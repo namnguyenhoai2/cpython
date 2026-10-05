@@ -1,29 +1,24 @@
 .. _tut-brieftourtwo:
 
-**********************************************
-Brief tour of the standard library --- part II
-**********************************************
+*************************************
+Sơ lược về thư viện chuẩn --- phần II
+*************************************
 
-This second tour covers more advanced modules that support professional
-programming needs.  These modules rarely occur in small scripts.
+Phần sơ lược thứ hai này đề cập đến các module nâng cao hơn, hỗ trợ những nhu cầu lập trình chuyên nghiệp. Các module này hiếm khi xuất hiện trong những script nhỏ.
 
 
 .. _tut-output-formatting:
 
-Output formatting
-=================
+Định dạng đầu ra
+================
 
-The :mod:`reprlib` module provides a version of :func:`repr` customized for
-abbreviated displays of large or deeply nested containers::
+Module :mod:`reprlib` cung cấp một phiên bản của :func:`repr` được tùy chỉnh để hiển thị rút gọn các container lớn hoặc lồng nhau sâu::
 
    >>> import reprlib
    >>> reprlib.repr(set('supercalifragilisticexpialidocious'))
    "{'a', 'c', 'd', 'e', 'f', 'g', ...}"
 
-The :mod:`pprint` module offers more sophisticated control over printing both
-built-in and user defined objects in a way that is readable by the interpreter.
-When the result is longer than one line, the "pretty printer" adds line breaks
-and indentation to more clearly reveal data structure::
+Module :mod:`pprint` cho phép kiểm soát tinh vi hơn việc in cả các object dựng sẵn và object do người dùng định nghĩa theo cách mà interpreter có thể đọc được. Khi kết quả dài hơn một dòng, “pretty printer” sẽ thêm ngắt dòng và thụt lề để làm lộ rõ hơn cấu trúc dữ liệu::
 
    >>> import pprint
    >>> t = [[[['black', 'cyan'], 'white', ['green', 'red']], [['magenta',
@@ -36,8 +31,7 @@ and indentation to more clearly reveal data structure::
      [['magenta', 'yellow'],
       'blue']]]
 
-The :mod:`textwrap` module formats paragraphs of text to fit a given screen
-width::
+Module :mod:`textwrap` định dạng các đoạn văn bản sao cho vừa với chiều rộng màn hình nhất định::
 
    >>> import textwrap
    >>> doc = """The wrap() method is just like fill() except that it returns
@@ -50,14 +44,12 @@ width::
    instead of one big string with newlines
    to separate the wrapped lines.
 
-The :mod:`locale` module accesses a database of culture specific data formats.
-The grouping attribute of locale's format function provides a direct way of
-formatting numbers with group separators::
+Module :mod:`locale` truy cập cơ sở dữ liệu về các định dạng dữ liệu đặc thù theo văn hóa. Thuộc tính grouping của hàm format trong locale cung cấp một cách trực tiếp để định dạng các số với dấu phân cách nhóm::
 
    >>> import locale
    >>> locale.setlocale(locale.LC_ALL, 'English_United States.1252')
    'English_United States.1252'
-   >>> conv = locale.localeconv()          # get a mapping of conventions
+   >>> conv = locale.localeconv()          # lấy ánh xạ các quy ước
    >>> x = 1234567.8
    >>> locale.format_string("%d", x, grouping=True)
    '1,234,567'
@@ -68,28 +60,20 @@ formatting numbers with group separators::
 
 .. _tut-templating:
 
-Templating
-==========
+Tạo mẫu
+=======
 
-The :mod:`string` module includes a versatile :class:`~string.Template` class
-with a simplified syntax suitable for editing by end-users.  This allows users
-to customize their applications without having to alter the application.
+Mô-đun :mod:`string` bao gồm một lớp :class:`~string.Template` linh hoạt với cú pháp đơn giản, phù hợp để người dùng cuối chỉnh sửa. Điều này cho phép người dùng tùy chỉnh ứng dụng của họ mà không cần thay đổi ứng dụng.
 
-The format uses placeholder names formed by ``$`` with valid Python identifiers
-(alphanumeric characters and underscores).  Surrounding the placeholder with
-braces allows it to be followed by more alphanumeric letters with no intervening
-spaces.  Writing ``$$`` creates a single escaped ``$``::
+Định dạng này sử dụng các tên placeholder được tạo bởi ``$`` với các định danh Python hợp lệ (các ký tự chữ-số và dấu gạch dưới). Việc bao quanh placeholder bằng dấu ngoặc nhọn cho phép theo sau nó là nhiều ký tự chữ-số hơn mà không cần khoảng trắng. Viết ``$$`` sẽ tạo ra một ``$`` được escape duy nhất::
 
    >>> from string import Template
    >>> t = Template('${village}folk send $$10 to $cause.')
    >>> t.substitute(village='Nottingham', cause='the ditch fund')
    'Nottinghamfolk send $10 to the ditch fund.'
 
-The :meth:`~string.Template.substitute` method raises a :exc:`KeyError` when a
-placeholder is not supplied in a dictionary or a keyword argument.  For
-mail-merge style applications, user supplied data may be incomplete and the
-:meth:`~string.Template.safe_substitute` method may be more appropriate ---
-it will leave placeholders unchanged if data is missing::
+Phương thức :meth:`~string.Template.substitute` sẽ phát sinh :exc:`KeyError` khi một placeholder không được cung cấp trong một dictionary hoặc đối số từ khóa. Đối với các ứng dụng kiểu trộn thư, dữ liệu do người dùng cung cấp có thể không đầy đủ và
+phương thức :meth:`~string.Template.safe_substitute` có thể phù hợp hơn — phương thức này sẽ giữ nguyên các placeholder nếu thiếu dữ liệu::
 
    >>> t = Template('Return the $item to $owner.')
    >>> d = dict(item='unladen swallow')
@@ -100,9 +84,7 @@ it will leave placeholders unchanged if data is missing::
    >>> t.safe_substitute(d)
    'Return the unladen swallow to $owner.'
 
-Template subclasses can specify a custom delimiter.  For example, a batch
-renaming utility for a photo browser may elect to use percent signs for
-placeholders such as the current date, image sequence number, or file format::
+Các lớp con của Template có thể chỉ định một dấu phân cách tùy chỉnh. Ví dụ, một tiện ích đổi tên hàng loạt cho trình duyệt ảnh có thể chọn sử dụng dấu phần trăm cho các placeholder như ngày hiện tại, số thứ tự ảnh hoặc định dạng tệp::
 
    >>> import time, os.path
    >>> photofiles = ['img_1074.jpg', 'img_1076.jpg', 'img_1077.jpg']
@@ -123,23 +105,17 @@ placeholders such as the current date, image sequence number, or file format::
    img_1076.jpg --> Ashley_1.jpg
    img_1077.jpg --> Ashley_2.jpg
 
-Another application for templating is separating program logic from the details
-of multiple output formats.  This makes it possible to substitute custom
-templates for XML files, plain text reports, and HTML web reports.
+Một ứng dụng khác của templating là tách logic chương trình khỏi các chi tiết của nhiều định dạng đầu ra. Điều này giúp có thể thay thế bằng các template tùy chỉnh cho tệp XML, báo cáo văn bản thuần túy và báo cáo web HTML.
 
 
 .. _tut-binary-formats:
 
-Working with binary data record layouts
-=======================================
+Làm việc với bố cục bản ghi dữ liệu nhị phân
+============================================
 
-The :mod:`struct` module provides :func:`~struct.pack` and
-:func:`~struct.unpack` functions for working with variable length binary
-record formats.  The following example shows
-how to loop through header information in a ZIP file without using the
-:mod:`zipfile` module.  Pack codes ``"H"`` and ``"I"`` represent two and four
-byte unsigned numbers respectively.  The ``"<"`` indicates that they are
-standard size and in little-endian byte order::
+Mô-đun :mod:`struct` cung cấp :func:`~struct.pack` và
+các hàm :func:`~struct.unpack` để làm việc với các định dạng bản ghi nhị phân có độ dài thay đổi. Ví dụ sau đây cho thấy cách lặp qua thông tin header trong tệp ZIP mà không sử dụng mô-đun
+:mod:`zipfile`. Các mã pack ``"H"`` và ``"I"`` lần lượt biểu diễn các số không dấu dài hai và bốn byte. ``"<"`` cho biết rằng chúng có kích thước tiêu chuẩn và theo thứ tự byte little-endian::
 
    import struct
 
@@ -147,7 +123,7 @@ standard size and in little-endian byte order::
        data = f.read()
 
    start = 0
-   for i in range(3):                      # show the first 3 file headers
+   for i in range(3):                      # hiển thị 3 header tệp đầu tiên
        start += 14
        fields = struct.unpack('<IIIHH', data[start:start+16])
        crc32, comp_size, uncomp_size, filenamesize, extra_size = fields
@@ -158,21 +134,17 @@ standard size and in little-endian byte order::
        extra = data[start:start+extra_size]
        print(filename, hex(crc32), comp_size, uncomp_size)
 
-       start += extra_size + comp_size     # skip to the next header
+       start += extra_size + comp_size     # chuyển đến header tiếp theo
 
 
 .. _tut-multi-threading:
 
-Multi-threading
-===============
+Đa luồng
+========
 
-Threading is a technique for decoupling tasks which are not sequentially
-dependent.  Threads can be used to improve the responsiveness of applications
-that accept user input while other tasks run in the background.  A related use
-case is running I/O in parallel with computations in another thread.
+Lập trình luồng là một kỹ thuật tách rời các tác vụ không phụ thuộc tuần tự vào nhau. Các thread có thể được sử dụng để cải thiện khả năng phản hồi của các ứng dụng tiếp nhận dữ liệu đầu vào từ người dùng trong khi các tác vụ khác chạy ở chế độ nền. Một trường hợp sử dụng liên quan là chạy các thao tác I/O song song với các phép tính trong một thread khác.
 
-The following code shows how the high level :mod:`threading` module can run
-tasks in background while the main program continues to run::
+Đoạn mã sau đây cho thấy cách module cấp cao :mod:`threading` có thể chạy các tác vụ ở chế độ nền trong khi chương trình chính vẫn tiếp tục chạy::
 
    import threading, zipfile
 
@@ -191,29 +163,21 @@ tasks in background while the main program continues to run::
    background.start()
    print('The main program continues to run in foreground.')
 
-   background.join()    # Wait for the background task to finish
+   background.join()    # Chờ tác vụ nền hoàn tất
    print('Main program waited until background was done.')
 
-The principal challenge of multi-threaded applications is coordinating threads
-that share data or other resources.  To that end, the threading module provides
-a number of synchronization primitives including locks, events, condition
-variables, and semaphores.
+Thách thức chính của các ứng dụng đa luồng là điều phối các thread chia sẻ dữ liệu hoặc các tài nguyên khác. Để đạt được mục đích đó, module threading cung cấp một số primitive đồng bộ hóa, bao gồm lock, event, biến điều kiện và semaphore.
 
-While those tools are powerful, minor design errors can result in problems that
-are difficult to reproduce.  So, the preferred approach to task coordination is
-to concentrate all access to a resource in a single thread and then use the
-:mod:`queue` module to feed that thread with requests from other threads.
-Applications using :class:`~queue.Queue` objects for inter-thread communication and
-coordination are easier to design, more readable, and more reliable.
+Mặc dù các công cụ đó rất mạnh, những lỗi nhỏ trong thiết kế có thể dẫn đến các vấn đề khó tái hiện. Vì vậy, cách tiếp cận được ưu tiên để điều phối tác vụ là tập trung toàn bộ quyền truy cập vào một tài nguyên trong một thread duy nhất, sau đó sử dụng
+module :mod:`queue` để cung cấp cho thread đó các yêu cầu từ những thread khác. Các ứng dụng sử dụng các object :class:`~queue.Queue` để giao tiếp và điều phối giữa các thread sẽ dễ thiết kế hơn, dễ đọc hơn và đáng tin cậy hơn.
 
 
 .. _tut-logging:
 
-Logging
-=======
+Ghi nhật ký
+===========
 
-The :mod:`logging` module offers a full featured and flexible logging system.
-At its simplest, log messages are sent to a file or to ``sys.stderr``::
+Mô-đun :mod:`logging` cung cấp một hệ thống ghi nhật ký đầy đủ tính năng và linh hoạt. Ở dạng đơn giản nhất, các thông báo nhật ký được gửi đến một tệp hoặc đến ``sys.stderr``::
 
    import logging
    logging.debug('Debugging information')
@@ -222,7 +186,7 @@ At its simplest, log messages are sent to a file or to ``sys.stderr``::
    logging.error('Error occurred')
    logging.critical('Critical error -- shutting down')
 
-This produces the following output:
+Kết quả này tạo ra đầu ra sau:
 
 .. code-block:: none
 
@@ -230,34 +194,21 @@ This produces the following output:
    ERROR:root:Error occurred
    CRITICAL:root:Critical error -- shutting down
 
-By default, informational and debugging messages are suppressed and the output
-is sent to standard error.  Other output options include routing messages
-through email, datagrams, sockets, or to an HTTP Server.  New filters can select
-different routing based on message priority: :const:`~logging.DEBUG`,
-:const:`~logging.INFO`, :const:`~logging.WARNING`, :const:`~logging.ERROR`,
-and :const:`~logging.CRITICAL`.
+Theo mặc định, các thông báo thông tin và gỡ lỗi bị ẩn, còn đầu ra được gửi đến lỗi chuẩn. Các tùy chọn đầu ra khác bao gồm định tuyến thông báo qua email, datagram, socket hoặc đến HTTP Server. Các bộ lọc mới có thể chọn cách định tuyến khác nhau dựa trên mức độ ưu tiên của thông báo: :const:`~logging.DEBUG`,
+:const:`~logging.INFO`, :const:`~logging.WARNING`, :const:`~logging.ERROR` và :const:`~logging.CRITICAL`.
 
-The logging system can be configured directly from Python or can be loaded from
-a user editable configuration file for customized logging without altering the
-application.
+Hệ thống ghi nhật ký có thể được cấu hình trực tiếp từ Python hoặc được tải từ một tệp cấu hình do người dùng chỉnh sửa để tùy biến việc ghi nhật ký mà không cần thay đổi ứng dụng.
 
 
 .. _tut-weak-references:
 
-Weak references
-===============
+Tham chiếu yếu
+==============
 
-Python does automatic memory management (reference counting for most objects and
-:term:`garbage collection` to eliminate cycles).  The memory is freed shortly
-after the last reference to it has been eliminated.
+Python tự động quản lý bộ nhớ (đếm tham chiếu đối với hầu hết các đối tượng và
+:term:`garbage collection` để loại bỏ các chu kỳ). Bộ nhớ được giải phóng ngay sau khi tham chiếu cuối cùng đến nó bị loại bỏ.
 
-This approach works fine for most applications but occasionally there is a need
-to track objects only as long as they are being used by something else.
-Unfortunately, just tracking them creates a reference that makes them permanent.
-The :mod:`weakref` module provides tools for tracking objects without creating a
-reference.  When the object is no longer needed, it is automatically removed
-from a weakref table and a callback is triggered for weakref objects.  Typical
-applications include caching objects that are expensive to create::
+Cách tiếp cận này hoạt động tốt với hầu hết các ứng dụng, nhưng đôi khi cần theo dõi các đối tượng chỉ trong thời gian chúng đang được một thứ khác sử dụng. Đáng tiếc là việc chỉ theo dõi chúng đã tạo ra một tham chiếu khiến chúng tồn tại vĩnh viễn. Module :mod:`weakref` cung cấp các công cụ để theo dõi đối tượng mà không tạo tham chiếu. Khi đối tượng không còn cần thiết, nó sẽ tự động bị xóa khỏi bảng weakref và một callback được kích hoạt cho các đối tượng weakref. Các ứng dụng điển hình bao gồm lưu vào bộ nhớ đệm những đối tượng tốn kém khi tạo ra::
 
    >>> import weakref, gc
    >>> class A:
@@ -266,18 +217,18 @@ applications include caching objects that are expensive to create::
    ...     def __repr__(self):
    ...         return str(self.value)
    ...
-   >>> a = A(10)                   # create a reference
+   >>> a = A(10)                   # tạo một tham chiếu
    >>> d = weakref.WeakValueDictionary()
-   >>> d['primary'] = a            # does not create a reference
-   >>> d['primary']                # fetch the object if it is still alive
+   >>> d['primary'] = a            # không tạo một tham chiếu
+   >>> d['primary']                # lấy đối tượng nếu nó vẫn còn tồn tại
    10
-   >>> del a                       # remove the one reference
-   >>> gc.collect()                # run garbage collection right away
+   >>> del a                       # xóa tham chiếu đó
+   >>> gc.collect()                # chạy bộ thu gom rác ngay lập tức
    0
-   >>> d['primary']                # entry was automatically removed
+   >>> d['primary']                # mục nhập đã được tự động xóa
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
-       d['primary']                # entry was automatically removed
+       d['primary']                # mục nhập đã được tự động xóa
      File "C:/python314/lib/weakref.py", line 46, in __getitem__
        o = self.data[key]()
    KeyError: 'primary'
@@ -285,18 +236,12 @@ applications include caching objects that are expensive to create::
 
 .. _tut-list-tools:
 
-Tools for working with lists
-============================
+Các công cụ làm việc với list
+=============================
 
-Many data structure needs can be met with the built-in list type. However,
-sometimes there is a need for alternative implementations with different
-performance trade-offs.
+Nhiều nhu cầu về cấu trúc dữ liệu có thể được đáp ứng bằng kiểu list tích hợp sẵn. Tuy nhiên, đôi khi cần có các cách triển khai thay thế với những đánh đổi về hiệu năng khác nhau.
 
-The :mod:`array` module provides an :class:`~array.array` object that is like
-a list that stores only homogeneous data and stores it more compactly.  The
-following example shows an array of numbers stored as two byte unsigned binary
-numbers (typecode ``"H"``) rather than the usual 16 bytes per entry for regular
-lists of Python int objects::
+Mô-đun :mod:`array` cung cấp một đối tượng :class:`~array.array` tương tự list nhưng chỉ lưu trữ dữ liệu đồng nhất và lưu trữ dữ liệu đó gọn hơn. Ví dụ sau đây cho thấy một mảng các số được lưu dưới dạng số nhị phân không dấu hai byte (typecode ``"H"``) thay vì 16 byte cho mỗi mục nhập như các list thông thường gồm các đối tượng int của Python::
 
    >>> from array import array
    >>> a = array('H', [4000, 10, 700, 22222])
@@ -305,10 +250,7 @@ lists of Python int objects::
    >>> a[1:3]
    array('H', [10, 700])
 
-The :mod:`collections` module provides a :class:`~collections.deque` object
-that is like a list with faster appends and pops from the left side but slower
-lookups in the middle. These objects are well suited for implementing queues
-and breadth first tree searches::
+Mô-đun :mod:`collections` cung cấp một đối tượng :class:`~collections.deque` tương tự list, với thao tác thêm và lấy phần tử ở phía bên trái nhanh hơn nhưng thao tác tra cứu ở giữa chậm hơn. Các đối tượng này rất phù hợp để triển khai queue và tìm kiếm cây theo chiều rộng::
 
    >>> from collections import deque
    >>> d = deque(["task1", "task2", "task3"])
@@ -326,9 +268,7 @@ and breadth first tree searches::
                return m
            unsearched.append(m)
 
-In addition to alternative list implementations, the library also offers other
-tools such as the :mod:`bisect` module with functions for manipulating sorted
-lists::
+Ngoài các cách triển khai list thay thế, thư viện còn cung cấp những công cụ khác như module :mod:`bisect` với các hàm thao tác trên các list đã sắp xếp::
 
    >>> import bisect
    >>> scores = [(100, 'perl'), (200, 'tcl'), (400, 'lua'), (500, 'python')]
@@ -336,39 +276,30 @@ lists::
    >>> scores
    [(100, 'perl'), (200, 'tcl'), (300, 'ruby'), (400, 'lua'), (500, 'python')]
 
-The :mod:`heapq` module provides functions for implementing heaps based on
-regular lists.  The lowest valued entry is always kept at position zero.  This
-is useful for applications which repeatedly access the smallest element but do
-not want to run a full list sort::
+Module :mod:`heapq` cung cấp các hàm để triển khai heap dựa trên các list thông thường. Phần tử có giá trị nhỏ nhất luôn được giữ ở vị trí 0. Điều này hữu ích cho các ứng dụng thường xuyên truy cập phần tử nhỏ nhất nhưng không muốn thực hiện việc sắp xếp toàn bộ list::
 
    >>> from heapq import heapify, heappop, heappush
    >>> data = [1, 3, 5, 7, 9, 2, 4, 6, 8, 0]
-   >>> heapify(data)                      # rearrange the list into heap order
-   >>> heappush(data, -5)                 # add a new entry
-   >>> [heappop(data) for i in range(3)]  # fetch the three smallest entries
+   >>> heapify(data)                      # sắp xếp lại list theo thứ tự heap
+   >>> heappush(data, -5)                 # thêm một phần tử mới
+   >>> [heappop(data) for i in range(3)]  # lấy ba phần tử nhỏ nhất
    [-5, 0, 1]
 
 
 .. _tut-decimal-fp:
 
-Decimal floating-point arithmetic
-=================================
+Số học dấu phẩy động thập phân
+==============================
 
-The :mod:`decimal` module offers a :class:`~decimal.Decimal` datatype for
-decimal floating-point arithmetic.  Compared to the built-in :class:`float`
-implementation of binary floating point, the class is especially helpful for
+Module :mod:`decimal` cung cấp một kiểu dữ liệu :class:`~decimal.Decimal` cho số học dấu phẩy động thập phân. So với cách triển khai dấu phẩy động nhị phân tích hợp sẵn :class:`float`, class này đặc biệt hữu ích cho
 
-* financial applications and other uses which require exact decimal
-  representation,
-* control over precision,
-* control over rounding to meet legal or regulatory requirements,
-* tracking of significant decimal places, or
-* applications where the user expects the results to match calculations done by
-  hand.
+* các ứng dụng tài chính và những mục đích sử dụng khác yêu cầu biểu diễn số thập phân chính xác tuyệt đối,
+* kiểm soát độ chính xác,
+* kiểm soát việc làm tròn để đáp ứng các yêu cầu pháp lý hoặc quy định,
+* theo dõi số chữ số thập phân có nghĩa, hoặc
+* các ứng dụng mà người dùng mong đợi kết quả khớp với các phép tính thực hiện bằng tay.
 
-For example, calculating a 5% tax on a 70 cent phone charge gives different
-results in decimal floating point and binary floating point. The difference
-becomes significant if the results are rounded to the nearest cent::
+Ví dụ: tính thuế 5% trên cước điện thoại 70 cent cho kết quả khác nhau khi dùng số dấu phẩy động thập phân và số dấu phẩy động nhị phân. Sự khác biệt trở nên đáng kể nếu kết quả được làm tròn đến cent gần nhất::
 
    >>> from decimal import *
    >>> round(Decimal('0.70') * Decimal('1.05'), 2)
@@ -376,15 +307,9 @@ becomes significant if the results are rounded to the nearest cent::
    >>> round(.70 * 1.05, 2)
    0.73
 
-The :class:`~decimal.Decimal` result keeps a trailing zero, automatically
-inferring four place significance from multiplicands with two place
-significance.  Decimal reproduces mathematics as done by hand and avoids
-issues that can arise when binary floating point cannot exactly represent
-decimal quantities.
+Kết quả :class:`~decimal.Decimal` giữ lại một số 0 ở cuối, tự động suy ra độ chính xác bốn chữ số thập phân từ các thừa số có độ chính xác hai chữ số thập phân. Decimal tái hiện phép toán như khi thực hiện bằng tay và tránh các vấn đề có thể phát sinh khi số dấu phẩy động nhị phân không thể biểu diễn chính xác các đại lượng thập phân.
 
-Exact representation enables the :class:`~decimal.Decimal` class to perform
-modulo calculations and equality tests that are unsuitable for binary floating
-point::
+Biểu diễn chính xác cho phép lớp :class:`~decimal.Decimal` thực hiện các phép tính modulo và kiểm tra tính bằng nhau, vốn không phù hợp với số dấu phẩy động nhị phân::
 
    >>> Decimal('1.00') % Decimal('.10')
    Decimal('0.00')
@@ -396,7 +321,7 @@ point::
    >>> 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 == 1.0
    False
 
-The :mod:`decimal` module provides arithmetic with as much precision as needed::
+Mô-đun :mod:`decimal` cung cấp các phép tính số học với độ chính xác cao tùy theo nhu cầu::
 
    >>> getcontext().prec = 36
    >>> Decimal(1) / Decimal(7)

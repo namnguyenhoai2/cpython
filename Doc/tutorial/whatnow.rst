@@ -1,74 +1,42 @@
 .. _tut-whatnow:
 
-*********
-What Now?
-*********
+****************
+Bây giờ thì sao?
+****************
 
-Reading this tutorial has probably reinforced your interest in using Python ---
-you should be eager to apply Python to solving your real-world problems. Where
-should you go to learn more?
+Việc đọc tutorial này có lẽ đã củng cố sự quan tâm của bạn đối với Python --- hẳn bạn đang háo hức áp dụng Python để giải quyết các vấn đề thực tế của mình. Bạn nên tìm hiểu thêm ở đâu?
 
-This tutorial is part of Python's documentation set.   Some other documents in
-the set are:
+Tutorial này là một phần trong bộ tài liệu của Python. Một số tài liệu khác trong bộ này là:
 
-* :ref:`builtins-index`: gives details about Python's built-in types and
-  functions.
+* :ref:`builtins-index`: cung cấp thông tin chi tiết về các kiểu và hàm dựng sẵn của Python.
 
-* :ref:`library-index`: gives complete (though terse)
-  reference material about types, functions, and the modules in the standard
-  library.  The standard Python distribution includes a *lot* of additional code.
-  There are modules to read Unix mailboxes, retrieve documents via HTTP, generate
-  random numbers, parse command-line options, compress data,
-  and many other tasks. Skimming through the Library Reference will give you an
-  idea of what's available.
+* :ref:`library-index`: cung cấp tài liệu tham khảo đầy đủ (dù cô đọng) về các kiểu, hàm và module trong thư viện chuẩn. Bản phân phối Python tiêu chuẩn bao gồm rất *nhiều* mã bổ sung. Có các module để đọc Unix mailbox, truy xuất tài liệu qua HTTP, tạo số ngẫu nhiên, phân tích cú pháp các tùy chọn dòng lệnh, nén dữ liệu và thực hiện nhiều tác vụ khác. Việc xem lướt qua Library Reference sẽ giúp bạn hình dung về những gì hiện có.
 
-* :ref:`installing-index` explains how to install additional modules written
-  by other Python users.
+* :ref:`installing-index` giải thích cách cài đặt các module bổ sung do những người dùng Python khác viết.
 
-* :ref:`reference-index`: A detailed explanation of Python's syntax and
-  semantics.  It's heavy reading, but is useful as a complete guide to the
-  language itself.
+* :ref:`reference-index`: Giải thích chi tiết về cú pháp và ngữ nghĩa của Python. Đây là phần tài liệu khá nặng, nhưng hữu ích như một hướng dẫn đầy đủ về bản thân ngôn ngữ này.
 
-More Python resources:
+Các tài nguyên Python khác:
 
-* https://www.python.org:  The major Python website.  It contains code,
-  documentation, and pointers to Python-related pages around the web.
+* https://www.python.org:  Website chính của Python.  Website này chứa mã, tài liệu và các liên kết đến những trang liên quan đến Python trên khắp web.
 
-* https://docs.python.org:  Fast access to Python's  documentation.
+* https://docs.python.org:  Truy cập nhanh vào tài liệu Python.
 
-* https://pypi.org: The Python Package Index, previously also nicknamed
-  the Cheese Shop [#]_, is an index of user-created Python modules that are available
-  for download.  Once you begin releasing code, you can register it here so that
-  others can find it.
+* https://pypi.org: Python Package Index, trước đây còn được gọi với biệt danh Cheese Shop [#]_, là một chỉ mục các module Python do người dùng tạo và có thể tải xuống.  Khi bắt đầu phát hành mã, bạn có thể đăng ký mã tại đây để những người khác có thể tìm thấy.
 
-* https://code.activestate.com/recipes/langs/python/: The Python Cookbook is a
-  sizable collection of code examples, larger modules, and useful scripts.
-  Particularly notable contributions are collected in a book also titled Python
-  Cookbook (O'Reilly & Associates, ISBN 0-596-00797-3.)
+* https://code.activestate.com/recipes/langs/python/: Python Cookbook là một bộ sưu tập lớn gồm các ví dụ mã, những module lớn hơn và các script hữu ích. Những đóng góp đặc biệt đáng chú ý được tập hợp trong một cuốn sách cũng có tên Python Cookbook (O'Reilly & Associates, ISBN 0-596-00797-3.)
 
-* https://pyvideo.org collects links to Python-related videos from
-  conferences and user-group meetings.
+* https://pyvideo.org tập hợp các liên kết đến những video liên quan đến Python từ các hội nghị và các buổi gặp mặt của nhóm người dùng.
 
-* https://scipy.org: The Scientific Python project includes modules for fast
-  array computations and manipulations plus a host of packages for such
-  things as linear algebra, Fourier transforms, non-linear solvers,
-  random number distributions, statistical analysis and the like.
+* https://scipy.org: Dự án Scientific Python bao gồm các module để tính toán và thao tác mảng nhanh, cùng nhiều package cho những tác vụ như đại số tuyến tính, phép biến đổi Fourier, bộ giải phi tuyến, phân phối số ngẫu nhiên, phân tích thống kê và các tác vụ tương tự.
 
-For Python-related questions and problem reports, you can post to the newsgroup
-:newsgroup:`comp.lang.python`, or send them to the mailing list at
-python-list@python.org.  The newsgroup and mailing list are gatewayed, so
-messages posted to one will automatically be forwarded to the other.  There are
-hundreds of postings a day, asking (and
-answering) questions, suggesting new features, and announcing new modules.
-Mailing list archives are available at https://mail.python.org/pipermail/.
+Đối với các câu hỏi và báo cáo vấn đề liên quan đến Python, bạn có thể đăng lên nhóm tin
+:newsgroup:`comp.lang.python`, hoặc gửi đến danh sách thư tại python-list@python.org. Nhóm tin và danh sách thư được kết nối với nhau, vì vậy các tin nhắn được đăng lên một bên sẽ tự động được chuyển tiếp sang bên kia. Mỗi ngày có hàng trăm bài đăng, đặt câu hỏi (và trả lời câu hỏi), đề xuất tính năng mới và thông báo về các module mới. Kho lưu trữ của danh sách thư có tại https://mail.python.org/pipermail/.
 
-Before posting, be sure to check the list of
-:ref:`Frequently Asked Questions <faq-index>` (also called the FAQ).  The
-FAQ answers many of the questions that come up again and again, and may
-already contain the solution for your problem.
+Trước khi đăng bài, hãy nhớ xem danh sách
+:ref:`Các câu hỏi thường gặp <faq-index>` (còn gọi là FAQ). FAQ trả lời nhiều câu hỏi thường xuyên được đặt ra và có thể đã chứa lời giải cho vấn đề của bạn.
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] "Cheese Shop" is a Monty Python sketch: a customer enters a cheese shop,
-   but whatever cheese he asks for, the clerk says it's missing.
+.. [#] "Cheese Shop" là một tiểu phẩm của Monty Python: một khách hàng bước vào cửa hàng phô mai, nhưng bất kể anh ta yêu cầu loại phô mai nào, người bán hàng cũng nói rằng loại đó đã hết.
 

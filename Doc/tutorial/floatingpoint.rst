@@ -5,97 +5,59 @@
 
 .. _tut-fp-issues:
 
-**************************************************
-Floating-Point Arithmetic:  Issues and Limitations
-**************************************************
+******************************************************
+Phép tính số thực dấu phẩy động: Các vấn đề và hạn chế
+******************************************************
 
 .. sectionauthor:: Tim Peters <tim_one@users.sourceforge.net>
 .. sectionauthor:: Raymond Hettinger <python at rcn dot com>
 
 
-Floating-point numbers are represented in computer hardware as base 2 (binary)
-fractions.  For example, the **decimal** fraction ``0.625``
-has value 6/10 + 2/100 + 5/1000, and in the same way the **binary** fraction ``0.101``
-has value 1/2 + 0/4 + 1/8. These two fractions have identical values, the only
-real difference being that the first is written in base 10 fractional notation,
-and the second in base 2.
+Trong phần cứng máy tính, các số dấu phẩy động được biểu diễn dưới dạng phân số cơ số 2 (nhị phân). Ví dụ, phân số **decimal** ``0.625`` có giá trị 6/10 + 2/100 + 5/1000, và tương tự, phân số **binary** ``0.101`` có giá trị 1/2 + 0/4 + 1/8. Hai phân số này có giá trị giống hệt nhau; điểm khác biệt thực sự duy nhất là phân số đầu tiên được viết theo ký hiệu phân số cơ số 10, còn phân số thứ hai được viết theo cơ số 2.
 
-Unfortunately, most decimal fractions cannot be represented exactly as binary
-fractions.  A consequence is that, in general, the decimal floating-point
-numbers you enter are only approximated by the binary floating-point numbers
-actually stored in the machine.
+Đáng tiếc là hầu hết các phân số thập phân không thể được biểu diễn chính xác dưới dạng phân số nhị phân. Hệ quả là nhìn chung, các số dấu phẩy động thập phân bạn nhập vào chỉ được các số dấu phẩy động nhị phân thực sự lưu trong máy tính xấp xỉ.
 
-The problem is easier to understand at first in base 10.  Consider the fraction
-1/3.  You can approximate that as a base 10 fraction::
+Ban đầu, vấn đề này dễ hiểu hơn trong cơ số 10. Hãy xét phân số 1/3. Bạn có thể xấp xỉ phân số đó dưới dạng một phân số cơ số 10::
 
    0.3
 
-or, better, ::
+hoặc chính xác hơn,::
 
    0.33
 
-or, better, ::
+hoặc chính xác hơn,::
 
    0.333
 
-and so on.  No matter how many digits you're willing to write down, the result
-will never be exactly 1/3, but will be an increasingly better approximation of
-1/3.
+và cứ tiếp tục như vậy. Dù bạn sẵn sàng viết bao nhiêu chữ số đi nữa, kết quả sẽ không bao giờ chính xác bằng 1/3, mà chỉ là một phép xấp xỉ 1/3 ngày càng tốt hơn.
 
-In the same way, no matter how many base 2 digits you're willing to use, the
-decimal value 0.1 cannot be represented exactly as a base 2 fraction.  In base
-2, 1/10 is the infinitely repeating fraction ::
+Tương tự, cho dù bạn sẵn sàng sử dụng bao nhiêu chữ số cơ số 2 đi nữa, giá trị thập phân 0.1 cũng không thể được biểu diễn chính xác dưới dạng phân số cơ số 2. Trong cơ số 2, 1/10 là phân số lặp vô hạn::
 
    0.0001100110011001100110011001100110011001100110011...
 
-Stop at any finite number of bits, and you get an approximation.  On most
-machines today, floats are approximated using a binary fraction with
-the numerator using the first 53 bits starting with the most significant bit and
-with the denominator as a power of two.  In the case of 1/10, the binary fraction
-is ``3602879701896397 / 2 ** 55`` which is close to but not exactly
-equal to the true value of 1/10.
+Dừng lại ở bất kỳ số bit hữu hạn nào, bạn sẽ nhận được một giá trị xấp xỉ. Trên hầu hết các máy hiện nay, số thực dấu phẩy động được xấp xỉ bằng một phân số nhị phân, trong đó tử số sử dụng 53 bit đầu tiên bắt đầu từ bit có trọng số lớn nhất và mẫu số là một lũy thừa của hai. Với 1/10, phân số nhị phân là ``3602879701896397 / 2 ** 55``, gần nhưng không hoàn toàn bằng giá trị thực của 1/10.
 
-Many users are not aware of the approximation because of the way values are
-displayed.  Python only prints a decimal approximation to the true decimal
-value of the binary approximation stored by the machine.  On most machines, if
-Python were to print the true decimal value of the binary approximation stored
-for 0.1, it would have to display::
+Nhiều người dùng không nhận ra sự xấp xỉ này do cách các giá trị được hiển thị. Python chỉ in ra một giá trị thập phân xấp xỉ giá trị thập phân thực của giá trị xấp xỉ nhị phân được máy lưu trữ. Trên hầu hết các máy, nếu Python in ra giá trị thập phân thực của giá trị xấp xỉ nhị phân được lưu trữ cho 0.1, nó sẽ phải hiển thị::
 
    >>> 0.1
    0.1000000000000000055511151231257827021181583404541015625
 
-That is more digits than most people find useful, so Python keeps the number
-of digits manageable by displaying a rounded value instead:
+Đó là nhiều chữ số hơn mức mà hầu hết mọi người thấy hữu ích, vì vậy Python giữ cho số chữ số ở mức vừa phải bằng cách hiển thị một giá trị đã được làm tròn:
 
 .. doctest::
 
    >>> 1 / 10
    0.1
 
-Just remember, even though the printed result looks like the exact value
-of 1/10, the actual stored value is the nearest representable binary fraction.
+Chỉ cần nhớ rằng, mặc dù kết quả được in ra trông giống như giá trị chính xác của 1/10, giá trị thực sự được lưu trữ là phân số nhị phân có thể biểu diễn gần nhất.
 
-Interestingly, there are many different decimal numbers that share the same
-nearest approximate binary fraction.  For example, the numbers ``0.1`` and
-``0.10000000000000001`` and
-``0.1000000000000000055511151231257827021181583404541015625`` are all
-approximated by ``3602879701896397 / 2 ** 55``.  Since all of these decimal
-values share the same approximation, any one of them could be displayed
-while still preserving the invariant ``eval(repr(x)) == x``.
+Điều thú vị là có nhiều số thập phân khác nhau cùng có một phân số nhị phân xấp xỉ gần nhất. Ví dụ, các số ``0.1``, ``0.10000000000000001`` và ``0.1000000000000000055511151231257827021181583404541015625`` đều được xấp xỉ bằng ``3602879701896397 / 2 ** 55``. Vì tất cả các giá trị thập phân này đều có cùng một giá trị xấp xỉ, bất kỳ giá trị nào trong số chúng cũng có thể được hiển thị mà vẫn bảo toàn bất biến ``eval(repr(x)) == x``.
 
-Historically, the Python prompt and built-in :func:`repr` function would choose
-the one with 17 significant digits, ``0.10000000000000001``.   Starting with
-Python 3.1, Python (on most systems) is now able to choose the shortest of
-these and simply display ``0.1``.
+Trước đây, dấu nhắc Python và hàm tích hợp sẵn :func:`repr` sẽ chọn giá trị có 17 chữ số có nghĩa, ``0.10000000000000001``. Bắt đầu từ Python 3.1, Python (trên hầu hết các hệ thống) đã có thể chọn giá trị ngắn nhất trong số này và chỉ hiển thị ``0.1``.
 
-Note that this is in the very nature of binary floating point: this is not a bug
-in Python, and it is not a bug in your code either.  You'll see the same kind of
-thing in all languages that support your hardware's floating-point arithmetic
-(although some languages may not *display* the difference by default, or in all
-output modes).
+Lưu ý rằng đây là bản chất của số dấu phẩy động nhị phân: đây không phải là lỗi trong Python và cũng không phải là lỗi trong mã của bạn. Bạn sẽ thấy hiện tượng tương tự trong mọi ngôn ngữ hỗ trợ phép tính dấu phẩy động của phần cứng mà bạn sử dụng (mặc dù một số ngôn ngữ có thể không *display* sự khác biệt theo mặc định hoặc trong mọi chế độ đầu ra).
 
-For more pleasant output, you may wish to use string formatting to produce a
-limited number of significant digits:
+Để có kết quả đầu ra dễ đọc hơn, bạn có thể muốn sử dụng định dạng chuỗi để tạo ra một số lượng chữ số có nghĩa giới hạn:
 
 .. doctest::
 
@@ -108,80 +70,53 @@ limited number of significant digits:
    >>> repr(math.pi)
    '3.141592653589793'
 
-It's important to realize that this is, in a real sense, an illusion: you're
-simply rounding the *display* of the true machine value.
+Điều quan trọng cần hiểu là, theo một nghĩa thực tế, đây chỉ là một ảo giác: bạn chỉ đang làm tròn *display* của giá trị máy thực sự.
 
-One illusion may beget another.  For example, since 0.1 is not exactly 1/10,
-summing three values of 0.1 may not yield exactly 0.3, either:
+Một ảo giác có thể dẫn đến một ảo giác khác. Ví dụ, vì 0.1 không chính xác bằng 1/10, nên việc cộng ba giá trị 0.1 có thể cũng không cho kết quả chính xác bằng 0.3:
 
 .. doctest::
 
    >>> 0.1 + 0.1 + 0.1 == 0.3
    False
 
-Also, since the 0.1 cannot get any closer to the exact value of 1/10 and
-0.3 cannot get any closer to the exact value of 3/10, then pre-rounding with
-:func:`round` function cannot help:
+Ngoài ra, vì 0.1 không thể tiến gần hơn đến giá trị chính xác của 1/10 và 0.3 không thể tiến gần hơn đến giá trị chính xác của 3/10, nên việc làm tròn trước bằng
+:func:`round` hàm này không thể giúp:
 
 .. doctest::
 
    >>> round(0.1, 1) + round(0.1, 1) + round(0.1, 1) == round(0.3, 1)
    False
 
-Though the numbers cannot be made closer to their intended exact values,
-the :func:`math.isclose` function can be useful for comparing inexact values:
+:func:`math.isclose` có thể hữu ích khi so sánh các giá trị không chính xác:
 
 .. doctest::
 
    >>> math.isclose(0.1 + 0.1 + 0.1, 0.3)
    True
 
-Alternatively, the :func:`round` function can be used to compare rough
-approximations:
+Ngoài ra, có thể sử dụng hàm :func:`round` để so sánh các giá trị xấp xỉ gần đúng:
 
 .. doctest::
 
    >>> round(math.pi, ndigits=2) == round(22 / 7, ndigits=2)
    True
 
-Binary floating-point arithmetic holds many surprises like this.  The problem
-with "0.1" is explained in precise detail below, in the "Representation Error"
-section.  See `Examples of Floating Point Problems
-<https://jvns.ca/blog/2023/01/13/examples-of-floating-point-problems/>`_ for
-a pleasant summary of how binary floating point works and the kinds of
-problems commonly encountered in practice.  Also see
-`The Perils of Floating Point <http://www.indowsway.com/floatingpoint.htm>`_
-for a more complete account of other common surprises.
+Số học dấu phẩy động nhị phân ẩn chứa nhiều điều bất ngờ như vậy. Vấn đề với "0.1" được giải thích chi tiết và chính xác bên dưới, trong phần "Lỗi biểu diễn". Xem `Các ví dụ về vấn đề với số dấu phẩy động <https://jvns.ca/blog/2023/01/13/examples-of-floating-point-problems/>`_ để có phần tóm tắt dễ hiểu về cách số dấu phẩy động nhị phân hoạt động và những vấn đề thường gặp trong thực tế. Ngoài ra, hãy xem `Những cạm bẫy của số dấu phẩy động <http://www.indowsway.com/floatingpoint.htm>`_ để có phần trình bày đầy đủ hơn về những điều bất ngờ phổ biến khác.
 
-As that says near the end, "there are no easy answers."  Still, don't be unduly
-wary of floating point!  The errors in Python float operations are inherited
-from the floating-point hardware, and on most machines are on the order of no
-more than 1 part in 2\*\*53 per operation.  That's more than adequate for most
-tasks, but you do need to keep in mind that it's not decimal arithmetic and
-that every float operation can suffer a new rounding error.
+Như phần đó nêu ở gần cuối, "không có câu trả lời dễ dàng nào". Tuy vậy, đừng quá e ngại số dấu phẩy động! Các lỗi trong phép toán float của Python bắt nguồn từ phần cứng dấu phẩy động và trên hầu hết các máy tính có độ lớn không vượt quá 1 phần trong 2\*\*53 cho mỗi phép toán. Mức này là quá đủ cho hầu hết tác vụ, nhưng bạn cần nhớ rằng đây không phải là số học thập phân và mọi phép toán float đều có thể phát sinh một lỗi làm tròn mới.
 
-While pathological cases do exist, for most casual use of floating-point
-arithmetic you'll see the result you expect in the end if you simply round the
-display of your final results to the number of decimal digits you expect.
-:func:`str` usually suffices, and for finer control see the :meth:`str.format`
-method's format specifiers in :ref:`formatstrings`.
+Mặc dù vẫn tồn tại các trường hợp bất thường, với hầu hết nhu cầu sử dụng số học dấu phẩy động thông thường, cuối cùng bạn sẽ nhận được kết quả như mong đợi nếu chỉ cần làm tròn phần hiển thị của các kết quả cuối cùng đến số chữ số thập phân mà bạn mong muốn.
+:func:`str` thường là đủ; để kiểm soát chi tiết hơn, hãy xem các chỉ định định dạng của phương thức :meth:`str.format` trong :ref:`formatstrings`.
 
-For use cases which require exact decimal representation, try using the
-:mod:`decimal` module which implements decimal arithmetic suitable for
-accounting applications and high-precision applications.
+Đối với các trường hợp sử dụng yêu cầu biểu diễn thập phân chính xác, hãy thử sử dụng
+module :mod:`decimal`, module này triển khai số học thập phân phù hợp cho các ứng dụng kế toán và ứng dụng độ chính xác cao.
 
-Another form of exact arithmetic is supported by the :mod:`fractions` module
-which implements arithmetic based on rational numbers (so the numbers like
-1/3 can be represented exactly).
+Một dạng số học chính xác khác được mô-đun :mod:`fractions` hỗ trợ; mô-đun này triển khai phép tính dựa trên các số hữu tỉ (vì vậy những số như 1/3 có thể được biểu diễn chính xác).
 
-If you are a heavy user of floating-point operations you should take a look
-at the NumPy package and many other packages for mathematical and
-statistical operations supplied by the SciPy project. See <https://scipy.org>.
+Nếu bạn thường xuyên sử dụng các phép toán dấu phẩy động, bạn nên xem qua gói NumPy và nhiều gói khác dành cho các phép toán toán học và thống kê do dự án SciPy cung cấp. Xem <https://scipy.org>.
 
-Python provides tools that may help on those rare occasions when you really
-*do* want to know the exact value of a float.  The
-:meth:`float.as_integer_ratio` method expresses the value of a float as a
-fraction:
+Python cung cấp các công cụ có thể hữu ích trong những trường hợp hiếm hoi khi bạn thực sự *muốn* biết giá trị chính xác của một số float.  Phương thức
+:meth:`float.as_integer_ratio` biểu diễn giá trị của một số float dưới dạng phân số:
 
 .. doctest::
 
@@ -189,39 +124,30 @@ fraction:
    >>> x.as_integer_ratio()
    (3537115888337719, 1125899906842624)
 
-Since the ratio is exact, it can be used to losslessly recreate the
-original value:
+Vì tỉ số này là chính xác, nó có thể được dùng để tái tạo giá trị ban đầu mà không mất mát:
 
 .. doctest::
 
     >>> x == 3537115888337719 / 1125899906842624
     True
 
-The :meth:`float.hex` method expresses a float in hexadecimal (base
-16), again giving the exact value stored by your computer:
+Phương thức :meth:`float.hex` biểu diễn một số float dưới dạng hệ thập lục phân (cơ số 16), một lần nữa cho biết giá trị chính xác được máy tính của bạn lưu trữ:
 
 .. doctest::
 
    >>> x.hex()
    '0x1.921f9f01b866ep+1'
 
-This precise hexadecimal representation can be used to reconstruct
-the float value exactly:
+Biểu diễn thập lục phân chính xác này có thể được dùng để tái tạo chính xác giá trị float:
 
 .. doctest::
 
     >>> x == float.fromhex('0x1.921f9f01b866ep+1')
     True
 
-Since the representation is exact, it is useful for reliably porting values
-across different versions of Python (platform independence) and exchanging
-data with other languages that support the same format (such as Java and C99).
+Vì cách biểu diễn là chính xác, nó hữu ích để chuyển các giá trị một cách đáng tin cậy giữa những phiên bản Python khác nhau (độc lập với nền tảng) và trao đổi dữ liệu với các ngôn ngữ khác hỗ trợ cùng định dạng (chẳng hạn như Java và C99).
 
-Another helpful tool is the :func:`sum` function which helps mitigate
-loss-of-precision during summation.  It uses extended precision for
-intermediate rounding steps as values are added onto a running total.
-That can make a difference in overall accuracy so that the errors do not
-accumulate to the point where they affect the final total:
+Một công cụ hữu ích khác là hàm :func:`sum`, giúp giảm thiểu mất độ chính xác trong quá trình tính tổng. Hàm này sử dụng độ chính xác mở rộng cho các bước làm tròn trung gian khi các giá trị được cộng dồn vào một tổng đang tính. Điều đó có thể tạo ra khác biệt về độ chính xác tổng thể, nhờ vậy các sai số không tích lũy đến mức ảnh hưởng đến tổng cuối cùng:
 
 .. doctest::
 
@@ -230,11 +156,7 @@ accumulate to the point where they affect the final total:
    >>> sum([0.1] * 10) == 1.0
    True
 
-The :func:`math.fsum` goes further and tracks all of the "lost digits"
-as values are added onto a running total so that the result has only a
-single rounding.  This is slower than :func:`sum` but will be more
-accurate in uncommon cases where large magnitude inputs mostly cancel
-each other out leaving a final sum near zero:
+:func:`math.fsum` còn tiến xa hơn khi theo dõi tất cả "chữ số bị mất" trong lúc các giá trị được cộng dồn vào một tổng đang tính, nhờ đó kết quả chỉ phải làm tròn một lần. Cách này chậm hơn :func:`sum` nhưng sẽ chính xác hơn trong những trường hợp hiếm gặp khi các đầu vào có độ lớn lớn chủ yếu triệt tiêu lẫn nhau, để lại một tổng cuối gần bằng không:
 
 .. doctest::
 
@@ -256,43 +178,31 @@ each other out leaving a final sum near zero:
 
 .. _tut-fp-error:
 
-Representation Error
-====================
+Lỗi biểu diễn
+=============
 
-This section explains the "0.1" example in detail, and shows how you can perform
-an exact analysis of cases like this yourself.  Basic familiarity with binary
-floating-point representation is assumed.
+Phần này giải thích chi tiết ví dụ "0.1" và chỉ ra cách bạn có thể tự thực hiện phân tích chính xác những trường hợp như vậy. Giả định rằng bạn đã quen thuộc ở mức cơ bản với cách biểu diễn số dấu phẩy động nhị phân.
 
-:dfn:`Representation error` refers to the fact that some (most, actually)
-decimal fractions cannot be represented exactly as binary (base 2) fractions.
-This is the chief reason why Python (or Perl, C, C++, Java, Fortran, and many
-others) often won't display the exact decimal number you expect.
+:dfn:`Lỗi biểu diễn` đề cập đến thực tế là một số (thực ra là hầu hết) phân số thập phân không thể được biểu diễn chính xác dưới dạng phân số nhị phân (cơ số 2). Đây là lý do chính khiến Python (hoặc Perl, C, C++, Java, Fortran và nhiều ngôn ngữ khác) thường không hiển thị số thập phân chính xác mà bạn mong đợi.
 
-Why is that?  1/10 is not exactly representable as a binary fraction.  Since at
-least 2000, almost all machines use IEEE 754 binary floating-point arithmetic,
-and almost all platforms map Python floats to IEEE 754 binary64 "double
-precision" values.  IEEE 754 binary64 values contain 53 bits of precision, so
-on input the computer strives to convert 0.1 to the closest fraction it can of
-the form *J*/2**\ *N* where *J* is an integer containing exactly 53 bits.
-Rewriting
-::
+Tại sao lại như vậy? 1/10 không thể được biểu diễn chính xác dưới dạng phân số nhị phân. Kể từ ít nhất năm 2000, hầu như tất cả máy tính đều sử dụng phép toán số dấu phẩy động nhị phân theo IEEE 754, và hầu như tất cả nền tảng đều ánh xạ các số float của Python thành các giá trị binary64 "độ chính xác kép" theo IEEE 754. Các giá trị binary64 theo IEEE 754 có độ chính xác 53 bit, vì vậy khi nhập vào, máy tính cố gắng chuyển 0.1 thành phân số gần nhất mà nó có thể tạo ra theo dạng *J*/2**\ *N*, trong đó *J* là một số nguyên chứa chính xác 53 bit.
+Viết lại
+::::::::
 
    1 / 10 ~= J / (2**N)
 
-as ::
+do đó::
 
    J ~= 2**N / 10
 
-and recalling that *J* has exactly 53 bits (is ``>= 2**52`` but ``< 2**53``),
-the best value for *N* is 56:
+và nhớ rằng *J* có chính xác 53 bit (là ``>= 2**52`` nhưng ``< 2**53``), giá trị tốt nhất cho *N* là 56:
 
 .. doctest::
 
     >>> 2**52 <=  2**56 // 10  < 2**53
     True
 
-That is, 56 is the only value for *N* that leaves *J* with exactly 53 bits.  The
-best possible value for *J* is then that quotient rounded:
+Điều đó có nghĩa là 56 là giá trị duy nhất của *N* khiến *J* còn lại đúng 53 bit.  Khi đó, giá trị tốt nhất có thể của *J* là thương sau khi làm tròn:
 
 .. doctest::
 
@@ -300,8 +210,7 @@ best possible value for *J* is then that quotient rounded:
    >>> r
    6
 
-Since the remainder is more than half of 10, the best approximation is obtained
-by rounding up:
+Vì phần dư lớn hơn một nửa của 10, phép xấp xỉ tốt nhất thu được bằng cách làm tròn lên:
 
 .. doctest::
 
@@ -310,47 +219,38 @@ by rounding up:
    >>> q+1
    7205759403792794
 
-Therefore the best possible approximation to 1/10 in IEEE 754 double precision
-is::
+Do đó, phép xấp xỉ tốt nhất có thể cho 1/10 ở độ chính xác kép IEEE 754 là::
 
    7205759403792794 / 2 ** 56
 
-Dividing both the numerator and denominator by two reduces the fraction to::
+Chia cả tử số và mẫu số cho hai sẽ rút gọn phân số thành::
 
    3602879701896397 / 2 ** 55
 
-Note that since we rounded up, this is actually a little bit larger than 1/10;
-if we had not rounded up, the quotient would have been a little bit smaller than
-1/10.  But in no case can it be *exactly* 1/10!
+Lưu ý rằng vì chúng ta đã làm tròn lên nên giá trị này thực tế lớn hơn 1/10 một chút; nếu không làm tròn lên, thương sẽ nhỏ hơn 1/10 một chút. Nhưng trong mọi trường hợp, nó không thể *chính xác* là 1/10!
 
-So the computer never "sees" 1/10:  what it sees is the exact fraction given
-above, the best IEEE 754 double approximation it can get:
+Vì vậy, máy tính không bao giờ "thấy" 1/10: thứ nó thấy là phân số chính xác được cho ở trên, là xấp xỉ double IEEE 754 tốt nhất mà nó có thể nhận được:
 
 .. doctest::
 
    >>> 0.1 * 2 ** 55
    3602879701896397.0
 
-If we multiply that fraction by 10\*\*55, we can see the value out to
-55 decimal digits:
+Nếu nhân phân số đó với 10\*\*55, chúng ta có thể thấy giá trị này với tối đa 55 chữ số thập phân:
 
 .. doctest::
 
    >>> 3602879701896397 * 10 ** 55 // 2 ** 55
    1000000000000000055511151231257827021181583404541015625
 
-meaning that the exact number stored in the computer is equal to
-the decimal value 0.1000000000000000055511151231257827021181583404541015625.
-Instead of displaying the full decimal value, many languages (including
-older versions of Python), round the result to 17 significant digits:
+nghĩa là số chính xác được lưu trong máy tính bằng giá trị thập phân 0.1000000000000000055511151231257827021181583404541015625. Thay vì hiển thị toàn bộ giá trị thập phân, nhiều ngôn ngữ (bao gồm các phiên bản Python cũ hơn) làm tròn kết quả còn 17 chữ số có nghĩa:
 
 .. doctest::
 
    >>> format(0.1, '.17f')
    '0.10000000000000001'
 
-The :mod:`fractions` and :mod:`decimal` modules make these calculations
-easy:
+Các mô-đun :mod:`fractions` và :mod:`decimal` giúp thực hiện những phép tính này dễ dàng:
 
 .. doctest::
 
@@ -368,3 +268,6 @@ easy:
 
    >>> format(Decimal.from_float(0.1), '.17')
    '0.10000000000000001'
+
+.. _`Examples of Floating Point Problems`: https://jvns.ca/blog/2023/01/13/examples-of-floating-point-problems/
+.. _`The Perils of Floating Point`: http://www.indowsway.com/floatingpoint.htm

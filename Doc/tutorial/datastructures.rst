@@ -1,101 +1,88 @@
 .. _tut-structures:
 
-***************
-Data Structures
-***************
+****************
+Cấu trúc dữ liệu
+****************
 
-This chapter describes some things you've learned about already in more detail,
-and adds some new things as well.
+Chương này mô tả chi tiết hơn một số nội dung bạn đã học, đồng thời bổ sung thêm một số nội dung mới.
 
 .. _tut-morelists:
 
-More on Lists
-=============
+Tìm hiểu thêm về List
+=====================
 
-The :ref:`list <typesseq-list>` data type has some more methods. Here are all
-of the methods of list objects:
+Kiểu dữ liệu :ref:`list <typesseq-list>` có thêm một số phương thức. Sau đây là tất cả các phương thức của đối tượng list:
 
 .. method:: list.append(value, /)
    :noindex:
 
-   Add an item to the end of the list.  Similar to ``a[len(a):] = [x]``.
+   Thêm một mục vào cuối list. Tương tự như ``a[len(a):] = [x]``.
 
 
 .. method:: list.extend(iterable, /)
    :noindex:
 
-   Extend the list by appending all the items from the iterable.  Similar to
-   ``a[len(a):] = iterable``.
+   Mở rộng list bằng cách thêm tất cả các mục từ iterable. Tương tự như ``a[len(a):] = iterable``.
 
 
 .. method:: list.insert(index, value, /)
    :noindex:
 
-   Insert an item at a given position.  The first argument is the index of the
-   element before which to insert, so ``a.insert(0, x)`` inserts at the front of
-   the list, and ``a.insert(len(a), x)`` is equivalent to ``a.append(x)``.
+   Chèn một mục vào vị trí đã cho. Đối số đầu tiên là chỉ mục của phần tử đứng trước vị trí cần chèn, vì vậy ``a.insert(0, x)`` sẽ chèn vào đầu list, còn ``a.insert(len(a), x)`` tương đương với ``a.append(x)``.
 
 
 .. method:: list.remove(value, /)
    :noindex:
 
-   Remove the first item from the list whose value is equal to *value*.  It raises a
-   :exc:`ValueError` if there is no such item.
+   Xóa phần tử đầu tiên trong danh sách có giá trị bằng *value*. Phương thức này sẽ phát sinh
+   :exc:`ValueError` nếu không có phần tử nào như vậy.
 
 
 .. method:: list.pop(index=-1, /)
    :noindex:
 
-   Remove the item at the given position in the list, and return it.  If no index
-   is specified, ``a.pop()`` removes and returns the last item in the list.
-   It raises an :exc:`IndexError` if the list is empty or the index is
-   outside the list range.
+   Xóa phần tử tại vị trí đã cho trong danh sách và trả về phần tử đó. Nếu không chỉ định chỉ mục, ``a.pop()`` sẽ xóa và trả về phần tử cuối cùng trong danh sách. Phương thức này sẽ phát sinh :exc:`IndexError` nếu danh sách trống hoặc chỉ mục nằm ngoài phạm vi của danh sách.
 
 
 .. method:: list.clear()
    :noindex:
 
-   Remove all items from the list.  Similar to ``del a[:]``.
+   Xóa tất cả phần tử khỏi danh sách. Tương tự như ``del a[:]``.
 
 
 .. method:: list.index(value[, start[, stop]])
    :noindex:
 
-   Return zero-based index of the first occurrence of *value* in the list.
-   Raises a :exc:`ValueError` if there is no such item.
+   Trả về chỉ mục bắt đầu từ 0 của lần xuất hiện đầu tiên của *value* trong danh sách. Phương thức này sẽ phát sinh :exc:`ValueError` nếu không có phần tử nào như vậy.
 
-   The optional arguments *start* and *end* are interpreted as in the slice
-   notation and are used to limit the search to a particular subsequence of
-   the list.  The returned index is computed relative to the beginning of the full
-   sequence rather than the *start* argument.
+   Các đối số tùy chọn *start* và *end* được diễn giải như trong ký hiệu lát cắt và dùng để giới hạn việc tìm kiếm vào một dãy con cụ thể của danh sách. Chỉ mục được trả về được tính tương đối so với phần đầu của toàn bộ dãy, thay vì đối số *start*.
 
 
 .. method:: list.count(value, /)
    :noindex:
 
-   Return the number of times *value* appears in the list.
+   Trả về số lần *value* xuất hiện trong danh sách.
 
 
 .. method:: list.sort(*, key=None, reverse=False)
    :noindex:
 
-   Sort the items of the list in place (the arguments can be used for sort
-   customization, see :func:`sorted` for their explanation).
+   Sắp xếp các phần tử của danh sách ngay tại chỗ (các đối số có thể được dùng để tùy chỉnh việc sắp xếp, xem :func:`sorted` để biết giải thích về chúng).
 
 
 .. method:: list.reverse()
    :noindex:
 
-   Reverse the elements of the list in place.
+   Đảo ngược các phần tử của danh sách ngay tại chỗ.
 
 
 .. method:: list.copy()
    :noindex:
 
-   Return a shallow copy of the list.  Similar to ``a[:]``.
+   Trả về một bản sao nông của danh sách. Tương tự như ``a[:]``.
 
 
-An example that uses most of the list methods::
+Một ví dụ sử dụng hầu hết các phương thức của danh sách::
 
     >>> fruits = ['orange', 'apple', 'pear', 'banana', 'kiwi', 'apple', 'banana']
     >>> fruits.count('apple')
@@ -104,7 +91,7 @@ An example that uses most of the list methods::
     0
     >>> fruits.index('banana')
     3
-    >>> fruits.index('banana', 4)  # Find next banana starting at position 4
+    >>> fruits.index('banana', 4)  # Tìm quả chuối tiếp theo, bắt đầu từ vị trí 4
     6
     >>> fruits.reverse()
     >>> fruits
@@ -118,31 +105,20 @@ An example that uses most of the list methods::
     >>> fruits.pop()
     'pear'
 
-You might have noticed that methods like ``insert``, ``remove`` or ``sort`` that
-only modify the list have no return value printed -- they return the default
-``None``. [#]_  This is a design principle for all mutable data structures in
-Python.
+Có thể bạn đã nhận thấy rằng các phương thức như ``insert``, ``remove`` hoặc ``sort`` chỉ sửa đổi danh sách không có giá trị trả về được in ra — chúng trả về giá trị mặc định ``None``. [#]_ Đây là một nguyên tắc thiết kế áp dụng cho tất cả các cấu trúc dữ liệu có thể thay đổi trong Python.
 
-Another thing you might notice is that not all data can be sorted or
-compared.  For instance, ``[None, 'hello', 10]`` doesn't sort because
-integers can't be compared to strings and ``None`` can't be compared to
-other types.  Also, there are some types that don't have a defined
-ordering relation.  For example, ``3+4j < 5+7j`` isn't a valid
-comparison.
+Một điều khác bạn có thể nhận thấy là không phải mọi dữ liệu đều có thể được sắp xếp hoặc so sánh. Chẳng hạn, ``[None, 'hello', 10]`` không sắp xếp được vì số nguyên không thể so sánh với chuỗi, còn ``None`` không thể được so sánh với các kiểu khác. Ngoài ra, có một số kiểu không có quan hệ thứ tự được định nghĩa. Ví dụ, ``3+4j < 5+7j`` không phải là phép so sánh hợp lệ.
 
 
 .. _tut-lists-as-stacks:
 
-Using Lists as Stacks
----------------------
+Sử dụng List làm Stack
+----------------------
 
 .. sectionauthor:: Ka-Ping Yee <ping@lfw.org>
 
 
-The list methods make it very easy to use a list as a stack, where the last
-element added is the first element retrieved ("last-in, first-out").  To add an
-item to the top of the stack, use :meth:`~list.append`.  To retrieve an item from the
-top of the stack, use :meth:`~list.pop` without an explicit index.  For example::
+Các phương thức của list giúp bạn dễ dàng sử dụng một list làm stack (ngăn xếp), trong đó phần tử được thêm vào sau cùng sẽ là phần tử được lấy ra đầu tiên ("last-in, first-out"). Để thêm một mục vào đầu stack, hãy sử dụng :meth:`~list.append`. Để lấy một mục ở đầu stack, hãy sử dụng :meth:`~list.pop` mà không chỉ định chỉ mục rõ ràng. Ví dụ::
 
    >>> stack = [3, 4, 5]
    >>> stack.append(6)
@@ -163,44 +139,36 @@ top of the stack, use :meth:`~list.pop` without an explicit index.  For example:
 
 .. _tut-lists-as-queues:
 
-Using Lists as Queues
----------------------
+Sử dụng List làm Queue
+----------------------
 
 .. sectionauthor:: Ka-Ping Yee <ping@lfw.org>
 
-It is also possible to use a list as a queue, where the first element added is
-the first element retrieved ("first-in, first-out"); however, lists are not
-efficient for this purpose.  While appends and pops from the end of list are
-fast, doing inserts or pops from the beginning of a list is slow (because all
-of the other elements have to be shifted by one).  See
-:ref:`time-complexity` for more information.
+Bạn cũng có thể sử dụng một list làm queue (hàng đợi), trong đó phần tử được thêm vào đầu tiên sẽ là phần tử được lấy ra đầu tiên ("first-in, first-out"); tuy nhiên, list không hiệu quả cho mục đích này. Mặc dù thao tác append và pop ở cuối list rất nhanh, việc insert hoặc pop ở đầu list lại chậm (vì tất cả các phần tử khác phải được dịch chuyển một vị trí). Xem
+:ref:`time-complexity` để biết thêm thông tin.
 
-To implement a queue, use :class:`collections.deque` which was designed to
-have fast appends and pops from both ends.  For example::
+Để triển khai một queue, hãy sử dụng :class:`collections.deque`, được thiết kế để thực hiện thao tác append và pop nhanh ở cả hai đầu. Ví dụ::
 
    >>> from collections import deque
    >>> queue = deque(["Eric", "John", "Michael"])
-   >>> queue.append("Terry")           # Terry arrives
-   >>> queue.append("Graham")          # Graham arrives
-   >>> queue.popleft()                 # The first to arrive now leaves
+   >>> queue.append("Terry")           # Terry đến
+   >>> queue.append("Graham")          # Graham đến
+   >>> queue.popleft()                 # Người đến đầu tiên rời đi
    'Eric'
-   >>> queue.popleft()                 # The second to arrive now leaves
+   >>> queue.popleft()                 # Người đến thứ hai rời đi
    'John'
-   >>> queue                           # Remaining queue in order of arrival
+   >>> queue                           # Hàng đợi còn lại theo thứ tự đến
    deque(['Michael', 'Terry', 'Graham'])
 
 
 .. _tut-listcomps:
 
-List Comprehensions
--------------------
+Phép suy diễn danh sách
+-----------------------
 
-List comprehensions provide a concise way to create lists.
-Common applications are to make new lists where each element is the result of
-some operations applied to each member of another sequence or iterable, or to
-create a subsequence of those elements that satisfy a certain condition.
+Phép suy diễn danh sách cung cấp một cách ngắn gọn để tạo danh sách. Các ứng dụng phổ biến là tạo danh sách mới trong đó mỗi phần tử là kết quả của một số phép toán được áp dụng lên từng phần tử của một chuỗi hoặc iterable khác, hoặc tạo một chuỗi con gồm những phần tử thỏa mãn một điều kiện nhất định.
 
-For example, assume we want to create a list of squares, like::
+Ví dụ, giả sử chúng ta muốn tạo một danh sách các số bình phương, như sau::
 
    >>> squares = []
    >>> for x in range(10):
@@ -209,29 +177,22 @@ For example, assume we want to create a list of squares, like::
    >>> squares
    [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
-Note that this creates (or overwrites) a variable named ``x`` that still exists
-after the loop completes.  We can calculate the list of squares without any
-side effects using::
+Lưu ý rằng điều này tạo ra (hoặc ghi đè) một biến có tên ``x`` vẫn tồn tại sau khi vòng lặp hoàn tất. Chúng ta có thể tính danh sách các bình phương mà không gây ra bất kỳ side effect nào bằng cách sử dụng::
 
    squares = list(map(lambda x: x**2, range(10)))
 
-or, equivalently::
+hoặc tương đương là::
 
    squares = [x**2 for x in range(10)]
 
-which is more concise and readable.
+cách này ngắn gọn và dễ đọc hơn.
 
-A list comprehension consists of brackets containing an expression followed
-by a :keyword:`!for` clause, then zero or more :keyword:`!for` or :keyword:`!if`
-clauses.  The result will be a new list resulting from evaluating the expression
-in the context of the :keyword:`!for` and :keyword:`!if` clauses which follow it.
-For example, this listcomp combines the elements of two lists if they are not
-equal::
+List comprehension bao gồm các dấu ngoặc vuông chứa một biểu thức, theo sau là mệnh đề :keyword:`!for`, rồi đến không hoặc nhiều mệnh đề :keyword:`!for` hoặc :keyword:`!if`. Kết quả sẽ là một danh sách mới thu được bằng cách đánh giá biểu thức trong ngữ cảnh của các mệnh đề :keyword:`!for` và :keyword:`!if` theo sau nó. Ví dụ, listcomp này kết hợp các phần tử của hai danh sách nếu chúng không bằng nhau::
 
    >>> [(x, y) for x in [1,2,3] for y in [3,1,4] if x != y]
    [(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
 
-and it's equivalent to::
+và tương đương với::
 
    >>> combs = []
    >>> for x in [1,2,3]:
@@ -242,54 +203,50 @@ and it's equivalent to::
    >>> combs
    [(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
 
-Note how the order of the :keyword:`for` and :keyword:`if` statements is the
-same in both these snippets.
+Hãy chú ý rằng thứ tự của các câu lệnh :keyword:`for` và :keyword:`if` là giống nhau trong cả hai đoạn mã này.
 
-If the expression is a tuple (e.g. the ``(x, y)`` in the previous example),
-it must be parenthesized. ::
+Nếu biểu thức là một tuple (ví dụ: ``(x, y)`` trong ví dụ trước), biểu thức đó phải được đặt trong dấu ngoặc đơn.::
 
    >>> vec = [-4, -2, 0, 2, 4]
-   >>> # create a new list with the values doubled
+   >>> # tạo một list mới với các giá trị được nhân đôi
    >>> [x*2 for x in vec]
    [-8, -4, 0, 4, 8]
-   >>> # filter the list to exclude negative numbers
+   >>> # lọc list để loại bỏ các số âm
    >>> [x for x in vec if x >= 0]
    [0, 2, 4]
-   >>> # apply a function to all the elements
+   >>> # áp dụng một hàm cho tất cả các phần tử
    >>> [abs(x) for x in vec]
    [4, 2, 0, 2, 4]
-   >>> # call a method on each element
+   >>> # gọi một method trên mỗi phần tử
    >>> freshfruit = ['  banana', '  loganberry ', 'passion fruit  ']
    >>> [weapon.strip() for weapon in freshfruit]
    ['banana', 'loganberry', 'passion fruit']
-   >>> # create a list of 2-tuples like (number, square)
+   >>> # tạo một list gồm các 2-tuple như (number, square)
    >>> [(x, x**2) for x in range(6)]
    [(0, 0), (1, 1), (2, 4), (3, 9), (4, 16), (5, 25)]
-   >>> # the tuple must be parenthesized, otherwise an error is raised
+   >>> # tuple phải được đặt trong dấu ngoặc đơn, nếu không sẽ phát sinh lỗi
    >>> [x, x**2 for x in range(6)]
      File "<stdin>", line 1
        [x, x**2 for x in range(6)]
         ^^^^^^^
    SyntaxError: did you forget parentheses around the comprehension target?
-   >>> # flatten a list using a listcomp with two 'for'
+   >>> # làm phẳng một list bằng listcomp với hai 'for'
    >>> vec = [[1,2,3], [4,5,6], [7,8,9]]
    >>> [num for elem in vec for num in elem]
    [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-List comprehensions can contain complex expressions and nested functions::
+Phép hiểu danh sách có thể chứa các biểu thức phức tạp và các hàm lồng nhau::
 
    >>> from math import pi
    >>> [str(round(pi, i)) for i in range(1, 6)]
    ['3.1', '3.14', '3.142', '3.1416', '3.14159']
 
-Nested List Comprehensions
---------------------------
+Phép hiểu danh sách lồng nhau
+-----------------------------
 
-The initial expression in a list comprehension can be any arbitrary expression,
-including another list comprehension.
+Biểu thức ban đầu trong một phép hiểu danh sách có thể là bất kỳ biểu thức tùy ý nào, bao gồm cả một phép hiểu danh sách khác.
 
-Consider the following example of a 3x4 matrix implemented as a list of
-3 lists of length 4::
+Hãy xem xét ví dụ sau về một ma trận 3x4 được triển khai dưới dạng danh sách gồm 3 danh sách có độ dài 4::
 
    >>> matrix = [
    ...     [1, 2, 3, 4],
@@ -297,14 +254,12 @@ Consider the following example of a 3x4 matrix implemented as a list of
    ...     [9, 10, 11, 12],
    ... ]
 
-The following list comprehension will transpose rows and columns::
+Phép hiểu danh sách sau đây sẽ chuyển vị các hàng và cột::
 
    >>> [[row[i] for row in matrix] for i in range(4)]
    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
 
-As we saw in the previous section, the inner list comprehension is evaluated in
-the context of the :keyword:`for` that follows it, so this example is
-equivalent to::
+Như đã thấy trong phần trước, phép hiểu danh sách bên trong được đánh giá trong ngữ cảnh của :keyword:`for` đứng sau nó, vì vậy ví dụ này tương đương với::
 
    >>> transposed = []
    >>> for i in range(4):
@@ -313,11 +268,11 @@ equivalent to::
    >>> transposed
    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
 
-which, in turn, is the same as::
+đến lượt nó, điều này cũng giống như::
 
    >>> transposed = []
    >>> for i in range(4):
-   ...     # the following 3 lines implement the nested listcomp
+   ...     # 3 dòng sau triển khai listcomp lồng nhau
    ...     transposed_row = []
    ...     for row in matrix:
    ...         transposed_row.append(row[i])
@@ -326,24 +281,19 @@ which, in turn, is the same as::
    >>> transposed
    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
 
-In the real world, you should prefer built-in functions to complex flow statements.
-The :func:`zip` function would do a great job for this use case::
+Trong thực tế, bạn nên ưu tiên các hàm dựng sẵn thay cho các câu lệnh điều khiển luồng phức tạp. Hàm :func:`zip` sẽ rất phù hợp với trường hợp sử dụng này::
 
    >>> list(zip(*matrix))
    [(1, 5, 9), (2, 6, 10), (3, 7, 11), (4, 8, 12)]
 
-See :ref:`tut-unpacking-arguments` for details on the asterisk in this line.
+Xem :ref:`tut-unpacking-arguments` để biết chi tiết về dấu hoa thị trong dòng này.
 
 .. _tut-del:
 
-The :keyword:`!del` statement
-=============================
+Câu lệnh :keyword:`!del`
+========================
 
-There is a way to remove an item from a list given its index instead of its
-value: the :keyword:`del` statement.  This differs from the :meth:`~list.pop` method
-which returns a value.  The :keyword:`!del` statement can also be used to remove
-slices from a list or clear the entire list (which we did earlier by assignment
-of an empty list to the slice).  For example::
+Có một cách để xóa một phần tử khỏi danh sách dựa trên chỉ mục của phần tử đó thay vì giá trị của nó: câu lệnh :keyword:`del`. Cách này khác với phương thức :meth:`~list.pop`, vốn trả về một giá trị. Câu lệnh :keyword:`!del` cũng có thể được dùng để xóa các lát cắt khỏi danh sách hoặc xóa toàn bộ danh sách (việc mà trước đó chúng ta đã thực hiện bằng cách gán một danh sách rỗng cho lát cắt). Ví dụ::
 
    >>> a = [-1, 1, 66.25, 333, 333, 1234.5]
    >>> del a[0]
@@ -356,70 +306,51 @@ of an empty list to the slice).  For example::
    >>> a
    []
 
-:keyword:`del` can also be used to delete entire variables::
+:keyword:`del` cũng có thể được dùng để xóa toàn bộ biến::
 
    >>> del a
 
-Referencing the name ``a`` hereafter is an error (at least until another value
-is assigned to it).  We'll find other uses for :keyword:`del` later.
+Việc tham chiếu đến tên ``a`` từ đây về sau sẽ gây ra lỗi (ít nhất là cho đến khi một giá trị khác được gán cho nó). Sau này chúng ta sẽ tìm thấy những cách sử dụng khác của :keyword:`del`.
 
 
 .. _tut-tuples:
 
-Tuples and Sequences
-====================
+Tuple và Sequence
+=================
 
-We saw that lists and strings have many common properties, such as indexing and
-slicing operations.  They are two examples of *sequence* data types (see
-:ref:`typesseq`).  Since Python is an evolving language, other sequence data
-types may be added.  There is also another standard sequence data type: the
-*tuple*.
+Chúng ta đã thấy rằng list và string có nhiều thuộc tính chung, chẳng hạn như các thao tác lập chỉ mục và cắt. Đây là hai ví dụ về kiểu dữ liệu *sequence* (xem
+:ref:`typesseq`). Vì Python là một ngôn ngữ không ngừng phát triển, các kiểu dữ liệu sequence khác có thể được bổ sung. Ngoài ra còn có một kiểu dữ liệu sequence tiêu chuẩn khác: *tuple*.
 
-A tuple consists of a number of values separated by commas, for instance::
+Một tuple gồm một số giá trị được phân tách bằng dấu phẩy, chẳng hạn như::
 
    >>> t = 12345, 54321, 'hello!'
    >>> t[0]
    12345
    >>> t
    (12345, 54321, 'hello!')
-   >>> # Tuples may be nested:
+   >>> # Tuple có thể được lồng nhau:
    >>> u = t, (1, 2, 3, 4, 5)
    >>> u
    ((12345, 54321, 'hello!'), (1, 2, 3, 4, 5))
-   >>> # Tuples are immutable:
+   >>> # Tuple là bất biến:
    >>> t[0] = 88888
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
    TypeError: 'tuple' object does not support item assignment
-   >>> # but they can contain mutable objects:
+   >>> # nhưng chúng có thể chứa các đối tượng khả biến:
    >>> v = ([1, 2, 3], [3, 2, 1])
    >>> v
    ([1, 2, 3], [3, 2, 1])
 
 
-As you see, on output tuples are always enclosed in parentheses, so that nested
-tuples are interpreted correctly; they may be input with or without surrounding
-parentheses, although often parentheses are necessary anyway (if the tuple is
-part of a larger expression).  It is not possible to assign to the individual
-items of a tuple, however it is possible to create tuples which contain mutable
-objects, such as lists.
+Như bạn thấy, khi xuất ra, các tuple luôn được đặt trong dấu ngoặc đơn để các tuple lồng nhau được diễn giải chính xác; chúng có thể được nhập vào có hoặc không có dấu ngoặc đơn bao quanh, mặc dù trong nhiều trường hợp, dấu ngoặc vẫn cần thiết (nếu tuple là một phần của biểu thức lớn hơn). Tuy nhiên, không thể gán cho từng phần tử riêng lẻ của tuple, nhưng có thể tạo các tuple chứa các đối tượng có thể thay đổi (mutable), chẳng hạn như list.
 
-Though tuples may seem similar to lists, they are often used in different
-situations and for different purposes.
-Tuples are :term:`immutable`, and usually contain a heterogeneous sequence of
-elements that are accessed via unpacking (see later in this section) or indexing
-(or even by attribute in the case of :func:`namedtuples <collections.namedtuple>`).
-Lists are :term:`mutable`, and their elements are usually homogeneous and are
-accessed by iterating over the list.
+Mặc dù tuple có vẻ tương tự list, chúng thường được dùng trong các tình huống và cho những mục đích khác nhau. Tuple là :term:`immutable`, và thường chứa một chuỗi phần tử không đồng nhất được truy cập thông qua unpacking (xem phần sau trong mục này) hoặc indexing (hoặc thậm chí bằng thuộc tính trong trường hợp của :func:`namedtuples <collections.namedtuple>`). List là :term:`mutable`, và các phần tử của chúng thường đồng nhất, được truy cập bằng cách lặp qua list.
 
-A special problem is the construction of tuples containing 0 or 1 items: the
-syntax has some extra quirks to accommodate these.  Empty tuples are constructed
-by an empty pair of parentheses; a tuple with one item is constructed by
-following a value with a comma (it is not sufficient to enclose a single value
-in parentheses). Ugly, but effective.  For example::
+Một vấn đề đặc biệt là việc tạo tuple chứa 0 hoặc 1 phần tử: cú pháp có thêm một số điểm đặc biệt để hỗ trợ các trường hợp này. Tuple rỗng được tạo bằng một cặp dấu ngoặc đơn rỗng; tuple có một phần tử được tạo bằng cách đặt dấu phẩy sau một giá trị (chỉ đặt một giá trị trong dấu ngoặc đơn là chưa đủ). Hơi xấu, nhưng hiệu quả. Ví dụ:::
 
    >>> empty = ()
-   >>> singleton = 'hello',    # <-- note trailing comma
+   >>> singleton = 'hello',    # <-- lưu ý dấu phẩy ở cuối
    >>> len(empty)
    0
    >>> len(singleton)
@@ -427,64 +358,50 @@ in parentheses). Ugly, but effective.  For example::
    >>> singleton
    ('hello',)
 
-The statement ``t = 12345, 54321, 'hello!'`` is an example of *tuple packing*:
-the values ``12345``, ``54321`` and ``'hello!'`` are packed together in a tuple.
-The reverse operation is also possible::
+Câu lệnh ``t = 12345, 54321, 'hello!'`` là một ví dụ về *đóng gói tuple*: các giá trị ``12345``, ``54321`` và ``'hello!'`` được đóng gói cùng nhau trong một tuple. Thao tác ngược lại cũng có thể thực hiện được::
 
    >>> x, y, z = t
 
-This is called, appropriately enough, *sequence unpacking* and works for any
-sequence on the right-hand side.  Sequence unpacking requires that there are as
-many variables on the left side of the equals sign as there are elements in the
-sequence.  Note that multiple assignment is really just a combination of tuple
-packing and sequence unpacking.
+Điều này được gọi, khá đúng với tên gọi, là *giải nén chuỗi* và hoạt động với mọi sequence ở vế phải. Việc giải nén sequence yêu cầu có số lượng biến ở bên trái dấu bằng bằng số phần tử trong sequence. Lưu ý rằng phép gán nhiều biến thực chất chỉ là sự kết hợp giữa đóng gói tuple và giải nén sequence.
 
 
 .. _tut-sets:
 
-Sets
-====
+Tập hợp
+=======
 
-Python also includes a data type for :ref:`sets <types-set>`.  A set is
-an unordered collection with no duplicate elements.  Basic uses include
-membership testing and eliminating duplicate entries.  Set objects also
-support mathematical operations like union, intersection, difference, and
-symmetric difference.
+Python cũng bao gồm một kiểu dữ liệu cho :ref:`sets <types-set>`. Set là một tập hợp không có thứ tự và không chứa các phần tử trùng lặp. Các cách sử dụng cơ bản gồm kiểm tra phần tử và loại bỏ các mục trùng lặp. Đối tượng set cũng hỗ trợ các phép toán trong toán học như hợp, giao, hiệu và hiệu đối xứng.
 
-Curly braces or the :func:`set` function can be used to create sets.  Note: to
-create an empty set you have to use ``set()``, not ``{}``; the latter creates an
-empty dictionary, a data structure that we discuss in the next section.
+Có thể sử dụng dấu ngoặc nhọn hoặc hàm :func:`set` để tạo set. Lưu ý: để tạo một set rỗng, bạn phải sử dụng ``set()``, không phải ``{}``; cách sau tạo một dictionary rỗng, một cấu trúc dữ liệu được thảo luận trong phần tiếp theo.
 
-Because sets are unordered, iterating over them or printing them can
-produce the elements in a different order than you expect.
+Vì set không có thứ tự, việc lặp qua chúng hoặc in chúng có thể cho ra các phần tử theo thứ tự khác với dự kiến.
 
-Here is a brief demonstration::
+Sau đây là một minh họa ngắn gọn::
 
    >>> basket = {'apple', 'orange', 'apple', 'pear', 'orange', 'banana'}
-   >>> print(basket)                      # show that duplicates have been removed
+   >>> print(basket)                      # cho thấy các phần tử trùng lặp đã được loại bỏ
    {'orange', 'banana', 'pear', 'apple'}
-   >>> 'orange' in basket                 # fast membership testing
+   >>> 'orange' in basket                 # kiểm tra phần tử nhanh chóng
    True
    >>> 'crabgrass' in basket
    False
 
-   >>> # Demonstrate set operations on unique letters from two words
+   >>> # Minh họa các phép toán trên set gồm các chữ cái duy nhất từ hai từ
    >>>
    >>> a = set('abracadabra')
    >>> b = set('alacazam')
-   >>> a                                  # unique letters in a
+   >>> a                                  # các chữ cái duy nhất trong a
    {'a', 'r', 'b', 'c', 'd'}
-   >>> a - b                              # letters in a but not in b
+   >>> a - b                              # các chữ cái có trong a nhưng không có trong b
    {'r', 'd', 'b'}
-   >>> a | b                              # letters in a or b or both
+   >>> a | b                              # các chữ cái có trong a hoặc b hoặc cả hai
    {'a', 'c', 'r', 'd', 'b', 'm', 'z', 'l'}
-   >>> a & b                              # letters in both a and b
+   >>> a & b                              # các chữ cái có trong cả a và b
    {'a', 'c'}
-   >>> a ^ b                              # letters in a or b but not both
+   >>> a ^ b                              # các chữ cái có trong a hoặc b nhưng không có trong cả hai
    {'r', 'd', 'b', 'm', 'z', 'l'}
 
-Similarly to :ref:`list comprehensions <tut-listcomps>`, set comprehensions
-are also supported::
+Tương tự như :ref:`list comprehensions <tut-listcomps>`, set comprehensions cũng được hỗ trợ::
 
    >>> a = {x for x in 'abracadabra' if x not in 'abc'}
    >>> a
@@ -496,39 +413,20 @@ are also supported::
 Dictionaries
 ============
 
-Another useful data type built into Python is the *dictionary* (see
-:ref:`typesmapping`). Dictionaries are sometimes found in other languages as
-"associative memories" or "associative arrays".  Unlike sequences, which are
-indexed by a range of numbers, dictionaries are indexed by *keys*, which can be
-any immutable type; strings and numbers can always be keys.  Tuples can be used
-as keys if they contain only strings, numbers, or tuples; if a tuple contains
-any mutable object either directly or indirectly, it cannot be used as a key.
-You can't use lists as keys, since lists can be modified in place using index
-assignments, slice assignments, or methods like :meth:`~list.append` and
+Một kiểu dữ liệu hữu ích khác được tích hợp sẵn trong Python là *từ điển* (xem
+:ref:`typesmapping`). Trong một số ngôn ngữ khác, từ điển đôi khi được gọi là "bộ nhớ liên kết" hoặc "mảng liên kết". Không giống các sequence, vốn được lập chỉ mục bằng một dải số, từ điển được lập chỉ mục bằng *khóa*, có thể là bất kỳ kiểu bất biến nào; chuỗi và số luôn có thể làm khóa. Tuple có thể được dùng làm khóa nếu chúng chỉ chứa chuỗi, số hoặc tuple; nếu một tuple chứa bất kỳ đối tượng khả biến nào, dù trực tiếp hay gián tiếp, thì không thể dùng nó làm khóa. Bạn không thể dùng list làm khóa, vì list có thể được sửa đổi tại chỗ bằng phép gán chỉ mục, phép gán lát cắt hoặc các phương thức như :meth:`~list.append` và
 :meth:`~list.extend`.
 
-It is best to think of a dictionary as a set of *key: value* pairs,
-with the requirement that the keys are unique (within one dictionary). A pair of
-braces creates an empty dictionary: ``{}``. Placing a comma-separated list of
-key:value pairs within the braces adds initial key:value pairs to the
-dictionary; this is also the way dictionaries are written on output.
+Tốt nhất là hãy hình dung một từ điển như một tập hợp các cặp *khóa: giá trị*, với yêu cầu các khóa phải là duy nhất (trong cùng một từ điển). Một cặp dấu ngoặc nhọn tạo ra một từ điển rỗng: ``{}``. Đặt một danh sách các cặp khóa:giá trị được phân tách bằng dấu phẩy בתוך cặp dấu ngoặc nhọn sẽ thêm các cặp khóa:giá trị ban đầu vào từ điển; đây cũng là cách từ điển được ghi khi xuất ra.
 
-The main operations on a dictionary are storing a value with some key and
-extracting the value given the key.  It is also possible to delete a key:value
-pair with ``del``. If you store using a key that is already in use, the old
-value associated with that key is forgotten.
+Các thao tác chính trên một từ điển là lưu một giá trị với một khóa nào đó và trích xuất giá trị tương ứng với khóa đó. Cũng có thể xóa một cặp khóa:giá trị bằng ``del``. Nếu bạn lưu bằng một khóa đã được sử dụng, giá trị cũ liên kết với khóa đó sẽ bị quên.
 
-Extracting a value for a non-existent key by subscripting (``d[key]``) raises a
-:exc:`KeyError`. To avoid getting this error when trying to access a possibly
-non-existent key, use the :meth:`~dict.get` method instead, which returns
-``None`` (or a specified default value) if the key is not in the dictionary.
+Việc trích xuất giá trị cho một khóa không tồn tại bằng cách lập chỉ mục (``d[key]``) sẽ phát sinh một
+:exc:`KeyError`. Để tránh gặp lỗi này khi cố truy cập một khóa có thể không tồn tại, hãy sử dụng phương thức :meth:`~dict.get` thay thế; phương thức này trả về ``None`` (hoặc một giá trị mặc định được chỉ định) nếu khóa không có trong từ điển.
 
-Performing ``list(d)`` on a dictionary returns a list of all the keys
-used in the dictionary, in insertion order (if you want it sorted, just use
-``sorted(d)`` instead). To check whether a single key is in the
-dictionary, use the :keyword:`in` keyword.
+Thực hiện ``list(d)`` trên một từ điển sẽ trả về danh sách tất cả các khóa được sử dụng trong từ điển, theo thứ tự chèn (nếu muốn sắp xếp, chỉ cần sử dụng ``sorted(d)`` thay thế). Để kiểm tra xem một khóa cụ thể có nằm trong từ điển hay không, hãy sử dụng từ khóa :keyword:`in`.
 
-Here is a small example using a dictionary::
+Sau đây là một ví dụ nhỏ sử dụng dictionary::
 
    >>> tel = {'jack': 4098, 'sape': 4139}
    >>> tel['guido'] = 4127
@@ -555,20 +453,17 @@ Here is a small example using a dictionary::
    >>> 'jack' not in tel
    False
 
-The :func:`dict` constructor builds dictionaries directly from sequences of
-key-value pairs::
+Constructor :func:`dict` tạo trực tiếp các dictionary từ các chuỗi gồm những cặp key-value::
 
    >>> dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
    {'sape': 4139, 'guido': 4127, 'jack': 4098}
 
-In addition, dict comprehensions can be used to create dictionaries from
-arbitrary key and value expressions::
+Ngoài ra, có thể sử dụng dict comprehension để tạo dictionary từ các biểu thức key và value tùy ý::
 
    >>> {x: x**2 for x in (2, 4, 6)}
    {2: 4, 4: 16, 6: 36}
 
-When the keys are simple strings, it is sometimes easier to specify pairs using
-keyword arguments::
+Khi các key là những chuỗi đơn giản, đôi khi việc chỉ định các cặp bằng keyword arguments sẽ dễ dàng hơn::
 
    >>> dict(sape=4139, guido=4127, jack=4098)
    {'sape': 4139, 'guido': 4127, 'jack': 4098}
@@ -576,11 +471,10 @@ keyword arguments::
 
 .. _tut-loopidioms:
 
-Looping Techniques
-==================
+Kỹ thuật lặp
+============
 
-When looping through dictionaries, the key and corresponding value can be
-retrieved at the same time using the :meth:`~dict.items` method. ::
+Khi lặp qua các dictionary, có thể truy xuất đồng thời key và value tương ứng bằng method :meth:`~dict.items`.::
 
    >>> knights = {'gallahad': 'the pure', 'robin': 'the brave'}
    >>> for k, v in knights.items():
@@ -589,8 +483,7 @@ retrieved at the same time using the :meth:`~dict.items` method. ::
    gallahad the pure
    robin the brave
 
-When looping through a sequence, the position index and corresponding value can
-be retrieved at the same time using the :func:`enumerate` function. ::
+Khi lặp qua một sequence, có thể truy xuất đồng thời chỉ mục vị trí và value tương ứng bằng function :func:`enumerate`.::
 
    >>> for i, v in enumerate(['tic', 'tac', 'toe']):
    ...     print(i, v)
@@ -599,8 +492,7 @@ be retrieved at the same time using the :func:`enumerate` function. ::
    1 tac
    2 toe
 
-To loop over two or more sequences at the same time, the entries can be paired
-with the :func:`zip` function. ::
+Để lặp qua hai hoặc nhiều sequence cùng lúc, có thể ghép các phần tử tương ứng bằng hàm :func:`zip`.::
 
    >>> questions = ['name', 'quest', 'favorite color']
    >>> answers = ['lancelot', 'the holy grail', 'blue']
@@ -611,8 +503,7 @@ with the :func:`zip` function. ::
    What is your quest?  It is the holy grail.
    What is your favorite color?  It is blue.
 
-To loop over a sequence in reverse, first specify the sequence in a forward
-direction and then call the :func:`reversed` function. ::
+Để lặp qua một sequence theo thứ tự ngược, trước tiên hãy chỉ định sequence theo hướng xuôi, sau đó gọi hàm :func:`reversed`.::
 
    >>> for i in reversed(range(1, 10, 2)):
    ...     print(i)
@@ -623,8 +514,7 @@ direction and then call the :func:`reversed` function. ::
    3
    1
 
-To loop over a sequence in sorted order, use the :func:`sorted` function which
-returns a new sorted list while leaving the source unaltered. ::
+Để lặp qua một sequence theo thứ tự đã sắp xếp, hãy sử dụng hàm :func:`sorted`, hàm này trả về một danh sách mới đã được sắp xếp mà không thay đổi dữ liệu nguồn.::
 
    >>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
    >>> for i in sorted(basket):
@@ -637,9 +527,8 @@ returns a new sorted list while leaving the source unaltered. ::
    orange
    pear
 
-Using :func:`set` on a sequence eliminates duplicate elements. The use of
-:func:`sorted` in combination with :func:`set` over a sequence is an idiomatic
-way to loop over unique elements of the sequence in sorted order. ::
+Sử dụng :func:`set` trên một sequence sẽ loại bỏ các phần tử trùng lặp. Việc sử dụng
+:func:`sorted` kết hợp với :func:`set` trên một sequence là cách phổ biến để lặp qua các phần tử duy nhất của sequence theo thứ tự đã sắp xếp.::
 
    >>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
    >>> for f in sorted(set(basket)):
@@ -650,8 +539,7 @@ way to loop over unique elements of the sequence in sorted order. ::
    orange
    pear
 
-It is sometimes tempting to change a list while you are looping over it;
-however, it is often simpler and safer to create a new list instead. ::
+Đôi khi bạn có thể muốn thay đổi một danh sách trong khi đang lặp qua danh sách đó; tuy nhiên, việc tạo một danh sách mới thường đơn giản và an toàn hơn.::
 
    >>> import math
    >>> raw_data = [56.2, float('NaN'), 51.7, 55.3, 52.5, float('NaN'), 47.8]
@@ -666,66 +554,36 @@ however, it is often simpler and safer to create a new list instead. ::
 
 .. _tut-conditions:
 
-More on Conditions
-==================
+Thông tin thêm về điều kiện
+===========================
 
-The conditions used in ``while`` and ``if`` statements can contain any
-operators, not just comparisons.
+Các điều kiện được sử dụng trong các câu lệnh ``while`` và ``if`` có thể chứa bất kỳ toán tử nào, không chỉ các phép so sánh.
 
 
-The comparison operators ``in`` and ``not in`` are membership tests that
-determine whether a value is in (or not in) a container.  The operators ``is``
-and ``is not`` compare whether two objects are really the same object.  All
-comparison operators have the same priority, which is lower than that of all
-numerical operators.
+Các toán tử so sánh ``in`` và ``not in`` là các phép kiểm tra membership, xác định xem một giá trị có nằm trong (hoặc không nằm trong) một container hay không. Các toán tử ``is`` và ``is not`` so sánh xem hai đối tượng có thực sự là cùng một đối tượng hay không. Tất cả các toán tử so sánh có cùng độ ưu tiên, thấp hơn độ ưu tiên của tất cả các toán tử số học.
 
-Comparisons can be chained.  For example, ``a < b == c`` tests whether ``a`` is
-less than ``b`` and moreover ``b`` equals ``c``.
+Các phép so sánh có thể được nối chuỗi. Ví dụ: ``a < b == c`` kiểm tra xem ``a`` có nhỏ hơn ``b`` hay không, đồng thời ``b`` có bằng ``c`` hay không.
 
-Comparisons may be combined using the Boolean operators ``and`` and ``or``, and
-the outcome of a comparison (or of any other Boolean expression) may be negated
-with ``not``.  These have lower priorities than comparison operators; between
-them, ``not`` has the highest priority and ``or`` the lowest, so that ``A and
-not B or C`` is equivalent to ``(A and (not B)) or C``. As always, parentheses
-can be used to express the desired composition.
+Các phép so sánh có thể được kết hợp bằng các toán tử Boolean ``and`` và ``or``, đồng thời kết quả của một phép so sánh (hoặc của bất kỳ biểu thức Boolean nào khác) có thể được phủ định bằng ``not``. Các toán tử này có độ ưu tiên thấp hơn các toán tử so sánh; giữa chúng, ``not`` có độ ưu tiên cao nhất và ``or`` thấp nhất, vì vậy ``A and not B or C`` tương đương với ``(A and (not B)) or C``. Như mọi khi, có thể sử dụng dấu ngoặc để thể hiện cấu trúc kết hợp mong muốn.
 
-The Boolean operators ``and`` and ``or`` are so-called *short-circuit*
-operators: their arguments are evaluated from left to right, and evaluation
-stops as soon as the outcome is determined.  For example, if ``A`` and ``C`` are
-true but ``B`` is false, ``A and B and C`` does not evaluate the expression
-``C``.  When used as a general value and not as a Boolean, the return value of a
-short-circuit operator is the last evaluated argument.
+Các toán tử Boolean ``and`` và ``or`` được gọi là các toán tử *short-circuit*: các đối số của chúng được đánh giá từ trái sang phải và quá trình đánh giá dừng ngay khi kết quả được xác định. Ví dụ, nếu ``A`` và ``C`` là đúng nhưng ``B`` là sai, ``A and B and C`` sẽ không đánh giá biểu thức ``C``. Khi được sử dụng như một giá trị tổng quát thay vì như một giá trị Boolean, giá trị trả về của một toán tử short-circuit là đối số được đánh giá cuối cùng.
 
-It is possible to assign the result of a comparison or other Boolean expression
-to a variable.  For example, ::
+Bạn có thể gán kết quả của một phép so sánh hoặc biểu thức Boolean khác cho một biến. Ví dụ:::
 
    >>> string1, string2, string3 = '', 'Trondheim', 'Hammer Dance'
    >>> non_null = string1 or string2 or string3
    >>> non_null
    'Trondheim'
 
-Note that in Python, unlike C, assignment inside expressions must be done
-explicitly with the
-:ref:`walrus operator <why-can-t-i-use-an-assignment-in-an-expression>` ``:=``.
-This avoids a common class of problems encountered in C programs: typing ``=``
-in an expression when ``==`` was intended.
+Lưu ý rằng trong Python, không giống như C, phép gán bên trong các biểu thức phải được thực hiện một cách tường minh bằng
+:ref:`walrus operator <why-can-t-i-use-an-assignment-in-an-expression>` ``:=``. Điều này tránh được một nhóm vấn đề phổ biến trong các chương trình C: gõ ``=`` trong một biểu thức khi thực ra ``==`` mới là điều được dự định.
 
 
 .. _tut-comparing:
 
-Comparing Sequences and Other Types
-===================================
-Sequence objects typically may be compared to other objects with the same sequence
-type. The comparison uses *lexicographical* ordering: first the first two
-items are compared, and if they differ this determines the outcome of the
-comparison; if they are equal, the next two items are compared, and so on, until
-either sequence is exhausted. If two items to be compared are themselves
-sequences of the same type, the lexicographical comparison is carried out
-recursively.  If all items of two sequences compare equal, the sequences are
-considered equal. If one sequence is an initial sub-sequence of the other, the
-shorter sequence is the smaller (lesser) one.  Lexicographical ordering for
-strings uses the Unicode code point number to order individual characters.
-Some examples of comparisons between sequences of the same type::
+So sánh các sequence và các kiểu khác
+=====================================
+Các đối tượng sequence thường có thể được so sánh với các đối tượng khác cùng kiểu sequence. Việc so sánh sử dụng thứ tự *lexicographical*: trước tiên, hai phần tử đầu tiên được so sánh; nếu chúng khác nhau, điều này quyết định kết quả so sánh; nếu chúng bằng nhau, hai phần tử tiếp theo được so sánh, và cứ tiếp tục như vậy cho đến khi một trong hai sequence cạn phần tử. Nếu hai phần tử được so sánh bản thân chúng là các sequence cùng kiểu, phép so sánh lexicographical được thực hiện đệ quy. Nếu mọi phần tử của hai sequence đều được xem là bằng nhau, hai sequence được coi là bằng nhau. Nếu một sequence là subsequence ban đầu của sequence kia, sequence ngắn hơn là sequence nhỏ hơn. Thứ tự lexicographical đối với chuỗi sử dụng số code point Unicode để sắp xếp từng ký tự. Sau đây là một số ví dụ về việc so sánh các sequence cùng kiểu::
 
    (1, 2, 3)              < (1, 2, 4)
    [1, 2, 3]              < [1, 2, 4]
@@ -735,14 +593,9 @@ Some examples of comparisons between sequences of the same type::
    (1, 2, 3)             == (1.0, 2.0, 3.0)
    (1, 2, ('aa', 'ab'))   < (1, 2, ('abc', 'a'), 4)
 
-Note that comparing objects of different types with ``<`` or ``>`` is legal
-provided that the objects have appropriate comparison methods.  For example,
-mixed numeric types are compared according to their numeric value, so 0 equals
-0.0, etc.  Otherwise, rather than providing an arbitrary ordering, the
-interpreter will raise a :exc:`TypeError` exception.
+Lưu ý rằng việc so sánh các đối tượng thuộc các kiểu khác nhau bằng ``<`` hoặc ``>`` là hợp lệ, miễn là các đối tượng có các phương thức so sánh phù hợp. Ví dụ, các kiểu số hỗn hợp được so sánh theo giá trị số của chúng, vì vậy 0 bằng 0.0, v.v. Nếu không, thay vì cung cấp một thứ tự tùy ý, interpreter sẽ raise một ngoại lệ :exc:`TypeError`.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] Other languages may return the mutated object, which allows method
-       chaining, such as ``d->insert("a")->remove("b")->sort();``.
+.. [#] Các ngôn ngữ khác có thể trả về đối tượng đã được biến đổi, cho phép method chaining, chẳng hạn như ``d->insert("a")->remove("b")->sort();``.

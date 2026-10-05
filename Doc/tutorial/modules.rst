@@ -1,31 +1,16 @@
 .. _tut-modules:
 
-*******
-Modules
-*******
+******
+Mô-đun
+******
 
-If you quit from the Python interpreter and enter it again, the definitions you
-have made (functions and variables) are lost. Therefore, if you want to write a
-somewhat longer program, you are better off using a text editor to prepare the
-input for the interpreter and running it with that file as input instead.  This
-is known as creating a *script*.  As your program gets longer, you may want to
-split it into several files for easier maintenance.  You may also want to use a
-handy function that you've written in several programs without copying its
-definition into each program.
+Nếu bạn thoát khỏi trình thông dịch Python rồi vào lại, các định nghĩa bạn đã tạo (hàm và biến) sẽ bị mất. Vì vậy, nếu muốn viết một chương trình dài hơn một chút, tốt hơn hết là bạn nên dùng trình soạn thảo văn bản để chuẩn bị đầu vào cho trình thông dịch và chạy trình thông dịch với tệp đó làm đầu vào. Đây được gọi là tạo một *script*. Khi chương trình dài hơn, bạn có thể muốn chia chương trình thành nhiều tệp để dễ bảo trì hơn. Bạn cũng có thể muốn sử dụng một hàm tiện dụng mà mình đã viết trong nhiều chương trình mà không cần sao chép định nghĩa của hàm đó vào từng chương trình.
 
-To support this, Python has a way to put definitions in a file and use them in a
-script or in an interactive instance of the interpreter. Such a file is called a
-*module*; definitions from a module can be *imported* into other modules or into
-the *main* module (the collection of variables that you have access to in a
-script executed at the top level and in calculator mode).
+Để hỗ trợ việc này, Python cung cấp cách đặt các định nghĩa trong một tệp và sử dụng chúng trong một script hoặc trong một phiên tương tác của trình thông dịch. Một tệp như vậy được gọi là *module*; các định nghĩa từ một module có thể được *imported* vào các module khác hoặc vào module *main* (tập hợp các biến mà bạn có quyền truy cập trong một script được thực thi ở cấp cao nhất và trong chế độ máy tính).
 
-A module is a file containing Python definitions and statements.  The file name
-is the module name with the suffix :file:`.py` appended.  Within a module, the
-module's name (as a string) is available as the value of the global variable
-``__name__``.  For instance, use your favorite text editor to create a file
-called :file:`fibo.py` in the current directory with the following contents::
+Một module là một tệp chứa các định nghĩa và câu lệnh Python. Tên tệp là tên module với hậu tố :file:`.py` được thêm vào. Bên trong một module, tên của module (dưới dạng một chuỗi) có sẵn dưới dạng giá trị của biến toàn cục ``__name__``. Ví dụ, hãy dùng trình soạn thảo văn bản yêu thích của bạn để tạo một tệp có tên :file:`fibo.py` trong thư mục hiện tại với nội dung sau::
 
-   # Fibonacci numbers module
+   # Module các số Fibonacci
 
    def fib(n):
        """Write Fibonacci series up to n."""
@@ -44,15 +29,11 @@ called :file:`fibo.py` in the current directory with the following contents::
            a, b = b, a+b
        return result
 
-Now enter the Python interpreter and import this module with the following
-command::
+Bây giờ hãy vào trình thông dịch Python và import module này bằng lệnh sau::
 
    >>> import fibo
 
-This does not add the names of the functions defined in ``fibo``  directly to
-the current :term:`namespace` (see :ref:`tut-scopes` for more details);
-it only adds the module name ``fibo`` there. Using
-the module name you can access the functions::
+Điều này không thêm trực tiếp tên của các hàm được định nghĩa trong ``fibo`` vào :term:`namespace` hiện tại (xem :ref:`tut-scopes` để biết thêm chi tiết); nó chỉ thêm tên module ``fibo`` vào đó. Bạn có thể truy cập các hàm bằng tên module::
 
    >>> fibo.fib(1000)
    0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
@@ -61,7 +42,7 @@ the module name you can access the functions::
    >>> fibo.__name__
    'fibo'
 
-If you intend to use a function often you can assign it to a local name::
+Nếu dự định sử dụng một hàm thường xuyên, bạn có thể gán hàm đó cho một tên cục bộ::
 
    >>> fib = fibo.fib
    >>> fib(500)
@@ -70,53 +51,35 @@ If you intend to use a function often you can assign it to a local name::
 
 .. _tut-moremodules:
 
-More on Modules
-===============
+Tìm hiểu thêm về module
+=======================
 
-A module can contain executable statements as well as function definitions.
-These statements are intended to initialize the module. They are executed only
-the *first* time the module name is encountered in an import statement. [#]_
-(They are also run if the file is executed as a script.)
+Một module có thể chứa các câu lệnh thực thi cũng như các định nghĩa hàm. Những câu lệnh này được dùng để khởi tạo module. Chúng chỉ được thực thi vào *lần đầu tiên* tên module xuất hiện trong một câu lệnh import. [#]_ (Chúng cũng được thực thi nếu tệp được chạy như một script.)
 
-Each module has its own private namespace, which is used as the global namespace
-by all functions defined in the module. Thus, the author of a module can
-use global variables in the module without worrying about accidental clashes
-with a user's global variables. On the other hand, if you know what you are
-doing you can touch a module's global variables with the same notation used to
-refer to its functions, ``modname.itemname``.
+Mỗi module có namespace riêng tư của mình, được tất cả các hàm được định nghĩa trong module sử dụng làm namespace toàn cục. Vì vậy, tác giả của một module có thể sử dụng các biến toàn cục trong module mà không phải lo lắng về việc vô tình xung đột với các biến toàn cục của người dùng. Mặt khác, nếu biết mình đang làm gì, bạn có thể truy cập các biến toàn cục của module bằng cùng ký hiệu được dùng để tham chiếu đến các hàm của module, ``modname.itemname``.
 
-Modules can import other modules.  It is customary but not required to place all
-:keyword:`import` statements at the beginning of a module (or script, for that
-matter).  The imported module names, if placed at the top level of a module
-(outside any functions or classes), are added to the module's global namespace.
+Các module có thể import các module khác. Thông thường, nhưng không bắt buộc, người ta đặt tất cả
+các câu lệnh :keyword:`import` ở đầu module (hoặc script cũng vậy). Tên của các module được import, nếu được đặt ở cấp cao nhất của một module (bên ngoài mọi hàm hoặc lớp), sẽ được thêm vào namespace toàn cục của module.
 
-There is a variant of the :keyword:`import` statement that imports names from a
-module directly into the importing module's namespace.  For example::
+Có một biến thể của câu lệnh :keyword:`import` để import trực tiếp các tên từ một module vào namespace của module thực hiện việc import. Ví dụ::
 
    >>> from fibo import fib, fib2
    >>> fib(500)
    0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
 
-This does not introduce the module name from which the imports are taken in the
-local namespace (so in the example, ``fibo`` is not defined).
+Điều này không đưa tên của module nơi các import được lấy vào namespace cục bộ (vì vậy trong ví dụ, ``fibo`` không được định nghĩa).
 
-There is even a variant to import all names that a module defines::
+Thậm chí còn có một biến thể để import tất cả các tên mà một module định nghĩa::
 
    >>> from fibo import *
    >>> fib(500)
    0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
 
-This imports all names except those beginning with an underscore (``_``).
-In most cases Python programmers do not use this facility since it introduces
-an unknown set of names into the interpreter, possibly hiding some things
-you have already defined.
+Cách này import tất cả các tên ngoại trừ những tên bắt đầu bằng dấu gạch dưới (``_``). Trong hầu hết trường hợp, các lập trình viên Python không sử dụng tính năng này vì nó đưa một tập hợp tên không xác định vào interpreter, có thể che khuất một số thành phần bạn đã định nghĩa.
 
-Note that in general the practice of importing ``*`` from a module or package is
-frowned upon, since it often causes poorly readable code. However, it is okay to
-use it to save typing in interactive sessions.
+Lưu ý rằng nhìn chung, việc import ``*`` từ một module hoặc package không được khuyến khích vì thường khiến code khó đọc. Tuy nhiên, bạn có thể sử dụng cách này để giảm thao tác gõ trong các phiên tương tác.
 
-If the module name is followed by :keyword:`!as`, then the name
-following :keyword:`!as` is bound directly to the imported module.
+Nếu tên module được theo sau bởi :keyword:`!as`, thì tên đứng sau :keyword:`!as` sẽ được liên kết trực tiếp với module đã import.
 
 ::
 
@@ -124,10 +87,9 @@ following :keyword:`!as` is bound directly to the imported module.
    >>> fib.fib(500)
    0 1 1 2 3 5 8 13 21 34 55 89 144 233 377
 
-This is effectively importing the module in the same way that ``import fibo``
-will do, with the only difference of it being available as ``fib``.
+Về cơ bản, cách này import module theo cùng cách mà ``import fibo`` thực hiện, chỉ khác là module đó có thể được sử dụng với tên ``fib``.
 
-It can also be used when utilising :keyword:`from` with similar effects::
+Cách này cũng có thể được sử dụng khi dùng :keyword:`from` với các hiệu ứng tương tự::
 
    >>> from fibo import fib as fibonacci
    >>> fibonacci(500)
@@ -136,149 +98,96 @@ It can also be used when utilising :keyword:`from` with similar effects::
 
 .. note::
 
-   For efficiency reasons, each module is only imported once per interpreter
-   session.  Therefore, if you change your modules, you must restart the
-   interpreter -- or, if it's just one module you want to test interactively,
-   use :func:`importlib.reload`, e.g. ``import importlib;
-   importlib.reload(modulename)``.
+   Vì lý do hiệu suất, mỗi module chỉ được import một lần trong mỗi phiên interpreter. Do đó, nếu bạn thay đổi các module của mình, bạn phải khởi động lại interpreter -- hoặc nếu chỉ muốn kiểm thử tương tác một module, hãy sử dụng :func:`importlib.reload`, ví dụ ``import importlib; importlib.reload(modulename)``.
 
 
 .. _tut-modulesasscripts:
 
-Executing modules as scripts
-----------------------------
+Thực thi module dưới dạng script
+--------------------------------
 
-When you run a Python module with ::
+Khi bạn chạy một module Python bằng::
 
    python fibo.py <arguments>
 
-the code in the module will be executed, just as if you imported it, but with
-the ``__name__`` set to ``"__main__"``.  That means that by adding this code at
-the end of your module::
+mã trong module sẽ được thực thi, giống như khi bạn import module đó, nhưng với ``__name__`` được đặt thành ``"__main__"``. Điều đó có nghĩa là bằng cách thêm đoạn mã này vào cuối module::
 
    if __name__ == "__main__":
        import sys
        fib(int(sys.argv[1]))
 
-you can make the file usable as a script as well as an importable module,
-because the code that parses the command line only runs if the module is
-executed as the "main" file:
+bạn có thể sử dụng tệp này vừa như một script vừa như một module có thể import, vì mã phân tích command line chỉ chạy khi module được thực thi dưới dạng tệp "main":
 
 .. code-block:: shell-session
 
    $ python fibo.py 50
    0 1 1 2 3 5 8 13 21 34
 
-If the module is imported, the code is not run::
+Nếu module được import, mã này sẽ không được chạy::
 
    >>> import fibo
    >>>
 
-This is often used either to provide a convenient user interface to a module, or
-for testing purposes (running the module as a script executes a test suite).
+Cách này thường được dùng để cung cấp giao diện người dùng thuận tiện cho một module hoặc cho mục đích kiểm thử (chạy module dưới dạng script sẽ thực thi một test suite).
 
 
 .. _tut-searchpath:
 
-The Module Search Path
-----------------------
+Đường dẫn tìm kiếm module
+-------------------------
 
 .. index:: triple: module; search; path
 
-When a module named :mod:`!spam` is imported, the interpreter first searches for
-a built-in module with that name. These module names are listed in
-:data:`sys.builtin_module_names`. If not found, it then searches for a file
-named :file:`spam.py` in a list of directories given by the variable
-:data:`sys.path`.  :data:`sys.path` is initialized from these locations:
+Khi một module có tên :mod:`!spam` được import, interpreter trước tiên sẽ tìm một built-in module có tên đó. Tên của các module này được liệt kê trong
+:data:`sys.builtin_module_names`. Nếu không tìm thấy, interpreter sẽ tiếp tục tìm một tệp có tên :file:`spam.py` trong danh sách các thư mục được chỉ định bởi biến
+:data:`sys.path`. :data:`sys.path` được khởi tạo từ các vị trí sau:
 
-* The directory containing the input script (or the current directory when no
-  file is specified).
-* :envvar:`PYTHONPATH` (a list of directory names, with the same syntax as the
-  shell variable :envvar:`PATH`).
-* The installation-dependent default (by convention including a
-  ``site-packages`` directory, handled by the :mod:`site` module).
+* Thư mục chứa input script (hoặc thư mục hiện tại khi không chỉ định tệp).
+* :envvar:`PYTHONPATH` (danh sách tên thư mục, sử dụng cùng cú pháp với biến shell :envvar:`PATH`).
+* Giá trị mặc định phụ thuộc vào cài đặt (theo quy ước bao gồm một thư mục ``site-packages``, được xử lý bởi module :mod:`site`).
 
-More details are at :ref:`sys-path-init`.
+Xem thêm chi tiết tại :ref:`sys-path-init`.
 
 .. note::
-   On file systems which support symlinks, the directory containing the input
-   script is calculated after the symlink is followed. In other words the
-   directory containing the symlink is **not** added to the module search path.
+   Trên các hệ thống tệp hỗ trợ symlink, thư mục chứa script đầu vào được tính sau khi symlink được resolve. Nói cách khác, thư mục chứa symlink **không** được thêm vào đường dẫn tìm kiếm module.
 
-After initialization, Python programs can modify :data:`sys.path`.  The
-directory containing the script being run is placed at the beginning of the
-search path, ahead of the standard library path. This means that scripts in that
-directory will be loaded instead of modules of the same name in the library
-directory. This is an error unless the replacement is intended.  See section
-:ref:`tut-standardmodules` for more information.
+Sau khi khởi tạo, các chương trình Python có thể sửa đổi :data:`sys.path`. Thư mục chứa script đang được chạy được đặt ở đầu đường dẫn tìm kiếm, trước đường dẫn thư viện chuẩn. Điều này có nghĩa là các script trong thư mục đó sẽ được tải thay cho các module cùng tên trong thư mục thư viện. Đây là một lỗi trừ khi việc thay thế này là có chủ đích. Xem phần
+:ref:`tut-standardmodules` để biết thêm thông tin.
 
 .. %
     Do we need stuff on zip files etc. ? DUBOIS
 
 .. _tut-pycache:
 
-"Compiled" Python files
------------------------
+Các tệp Python "đã biên dịch"
+-----------------------------
 
-To speed up loading modules, Python caches the compiled version of each module
-in the ``__pycache__`` directory under the name :file:`module.{version}.pyc`,
-where the version encodes the format of the compiled file; it generally contains
-the Python version number.  For example, in CPython release 3.3 the compiled
-version of spam.py would be cached as ``__pycache__/spam.cpython-33.pyc``.  This
-naming convention allows compiled modules from different releases and different
-versions of Python to coexist.
+Để tăng tốc độ tải module, Python lưu phiên bản đã biên dịch của mỗi module vào bộ nhớ đệm trong thư mục ``__pycache__`` với tên :file:`module.{version}.pyc`, trong đó phiên bản mã hóa định dạng của tệp đã biên dịch; nhìn chung, nó chứa số phiên bản Python. Ví dụ, trong bản phát hành CPython 3.3, phiên bản đã biên dịch của spam.py sẽ được lưu vào bộ nhớ đệm dưới dạng ``__pycache__/spam.cpython-33.pyc``. Quy ước đặt tên này cho phép các module đã biên dịch từ những bản phát hành và phiên bản Python khác nhau cùng tồn tại.
 
-Python checks the modification date of the source against the compiled version
-to see if it's out of date and needs to be recompiled.  This is a completely
-automatic process.  Also, the compiled modules are platform-independent, so the
-same library can be shared among systems with different architectures.
+Python kiểm tra ngày sửa đổi của mã nguồn với phiên bản đã biên dịch để xác định xem phiên bản đó đã lỗi thời và cần được biên dịch lại hay chưa. Đây là một quy trình hoàn toàn tự động. Ngoài ra, các module đã biên dịch không phụ thuộc vào nền tảng, vì vậy cùng một thư viện có thể được chia sẻ giữa các hệ thống có kiến trúc khác nhau.
 
-Python does not check the cache in two circumstances.  First, it always
-recompiles and does not store the result for the module that's loaded directly
-from the command line.  Second, it does not check the cache if there is no
-source module.  To support a non-source (compiled only) distribution, the
-compiled module must be in the source directory, and there must not be a source
-module.
+Python không kiểm tra cache trong hai trường hợp. Thứ nhất, Python luôn biên dịch lại và không lưu kết quả đối với module được tải trực tiếp từ dòng lệnh. Thứ hai, Python không kiểm tra cache nếu không có module nguồn. Để hỗ trợ bản phân phối không có mã nguồn (chỉ có mã đã biên dịch), module đã biên dịch phải nằm trong thư mục mã nguồn và không được có module nguồn.
 
-Some tips for experts:
+Một số mẹo dành cho chuyên gia:
 
-* You can use the :option:`-O` or :option:`-OO` switches on the Python command
-  to reduce the size of a compiled module.  The ``-O`` switch removes assert
-  statements, the ``-OO`` switch removes both assert statements and __doc__
-  strings.  Since some programs may rely on having these available, you should
-  only use this option if you know what you're doing.  "Optimized" modules have
-  an ``opt-`` tag and are usually smaller.  Future releases may
-  change the effects of optimization.
+* Bạn có thể sử dụng các switch :option:`-O` hoặc :option:`-OO` trong lệnh Python để giảm kích thước của module đã biên dịch. Switch ``-O`` loại bỏ các câu lệnh assert, còn switch ``-OO`` loại bỏ cả câu lệnh assert và chuỗi __doc__. Vì một số chương trình có thể phụ thuộc vào việc các thành phần này khả dụng, bạn chỉ nên sử dụng tùy chọn này nếu hiểu rõ mình đang làm gì. Các module "được tối ưu hóa" có thẻ ``opt-`` và thường nhỏ hơn. Các bản phát hành trong tương lai có thể thay đổi tác động của việc tối ưu hóa.
 
-* A program doesn't run any faster when it is read from a ``.pyc``
-  file than when it is read from a ``.py`` file; the only thing that's faster
-  about ``.pyc`` files is the speed with which they are loaded.
+* Một chương trình không chạy nhanh hơn khi được đọc từ tệp ``.pyc`` so với khi được đọc từ tệp ``.py``; điều duy nhất nhanh hơn ở các tệp ``.pyc`` là tốc độ chúng được tải.
 
-* The module :mod:`compileall` can create .pyc files for all modules in a
-  directory.
+* Module :mod:`compileall` có thể tạo các tệp .pyc cho tất cả module trong một thư mục.
 
-* There is more detail on this process, including a flow chart of the
-  decisions, in :pep:`3147`.
+* Có thêm thông tin chi tiết về quy trình này, bao gồm lưu đồ về các quyết định, trong :pep:`3147`.
 
 
 .. _tut-standardmodules:
 
-Standard Modules
+Các mô-đun chuẩn
 ================
 
 .. index:: pair: module; sys
 
-Python comes with a library of standard modules, described in a separate
-document, the Python Library Reference ("Library Reference" hereafter).  Some
-modules are built into the interpreter; these provide access to operations that
-are not part of the core of the language but are nevertheless built in, either
-for efficiency or to provide access to operating system primitives such as
-system calls.  The set of such modules is a configuration option which also
-depends on the underlying platform.  For example, the :mod:`winreg` module is only
-provided on Windows systems. One particular module deserves some attention:
-:mod:`sys`, which is built into every Python interpreter.  The variables
-``sys.ps1`` and ``sys.ps2`` define the strings used as primary and secondary
-prompts::
+Python đi kèm một thư viện gồm các module chuẩn, được mô tả trong một tài liệu riêng, Python Library Reference (sau đây gọi là "Library Reference"). Một số module được tích hợp sẵn trong trình thông dịch; chúng cung cấp quyền truy cập vào những thao tác không thuộc phần cốt lõi của ngôn ngữ nhưng vẫn được tích hợp sẵn, nhằm tăng hiệu quả hoặc cung cấp quyền truy cập vào các primitive của hệ điều hành, chẳng hạn như các system call. Tập hợp các module như vậy là một tùy chọn cấu hình và cũng phụ thuộc vào nền tảng bên dưới. Ví dụ, module :mod:`winreg` chỉ được cung cấp trên các hệ thống Windows. Có một module đặc biệt đáng được chú ý:
+:mod:`sys`, được tích hợp sẵn trong mọi trình thông dịch Python. Các biến ``sys.ps1`` và ``sys.ps2`` xác định các chuỗi được dùng làm prompt chính và prompt phụ::
 
    >>> import sys
    >>> sys.ps1
@@ -291,13 +200,10 @@ prompts::
    C>
 
 
-These two variables are only defined if the interpreter is in interactive mode.
+Hai biến này chỉ được định nghĩa khi trình thông dịch ở chế độ interactive.
 
-The variable ``sys.path`` is a list of strings that determines the interpreter's
-search path for modules. It is initialized to a default path taken from the
-environment variable :envvar:`PYTHONPATH`, or from a built-in default if
-:envvar:`PYTHONPATH` is not set.  You can modify it using standard list
-operations::
+Biến ``sys.path`` là một danh sách các chuỗi xác định đường dẫn tìm kiếm module của trình thông dịch. Biến này được khởi tạo bằng đường dẫn mặc định lấy từ biến môi trường :envvar:`PYTHONPATH`, hoặc bằng giá trị mặc định tích hợp sẵn nếu
+:envvar:`PYTHONPATH` không được thiết lập. Bạn có thể sửa đổi biến này bằng các thao tác danh sách chuẩn::
 
    >>> import sys
    >>> sys.path.append('/ufs/guido/lib/python')
@@ -305,11 +211,10 @@ operations::
 
 .. _tut-dir:
 
-The :func:`dir` Function
-========================
+Hàm :func:`dir`
+===============
 
-The built-in function :func:`dir` is used to find out which names a module
-defines.  It returns a sorted list of strings::
+Hàm tích hợp sẵn :func:`dir` được dùng để tìm hiểu những tên nào được một module định nghĩa. Hàm này trả về một danh sách chuỗi đã được sắp xếp::
 
    >>> import fibo, sys
    >>> dir(fibo)
@@ -337,7 +242,7 @@ defines.  It returns a sorted list of strings::
     'stdin', 'stdout', 'thread_info', 'unraisablehook', 'version', 'version_info',
     'warnoptions']
 
-Without arguments, :func:`dir` lists the names you have defined currently::
+Không có đối số, :func:`dir` liệt kê các tên mà bạn hiện đã định nghĩa::
 
    >>> a = [1, 2, 3, 4, 5]
    >>> import fibo
@@ -345,12 +250,11 @@ Without arguments, :func:`dir` lists the names you have defined currently::
    >>> dir()
    ['__builtins__', '__name__', 'a', 'fib', 'fibo', 'sys']
 
-Note that it lists all types of names: variables, modules, functions, etc.
+Lưu ý rằng nó liệt kê mọi loại tên: biến, module, hàm, v.v.
 
 .. index:: pair: module; builtins
 
-:func:`dir` does not list the names of built-in functions and variables.  If you
-want a list of those, they are defined in the standard module
+:func:`dir` không liệt kê tên của các hàm và biến dựng sẵn. Nếu muốn xem danh sách đó, chúng được định nghĩa trong mô-đun chuẩn
 :mod:`builtins`::
 
    >>> import builtins
@@ -387,27 +291,13 @@ want a list of those, they are defined in the standard module
 
 .. _tut-packages:
 
-Packages
-========
+Package
+=======
 
-Packages are a way of structuring Python's module namespace by using "dotted
-module names".  For example, the module name :mod:`!A.B` designates a submodule
-named ``B`` in a package named ``A``.  Just like the use of modules saves the
-authors of different modules from having to worry about each other's global
-variable names, the use of dotted module names saves the authors of multi-module
-packages like NumPy or Pillow from having to worry about
-each other's module names.
+Package là một cách tổ chức namespace của module Python bằng cách sử dụng "tên module dạng dấu chấm". Ví dụ, tên module :mod:`!A.B` chỉ một submodule có tên ``B`` trong một package có tên ``A``. Cũng như việc sử dụng module giúp tác giả của các module khác nhau không phải lo lắng về tên biến toàn cục của nhau, việc sử dụng tên module dạng dấu chấm giúp tác giả của các package nhiều module như NumPy hoặc Pillow không phải lo lắng về tên module của nhau.
 
-Suppose you want to design a collection of modules (a "package") for the uniform
-handling of sound files and sound data.  There are many different sound file
-formats (usually recognized by their extension, for example: :file:`.wav`,
-:file:`.aiff`, :file:`.au`), so you may need to create and maintain a growing
-collection of modules for the conversion between the various file formats.
-There are also many different operations you might want to perform on sound data
-(such as mixing, adding echo, applying an equalizer function, creating an
-artificial stereo effect), so in addition you will be writing a never-ending
-stream of modules to perform these operations.  Here's a possible structure for
-your package (expressed in terms of a hierarchical filesystem):
+Giả sử bạn muốn thiết kế một tập hợp các module (một "package") để xử lý thống nhất các tệp âm thanh và dữ liệu âm thanh. Có nhiều định dạng tệp âm thanh khác nhau (thường được nhận biết qua phần mở rộng, ví dụ: :file:`.wav`,
+:file:`.aiff`, :file:`.au`), vì vậy bạn có thể cần tạo và duy trì một tập hợp module ngày càng mở rộng để chuyển đổi giữa các định dạng tệp khác nhau. Ngoài ra, có nhiều thao tác khác nhau mà bạn có thể muốn thực hiện trên dữ liệu âm thanh (chẳng hạn như trộn, thêm tiếng vang, áp dụng hàm equalizer, tạo hiệu ứng stereo nhân tạo), nên bạn cũng sẽ liên tục viết thêm các module để thực hiện những thao tác này. Sau đây là một cấu trúc khả dĩ cho package của bạn (được biểu diễn dưới dạng một hệ thống tệp phân cấp):
 
 .. code-block:: text
 
@@ -435,157 +325,97 @@ your package (expressed in terms of a hierarchical filesystem):
                  karaoke.py
                  ...
 
-When importing the package, Python searches through the directories on
-``sys.path`` looking for the package subdirectory.
+Khi import package, Python sẽ tìm trong các thư mục trên ``sys.path`` để tìm thư mục con của package.
 
-The :file:`__init__.py` files are required to make Python treat directories
-containing the file as packages (unless using a :term:`namespace package`, a
-relatively advanced feature). This prevents directories with a common name,
-such as ``string``, from unintentionally hiding valid modules that occur later
-on the module search path. In the simplest case, :file:`__init__.py` can just be
-an empty file, but it can also execute initialization code for the package or
-set the ``__all__`` variable, described later.
+Các tệp :file:`__init__.py` là bắt buộc để Python coi những thư mục chứa tệp đó là package (trừ khi sử dụng :term:`namespace package`, một tính năng tương đối nâng cao). Điều này ngăn các thư mục có tên phổ biến, chẳng hạn như ``string``, vô tình che khuất các module hợp lệ xuất hiện sau đó trên đường dẫn tìm kiếm module. Trong trường hợp đơn giản nhất, :file:`__init__.py` chỉ cần là một tệp rỗng, nhưng nó cũng có thể thực thi mã khởi tạo cho package hoặc thiết lập biến ``__all__``, được mô tả ở phần sau.
 
-Users of the package can import individual modules from the package, for
-example::
+Người dùng package có thể import từng module riêng lẻ từ package, ví dụ:::
 
    import sound.effects.echo
 
-This loads the submodule :mod:`!sound.effects.echo`.  It must be referenced with
-its full name. ::
+Thao tác này tải submodule :mod:`!sound.effects.echo`. Bạn phải tham chiếu đến nó bằng tên đầy đủ.::
 
    sound.effects.echo.echofilter(input, output, delay=0.7, atten=4)
 
-An alternative way of importing the submodule is::
+Một cách khác để import submodule là::
 
    from sound.effects import echo
 
-This also loads the submodule :mod:`!echo`, and makes it available without its
-package prefix, so it can be used as follows::
+Điều này cũng tải submodule :mod:`!echo`, đồng thời cung cấp nó mà không cần tiền tố package, vì vậy có thể sử dụng như sau::
 
    echo.echofilter(input, output, delay=0.7, atten=4)
 
-Yet another variation is to import the desired function or variable directly::
+Một biến thể khác nữa là import trực tiếp hàm hoặc biến mong muốn::
 
    from sound.effects.echo import echofilter
 
-Again, this loads the submodule :mod:`!echo`, but this makes its function
-:func:`!echofilter` directly available::
+Một lần nữa, thao tác này tải submodule :mod:`!echo`, nhưng khiến hàm của nó
+:func:`!echofilter` được cung cấp trực tiếp::
 
    echofilter(input, output, delay=0.7, atten=4)
 
-Note that when using ``from package import item``, the item can be either a
-submodule (or subpackage) of the package, or some  other name defined in the
-package, like a function, class or variable.  The ``import`` statement first
-tests whether the item is defined in the package; if not, it assumes it is a
-module and attempts to load it.  If it fails to find it, an :exc:`ImportError`
-exception is raised.
+Lưu ý rằng khi sử dụng ``from package import item``, item có thể là một submodule (hoặc subpackage) của package, hoặc một tên khác được định nghĩa trong package, chẳng hạn như hàm, class hoặc biến. Câu lệnh ``import`` trước tiên kiểm tra xem item có được định nghĩa trong package hay không; nếu không, nó giả định item là một module và cố gắng tải module đó. Nếu không tìm thấy, một ngoại lệ :exc:`ImportError` sẽ được raise.
 
-Contrarily, when using syntax like ``import item.subitem.subsubitem``, each item
-except for the last must be a package; the last item can be a module or a
-package but can't be a class or function or variable defined in the previous
-item.
+Ngược lại, khi sử dụng cú pháp như ``import item.subitem.subsubitem``, mọi item ngoại trừ item cuối cùng phải là một package; item cuối cùng có thể là một module hoặc package nhưng không thể là class, hàm hoặc biến được định nghĩa trong item trước đó.
 
 
 .. _tut-pkg-import-star:
 
-Importing \* From a Package
----------------------------
+Import \* từ một Package
+------------------------
 
 .. index:: single: __all__
 
-Now what happens when the user writes ``from sound.effects import *``?  Ideally,
-one would hope that this somehow goes out to the filesystem, finds which
-submodules are present in the package, and imports them all.  This could take a
-long time and importing sub-modules might have unwanted side-effects that should
-only happen when the sub-module is explicitly imported.
+Vậy điều gì xảy ra khi người dùng viết ``from sound.effects import *``?  Lý tưởng nhất là ta hy vọng câu lệnh này bằng cách nào đó sẽ truy cập vào filesystem, tìm xem những submodule nào hiện diện trong package, rồi import tất cả chúng.  Quá trình này có thể mất nhiều thời gian, và việc import các submodule có thể gây ra những side effect không mong muốn, vốn chỉ nên xảy ra khi submodule được import một cách rõ ràng.
 
-The only solution is for the package author to provide an explicit index of the
-package.  The :keyword:`import` statement uses the following convention: if a package's
-:file:`__init__.py` code defines a list named ``__all__``, it is taken to be the
-list of module names that should be imported when ``from package import *`` is
-encountered.  It is up to the package author to keep this list up-to-date when a
-new version of the package is released.  Package authors may also decide not to
-support it, if they don't see a use for importing \* from their package.  For
-example, the file :file:`sound/effects/__init__.py` could contain the following
-code::
+Giải pháp duy nhất là tác giả package cung cấp một chỉ mục rõ ràng cho package.  Câu lệnh :keyword:`import` sử dụng quy ước sau: nếu một package có
+:file:`__init__.py` định nghĩa một danh sách có tên ``__all__``, danh sách đó được xem là danh sách tên các module cần được import khi gặp ``from package import *``.  Tác giả package có trách nhiệm cập nhật danh sách này khi phát hành phiên bản mới của package.  Tác giả package cũng có thể quyết định không hỗ trợ cơ chế này nếu họ không thấy có ích khi import \* từ package của mình.  Ví dụ, tệp :file:`sound/effects/__init__.py` có thể chứa đoạn code sau::
 
    __all__ = ["echo", "surround", "reverse"]
 
-This would mean that ``from sound.effects import *`` would import the three
-named submodules of the :mod:`!sound.effects` package.
+Điều này có nghĩa là ``from sound.effects import *`` sẽ import ba submodule đã nêu tên của package :mod:`!sound.effects`.
 
-Be aware that submodules might become shadowed by locally defined names. For
-example, if you added a ``reverse`` function to the
-:file:`sound/effects/__init__.py` file, the ``from sound.effects import *``
-would only import the two submodules ``echo`` and ``surround``, but *not* the
-``reverse`` submodule, because it is shadowed by the locally defined
-``reverse`` function::
+Hãy lưu ý rằng các submodule có thể bị che khuất bởi những tên được định nghĩa cục bộ. Ví dụ, nếu bạn thêm một hàm ``reverse`` vào tệp
+:file:`sound/effects/__init__.py`, thì ``from sound.effects import *`` sẽ chỉ import hai submodule ``echo`` và ``surround``, nhưng *không* submodule ``reverse``, vì nó bị che khuất bởi hàm ``reverse`` được định nghĩa cục bộ::
 
     __all__ = [
-        "echo",      # refers to the 'echo.py' file
-        "surround",  # refers to the 'surround.py' file
-        "reverse",   # !!! refers to the 'reverse' function now !!!
+        "echo",      # tham chiếu đến tệp 'echo.py'
+        "surround",  # tham chiếu đến tệp 'surround.py'
+        "reverse",   # !!! giờ đây tham chiếu đến hàm 'reverse' !!!
     ]
 
-    def reverse(msg: str):  # <-- this name shadows the 'reverse.py' submodule
-        return msg[::-1]    #     in the case of a 'from sound.effects import *'
+    def reverse(msg: str):  # <-- tên này che khuất submodule 'reverse.py'
+        return msg[::-1]    #     trong trường hợp sử dụng 'from sound.effects import *'
 
-If ``__all__`` is not defined, the statement ``from sound.effects import *``
-does *not* import all submodules from the package :mod:`!sound.effects` into the
-current namespace; it only ensures that the package :mod:`!sound.effects` has
-been imported (possibly running any initialization code in :file:`__init__.py`)
-and then imports whatever names are defined in the package.  This includes any
-names defined (and submodules explicitly loaded) by :file:`__init__.py`.  It
-also includes any submodules of the package that were explicitly loaded by
-previous :keyword:`import` statements.  Consider this code::
+Nếu ``__all__`` chưa được định nghĩa, câu lệnh ``from sound.effects import *`` sẽ *không* import tất cả các submodule từ package :mod:`!sound.effects` vào namespace hiện tại; nó chỉ đảm bảo rằng package :mod:`!sound.effects` đã được import (có thể chạy mọi mã khởi tạo trong :file:`__init__.py`) rồi import mọi tên được định nghĩa trong package. Điều này bao gồm mọi tên được định nghĩa (và các submodule được nạp rõ ràng) bởi :file:`__init__.py`. Nó cũng bao gồm mọi submodule của package đã được nạp rõ ràng bởi các câu lệnh :keyword:`import` trước đó. Hãy xem đoạn mã sau::
 
    import sound.effects.echo
    import sound.effects.surround
    from sound.effects import *
 
-In this example, the :mod:`!echo` and :mod:`!surround` modules are imported in the
-current namespace because they are defined in the :mod:`!sound.effects` package
-when the ``from...import`` statement is executed.  (This also works when
-``__all__`` is defined.)
+Trong ví dụ này, các module :mod:`!echo` và :mod:`!surround` được import vào namespace hiện tại vì chúng được định nghĩa trong package :mod:`!sound.effects` khi câu lệnh ``from...import`` được thực thi. (Điều này cũng hoạt động khi ``__all__`` được định nghĩa.)
 
-Although certain modules are designed to export only names that follow certain
-patterns when you use ``import *``, it is still considered bad practice in
-production code.
+Mặc dù một số module được thiết kế để chỉ export các tên tuân theo những mẫu nhất định khi bạn sử dụng ``import *``, cách này vẫn được xem là không nên dùng trong mã production.
 
-Remember, there is nothing wrong with using ``from package import
-specific_submodule``!  In fact, this is the recommended notation unless the
-importing module needs to use submodules with the same name from different
-packages.
+Hãy nhớ rằng việc sử dụng ``from package import specific_submodule`` hoàn toàn không có gì sai! Trên thực tế, đây là ký hiệu được khuyến nghị, trừ khi module nhập cần sử dụng các submodule cùng tên từ những package khác nhau.
 
 
 .. _intra-package-references:
 
-Intra-package References
-------------------------
+Tham chiếu giữa các package
+---------------------------
 
-When packages are structured into subpackages (as with the :mod:`!sound` package
-in the example), you can use absolute imports to refer to submodules of siblings
-packages.  For example, if the module :mod:`!sound.filters.vocoder` needs to use
-the :mod:`!echo` module in the :mod:`!sound.effects` package, it can use ``from
-sound.effects import echo``.
+Khi các package được tổ chức thành những subpackage (như package :mod:`!sound` trong ví dụ), bạn có thể sử dụng absolute import để tham chiếu đến các submodule của những package ngang hàng. Ví dụ, nếu module :mod:`!sound.filters.vocoder` cần sử dụng module :mod:`!echo` trong package :mod:`!sound.effects`, nó có thể dùng ``from sound.effects import echo``.
 
-You can also write relative imports, with the ``from module import name`` form
-of import statement.  These imports use leading dots to indicate the current and
-parent packages involved in the relative import.  From the :mod:`!surround`
-module for example, you might use::
+Bạn cũng có thể viết relative import bằng dạng ``from module import name`` của câu lệnh import. Các import này sử dụng những dấu chấm ở đầu để biểu thị package hiện tại và các package cha liên quan trong relative import. Ví dụ, từ module :mod:`!surround`, bạn có thể dùng::
 
    from . import echo
    from .. import formats
    from ..filters import equalizer
 
-Note that relative imports are based on the name of the current module's package.
-Since the main module does not have a package, modules intended for use
-as the main module of a Python application must always use absolute imports.
+Lưu ý rằng relative import dựa trên tên package của module hiện tại. Vì module chính không thuộc package nào, các module được dùng làm module chính của một ứng dụng Python luôn phải sử dụng absolute import.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] In fact function definitions are also 'statements' that are 'executed'; the
-   execution of a module-level function definition adds the function name to
-   the module's global namespace.
+.. [#] Thực tế, các định nghĩa hàm cũng là những 'câu lệnh' được 'thực thi'; việc thực thi một định nghĩa hàm ở cấp module sẽ thêm tên hàm vào namespace toàn cục của module.

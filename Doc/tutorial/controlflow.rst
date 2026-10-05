@@ -1,20 +1,18 @@
 .. _tut-morecontrol:
 
-***********************
-More Control Flow Tools
-***********************
+*********************************
+Các công cụ điều khiển luồng khác
+*********************************
 
-As well as the :keyword:`while` statement just introduced, Python uses a few more
-that we will encounter in this chapter.
+Ngoài câu lệnh :keyword:`while` vừa được giới thiệu, Python còn sử dụng một vài câu lệnh khác mà chúng ta sẽ gặp trong chương này.
 
 
 .. _tut-if:
 
-:keyword:`!if` Statements
-=========================
+Các câu lệnh :keyword:`!if`
+===========================
 
-Perhaps the most well-known statement type is the :keyword:`if` statement.  For
-example::
+Có lẽ loại câu lệnh được biết đến nhiều nhất là câu lệnh :keyword:`if`. Ví dụ:::
 
    >>> x = int(input("Please enter an integer: "))
    Please enter an integer: 42
@@ -30,30 +28,20 @@ example::
    ...
    More
 
-There can be zero or more :keyword:`elif` parts, and the :keyword:`else` part is
-optional.  The keyword ':keyword:`!elif`' is short for 'else if', and is useful
-to avoid excessive indentation.  An  :keyword:`!if` ... :keyword:`!elif` ...
-:keyword:`!elif` ... sequence is a substitute for the ``switch`` or
-``case`` statements found in other languages.
+Có thể có không hoặc nhiều phần :keyword:`elif`, còn phần :keyword:`else` là tùy chọn. Từ khóa ':keyword:`!elif`' là dạng viết tắt của 'else if' và hữu ích để tránh thụt lề quá sâu. Một :keyword:`!if` ... :keyword:`!elif` ...
+Chuỗi :keyword:`!elif` ... là một cách thay thế cho các câu lệnh ``switch`` hoặc ``case`` trong các ngôn ngữ khác.
 
-If you're comparing the same value to several constants, or checking for specific types or
-attributes, you may also find the :keyword:`!match` statement useful. For more
-details see :ref:`tut-match`.
+Nếu bạn đang so sánh cùng một giá trị với nhiều hằng số hoặc kiểm tra các kiểu hay thuộc tính cụ thể, bạn cũng có thể thấy câu lệnh :keyword:`!match` hữu ích. Để biết thêm chi tiết, hãy xem :ref:`tut-match`.
 
 .. _tut-for:
 
-:keyword:`!for` Statements
-==========================
+Câu lệnh :keyword:`!for`
+========================
 
 .. index::
    pair: statement; for
 
-The :keyword:`for` statement in Python differs a bit from what you may be used
-to in C or Pascal.  Rather than always iterating over an arithmetic progression
-of numbers (like in Pascal), or giving the user the ability to define both the
-iteration step and halting condition (as C), Python's :keyword:`!for` statement
-iterates over the items of any sequence (a list or a string), in the order that
-they appear in the sequence.  For example (no pun intended):
+Câu lệnh :keyword:`for` trong Python hơi khác so với những gì bạn có thể đã quen dùng trong C hoặc Pascal. Thay vì luôn lặp qua một cấp số cộng các số (như trong Pascal), hoặc cho phép người dùng xác định cả bước lặp và điều kiện dừng (như trong C), câu lệnh :keyword:`!for` của Python lặp qua các phần tử của bất kỳ sequence nào (danh sách hoặc chuỗi), theo đúng thứ tự xuất hiện trong sequence đó. Ví dụ (hoàn toàn không có ý chơi chữ):
 
 .. One suggestion was to give a real C example here, but that may only serve to
    confuse non-C programmers.
@@ -69,19 +57,17 @@ they appear in the sequence.  For example (no pun intended):
    window 6
    defenestrate 12
 
-Code that modifies a collection while iterating over that same collection can
-be tricky to get right.  Instead, it is usually more straight-forward to loop
-over a copy of the collection or to create a new collection::
+Mã sửa đổi một collection trong khi đang lặp qua chính collection đó có thể khó triển khai chính xác. Thay vào đó, thường sẽ đơn giản hơn nếu lặp qua một bản sao của collection hoặc tạo một collection mới::
 
-    # Create a sample collection
+    # Tạo một collection mẫu
     users = {'Hans': 'active', 'Éléonore': 'inactive', '景太郎': 'active'}
 
-    # Strategy:  Iterate over a copy
+    # Chiến lược: Lặp qua một bản sao
     for user, status in users.copy().items():
         if status == 'inactive':
             del users[user]
 
-    # Strategy:  Create a new collection
+    # Chiến lược: Tạo một collection mới
     active_users = {}
     for user, status in users.items():
         if status == 'active':
@@ -90,11 +76,11 @@ over a copy of the collection or to create a new collection::
 
 .. _tut-range:
 
-The :func:`range` Function
-==========================
+Hàm :func:`range`
+=================
 
-If you do need to iterate over a sequence of numbers, the built-in function
-:func:`range` comes in handy.  It generates arithmetic progressions::
+Nếu bạn thực sự cần lặp qua một dãy số, hàm tích hợp sẵn
+:func:`range` sẽ rất hữu ích. Hàm này tạo ra các cấp số cộng::
 
     >>> for i in range(5):
     ...     print(i)
@@ -105,10 +91,7 @@ If you do need to iterate over a sequence of numbers, the built-in function
     3
     4
 
-The given end point is never part of the generated sequence; ``range(10)`` generates
-10 values, the legal indices for items of a sequence of length 10.  It
-is possible to let the range start at another number, or to specify a different
-increment (even negative; sometimes this is called the 'step')::
+Điểm cuối đã cho không bao giờ là một phần của dãy được tạo; ``range(10)`` tạo ra 10 giá trị, là các chỉ số hợp lệ cho các phần tử của một dãy có độ dài 10. Bạn có thể để phạm vi bắt đầu từ một số khác hoặc chỉ định một bước tăng khác (kể cả số âm; đôi khi được gọi là 'step')::
 
     >>> list(range(5, 10))
     [5, 6, 7, 8, 9]
@@ -119,8 +102,8 @@ increment (even negative; sometimes this is called the 'step')::
     >>> list(range(-10, -100, -30))
     [-10, -40, -70]
 
-To iterate over the indices of a sequence, you can combine :func:`range` and
-:func:`len` as follows::
+Để lặp qua các chỉ số của một dãy, bạn có thể kết hợp :func:`range` và
+:func:`len` như sau::
 
    >>> a = ['Mary', 'had', 'a', 'little', 'lamb']
    >>> for i in range(len(a)):
@@ -132,39 +115,29 @@ To iterate over the indices of a sequence, you can combine :func:`range` and
    3 little
    4 lamb
 
-In most such cases, however, it is convenient to use the :func:`enumerate`
-function, see :ref:`tut-loopidioms`.
+Tuy nhiên, trong hầu hết các trường hợp như vậy, sẽ thuận tiện hơn khi sử dụng hàm :func:`enumerate`, xem :ref:`tut-loopidioms`.
 
-A strange thing happens if you just print a range::
+Một điều kỳ lạ xảy ra nếu bạn chỉ in một range::
 
    >>> range(10)
    range(0, 10)
 
-In many ways the object returned by :func:`range` behaves as if it is a list,
-but in fact it isn't. It is an object which returns the successive items of
-the desired sequence when you iterate over it, but it doesn't really make
-the list, thus saving space.
+Theo nhiều cách, đối tượng được trả về bởi :func:`range` hoạt động như thể nó là một danh sách, nhưng thực tế không phải vậy. Đây là một đối tượng trả về các phần tử liên tiếp của chuỗi mong muốn khi bạn lặp qua nó, nhưng nó không thực sự tạo danh sách, nhờ đó tiết kiệm không gian.
 
-We say such an object is :term:`iterable`, that is, suitable as a target for
-functions and constructs that expect something from which they can
-obtain successive items until the supply is :term:`exhausted`.  We have seen that
-the :keyword:`for` statement is such a construct, while an example of a function
-that takes an iterable is :func:`sum`::
+Chúng ta gọi một đối tượng như vậy là :term:`iterable`, nghĩa là nó phù hợp làm đích cho các hàm và cấu trúc cần một đối tượng mà từ đó chúng có thể lấy các phần tử liên tiếp cho đến khi nguồn cung :term:`exhausted`. Chúng ta đã thấy câu lệnh :keyword:`for` là một cấu trúc như vậy, còn một ví dụ về hàm nhận một iterable là :func:`sum`::
 
     >>> sum(range(4))  # 0 + 1 + 2 + 3
     6
 
-Later we will see more functions that return iterables and take iterables as
-arguments.  In chapter :ref:`tut-structures`, we will discuss :func:`list` in more
-detail.
+Sau này chúng ta sẽ thấy thêm nhiều hàm trả về iterable và nhận iterable làm đối số. Trong chương :ref:`tut-structures`, chúng ta sẽ thảo luận chi tiết hơn về :func:`list`.
 
 .. _tut-break:
 
-:keyword:`!break` and :keyword:`!continue` Statements
-=====================================================
+Các câu lệnh :keyword:`!break` và :keyword:`!continue`
+======================================================
 
-The :keyword:`break` statement breaks out of the innermost enclosing
-:keyword:`for` or :keyword:`while` loop::
+Câu lệnh :keyword:`break` thoát khỏi vòng lặp bao ngoài gần nhất
+vòng lặp :keyword:`for` hoặc :keyword:`while`::
 
     >>> for n in range(2, 10):
     ...     for x in range(2, n):
@@ -177,8 +150,7 @@ The :keyword:`break` statement breaks out of the innermost enclosing
     8 equals 2 * 4
     9 equals 3 * 3
 
-The :keyword:`continue` statement continues with the next
-iteration of the loop::
+Câu lệnh :keyword:`continue` tiếp tục với lần lặp tiếp theo của vòng lặp::
 
     >>> for num in range(2, 10):
     ...     if num % 2 == 0:
@@ -198,25 +170,18 @@ iteration of the loop::
 .. _tut-for-else:
 .. _break-and-continue-statements-and-else-clauses-on-loops:
 
-:keyword:`!else` Clauses on Loops
-=================================
+:keyword:`!else` Mệnh đề trên vòng lặp
+======================================
 
-In a :keyword:`!for` or :keyword:`!while` loop the :keyword:`!break` statement
-may be paired with an :keyword:`!else` clause.  If the loop finishes without
-executing the :keyword:`!break`, the :keyword:`!else` clause executes.
+Trong vòng lặp :keyword:`!for` hoặc :keyword:`!while`, câu lệnh :keyword:`!break` có thể được ghép với mệnh đề :keyword:`!else`. Nếu vòng lặp kết thúc mà không thực thi :keyword:`!break`, mệnh đề :keyword:`!else` sẽ được thực thi.
 
-In a :keyword:`for` loop, the :keyword:`!else` clause is executed
-after the loop finishes its final iteration, that is, if no break occurred.
+Trong vòng lặp :keyword:`for`, mệnh đề :keyword:`!else` được thực thi sau khi vòng lặp hoàn tất lần lặp cuối cùng, tức là nếu không xảy ra break.
 
-In a :keyword:`while` loop, it's executed after the loop's condition becomes false.
+Trong vòng lặp :keyword:`while`, mệnh đề này được thực thi sau khi điều kiện của vòng lặp trở thành false.
 
-In either kind of loop, the :keyword:`!else` clause is **not** executed if the
-loop was terminated by a :keyword:`break`.  Of course, other ways of ending the
-loop early, such as a :keyword:`return` or a raised exception, will also skip
-execution of the :keyword:`else` clause.
+Trong cả hai loại vòng lặp, mệnh đề :keyword:`!else` **không** được thực thi nếu vòng lặp bị kết thúc bởi :keyword:`break`. Tất nhiên, những cách khác để kết thúc vòng lặp sớm, chẳng hạn như :keyword:`return` hoặc một exception được raise, cũng sẽ bỏ qua việc thực thi mệnh đề :keyword:`else`.
 
-This is exemplified in the following :keyword:`!for` loop,
-which searches for prime numbers::
+Điều này được minh họa trong vòng lặp :keyword:`!for` sau đây, dùng để tìm các số nguyên tố::
 
    >>> for n in range(2, 10):
    ...     for x in range(2, n):
@@ -224,7 +189,7 @@ which searches for prime numbers::
    ...             print(n, 'equals', x, '*', n//x)
    ...             break
    ...     else:
-   ...         # loop fell through without finding a factor
+   ...         # vòng lặp kết thúc mà không tìm thấy thừa số
    ...         print(n, 'is a prime number')
    ...
    2 is a prime number
@@ -236,70 +201,49 @@ which searches for prime numbers::
    8 equals 2 * 4
    9 equals 3 * 3
 
-(Yes, this is the correct code.  Look closely: the ``else`` clause belongs to
-the ``for`` loop, **not** the ``if`` statement.)
+(Đúng, đây là đoạn mã chính xác. Hãy nhìn kỹ: mệnh đề ``else`` thuộc về vòng lặp ``for``, **not** câu lệnh ``if``.)
 
-One way to think of the else clause is to imagine it paired with the ``if``
-inside the loop.  As the loop executes, it will run a sequence like
-if/if/if/else. The ``if`` is inside the loop, encountered a number of times. If
-the condition is ever true, a ``break`` will happen. If the condition is never
-true, the ``else`` clause outside the loop will execute.
+Một cách để hình dung mệnh đề else là tưởng tượng nó được ghép cặp với ``if`` bên trong vòng lặp. Khi vòng lặp thực thi, nó sẽ chạy theo một chuỗi như if/if/if/else. ``if`` nằm bên trong vòng lặp và được gặp nhiều lần. Nếu điều kiện từng đúng, một ``break`` sẽ xảy ra. Nếu điều kiện chưa bao giờ đúng, mệnh đề ``else`` bên ngoài vòng lặp sẽ được thực thi.
 
-When used with a loop, the ``else`` clause has more in common with the ``else``
-clause of a :keyword:`try` statement than it does with that of ``if``
-statements: a ``try`` statement's ``else`` clause runs when no exception
-occurs, and a loop's ``else`` clause runs when no ``break`` occurs. For more on
-the ``try`` statement and exceptions, see :ref:`tut-handling`.
+Khi được dùng với vòng lặp, mệnh đề ``else`` có nhiều điểm chung hơn với mệnh đề ``else`` của câu lệnh :keyword:`try` so với mệnh đề đó của các câu lệnh ``if``: mệnh đề ``else`` của câu lệnh ``try`` được thực thi khi không xảy ra ngoại lệ, còn mệnh đề ``else`` của vòng lặp được thực thi khi không xảy ra ``break``. Để biết thêm về câu lệnh ``try`` và ngoại lệ, xem :ref:`tut-handling`.
 
 .. index:: single: ...; ellipsis literal
 .. _tut-pass:
 
-:keyword:`!pass` Statements
-===========================
+Câu lệnh :keyword:`!pass`
+=========================
 
-The :keyword:`pass` statement does nothing. It can be used when a statement is
-required syntactically but the program requires no action. For example::
+Câu lệnh :keyword:`pass` không thực hiện thao tác nào. Câu lệnh này có thể được dùng khi cú pháp yêu cầu một câu lệnh nhưng chương trình không cần thực hiện hành động nào. Ví dụ::
 
    >>> while True:
-   ...     pass  # Busy-wait for keyboard interrupt (Ctrl+C)
+   ...     pass  # Chờ bận để bắt ngắt bàn phím (Ctrl+C)
    ...
 
-This is commonly used for creating minimal classes::
+Cách này thường được dùng để tạo các class tối giản::
 
    >>> class MyEmptyClass:
    ...     pass
    ...
 
-Another place :keyword:`pass` can be used is as a place-holder for a function or
-conditional body when you are working on new code, allowing you to keep thinking
-at a more abstract level.  The :keyword:`!pass` is silently ignored::
+Một nơi khác có thể sử dụng :keyword:`pass` là làm chỗ giữ chỗ cho phần thân của một hàm hoặc điều kiện khi bạn đang viết mã mới, cho phép bạn tiếp tục suy nghĩ ở mức trừu tượng hơn. :keyword:`!pass` sẽ bị bỏ qua một cách im lặng::
 
    >>> def initlog(*args):
-   ...     pass   # Remember to implement this!
+   ...     pass   # Nhớ triển khai phần này!
    ...
 
-For this last case, many people use the ellipsis literal :code:`...` instead of
-:code:`pass`. This use has no special meaning to Python, and is not part of
-the language definition (you could use any constant expression here), but
-:code:`...` is used conventionally as a placeholder body as well.
-See :ref:`bltin-ellipsis-object`.
+Trong trường hợp cuối cùng này, nhiều người sử dụng literal dấu ba chấm :code:`...` thay vì
+:code:`pass`. Cách sử dụng này không có ý nghĩa đặc biệt đối với Python và không thuộc định nghĩa của ngôn ngữ (bạn có thể sử dụng bất kỳ biểu thức hằng nào ở đây), nhưng
+:code:`...` cũng thường được sử dụng theo quy ước làm phần thân giữ chỗ. Xem :ref:`bltin-ellipsis-object`.
 
 
 .. _tut-match:
 
-:keyword:`!match` Statements
-============================
+Các câu lệnh :keyword:`!match`
+==============================
 
-A :keyword:`match` statement takes an expression and compares its value to successive
-patterns given as one or more case blocks.  This is superficially
-similar to a switch statement in C, Java or JavaScript (and many
-other languages), but it's more similar to pattern matching in
-languages like Rust or Haskell. Only the first pattern that matches
-gets executed and it can also extract components (sequence elements
-or object attributes) from the value into variables. If no case matches,
-none of the branches is executed.
+Một câu lệnh :keyword:`match` nhận một biểu thức và so sánh giá trị của biểu thức đó với các mẫu liên tiếp được cung cấp trong một hoặc nhiều khối case. Cách này bề ngoài tương tự như câu lệnh switch trong C, Java hoặc JavaScript (và nhiều ngôn ngữ khác), nhưng gần với pattern matching trong các ngôn ngữ như Rust hoặc Haskell hơn. Chỉ mẫu đầu tiên khớp mới được thực thi, và câu lệnh cũng có thể trích xuất các thành phần (phần tử chuỗi hoặc thuộc tính đối tượng) từ giá trị vào các biến. Nếu không có case nào khớp, không nhánh nào được thực thi.
 
-The simplest form compares a subject value against one or more literals::
+Dạng đơn giản nhất so sánh một giá trị subject với một hoặc nhiều literal::
 
     def http_error(status):
         match status:
@@ -312,18 +256,16 @@ The simplest form compares a subject value against one or more literals::
             case _:
                 return "Something's wrong with the internet"
 
-Note the last block: the "variable name" ``_`` acts as a *wildcard* and
-never fails to match.
+Lưu ý khối cuối cùng: "tên biến" ``_`` hoạt động như một *wildcard* và không bao giờ không khớp.
 
-You can combine several literals in a single pattern using ``|`` ("or")::
+Bạn có thể kết hợp một số literal trong cùng một pattern bằng ``|`` ("hoặc")::
 
             case 401 | 403 | 404:
                 return "Not allowed"
 
-Patterns can look like unpacking assignments, and can be used to bind
-variables::
+Các pattern có thể trông giống như các phép gán unpacking và có thể được dùng để liên kết các biến::
 
-    # point is an (x, y) tuple
+    # điểm là một tuple (x, y)
     match point:
         case (0, 0):
             print("Origin")
@@ -336,16 +278,9 @@ variables::
         case _:
             raise ValueError("Not a point")
 
-Study that one carefully!  The first pattern has two literals, and can
-be thought of as an extension of the literal pattern shown above.  But
-the next two patterns combine a literal and a variable, and the
-variable *binds* a value from the subject (``point``).  The fourth
-pattern captures two values, which makes it conceptually similar to
-the unpacking assignment ``(x, y) = point``.
+Hãy xem xét kỹ phần này! Pattern đầu tiên có hai literal và có thể được xem như phần mở rộng của literal pattern được trình bày ở trên. Nhưng hai pattern tiếp theo kết hợp một literal và một biến, trong đó biến *liên kết* một giá trị từ subject (``point``). Pattern thứ tư nắm bắt hai giá trị, khiến về mặt khái niệm nó tương tự phép gán unpacking ``(x, y) = point``.
 
-If you are using classes to structure your data
-you can use the class name followed by an argument list resembling a
-constructor, but with the ability to capture attributes into variables::
+Nếu bạn sử dụng các class để cấu trúc dữ liệu, bạn có thể dùng tên class theo sau là danh sách đối số giống với constructor, nhưng có khả năng nắm bắt các thuộc tính vào các biến::
 
     class Point:
         def __init__(self, x, y):
@@ -365,26 +300,16 @@ constructor, but with the ability to capture attributes into variables::
             case _:
                 print("Not a point")
 
-You can use positional parameters with some builtin classes that provide an
-ordering for their attributes (e.g. dataclasses). You can also define a specific
-position for attributes in patterns by setting the ``__match_args__`` special
-attribute in your classes. If it's set to ("x", "y"), the following patterns are all
-equivalent (and all bind the ``y`` attribute to the ``var`` variable)::
+Bạn có thể sử dụng các tham số vị trí với một số lớp dựng sẵn cung cấp thứ tự cho các thuộc tính của chúng (ví dụ: dataclasses). Bạn cũng có thể xác định vị trí cụ thể cho các thuộc tính trong pattern bằng cách đặt thuộc tính đặc biệt ``__match_args__`` trong các lớp của mình. Nếu đặt nó thành ("x", "y"), các pattern sau đều tương đương (và đều liên kết thuộc tính ``y`` với biến ``var``)::
 
     Point(1, var)
     Point(1, y=var)
     Point(x=1, y=var)
     Point(y=var, x=1)
 
-A recommended way to read patterns is to look at them as an extended form of what you
-would put on the left of an assignment, to understand which variables would be set to
-what.
-Only the standalone names (like ``var`` above) are assigned to by a match statement.
-Dotted names (like ``foo.bar``), attribute names (the ``x=`` and ``y=`` above) or class names
-(recognized by the "(...)" next to them like ``Point`` above) are never assigned to.
+Một cách được khuyến nghị để đọc các pattern là xem chúng như một dạng mở rộng của nội dung bạn sẽ đặt ở bên trái phép gán, nhằm hiểu biến nào sẽ được gán giá trị nào. Chỉ các tên đứng độc lập (như ``var`` ở trên) mới được câu lệnh match gán giá trị. Tên có dấu chấm (như ``foo.bar``), tên thuộc tính (các ``x=`` và ``y=`` ở trên) hoặc tên lớp (được nhận biết qua "(...)" bên cạnh chúng, như ``Point`` ở trên) không bao giờ được gán giá trị.
 
-Patterns can be arbitrarily nested.  For example, if we have a short
-list of Points, with ``__match_args__`` added, we could match it like this::
+Các pattern có thể được lồng nhau tùy ý. Ví dụ, nếu chúng ta có một danh sách ngắn các Point, với ``__match_args__`` được thêm vào, chúng ta có thể so khớp danh sách đó như sau::
 
     class Point:
         __match_args__ = ('x', 'y')
@@ -404,9 +329,7 @@ list of Points, with ``__match_args__`` added, we could match it like this::
         case _:
             print("Something else")
 
-We can add an ``if`` clause to a pattern, known as a "guard".  If the
-guard is false, ``match`` goes on to try the next case block.  Note
-that value capture happens before the guard is evaluated::
+Chúng ta có thể thêm mệnh đề ``if`` vào một pattern, được gọi là "guard". Nếu guard có giá trị false, ``match`` sẽ tiếp tục thử khối case tiếp theo. Lưu ý rằng việc capture giá trị diễn ra trước khi guard được đánh giá::
 
     match point:
         case Point(x, y) if x == y:
@@ -414,34 +337,24 @@ that value capture happens before the guard is evaluated::
         case Point(x, y):
             print(f"Not on the diagonal")
 
-Several other key features of this statement:
+Một số tính năng quan trọng khác của câu lệnh này:
 
-- Like unpacking assignments, tuple and list patterns have exactly the
-  same meaning and actually match arbitrary sequences.  An important
-  exception is that they don't match iterators or strings.
+- Giống như phép gán unpacking, các pattern tuple và list có chính xác cùng ý nghĩa và thực tế sẽ khớp với các sequence tùy ý. Một ngoại lệ quan trọng là chúng không khớp với iterator hoặc string.
 
-- Sequence patterns support extended unpacking: ``[x, y, *rest]`` and ``(x, y,
-  *rest)`` work similar to unpacking assignments.  The
-  name after ``*`` may also be ``_``, so ``(x, y, *_)`` matches a sequence
-  of at least two items without binding the remaining items.
+- Các pattern sequence hỗ trợ extended unpacking: ``[x, y, *rest]`` và ``(x, y, *rest)`` hoạt động tương tự như trong phép gán unpacking. Tên sau ``*`` cũng có thể là ``_``, vì vậy ``(x, y, *_)`` sẽ khớp với một sequence có ít nhất hai phần tử mà không liên kết các phần tử còn lại.
 
-- Mapping patterns: ``{"bandwidth": b, "latency": l}`` captures the
-  ``"bandwidth"`` and ``"latency"`` values from a dictionary.  Unlike sequence
-  patterns, extra keys are ignored.  An unpacking like ``**rest`` is also
-  supported.  (But ``**_`` would be redundant, so it is not allowed.)
+- Các mẫu ánh xạ (mapping pattern): ``{"bandwidth": b, "latency": l}`` lấy các giá trị ``"bandwidth"`` và ``"latency"`` từ một dictionary. Khác với các mẫu chuỗi (sequence pattern), những khóa thừa sẽ bị bỏ qua. Cú pháp unpacking như ``**rest`` cũng được hỗ trợ. (Tuy nhiên, ``**_`` sẽ là dư thừa nên không được phép.)
 
-- Subpatterns may be captured using the ``as`` keyword::
+- Có thể capture các subpattern bằng từ khóa ``as``::
 
       case (Point(x1, y1), Point(x2, y2) as p2): ...
 
   will capture the second element of the input as ``p2`` (as long as the input is
   a sequence of two points)
 
-- Most literals are compared by equality, however the singletons ``True``,
-  ``False`` and ``None`` are compared by identity.
+- Hầu hết các literal được so sánh bằng phép so sánh bằng, tuy nhiên các singleton ``True``, ``False`` và ``None`` được so sánh bằng identity.
 
-- Patterns may use named constants.  These must be dotted names
-  to prevent them from being interpreted as capture variables::
+- Các pattern có thể sử dụng các hằng số có tên. Những hằng số này phải là các tên có dấu chấm để tránh bị diễn giải thành các biến capture::
 
       from enum import Enum
       class Color(Enum):
@@ -459,18 +372,17 @@ Several other key features of this statement:
           case Color.BLUE:
               print("I'm feeling the blues :(")
 
-For a more detailed explanation and additional examples, you can look into
-:pep:`636` which is written in a tutorial format.
+Để xem phần giải thích chi tiết hơn và các ví dụ bổ sung, bạn có thể xem
+:pep:`636` được viết theo dạng hướng dẫn.
 
 .. _tut-functions:
 
-Defining Functions
+Định nghĩa các hàm
 ==================
 
-We can create a function that writes the Fibonacci series to an arbitrary
-boundary::
+Chúng ta có thể tạo một hàm ghi dãy Fibonacci đến một giới hạn tùy ý::
 
-   >>> def fib(n):    # write Fibonacci series less than n
+   >>> def fib(n):    # ghi dãy Fibonacci nhỏ hơn n
    ...     """Print a Fibonacci series less than n."""
    ...     a, b = 0, 1
    ...     while a < n:
@@ -478,7 +390,7 @@ boundary::
    ...         a, b = b, a+b
    ...     print()
    ...
-   >>> # Now call the function we just defined:
+   >>> # Bây giờ hãy gọi hàm chúng ta vừa định nghĩa:
    >>> fib(2000)
    0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597
 
@@ -487,40 +399,15 @@ boundary::
    single: docstrings
    single: strings, documentation
 
-The keyword :keyword:`def` introduces a function *definition*.  It must be
-followed by the function name and the parenthesized list of formal parameters.
-The statements that form the body of the function start at the next line, and
-must be indented.
+Từ khóa :keyword:`def` giới thiệu *định nghĩa* một hàm. Từ khóa này phải được theo sau bởi tên hàm và danh sách các tham số hình thức đặt trong dấu ngoặc đơn. Các câu lệnh tạo thành thân hàm bắt đầu từ dòng tiếp theo và phải được thụt lề.
 
-The first statement of the function body can optionally be a string literal;
-this string literal is the function's documentation string, or :dfn:`docstring`.
-(More about docstrings can be found in the section :ref:`tut-docstrings`.)
-There are tools which use docstrings to automatically produce online or printed
-documentation, or to let the user interactively browse through code; it's good
-practice to include docstrings in code that you write, so make a habit of it.
+Câu lệnh đầu tiên trong phần thân hàm có thể tùy chọn là một chuỗi ký tự; chuỗi ký tự này là chuỗi tài liệu của hàm, hay còn gọi là :dfn:`docstring`. (Bạn có thể tìm thêm thông tin về docstring trong phần :ref:`tut-docstrings`.) Có những công cụ sử dụng docstring để tự động tạo tài liệu trực tuyến hoặc tài liệu in, hoặc cho phép người dùng duyệt mã tương tác; việc đưa docstring vào mã bạn viết là một thực hành tốt, vì vậy hãy tạo thói quen này.
 
-The *execution* of a function introduces a new symbol table used for the local
-variables of the function.  More precisely, all variable assignments in a
-function store the value in the local symbol table; whereas variable references
-first look in the local symbol table, then in the local symbol tables of
-enclosing functions, then in the global symbol table, and finally in the table
-of built-in names. Thus, global variables and variables of enclosing functions
-cannot be directly assigned a value within a function (unless, for global
-variables, named in a :keyword:`global` statement, or, for variables of enclosing
-functions, named in a :keyword:`nonlocal` statement), although they may be
-referenced.
+Việc *thực thi* một hàm tạo ra một bảng ký hiệu mới được dùng cho các biến cục bộ của hàm. Cụ thể hơn, mọi phép gán biến trong một hàm đều lưu giá trị vào bảng ký hiệu cục bộ; trong khi đó, các tham chiếu biến trước tiên tìm trong bảng ký hiệu cục bộ, sau đó trong các bảng ký hiệu cục bộ của những hàm bao quanh, tiếp theo trong bảng ký hiệu toàn cục và cuối cùng trong bảng các tên dựng sẵn. Vì vậy, các biến toàn cục và biến của những hàm bao quanh không thể được gán giá trị trực tiếp bên trong một hàm (trừ khi các biến toàn cục được nêu trong câu lệnh :keyword:`global`, hoặc các biến của những hàm bao quanh được nêu trong câu lệnh :keyword:`nonlocal`), mặc dù chúng có thể được tham chiếu.
 
-The actual parameters (arguments) to a function call are introduced in the local
-symbol table of the called function when it is called; thus, arguments are
-passed using *call by value* (where the *value* is always an object *reference*,
-not the value of the object). [#]_ When a function calls another function,
-or calls itself recursively, a new
-local symbol table is created for that call.
+Các tham số thực tế (đối số) của một lần gọi hàm được đưa vào bảng ký hiệu cục bộ của hàm được gọi khi hàm đó được gọi; do đó, các đối số được truyền bằng *tham trị* (trong đó *giá trị* luôn là một *tham chiếu* đến đối tượng, chứ không phải giá trị của đối tượng). [#]_ Khi một hàm gọi một hàm khác hoặc tự gọi đệ quy, một bảng ký hiệu cục bộ mới sẽ được tạo cho lần gọi đó.
 
-A function definition associates the function name with the function object in
-the current symbol table.  The interpreter recognizes the object pointed to by
-that name as a user-defined function.  Other names can also point to that same
-function object and can also be used to access the function::
+Một định nghĩa hàm liên kết tên hàm với đối tượng hàm trong bảng ký hiệu hiện tại. Trình thông dịch nhận diện đối tượng được tên đó trỏ tới là một hàm do người dùng định nghĩa. Các tên khác cũng có thể trỏ tới cùng đối tượng hàm đó và cũng có thể được dùng để truy cập hàm::
 
    >>> fib
    <function fib at 10042ed0>
@@ -528,68 +415,50 @@ function object and can also be used to access the function::
    >>> f(100)
    0 1 1 2 3 5 8 13 21 34 55 89
 
-Coming from other languages, you might object that ``fib`` is not a function but
-a procedure since it doesn't return a value.  In fact, even functions without a
-:keyword:`return` statement do return a value, albeit a rather boring one.  This
-value is called ``None`` (it's a built-in name).  Writing the value ``None`` is
-normally suppressed by the interpreter if it would be the only value written.
-You can see it if you really want to using :func:`print`::
+Nếu đến từ các ngôn ngữ khác, bạn có thể phản đối rằng ``fib`` không phải là một hàm mà là một thủ tục vì nó không trả về giá trị. Thực tế, ngay cả các hàm không có một
+câu lệnh :keyword:`return` cũng trả về một giá trị, dù khá đơn điệu. Giá trị này được gọi là ``None`` (đây là một tên dựng sẵn). Thông thường, trình thông dịch sẽ không hiển thị giá trị ``None`` nếu đó là giá trị duy nhất được hiển thị. Bạn có thể xem giá trị này nếu thực sự muốn bằng cách sử dụng :func:`print`::
 
    >>> fib(0)
    >>> print(fib(0))
    None
 
-It is simple to write a function that returns a list of the numbers of the
-Fibonacci series, instead of printing it::
+Việc viết một hàm trả về một danh sách các số trong dãy Fibonacci thay vì in dãy đó ra rất đơn giản::
 
-   >>> def fib2(n):  # return Fibonacci series up to n
+   >>> def fib2(n):  # trả về dãy Fibonacci đến n
    ...     """Return a list containing the Fibonacci series up to n."""
    ...     result = []
    ...     a, b = 0, 1
    ...     while a < n:
-   ...         result.append(a)    # see below
+   ...         result.append(a)    # xem bên dưới
    ...         a, b = b, a+b
    ...     return result
    ...
-   >>> f100 = fib2(100)    # call it
-   >>> f100                # write the result
+   >>> f100 = fib2(100)    # gọi nó
+   >>> f100                # ghi kết quả
    [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 
-This example, as usual, demonstrates some new Python features:
+Ví dụ này, như thường lệ, minh họa một số tính năng mới của Python:
 
-* The :keyword:`return` statement returns with a value from a function.
-  :keyword:`!return` without an expression argument returns ``None``. Falling off
-  the end of a function also returns ``None``.
+* Câu lệnh :keyword:`return` trả về một giá trị từ một hàm.
+  :keyword:`!return` không có đối số biểu thức sẽ trả về ``None``. Khi chạy đến cuối hàm cũng sẽ trả về ``None``.
 
-* The statement ``result.append(a)`` calls a *method* of the list object
-  ``result``.  A method is a function that 'belongs' to an object and is named
-  ``obj.methodname``, where ``obj`` is some object (this may be an expression),
-  and ``methodname`` is the name of a method that is defined by the object's type.
-  Different types define different methods.  Methods of different types may have
-  the same name without causing ambiguity.  (It is possible to define your own
-  object types and methods, using *classes*, see :ref:`tut-classes`)
-  The method :meth:`~list.append` shown in the example is defined for list objects; it
-  adds a new element at the end of the list.  In this example it is equivalent to
-  ``result = result + [a]``, but more efficient.
+* Câu lệnh ``result.append(a)`` gọi *method* của đối tượng danh sách ``result``. Một method là một hàm “thuộc về” một đối tượng và được đặt tên là ``obj.methodname``, trong đó ``obj`` là một đối tượng nào đó (có thể là một biểu thức), còn ``methodname`` là tên của một method được định nghĩa bởi kiểu của đối tượng. Các kiểu khác nhau định nghĩa các method khác nhau. Các method thuộc những kiểu khác nhau có thể có cùng tên mà không gây ra sự mơ hồ. (Bạn có thể định nghĩa các kiểu đối tượng và method của riêng mình bằng cách sử dụng *classes*, xem :ref:`tut-classes`) Method :meth:`~list.append` được minh họa trong ví dụ được định nghĩa cho các đối tượng danh sách; nó thêm một phần tử mới vào cuối danh sách. Trong ví dụ này, nó tương đương với ``result = result + [a]``, nhưng hiệu quả hơn.
 
 
 .. _tut-defining:
 
-More on Defining Functions
-==========================
+Tìm hiểu thêm về Defining Functions
+===================================
 
-It is also possible to define functions with a variable number of arguments.
-There are three forms, which can be combined.
+Bạn cũng có thể định nghĩa các hàm với số lượng đối số thay đổi. Có ba dạng và chúng có thể được kết hợp với nhau.
 
 
 .. _tut-defaultargs:
 
-Default Argument Values
------------------------
+Giá trị mặc định của đối số
+---------------------------
 
-The most useful form is to specify a default value for one or more arguments.
-This creates a function that can be called with fewer arguments than it is
-defined to allow.  For example::
+Cách hữu ích nhất là chỉ định một giá trị mặc định cho một hoặc nhiều đối số. Điều này tạo ra một hàm có thể được gọi với ít đối số hơn số đối số mà hàm được định nghĩa để chấp nhận. Ví dụ:::
 
    def ask_ok(prompt, retries=4, reminder='Please try again!'):
        while True:
@@ -603,20 +472,15 @@ defined to allow.  For example::
                raise ValueError('invalid user response')
            print(reminder)
 
-This function can be called in several ways:
+Hàm này có thể được gọi theo một số cách:
 
-* giving only the mandatory argument:
-  ``ask_ok('Do you really want to quit?')``
-* giving one of the optional arguments:
-  ``ask_ok('OK to overwrite the file?', 2)``
-* or even giving all arguments:
-  ``ask_ok('OK to overwrite the file?', 2, 'Come on, only yes or no!')``
+* chỉ cung cấp đối số bắt buộc: ``ask_ok('Do you really want to quit?')``
+* cung cấp một trong các đối số tùy chọn: ``ask_ok('OK to overwrite the file?', 2)``
+* hoặc thậm chí cung cấp tất cả các đối số: ``ask_ok('OK to overwrite the file?', 2, 'Come on, only yes or no!')``
 
-This example also introduces the :keyword:`in` keyword. This tests whether or
-not a sequence contains a certain value.
+Ví dụ này cũng giới thiệu từ khóa :keyword:`in`. Từ khóa này kiểm tra xem một sequence có chứa một giá trị nhất định hay không.
 
-The default values are evaluated at the point of function definition in the
-*defining* scope, so that ::
+Các giá trị mặc định được đánh giá tại thời điểm định nghĩa hàm trong phạm vi *định nghĩa*, vì vậy::
 
    i = 5
 
@@ -626,12 +490,9 @@ The default values are evaluated at the point of function definition in the
    i = 6
    f()
 
-will print ``5``.
+sẽ in ra ``5``.
 
-**Important warning:**  The default value is evaluated only once. This makes a
-difference when the default is a mutable object such as a list, dictionary, or
-instances of most classes.  For example, the following function accumulates the
-arguments passed to it on subsequent calls::
+**Cảnh báo quan trọng:** Giá trị mặc định chỉ được đánh giá một lần. Điều này tạo ra khác biệt khi giá trị mặc định là một đối tượng có thể thay đổi, chẳng hạn như list, dictionary hoặc các thể hiện của hầu hết các lớp. Ví dụ, hàm sau đây sẽ tích lũy các đối số được truyền vào trong những lần gọi tiếp theo::
 
    def f(a, L=[]):
        L.append(a)
@@ -641,14 +502,13 @@ arguments passed to it on subsequent calls::
    print(f(2))
    print(f(3))
 
-This will print ::
+Lệnh này sẽ in ra::
 
    [1]
    [1, 2]
    [1, 2, 3]
 
-If you don't want the default to be shared between subsequent calls, you can
-write the function like this instead::
+Nếu bạn không muốn giá trị mặc định được dùng chung giữa các lần gọi tiếp theo, bạn có thể viết hàm như sau::
 
    def f(a, L=None):
        if L is None:
@@ -659,11 +519,10 @@ write the function like this instead::
 
 .. _tut-keywordargs:
 
-Keyword Arguments
------------------
+Đối số từ khóa
+--------------
 
-Functions can also be called using :term:`keyword arguments <keyword argument>`
-of the form ``kwarg=value``.  For instance, the following function::
+Các hàm cũng có thể được gọi bằng :term:`đối số từ khóa <keyword argument>` có dạng ``kwarg=value``. Ví dụ, hàm sau đây::
 
    def parrot(voltage, state='a stiff', action='voom', type='Norwegian Blue'):
        print("-- This parrot wouldn't", action, end=' ')
@@ -671,31 +530,23 @@ of the form ``kwarg=value``.  For instance, the following function::
        print("-- Lovely plumage, the", type)
        print("-- It's", state, "!")
 
-accepts one required argument (``voltage``) and three optional arguments
-(``state``, ``action``, and ``type``).  This function can be called in any
-of the following ways::
+chấp nhận một đối số bắt buộc (``voltage``) và ba đối số tùy chọn (``state``, ``action`` và ``type``). Hàm này có thể được gọi theo bất kỳ cách nào sau đây::
 
-   parrot(1000)                                          # 1 positional argument
-   parrot(voltage=1000)                                  # 1 keyword argument
-   parrot(voltage=1000000, action='VOOOOOM')             # 2 keyword arguments
-   parrot(action='VOOOOOM', voltage=1000000)             # 2 keyword arguments
-   parrot('a million', 'bereft of life', 'jump')         # 3 positional arguments
-   parrot('a thousand', state='pushing up the daisies')  # 1 positional, 1 keyword
+   parrot(1000)                                          # 1 đối số vị trí
+   parrot(voltage=1000)                                  # 1 đối số từ khóa
+   parrot(voltage=1000000, action='VOOOOOM')             # 2 đối số từ khóa
+   parrot(action='VOOOOOM', voltage=1000000)             # 2 đối số từ khóa
+   parrot('a million', 'bereft of life', 'jump')         # 3 đối số vị trí
+   parrot('a thousand', state='pushing up the daisies')  # 1 đối số vị trí, 1 đối số từ khóa
 
-but all the following calls would be invalid::
+nhưng tất cả các lệnh gọi sau đây đều không hợp lệ::
 
-   parrot()                     # required argument missing
-   parrot(voltage=5.0, 'dead')  # non-keyword argument after a keyword argument
-   parrot(110, voltage=220)     # duplicate value for the same argument
-   parrot(actor='John Cleese')  # unknown keyword argument
+   parrot()                     # thiếu đối số bắt buộc
+   parrot(voltage=5.0, 'dead')  # đối số không phải keyword đứng sau đối số keyword
+   parrot(110, voltage=220)     # giá trị trùng lặp cho cùng một đối số
+   parrot(actor='John Cleese')  # đối số keyword không xác định
 
-In a function call, keyword arguments must follow positional arguments.
-All the keyword arguments passed must match one of the arguments
-accepted by the function (e.g. ``actor`` is not a valid argument for the
-``parrot`` function), and their order is not important.  This also includes
-non-optional arguments (e.g. ``parrot(voltage=1000)`` is valid too).
-No argument may receive a value more than once.
-Here's an example that fails due to this restriction::
+Trong một lệnh gọi hàm, các đối số keyword phải đứng sau các đối số vị trí. Tất cả đối số keyword được truyền vào phải khớp với một trong các đối số mà hàm chấp nhận (ví dụ: ``actor`` không phải là đối số hợp lệ cho hàm ``parrot``), và thứ tự của chúng không quan trọng. Điều này cũng bao gồm các đối số không tùy chọn (ví dụ: ``parrot(voltage=1000)`` cũng hợp lệ). Không đối số nào được nhận giá trị nhiều hơn một lần. Dưới đây là một ví dụ không thành công do quy tắc hạn chế này::
 
    >>> def function(a):
    ...     pass
@@ -705,13 +556,7 @@ Here's an example that fails due to this restriction::
      File "<stdin>", line 1, in <module>
    TypeError: function() got multiple values for argument 'a'
 
-When a final formal parameter of the form ``**name`` is present, it receives a
-dictionary (see :ref:`typesmapping`) containing all keyword arguments except for
-those corresponding to a formal parameter.  This may be combined with a formal
-parameter of the form ``*name`` (described in the next subsection) which
-receives a :ref:`tuple <tut-tuples>` containing the positional
-arguments beyond the formal parameter list.  (``*name`` must occur
-before ``**name``.) For example, if we define a function like this::
+Khi có một tham số hình thức cuối cùng có dạng ``**name``, tham số này sẽ nhận một dictionary (xem :ref:`typesmapping`) chứa tất cả đối số keyword, ngoại trừ những đối số tương ứng với một tham số hình thức. Tham số này có thể được kết hợp với một tham số hình thức có dạng ``*name`` (được mô tả trong tiểu mục tiếp theo), tham số này nhận một :ref:`tuple <tut-tuples>` chứa các đối số vị trí nằm ngoài danh sách tham số hình thức. (``*name`` phải xuất hiện trước ``**name``.) Ví dụ: nếu chúng ta định nghĩa một hàm như sau::
 
    def cheeseshop(kind, *arguments, **keywords):
        print("-- Do you have any", kind, "?")
@@ -722,7 +567,7 @@ before ``**name``.) For example, if we define a function like this::
        for kw in keywords:
            print(kw, ":", keywords[kw])
 
-It could be called like this::
+Có thể gọi hàm như sau::
 
    cheeseshop("Limburger", "It's very runny, sir.",
               "It's really very, VERY runny, sir.",
@@ -730,7 +575,7 @@ It could be called like this::
               client="John Cleese",
               sketch="Cheese Shop Sketch")
 
-and of course it would print:
+và tất nhiên, kết quả in ra sẽ là:
 
 .. code-block:: none
 
@@ -743,19 +588,14 @@ and of course it would print:
    client : John Cleese
    sketch : Cheese Shop Sketch
 
-Note that the order in which the keyword arguments are printed is guaranteed
-to match the order in which they were provided in the function call.
+Lưu ý rằng thứ tự in các đối số từ khóa được đảm bảo khớp với thứ tự chúng được cung cấp trong lệnh gọi hàm.
 
-Special parameters
-------------------
+Các tham số đặc biệt
+--------------------
 
-By default, arguments may be passed to a Python function either by position
-or explicitly by keyword. For readability and performance, it makes sense to
-restrict the way arguments can be passed so that a developer need only look
-at the function definition to determine if items are passed by position, by
-position or keyword, or by keyword.
+Theo mặc định, các đối số có thể được truyền vào một hàm Python theo vị trí hoặc chỉ rõ bằng từ khóa. Để dễ đọc và đạt hiệu năng tốt hơn, việc giới hạn cách truyền đối số là hợp lý, để nhà phát triển chỉ cần xem định nghĩa hàm là có thể xác định các mục được truyền theo vị trí, theo vị trí hoặc từ khóa, hay theo từ khóa.
 
-A function definition may look like:
+Một định nghĩa hàm có thể có dạng:
 
 .. code-block:: none
 
@@ -766,46 +606,33 @@ A function definition may look like:
            |                                - Keyword only
             -- Positional only
 
-where ``/`` and ``*`` are optional. If used, these symbols indicate the kind of
-parameter by how the arguments may be passed to the function:
-positional-only, positional-or-keyword, and keyword-only. Keyword parameters
-are also referred to as named parameters.
+trong đó ``/`` và ``*`` là tùy chọn. Nếu được sử dụng, các ký hiệu này cho biết loại tham số dựa trên cách các đối số có thể được truyền vào hàm: chỉ theo vị trí, theo vị trí hoặc từ khóa, và chỉ theo từ khóa. Các tham số từ khóa còn được gọi là tham số có tên.
 
--------------------------------
-Positional-or-Keyword Arguments
--------------------------------
+------------------------------------
+Đối số theo vị trí hoặc theo từ khóa
+------------------------------------
 
-If ``/`` and ``*`` are not present in the function definition, arguments may
-be passed to a function by position or by keyword.
+Nếu ``/`` và ``*`` không xuất hiện trong định nghĩa hàm, đối số có thể được truyền vào hàm theo vị trí hoặc theo từ khóa.
 
---------------------------
-Positional-Only Parameters
---------------------------
+-----------------------
+Tham số chỉ theo vị trí
+-----------------------
 
-Looking at this in a bit more detail, it is possible to mark certain parameters
-as *positional-only*. If *positional-only*, the parameters' order matters, and
-the parameters cannot be passed by keyword. Positional-only parameters are
-placed before a ``/`` (forward-slash). The ``/`` is used to logically
-separate the positional-only parameters from the rest of the parameters.
-If there is no ``/`` in the function definition, there are no positional-only
-parameters.
+Xem xét chi tiết hơn, bạn có thể đánh dấu một số tham số là *chỉ theo vị trí*. Nếu *chỉ theo vị trí*, thứ tự của các tham số rất quan trọng và không thể truyền các tham số bằng từ khóa. Các tham số chỉ theo vị trí được đặt trước ``/`` (dấu gạch chéo). ``/`` được dùng để phân tách về mặt logic các tham số chỉ theo vị trí với các tham số còn lại. Nếu không có ``/`` trong định nghĩa hàm, sẽ không có tham số chỉ theo vị trí.
 
-Parameters following the ``/`` may be *positional-or-keyword* or *keyword-only*.
+Các tham số đứng sau ``/`` có thể là *theo vị trí hoặc theo từ khóa* hoặc *chỉ theo từ khóa*.
 
-----------------------
-Keyword-Only Arguments
-----------------------
+-----------------------
+Đối số chỉ theo từ khóa
+-----------------------
 
-To mark parameters as *keyword-only*, indicating the parameters must be passed
-by keyword argument, place an ``*`` in the arguments list just before the first
-*keyword-only* parameter.
+Để đánh dấu các tham số là *chỉ theo từ khóa*, cho biết rằng các tham số phải được truyền bằng đối số từ khóa, hãy đặt một ``*`` trong danh sách đối số, ngay trước tham số *chỉ theo từ khóa* đầu tiên.
 
------------------
-Function Examples
------------------
+------------
+Ví dụ về hàm
+------------
 
-Consider the following example function definitions paying close attention to the
-markers ``/`` and ``*``::
+Hãy xem xét các định nghĩa hàm sau đây, đặc biệt chú ý đến các dấu đánh dấu ``/`` và ``*``::
 
    >>> def standard_arg(arg):
    ...     print(arg)
@@ -820,9 +647,7 @@ markers ``/`` and ``*``::
    ...     print(pos_only, standard, kwd_only)
 
 
-The first function definition, ``standard_arg``, the most familiar form,
-places no restrictions on the calling convention and arguments may be
-passed by position or keyword::
+Định nghĩa hàm đầu tiên, ``standard_arg``, là dạng quen thuộc nhất, không áp đặt hạn chế nào đối với quy ước gọi hàm, và các đối số có thể được truyền theo vị trí hoặc theo từ khóa::
 
    >>> standard_arg(2)
    2
@@ -830,8 +655,7 @@ passed by position or keyword::
    >>> standard_arg(arg=2)
    2
 
-The second function ``pos_only_arg`` is restricted to only use positional
-parameters as there is a ``/`` in the function definition::
+Hàm thứ hai ``pos_only_arg`` chỉ bị giới hạn ở việc sử dụng các tham số theo vị trí, vì có một ``/`` trong định nghĩa hàm::
 
    >>> pos_only_arg(1)
    1
@@ -841,8 +665,7 @@ parameters as there is a ``/`` in the function definition::
      File "<stdin>", line 1, in <module>
    TypeError: pos_only_arg() got some positional-only arguments passed as keyword arguments: 'arg'
 
-The third function ``kwd_only_arg`` only allows keyword arguments as indicated
-by a ``*`` in the function definition::
+Hàm thứ ba ``kwd_only_arg`` chỉ cho phép các đối số theo từ khóa, như được chỉ ra bởi một ``*`` trong định nghĩa hàm::
 
    >>> kwd_only_arg(3)
    Traceback (most recent call last):
@@ -852,8 +675,7 @@ by a ``*`` in the function definition::
    >>> kwd_only_arg(arg=3)
    3
 
-And the last uses all three calling conventions in the same function
-definition::
+Và hàm cuối cùng sử dụng cả ba quy ước gọi hàm trong cùng một định nghĩa hàm::
 
    >>> combined_example(1, 2, 3)
    Traceback (most recent call last):
@@ -872,13 +694,12 @@ definition::
    TypeError: combined_example() got some positional-only arguments passed as keyword arguments: 'pos_only'
 
 
-Finally, consider this function definition which has a potential collision between the positional argument ``name``  and ``**kwds`` which has ``name`` as a key::
+Cuối cùng, hãy xem xét định nghĩa hàm này, trong đó có khả năng xảy ra xung đột giữa đối số theo vị trí ``name`` và ``**kwds``, vốn có ``name`` làm khóa::
 
     def foo(name, **kwds):
         return 'name' in kwds
 
-There is no possible call that will make it return ``True`` as the keyword ``'name'``
-will always bind to the first parameter. For example::
+Không có cách gọi nào có thể khiến nó trả về ``True``, vì từ khóa ``'name'`` sẽ luôn liên kết với tham số đầu tiên. Ví dụ::
 
     >>> foo(1, **{'name': 2})
     Traceback (most recent call last):
@@ -886,7 +707,7 @@ will always bind to the first parameter. For example::
     TypeError: foo() got multiple values for argument 'name'
     >>>
 
-But using ``/`` (positional only arguments), it is possible since it allows ``name`` as a positional argument and ``'name'`` as a key in the keyword arguments::
+Nhưng khi sử dụng ``/`` (các đối số chỉ theo vị trí), điều này là khả thi vì nó cho phép ``name`` làm đối số theo vị trí và ``'name'`` làm khóa trong các đối số từ khóa::
 
     >>> def foo(name, /, **kwds):
     ...     return 'name' in kwds
@@ -894,52 +715,37 @@ But using ``/`` (positional only arguments), it is possible since it allows ``na
     >>> foo(1, **{'name': 2})
     True
 
-In other words, the names of positional-only parameters can be used in
-``**kwds`` without ambiguity.
+Nói cách khác, tên của các tham số chỉ theo vị trí có thể được sử dụng trong ``**kwds`` mà không gây mơ hồ.
 
------
-Recap
------
+-------
+Tóm tắt
+-------
 
-The use case will determine which parameters to use in the function definition::
+Trường hợp sử dụng sẽ quyết định nên dùng tham số nào trong định nghĩa hàm::
 
    def f(pos1, pos2, /, pos_or_kwd, *, kwd1, kwd2):
 
-As guidance:
+Hướng dẫn:
 
-* Use positional-only if you want the name of the parameters to not be
-  available to the user. This is useful when parameter names have no real
-  meaning, if you want to enforce the order of the arguments when the function
-  is called or if you need to take some positional parameters and arbitrary
-  keywords.
-* Use keyword-only when names have meaning and the function definition is
-  more understandable by being explicit with names or you want to prevent
-  users relying on the position of the argument being passed.
-* For an API, use positional-only to prevent breaking API changes
-  if the parameter's name is modified in the future.
+* Sử dụng các tham số chỉ theo vị trí nếu bạn không muốn tên của các tham số được cung cấp cho người dùng. Điều này hữu ích khi tên tham số không có ý nghĩa thực sự, khi bạn muốn bắt buộc thứ tự của các đối số lúc gọi hàm hoặc khi bạn cần nhận một số tham số theo vị trí và các từ khóa tùy ý.
+* Dùng keyword-only khi tên có ý nghĩa và việc khai báo hàm sẽ dễ hiểu hơn nếu nêu rõ tên, hoặc khi bạn muốn ngăn người dùng dựa vào vị trí của đối số được truyền vào.
+* Đối với một API, hãy dùng positional-only để ngăn các thay đổi API gây lỗi nếu tên tham số được sửa đổi trong tương lai.
 
 .. _tut-arbitraryargs:
 
-Arbitrary Argument Lists
-------------------------
+Danh sách đối số tùy ý
+----------------------
 
 .. index::
    single: * (asterisk); in function calls
 
-Finally, the least frequently used option is to specify that a function can be
-called with an arbitrary number of arguments.  These arguments will be wrapped
-up in a tuple (see :ref:`tut-tuples`).  Before the variable number of arguments,
-zero or more normal arguments may occur. ::
+Cuối cùng, tùy chọn ít được sử dụng nhất là chỉ định rằng một hàm có thể được gọi với một số lượng đối số tùy ý. Các đối số này sẽ được gói vào một tuple (xem :ref:`tut-tuples`). Trước số lượng đối số thay đổi, có thể có không hoặc một vài đối số thông thường.::
 
    def write_multiple_items(file, separator, *args):
        file.write(separator.join(args))
 
 
-Normally, these *variadic* arguments will be last in the list of formal
-parameters, because they scoop up all remaining input arguments that are
-passed to the function. Any formal parameters which occur after the ``*args``
-parameter are 'keyword-only' arguments, meaning that they can only be used as
-keywords rather than positional arguments. ::
+Thông thường, các đối số *variadic* này sẽ ở cuối danh sách tham số hình thức, vì chúng thu nhận tất cả các đối số đầu vào còn lại được truyền vào hàm. Bất kỳ tham số hình thức nào xuất hiện sau tham số ``*args`` đều là đối số 'keyword-only', nghĩa là chúng chỉ có thể được sử dụng dưới dạng keyword thay vì đối số vị trí.::
 
    >>> def concat(*args, sep="/"):
    ...     return sep.join(args)
@@ -951,27 +757,21 @@ keywords rather than positional arguments. ::
 
 .. _tut-unpacking-arguments:
 
-Unpacking Argument Lists
-------------------------
+Giải nén danh sách đối số
+-------------------------
 
-The reverse situation occurs when the arguments are already in a list or tuple
-but need to be unpacked for a function call requiring separate positional
-arguments.  For instance, the built-in :func:`range` function expects separate
-*start* and *stop* arguments.  If they are not available separately, write the
-function call with the  ``*``\ -operator to unpack the arguments out of a list
-or tuple::
+Tình huống ngược lại xảy ra khi các đối số đã nằm trong một list hoặc tuple nhưng cần được giải nén để gọi một hàm yêu cầu các đối số vị trí riêng biệt. Ví dụ, hàm tích hợp sẵn :func:`range` yêu cầu các đối số *start* và *stop* riêng biệt. Nếu chúng không có sẵn một cách riêng biệt, hãy viết lệnh gọi hàm với ``*``\ -operator để giải nén các đối số từ một list hoặc tuple::
 
-   >>> list(range(3, 6))            # normal call with separate arguments
+   >>> list(range(3, 6))            # lời gọi thông thường với các đối số riêng biệt
    [3, 4, 5]
    >>> args = [3, 6]
-   >>> list(range(*args))            # call with arguments unpacked from a list
+   >>> list(range(*args))            # lời gọi với các đối số được giải nén từ một danh sách
    [3, 4, 5]
 
 .. index::
    single: **; in function calls
 
-In the same fashion, dictionaries can deliver keyword arguments with the
-``**``\ -operator::
+Tương tự, các dictionary có thể cung cấp các đối số từ khóa bằng toán tử ``**``\ ::
 
    >>> def parrot(voltage, state='a stiff', action='voom'):
    ...     print("-- This parrot wouldn't", action, end=' ')
@@ -985,16 +785,10 @@ In the same fashion, dictionaries can deliver keyword arguments with the
 
 .. _tut-lambda:
 
-Lambda Expressions
-------------------
+Biểu thức Lambda
+----------------
 
-Small anonymous functions can be created with the :keyword:`lambda` keyword.
-This function returns the sum of its two arguments: ``lambda a, b: a+b``.
-Lambda functions can be used wherever function objects are required.  They are
-syntactically restricted to a single expression.  Semantically, they are just
-syntactic sugar for a normal function definition.  Like nested function
-definitions, lambda functions can reference variables from the containing
-scope::
+Có thể tạo các hàm ẩn danh nhỏ bằng từ khóa :keyword:`lambda`. Hàm này trả về tổng của hai đối số: ``lambda a, b: a+b``. Các hàm lambda có thể được sử dụng ở bất cứ nơi nào cần các đối tượng hàm. Chúng bị giới hạn về mặt cú pháp ở một biểu thức duy nhất. Về ngữ nghĩa, chúng chỉ là cú pháp rút gọn cho một định nghĩa hàm thông thường. Giống như các định nghĩa hàm lồng nhau, các hàm lambda có thể tham chiếu đến các biến từ phạm vi chứa chúng::
 
    >>> def make_incrementor(n):
    ...     return lambda x: x + n
@@ -1005,9 +799,7 @@ scope::
    >>> f(1)
    43
 
-The above example uses a lambda expression to return a function.  Another use
-is to pass a small function as an argument.  For instance, :meth:`list.sort`
-takes a sorting key function *key* which can be a lambda function::
+Ví dụ trên sử dụng một biểu thức lambda để trả về một hàm. Một cách sử dụng khác là truyền một hàm nhỏ làm đối số. Chẳng hạn, :meth:`list.sort` nhận một hàm khóa sắp xếp *key*, có thể là một hàm lambda::
 
    >>> pairs = [(1, 'one'), (2, 'two'), (3, 'three'), (4, 'four')]
    >>> pairs.sort(key=lambda pair: pair[1])
@@ -1017,32 +809,23 @@ takes a sorting key function *key* which can be a lambda function::
 
 .. _tut-docstrings:
 
-Documentation Strings
----------------------
+Chuỗi tài liệu
+--------------
 
 .. index::
    single: docstrings
    single: documentation strings
    single: strings, documentation
 
-Here are some conventions about the content and formatting of documentation
-strings.
+Sau đây là một số quy ước về nội dung và định dạng của chuỗi tài liệu.
 
-The first line should always be a short, concise summary of the object's
-purpose.  For brevity, it should not explicitly state the object's name or type,
-since these are available by other means (except if the name happens to be a
-verb describing a function's operation).  This line should begin with a capital
-letter and end with a period.
+Dòng đầu tiên luôn phải là bản tóm tắt ngắn gọn về mục đích của đối tượng. Để ngắn gọn, dòng này không nên nêu rõ tên hoặc kiểu của đối tượng, vì các thông tin đó có thể được biết bằng những cách khác (trừ khi tên tình cờ là một động từ mô tả thao tác của một hàm). Dòng này phải bắt đầu bằng chữ in hoa và kết thúc bằng dấu chấm.
 
-If there are more lines in the documentation string, the second line should be
-blank, visually separating the summary from the rest of the description.  The
-following lines should be one or more paragraphs describing the object's calling
-conventions, its side effects, etc.
+Nếu chuỗi tài liệu có nhiều dòng hơn, dòng thứ hai phải để trống nhằm tách biệt về mặt hiển thị phần tóm tắt với phần mô tả còn lại. Các dòng tiếp theo phải gồm một hoặc nhiều đoạn mô tả quy ước gọi đối tượng, các tác dụng phụ của đối tượng, v.v.
 
-The Python parser strips indentation from multi-line string literals when they
-serve as module, class, or function docstrings.
+Trình phân tích cú pháp Python loại bỏ thụt lề khỏi các string literal nhiều dòng khi chúng được dùng làm docstring của module, class hoặc function.
 
-Here is an example of a multi-line docstring::
+Sau đây là một ví dụ về docstring nhiều dòng::
 
    >>> def my_function():
    ...     """Do nothing, but document it.
@@ -1065,8 +848,8 @@ Here is an example of a multi-line docstring::
 
 .. _tut-annotations:
 
-Function Annotations
---------------------
+Chú thích hàm
+-------------
 
 .. sectionauthor:: Zachary Ware <zachary.ware@gmail.com>
 .. index::
@@ -1074,18 +857,10 @@ Function Annotations
    single: ->; function annotations
    single: : (colon); function annotations
 
-:ref:`Function annotations <function>` are completely optional metadata
-information about the types used by user-defined functions (see :pep:`3107` and
-:pep:`484` for more information).
+:ref:`Chú thích hàm <function>` là thông tin metadata hoàn toàn tùy chọn về các kiểu được sử dụng bởi các hàm do người dùng định nghĩa (xem :pep:`3107` và
+:pep:`484` để biết thêm thông tin).
 
-:term:`Annotations <function annotation>` are stored in the :attr:`~object.__annotations__`
-attribute of the function as a dictionary and have no effect on any other part of the
-function.  Parameter annotations are defined by a colon after the parameter name, followed
-by an expression evaluating to the value of the annotation.  Return annotations are
-defined by a literal ``->``, followed by an expression, between the parameter
-list and the colon denoting the end of the :keyword:`def` statement.  The
-following example has a required argument, an optional argument, and the return
-value annotated::
+:term:`Các annotation <function annotation>` được lưu trong thuộc tính :attr:`~object.__annotations__` của hàm dưới dạng một dictionary và không ảnh hưởng đến bất kỳ phần nào khác của hàm. Annotation của tham số được định nghĩa bằng dấu hai chấm sau tên tham số, tiếp theo là một biểu thức đánh giá thành giá trị của annotation. Annotation giá trị trả về được định nghĩa bằng một ``->`` literal, tiếp theo là một biểu thức, nằm giữa danh sách tham số và dấu hai chấm đánh dấu phần kết thúc của câu lệnh :keyword:`def`. Ví dụ sau có một đối số bắt buộc, một đối số tùy chọn và giá trị trả về được chú thích::
 
    >>> def f(ham: str, eggs: str = 'eggs') -> str:
    ...     print("Annotations:", f.__annotations__)
@@ -1099,60 +874,39 @@ value annotated::
 
 .. _tut-codingstyle:
 
-Intermezzo: Coding Style
-========================
+Xen kẽ: Phong cách viết mã
+==========================
 
 .. sectionauthor:: Georg Brandl <georg@python.org>
 .. index:: pair: coding; style
 
-Now that you are about to write longer, more complex pieces of Python, it is a
-good time to talk about *coding style*.  Most languages can be written (or more
-concisely, *formatted*) in different styles; some are more readable than others.
-Making it easy for others to read your code is always a good idea, and adopting
-a nice coding style helps tremendously for that.
+Giờ đây, khi bạn sắp viết những phần Python dài hơn và phức tạp hơn, đây là lúc thích hợp để nói về *phong cách viết mã*. Hầu hết các ngôn ngữ đều có thể được viết (hay nói ngắn gọn hơn là *định dạng*) theo nhiều phong cách khác nhau; một số phong cách dễ đọc hơn những phong cách khác. Việc giúp người khác dễ đọc mã của bạn luôn là một ý hay, và áp dụng một phong cách viết mã tốt sẽ hỗ trợ rất nhiều cho điều đó.
 
-For Python, :pep:`8` has emerged as the style guide that most projects adhere to;
-it promotes a very readable and eye-pleasing coding style.  Every Python
-developer should read it at some point; here are the most important points
-extracted for you:
+Đối với Python, :pep:`8` đã trở thành hướng dẫn về phong cách mà hầu hết các dự án đều tuân theo; hướng dẫn này khuyến khích một phong cách viết mã rất dễ đọc và đẹp mắt. Mọi Python developer nên đọc tài liệu này vào một thời điểm nào đó; dưới đây là những điểm quan trọng nhất được trích ra cho bạn:
 
-* Use 4-space indentation, and no tabs.
+* Sử dụng thụt lề 4 dấu cách, không sử dụng tab.
 
-  4 spaces are a good compromise between small indentation (allows greater
-  nesting depth) and large indentation (easier to read).  Tabs introduce
-  confusion, and are best left out.
+  4 dấu cách là sự cân bằng hợp lý giữa thụt lề ít (cho phép lồng nhau ở độ sâu lớn hơn) và thụt lề nhiều (dễ đọc hơn). Tab gây nhầm lẫn và tốt nhất nên tránh sử dụng.
 
-* Wrap lines so that they don't exceed 79 characters.
+* Ngắt dòng sao cho mỗi dòng không vượt quá 79 ký tự.
 
-  This helps users with small displays and makes it possible to have several
-  code files side-by-side on larger displays.
+  Điều này giúp người dùng có màn hình nhỏ dễ đọc hơn và cho phép hiển thị nhiều tệp mã cạnh nhau trên các màn hình lớn.
 
-* Use blank lines to separate functions and classes, and larger blocks of
-  code inside functions.
+* Dùng các dòng trống để phân tách các hàm và lớp, cũng như các khối mã lớn hơn bên trong hàm.
 
-* When possible, put comments on a line of their own.
+* Khi có thể, hãy đặt chú thích trên một dòng riêng.
 
-* Use docstrings.
+* Sử dụng docstring.
 
-* Use spaces around operators and after commas, but not directly inside
-  bracketing constructs: ``a = f(1, 2) + g(3, 4)``.
+* Dùng khoảng trắng xung quanh các toán tử và sau dấu phẩy, nhưng không đặt khoảng trắng ngay bên trong các cấu trúc dấu ngoặc: ``a = f(1, 2) + g(3, 4)``.
 
-* Name your classes and functions consistently; the convention is to use
-  ``UpperCamelCase`` for classes and ``lowercase_with_underscores`` for functions
-  and methods.  Always use ``self`` as the name for the first method argument
-  (see :ref:`tut-firstclasses` for more on classes and methods).
+* Đặt tên cho các lớp và hàm một cách nhất quán; quy ước là dùng ``UpperCamelCase`` cho các lớp và ``lowercase_with_underscores`` cho các hàm và phương thức. Luôn dùng ``self`` làm tên cho đối số phương thức đầu tiên (xem :ref:`tut-firstclasses` để biết thêm về các lớp và phương thức).
 
-* Don't use fancy encodings if your code is meant to be used in international
-  environments.  Python's default, UTF-8, or even plain ASCII work best in any
-  case.
+* Đừng sử dụng các encoding cầu kỳ nếu code của bạn được dùng trong môi trường quốc tế. Encoding mặc định của Python, UTF-8 hoặc thậm chí ASCII thuần túy đều hoạt động tốt trong mọi trường hợp.
 
-* Likewise, don't use non-ASCII characters in identifiers if there is only the
-  slightest chance people speaking a different language will read or maintain
-  the code.
+* Tương tự, đừng sử dụng các ký tự không thuộc ASCII trong identifier nếu chỉ có một chút khả năng những người nói ngôn ngữ khác sẽ đọc hoặc bảo trì code.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] Actually, *call by object reference* would be a better description,
-   since if a mutable object is passed, the caller will see any changes the
-   callee makes to it (items inserted into a list).
+.. [#] Thực ra, *truyền đối tượng theo tham chiếu* sẽ là cách mô tả chính xác hơn, vì nếu một đối tượng có thể thay đổi được được truyền vào, bên gọi sẽ thấy mọi thay đổi mà bên được gọi thực hiện đối với nó (các phần tử được chèn vào một danh sách).

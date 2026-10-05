@@ -7,18 +7,18 @@ Cấu hình Python
 
 .. _build-requirements:
 
-Yêu cầu để build
-================
+Yêu cầu build
+=============
 
 Để build CPython, bạn sẽ cần:
 
-* Một trình biên dịch `C11 <https://en.cppreference.com/w/c/11>`_. Không yêu cầu `các tính năng C11 tùy chọn <https://en.wikipedia.org/wiki/C11_(C_standard_revision)#Optional_features>`_.
+* Một trình biên dịch `C11 <https://en.cppreference.com/w/c/11>`_. Không bắt buộc phải có `các tính năng C11 tùy chọn <https://en.wikipedia.org/wiki/C11_(C_standard_revision)#Optional_features>`_.
 
-* Trên Windows, cần có Microsoft Visual Studio 2017 hoặc phiên bản mới hơn.
+* Trên Windows, cần có Microsoft Visual Studio 2017 trở lên.
 
-* Hỗ trợ số dấu phẩy động `IEEE 754 <https://en.wikipedia.org/wiki/IEEE_754>`_ và `giá trị Không-phải-số (NaN) dấu phẩy động <https://en.wikipedia.org/wiki/NaN#Floating_point>`_.
+* Hỗ trợ số dấu phẩy động `IEEE 754 <https://en.wikipedia.org/wiki/IEEE_754>`_ và `giá trị Not-a-Number (NaN) dấu phẩy động <https://en.wikipedia.org/wiki/NaN#Floating_point>`_.
 
-* Hỗ trợ luồng.
+* Hỗ trợ threads.
 
 .. versionchanged:: 3.5
    Trên Windows, hiện yêu cầu Visual Studio 2015 trở lên.
@@ -30,9 +30,9 @@ Yêu cầu để build
    Hiện yêu cầu hỗ trợ thread.
 
 .. versionchanged:: 3.11
-   Hiện yêu cầu trình biên dịch C11, IEEE 754 và hỗ trợ NaN. Trên Windows, yêu cầu Visual Studio 2017 trở lên.
+   Hiện yêu cầu compiler C11, hỗ trợ IEEE 754 và NaN. Trên Windows, yêu cầu Visual Studio 2017 trở lên.
 
-Xem thêm :pep:`7` "Hướng dẫn phong cách viết mã C" và :pep:`11` "Hỗ trợ nền tảng CPython".
+Xem thêm :pep:`7` "Style Guide for C Code" và :pep:`11` "CPython platform support".
 
 
 .. _optional-module-requirements:
@@ -40,13 +40,13 @@ Xem thêm :pep:`7` "Hướng dẫn phong cách viết mã C" và :pep:`11` "Hỗ
 Yêu cầu đối với các module tùy chọn
 -----------------------------------
 
-Một số :term:`module tùy chọn <optional module>` của thư viện chuẩn yêu cầu cài đặt các thư viện bên thứ ba để phát triển (ví dụ: phải có sẵn các tệp header).
+Một số :term:`module tùy chọn <optional module>` của standard library yêu cầu cài đặt các thư viện bên thứ ba để phát triển (ví dụ: phải có sẵn các tệp header).
 
 Các yêu cầu còn thiếu được báo cáo trong đầu ra ``configure``. Các mô-đun bị thiếu do thiếu dependency được liệt kê gần cuối đầu ra ``make``, đôi khi sử dụng tên nội bộ; ví dụ: ``_ctypes`` cho mô-đun :mod:`ctypes`.
 
-Nếu bạn phân phối một trình thông dịch CPython không có các mô-đun tùy chọn, cách làm tốt nhất là thông báo cho người dùng, vì họ thường kỳ vọng các mô-đun trong standard library luôn khả dụng.
+Nếu bạn phân phối một trình thông dịch CPython không có các mô-đun tùy chọn, bạn nên thông báo cho người dùng, vì họ thường mong đợi các mô-đun trong thư viện chuẩn luôn khả dụng.
 
-Các dependency để build các mô-đun tùy chọn là:
+Các dependency để xây dựng các mô-đun tùy chọn là:
 
 .. list-table::
    :header-rows: 1
@@ -59,7 +59,7 @@ Các dependency để build các mô-đun tùy chọn là:
    ---------------------------------------------
      - :mod:`bz2`
    * - `libffi <https://sourceware.org/libffi/>`_
-     - khuyến nghị dùng 3.3.0
+     - khuyến nghị 3.3.0
      - :mod:`ctypes`
    * - `liblzma <https://tukaani.org/xz/>`_
    ----------------------------------------
@@ -93,39 +93,39 @@ Các dependency để build các mô-đun tùy chọn là:
      - 1.4.5
      - :mod:`compression.zstd`
 
-.. [1] Nếu *libmpdec* không khả dụng, module :mod:`decimal` sẽ sử dụng một implementation thuần Python. Xem :option:`--with-system-libmpdec` để biết chi tiết.
-.. [2] Xem :option:`--with-readline` để biết cách chọn backend cho
-   module :mod:`readline`.
-.. [3] Module :mod:`uuid` sử dụng ``_uuid`` để tạo UUID “an toàn”. Xem tài liệu của module để biết chi tiết.
-.. [4] Module :mod:`curses` yêu cầu thư viện ``libncurses`` hoặc ``libncursesw``. Module :mod:`curses.panel` cũng yêu cầu thư viện ``libpanel`` hoặc ``libpanelw``.
-.. [5] Nếu OpenSSL không khả dụng, module :mod:`hashlib` sẽ sử dụng các implementation đi kèm của một số hàm băm. Xem :option:`--with-builtin-hashlib-hashes` để *buộc* sử dụng OpenSSL.
-.. [6] OpenSSL 1.1.1 là phiên bản tối thiểu có thể dùng để build, nhưng dòng phiên bản này đã hết vòng đời và không còn nhận được các bản sửa lỗi bảo mật công khai. Hãy sử dụng bản phát hành vá mới nhất của một dòng bản phát hành LTS hiện đang được hỗ trợ (xem `OpenSSL Roadmap <https://openssl-library.org/roadmap/index.html>`__), hoặc gói do hệ điều hành cung cấp nếu có. Các thư viện khác cung cấp API tương thích với OpenSSL 1.1.1 trở lên có thể hoạt động, nhưng không được hỗ trợ chính thức.
+.. [1] Nếu *libmpdec* không khả dụng, mô-đun :mod:`decimal` sẽ sử dụng một triển khai thuần Python. Xem :option:`--with-system-libmpdec` để biết chi tiết.
+.. [2] Xem :option:`--with-readline` để chọn backend cho
+   :mod:`readline` mô-đun.
+.. [3] Mô-đun :mod:`uuid` sử dụng ``_uuid`` để tạo các UUID “an toàn”. Xem tài liệu của mô-đun để biết chi tiết.
+.. [4] Mô-đun :mod:`curses` yêu cầu thư viện ``libncurses`` hoặc ``libncursesw``. Mô-đun :mod:`curses.panel` cũng yêu cầu thư viện ``libpanel`` hoặc ``libpanelw``.
+.. [5] Nếu OpenSSL không khả dụng, mô-đun :mod:`hashlib` sẽ sử dụng các triển khai đi kèm của một số hàm băm. Xem :option:`--with-builtin-hashlib-hashes` để *buộc* sử dụng OpenSSL.
+.. [6] OpenSSL 1.1.1 là phiên bản tối thiểu có thể dùng để build, nhưng dòng phiên bản này đã hết vòng đời và không còn nhận được các bản sửa lỗi bảo mật công khai. Hãy sử dụng bản phát hành vá mới nhất của một dòng bản phát hành LTS hiện được hỗ trợ (xem `OpenSSL Roadmap <https://openssl-library.org/roadmap/index.html>`__), hoặc gói do hệ điều hành cung cấp nếu có. Các thư viện khác cung cấp API tương thích với OpenSSL 1.1.1 trở lên có thể hoạt động, nhưng không được hỗ trợ chính thức.
 
-Lưu ý rằng bảng này không bao gồm tất cả các module tùy chọn; đặc biệt là các module dành riêng cho từng nền tảng như :mod:`winreg` không được liệt kê ở đây.
+Lưu ý rằng bảng này không bao gồm tất cả các module tùy chọn; cụ thể là các module dành riêng cho từng nền tảng như :mod:`winreg` không được liệt kê ở đây.
 
 .. seealso::
 
-   * `devguide <https://devguide.python.org/getting-started/setup-building/#install-dependencies>`_ bao gồm danh sách đầy đủ các dependency cần thiết để xây dựng tất cả các module và hướng dẫn cách cài đặt chúng trên các nền tảng phổ biến.
-   * :option:`--with-system-expat` cho phép xây dựng với thư viện bên ngoài `libexpat <https://libexpat.github.io/>`_.
+   * `devguide <https://devguide.python.org/getting-started/setup-building/#install-dependencies>`_ bao gồm danh sách đầy đủ các dependency cần thiết để build tất cả các module, cùng hướng dẫn cài đặt chúng trên các nền tảng phổ biến.
+   * :option:`--with-system-expat` cho phép build với thư viện `libexpat <https://libexpat.github.io/>`_ bên ngoài.
    * :ref:`configure-options-for-dependencies`
 
 .. versionchanged:: 3.1
-   Tcl/Tk phiên bản 8.3.1 hiện được yêu cầu cho :mod:`tkinter`.
+   Hiện yêu cầu Tcl/Tk phiên bản 8.3.1 cho :mod:`tkinter`.
 
 .. versionchanged:: 3.5
-   Tcl/Tk phiên bản 8.4 hiện được yêu cầu cho :mod:`tkinter`.
+   Hiện yêu cầu Tcl/Tk phiên bản 8.4 cho :mod:`tkinter`.
 
 .. versionchanged:: 3.7
-   OpenSSL 1.0.2 hiện được yêu cầu cho :mod:`hashlib` và :mod:`ssl`.
+   Hiện yêu cầu OpenSSL 1.0.2 cho :mod:`hashlib` và :mod:`ssl`.
 
 .. versionchanged:: 3.10
-   OpenSSL 1.1.1 hiện được yêu cầu cho :mod:`hashlib` và :mod:`ssl`. SQLite 3.7.15 hiện được yêu cầu cho :mod:`sqlite3`.
+   Hiện yêu cầu OpenSSL 1.1.1 cho :mod:`hashlib` và :mod:`ssl`. Hiện yêu cầu SQLite 3.7.15 cho :mod:`sqlite3`.
 
 .. versionchanged:: 3.11
-   Tcl/Tk phiên bản 8.5.12 hiện được yêu cầu cho :mod:`tkinter`.
+   Hiện yêu cầu Tcl/Tk phiên bản 8.5.12 cho :mod:`tkinter`.
 
 .. versionchanged:: 3.13
-   SQLite 3.15.2 hiện được yêu cầu cho :mod:`sqlite3`.
+   Hiện yêu cầu SQLite 3.15.2 cho :mod:`sqlite3`.
 
 
 Các tệp được tạo
@@ -138,14 +138,14 @@ Các tệp được tạo
     make regen-limited-abi
     make regen-configure
 
-Tệp ``Makefile.pre.in`` ghi lại các tệp được tạo, đầu vào của chúng và các công cụ được sử dụng để tạo lại chúng. Tìm các target make ``regen-*``.
+Tệp ``Makefile.pre.in`` mô tả các tệp được tạo, đầu vào của chúng và các công cụ được sử dụng để tạo lại chúng. Tìm các make target ``regen-*``.
 
 Tập lệnh configure
 ------------------
 
-Lệnh ``make regen-configure`` tạo lại tệp ``aclocal.m4`` và tập lệnh ``configure`` bằng tập lệnh shell ``Tools/build/regen-configure.sh``, sử dụng một container Ubuntu để có cùng phiên bản công cụ và tạo ra đầu ra có thể tái lập.
+Lệnh ``make regen-configure`` tạo lại tệp ``aclocal.m4`` và tập lệnh ``configure`` bằng tập lệnh shell ``Tools/build/regen-configure.sh``, sử dụng một container Ubuntu để có được cùng phiên bản công cụ và tạo ra đầu ra có thể tái lập.
 
-Container là tùy chọn; bạn có thể chạy lệnh sau locally::
+Container là tùy chọn, bạn có thể chạy lệnh sau trên máy cục bộ::
 
     autoreconf -ivf -Werror
 
@@ -164,7 +164,7 @@ Các tệp được tạo có thể thay đổi tùy thuộc vào phiên bản c
 Các tùy chọn Configure
 ======================
 
-Liệt kê tất cả các tùy chọn của script :file:`configure` bằng cách sử dụng::
+Liệt kê tất cả các tùy chọn của script :file:`configure` bằng lệnh::
 
     ./configure --help
 
@@ -175,68 +175,60 @@ Tùy chọn chung
 
 .. option:: --enable-loadable-sqlite-extensions
 
-   Support loadable extensions in the :mod:`!_sqlite` extension module (default
-   is no) of the :mod:`sqlite3` module.
+   Hỗ trợ các extension có thể tải trong mô-đun extension :mod:`!_sqlite` (mặc định là không) của mô-đun :mod:`sqlite3`.
 
-   See the :meth:`sqlite3.Connection.enable_load_extension` method of the
-   :mod:`sqlite3` module.
+   Xem phương thức :meth:`sqlite3.Connection.enable_load_extension` của
+   mô-đun :mod:`sqlite3`.
 
    .. versionadded:: 3.6
 
 .. option:: --disable-ipv6
 
-   Disable IPv6 support (enabled by default if supported), see the
-   :mod:`socket` module.
+   Tắt hỗ trợ IPv6 (được bật theo mặc định nếu được hỗ trợ), xem
+   mô-đun :mod:`socket`.
 
 .. option:: --enable-big-digits=[15|30]
 
-   Define the size in bits of Python :class:`int` digits: 15 or 30 bits.
+   Xác định kích thước tính bằng bit của các chữ số :class:`int` trong Python: 15 hoặc 30 bit.
 
-   By default, the digit size is 30.
+   Theo mặc định, kích thước chữ số là 30.
 
-   Define the ``PYLONG_BITS_IN_DIGIT`` to ``15`` or ``30``.
+   Định nghĩa ``PYLONG_BITS_IN_DIGIT`` thành ``15`` hoặc ``30``.
 
-   See :data:`sys.int_info.bits_per_digit <sys.int_info>`.
+   Xem :data:`sys.int_info.bits_per_digit <sys.int_info>`.
 
 .. option:: --with-suffix=SUFFIX
 
-   Set the Python executable suffix to *SUFFIX*.
+   Đặt hậu tố của tệp thực thi Python thành *SUFFIX*.
 
-   The default suffix is ``.exe`` on Windows and macOS (``python.exe``
-   executable), ``.js`` on Emscripten node, ``.html`` on Emscripten browser,
-   ``.wasm`` on WASI, and an empty string on other platforms (``python``
-   executable).
+   Hậu tố mặc định là ``.exe`` trên Windows và macOS (tệp thực thi ``python.exe``), ``.js`` trên nút Emscripten, ``.html`` trên trình duyệt Emscripten, ``.wasm`` trên WASI và chuỗi rỗng trên các nền tảng khác (tệp thực thi ``python``).
 
    .. versionchanged:: 3.11
-      The default suffix on WASM platform is one of ``.js``, ``.html``
-      or ``.wasm``.
+      Hậu tố mặc định trên nền tảng WASM là một trong các giá trị ``.js``, ``.html`` hoặc ``.wasm``.
 
 .. option:: --with-tzpath=<list of absolute paths separated by pathsep>
 
-   Select the default time zone search path for :const:`zoneinfo.TZPATH`.
-   See the :ref:`Compile-time configuration
-   <zoneinfo_data_compile_time_config>` of the :mod:`zoneinfo` module.
+   Chọn đường dẫn tìm kiếm múi giờ mặc định cho :const:`zoneinfo.TZPATH`. Xem :ref:`Cấu hình tại thời điểm biên dịch <zoneinfo_data_compile_time_config>` của mô-đun :mod:`zoneinfo`.
 
-   Default: ``/usr/share/zoneinfo:/usr/lib/zoneinfo:/usr/share/lib/zoneinfo:/etc/zoneinfo``.
+   Mặc định: ``/usr/share/zoneinfo:/usr/lib/zoneinfo:/usr/share/lib/zoneinfo:/etc/zoneinfo``.
 
-   See :data:`os.pathsep` path separator.
+   Xem dấu phân cách đường dẫn :data:`os.pathsep`.
 
    .. versionadded:: 3.9
 
 .. option:: --without-decimal-contextvar
 
-   Build the ``_decimal`` extension module using a thread-local context rather
-   than a coroutine-local context (default), see the :mod:`decimal` module.
+   Xây dựng module extension ``_decimal`` bằng context cục bộ theo thread thay vì context cục bộ theo coroutine (mặc định), xem module :mod:`decimal`.
 
-   See :const:`decimal.HAVE_CONTEXTVAR` and the :mod:`contextvars` module.
+   Xem :const:`decimal.HAVE_CONTEXTVAR` và module :mod:`contextvars`.
 
    .. versionadded:: 3.9
 
 .. option:: --with-dbmliborder=<list of backend names>
 
-   Override order to check db backends for the :mod:`dbm` module
+   Ghi đè thứ tự kiểm tra các backend cơ sở dữ liệu cho module :mod:`dbm`
 
-   A valid value is a colon (``:``) separated string with the backend names:
+   Giá trị hợp lệ là một chuỗi được phân tách bằng dấu hai chấm (``:``) chứa tên các backend:
 
    * ``ndbm``;
    * ``gdbm``;
@@ -244,109 +236,99 @@ Tùy chọn chung
 
 .. option:: --without-c-locale-coercion
 
-   Disable C locale coercion to a UTF-8 based locale (enabled by default).
+   Tắt cơ chế chuyển đổi locale C sang locale dựa trên UTF-8 (được bật theo mặc định).
 
-   Don't define the ``PY_COERCE_C_LOCALE`` macro.
+   Không định nghĩa macro ``PY_COERCE_C_LOCALE``.
 
-   See :envvar:`PYTHONCOERCECLOCALE` and the :pep:`538`.
+   Xem :envvar:`PYTHONCOERCECLOCALE` và :pep:`538`.
 
 .. option:: --with-platlibdir=DIRNAME
 
-   Python library directory name (default is ``lib``).
+   Tên thư mục thư viện Python (mặc định là ``lib``).
 
-   Fedora and SuSE use ``lib64`` on 64-bit platforms.
+   Fedora và SuSE sử dụng ``lib64`` trên các nền tảng 64-bit.
 
-   See :data:`sys.platlibdir`.
+   Xem :data:`sys.platlibdir`.
 
    .. versionadded:: 3.9
 
 .. option:: --with-wheel-pkg-dir=PATH
 
-   Directory of wheel packages used by the :mod:`ensurepip` module
-   (none by default).
+   Thư mục chứa các gói wheel được module :mod:`ensurepip` sử dụng (mặc định không có).
 
-   Some Linux distribution packaging policies recommend against bundling
-   dependencies. For example, Fedora installs wheel packages in the
-   ``/usr/share/python-wheels/`` directory and don't install the
-   :mod:`!ensurepip._bundled` package.
+   Một số chính sách đóng gói của bản phân phối Linux khuyến nghị không đóng gói kèm các dependency. Ví dụ, Fedora cài đặt các gói wheel vào thư mục ``/usr/share/python-wheels/`` và không cài đặt
+   gói :mod:`!ensurepip._bundled`.
 
    .. versionadded:: 3.10
 
 .. option:: --with-pkg-config=[check|yes|no]
 
-   Whether configure should use :program:`pkg-config` to detect build
-   dependencies.
+   Liệu configure có nên sử dụng :program:`pkg-config` để phát hiện các dependency khi build hay không.
 
-   * ``check`` (default): :program:`pkg-config` is optional
-   * ``yes``: :program:`pkg-config` is mandatory
-   * ``no``: configure does not use :program:`pkg-config` even when present
+   * ``check`` (mặc định): :program:`pkg-config` là tùy chọn
+   * ``yes``: :program:`pkg-config` là bắt buộc
+   * ``no``: configure không sử dụng :program:`pkg-config` ngay cả khi có mặt
 
    .. versionadded:: 3.11
 
 .. option:: --enable-pystats
 
-   Turn on internal Python performance statistics gathering.
+   Bật tính năng thu thập thống kê hiệu năng Python nội bộ.
 
-   By default, statistics gathering is off. Use ``python3 -X pystats`` command
-   or set ``PYTHONSTATS=1`` environment variable to turn on statistics
-   gathering at Python startup.
+   Theo mặc định, tính năng thu thập thống kê bị tắt. Sử dụng lệnh ``python3 -X pystats`` hoặc đặt biến môi trường ``PYTHONSTATS=1`` để bật tính năng thu thập thống kê khi Python khởi động.
 
-   At Python exit, dump statistics if statistics gathering was on and not
-   cleared.
+   Khi Python thoát, kết xuất số liệu thống kê nếu tính năng thu thập số liệu thống kê đang được bật và chưa bị xóa.
 
-   Effects:
+   Tác động:
 
-   * Add :option:`-X pystats <-X>` command line option.
-   * Add :envvar:`!PYTHONSTATS` environment variable.
-   * Define the ``Py_STATS`` macro.
-   * Add functions to the :mod:`sys` module:
+   * Thêm tùy chọn dòng lệnh :option:`-X pystats <-X>`.
+   * Thêm biến môi trường :envvar:`!PYTHONSTATS`.
+   * Định nghĩa macro ``Py_STATS``.
+   * Thêm các hàm vào module :mod:`sys`:
 
-     * :func:`!sys._stats_on`: Turns on statistics gathering.
-     * :func:`!sys._stats_off`: Turns off statistics gathering.
-     * :func:`!sys._stats_clear`: Clears the statistics.
-     * :func:`!sys._stats_dump`: Dump statistics to file, and clears the statistics.
+     * :func:`!sys._stats_on`: Bật tính năng thu thập số liệu thống kê.
+     * :func:`!sys._stats_off`: Tắt việc thu thập thống kê.
+     * :func:`!sys._stats_clear`: Xóa số liệu thống kê.
+     * :func:`!sys._stats_dump`: Ghi số liệu thống kê vào tệp rồi xóa số liệu thống kê.
 
-   The statistics will be dumped to a arbitrary (probably unique) file in
-   ``/tmp/py_stats/`` (Unix) or ``C:\temp\py_stats\`` (Windows). If that
-   directory does not exist, results will be printed on stderr.
+   Số liệu thống kê sẽ được ghi vào một tệp bất kỳ (có thể là duy nhất) trong ``/tmp/py_stats/`` (Unix) hoặc ``C:\temp\py_stats\`` (Windows). Nếu thư mục đó không tồn tại, kết quả sẽ được in ra stderr.
 
-   Use ``Tools/scripts/summarize_stats.py`` to read the stats.
+   Dùng ``Tools/scripts/summarize_stats.py`` để đọc số liệu thống kê.
 
-   Statistics:
+   Thống kê:
 
    * Opcode:
 
-     * Specialization: success, failure, hit, deferred, miss, deopt, failures;
-     * Execution count;
-     * Pair count.
+     * Chuyên biệt hóa: thành công, thất bại, trúng, trì hoãn, trượt, deopt, các lỗi;
+     * Số lần thực thi;
+     * Số cặp.
 
-   * Call:
+   * Lời gọi:
 
-     * Inlined Python calls;
-     * PyEval calls;
-     * Frames pushed;
-     * Frame object created;
-     * Eval calls: vector, generator, legacy, function VECTORCALL, build class,
-       slot, function "ex", API, method.
+     * Lời gọi Python được inline;
+     * Lời gọi PyEval;
+     * Các frame được push;
+     * Đã tạo đối tượng Frame;
+     * Các lệnh gọi Eval: vector, generator, legacy, hàm VECTORCALL, lớp build, slot, hàm "ex", API, phương thức.
 
-   * Object:
+   * Đối tượng:
 
-     * incref and decref;
-     * interpreter incref and decref;
-     * allocations: all, 512 bytes, 4 kiB, big;
-     * free;
-     * to/from free lists;
-     * dictionary materialized/dematerialized;
-     * type cache;
-     * optimization attempts;
-     * optimization traces created/executed;
-     * uops executed.
+     * incref và decref;
+     * incref và decref của interpreter;
+     * cấp phát: tất cả, 512 bytes, 4 kiB, lớn;
+     * giải phóng;
+     * đến/từ free list;
+     * dictionary được materialize/dematerialize;
+     * bộ nhớ đệm kiểu;
+     * các lần thử tối ưu hóa;
+     * các optimization trace được tạo/thực thi;
+     * các uops được thực thi.
 
-   * Garbage collector:
+   * Bộ thu gom rác:
 
-     * Garbage collections;
-     * Objects visited;
-     * Objects collected.
+     * Số lần thu gom rác;
+     * Số đối tượng đã duyệt qua;
+     * Số đối tượng đã được thu gom.
 
    .. versionadded:: 3.11
 
@@ -354,48 +336,40 @@ Tùy chọn chung
 
 .. option:: --disable-gil
 
-   Enables support for running Python without the :term:`global interpreter
-   lock` (GIL): :term:`free-threaded build`.
+   Cho phép chạy Python mà không có :term:`global interpreter lock` (GIL): :term:`free-threaded build`.
 
-   Defines the ``Py_GIL_DISABLED`` macro and adds ``"t"`` to
+   Định nghĩa macro ``Py_GIL_DISABLED`` và thêm ``"t"`` vào
    :data:`sys.abiflags`.
 
-   See :ref:`whatsnew313-free-threaded-cpython` for more detail.
+   Xem :ref:`whatsnew313-free-threaded-cpython` để biết thêm chi tiết.
 
    .. versionadded:: 3.13
 
 .. option:: --enable-experimental-jit=[no|yes|yes-off|interpreter]
 
-   Indicate how to integrate the :ref:`experimental just-in-time compiler <whatsnew314-jit-compiler>`.
+   Cho biết cách tích hợp :ref:`trình biên dịch just-in-time thử nghiệm <whatsnew314-jit-compiler>`.
 
-   * ``no``: Don't build the JIT.
-   * ``yes``: Enable the JIT. To disable it at runtime, set the environment
-     variable :envvar:`PYTHON_JIT=0 <PYTHON_JIT>`.
-   * ``yes-off``: Build the JIT, but disable it by default. To enable it at
-     runtime, set the environment variable :envvar:`PYTHON_JIT=1 <PYTHON_JIT>`.
-   * ``interpreter``: Enable the "JIT interpreter" (only useful for those
-     debugging the JIT itself). To disable it at runtime, set the environment
-     variable :envvar:`PYTHON_JIT=0 <PYTHON_JIT>`.
+   * ``no``: Không xây dựng JIT.
+   * ``yes``: Bật JIT. Để tắt JIT trong runtime, hãy đặt biến môi trường :envvar:`PYTHON_JIT=0 <PYTHON_JIT>`.
+   * ``yes-off``: Xây dựng JIT nhưng tắt theo mặc định. Để bật JIT trong runtime, hãy đặt biến môi trường :envvar:`PYTHON_JIT=1 <PYTHON_JIT>`.
+   * ``interpreter``: Bật "trình thông dịch JIT" (chỉ hữu ích cho những người gỡ lỗi chính JIT). Để tắt nó trong runtime, hãy đặt biến môi trường :envvar:`PYTHON_JIT=0 <PYTHON_JIT>`.
 
-   ``--enable-experimental-jit=no`` is the default behavior if the option is not
-   provided, and ``--enable-experimental-jit`` is shorthand for
-   ``--enable-experimental-jit=yes``.  See :file:`Tools/jit/README.md` for more
-   information, including how to install the necessary build-time dependencies.
+   ``--enable-experimental-jit=no`` là hành vi mặc định nếu không cung cấp tùy chọn này, còn ``--enable-experimental-jit`` là dạng viết tắt của ``--enable-experimental-jit=yes``. Xem :file:`Tools/jit/README.md` để biết thêm thông tin, bao gồm cách cài đặt các phần phụ thuộc cần thiết tại thời điểm xây dựng.
 
    .. note::
 
-      When building CPython with JIT enabled, ensure that your system has Python 3.11 or later installed.
+      Khi xây dựng CPython với JIT được bật, hãy đảm bảo hệ thống của bạn đã cài đặt Python 3.11 trở lên.
 
    .. versionadded:: 3.13
 
 .. option:: PKG_CONFIG
 
-   Path to ``pkg-config`` utility.
+   Đường dẫn đến tiện ích ``pkg-config``.
 
 .. option:: PKG_CONFIG_LIBDIR
 .. option:: PKG_CONFIG_PATH
 
-   ``pkg-config`` options.
+   ``pkg-config`` tùy chọn.
 
 
 Tùy chọn trình biên dịch C
@@ -403,134 +377,124 @@ Tùy chọn trình biên dịch C
 
 .. option:: CC
 
-   C compiler command.
+   Lệnh trình biên dịch C.
 
 .. option:: CFLAGS
 
-   C compiler flags.
+   Cờ trình biên dịch C.
 
 .. option:: CPP
 
-   C preprocessor command.
+   Lệnh bộ tiền xử lý C.
 
 .. option:: CPPFLAGS
 
-   C preprocessor flags, e.g. :samp:`-I{include_dir}`.
+   Cờ bộ tiền xử lý C, ví dụ: :samp:`-I{include_dir}`.
 
 
-Tùy chọn linker
----------------
+Tùy chọn trình liên kết
+-----------------------
 
 .. option:: LDFLAGS
 
-   Linker flags, e.g. :samp:`-L{library_directory}`.
+   Các cờ của linker, ví dụ :samp:`-L{library_directory}`.
 
 .. option:: LIBS
 
-   Libraries to pass to the linker, e.g. :samp:`-l{library}`.
+   Các thư viện sẽ truyền cho linker, ví dụ :samp:`-l{library}`.
 
 .. option:: MACHDEP
 
-   Name for machine-dependent library files.
+   Tên cho các tệp thư viện phụ thuộc vào máy.
 
 
 .. _configure-options-for-dependencies:
 
-Tùy chọn cho các dependency bên thứ ba
---------------------------------------
+Các tùy chọn cho các dependency bên thứ ba
+------------------------------------------
 
 .. versionadded:: 3.11
 
 .. option:: BZIP2_CFLAGS
 .. option:: BZIP2_LIBS
 
-   C compiler and linker flags to link Python to ``libbz2``, used by :mod:`bz2`
-   module, overriding ``pkg-config``.
+   Các cờ của trình biên dịch C và linker để liên kết Python với ``libbz2``, được mô-đun :mod:`bz2` sử dụng, ghi đè lên ``pkg-config``.
 
 .. option:: CURSES_CFLAGS
 .. option:: CURSES_LIBS
 
-   C compiler and linker flags for ``libncurses`` or ``libncursesw``, used by
-   :mod:`curses` module, overriding ``pkg-config``.
+   Các cờ của trình biên dịch C và linker cho ``libncurses`` hoặc ``libncursesw``, được sử dụng bởi
+   mô-đun :mod:`curses`, ghi đè lên ``pkg-config``.
 
 .. option:: GDBM_CFLAGS
 .. option:: GDBM_LIBS
 
-   C compiler and linker flags for ``gdbm``.
+   Cờ trình biên dịch và liên kết C cho ``gdbm``.
 
 .. option:: LIBEDIT_CFLAGS
 .. option:: LIBEDIT_LIBS
 
-   C compiler and linker flags for ``libedit``, used by :mod:`readline` module,
-   overriding ``pkg-config``.
+   Cờ trình biên dịch và liên kết C cho ``libedit``, được module :mod:`readline` sử dụng, ghi đè ``pkg-config``.
 
 .. option:: LIBFFI_CFLAGS
 .. option:: LIBFFI_LIBS
 
-   C compiler and linker flags for ``libffi``, used by :mod:`ctypes` module,
-   overriding ``pkg-config``.
+   Cờ trình biên dịch và liên kết C cho ``libffi``, được module :mod:`ctypes` sử dụng, ghi đè ``pkg-config``.
 
 .. option:: LIBMPDEC_CFLAGS
 .. option:: LIBMPDEC_LIBS
 
-   C compiler and linker flags for ``libmpdec``, used by :mod:`decimal` module,
-   overriding ``pkg-config``.
+   Cờ trình biên dịch và liên kết C cho ``libmpdec``, được module :mod:`decimal` sử dụng, ghi đè ``pkg-config``.
 
    .. note::
 
-      These environment variables have no effect unless
-      :option:`--with-system-libmpdec` is specified.
+      Các biến môi trường này không có hiệu lực trừ khi
+      :option:`--with-system-libmpdec` được chỉ định.
 
 .. option:: LIBLZMA_CFLAGS
 .. option:: LIBLZMA_LIBS
 
-   C compiler and linker flags for ``liblzma``, used by :mod:`lzma` module,
-   overriding ``pkg-config``.
+   Cờ trình biên dịch và liên kết C cho ``liblzma``, được module :mod:`lzma` sử dụng, ghi đè ``pkg-config``.
 
 .. option:: LIBREADLINE_CFLAGS
 .. option:: LIBREADLINE_LIBS
 
-   C compiler and linker flags for ``libreadline``, used by :mod:`readline`
-   module, overriding ``pkg-config``.
+   Các cờ trình biên dịch và liên kết C cho ``libreadline``, được mô-đun :mod:`readline` sử dụng, ghi đè ``pkg-config``.
 
 .. option:: LIBSQLITE3_CFLAGS
 .. option:: LIBSQLITE3_LIBS
 
-   C compiler and linker flags for ``libsqlite3``, used by :mod:`sqlite3`
-   module, overriding ``pkg-config``.
+   Các cờ trình biên dịch và liên kết C cho ``libsqlite3``, được mô-đun :mod:`sqlite3` sử dụng, ghi đè ``pkg-config``.
 
 .. option:: LIBUUID_CFLAGS
 .. option:: LIBUUID_LIBS
 
-   C compiler and linker flags for ``libuuid``, used by :mod:`uuid` module,
-   overriding ``pkg-config``.
+   Các cờ trình biên dịch và liên kết C cho ``libuuid``, được mô-đun :mod:`uuid` sử dụng, ghi đè ``pkg-config``.
 
 .. option:: LIBZSTD_CFLAGS
 .. option:: LIBZSTD_LIBS
 
-   C compiler and linker flags for ``libzstd``, used by :mod:`compression.zstd` module,
-   overriding ``pkg-config``.
+   Các cờ trình biên dịch và liên kết C cho ``libzstd``, được mô-đun :mod:`compression.zstd` sử dụng, ghi đè ``pkg-config``.
 
    .. versionadded:: 3.14
 
 .. option:: PANEL_CFLAGS
 .. option:: PANEL_LIBS
 
-   C compiler and linker flags for PANEL, overriding ``pkg-config``.
+   Các cờ trình biên dịch và liên kết C cho PANEL, ghi đè ``pkg-config``.
 
-   C compiler and linker flags for ``libpanel`` or ``libpanelw``, used by
-   :mod:`curses.panel` module, overriding ``pkg-config``.
+   Các cờ trình biên dịch và liên kết C cho ``libpanel`` hoặc ``libpanelw``, được sử dụng bởi
+   mô-đun :mod:`curses.panel`, ghi đè ``pkg-config``.
 
 .. option:: TCLTK_CFLAGS
 .. option:: TCLTK_LIBS
 
-   C compiler and linker flags for TCLTK, overriding ``pkg-config``.
+   Các cờ compiler và linker C cho TCLTK, ghi đè ``pkg-config``.
 
 .. option:: ZLIB_CFLAGS
 .. option:: ZLIB_LIBS
 
-   C compiler and linker flags for ``libzlib``, used by :mod:`gzip` module,
-   overriding ``pkg-config``.
+   Các cờ compiler và linker C cho ``libzlib``, được module :mod:`gzip` sử dụng, ghi đè ``pkg-config``.
 
 
 Tùy chọn WebAssembly
@@ -538,16 +502,15 @@ Tùy chọn WebAssembly
 
 .. option:: --enable-wasm-dynamic-linking
 
-   Turn on dynamic linking support for WASM.
+   Bật hỗ trợ dynamic linking cho WASM.
 
-   Dynamic linking enables ``dlopen``. File size of the executable
-   increases due to limited dead code elimination and additional features.
+   Dynamic linking cho phép ``dlopen``. Kích thước tệp thực thi tăng do khả năng loại bỏ dead code bị hạn chế và có thêm các tính năng.
 
    .. versionadded:: 3.11
 
 .. option:: --enable-wasm-pthreads
 
-   Turn on pthreads support for WASM.
+   Bật hỗ trợ pthreads cho WASM.
 
    .. versionadded:: 3.11
 
@@ -557,192 +520,151 @@ Tùy chọn cài đặt
 
 .. option:: --prefix=PREFIX
 
-   Install architecture-independent files in PREFIX. On Unix, it
-   defaults to :file:`/usr/local`.
+   Cài đặt các tệp không phụ thuộc kiến trúc vào PREFIX. Trên Unix, giá trị mặc định là :file:`/usr/local`.
 
-   This value can be retrieved at runtime using :data:`sys.prefix`.
+   Có thể lấy giá trị này trong runtime bằng :data:`sys.prefix`.
 
-   As an example, one can use ``--prefix="$HOME/.local/"`` to install
-   a Python in its home directory.
+   Ví dụ, có thể sử dụng ``--prefix="$HOME/.local/"`` để cài đặt Python vào thư mục chính của nó.
 
 .. option:: --exec-prefix=EPREFIX
 
-   Install architecture-dependent files in EPREFIX, defaults to :option:`--prefix`.
+   Cài đặt các tệp phụ thuộc kiến trúc vào EPREFIX, với giá trị mặc định là :option:`--prefix`.
 
-   This value can be retrieved at runtime using :data:`sys.exec_prefix`.
+   Có thể lấy giá trị này trong runtime bằng :data:`sys.exec_prefix`.
 
 .. option:: --disable-test-modules
 
-   Don't build nor install test modules, like the :mod:`test` package or the
-   :mod:`!_testcapi` extension module (built and installed by default).
+   Không xây dựng hoặc cài đặt các mô-đun kiểm thử, chẳng hạn như package :mod:`test` hoặc
+   mô-đun mở rộng :mod:`!_testcapi` (được xây dựng và cài đặt theo mặc định).
 
    .. versionadded:: 3.10
 
 .. option:: --with-ensurepip=[upgrade|install|no]
 
-   Select the :mod:`ensurepip` command run on Python installation:
+   Chọn lệnh :mod:`ensurepip` chạy khi cài đặt Python:
 
-   * ``upgrade`` (default): run ``python -m ensurepip --altinstall --upgrade``
-     command.
-   * ``install``: run ``python -m ensurepip --altinstall`` command;
-   * ``no``: don't run ensurepip;
+   * ``upgrade`` (mặc định): chạy lệnh ``python -m ensurepip --altinstall --upgrade``.
+   * ``install``: chạy lệnh ``python -m ensurepip --altinstall``;
+   * ``no``: không chạy ensurepip;
 
    .. versionadded:: 3.6
 
 
-Tùy chọn hiệu năng
-------------------
+Các tùy chọn hiệu năng
+----------------------
 
 Bạn nên cấu hình Python bằng ``--enable-optimizations --with-lto`` (PGO + LTO) để đạt hiệu năng tốt nhất. Cũng có thể sử dụng cờ thử nghiệm ``--enable-bolt`` để cải thiện hiệu năng.
 
 .. option:: --enable-optimizations
 
-   Enable Profile Guided Optimization (PGO) using :envvar:`PROFILE_TASK`
-   (disabled by default).
+   Bật Profile Guided Optimization (PGO) bằng :envvar:`PROFILE_TASK` (theo mặc định là tắt).
 
-   The C compiler Clang requires ``llvm-profdata`` program for PGO. On
-   macOS, GCC also requires it: GCC is just an alias to Clang on macOS.
+   Trình biên dịch C Clang yêu cầu chương trình ``llvm-profdata`` cho PGO. Trên macOS, GCC cũng yêu cầu điều này: GCC thực chất chỉ là bí danh của Clang trên macOS.
 
-   Disable also semantic interposition in libpython if ``--enable-shared`` and
-   GCC is used: add ``-fno-semantic-interposition`` to the compiler and linker
-   flags.
+   Đồng thời vô hiệu hóa semantic interposition trong libpython nếu sử dụng ``--enable-shared`` và GCC: thêm ``-fno-semantic-interposition`` vào các cờ của trình biên dịch và trình liên kết.
 
    .. note::
 
-      During the build, you may encounter compiler warnings about
-      profile data not being available for some source files.
-      These warnings are harmless, as only a subset of the code is exercised
-      during profile data acquisition.
-      To disable these warnings on Clang, manually suppress them by adding
-      ``-Wno-profile-instr-unprofiled`` to :envvar:`CFLAGS`.
+      Trong quá trình build, bạn có thể gặp cảnh báo của trình biên dịch cho biết dữ liệu profile không khả dụng đối với một số tệp nguồn. Những cảnh báo này không gây ảnh hưởng, vì chỉ một phần code được thực thi trong quá trình thu thập dữ liệu profile. Để tắt các cảnh báo này trên Clang, hãy tự suppress chúng bằng cách thêm ``-Wno-profile-instr-unprofiled`` vào :envvar:`CFLAGS`.
 
    .. versionadded:: 3.6
 
    .. versionchanged:: 3.10
-      Use ``-fno-semantic-interposition`` on GCC.
+      Sử dụng ``-fno-semantic-interposition`` trên GCC.
 
 .. envvar:: PROFILE_TASK
 
-   Environment variable used in the Makefile: Python command line arguments for
-   the PGO generation task.
+   Biến môi trường được sử dụng trong Makefile: các đối số dòng lệnh Python cho tác vụ tạo PGO.
 
-   Default: ``-m test --pgo --timeout=$(TESTTIMEOUT)``.
+   Mặc định: ``-m test --pgo --timeout=$(TESTTIMEOUT)``.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.13
-      Task failure is no longer ignored silently.
+      Lỗi của tác vụ không còn bị âm thầm bỏ qua.
 
 .. option:: --with-lto=[full|thin|no|yes]
 
-   Enable Link Time Optimization (LTO) in any build (disabled by default).
+   Bật Link Time Optimization (LTO) trong mọi bản build (mặc định bị tắt).
 
-   The C compiler Clang requires ``llvm-ar`` for LTO (``ar`` on macOS), as well
-   as an LTO-aware linker (``ld.gold`` or ``lld``).
+   Trình biên dịch C Clang yêu cầu ``llvm-ar`` cho LTO (``ar`` trên macOS), cùng với một linker hỗ trợ LTO (``ld.gold`` hoặc ``lld``).
 
    .. versionadded:: 3.6
 
    .. versionadded:: 3.11
-      To use ThinLTO feature, use ``--with-lto=thin`` on Clang.
+      Để sử dụng tính năng ThinLTO, hãy dùng ``--with-lto=thin`` trên Clang.
 
    .. versionchanged:: 3.12
-      Use ThinLTO as the default optimization policy on Clang if the compiler accepts the flag.
+      Sử dụng ThinLTO làm chính sách tối ưu hóa mặc định trên Clang nếu trình biên dịch chấp nhận flag này.
 
 .. option:: --enable-bolt
 
-   Enable usage of the `BOLT post-link binary optimizer
-   <https://github.com/llvm/llvm-project/tree/main/bolt>`_ (disabled by
-   default).
+   Bật việc sử dụng `BOLT post-link binary optimizer <https://github.com/llvm/llvm-project/tree/main/bolt>`_ (mặc định bị tắt).
 
-   BOLT is part of the LLVM project but is not always included in their binary
-   distributions. This flag requires that ``llvm-bolt`` and ``merge-fdata``
-   are available.
+   BOLT là một phần của dự án LLVM nhưng không phải lúc nào cũng được bao gồm trong các bản phân phối binary của họ. Flag này yêu cầu ``llvm-bolt`` và ``merge-fdata`` phải khả dụng.
 
-   BOLT is still a fairly new project so this flag should be considered
-   experimental for now. Because this tool operates on machine code its success
-   is dependent on a combination of the build environment + the other
-   optimization configure args + the CPU architecture, and not all combinations
-   are supported.
-   BOLT versions before LLVM 16 are known to crash BOLT under some scenarios.
-   Use of LLVM 16 or newer for BOLT optimization is strongly encouraged.
+   BOLT vẫn là một dự án tương đối mới, vì vậy hiện tại nên xem flag này là thử nghiệm. Vì công cụ này hoạt động trên machine code, khả năng thành công phụ thuộc vào sự kết hợp giữa môi trường build, các configure args tối ưu hóa khác và kiến trúc CPU; không phải mọi tổ hợp đều được hỗ trợ. Các phiên bản BOLT trước LLVM 16 được biết là có thể khiến BOLT gặp lỗi dưới một số tình huống. Khuyến nghị mạnh mẽ sử dụng LLVM 16 hoặc mới hơn cho việc tối ưu hóa bằng BOLT.
 
-   The :envvar:`!BOLT_INSTRUMENT_FLAGS` and :envvar:`!BOLT_APPLY_FLAGS`
-   :program:`configure` variables can be defined to override the default set of
-   arguments for :program:`llvm-bolt` to instrument and apply BOLT data to
-   binaries, respectively.
+   :envvar:`!BOLT_INSTRUMENT_FLAGS` và :envvar:`!BOLT_APPLY_FLAGS`
+   Các biến :program:`configure` có thể được định nghĩa để ghi đè tập đối số mặc định cho :program:`llvm-bolt`, lần lượt dùng để instrument và áp dụng dữ liệu BOLT cho các binary.
 
    .. versionadded:: 3.12
 
 .. option:: BOLT_APPLY_FLAGS
 
-   Arguments to ``llvm-bolt`` when creating a `BOLT optimized binary
-   <https://github.com/facebookarchive/BOLT>`_.
+   Các đối số truyền cho ``llvm-bolt`` khi tạo một binary được tối ưu hóa bằng `BOLT optimized binary <https://github.com/facebookarchive/BOLT>`_.
 
    .. versionadded:: 3.12
 
 .. option:: BOLT_INSTRUMENT_FLAGS
 
-   Arguments to ``llvm-bolt`` when instrumenting binaries.
+   Các đối số truyền cho ``llvm-bolt`` khi instrument các binary.
 
    .. versionadded:: 3.12
 
 .. option:: --with-computed-gotos
 
-   Enable computed gotos in evaluation loop (enabled by default on supported
-   compilers).
+   Bật computed goto trong vòng lặp đánh giá (được bật theo mặc định trên các compiler được hỗ trợ).
 
 .. option:: --with-tail-call-interp
 
-   Enable interpreters using tail calls in CPython. If enabled, enabling PGO
-   (:option:`--enable-optimizations`) is highly recommended. This option specifically
-   requires a C compiler with proper tail call support, and the
-   `preserve_none <https://clang.llvm.org/docs/AttributeReference.html#preserve-none>`_
-   calling convention. For example, Clang 19 and newer supports this feature.
+   Bật các interpreter sử dụng tail call trong CPython. Nếu bật, rất nên bật PGO (:option:`--enable-optimizations`). Tùy chọn này yêu cầu cụ thể một C compiler có hỗ trợ tail call phù hợp và calling convention `preserve_none <https://clang.llvm.org/docs/AttributeReference.html#preserve-none>`_. Ví dụ: Clang 19 trở lên hỗ trợ tính năng này.
 
    .. versionadded:: 3.14
 
 .. option:: --without-mimalloc
 
-   Disable the fast :ref:`mimalloc <mimalloc>` allocator
-   (enabled by default).
+   Tắt bộ cấp phát nhanh :ref:`mimalloc <mimalloc>` (được bật theo mặc định).
 
-   This option cannot be used together with :option:`--disable-gil`
-   because the :term:`free-threaded <free threading>` build requires mimalloc.
+   Không thể sử dụng tùy chọn này cùng với :option:`--disable-gil` vì bản dựng :term:`free-threaded <free threading>` yêu cầu mimalloc.
 
-   See also :envvar:`PYTHONMALLOC` environment variable.
+   Xem thêm biến môi trường :envvar:`PYTHONMALLOC`.
 
 .. option:: --without-pymalloc
 
-   Disable the specialized Python memory allocator :ref:`pymalloc <pymalloc>`
-   (enabled by default).
+   Vô hiệu hóa trình cấp phát bộ nhớ Python chuyên biệt :ref:`pymalloc <pymalloc>` (được bật theo mặc định).
 
-   See also :envvar:`PYTHONMALLOC` environment variable.
+   Xem thêm biến môi trường :envvar:`PYTHONMALLOC`.
 
 .. option:: --without-doc-strings
 
-   Disable static documentation strings to reduce the memory footprint (enabled
-   by default). Documentation strings defined in Python are not affected.
+   Không định nghĩa các chuỗi tài liệu tĩnh để giảm mức sử dụng bộ nhớ (được bật theo mặc định). Các chuỗi tài liệu được định nghĩa trong Python không bị ảnh hưởng.
 
-   Don't define the ``WITH_DOC_STRINGS`` macro.
+   Không định nghĩa macro ``WITH_DOC_STRINGS``.
 
-   See the ``PyDoc_STRVAR()`` macro.
+   Xem macro ``PyDoc_STRVAR()``.
 
 .. option:: --enable-profiling
 
-   Enable C-level code profiling with ``gprof`` (disabled by default).
+   Bật profiling mã cấp C bằng ``gprof`` (mặc định bị tắt).
 
 .. option:: --with-strict-overflow
 
-   Add ``-fstrict-overflow`` to the C compiler flags (by default we add
-   ``-fno-strict-overflow`` instead).
+   Thêm ``-fstrict-overflow`` vào các cờ của trình biên dịch C (theo mặc định, chúng tôi thay vào đó thêm ``-fno-strict-overflow``).
 
 .. option:: --without-remote-debug
 
-   Deactivate remote debugging support described in :pep:`768` (enabled by default).
-   When this flag is provided the code that allows the interpreter to schedule the
-   execution of a Python file in a separate process as described in :pep:`768` is
-   not compiled. This includes both the functionality to schedule code to be executed
-   and the functionality to receive code to be executed.
+   Tắt hỗ trợ remote debugging được mô tả trong :pep:`768` (mặc định được bật). Khi cung cấp cờ này, mã cho phép trình thông dịch lên lịch thực thi một tệp Python trong một tiến trình riêng như mô tả trong :pep:`768` sẽ không được biên dịch. Điều này bao gồm cả chức năng lên lịch thực thi mã và chức năng nhận mã để thực thi.
 
    .. c:macro:: Py_REMOTE_DEBUG
 
@@ -757,276 +679,252 @@ Bạn nên cấu hình Python bằng ``--enable-optimizations --with-lto`` (PGO 
 
 .. _debug-build:
 
-Bản dựng gỡ lỗi Python
+Bản dựng Python gỡ lỗi
 ----------------------
 
-Bản dựng gỡ lỗi là Python được xây dựng với tùy chọn cấu hình :option:`--with-pydebug`.
+Bản dựng debug là Python được xây dựng với tùy chọn configure :option:`--with-pydebug`.
 
-Các tác động của bản dựng gỡ lỗi:
+Các tác động của bản dựng debug:
 
-* Hiển thị tất cả cảnh báo theo mặc định: danh sách các bộ lọc cảnh báo mặc định trong mô-đun :mod:`warnings` là rỗng.
+* Hiển thị tất cả cảnh báo theo mặc định: danh sách bộ lọc cảnh báo mặc định trong module :mod:`warnings` là rỗng.
 * Thêm ``d`` vào :data:`sys.abiflags`.
 * Thêm hàm :func:`!sys.gettotalrefcount`.
 * Thêm tùy chọn dòng lệnh :option:`-X showrefcount <-X>`.
-* Thêm tùy chọn dòng lệnh :option:`-d` và biến môi trường :envvar:`PYTHONDEBUG` để gỡ lỗi parser.
-* Thêm hỗ trợ cho biến ``__lltrace__``: bật tracing cấp thấp trong vòng lặp đánh giá bytecode nếu biến này được định nghĩa.
-* Cài đặt :ref:`hook debug trên các trình cấp phát bộ nhớ <default-memory-allocators>` để phát hiện lỗi tràn bộ đệm và các lỗi bộ nhớ khác.
+* Thêm tùy chọn dòng lệnh :option:`-d` và biến môi trường :envvar:`PYTHONDEBUG` để gỡ lỗi trình phân tích cú pháp.
+* Thêm hỗ trợ cho biến ``__lltrace__``: bật tính năng tracing cấp thấp trong vòng lặp đánh giá bytecode nếu biến này được định nghĩa.
+* Cài đặt :ref:`các hook debug trên bộ cấp phát bộ nhớ <default-memory-allocators>` để phát hiện lỗi tràn bộ đệm và các lỗi bộ nhớ khác.
 * Định nghĩa các macro ``Py_DEBUG`` và ``Py_REF_DEBUG``.
 * Thêm các kiểm tra runtime: mã được bao quanh bởi ``#ifdef Py_DEBUG`` và ``#endif``. Bật các assertion ``assert(...)`` và ``_PyObject_ASSERT(...)``: không đặt macro ``NDEBUG`` (xem thêm tùy chọn configure :option:`--with-assertions`). Các kiểm tra runtime chính:
 
   * Thêm các kiểm tra tính hợp lệ cho các đối số của hàm.
   * Các đối tượng Unicode và int được tạo với vùng nhớ được điền bằng một mẫu để phát hiện việc sử dụng các đối tượng chưa được khởi tạo.
-  * Đảm bảo rằng các hàm có thể xóa hoặc thay thế exception hiện tại không được gọi khi đang có một exception được phát sinh.
+  * Đảm bảo rằng các hàm có thể xóa hoặc thay thế exception hiện tại không được gọi khi một exception đang được raise.
   * Kiểm tra để đảm bảo các hàm deallocator không thay đổi exception hiện tại.
-  * Bộ thu gom rác (hàm :func:`gc.collect`) thực hiện một số kiểm tra cơ bản về tính nhất quán của các đối tượng.
-  * Macro :c:macro:`!Py_SAFE_DOWNCAST()` kiểm tra underflow và overflow của số nguyên khi downcast từ các kiểu có độ rộng lớn sang các kiểu có độ rộng nhỏ hơn.
+  * Garbage collector (hàm :func:`gc.collect`) thực hiện một số kiểm tra cơ bản về tính nhất quán của các đối tượng.
+  * Macro :c:macro:`!Py_SAFE_DOWNCAST()` kiểm tra tình trạng underflow và overflow của số nguyên khi chuyển từ kiểu rộng sang kiểu hẹp.
 
-Xem thêm :ref:`Chế độ Phát triển Python <devmode>` và
-:option:`--with-trace-refs` là tùy chọn configure.
+Xem thêm :ref:`Chế độ phát triển Python <devmode>` và
+:option:`--with-trace-refs` tùy chọn configure.
 
 .. versionchanged:: 3.8
-   Các bản build release hiện tương thích ABI với các bản build debug: việc định nghĩa macro ``Py_DEBUG`` không còn ngụ ý macro ``Py_TRACE_REFS`` (xem
-   tùy chọn :option:`--with-trace-refs`). Tuy nhiên, các bản build debug vẫn cung cấp nhiều symbol hơn các bản build release, và mã được build dựa trên bản build debug không nhất thiết tương thích với bản build release.
+   Các bản build phát hành hiện tương thích ABI với các bản build debug: việc định nghĩa macro ``Py_DEBUG`` không còn ngụ ý macro ``Py_TRACE_REFS`` (xem
+   tùy chọn :option:`--with-trace-refs`). Tuy nhiên, các bản build debug vẫn cung cấp nhiều symbol hơn các bản build phát hành, và mã được build dựa trên bản build debug không nhất thiết tương thích với bản build phát hành.
 
 
-Các tùy chọn debug
-------------------
+Tùy chọn debug
+--------------
 
 .. option:: --with-pydebug
 
-   :ref:`Build Python in debug mode <debug-build>`: define the ``Py_DEBUG``
-   macro (disabled by default).
+   :ref:`Xây dựng Python ở chế độ debug <debug-build>`: định nghĩa macro ``Py_DEBUG`` (bị tắt theo mặc định).
 
 .. option:: --with-trace-refs
 
-   Enable tracing references for debugging purpose (disabled by default).
+   Bật theo dõi các tham chiếu để gỡ lỗi (bị tắt theo mặc định).
 
-   Effects:
+   Ảnh hưởng:
 
-   * Define the ``Py_TRACE_REFS`` macro.
-   * Add :func:`sys.getobjects` function.
-   * Add :envvar:`PYTHONDUMPREFS` environment variable.
+   * Định nghĩa macro ``Py_TRACE_REFS``.
+   * Thêm hàm :func:`sys.getobjects`.
+   * Thêm biến môi trường :envvar:`PYTHONDUMPREFS`.
 
-   The :envvar:`PYTHONDUMPREFS` environment variable can be used to dump
-   objects and reference counts still alive at Python exit.
+   Có thể sử dụng biến môi trường :envvar:`PYTHONDUMPREFS` để kết xuất các đối tượng và số lượng tham chiếu vẫn còn tồn tại khi Python thoát.
 
-   :ref:`Statically allocated objects <static-types>` are not traced.
+   :ref:`Các đối tượng được cấp phát tĩnh <static-types>` không được theo dõi.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.13
-      This build is now ABI compatible with release build and :ref:`debug build
-      <debug-build>`.
+      Bản build này hiện tương thích ABI với bản build release và :ref:`bản build debug <debug-build>`.
 
 .. option:: --with-assertions
 
-   Build with C assertions enabled (default is no): ``assert(...);`` and
-   ``_PyObject_ASSERT(...);``.
+   Biên dịch với các assertion của C được bật (mặc định là không): ``assert(...);`` và ``_PyObject_ASSERT(...);``.
 
-   If set, the ``NDEBUG`` macro is not defined in the :envvar:`OPT` compiler
-   variable.
+   Nếu được đặt, macro ``NDEBUG`` không được định nghĩa trong biến compiler :envvar:`OPT`.
 
-   See also the :option:`--with-pydebug` option (:ref:`debug build
-   <debug-build>`) which also enables assertions.
+   Xem thêm tùy chọn :option:`--with-pydebug` (:ref:`debug build <debug-build>`), tùy chọn này cũng bật các assertion.
 
    .. versionadded:: 3.6
 
 .. option:: --with-valgrind
 
-   Enable Valgrind support (default is no).
+   Bật hỗ trợ Valgrind (mặc định là không).
 
 .. option:: --with-dtrace
 
-   Enable DTrace support (default is no).
+   Bật hỗ trợ DTrace (mặc định là không).
 
-   See :ref:`Instrumenting CPython with DTrace and SystemTap
-   <instrumentation>`.
+   Xem :ref:`Instrumenting CPython with DTrace and SystemTap <instrumentation>`.
 
    .. versionadded:: 3.6
 
 .. option:: --with-address-sanitizer
 
-   Enable AddressSanitizer memory error detector, ``asan`` (default is no).
-   To improve ASan detection capabilities you may also want to combine this
-   with :option:`--without-pymalloc` to disable the specialized small-object
-   allocator whose allocations are not tracked by ASan.
+   Bật trình phát hiện lỗi bộ nhớ AddressSanitizer, ``asan`` (mặc định là không). Để cải thiện khả năng phát hiện của ASan, bạn cũng có thể kết hợp tùy chọn này với :option:`--without-pymalloc` để tắt trình cấp phát đối tượng nhỏ chuyên dụng, vì các vùng cấp phát của trình này không được ASan theo dõi.
 
    .. versionadded:: 3.6
 
 .. option:: --with-memory-sanitizer
 
-   Enable MemorySanitizer allocation error detector, ``msan`` (default is no).
+   Bật trình phát hiện lỗi cấp phát của MemorySanitizer, ``msan`` (mặc định là no).
 
-   MSan reports false positives for memory initialized by libraries that are
-   not built with MSan, so either build all dependencies with MSan or disable
-   the extension modules that use them in :file:`Modules/Setup.local`.
+   MSan báo cáo các kết quả dương tính giả đối với bộ nhớ được khởi tạo bởi những thư viện không được xây dựng với MSan, vì vậy hãy xây dựng tất cả dependency với MSan hoặc vô hiệu hóa các extension module sử dụng chúng trong :file:`Modules/Setup.local`.
 
    .. versionadded:: 3.6
 
 .. option:: --with-undefined-behavior-sanitizer
 
-   Enable UndefinedBehaviorSanitizer undefined behaviour detector, ``ubsan``
-   (default is no).
+   Bật trình phát hiện undefined behavior của UndefinedBehaviorSanitizer, ``ubsan`` (mặc định là no).
 
    .. versionadded:: 3.6
 
 .. option:: --with-thread-sanitizer
 
-   Enable ThreadSanitizer data race detector, ``tsan``
-   (default is no).
+   Bật trình phát hiện data race của ThreadSanitizer, ``tsan`` (mặc định là no).
 
    .. versionadded:: 3.13
 
 
-Tùy chọn linker
----------------
+Tùy chọn trình liên kết
+-----------------------
 
 .. option:: --enable-shared
 
-   Enable building a shared Python library: ``libpython`` (default is no).
+   Bật việc xây dựng shared Python library: ``libpython`` (mặc định là no).
 
 .. option:: --without-static-libpython
 
-   Do not build ``libpythonMAJOR.MINOR.a`` and do not install ``python.o``
-   (built and enabled by default).
+   Không xây dựng ``libpythonMAJOR.MINOR.a`` và không cài đặt ``python.o`` (được xây dựng và bật theo mặc định).
 
    .. versionadded:: 3.10
 
 
-Các tùy chọn thư viện
----------------------
+Tùy chọn thư viện
+-----------------
 
 .. option:: --with-libs='lib1 ...'
 
-   Link against additional libraries (default is no).
+   Liên kết với các thư viện bổ sung (mặc định là không).
 
 .. option:: --with-system-expat
 
-   Build the :mod:`!pyexpat` module using an installed ``expat`` library
-   (default is no).
+   Xây dựng module :mod:`!pyexpat` bằng thư viện ``expat`` đã cài đặt (mặc định là không).
 
 .. option:: --with-system-libmpdec
 
-   Build the ``_decimal`` extension module using an installed ``mpdecimal``
-   library, see the :mod:`decimal` module (default is yes).
+   Xây dựng module mở rộng ``_decimal`` bằng thư viện ``mpdecimal`` đã cài đặt, xem module :mod:`decimal` (mặc định là có).
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.13
-      Default to using the installed ``mpdecimal`` library.
+      Mặc định sử dụng thư viện ``mpdecimal`` đã cài đặt.
 
    .. versionchanged:: 3.15
 
-      A bundled copy of the library will no longer be selected
-      implicitly if an installed ``mpdecimal`` library is not found.
-      In Python 3.15 only, it can still be selected explicitly using
-      ``--with-system-libmpdec=no`` or ``--without-system-libmpdec``.
+      Bản sao thư viện đi kèm sẽ không còn được tự động chọn nếu không tìm thấy thư viện ``mpdecimal`` đã cài đặt. Chỉ trong Python 3.15, thư viện này vẫn có thể được chọn một cách rõ ràng bằng ``--with-system-libmpdec=no`` hoặc ``--without-system-libmpdec``.
 
    .. deprecated-removed:: 3.13 3.16
       A copy of the ``mpdecimal`` library sources will no longer be distributed
       with Python 3.16.
 
-   .. seealso:: :option:`LIBMPDEC_CFLAGS` and :option:`LIBMPDEC_LIBS`.
+   .. seealso:: :option:`LIBMPDEC_CFLAGS` và :option:`LIBMPDEC_LIBS`.
 
 .. option:: --with-readline=readline|editline
 
-   Designate a backend library for the :mod:`readline` module.
+   Chỉ định thư viện backend cho mô-đun :mod:`readline`.
 
-   * readline: Use readline as the backend.
-   * editline: Use editline as the backend.
+   * readline: Sử dụng readline làm backend.
+   * editline: Sử dụng editline làm backend.
 
    .. versionadded:: 3.10
 
 .. option:: --without-readline
 
-   Don't build the :mod:`readline` module (built by default).
+   Không build mô-đun :mod:`readline` (mặc định được build).
 
-   Don't define the ``HAVE_LIBREADLINE`` macro.
+   Không định nghĩa macro ``HAVE_LIBREADLINE``.
 
    .. versionadded:: 3.10
 
 .. option:: --with-libm=STRING
 
-   Override ``libm`` math library to *STRING* (default is system-dependent).
+   Ghi đè thư viện toán học ``libm`` thành *STRING* (mặc định phụ thuộc vào hệ thống).
 
 .. option:: --with-libc=STRING
 
-   Override ``libc`` C library to *STRING* (default is system-dependent).
+   Ghi đè thư viện C ``libc`` thành *STRING* (mặc định phụ thuộc vào hệ thống).
 
 .. option:: --with-openssl=DIR
 
-   Root of the OpenSSL directory.
+   Thư mục gốc của OpenSSL.
 
    .. versionadded:: 3.7
 
 .. option:: --with-openssl-rpath=[no|auto|DIR]
 
-   Set runtime library directory (rpath) for OpenSSL libraries:
+   Đặt thư mục thư viện runtime (rpath) cho các thư viện OpenSSL:
 
-   * ``no`` (default): don't set rpath;
-   * ``auto``: auto-detect rpath from :option:`--with-openssl` and
-     ``pkg-config``;
-   * *DIR*: set an explicit rpath.
+   * ``no`` (mặc định): không đặt rpath;
+   * ``auto``: tự động phát hiện rpath từ :option:`--with-openssl` và ``pkg-config``;
+   * *DIR*: đặt rpath rõ ràng.
 
    .. versionadded:: 3.10
 
 
-Các tùy chọn bảo mật
---------------------
+Tùy chọn bảo mật
+----------------
 
 .. option:: --with-hash-algorithm=[fnv|siphash13|siphash24]
 
-   Select hash algorithm for use in ``Python/pyhash.c``:
+   Chọn thuật toán hash để sử dụng trong ``Python/pyhash.c``:
 
-   * ``siphash13`` (default);
+   * ``siphash13`` (mặc định);
    * ``siphash24``;
    * ``fnv``.
 
    .. versionadded:: 3.4
 
    .. versionadded:: 3.11
-      ``siphash13`` is added and it is the new default.
+      ``siphash13`` được thêm vào và là mặc định mới.
 
 .. option:: --with-builtin-hashlib-hashes=md5,sha1,sha256,sha512,sha3,blake2
 
-   Built-in hash modules:
+   Các mô-đun hash tích hợp sẵn:
 
    * ``md5``;
    * ``sha1``;
    * ``sha256``;
    * ``sha512``;
-   * ``sha3`` (with shake);
+   * ``sha3`` (với shake);
    * ``blake2``.
 
    .. versionadded:: 3.9
 
 .. option:: --with-ssl-default-suites=[python|openssl|STRING]
 
-   Override the OpenSSL default cipher suites string:
+   Ghi đè chuỗi cipher suites mặc định của OpenSSL:
 
-   * ``python`` (default): use Python's preferred selection;
-   * ``openssl``: leave OpenSSL's defaults untouched;
-   * *STRING*: use a custom string
+   * ``python``: sử dụng lựa chọn ưu tiên của Python;
+   * ``openssl``: giữ nguyên các giá trị mặc định của OpenSSL;
+   * *STRING*: sử dụng một chuỗi tùy chỉnh
 
-   See the :mod:`ssl` module.
+   Xem module :mod:`ssl`.
 
    .. versionadded:: 3.7
 
    .. versionchanged:: 3.10
 
-      The settings ``python`` and *STRING* also set TLS 1.2 as minimum
-      protocol version.
+      Các cài đặt ``python`` và *STRING* cũng đặt TLS 1.2 làm phiên bản giao thức tối thiểu.
 
 .. option:: --disable-safety
 
-   Disable compiler options that are `recommended by OpenSSF`_ for security reasons with no performance overhead.
-   If this option is not enabled, CPython will be built based on safety compiler options with no slow down.
-   When this option is enabled, CPython will not be built with the compiler options listed below.
+   Vô hiệu hóa các tùy chọn trình biên dịch được `OpenSSF khuyến nghị <recommended by OpenSSF_>`_ vì lý do bảo mật mà không làm giảm hiệu năng. Nếu tùy chọn này không được bật, CPython sẽ được build dựa trên các tùy chọn trình biên dịch an toàn mà không bị chậm lại. Khi tùy chọn này được bật, CPython sẽ không được build với các tùy chọn trình biên dịch được liệt kê bên dưới.
 
-   The following compiler options are disabled with :option:`!--disable-safety`:
+   Các tùy chọn trình biên dịch sau đây bị vô hiệu hóa với :option:`!--disable-safety`:
 
-   * `-fstack-protector-strong`_: Enable run-time checks for stack-based buffer overflows.
-   * `-Wtrampolines`_: Enable warnings about trampolines that require executable stacks.
+   * `-fstack-protector-strong`_: Bật các kiểm tra thời gian chạy để phát hiện tràn bộ đệm dựa trên stack.
+   * `-Wtrampolines`_: Bật cảnh báo về các trampoline yêu cầu stack có quyền thực thi.
 
    .. _recommended by OpenSSF: https://github.com/ossf/wg-best-practices-os-developers/blob/main/docs/Compiler-Hardening-Guides/Compiler-Options-Hardening-Guide-for-C-and-C++.md
    .. _-fstack-protector-strong: https://github.com/ossf/wg-best-practices-os-developers/blob/main/docs/Compiler-Hardening-Guides/Compiler-Options-Hardening-Guide-for-C-and-C++.md#enable-run-time-checks-for-stack-based-buffer-overflows
@@ -1036,113 +934,99 @@ Các tùy chọn bảo mật
 
 .. option:: --enable-slower-safety
 
-   Enable compiler options that are `recommended by OpenSSF`_ for security reasons which require overhead.
-   If this option is not enabled, CPython will not be built based on safety compiler options which performance impact.
-   When this option is enabled, CPython will be built with the compiler options listed below.
+   Bật các tùy chọn trình biên dịch được `OpenSSF khuyến nghị <recommended by OpenSSF_>`_ vì lý do bảo mật nhưng cần thêm chi phí xử lý. Nếu không bật tùy chọn này, CPython sẽ không được xây dựng bằng các tùy chọn trình biên dịch bảo mật gây ảnh hưởng đến hiệu năng. Khi bật tùy chọn này, CPython sẽ được xây dựng với các tùy chọn trình biên dịch được liệt kê bên dưới.
 
-   The following compiler options are enabled with :option:`!--enable-slower-safety`:
+   Các tùy chọn trình biên dịch sau được bật cùng với :option:`!--enable-slower-safety`:
 
-   * `-D_FORTIFY_SOURCE=3`_: Fortify sources with compile- and run-time checks for unsafe libc usage and buffer overflows.
+   * `-D_FORTIFY_SOURCE=3`_: Tăng cường bảo vệ mã nguồn bằng các bước kiểm tra trong thời gian biên dịch và thời gian chạy đối với việc sử dụng libc không an toàn và lỗi tràn bộ đệm.
 
    .. _-D_FORTIFY_SOURCE=3: https://github.com/ossf/wg-best-practices-os-developers/blob/main/docs/Compiler-Hardening-Guides/Compiler-Options-Hardening-Guide-for-C-and-C++.md#fortify-sources-for-unsafe-libc-usage-and-buffer-overflows
 
    .. versionadded:: 3.14
 
 
-Các tùy chọn macOS
-------------------
+Tùy chọn macOS
+--------------
 
 Xem :source:`Mac/README.rst`.
 
 .. option:: --enable-universalsdk
 .. option:: --enable-universalsdk=SDKDIR
 
-   Create a universal binary build. *SDKDIR* specifies which macOS SDK should
-   be used to perform the build (default is no).
+   Tạo bản build universal binary. *SDKDIR* chỉ định SDK macOS nào sẽ được sử dụng để thực hiện quá trình build (mặc định là không).
 
 .. option:: --enable-framework
 .. option:: --enable-framework=INSTALLDIR
 
-   Create a Python.framework rather than a traditional Unix install. Optional
-   *INSTALLDIR* specifies the installation path (default is no).
+   Tạo Python.framework thay vì cài đặt Unix truyền thống. *INSTALLDIR* tùy chọn chỉ định đường dẫn cài đặt (mặc định là không).
 
 .. option:: --with-universal-archs=ARCH
 
-   Specify the kind of universal binary that should be created. This option is
-   only valid when :option:`--enable-universalsdk` is set.
+   Chỉ định loại universal binary cần tạo. Tùy chọn này chỉ hợp lệ khi :option:`--enable-universalsdk` được thiết lập.
 
-   Options:
+   Các tùy chọn:
 
-   * ``universal2`` (x86-64 and arm64);
-   * ``32-bit`` (PPC and i386);
-   * ``64-bit``  (PPC64 and x86-64);
-   * ``3-way`` (i386, PPC and x86-64);
-   * ``intel`` (i386 and x86-64);
+   * ``universal2`` (x86-64 và arm64);
+   * ``32-bit`` (PPC và i386);
+   * ``64-bit``  (PPC64 và x86-64);
+   * ``3-way`` (i386, PPC và x86-64);
+   * ``intel`` (i386 và x86-64);
    * ``intel-32`` (i386);
    * ``intel-64`` (x86-64);
-   * ``all``  (PPC, i386, PPC64 and x86-64).
+   * ``all``  (PPC, i386, PPC64 và x86-64).
 
-   Note that values for this configuration item are *not* the same as the
-   identifiers used for universal binary wheels on macOS. See the Python
-   Packaging User Guide for details on the `packaging platform compatibility
-   tags used on macOS
-   <https://packaging.python.org/en/latest/specifications/platform-compatibility-tags/#macos>`_
+   Lưu ý rằng các giá trị cho mục cấu hình này *không* giống với các mã định danh được sử dụng cho universal binary wheels trên macOS. Xem Python Packaging User Guide để biết chi tiết về `các thẻ tương thích nền tảng packaging được sử dụng trên macOS <https://packaging.python.org/en/latest/specifications/platform-compatibility-tags/#macos>`_
 
 .. option:: --with-framework-name=FRAMEWORK
 
-   Specify the name for the python framework on macOS only valid when
-   :option:`--enable-framework` is set (default: ``Python``).
+   Chỉ định tên của Python framework trên macOS, chỉ hợp lệ khi
+   :option:`--enable-framework` được thiết lập (mặc định: ``Python``).
 
 .. option:: --with-app-store-compliance
 .. option:: --with-app-store-compliance=PATCH-FILE
 
-   The Python standard library contains strings that are known to trigger
-   automated inspection tool errors when submitted for distribution by
-   the macOS and iOS App Stores. If enabled, this option will apply the list of
-   patches that are known to correct app store compliance. A custom patch
-   file can also be specified. This option is disabled by default.
+   Thư viện chuẩn Python chứa các chuỗi được biết là có thể kích hoạt lỗi của các công cụ kiểm tra tự động khi được gửi để phân phối qua Mac App Store và iOS App Store. Nếu được bật, tùy chọn này sẽ áp dụng danh sách các bản vá được biết là có thể khắc phục việc tuân thủ yêu cầu của app store. Cũng có thể chỉ định một tệp bản vá tùy chỉnh. Tùy chọn này bị tắt theo mặc định.
 
    .. versionadded:: 3.13
 
-Tùy chọn iOS
-------------
+Các tùy chọn iOS
+----------------
 
 Xem :source:`iOS/README.rst`.
 
 .. option:: --enable-framework=INSTALLDIR
 
-   Create a Python.framework. Unlike macOS, the *INSTALLDIR* argument
-   specifying the installation path is mandatory.
+   Tạo một Python.framework. Không giống macOS, đối số *INSTALLDIR* chỉ định đường dẫn cài đặt là bắt buộc.
 
 .. option:: --with-framework-name=FRAMEWORK
 
-   Specify the name for the framework (default: ``Python``).
+   Chỉ định tên cho framework (mặc định: ``Python``).
 
 
-Tùy chọn biên dịch chéo
------------------------
+Các tùy chọn biên dịch chéo
+---------------------------
 
-Biên dịch chéo, còn được gọi là cross building, có thể được sử dụng để xây dựng Python cho một kiến trúc CPU hoặc nền tảng khác. Biên dịch chéo yêu cầu một trình thông dịch Python cho build platform. Phiên bản của Python dùng để build phải khớp với phiên bản của Python trên host được biên dịch chéo.
+Biên dịch chéo, còn được gọi là cross building, có thể được sử dụng để xây dựng Python cho một kiến trúc CPU hoặc nền tảng khác. Biên dịch chéo yêu cầu một trình thông dịch Python cho nền tảng build. Phiên bản Python dùng để build phải khớp với phiên bản Python host được biên dịch chéo.
 
 .. option:: --build=BUILD
 
-   configure for building on BUILD, usually guessed by :program:`config.guess`.
+   configure để build trên BUILD, thường được :program:`config.guess` đoán.
 
 .. option:: --host=HOST
 
-   cross-compile to build programs to run on HOST (target platform)
+   cross-compile để xây dựng các chương trình chạy trên HOST (nền tảng đích)
 
 .. option:: --with-build-python=path/to/python
 
-   path to build ``python`` binary for cross compiling
+   đường dẫn để xây dựng binary ``python`` cho cross compiling
 
    .. versionadded:: 3.11
 
 .. option:: CONFIG_SITE=file
 
-   An environment variable that points to a file with configure overrides.
+   Một biến môi trường trỏ đến một tệp chứa các tùy chọn ghi đè configure.
 
-   Example *config.site* file:
+   Ví dụ về tệp *config.site*:
 
    .. code-block:: ini
 
@@ -1153,12 +1037,12 @@ Biên dịch chéo, còn được gọi là cross building, có thể được s
 
 .. option:: HOSTRUNNER
 
-   Program to run CPython for the host platform for cross-compilation.
+   Chương trình dùng để chạy CPython trên nền tảng host cho cross-compilation.
 
    .. versionadded:: 3.11
 
 
-Ví dụ về biên dịch chéo::
+Ví dụ về cross compiling::
 
    CONFIG_SITE=config.site-aarch64 ../configure \
        --build=x86_64-pc-linux-gnu \
@@ -1166,8 +1050,8 @@ Ví dụ về biên dịch chéo::
        --with-build-python=../x86_64/python
 
 
-Hệ thống xây dựng Python
-========================
+Hệ thống build Python
+=====================
 
 Các tệp chính của hệ thống build
 --------------------------------
@@ -1175,16 +1059,16 @@ Các tệp chính của hệ thống build
 * :file:`configure.ac` => :file:`configure`;
 * :file:`Makefile.pre.in` => :file:`Makefile` (được tạo bởi :file:`configure`);
 * :file:`pyconfig.h` (được tạo bởi :file:`configure`);
-* :file:`Modules/Setup`: Các phần mở rộng C được build bởi Makefile bằng
-  tập lệnh shell :file:`Module/makesetup`;
+* :file:`Modules/Setup`: Các phần mở rộng C được build bởi Makefile bằng cách sử dụng
+  :file:`Module/makesetup` shell script;
 
 Các bước build chính
 --------------------
 
 * Các tệp C (``.c``) được build thành các tệp đối tượng (``.o``).
 * Một thư viện ``libpython`` tĩnh (``.a``) được tạo từ các tệp đối tượng.
-* ``python.o`` và thư viện ``libpython`` tĩnh được liên kết vào chương trình ``python`` cuối cùng.
-* Các phần mở rộng C được Makefile xây dựng (xem :file:`Modules/Setup`).
+* ``python.o`` và thư viện ``libpython`` tĩnh được liên kết thành chương trình ``python`` cuối cùng.
+* Các phần mở rộng C được build bởi Makefile (xem :file:`Modules/Setup`).
 
 Các target chính của Makefile
 -----------------------------
@@ -1192,53 +1076,53 @@ Các target chính của Makefile
 make
 ^^^^
 
-Trong phần lớn trường hợp, khi xây dựng lại sau khi chỉnh sửa mã hoặc cập nhật checkout của bạn từ upstream, tất cả những gì bạn cần làm là thực thi ``make``, lệnh này (theo semantics của Make) sẽ xây dựng target mặc định, tức target đầu tiên được định nghĩa trong Makefile. Theo thông lệ (bao gồm cả trong dự án CPython), đây thường là target ``all``. Script ``configure`` mở rộng một biến ``autoconf``, ``@DEF_MAKE_ALL_RULE@`` để mô tả chính xác những target nào ``make all`` sẽ xây dựng. Có ba lựa chọn:
+Trong hầu hết trường hợp, khi build lại sau khi chỉnh sửa một phần code hoặc cập nhật checkout từ upstream, bạn chỉ cần thực thi ``make``, lệnh này (theo ngữ nghĩa của Make) sẽ build target mặc định, tức target đầu tiên được định nghĩa trong Makefile. Theo thông lệ (bao gồm cả trong dự án CPython), đây thường là target ``all``. Script ``configure`` mở rộng một biến ``autoconf``, ``@DEF_MAKE_ALL_RULE@`` để mô tả chính xác các target mà ``make all`` sẽ build. Có ba lựa chọn:
 
-* ``profile-opt`` (được cấu hình bằng ``--enable-optimizations``)
+* ``profile-opt`` (được cấu hình với ``--enable-optimizations``)
 * ``build_wasm`` (được chọn nếu nền tảng máy chủ khớp với ``wasm32-wasi*`` hoặc ``wasm32-emscripten``)
 * ``build_all`` (được cấu hình mà không sử dụng rõ ràng một trong hai tùy chọn còn lại)
 
-Tùy thuộc vào những thay đổi gần đây nhất đối với các tệp nguồn, Make sẽ xây dựng lại mọi target (tệp đối tượng và tệp thực thi) được xác định là đã lỗi thời, bao gồm cả việc chạy lại ``configure`` nếu cần. Tuy nhiên, các dependency giữa nguồn và target rất nhiều và được duy trì thủ công, nên đôi khi Make không có đủ thông tin cần thiết để phát hiện chính xác tất cả target cần được xây dựng lại. Tùy thuộc vào những target không được xây dựng lại, bạn có thể gặp một số vấn đề. Nếu bạn gặp vấn đề khi build hoặc test mà không thể giải thích theo cách nào khác, ``make clean && make`` sẽ xử lý phần lớn vấn đề về dependency, đổi lại thời gian build sẽ lâu hơn.
+Tùy thuộc vào những thay đổi gần đây nhất đối với các tệp nguồn, Make sẽ xây dựng lại mọi target (tệp đối tượng và tệp thực thi) được xác định là đã lỗi thời, bao gồm cả việc chạy lại ``configure`` nếu cần. Tuy nhiên, các dependency giữa nguồn và target rất nhiều và được duy trì thủ công, vì vậy đôi khi Make không có đủ thông tin cần thiết để xác định chính xác tất cả target cần được xây dựng lại. Tùy thuộc vào những target không được xây dựng lại, bạn có thể gặp một số vấn đề. Nếu bạn gặp vấn đề khi build hoặc test mà không thể giải thích bằng cách nào khác, ``make clean && make`` sẽ xử lý phần lớn các vấn đề về dependency, đổi lại thời gian build sẽ lâu hơn.
 
 
 make platform
 ^^^^^^^^^^^^^
 
-Xây dựng chương trình ``python``, nhưng không xây dựng các module mở rộng của standard library. Thao tác này tạo một tệp có tên ``platform``, chứa một dòng duy nhất mô tả chi tiết về nền tảng build, chẳng hạn như ``macosx-14.3-arm64-3.12`` hoặc ``linux-x86_64-3.13``.
+Xây dựng chương trình ``python``, nhưng không xây dựng các mô-đun mở rộng của standard library. Thao tác này tạo một tệp có tên ``platform``, chứa một dòng duy nhất mô tả thông tin chi tiết về build platform, ví dụ: ``macosx-14.3-arm64-3.12`` hoặc ``linux-x86_64-3.13``.
 
 
 make profile-opt
 ^^^^^^^^^^^^^^^^
 
-Xây dựng Python bằng profile-guided optimization (PGO). Bạn có thể sử dụng tùy chọn configure :option:`--enable-optimizations` để đặt đây làm target mặc định của lệnh ``make`` (``make all`` hoặc chỉ ``make``).
+Xây dựng Python bằng tối ưu hóa dựa trên hồ sơ (PGO). Bạn có thể sử dụng tùy chọn configure :option:`--enable-optimizations` để đặt đây làm target mặc định của lệnh ``make`` (``make all`` hoặc chỉ ``make``).
 
 
 
 make clean
 ^^^^^^^^^^
 
-Xóa các tệp đã được build.
+Xóa các tệp đã được xây dựng.
 
 
 make distclean
 ^^^^^^^^^^^^^^
 
-Ngoài những gì ``make clean`` thực hiện, hãy xóa các tệp do configure script tạo ra. Cần chạy ``configure`` trước khi build lại. [#]_
+Ngoài các tác vụ do ``make clean`` thực hiện, hãy xóa các tệp được tạo bởi configure script. Bạn sẽ phải chạy ``configure`` trước khi xây dựng lại. [#]_
 
 
 make install
 ^^^^^^^^^^^^
 
-Build target ``all`` và cài đặt Python.
+Xây dựng target ``all`` và cài đặt Python.
 
 
 make test
 ^^^^^^^^^
 
-Xây dựng target ``all`` và chạy bộ kiểm thử Python với tùy chọn ``--fast-ci`` mà không chạy các bài kiểm thử GUI. Các biến:
+Xây dựng target ``all`` và chạy bộ kiểm thử Python với tùy chọn ``--fast-ci``, không chạy các bài kiểm thử GUI. Các biến:
 
-* ``TESTOPTS``: các tùy chọn dòng lệnh regrtest bổ sung.
-* ``TESTPYTHONOPTS``: các tùy chọn dòng lệnh Python bổ sung.
+* ``TESTOPTS``: các tùy chọn dòng lệnh bổ sung cho regrtest.
+* ``TESTPYTHONOPTS``: các tùy chọn dòng lệnh bổ sung cho Python.
 * ``TESTTIMEOUT``: thời gian chờ tính bằng giây (mặc định: 10 phút).
 
 
@@ -1259,13 +1143,13 @@ Tương tự như ``make test``, nhưng sử dụng tùy chọn ``--slow-ci`` v�
 make regen-all
 ^^^^^^^^^^^^^^
 
-Tạo lại (gần như) tất cả các tệp được tạo tự động. Các tệp này bao gồm (nhưng không chỉ giới hạn ở) các trường hợp bytecode và tệp trình tạo parser. Phải chạy riêng ``make regen-stdlib-module-names`` và ``autoconf`` cho các `tệp được tạo còn lại <#generated-files>`_.
+Tạo lại (gần như) tất cả các tệp được tạo. Các tệp này bao gồm (nhưng không chỉ giới hạn ở) các trường hợp bytecode và tệp trình tạo parser. ``make regen-stdlib-module-names`` và ``autoconf`` phải được chạy riêng cho các `tệp được tạo còn lại <#generated-files>`_.
 
 
-C extension
------------
+Các phần mở rộng C
+------------------
 
-Một số C extension được build dưới dạng built-in module, chẳng hạn như module ``sys``. Chúng được build với macro ``Py_BUILD_CORE_BUILTIN`` được định nghĩa. Built-in module không có thuộc tính ``__file__``:
+Một số phần mở rộng C được xây dựng dưới dạng các module tích hợp sẵn, chẳng hạn như module ``sys``. Chúng được xây dựng với macro ``Py_BUILD_CORE_BUILTIN`` được định nghĩa. Các module tích hợp sẵn không có thuộc tính ``__file__``:
 
 .. code-block:: pycon
 
@@ -1277,7 +1161,7 @@ Một số C extension được build dưới dạng built-in module, chẳng h�
       File "<stdin>", line 1, in <module>
     AttributeError: module 'sys' has no attribute '__file__'
 
-Các C extension khác được build dưới dạng dynamic library, chẳng hạn như module ``_asyncio``. Chúng được build với macro ``Py_BUILD_CORE_MODULE`` được định nghĩa. Ví dụ trên Linux x86-64:
+Các phần mở rộng C khác được xây dựng dưới dạng thư viện động, chẳng hạn như module ``_asyncio``. Chúng được xây dựng với macro ``Py_BUILD_CORE_MODULE`` được định nghĩa. Ví dụ trên Linux x86-64:
 
 .. code-block:: pycon
 
@@ -1287,39 +1171,36 @@ Các C extension khác được build dưới dạng dynamic library, chẳng h�
     >>> _asyncio.__file__
     '/usr/lib64/python3.9/lib-dynload/_asyncio.cpython-39-x86_64-linux-gnu.so'
 
-:file:`Modules/Setup` được dùng để tạo các target Makefile nhằm build C extension. Ở phần đầu của các tệp, C extension được build dưới dạng built-in module. Các extension được định nghĩa sau marker ``*shared*`` sẽ được build dưới dạng dynamic library.
+:file:`Modules/Setup` được dùng để tạo các target Makefile nhằm build các extension C. Ở phần đầu của các tệp, các extension C được build dưới dạng module tích hợp sẵn. Các extension được định nghĩa sau marker ``*shared*`` được build dưới dạng thư viện động.
 
 Các :c:macro:`!PyAPI_FUNC()`, :c:macro:`!PyAPI_DATA()` và
-macro :c:macro:`PyMODINIT_FUNC` của :file:`Include/exports.h` được định nghĩa khác nhau tùy thuộc vào việc macro ``Py_BUILD_CORE_MODULE`` có được định nghĩa hay không:
+Các macro :c:macro:`PyMODINIT_FUNC` của :file:`Include/exports.h` được định nghĩa khác nhau tùy thuộc vào việc macro ``Py_BUILD_CORE_MODULE`` có được định nghĩa hay không:
 
 * Sử dụng ``Py_EXPORTED_SYMBOL`` nếu ``Py_BUILD_CORE_MODULE`` được định nghĩa
-* Nếu không, sử dụng ``Py_IMPORTED_SYMBOL``.
+* Nếu không, hãy sử dụng ``Py_IMPORTED_SYMBOL``.
 
-Nếu vô tình sử dụng macro ``Py_BUILD_CORE_BUILTIN`` cho một C extension được xây dựng dưới dạng shared library, hàm :samp:`PyInit_{xxx}()` của nó sẽ không được export, gây ra :exc:`ImportError` khi import.
+Nếu macro ``Py_BUILD_CORE_BUILTIN`` bị dùng nhầm trong một extension C được build dưới dạng shared library, hàm :samp:`PyInit_{xxx}()` của nó sẽ không được export, gây ra lỗi :exc:`ImportError` khi import.
 
 
 Cờ compiler và linker
 =====================
 
-Các tùy chọn được thiết lập bởi script ``./configure`` và các biến môi trường, đồng thời được ``Makefile`` sử dụng.
+Các tùy chọn được đặt bởi script ``./configure`` và các biến môi trường, rồi được ``Makefile`` sử dụng.
 
-Cờ preprocessor
----------------
+Các cờ preprocessor
+-------------------
 
 .. envvar:: CONFIGURE_CPPFLAGS
 
-   Value of :envvar:`CPPFLAGS` variable passed to the ``./configure`` script.
+   Giá trị của biến :envvar:`CPPFLAGS` được truyền cho script ``./configure``.
 
    .. versionadded:: 3.6
 
 .. envvar:: CPPFLAGS
 
-   (Objective) C/C++ preprocessor flags, e.g. :samp:`-I{include_dir}` if you have
-   headers in a nonstandard directory *include_dir*.
+   Các cờ preprocessor của (Objective) C/C++, ví dụ :samp:`-I{include_dir}` nếu bạn có các header trong thư mục không theo chuẩn *include_dir*.
 
-   Both :envvar:`CPPFLAGS` and :envvar:`LDFLAGS` need to contain the shell's
-   value to be able to build extension modules using the
-   directories specified in the environment variables.
+   Cả :envvar:`CPPFLAGS` và :envvar:`LDFLAGS` đều cần chứa giá trị của shell để có thể build các extension module bằng cách sử dụng những thư mục được chỉ định trong các biến môi trường.
 
 .. envvar:: BASECPPFLAGS
 
@@ -1327,235 +1208,216 @@ Cờ preprocessor
 
 .. envvar:: PY_CPPFLAGS
 
-   Extra preprocessor flags added for building the interpreter object files.
+   Các cờ preprocessor bổ sung được thêm vào khi build các tệp đối tượng của interpreter.
 
-   Default: ``$(BASECPPFLAGS) -I. -I$(srcdir)/Include $(CONFIGURE_CPPFLAGS) $(CPPFLAGS)``.
+   Mặc định: ``$(BASECPPFLAGS) -I. -I$(srcdir)/Include $(CONFIGURE_CPPFLAGS) $(CPPFLAGS)``.
 
    .. versionadded:: 3.2
 
-Cờ compiler
------------
+Các cờ compiler
+---------------
 
 .. envvar:: CC
 
-   C compiler command.
+   Lệnh compiler C.
 
-   Example: ``gcc -pthread``.
+   Ví dụ: ``gcc -pthread``.
 
 .. envvar:: CXX
 
-   C++ compiler command.
+   Lệnh compiler C++.
 
-   Example: ``g++ -pthread``.
+   Ví dụ: ``g++ -pthread``.
 
 .. envvar:: CFLAGS
 
-   C compiler flags.
+   Các cờ compiler C.
 
 .. envvar:: CFLAGS_NODIST
 
-   :envvar:`CFLAGS_NODIST` is used for building the interpreter and stdlib C
-   extensions.  Use it when a compiler flag should *not* be part of
-   :envvar:`CFLAGS` once Python is installed (:gh:`65320`).
+   :envvar:`CFLAGS_NODIST` được sử dụng để xây dựng trình thông dịch và các phần mở rộng C của stdlib. Sử dụng nó khi một cờ compiler *không nên* là một phần của
+   :envvar:`CFLAGS` sau khi Python được cài đặt (:gh:`65320`).
 
-   In particular, :envvar:`CFLAGS` should not contain:
+   Cụ thể, :envvar:`CFLAGS` không được chứa:
 
-   * the compiler flag ``-I`` (for setting the search path for include files).
-     The ``-I`` flags are processed from left to right, and any flags in
-     :envvar:`CFLAGS` would take precedence over user- and package-supplied ``-I``
-     flags.
+   * cờ compiler ``-I`` (để thiết lập đường dẫn tìm kiếm cho các tệp include). Các cờ ``-I`` được xử lý từ trái sang phải, và mọi cờ trong
+     :envvar:`CFLAGS` sẽ được ưu tiên hơn các cờ ``-I`` do người dùng và gói cung cấp.
 
-   * hardening flags such as ``-Werror`` because distributions cannot control
-     whether packages installed by users conform to such heightened
-     standards.
+   * các cờ hardening như ``-Werror`` vì các bản phân phối không thể kiểm soát liệu các gói do người dùng cài đặt có tuân thủ những tiêu chuẩn cao hơn như vậy hay không.
 
    .. versionadded:: 3.5
 
 .. envvar:: COMPILEALL_OPTS
 
-   Options passed to the :mod:`compileall` command line when building PYC files
-   in ``make install``. Default: ``-j0``.
+   Các tùy chọn được truyền vào dòng lệnh :mod:`compileall` khi xây dựng tệp PYC trong ``make install``. Mặc định: ``-j0``.
 
    .. versionadded:: 3.12
 
 .. envvar:: EXTRA_CFLAGS
 
-   Extra C compiler flags.
+   Các cờ compiler C bổ sung.
 
 .. envvar:: CONFIGURE_CFLAGS
 
-   Value of :envvar:`CFLAGS` variable passed to the ``./configure``
-   script.
+   Giá trị của biến :envvar:`CFLAGS` được truyền cho script ``./configure``.
 
    .. versionadded:: 3.2
 
 .. envvar:: CONFIGURE_CFLAGS_NODIST
 
-   Value of :envvar:`CFLAGS_NODIST` variable passed to the ``./configure``
-   script.
+   Giá trị của biến :envvar:`CFLAGS_NODIST` được truyền cho script ``./configure``.
 
    .. versionadded:: 3.5
 
 .. envvar:: BASECFLAGS
 
-   Base compiler flags.
+   Cờ biên dịch cơ sở.
 
 .. envvar:: OPT
 
-   Optimization flags.
+   Cờ tối ưu hóa.
 
 .. envvar:: CFLAGS_ALIASING
 
-   Strict or non-strict aliasing flags used to compile ``Python/dtoa.c``.
+   Các cờ aliasing nghiêm ngặt hoặc không nghiêm ngặt được sử dụng để biên dịch ``Python/dtoa.c``.
 
    .. versionadded:: 3.7
 
 .. envvar:: CFLAGS_CEVAL
 
-   Flags used to compile ``Python/ceval.c``.
+   Các cờ được sử dụng để biên dịch ``Python/ceval.c``.
 
    .. versionadded:: 3.14.5
 
 .. envvar:: CCSHARED
 
-   Compiler flags used to build a shared library.
+   Các cờ biên dịch được sử dụng để xây dựng thư viện dùng chung.
 
-   For example, ``-fPIC`` is used on Linux and on BSD.
+   Ví dụ: ``-fPIC`` được sử dụng trên Linux và BSD.
 
 .. envvar:: CFLAGSFORSHARED
 
-   Extra C flags added for building the interpreter object files.
+   Các cờ C bổ sung được thêm vào để xây dựng các tệp đối tượng của trình thông dịch.
 
-   Default: ``$(CCSHARED)`` when :option:`--enable-shared` is used, or an empty
-   string otherwise.
+   Mặc định: ``$(CCSHARED)`` khi sử dụng :option:`--enable-shared`, hoặc chuỗi rỗng trong các trường hợp khác.
 
 .. envvar:: PY_CFLAGS
 
-   Default: ``$(BASECFLAGS) $(OPT) $(CONFIGURE_CFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)``.
+   Mặc định: ``$(BASECFLAGS) $(OPT) $(CONFIGURE_CFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)``.
 
 .. envvar:: PY_CFLAGS_NODIST
 
-   Default: ``$(CONFIGURE_CFLAGS_NODIST) $(CFLAGS_NODIST) -I$(srcdir)/Include/internal``.
+   Mặc định: ``$(CONFIGURE_CFLAGS_NODIST) $(CFLAGS_NODIST) -I$(srcdir)/Include/internal``.
 
    .. versionadded:: 3.5
 
 .. envvar:: PY_STDMODULE_CFLAGS
 
-   C flags used for building the interpreter object files.
+   Các cờ C được sử dụng để xây dựng các tệp đối tượng của trình thông dịch.
 
-   Default: ``$(PY_CFLAGS) $(PY_CFLAGS_NODIST) $(PY_CPPFLAGS) $(CFLAGSFORSHARED)``.
+   Mặc định: ``$(PY_CFLAGS) $(PY_CFLAGS_NODIST) $(PY_CPPFLAGS) $(CFLAGSFORSHARED)``.
 
    .. versionadded:: 3.7
 
 .. envvar:: PY_CORE_CFLAGS
 
-   Default: ``$(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE``.
+   Mặc định: ``$(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE``.
 
    .. versionadded:: 3.2
 
 .. envvar:: PY_BUILTIN_MODULE_CFLAGS
 
-   Compiler flags to build a standard library extension module as a built-in
-   module, like the :mod:`posix` module.
+   Các cờ trình biên dịch để xây dựng một mô-đun mở rộng thư viện chuẩn dưới dạng mô-đun tích hợp sẵn, như mô-đun :mod:`posix`.
 
-   Default: ``$(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE_BUILTIN``.
+   Mặc định: ``$(PY_STDMODULE_CFLAGS) -DPy_BUILD_CORE_BUILTIN``.
 
    .. versionadded:: 3.8
 
 .. envvar:: PURIFY
 
-   Purify command. Purify is a memory debugger program.
+   Lệnh Purify. Purify là một chương trình gỡ lỗi bộ nhớ.
 
-   Default: empty string (not used).
+   Mặc định: chuỗi rỗng (không được sử dụng).
 
 
-Cờ linker
----------
+Các cờ trình liên kết
+---------------------
 
 .. envvar:: LINKCC
 
-   Linker command used to build programs like ``python`` and ``_testembed``.
+   Lệnh trình liên kết được sử dụng để xây dựng các chương trình như ``python`` và ``_testembed``.
 
-   Default: ``$(PURIFY) $(CC)``.
+   Mặc định: ``$(PURIFY) $(CC)``.
 
 .. envvar:: CONFIGURE_LDFLAGS
 
-   Value of :envvar:`LDFLAGS` variable passed to the ``./configure`` script.
+   Giá trị của biến :envvar:`LDFLAGS` được truyền cho script ``./configure``.
 
-   Avoid assigning :envvar:`CFLAGS`, :envvar:`LDFLAGS`, etc. so users can use
-   them on the command line to append to these values without stomping the
-   pre-set values.
+   Tránh gán :envvar:`CFLAGS`, :envvar:`LDFLAGS`, v.v. để người dùng có thể sử dụng chúng trên dòng lệnh nhằm nối thêm vào các giá trị này mà không ghi đè các giá trị được thiết lập sẵn.
 
    .. versionadded:: 3.2
 
 .. envvar:: LDFLAGS_NODIST
 
-   :envvar:`LDFLAGS_NODIST` is used in the same manner as
-   :envvar:`CFLAGS_NODIST`.  Use it when a linker flag should *not* be part of
-   :envvar:`LDFLAGS` once Python is installed (:gh:`65320`).
+   :envvar:`LDFLAGS_NODIST` được dùng theo cùng cách như
+   :envvar:`CFLAGS_NODIST`. Sử dụng nó khi một linker flag *không* nên là một phần của
+   :envvar:`LDFLAGS` sau khi Python được cài đặt (:gh:`65320`).
 
-   In particular, :envvar:`LDFLAGS` should not contain:
+   Đặc biệt, :envvar:`LDFLAGS` không nên chứa:
 
-   * the compiler flag ``-L`` (for setting the search path for libraries).
-     The ``-L`` flags are processed from left to right, and any flags in
-     :envvar:`LDFLAGS` would take precedence over user- and package-supplied ``-L``
-     flags.
+   * cờ trình biên dịch ``-L`` (dùng để thiết lập đường dẫn tìm kiếm cho các thư viện). Các cờ ``-L`` được xử lý từ trái sang phải, và mọi cờ trong
+     :envvar:`LDFLAGS` sẽ được ưu tiên hơn các cờ ``-L`` do người dùng và package cung cấp.
 
 .. envvar:: CONFIGURE_LDFLAGS_NODIST
 
-   Value of :envvar:`LDFLAGS_NODIST` variable passed to the ``./configure``
-   script.
+   Giá trị của biến :envvar:`LDFLAGS_NODIST` được truyền cho script ``./configure``.
 
    .. versionadded:: 3.8
 
 .. envvar:: LDFLAGS
 
-   Linker flags, e.g. :samp:`-L{lib_dir}` if you have libraries in a nonstandard
-   directory *lib_dir*.
+   Các cờ linker, ví dụ :samp:`-L{lib_dir}` nếu bạn có các thư viện trong thư mục không chuẩn *lib_dir*.
 
-   Both :envvar:`CPPFLAGS` and :envvar:`LDFLAGS` need to contain the shell's
-   value to be able to build extension modules using the
-   directories specified in the environment variables.
+   Cả :envvar:`CPPFLAGS` và :envvar:`LDFLAGS` đều cần chứa giá trị của shell để có thể build các extension module bằng cách sử dụng những thư mục được chỉ định trong các biến môi trường.
 
 .. envvar:: LIBS
 
-   Linker flags to pass libraries to the linker when linking the Python
-   executable.
+   Các cờ linker dùng để truyền các thư viện cho linker khi liên kết executable Python.
 
-   Example: ``-lrt``.
+   Ví dụ: ``-lrt``.
 
 .. envvar:: LDSHARED
 
-   Command to build a shared library.
+   Lệnh để xây dựng một thư viện dùng chung.
 
-   Default: ``@LDSHARED@ $(PY_LDFLAGS)``.
+   Mặc định: ``@LDSHARED@ $(PY_LDFLAGS)``.
 
 .. envvar:: BLDSHARED
 
-   Command to build ``libpython`` shared library.
+   Lệnh để xây dựng thư viện dùng chung ``libpython``.
 
-   Default: ``@BLDSHARED@ $(PY_CORE_LDFLAGS)``.
+   Mặc định: ``@BLDSHARED@ $(PY_CORE_LDFLAGS)``.
 
 .. envvar:: PY_LDFLAGS
 
-   Default: ``$(CONFIGURE_LDFLAGS) $(LDFLAGS)``.
+   Mặc định: ``$(CONFIGURE_LDFLAGS) $(LDFLAGS)``.
 
 .. envvar:: PY_LDFLAGS_NODIST
 
-   Default: ``$(CONFIGURE_LDFLAGS_NODIST) $(LDFLAGS_NODIST)``.
+   Mặc định: ``$(CONFIGURE_LDFLAGS_NODIST) $(LDFLAGS_NODIST)``.
 
    .. versionadded:: 3.8
 
 .. envvar:: PY_CORE_LDFLAGS
 
-   Linker flags used for building the interpreter object files.
+   Các linker flags được sử dụng để xây dựng các tệp object của interpreter.
 
    .. versionadded:: 3.8
 
 
 .. rubric:: Chú thích cuối trang
 
-.. [#] ``git clean -fdx`` là một cách thậm chí cực đoan hơn để "dọn dẹp" checkout của bạn. Nó xóa mọi tệp mà Git không nhận diện. Khi tìm lỗi bằng ``git bisect``, bạn `được khuyến nghị thực hiện việc này giữa các lần thăm dò <https://github.com/python/cpython/issues/114505#issuecomment-1907021718>`_ để đảm bảo một bản build hoàn toàn sạch. **Hãy sử dụng cẩn thận**, vì thao tác này sẽ xóa mọi tệp chưa được đưa vào Git, bao gồm cả phần công việc mới chưa commit của bạn.
+.. [#] ``git clean -fdx`` là một cách thậm chí cực đoan hơn để "dọn sạch" checkout của bạn. Nó xóa tất cả các tệp mà Git không biết đến. Khi tìm lỗi bằng ``git bisect``, `được khuyến nghị giữa các lần thăm dò <https://github.com/python/cpython/issues/114505#issuecomment-1907021718>`_ để đảm bảo một bản build hoàn toàn sạch. **Hãy sử dụng cẩn thận**, vì thao tác này sẽ xóa tất cả các tệp chưa được commit vào Git, bao gồm cả công việc mới chưa commit của bạn.
 
 .. _`C11`: https://en.cppreference.com/w/c/11
 .. _`Optional C11 features`: https://en.wikipedia.org/wiki/C11_(C_standard_revision)#Optional_features
@@ -1574,5 +1436,9 @@ Cờ linker
 .. _`Autoconf`: https://gnu.org/software/autoconf
 .. _`Automake`: https://www.gnu.org/software/automake
 .. _`pkg-config`: https://www.freedesktop.org/wiki/Software/pkg-config/
+.. _`BOLT post-link binary optimizer`: https://github.com/llvm/llvm-project/tree/main/bolt
+.. _`BOLT optimized binary`: https://github.com/facebookarchive/BOLT
+.. _`preserve_none`: https://clang.llvm.org/docs/AttributeReference.html#preserve-none
+.. _`packaging platform compatibility tags used on macOS`: https://packaging.python.org/en/latest/specifications/platform-compatibility-tags/#macos
 .. _`generated files`: #generated-files
 .. _`recommended between probes`: https://github.com/python/cpython/issues/114505#issuecomment-1907021718

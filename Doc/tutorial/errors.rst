@@ -1,21 +1,18 @@
 .. _tut-errors:
 
-*********************
-Errors and Exceptions
-*********************
+***************
+Lỗi và Ngoại lệ
+***************
 
-Until now error messages haven't been more than mentioned, but if you have tried
-out the examples you have probably seen some.  There are (at least) two
-distinguishable kinds of errors: *syntax errors* and *exceptions*.
+Cho đến nay, các thông báo lỗi mới chỉ được đề cập đến, nhưng nếu bạn đã thử các ví dụ, có lẽ bạn đã thấy một vài thông báo. Có (ít nhất) hai loại lỗi có thể phân biệt: *lỗi cú pháp* và *ngoại lệ*.
 
 
 .. _tut-syntaxerrors:
 
-Syntax Errors
-=============
+Lỗi cú pháp
+===========
 
-Syntax errors, also known as parsing errors, are perhaps the most common kind of
-complaint you get while you are still learning Python::
+Lỗi cú pháp, còn được gọi là lỗi phân tích cú pháp, có lẽ là loại lỗi phổ biến nhất mà bạn gặp phải khi vẫn đang học Python::
 
    >>> while True print('Hello world')
      File "<stdin>", line 1
@@ -23,25 +20,17 @@ complaint you get while you are still learning Python::
                   ^^^^^
    SyntaxError: invalid syntax
 
-The parser repeats the offending line and displays little arrows pointing
-at the place where the error was detected.  Note that this is not always the
-place that needs to be fixed.  In the example, the error is detected at the
-function :func:`print`, since a colon (``':'``) is missing just before it.
+Bộ phân tích cú pháp lặp lại dòng gây lỗi và hiển thị các mũi tên nhỏ chỉ vào vị trí phát hiện lỗi. Lưu ý rằng đây không phải lúc nào cũng là vị trí cần sửa. Trong ví dụ này, lỗi được phát hiện tại hàm :func:`print`, vì ngay trước đó bị thiếu dấu hai chấm (``':'``).
 
-The file name (``<stdin>`` in our example) and line number are printed so you
-know where to look in case the input came from a file.
+Tên tệp (``<stdin>`` trong ví dụ của chúng ta) và số dòng được in ra để bạn biết cần tìm ở đâu trong trường hợp đầu vào đến từ một tệp.
 
 
 .. _tut-exceptions:
 
-Exceptions
-==========
+Ngoại lệ
+========
 
-Even if a statement or expression is syntactically correct, it may cause an
-error when an attempt is made to execute it. Errors detected during execution
-are called *exceptions* and are not unconditionally fatal: you will soon learn
-how to handle them in Python programs.  Most exceptions are not handled by
-programs, however, and result in error messages as shown here::
+Ngay cả khi một câu lệnh hoặc biểu thức đúng về mặt cú pháp, nó vẫn có thể gây ra lỗi khi cố gắng thực thi. Các lỗi được phát hiện trong quá trình thực thi được gọi là *exceptions* và không phải lúc nào cũng nghiêm trọng: bạn sẽ sớm học cách xử lý chúng trong các chương trình Python. Tuy nhiên, hầu hết các exception không được chương trình xử lý và dẫn đến các thông báo lỗi như minh họa ở đây::
 
    >>> 10 * (1/0)
    Traceback (most recent call last):
@@ -62,35 +51,21 @@ programs, however, and result in error messages as shown here::
        ~~~~^~~
    TypeError: can only concatenate str (not "int") to str
 
-The last line of the error message indicates what happened. Exceptions come in
-different types, and the type is printed as part of the message: the types in
-the example are :exc:`ZeroDivisionError`, :exc:`NameError` and :exc:`TypeError`.
-The string printed as the exception type is the name of the built-in exception
-that occurred.  This is true for all built-in exceptions, but need not be true
-for user-defined exceptions (although it is a useful convention). Standard
-exception names are built-in identifiers (not reserved keywords).
+Dòng cuối cùng của thông báo lỗi cho biết điều gì đã xảy ra. Exception có nhiều kiểu khác nhau và kiểu được in như một phần của thông báo: các kiểu trong ví dụ là :exc:`ZeroDivisionError`, :exc:`NameError` và :exc:`TypeError`. Chuỗi được in dưới dạng kiểu exception là tên của exception tích hợp đã xảy ra. Điều này đúng với tất cả exception tích hợp, nhưng không nhất thiết đúng với exception do người dùng định nghĩa (mặc dù đây là một quy ước hữu ích). Tên các exception tiêu chuẩn là các identifier tích hợp (không phải từ khóa dành riêng).
 
-The rest of the line provides detail based on the type of exception and what
-caused it.
+Phần còn lại của dòng cung cấp thông tin chi tiết dựa trên kiểu exception và nguyên nhân gây ra nó.
 
-The preceding part of the error message shows the context where the exception
-occurred, in the form of a stack traceback. In general it contains a stack
-traceback listing source lines; however, it will not display lines read from
-standard input.
+Phần trước đó của thông báo lỗi cho biết ngữ cảnh nơi exception xảy ra, dưới dạng stack traceback. Nhìn chung, nó chứa một stack traceback liệt kê các dòng mã nguồn; tuy nhiên, nó sẽ không hiển thị các dòng được đọc từ standard input.
 
-:ref:`bltin-exceptions` lists the built-in exceptions and their meanings.
+:ref:`bltin-exceptions` liệt kê các exception tích hợp và ý nghĩa của chúng.
 
 
 .. _tut-handling:
 
-Handling Exceptions
-===================
+Xử lý Exception
+===============
 
-It is possible to write programs that handle selected exceptions. Look at the
-following example, which asks the user for input until a valid integer has been
-entered, but allows the user to interrupt the program (using :kbd:`Control-C` or
-whatever the operating system supports); note that a user-generated interruption
-is signalled by raising the :exc:`KeyboardInterrupt` exception. ::
+Bạn có thể viết các chương trình xử lý những exception được chọn. Hãy xem ví dụ sau, trong đó chương trình yêu cầu người dùng nhập dữ liệu cho đến khi một số nguyên hợp lệ được nhập, nhưng cho phép người dùng ngắt chương trình (bằng :kbd:`Control-C` hoặc bất kỳ cách nào mà hệ điều hành hỗ trợ); lưu ý rằng việc ngắt do người dùng tạo ra được báo hiệu bằng cách phát sinh exception :exc:`KeyboardInterrupt`.::
 
    >>> while True:
    ...     try:
@@ -100,36 +75,25 @@ is signalled by raising the :exc:`KeyboardInterrupt` exception. ::
    ...         print("Oops!  That was no valid number.  Try again...")
    ...
 
-The :keyword:`try` statement works as follows.
+Câu lệnh :keyword:`try` hoạt động như sau.
 
-* First, the *try clause* (the statement(s) between the :keyword:`try` and
-  :keyword:`except` keywords) is executed.
+* Trước tiên, *mệnh đề try* (các câu lệnh nằm giữa :keyword:`try` và
+  :keyword:`except` từ khóa) được thực thi.
 
-* If no exception occurs, the *except clause* is skipped and execution of the
-  :keyword:`try` statement is finished.
+* Nếu không xảy ra ngoại lệ, *mệnh đề except* được bỏ qua và việc thực thi
+  câu lệnh :keyword:`try` kết thúc.
 
-* If an exception occurs during execution of the :keyword:`try` clause, the rest of the
-  clause is skipped.  Then, if its type matches the exception named after the
-  :keyword:`except` keyword, the *except clause* is executed, and then execution
-  continues after the try/except block.
+* Nếu một ngoại lệ xảy ra trong khi thực thi mệnh đề :keyword:`try`, phần còn lại của mệnh đề sẽ bị bỏ qua. Sau đó, nếu kiểu của ngoại lệ đó khớp với ngoại lệ được nêu sau
+  từ khóa :keyword:`except`, *mệnh đề except* được thực thi, rồi việc thực thi tiếp tục sau khối try/except.
 
-* If an exception occurs which does not match the exception named in the *except
-  clause*, it is passed on to outer :keyword:`try` statements; if no handler is
-  found, it is an *unhandled exception* and execution stops with an error message.
+* Nếu xảy ra một ngoại lệ không khớp với ngoại lệ được nêu trong mệnh đề *except clause*, ngoại lệ đó sẽ được chuyển tiếp đến các câu lệnh :keyword:`try` bên ngoài; nếu không tìm thấy trình xử lý nào, đó là một *unhandled exception* và quá trình thực thi dừng lại với một thông báo lỗi.
 
-A :keyword:`try` statement may have more than one *except clause*, to specify
-handlers for different exceptions.  At most one handler will be executed.
-Handlers only handle exceptions that occur in the corresponding *try clause*,
-not in other handlers of the same :keyword:`!try` statement.  An *except clause*
-may name multiple exceptions, for example::
+Một câu lệnh :keyword:`try` có thể có nhiều mệnh đề *except clause* để chỉ định các trình xử lý cho những ngoại lệ khác nhau. Tối đa một trình xử lý sẽ được thực thi. Các trình xử lý chỉ xử lý những ngoại lệ xảy ra trong *try clause* tương ứng, không xử lý các ngoại lệ xảy ra trong những trình xử lý khác của cùng câu lệnh :keyword:`!try`. Một *except clause* có thể nêu nhiều ngoại lệ, chẳng hạn như::
 
    ... except RuntimeError, TypeError, NameError:
    ...     pass
 
-A class in an :keyword:`except` clause matches exceptions which are instances of the
-class itself or one of its derived classes (but not the other way around --- an
-*except clause* listing a derived class does not match instances of its base classes).
-For example, the following code will print B, C, D in that order::
+Một class trong mệnh đề :keyword:`except` sẽ khớp với các ngoại lệ là instance của chính class đó hoặc một trong các class dẫn xuất của nó (nhưng không theo chiều ngược lại --- một *except clause* liệt kê một class dẫn xuất sẽ không khớp với các instance của các class cơ sở của nó). Ví dụ, đoạn mã sau sẽ in B, C, D theo thứ tự đó::
 
    class B(Exception):
        pass
@@ -150,27 +114,20 @@ For example, the following code will print B, C, D in that order::
        except B:
            print("B")
 
-Note that if the *except clauses* were reversed (with ``except B`` first), it
-would have printed B, B, B --- the first matching *except clause* is triggered.
+Lưu ý rằng nếu các mệnh đề *except clauses* được đảo ngược (với ``except B`` trước), kết quả sẽ là B, B, B --- *except clause* khớp đầu tiên sẽ được kích hoạt.
 
-When an exception occurs, it may have associated values, also known as the
-exception's *arguments*. The presence and types of the arguments depend on the
-exception type.
+Khi xảy ra một ngoại lệ, ngoại lệ đó có thể có các giá trị đi kèm, còn được gọi là *arguments* của ngoại lệ. Sự hiện diện và kiểu của các arguments phụ thuộc vào kiểu ngoại lệ.
 
-The *except clause* may specify a variable after the exception name.  The
-variable is bound to the exception instance which typically has an ``args``
-attribute that stores the arguments. For convenience, builtin exception
-types define :meth:`~object.__str__` to print all the arguments without explicitly
-accessing ``.args``.  ::
+Mệnh đề *except clause* có thể chỉ định một biến sau tên ngoại lệ. Biến này được liên kết với instance ngoại lệ, thường có một thuộc tính ``args`` lưu trữ các arguments. Để thuận tiện, các kiểu ngoại lệ dựng sẵn định nghĩa :meth:`~object.__str__` để in tất cả các arguments mà không cần truy cập rõ ràng vào ``.args``.::
 
    >>> try:
    ...     raise Exception('spam', 'eggs')
    ... except Exception as inst:
-   ...     print(type(inst))    # the exception type
-   ...     print(inst.args)     # arguments stored in .args
-   ...     print(inst)          # __str__ allows args to be printed directly,
-   ...                          # but may be overridden in exception subclasses
-   ...     x, y = inst.args     # unpack args
+   ...     print(type(inst))    # kiểu ngoại lệ
+   ...     print(inst.args)     # các đối số được lưu trong .args
+   ...     print(inst)          # __str__ cho phép in trực tiếp args,
+   ...                          # nhưng có thể được ghi đè trong các subclass của exception
+   ...     x, y = inst.args     # giải nén args
    ...     print('x =', x)
    ...     print('y =', y)
    ...
@@ -180,25 +137,14 @@ accessing ``.args``.  ::
    x = spam
    y = eggs
 
-The exception's :meth:`~object.__str__` output is printed as the last part ('detail')
-of the message for unhandled exceptions.
+Đầu ra :meth:`~object.__str__` của exception được in dưới dạng phần cuối cùng ('chi tiết') của thông báo đối với các exception không được xử lý.
 
-:exc:`BaseException` is the common base class of all exceptions. One of its
-subclasses, :exc:`Exception`, is the base class of all the non-fatal exceptions.
-Exceptions which are not subclasses of :exc:`Exception` are not typically
-handled, because they are used to indicate that the program should terminate.
-They include :exc:`SystemExit` which is raised by :meth:`sys.exit` and
-:exc:`KeyboardInterrupt` which is raised when a user wishes to interrupt
-the program.
+:exc:`BaseException` là lớp cơ sở chung của tất cả exception. Một trong các subclass của nó, :exc:`Exception`, là lớp cơ sở của tất cả exception không nghiêm trọng. Các exception không phải là subclass của :exc:`Exception` thường không được xử lý, vì chúng được dùng để cho biết rằng chương trình nên kết thúc. Chúng bao gồm :exc:`SystemExit`, được raise bởi :meth:`sys.exit`, và
+:exc:`KeyboardInterrupt`, được raise khi người dùng muốn ngắt chương trình.
 
-:exc:`Exception` can be used as a wildcard that catches (almost) everything.
-However, it is good practice to be as specific as possible with the types
-of exceptions that we intend to handle, and to allow any unexpected
-exceptions to propagate on.
+:exc:`Exception` có thể được sử dụng như một wildcard bắt được gần như mọi thứ. Tuy nhiên, nên chỉ định cụ thể nhất có thể các loại exception mà chúng ta dự định xử lý, đồng thời cho phép mọi exception không mong muốn được tiếp tục truyền lên.
 
-The most common pattern for handling :exc:`Exception` is to print or log
-the exception and then re-raise it (allowing a caller to handle the
-exception as well)::
+Mẫu phổ biến nhất để xử lý :exc:`Exception` là in hoặc ghi log exception, sau đó raise lại exception đó (cho phép caller cũng xử lý exception).::
 
    import sys
 
@@ -214,10 +160,7 @@ exception as well)::
        print(f"Unexpected {err=}, {type(err)=}")
        raise
 
-The :keyword:`try` ... :keyword:`except` statement has an optional *else
-clause*, which, when present, must follow all *except clauses*.  It is useful
-for code that must be executed if the *try clause* does not raise an exception.
-For example::
+Câu lệnh :keyword:`try` ... :keyword:`except` có một *else clause* tùy chọn; nếu có, mệnh đề này phải theo sau tất cả các *except clauses*. Mệnh đề này hữu ích cho phần code phải được thực thi nếu *try clause* không raise exception. Ví dụ::
 
    for arg in sys.argv[1:]:
        try:
@@ -228,14 +171,10 @@ For example::
            print(arg, 'has', len(f.readlines()), 'lines')
            f.close()
 
-The use of the :keyword:`!else` clause is better than adding additional code to
-the :keyword:`try` clause because it avoids accidentally catching an exception
-that wasn't raised by the code being protected by the :keyword:`!try` ...
-:keyword:`!except` statement.
+Sử dụng :keyword:`!else` clause tốt hơn việc thêm code vào :keyword:`try` clause vì cách này tránh vô tình bắt một exception không được raise bởi phần code được bảo vệ bởi :keyword:`!try` ...
+Câu lệnh :keyword:`!except`.
 
-Exception handlers do not handle only exceptions that occur immediately in the
-*try clause*, but also those that occur inside functions that are called (even
-indirectly) in the *try clause*. For example::
+Exception handler không chỉ xử lý các exception xảy ra ngay trong *try clause*, mà còn xử lý những exception xảy ra bên trong các hàm được gọi (kể cả gián tiếp) trong *try clause*. Ví dụ::
 
    >>> def this_fails():
    ...     x = 1/0
@@ -250,11 +189,10 @@ indirectly) in the *try clause*. For example::
 
 .. _tut-raising:
 
-Raising Exceptions
-==================
+Raise Exception
+===============
 
-The :keyword:`raise` statement allows the programmer to force a specified
-exception to occur. For example::
+Câu lệnh :keyword:`raise` cho phép lập trình viên buộc một ngoại lệ được chỉ định xảy ra. Ví dụ::
 
    >>> raise NameError('HiThere')
    Traceback (most recent call last):
@@ -262,17 +200,11 @@ exception to occur. For example::
        raise NameError('HiThere')
    NameError: HiThere
 
-The sole argument to :keyword:`raise` indicates the exception to be raised.
-This must be either an exception instance or an exception class (a class that
-derives from :class:`BaseException`, such as :exc:`Exception` or one of its
-subclasses).  If an exception class is passed, it will be implicitly
-instantiated by calling its constructor with no arguments::
+Đối số duy nhất của :keyword:`raise` cho biết ngoại lệ cần được đưa ra. Đối số này phải là một instance ngoại lệ hoặc một class ngoại lệ (một class kế thừa từ :class:`BaseException`, chẳng hạn như :exc:`Exception` hoặc một subclass của nó). Nếu truyền vào một class ngoại lệ, class đó sẽ được khởi tạo ngầm bằng cách gọi constructor của nó mà không có đối số nào::
 
-   raise ValueError  # shorthand for 'raise ValueError()'
+   raise ValueError  # viết tắt của 'raise ValueError()'
 
-If you need to determine whether an exception was raised but don't intend to
-handle it, a simpler form of the :keyword:`raise` statement allows you to
-re-raise the exception::
+Nếu bạn cần xác định xem một ngoại lệ có được đưa ra hay không nhưng không định xử lý nó, một dạng đơn giản hơn của câu lệnh :keyword:`raise` cho phép bạn đưa lại ngoại lệ đó::
 
    >>> try:
    ...     raise NameError('HiThere')
@@ -289,12 +221,10 @@ re-raise the exception::
 
 .. _tut-exception-chaining:
 
-Exception Chaining
-==================
+Chuỗi ngoại lệ
+==============
 
-If an unhandled exception occurs inside an :keyword:`except` section, it will
-have the exception being handled attached to it and included in the error
-message::
+Nếu một ngoại lệ chưa được xử lý xảy ra bên trong một khối :keyword:`except`, ngoại lệ đó sẽ được đính kèm với ngoại lệ đang được xử lý và được đưa vào thông báo lỗi::
 
     >>> try:
     ...     open("database.sqlite")
@@ -314,13 +244,13 @@ message::
         raise RuntimeError("unable to handle error")
     RuntimeError: unable to handle error
 
-To indicate that an exception is a direct consequence of another, the
-:keyword:`raise` statement allows an optional :keyword:`from<raise>` clause::
+Để cho biết một ngoại lệ là hệ quả trực tiếp của một ngoại lệ khác,
+Câu lệnh :keyword:`raise` cho phép một mệnh đề :keyword:`from<raise>` tùy chọn::
 
-    # exc must be exception instance or None.
+    # exc phải là một exception instance hoặc None.
     raise RuntimeError from exc
 
-This can be useful when you are transforming exceptions. For example::
+Điều này có thể hữu ích khi bạn chuyển đổi các exception. Ví dụ::
 
     >>> def func():
     ...     raise ConnectionError
@@ -344,8 +274,7 @@ This can be useful when you are transforming exceptions. For example::
         raise RuntimeError('Failed to open database') from exc
     RuntimeError: Failed to open database
 
-It also allows disabling automatic exception chaining using the ``from None``
-idiom::
+Câu lệnh này cũng cho phép vô hiệu hóa việc chaining exception tự động bằng idiom ``from None``::
 
     >>> try:
     ...     open('database.sqlite')
@@ -357,37 +286,30 @@ idiom::
         raise RuntimeError from None
     RuntimeError
 
-For more information about chaining mechanics, see :ref:`bltin-exceptions`.
+Để biết thêm thông tin về cơ chế chaining, hãy xem :ref:`bltin-exceptions`.
 
 
 .. _tut-userexceptions:
 
-User-defined Exceptions
-=======================
+Các exception do người dùng định nghĩa
+======================================
 
-Programs may name their own exceptions by creating a new exception class (see
-:ref:`tut-classes` for more about Python classes).  Exceptions should typically
-be derived from the :exc:`Exception` class, either directly or indirectly.
+Các chương trình có thể đặt tên cho các exception của riêng mình bằng cách tạo một exception class mới (xem
+:ref:`tut-classes` để biết thêm về các lớp Python). Các ngoại lệ thường nên được dẫn xuất từ lớp :exc:`Exception`, trực tiếp hoặc gián tiếp.
 
-Exception classes can be defined which do anything any other class can do, but
-are usually kept simple, often only offering a number of attributes that allow
-information about the error to be extracted by handlers for the exception.
+Có thể định nghĩa các lớp ngoại lệ thực hiện bất kỳ điều gì mà các lớp khác có thể thực hiện, nhưng chúng thường được giữ đơn giản, thường chỉ cung cấp một số thuộc tính cho phép các trình xử lý ngoại lệ trích xuất thông tin về lỗi.
 
-Most exceptions are defined with names that end in "Error", similar to the
-naming of the standard exceptions.
+Hầu hết các ngoại lệ được định nghĩa với tên kết thúc bằng "Error", tương tự như cách đặt tên của các ngoại lệ chuẩn.
 
-Many standard modules define their own exceptions to report errors that may
-occur in functions they define.
+Nhiều module chuẩn tự định nghĩa các ngoại lệ để báo cáo những lỗi có thể xảy ra trong các hàm do chúng định nghĩa.
 
 
 .. _tut-cleanup:
 
-Defining Clean-up Actions
-=========================
+Định nghĩa các tác vụ dọn dẹp
+=============================
 
-The :keyword:`try` statement has another optional clause which is intended to
-define clean-up actions that must be executed under all circumstances.  For
-example::
+Câu lệnh :keyword:`try` có một mệnh đề tùy chọn khác, nhằm định nghĩa các tác vụ dọn dẹp phải được thực thi trong mọi trường hợp. Ví dụ:::
 
    >>> try:
    ...     raise KeyboardInterrupt
@@ -400,43 +322,24 @@ example::
        raise KeyboardInterrupt
    KeyboardInterrupt
 
-If a :keyword:`finally` clause is present, the :keyword:`!finally`
-clause will execute as the last task before the :keyword:`try`
-statement completes. The :keyword:`!finally` clause runs whether or
-not the :keyword:`!try` statement produces an exception. The following
-points discuss more complex cases when an exception occurs:
+Nếu có mệnh đề :keyword:`finally`, mệnh đề :keyword:`!finally` sẽ thực thi như tác vụ cuối cùng trước khi câu lệnh :keyword:`try` hoàn tất. Mệnh đề :keyword:`!finally` sẽ chạy bất kể câu lệnh :keyword:`!try` có phát sinh ngoại lệ hay không. Các điểm sau đây thảo luận về những trường hợp phức tạp hơn khi xảy ra ngoại lệ:
 
-* If an exception occurs during execution of the :keyword:`!try`
-  clause, the exception may be handled by an :keyword:`except`
-  clause. If the exception is not handled by an :keyword:`!except`
-  clause, the exception is re-raised after the :keyword:`!finally`
-  clause has been executed.
+* Nếu xảy ra ngoại lệ trong quá trình thực thi mệnh đề :keyword:`!try`, ngoại lệ đó có thể được xử lý bởi mệnh đề :keyword:`except`. Nếu ngoại lệ không được xử lý bởi mệnh đề :keyword:`!except`, ngoại lệ sẽ được ném lại sau khi mệnh đề :keyword:`!finally` đã được thực thi.
 
-* An exception could occur during execution of an :keyword:`!except`
-  or :keyword:`!else` clause. Again, the exception is re-raised after
-  the :keyword:`!finally` clause has been executed.
+* Một ngoại lệ có thể xảy ra trong quá trình thực thi mệnh đề :keyword:`!except` hoặc :keyword:`!else`. Tương tự, ngoại lệ sẽ được ném lại sau khi mệnh đề :keyword:`!finally` đã được thực thi.
 
-* If the :keyword:`!finally` clause executes a :keyword:`break`,
-  :keyword:`continue` or :keyword:`return` statement, exceptions are not
-  re-raised. This can be confusing and is therefore discouraged. From
-  version 3.14 the compiler emits a :exc:`SyntaxWarning` for it
-  (see :pep:`765`).
+* Nếu mệnh đề :keyword:`!finally` thực thi một :keyword:`break`,
+  :keyword:`continue` hoặc câu lệnh :keyword:`return`, các ngoại lệ sẽ không được ném lại. Điều này có thể gây nhầm lẫn và do đó không được khuyến khích. Kể từ phiên bản 3.14, compiler sẽ phát ra :exc:`SyntaxWarning` cho trường hợp này (xem :pep:`765`).
 
-* If the :keyword:`!try` statement reaches a :keyword:`break`,
-  :keyword:`continue` or :keyword:`return` statement, the
-  :keyword:`!finally` clause will execute just prior to the
-  :keyword:`!break`, :keyword:`!continue` or :keyword:`!return`
-  statement's execution.
+* Nếu câu lệnh :keyword:`!try` gặp một :keyword:`break`,
+  :keyword:`continue` hoặc câu lệnh :keyword:`return`, thì
+  mệnh đề :keyword:`!finally` sẽ được thực thi ngay trước
+  việc thực thi câu lệnh :keyword:`!break`, :keyword:`!continue` hoặc :keyword:`!return`.
 
-* If a :keyword:`!finally` clause includes a :keyword:`!return`
-  statement, the returned value will be the one from the
-  :keyword:`!finally` clause's :keyword:`!return` statement, not the
-  value from the :keyword:`!try` clause's :keyword:`!return`
-  statement. This can be confusing and is therefore discouraged. From
-  version 3.14 the compiler emits a :exc:`SyntaxWarning` for it
-  (see :pep:`765`).
+* Nếu mệnh đề :keyword:`!finally` chứa câu lệnh :keyword:`!return`, giá trị được trả về sẽ là giá trị từ
+  câu lệnh :keyword:`!return` của mệnh đề :keyword:`!finally`, chứ không phải giá trị từ câu lệnh :keyword:`!return` của mệnh đề :keyword:`!try`. Điều này có thể gây khó hiểu và do đó không được khuyến khích. Kể từ phiên bản 3.14, trình biên dịch sẽ phát :exc:`SyntaxWarning` cho trường hợp này (xem :pep:`765`).
 
-For example::
+Ví dụ::
 
    >>> def bool_return():
    ...     try:
@@ -447,7 +350,7 @@ For example::
    >>> bool_return()
    False
 
-A more complicated example::
+Một ví dụ phức tạp hơn::
 
    >>> def divide(x, y):
    ...     try:
@@ -476,58 +379,40 @@ A more complicated example::
                 ~~^~~
    TypeError: unsupported operand type(s) for /: 'str' and 'str'
 
-As you can see, the :keyword:`finally` clause is executed in any event.  The
-:exc:`TypeError` raised by dividing two strings is not handled by the
-:keyword:`except` clause and therefore re-raised after the :keyword:`!finally`
-clause has been executed.
+Như bạn có thể thấy, mệnh đề :keyword:`finally` luôn được thực thi trong mọi trường hợp. Câu lệnh
+:exc:`TypeError` phát sinh do chia hai chuỗi không được xử lý bởi
+:keyword:`except` mệnh đề và do đó được phát sinh lại sau khi mệnh đề :keyword:`!finally` đã được thực thi.
 
-In real world applications, the :keyword:`finally` clause is useful for
-releasing external resources (such as files or network connections), regardless
-of whether the use of the resource was successful.
+Trong các ứng dụng thực tế, mệnh đề :keyword:`finally` hữu ích để giải phóng các tài nguyên bên ngoài (chẳng hạn như tệp hoặc kết nối mạng), bất kể việc sử dụng tài nguyên có thành công hay không.
 
 
 .. _tut-cleanup-with:
 
-Predefined Clean-up Actions
-===========================
+Tác vụ dọn dẹp được định nghĩa sẵn
+==================================
 
-Some objects define standard clean-up actions to be undertaken when the object
-is no longer needed, regardless of whether or not the operation using the object
-succeeded or failed. Look at the following example, which tries to open a file
-and print its contents to the screen. ::
+Một số đối tượng định nghĩa các tác vụ dọn dẹp tiêu chuẩn cần được thực hiện khi đối tượng không còn cần thiết, bất kể thao tác sử dụng đối tượng đó thành công hay thất bại. Hãy xem ví dụ sau, trong đó chương trình cố gắng mở một tệp và in nội dung của tệp ra màn hình.::
 
    for line in open("myfile.txt"):
        print(line, end="")
 
-The problem with this code is that it leaves the file open for an indeterminate
-amount of time after this part of the code has finished executing.
-This is not an issue in simple scripts, but can be a problem for larger
-applications. The :keyword:`with` statement allows objects like files to be
-used in a way that ensures they are always cleaned up promptly and correctly. ::
+Vấn đề với đoạn mã này là nó để tệp mở trong một khoảng thời gian không xác định sau khi phần mã này thực thi xong. Đây không phải là vấn đề trong các script đơn giản, nhưng có thể gây ra vấn đề cho các ứng dụng lớn hơn. Câu lệnh :keyword:`with` cho phép sử dụng các đối tượng như tệp theo cách đảm bảo chúng luôn được dọn dẹp kịp thời và đúng cách.::
 
    with open("myfile.txt") as f:
        for line in f:
            print(line, end="")
 
-After the statement is executed, the file *f* is always closed, even if a
-problem was encountered while processing the lines. Objects which, like files,
-provide predefined clean-up actions will indicate this in their documentation.
+Sau khi câu lệnh được thực thi, tệp *f* luôn được đóng, ngay cả khi gặp vấn đề trong quá trình xử lý các dòng. Những đối tượng, như tệp, cung cấp các tác vụ dọn dẹp được định nghĩa sẵn sẽ nêu rõ điều này trong tài liệu của chúng.
 
 
 .. _tut-exception-groups:
 
-Raising and Handling Multiple Unrelated Exceptions
-==================================================
+Phát sinh và xử lý nhiều ngoại lệ không liên quan
+=================================================
 
-There are situations where it is necessary to report several exceptions that
-have occurred. This is often the case in concurrency frameworks, when several
-tasks may have failed in parallel, but there are also other use cases where
-it is desirable to continue execution and collect multiple errors rather than
-raise the first exception.
+Có những tình huống cần báo cáo nhiều ngoại lệ đã xảy ra. Điều này thường gặp trong các framework concurrency, khi nhiều tác vụ có thể đã thất bại song song, nhưng cũng có những trường hợp sử dụng khác mà việc tiếp tục thực thi và thu thập nhiều lỗi thay vì raise ngoại lệ đầu tiên là điều mong muốn.
 
-The builtin :exc:`ExceptionGroup` wraps a list of exception instances so
-that they can be raised together. It is an exception itself, so it can be
-caught like any other exception. ::
+Builtin :exc:`ExceptionGroup` bao bọc một danh sách các instance ngoại lệ để chúng có thể được raise cùng nhau. Bản thân nó là một ngoại lệ, vì vậy có thể được catch như mọi ngoại lệ khác.::
 
    >>> def f():
    ...     excs = [OSError('error 1'), SystemError('error 2')]
@@ -554,12 +439,7 @@ caught like any other exception. ::
    caught <class 'ExceptionGroup'>: there were problems (2 sub-exceptions)
    >>>
 
-By using ``except*`` instead of ``except``, we can selectively
-handle only the exceptions in the group that match a certain
-type. In the following example, which shows a nested exception
-group, each ``except*`` clause extracts from the group exceptions
-of a certain type while letting all other exceptions propagate to
-other clauses and eventually to be reraised. ::
+Bằng cách sử dụng ``except*`` thay cho ``except``, chúng ta có thể chỉ xử lý những ngoại lệ trong group khớp với một kiểu nhất định. Trong ví dụ sau, minh họa một exception group lồng nhau, mỗi mệnh đề ``except*`` sẽ trích xuất khỏi group các ngoại lệ thuộc một kiểu nhất định, đồng thời để mọi ngoại lệ khác propagate đến các mệnh đề khác và cuối cùng được raise lại.::
 
    >>> def f():
    ...     raise ExceptionGroup(
@@ -602,10 +482,7 @@ other clauses and eventually to be reraised. ::
          +------------------------------------
    >>>
 
-Note that the exceptions nested in an exception group must be instances,
-not types. This is because in practice the exceptions would typically
-be ones that have already been raised and caught by the program, along
-the following pattern::
+Lưu ý rằng các ngoại lệ được lồng trong một exception group phải là instance, không phải type. Điều này là vì trong thực tế, các ngoại lệ thường là những ngoại lệ đã được chương trình raise và catch theo mẫu sau đây::
 
    >>> excs = []
    ... for test in tests:
@@ -621,15 +498,10 @@ the following pattern::
 
 .. _tut-exception-notes:
 
-Enriching Exceptions with Notes
-===============================
+Bổ sung ghi chú cho ngoại lệ
+============================
 
-When an exception is created in order to be raised, it is usually initialized
-with information that describes the error that has occurred. There are cases
-where it is useful to add information after the exception was caught. For this
-purpose, exceptions have a method ``add_note(note)`` that accepts a string and
-adds it to the exception's notes list. The standard traceback rendering
-includes all notes, in the order they were added, after the exception. ::
+Khi một ngoại lệ được tạo để raise, nó thường được khởi tạo với thông tin mô tả lỗi đã xảy ra. Có những trường hợp việc bổ sung thông tin sau khi đã catch ngoại lệ sẽ rất hữu ích. Vì mục đích này, các ngoại lệ có một phương thức ``add_note(note)`` nhận một chuỗi và thêm chuỗi đó vào danh sách ghi chú của ngoại lệ. Việc hiển thị traceback tiêu chuẩn bao gồm tất cả ghi chú, theo thứ tự chúng được thêm vào, sau ngoại lệ.::
 
    >>> try:
    ...     raise TypeError('bad type')
@@ -646,9 +518,7 @@ includes all notes, in the order they were added, after the exception. ::
    Add some more information
    >>>
 
-For example, when collecting exceptions into an exception group, we may want
-to add context information for the individual errors. In the following each
-exception in the group has a note indicating when this error has occurred. ::
+Ví dụ, khi thu thập các ngoại lệ vào một exception group, chúng ta có thể muốn thêm thông tin ngữ cảnh cho từng lỗi riêng lẻ. Trong ví dụ sau, mỗi ngoại lệ trong group có một ghi chú cho biết lỗi này đã xảy ra khi nào.::
 
    >>> def f():
    ...     raise OSError('operation failed')

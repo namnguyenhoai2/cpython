@@ -1,59 +1,41 @@
 .. _tut-informal:
 
-**********************************
-An Informal Introduction to Python
-**********************************
+*************************************
+Giới thiệu không chính thức về Python
+*************************************
 
-In the following examples, input and output are distinguished by the presence or
-absence of prompts (:term:`>>>` and :term:`...`): to repeat the example, you must type
-everything after the prompt, when the prompt appears; lines that do not begin
-with a prompt are output from the interpreter. Note that a secondary prompt on a
-line by itself in an example means you must type a blank line; this is used to
-end a multi-line command.
+Trong các ví dụ sau, phần nhập và phần xuất được phân biệt bằng việc có hoặc không có dấu nhắc (:term:`>>>` và :term:`...`): để lặp lại ví dụ, bạn phải nhập mọi thứ sau dấu nhắc khi dấu nhắc xuất hiện; các dòng không bắt đầu bằng dấu nhắc là phần xuất từ trình thông dịch. Lưu ý rằng dấu nhắc phụ đứng một mình trên một dòng trong ví dụ có nghĩa là bạn phải nhập một dòng trống; cách này được dùng để kết thúc một lệnh nhiều dòng.
 
 .. only:: html
 
-   You can use the "Copy" button (it appears in the upper-right corner
-   when hovering over or tapping a code example), which strips prompts
-   and omits output, to copy and paste the input lines into your interpreter.
+   Bạn có thể dùng nút "Copy" (nút này xuất hiện ở góc trên bên phải khi di chuột qua hoặc chạm vào một ví dụ mã), nút này sẽ loại bỏ các dấu nhắc và bỏ qua phần xuất, để sao chép và dán các dòng nhập vào trình thông dịch.
 
 .. index:: single: # (hash); comment
 
-Many of the examples in this manual, even those entered at the interactive
-prompt, include comments.  Comments in Python start with the hash character,
-``#``, and extend to the end of the physical line.  A comment may appear at the
-start of a line or following whitespace or code, but not within a string
-literal.  A hash character within a string literal is just a hash character.
-Since comments are to clarify code and are not interpreted by Python, they may
-be omitted when typing in examples.
+Nhiều ví dụ trong tài liệu này, kể cả những ví dụ được nhập tại dấu nhắc tương tác, có chứa chú thích. Chú thích trong Python bắt đầu bằng ký tự dấu thăng, ``#``, và kéo dài đến hết dòng vật lý. Chú thích có thể xuất hiện ở đầu dòng hoặc sau khoảng trắng hay mã, nhưng không được nằm trong literal chuỗi. Ký tự dấu thăng bên trong literal chuỗi chỉ đơn giản là một ký tự dấu thăng. Vì chú thích dùng để làm rõ mã và không được Python diễn giải, bạn có thể bỏ qua chúng khi nhập các ví dụ.
 
-Some examples::
+Một số ví dụ::
 
-   # this is the first comment
-   spam = 1  # and this is the second comment
-             # ... and now a third!
+   # đây là chú thích đầu tiên
+   spam = 1  # và đây là chú thích thứ hai
+             # ... và giờ là lần thứ ba!
    text = "# This is not a comment because it's inside quotes."
 
 
 .. _tut-calculator:
 
-Using Python as a Calculator
-============================
+Dùng Python làm máy tính
+========================
 
-Let's try some simple Python commands.  Start the interpreter and wait for the
-primary prompt, ``>>>``.  (It shouldn't take long.)
+Hãy thử một số lệnh Python đơn giản. Khởi động trình thông dịch và chờ dấu nhắc chính, ``>>>``. (Việc này sẽ không mất nhiều thời gian.)
 
 
 .. _tut-numbers:
 
-Numbers
--------
+Các số
+------
 
-The interpreter acts as a simple calculator: you can type an expression into it
-and it will write the value.  Expression syntax is straightforward: the
-operators ``+``, ``-``, ``*`` and ``/`` can be used to perform
-arithmetic; parentheses (``()``) can be used for grouping.
-For example::
+Trình thông dịch hoạt động như một máy tính đơn giản: bạn có thể nhập một biểu thức và nó sẽ hiển thị giá trị. Cú pháp biểu thức rất đơn giản: có thể dùng các toán tử ``+``, ``-``, ``*`` và ``/`` để thực hiện phép tính; có thể dùng dấu ngoặc đơn (``()``) để nhóm các phần tử. Ví dụ::
 
    >>> 2 + 2
    4
@@ -61,59 +43,51 @@ For example::
    20
    >>> (50 - 5*6) / 4
    5.0
-   >>> 8 / 5  # division always returns a floating-point number
+   >>> 8 / 5  # phép chia luôn trả về một số dấu phẩy động
    1.6
 
-The integer numbers (e.g. ``2``, ``4``, ``20``) have type :class:`int`,
-the ones with a fractional part (e.g. ``5.0``, ``1.6``) have type
-:class:`float`.  We will see more about numeric types later in the tutorial.
+Các số nguyên (ví dụ: ``2``, ``4``, ``20``) có kiểu :class:`int`, còn các số có phần thập phân (ví dụ: ``5.0``, ``1.6``) có kiểu
+:class:`float`. Chúng ta sẽ tìm hiểu thêm về các kiểu số sau trong hướng dẫn này.
 
-Division (``/``) always returns a float.  To do :term:`floor division` and
-get an integer result you can use the ``//`` operator; to calculate
-the remainder you can use ``%``::
+Phép chia (``/``) luôn trả về một số thực. Để thực hiện :term:`floor division` và nhận được kết quả là số nguyên, bạn có thể sử dụng toán tử ``//``; để tính phần dư, bạn có thể sử dụng ``%``::
 
-   >>> 17 / 3  # classic division returns a float
+   >>> 17 / 3  # phép chia thông thường trả về một số thực
    5.666666666666667
    >>>
-   >>> 17 // 3  # floor division discards the fractional part
+   >>> 17 // 3  # phép chia lấy phần nguyên loại bỏ phần thập phân
    5
-   >>> 17 % 3  # the % operator returns the remainder of the division
+   >>> 17 % 3  # toán tử % trả về phần dư của phép chia
    2
-   >>> 5 * 3 + 2  # floored quotient * divisor + remainder
+   >>> 5 * 3 + 2  # thương làm tròn xuống * số chia + phần dư
    17
 
-With Python, it is possible to use the ``**`` operator to calculate powers [#]_::
+Trong Python, bạn có thể sử dụng toán tử ``**`` để tính lũy thừa [#]_::
 
-   >>> 5 ** 2  # 5 squared
+   >>> 5 ** 2  # 5 bình phương
    25
-   >>> 2 ** 7  # 2 to the power of 7
+   >>> 2 ** 7  # 2 mũ 7
    128
 
-The equal sign (``=``) is used to assign a value to a variable. Afterwards, no
-result is displayed before the next interactive prompt::
+Dấu bằng (``=``) được dùng để gán một giá trị cho một biến. Sau đó, không có kết quả nào được hiển thị trước dấu nhắc tương tác tiếp theo::
 
    >>> width = 20
    >>> height = 5 * 9
    >>> width * height
    900
 
-If a variable is not "defined" (assigned a value), trying to use it will
-give you an error::
+Nếu một biến chưa được "defined" (gán một giá trị), việc cố gắng sử dụng biến đó sẽ gây ra lỗi::
 
-   >>> n  # try to access an undefined variable
+   >>> n  # thử truy cập một biến chưa được định nghĩa
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
    NameError: name 'n' is not defined
 
-There is full support for floating point; operators with mixed type operands
-convert the integer operand to floating point::
+Python hỗ trợ đầy đủ số dấu phẩy động; các toán tử với các toán hạng có kiểu hỗn hợp sẽ chuyển toán hạng số nguyên thành số dấu phẩy động::
 
    >>> 4 * 3.75 - 1
    14.0
 
-In interactive mode, the last printed expression is assigned to the variable
-``_``.  This means that when you are using Python as a desk calculator, it is
-somewhat easier to continue calculations, for example::
+Trong chế độ tương tác, biểu thức được in cuối cùng được gán cho biến ``_``. Điều này có nghĩa là khi sử dụng Python như một máy tính để bàn, bạn có thể tiếp tục các phép tính dễ dàng hơn, chẳng hạn như::
 
    >>> tax = 12.5 / 100
    >>> price = 100.50
@@ -124,43 +98,32 @@ somewhat easier to continue calculations, for example::
    >>> round(_, 2)
    113.06
 
-This variable should be treated as read-only by the user.  Don't explicitly
-assign a value to it --- you would create an independent local variable with the
-same name masking the built-in variable with its magic behavior.
+Người dùng nên coi biến này là chỉ-đọc. Đừng gán giá trị cho biến này một cách rõ ràng --- nếu không, bạn sẽ tạo một biến cục bộ độc lập có cùng tên, che khuất biến dựng sẵn cùng hành vi đặc biệt của nó.
 
-In addition to :class:`int` and :class:`float`, Python supports other types of
-numbers, such as :class:`~decimal.Decimal` and :class:`~fractions.Fraction`.
-Python also has built-in support for :ref:`complex numbers <typesnumeric>`,
-and uses the ``j`` or ``J`` suffix to indicate the imaginary part
-(e.g. ``3+5j``).
+Ngoài :class:`int` và :class:`float`, Python còn hỗ trợ các kiểu số khác, chẳng hạn như :class:`~decimal.Decimal` và :class:`~fractions.Fraction`. Python cũng tích hợp sẵn hỗ trợ cho :ref:`số phức <typesnumeric>`, đồng thời sử dụng hậu tố ``j`` hoặc ``J`` để biểu thị phần ảo (ví dụ ``3+5j``).
 
 
 .. _tut-strings:
 
-Text
-----
+Văn bản
+-------
 
-Python can manipulate text (represented by type :class:`str`, so-called
-"strings") as well as numbers.  This includes characters "``!``", words
-"``rabbit``", names "``Paris``", sentences "``Got your back.``", etc.
-"``Yay! :)``". They can be enclosed in single quotes (``'...'``) or double
-quotes (``"..."``) with the same result [#]_.
+Python có thể thao tác với văn bản (được biểu diễn bằng kiểu :class:`str`, thường gọi là "chuỗi") cũng như các số. Điều này bao gồm các ký tự "``!``", từ "``rabbit``", tên "``Paris``", câu "``Got your back.``", v.v. "``Yay! :)``". Chúng có thể được đặt trong dấu nháy đơn (``'...'``) hoặc dấu nháy kép (``"..."``) với cùng một kết quả [#]_.
 
 .. code-block:: pycon
 
-   >>> 'spam eggs'  # single quotes
+   >>> 'spam eggs'  # dấu nháy đơn
    'spam eggs'
-   >>> "Paris rabbit got your back :)! Yay!"  # double quotes
+   >>> "Paris rabbit got your back :)! Yay!"  # dấu nháy kép
    'Paris rabbit got your back :)! Yay!'
-   >>> '1975'  # digits and numerals enclosed in quotes are also strings
+   >>> '1975'  # các chữ số và số được đặt trong dấu nháy cũng là chuỗi
    '1975'
 
-To quote a quote, we need to "escape" it, by preceding it with ``\``.
-Alternatively, we can use the other type of quotation marks::
+Để trích dẫn một câu trích dẫn, chúng ta cần "escape" nó bằng cách đặt ``\`` trước nó. Ngoài ra, chúng ta có thể sử dụng kiểu dấu ngoặc kép còn lại::
 
-   >>> 'doesn\'t'  # use \' to escape the single quote...
+   >>> 'doesn\'t'  # sử dụng \' để escape dấu nháy đơn...
    "doesn't"
-   >>> "doesn't"  # ...or use double quotes instead
+   >>> "doesn't"  # ...hoặc thay vào đó sử dụng dấu ngoặc kép
    "doesn't"
    >>> '"Yes," they said.'
    '"Yes," they said.'
@@ -169,37 +132,27 @@ Alternatively, we can use the other type of quotation marks::
    >>> '"Isn\'t," they said.'
    '"Isn\'t," they said.'
 
-In the Python shell, the string definition and output string can look
-different.  The :func:`print` function produces a more readable output, by
-omitting the enclosing quotes and by printing escaped and special characters::
+Trong Python shell, phần định nghĩa chuỗi và chuỗi đầu ra có thể trông khác nhau. Hàm :func:`print` tạo ra đầu ra dễ đọc hơn bằng cách bỏ qua các dấu ngoặc kép bao quanh, đồng thời in các ký tự đã được escape và các ký tự đặc biệt::
 
-   >>> s = 'First line.\nSecond line.'  # \n means newline
-   >>> s  # without print(), special characters are included in the string
+   >>> s = 'First line.\nSecond line.'  # \n có nghĩa là ký tự xuống dòng
+   >>> s  # không có print(), các ký tự đặc biệt được giữ nguyên trong chuỗi
    'First line.\nSecond line.'
-   >>> print(s)  # with print(), special characters are interpreted, so \n produces new line
+   >>> print(s)  # với print(), các ký tự đặc biệt được diễn giải, vì vậy \n tạo ra dòng mới
    First line.
    Second line.
 
-If you don't want characters prefaced by ``\`` to be interpreted as
-special characters, you can use *raw strings* by adding an ``r`` before
-the first quote::
+Nếu bạn không muốn các ký tự đứng trước ``\`` được diễn giải là ký tự đặc biệt, bạn có thể sử dụng *chuỗi raw* bằng cách thêm một ``r`` trước dấu ngoặc kép đầu tiên::
 
-   >>> print('C:\this\name')  # here \t means tab, \n means newline
+   >>> print('C:\this\name')  # ở đây \t có nghĩa là tab, \n có nghĩa là dòng mới
    C:      his
    ame
-   >>> print(r'C:\this\name')  # note the r before the quote
+   >>> print(r'C:\this\name')  # hãy lưu ý chữ r trước dấu ngoặc kép
    C:\this\name
 
-There is one subtle aspect to raw strings: a raw string may not end in
-an odd number of ``\`` characters; see
-:ref:`the FAQ entry <faq-programming-raw-string-backslash>` for more information
-and workarounds.
+Có một điểm tinh tế đối với chuỗi raw: một chuỗi raw không được kết thúc bằng số lẻ ký tự ``\``; xem
+:ref:`mục FAQ <faq-programming-raw-string-backslash>` để biết thêm thông tin và các cách khắc phục.
 
-String literals can span multiple lines.  One way is using triple-quotes:
-``"""..."""`` or ``'''...'''``.  End-of-line characters are automatically
-included in the string, but it's possible to prevent this by adding a ``\`` at
-the end of the line.  In the following example, the initial newline is not
-included::
+Chuỗi ký tự có thể kéo dài qua nhiều dòng. Một cách là sử dụng dấu ngoặc kép ba lần: ``"""..."""`` hoặc ``'''...'''``. Các ký tự cuối dòng được tự động đưa vào chuỗi, nhưng có thể ngăn điều này bằng cách thêm một ``\`` ở cuối dòng. Trong ví dụ sau, ký tự dòng mới ban đầu không được đưa vào::
 
    >>> print("""\
    ... Usage: thingy [OPTIONS]
@@ -212,30 +165,28 @@ included::
 
    >>>
 
-Strings can be concatenated (glued together) with the ``+`` operator, and
-repeated with ``*``::
+Các chuỗi có thể được nối (ghép lại) bằng toán tử ``+``, và được lặp lại bằng ``*``::
 
-   >>> # 3 times 'un', followed by 'ium'
+   >>> # 3 lần 'un', tiếp theo là 'ium'
    >>> 3 * 'un' + 'ium'
    'unununium'
 
-Two or more *string literals* (i.e. the ones enclosed between quotes) next
-to each other are automatically concatenated. ::
+Hai hoặc nhiều *chuỗi ký tự* (tức là các chuỗi được đặt giữa dấu ngoặc kép) nằm cạnh nhau sẽ được tự động nối lại.::
 
    >>> 'Py' 'thon'
    'Python'
 
-This feature is particularly useful when you want to break long strings::
+Tính năng này đặc biệt hữu ích khi bạn muốn ngắt các chuỗi dài::
 
    >>> text = ('Put several strings within parentheses '
    ...         'to have them joined together.')
    >>> text
    'Put several strings within parentheses to have them joined together.'
 
-This only works with two literals though, not with variables or expressions::
+Tuy nhiên, cách này chỉ hoạt động với hai chuỗi ký tự, không áp dụng cho biến hoặc biểu thức::
 
    >>> prefix = 'Py'
-   >>> prefix 'thon'  # can't concatenate a variable and a string literal
+   >>> prefix 'thon'  # không thể nối một biến với một chuỗi ký tự
      File "<stdin>", line 1
        prefix 'thon'
               ^^^^^^
@@ -246,62 +197,54 @@ This only works with two literals though, not with variables or expressions::
                   ^^^^^
    SyntaxError: invalid syntax
 
-If you want to concatenate variables or a variable and a literal, use ``+``::
+Nếu muốn nối các biến hoặc một biến với một chuỗi ký tự, hãy sử dụng ``+``::
 
    >>> prefix + 'thon'
    'Python'
 
-Strings can be *indexed* (subscripted), with the first character having index 0.
-There is no separate character type; a character is simply a string of size
-one::
+Có thể *lập chỉ mục* (subscript) các chuỗi, trong đó ký tự đầu tiên có chỉ mục là 0. Không có kiểu ký tự riêng biệt; một ký tự đơn giản là một chuỗi có kích thước bằng một::
 
    >>> word = 'Python'
-   >>> word[0]  # character in position 0
+   >>> word[0]  # ký tự ở vị trí 0
    'P'
-   >>> word[5]  # character in position 5
+   >>> word[5]  # ký tự ở vị trí 5
    'n'
 
-Indices may also be negative numbers, to start counting from the right::
+Chỉ mục cũng có thể là số âm để bắt đầu đếm từ bên phải::
 
-   >>> word[-1]  # last character
+   >>> word[-1]  # ký tự cuối cùng
    'n'
-   >>> word[-2]  # second-last character
+   >>> word[-2]  # ký tự áp chót
    'o'
    >>> word[-6]
    'P'
 
-Note that since -0 is the same as 0, negative indices start from -1.
+Lưu ý rằng vì -0 giống với 0 nên các chỉ mục âm bắt đầu từ -1.
 
-In addition to indexing, *slicing* is also supported.  While indexing is used
-to obtain individual characters, *slicing* allows you to obtain a substring::
+Ngoài việc lập chỉ mục, *slicing* cũng được hỗ trợ.  Trong khi lập chỉ mục được dùng để lấy từng ký tự riêng lẻ, *slicing* cho phép bạn lấy một chuỗi con::
 
-   >>> word[0:2]  # characters from position 0 (included) to 2 (excluded)
+   >>> word[0:2]  # các ký tự từ vị trí 0 (bao gồm) đến vị trí 2 (không bao gồm)
    'Py'
-   >>> word[2:5]  # characters from position 2 (included) to 5 (excluded)
+   >>> word[2:5]  # các ký tự từ vị trí 2 (bao gồm) đến vị trí 5 (không bao gồm)
    'tho'
 
-Slice indices have useful defaults; an omitted first index defaults to zero, an
-omitted second index defaults to the size of the string being sliced. ::
+Các chỉ số lát cắt có các giá trị mặc định hữu ích; nếu bỏ qua chỉ số đầu tiên thì mặc định là số không, còn nếu bỏ qua chỉ số thứ hai thì mặc định là kích thước của chuỗi được lát cắt.::
 
-   >>> word[:2]   # character from the beginning to position 2 (excluded)
+   >>> word[:2]   # ký tự từ đầu đến vị trí 2 (không bao gồm)
    'Py'
-   >>> word[4:]   # characters from position 4 (included) to the end
+   >>> word[4:]   # các ký tự từ vị trí 4 (bao gồm) đến cuối
    'on'
-   >>> word[-2:]  # characters from the second-last (included) to the end
+   >>> word[-2:]  # các ký tự từ vị trí áp chót (bao gồm) đến cuối
    'on'
 
-Note how the start is always included, and the end always excluded.  This
-makes sure that ``s[:i] + s[i:]`` is always equal to ``s``::
+Lưu ý rằng phần bắt đầu luôn được bao gồm, còn phần kết thúc luôn không được bao gồm. Điều này đảm bảo rằng ``s[:i] + s[i:]`` luôn bằng ``s``::
 
    >>> word[:2] + word[2:]
    'Python'
    >>> word[:4] + word[4:]
    'Python'
 
-One way to remember how slices work is to think of the indices as pointing
-*between* characters, with the left edge of the first character numbered 0.
-Then the right edge of the last character of a string of *n* characters has
-index *n*, for example::
+Một cách để ghi nhớ cách hoạt động của các slice là hình dung các chỉ mục trỏ *giữa* các ký tự, trong đó cạnh trái của ký tự đầu tiên được đánh số 0. Khi đó, cạnh phải của ký tự cuối cùng trong một chuỗi gồm *n* ký tự có chỉ mục là *n*, chẳng hạn::
 
     +---+---+---+---+---+---+
     | P | y | t | h | o | n |
@@ -309,32 +252,25 @@ index *n*, for example::
     0   1   2   3   4   5   6
    -6  -5  -4  -3  -2  -1
 
-The first row of numbers gives the position of the indices 0...6 in the string;
-the second row gives the corresponding negative indices. The slice from *i* to
-*j* consists of all characters between the edges labeled *i* and *j*,
-respectively.
+Hàng số đầu tiên cho biết vị trí của các chỉ mục 0...6 trong chuỗi; hàng thứ hai cho biết các chỉ mục âm tương ứng. Slice từ *i* đến *j* gồm tất cả các ký tự nằm giữa các cạnh lần lượt được gắn nhãn *i* và *j*.
 
-For non-negative indices, the length of a slice is the difference of the
-indices, if both are within bounds.  For example, the length of ``word[1:3]`` is
-2.
+Đối với các chỉ mục không âm, độ dài của một slice là hiệu của các chỉ mục nếu cả hai đều nằm trong giới hạn. Ví dụ: độ dài của ``word[1:3]`` là 2.
 
-Attempting to use an index that is too large will result in an error::
+Việc cố sử dụng một chỉ mục quá lớn sẽ dẫn đến lỗi::
 
-   >>> word[42]  # the word only has 6 characters
+   >>> word[42]  # từ này chỉ có 6 ký tự
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
    IndexError: string index out of range
 
-However, out of range slice indexes are handled gracefully when used for
-slicing::
+Tuy nhiên, các chỉ mục slice nằm ngoài phạm vi sẽ được xử lý phù hợp khi dùng để tạo slice::
 
    >>> word[4:42]
    'on'
    >>> word[42:]
    ''
 
-Python strings cannot be changed --- they are :term:`immutable`.
-Therefore, assigning to an indexed position in the string results in an error::
+Các chuỗi Python không thể bị thay đổi --- chúng là :term:`immutable`. Vì vậy, việc gán vào một vị trí được lập chỉ mục trong chuỗi sẽ dẫn đến lỗi::
 
    >>> word[0] = 'J'
    Traceback (most recent call last):
@@ -345,14 +281,14 @@ Therefore, assigning to an indexed position in the string results in an error::
      File "<stdin>", line 1, in <module>
    TypeError: 'str' object does not support item assignment
 
-If you need a different string, you should create a new one::
+Nếu cần một chuỗi khác, bạn nên tạo một chuỗi mới::
 
    >>> 'J' + word[1:]
    'Jython'
    >>> word[:2] + 'py'
    'Pypy'
 
-The built-in function :func:`len` returns the length of a string::
+Hàm tích hợp :func:`len` trả về độ dài của một chuỗi::
 
    >>> s = 'supercalifragilisticexpialidocious'
    >>> len(s)
@@ -362,87 +298,74 @@ The built-in function :func:`len` returns the length of a string::
 .. seealso::
 
    :ref:`textseq`
-      Strings are examples of *sequence types*, and support the common
-      operations supported by such types.
+      Chuỗi là ví dụ về *các kiểu sequence*, và hỗ trợ các thao tác phổ biến được các kiểu này hỗ trợ.
 
    :ref:`string-methods`
-      Strings support a large number of methods for
-      basic transformations and searching.
+      Chuỗi hỗ trợ rất nhiều phương thức để thực hiện các phép biến đổi và tìm kiếm cơ bản.
 
    :ref:`f-strings`
-      String literals that have embedded expressions.
+      Các string literal có chứa biểu thức nhúng.
 
    :ref:`formatstrings`
-      Information about string formatting with :meth:`str.format`.
+      Thông tin về việc định dạng chuỗi bằng :meth:`str.format`.
 
    :ref:`old-string-formatting`
-      The old formatting operations invoked when strings are
-      the left operand of the ``%`` operator are described in more detail here.
+      Các thao tác định dạng cũ được gọi khi chuỗi là toán hạng bên trái của toán tử ``%`` được mô tả chi tiết hơn tại đây.
 
 
 .. _tut-lists:
 
-Lists
------
+Danh sách
+---------
 
-Python knows a number of *compound* data types, used to group together other
-values.  The most versatile is the *list*, which can be written as a list of
-comma-separated values (items) between square brackets.  Lists might contain
-items of different types, but usually the items all have the same type. ::
+Python biết một số kiểu dữ liệu *phức hợp*, được dùng để nhóm các giá trị khác lại với nhau. Kiểu linh hoạt nhất là *danh sách*, có thể được viết dưới dạng một danh sách các giá trị (phần tử) được phân tách bằng dấu phẩy và đặt giữa các dấu ngoặc vuông. Danh sách có thể chứa các phần tử thuộc những kiểu khác nhau, nhưng thông thường tất cả các phần tử đều có cùng một kiểu.::
 
    >>> squares = [1, 4, 9, 16, 25]
    >>> squares
    [1, 4, 9, 16, 25]
 
-Like strings (and all other built-in :term:`sequence` types), lists can be
-indexed and sliced::
+Giống như chuỗi (và tất cả các kiểu :term:`sequence` dựng sẵn khác), danh sách có thể được lập chỉ mục và cắt lát::
 
-   >>> squares[0]  # indexing returns the item
+   >>> squares[0]  # lập chỉ mục trả về phần tử
    1
    >>> squares[-1]
    25
-   >>> squares[-3:]  # slicing returns a new list
+   >>> squares[-3:]  # cắt lát trả về một danh sách mới
    [9, 16, 25]
 
-Lists also support operations like concatenation::
+Danh sách cũng hỗ trợ các phép toán như phép nối::
 
    >>> squares + [36, 49, 64, 81, 100]
    [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
 
-Unlike strings, which are :term:`immutable`, lists are a :term:`mutable`
-type, i.e. it is possible to change their content::
+Không giống như chuỗi, vốn :term:`immutable`, danh sách là một kiểu :term:`mutable`, tức là có thể thay đổi nội dung của chúng::
 
-    >>> cubes = [1, 8, 27, 65, 125]  # something's wrong here
-    >>> 4 ** 3  # the cube of 4 is 64, not 65!
+    >>> cubes = [1, 8, 27, 65, 125]  # có gì đó không đúng ở đây
+    >>> 4 ** 3  # lũy thừa bậc ba của 4 là 64, không phải 65!
     64
-    >>> cubes[3] = 64  # replace the wrong value
+    >>> cubes[3] = 64  # thay thế giá trị sai
     >>> cubes
     [1, 8, 27, 64, 125]
 
-You can also add new items at the end of the list, by using
-the :meth:`list.append` *method* (we will see more about methods later)::
+Bạn cũng có thể thêm các mục mới vào cuối danh sách bằng cách sử dụng :meth:`list.append` *phương thức* (chúng ta sẽ tìm hiểu thêm về các phương thức sau này)::
 
-   >>> cubes.append(216)  # add the cube of 6
-   >>> cubes.append(7 ** 3)  # and the cube of 7
+   >>> cubes.append(216)  # thêm lũy thừa bậc ba của 6
+   >>> cubes.append(7 ** 3)  # và lũy thừa bậc ba của 7
    >>> cubes
    [1, 8, 27, 64, 125, 216, 343]
 
-Simple assignment in Python never copies data. When you assign a list
-to a variable, the variable refers to the *existing list*.
-Any changes you make to the list through one variable will be seen
-through all other variables that refer to it.::
+Trong Python, phép gán đơn giản không bao giờ sao chép dữ liệu. Khi bạn gán một danh sách cho một biến, biến đó tham chiếu đến *danh sách hiện có*. Mọi thay đổi bạn thực hiện đối với danh sách thông qua một biến sẽ được nhìn thấy qua tất cả các biến khác tham chiếu đến danh sách đó.::
 
    >>> rgb = ["Red", "Green", "Blue"]
    >>> rgba = rgb
-   >>> id(rgb) == id(rgba)  # they reference the same object
+   >>> id(rgb) == id(rgba)  # chúng tham chiếu đến cùng một đối tượng
    True
    >>> rgba.append("Alph")
    >>> rgb
    ["Red", "Green", "Blue", "Alph"]
 
-All slice operations return a new list containing the requested elements.  This
-means that the following slice returns a
-:ref:`shallow copy <shallow_vs_deep_copy>` of the list::
+Mọi thao tác cắt đều trả về một danh sách mới chứa các phần tử được yêu cầu. Điều này có nghĩa là lát cắt sau đây trả về một
+:ref:`bản sao nông (shallow copy) <shallow_vs_deep_copy>` của danh sách::
 
    >>> correct_rgba = rgba[:]
    >>> correct_rgba[-1] = "Alpha"
@@ -451,33 +374,31 @@ means that the following slice returns a
    >>> rgba
    ["Red", "Green", "Blue", "Alph"]
 
-Assignment to slices is also possible, and this can even change the size of the
-list or clear it entirely::
+Bạn cũng có thể gán cho các lát cắt, và thao tác này thậm chí có thể thay đổi kích thước danh sách hoặc xóa toàn bộ danh sách::
 
    >>> letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
    >>> letters
    ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-   >>> # replace some values
+   >>> # thay thế một số giá trị
    >>> letters[2:5] = ['C', 'D', 'E']
    >>> letters
    ['a', 'b', 'C', 'D', 'E', 'f', 'g']
-   >>> # now remove them
+   >>> # bây giờ xóa chúng
    >>> letters[2:5] = []
    >>> letters
    ['a', 'b', 'f', 'g']
-   >>> # clear the list by replacing all the elements with an empty list
+   >>> # xóa danh sách bằng cách thay thế tất cả các phần tử bằng một danh sách rỗng
    >>> letters[:] = []
    >>> letters
    []
 
-The built-in function :func:`len` also applies to lists::
+Hàm tích hợp sẵn :func:`len` cũng áp dụng cho các danh sách::
 
    >>> letters = ['a', 'b', 'c', 'd']
    >>> len(letters)
    4
 
-It is possible to nest lists (create lists containing other lists), for
-example::
+Có thể lồng các danh sách (tạo các danh sách chứa những danh sách khác), chẳng hạn như::
 
    >>> a = ['a', 'b', 'c']
    >>> n = [1, 2, 3]
@@ -491,16 +412,13 @@ example::
 
 .. _tut-firststeps:
 
-First Steps Towards Programming
-===============================
+Những bước đầu tiên trong lập trình
+===================================
 
-Of course, we can use Python for more complicated tasks than adding two and two
-together.  For instance, we can write an initial sub-sequence of the
-`Fibonacci series <https://en.wikipedia.org/wiki/Fibonacci_sequence>`_
-as follows::
+Tất nhiên, chúng ta có thể sử dụng Python cho những tác vụ phức tạp hơn việc cộng hai với hai. Chẳng hạn, chúng ta có thể viết một dãy con ban đầu của `dãy Fibonacci <https://en.wikipedia.org/wiki/Fibonacci_sequence>`_ như sau::
 
-   >>> # Fibonacci series:
-   >>> # the sum of two elements defines the next
+   >>> # dãy Fibonacci:
+   >>> # tổng của hai phần tử xác định phần tử tiếp theo
    >>> a, b = 0, 1
    >>> while a < 10:
    ...     print(a)
@@ -514,45 +432,21 @@ as follows::
    5
    8
 
-This example introduces several new features.
+Ví dụ này giới thiệu một số tính năng mới.
 
-* The first line contains a *multiple assignment*: the variables ``a`` and ``b``
-  simultaneously get the new values 0 and 1.  On the last line this is used again,
-  demonstrating that the expressions on the right-hand side are all evaluated
-  first before any of the assignments take place.  The right-hand side expressions
-  are evaluated  from the left to the right.
+* Dòng đầu tiên chứa một *phép gán nhiều biến*: các biến ``a`` và ``b`` đồng thời nhận các giá trị mới là 0 và 1.  Ở dòng cuối, cách này lại được sử dụng, cho thấy rằng tất cả biểu thức ở vế phải trước tiên đều được đánh giá, rồi sau đó các phép gán mới được thực hiện.  Các biểu thức ở vế phải được đánh giá từ trái sang phải.
 
-* The :keyword:`while` loop executes as long as the condition (here: ``a < 10``)
-  remains true.  In Python, like in C, any non-zero integer value is true; zero is
-  false.  The condition may also be a string or list value, in fact any sequence;
-  anything with a non-zero length is true, empty sequences are false.  The test
-  used in the example is a simple comparison.  The standard comparison operators
-  are written the same as in C: ``<`` (less than), ``>`` (greater than), ``==``
-  (equal to), ``<=`` (less than or equal to), ``>=`` (greater than or equal to)
-  and ``!=`` (not equal to).
+* Vòng lặp :keyword:`while` thực thi miễn là điều kiện (ở đây là: ``a < 10``) vẫn đúng.  Trong Python, cũng như trong C, mọi giá trị số nguyên khác không đều được xem là đúng; số 0 là sai.  Điều kiện cũng có thể là một chuỗi hoặc giá trị danh sách, thực tế là bất kỳ sequence nào; mọi sequence có độ dài khác không đều đúng, còn sequence rỗng thì sai.  Phép kiểm tra được sử dụng trong ví dụ là một phép so sánh đơn giản.  Các toán tử so sánh chuẩn được viết giống như trong C: ``<`` (nhỏ hơn), ``>`` (lớn hơn), ``==`` (bằng), ``<=`` (nhỏ hơn hoặc bằng), ``>=`` (lớn hơn hoặc bằng) và ``!=`` (khác).
 
-* The *body* of the loop is *indented*: indentation is Python's way of grouping
-  statements.  At the interactive prompt, you have to type a tab or space(s) for
-  each indented line.  In practice you will prepare more complicated input
-  for Python with a text editor; all decent text editors have an auto-indent
-  facility.  When a compound statement is entered interactively, it must be
-  followed by a blank line to indicate completion (since the parser cannot
-  guess when you have typed the last line).  Note that each line within a basic
-  block must be indented by the same amount.
+* *Thân* của vòng lặp được *thụt lề*: thụt lề là cách Python dùng để nhóm các câu lệnh.  Tại dấu nhắc tương tác, bạn phải nhập một tab hoặc một hay nhiều dấu cách cho mỗi dòng được thụt lề.  Trên thực tế, bạn sẽ chuẩn bị phần nhập phức tạp hơn cho Python bằng một trình soạn thảo văn bản; mọi trình soạn thảo văn bản tốt đều có tính năng tự động thụt lề.  Khi nhập một câu lệnh phức hợp theo cách tương tác, phải theo sau câu lệnh đó bằng một dòng trống để cho biết đã hoàn tất (vì parser không thể đoán khi nào bạn đã nhập dòng cuối cùng).  Lưu ý rằng mỗi dòng trong một basic block phải được thụt lề cùng một mức.
 
-* The :func:`print` function writes the value of the argument(s) it is given.
-  It differs from just writing the expression you want to write (as we did
-  earlier in the calculator examples) in the way it handles multiple arguments,
-  floating-point quantities, and strings.  Strings are printed without quotes,
-  and a space is inserted between items, so you can format things nicely, like
-  this::
+* Hàm :func:`print` ghi giá trị của các đối số được truyền vào. Hàm này khác với việc chỉ ghi biểu thức bạn muốn ghi (như chúng ta đã làm trước đó trong các ví dụ về calculator) ở cách xử lý nhiều đối số, các giá trị floating-point và các chuỗi.  Chuỗi được in ra không có dấu ngoặc kép, và một dấu cách được chèn giữa các mục, vì vậy bạn có thể định dạng mọi thứ đẹp mắt, như sau::
 
      >>> i = 256*256
      >>> print('The value of i is', i)
      The value of i is 65536
 
-  The keyword argument *end* can be used to avoid the newline after the output,
-  or end the output with a different string::
+  Đối số từ khóa *end* có thể được sử dụng để tránh ký tự xuống dòng sau phần đầu ra hoặc kết thúc phần đầu ra bằng một chuỗi khác::
 
      >>> a, b = 0, 1
      >>> while a < 1000:
@@ -562,13 +456,10 @@ This example introduces several new features.
      0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích
 
-.. [#] Since ``**`` has higher precedence than ``-``, ``-3**2`` will be
-   interpreted as ``-(3**2)`` and thus result in ``-9``.  To avoid this
-   and get ``9``, you can use ``(-3)**2``.
+.. [#] Vì ``**`` có độ ưu tiên cao hơn ``-``, ``-3**2`` sẽ được hiểu là ``-(3**2)`` và do đó cho kết quả là ``-9``.  Để tránh điều này và nhận được ``9``, bạn có thể sử dụng ``(-3)**2``.
 
-.. [#] Unlike other languages, special characters such as ``\n`` have the
-   same meaning with both single (``'...'``) and double (``"..."``) quotes.
-   The only difference between the two is that within single quotes you don't
-   need to escape ``"`` (but you have to escape ``\'``) and vice versa.
+.. [#] Không giống như các ngôn ngữ khác, các ký tự đặc biệt như ``\n`` có cùng ý nghĩa khi đặt trong dấu nháy đơn (``'...'``) và dấu nháy kép (``"..."``). Điểm khác biệt duy nhất giữa hai loại này là trong dấu nháy đơn, bạn không cần escape ``"`` (nhưng phải escape ``\'``) và ngược lại.
+
+.. _`Fibonacci series`: https://en.wikipedia.org/wiki/Fibonacci_sequence

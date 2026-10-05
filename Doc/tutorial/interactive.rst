@@ -1,52 +1,30 @@
 .. _tut-interacting:
 
-**************************************************
-Interactive Input Editing and History Substitution
-**************************************************
+****************************************************
+Chỉnh sửa đầu vào tương tác và thay thế lịch sử lệnh
+****************************************************
 
-Some versions of the Python interpreter support editing of the current input
-line and history substitution, similar to facilities found in the Korn shell and
-the GNU Bash shell.  This is implemented using the `GNU Readline`_ library,
-which supports various styles of editing.  This library has its own
-documentation which we won't duplicate here.
+Một số phiên bản trình thông dịch Python hỗ trợ chỉnh sửa dòng đầu vào hiện tại và thay thế lịch sử lệnh, tương tự các tính năng có trong shell Korn và shell GNU Bash. Tính năng này được triển khai bằng thư viện `GNU Readline <GNU Readline_>`_, hỗ trợ nhiều kiểu chỉnh sửa khác nhau. Thư viện này có tài liệu riêng mà chúng tôi sẽ không sao chép tại đây.
 
 
 .. _tut-keybindings:
 
-Tab Completion and History Editing
-==================================
+Hoàn tất bằng phím Tab và chỉnh sửa lịch sử
+===========================================
 
-Completion of variable and module names is
-:ref:`automatically enabled <rlcompleter-config>` at interpreter startup so
-that the :kbd:`Tab` key invokes the completion function; it looks at
-Python statement names, the current local variables, and the available
-module names.  For dotted expressions such as ``string.a``, it will evaluate
-the expression up to the final ``'.'`` and then suggest completions from
-the attributes of the resulting object.  Note that this may execute
-application-defined code if an object with a :meth:`~object.__getattr__` method
-is part of the expression.  The default configuration also saves your
-history into a file named :file:`.python_history` in your user directory.
-The history will be available again during the next interactive interpreter
-session.
+Việc hoàn tất tên biến và mô-đun được
+:ref:`tự động bật <rlcompleter-config>` khi trình thông dịch khởi động để phím :kbd:`Tab` gọi hàm hoàn tất; hàm này xem xét tên các câu lệnh Python, các biến cục bộ hiện tại và tên các mô-đun khả dụng. Đối với các biểu thức có dấu chấm như ``string.a``, hàm sẽ đánh giá biểu thức cho đến ``'.'`` cuối cùng, sau đó đề xuất các nội dung hoàn tất từ các thuộc tính của đối tượng nhận được. Lưu ý rằng việc này có thể thực thi mã do ứng dụng định nghĩa nếu một đối tượng có phương thức :meth:`~object.__getattr__` nằm trong biểu thức. Cấu hình mặc định cũng lưu lịch sử của bạn vào một tệp có tên :file:`.python_history` trong thư mục người dùng. Lịch sử sẽ lại khả dụng trong phiên trình thông dịch tương tác tiếp theo.
 
 
 .. _tut-commentary:
 
-Alternatives to the Interactive Interpreter
-===========================================
+Các lựa chọn thay thế cho trình thông dịch tương tác
+====================================================
 
-This facility is an enormous step forward compared to earlier versions of the
-interpreter; however, some wishes are left: It would be nice if the proper
-indentation were suggested on continuation lines (the parser knows if an
-:data:`~token.INDENT` token is required next).  The completion mechanism might
-use the interpreter's symbol table.  A command to check (or even suggest)
-matching parentheses, quotes, etc., would also be useful.
+Tính năng này là một bước tiến rất lớn so với các phiên bản trình thông dịch trước đây; tuy nhiên, vẫn còn một số mong muốn chưa được đáp ứng: Sẽ rất hữu ích nếu thụt lề phù hợp được đề xuất trên các dòng tiếp nối (trình phân tích cú pháp biết liệu một
+:data:`~token.INDENT` token là bắt buộc tiếp theo). Cơ chế hoàn tất có thể sử dụng bảng ký hiệu của trình thông dịch. Một lệnh để kiểm tra (hoặc thậm chí gợi ý) các cặp dấu ngoặc, dấu nháy tương ứng, v.v. cũng sẽ rất hữu ích.
 
-One alternative enhanced interactive interpreter that has been around for quite
-some time is IPython_, which features tab completion, object exploration and
-advanced history management.  It can also be thoroughly customized and embedded
-into other applications.  Another similar enhanced interactive environment is
-bpython_.
+Một trình thông dịch tương tác nâng cao khác đã tồn tại từ khá lâu là IPython_, cung cấp tính năng tự động hoàn tất bằng phím Tab, khám phá đối tượng và quản lý lịch sử nâng cao. Nó cũng có thể được tùy chỉnh toàn diện và nhúng vào các ứng dụng khác. Một môi trường tương tác nâng cao tương tự khác là bpython_.
 
 
 .. _GNU Readline: https://tiswww.case.edu/php/chet/readline/rltop.html

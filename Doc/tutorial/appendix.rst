@@ -1,113 +1,68 @@
 .. _tut-appendix:
 
-********
-Appendix
-********
+*******
+Phụ lục
+*******
 
 
 .. _tut-interac:
 
-Interactive Mode
+Chế độ tương tác
 ================
 
-There are two variants of the interactive :term:`REPL`.  The classic
-basic interpreter is supported on all platforms with minimal line
-control capabilities.
+Có hai biến thể của :term:`REPL` tương tác. Trình thông dịch cơ bản cổ điển được hỗ trợ trên mọi nền tảng với khả năng điều khiển dòng tối thiểu.
 
-Since Python 3.13, a new interactive shell is used by default.
-This one supports color, multiline editing, history browsing, and
-paste mode.  To disable color, see :ref:`using-on-controlling-color` for
-details.  Function keys provide some additional functionality.
-:kbd:`F1` enters the interactive help browser :mod:`pydoc`.
-:kbd:`F2` allows for browsing command-line history with neither output nor the
-:term:`>>>` and :term:`...` prompts. :kbd:`F3` enters "paste mode", which
-makes pasting larger blocks of code easier. Press :kbd:`F3` to return to
-the regular prompt.
+Kể từ Python 3.13, một shell tương tác mới được sử dụng theo mặc định. Shell này hỗ trợ màu sắc, chỉnh sửa nhiều dòng, duyệt lịch sử và chế độ dán. Để tắt màu sắc, hãy xem :ref:`using-on-controlling-color` để biết chi tiết. Các phím chức năng cung cấp thêm một số tính năng.
+:kbd:`F1` mở trình duyệt trợ giúp tương tác :mod:`pydoc`.
+:kbd:`F2` cho phép duyệt lịch sử dòng lệnh mà không có đầu ra hoặc
+các lời nhắc :term:`>>>` và :term:`...`. :kbd:`F3` vào "chế độ dán", giúp việc dán các khối mã lớn dễ dàng hơn. Nhấn :kbd:`F3` để quay lại lời nhắc thông thường.
 
-When using the new interactive shell, exit the shell by typing :kbd:`exit`
-or :kbd:`quit`. Adding call parentheses after those commands is not
-required.
+Khi sử dụng interactive shell mới, hãy thoát khỏi shell bằng cách nhập :kbd:`exit` hoặc :kbd:`quit`. Không bắt buộc phải thêm dấu ngoặc tròn gọi hàm sau các lệnh đó.
 
-If the new interactive shell is not desired, it can be disabled via
-the :envvar:`PYTHON_BASIC_REPL` environment variable.
+Nếu không muốn sử dụng interactive shell mới, bạn có thể vô hiệu hóa nó thông qua biến môi trường :envvar:`PYTHON_BASIC_REPL`.
 
 .. _tut-error:
 
-Error Handling
---------------
+Xử lý lỗi
+---------
 
-When an error occurs, the interpreter prints an error message and a stack trace.
-In interactive mode, it then returns to the primary prompt; when input came from
-a file, it exits with a nonzero exit status after printing the stack trace.
-(Exceptions handled by an :keyword:`except` clause in a :keyword:`try` statement
-are not errors in this context.)  Some errors are unconditionally fatal and
-cause an exit with a nonzero exit status; this applies to internal inconsistencies and
-some cases of running out of memory.  All error messages are written to the
-standard error stream; normal output from executed commands is written to
-standard output.
+Khi xảy ra lỗi, interpreter sẽ in thông báo lỗi và stack trace. Trong interactive mode, sau đó interpreter quay lại primary prompt; khi dữ liệu đầu vào đến từ một tệp, interpreter sẽ thoát với trạng thái thoát khác 0 sau khi in stack trace. (Các ngoại lệ được xử lý bởi mệnh đề :keyword:`except` trong câu lệnh :keyword:`try` không được xem là lỗi trong ngữ cảnh này.) Một số lỗi luôn nghiêm trọng và khiến chương trình thoát với trạng thái thoát khác 0; điều này áp dụng cho các tình trạng không nhất quán nội bộ và một số trường hợp hết bộ nhớ. Tất cả thông báo lỗi được ghi vào luồng standard error; đầu ra thông thường từ các lệnh đã thực thi được ghi vào standard output.
 
-Typing the interrupt character (usually :kbd:`Control-C` or :kbd:`Delete`) to the primary or
-secondary prompt cancels the input and returns to the primary prompt. [#]_
-Typing an interrupt while a command is executing raises the
-:exc:`KeyboardInterrupt` exception, which may be handled by a :keyword:`try`
-statement.
+Nhập ký tự ngắt (thường là :kbd:`Control-C` hoặc :kbd:`Delete`) tại primary prompt hoặc secondary prompt sẽ hủy dữ liệu đầu vào và quay lại primary prompt. [#]_ Nhập ký tự ngắt trong khi một lệnh đang thực thi sẽ ném ra
+ngoại lệ :exc:`KeyboardInterrupt`, có thể được xử lý bằng câu lệnh :keyword:`try`.
 
 
 .. _tut-scripts:
 
-Executable Python Scripts
--------------------------
+Các tập lệnh Python có thể thực thi
+-----------------------------------
 
-On BSD'ish Unix systems, Python scripts can be made directly executable, like
-shell scripts, by putting the line ::
+Trên các hệ thống Unix kiểu BSD, bạn có thể làm cho các tập lệnh Python có thể thực thi trực tiếp, giống như các tập lệnh shell, bằng cách đặt dòng::
 
    #!/usr/bin/env python3
 
-(assuming that the interpreter is on the user's :envvar:`PATH`) at the beginning
-of the script and giving the file an executable mode.  The ``#!`` must be the
-first two characters of the file.  On some platforms, this first line must end
-with a Unix-style line ending (``'\n'``), not a Windows (``'\r\n'``) line
-ending.  Note that the hash, or pound, character, ``'#'``, is used to start a
-comment in Python.
+(với giả định rằng trình thông dịch nằm trong :envvar:`PATH` của người dùng) ở đầu tập lệnh và cấp cho tệp quyền thực thi. ``#!`` phải là hai ký tự đầu tiên của tệp. Trên một số nền tảng, dòng đầu tiên này phải kết thúc bằng ký hiệu kết thúc dòng kiểu Unix (``'\n'``), không phải ký hiệu kết thúc dòng kiểu Windows (``'\r\n'``). Lưu ý rằng ký tự dấu thăng, hay dấu pound, ``'#'``, được dùng để bắt đầu một comment trong Python.
 
-The script can be given an executable mode, or permission, using the
-:program:`chmod` command.
+Bạn có thể cấp quyền thực thi, hay quyền (permission), cho tập lệnh bằng cách sử dụng
+lệnh :program:`chmod`.
 
 .. code-block:: shell-session
 
    $ chmod +x myscript.py
 
-On Windows systems, there is no notion of an "executable mode".  The Python
-installer automatically associates ``.py`` files with ``python.exe`` so that
-a double-click on a Python file will run it as a script.  The extension can
-also be ``.pyw``, in that case, the console window that normally appears is
-suppressed.
+Trên các hệ thống Windows, không có khái niệm "quyền thực thi". Trình cài đặt Python tự động liên kết các tệp ``.py`` với ``python.exe``, để việc nhấp đúp vào một tệp Python sẽ chạy tệp đó dưới dạng tập lệnh. Phần mở rộng cũng có thể là ``.pyw``; trong trường hợp đó, cửa sổ console thường xuất hiện sẽ được ẩn đi.
 
 
 .. _tut-startup:
 
-The Interactive Startup File
-----------------------------
+Tệp Khởi động Tương tác
+-----------------------
 
-When you use Python interactively, it is frequently handy to have some standard
-commands executed every time the interpreter is started.  You can do this by
-setting an environment variable named :envvar:`PYTHONSTARTUP` to the name of a
-file containing your start-up commands.  This is similar to the :file:`.profile`
-feature of the Unix shells.
+Khi sử dụng Python ở chế độ tương tác, việc có một số lệnh tiêu chuẩn được thực thi mỗi khi trình thông dịch khởi động thường rất hữu ích. Bạn có thể thực hiện điều này bằng cách đặt một biến môi trường có tên :envvar:`PYTHONSTARTUP` thành tên của một tệp chứa các lệnh khởi động. Điều này tương tự tính năng :file:`.profile` của các shell Unix.
 
-This file is only read in interactive sessions, not when Python reads commands
-from a script, and not when :file:`/dev/tty` is given as the explicit source of
-commands (which otherwise behaves like an interactive session).  It is executed
-in the same namespace where interactive commands are executed, so that objects
-that it defines or imports can be used without qualification in the interactive
-session. You can also change the prompts ``sys.ps1`` and ``sys.ps2`` in this
-file.
+Tệp này chỉ được đọc trong các phiên tương tác, không được đọc khi Python đọc lệnh từ một tập lệnh, và cũng không được đọc khi :file:`/dev/tty` được cung cấp làm nguồn lệnh rõ ràng (trong trường hợp này, nó vẫn hoạt động như một phiên tương tác). Tệp được thực thi trong cùng namespace nơi các lệnh tương tác được thực thi, vì vậy bạn có thể sử dụng mà không cần chỉ định đầy đủ các đối tượng mà tệp định nghĩa hoặc nhập vào trong phiên tương tác. Bạn cũng có thể thay đổi các dấu nhắc ``sys.ps1`` và ``sys.ps2`` trong tệp này.
 
-If you want to read an additional start-up file from the current directory, you
-can program this in the global start-up file using code like ``if
-os.path.isfile('.pythonrc.py'): exec(open('.pythonrc.py').read())``.
-If you want to use the startup file in a script, you must do this explicitly
-in the script::
+Nếu muốn đọc thêm một tệp khởi động từ thư mục hiện tại, bạn có thể lập trình việc này trong tệp khởi động toàn cục bằng đoạn mã như ``if os.path.isfile('.pythonrc.py'): exec(open('.pythonrc.py').read())``. Nếu muốn sử dụng tệp khởi động trong một tập lệnh, bạn phải thực hiện việc này một cách rõ ràng trong tập lệnh đó::
 
    import os
    filename = os.environ.get('PYTHONSTARTUP')
@@ -119,27 +74,21 @@ in the script::
 
 .. _tut-customize:
 
-The Customization Modules
--------------------------
+Các mô-đun tùy chỉnh
+--------------------
 
-Python provides two hooks to let you customize it: :index:`sitecustomize` and
-:index:`usercustomize`.  To see how it works, you need first to find the location
-of your user site-packages directory.  Start Python and run this code::
+Python cung cấp hai hook để bạn tùy chỉnh nó: :index:`sitecustomize` và
+:index:`usercustomize`. Để xem cách hoạt động, trước tiên bạn cần tìm vị trí của thư mục user site-packages. Khởi động Python và chạy đoạn mã này::
 
    >>> import site
    >>> site.getusersitepackages()
    '/home/user/.local/lib/python3.x/site-packages'
 
-Now you can create a file named :file:`usercustomize.py` in that directory and
-put anything you want in it.  It will affect every invocation of Python, unless
-it is started with the :option:`-s` option to disable the automatic import.
+Bây giờ bạn có thể tạo một tệp có tên :file:`usercustomize.py` trong thư mục đó và đặt vào đó bất cứ nội dung nào bạn muốn. Tệp này sẽ ảnh hưởng đến mọi lần gọi Python, trừ khi Python được khởi động với tùy chọn :option:`-s` để tắt việc import tự động.
 
-:index:`sitecustomize` works in the same way, but is typically created by an
-administrator of the computer in the global site-packages directory, and is
-imported before :index:`usercustomize`.  See the documentation of the :mod:`site`
-module for more details.
+:index:`sitecustomize` hoạt động theo cách tương tự, nhưng thường được quản trị viên máy tính tạo trong thư mục global site-packages và được import trước :index:`usercustomize`. Xem tài liệu của mô-đun :mod:`site` để biết thêm chi tiết.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích
 
-.. [#] A problem with the GNU Readline package may prevent this.
+.. [#] Một vấn đề với gói GNU Readline có thể ngăn điều này xảy ra.

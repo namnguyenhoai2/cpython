@@ -1,31 +1,22 @@
 .. _tut-io:
 
-****************
-Input and Output
-****************
+*****************
+Đầu vào và đầu ra
+*****************
 
-There are several ways to present the output of a program; data can be printed
-in a human-readable form, or written to a file for future use. This chapter will
-discuss some of the possibilities.
+Có một số cách để trình bày đầu ra của chương trình; dữ liệu có thể được in ở dạng dễ đọc đối với con người hoặc được ghi vào một tệp để sử dụng sau này. Chương này sẽ thảo luận về một số khả năng.
 
 
 .. _tut-formatting:
 
-Fancier Output Formatting
+Định dạng đầu ra nâng cao
 =========================
 
-So far we've encountered two ways of writing values: *expression statements* and
-the :func:`print` function.  (A third way is using the :meth:`~io.TextIOBase.write` method
-of file objects; the standard output file can be referenced as ``sys.stdout``.
-See the Library Reference for more information on this.)
+Cho đến nay, chúng ta đã gặp hai cách ghi các giá trị: *các câu lệnh biểu thức* và :func:`print` function. (Cách thứ ba là sử dụng :meth:`~io.TextIOBase.write` method của các đối tượng tệp; tệp đầu ra tiêu chuẩn có thể được tham chiếu bằng ``sys.stdout``. Xem Library Reference để biết thêm thông tin về nội dung này.)
 
-Often you'll want more control over the formatting of your output than simply
-printing space-separated values. There are several ways to format output.
+Thông thường, bạn sẽ muốn kiểm soát nhiều hơn đối với định dạng đầu ra thay vì chỉ in các giá trị được phân tách bằng khoảng trắng. Có một số cách để định dạng đầu ra.
 
-* To use :ref:`formatted string literals <tut-f-strings>`, begin a string
-  with ``f`` or ``F`` before the opening quotation mark or triple quotation mark.
-  Inside this string, you can write a Python expression between ``{`` and ``}``
-  characters that can refer to variables or literal values.
+* Để sử dụng :ref:`các literal chuỗi được định dạng <tut-f-strings>`, hãy bắt đầu một chuỗi bằng ``f`` hoặc ``F`` trước dấu ngoặc kép mở đầu hoặc dấu ngoặc kép ba. Bên trong chuỗi này, bạn có thể viết một biểu thức Python giữa các ký tự ``{`` và ``}``, biểu thức này có thể tham chiếu đến các biến hoặc giá trị literal.
 
   ::
 
@@ -34,11 +25,7 @@ printing space-separated values. There are several ways to format output.
      >>> f'Results of the {year} {event}'
      'Results of the 2016 Referendum'
 
-* The :meth:`str.format` method of strings requires more manual
-  effort.  You'll still use ``{`` and ``}`` to mark where a variable
-  will be substituted and can provide detailed formatting directives,
-  but you'll also need to provide the information to be formatted. In the following code
-  block there are two examples of how to format variables:
+* :meth:`str.format` method của chuỗi đòi hỏi nhiều thao tác thủ công hơn. Bạn vẫn sẽ sử dụng ``{`` và ``}`` để đánh dấu vị trí một biến sẽ được thay thế và có thể cung cấp các chỉ thị định dạng chi tiết, nhưng bạn cũng cần cung cấp thông tin cần được định dạng. Trong khối mã sau đây có hai ví dụ về cách định dạng các biến:
 
 
   ::
@@ -49,30 +36,17 @@ printing space-separated values. There are several ways to format output.
      >>> '{:-9} YES votes  {:2.2%}'.format(yes_votes, percentage)
      ' 42572654 YES votes  49.67%'
 
-  Notice how the ``yes_votes`` are padded with spaces and a negative sign only for negative numbers.
-  The example also prints ``percentage`` multiplied by 100, with 2 decimal
-  places and followed by a percent sign (see :ref:`formatspec` for details).
+  Hãy chú ý rằng ``yes_votes`` được đệm bằng dấu cách và chỉ có dấu âm đối với các số âm. Ví dụ này cũng in ``percentage`` được nhân với 100, có 2 chữ số thập phân và theo sau là dấu phần trăm (xem :ref:`formatspec` để biết chi tiết).
 
 
-* Finally, you can do all the string handling yourself by using string slicing and
-  concatenation operations to create any layout you can imagine.  The
-  string type has some methods that perform useful operations for padding
-  strings to a given column width.
+* Cuối cùng, bạn có thể tự xử lý toàn bộ chuỗi bằng cách sử dụng các thao tác cắt và nối chuỗi để tạo ra bất kỳ bố cục nào bạn có thể hình dung. Kiểu chuỗi có một số phương thức thực hiện các thao tác hữu ích nhằm đệm chuỗi đến độ rộng cột cho trước.
 
-When you don't need fancy output but just want a quick display of some
-variables for debugging purposes, you can convert any value to a string with
-the :func:`repr` or :func:`str` functions.
+Khi không cần đầu ra cầu kỳ mà chỉ muốn nhanh chóng hiển thị một số biến để debug, bạn có thể chuyển đổi bất kỳ giá trị nào thành chuỗi bằng các hàm :func:`repr` hoặc :func:`str`.
 
-The :func:`str` function is meant to return representations of values which are
-fairly human-readable, while :func:`repr` is meant to generate representations
-which can be read by the interpreter (or will force a :exc:`SyntaxError` if
-there is no equivalent syntax).  For objects which don't have a particular
-representation for human consumption, :func:`str` will return the same value as
-:func:`repr`.  Many values, such as numbers or structures like lists and
-dictionaries, have the same representation using either function.  Strings, in
-particular, have two distinct representations.
+Hàm :func:`str` được dùng để trả về các biểu diễn của giá trị tương đối dễ đọc đối với con người, trong khi :func:`repr` được dùng để tạo ra các biểu diễn mà interpreter có thể đọc được (hoặc sẽ buộc phải có một :exc:`SyntaxError` nếu không có cú pháp tương đương). Đối với các đối tượng không có biểu diễn cụ thể dành cho con người, :func:`str` sẽ trả về cùng giá trị như
+:func:`repr`. Nhiều giá trị, chẳng hạn như số hoặc các cấu trúc như list và dictionary, có cùng biểu diễn khi sử dụng một trong hai hàm. Đặc biệt, chuỗi có hai biểu diễn khác nhau.
 
-Some examples::
+Một số ví dụ::
 
    >>> s = 'Hello, world.'
    >>> str(s)
@@ -86,20 +60,16 @@ Some examples::
    >>> s = 'The value of x is ' + repr(x) + ', and y is ' + repr(y) + '...'
    >>> print(s)
    The value of x is 32.5, and y is 40000...
-   >>> # The repr() of a string adds string quotes and backslashes:
+   >>> # repr() của một chuỗi bổ sung dấu ngoặc kép của chuỗi và dấu gạch chéo ngược:
    >>> hello = 'hello, world\n'
    >>> hellos = repr(hello)
    >>> print(hellos)
    'hello, world\n'
-   >>> # The argument to repr() may be any Python object:
+   >>> # Đối số của repr() có thể là bất kỳ đối tượng Python nào:
    >>> repr((x, y, ('spam', 'eggs')))
    "(32.5, 40000, ('spam', 'eggs'))"
 
-The :mod:`string` module contains support for a simple templating approach
-based upon regular expressions, via :class:`string.Template`.
-This offers yet another way to substitute values into strings,
-using placeholders like ``$x`` and replacing them with values from a dictionary.
-This syntax is easy to use, although it offers much less control for formatting.
+Mô-đun :mod:`string` cung cấp hỗ trợ cho một phương pháp tạo mẫu đơn giản dựa trên regular expression, thông qua :class:`string.Template`. Đây là một cách khác để thay thế các giá trị trong chuỗi, bằng cách sử dụng các placeholder như ``$x`` và thay thế chúng bằng các giá trị từ một dictionary. Cú pháp này dễ sử dụng, mặc dù cung cấp ít quyền kiểm soát hơn nhiều đối với việc định dạng.
 
 .. index::
    single: formatted string literal
@@ -111,24 +81,18 @@ This syntax is easy to use, although it offers much less control for formatting.
 
 .. _tut-f-strings:
 
-Formatted String Literals
--------------------------
+Các literal chuỗi được định dạng
+--------------------------------
 
-:ref:`Formatted string literals <f-strings>` (also called f-strings for
-short) let you include the value of Python expressions inside a string by
-prefixing the string with ``f`` or ``F`` and writing expressions as
-``{expression}``.
+:ref:`Các literal chuỗi được định dạng <f-strings>` (còn được gọi tắt là f-string) cho phép bạn đưa giá trị của các biểu thức Python vào trong chuỗi bằng cách thêm ``f`` hoặc ``F`` vào trước chuỗi và viết các biểu thức dưới dạng ``{expression}``.
 
-An optional format specifier can follow the expression. This allows greater
-control over how the value is formatted. The following example rounds pi to
-three places after the decimal::
+Một format specifier tùy chọn có thể được đặt sau biểu thức. Điều này cho phép kiểm soát tốt hơn cách giá trị được định dạng. Ví dụ sau làm tròn pi đến ba chữ số sau dấu thập phân::
 
    >>> import math
    >>> print(f'The value of pi is approximately {math.pi:.3f}.')
    The value of pi is approximately 3.142.
 
-Passing an integer after the ``':'`` will cause that field to be a minimum
-number of characters wide.  This is useful for making columns line up. ::
+Truyền một số nguyên sau ``':'`` sẽ khiến trường đó có độ rộng tối thiểu bằng số ký tự được chỉ định. Điều này hữu ích để căn thẳng các cột.::
 
    >>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 7678}
    >>> for name, phone in table.items():
@@ -138,9 +102,7 @@ number of characters wide.  This is useful for making columns line up. ::
    Jack       ==>       4098
    Dcab       ==>       7678
 
-Other modifiers can be used to convert the value before it is formatted.
-``'!a'`` applies :func:`ascii`, ``'!s'`` applies :func:`str`, and ``'!r'``
-applies :func:`repr`::
+Có thể sử dụng các modifier khác để chuyển đổi giá trị trước khi định dạng. ``'!a'`` áp dụng :func:`ascii`, ``'!s'`` áp dụng :func:`str`, và ``'!r'`` áp dụng :func:`repr`::
 
    >>> animals = 'eels'
    >>> print(f'My hovercraft is full of {animals}.')
@@ -148,8 +110,7 @@ applies :func:`repr`::
    >>> print(f'My hovercraft is full of {animals!r}.')
    My hovercraft is full of 'eels'.
 
-The ``=`` specifier can be used to expand an expression to the text of the
-expression, an equal sign, then the representation of the evaluated expression:
+Bộ chỉ định ``=`` có thể được dùng để mở rộng một biểu thức thành văn bản của biểu thức đó, một dấu bằng, rồi đến biểu diễn của biểu thức đã được đánh giá:
 
    >>> bugs = 'roaches'
    >>> count = 13
@@ -157,70 +118,60 @@ expression, an equal sign, then the representation of the evaluated expression:
    >>> print(f'Debugging {bugs=} {count=} {area=}')
    Debugging bugs='roaches' count=13 area='living room'
 
-See :ref:`self-documenting expressions <bpo-36817-whatsnew>` for more information
-on the ``=`` specifier. For a reference on these format specifications, see
-the reference guide for the :ref:`formatspec`.
+Xem :ref:`biểu thức tự mô tả <bpo-36817-whatsnew>` để biết thêm thông tin về bộ chỉ định ``=``. Để tham khảo về các đặc tả định dạng này, hãy xem hướng dẫn tham khảo về :ref:`formatspec`.
 
 .. _tut-string-format:
 
-The String format() Method
---------------------------
+Phương thức format() của chuỗi
+------------------------------
 
-Basic usage of the :meth:`str.format` method looks like this::
+Cách sử dụng cơ bản của phương thức :meth:`str.format` trông như sau::
 
    >>> print('We are the {} who say "{}!"'.format('knights', 'Ni'))
    We are the knights who say "Ni!"
 
-The brackets and characters within them (called format fields) are replaced with
-the objects passed into the :meth:`str.format` method.  A number in the
-brackets can be used to refer to the position of the object passed into the
-:meth:`str.format` method. ::
+Các dấu ngoặc và ký tự bên trong chúng (được gọi là các trường định dạng) sẽ được thay thế bằng các đối tượng được truyền vào phương thức :meth:`str.format`. Có thể dùng một số trong dấu ngoặc để tham chiếu đến vị trí của đối tượng được truyền vào
+phương thức :meth:`str.format`.::
 
    >>> print('{0} and {1}'.format('spam', 'eggs'))
    spam and eggs
    >>> print('{1} and {0}'.format('spam', 'eggs'))
    eggs and spam
 
-If keyword arguments are used in the :meth:`str.format` method, their values
-are referred to by using the name of the argument. ::
+Nếu sử dụng các đối số từ khóa trong phương thức :meth:`str.format`, các giá trị của chúng được tham chiếu bằng cách dùng tên của đối số.::
 
    >>> print('This {food} is {adjective}.'.format(
    ...       food='spam', adjective='absolutely horrible'))
    This spam is absolutely horrible.
 
-Positional and keyword arguments can be arbitrarily combined::
+Các đối số vị trí và đối số từ khóa có thể được kết hợp tùy ý::
 
    >>> print('The story of {0}, {1}, and {other}.'.format('Bill', 'Manfred',
    ...                                                    other='Georg'))
    The story of Bill, Manfred, and Georg.
 
-If you have a really long format string that you don't want to split up, it
-would be nice if you could reference the variables to be formatted by name
-instead of by position.  This can be done by simply passing the dict and using
-square brackets ``'[]'`` to access the keys. ::
+Nếu bạn có một format string thực sự dài mà không muốn chia nhỏ, sẽ thật tiện nếu bạn có thể tham chiếu đến các biến cần định dạng bằng tên thay vì vị trí. Bạn có thể thực hiện việc này bằng cách chỉ cần truyền dict và sử dụng dấu ngoặc vuông ``'[]'`` để truy cập các khóa.::
 
    >>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
    >>> print('Jack: {0[Jack]:d}; Sjoerd: {0[Sjoerd]:d}; '
    ...       'Dcab: {0[Dcab]:d}'.format(table))
    Jack: 4098; Sjoerd: 4127; Dcab: 8637678
 
-This could also be done by passing the ``table`` dictionary as keyword arguments with the ``**``
-notation. ::
+Bạn cũng có thể thực hiện việc này bằng cách truyền dictionary ``table`` dưới dạng các đối số từ khóa với ký hiệu ``**``.::
 
    >>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
    >>> print('Jack: {Jack:d}; Sjoerd: {Sjoerd:d}; Dcab: {Dcab:d}'.format(**table))
    Jack: 4098; Sjoerd: 4127; Dcab: 8637678
 
-This is particularly useful in combination with the built-in function
-:func:`vars`, which returns a dictionary containing all local variables::
+Điều này đặc biệt hữu ích khi kết hợp với hàm tích hợp sẵn
+:func:`vars`, hàm này trả về một dictionary chứa tất cả các biến cục bộ::
 
    >>> table = {k: str(v) for k, v in vars().items()}
    >>> message = " ".join([f'{k}: ' + '{' + k +'};' for k in table.keys()])
    >>> print(message.format(**table))
    __name__: __main__; __doc__: None; __package__: None; __loader__: ...
 
-As an example, the following lines produce a tidily aligned
-set of columns giving integers and their squares and cubes::
+Ví dụ, các dòng sau tạo ra một tập hợp cột được căn chỉnh gọn gàng, hiển thị các số nguyên cùng với bình phương và lập phương của chúng::
 
    >>> for x in range(1, 11):
    ...     print('{0:2d} {1:3d} {2:4d}'.format(x, x*x, x*x*x))
@@ -236,18 +187,18 @@ set of columns giving integers and their squares and cubes::
     9  81  729
    10 100 1000
 
-For a complete overview of string formatting with :meth:`str.format`, see
+Để xem tổng quan đầy đủ về việc định dạng chuỗi với :meth:`str.format`, hãy xem
 :ref:`formatstrings`.
 
 
-Manual String Formatting
+Định dạng chuỗi thủ công
 ------------------------
 
-Here's the same table of squares and cubes, formatted manually::
+Đây là cùng một bảng bình phương và lập phương, được định dạng thủ công::
 
    >>> for x in range(1, 11):
    ...     print(repr(x).rjust(2), repr(x*x).rjust(3), end=' ')
-   ...     # Note use of 'end' on previous line
+   ...     # Lưu ý việc sử dụng 'end' ở dòng trước
    ...     print(repr(x*x*x).rjust(4))
    ...
     1   1    1
@@ -261,20 +212,11 @@ Here's the same table of squares and cubes, formatted manually::
     9  81  729
    10 100 1000
 
-(Note that the one space between each column was added by the
-way :func:`print` works: it always adds spaces between its arguments.)
+(Lưu ý rằng khoảng trắng duy nhất giữa mỗi cột được thêm vào bởi cách :func:`print` hoạt động: nó luôn thêm khoảng trắng giữa các đối số.)
 
-The :meth:`str.rjust` method of string objects right-justifies a string in a
-field of a given width by padding it with spaces on the left. There are
-similar methods :meth:`str.ljust` and :meth:`str.center`. These methods do
-not write anything, they just return a new string. If the input string is too
-long, they don't truncate it, but return it unchanged; this will mess up your
-column lay-out but that's usually better than the alternative, which would be
-lying about a value. (If you really want truncation you can always add a
-slice operation, as in ``x.ljust(n)[:n]``.)
+Phương thức :meth:`str.rjust` của các đối tượng chuỗi căn phải một chuỗi trong một trường có độ rộng cho trước bằng cách đệm khoảng trắng ở bên trái. Có các phương thức tương tự là :meth:`str.ljust` và :meth:`str.center`. Các phương thức này không ghi bất cứ thứ gì, chúng chỉ trả về một chuỗi mới. Nếu chuỗi đầu vào quá dài, chúng không cắt bớt chuỗi mà trả về nguyên trạng; điều này sẽ làm rối bố cục các cột, nhưng thường vẫn tốt hơn phương án còn lại, vốn sẽ làm sai lệch một giá trị. (Nếu thực sự muốn cắt bớt, bạn luôn có thể thêm thao tác lấy lát cắt, như trong ``x.ljust(n)[:n]``.)
 
-There is another method, :meth:`str.zfill`, which pads a numeric string on the
-left with zeros.  It understands about plus and minus signs::
+Có một phương thức khác, :meth:`str.zfill`, dùng để đệm một chuỗi số ở bên trái bằng các số 0. Nó hiểu các dấu cộng và dấu trừ::
 
    >>> '12'.zfill(5)
    '00012'
@@ -284,35 +226,28 @@ left with zeros.  It understands about plus and minus signs::
    '3.14159265359'
 
 
-Old string formatting
----------------------
+Định dạng chuỗi kiểu cũ
+-----------------------
 
-The % operator (modulo) can also be used for string formatting.
-Given ``format % values`` (where *format* is a string),
-``%`` conversion specifications in *format* are replaced with
-zero or more elements of *values*.
-This operation is commonly known as string
-interpolation. For example::
+Toán tử % (modulo) cũng có thể được dùng để định dạng chuỗi. Với ``format % values`` (trong đó *format* là một chuỗi), ``%`` các đặc tả chuyển đổi trong *format* được thay thế bằng không hoặc nhiều phần tử của *values*. Thao tác này thường được gọi là nội suy chuỗi. Ví dụ::
 
    >>> import math
    >>> print('The value of pi is approximately %5.3f.' % math.pi)
    The value of pi is approximately 3.142.
 
-More information can be found in the :ref:`old-string-formatting` section.
+Bạn có thể tìm thêm thông tin trong phần :ref:`old-string-formatting`.
 
 
 .. _tut-files:
 
-Reading and Writing Files
-=========================
+Đọc và Ghi Tệp
+==============
 
 .. index::
    pair: built-in function; open
    pair: object; file
 
-:func:`open` returns a :term:`file object`, and is most commonly used with
-two positional arguments and one keyword argument:
-``open(filename, mode, encoding=None)``
+:func:`open` trả về một :term:`file object`, và thường được sử dụng nhất với hai đối số vị trí và một đối số keyword: ``open(filename, mode, encoding=None)``
 
 ::
 
@@ -323,62 +258,31 @@ two positional arguments and one keyword argument:
    >>> print(f)
    <open file 'workfile', mode 'w' at 80a0960>
 
-The first argument is a string containing the filename.  The second argument is
-another string containing a few characters describing the way in which the file
-will be used.  *mode* can be ``'r'`` when the file will only be read, ``'w'``
-for only writing (an existing file with the same name will be erased), and
-``'a'`` opens the file for appending; any data written to the file is
-automatically added to the end.  ``'r+'`` opens the file for both reading and
-writing. The *mode* argument is optional; ``'r'`` will be assumed if it's
-omitted.
+Đối số đầu tiên là một chuỗi chứa tên tệp. Đối số thứ hai là một chuỗi khác chứa một vài ký tự mô tả cách tệp sẽ được sử dụng. *mode* có thể là ``'r'`` khi tệp chỉ được đọc, ``'w'`` khi chỉ ghi (một tệp hiện có cùng tên sẽ bị xóa), và ``'a'`` để mở tệp cho việc nối thêm; mọi dữ liệu được ghi vào tệp sẽ tự động được thêm vào cuối tệp. ``'r+'`` mở tệp để đọc và ghi. Đối số *mode* là tùy chọn; ``'r'`` sẽ được giả định nếu đối số này bị bỏ qua.
 
-Normally, files are opened in :dfn:`text mode`, that means, you read and write
-strings from and to the file, which are encoded in a specific *encoding*.
-If *encoding* is not specified, the default is platform dependent
-(see :func:`open`).
-Because UTF-8 is the modern de-facto standard, ``encoding="utf-8"`` is
-recommended unless you know that you need to use a different encoding.
-Appending a ``'b'`` to the mode opens the file in :dfn:`binary mode`.
-Binary mode data is read and written as :class:`bytes` objects.
-You can not specify *encoding* when opening file in binary mode.
+Thông thường, các tệp được mở ở :dfn:`text mode`, nghĩa là bạn đọc và ghi các chuỗi vào và từ tệp; các chuỗi này được mã hóa bằng một *encoding* cụ thể. Nếu không chỉ định *encoding*, mặc định sẽ phụ thuộc vào nền tảng (xem :func:`open`). Vì UTF-8 là tiêu chuẩn trên thực tế hiện đại, nên khuyến nghị sử dụng ``encoding="utf-8"`` trừ khi bạn biết mình cần một encoding khác. Thêm một ``'b'`` vào mode sẽ mở tệp ở :dfn:`binary mode`. Dữ liệu ở binary mode được đọc và ghi dưới dạng các đối tượng :class:`bytes`. Bạn không thể chỉ định *encoding* khi mở tệp ở binary mode.
 
-In text mode, the default when reading is to convert platform-specific line
-endings (``\n`` on Unix, ``\r\n`` on Windows) to just ``\n``.  When writing in
-text mode, the default is to convert occurrences of ``\n`` back to
-platform-specific line endings.  This behind-the-scenes modification
-to file data is fine for text files, but will corrupt binary data like that in
-:file:`JPEG` or :file:`EXE` files.  Be very careful to use binary mode when
-reading and writing such files.
+Ở text mode, mặc định khi đọc là chuyển đổi các ký tự kết thúc dòng đặc thù theo nền tảng (``\n`` trên Unix, ``\r\n`` trên Windows) thành chỉ ``\n``. Khi ghi ở text mode, mặc định là chuyển đổi các lần xuất hiện của ``\n`` trở lại thành ký tự kết thúc dòng đặc thù theo nền tảng. Việc sửa đổi dữ liệu tệp ngầm phía sau này phù hợp với các tệp văn bản, nhưng sẽ làm hỏng dữ liệu nhị phân như dữ liệu trong
+các tệp :file:`JPEG` hoặc :file:`EXE`. Hãy đặc biệt cẩn thận sử dụng chế độ nhị phân khi đọc và ghi các tệp như vậy.
 
-It is good practice to use the :keyword:`with` keyword when dealing
-with file objects.  The advantage is that the file is properly closed
-after its suite finishes, even if an exception is raised at some
-point.  Using :keyword:`!with` is also much shorter than writing
-equivalent :keyword:`try`\ -\ :keyword:`finally` blocks::
+Bạn nên sử dụng từ khóa :keyword:`with` khi làm việc với các đối tượng tệp. Ưu điểm là tệp được đóng đúng cách sau khi phần lệnh của nó kết thúc, ngay cả khi có ngoại lệ xảy ra tại một thời điểm nào đó. Sử dụng :keyword:`!with` cũng ngắn gọn hơn nhiều so với việc viết các khối :keyword:`try`\ -\ :keyword:`finally` tương đương.::
 
     >>> with open('workfile', encoding="utf-8") as f:
     ...     read_data = f.read()
 
-    >>> # We can check that the file has been automatically closed.
+    >>> # Chúng ta có thể kiểm tra xem tệp đã được tự động đóng hay chưa.
     >>> f.closed
     True
 
-If you're not using the :keyword:`with` keyword, then you should call
-``f.close()`` to close the file and immediately free up any system
-resources used by it.
+Nếu không sử dụng từ khóa :keyword:`with`, bạn nên gọi ``f.close()`` để đóng tệp và ngay lập tức giải phóng mọi tài nguyên hệ thống mà tệp đang sử dụng.
 
 .. warning::
-   Calling ``f.write()`` without using the :keyword:`!with` keyword or calling
-   ``f.close()`` **might** result in the arguments
-   of ``f.write()`` not being completely written to the disk, even if the
-   program exits successfully.
+   Việc gọi ``f.write()`` mà không sử dụng từ khóa :keyword:`!with` hoặc gọi ``f.close()`` **might** khiến các đối số của ``f.write()`` có thể không được ghi hoàn toàn vào đĩa, ngay cả khi chương trình thoát thành công.
 
 ..
-   See also https://bugs.python.org/issue17852
+   Xem thêm https://bugs.python.org/issue17852
 
-After a file object is closed, either by a :keyword:`with` statement
-or by calling ``f.close()``, attempts to use the file object will
-automatically fail. ::
+Sau khi một đối tượng tệp được đóng, είτε bằng câu lệnh :keyword:`with` hoặc bằng cách gọi ``f.close()``, mọi nỗ lực sử dụng đối tượng tệp sẽ tự động thất bại.::
 
    >>> f.close()
    >>> f.read()
@@ -389,32 +293,19 @@ automatically fail. ::
 
 .. _tut-filemethods:
 
-Methods of File Objects
------------------------
+Các phương thức của đối tượng tệp
+---------------------------------
 
-The rest of the examples in this section will assume that a file object called
-``f`` has already been created.
+Các ví dụ còn lại trong phần này giả định rằng một đối tượng tệp có tên là ``f`` đã được tạo.
 
-To read a file's contents, call ``f.read(size)``, which reads some quantity of
-data and returns it as a string (in text mode) or bytes object (in binary mode).
-*size* is an optional numeric argument.  When *size* is omitted or negative, the
-entire contents of the file will be read and returned; it's your problem if the
-file is twice as large as your machine's memory. Otherwise, at most *size*
-characters (in text mode) or *size* bytes (in binary mode) are read and returned.
-If the end of the file has been reached, ``f.read()`` will return an empty
-string (``''``).  ::
+Để đọc nội dung của một tệp, hãy gọi ``f.read(size)``, phương thức này đọc một lượng dữ liệu nhất định và trả về dữ liệu đó dưới dạng chuỗi (ở chế độ văn bản) hoặc đối tượng bytes (ở chế độ nhị phân). *size* là một đối số số tùy chọn. Khi *size* bị bỏ qua hoặc là số âm, toàn bộ nội dung của tệp sẽ được đọc và trả về; nếu tệp lớn gấp đôi dung lượng bộ nhớ của máy thì đó là vấn đề của bạn. Nếu không, nhiều nhất *size* ký tự (ở chế độ văn bản) hoặc *size* byte (ở chế độ nhị phân) sẽ được đọc và trả về. Khi đã đến cuối tệp, ``f.read()`` sẽ trả về một chuỗi rỗng (``''``).::
 
    >>> f.read()
    'This is the entire file.\n'
    >>> f.read()
    ''
 
-``f.readline()`` reads a single line from the file; a newline character (``\n``)
-is left at the end of the string, and is only omitted on the last line of the
-file if the file doesn't end in a newline.  This makes the return value
-unambiguous; if ``f.readline()`` returns an empty string, the end of the file
-has been reached, while a blank line is represented by ``'\n'``, a string
-containing only a single newline.  ::
+``f.readline()`` đọc một dòng duy nhất từ tệp; một ký tự xuống dòng (``\n``) được giữ lại ở cuối chuỗi và chỉ bị bỏ qua ở dòng cuối cùng của tệp nếu tệp không kết thúc bằng ký tự xuống dòng. Điều này giúp giá trị trả về không gây nhầm lẫn; nếu ``f.readline()`` trả về một chuỗi rỗng thì đã đến cuối tệp, còn một dòng trống được biểu diễn bằng ``'\n'``, một chuỗi chỉ chứa duy nhất một ký tự xuống dòng.::
 
    >>> f.readline()
    'This is the first line of the file.\n'
@@ -423,8 +314,7 @@ containing only a single newline.  ::
    >>> f.readline()
    ''
 
-For reading lines from a file, you can loop over the file object. This is memory
-efficient, fast, and leads to simple code::
+Để đọc các dòng từ một tệp, bạn có thể lặp qua đối tượng tệp. Cách này tiết kiệm bộ nhớ, nhanh và giúp tạo ra mã đơn giản::
 
    >>> for line in f:
    ...     print(line, end='')
@@ -432,120 +322,82 @@ efficient, fast, and leads to simple code::
    This is the first line of the file.
    Second line of the file
 
-If you want to read all the lines of a file in a list you can also use
-``list(f)`` or ``f.readlines()``.
+Nếu muốn đọc tất cả các dòng của một tệp vào một list, bạn cũng có thể sử dụng ``list(f)`` hoặc ``f.readlines()``.
 
-``f.write(string)`` writes the contents of *string* to the file, returning
-the number of characters written. ::
+``f.write(string)`` ghi nội dung của *string* vào tệp và trả về số ký tự đã ghi.::
 
    >>> f.write('This is a test\n')
    15
 
-Other types of objects need to be converted -- either to a string (in text mode)
-or a bytes object (in binary mode) -- before writing them::
+Các kiểu đối tượng khác cần được chuyển đổi -- thành chuỗi (ở chế độ văn bản) hoặc đối tượng bytes (ở chế độ nhị phân) -- trước khi ghi chúng::
 
    >>> value = ('the answer', 42)
-   >>> s = str(value)  # convert the tuple to string
+   >>> s = str(value)  # chuyển tuple thành chuỗi
    >>> f.write(s)
    18
 
-``f.tell()`` returns an integer giving the file object's current position in the file
-represented as number of bytes from the beginning of the file when in binary mode and
-an opaque number when in text mode.
+``f.tell()`` trả về một số nguyên cho biết vị trí hiện tại của đối tượng tệp trong tệp, được biểu diễn dưới dạng số byte tính từ đầu tệp khi ở chế độ nhị phân và một số không trong suốt khi ở chế độ văn bản.
 
-To change the file object's position, use ``f.seek(offset, whence)``.  The position is computed
-from adding *offset* to a reference point; the reference point is selected by
-the *whence* argument.  A *whence* value of 0 measures from the beginning
-of the file, 1 uses the current file position, and 2 uses the end of the file as
-the reference point.  *whence* can be omitted and defaults to 0, using the
-beginning of the file as the reference point. ::
+Để thay đổi vị trí của đối tượng tệp, hãy sử dụng ``f.seek(offset, whence)``. Vị trí được tính bằng cách cộng *offset* với một điểm tham chiếu; điểm tham chiếu được chọn bởi đối số *whence*. Giá trị *whence* bằng 0 tính từ đầu tệp, bằng 1 sử dụng vị trí hiện tại của tệp và bằng 2 sử dụng cuối tệp làm điểm tham chiếu. Có thể bỏ qua *whence* và giá trị mặc định là 0, sử dụng đầu tệp làm điểm tham chiếu.::
 
    >>> f = open('workfile', 'rb+')
    >>> f.write(b'0123456789abcdef')
    16
-   >>> f.seek(5)      # Go to the 6th byte in the file
+   >>> f.seek(5)      # Đi tới byte thứ 6 trong tệp
    5
    >>> f.read(1)
    b'5'
-   >>> f.seek(-3, 2)  # Go to the 3rd byte before the end
+   >>> f.seek(-3, 2)  # Đi tới byte thứ 3 tính từ cuối tệp
    13
    >>> f.read(1)
    b'd'
 
-In text files (those opened without a ``b`` in the mode string), only seeks
-relative to the beginning of the file are allowed (the exception being seeking
-to the very file end with ``seek(0, 2)``) and the only valid *offset* values are
-those returned from the ``f.tell()``, or zero. Any other *offset* value produces
-undefined behaviour.
+Trong các tệp văn bản (những tệp được mở mà không có ``b`` trong chuỗi mode), chỉ cho phép seek tương đối so với đầu tệp (ngoại lệ là seek đến đúng cuối tệp bằng ``seek(0, 2)``) và các giá trị *offset* hợp lệ duy nhất là những giá trị được ``f.tell()`` trả về hoặc bằng không. Bất kỳ giá trị *offset* nào khác đều tạo ra hành vi không xác định.
 
-File objects have some additional methods, such as :meth:`~io.IOBase.isatty` and
-:meth:`~io.IOBase.truncate` which are less frequently used; consult the Library
-Reference for a complete guide to file objects.
+Đối tượng tệp còn có một số phương thức bổ sung, chẳng hạn như :meth:`~io.IOBase.isatty` và
+:meth:`~io.IOBase.truncate`, ít được sử dụng hơn; hãy tham khảo Tài liệu Tham khảo Thư viện để có hướng dẫn đầy đủ về các đối tượng tệp.
 
 
 .. _tut-json:
 
-Saving structured data with :mod:`json`
----------------------------------------
+Lưu dữ liệu có cấu trúc bằng :mod:`json`
+----------------------------------------
 
 .. index:: pair: module; json
 
-Strings can easily be written to and read from a file.  Numbers take a bit more
-effort, since the :meth:`~io.TextIOBase.read` method only returns strings, which will have to
-be passed to a function like :func:`int`, which takes a string like ``'123'``
-and returns its numeric value 123.  When you want to save more complex data
-types like nested lists and dictionaries, parsing and serializing by hand
-becomes complicated.
+Bạn có thể dễ dàng ghi và đọc chuỗi từ một tệp. Số cần nhiều thao tác hơn một chút, vì phương thức :meth:`~io.TextIOBase.read` chỉ trả về chuỗi, và chuỗi đó phải được truyền cho một hàm như :func:`int`, hàm này nhận một chuỗi như ``'123'`` và trả về giá trị số 123 tương ứng. Khi muốn lưu các kiểu dữ liệu phức tạp hơn như danh sách lồng nhau và từ điển, việc tự phân tích cú pháp và tuần tự hóa trở nên phức tạp.
 
-Rather than having users constantly writing and debugging code to save
-complicated data types to files, Python allows you to use the popular data
-interchange format called `JSON (JavaScript Object Notation)
-<https://json.org>`_.  The standard module called :mod:`json` can take Python
-data hierarchies, and convert them to string representations; this process is
-called :dfn:`serializing`.  Reconstructing the data from the string representation
-is called :dfn:`deserializing`.  Between serializing and deserializing, the
-string representing the object may have been stored in a file or data, or
-sent over a network connection to some distant machine.
+Thay vì để người dùng liên tục viết và gỡ lỗi mã để lưu các kiểu dữ liệu phức tạp vào tệp, Python cho phép bạn sử dụng định dạng trao đổi dữ liệu phổ biến có tên là `JSON (JavaScript Object Notation) <https://json.org>`_. Mô-đun chuẩn có tên :mod:`json` có thể tiếp nhận các cấu trúc phân cấp dữ liệu Python và chuyển đổi chúng thành biểu diễn chuỗi; quá trình này được gọi là :dfn:`tuần tự hóa (serializing)`. Việc tái tạo dữ liệu từ biểu diễn chuỗi được gọi là :dfn:`giải tuần tự hóa (deserializing)`. Trong khoảng thời gian giữa việc tuần tự hóa và giải tuần tự hóa, chuỗi biểu diễn đối tượng có thể đã được lưu trong một tệp hoặc cơ sở dữ liệu, hoặc được gửi qua kết nối mạng đến một máy ở xa.
 
 .. note::
-   The JSON format is commonly used by modern applications to allow for data
-   exchange.  Many programmers are already familiar with it, which makes
-   it a good choice for interoperability.
+   Định dạng JSON thường được các ứng dụng hiện đại sử dụng để cho phép trao đổi dữ liệu. Nhiều lập trình viên đã quen thuộc với định dạng này, khiến nó trở thành một lựa chọn phù hợp cho khả năng tương tác.
 
-If you have an object ``x``, you can view its JSON string representation with a
-simple line of code::
+Nếu bạn có một đối tượng ``x``, bạn có thể xem biểu diễn chuỗi JSON của đối tượng đó bằng một dòng mã đơn giản::
 
    >>> import json
    >>> x = [1, 'simple', 'list']
    >>> json.dumps(x)
    '[1, "simple", "list"]'
 
-Another variant of the :func:`~json.dumps` function, called :func:`~json.dump`,
-simply serializes the object to a :term:`text file`.  So if ``f`` is a
-:term:`text file` object opened for writing, we can do this::
+Một biến thể khác của hàm :func:`~json.dumps`, có tên là :func:`~json.dump`, chỉ đơn giản là tuần tự hóa đối tượng thành :term:`text file`. Vì vậy, nếu ``f`` là một
+đối tượng :term:`text file` được mở để ghi, chúng ta có thể làm như sau::
 
    json.dump(x, f)
 
-To decode the object again, if ``f`` is a :term:`binary file` or
-:term:`text file` object which has been opened for reading::
+Để giải mã đối tượng một lần nữa, nếu ``f`` là một :term:`binary file` hoặc
+đối tượng :term:`text file` đã được mở để đọc::
 
    x = json.load(f)
 
 .. note::
-   JSON files must be encoded in UTF-8. Use ``encoding="utf-8"`` when opening
-   JSON file as a :term:`text file` for both of reading and writing.
+   Các tệp JSON phải được mã hóa bằng UTF-8. Sử dụng ``encoding="utf-8"`` khi mở tệp JSON dưới dạng :term:`text file` để đọc và ghi.
 
-This simple serialization technique can handle lists and dictionaries, but
-serializing arbitrary class instances in JSON requires a bit of extra effort.
-The reference for the :mod:`json` module contains an explanation of this.
+Kỹ thuật tuần tự hóa đơn giản này có thể xử lý các danh sách và từ điển, nhưng việc tuần tự hóa các thực thể lớp tùy ý trong JSON đòi hỏi thêm một chút công sức. Tài liệu tham khảo về mô-đun :mod:`json` có giải thích về vấn đề này.
 
 .. seealso::
 
-   :mod:`pickle` - the pickle module
+   :mod:`pickle` - mô-đun pickle
 
-   Contrary to :ref:`JSON <tut-json>`, *pickle* is a protocol which allows
-   the serialization of arbitrarily complex Python objects.  As such, it is
-   specific to Python and cannot be used to communicate with applications
-   written in other languages.  It is also insecure by default:
-   deserializing pickle data coming from an untrusted source can execute
-   arbitrary code, if the data was crafted by a skilled attacker.
+   Trái với :ref:`JSON <tut-json>`, *pickle* là một giao thức cho phép tuần tự hóa các đối tượng Python phức tạp tùy ý. Vì vậy, nó dành riêng cho Python và không thể được dùng để giao tiếp với các ứng dụng được viết bằng ngôn ngữ khác. Theo mặc định, nó cũng không an toàn: việc giải tuần tự hóa dữ liệu pickle đến từ một nguồn không đáng tin cậy có thể thực thi mã tùy ý nếu dữ liệu đó được tạo bởi một kẻ tấn công có kỹ năng.
+
+.. _`JSON (JavaScript Object Notation)`: https://json.org

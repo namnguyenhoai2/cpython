@@ -1,80 +1,50 @@
 
 .. _tut-venv:
 
-*********************************
-Virtual Environments and Packages
-*********************************
+************************
+Môi trường ảo và Package
+************************
 
-Introduction
-============
+Giới thiệu
+==========
 
-Python applications will often use packages and modules that don't
-come as part of the standard library.  Applications will sometimes
-need a specific version of a library, because the application may
-require that a particular bug has been fixed or the application may be
-written using an obsolete version of the library's interface.
+Các ứng dụng Python thường sử dụng những package và module không có sẵn trong standard library. Đôi khi, ứng dụng cần một phiên bản cụ thể của một thư viện, vì ứng dụng có thể yêu cầu một lỗi cụ thể đã được sửa hoặc có thể được viết bằng cách sử dụng interface đã lỗi thời của thư viện.
 
-This means it may not be possible for one Python installation to meet
-the requirements of every application.  If application A needs version
-1.0 of a particular module but application B needs version 2.0, then
-the requirements are in conflict and installing either version 1.0 or 2.0
-will leave one application unable to run.
+Điều này có nghĩa là một bản cài đặt Python có thể không đáp ứng được yêu cầu của mọi ứng dụng. Nếu ứng dụng A cần phiên bản 1.0 của một module cụ thể nhưng ứng dụng B cần phiên bản 2.0, thì các yêu cầu xung đột với nhau và việc cài đặt phiên bản 1.0 hoặc 2.0 sẽ khiến một trong hai ứng dụng không thể chạy.
 
-The solution for this problem is to create a :term:`virtual environment`, a
-self-contained directory tree that contains a Python installation for a
-particular version of Python, plus a number of additional packages.
+Giải pháp cho vấn đề này là tạo một :term:`virtual environment`, một cây thư mục độc lập chứa một bản cài đặt Python cho một phiên bản Python cụ thể, cùng với một số package bổ sung.
 
-Different applications can then use different virtual environments.
-To resolve the earlier example of conflicting requirements,
-application A can have its own virtual environment with version 1.0
-installed while application B has another virtual environment with version 2.0.
-If application B requires a library be upgraded to version 3.0, this will
-not affect application A's environment.
+Sau đó, các ứng dụng khác nhau có thể sử dụng những môi trường ảo khác nhau. Để giải quyết ví dụ về các yêu cầu xung đột ở trên, ứng dụng A có thể có môi trường ảo riêng với phiên bản 1.0 được cài đặt, trong khi ứng dụng B có một môi trường ảo khác với phiên bản 2.0. Nếu ứng dụng B yêu cầu nâng cấp một thư viện lên phiên bản 3.0, điều này sẽ không ảnh hưởng đến môi trường của ứng dụng A.
 
 
-Creating Virtual Environments
-=============================
+Tạo môi trường ảo
+=================
 
-The module used to create and manage virtual environments is called
-:mod:`venv`.  :mod:`venv` will install the Python version from which
-the command was run (as reported by the :option:`--version` option).
-For instance, executing the command with ``python3.12`` will install
-version 3.12.
+Mô-đun được dùng để tạo và quản lý các môi trường ảo có tên là
+:mod:`venv`. :mod:`venv` sẽ cài đặt phiên bản Python mà từ đó lệnh được chạy (như được báo cáo bởi tùy chọn :option:`--version`). Ví dụ, thực thi lệnh với ``python3.12`` sẽ cài đặt phiên bản 3.12.
 
-To create a virtual environment, decide upon a directory where you want to
-place it, and run the :mod:`venv` module as a script with the directory path::
+Để tạo một môi trường ảo, hãy chọn một thư mục nơi bạn muốn đặt môi trường đó, rồi chạy mô-đun :mod:`venv` dưới dạng script với đường dẫn thư mục::
 
    python -m venv tutorial-env
 
-This will create the ``tutorial-env`` directory if it doesn't exist,
-and also create directories inside it containing a copy of the Python
-interpreter and various supporting files.
+Lệnh này sẽ tạo thư mục ``tutorial-env`` nếu thư mục đó chưa tồn tại, đồng thời tạo các thư mục bên trong chứa một bản sao của trình thông dịch Python và nhiều tệp hỗ trợ khác.
 
-A common directory location for a virtual environment is ``.venv``.
-This name keeps the directory typically hidden in your shell and thus
-out of the way while giving it a name that explains why the directory
-exists. It also prevents clashing with ``.env`` environment variable
-definition files that some tooling supports.
+Một vị trí thư mục phổ biến cho môi trường ảo là ``.venv``. Tên này thường giữ cho thư mục được ẩn trong shell, nhờ đó không gây vướng víu, đồng thời cho nó một cái tên giải thích lý do thư mục tồn tại. Tên này cũng ngăn xung đột với các tệp định nghĩa biến môi trường ``.env`` mà một số công cụ hỗ trợ.
 
-Once you've created a virtual environment, you may activate it.
+Sau khi tạo môi trường ảo, bạn có thể kích hoạt môi trường đó.
 
-On Windows, run::
+Trên Windows, chạy::
 
   tutorial-env\Scripts\activate
 
-On Unix or MacOS, run::
+Trên Unix hoặc MacOS, hãy chạy::
 
   source tutorial-env/bin/activate
 
-(This script is written for the bash shell.  If you use the
-:program:`csh` or :program:`fish` shells, there are alternate
-``activate.csh`` and ``activate.fish`` scripts you should use
-instead.)
+(Tập lệnh này được viết cho bash shell. Nếu bạn sử dụng
+:program:`csh` hoặc :program:`fish` shell, có các tập lệnh ``activate.csh`` và ``activate.fish`` thay thế mà bạn nên sử dụng.)
 
-Activating the virtual environment will change your shell's prompt to show what
-virtual environment you're using, and modify the environment so that running
-``python`` will get you that particular version and installation of Python.
-For example:
+Việc kích hoạt virtual environment sẽ thay đổi dấu nhắc của shell để hiển thị virtual environment bạn đang sử dụng, đồng thời sửa đổi môi trường để khi chạy ``python``, bạn sẽ nhận được phiên bản và bản cài đặt Python cụ thể đó. Ví dụ:
 
 .. code-block:: console
 
@@ -88,30 +58,23 @@ For example:
   '~/envs/tutorial-env/lib/python3.5/site-packages']
   >>>
 
-Note that the activated virtual environment does not alter the ``PYTHONPATH`` variable in any way.
-This may lead to unexpected results if the path includes references to code which is incompatible with
-the Python version the virtual environment is using. The best practice is to ``unset PYTHONPATH``
-in bash or the equivalent for the shell you are using.
+Lưu ý rằng virtual environment đã kích hoạt không thay đổi biến ``PYTHONPATH`` theo bất kỳ cách nào. Điều này có thể dẫn đến kết quả không mong muốn nếu đường dẫn chứa các tham chiếu đến mã không tương thích với phiên bản Python mà virtual environment đang sử dụng. Cách tốt nhất là ``unset PYTHONPATH`` trong bash hoặc lệnh tương đương đối với shell bạn đang sử dụng.
 
-To deactivate a virtual environment, type::
+Để hủy kích hoạt virtual environment, hãy nhập::
 
     deactivate
 
-into the terminal.
+vào terminal.
 
-Managing Packages with pip
-==========================
+Quản lý các gói bằng pip
+========================
 
-You can install, upgrade, and remove packages using a program called
-:program:`pip`.  By default ``pip`` will install packages from the `Python
-Package Index <https://pypi.org>`_.  You can browse the Python
-Package Index by going to it in your web browser.
+Bạn có thể cài đặt, nâng cấp và gỡ bỏ các gói bằng một chương trình có tên là
+:program:`pip`. Theo mặc định, ``pip`` sẽ cài đặt các gói từ `Python Package Index <https://pypi.org>`_. Bạn có thể duyệt Python Package Index bằng cách truy cập dịch vụ này trong trình duyệt web.
 
-``pip`` has a number of subcommands: "install", "uninstall",
-"freeze", etc.  (Consult the :ref:`installing-index` guide for
-complete documentation for ``pip``.)
+``pip`` có một số subcommand: "install", "uninstall", "freeze", v.v. (Tham khảo :ref:`installing-index` để xem tài liệu đầy đủ về ``pip``.)
 
-You can install the latest version of a package by specifying a package's name:
+Bạn có thể cài đặt phiên bản mới nhất của một gói bằng cách chỉ định tên gói:
 
 .. code-block:: console
 
@@ -122,8 +85,7 @@ You can install the latest version of a package by specifying a package's name:
     Running setup.py install for novas
   Successfully installed novas-3.1.1.3
 
-You can also install a specific version of a package by giving the
-package name  followed by ``==`` and the version number:
+Bạn cũng có thể cài đặt một phiên bản cụ thể của gói bằng cách cung cấp tên gói, theo sau là ``==`` và số phiên bản:
 
 .. code-block:: console
 
@@ -133,10 +95,7 @@ package name  followed by ``==`` and the version number:
   Installing collected packages: requests
   Successfully installed requests-2.6.0
 
-If you re-run this command, ``pip`` will notice that the requested
-version is already installed and do nothing.  You can supply a
-different version number to get that version, or you can run ``python
--m pip install --upgrade`` to upgrade the package to the latest version:
+Nếu chạy lại lệnh này, ``pip`` sẽ nhận thấy phiên bản được yêu cầu đã được cài đặt và không làm gì cả. Bạn có thể cung cấp một số phiên bản khác để cài đặt phiên bản đó, hoặc có thể chạy ``python -m pip install --upgrade`` để nâng cấp gói lên phiên bản mới nhất:
 
 .. code-block:: console
 
@@ -148,10 +107,9 @@ different version number to get that version, or you can run ``python
         Successfully uninstalled requests-2.6.0
   Successfully installed requests-2.7.0
 
-``python -m pip uninstall`` followed by one or more package names will
-remove the packages from the virtual environment.
+``python -m pip uninstall`` theo sau bởi một hoặc nhiều tên package sẽ xóa các package đó khỏi virtual environment.
 
-``python -m pip show`` will display information about a particular package:
+``python -m pip show`` sẽ hiển thị thông tin về một package cụ thể:
 
 .. code-block:: console
 
@@ -168,8 +126,7 @@ remove the packages from the virtual environment.
   Location: /Users/akuchling/envs/tutorial-env/lib/python3.4/site-packages
   Requires:
 
-``python -m pip list`` will display all of the packages installed in
-the virtual environment:
+``python -m pip list`` sẽ hiển thị tất cả package đã được cài đặt trong virtual environment:
 
 .. code-block:: console
 
@@ -180,9 +137,7 @@ the virtual environment:
   requests (2.7.0)
   setuptools (16.0)
 
-``python -m pip freeze`` will produce a similar list of the installed packages,
-but the output uses the format that ``python -m pip install`` expects.
-A common convention is to put this list in a ``requirements.txt`` file:
+``python -m pip freeze`` sẽ tạo ra danh sách tương tự các package đã cài đặt, nhưng kết quả sử dụng định dạng mà ``python -m pip install`` yêu cầu. Một quy ước phổ biến là đặt danh sách này trong tệp ``requirements.txt``:
 
 .. code-block:: console
 
@@ -192,9 +147,7 @@ A common convention is to put this list in a ``requirements.txt`` file:
   numpy==1.9.2
   requests==2.7.0
 
-The ``requirements.txt`` can then be committed to version control and
-shipped as part of an application.  Users can then install all the
-necessary packages with ``install -r``:
+Sau đó, ``requirements.txt`` có thể được commit vào hệ thống quản lý phiên bản và đóng gói cùng với một ứng dụng. Người dùng có thể cài đặt tất cả package cần thiết bằng ``install -r``:
 
 .. code-block:: console
 
@@ -209,9 +162,8 @@ necessary packages with ``install -r``:
     Running setup.py install for novas
   Successfully installed novas-3.1.1.3 numpy-1.9.2 requests-2.7.0
 
-``pip`` has many more options.  Consult the :ref:`installing-index`
-guide for complete documentation for ``pip``.  When you've written
-a package and want to make it available on the Python Package Index,
-consult the `Python packaging user guide`_.
+``pip`` còn có nhiều tùy chọn khác. Hãy tham khảo hướng dẫn :ref:`installing-index` để xem tài liệu đầy đủ về ``pip``. Khi bạn đã viết xong một package và muốn cung cấp package đó trên Python Package Index, hãy tham khảo `hướng dẫn sử dụng về đóng gói Python <Python packaging user guide_>`_.
 
 .. _Python Packaging User Guide: https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+.. _`Python Package Index`: https://pypi.org
