@@ -1,6 +1,6 @@
-****************************
-  What's New in Python 2.1
-****************************
+**************************
+Có gì mới trong Python 2.1
+**************************
 
 :Author: A.M. Kuchling
 
@@ -9,37 +9,22 @@
 .. $Id: whatsnew21.tex 50964 2006-07-30 03:03:43Z fred.drake $
 
 
-Introduction
-============
+Giới thiệu
+==========
 
-This article explains the new features in Python 2.1.  While there aren't as
-many changes in 2.1 as there were in Python 2.0, there are still some pleasant
-surprises in store.  2.1 is the first release to be steered through the use of
-Python Enhancement Proposals, or PEPs, so most of the sizable changes have
-accompanying PEPs that provide more complete documentation and a design
-rationale for the change.  This article doesn't attempt to document the new
-features completely, but simply provides an overview of the new features for
-Python programmers. Refer to the Python 2.1 documentation, or to the specific
-PEP, for more details about any new feature that particularly interests you.
+Bài viết này giải thích các tính năng mới trong Python 2.1. Mặc dù 2.1 không có nhiều thay đổi như Python 2.0, vẫn có một số điều bất ngờ thú vị đang chờ bạn. 2.1 là bản phát hành đầu tiên được định hướng thông qua Python Enhancement Proposals, hay PEP, vì vậy hầu hết các thay đổi đáng kể đều có PEP đi kèm, cung cấp tài liệu đầy đủ hơn và cơ sở lý luận thiết kế cho thay đổi đó. Bài viết này không cố gắng ghi lại đầy đủ các tính năng mới, mà chỉ cung cấp tổng quan về những tính năng mới dành cho lập trình viên Python. Hãy tham khảo tài liệu Python 2.1 hoặc PEP cụ thể để biết thêm chi tiết về bất kỳ tính năng mới nào đặc biệt khiến bạn quan tâm.
 
-One recent goal of the Python development team has been to accelerate the pace
-of new releases, with a new release coming every 6 to 9 months. 2.1 is the first
-release to come out at this faster pace, with the first alpha appearing in
-January, 3 months after the final version of 2.0 was released.
+Một mục tiêu gần đây của nhóm phát triển Python là đẩy nhanh nhịp độ phát hành phiên bản mới, với một bản phát hành mới sau mỗi 6 đến 9 tháng. 2.1 là bản phát hành đầu tiên được phát hành theo nhịp độ nhanh hơn này, với bản alpha đầu tiên xuất hiện vào tháng 1, 3 tháng sau khi phiên bản cuối cùng của 2.0 được phát hành.
 
-The final release of Python 2.1 was made on April 17, 2001.
+Bản phát hành cuối cùng của Python 2.1 được phát hành vào ngày 17 tháng 4 năm 2001.
 
 .. ======================================================================
 
 
-PEP 227: Nested Scopes
-======================
+PEP 227: Phạm vi lồng nhau
+==========================
 
-The largest change in Python 2.1 is to Python's scoping rules.  In Python 2.0,
-at any given time there are at most three namespaces used to look up variable
-names: local, module-level, and the built-in namespace.  This often surprised
-people because it didn't match their intuitive expectations.  For example, a
-nested recursive function definition doesn't work::
+Thay đổi lớn nhất trong Python 2.1 là các quy tắc về phạm vi biến của Python. Trong Python 2.0, tại bất kỳ thời điểm nào cũng có nhiều nhất ba không gian tên được dùng để tra cứu tên biến: cục bộ, cấp mô-đun và không gian tên dựng sẵn. Điều này thường khiến mọi người ngạc nhiên vì nó không phù hợp với kỳ vọng trực quan của họ. Ví dụ, định nghĩa hàm đệ quy lồng nhau không hoạt động::
 
    def f():
        ...
@@ -48,13 +33,7 @@ nested recursive function definition doesn't work::
            return g(value-1) + 1
        ...
 
-The function :func:`!g` will always raise a :exc:`NameError` exception, because
-the binding of the name ``g`` isn't in either its local namespace or in the
-module-level namespace.  This isn't much of a problem in practice (how often do
-you recursively define interior functions like this?), but this also made using
-the :keyword:`lambda` expression clumsier, and this was a problem in practice.
-In code which uses :keyword:`lambda` you can often find local variables being
-copied by passing them as the default values of arguments. ::
+Hàm :func:`!g` sẽ luôn phát sinh một ngoại lệ :exc:`NameError`, vì liên kết của tên ``g`` không nằm trong không gian tên cục bộ cũng như không gian tên cấp mô-đun của nó. Trên thực tế, đây không phải vấn đề lớn (bao lâu bạn mới định nghĩa đệ quy các hàm bên trong như thế này?), nhưng điều này cũng khiến việc sử dụng biểu thức :keyword:`lambda` trở nên rắc rối hơn, và đây lại là một vấn đề trong thực tế. Trong mã sử dụng :keyword:`lambda`, bạn thường có thể thấy các biến cục bộ được sao chép bằng cách truyền chúng làm giá trị mặc định của các đối số.::
 
    def find(self, name):
        "Return list of any entries equal to 'name'"
@@ -62,38 +41,15 @@ copied by passing them as the default values of arguments. ::
                   self.list_attribute)
        return L
 
-The readability of Python code written in a strongly functional style suffers
-greatly as a result.
+Do đó, khả năng dễ đọc của mã Python được viết theo phong cách hàm thuần túy (functional) bị ảnh hưởng nghiêm trọng.
 
-The most significant change to Python 2.1 is that static scoping has been added
-to the language to fix this problem.  As a first effect, the ``name=name``
-default argument is now unnecessary in the above example.  Put simply, when a
-given variable name is not assigned a value within a function (by an assignment,
-or the :keyword:`def`, :keyword:`class`, or :keyword:`import` statements),
-references to the variable will be looked up in the local namespace of the
-enclosing scope.  A more detailed explanation of the rules, and a dissection of
-the implementation, can be found in the PEP.
+Thay đổi quan trọng nhất trong Python 2.1 là ngôn ngữ này đã bổ sung cơ chế định phạm vi tĩnh để khắc phục vấn đề trên. Trước hết, đối số mặc định ``name=name`` trong ví dụ trên giờ đây không còn cần thiết. Nói đơn giản, khi một tên biến nhất định không được gán giá trị trong một hàm (bằng phép gán hoặc các câu lệnh :keyword:`def`, :keyword:`class` hay :keyword:`import`), các tham chiếu đến biến đó sẽ được tra cứu trong không gian tên cục bộ của phạm vi bao quanh. Bạn có thể tìm thấy phần giải thích chi tiết hơn về các quy tắc, cùng với phần phân tích cách triển khai, trong PEP.
 
-This change may cause some compatibility problems for code where the same
-variable name is used both at the module level and as a local variable within a
-function that contains further function definitions. This seems rather unlikely
-though, since such code would have been pretty confusing to read in the first
-place.
+Thay đổi này có thể gây ra một số vấn đề về khả năng tương thích đối với mã trong đó cùng một tên biến được sử dụng cả ở cấp mô-đun lẫn làm biến cục bộ bên trong một hàm có chứa các định nghĩa hàm khác. Tuy nhiên, điều này có vẻ khá khó xảy ra, vì ngay từ đầu loại mã như vậy vốn đã khá khó đọc.
 
-One side effect of the change is that the ``from module import *`` and
-``exec`` statements have been made illegal inside a function scope under
-certain conditions.  The Python reference manual has said all along that ``from
-module import *`` is only legal at the top level of a module, but the CPython
-interpreter has never enforced this before.  As part of the implementation of
-nested scopes, the compiler which turns Python source into bytecodes has to
-generate different code to access variables in a containing scope.  ``from
-module import *`` and ``exec`` make it impossible for the compiler to
-figure this out, because they add names to the local namespace that are
-unknowable at compile time. Therefore, if a function contains function
-definitions or :keyword:`lambda` expressions with free variables, the compiler
-will flag this by raising a :exc:`SyntaxError` exception.
+Một tác động phụ của thay đổi này là các câu lệnh ``from module import *`` và ``exec`` đã trở thành không hợp lệ bên trong phạm vi hàm trong một số điều kiện nhất định. Tài liệu tham khảo Python từ trước đến nay vẫn nêu rằng ``from module import *`` chỉ hợp lệ ở cấp cao nhất của một mô-đun, nhưng trước đây trình thông dịch CPython chưa bao giờ thực thi quy tắc này. Trong quá trình triển khai các phạm vi lồng nhau, trình biên dịch chuyển mã nguồn Python thành bytecode phải tạo ra mã khác để truy cập các biến trong phạm vi bao quanh. ``from module import *`` và ``exec`` khiến trình biên dịch không thể xác định điều này, vì chúng thêm vào không gian tên cục bộ những tên mà tại thời điểm biên dịch không thể biết trước. Vì vậy, nếu một hàm chứa các định nghĩa hàm hoặc các biểu thức :keyword:`lambda` có biến tự do, trình biên dịch sẽ phát hiện điều này bằng cách phát sinh một ngoại lệ :exc:`SyntaxError`.
 
-To make the preceding explanation a bit clearer, here's an example::
+Để phần giải thích trước đó rõ ràng hơn một chút, hãy xem ví dụ sau::
 
    x = 1
    def f():
@@ -102,81 +58,53 @@ To make the preceding explanation a bit clearer, here's an example::
        def g():
            return x
 
-Line 4 containing the ``exec`` statement is a syntax error, since
-``exec`` would define a new local variable named ``x`` whose value should
-be accessed by :func:`!g`.
+Dòng 4 chứa câu lệnh ``exec`` là một lỗi cú pháp, vì ``exec`` sẽ định nghĩa một biến cục bộ mới có tên ``x``, và giá trị của biến này phải được truy cập bằng :func:`!g`.
 
-This shouldn't be much of a limitation, since ``exec`` is rarely used in
-most Python code (and when it is used, it's often a sign of a poor design
-anyway).
+Điều này không nên là một hạn chế quá lớn, vì ``exec`` hiếm khi được sử dụng trong hầu hết mã Python (và khi được sử dụng, nó thường là dấu hiệu của một thiết kế kém).
 
-Compatibility concerns have led to nested scopes being introduced gradually; in
-Python 2.1, they aren't enabled by default, but can be turned on within a module
-by using a future statement as described in :pep:`236`.  (See the following section
-for further discussion of :pep:`236`.)  In Python 2.2, nested scopes will become
-the default and there will be no way to turn them off, but users will have had
-all of 2.1's lifetime to fix any breakage resulting from their introduction.
+Các mối lo ngại về khả năng tương thích đã dẫn đến việc đưa các phạm vi lồng nhau vào dần dần; trong Python 2.1, chúng không được bật theo mặc định nhưng có thể được bật trong một module bằng cách sử dụng câu lệnh future như mô tả trong :pep:`236`. (Xem phần tiếp theo để biết thêm thảo luận về :pep:`236`.) Trong Python 2.2, các phạm vi lồng nhau sẽ trở thành mặc định và sẽ không có cách nào tắt chúng, nhưng người dùng sẽ có toàn bộ thời gian tồn tại của 2.1 để sửa mọi vấn đề phát sinh từ việc đưa chúng vào.
 
 
 .. seealso::
 
-   :pep:`227` - Statically Nested Scopes
-      Written and implemented by Jeremy Hylton.
+   :pep:`227` - Phạm vi lồng nhau tĩnh
+      Được viết và triển khai bởi Jeremy Hylton.
 
 .. ======================================================================
 
 
-PEP 236: __future__ Directives
-==============================
+PEP 236: Chỉ thị __future__
+===========================
 
-The reaction to nested scopes was widespread concern about the dangers of
-breaking code with the 2.1 release, and it was strong enough to make the
-Pythoneers take a more conservative approach.  This approach consists of
-introducing a convention for enabling optional functionality in release N that
-will become compulsory in release N+1.
+Phản ứng đối với các phạm vi lồng nhau là sự lo ngại rộng rãi về nguy cơ làm hỏng mã trong bản phát hành 2.1, và mối lo ngại này đủ mạnh để khiến cộng đồng Python áp dụng một cách tiếp cận thận trọng hơn. Cách tiếp cận này bao gồm việc đưa ra một quy ước để bật chức năng tùy chọn trong bản phát hành N, chức năng sẽ trở thành bắt buộc trong bản phát hành N+1.
 
-The syntax uses a ``from...import`` statement using the reserved module name
-:mod:`__future__`.  Nested scopes can be enabled by the following statement::
+Cú pháp sử dụng một câu lệnh ``from...import`` với tên mô-đun dành riêng
+:mod:`__future__`. Có thể bật các phạm vi lồng nhau bằng câu lệnh sau::
 
    from __future__ import nested_scopes
 
-While it looks like a normal :keyword:`import` statement, it's not; there are
-strict rules on where such a future statement can be put. They can only be at
-the top of a module, and must precede any Python code or regular
-:keyword:`!import` statements.  This is because such statements can affect how
-the Python bytecode compiler parses code and generates bytecode, so they must
-precede any statement that will result in bytecodes being produced.
+Mặc dù trông giống một câu lệnh :keyword:`import` thông thường, nhưng thực tế không phải vậy; có những quy tắc nghiêm ngặt về vị trí có thể đặt câu lệnh future như vậy. Chúng chỉ có thể nằm ở đầu mô-đun và phải đứng trước mọi mã Python hoặc các câu lệnh :keyword:`import` thông thường
+:keyword:`!import`. Điều này là do những câu lệnh như vậy có thể ảnh hưởng đến cách trình biên dịch bytecode Python phân tích cú pháp mã và tạo bytecode, vì vậy chúng phải đứng trước mọi câu lệnh dẫn đến việc tạo bytecode.
 
 
 .. seealso::
 
-   :pep:`236` - Back to the :mod:`__future__`
-      Written by Tim Peters, and primarily implemented by Jeremy Hylton.
+   :pep:`236` - Quay lại :mod:`__future__`
+      Được viết bởi Tim Peters và chủ yếu được triển khai bởi Jeremy Hylton.
 
 .. ======================================================================
 
 
-PEP 207: Rich Comparisons
-=========================
+PEP 207: So sánh phong phú
+==========================
 
-In earlier versions, Python's support for implementing comparisons on user-defined
-classes and extension types was quite simple. Classes could implement a
-:meth:`!__cmp__` method that was given two instances of a class, and could only
-return 0 if they were equal or +1 or -1 if they weren't; the method couldn't
-raise an exception or return anything other than a Boolean value.  Users of
-Numeric Python often found this model too weak and restrictive, because in the
-number-crunching programs that numeric Python is used for, it would be more
-useful to be able to perform elementwise comparisons of two matrices, returning
-a matrix containing the results of a given comparison for each element.  If the
-two matrices are of different sizes, then the compare has to be able to raise an
-exception to signal the error.
+Trong các phiên bản trước, khả năng hỗ trợ triển khai phép so sánh trên các lớp do người dùng định nghĩa và các kiểu mở rộng của Python khá đơn giản. Các lớp có thể triển khai một
+phương thức :meth:`!__cmp__` nhận hai thực thể của một lớp và chỉ có thể trả về 0 nếu chúng bằng nhau hoặc +1 hay -1 nếu chúng không bằng nhau; phương thức này không thể phát sinh ngoại lệ hoặc trả về bất kỳ giá trị nào khác ngoài giá trị Boolean. Người dùng Numeric Python thường nhận thấy mô hình này quá yếu và hạn chế, vì trong các chương trình tính toán số mà Numeric Python được sử dụng, sẽ hữu ích hơn nếu có thể thực hiện phép so sánh theo từng phần tử giữa hai ma trận, trả về một ma trận chứa kết quả của phép so sánh đã cho cho từng phần tử. Nếu hai ma trận có kích thước khác nhau, phép so sánh phải có khả năng phát sinh ngoại lệ để báo hiệu lỗi.
 
-In Python 2.1, rich comparisons were added in order to support this need.
-Python classes can now individually overload each of the ``<``, ``<=``, ``>``,
-``>=``, ``==``, and ``!=`` operations.  The new magic method names are:
+Trong Python 2.1, rich comparison được bổ sung để đáp ứng nhu cầu này. Các lớp Python giờ đây có thể overload riêng từng phép toán ``<``, ``<=``, ``>``, ``>=``, ``==`` và ``!=``. Tên các magic method mới là:
 
 +-----------+------------------------+
-| Operation | Method name            |
+| Phép toán | Tên phương thức        |
 +===========+========================+
 | ``<``     | :meth:`~object.__lt__` |
 +-----------+------------------------+
@@ -191,37 +119,22 @@ Python classes can now individually overload each of the ``<``, ``<=``, ``>``,
 | ``!=``    | :meth:`~object.__ne__` |
 +-----------+------------------------+
 
-(The magic methods are named after the corresponding Fortran operators ``.LT.``.
-``.LE.``, &c.  Numeric programmers are almost certainly quite familiar with
-these names and will find them easy to remember.)
+(Các magic method được đặt tên theo những toán tử Fortran tương ứng ``.LT.``. ``.LE.``, &c. Các lập trình viên số học gần như chắc chắn đã rất quen thuộc với những tên này và sẽ thấy chúng dễ nhớ.)
 
-Each of these magic methods is of the form ``method(self, other)``, where
-``self`` will be the object on the left-hand side of the operator, while
-``other`` will be the object on the right-hand side.  For example, the
-expression ``A < B`` will cause ``A.__lt__(B)`` to be called.
+Mỗi magic method này có dạng ``method(self, other)``, trong đó ``self`` là đối tượng ở vế trái của toán tử, còn ``other`` là đối tượng ở vế phải. Ví dụ, biểu thức ``A < B`` sẽ khiến ``A.__lt__(B)`` được gọi.
 
-Each of these magic methods can return anything at all: a Boolean, a matrix, a
-list, or any other Python object.  Alternatively they can raise an exception if
-the comparison is impossible, inconsistent, or otherwise meaningless.
+Mỗi phương thức đặc biệt này đều có thể trả về bất kỳ giá trị nào: một Boolean, một ma trận, một danh sách hoặc bất kỳ đối tượng Python nào khác. Ngoài ra, chúng có thể phát sinh một ngoại lệ nếu phép so sánh là không thể thực hiện, không nhất quán hoặc không có ý nghĩa theo cách khác.
 
-The built-in ``cmp(A,B)`` function can use the rich comparison machinery,
-and now accepts an optional argument specifying which comparison operation to
-use; this is given as one of the strings ``"<"``, ``"<="``, ``">"``, ``">="``,
-``"=="``, or ``"!="``.  If called without the optional third argument,
-:func:`!cmp` will only return -1, 0, or +1 as in previous versions of Python;
-otherwise it will call the appropriate method and can return any Python object.
+Hàm dựng sẵn ``cmp(A,B)`` có thể sử dụng cơ chế rich comparison và giờ đây chấp nhận một đối số tùy chọn chỉ rõ phép toán so sánh cần dùng; đối số này được truyền dưới dạng một trong các chuỗi ``"<"``, ``"<="``, ``">"``, ``">="``, ``"=="`` hoặc ``"!="``. Nếu được gọi mà không có đối số tùy chọn thứ ba,
+:func:`!cmp` sẽ chỉ trả về -1, 0 hoặc +1 như trong các phiên bản Python trước; nếu không, nó sẽ gọi phương thức thích hợp và có thể trả về bất kỳ đối tượng Python nào.
 
-There are also corresponding changes of interest to C programmers; there's a new
-slot ``tp_richcmp`` in type objects and an API for performing a given rich
-comparison.  I won't cover the C API here, but will refer you to :pep:`207`, or to
-2.1's C API documentation, for the full list of related functions.
+Cũng có những thay đổi tương ứng đáng chú ý đối với các lập trình viên C; trong các đối tượng kiểu có một slot mới ``tp_richcmp`` và một API để thực hiện một phép rich comparison nhất định. Tôi sẽ không trình bày API C ở đây, nhưng sẽ dẫn bạn đến :pep:`207` hoặc tài liệu API C của phiên bản 2.1 để xem danh sách đầy đủ các hàm liên quan.
 
 
 .. seealso::
 
    :pep:`207` - Rich Comparisons
-      Written by Guido van Rossum, heavily based on earlier work by David Ascher, and
-      implemented by Guido van Rossum.
+      Được viết bởi Guido van Rossum, dựa nhiều trên công trình trước đó của David Ascher và được triển khai bởi Guido van Rossum.
 
 .. ======================================================================
 
@@ -229,42 +142,25 @@ comparison.  I won't cover the C API here, but will refer you to :pep:`207`, or 
 PEP 230: Warning Framework
 ==========================
 
-Over its 10 years of existence, Python has accumulated a certain number of
-obsolete modules and features along the way.  It's difficult to know when a
-feature is safe to remove, since there's no way of knowing how much code uses it
---- perhaps no programs depend on the feature, or perhaps many do.  To enable
-removing old features in a more structured way, a warning framework was added.
-When the Python developers want to get rid of a feature, it will first trigger a
-warning in the next version of Python.  The following Python version can then
-drop the feature, and users will have had a full release cycle to remove uses of
-the old feature.
+Trong 10 năm tồn tại, Python đã tích lũy một số module và tính năng lỗi thời. Thật khó biết khi nào có thể an toàn loại bỏ một tính năng, vì không có cách nào biết có bao nhiêu code đang sử dụng tính năng đó --- có thể không chương trình nào phụ thuộc vào tính năng này, hoặc cũng có thể rất nhiều chương trình phụ thuộc. Để cho phép loại bỏ các tính năng cũ theo một cách có cấu trúc hơn, một framework cảnh báo đã được bổ sung. Khi các nhà phát triển Python muốn loại bỏ một tính năng, tính năng đó trước tiên sẽ kích hoạt một cảnh báo trong phiên bản Python tiếp theo. Phiên bản Python sau đó có thể loại bỏ tính năng này, và người dùng sẽ có trọn một chu kỳ phát hành để loại bỏ việc sử dụng tính năng cũ.
 
-Python 2.1 adds the warning framework to be used in this scheme.  It adds a
-:mod:`warnings` module that provide functions to issue warnings, and to filter
-out warnings that you don't want to be displayed. Third-party modules can also
-use this framework to deprecate old features that they no longer wish to
-support.
+Python 2.1 bổ sung framework cảnh báo để sử dụng theo cơ chế này. Phiên bản này bổ sung một
+:mod:`warnings` module cung cấp các hàm để phát cảnh báo và lọc những cảnh báo mà bạn không muốn hiển thị. Các module bên thứ ba cũng có thể sử dụng framework này để đánh dấu những tính năng cũ mà họ không còn muốn hỗ trợ là deprecated.
 
-For example, in Python 2.1 the :mod:`!regex` module is deprecated, so importing
-it causes a warning to be printed::
+Ví dụ, trong Python 2.1, module :mod:`!regex` đã bị deprecated, vì vậy việc import module này sẽ khiến một cảnh báo được in ra::
 
    >>> import regex
    __main__:1: DeprecationWarning: the regex module
             is deprecated; please use the re module
    >>>
 
-Warnings can be issued by calling the :func:`warnings.warn` function::
+Có thể phát cảnh báo bằng cách gọi hàm :func:`warnings.warn`::
 
    warnings.warn("feature X no longer supported")
 
-The first parameter is the warning message; an additional optional parameters
-can be used to specify a particular warning category.
+Tham số đầu tiên là thông báo cảnh báo; các tham số tùy chọn bổ sung có thể được sử dụng để chỉ định một category cảnh báo cụ thể.
 
-Filters can be added to disable certain warnings; a regular expression pattern
-can be applied to the message or to the module name in order to suppress a
-warning.  For example, you may have a program that uses the :mod:`!regex` module
-and not want to spare the time to convert it to use the :mod:`re` module right
-now.  The warning can be suppressed by calling ::
+Có thể thêm các bộ lọc để vô hiệu hóa một số cảnh báo; một mẫu biểu thức chính quy có thể được áp dụng cho thông báo hoặc tên module để chặn một cảnh báo. Ví dụ: bạn có thể có một chương trình sử dụng module :mod:`!regex` và hiện không muốn dành thời gian chuyển đổi chương trình đó để sử dụng module :mod:`re`. Có thể chặn cảnh báo bằng cách gọi::
 
    import warnings
    warnings.filterwarnings(action = 'ignore',
@@ -272,68 +168,40 @@ now.  The warning can be suppressed by calling ::
                            category=DeprecationWarning,
                            module = '__main__')
 
-This adds a filter that will apply only to warnings of the class
-:class:`DeprecationWarning` triggered in the :mod:`__main__` module, and applies
-a regular expression to only match the message about the :mod:`!regex` module
-being deprecated, and will cause such warnings to be ignored.  Warnings can also
-be printed only once, printed every time the offending code is executed, or
-turned into exceptions that will cause the program to stop (unless the
-exceptions are caught in the usual way, of course).
+Điều này thêm một bộ lọc chỉ áp dụng cho các cảnh báo thuộc lớp
+:class:`DeprecationWarning` được kích hoạt trong mô-đun :mod:`__main__`, và áp dụng một biểu thức chính quy để chỉ khớp với thông báo về việc mô-đun :mod:`!regex` đã lỗi thời, đồng thời khiến các cảnh báo như vậy bị bỏ qua. Cảnh báo cũng có thể chỉ được in một lần, được in mỗi khi mã gây ra lỗi được thực thi, hoặc được chuyển thành các ngoại lệ khiến chương trình dừng lại (tất nhiên, trừ khi các ngoại lệ đó được bắt theo cách thông thường).
 
-Functions were also added to Python's C API for issuing warnings; refer to PEP
-230 or to Python's API documentation for the details.
+Các hàm cũng được thêm vào C API của Python để phát sinh cảnh báo; hãy xem PEP 230 hoặc tài liệu API của Python để biết chi tiết.
 
 
 .. seealso::
 
-   :pep:`5` - Guidelines for Language Evolution
-      Written by Paul Prescod, to specify procedures to be followed when removing old
-      features from Python.  The policy described in this PEP hasn't been officially
-      adopted, but the eventual policy probably won't be too different from Prescod's
-      proposal.
+   :pep:`5` - Hướng dẫn phát triển ngôn ngữ
+      Do Paul Prescod viết nhằm quy định các quy trình cần tuân theo khi loại bỏ các tính năng cũ khỏi Python. Chính sách được mô tả trong PEP này chưa được chính thức thông qua, nhưng chính sách cuối cùng có lẽ sẽ không khác proposal của Prescod quá nhiều.
 
-   :pep:`230` - Warning Framework
-      Written and implemented by Guido van Rossum.
+   :pep:`230` - Framework cảnh báo
+      Do Guido van Rossum viết và triển khai.
 
 .. ======================================================================
 
 
-PEP 229: New Build System
-=========================
+PEP 229: Hệ thống Build mới
+===========================
 
-When compiling Python, the user had to go in and edit the :file:`Modules/Setup`
-file in order to enable various additional modules; the default set is
-relatively small and limited to modules that compile on most Unix platforms.
-This means that on Unix platforms with many more features, most notably Linux,
-Python installations often don't contain all useful modules they could.
+Khi biên dịch Python, người dùng phải mở và chỉnh sửa tệp :file:`Modules/Setup` để bật nhiều module bổ sung; tập module mặc định tương đối nhỏ và chỉ giới hạn ở các module có thể biên dịch trên hầu hết nền tảng Unix. Điều này có nghĩa là trên các nền tảng Unix có nhiều tính năng hơn, đáng chú ý nhất là Linux, các bản cài đặt Python thường không chứa tất cả những module hữu ích mà chúng có thể có.
 
-Python 2.0 added the Distutils, a set of modules for distributing and installing
-extensions.  In Python 2.1, the Distutils are used to compile much of the
-standard library of extension modules, autodetecting which ones are supported on
-the current machine.  It's hoped that this will make Python installations easier
-and more featureful.
+Python 2.0 đã bổ sung Distutils, một tập hợp các module để phân phối và cài đặt extension. Trong Python 2.1, Distutils được dùng để biên dịch phần lớn thư viện chuẩn gồm các extension module, đồng thời tự động phát hiện những module được hỗ trợ trên máy hiện tại. Hy vọng rằng điều này sẽ giúp việc cài đặt Python trở nên dễ dàng hơn và có nhiều tính năng hơn.
 
-Instead of having to edit the :file:`Modules/Setup` file in order to enable
-modules, a :file:`setup.py` script in the top directory of the Python source
-distribution is run at build time, and attempts to discover which modules can be
-enabled by examining the modules and header files on the system.  If a module is
-configured in :file:`Modules/Setup`, the :file:`setup.py` script won't attempt
-to compile that module and will defer to the :file:`Modules/Setup` file's
-contents.  This provides a way to specific any strange command-line flags or
-libraries that are required for a specific platform.
+Thay vì phải chỉnh sửa tệp :file:`Modules/Setup` để bật các module, một script :file:`setup.py` trong thư mục cấp cao nhất của bản phân phối mã nguồn Python sẽ được chạy trong thời gian build và cố gắng phát hiện những module nào có thể được bật bằng cách kiểm tra các module và tệp header trên hệ thống. Nếu một module được cấu hình trong :file:`Modules/Setup`, script :file:`setup.py` sẽ không cố gắng biên dịch module đó mà sẽ dùng nội dung của tệp :file:`Modules/Setup`. Điều này cung cấp một cách để chỉ định bất kỳ cờ dòng lệnh hoặc thư viện đặc biệt nào được yêu cầu cho một nền tảng cụ thể.
 
-In another far-reaching change to the build mechanism, Neil Schemenauer
-restructured things so Python now uses a single makefile that isn't recursive,
-instead of makefiles in the top directory and in each of the :file:`Python/`,
-:file:`Parser/`, :file:`Objects/`, and :file:`Modules/` subdirectories.  This
-makes building Python faster and also makes hacking the Makefiles clearer and
-simpler.
+Trong một thay đổi có phạm vi ảnh hưởng lớn khác đối với cơ chế build, Neil Schemenauer đã tái cấu trúc mọi thứ để Python giờ đây sử dụng một makefile duy nhất không đệ quy, thay vì các makefile trong thư mục cấp cao nhất và trong mỗi thư mục :file:`Python/`,
+:file:`Parser/`, :file:`Objects/`, và :file:`Modules/`. Điều này giúp build Python nhanh hơn, đồng thời khiến việc chỉnh sửa Makefile trở nên rõ ràng và đơn giản hơn.
 
 
 .. seealso::
 
-   :pep:`229` - Using Distutils to Build Python
-      Written and implemented by A.M. Kuchling.
+   :pep:`229` - Sử dụng Distutils để Build Python
+      Được viết và triển khai bởi A.M. Kuchling.
 
 .. ======================================================================
 
@@ -341,17 +209,11 @@ simpler.
 PEP 205: Weak References
 ========================
 
-Weak references, available through the :mod:`weakref` module, are a minor but
-useful new data type in the Python programmer's toolbox.
+Weak reference, có trong module :mod:`weakref`, là một kiểu dữ liệu mới nhỏ nhưng hữu ích trong bộ công cụ của lập trình viên Python.
 
-Storing a reference to an object (say, in a dictionary or a list) has the side
-effect of keeping that object alive forever.  There are a few specific cases
-where this behaviour is undesirable, object caches being the most common one,
-and another being circular references in data structures such as trees.
+Việc lưu một tham chiếu đến một đối tượng (chẳng hạn trong dictionary hoặc list) có tác dụng phụ là giữ đối tượng đó tồn tại mãi mãi. Có một số trường hợp cụ thể mà hành vi này không mong muốn, phổ biến nhất là object cache, ngoài ra còn có các tham chiếu vòng trong những cấu trúc dữ liệu như cây.
 
-For example, consider a memoizing function that caches the results of another
-function ``f(x)`` by storing the function's argument and its result in a
-dictionary::
+Ví dụ, hãy xét một hàm memoize lưu kết quả của một hàm khác ``f(x)`` bằng cách lưu đối số của hàm và kết quả của nó trong một dictionary::
 
    _cache = {}
    def memoize(x):
@@ -365,22 +227,11 @@ dictionary::
 
        return retval
 
-This version works for simple things such as integers, but it has a side effect;
-the ``_cache`` dictionary holds a reference to the return values, so they'll
-never be deallocated until the Python process exits and cleans up. This isn't
-very noticeable for integers, but if :func:`!f` returns an object, or a data
-structure that takes up a lot of memory, this can be a problem.
+Phiên bản này hoạt động với những thứ đơn giản như số nguyên, nhưng có một tác dụng phụ; dictionary ``_cache`` giữ một tham chiếu đến các giá trị trả về, vì vậy chúng sẽ không bao giờ được giải phóng cho đến khi tiến trình Python thoát và thực hiện dọn dẹp. Điều này không dễ nhận thấy với các số nguyên, nhưng nếu :func:`!f` trả về một đối tượng hoặc một cấu trúc dữ liệu chiếm nhiều bộ nhớ thì đây có thể là một vấn đề.
 
-Weak references provide a way to implement a cache that won't keep objects alive
-beyond their time.  If an object is only accessible through weak references, the
-object will be deallocated and the weak references will now indicate that the
-object it referred to no longer exists.  A weak reference to an object *obj* is
-created by calling ``wr = weakref.ref(obj)``.  The object being referred to is
-returned by calling the weak reference as if it were a function: ``wr()``.  It
-will return the referenced object, or ``None`` if the object no longer exists.
+Weak reference cung cấp một cách để triển khai cache không giữ các đối tượng tồn tại lâu hơn thời gian cần thiết. Nếu một đối tượng chỉ có thể được truy cập thông qua các weak reference, đối tượng đó sẽ được giải phóng và các weak reference giờ đây sẽ cho biết đối tượng mà chúng tham chiếu đến không còn tồn tại. Một weak reference đến đối tượng *obj* được tạo bằng cách gọi ``wr = weakref.ref(obj)``. Đối tượng được tham chiếu được trả về bằng cách gọi weak reference như thể nó là một hàm: ``wr()``. Lệnh này sẽ trả về đối tượng được tham chiếu hoặc ``None`` nếu đối tượng không còn tồn tại.
 
-This makes it possible to write a :func:`!memoize` function whose cache doesn't
-keep objects alive, by storing weak references in the cache. ::
+Điều này cho phép viết một hàm :func:`!memoize` có cache không giữ các đối tượng còn tồn tại, bằng cách lưu các tham chiếu yếu trong cache.::
 
    _cache = {}
    def memoize(x):
@@ -397,12 +248,8 @@ keep objects alive, by storing weak references in the cache. ::
 
        return retval
 
-The :mod:`weakref` module also allows creating proxy objects which behave like
-weak references --- an object referenced only by proxy objects is deallocated --
-but instead of requiring an explicit call to retrieve the object, the proxy
-transparently forwards all operations to the object as long as the object still
-exists.  If the object is deallocated, attempting to use a proxy will cause a
-:exc:`!weakref.ReferenceError` exception to be raised. ::
+Module :mod:`weakref` cũng cho phép tạo các đối tượng proxy hoạt động như các tham chiếu yếu --- một đối tượng chỉ được các đối tượng proxy tham chiếu sẽ bị giải phóng -- nhưng thay vì yêu cầu gọi tường minh để truy xuất đối tượng, proxy sẽ chuyển tiếp transparently mọi thao tác đến đối tượng miễn là đối tượng đó vẫn tồn tại. Nếu đối tượng bị giải phóng, việc cố gắng sử dụng proxy sẽ khiến một
+ngoại lệ :exc:`!weakref.ReferenceError` được phát sinh.::
 
    proxy = weakref.proxy(obj)
    proxy.attr   # Equivalent to obj.attr
@@ -413,28 +260,18 @@ exists.  If the object is deallocated, attempting to use a proxy will cause a
 
 .. seealso::
 
-   :pep:`205` - Weak References
-      Written and implemented by Fred L. Drake, Jr.
+   :pep:`205` - Tham chiếu yếu
+      Được viết và triển khai bởi Fred L. Drake, Jr.
 
 .. ======================================================================
 
 
-PEP 232: Function Attributes
-============================
+PEP 232: Thuộc tính hàm
+=======================
 
-In Python 2.1, functions can now have arbitrary information attached to them.
-People were often using docstrings to hold information about functions and
-methods, because the :attr:`~function.__doc__` attribute was the only way of
-attaching any
-information to a function.  For example, in the Zope web application server,
-functions are marked as safe for public access by having a docstring, and in
-John Aycock's SPARK parsing framework, docstrings hold parts of the BNF grammar
-to be parsed.  This overloading is unfortunate, since docstrings are really
-intended to hold a function's documentation; for example, it means you can't
-properly document functions intended for private use in Zope.
+Trong Python 2.1, các hàm giờ đây có thể được gắn với thông tin tùy ý. Mọi người thường sử dụng docstring để lưu thông tin về các hàm và phương thức, vì thuộc tính :attr:`~function.__doc__` là cách duy nhất để gắn bất kỳ thông tin nào vào một hàm. Ví dụ, trong máy chủ ứng dụng web Zope, các hàm được đánh dấu là an toàn để truy cập công khai bằng cách có một docstring, còn trong framework phân tích SPARK của John Aycock, docstring chứa các phần của văn phạm BNF cần được phân tích. Việc sử dụng quá tải này thật đáng tiếc, vì docstring thực sự được dùng để chứa tài liệu về một hàm; chẳng hạn, điều đó có nghĩa là bạn không thể ghi tài liệu đúng cách cho các hàm предназначенные để sử dụng riêng tư trong Zope.
 
-Arbitrary attributes can now be set and retrieved on functions using the regular
-Python syntax::
+Giờ đây, bạn có thể thiết lập và truy xuất các thuộc tính tùy ý trên các hàm bằng cú pháp Python thông thường::
 
    def f(): pass
 
@@ -442,48 +279,33 @@ Python syntax::
    f.secure = 1
    f.grammar = "A ::= B (C D)*"
 
-The dictionary containing attributes can be accessed as the function's
-:attr:`~function.__dict__`. Unlike the :attr:`~type.__dict__` attribute of class instances, in
-functions you can actually assign a new dictionary to :attr:`~function.__dict__`, though
-the new value is restricted to a regular Python dictionary; you *can't* be
-tricky and set it to a :class:`!UserDict` instance, or any other random object
-that behaves like a mapping.
+Từ điển chứa các thuộc tính có thể được truy cập dưới dạng từ điển của hàm
+:attr:`~function.__dict__`. Không giống thuộc tính :attr:`~type.__dict__` của các instance lớp, với hàm, bạn thực sự có thể gán một dictionary mới cho :attr:`~function.__dict__`, mặc dù giá trị mới bị giới hạn ở một dictionary Python thông thường; bạn *không thể* lách luật bằng cách gán cho nó một instance :class:`!UserDict`, hoặc bất kỳ đối tượng ngẫu nhiên nào khác hoạt động như một mapping.
 
 
 .. seealso::
 
-   :pep:`232` - Function Attributes
-      Written and implemented by Barry Warsaw.
+   :pep:`232` - Thuộc tính hàm
+      Được viết và triển khai bởi Barry Warsaw.
 
 .. ======================================================================
 
 
-PEP 235: Importing Modules on Case-Insensitive Platforms
-========================================================
+PEP 235: Import module trên các nền tảng không phân biệt chữ hoa chữ thường
+===========================================================================
 
-Some operating systems have filesystems that are case-insensitive, MacOS and
-Windows being the primary examples; on these systems, it's impossible to
-distinguish the filenames ``FILE.PY`` and ``file.py``, even though they do store
-the file's name  in its original case (they're case-preserving, too).
+Một số hệ điều hành có filesystem không phân biệt chữ hoa chữ thường, trong đó MacOS và Windows là những ví dụ tiêu biểu; trên các hệ thống này, không thể phân biệt các tên tệp ``FILE.PY`` và ``file.py``, mặc dù chúng vẫn lưu tên tệp theo đúng kiểu chữ ban đầu (tức cũng bảo toàn kiểu chữ).
 
-In Python 2.1, the :keyword:`import` statement will work to simulate case-sensitivity
-on case-insensitive platforms.  Python will now search for the first
-case-sensitive match by default, raising an :exc:`ImportError` if no such file
-is found, so ``import file`` will not import a module named ``FILE.PY``.
-Case-insensitive matching can be requested by setting the :envvar:`PYTHONCASEOK`
-environment variable before starting the Python interpreter.
+Trong Python 2.1, câu lệnh :keyword:`import` sẽ hoạt động để mô phỏng phân biệt chữ hoa chữ thường trên các nền tảng không phân biệt chữ hoa chữ thường. Theo mặc định, Python giờ đây sẽ tìm kết quả khớp đầu tiên có phân biệt chữ hoa chữ thường, đồng thời phát sinh :exc:`ImportError` nếu không tìm thấy tệp như vậy, vì thế ``import file`` sẽ không import module có tên ``FILE.PY``. Có thể yêu cầu khớp không phân biệt chữ hoa chữ thường bằng cách đặt biến môi trường :envvar:`PYTHONCASEOK` trước khi khởi động trình thông dịch Python.
 
 .. ======================================================================
 
 
-PEP 217: Interactive Display Hook
-=================================
+PEP 217: Hook hiển thị tương tác
+================================
 
-When using the Python interpreter interactively, the output of commands is
-displayed using the built-in :func:`repr` function. In Python 2.1, the variable
-:func:`sys.displayhook` can be set to a callable object which will be called
-instead of :func:`repr`. For example, you can set it to a special
-pretty-printing function::
+Khi sử dụng trình thông dịch Python ở chế độ tương tác, đầu ra của các lệnh được hiển thị bằng hàm tích hợp :func:`repr`. Trong Python 2.1, biến
+:func:`sys.displayhook` có thể được đặt thành một đối tượng callable, đối tượng này sẽ được gọi thay cho :func:`repr`. Ví dụ: bạn có thể đặt nó thành một hàm pretty-printing đặc biệt::
 
    >>> # Create a recursive data structure
    ... L = [1,2,3]
@@ -500,96 +322,56 @@ pretty-printing function::
 
 .. seealso::
 
-   :pep:`217` - Display Hook for Interactive Use
-      Written and implemented by Moshe Zadka.
+   :pep:`217` - Hook hiển thị cho chế độ tương tác
+      Được viết và triển khai bởi Moshe Zadka.
 
 .. ======================================================================
 
 
-PEP 208: New Coercion Model
-===========================
+PEP 208: Mô hình cưỡng chế kiểu mới
+===================================
 
-How numeric coercion is done at the C level was significantly modified.  This
-will only affect the authors of C extensions to Python, allowing them more
-flexibility in writing extension types that support numeric operations.
+Cách thực hiện việc ép kiểu số ở cấp C đã được sửa đổi đáng kể. Điều này chỉ ảnh hưởng đến các tác giả viết C extension cho Python, cho phép họ linh hoạt hơn khi viết các extension type hỗ trợ các phép toán số.
 
-Extension types can now set the type flag ``Py_TPFLAGS_CHECKTYPES`` in their
-``PyTypeObject`` structure to indicate that they support the new coercion model.
-In such extension types, the numeric slot functions can no longer assume that
-they'll be passed two arguments of the same type; instead they may be passed two
-arguments of differing types, and can then perform their own internal coercion.
-If the slot function is passed a type it can't handle, it can indicate the
-failure by returning a reference to the ``Py_NotImplemented`` singleton value.
-The numeric functions of the other type will then be tried, and perhaps they can
-handle the operation; if the other type also returns ``Py_NotImplemented``, then
-a :exc:`TypeError` will be raised.  Numeric methods written in Python can also
-return ``Py_NotImplemented``, causing the interpreter to act as if the method
-did not exist (perhaps raising a :exc:`TypeError`, perhaps trying another
-object's numeric methods).
+Các extension type giờ đây có thể đặt cờ kiểu ``Py_TPFLAGS_CHECKTYPES`` trong cấu trúc ``PyTypeObject`` của chúng để cho biết rằng chúng hỗ trợ mô hình ép kiểu mới. Trong những extension type như vậy, các hàm numeric slot không còn có thể giả định rằng chúng sẽ được truyền vào hai đối số cùng kiểu; thay vào đó, chúng có thể được truyền vào hai đối số khác kiểu và sau đó tự thực hiện việc ép kiểu nội bộ. Nếu hàm slot được truyền vào một kiểu mà nó không thể xử lý, hàm có thể biểu thị lỗi bằng cách trả về một tham chiếu đến giá trị singleton ``Py_NotImplemented``. Sau đó, các hàm số của kiểu còn lại sẽ được thử, và có thể chúng sẽ xử lý được phép toán; nếu kiểu còn lại cũng trả về ``Py_NotImplemented``, thì một :exc:`TypeError` sẽ được phát sinh. Các phương thức số được viết bằng Python cũng có thể trả về ``Py_NotImplemented``, khiến interpreter hoạt động như thể phương thức đó không tồn tại (có thể phát sinh :exc:`TypeError`, hoặc thử các phương thức số của đối tượng khác).
 
 
 .. seealso::
 
-   :pep:`208` - Reworking the Coercion Model
-      Written and implemented by Neil Schemenauer, heavily based upon earlier work by
-      Marc-André Lemburg.  Read this to understand the fine points of how numeric
-      operations will now be processed at the C level.
+   :pep:`208` - Thiết kế lại mô hình ép kiểu
+      Được Neil Schemenauer viết và triển khai, dựa nhiều trên công trình trước đó của Marc-André Lemburg. Hãy đọc tài liệu này để hiểu những điểm tinh tế trong cách các phép toán số sẽ được xử lý ở cấp C.
 
 .. ======================================================================
 
 
-PEP 241: Metadata in Python Packages
-====================================
+PEP 241: Siêu dữ liệu trong các gói Python
+==========================================
 
-A common complaint from Python users is that there's no single catalog of all
-the Python modules in existence.  T. Middleton's Vaults of Parnassus at
-``www.vex.net/parnassus/`` (retired in February 2009, `available in the
-Internet Archive Wayback Machine
-<https://web.archive.org/web/20090130140102/http://www.vex.net/parnassus/>`_)
-was the largest catalog of Python modules, but
-registering software at the Vaults is optional, and many people did not bother.
+Một phàn nàn phổ biến của người dùng Python là không có một catalog duy nhất về tất cả các module Python đang tồn tại. Vaults of Parnassus của T. Middleton tại ``www.vex.net/parnassus/`` (ngừng hoạt động vào tháng 2 năm 2009, `hiện có trên Internet Archive Wayback Machine <https://web.archive.org/web/20090130140102/http://www.vex.net/parnassus/>`_) là catalog lớn nhất về các module Python, nhưng việc đăng ký phần mềm tại Vaults là tùy chọn và nhiều người đã không thực hiện.
 
-As a first small step toward fixing the problem, Python software packaged using
-the Distutils :command:`sdist` command will include a file named
-:file:`PKG-INFO` containing information about the package such as its name,
-version, and author (metadata, in cataloguing terminology).  :pep:`241` contains
-the full list of fields that can be present in the :file:`PKG-INFO` file.  As
-people began to package their software using Python 2.1, more and more packages
-will include metadata, making it possible to build automated cataloguing systems
-and experiment with them.  With the result experience, perhaps it'll be possible
-to design a really good catalog and then build support for it into Python 2.2.
-For example, the Distutils :command:`sdist` and :command:`bdist_\*` commands
-could support an ``upload`` option that would automatically upload your
-package to a catalog server.
+Là bước nhỏ đầu tiên nhằm khắc phục vấn đề này, phần mềm Python được đóng gói bằng lệnh Distutils :command:`sdist` sẽ bao gồm một tệp có tên
+:file:`PKG-INFO` chứa thông tin về package như tên, phiên bản và tác giả (metadata, theo thuật ngữ lập danh mục). :pep:`241` chứa danh sách đầy đủ các trường có thể xuất hiện trong tệp :file:`PKG-INFO`. Khi mọi người bắt đầu đóng gói phần mềm bằng Python 2.1, ngày càng nhiều package sẽ bao gồm metadata, giúp xây dựng các hệ thống lập danh mục tự động và thử nghiệm với chúng. Với kinh nghiệm thu được, có lẽ chúng ta sẽ có thể thiết kế một catalog thực sự tốt, rồi tích hợp hỗ trợ cho nó vào Python 2.2. Ví dụ, các lệnh :command:`sdist` và :command:`bdist_\*` của Distutils có thể hỗ trợ tùy chọn ``upload``, tùy chọn này sẽ tự động tải package của bạn lên máy chủ catalog.
 
-You can start creating packages containing :file:`PKG-INFO` even if you're not
-using Python 2.1, since a new release of the Distutils will be made for users of
-earlier Python versions.  Version 1.0.2 of the Distutils includes the changes
-described in :pep:`241`, as well as various bugfixes and enhancements.  It will be
-available from the Distutils SIG at https://www.python.org/community/sigs/current/distutils-sig/.
+Bạn có thể bắt đầu tạo các package chứa :file:`PKG-INFO` ngay cả khi không sử dụng Python 2.1, vì một bản phát hành mới của Distutils sẽ được cung cấp cho người dùng các phiên bản Python cũ hơn. Phiên bản 1.0.2 của Distutils bao gồm những thay đổi được mô tả trong :pep:`241`, cùng với nhiều bản sửa lỗi và cải tiến khác. Phiên bản này sẽ có sẵn từ Distutils SIG tại https://www.python.org/community/sigs/current/distutils-sig/.
 
 
 .. seealso::
 
-   :pep:`241` - Metadata for Python Software Packages
-      Written and implemented by A.M. Kuchling.
+   :pep:`241` - Metadata cho các package phần mềm Python
+      Được viết và triển khai bởi A.M. Kuchling.
 
-   :pep:`243` - Module Repository Upload Mechanism
-      Written by Sean Reifschneider, this draft PEP describes a proposed mechanism for
-      uploading  Python packages to a central server.
+   :pep:`243` - Cơ chế tải module lên kho lưu trữ
+      Do Sean Reifschneider viết, bản PEP dự thảo này mô tả một cơ chế được đề xuất để tải các package Python lên một máy chủ trung tâm.
 
 .. ======================================================================
 
 
-New and Improved Modules
-========================
+Các module mới và được cải tiến
+===============================
 
-* Ka-Ping Yee contributed two new modules: :mod:`!inspect.py`, a module for
-  getting information about live Python code, and :mod:`!pydoc.py`, a module for
-  interactively converting docstrings to HTML or text.  As a bonus,
-  :file:`Tools/scripts/pydoc`, which is now automatically installed, uses
-  :mod:`!pydoc.py` to display documentation given a Python module, package, or
-  class name.  For example, ``pydoc xml.dom`` displays the following::
+* Ka-Ping Yee đã đóng góp hai module mới: :mod:`!inspect.py`, một module dùng để lấy thông tin về mã Python đang chạy, và :mod:`!pydoc.py`, một module dùng để chuyển đổi docstring sang HTML hoặc văn bản một cách tương tác.  Ngoài ra,
+  :file:`Tools/scripts/pydoc`, hiện được cài đặt tự động, sử dụng
+  :mod:`!pydoc.py` để hiển thị tài liệu khi được cung cấp tên của một module, package hoặc class Python.  Ví dụ, ``pydoc xml.dom`` hiển thị nội dung sau đây::
 
      Python Library Documentation: package xml.dom in xml
 
@@ -606,193 +388,90 @@ New and Improved Modules
          This package contains the following modules:
            ...
 
-  :file:`pydoc` also includes a Tk-based interactive help browser.   :file:`pydoc`
-  quickly becomes addictive; try it out!
+  :file:`pydoc` cũng bao gồm một trình duyệt trợ giúp tương tác dựa trên Tk.   :file:`pydoc` nhanh chóng trở nên gây nghiện; hãy thử ngay!
 
-* Two different modules for unit testing were added to the standard library.
-  The :mod:`doctest` module, contributed by Tim Peters, provides a testing
-  framework based on running embedded examples in docstrings and comparing the
-  results against the expected output.  PyUnit, contributed by Steve Purcell, is a
-  unit testing framework inspired by JUnit, which was in turn an adaptation of
-  Kent Beck's Smalltalk testing framework.  See https://pyunit.sourceforge.net/ for
-  more information about PyUnit.
+* Hai module khác nhau để unit testing đã được bổ sung vào standard library. Module :mod:`doctest`, do Tim Peters đóng góp, cung cấp một testing framework dựa trên việc chạy các ví dụ được nhúng trong docstring và so sánh kết quả với đầu ra dự kiến.  PyUnit, do Steve Purcell đóng góp, là một unit testing framework lấy cảm hứng từ JUnit, vốn lần lượt được phát triển dựa trên testing framework Smalltalk của Kent Beck.  Xem https://pyunit.sourceforge.net/ để biết thêm thông tin về PyUnit.
 
-* The :mod:`difflib` module contains a class, :class:`~difflib.SequenceMatcher`, which
-  compares two sequences and computes the changes required to transform one
-  sequence into the other.  For example, this module can be used to write a tool
-  similar to the Unix :program:`diff` program, and in fact the sample program
-  :file:`Tools/scripts/ndiff.py` demonstrates how to write such a script.
+* Module :mod:`difflib` chứa một class, :class:`~difflib.SequenceMatcher`, dùng để so sánh hai sequence và tính toán các thay đổi cần thiết để biến sequence này thành sequence kia.  Ví dụ, module này có thể được dùng để viết một công cụ tương tự chương trình :program:`diff` của Unix, và thực tế chương trình mẫu
+  :file:`Tools/scripts/ndiff.py` minh họa cách viết một script như vậy.
 
-* :mod:`curses.panel`, a wrapper for the panel library, part of ncurses and of
-  SYSV curses, was contributed by Thomas Gellekum.  The panel library provides
-  windows with the additional feature of depth. Windows can be moved higher or
-  lower in the depth ordering, and the panel library figures out where panels
-  overlap and which sections are visible.
+* :mod:`curses.panel`, một trình bao bọc cho thư viện panel, vốn là một phần của ncurses và SYSV curses, do Thomas Gellekum đóng góp. Thư viện panel cung cấp các cửa sổ với tính năng bổ sung là độ sâu. Các cửa sổ có thể được di chuyển lên cao hơn hoặc xuống thấp hơn trong thứ tự độ sâu, còn thư viện panel sẽ xác định vị trí các panel chồng lấn lên nhau và những phần nào đang hiển thị.
 
-* The PyXML package has gone through a few releases since Python 2.0, and Python
-  2.1 includes an updated version of the :mod:`xml` package.  Some of the
-  noteworthy changes include support for Expat 1.2 and later versions, the ability
-  for Expat parsers to handle files in any encoding supported by Python, and
-  various bugfixes for SAX, DOM, and the :mod:`!minidom` module.
+* Gói PyXML đã trải qua một vài bản phát hành kể từ Python 2.0, và Python 2.1 bao gồm một phiên bản cập nhật của gói :mod:`xml`. Một số thay đổi đáng chú ý gồm hỗ trợ Expat 1.2 và các phiên bản mới hơn, khả năng để các trình phân tích Expat xử lý tệp ở bất kỳ encoding nào được Python hỗ trợ, cùng nhiều bản sửa lỗi cho các module SAX, DOM và :mod:`!minidom`.
 
-* Ping also contributed another hook for handling uncaught exceptions.
-  :func:`sys.excepthook` can be set to a callable object.  When an exception isn't
-  caught by any :keyword:`try`...\ :keyword:`except` blocks, the exception will be
-  passed to :func:`sys.excepthook`, which can then do whatever it likes.  At the
-  Ninth Python Conference, Ping demonstrated an application for this hook:
-  printing an extended traceback that not only lists the stack frames, but also
-  lists the function arguments and the local variables for each frame.
+* Ping cũng đóng góp thêm một hook để xử lý các ngoại lệ chưa được bắt.
+  :func:`sys.excepthook` có thể được đặt thành một đối tượng callable. Khi một ngoại lệ không được bắt bởi bất kỳ khối :keyword:`try`...\ :keyword:`except` nào, ngoại lệ đó sẽ được truyền cho :func:`sys.excepthook`, và đối tượng này có thể xử lý tùy ý. Tại Hội nghị Python lần thứ Chín, Ping đã minh họa một ứng dụng cho hook này: in ra traceback mở rộng không chỉ liệt kê các stack frame mà còn liệt kê các đối số của hàm và các biến cục bộ của từng frame.
 
-* Various functions in the :mod:`time` module, such as :func:`~time.asctime` and
-  :func:`~time.localtime`, require a floating-point argument containing the time in
-  seconds since the epoch.  The most common use of these functions is to work with
-  the current time, so the floating-point argument has been made optional; when a
-  value isn't provided, the current time will be used.  For example, log file
-  entries usually need a string containing the current time; in Python 2.1,
-  ``time.asctime()`` can be used, instead of the lengthier
-  ``time.asctime(time.localtime(time.time()))`` that was previously required.
+* Nhiều hàm trong module :mod:`time`, chẳng hạn như :func:`~time.asctime` và
+  :func:`~time.localtime`, yêu cầu một đối số dấu phẩy động chứa thời gian tính bằng giây kể từ epoch. Cách sử dụng phổ biến nhất của các hàm này là làm việc với thời gian hiện tại, vì vậy đối số dấu phẩy động đã được chuyển thành tùy chọn; khi không cung cấp giá trị, thời gian hiện tại sẽ được sử dụng. Ví dụ, các mục trong tệp nhật ký thường cần một chuỗi chứa thời gian hiện tại; trong Python 2.1, có thể sử dụng ``time.asctime()`` thay cho ``time.asctime(time.localtime(time.time()))`` dài dòng hơn vốn trước đây là bắt buộc.
 
-  This change was proposed and implemented by Thomas Wouters.
+  Thay đổi này do Thomas Wouters đề xuất và triển khai.
 
-* The :mod:`ftplib` module now defaults to retrieving files in passive mode,
-  because passive mode is more likely to work from behind a firewall.  This
-  request came from the Debian bug tracking system, since other Debian packages
-  use :mod:`ftplib` to retrieve files and then don't work from behind a firewall.
-  It's deemed unlikely that this will cause problems for anyone, because Netscape
-  defaults to passive mode and few people complain, but if passive mode is
-  unsuitable for your application or network setup, call ``set_pasv(0)`` on
-  FTP objects to disable passive mode.
+* Mô-đun :mod:`ftplib` hiện mặc định truy xuất tệp ở chế độ passive, vì chế độ passive có khả năng hoạt động tốt hơn khi chạy phía sau tường lửa. Yêu cầu này đến từ hệ thống theo dõi lỗi của Debian, vì các gói Debian khác sử dụng :mod:`ftplib` để truy xuất tệp và sau đó không hoạt động được phía sau tường lửa. Người ta cho rằng điều này khó gây ra vấn đề cho bất kỳ ai, vì Netscape mặc định sử dụng chế độ passive và ít người phàn nàn; tuy nhiên, nếu chế độ passive không phù hợp với ứng dụng hoặc cấu hình mạng của bạn, hãy gọi ``set_pasv(0)`` trên các đối tượng FTP để tắt chế độ passive.
 
-* Support for raw socket access has been added to the :mod:`socket` module,
-  contributed by Grant Edwards.
+* Mô-đun :mod:`socket` đã được bổ sung khả năng truy cập raw socket, do Grant Edwards đóng góp.
 
-* The :mod:`pstats` module now contains a simple interactive statistics browser
-  for displaying timing profiles for Python programs, invoked when the module is
-  run as a script.  Contributed by  Eric S. Raymond.
+* Mô-đun :mod:`pstats` hiện có một trình duyệt thống kê tương tác đơn giản để hiển thị các profile về thời gian thực thi của chương trình Python, được gọi khi mô-đun được chạy dưới dạng script. Do Eric S. Raymond đóng góp.
 
-* A new implementation-dependent function, ``sys._getframe([depth])``, has
-  been added to return a given frame object from the current call stack.
-  :func:`sys._getframe` returns the frame at the top of the call stack;  if the
-  optional integer argument *depth* is supplied, the function returns the frame
-  that is *depth* calls below the top of the stack.  For example,
-  ``sys._getframe(1)`` returns the caller's frame object.
+* Một hàm mới phụ thuộc vào cách triển khai, ``sys._getframe([depth])``, đã được bổ sung để trả về một đối tượng frame cho trước từ call stack hiện tại.
+  :func:`sys._getframe` trả về frame ở đầu call stack; nếu cung cấp đối số số nguyên tùy chọn *depth*, hàm sẽ trả về frame nằm thấp hơn đầu stack *depth* lần gọi. Ví dụ, ``sys._getframe(1)`` trả về đối tượng frame của hàm gọi.
 
-  This function is only present in CPython, not in Jython or the .NET
-  implementation.  Use it for debugging, and resist the temptation to put it into
-  production code.
+  Hàm này chỉ có trong CPython, không có trong Jython hoặc bản triển khai .NET. Hãy sử dụng hàm này để debug và tránh đưa nó vào mã production.
 
 .. ======================================================================
 
 
-Other Changes and Fixes
-=======================
+Các thay đổi và bản sửa lỗi khác
+================================
 
-There were relatively few smaller changes made in Python 2.1 due to the shorter
-release cycle.  A search through the CVS change logs turns up 117 patches
-applied, and 136 bugs fixed; both figures are likely to be underestimates.  Some
-of the more notable changes are:
+Do chu kỳ phát hành ngắn hơn, Python 2.1 có tương đối ít thay đổi nhỏ. Việc tìm kiếm trong nhật ký thay đổi CVS cho thấy đã áp dụng 117 bản vá và sửa 136 lỗi; cả hai con số này có thể đều là ước tính thấp hơn thực tế. Một số thay đổi đáng chú ý hơn gồm:
 
-* A specialized object allocator is now optionally available, that should be
-  faster than the system :c:func:`malloc` and have less memory overhead.  The
-  allocator uses C's :c:func:`!malloc` function to get large pools of memory, and
-  then fulfills smaller memory requests from these pools.  It can be enabled by
-  providing the :option:`!--with-pymalloc` option to the :program:`configure`
-  script; see :file:`Objects/obmalloc.c` for the implementation details.
+* Hiện đã có thể tùy chọn sử dụng một bộ cấp phát đối tượng chuyên dụng, được cho là nhanh hơn :c:func:`malloc` của hệ thống và có ít overhead bộ nhớ hơn. Bộ cấp phát này sử dụng hàm :c:func:`!malloc` của C để lấy các pool bộ nhớ lớn, sau đó đáp ứng các yêu cầu bộ nhớ nhỏ hơn từ những pool này. Có thể bật bộ cấp phát bằng cách cung cấp tùy chọn :option:`!--with-pymalloc` cho script :program:`configure`; xem :file:`Objects/obmalloc.c` để biết chi tiết triển khai.
 
-  Authors of C extension modules should test their code with the object allocator
-  enabled, because some incorrect code may break, causing core dumps at runtime.
-  There are a bunch of memory allocation functions in Python's C API that have
-  previously been just aliases for the C library's :c:func:`malloc` and
-  :c:func:`free`, meaning that if you accidentally called mismatched functions, the
-  error wouldn't be noticeable.  When the object allocator is enabled, these
-  functions aren't aliases of :c:func:`!malloc` and :c:func:`!free` any more, and
-  calling the wrong function to free memory will get you a core dump.  For
-  example, if memory was allocated using :c:macro:`PyMem_New`, it has to be freed
-  using :c:func:`PyMem_Del`, not :c:func:`!free`.  A few modules included with Python
-  fell afoul of this and had to be fixed; doubtless there are more third-party
-  modules that will have the same problem.
+  Các tác giả của module mở rộng C nên kiểm thử mã của mình khi bật bộ cấp phát đối tượng, vì một số mã không chính xác có thể gây lỗi, dẫn đến core dump trong runtime. Có một loạt hàm cấp phát bộ nhớ trong C API của Python trước đây chỉ là alias cho :c:func:`malloc` của thư viện C và
+  :c:func:`free`, nghĩa là nếu bạn vô tình gọi các hàm không tương ứng, lỗi sẽ không bị phát hiện. Khi bật bộ cấp phát đối tượng, các hàm này không còn là alias của :c:func:`!malloc` và :c:func:`!free` nữa, và việc gọi sai hàm để giải phóng bộ nhớ sẽ gây ra core dump. Ví dụ, nếu bộ nhớ được cấp phát bằng :c:macro:`PyMem_New`, thì phải được giải phóng bằng :c:func:`PyMem_Del`, chứ không phải :c:func:`!free`. Một vài module đi kèm Python đã gặp phải vấn đề này và phải được sửa; chắc chắn vẫn còn các module bên thứ ba khác gặp vấn đề tương tự.
 
-  The object allocator was contributed by Vladimir Marangozov.
+  Bộ cấp phát đối tượng do Vladimir Marangozov đóng góp.
 
-* The speed of line-oriented file I/O has been improved because people often
-  complain about its lack of speed, and because it's often been used as a naïve
-  benchmark.  The :meth:`readline` method of file objects has therefore been
-  rewritten to be much faster.  The exact amount of the speedup will vary from
-  platform to platform depending on how slow the C library's :c:func:`!getc` was, but
-  is around 66%, and potentially much faster on some particular operating systems.
-  Tim Peters did much of the benchmarking and coding for this change, motivated by
-  a discussion in comp.lang.python.
+* Tốc độ I/O tệp theo từng dòng đã được cải thiện vì mọi người thường phàn nàn về tốc độ chậm của nó, đồng thời nó cũng thường được dùng làm benchmark ngây thơ. Vì vậy, phương thức :meth:`readline` của các đối tượng tệp đã được viết lại để nhanh hơn nhiều. Mức tăng tốc chính xác sẽ khác nhau tùy nền tảng, phụ thuộc vào độ chậm của :c:func:`!getc` trong thư viện C, nhưng vào khoảng 66% và có thể nhanh hơn nhiều trên một số hệ điều hành cụ thể. Tim Peters đã thực hiện phần lớn công việc benchmark và viết mã cho thay đổi này, bắt nguồn từ một cuộc thảo luận trong comp.lang.python.
 
-  A new module and method for file objects was also added, contributed by Jeff
-  Epler. The new method, :meth:`!xreadlines`, is similar to the existing
-  :func:`!xrange` built-in.  :func:`!xreadlines` returns an opaque sequence object
-  that only supports being iterated over, reading a line on every iteration but
-  not reading the entire file into memory as the existing :meth:`!readlines` method
-  does. You'd use it like this::
+  Một module và phương thức mới cho các đối tượng tệp cũng được bổ sung, do Jeff Epler đóng góp. Phương thức mới, :meth:`!xreadlines`, tương tự như phương thức hiện có
+  :func:`!xrange` tích hợp sẵn. :func:`!xreadlines` trả về một đối tượng chuỗi không trong suốt, chỉ hỗ trợ việc lặp qua, đọc một dòng ở mỗi lần lặp thay vì đọc toàn bộ tệp vào bộ nhớ như phương thức :meth:`!readlines` hiện có. Bạn có thể sử dụng nó như sau::
 
      for line in sys.stdin.xreadlines():
          # ... do something for each line ...
          ...
 
-  For a fuller discussion of the line I/O changes, see the python-dev summary for
-  January 1--15, 2001 at https://mail.python.org/pipermail/python-dev/2001-January/.
+  Để xem thảo luận đầy đủ hơn về các thay đổi đối với I/O theo dòng, hãy xem bản tóm tắt python-dev cho ngày 1--15 tháng 1 năm 2001 tại https://mail.python.org/pipermail/python-dev/2001-January/.
 
-* A new method, :meth:`~dict.popitem`, was added to dictionaries to enable
-  destructively iterating through the contents of a dictionary; this can be faster
-  for large dictionaries because there's no need to construct a list containing
-  all the keys or values. ``D.popitem()`` removes a random ``(key, value)`` pair
-  from the dictionary ``D`` and returns it as a 2-tuple.  This was implemented
-  mostly by Tim Peters and Guido van Rossum, after a suggestion and preliminary
-  patch by Moshe Zadka.
+* Một phương thức mới, :meth:`~dict.popitem`, đã được thêm vào các dictionary để cho phép lặp có tính hủy qua nội dung của dictionary; phương thức này có thể nhanh hơn đối với các dictionary lớn vì không cần tạo một list chứa tất cả các key hoặc value. ``D.popitem()`` xóa một cặp ``(key, value)`` ngẫu nhiên khỏi dictionary ``D`` và trả về cặp đó dưới dạng tuple 2 phần tử. Tính năng này chủ yếu do Tim Peters và Guido van Rossum triển khai, sau một đề xuất và bản vá sơ bộ của Moshe Zadka.
 
-* Modules can now control which names are imported when ``from module import *``
-  is used, by defining an ``__all__`` attribute containing a list of names that
-  will be imported.  One common complaint is that if the module imports other
-  modules such as :mod:`sys` or :mod:`string`, ``from module import *`` will add
-  them to the importing module's namespace.  To fix this, simply list the public
-  names in ``__all__``::
+* Các module giờ đây có thể kiểm soát những name nào được import khi sử dụng ``from module import *``, bằng cách định nghĩa một thuộc tính ``__all__`` chứa list các name sẽ được import. Một phàn nàn phổ biến là nếu module import các module khác như :mod:`sys` hoặc :mod:`string`, ``from module import *`` sẽ thêm chúng vào namespace của module import. Để khắc phục điều này, chỉ cần liệt kê các name công khai trong ``__all__``::
 
      # List public names
      __all__ = ['Database', 'open']
 
-  A stricter version of this patch was first suggested and implemented by Ben
-  Wolfson, but after some python-dev discussion, a weaker final version was
-  checked in.
+  Một phiên bản nghiêm ngặt hơn của bản vá này ban đầu do Ben Wolfson đề xuất và triển khai, nhưng sau một số thảo luận trên python-dev, phiên bản cuối cùng yếu hơn đã được đưa vào kho mã.
 
-* Applying :func:`repr` to strings previously used octal escapes for
-  non-printable characters; for example, a newline was ``'\012'``.  This was a
-  vestigial trace of Python's C ancestry, but today octal is of very little
-  practical use.  Ka-Ping Yee suggested using hex escapes instead of octal ones,
-  and using the ``\n``, ``\t``, ``\r`` escapes for the appropriate characters,
-  and implemented this new formatting.
+* Trước đây, việc áp dụng :func:`repr` cho các chuỗi sử dụng escape bát phân cho các ký tự không in được; chẳng hạn, ký tự dòng mới được biểu diễn là ``'\012'``. Đây là dấu vết còn sót lại từ nguồn gốc C của Python, nhưng ngày nay bát phân hầu như không có nhiều giá trị thực tiễn. Ka-Ping Yee đề xuất sử dụng escape thập lục phân thay cho escape bát phân, đồng thời sử dụng các escape ``\n``, ``\t``, ``\r`` cho các ký tự tương ứng, và đã triển khai cách định dạng mới này.
 
-* Syntax errors detected at compile-time can now raise exceptions containing the
-  filename and line number of the error, a pleasant side effect of the compiler
-  reorganization done by Jeremy Hylton.
+* Các lỗi cú pháp được phát hiện tại thời điểm biên dịch giờ đây có thể tạo ra các exception chứa tên tệp và số dòng xảy ra lỗi, một tác dụng phụ đáng hoan nghênh của việc tổ chức lại compiler do Jeremy Hylton thực hiện.
 
-* C extensions which import other modules have been changed to use
-  :c:func:`PyImport_ImportModule`, which means that they will use any import hooks
-  that have been installed.  This is also encouraged for third-party extensions
-  that need to import some other module from C code.
+* Các phần mở rộng C nhập các mô-đun khác đã được thay đổi để sử dụng
+  :c:func:`PyImport_ImportModule`, nghĩa là chúng sẽ sử dụng mọi import hook đã được cài đặt. Điều này cũng được khuyến khích đối với các phần mở rộng bên thứ ba cần nhập một số mô-đun khác từ mã C.
 
-* The size of the Unicode character database was shrunk by another 340K thanks
-  to Fredrik Lundh.
+* Kích thước của cơ sở dữ liệu ký tự Unicode đã được giảm thêm 340K nhờ Fredrik Lundh.
 
-* Some new ports were contributed: MacOS X (by Steven Majewski), Cygwin (by
-  Jason Tishler); RISCOS (by Dietmar Schwertberger); Unixware 7  (by Billy G.
-  Allie).
+* Một số bản chuyển nền tảng mới đã được đóng góp: MacOS X (do Steven Majewski thực hiện), Cygwin (do Jason Tishler thực hiện); RISCOS (do Dietmar Schwertberger thực hiện); Unixware 7 (do Billy G. Allie thực hiện).
 
-And there's the usual list of minor bugfixes, minor memory leaks, docstring
-edits, and other tweaks, too lengthy to be worth itemizing; see the CVS logs for
-the full details if you want them.
+Ngoài ra còn có danh sách thông thường gồm các bản sửa lỗi nhỏ, các rò rỉ bộ nhớ nhỏ, các chỉnh sửa docstring và những tinh chỉnh khác, quá dài nên không đáng liệt kê từng mục; hãy xem các nhật ký CVS để biết đầy đủ chi tiết nếu bạn cần.
 
 .. ======================================================================
 
 
-Acknowledgements
-================
+Lời cảm ơn
+==========
 
-The author would like to thank the following people for offering suggestions on
-various drafts of this article: Graeme Cross, David Goodger, Jay Graves, Michael
-Hudson, Marc-André Lemburg, Fredrik Lundh, Neil Schemenauer, Thomas Wouters.
+Tác giả xin cảm ơn những người sau đây đã đưa ra các đề xuất cho nhiều bản nháp khác nhau của bài viết này: Graeme Cross, David Goodger, Jay Graves, Michael Hudson, Marc-André Lemburg, Fredrik Lundh, Neil Schemenauer, Thomas Wouters.
 
+.. _`available in the Internet Archive Wayback Machine`: https://web.archive.org/web/20090130140102/http://www.vex.net/parnassus/

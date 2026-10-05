@@ -1,6 +1,6 @@
-****************************
-  What's New In Python 3.0
-****************************
+**************************
+Có gì mới trong Python 3.0
+**************************
 
 .. XXX Add trademark info for Apple, Microsoft.
 
@@ -51,28 +51,11 @@
    when researching a change.  (Again, I didn't get to this for 3.0.
    GvR.)
 
-This article explains the new features in Python 3.0, compared to 2.6.
-Python 3.0, also known as "Python 3000" or "Py3K", is the first ever
-*intentionally backwards incompatible* Python release. Python 3.0 was released on December 3, 2008.
-There are more changes than in a typical release, and more that are important for all
-Python users. Nevertheless, after digesting the changes, you'll find
-that Python really hasn't changed all that much -- by and large, we're
-mostly fixing well-known annoyances and warts, and removing a lot of
-old cruft.
+Bài viết này giải thích các tính năng mới trong Python 3.0 so với 2.6. Python 3.0, còn được gọi là "Python 3000" hoặc "Py3K", là bản phát hành Python đầu tiên *cố ý không tương thích ngược*. Python 3.0 được phát hành vào ngày 3 tháng 12 năm 2008. Bản phát hành này có nhiều thay đổi hơn một bản phát hành thông thường, và nhiều thay đổi trong số đó quan trọng đối với tất cả người dùng Python. Tuy nhiên, sau khi tìm hiểu các thay đổi, bạn sẽ thấy Python thực sự không thay đổi quá nhiều -- nhìn chung, chúng ta chủ yếu sửa những điều phiền toái và khiếm khuyết đã được biết đến từ lâu, đồng thời loại bỏ rất nhiều phần dư thừa cũ.
 
-This article doesn't attempt to provide a complete specification of
-all new features, but instead tries to give a convenient overview.
-For full details, you should refer to the documentation for Python
-3.0, and/or the many PEPs referenced in the text. If you want to
-understand the complete implementation and design rationale for a
-particular feature, PEPs usually have more details than the regular
-documentation; but note that PEPs usually are not kept up-to-date once
-a feature has been fully implemented.
+Bài viết này không nhằm cung cấp đặc tả đầy đủ về tất cả các tính năng mới, mà cố gắng đưa ra một cái nhìn tổng quan thuận tiện. Để biết đầy đủ chi tiết, bạn nên tham khảo tài liệu về Python 3.0 và/hoặc nhiều PEP được tham chiếu trong văn bản. Nếu muốn hiểu đầy đủ cách triển khai và lý do thiết kế của một tính năng cụ thể, các PEP thường có nhiều chi tiết hơn tài liệu thông thường; tuy nhiên, lưu ý rằng các PEP thường không được cập nhật nữa sau khi một tính năng đã được triển khai hoàn chỉnh.
 
-Due to time constraints this document is not as complete as it should
-have been.  As always for a new release, the ``Misc/NEWS`` file in the
-source distribution contains a wealth of detailed information about
-every small thing that was changed.
+Do hạn chế về thời gian, tài liệu này chưa đầy đủ như lẽ ra phải có. Như mọi khi đối với một bản phát hành mới, tệp ``Misc/NEWS`` trong source distribution chứa rất nhiều thông tin chi tiết về mọi thay đổi nhỏ.
 
 .. Compare with previous release in 2 - 3 sentences here.
 .. add hyperlink when the documentation becomes available online.
@@ -85,18 +68,15 @@ every small thing that was changed.
 .. ======================================================================
 
 
-Common Stumbling Blocks
-=======================
+Những điểm dễ vướng mắc thường gặp
+==================================
 
-This section lists those few changes that are most likely to trip you
-up if you're used to Python 2.5.
+Phần này liệt kê một số thay đổi có nhiều khả năng khiến bạn gặp khó khăn nhất nếu đã quen với Python 2.5.
 
-Print Is A Function
--------------------
+Print là một hàm
+----------------
 
-The ``print`` statement has been replaced with a :func:`print`
-function, with keyword arguments to replace most of the special syntax
-of the old ``print`` statement (:pep:`3105`).  Examples::
+Câu lệnh ``print`` đã được thay thế bằng hàm :func:`print`, với các đối số từ khóa để thay thế hầu hết cú pháp đặc biệt của câu lệnh ``print`` cũ (:pep:`3105`). Ví dụ::
 
   Old: print "The answer is", 2*2
   New: print("The answer is", 2*2)
@@ -113,311 +93,169 @@ of the old ``print`` statement (:pep:`3105`).  Examples::
   Old: print (x, y)       # prints repr((x, y))
   New: print((x, y))      # Not the same as print(x, y)!
 
-You can also customize the separator between items, e.g.::
+Bạn cũng có thể tùy chỉnh dấu phân cách giữa các mục, chẳng hạn như::
 
   print("There are <", 2**32, "> possibilities!", sep="")
 
-which produces:
+kết quả là:
 
 .. code-block:: none
 
   There are <4294967296> possibilities!
 
-Note:
+Lưu ý:
 
-* The :func:`print` function doesn't support the "softspace" feature of
-  the old ``print`` statement.  For example, in Python 2.x,
-  ``print "A\n", "B"`` would write ``"A\nB\n"``; but in Python 3.0,
-  ``print("A\n", "B")`` writes ``"A\n B\n"``.
+* Hàm :func:`print` không hỗ trợ tính năng "softspace" của câu lệnh ``print`` cũ. Ví dụ: trong Python 2.x, ``print "A\n", "B"`` sẽ ghi ``"A\nB\n"``; nhưng trong Python 3.0, ``print("A\n", "B")`` ghi ``"A\n B\n"``.
 
-* Initially, you'll be finding yourself typing the old ``print x``
-  a lot in interactive mode.  Time to retrain your fingers to type
-  ``print(x)`` instead!
+* Ban đầu, bạn sẽ thấy mình thường xuyên gõ ``print x`` trong chế độ tương tác. Đã đến lúc rèn lại thói quen gõ ``print(x)`` thay thế!
 
-* When using the ``2to3`` source-to-source conversion tool, all
-  ``print`` statements are automatically converted to
-  :func:`print` function calls, so this is mostly a non-issue for
-  larger projects.
+* Khi sử dụng công cụ chuyển đổi source-to-source ``2to3``, tất cả các câu lệnh ``print`` sẽ tự động được chuyển đổi thành
+  các lệnh gọi hàm :func:`print`, vì vậy đây hầu như không phải là vấn đề đối với các dự án lớn.
 
-Views And Iterators Instead Of Lists
--------------------------------------
+Views Và Iterators Thay Vì Lists
+--------------------------------
 
-Some well-known APIs no longer return lists:
+Một số API phổ biến không còn trả về lists nữa:
 
-* :class:`dict` methods :meth:`dict.keys`, :meth:`dict.items` and
-  :meth:`dict.values` return "views" instead of lists.  For example,
-  this no longer works: ``k = d.keys(); k.sort()``.  Use ``k =
-  sorted(d)`` instead (this works in Python 2.5 too and is just
-  as efficient).
+* Các phương thức :class:`dict` :meth:`dict.keys`, :meth:`dict.items` và
+  :meth:`dict.values` trả về “views” thay vì lists. Ví dụ: đoạn mã sau không còn hoạt động: ``k = d.keys(); k.sort()``. Thay vào đó, hãy sử dụng ``k = sorted(d)`` (cách này cũng hoạt động trong Python 2.5 và hiệu quả tương đương).
 
-* Also, the :meth:`!dict.iterkeys`, :meth:`!dict.iteritems` and
-  :meth:`!dict.itervalues` methods are no longer supported.
+* Ngoài ra, :meth:`!dict.iterkeys`, :meth:`!dict.iteritems` và
+  Các phương thức :meth:`!dict.itervalues` không còn được hỗ trợ.
 
-* :func:`map` and :func:`filter` return iterators.  If you really need
-  a list and the input sequences are all of equal length, a quick
-  fix is to wrap :func:`map` in :func:`list`, e.g. ``list(map(...))``,
-  but a better fix is
-  often to use a list comprehension (especially when the original code
-  uses :keyword:`lambda`), or rewriting the code so it doesn't need a
-  list at all.  Particularly tricky is :func:`map` invoked for the
-  side effects of the function; the correct transformation is to use a
-  regular :keyword:`for` loop (since creating a list would just be
-  wasteful).
+* :func:`map` và :func:`filter` trả về các iterator. Nếu thực sự cần một danh sách và tất cả các dãy đầu vào đều có cùng độ dài, cách khắc phục nhanh là bọc :func:`map` trong :func:`list`, chẳng hạn ``list(map(...))``, nhưng cách khắc phục tốt hơn thường là sử dụng list comprehension (đặc biệt khi mã gốc sử dụng :keyword:`lambda`), hoặc viết lại mã để không cần danh sách. Trường hợp đặc biệt khó xử là :func:`map` được gọi để tạo ra các side effect của hàm; cách chuyển đổi đúng là sử dụng vòng lặp :keyword:`for` thông thường (vì việc tạo một danh sách sẽ chỉ gây lãng phí).
 
-  If the input sequences are not of equal length, :func:`map` will
-  stop at the termination of the shortest of the sequences. For full
-  compatibility with :func:`map` from Python 2.x, also wrap the sequences in
-  :func:`itertools.zip_longest`, e.g. ``map(func, *sequences)`` becomes
-  ``list(map(func, itertools.zip_longest(*sequences)))``.
+  Nếu các dãy đầu vào không có cùng độ dài, :func:`map` sẽ dừng khi dãy ngắn nhất kết thúc. Để tương thích đầy đủ với :func:`map` trong Python 2.x, cũng bọc các dãy trong
+  :func:`itertools.zip_longest`, chẳng hạn ``map(func, *sequences)`` trở thành ``list(map(func, itertools.zip_longest(*sequences)))``.
 
-* :func:`range` now behaves like :func:`!xrange` used to behave, except
-  it works with values of arbitrary size.  The latter no longer
-  exists.
+* :func:`range` giờ hoạt động giống như :func:`!xrange` trước đây, ngoại trừ việc nó hoạt động với các giá trị có kích thước tùy ý. Đối tượng sau không còn tồn tại.
 
-* :func:`zip` now returns an iterator.
+* :func:`zip` giờ trả về một iterator.
 
-Ordering Comparisons
---------------------
+Các phép so sánh thứ tự
+-----------------------
 
-Python 3.0 has simplified the rules for ordering comparisons:
+Python 3.0 đã đơn giản hóa các quy tắc so sánh thứ tự:
 
-* The ordering comparison operators (``<``, ``<=``, ``>=``, ``>``)
-  raise a TypeError exception when the operands don't have a
-  meaningful natural ordering.  Thus, expressions like ``1 < ''``, ``0
-  > None`` or ``len <= len`` are no longer valid, and e.g. ``None <
-  None`` raises :exc:`TypeError` instead of returning
-  ``False``.  A corollary is that sorting a heterogeneous list
-  no longer makes sense -- all the elements must be comparable to each
-  other.  Note that this does not apply to the ``==`` and ``!=``
-  operators: objects of different incomparable types always compare
-  unequal to each other.
+* Các toán tử so sánh thứ tự (``<``, ``<=``, ``>=``, ``>``) sẽ phát sinh ngoại lệ TypeError khi các toán hạng không có thứ tự tự nhiên có ý nghĩa. Do đó, các biểu thức như ``1 < ''``, ``0 > None`` hoặc ``len <= len`` không còn hợp lệ, và chẳng hạn ``None < None`` sẽ phát sinh :exc:`TypeError` thay vì trả về ``False``. Hệ quả là việc sắp xếp một danh sách không đồng nhất không còn hợp lý -- tất cả các phần tử phải có thể so sánh với nhau. Lưu ý rằng điều này không áp dụng cho các toán tử ``==`` và ``!=``: các đối tượng thuộc những kiểu khác nhau và không thể so sánh luôn được xem là không bằng nhau.
 
-* :meth:`sorted` and :meth:`list.sort` no longer accept the
-  *cmp* argument providing a comparison function.  Use the *key*
-  argument instead. N.B. the *key* and *reverse* arguments are now
-  "keyword-only".
+* :meth:`sorted` và :meth:`list.sort` không còn chấp nhận đối số *cmp* cung cấp một hàm so sánh. Thay vào đó, hãy sử dụng đối số *key*. Lưu ý: các đối số *key* và *reverse* hiện là các đối số "chỉ dùng cho từ khóa".
 
-* The :func:`!cmp` function should be treated as gone, and the :meth:`!__cmp__`
-  special method is no longer supported.  Use :meth:`~object.__lt__` for sorting,
-  :meth:`~object.__eq__` with :meth:`~object.__hash__`, and other rich comparisons as needed.
-  (If you really need the :func:`!cmp` functionality, you could use the
-  expression ``(a > b) - (a < b)`` as the equivalent for ``cmp(a, b)``.)
+* Nên xem hàm :func:`!cmp` như đã bị loại bỏ, và phương thức đặc biệt :meth:`!__cmp__` không còn được hỗ trợ. Hãy sử dụng :meth:`~object.__lt__` để sắp xếp,
+  :meth:`~object.__eq__` với :meth:`~object.__hash__`, và các phép so sánh rich khác khi cần. (Nếu thực sự cần chức năng :func:`!cmp`, bạn có thể sử dụng biểu thức ``(a > b) - (a < b)`` làm tương đương với ``cmp(a, b)``.)
 
-Integers
---------
+Số nguyên
+---------
 
-* :pep:`237`: Essentially, :class:`!long` renamed to :class:`int`.
-  That is, there is only one built-in integral type, named
-  :class:`int`; but it behaves mostly like the old :class:`!long` type.
+* :pep:`237`: Về cơ bản, :class:`!long` được đổi tên thành :class:`int`. Nghĩa là, chỉ có một kiểu số nguyên tích hợp sẵn, có tên
+  :class:`int`; nhưng phần lớn nó hoạt động giống kiểu :class:`!long` cũ.
 
-* :pep:`238`: An expression like ``1/2`` returns a float.  Use
-  ``1//2`` to get the truncating behavior.  (The latter syntax has
-  existed for years, at least since Python 2.2.)
+* :pep:`238`: Một biểu thức như ``1/2`` trả về một số thực. Dùng ``1//2`` để có hành vi cắt bỏ phần thập phân. (Cú pháp sau đã tồn tại nhiều năm, ít nhất là từ Python 2.2.)
 
-* The :data:`!sys.maxint` constant was removed, since there is no
-  longer a limit to the value of integers.  However, :data:`sys.maxsize`
-  can be used as an integer larger than any practical list or string
-  index.  It conforms to the implementation's "natural" integer size
-  and is typically the same as :data:`!sys.maxint` in previous releases
-  on the same platform (assuming the same build options).
+* Hằng số :data:`!sys.maxint` đã bị loại bỏ vì giờ đây không còn giới hạn đối với giá trị của số nguyên. Tuy nhiên, có thể dùng :data:`sys.maxsize` làm một số nguyên lớn hơn bất kỳ chỉ mục danh sách hoặc chuỗi nào trong thực tế. Nó tuân theo kích thước số nguyên "tự nhiên" của implementation và thường giống với :data:`!sys.maxint` trong các bản phát hành trước trên cùng một nền tảng (với điều kiện các tùy chọn build giống nhau).
 
-* The :func:`repr` of a long integer doesn't include the trailing ``L``
-  anymore, so code that unconditionally strips that character will
-  chop off the last digit instead.  (Use :func:`str` instead.)
+* :func:`repr` của một số nguyên dài không còn bao gồm ``L`` ở cuối nữa, vì vậy mã luôn loại bỏ ký tự đó sẽ vô tình cắt mất chữ số cuối. (Thay vào đó, hãy dùng :func:`str`.)
 
-* Octal literals are no longer of the form ``0720``; use ``0o720``
-  instead.
+* Các literal bát phân không còn có dạng ``0720``; thay vào đó, hãy dùng ``0o720``.
 
-Text Vs. Data Instead Of Unicode Vs. 8-bit
-------------------------------------------
+Văn bản và Dữ liệu thay vì Unicode và 8-bit
+-------------------------------------------
 
-Everything you thought you knew about binary data and Unicode has
-changed.
+Mọi điều bạn từng nghĩ mình biết về dữ liệu nhị phân và Unicode đã thay đổi.
 
-* Python 3.0 uses the concepts of *text* and (binary) *data* instead
-  of Unicode strings and 8-bit strings.  All text is Unicode; however
-  *encoded* Unicode is represented as binary data.  The type used to
-  hold text is :class:`str`, the type used to hold data is
-  :class:`bytes`.  The biggest difference with the 2.x situation is
-  that any attempt to mix text and data in Python 3.0 raises
-  :exc:`TypeError`, whereas if you were to mix Unicode and 8-bit
-  strings in Python 2.x, it would work if the 8-bit string happened to
-  contain only 7-bit (ASCII) bytes, but you would get
-  :exc:`UnicodeDecodeError` if it contained non-ASCII values.  This
-  value-specific behavior has caused numerous sad faces over the
-  years.
+* Python 3.0 sử dụng các khái niệm *text* và (binary) *data* thay vì chuỗi Unicode và chuỗi 8-bit. Mọi text đều là Unicode; tuy nhiên Unicode *encoded* được biểu diễn dưới dạng binary data. Kiểu dùng để chứa text là :class:`str`, kiểu dùng để chứa data là
+  :class:`bytes`. Điểm khác biệt lớn nhất so với tình huống trong 2.x là mọi nỗ lực trộn text và data trong Python 3.0 đều gây ra
+  :exc:`TypeError`, trong khi nếu bạn trộn chuỗi Unicode và chuỗi 8-bit trong Python 2.x, thao tác đó sẽ hoạt động nếu chuỗi 8-bit chỉ chứa các byte 7-bit (ASCII), nhưng bạn sẽ nhận được
+  :exc:`UnicodeDecodeError` nếu nó chứa các giá trị không phải ASCII. Hành vi phụ thuộc vào giá trị này đã khiến nhiều người thất vọng trong nhiều năm.
 
-* As a consequence of this change in philosophy, pretty much all code
-  that uses Unicode, encodings or binary data most likely has to
-  change.  The change is for the better, as in the 2.x world there
-  were numerous bugs having to do with mixing encoded and unencoded
-  text.  To be prepared in Python 2.x, start using :class:`!unicode`
-  for all unencoded text, and :class:`str` for binary or encoded data
-  only.  Then the ``2to3`` tool will do most of the work for you.
+* Do thay đổi trong quan điểm này, gần như mọi code sử dụng Unicode, encoding hoặc binary data rất có thể đều phải thay đổi. Đây là một thay đổi theo hướng tốt hơn, vì trong thế giới 2.x có rất nhiều bug liên quan đến việc trộn text đã được encode và chưa được encode. Để chuẩn bị cho Python 2.x, hãy bắt đầu sử dụng :class:`!unicode` cho mọi text chưa được encode và chỉ sử dụng :class:`str` cho binary hoặc encoded data. Sau đó, công cụ ``2to3`` sẽ thực hiện phần lớn công việc cho bạn.
 
-* You can no longer use ``u"..."`` literals for Unicode text.
-  However, you must use ``b"..."`` literals for binary data.
+* Bạn không thể tiếp tục sử dụng các literal ``u"..."`` cho text Unicode. Tuy nhiên, bạn phải sử dụng các literal ``b"..."`` cho binary data.
 
-* As the :class:`str` and :class:`bytes` types cannot be mixed, you
-  must always explicitly convert between them.  Use :meth:`str.encode`
-  to go from :class:`str` to :class:`bytes`, and :meth:`bytes.decode`
-  to go from :class:`bytes` to :class:`str`.  You can also use
-  ``bytes(s, encoding=...)`` and ``str(b, encoding=...)``,
-  respectively.
+* Vì không thể trộn các kiểu :class:`str` và :class:`bytes`, bạn luôn phải chuyển đổi rõ ràng giữa chúng. Sử dụng :meth:`str.encode` để chuyển từ :class:`str` sang :class:`bytes`, và :meth:`bytes.decode` để chuyển từ :class:`bytes` sang :class:`str`. Bạn cũng có thể lần lượt sử dụng ``bytes(s, encoding=...)`` và ``str(b, encoding=...)``.
 
-* Like :class:`str`, the :class:`bytes` type is immutable.  There is a
-  separate *mutable* type to hold buffered binary data,
-  :class:`bytearray`.  Nearly all APIs that accept :class:`bytes` also
-  accept :class:`bytearray`.  The mutable API is based on
+* Giống như :class:`str`, kiểu :class:`bytes` là bất biến. Có một kiểu *mutable* riêng để chứa dữ liệu nhị phân đã đệm,
+  :class:`bytearray`. Gần như mọi API chấp nhận :class:`bytes` cũng chấp nhận :class:`bytearray`. API có thể thay đổi này dựa trên
   :class:`collections.MutableSequence <collections.abc.MutableSequence>`.
 
-* All backslashes in raw string literals are interpreted literally.
-  This means that ``'\U'`` and ``'\u'`` escapes in raw strings are not
-  treated specially.  For example, ``r'\u20ac'`` is a string of 6
-  characters in Python 3.0, whereas in 2.6, ``ur'\u20ac'`` was the
-  single "euro" character.  (Of course, this change only affects raw
-  string literals; the euro character is ``'\u20ac'`` in Python 3.0.)
+* Tất cả dấu gạch chéo ngược trong các string literal thô đều được diễn giải theo nghĩa đen. Điều này có nghĩa là các escape ``'\U'`` và ``'\u'`` trong string thô không được xử lý đặc biệt. Ví dụ, ``r'\u20ac'`` là một chuỗi gồm 6 ký tự trong Python 3.0, trong khi ở 2.6, ``ur'\u20ac'`` là ký tự "euro" duy nhất. (Dĩ nhiên, thay đổi này chỉ ảnh hưởng đến các string literal thô; ký tự euro là ``'\u20ac'`` trong Python 3.0.)
 
-* The built-in :class:`!basestring` abstract type was removed.  Use
-  :class:`str` instead.  The :class:`str` and :class:`bytes` types
-  don't have functionality enough in common to warrant a shared base
-  class.  The ``2to3`` tool (see below) replaces every occurrence of
-  :class:`!basestring` with :class:`str`.
+* Kiểu trừu tượng tích hợp sẵn :class:`!basestring` đã bị loại bỏ. Thay vào đó, hãy sử dụng
+  :class:`str`. Các kiểu :class:`str` và :class:`bytes` không có đủ chức năng chung để cần một lớp cơ sở dùng chung. Công cụ ``2to3`` (xem bên dưới) thay thế mọi lần xuất hiện của
+  :class:`!basestring` bằng :class:`str`.
 
-* Files opened as text files (still the default mode for :func:`open`)
-  always use an encoding to map between strings (in memory) and bytes
-  (on disk).  Binary files (opened with a ``b`` in the mode argument)
-  always use bytes in memory.  This means that if a file is opened
-  using an incorrect mode or encoding, I/O will likely fail loudly,
-  instead of silently producing incorrect data.  It also means that
-  even Unix users will have to specify the correct mode (text or
-  binary) when opening a file.  There is a platform-dependent default
-  encoding, which on Unixy platforms can be set with the ``LANG``
-  environment variable (and sometimes also with some other
-  platform-specific locale-related environment variables).  In many
-  cases, but not all, the system default is UTF-8; you should never
-  count on this default.  Any application reading or writing more than
-  pure ASCII text should probably have a way to override the encoding.
-  There is no longer any need for using the encoding-aware streams
-  in the :mod:`codecs` module.
+* Các tệp được mở dưới dạng tệp văn bản (vẫn là chế độ mặc định của :func:`open`) luôn sử dụng một encoding để ánh xạ giữa các chuỗi (trong bộ nhớ) và byte (trên đĩa). Các tệp nhị phân (được mở với ``b`` trong đối số mode) luôn sử dụng byte trong bộ nhớ. Điều này có nghĩa là nếu một tệp được mở bằng mode hoặc encoding không chính xác, thao tác I/O có khả năng sẽ thất bại rõ ràng, thay vì âm thầm tạo ra dữ liệu không chính xác. Điều đó cũng có nghĩa là ngay cả người dùng Unix cũng sẽ phải chỉ định mode chính xác (text hoặc binary) khi mở tệp. Có một encoding mặc định phụ thuộc vào nền tảng; trên các nền tảng kiểu Unix, encoding này có thể được thiết lập bằng biến môi trường ``LANG`` (và đôi khi cũng bằng một số biến môi trường khác dành riêng cho nền tảng liên quan đến locale). Trong nhiều trường hợp, nhưng không phải tất cả, mặc định của hệ thống là UTF-8; bạn không bao giờ nên mặc định dựa vào điều này. Bất kỳ ứng dụng nào đọc hoặc ghi văn bản ngoài ASCII thuần túy có lẽ nên có cách ghi đè encoding. Không còn cần sử dụng các stream hỗ trợ encoding trong module :mod:`codecs` nữa.
 
-* The initial values of :data:`sys.stdin`, :data:`sys.stdout` and
-  :data:`sys.stderr` are now unicode-only text files (i.e., they are
-  instances of :class:`io.TextIOBase`).  To read and write bytes data
-  with these streams, you need to use their :data:`io.TextIOBase.buffer`
-  attribute.
+* Các giá trị ban đầu của :data:`sys.stdin`, :data:`sys.stdout` và
+  :data:`sys.stderr` hiện là các tệp văn bản chỉ chứa Unicode (tức là chúng là các instance của :class:`io.TextIOBase`). Để đọc và ghi dữ liệu byte bằng các stream này, bạn cần sử dụng thuộc tính :data:`io.TextIOBase.buffer` của chúng.
 
-* Filenames are passed to and returned from APIs as (Unicode) strings.
-  This can present platform-specific problems because on some
-  platforms filenames are arbitrary byte strings.  (On the other hand,
-  on Windows filenames are natively stored as Unicode.)  As a
-  work-around, most APIs (e.g. :func:`open` and many functions in the
-  :mod:`os` module) that take filenames accept :class:`bytes` objects
-  as well as strings, and a few APIs have a way to ask for a
-  :class:`bytes` return value.  Thus, :func:`os.listdir` returns a
-  list of :class:`bytes` instances if the argument is a :class:`bytes`
-  instance, and :func:`os.getcwdb` returns the current working
-  directory as a :class:`bytes` instance.  Note that when
-  :func:`os.listdir` returns a list of strings, filenames that
-  cannot be decoded properly are omitted rather than raising
+* Tên tệp được truyền đến và trả về từ các API dưới dạng chuỗi (Unicode). Điều này có thể gây ra các vấn đề phụ thuộc nền tảng vì trên một số nền tảng, tên tệp là các chuỗi byte tùy ý. (Mặt khác, trên Windows, tên tệp vốn được lưu trữ dưới dạng Unicode.) Để khắc phục, hầu hết các API (ví dụ :func:`open` và nhiều hàm trong
+  module :mod:`os`) nhận tên tệp đều chấp nhận các đối tượng :class:`bytes` cũng như các chuỗi, và một số API có cách để yêu cầu giá trị trả về dạng
+  :class:`bytes`. Vì vậy, :func:`os.listdir` trả về một danh sách các instance :class:`bytes` nếu đối số là một instance :class:`bytes`, còn :func:`os.getcwdb` trả về thư mục làm việc hiện tại dưới dạng một instance :class:`bytes`. Lưu ý rằng khi
+  :func:`os.listdir` trả về một danh sách chuỗi, các tên tệp không thể được giải mã chính xác sẽ bị bỏ qua thay vì phát sinh
   :exc:`UnicodeError`.
 
-* Some system APIs like :data:`os.environ` and :data:`sys.argv` can
-  also present problems when the bytes made available by the system is
-  not interpretable using the default encoding.  Setting the ``LANG``
-  variable and rerunning the program is probably the best approach.
+* Một số API hệ thống như :data:`os.environ` và :data:`sys.argv` cũng có thể gây ra vấn đề khi các byte do hệ thống cung cấp không thể được diễn giải bằng encoding mặc định. Đặt biến ``LANG`` rồi chạy lại chương trình có lẽ là cách tốt nhất.
 
-* :pep:`3138`: The :func:`repr` of a string no longer escapes
-  non-ASCII characters.  It still escapes control characters and code
-  points with non-printable status in the Unicode standard, however.
+* :pep:`3138`: :func:`repr` của một chuỗi không còn escape các ký tự non-ASCII nữa. Tuy nhiên, nó vẫn escape các ký tự điều khiển và những code point có trạng thái không thể in trong tiêu chuẩn Unicode.
 
-* :pep:`3120`: The default source encoding is now UTF-8.
+* :pep:`3120`: Encoding nguồn mặc định hiện là UTF-8.
 
-* :pep:`3131`: Non-ASCII letters are now allowed in identifiers.
-  (However, the standard library remains ASCII-only with the exception
-  of contributor names in comments.)
+* :pep:`3131`: Các chữ cái non-ASCII hiện được phép dùng trong identifier. (Tuy nhiên, standard library vẫn chỉ dùng ASCII, ngoại trừ tên của những người đóng góp trong comment.)
 
-* The :mod:`!StringIO` and :mod:`!cStringIO` modules are gone.  Instead,
-  import the :mod:`io` module and use :class:`io.StringIO` or
-  :class:`io.BytesIO` for text and data respectively.
+* Các module :mod:`!StringIO` và :mod:`!cStringIO` đã bị loại bỏ. Thay vào đó, hãy import module :mod:`io` và sử dụng :class:`io.StringIO` hoặc
+  :class:`io.BytesIO` lần lượt cho text và data.
 
-* See also the :ref:`unicode-howto`, which was updated for Python 3.0.
+* Xem thêm :ref:`unicode-howto`, đã được cập nhật cho Python 3.0.
 
 
-Overview Of Syntax Changes
-==========================
+Tổng quan về các thay đổi cú pháp
+=================================
 
-This section gives a brief overview of every *syntactic* change in
-Python 3.0.
+Phần này cung cấp tổng quan ngắn gọn về mọi thay đổi *cú pháp* trong Python 3.0.
 
-New Syntax
-----------
+Cú pháp mới
+-----------
 
-* :pep:`3107`: Function argument and return value annotations.  This
-  provides a standardized way of annotating a function's parameters
-  and return value.  There are no semantics attached to such
-  annotations except that they can be introspected at runtime using
-  the :attr:`~object.__annotations__` attribute.  The intent is to
-  encourage experimentation through metaclasses, decorators or frameworks.
+* :pep:`3107`: Chú thích hàm và giá trị trả về. Điều này cung cấp một cách chuẩn hóa để chú thích các tham số và giá trị trả về của hàm. Những chú thích như vậy không có ngữ nghĩa nào khác, ngoại trừ việc có thể được kiểm tra trong runtime bằng thuộc tính :attr:`~object.__annotations__`. Mục đích là khuyến khích thử nghiệm thông qua metaclass, decorator hoặc framework.
 
-* :pep:`3102`: Keyword-only arguments.  Named parameters occurring
-  after ``*args`` in the parameter list *must* be specified using
-  keyword syntax in the call.  You can also use a bare ``*`` in the
-  parameter list to indicate that you don't accept a variable-length
-  argument list, but you do have keyword-only arguments.
+* :pep:`3102`: Đối số chỉ dùng từ khóa. Các tham số được đặt tên xuất hiện sau ``*args`` trong danh sách tham số *phải* được chỉ định bằng cú pháp từ khóa khi gọi hàm. Bạn cũng có thể sử dụng ``*`` đứng riêng trong danh sách tham số để cho biết rằng bạn không chấp nhận danh sách đối số có độ dài thay đổi, nhưng có các đối số chỉ dùng từ khóa.
 
-* Keyword arguments are allowed after the list of base classes in a
-  class definition.  This is used by the new convention for specifying
-  a metaclass (see next section), but can be used for other purposes
-  as well, as long as the metaclass supports it.
+* Các đối số từ khóa được phép xuất hiện sau danh sách lớp cơ sở trong định nghĩa lớp. Điều này được dùng trong quy ước mới để chỉ định metaclass (xem phần tiếp theo), nhưng cũng có thể được dùng cho các mục đích khác, miễn là metaclass hỗ trợ nó.
 
-* :pep:`3104`: :keyword:`nonlocal` statement.  Using ``nonlocal x``
-  you can now assign directly to a variable in an outer (but
-  non-global) scope.  :keyword:`!nonlocal` is a new reserved word.
+* :pep:`3104`: Câu lệnh :keyword:`nonlocal`. Khi sử dụng ``nonlocal x``, giờ đây bạn có thể gán trực tiếp cho một biến trong phạm vi bên ngoài (nhưng không phải phạm vi toàn cục). :keyword:`!nonlocal` là một từ dành riêng mới.
 
-* :pep:`3132`: Extended Iterable Unpacking.  You can now write things
-  like ``a, b, *rest = some_sequence``.  And even ``*rest, a =
-  stuff``.  The ``rest`` object is always a (possibly empty) list; the
-  right-hand side may be any iterable.  Example::
+* :pep:`3132`: Giải nén Iterable mở rộng. Giờ đây bạn có thể viết những biểu thức như ``a, b, *rest = some_sequence``. Thậm chí ``*rest, a = stuff``. Đối tượng ``rest`` luôn là một danh sách (có thể rỗng); vế phải có thể là bất kỳ iterable nào. Ví dụ::
 
     (a, *rest, b) = range(5)
 
-  This sets *a* to ``0``, *b* to ``4``, and *rest* to ``[1, 2, 3]``.
+  Lệnh này gán *a* thành ``0``, *b* thành ``4``, và *rest* thành ``[1, 2, 3]``.
 
-* Dictionary comprehensions: ``{k: v for k, v in stuff}`` means the
-  same thing as ``dict(stuff)`` but is more flexible.  (This is
-  :pep:`274` vindicated. :-)
+* Dictionary comprehension: ``{k: v for k, v in stuff}`` có cùng ý nghĩa với ``dict(stuff)`` nhưng linh hoạt hơn.  (Đây là
+  :pep:`274` đã được minh oan. :-)
 
-* Set literals, e.g. ``{1, 2}``.  Note that ``{}`` is an empty
-  dictionary; use ``set()`` for an empty set.  Set comprehensions are
-  also supported; e.g., ``{x for x in stuff}`` means the same thing as
-  ``set(stuff)`` but is more flexible.
+* Set literal, chẳng hạn ``{1, 2}``.  Lưu ý rằng ``{}`` là một dictionary rỗng; hãy dùng ``set()`` cho một set rỗng.  Set comprehension cũng được hỗ trợ; chẳng hạn, ``{x for x in stuff}`` có cùng ý nghĩa với ``set(stuff)`` nhưng linh hoạt hơn.
 
-* New octal literals, e.g. ``0o720`` (already in 2.6).  The old octal
-  literals (``0720``) are gone.
+* Literal bát phân mới, chẳng hạn ``0o720`` (đã có trong 2.6).  Literal bát phân cũ (``0720``) đã bị loại bỏ.
 
-* New binary literals, e.g. ``0b1010`` (already in 2.6), and
-  there is a new corresponding built-in function, :func:`bin`.
+* Literal nhị phân mới, chẳng hạn ``0b1010`` (đã có trong 2.6), và có một built-in function tương ứng mới là :func:`bin`.
 
-* Bytes literals are introduced with a leading ``b`` or ``B``, and
-  there is a new corresponding built-in function, :func:`bytes`.
+* Literal bytes được bắt đầu bằng ``b`` hoặc ``B``, và có một built-in function tương ứng mới là :func:`bytes`.
 
-Changed Syntax
---------------
+Cú pháp đã thay đổi
+-------------------
 
-* :pep:`3109` and :pep:`3134`: new :keyword:`raise` statement syntax:
-  :samp:`raise [{expr} [from {expr}]]`.  See below.
+* :pep:`3109` và :pep:`3134`: cú pháp câu lệnh :keyword:`raise` mới:
+  :samp:`raise [{expr} [from {expr}]]`.  Xem bên dưới.
 
-* :keyword:`!as` and :keyword:`with` are now reserved words.  (Since
-  2.6, actually.)
+* :keyword:`!as` và :keyword:`with` hiện là các từ khóa dành riêng.  (Thực ra, từ 2.6.)
 
-* ``True``, ``False``, and ``None`` are reserved words.  (2.6 partially enforced
-  the restrictions on ``None`` already.)
+* ``True``, ``False`` và ``None`` là các từ khóa dành riêng.  (2.6 đã thực thi một phần các hạn chế đối với ``None``.)
 
-* Change from :keyword:`except` *exc*, *var* to
-  :keyword:`!except` *exc* :keyword:`!as` *var*.  See :pep:`3110`.
+* Thay đổi từ :keyword:`except` *exc*, *var* thành
+  :keyword:`!except` *exc* :keyword:`!as` *var*.  Xem :pep:`3110`.
 
-* :pep:`3115`: New Metaclass Syntax.  Instead of::
+* :pep:`3115`: Cú pháp Metaclass mới.  Thay vì::
 
     class C:
         __metaclass__ = M
@@ -433,175 +271,111 @@ Changed Syntax
   new-style classes without deriving every class from
   :class:`object`.)
 
-* List comprehensions no longer support the syntactic form
-  :samp:`[... for {var} in {item1}, {item2}, ...]`.  Use
-  :samp:`[... for {var} in ({item1}, {item2}, ...)]` instead.
-  Also note that list comprehensions have different semantics: they
-  are closer to syntactic sugar for a generator expression inside a
-  :func:`list` constructor, and in particular the loop control
-  variables are no longer leaked into the surrounding scope.
+* List comprehensions không còn hỗ trợ dạng cú pháp
+  :samp:`[... for {var} in {item1}, {item2}, ...]`.  Hãy sử dụng
+  :samp:`[... for {var} in ({item1}, {item2}, ...)]` thay vào đó. Cũng lưu ý rằng list comprehensions có ngữ nghĩa khác: chúng gần với cú pháp rút gọn cho một biểu thức generator bên trong một
+  :func:`list` constructor, và đặc biệt là các biến điều khiển vòng lặp không còn bị rò rỉ vào phạm vi xung quanh.
 
-* The *ellipsis* (``...``) can be used as an atomic expression
-  anywhere.  (Previously it was only allowed in slices.)  Also, it
-  *must* now be spelled as ``...``.  (Previously it could also be
-  spelled as ``. . .``, by a mere accident of the grammar.)
+* *ellipsis* (``...``) có thể được dùng như một biểu thức nguyên tử ở bất kỳ đâu.  (Trước đây, nó chỉ được phép dùng trong các lát cắt.)  Ngoài ra, hiện nay nó *phải* được viết là ``...``.  (Trước đây, nó cũng có thể được viết là ``. . .``, chỉ do một sự tình cờ trong grammar.)
 
-Removed Syntax
---------------
+Cú pháp đã bị loại bỏ
+---------------------
 
-* :pep:`3113`: Tuple parameter unpacking removed.  You can no longer
-  write ``def foo(a, (b, c)): ...``.
-  Use ``def foo(a, b_c): b, c = b_c`` instead.
+* :pep:`3113`: Đã loại bỏ việc unpacking tham số kiểu tuple. Bạn không còn có thể viết ``def foo(a, (b, c)): ...``. Thay vào đó, hãy dùng ``def foo(a, b_c): b, c = b_c``.
 
-* Removed backticks (use :func:`repr` instead).
+* Đã loại bỏ backtick (thay vào đó, hãy dùng :func:`repr`).
 
-* Removed ``<>`` (use ``!=`` instead).
+* Đã loại bỏ ``<>`` (thay vào đó, hãy dùng ``!=``).
 
-* Removed keyword: :func:`exec` is no longer a keyword; it remains as
-  a function.  (Fortunately the function syntax was also accepted in
-  2.x.)  Also note that :func:`exec` no longer takes a stream argument;
-  instead of ``exec(f)`` you can use ``exec(f.read())``.
+* Đã loại bỏ từ khóa: :func:`exec` không còn là từ khóa; nó vẫn là một hàm. (May mắn là cú pháp hàm cũng được chấp nhận trong 2.x.) Ngoài ra, lưu ý rằng :func:`exec` không còn nhận đối số stream; thay vì ``exec(f)``, bạn có thể dùng ``exec(f.read())``.
 
-* Integer literals no longer support a trailing ``l`` or ``L``.
+* Các literal số nguyên không còn hỗ trợ ``l`` hoặc ``L`` ở cuối.
 
-* String literals no longer support a leading ``u`` or ``U``.
+* Các literal chuỗi không còn hỗ trợ ``u`` hoặc ``U`` ở đầu.
 
-* The :keyword:`from` *module* :keyword:`import` ``*`` syntax is only
-  allowed at the module level, no longer inside functions.
+* Cú pháp :keyword:`from` *module* :keyword:`import` ``*`` chỉ được phép ở cấp module, không còn được phép bên trong các hàm.
 
-* The only acceptable syntax for relative imports is :samp:`from .[{module}]
-  import {name}`.  All :keyword:`import` forms not starting with ``.`` are
-  interpreted as absolute imports.  (:pep:`328`)
+* Cú pháp duy nhất được chấp nhận cho import tương đối là :samp:`from .[{module}] import {name}`.  Mọi dạng :keyword:`import` không bắt đầu bằng ``.`` đều được diễn giải là import tuyệt đối.  (:pep:`328`)
 
-* Classic classes are gone.
+* Các class kiểu cổ điển không còn tồn tại.
 
 
-Changes Already Present In Python 2.6
-=====================================
+Các thay đổi đã có trong Python 2.6
+===================================
 
-Since many users presumably make the jump straight from Python 2.5 to
-Python 3.0, this section reminds the reader of new features that were
-originally designed for Python 3.0 but that were back-ported to Python
-2.6.  The corresponding sections in :ref:`whats-new-in-2.6` should be
-consulted for longer descriptions.
+Vì có lẽ nhiều người dùng sẽ chuyển thẳng từ Python 2.5 sang Python 3.0, phần này nhắc lại cho người đọc các tính năng mới vốn được thiết kế cho Python 3.0 nhưng đã được back-port về Python 2.6.  Nên tham khảo các phần tương ứng trong :ref:`whats-new-in-2.6` để xem mô tả chi tiết hơn.
 
-* :ref:`pep-0343`.  The :keyword:`with` statement is now a standard
-  feature and no longer needs to be imported from the :mod:`__future__`.
-  Also check out :ref:`new-26-context-managers` and
+* :ref:`pep-0343`.  Câu lệnh :keyword:`with` hiện là một tính năng tiêu chuẩn và không còn cần được import từ :mod:`__future__`. Đồng thời, hãy xem :ref:`new-26-context-managers` và
   :ref:`new-module-contextlib`.
 
-* :ref:`pep-0366`.  This enhances the usefulness of the :option:`-m`
-  option when the referenced module lives in a package.
+* :ref:`pep-0366`.  Điều này làm tăng tính hữu ích của tùy chọn :option:`-m` khi module được tham chiếu nằm trong một package.
 
 * :ref:`pep-0370`.
 
 * :ref:`pep-0371`.
 
-* :ref:`pep-3101`.  Note: the 2.6 description mentions the
-  :meth:`format` method for both 8-bit and Unicode strings.  In 3.0,
-  only the :class:`str` type (text strings with Unicode support)
-  supports this method; the :class:`bytes` type does not.  The plan is
-  to eventually make this the only API for string formatting, and to
-  start deprecating the ``%`` operator in Python 3.1.
+* :ref:`pep-3101`.  Lưu ý: phần mô tả về 2.6 đề cập đến
+  Phương thức :meth:`format` cho cả chuỗi 8-bit và chuỗi Unicode. Trong 3.0, chỉ kiểu :class:`str` (chuỗi văn bản có hỗ trợ Unicode) hỗ trợ phương thức này; kiểu :class:`bytes` thì không. Kế hoạch là cuối cùng biến đây thành API duy nhất để định dạng chuỗi, đồng thời bắt đầu loại bỏ dần toán tử ``%`` trong Python 3.1.
 
-* :ref:`pep-3105`.  This is now a standard feature and no longer needs
-  to be imported from :mod:`__future__`.  More details were given above.
+* :ref:`pep-3105`. Đây hiện là một tính năng tiêu chuẩn và không còn cần được import từ :mod:`__future__`. Phần trên đã cung cấp thêm chi tiết.
 
-* :ref:`pep-3110`.  The :keyword:`except` *exc* :keyword:`!as` *var*
-  syntax is now standard and :keyword:`!except` *exc*, *var* is no
-  longer supported.  (Of course, the :keyword:`!as` *var* part is still
-  optional.)
+* :ref:`pep-3110`. Cú pháp :keyword:`except` *exc* :keyword:`!as` *var* hiện đã là tiêu chuẩn và :keyword:`!except` *exc*, *var* không còn được hỗ trợ. (Tất nhiên, phần :keyword:`!as` *var* vẫn là tùy chọn.)
 
-* :ref:`pep-3112`.  The ``b"..."`` string literal notation (and its
-  variants like ``b'...'``, ``b"""..."""``, and ``br"..."``) now
-  produces a literal of type :class:`bytes`.
+* :ref:`pep-3112`. Ký hiệu literal chuỗi ``b"..."`` (và các biến thể như ``b'...'``, ``b"""..."""`` và ``br"..."``) hiện tạo ra một literal có kiểu :class:`bytes`.
 
-* :ref:`pep-3116`.  The :mod:`io` module is now the standard way of
-  doing file I/O.  The built-in :func:`open` function is now an
-  alias for :func:`io.open` and has additional keyword arguments
-  *encoding*, *errors*, *newline* and *closefd*.  Also note that an
-  invalid *mode* argument now raises :exc:`ValueError`, not
-  :exc:`IOError`.  The binary file object underlying a text file
-  object can be accessed as :attr:`!f.buffer` (but beware that the
-  text object maintains a buffer of itself in order to speed up
-  the encoding and decoding operations).
+* :ref:`pep-3116`. Module :mod:`io` hiện là cách tiêu chuẩn để thực hiện I/O tệp. Hàm dựng sẵn :func:`open` hiện là bí danh của :func:`io.open` và có thêm các đối số từ khóa *encoding*, *errors*, *newline* và *closefd*. Cũng lưu ý rằng một đối số *mode* không hợp lệ hiện tạo ra :exc:`ValueError`, chứ không
+  :exc:`IOError`. Đối tượng tệp nhị phân bên dưới đối tượng tệp văn bản có thể được truy cập dưới dạng :attr:`!f.buffer` (nhưng hãy cẩn thận vì đối tượng văn bản duy trì một bộ đệm của chính nó để tăng tốc các thao tác mã hóa và giải mã).
 
-* :ref:`pep-3118`.  The old builtin :func:`!buffer` is now really gone;
-  the new builtin :func:`memoryview` provides (mostly) similar
-  functionality.
+* :ref:`pep-3118`. Hàm dựng sẵn cũ :func:`!buffer` hiện thực sự đã bị loại bỏ; hàm dựng sẵn mới :func:`memoryview` cung cấp chức năng tương tự (phần lớn).
 
-* :ref:`pep-3119`.  The :mod:`abc` module and the ABCs defined in the
-  :mod:`collections` module plays a somewhat more prominent role in
-  the language now, and built-in collection types like :class:`dict`
-  and :class:`list` conform to the :class:`collections.MutableMapping <collections.abc.MutableMapping>`
-  and :class:`collections.MutableSequence <collections.abc.MutableSequence>` ABCs, respectively.
+* :ref:`pep-3119`.  Module :mod:`abc` và các ABC được định nghĩa trong
+  module :mod:`collections` hiện đóng vai trò nổi bật hơn đôi chút trong ngôn ngữ, và các kiểu collection dựng sẵn như :class:`dict` và :class:`list` lần lượt tuân theo các ABC :class:`collections.MutableMapping <collections.abc.MutableMapping>` và :class:`collections.MutableSequence <collections.abc.MutableSequence>`.
 
-* :ref:`pep-3127`.  As mentioned above, the new octal literal
-  notation is the only one supported, and binary literals have been
-  added.
+* :ref:`pep-3127`.  Như đã đề cập ở trên, chỉ ký hiệu literal bát phân mới được hỗ trợ, và literal nhị phân đã được bổ sung.
 
 * :ref:`pep-3129`.
 
-* :ref:`pep-3141`.  The :mod:`numbers` module is another new use of
-  ABCs, defining Python's "numeric tower".  Also note the new
-  :mod:`fractions` module which implements :class:`numbers.Rational`.
+* :ref:`pep-3141`.  Module :mod:`numbers` là một cách sử dụng ABC mới khác, dùng để định nghĩa “numeric tower” của Python.  Ngoài ra, hãy lưu ý đến
+  :mod:`fractions` module triển khai :class:`numbers.Rational`.
 
 
-Library Changes
-===============
+Thay đổi trong thư viện
+=======================
 
-Due to time constraints, this document does not exhaustively cover the
-very extensive changes to the standard library.  :pep:`3108` is the
-reference for the major changes to the library.  Here's a capsule
-review:
+Do hạn chế về thời gian, tài liệu này không trình bày toàn diện những thay đổi rất lớn đối với standard library.  :pep:`3108` là tài liệu tham khảo về những thay đổi chính đối với thư viện.  Dưới đây là phần tổng quan ngắn gọn:
 
-* Many old modules were removed.  Some, like :mod:`!gopherlib` (no
-  longer used) and :mod:`!md5` (replaced by :mod:`hashlib`), were
-  already deprecated by :pep:`4`.  Others were removed as a result
-  of the removal of support for various platforms such as Irix, BeOS
-  and Mac OS 9 (see :pep:`11`).  Some modules were also selected for
-  removal in Python 3.0 due to lack of use or because a better
-  replacement exists.  See :pep:`3108` for an exhaustive list.
+* Nhiều module cũ đã bị loại bỏ. Một số module, chẳng hạn như :mod:`!gopherlib` (không còn được sử dụng) và :mod:`!md5` (được thay thế bằng :mod:`hashlib`), đã bị phản đối từ :pep:`4`. Những module khác bị loại bỏ do ngừng hỗ trợ cho nhiều nền tảng khác nhau như Irix, BeOS và Mac OS 9 (xem :pep:`11`). Một số module cũng được chọn để loại bỏ trong Python 3.0 vì ít được sử dụng hoặc vì đã có một phần thay thế tốt hơn. Xem :pep:`3108` để biết danh sách đầy đủ.
 
-* The :mod:`!bsddb3` package was removed because its presence in the
-  core standard library has proved over time to be a particular burden
-  for the core developers due to testing instability and Berkeley DB's
-  release schedule.  However, the package is alive and well,
-  externally maintained at https://www.jcea.es/programacion/pybsddb.htm.
+* Gói :mod:`!bsddb3` bị loại bỏ vì theo thời gian, sự hiện diện của nó trong thư viện chuẩn cốt lõi đã trở thành một gánh nặng đặc biệt đối với các nhà phát triển cốt lõi do tính không ổn định khi kiểm thử và lịch phát hành của Berkeley DB. Tuy nhiên, gói này vẫn đang được duy trì và phát triển tốt bên ngoài tại https://www.jcea.es/programacion/pybsddb.htm.
 
-* Some modules were renamed because their old name disobeyed
-  :pep:`8`, or for various other reasons.  Here's the list:
+* Một số module được đổi tên vì tên cũ không tuân theo
+  :pep:`8`, hoặc vì nhiều lý do khác. Dưới đây là danh sách:
 
-  =======================  =======================
-  Old Name                 New Name
-  =======================  =======================
-  _winreg                  winreg
-  ConfigParser             configparser
-  copy_reg                 copyreg
-  Queue                    queue
-  SocketServer             socketserver
-  markupbase               _markupbase
-  repr                     reprlib
-  test.test_support        test.support
-  =======================  =======================
+  +-------------------+--------------+
+  | Tên cũ            | Tên mới      |
+  +===================+==============+
+  | _winreg           | winreg       |
+  +-------------------+--------------+
+  | ConfigParser      | configparser |
+  +-------------------+--------------+
+  | copy_reg          | copyreg      |
+  +-------------------+--------------+
+  | Queue             | queue        |
+  +-------------------+--------------+
+  | SocketServer      | socketserver |
+  +-------------------+--------------+
+  | markupbase        | _markupbase  |
+  +-------------------+--------------+
+  | repr              | reprlib      |
+  +-------------------+--------------+
+  | test.test_support | test.support |
+  +-------------------+--------------+
 
-* A common pattern in Python 2.x is to have one version of a module
-  implemented in pure Python, with an optional accelerated version
-  implemented as a C extension; for example, :mod:`pickle` and
-  :mod:`!cPickle`.  This places the burden of importing the accelerated
-  version and falling back on the pure Python version on each user of
-  these modules.  In Python 3.0, the accelerated versions are
-  considered implementation details of the pure Python versions.
-  Users should always import the standard version, which attempts to
-  import the accelerated version and falls back to the pure Python
-  version.  The :mod:`pickle` / :mod:`!cPickle` pair received this
-  treatment.  The :mod:`profile` module is on the list for 3.1.  The
-  :mod:`!StringIO` module has been turned into a class in the :mod:`io`
-  module.
+* Một mẫu hình phổ biến trong Python 2.x là có một phiên bản của mô-đun được triển khai bằng Python thuần túy, cùng một phiên bản tăng tốc tùy chọn được triển khai dưới dạng phần mở rộng C; ví dụ: :mod:`pickle` và
+  :mod:`!cPickle`. Điều này khiến mỗi người dùng các mô-đun này phải tự chịu trách nhiệm nhập phiên bản tăng tốc và chuyển sang phiên bản Python thuần túy khi cần. Trong Python 3.0, các phiên bản tăng tốc được xem là chi tiết triển khai của các phiên bản Python thuần túy. Người dùng luôn nên nhập phiên bản chuẩn, phiên bản này sẽ cố gắng nhập phiên bản tăng tốc và chuyển sang phiên bản Python thuần túy khi cần. Cặp :mod:`pickle` / :mod:`!cPickle` đã được xử lý theo cách này. Mô-đun :mod:`profile` nằm trong danh sách dành cho phiên bản 3.1. Phiên bản
+  :mod:`!StringIO` đã được chuyển thành một lớp trong mô-đun :mod:`io`.
 
-* Some related modules have been grouped into packages, and usually
-  the submodule names have been simplified.  The resulting new
-  packages are:
+* Một số mô-đun liên quan đã được nhóm thành các package, và tên các submodule thường được đơn giản hóa. Các package mới tạo ra là:
 
   * :mod:`dbm` (:mod:`!anydbm`, :mod:`!dbhash`, :mod:`!dbm`,
     :mod:`!dumbdbm`, :mod:`!gdbm`, :mod:`!whichdb`).
@@ -612,10 +386,8 @@ review:
     :mod:`!CGIHTTPServer`, :mod:`!SimpleHTTPServer`, :mod:`!Cookie`,
     :mod:`!cookielib`).
 
-  * :mod:`tkinter` (all ``Tkinter``-related modules except
-    :mod:`turtle`).  The target audience of :mod:`turtle` doesn't
-    really care about :mod:`tkinter`.  Also note that as of Python
-    2.6, the functionality of :mod:`turtle` has been greatly enhanced.
+  * :mod:`tkinter` (tất cả các mô-đun liên quan đến ``Tkinter``, ngoại trừ
+    :mod:`turtle`). Đối tượng người dùng của :mod:`turtle` thực sự không quan tâm đến :mod:`tkinter`. Cũng lưu ý rằng kể từ Python 2.6, chức năng của :mod:`turtle` đã được nâng cao đáng kể.
 
   * :mod:`urllib` (:mod:`!urllib`, :mod:`!urllib2`, :mod:`!urlparse`,
     :mod:`!robotparse`).
@@ -623,309 +395,199 @@ review:
   * :mod:`xmlrpc` (:mod:`!xmlrpclib`, :mod:`!DocXMLRPCServer`,
     :mod:`!SimpleXMLRPCServer`).
 
-Some other changes to standard library modules, not covered by
+Một số thay đổi khác đối với các module thư viện chuẩn, không được đề cập trong
 :pep:`3108`:
 
-* Killed :mod:`!sets`.  Use the built-in :func:`set` class.
+* Đã loại bỏ :mod:`!sets`. Hãy sử dụng class :func:`set` tích hợp sẵn.
 
-* Cleanup of the :mod:`sys` module: removed :func:`!sys.exitfunc`,
+* Dọn dẹp module :mod:`sys`: đã loại bỏ :func:`!sys.exitfunc`,
   :func:`!sys.exc_clear`, :data:`!sys.exc_type`, :data:`!sys.exc_value`,
-  :data:`!sys.exc_traceback`.  (Note that :data:`sys.last_type`
-  etc. remain.)
+  :data:`!sys.exc_traceback`. (Lưu ý rằng :data:`sys.last_type` v.v. vẫn còn.)
 
-* Cleanup of the :class:`array.array` type: the :meth:`!read` and
-  :meth:`!write` methods are gone; use :meth:`~array.array.fromfile` and
-  :meth:`~array.array.tofile` instead.  Also, the ``'c'`` typecode for array is
-  gone -- use either ``'b'`` for bytes or ``'u'`` for Unicode
-  characters.
+* Dọn dẹp kiểu :class:`array.array`: :meth:`!read` và
+  các phương thức :meth:`!write` đã bị loại bỏ; hãy sử dụng :meth:`~array.array.fromfile` và
+  :meth:`~array.array.tofile` thay thế. Ngoài ra, typecode ``'c'`` của array cũng đã bị loại bỏ -- hãy sử dụng ``'b'`` cho bytes hoặc ``'u'`` cho các ký tự Unicode.
 
-* Cleanup of the :mod:`operator` module: removed
-  :func:`!sequenceIncludes` and :func:`!isCallable`.
+* Dọn dẹp mô-đun :mod:`operator`: đã xóa
+  :func:`!sequenceIncludes` và :func:`!isCallable`.
 
-* Cleanup of the :mod:`!thread` module: :func:`!acquire_lock` and
-  :func:`!release_lock` are gone; use :meth:`~threading.Lock.acquire` and
-  :meth:`~threading.Lock.release` instead.
+* Dọn dẹp mô-đun :mod:`!thread`: :func:`!acquire_lock` và
+  :func:`!release_lock` không còn; hãy sử dụng :meth:`~threading.Lock.acquire` và
+  :meth:`~threading.Lock.release` thay thế.
 
-* Cleanup of the :mod:`random` module: removed the :func:`!jumpahead` API.
+* Dọn dẹp mô-đun :mod:`random`: đã xóa API :func:`!jumpahead`.
 
-* The :mod:`!new` module is gone.
+* Mô-đun :mod:`!new` không còn nữa.
 
-* The functions :func:`!os.tmpnam`, :func:`!os.tempnam` and
-  :func:`!os.tmpfile` have been removed in favor of the :mod:`tempfile`
-  module.
+* Các hàm :func:`!os.tmpnam`, :func:`!os.tempnam` và
+  :func:`!os.tmpfile` đã bị loại bỏ để chuyển sang module :mod:`tempfile`.
 
-* The :mod:`tokenize` module has been changed to work with bytes.  The
-  main entry point is now :func:`tokenize.tokenize`, instead of
-  generate_tokens.
+* Module :mod:`tokenize` đã được thay đổi để làm việc với bytes. Điểm vào chính hiện là :func:`tokenize.tokenize`, thay vì generate_tokens.
 
-* :data:`!string.letters` and its friends (:data:`!string.lowercase` and
-  :data:`!string.uppercase`) are gone.  Use
-  :data:`string.ascii_letters` etc. instead.  (The reason for the
-  removal is that :data:`!string.letters` and friends had
-  locale-specific behavior, which is a bad idea for such
-  attractively named global "constants".)
+* :data:`!string.letters` và các hàm liên quan (:data:`!string.lowercase` và
+  :data:`!string.uppercase`) đã bị loại bỏ. Hãy sử dụng
+  :data:`string.ascii_letters` v.v. thay thế. (Lý do loại bỏ là :data:`!string.letters` và các thành phần liên quan có hành vi phụ thuộc vào locale, điều này không phù hợp với các "hằng số" toàn cục có tên hấp dẫn như vậy.)
 
-* Renamed module :mod:`!__builtin__` to :mod:`builtins` (removing the
-  underscores, adding an 's').  The :data:`!__builtins__` variable
-  found in most global namespaces is unchanged.  To modify a builtin,
-  you should use :mod:`builtins`, not :data:`!__builtins__`!
+* Đổi tên module :mod:`!__builtin__` thành :mod:`builtins` (bỏ dấu gạch dưới và thêm 's'). Biến :data:`!__builtins__` có trong hầu hết các namespace toàn cục không thay đổi. Để sửa đổi một builtin, bạn nên sử dụng :mod:`builtins`, không phải :data:`!__builtins__`!
 
 
-:pep:`3101`: A New Approach To String Formatting
-================================================
+:pep:`3101`: Một cách tiếp cận mới đối với việc định dạng chuỗi
+===============================================================
 
-* A new system for  built-in string formatting operations replaces the
-  ``%`` string  formatting operator.   (However, the ``%``  operator is
-  still supported;  it will  be deprecated in  Python 3.1  and removed
-  from the language at some later time.)  Read :pep:`3101` for the full
-  scoop.
+* Một hệ thống mới cho các thao tác định dạng chuỗi tích hợp sẵn thay thế toán tử định dạng chuỗi ``%``. (Tuy nhiên, toán tử ``%`` vẫn được hỗ trợ; nó sẽ bị phản đối trong Python 3.1 và bị loại bỏ khỏi ngôn ngữ vào một thời điểm nào đó sau này.) Đọc :pep:`3101` để biết đầy đủ chi tiết.
 
 
-Changes To Exceptions
-=====================
+Các thay đổi đối với ngoại lệ
+=============================
 
-The APIs for raising and catching exception have been cleaned up and
-new powerful features added:
+Các API để phát sinh và bắt ngoại lệ đã được tinh gọn, đồng thời bổ sung các tính năng mạnh mẽ mới:
 
-* :pep:`352`: All exceptions must be derived (directly or indirectly)
-  from :exc:`BaseException`.  This is the root of the exception
-  hierarchy.  This is not new as a recommendation, but the
-  *requirement* to inherit from :exc:`BaseException` is new.  (Python
-  2.6 still allowed classic classes to be raised, and placed no
-  restriction on what you can catch.)  As a consequence, string
-  exceptions are finally truly and utterly dead.
+* :pep:`352`: Tất cả ngoại lệ phải được dẫn xuất (trực tiếp hoặc gián tiếp) từ :exc:`BaseException`. Đây là gốc của hệ thống phân cấp ngoại lệ. Đây không phải là khuyến nghị mới, nhưng *yêu cầu* kế thừa từ :exc:`BaseException` là điều mới. (Python 2.6 vẫn cho phép phát sinh các lớp kiểu cũ và không đặt ra hạn chế nào đối với những gì bạn có thể bắt.) Do đó, các ngoại lệ chuỗi cuối cùng đã thực sự hoàn toàn bị loại bỏ.
 
-* Almost all exceptions should actually derive from :exc:`Exception`;
-  :exc:`BaseException` should only be used as a base class for
-  exceptions that should only be handled at the top level, such as
-  :exc:`SystemExit` or :exc:`KeyboardInterrupt`.  The recommended
-  idiom for handling all exceptions except for this latter category is
-  to use :keyword:`except` :exc:`Exception`.
+* Hầu hết các ngoại lệ thực sự nên được dẫn xuất từ :exc:`Exception`;
+  Chỉ nên sử dụng :exc:`BaseException` làm lớp cơ sở cho những ngoại lệ chỉ nên được xử lý ở cấp cao nhất, chẳng hạn như
+  :exc:`SystemExit` hoặc :exc:`KeyboardInterrupt`. Cách viết được khuyến nghị để xử lý mọi exception ngoại trừ nhóm sau là sử dụng :keyword:`except` :exc:`Exception`.
 
-* :exc:`!StandardError` was removed.
+* :exc:`!StandardError` đã bị loại bỏ.
 
-* Exceptions no longer behave as sequences.  Use the :attr:`~BaseException.args`
-  attribute instead.
+* Exception không còn hoạt động như các sequence. Thay vào đó, hãy sử dụng thuộc tính :attr:`~BaseException.args`.
 
-* :pep:`3109`: Raising exceptions.  You must now use :samp:`raise
-  {Exception}({args})` instead of :samp:`raise {Exception}, {args}`.
-  Additionally, you can no longer explicitly specify a traceback;
-  instead, if you *have* to do this, you can assign directly to the
-  :attr:`~BaseException.__traceback__` attribute (see below).
+* :pep:`3109`: Raising exception. Bây giờ bạn phải sử dụng :samp:`raise {Exception}({args})` thay cho :samp:`raise {Exception}, {args}`. Ngoài ra, bạn không thể chỉ định traceback một cách rõ ràng nữa; thay vào đó, nếu bạn *have* phải làm việc này, bạn có thể gán trực tiếp cho
+  thuộc tính :attr:`~BaseException.__traceback__` (xem bên dưới).
 
-* :pep:`3110`: Catching exceptions.  You must now use
-  :samp:`except {SomeException} as {variable}` instead
-  of :samp:`except {SomeException}, {variable}`.  Moreover, the
-  *variable* is explicitly deleted when the :keyword:`except` block
-  is left.
+* :pep:`3110`: Catching exception. Bây giờ bạn phải sử dụng
+  :samp:`except {SomeException} as {variable}` thay cho :samp:`except {SomeException}, {variable}`. Hơn nữa, *variable* sẽ bị xóa rõ ràng khi thoát khỏi khối :keyword:`except`.
 
-* :pep:`3134`: Exception chaining.  There are two cases: implicit
-  chaining and explicit chaining.  Implicit chaining happens when an
-  exception is raised in an :keyword:`except` or :keyword:`finally`
-  handler block.  This usually happens due to a bug in the handler
-  block; we call this a *secondary* exception.  In this case, the
-  original exception (that was being handled) is saved as the
-  :attr:`~BaseException.__context__` attribute of the secondary exception.
-  Explicit chaining is invoked with this syntax::
+* :pep:`3134`: Liên kết ngoại lệ. Có hai trường hợp: liên kết ngầm và liên kết tường minh. Liên kết ngầm xảy ra khi một ngoại lệ được phát sinh trong khối xử lý :keyword:`except` hoặc :keyword:`finally`. Điều này thường xảy ra do lỗi trong khối xử lý; chúng ta gọi đây là ngoại lệ *thứ cấp*. Trong trường hợp này, ngoại lệ ban đầu (đang được xử lý) được lưu dưới dạng
+  thuộc tính :attr:`~BaseException.__context__` của ngoại lệ thứ cấp. Liên kết tường minh được gọi bằng cú pháp sau::
 
     raise SecondaryException() from primary_exception
 
-  (where *primary_exception* is any expression that produces an
-  exception object, probably an exception that was previously caught).
-  In this case, the primary exception is stored on the
-  :attr:`~BaseException.__cause__` attribute of the secondary exception.  The
-  traceback printed when an unhandled exception occurs walks the chain
-  of :attr:`!__cause__` and :attr:`~BaseException.__context__` attributes and
-  prints a
-  separate traceback for each component of the chain, with the primary
-  exception at the top.  (Java users may recognize this behavior.)
+  (trong đó *primary_exception* là bất kỳ biểu thức nào tạo ra một đối tượng ngoại lệ, có thể là một ngoại lệ đã được bắt trước đó). Trong trường hợp này, ngoại lệ chính được lưu trên
+  thuộc tính :attr:`~BaseException.__cause__` của ngoại lệ thứ cấp. Traceback được in khi xảy ra một ngoại lệ chưa được xử lý sẽ duyệt qua chuỗi các thuộc tính :attr:`!__cause__` và :attr:`~BaseException.__context__` và in một traceback riêng cho từng thành phần của chuỗi, với ngoại lệ chính ở trên cùng. (Người dùng Java có thể nhận ra hành vi này.)
 
-* :pep:`3134`: Exception objects now store their traceback as the
-  :attr:`~BaseException.__traceback__` attribute.  This means that an exception
-  object now contains all the information pertaining to an exception,
-  and there are fewer reasons to use :func:`sys.exc_info` (though the
-  latter is not removed).
+* :pep:`3134`: Các đối tượng ngoại lệ hiện lưu traceback của chúng dưới dạng
+  thuộc tính :attr:`~BaseException.__traceback__`. Điều này có nghĩa là một đối tượng ngoại lệ hiện chứa mọi thông tin liên quan đến một ngoại lệ, và có ít lý do hơn để sử dụng :func:`sys.exc_info` (mặc dù thuộc tính sau không bị loại bỏ).
 
-* A few exception messages are improved when Windows fails to load an
-  extension module.  For example, ``error code 193`` is now ``%1 is
-  not a valid Win32 application``.  Strings now deal with non-English
-  locales.
+* Một số thông báo ngoại lệ được cải thiện khi Windows không tải được một extension module. Ví dụ, ``error code 193`` hiện là ``%1 is not a valid Win32 application``. Các chuỗi hiện xử lý được các locale không phải tiếng Anh.
 
 
-Miscellaneous Other Changes
-===========================
+Các thay đổi khác
+=================
 
-Operators And Special Methods
------------------------------
+Toán tử và phương thức đặc biệt
+-------------------------------
 
-* ``!=`` now returns the opposite of ``==``, unless ``==`` returns
+* ``!=`` giờ đây trả về giá trị đối lập với ``==``, trừ khi ``==`` trả về
   :data:`NotImplemented`.
 
-* The concept of "unbound methods" has been removed from the language.
-  When referencing a method as a class attribute, you now get a plain
-  function object.
+* Khái niệm "unbound method" đã bị loại bỏ khỏi ngôn ngữ. Khi tham chiếu đến một phương thức dưới dạng thuộc tính của lớp, giờ đây bạn nhận được một đối tượng hàm thuần túy.
 
-* :meth:`!__getslice__`, :meth:`!__setslice__` and :meth:`!__delslice__`
-  were killed.  The syntax ``a[i:j]`` now translates to
-  ``a.__getitem__(slice(i, j))`` (or :meth:`~object.__setitem__` or
-  :meth:`~object.__delitem__`, when used as an assignment or deletion target,
-  respectively).
+* :meth:`!__getslice__`, :meth:`!__setslice__` và :meth:`!__delslice__` đã bị loại bỏ. Cú pháp ``a[i:j]`` giờ đây được chuyển thành ``a.__getitem__(slice(i, j))`` (hoặc :meth:`~object.__setitem__` hoặc
+  :meth:`~object.__delitem__`, lần lượt khi được dùng làm đích gán hoặc xóa).
 
-* :pep:`3114`: the standard :meth:`next` method has been renamed to
+* :pep:`3114`: phương thức :meth:`next` tiêu chuẩn đã được đổi tên thành
   :meth:`~iterator.__next__`.
 
-* The :meth:`!__oct__` and :meth:`!__hex__` special methods are removed
-  -- :func:`oct` and :func:`hex` use :meth:`~object.__index__` now to convert
-  the argument to an integer.
+* Các phương thức đặc biệt :meth:`!__oct__` và :meth:`!__hex__` đã bị loại bỏ -- :func:`oct` và :func:`hex` giờ đây sử dụng :meth:`~object.__index__` để chuyển đối số thành số nguyên.
 
-* Removed support for :attr:`!__members__` and :attr:`!__methods__`.
+* Đã loại bỏ hỗ trợ cho :attr:`!__members__` và :attr:`!__methods__`.
 
-* The function attributes named :attr:`!func_X` have been renamed to
-  use the :attr:`!__X__` form, freeing up these names in the function
-  attribute namespace for user-defined attributes.  To wit,
+* Các thuộc tính hàm có tên :attr:`!func_X` đã được đổi tên để sử dụng dạng :attr:`!__X__`, giải phóng các tên này trong không gian tên thuộc tính hàm cho các thuộc tính do người dùng định nghĩa. Cụ thể là,
   :attr:`!func_closure`, :attr:`!func_code`, :attr:`!func_defaults`,
   :attr:`!func_dict`, :attr:`!func_doc`, :attr:`!func_globals`,
-  :attr:`!func_name` were renamed to :attr:`~function.__closure__`,
+  :attr:`!func_name` đã được đổi tên thành :attr:`~function.__closure__`,
   :attr:`~function.__code__`, :attr:`~function.__defaults__`,
   :attr:`~function.__dict__`, :attr:`~function.__doc__`,
-  :attr:`~function.__globals__`, :attr:`~function.__name__`,
-  respectively.
+  lần lượt là :attr:`~function.__globals__` và :attr:`~function.__name__`.
 
-* :meth:`!__nonzero__` is now :meth:`~object.__bool__`.
+* :meth:`!__nonzero__` giờ đây là :meth:`~object.__bool__`.
 
-Builtins
---------
+Các hàm dựng sẵn
+----------------
 
-* :pep:`3135`: New :func:`super`.  You can now invoke :func:`super`
-  without arguments and (assuming this is in a regular instance method
-  defined inside a :keyword:`class` statement) the right class and
-  instance will automatically be chosen.  With arguments, the behavior
-  of :func:`super` is unchanged.
+* :pep:`3135`: :func:`super` mới. Giờ đây bạn có thể gọi :func:`super` mà không cần đối số và (với điều kiện đây là một instance method thông thường được định nghĩa bên trong câu lệnh :keyword:`class`) lớp và instance phù hợp sẽ được tự động chọn. Khi có đối số, hành vi của :func:`super` không thay đổi.
 
-* :pep:`3111`: :func:`!raw_input` was renamed to :func:`input`.  That
-  is, the new :func:`input` function reads a line from
-  :data:`sys.stdin` and returns it with the trailing newline stripped.
-  It raises :exc:`EOFError` if the input is terminated prematurely.
-  To get the old behavior of :func:`input`, use ``eval(input())``.
+* :pep:`3111`: :func:`!raw_input` đã được đổi tên thành :func:`input`. Nghĩa là, hàm :func:`input` mới đọc một dòng từ
+  :data:`sys.stdin` và trả về dòng đó sau khi loại bỏ ký tự newline ở cuối. Hàm này raise :exc:`EOFError` nếu đầu vào kết thúc sớm. Để có hành vi cũ của :func:`input`, hãy dùng ``eval(input())``.
 
-* A new built-in function :func:`next` was added to call the
-  :meth:`~iterator.__next__` method on an object.
+* Một hàm built-in mới :func:`next` đã được thêm để gọi
+  method :meth:`~iterator.__next__` trên một object.
 
-* The :func:`round` function rounding strategy and return type have
-  changed.  Exact halfway cases are now rounded to the nearest even
-  result instead of away from zero.  (For example, ``round(2.5)`` now
-  returns ``2`` rather than ``3``.)  ``round(x[, n])`` now
-  delegates to ``x.__round__([n])`` instead of always returning a
-  float.  It generally returns an integer when called with a single
-  argument and a value of the same type as ``x`` when called with two
-  arguments.
+* Chiến lược làm tròn và kiểu giá trị trả về của hàm :func:`round` đã thay đổi. Các trường hợp chính xác nằm giữa hai giá trị giờ đây được làm tròn đến kết quả chẵn gần nhất thay vì làm tròn ra xa số 0. (Ví dụ: ``round(2.5)`` giờ đây trả về ``2`` thay vì ``3``.) ``round(x[, n])`` giờ đây ủy quyền cho ``x.__round__([n])`` thay vì luôn trả về một số thực. Nhìn chung, hàm này trả về một số nguyên khi được gọi với một đối số và một giá trị có cùng kiểu với ``x`` khi được gọi với hai đối số.
 
-* Moved :func:`!intern` to :func:`sys.intern`.
+* Đã chuyển :func:`!intern` sang :func:`sys.intern`.
 
-* Removed: :func:`!apply`.  Instead of ``apply(f, args)`` use
-  ``f(*args)``.
+* Đã loại bỏ: :func:`!apply`.  Thay vì ``apply(f, args)``, hãy dùng ``f(*args)``.
 
-* Removed :func:`callable`.  Instead of ``callable(f)`` you can use
-  ``isinstance(f, collections.Callable)``.  The :func:`!operator.isCallable`
-  function is also gone.
+* Đã loại bỏ :func:`callable`.  Thay vì ``callable(f)``, bạn có thể dùng ``isinstance(f, collections.Callable)``.  Hàm :func:`!operator.isCallable` cũng không còn.
 
-* Removed :func:`!coerce`.  This function no longer serves a purpose
-  now that classic classes are gone.
+* Đã loại bỏ :func:`!coerce`.  Hàm này không còn mục đích sử dụng vì các lớp kiểu cũ đã bị loại bỏ.
 
-* Removed :func:`!execfile`.  Instead of ``execfile(fn)`` use
-  ``exec(open(fn).read())``.
+* Đã loại bỏ :func:`!execfile`.  Thay vì ``execfile(fn)``, hãy dùng ``exec(open(fn).read())``.
 
-* Removed the :class:`!file` type.  Use :func:`open`.  There are now several
-  different kinds of streams that open can return in the :mod:`io` module.
+* Đã loại bỏ kiểu :class:`!file`.  Hãy dùng :func:`open`.  Hiện có một số loại stream khác nhau mà open có thể trả về trong module :mod:`io`.
 
-* Removed :func:`!reduce`.  Use :func:`functools.reduce` if you really
-  need it; however, 99 percent of the time an explicit :keyword:`for`
-  loop is more readable.
+* Đã loại bỏ :func:`!reduce`.  Hãy dùng :func:`functools.reduce` nếu bạn thực sự cần; tuy nhiên, trong 99 phần trăm trường hợp, vòng lặp :keyword:`for` tường minh sẽ dễ đọc hơn.
 
-* Removed :func:`!reload`.  Use :func:`!imp.reload`.
+* Đã loại bỏ :func:`!reload`.  Hãy dùng :func:`!imp.reload`.
 
-* Removed. :meth:`!dict.has_key` -- use the :keyword:`in` operator
-  instead.
+* Đã bị loại bỏ. :meth:`!dict.has_key` -- hãy dùng toán tử :keyword:`in` thay vào đó.
 
 .. ======================================================================
 
 
-Build and C API Changes
-=======================
+Các thay đổi về Build và C API
+==============================
 
-Due to time constraints, here is a *very* incomplete list of changes
-to the C API.
+Do hạn chế về thời gian, sau đây là danh sách *rất* không đầy đủ về các thay đổi đối với C API.
 
-* Support for several platforms was dropped, including but not limited
-  to Mac OS 9, BeOS, RISCOS, Irix, and Tru64.
+* Đã ngừng hỗ trợ một số nền tảng, bao gồm nhưng không giới hạn ở Mac OS 9, BeOS, RISCOS, Irix và Tru64.
 
-* :pep:`3118`: New Buffer API.
+* :pep:`3118`: API Buffer mới.
 
-* :pep:`3121`: Extension Module Initialization & Finalization.
+* :pep:`3121`: Khởi tạo và hoàn tất mô-đun mở rộng.
 
-* :pep:`3123`: Making :c:macro:`PyObject_HEAD` conform to standard C.
+* :pep:`3123`: Đưa :c:macro:`PyObject_HEAD` tuân thủ C chuẩn.
 
-* No more C API support for restricted execution.
+* Không còn hỗ trợ C API cho việc thực thi bị hạn chế.
 
 * :c:func:`!PyNumber_Coerce`, :c:func:`!PyNumber_CoerceEx`,
-  :c:func:`!PyMember_Get`, and :c:func:`!PyMember_Set` C APIs are removed.
+  :c:func:`!PyMember_Get` và các C API :c:func:`!PyMember_Set` đã bị xóa.
 
-* New C API :c:func:`PyImport_ImportModuleNoBlock`, works like
-  :c:func:`PyImport_ImportModule` but won't block on the import lock
-  (returning an error instead).
+* C API mới :c:func:`PyImport_ImportModuleNoBlock`, hoạt động giống như
+  :c:func:`PyImport_ImportModule` nhưng sẽ không chặn khi khóa import (thay vào đó trả về lỗi).
 
-* Renamed the boolean conversion C-level slot and method:
-  ``nb_nonzero`` is now ``nb_bool``.
+* Đã đổi tên slot và phương thức chuyển đổi boolean ở cấp C: ``nb_nonzero`` hiện là ``nb_bool``.
 
-* Removed :c:macro:`!METH_OLDARGS` and :c:macro:`!WITH_CYCLE_GC` from the C API.
+* Đã xóa :c:macro:`!METH_OLDARGS` và :c:macro:`!WITH_CYCLE_GC` khỏi C API.
 
 .. ======================================================================
 
 
-Performance
-===========
+Hiệu năng
+=========
 
-The net result of the 3.0 generalizations is that Python 3.0 runs the
-pystone benchmark around 10% slower than Python 2.5.  Most likely the
-biggest cause is the removal of special-casing for small integers.
-There's room for improvement, but it will happen after 3.0 is
-released!
+Kết quả chung của những khái quát hóa trong phiên bản 3.0 là Python 3.0 chạy benchmark pystone chậm hơn khoảng 10% so với Python 2.5. Nhiều khả năng nguyên nhân lớn nhất là việc loại bỏ cơ chế xử lý đặc biệt cho các số nguyên nhỏ. Vẫn còn khả năng cải thiện, nhưng việc đó sẽ diễn ra sau khi 3.0 được phát hành!
 
 .. ======================================================================
 
 
-Porting To Python 3.0
-=====================
+Chuyển sang Python 3.0
+======================
 
-For porting existing Python 2.5 or 2.6 source code to Python 3.0, the
-best strategy is the following:
+Để chuyển mã nguồn Python 2.5 hoặc 2.6 hiện có sang Python 3.0, chiến lược tốt nhất là như sau:
 
-0. (Prerequisite:) Start with excellent test coverage.
+0. (Điều kiện tiên quyết:) Bắt đầu với độ bao phủ kiểm thử tuyệt vời.
 
-1. Port to Python 2.6.  This should be no more work than the average
-   port from Python 2.x to Python 2.(x+1).  Make sure all your tests
-   pass.
+1. Chuyển sang Python 2.6. Việc này không nên tốn nhiều công sức hơn so với một lần chuyển trung bình từ Python 2.x sang Python 2.(x+1). Hãy đảm bảo tất cả các bài kiểm thử đều đạt.
 
-2. (Still using 2.6:) Turn on the :option:`!-3` command line switch.
-   This enables warnings about features that will be removed (or
-   change) in 3.0.  Run your test suite again, and fix code that you
-   get warnings about until there are no warnings left, and all your
-   tests still pass.
+2. (Vẫn sử dụng 2.6:) Bật tùy chọn dòng lệnh :option:`!-3`. Tùy chọn này bật các cảnh báo về những tính năng sẽ bị loại bỏ (hoặc thay đổi) trong 3.0. Chạy lại bộ kiểm thử, rồi sửa mã được cảnh báo cho đến khi không còn cảnh báo nào và tất cả các bài kiểm thử vẫn đạt.
 
-3. Run the ``2to3`` source-to-source translator over your source code
-   tree.  Run the
-   result of the translation under Python 3.0.  Manually fix up any
-   remaining issues, fixing problems until all tests pass again.
+3. Chạy trình chuyển đổi mã nguồn sang mã nguồn ``2to3`` trên cây mã nguồn của bạn. Chạy kết quả chuyển đổi bằng Python 3.0. Sửa thủ công mọi vấn đề còn lại, tiếp tục khắc phục cho đến khi tất cả các bài kiểm thử lại đạt.
 
-It is not recommended to try to write source code that runs unchanged
-under both Python 2.6 and 3.0; you'd have to use a very contorted
-coding style, e.g. avoiding ``print`` statements, metaclasses,
-and much more.  If you are maintaining a library that needs to support
-both Python 2.6 and Python 3.0, the best approach is to modify step 3
-above by editing the 2.6 version of the source code and running the
-``2to3`` translator again, rather than editing the 3.0 version of the
-source code.
+Không nên cố viết mã nguồn có thể chạy nguyên vẹn trên cả Python 2.6 và 3.0; bạn sẽ phải sử dụng một phong cách lập trình rất rắc rối, chẳng hạn như tránh các câu lệnh ``print``, metaclass và nhiều thứ khác. Nếu bạn đang duy trì một thư viện cần hỗ trợ cả Python 2.6 và Python 3.0, cách tiếp cận tốt nhất là sửa đổi bước 3 ở trên bằng cách chỉnh sửa phiên bản mã nguồn 2.6 rồi chạy lại trình chuyển đổi ``2to3``, thay vì chỉnh sửa phiên bản mã nguồn 3.0.
 
-For porting C extensions to Python 3.0, please see :ref:`cporting-howto`.
+Để chuyển các phần mở rộng C sang Python 3.0, vui lòng xem :ref:`cporting-howto`.
 
 .. ======================================================================

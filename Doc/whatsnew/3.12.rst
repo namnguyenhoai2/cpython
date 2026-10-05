@@ -1,7 +1,7 @@
 
-****************************
-  What's New In Python 3.12
-****************************
+**************************
+Điểm mới trong Python 3.12
+**************************
 
 :Editor: Adam Turner
 
@@ -45,147 +45,101 @@
    This saves the maintainer the effort of going through the VCS log when
    researching a change.
 
-This article explains the new features in Python 3.12, compared to 3.11.
-Python 3.12 was released on October 2, 2023.
-For full details, see the :ref:`changelog <changelog>`.
+Bài viết này giải thích các tính năng mới trong Python 3.12 so với 3.11. Python 3.12 được phát hành vào ngày 2 tháng 10 năm 2023. Để xem đầy đủ thông tin, hãy tham khảo :ref:`nhật ký thay đổi <changelog>`.
 
 .. seealso::
 
-   :pep:`693` -- Python 3.12 Release Schedule
+   :pep:`693` -- Lịch phát hành Python 3.12
 
-Summary -- Release highlights
-=============================
+Tóm tắt -- Những điểm nổi bật của bản phát hành
+===============================================
 
 .. This section singles out the most important changes in Python 3.12.
    Brevity is key.
 
-Python 3.12 is a stable release of the Python programming language,
-with a mix of changes to the language and the standard library.
-The library changes focus on cleaning up deprecated APIs, usability, and correctness.
-Of note, the :mod:`!distutils` package has been removed from the standard library.
-Filesystem support in :mod:`os` and :mod:`pathlib` has seen a number of improvements,
-and several modules have better performance.
+Python 3.12 là một bản phát hành ổn định của ngôn ngữ lập trình Python, với sự kết hợp giữa các thay đổi đối với ngôn ngữ và thư viện chuẩn. Các thay đổi trong thư viện tập trung vào việc dọn dẹp các API đã deprecated, cải thiện khả năng sử dụng và tính chính xác. Đáng chú ý, gói :mod:`!distutils` đã bị loại khỏi thư viện chuẩn. Hỗ trợ hệ thống tệp trong :mod:`os` và :mod:`pathlib` đã có một số cải tiến, đồng thời hiệu suất của một số module cũng được nâng cao.
 
-The language changes focus on usability,
-as :term:`f-strings <f-string>` have had many limitations removed
-and 'Did you mean ...' suggestions continue to improve.
-The new :ref:`type parameter syntax <whatsnew312-pep695>`
-and :keyword:`type` statement improve ergonomics for using :term:`generic types
-<generic type>` and :term:`type aliases <type alias>` with static type checkers.
+Các thay đổi đối với ngôn ngữ tập trung vào khả năng sử dụng, vì :term:`f-strings <f-string>` đã được loại bỏ nhiều hạn chế và các đề xuất 'Bạn có muốn nói ...' tiếp tục được cải thiện. Cú pháp :ref:`tham số kiểu <whatsnew312-pep695>` mới và :keyword:`type` câu lệnh cải thiện tính tiện dụng khi sử dụng :term:`kiểu generic <generic type>` và :term:`bí danh kiểu <type alias>` với các trình kiểm tra kiểu tĩnh.
 
-This article doesn't attempt to provide a complete specification of all new features,
-but instead gives a convenient overview.
-For full details, you should refer to the documentation,
-such as the  :ref:`Library Reference <library-index>`
-and :ref:`Language Reference <reference-index>`.
-If you want to understand the complete implementation and design rationale for a change,
-refer to the PEP for a particular new feature;
-but note that PEPs usually are not kept up-to-date
-once a feature has been fully implemented.
+Bài viết này không nhằm cung cấp đặc tả đầy đủ về tất cả các tính năng mới, mà thay vào đó đưa ra một phần tổng quan thuận tiện. Để biết đầy đủ chi tiết, bạn nên tham khảo tài liệu, chẳng hạn như :ref:`Tài liệu tham khảo Thư viện <library-index>` và :ref:`Tài liệu tham khảo Ngôn ngữ <reference-index>`. Nếu muốn hiểu toàn bộ cách triển khai và cơ sở thiết kế của một thay đổi, hãy tham khảo PEP về tính năng mới cụ thể đó; tuy nhiên, lưu ý rằng các PEP thường không được cập nhật sau khi một tính năng đã được triển khai hoàn chỉnh.
 
 --------------
 
 .. PEP-sized items next.
 
-New syntax features:
+Các tính năng cú pháp mới:
 
-* :ref:`PEP 695 <whatsnew312-pep695>`, type parameter syntax and the :keyword:`type` statement
+* :ref:`PEP 695 <whatsnew312-pep695>`, cú pháp tham số kiểu và câu lệnh :keyword:`type`
 
-New grammar features:
+Các tính năng ngữ pháp mới:
 
-* :ref:`PEP 701 <whatsnew312-pep701>`, :term:`f-strings <f-string>` in the grammar
+* :ref:`PEP 701 <whatsnew312-pep701>`, :term:`f-strings <f-string>` trong ngữ pháp
 
-Interpreter improvements:
+Các cải tiến cho interpreter:
 
-* :ref:`PEP 684 <whatsnew312-pep684>`, a unique per-interpreter :term:`GIL
-  <global interpreter lock>`
-* :ref:`PEP 669 <whatsnew312-pep669>`, low impact monitoring
-* `Improved 'Did you mean ...' suggestions <improved error messages_>`_
-  for :exc:`NameError`, :exc:`ImportError`, and :exc:`SyntaxError` exceptions
+* :ref:`PEP 684 <whatsnew312-pep684>`, một GIL riêng biệt cho mỗi interpreter :term:`GIL <global interpreter lock>`
+* :ref:`PEP 669 <whatsnew312-pep669>`, giám sát với tác động thấp
+* `Cải thiện các đề xuất "Bạn có muốn nói ..." <improved error messages_>`_ cho các ngoại lệ :exc:`NameError`, :exc:`ImportError` và :exc:`SyntaxError`
 
-Python data model improvements:
+Các cải tiến về mô hình dữ liệu Python:
 
-* :ref:`PEP 688 <whatsnew312-pep688>`, using the :ref:`buffer protocol
-  <bufferobjects>` from Python
+* :ref:`PEP 688 <whatsnew312-pep688>`, sử dụng :ref:`buffer protocol <bufferobjects>` từ Python
 
-Significant improvements in the standard library:
+Các cải tiến đáng kể trong standard library:
 
-* The :class:`pathlib.Path` class now supports subclassing
-* The :mod:`os` module received several improvements for Windows support
-* A :ref:`command-line interface <sqlite3-cli>` has been added to the
-  :mod:`sqlite3` module
-* :func:`isinstance` checks against :func:`runtime-checkable protocols
-  <typing.runtime_checkable>` enjoy a speed up of between two and 20 times
-* The :mod:`asyncio` package has had a number of performance improvements,
-  with some benchmarks showing a 75% speed up.
-* A :ref:`command-line interface <uuid-cli>` has been added to the
-  :mod:`uuid` module
-* Due to the changes in :ref:`PEP 701 <whatsnew312-pep701>`,
-  producing tokens via the :mod:`tokenize` module is up to 64% faster.
+* Lớp :class:`pathlib.Path` hiện hỗ trợ subclassing
+* Module :mod:`os` đã nhận được một số cải tiến để hỗ trợ Windows
+* Một :ref:`giao diện dòng lệnh <sqlite3-cli>` đã được thêm vào
+  :mod:`sqlite3` mô-đun
+* :func:`isinstance` các phép kiểm tra đối với :func:`runtime-checkable protocols <typing.runtime_checkable>` được tăng tốc từ hai đến 20 lần
+* :mod:`asyncio` gói đã được cải thiện hiệu năng đáng kể, với một số benchmark cho thấy tốc độ tăng 75%.
+* Một :ref:`giao diện dòng lệnh <uuid-cli>` đã được thêm vào
+  :mod:`uuid` mô-đun
+* Do những thay đổi trong :ref:`PEP 701 <whatsnew312-pep701>`, việc tạo token thông qua mô-đun :mod:`tokenize` nhanh hơn tới 64%.
 
-Security improvements:
+Cải tiến bảo mật:
 
-* Replace the builtin :mod:`hashlib` implementations of
-  SHA1, SHA3, SHA2-384, SHA2-512, and MD5 with formally verified code from the
-  `HACL* <https://github.com/hacl-star/hacl-star/>`__ project.
-  These builtin implementations remain as fallbacks that are only used when
-  OpenSSL does not provide them.
+* Thay thế các triển khai :mod:`hashlib` tích hợp sẵn của SHA1, SHA3, SHA2-384, SHA2-512 và MD5 bằng mã đã được xác minh chính thức từ dự án `HACL* <https://github.com/hacl-star/hacl-star/>`__. Các triển khai tích hợp sẵn này vẫn được giữ lại làm phương án dự phòng và chỉ được sử dụng khi OpenSSL không cung cấp chúng.
 
-C API improvements:
+Cải tiến C API:
 
-* :ref:`PEP 697 <whatsnew312-pep697>`, unstable C API tier
-* :ref:`PEP 683 <whatsnew312-pep683>`, immortal objects
+* :ref:`PEP 697 <whatsnew312-pep697>`, tầng C API không ổn định
+* :ref:`PEP 683 <whatsnew312-pep683>`, đối tượng bất tử
 
-CPython implementation improvements:
+Cải tiến trong triển khai CPython:
 
-* :ref:`PEP 709 <whatsnew312-pep709>`, comprehension inlining
-* :ref:`CPython support <perf_profiling>` for the Linux ``perf`` profiler
-* Implement stack overflow protection on supported platforms
+* :ref:`PEP 709 <whatsnew312-pep709>`, đưa comprehension vào nội tuyến
+* :ref:`Hỗ trợ CPython <perf_profiling>` cho ``perf`` profiler trên Linux
+* Triển khai cơ chế bảo vệ tràn stack trên các nền tảng được hỗ trợ
 
-New typing features:
+Các tính năng typing mới:
 
-* :ref:`PEP 692 <whatsnew312-pep692>`, using :class:`~typing.TypedDict` to
-  annotate :term:`**kwargs <argument>`
+* :ref:`PEP 692 <whatsnew312-pep692>`, sử dụng :class:`~typing.TypedDict` để chú thích :term:`****kwargs <argument>`
 * :ref:`PEP 698 <whatsnew312-pep698>`, :deco:`typing.override` decorator
 
-Important deprecations, removals or restrictions:
+Các nội dung ngừng hỗ trợ, loại bỏ hoặc hạn chế quan trọng:
 
-* :pep:`623`: Remove ``wstr`` from Unicode objects in Python's C API,
-  reducing the size of every :class:`str` object by at least 8 bytes.
+* :pep:`623`: Loại bỏ ``wstr`` khỏi các đối tượng Unicode trong C API của Python, làm giảm kích thước của mọi :class:`str` object ít nhất 8 byte.
 
-* :pep:`632`: Remove the :mod:`!distutils` package.
-  See :pep:`the migration guide <0632#migration-advice>`
-  for advice replacing the APIs it provided.
-  The third-party `Setuptools <https://setuptools.pypa.io/en/latest/deprecated/distutils-legacy.html>`__
-  package continues to provide :mod:`!distutils`,
-  if you still require it in Python 3.12 and beyond.
+* :pep:`632`: Xóa gói :mod:`!distutils`. Xem :pep:`the migration guide <0632#migration-advice>` để biết cách thay thế các API mà gói này cung cấp. Gói bên thứ ba `Setuptools <https://setuptools.pypa.io/en/latest/deprecated/distutils-legacy.html>`__ vẫn tiếp tục cung cấp :mod:`!distutils`, nếu bạn vẫn cần nó trong Python 3.12 trở lên.
 
-* :gh:`95299`: Do not pre-install ``setuptools`` in virtual environments
-  created with :mod:`venv`.
-  This means that ``distutils``, ``setuptools``, ``pkg_resources``,
-  and ``easy_install`` will no longer available by default; to access these
-  run ``pip install setuptools`` in the :ref:`activated <venv-explanation>`
-  virtual environment.
+* :gh:`95299`: Không cài đặt sẵn ``setuptools`` trong các môi trường ảo được tạo bằng :mod:`venv`. Điều này có nghĩa là ``distutils``, ``setuptools``, ``pkg_resources`` và ``easy_install`` sẽ không còn khả dụng theo mặc định; để truy cập chúng, hãy chạy ``pip install setuptools`` trong môi trường ảo :ref:`activated <venv-explanation>`.
 
-* The :mod:`!asynchat`, :mod:`!asyncore`, and :mod:`!imp` modules have been
-  removed, along with several :class:`unittest.TestCase`
-  `method aliases <unittest-TestCase-removed-aliases_>`_.
+* Các module :mod:`!asynchat`, :mod:`!asyncore` và :mod:`!imp` đã bị xóa, cùng với một số :class:`unittest.TestCase` `bí danh phương thức <unittest-TestCase-removed-aliases_>`_.
 
 
-New Features
-============
+Tính năng mới
+=============
 
 .. _whatsnew312-pep695:
 
-PEP 695: Type Parameter Syntax
-------------------------------
+PEP 695: Cú pháp tham số kiểu
+-----------------------------
 
-Generic classes and functions under :pep:`484` were declared using a verbose syntax
-that left the scope of type parameters unclear and required explicit declarations of
-variance.
+Các lớp và hàm generic trong :pep:`484` được khai báo bằng cú pháp dài dòng, khiến phạm vi của các tham số kiểu không rõ ràng và yêu cầu khai báo tường minh về variance.
 
-:pep:`695` introduces a new, more compact and explicit way to create
-:ref:`generic classes <generic-classes>` and :ref:`functions <generic-functions>`::
+:pep:`695` giới thiệu một cách mới, ngắn gọn và tường minh hơn để tạo
+:ref:`các lớp generic <generic-classes>` và :ref:`hàm <generic-functions>`::
 
    def max[T](args: Iterable[T]) -> T:
        ...
@@ -197,88 +151,57 @@ variance.
        def append(self, element: T) -> None:
            ...
 
-In addition, the PEP introduces a new way to declare :ref:`type aliases <type-aliases>`
-using the :keyword:`type` statement, which creates an instance of
+Ngoài ra, PEP này giới thiệu một cách mới để khai báo :ref:`bí danh kiểu <type-aliases>` bằng cách sử dụng câu lệnh :keyword:`type`, câu lệnh này tạo một thực thể của
 :class:`~typing.TypeAliasType`::
 
    type Point = tuple[float, float]
 
-Type aliases can also be :ref:`generic <generic-type-aliases>`::
+Bí danh kiểu cũng có thể là :ref:`generic <generic-type-aliases>`::
 
    type Point[T] = tuple[T, T]
 
-The new syntax allows declaring :class:`~typing.TypeVarTuple`
-and :class:`~typing.ParamSpec` parameters, as well as :class:`~typing.TypeVar`
-parameters with bounds or constraints::
+Cú pháp mới cho phép khai báo :class:`~typing.TypeVarTuple` và :class:`~typing.ParamSpec` tham số, cũng như :class:`~typing.TypeVar` tham số có giới hạn hoặc ràng buộc::
 
    type IntFunc[**P] = Callable[P, int]  # ParamSpec
    type LabeledTuple[*Ts] = tuple[str, *Ts]  # TypeVarTuple
    type HashableSequence[T: Hashable] = Sequence[T]  # TypeVar with bound
    type IntOrStrSequence[T: (int, str)] = Sequence[T]  # TypeVar with constraints
 
-The value of type aliases and the bound and constraints of type variables
-created through this syntax are evaluated only on demand (see
-:ref:`lazy evaluation <lazy-evaluation>`). This means type aliases are able to
-refer to other types defined later in the file.
+Giá trị của bí danh kiểu và giới hạn, ràng buộc của các biến kiểu được tạo thông qua cú pháp này chỉ được đánh giá khi cần (xem
+:ref:`đánh giá trì hoãn <lazy-evaluation>`). Điều này có nghĩa là bí danh kiểu có thể tham chiếu đến các kiểu khác được định nghĩa sau đó trong tệp.
 
-Type parameters declared through a type parameter list are visible within the
-scope of the declaration and any nested scopes, but not in the outer scope. For
-example, they can be used in the type annotations for the methods of a generic
-class or in the class body. However, they cannot be used in the module scope after
-the class is defined. See :ref:`type-params` for a detailed description of the
-runtime semantics of type parameters.
+Các tham số kiểu được khai báo thông qua danh sách tham số kiểu hiển thị trong phạm vi của khai báo và mọi phạm vi lồng nhau, nhưng không hiển thị trong phạm vi bên ngoài. Ví dụ: chúng có thể được sử dụng trong chú thích kiểu cho các method của một lớp generic hoặc trong thân lớp. Tuy nhiên, chúng không thể được sử dụng trong phạm vi module sau khi lớp được định nghĩa. Xem :ref:`type-params` để biết mô tả chi tiết về ngữ nghĩa runtime của các tham số kiểu.
 
-In order to support these scoping semantics, a new kind of scope is introduced,
-the :ref:`annotation scope <annotation-scopes>`. Annotation scopes behave for the
-most part like function scopes, but interact differently with enclosing class scopes.
-In Python 3.13, :term:`annotations <annotation>` will also be evaluated in
-annotation scopes.
+Để hỗ trợ các ngữ nghĩa phạm vi này, một loại phạm vi mới được giới thiệu, đó là :ref:`phạm vi annotation <annotation-scopes>`. Phạm vi annotation phần lớn hoạt động giống như phạm vi hàm, nhưng tương tác khác với các phạm vi lớp bao quanh. Trong Python 3.13, :term:`annotations <annotation>` cũng sẽ được đánh giá trong các phạm vi annotation.
 
-See :pep:`695` for more details.
+Xem :pep:`695` để biết thêm chi tiết.
 
-(PEP written by Eric Traut. Implementation by Jelle Zijlstra, Eric Traut,
-and others in :gh:`103764`.)
+(PEP do Eric Traut soạn thảo. Jelle Zijlstra, Eric Traut và những người khác triển khai trong :gh:`103764`.)
 
 .. _whatsnew312-pep701:
 
-PEP 701: Syntactic formalization of f-strings
+PEP 701: Chính thức hóa cú pháp của f-strings
 ---------------------------------------------
 
-:pep:`701` lifts some restrictions on the usage of :term:`f-strings <f-string>`.
-Expression components inside f-strings can now be any valid Python expression,
-including strings reusing the same quote as the containing f-string,
-multi-line expressions, comments, backslashes, and unicode escape sequences.
-Let's cover these in detail:
+:pep:`701` loại bỏ một số hạn chế đối với việc sử dụng :term:`f-strings <f-string>`. Các thành phần biểu thức bên trong f-strings giờ đây có thể là bất kỳ biểu thức Python hợp lệ nào, bao gồm các chuỗi sử dụng lại cùng loại dấu nháy với f-string chứa chúng, biểu thức nhiều dòng, chú thích, dấu gạch chéo ngược và các chuỗi escape Unicode. Hãy tìm hiểu chi tiết các trường hợp này:
 
-* Quote reuse: in Python 3.11, reusing the same quotes as the enclosing f-string
-  raises a :exc:`SyntaxError`, forcing the user to either use other available
-  quotes (like using double quotes or triple quotes if the f-string uses single
-  quotes). In Python 3.12, you can now do things like this:
+* Sử dụng lại dấu nháy: trong Python 3.11, việc sử dụng lại cùng loại dấu nháy với f-string bao quanh sẽ gây ra :exc:`SyntaxError`, buộc người dùng phải sử dụng các dấu nháy khác (chẳng hạn như dùng dấu nháy kép hoặc dấu nháy ba nếu f-string sử dụng dấu nháy đơn). Trong Python 3.12, giờ đây bạn có thể viết những đoạn như sau:
 
     >>> songs = ['Take me back to Eden', 'Alkaline', 'Ascensionism']
     >>> f"This is the playlist: {", ".join(songs)}"
     'This is the playlist: Take me back to Eden, Alkaline, Ascensionism'
 
-  Note that before this change there was no explicit limit in how f-strings can
-  be nested, but the fact that string quotes cannot be reused inside the
-  expression component of f-strings made it impossible to nest f-strings
-  arbitrarily. In fact, this is the most nested f-string that could be written:
+  Lưu ý rằng trước thay đổi này, không có giới hạn rõ ràng về việc f-strings có thể được lồng nhau như thế nào, nhưng việc không thể sử dụng lại dấu nháy bên trong thành phần biểu thức của f-strings khiến việc lồng f-strings tùy ý trở nên bất khả thi. Trên thực tế, đây là f-string được lồng sâu nhất có thể viết được:
 
     >>> f"""{f'''{f'{f"{1+1}"}'}'''}"""
     '2'
 
-  As now f-strings can contain any valid Python expression inside expression
-  components, it is now possible to nest f-strings arbitrarily:
+  Vì hiện nay f-string có thể chứa bất kỳ biểu thức Python hợp lệ nào bên trong các thành phần biểu thức, giờ đây bạn có thể lồng f-string tùy ý:
 
     >>> f"{f"{f"{f"{f"{f"{1+1}"}"}"}"}"}"
     '2'
 
-* Multi-line expressions and comments: In Python 3.11, f-string expressions
-  must be defined in a single line, even if the expression within the f-string
-  could normally span multiple lines
-  (like literal lists being defined over multiple lines),
-  making them harder to read. In Python 3.12 you can now define f-strings
-  spanning multiple lines, and add inline comments:
+* Biểu thức nhiều dòng và chú thích: Trong Python 3.11, các biểu thức f-string phải được định nghĩa trên một dòng duy nhất, ngay cả khi biểu thức bên trong f-string bình thường có thể trải dài trên nhiều dòng (chẳng hạn như các literal list được định nghĩa trên nhiều dòng), khiến chúng khó đọc hơn. Trong Python 3.12, giờ đây bạn có thể định nghĩa f-string trải dài trên nhiều dòng và thêm chú thích nội dòng:
 
     >>> f"This is the playlist: {", ".join([
     ...     'Take me back to Eden',  # My, my, those eyes like fire
@@ -287,11 +210,7 @@ Let's cover these in detail:
     ... ])}"
     'This is the playlist: Take me back to Eden, Alkaline, Ascensionism'
 
-* Backslashes and unicode characters: before Python 3.12 f-string expressions
-  couldn't contain any ``\`` character. This also affected unicode :ref:`escape
-  sequences <escape-sequences>` (such as ``\N{snowman}``) as these contain
-  the ``\N`` part that previously could not be part of expression components of
-  f-strings. Now, you can define expressions like this:
+* Dấu gạch chéo ngược và ký tự unicode: trước Python 3.12, các biểu thức f-string không thể chứa bất kỳ ký tự ``\``. Điều này cũng ảnh hưởng đến các :ref:`chuỗi escape <escape-sequences>` unicode (chẳng hạn như ``\N{snowman}``), vì chúng chứa phần ``\N`` trước đây không thể xuất hiện trong các thành phần biểu thức của f-string. Giờ đây, bạn có thể định nghĩa các biểu thức như sau:
 
     >>> print(f"This is the playlist: {"\n".join(songs)}")
     This is the playlist: Take me back to Eden
@@ -300,12 +219,9 @@ Let's cover these in detail:
     >>> print(f"This is the playlist: {"\N{BLACK HEART SUIT}".join(songs)}")
     This is the playlist: Take me back to Eden♥Alkaline♥Ascensionism
 
-See :pep:`701` for more details.
+Xem :pep:`701` để biết thêm chi tiết.
 
-As a positive side-effect of how this feature has been implemented (by parsing f-strings
-with :pep:`the PEG parser <617>`), now error messages for f-strings are more precise
-and include the exact location of the error. For example, in Python 3.11, the following
-f-string raises a :exc:`SyntaxError`:
+Một tác dụng phụ tích cực của cách triển khai tính năng này (bằng cách phân tích cú pháp f-string với :pep:`the PEG parser <617>`) là hiện nay các thông báo lỗi cho f-string chính xác hơn và bao gồm vị trí chính xác của lỗi. Ví dụ, trong Python 3.11, f-string sau đây sẽ phát sinh :exc:`SyntaxError`:
 
 .. code-block:: python
 
@@ -315,9 +231,7 @@ f-string raises a :exc:`SyntaxError`:
          ^^^
     SyntaxError: f-string: invalid syntax. Perhaps you forgot a comma?
 
-but the error message doesn't include the exact location of the error within the line and
-also has the expression artificially surrounded by parentheses. In Python 3.12, as f-strings
-are parsed with the PEG parser, error messages can be more precise and show the entire line:
+nhưng thông báo lỗi không bao gồm vị trí chính xác của lỗi trong dòng và cũng đặt biểu thức trong dấu ngoặc đơn một cách giả tạo. Trong Python 3.12, vì f-string được phân tích cú pháp bằng PEG parser, các thông báo lỗi có thể chính xác hơn và hiển thị toàn bộ dòng:
 
 .. code-block:: python
 
@@ -327,23 +241,16 @@ are parsed with the PEG parser, error messages can be more precise and show the 
                        ^^^
     SyntaxError: invalid syntax. Perhaps you forgot a comma?
 
-(Contributed by Pablo Galindo, Batuhan Taskaya, Lysandros Nikolaou, Cristián
-Maureira-Fredes and Marta Gómez in :gh:`102856`. PEP written by Pablo Galindo,
-Batuhan Taskaya, Lysandros Nikolaou and Marta Gómez).
+(Được đóng góp bởi Pablo Galindo, Batuhan Taskaya, Lysandros Nikolaou, Cristián Maureira-Fredes và Marta Gómez trong :gh:`102856`. PEP do Pablo Galindo, Batuhan Taskaya, Lysandros Nikolaou và Marta Gómez viết).
 
 .. _whatsnew312-pep684:
 
-PEP 684: A Per-Interpreter GIL
-------------------------------
+PEP 684: GIL riêng cho từng trình thông dịch
+--------------------------------------------
 
-:pep:`684` introduces a per-interpreter :term:`GIL <global interpreter lock>`,
-so that sub-interpreters may now be created with a unique GIL per interpreter.
-This allows Python programs to take full advantage of multiple CPU
-cores. This is currently only available through the C-API,
-though a Python API is :pep:`anticipated for 3.13 <554>`.
+:pep:`684` giới thiệu một :term:`GIL <global interpreter lock>` riêng cho từng trình thông dịch, nhờ đó giờ đây có thể tạo các trình thông dịch con với một GIL riêng cho mỗi trình thông dịch. Điều này cho phép các chương trình Python tận dụng tối đa nhiều lõi CPU. Hiện tại, tính năng này chỉ khả dụng thông qua C-API, mặc dù một Python API đang được lên kế hoạch.:pep:`anticipated for 3.13 <554>`
 
-Use the new :c:func:`Py_NewInterpreterFromConfig` function to
-create an interpreter with its own GIL:
+Sử dụng hàm :c:func:`Py_NewInterpreterFromConfig` mới để tạo một trình thông dịch với GIL riêng:
 
 .. code-block:: c
 
@@ -356,91 +263,57 @@ create an interpreter with its own GIL:
    if (PyStatus_Exception(status)) {
        return -1;
    }
-   /* The new interpreter is now active in the current thread. */
+   /* Trình thông dịch mới hiện đã hoạt động trong thread hiện tại. */
 
-For further examples how to use the C-API for sub-interpreters with a
-per-interpreter GIL, see ``Modules/_xxsubinterpretersmodule.c``.
+Để xem thêm các ví dụ về cách sử dụng C-API cho các trình thông dịch con với GIL riêng cho từng trình thông dịch, hãy xem ``Modules/_xxsubinterpretersmodule.c``.
 
-(Contributed by Eric Snow in :gh:`104210`, etc.)
+(Do Eric Snow đóng góp trong :gh:`104210`, v.v.)
 
 .. _whatsnew312-pep669:
 
-PEP 669: Low impact monitoring for CPython
-------------------------------------------
+PEP 669: Giám sát ít tác động cho CPython
+-----------------------------------------
 
-:pep:`669` defines a new :mod:`API <sys.monitoring>` for profilers,
-debuggers, and other tools to monitor events in CPython.
-It covers a wide range of events, including calls,
-returns, lines, exceptions, jumps, and more.
-This means that you only pay for what you use, providing support
-for near-zero overhead debuggers and coverage tools.
-See  :mod:`sys.monitoring` for details.
+:pep:`669` định nghĩa một :mod:`API <sys.monitoring>` mới dành cho profiler, debugger và các công cụ khác để giám sát các sự kiện trong CPython. API này bao quát nhiều loại sự kiện, bao gồm lệnh gọi, giá trị trả về, dòng lệnh, ngoại lệ, bước nhảy và nhiều loại khác. Điều này có nghĩa là bạn chỉ trả chi phí cho những gì mình sử dụng, hỗ trợ các debugger và công cụ đo độ bao phủ (coverage) có overhead gần bằng không. Xem :mod:`sys.monitoring` để biết chi tiết.
 
-(Contributed by Mark Shannon in :gh:`103082`.)
+(Do Mark Shannon đóng góp trong :gh:`103082`.)
 
 .. _whatsnew312-pep688:
 
-PEP 688: Making the buffer protocol accessible in Python
---------------------------------------------------------
+PEP 688: Giúp buffer protocol có thể truy cập trong Python
+----------------------------------------------------------
 
-:pep:`688` introduces a way to use the :ref:`buffer protocol <bufferobjects>`
-from Python code. Classes that implement the :meth:`~object.__buffer__` method
-are now usable as buffer types.
+:pep:`688` giới thiệu cách sử dụng :ref:`buffer protocol <bufferobjects>` từ mã Python. Các lớp triển khai phương thức :meth:`~object.__buffer__` hiện có thể được sử dụng làm kiểu buffer.
 
-The new :class:`collections.abc.Buffer` ABC provides a standard
-way to represent buffer objects, for example in type annotations.
-The new :class:`inspect.BufferFlags` enum represents the flags that
-can be used to customize buffer creation.
-(Contributed by Jelle Zijlstra in :gh:`102500`.)
+ABC :class:`collections.abc.Buffer` mới cung cấp một cách chuẩn để biểu diễn các đối tượng buffer, chẳng hạn trong chú thích kiểu. Enum :class:`inspect.BufferFlags` mới biểu diễn các cờ có thể dùng để tùy chỉnh việc tạo buffer. (Do Jelle Zijlstra đóng góp trong :gh:`102500`.)
 
 .. _whatsnew312-pep709:
 
-PEP 709: Comprehension inlining
--------------------------------
+PEP 709: Inline comprehension
+-----------------------------
 
-Dictionary, list, and set comprehensions are now inlined, rather than creating a
-new single-use function object for each execution of the comprehension. This
-speeds up execution of a comprehension by up to two times.
-See :pep:`709` for further details.
+Dictionary comprehension, list comprehension và set comprehension hiện được inline thay vì tạo một function object chỉ dùng một lần cho mỗi lần thực thi comprehension. Điều này tăng tốc độ thực thi comprehension lên đến hai lần. Xem :pep:`709` để biết thêm chi tiết.
 
-Comprehension iteration variables remain isolated and don't overwrite a
-variable of the same name in the outer scope, nor are they visible after the
-comprehension. Inlining does result in a few visible behavior changes:
+Các biến lặp của comprehension vẫn được cô lập và không ghi đè lên biến cùng tên trong phạm vi bên ngoài, đồng thời cũng không hiển thị sau comprehension. Việc inline dẫn đến một vài thay đổi có thể quan sát được trong hành vi:
 
-* There is no longer a separate frame for the comprehension in tracebacks,
-  and tracing/profiling no longer shows the comprehension as a function call.
-* The :mod:`symtable` module will no longer produce child symbol tables for each
-  comprehension; instead, the comprehension's locals will be included in the
-  parent function's symbol table.
-* Calling :func:`locals` inside a comprehension now includes variables
-  from outside the comprehension, and no longer includes the synthetic ``.0``
-  variable for the comprehension "argument".
-* A comprehension iterating directly over ``locals()`` (e.g. ``[k for k in
-  locals()]``) may see "RuntimeError: dictionary changed size during iteration"
-  when run under tracing (e.g. code coverage measurement). This is the same
-  behavior already seen in e.g. ``for k in locals():``. To avoid the error, first
-  create a list of keys to iterate over: ``keys = list(locals()); [k for k in
-  keys]``.
+* Không còn frame riêng cho comprehension trong traceback, và tracing/profiling cũng không còn hiển thị comprehension dưới dạng một lệnh gọi hàm.
+* Module :mod:`symtable` sẽ không còn tạo các bảng ký hiệu con cho từng comprehension; thay vào đó, các biến cục bộ của comprehension sẽ được đưa vào bảng ký hiệu của hàm cha.
+* Việc gọi :func:`locals` bên trong comprehension giờ đây bao gồm các biến bên ngoài comprehension và không còn bao gồm biến tổng hợp ``.0`` cho "đối số" của comprehension.
+* Một comprehension lặp trực tiếp trên ``locals()`` (ví dụ: ``[k for k in locals()]``) có thể gặp "RuntimeError: dictionary changed size during iteration" khi chạy dưới tracing (ví dụ: đo độ bao phủ mã). Đây là hành vi vốn đã được thấy trong ``for k in locals():``, chẳng hạn. Để tránh lỗi, trước tiên hãy tạo một danh sách các khóa cần lặp qua: ``keys = list(locals()); [k for k in keys]``.
 
-(Contributed by Carl Meyer and Vladimir Matveev in :pep:`709`.)
+(Do Carl Meyer và Vladimir Matveev đóng góp trong :pep:`709`.)
 
-Improved Error Messages
------------------------
+Thông báo lỗi được cải thiện
+----------------------------
 
-* Modules from the standard library are now potentially suggested as part of
-  the error messages displayed by the interpreter when a :exc:`NameError` is
-  raised to the top level. (Contributed by Pablo Galindo in :gh:`98254`.)
+* Các module từ thư viện chuẩn giờ đây có thể được đề xuất trong thông báo lỗi mà trình thông dịch hiển thị khi :exc:`NameError` được đưa lên cấp cao nhất. (Do Pablo Galindo đóng góp trong :gh:`98254`.)
 
     >>> sys.version_info
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
     NameError: name 'sys' is not defined. Did you forget to import 'sys'?
 
-* Improve the error suggestion for :exc:`NameError` exceptions for instances.
-  Now if a :exc:`NameError` is raised in a method and the instance has an
-  attribute that's exactly equal to the name in the exception, the suggestion
-  will include ``self.<NAME>`` instead of the closest match in the method
-  scope. (Contributed by Pablo Galindo in :gh:`99139`.)
+* Cải thiện đề xuất lỗi cho các ngoại lệ :exc:`NameError` đối với các instance. Giờ đây, nếu một :exc:`NameError` được phát sinh trong một phương thức và instance có một thuộc tính trùng khớp chính xác với tên trong ngoại lệ, đề xuất sẽ bao gồm ``self.<NAME>`` thay vì kết quả khớp gần nhất trong phạm vi của phương thức. (Do Pablo Galindo đóng góp trong :gh:`99139`.)
 
     >>> class A:
     ...    def __init__(self):
@@ -456,8 +329,7 @@ Improved Error Messages
                    ^^^^^
     NameError: name 'blech' is not defined. Did you mean: 'self.blech'?
 
-* Improve the :exc:`SyntaxError` error message when the user types ``import x
-  from y`` instead of ``from y import x``. (Contributed by Pablo Galindo in :gh:`98931`.)
+* Cải thiện thông báo lỗi :exc:`SyntaxError` khi người dùng nhập ``import x from y`` thay vì ``from y import x``. (Do Pablo Galindo đóng góp trong :gh:`98931`.)
 
     >>> import a.y.z from b.y.z
     Traceback (most recent call last):
@@ -466,9 +338,7 @@ Improved Error Messages
         ^^^^^^^^^^^^^^^^^^^^^^^
     SyntaxError: Did you mean to use 'from ... import ...' instead?
 
-* :exc:`ImportError` exceptions raised from failed ``from <module> import
-  <name>`` statements now include suggestions for the value of ``<name>`` based on the
-  available names in ``<module>``. (Contributed by Pablo Galindo in :gh:`91058`.)
+* Các ngoại lệ :exc:`ImportError` phát sinh từ các câu lệnh ``from <module> import <name>`` thất bại giờ đây sẽ bao gồm các đề xuất cho giá trị của ``<name>`` dựa trên những tên khả dụng trong ``<module>``. (Do Pablo Galindo đóng góp trong :gh:`91058`.)
 
     >>> from collections import chainmap
     Traceback (most recent call last):
@@ -476,23 +346,19 @@ Improved Error Messages
     ImportError: cannot import name 'chainmap' from 'collections'. Did you mean: 'ChainMap'?
 
 
-New Features Related to Type Hints
-==================================
+Các tính năng mới liên quan đến Type Hints
+==========================================
 
-This section covers major changes affecting :pep:`type hints <484>` and
-the :mod:`typing` module.
+Phần này trình bày các thay đổi lớn ảnh hưởng đến :pep:`type hints <484>` và module :mod:`typing`.
 
 .. _whatsnew312-pep692:
 
-PEP 692: Using ``TypedDict`` for more precise ``**kwargs`` typing
------------------------------------------------------------------
+PEP 692: Sử dụng ``TypedDict`` để định kiểu ``**kwargs`` chính xác hơn
+----------------------------------------------------------------------
 
-Typing ``**kwargs`` in a function signature as introduced by :pep:`484` allowed
-for valid annotations only in cases where all of the ``**kwargs`` were of the
-same type.
+Việc định kiểu ``**kwargs`` trong chữ ký hàm như được giới thiệu bởi :pep:`484` chỉ cho phép các chú thích hợp lệ trong những trường hợp tất cả ``**kwargs`` đều có cùng một kiểu.
 
-:pep:`692` specifies a more precise way of typing ``**kwargs`` by relying on
-typed dictionaries::
+:pep:`692` quy định một cách chính xác hơn để định kiểu ``**kwargs`` bằng cách dựa trên các typed dictionary.::
 
    from typing import TypedDict, Unpack
 
@@ -502,22 +368,18 @@ typed dictionaries::
 
    def foo(**kwargs: Unpack[Movie]): ...
 
-See :pep:`692` for more details.
+Xem :pep:`692` để biết thêm chi tiết.
 
-(Contributed by Franek Magiera in :gh:`103629`.)
+(Đóng góp bởi Franek Magiera trong :gh:`103629`.)
 
 .. _whatsnew312-pep698:
 
-PEP 698: Override Decorator for Static Typing
+PEP 698: Decorator Override cho Static Typing
 ---------------------------------------------
 
-A new decorator :deco:`typing.override` has been added to the :mod:`typing`
-module. It indicates to type checkers that the method is intended to override
-a method in a superclass. This allows type checkers to catch mistakes where
-a method that is intended to override something in a base class
-does not in fact do so.
+Một decorator mới :deco:`typing.override` đã được thêm vào module :mod:`typing`. Decorator này cho các trình kiểm tra kiểu biết rằng phương thức được dự định sẽ override một phương thức trong lớp cha. Điều này cho phép các trình kiểm tra kiểu phát hiện những lỗi trong đó một phương thức được dự định override một phương thức nào đó trong lớp cơ sở nhưng trên thực tế lại không làm vậy.
 
-Example::
+Ví dụ::
 
    from typing import override
 
@@ -535,459 +397,275 @@ Example::
      def get_colour(self) -> str:
        return "red"
 
-See :pep:`698` for more details.
+Xem :pep:`698` để biết thêm chi tiết.
 
-(Contributed by Steven Troxler in :gh:`101561`.)
+(Do Steven Troxler đóng góp trong :gh:`101561`.)
 
-Other Language Changes
-======================
+Các thay đổi khác về ngôn ngữ
+=============================
 
-* The parser now raises :exc:`SyntaxError` when parsing source code containing
-  null bytes. (Contributed by Pablo Galindo in :gh:`96670`.)
+* Trình phân tích cú pháp hiện đưa ra :exc:`SyntaxError` khi phân tích mã nguồn chứa byte null. (Do Pablo Galindo đóng góp trong :gh:`96670`.)
 
-* A backslash-character pair that is not a valid escape sequence now generates
-  a :exc:`SyntaxWarning`, instead of :exc:`DeprecationWarning`.
-  For example, ``re.compile("\d+\.\d+")`` now emits a :exc:`SyntaxWarning`
-  (``"\d"`` is an invalid escape sequence, use raw strings for regular
-  expression: ``re.compile(r"\d+\.\d+")``).
-  In a future Python version, :exc:`SyntaxError` will eventually be raised,
-  instead of :exc:`SyntaxWarning`.
-  (Contributed by Victor Stinner in :gh:`98401`.)
+* Một cặp ký tự dấu gạch chéo ngược không phải là escape sequence hợp lệ hiện tạo ra :exc:`SyntaxWarning`, thay vì :exc:`DeprecationWarning`. Ví dụ: ``re.compile("\d+\.\d+")`` hiện phát ra :exc:`SyntaxWarning` (``"\d"`` là một escape sequence không hợp lệ, hãy sử dụng chuỗi thô cho biểu thức chính quy: ``re.compile(r"\d+\.\d+")``). Trong một phiên bản Python tương lai, :exc:`SyntaxError` cuối cùng sẽ được đưa ra, thay vì :exc:`SyntaxWarning`. (Do Victor Stinner đóng góp trong :gh:`98401`.)
 
-* Octal escapes with value larger than ``0o377`` (ex: ``"\477"``), deprecated
-  in Python 3.11, now produce a :exc:`SyntaxWarning`, instead of
-  :exc:`DeprecationWarning`.
-  In a future Python version they will be eventually a :exc:`SyntaxError`.
-  (Contributed by Victor Stinner in :gh:`98401`.)
+* Các escape bát phân có giá trị lớn hơn ``0o377`` (ví dụ: ``"\477"``), đã bị phản đối trong Python 3.11, hiện tạo ra :exc:`SyntaxWarning`, thay vì
+  :exc:`DeprecationWarning`. Trong một phiên bản Python tương lai, cuối cùng chúng sẽ trở thành :exc:`SyntaxError`. (Do Victor Stinner đóng góp trong :gh:`98401`.)
 
-* Variables used in the target part of comprehensions that are not stored to
-  can now be used in assignment expressions (``:=``).
-  For example, in ``[(b := 1) for a, b.prop in some_iter]``, the assignment to
-  ``b`` is now allowed. Note that assigning to variables stored to in the target
-  part of comprehensions (like ``a``) is still disallowed, as per :pep:`572`.
-  (Contributed by Nikita Sobolev in :gh:`100581`.)
+* Các biến được sử dụng trong phần target của comprehensions nhưng không được lưu giờ đây có thể được sử dụng trong các biểu thức gán (``:=``). Ví dụ, trong ``[(b := 1) for a, b.prop in some_iter]``, việc gán cho ``b`` giờ đây được cho phép. Lưu ý rằng việc gán cho các biến được lưu trong phần target của comprehensions (như ``a``) vẫn không được phép, theo :pep:`572`. (Đóng góp của Nikita Sobolev trong :gh:`100581`.)
 
-* Exceptions raised in a class or type's ``__set_name__`` method are no longer
-  wrapped by a :exc:`RuntimeError`. Context information is added to the
-  exception as a :pep:`678` note. (Contributed by Irit Katriel in :gh:`77757`.)
+* Các ngoại lệ được phát sinh trong phương thức ``__set_name__`` của một class hoặc type không còn được bọc bởi một :exc:`RuntimeError`. Thông tin ngữ cảnh được thêm vào ngoại lệ dưới dạng một ghi chú :pep:`678`. (Đóng góp của Irit Katriel trong :gh:`77757`.)
 
-* When a ``try-except*`` construct handles the entire :exc:`ExceptionGroup`
-  and raises one other exception, that exception is no longer wrapped in an
-  :exc:`ExceptionGroup`. Also changed in version 3.11.4. (Contributed by Irit
-  Katriel in :gh:`103590`.)
+* Khi một cấu trúc ``try-except*`` xử lý toàn bộ :exc:`ExceptionGroup` và phát sinh một ngoại lệ khác, ngoại lệ đó không còn được bọc trong một
+  :exc:`ExceptionGroup`. Cũng đã được thay đổi trong phiên bản 3.11.4. (Đóng góp của Irit Katriel trong :gh:`103590`.)
 
-* The Garbage Collector now runs only on the eval breaker mechanism of the
-  Python bytecode evaluation loop instead of object allocations. The GC can
-  also run when :c:func:`PyErr_CheckSignals` is called so C extensions that
-  need to run for a long time without executing any Python code also have a
-  chance to execute the GC periodically. (Contributed by Pablo Galindo in
+* Garbage Collector giờ đây chỉ chạy theo cơ chế eval breaker của vòng lặp đánh giá bytecode Python thay vì khi cấp phát đối tượng. GC cũng có thể chạy khi :c:func:`PyErr_CheckSignals` được gọi, vì vậy các phần mở rộng C cần chạy trong thời gian dài mà không thực thi mã Python cũng có cơ hội chạy GC định kỳ. (Đóng góp của Pablo Galindo trong
   :gh:`97922`.)
 
-* All builtin and extension callables expecting boolean parameters now accept
-  arguments of any type instead of just :class:`bool` and :class:`int`.
-  (Contributed by Serhiy Storchaka in :gh:`60203`.)
+* Tất cả các callable builtin và extension yêu cầu tham số boolean giờ đây chấp nhận đối số thuộc bất kỳ kiểu nào thay vì chỉ :class:`bool` và :class:`int`. (Đóng góp của Serhiy Storchaka trong :gh:`60203`.)
 
-* :class:`memoryview` now supports the half-float type (the "e" format code).
-  (Contributed by Donghee Na and Antoine Pitrou in :gh:`90751`.)
+* :class:`memoryview` giờ đây hỗ trợ kiểu half-float (mã định dạng "e"). (Đóng góp của Donghee Na và Antoine Pitrou trong :gh:`90751`.)
 
-* :class:`slice` objects are now hashable, allowing them to be used as dict keys and
-  set items. (Contributed by Will Bradshaw, Furkan Onder, and Raymond Hettinger in :gh:`101264`.)
+* Các đối tượng :class:`slice` hiện có thể băm được, cho phép sử dụng chúng làm khóa dict và phần tử set. (Do Will Bradshaw, Furkan Onder và Raymond Hettinger đóng góp trong :gh:`101264`.)
 
-* :func:`sum` now uses Neumaier summation to improve accuracy and commutativity
-  when summing floats or mixed ints and floats.
-  (Contributed by Raymond Hettinger in :gh:`100425`.)
+* :func:`sum` hiện sử dụng phép cộng Neumaier để cải thiện độ chính xác và tính giao hoán khi cộng các số float hoặc hỗn hợp int và float. (Do Raymond Hettinger đóng góp trong :gh:`100425`.)
 
-* :func:`ast.parse` now raises :exc:`SyntaxError` instead of :exc:`ValueError`
-  when parsing source code containing null bytes. (Contributed by Pablo Galindo
-  in :gh:`96670`.)
+* :func:`ast.parse` hiện phát sinh :exc:`SyntaxError` thay vì :exc:`ValueError` khi phân tích mã nguồn chứa byte null. (Do Pablo Galindo đóng góp trong :gh:`96670`.)
 
-* The extraction methods in :mod:`tarfile`, and :func:`shutil.unpack_archive`,
-  have a new a *filter* argument that allows limiting tar features than may be
-  surprising or dangerous, such as creating files outside the destination
-  directory.
-  See :ref:`tarfile extraction filters <tarfile-extraction-filter>` for details.
-  In Python 3.14, the default will switch to ``'data'``.
-  (Contributed by Petr Viktorin in :pep:`706`.)
+* Các phương thức trích xuất trong :mod:`tarfile` và :func:`shutil.unpack_archive` có thêm đối số *filter*, cho phép giới hạn các tính năng của tar có thể gây bất ngờ hoặc nguy hiểm, chẳng hạn như tạo tệp bên ngoài thư mục đích. Xem :ref:`bộ lọc trích xuất tarfile <tarfile-extraction-filter>` để biết chi tiết. Trong Python 3.14, giá trị mặc định sẽ chuyển sang ``'data'``. (Do Petr Viktorin đóng góp trong :pep:`706`.)
 
-* :class:`types.MappingProxyType` instances are now hashable if the underlying
-  mapping is hashable.
-  (Contributed by Serhiy Storchaka in :gh:`87995`.)
+* Các instance :class:`types.MappingProxyType` hiện có thể băm được nếu mapping bên dưới có thể băm được. (Do Serhiy Storchaka đóng góp trong :gh:`87995`.)
 
-* Add :ref:`support for the perf profiler <perf_profiling>` through the new
-  environment variable :envvar:`PYTHONPERFSUPPORT`
-  and command-line option :option:`-X perf <-X>`,
-  as well as the new :func:`sys.activate_stack_trampoline`,
-  :func:`sys.deactivate_stack_trampoline`,
-  and :func:`sys.is_stack_trampoline_active` functions.
-  (Design by Pablo Galindo. Contributed by Pablo Galindo and Christian Heimes
-  with contributions from Gregory P. Smith [Google] and Mark Shannon
-  in :gh:`96123`.)
+* Thêm :ref:`hỗ trợ perf profiler <perf_profiling>` thông qua biến môi trường mới :envvar:`PYTHONPERFSUPPORT` và tùy chọn dòng lệnh :option:`-X perf <-X>`, cũng như :func:`sys.activate_stack_trampoline` mới,
+  các hàm :func:`sys.deactivate_stack_trampoline` và :func:`sys.is_stack_trampoline_active`. (Thiết kế bởi Pablo Galindo. Do Pablo Galindo và Christian Heimes đóng góp, cùng với các đóng góp của Gregory P. Smith [Google] và Mark Shannon trong :gh:`96123`.)
 
 
-New Modules
-===========
+Mô-đun mới
+==========
 
-* None.
+* Không có.
 
 
-Improved Modules
-================
+Mô-đun được cải thiện
+=====================
 
 array
 -----
 
-* The :class:`array.array` class now supports subscripting, making it a
-  :term:`generic type`. (Contributed by Jelle Zijlstra in :gh:`98658`.)
+* Lớp :class:`array.array` hiện hỗ trợ phép truy cập chỉ mục, nhờ đó trở thành một
+  :term:`generic type`. (Do Jelle Zijlstra đóng góp trong :gh:`98658`.)
 
 asyncio
 -------
 
-* The performance of writing to sockets in :mod:`asyncio` has been
-  significantly improved. ``asyncio`` now avoids unnecessary copying when
-  writing to sockets and uses :meth:`~socket.socket.sendmsg` if the platform
-  supports it. (Contributed by Kumar Aditya in :gh:`91166`.)
+* Hiệu năng ghi vào socket trong :mod:`asyncio` đã được cải thiện đáng kể. ``asyncio`` giờ đây tránh việc sao chép không cần thiết khi ghi vào socket và sử dụng :meth:`~socket.socket.sendmsg` nếu nền tảng hỗ trợ. (Đóng góp bởi Kumar Aditya trong :gh:`91166`.)
 
-* Add :func:`asyncio.eager_task_factory` and :func:`asyncio.create_eager_task_factory`
-  functions to allow opting an event loop in to eager task execution,
-  making some use-cases 2x to 5x faster.
-  (Contributed by Jacob Bower & Itamar Oren in :gh:`102853`, :gh:`104140`, and :gh:`104138`)
+* Thêm các hàm :func:`asyncio.eager_task_factory` và :func:`asyncio.create_eager_task_factory` để cho phép bật thực thi task eager cho event loop, giúp một số trường hợp sử dụng nhanh hơn từ 2 đến 5 lần. (Đóng góp bởi Jacob Bower và Itamar Oren trong :gh:`102853`, :gh:`104140` và :gh:`104138`.)
 
-* On Linux, :mod:`asyncio` uses :class:`!asyncio.PidfdChildWatcher` by default
-  if :func:`os.pidfd_open` is available and functional instead of
-  :class:`!asyncio.ThreadedChildWatcher`.
-  (Contributed by Kumar Aditya in :gh:`98024`.)
+* Trên Linux, :mod:`asyncio` sử dụng :class:`!asyncio.PidfdChildWatcher` theo mặc định nếu :func:`os.pidfd_open` khả dụng và hoạt động đúng thay vì
+  :class:`!asyncio.ThreadedChildWatcher`. (Đóng góp bởi Kumar Aditya trong :gh:`98024`.)
 
-* The event loop now uses the best available child watcher for each platform
-  (:class:`!asyncio.PidfdChildWatcher` if supported and
-  :class:`!asyncio.ThreadedChildWatcher` otherwise), so manually
-  configuring a child watcher is not recommended.
-  (Contributed by Kumar Aditya in :gh:`94597`.)
+* Event loop giờ đây sử dụng child watcher tốt nhất hiện có cho từng nền tảng (:class:`!asyncio.PidfdChildWatcher` nếu được hỗ trợ và
+  :class:`!asyncio.ThreadedChildWatcher` nếu không), vì vậy không nên tự cấu hình child watcher. (Đóng góp bởi Kumar Aditya trong :gh:`94597`.)
 
-* Add *loop_factory* parameter to :func:`asyncio.run` to allow specifying
-  a custom event loop factory.
-  (Contributed by Kumar Aditya in :gh:`99388`.)
+* Thêm tham số *loop_factory* vào :func:`asyncio.run` để cho phép chỉ định event loop factory tùy chỉnh. (Đóng góp bởi Kumar Aditya trong :gh:`99388`.)
 
-* Add C implementation of :func:`asyncio.current_task` for 4x-6x speedup.
-  (Contributed by Itamar Oren and Pranav Thulasiram Bhat in :gh:`100344`.)
+* Thêm triển khai C của :func:`asyncio.current_task` để tăng tốc 4x-6x. (Đóng góp bởi Itamar Oren và Pranav Thulasiram Bhat trong :gh:`100344`.)
 
-* :func:`asyncio.iscoroutine` now returns ``False`` for generators as
-  :mod:`asyncio` does not support legacy generator-based coroutines.
-  (Contributed by Kumar Aditya in :gh:`102748`.)
+* :func:`asyncio.iscoroutine` hiện trả về ``False`` cho các generator dưới dạng
+  :mod:`asyncio` không hỗ trợ các coroutine dựa trên generator kiểu cũ. (Đóng góp bởi Kumar Aditya trong :gh:`102748`.)
 
-* :func:`asyncio.wait` and :func:`asyncio.as_completed` now accepts generators
-  yielding tasks.
-  (Contributed by Kumar Aditya in :gh:`78530`.)
+* :func:`asyncio.wait` và :func:`asyncio.as_completed` hiện chấp nhận các generator trả về task. (Đóng góp bởi Kumar Aditya trong :gh:`78530`.)
 
 calendar
 --------
 
-* Add enums :data:`calendar.Month` and :data:`calendar.Day`
-  defining months of the year and days of the week.
-  (Contributed by Prince Roshan in :gh:`103636`.)
+* Thêm các enum :data:`calendar.Month` và :data:`calendar.Day` để định nghĩa các tháng trong năm và các ngày trong tuần. (Đóng góp bởi Prince Roshan trong :gh:`103636`.)
 
 csv
 ---
 
-* Add :const:`csv.QUOTE_NOTNULL` and :const:`csv.QUOTE_STRINGS` flags to
-  provide finer grained control of ``None`` and empty strings by
-  :class:`~csv.reader` and :class:`~csv.writer` objects.
+* Thêm các cờ :const:`csv.QUOTE_NOTNULL` và :const:`csv.QUOTE_STRINGS` để kiểm soát chi tiết hơn ``None`` và các chuỗi rỗng bằng
+  các đối tượng :class:`~csv.reader` và :class:`~csv.writer`.
 
 dis
 ---
 
-* Pseudo instruction opcodes (which are used by the compiler but
-  do not appear in executable bytecode) are now exposed in the
-  :mod:`dis` module.
-  :opcode:`HAVE_ARGUMENT` is still relevant to real opcodes,
-  but it is not useful for pseudo instructions. Use the new
-  :data:`dis.hasarg` collection instead.
-  (Contributed by Irit Katriel in :gh:`94216`.)
+* Các opcode của pseudo instruction (được compiler sử dụng nhưng không xuất hiện trong executable bytecode) hiện đã được cung cấp trong
+  module :mod:`dis`.
+  :opcode:`HAVE_ARGUMENT` vẫn phù hợp với các opcode thực, nhưng không hữu ích cho pseudo instruction. Thay vào đó, hãy sử dụng
+  collection :data:`dis.hasarg` mới. (Do Irit Katriel đóng góp trong :gh:`94216`.)
 
-* Add the :data:`dis.hasexc` collection to signify instructions that set
-  an exception handler. (Contributed by Irit Katriel in :gh:`94216`.)
+* Thêm collection :data:`dis.hasexc` để biểu thị các instruction thiết lập exception handler. (Do Irit Katriel đóng góp trong :gh:`94216`.)
 
 fractions
 ---------
 
-* Objects of type :class:`fractions.Fraction` now support float-style
-  formatting. (Contributed by Mark Dickinson in :gh:`100161`.)
+* Các object thuộc kiểu :class:`fractions.Fraction` hiện hỗ trợ định dạng kiểu float. (Do Mark Dickinson đóng góp trong :gh:`100161`.)
 
 importlib.resources
 -------------------
 
-* :func:`importlib.resources.as_file` now supports resource directories.
-  (Contributed by Jason R. Coombs in :gh:`97930`.)
+* :func:`importlib.resources.as_file` hiện hỗ trợ các thư mục tài nguyên. (Do Jason R. Coombs đóng góp trong :gh:`97930`.)
 
-* Rename first parameter of :func:`importlib.resources.files` to *anchor*.
-  (Contributed by Jason R. Coombs in :gh:`100598`.)
+* Đổi tên tham số đầu tiên của :func:`importlib.resources.files` thành *anchor*. (Do Jason R. Coombs đóng góp trong :gh:`100598`.)
 
 inspect
 -------
 
-* Add :func:`inspect.markcoroutinefunction` to mark sync functions that return
-  a :term:`coroutine` for use with :func:`inspect.iscoroutinefunction`.
-  (Contributed by Carlton Gibson in :gh:`99247`.)
+* Thêm :func:`inspect.markcoroutinefunction` để đánh dấu các hàm sync trả về một :term:`coroutine` để sử dụng với :func:`inspect.iscoroutinefunction`. (Do Carlton Gibson đóng góp trong :gh:`99247`.)
 
-* Add :func:`inspect.getasyncgenstate` and :func:`inspect.getasyncgenlocals`
-  for determining the current state of asynchronous generators.
-  (Contributed by Thomas Krennwallner in :gh:`79940`.)
+* Thêm :func:`inspect.getasyncgenstate` và :func:`inspect.getasyncgenlocals` để xác định trạng thái hiện tại của asynchronous generators. (Do Thomas Krennwallner đóng góp trong :gh:`79940`.)
 
-* The performance of :func:`inspect.getattr_static` has been considerably
-  improved. Most calls to the function should be at least 2x faster than they
-  were in Python 3.11. (Contributed by Alex Waygood in :gh:`103193`.)
+* Hiệu năng của :func:`inspect.getattr_static` đã được cải thiện đáng kể. Hầu hết các lệnh gọi đến hàm này sẽ nhanh hơn ít nhất 2 lần so với trong Python 3.11. (Do Alex Waygood đóng góp trong :gh:`103193`.)
 
 itertools
 ---------
 
-* Add :func:`itertools.batched` for collecting into even-sized
-  tuples where the last batch may be shorter than the rest.
-  (Contributed by Raymond Hettinger in :gh:`98363`.)
+* Thêm :func:`itertools.batched` để gom các phần tử thành các tuple có kích thước chẵn, trong đó nhóm cuối cùng có thể ngắn hơn các nhóm còn lại. (Do Raymond Hettinger đóng góp trong :gh:`98363`.)
 
 math
 ----
 
-* Add :func:`math.sumprod` for computing a sum of products.
-  (Contributed by Raymond Hettinger in :gh:`100485`.)
+* Thêm :func:`math.sumprod` để tính tổng các tích. (Do Raymond Hettinger đóng góp trong :gh:`100485`.)
 
-* Extend :func:`math.nextafter` to include a *steps* argument
-  for moving up or down multiple steps at a time. (Contributed by
-  Matthias Goergens, Mark Dickinson, and Raymond Hettinger in :gh:`94906`.)
+* Mở rộng :func:`math.nextafter` để bổ sung đối số *steps*, cho phép di chuyển lên hoặc xuống nhiều bước cùng một lúc. (Do Matthias Goergens, Mark Dickinson và Raymond Hettinger đóng góp trong :gh:`94906`.)
 
 os
 --
 
-* Add :const:`os.PIDFD_NONBLOCK` to open a file descriptor
-  for a process with :func:`os.pidfd_open` in non-blocking mode.
-  (Contributed by Kumar Aditya in :gh:`93312`.)
+* Thêm :const:`os.PIDFD_NONBLOCK` để mở file descriptor cho một tiến trình với :func:`os.pidfd_open` ở chế độ non-blocking. (Do Kumar Aditya đóng góp trong :gh:`93312`.)
 
-* :class:`os.DirEntry` now includes an :meth:`os.DirEntry.is_junction`
-  method to check if the entry is a junction.
-  (Contributed by Charles Machalow in :gh:`99547`.)
+* :class:`os.DirEntry` hiện bao gồm một phương thức :meth:`os.DirEntry.is_junction` để kiểm tra xem mục nhập có phải là junction hay không. (Do Charles Machalow đóng góp trong :gh:`99547`.)
 
-* Add :func:`os.listdrives`, :func:`os.listvolumes` and :func:`os.listmounts`
-  functions on Windows for enumerating drives, volumes and mount points.
-  (Contributed by Steve Dower in :gh:`102519`.)
+* Thêm các hàm :func:`os.listdrives`, :func:`os.listvolumes` và :func:`os.listmounts` trên Windows để liệt kê các ổ đĩa, volume và mount point. (Do Steve Dower đóng góp trong :gh:`102519`.)
 
-* :func:`os.stat` and :func:`os.lstat` are now more accurate on Windows.
-  The ``st_birthtime`` field will now be filled with the creation time
-  of the file, and ``st_ctime`` is deprecated but still contains the
-  creation time (but in the future will return the last metadata change,
-  for consistency with other platforms). ``st_dev`` may be up to 64 bits
-  and ``st_ino`` up to 128 bits depending on your file system, and
-  ``st_rdev`` is always set to zero rather than incorrect values.
-  Both functions may be significantly faster on newer releases of
-  Windows. (Contributed by Steve Dower in :gh:`99726`.)
+* :func:`os.stat` và :func:`os.lstat` hiện chính xác hơn trên Windows. Trường ``st_birthtime`` hiện sẽ được điền bằng thời điểm tạo tệp, còn ``st_ctime`` đã lỗi thời nhưng vẫn chứa thời điểm tạo (tuy nhiên trong tương lai sẽ trả về thời điểm thay đổi metadata gần nhất, để nhất quán với các nền tảng khác). ``st_dev`` có thể dài tối đa 64 bit và ``st_ino`` tối đa 128 bit tùy thuộc vào hệ thống tệp của bạn, còn ``st_rdev`` luôn được đặt thành 0 thay vì các giá trị không chính xác. Cả hai hàm có thể nhanh hơn đáng kể trên các bản phát hành Windows mới hơn. (Do Steve Dower đóng góp trong :gh:`99726`.)
 
 os.path
 -------
 
-* Add :func:`os.path.isjunction` to check if a given path is a junction.
-  (Contributed by Charles Machalow in :gh:`99547`.)
+* Thêm :func:`os.path.isjunction` để kiểm tra xem một đường dẫn đã cho có phải là junction hay không. (Do Charles Machalow đóng góp trong :gh:`99547`.)
 
-* Add :func:`os.path.splitroot` to split a path into a triad
-  ``(drive, root, tail)``. (Contributed by Barney Gale in :gh:`101000`.)
+* Thêm :func:`os.path.splitroot` để tách một đường dẫn thành bộ ba ``(drive, root, tail)``. (Do Barney Gale đóng góp trong :gh:`101000`.)
 
 pathlib
 -------
 
-* Add support for subclassing :class:`pathlib.PurePath` and
-  :class:`pathlib.Path`, plus their Posix- and Windows-specific variants.
-  Subclasses may override the :meth:`pathlib.PurePath.with_segments` method
-  to pass information between path instances.
+* Thêm hỗ trợ tạo lớp con của :class:`pathlib.PurePath` và
+  :class:`pathlib.Path`, cùng với các biến thể dành riêng cho Posix và Windows. Các lớp con có thể ghi đè phương thức :meth:`pathlib.PurePath.with_segments` để truyền thông tin giữa các thực thể đường dẫn.
 
-* Add :meth:`pathlib.Path.walk` for walking the directory trees and generating
-  all file or directory names within them, similar to :func:`os.walk`.
-  (Contributed by Stanislav Zmiev in :gh:`90385`.)
+* Thêm :meth:`pathlib.Path.walk` để duyệt qua các cây thư mục và tạo tên của tất cả tệp hoặc thư mục bên trong chúng, tương tự như :func:`os.walk`. (Do Stanislav Zmiev đóng góp trong :gh:`90385`.)
 
-* Add *walk_up* optional parameter to :meth:`pathlib.PurePath.relative_to`
-  to allow the insertion of ``..`` entries in the result; this behavior is
-  more consistent with :func:`os.path.relpath`.
-  (Contributed by Domenico Ragusa in :gh:`84538`.)
+* Thêm tham số tùy chọn *walk_up* vào :meth:`pathlib.PurePath.relative_to` để cho phép chèn các mục ``..`` vào kết quả; hành vi này nhất quán hơn với :func:`os.path.relpath`. (Do Domenico Ragusa đóng góp trong :gh:`84538`.)
 
-* Add :meth:`pathlib.Path.is_junction` as a proxy to :func:`os.path.isjunction`.
-  (Contributed by Charles Machalow in :gh:`99547`.)
+* Thêm :meth:`pathlib.Path.is_junction` làm proxy cho :func:`os.path.isjunction`. (Do Charles Machalow đóng góp trong :gh:`99547`.)
 
-* Add *case_sensitive* optional parameter to :meth:`pathlib.Path.glob`,
-  :meth:`pathlib.Path.rglob` and :meth:`pathlib.PurePath.match` for matching
-  the path's case sensitivity, allowing for more precise control over the matching process.
+* Thêm tham số tùy chọn *case_sensitive* vào :meth:`pathlib.Path.glob`,
+  :meth:`pathlib.Path.rglob` và :meth:`pathlib.PurePath.match` để khớp với độ phân biệt chữ hoa chữ thường của đường dẫn, cho phép kiểm soát chính xác hơn quá trình khớp.
 
 platform
 --------
 
-* Add support for detecting Windows 11 and Windows Server releases past 2012.
-  Previously, lookups on Windows Server platforms newer than Windows Server 2012
-  and on Windows 11 would return ``Windows-10``.
-  (Contributed by Steve Dower in :gh:`89545`.)
+* Thêm hỗ trợ phát hiện Windows 11 và các bản phát hành Windows Server mới hơn 2012. Trước đây, các lần tra cứu trên những nền tảng Windows Server mới hơn Windows Server 2012 và trên Windows 11 sẽ trả về ``Windows-10``. (Do Steve Dower đóng góp trong :gh:`89545`.)
 
 pdb
 ---
 
-* Add convenience variables to hold values temporarily for debug session
-  and provide quick access to values like the current frame or the return
-  value.
-  (Contributed by Tian Gao in :gh:`103693`.)
+* Thêm các biến tiện ích để tạm thời lưu giữ giá trị cho phiên debug và cung cấp quyền truy cập nhanh vào các giá trị như frame hiện tại hoặc giá trị trả về. (Do Tian Gao đóng góp trong :gh:`103693`.)
 
-random
-------
+ngẫu nhiên
+----------
 
-* Add :func:`random.binomialvariate`.
-  (Contributed by Raymond Hettinger in :gh:`81620`.)
+* Thêm :func:`random.binomialvariate`. (Đóng góp bởi Raymond Hettinger trong :gh:`81620`.)
 
-* Add a default of ``lambd=1.0`` to :func:`random.expovariate`.
-  (Contributed by Raymond Hettinger in :gh:`100234`.)
+* Thêm giá trị mặc định ``lambd=1.0`` vào :func:`random.expovariate`. (Đóng góp bởi Raymond Hettinger trong :gh:`100234`.)
 
 shutil
 ------
 
-* :func:`shutil.make_archive` now passes the *root_dir* argument to custom
-  archivers which support it.
-  In this case it no longer temporarily changes the current working directory
-  of the process to *root_dir* to perform archiving.
-  (Contributed by Serhiy Storchaka in :gh:`74696`.)
+* :func:`shutil.make_archive` giờ đây truyền đối số *root_dir* cho các trình lưu trữ tùy chỉnh hỗ trợ đối số này. Trong trường hợp này, nó không còn tạm thời thay đổi thư mục làm việc hiện tại của tiến trình thành *root_dir* để thực hiện việc lưu trữ. (Đóng góp bởi Serhiy Storchaka trong :gh:`74696`.)
 
-* :func:`shutil.rmtree` now accepts a new argument *onexc* which is an
-  error handler like *onerror* but which expects an exception instance
-  rather than a *(typ, val, tb)* triplet. *onerror* is deprecated.
-  (Contributed by Irit Katriel in :gh:`102828`.)
+* :func:`shutil.rmtree` giờ đây chấp nhận đối số mới *onexc*, là một trình xử lý lỗi giống như *onerror* nhưng yêu cầu một instance ngoại lệ thay vì bộ ba *(typ, val, tb)*. *onerror* đã bị deprecated. (Đóng góp bởi Irit Katriel trong :gh:`102828`.)
 
-* :func:`shutil.which` now consults the *PATHEXT* environment variable to
-  find matches within *PATH* on Windows even when the given *cmd* includes
-  a directory component.
-  (Contributed by Charles Machalow in :gh:`103179`.)
+* :func:`shutil.which` giờ đây kiểm tra biến môi trường *PATHEXT* để tìm các kết quả khớp trong *PATH* trên Windows ngay cả khi *cmd* đã cho bao gồm một thành phần thư mục. (Đóng góp bởi Charles Machalow trong :gh:`103179`.)
 
-  :func:`shutil.which` will call ``NeedCurrentDirectoryForExePathW`` when
-  querying for executables on Windows to determine if the current working
-  directory should be prepended to the search path.
-  (Contributed by Charles Machalow in :gh:`103179`.)
+  :func:`shutil.which` sẽ gọi ``NeedCurrentDirectoryForExePathW`` khi truy vấn các tệp thực thi trên Windows để xác định xem có nên thêm thư mục làm việc hiện tại vào đầu đường dẫn tìm kiếm hay không. (Do Charles Machalow đóng góp trong :gh:`103179`.)
 
-  :func:`shutil.which` will return a path matching the *cmd* with a component
-  from ``PATHEXT`` prior to a direct match elsewhere in the search path on
-  Windows.
-  (Contributed by Charles Machalow in :gh:`103179`.)
+  :func:`shutil.which` sẽ trả về một đường dẫn khớp với *cmd*, trong đó có một thành phần từ ``PATHEXT``, trước một kết quả khớp trực tiếp ở nơi khác trong đường dẫn tìm kiếm trên Windows. (Do Charles Machalow đóng góp trong :gh:`103179`.)
 
 sqlite3
 -------
 
-* Add a :ref:`command-line interface <sqlite3-cli>`.
-  (Contributed by Erlend E. Aasland in :gh:`77617`.)
+* Thêm :ref:`command-line interface <sqlite3-cli>`. (Do Erlend E. Aasland đóng góp trong :gh:`77617`.)
 
-* Add the :attr:`sqlite3.Connection.autocommit` attribute
-  to :class:`sqlite3.Connection`
-  and the *autocommit* parameter to :func:`sqlite3.connect`
-  to control :pep:`249`-compliant
-  :ref:`transaction handling <sqlite3-transaction-control-autocommit>`.
-  (Contributed by Erlend E. Aasland in :gh:`83638`.)
+* Thêm thuộc tính :attr:`sqlite3.Connection.autocommit` vào :class:`sqlite3.Connection` và tham số *autocommit* vào :func:`sqlite3.connect` để kiểm soát việc xử lý giao dịch tuân thủ :pep:`249`.
+  :ref:`xử lý giao dịch <sqlite3-transaction-control-autocommit>`. (Do Erlend E. Aasland đóng góp trong :gh:`83638`.)
 
-* Add *entrypoint* keyword-only parameter to
-  :meth:`sqlite3.Connection.load_extension`,
-  for overriding the SQLite extension entry point.
-  (Contributed by Erlend E. Aasland in :gh:`103015`.)
+* Thêm tham số chỉ dùng dưới dạng keyword *entrypoint* vào
+  :meth:`sqlite3.Connection.load_extension`, để ghi đè entry point của extension SQLite. (Do Erlend E. Aasland đóng góp trong :gh:`103015`.)
 
-* Add :meth:`sqlite3.Connection.getconfig` and
-  :meth:`sqlite3.Connection.setconfig` to :class:`sqlite3.Connection`
-  to make configuration changes to a database connection.
-  (Contributed by Erlend E. Aasland in :gh:`103489`.)
+* Thêm :meth:`sqlite3.Connection.getconfig` và
+  :meth:`sqlite3.Connection.setconfig` vào :class:`sqlite3.Connection` để thực hiện các thay đổi cấu hình đối với kết nối cơ sở dữ liệu. (Do Erlend E. Aasland đóng góp trong :gh:`103489`.)
 
 statistics
 ----------
 
-* Extend :func:`statistics.correlation` to include as a ``ranked`` method
-  for computing the Spearman correlation of ranked data.
-  (Contributed by Raymond Hettinger in :gh:`95861`.)
+* Mở rộng :func:`statistics.correlation` để thêm một phương thức ``ranked`` dùng cho việc tính toán tương quan Spearman của dữ liệu được xếp hạng. (Do Raymond Hettinger đóng góp trong :gh:`95861`.)
 
 sys
 ---
 
-* Add the :mod:`sys.monitoring` namespace to expose the new :ref:`PEP 669
-  <whatsnew312-pep669>` monitoring API.
-  (Contributed by Mark Shannon in :gh:`103082`.)
+* Thêm namespace :mod:`sys.monitoring` để cung cấp API giám sát :ref:`PEP 669 <whatsnew312-pep669>` mới. (Do Mark Shannon đóng góp trong :gh:`103082`.)
 
-* Add :func:`sys.activate_stack_trampoline` and
-  :func:`sys.deactivate_stack_trampoline` for activating and deactivating
-  stack profiler trampolines,
-  and :func:`sys.is_stack_trampoline_active` for querying if stack profiler
-  trampolines are active.
-  (Contributed by Pablo Galindo and Christian Heimes
-  with contributions from Gregory P. Smith [Google] and Mark Shannon
-  in :gh:`96123`.)
+* Thêm :func:`sys.activate_stack_trampoline` và
+  :func:`sys.deactivate_stack_trampoline` để kích hoạt và vô hiệu hóa các trampoline của stack profiler, và :func:`sys.is_stack_trampoline_active` để truy vấn xem các trampoline của stack profiler có đang hoạt động hay không. (Do Pablo Galindo và Christian Heimes đóng góp, cùng với các đóng góp của Gregory P. Smith [Google] và Mark Shannon trong :gh:`96123`.)
 
-* Add :data:`sys.last_exc` which holds the last unhandled exception that
-  was raised (for post-mortem debugging use cases). Deprecate the
-  three fields that have the same information in its legacy form:
-  :data:`sys.last_type`, :data:`sys.last_value` and :data:`sys.last_traceback`.
-  (Contributed by Irit Katriel in :gh:`102778`.)
+* Thêm :data:`sys.last_exc`, chứa ngoại lệ chưa được xử lý cuối cùng đã xảy ra (dành cho các trường hợp sử dụng gỡ lỗi post-mortem). Không dùng nữa ba trường có cùng thông tin ở dạng legacy:
+  :data:`sys.last_type`, :data:`sys.last_value` và :data:`sys.last_traceback`. (Do Irit Katriel đóng góp trong :gh:`102778`.)
 
-* :func:`sys._current_exceptions` now returns a mapping from thread-id to an
-  exception instance, rather than to a ``(typ, exc, tb)`` tuple.
-  (Contributed by Irit Katriel in :gh:`103176`.)
+* :func:`sys._current_exceptions` giờ đây trả về một mapping từ thread-id đến một exception instance, thay vì đến một tuple ``(typ, exc, tb)``. (Do Irit Katriel đóng góp trong :gh:`103176`.)
 
-* :func:`sys.setrecursionlimit` and :func:`sys.getrecursionlimit`.
-  The recursion limit now applies only to Python code. Builtin functions do
-  not use the recursion limit, but are protected by a different mechanism
-  that prevents recursion from causing a virtual machine crash.
+* :func:`sys.setrecursionlimit` và :func:`sys.getrecursionlimit`. Giới hạn đệ quy giờ đây chỉ áp dụng cho mã Python. Các hàm tích hợp không sử dụng giới hạn đệ quy, nhưng được bảo vệ bằng một cơ chế khác nhằm ngăn việc đệ quy gây ra sự cố cho máy ảo.
 
 tempfile
 --------
 
-* The :class:`tempfile.NamedTemporaryFile` function has a new optional parameter
-  *delete_on_close* (Contributed by Evgeny Zorin in :gh:`58451`.)
-* :func:`tempfile.mkdtemp` now always returns an absolute path, even if the
-  argument provided to the *dir* parameter is a relative path.
+* Hàm :class:`tempfile.NamedTemporaryFile` có thêm tham số tùy chọn *delete_on_close* (Do Evgeny Zorin đóng góp trong :gh:`58451`.)
+* :func:`tempfile.mkdtemp` giờ đây luôn trả về một đường dẫn tuyệt đối, ngay cả khi đối số được truyền cho tham số *dir* là một đường dẫn tương đối.
 
 threading
 ---------
 
-* Add :func:`threading.settrace_all_threads` and
-  :func:`threading.setprofile_all_threads` that allow to set tracing and
-  profiling functions in all running threads in addition to the calling one.
-  (Contributed by Pablo Galindo in :gh:`93503`.)
+* Thêm :func:`threading.settrace_all_threads` và
+  :func:`threading.setprofile_all_threads` cho phép thiết lập các hàm tracing và profiling trong tất cả các thread đang chạy, ngoài thread đang gọi. (Do Pablo Galindo đóng góp trong :gh:`93503`.)
 
 tkinter
 -------
 
-* ``tkinter.Canvas.coords()`` now flattens its arguments.
-  It now accepts not only coordinates as separate arguments
-  (``x1, y1, x2, y2, ...``) and a sequence of coordinates
-  (``[x1, y1, x2, y2, ...]``), but also coordinates grouped in pairs
-  (``(x1, y1), (x2, y2), ...`` and ``[(x1, y1), (x2, y2), ...]``),
-  like ``create_*()`` methods.
-  (Contributed by Serhiy Storchaka in :gh:`94473`.)
+* ``tkinter.Canvas.coords()`` giờ đây làm phẳng các đối số. Hàm này không chỉ chấp nhận tọa độ dưới dạng các đối số riêng biệt (``x1, y1, x2, y2, ...``) và một chuỗi tọa độ (``[x1, y1, x2, y2, ...]``), mà còn chấp nhận các tọa độ được nhóm thành từng cặp (``(x1, y1), (x2, y2), ...`` và ``[(x1, y1), (x2, y2), ...]``), giống như các phương thức ``create_*()``. (Do Serhiy Storchaka đóng góp trong :gh:`94473`.)
 
 tokenize
 --------
 
-* The :mod:`tokenize` module includes the changes introduced in :pep:`701`.
-  (Contributed by Marta Gómez Macías and Pablo Galindo in :gh:`102856`.)
-  See :ref:`whatsnew312-porting-to-python312` for more information on the
-  changes to the :mod:`tokenize` module.
+* Mô-đun :mod:`tokenize` bao gồm các thay đổi được giới thiệu trong :pep:`701`. (Do Marta Gómez Macías và Pablo Galindo đóng góp trong :gh:`102856`.) Xem :ref:`whatsnew312-porting-to-python312` để biết thêm thông tin về các thay đổi đối với mô-đun :mod:`tokenize`.
 
 types
 -----
 
-* Add :func:`types.get_original_bases` to allow for further introspection of
-  :ref:`user-defined-generics` when subclassed. (Contributed by
-  James Hilton-Balfe and Alex Waygood in :gh:`101827`.)
+* Thêm :func:`types.get_original_bases` để cho phép kiểm tra nội quan sâu hơn về
+  :ref:`user-defined-generics` khi được phân lớp con. (Do James Hilton-Balfe và Alex Waygood đóng góp trong :gh:`101827`.)
 
 .. _whatsnew-typing-py312:
 
 typing
 ------
 
-* :func:`isinstance` checks against
-  :func:`runtime-checkable protocols <typing.runtime_checkable>` now use
-  :func:`inspect.getattr_static` rather than :func:`hasattr` to lookup whether
-  attributes exist. This means that descriptors and :meth:`~object.__getattr__`
-  methods are no longer unexpectedly evaluated during ``isinstance()`` checks
-  against runtime-checkable protocols. However, it may also mean that some
-  objects which used to be considered instances of a runtime-checkable protocol
-  may no longer be considered instances of that protocol on Python 3.12+, and
-  vice versa. Most users are unlikely to be affected by this change.
-  (Contributed by Alex Waygood in :gh:`102433`.)
+* :func:`isinstance` kiểm tra đối chiếu với
+  :func:`runtime-checkable protocols <typing.runtime_checkable>` hiện sử dụng
+  :func:`inspect.getattr_static` thay vì :func:`hasattr` để tra cứu xem các thuộc tính có tồn tại hay không. Điều này có nghĩa là các descriptor và phương thức :meth:`~object.__getattr__` không còn bị đánh giá ngoài dự kiến trong các phép kiểm tra ``isinstance()`` đối với các protocol có thể kiểm tra tại runtime. Tuy nhiên, điều này cũng có thể có nghĩa là một số đối tượng trước đây được xem là các instance của một protocol có thể kiểm tra tại runtime nay có thể không còn được xem là instance của protocol đó trên Python 3.12+ và ngược lại. Phần lớn người dùng khó có khả năng bị ảnh hưởng bởi thay đổi này. (Đóng góp bởi Alex Waygood trong :gh:`102433`.)
 
-* The members of a runtime-checkable protocol are now considered "frozen" at
-  runtime as soon as the class has been created. Monkey-patching attributes
-  onto a runtime-checkable protocol will still work, but will have no impact on
-  :func:`isinstance` checks comparing objects to the protocol. For example::
+* Các thành viên của một protocol có thể kiểm tra tại runtime hiện được xem là "frozen" tại runtime ngay sau khi class được tạo. Việc monkey-patching các thuộc tính vào một protocol có thể kiểm tra tại runtime vẫn sẽ hoạt động, nhưng sẽ không ảnh hưởng đến
+  các phép kiểm tra :func:`isinstance` so sánh các đối tượng với protocol. Ví dụ::
 
       >>> from typing import Protocol, runtime_checkable
       >>> @runtime_checkable
@@ -1006,34 +684,25 @@ typing
       >>> isinstance(f, HasX)  # unchanged, even though HasX now also has a "y" attribute
       True
 
-  This change was made in order to speed up ``isinstance()`` checks against
-  runtime-checkable protocols.
+  Thay đổi này được thực hiện nhằm tăng tốc các phép kiểm tra ``isinstance()`` đối với các protocol có thể kiểm tra tại runtime.
 
-* The performance profile of :func:`isinstance` checks against
-  :func:`runtime-checkable protocols <typing.runtime_checkable>` has changed
-  significantly. Most ``isinstance()`` checks against protocols with only a few
-  members should be at least 2x faster than in 3.11, and some may be 20x
-  faster or more. However, ``isinstance()`` checks against protocols with many
-  members may be slower than in Python 3.11. (Contributed by Alex
-  Waygood in :gh:`74690` and :gh:`103193`.)
+* Đặc tính hiệu năng của các phép kiểm tra :func:`isinstance` đối với
+  :func:`runtime-checkable protocols <typing.runtime_checkable>` đã thay đổi đáng kể. Hầu hết các phép kiểm tra ``isinstance()`` đối với các protocol chỉ có một vài thành viên sẽ nhanh hơn ít nhất 2 lần so với 3.11, và một số có thể nhanh hơn 20 lần hoặc hơn. Tuy nhiên, các phép kiểm tra ``isinstance()`` đối với các protocol có nhiều thành viên có thể chậm hơn so với Python 3.11. (Đóng góp bởi Alex Waygood trong :gh:`74690` và :gh:`103193`.)
 
-* All :data:`typing.TypedDict` and :data:`typing.NamedTuple` classes now have the
-  ``__orig_bases__`` attribute. (Contributed by Adrian Garcia Badaracco in
+* Tất cả các lớp :data:`typing.TypedDict` và :data:`typing.NamedTuple` hiện đều có thuộc tính ``__orig_bases__``. (Đóng góp của Adrian Garcia Badaracco trong
   :gh:`103699`.)
 
-* Add ``frozen_default`` parameter to :deco:`typing.dataclass_transform`.
-  (Contributed by Erik De Bonte in :gh:`99957`.)
+* Thêm tham số ``frozen_default`` vào :deco:`typing.dataclass_transform`. (Đóng góp của Erik De Bonte trong :gh:`99957`.)
 
 unicodedata
 -----------
 
-* The Unicode database has been updated to version 15.0.0. (Contributed by
-  Benjamin Peterson in :gh:`96734`).
+* Cơ sở dữ liệu Unicode đã được cập nhật lên phiên bản 15.0.0. (Đóng góp của Benjamin Peterson trong :gh:`96734`).
 
 unittest
 --------
 
-Add a ``--durations`` command line option, showing the N slowest test cases::
+Thêm tùy chọn dòng lệnh ``--durations``, hiển thị N trường hợp kiểm thử chạy chậm nhất::
 
   python3 -m unittest --durations=3 lib.tests.test_threading
   .....
@@ -1049,115 +718,78 @@ Add a ``--durations`` command line option, showing the N slowest test cases::
 
   OK (skipped=3)
 
-(Contributed by Giampaolo Rodola in :gh:`48330`)
+(Đóng góp của Giampaolo Rodola trong :gh:`48330`)
 
 uuid
 ----
 
-* Add a :ref:`command-line interface <uuid-cli>`.
-  (Contributed by Adam Chhina in :gh:`88597`.)
+* Thêm :ref:`giao diện dòng lệnh <uuid-cli>`. (Đóng góp của Adam Chhina trong :gh:`88597`.)
 
 
-Optimizations
-=============
-
-* Remove ``wstr`` and ``wstr_length`` members from Unicode objects.
-  It reduces object size by 8 or 16 bytes on 64bit platform. (:pep:`623`)
-  (Contributed by Inada Naoki in :gh:`92536`.)
-
-* Add experimental support for using the BOLT binary optimizer in the build
-  process, which improves performance by 1-5%.
-  (Contributed by Kevin Modzelewski in :gh:`90536` and tuned by Donghee Na in :gh:`101525`)
-
-* Speed up the regular expression substitution (functions :func:`re.sub` and
-  :func:`re.subn` and corresponding :class:`!re.Pattern` methods) for
-  replacement strings containing group references by 2--3 times.
-  (Contributed by Serhiy Storchaka in :gh:`91524`.)
-
-* Speed up :class:`asyncio.Task` creation by deferring expensive string formatting.
-  (Contributed by Itamar Oren in :gh:`103793`.)
-
-* The :func:`tokenize.tokenize` and :func:`tokenize.generate_tokens` functions are
-  up to 64% faster as a side effect of the changes required to cover :pep:`701` in
-  the :mod:`tokenize` module. (Contributed by Marta Gómez Macías and Pablo Galindo
-  in :gh:`102856`.)
-
-* Speed up :func:`super` method calls and attribute loads via the
-  new :opcode:`LOAD_SUPER_ATTR` instruction. (Contributed by Carl Meyer and
-  Vladimir Matveev in :gh:`103497`.)
-
-
-CPython bytecode changes
-========================
-
-* Remove the :opcode:`!LOAD_METHOD` instruction. It has been merged into
-  :opcode:`LOAD_ATTR`. :opcode:`LOAD_ATTR` will now behave like the old
-  :opcode:`!LOAD_METHOD` instruction if the low bit of its oparg is set.
-  (Contributed by Ken Jin in :gh:`93429`.)
-
-* Remove the :opcode:`!JUMP_IF_FALSE_OR_POP` and :opcode:`!JUMP_IF_TRUE_OR_POP`
-  instructions. (Contributed by Irit Katriel in :gh:`102859`.)
-
-* Remove the :opcode:`!PRECALL` instruction. (Contributed by Mark Shannon in
-  :gh:`92925`.)
-
-* Add the :opcode:`BINARY_SLICE` and :opcode:`STORE_SLICE` instructions.
-  (Contributed by Mark Shannon in :gh:`94163`.)
-
-* Add the :opcode:`CALL_INTRINSIC_1` instructions.
-  (Contributed by Mark Shannon in :gh:`99005`.)
-
-* Add the :opcode:`CALL_INTRINSIC_2` instruction.
-  (Contributed by Irit Katriel in :gh:`101799`.)
-
-* Add the :opcode:`CLEANUP_THROW` instruction.
-  (Contributed by Brandt Bucher in :gh:`90997`.)
-
-* Add the :opcode:`!END_SEND` instruction.
-  (Contributed by Mark Shannon in :gh:`103082`.)
-
-* Add the :opcode:`LOAD_FAST_AND_CLEAR` instruction as part of the
-  implementation of :pep:`709`. (Contributed by Carl Meyer in :gh:`101441`.)
-
-* Add the :opcode:`LOAD_FAST_CHECK` instruction.
-  (Contributed by Dennis Sweeney in :gh:`93143`.)
-
-* Add the :opcode:`LOAD_FROM_DICT_OR_DEREF`, :opcode:`LOAD_FROM_DICT_OR_GLOBALS`,
-  and :opcode:`LOAD_LOCALS` opcodes as part of the implementation of :pep:`695`.
-  Remove the :opcode:`!LOAD_CLASSDEREF` opcode, which can be replaced with
-  :opcode:`LOAD_LOCALS` plus :opcode:`LOAD_FROM_DICT_OR_DEREF`. (Contributed
-  by Jelle Zijlstra in :gh:`103764`.)
-
-* Add the :opcode:`LOAD_SUPER_ATTR` instruction. (Contributed by Carl Meyer and
-  Vladimir Matveev in :gh:`103497`.)
-
-* Add the ``RETURN_CONST`` instruction. (Contributed by Wenyang Wang in :gh:`101632`.)
-
-Demos and Tools
-===============
-
-* Remove the ``Tools/demo/`` directory which contained old demo scripts. A copy
-  can be found in the `old-demos project
-  <https://github.com/gvanrossum/old-demos>`_.
-  (Contributed by Victor Stinner in :gh:`97681`.)
-
-* Remove outdated example scripts of the ``Tools/scripts/`` directory.
-  A copy can be found in the `old-demos project
-  <https://github.com/gvanrossum/old-demos>`_.
-  (Contributed by Victor Stinner in :gh:`97669`.)
-
-
-Deprecated
+Tối ưu hóa
 ==========
 
-* :mod:`argparse`: The *type*, *choices*, and *metavar* parameters
-  of :class:`!argparse.BooleanOptionalAction` are deprecated
-  and will be removed in 3.14.
-  (Contributed by Nikita Sobolev in :gh:`92248`.)
+* Xóa các thành viên ``wstr`` và ``wstr_length`` khỏi các đối tượng Unicode. Việc này làm giảm kích thước đối tượng 8 hoặc 16 byte trên nền tảng 64-bit. (:pep:`623`) (Đóng góp của Inada Naoki trong :gh:`92536`.)
 
-* :mod:`ast`: The following :mod:`ast` features have been deprecated in documentation since
-  Python 3.8, now cause a :exc:`DeprecationWarning` to be emitted at runtime
-  when they are accessed or used, and will be removed in Python 3.14:
+* Thêm hỗ trợ thử nghiệm cho việc sử dụng trình tối ưu hóa nhị phân BOLT trong quá trình build, giúp cải thiện hiệu suất từ 1-5%. (Đóng góp của Kevin Modzelewski trong :gh:`90536` và được Donghee Na tinh chỉnh trong :gh:`101525`)
+
+* Tăng tốc việc thay thế biểu thức chính quy (các hàm :func:`re.sub` và
+  :func:`re.subn` cùng các phương thức :class:`!re.Pattern` tương ứng) đối với các chuỗi thay thế chứa tham chiếu nhóm lên 2--3 lần. (Đóng góp của Serhiy Storchaka trong :gh:`91524`.)
+
+* Tăng tốc việc tạo :class:`asyncio.Task` bằng cách trì hoãn việc định dạng chuỗi tốn kém. (Đóng góp của Itamar Oren trong :gh:`103793`.)
+
+* Các hàm :func:`tokenize.tokenize` và :func:`tokenize.generate_tokens` nhanh hơn tới 64% nhờ tác động phụ của những thay đổi cần thiết để bao quát :pep:`701` trong mô-đun :mod:`tokenize`. (Đóng góp của Marta Gómez Macías và Pablo Galindo trong :gh:`102856`.)
+
+* Tăng tốc các lệnh gọi phương thức và việc tải thuộc tính của :func:`super` thông qua instruction :opcode:`LOAD_SUPER_ATTR` mới. (Đóng góp của Carl Meyer và Vladimir Matveev trong :gh:`103497`.)
+
+
+Các thay đổi về bytecode của CPython
+====================================
+
+* Xóa instruction :opcode:`!LOAD_METHOD`. Instruction này đã được hợp nhất vào
+  :opcode:`LOAD_ATTR`. :opcode:`LOAD_ATTR` giờ đây sẽ hoạt động giống như instruction cũ
+  :opcode:`!LOAD_METHOD` nếu bit thấp của oparg được đặt. (Đóng góp của Ken Jin trong :gh:`93429`.)
+
+* Xóa các chỉ thị :opcode:`!JUMP_IF_FALSE_OR_POP` và :opcode:`!JUMP_IF_TRUE_OR_POP`. (Do Irit Katriel đóng góp trong :gh:`102859`.)
+
+* Xóa chỉ thị :opcode:`!PRECALL`. (Do Mark Shannon đóng góp trong
+  :gh:`92925`.)
+
+* Thêm các chỉ thị :opcode:`BINARY_SLICE` và :opcode:`STORE_SLICE`. (Do Mark Shannon đóng góp trong :gh:`94163`.)
+
+* Thêm các chỉ thị :opcode:`CALL_INTRINSIC_1`. (Do Mark Shannon đóng góp trong :gh:`99005`.)
+
+* Thêm chỉ thị :opcode:`CALL_INTRINSIC_2`. (Do Irit Katriel đóng góp trong :gh:`101799`.)
+
+* Thêm chỉ thị :opcode:`CLEANUP_THROW`. (Do Brandt Bucher đóng góp trong :gh:`90997`.)
+
+* Thêm chỉ thị :opcode:`!END_SEND`. (Do Mark Shannon đóng góp trong :gh:`103082`.)
+
+* Thêm lệnh :opcode:`LOAD_FAST_AND_CLEAR` như một phần trong việc triển khai :pep:`709`. (Do Carl Meyer đóng góp trong :gh:`101441`.)
+
+* Thêm lệnh :opcode:`LOAD_FAST_CHECK`. (Do Dennis Sweeney đóng góp trong :gh:`93143`.)
+
+* Thêm các opcode :opcode:`LOAD_FROM_DICT_OR_DEREF`, :opcode:`LOAD_FROM_DICT_OR_GLOBALS` và :opcode:`LOAD_LOCALS` như một phần trong việc triển khai :pep:`695`. Xóa opcode :opcode:`!LOAD_CLASSDEREF`, có thể được thay thế bằng
+  :opcode:`LOAD_LOCALS` cộng với :opcode:`LOAD_FROM_DICT_OR_DEREF`. (Do Jelle Zijlstra đóng góp trong :gh:`103764`.)
+
+* Thêm lệnh :opcode:`LOAD_SUPER_ATTR`. (Do Carl Meyer và Vladimir Matveev đóng góp trong :gh:`103497`.)
+
+* Thêm lệnh ``RETURN_CONST``. (Do Wenyang Wang đóng góp trong :gh:`101632`.)
+
+Bản trình diễn và Công cụ
+=========================
+
+* Xóa thư mục ``Tools/demo/`` chứa các demo script cũ. Có thể tìm thấy bản sao trong `dự án old-demos <https://github.com/gvanrossum/old-demos>`_. (Do Victor Stinner đóng góp trong :gh:`97681`.)
+
+* Xóa các example script đã lỗi thời của thư mục ``Tools/scripts/``. Có thể tìm thấy bản sao trong `dự án old-demos <https://github.com/gvanrossum/old-demos>`_. (Do Victor Stinner đóng góp trong :gh:`97669`.)
+
+
+Không còn được khuyến nghị
+==========================
+
+* :mod:`argparse`: Các tham số *type*, *choices* và *metavar* của :class:`!argparse.BooleanOptionalAction` không còn được khuyến nghị và sẽ bị xóa trong 3.14. (Do Nikita Sobolev đóng góp trong :gh:`92248`.)
+
+* :mod:`ast`: Các :mod:`ast` tính năng sau đây đã không còn được khuyến nghị trong tài liệu kể từ Python 3.8, hiện sẽ khiến một :exc:`DeprecationWarning` được phát ra tại runtime khi chúng được truy cập hoặc sử dụng, và sẽ bị xóa trong Python 3.14:
 
   * :class:`!ast.Num`
   * :class:`!ast.Str`
@@ -1165,193 +797,103 @@ Deprecated
   * :class:`!ast.NameConstant`
   * :class:`!ast.Ellipsis`
 
-  Use :class:`ast.Constant` instead.
-  (Contributed by Serhiy Storchaka in :gh:`90953`.)
+  Thay vào đó, hãy sử dụng :class:`ast.Constant`. (Do Serhiy Storchaka đóng góp trong :gh:`90953`.)
 
 * :mod:`asyncio`:
 
-  * The child watcher classes :class:`!asyncio.MultiLoopChildWatcher`,
-    :class:`!asyncio.FastChildWatcher`, :class:`!asyncio.AbstractChildWatcher`
-    and :class:`!asyncio.SafeChildWatcher` are deprecated and
-    will be removed in Python 3.14.
-    (Contributed by Kumar Aditya in :gh:`94597`.)
+  * Các class child watcher :class:`!asyncio.MultiLoopChildWatcher`,
+    :class:`!asyncio.FastChildWatcher`, :class:`!asyncio.AbstractChildWatcher` và :class:`!asyncio.SafeChildWatcher` đã lỗi thời và sẽ bị loại bỏ trong Python 3.14. (Do Kumar Aditya đóng góp trong :gh:`94597`.)
 
   * :func:`!asyncio.set_child_watcher`, :func:`!asyncio.get_child_watcher`,
-    :meth:`!asyncio.AbstractEventLoopPolicy.set_child_watcher` and
-    :meth:`!asyncio.AbstractEventLoopPolicy.get_child_watcher` are deprecated
-    and will be removed in Python 3.14.
-    (Contributed by Kumar Aditya in :gh:`94597`.)
+    :meth:`!asyncio.AbstractEventLoopPolicy.set_child_watcher` và
+    :meth:`!asyncio.AbstractEventLoopPolicy.get_child_watcher` đã lỗi thời và sẽ bị loại bỏ trong Python 3.14. (Do Kumar Aditya đóng góp trong :gh:`94597`.)
 
-  * The :meth:`~asyncio.get_event_loop` method of the
-    default event loop policy now emits a :exc:`DeprecationWarning` if there
-    is no current event loop set and it decides to create one.
-    (Contributed by Serhiy Storchaka and Guido van Rossum in :gh:`100160`.)
+  * Phương thức :meth:`~asyncio.get_event_loop` của chính sách event loop mặc định hiện phát ra một :exc:`DeprecationWarning` nếu chưa đặt event loop hiện tại và phương thức này quyết định tạo một event loop. (Do Serhiy Storchaka và Guido van Rossum đóng góp trong :gh:`100160`.)
 
-* :mod:`calendar`: ``calendar.January`` and ``calendar.February`` constants are deprecated and
-  replaced by :data:`calendar.JANUARY` and :data:`calendar.FEBRUARY`.
-  (Contributed by Prince Roshan in :gh:`103636`.)
+* :mod:`calendar`: Các hằng số ``calendar.January`` và ``calendar.February`` đã lỗi thời và được thay thế bằng :data:`calendar.JANUARY` và :data:`calendar.FEBRUARY`. (Do Prince Roshan đóng góp trong :gh:`103636`.)
 
-* :mod:`collections.abc`: Deprecated :class:`collections.abc.ByteString`.
+* :mod:`collections.abc`: :class:`collections.abc.ByteString` đã lỗi thời.
 
-  Use ``isinstance(obj, collections.abc.Buffer)`` to test if ``obj`` implements
-  the :ref:`buffer protocol <bufferobjects>` at runtime. For use in type
-  annotations, either use :class:`~collections.abc.Buffer` or a union
-  that explicitly specifies the types your code supports (e.g.,
-  ``bytes | bytearray | memoryview``).
+  Dùng ``isinstance(obj, collections.abc.Buffer)`` để kiểm tra xem ``obj`` có triển khai :ref:`buffer protocol <bufferobjects>` tại runtime hay không. Để sử dụng trong type annotations, hãy dùng :class:`~collections.abc.Buffer` hoặc một union chỉ định rõ các kiểu mà mã của bạn hỗ trợ (ví dụ: ``bytes | bytearray | memoryview``).
 
-  :class:`!ByteString` was originally intended to be an abstract class that
-  would serve as a supertype of both :class:`bytes` and :class:`bytearray`.
-  However, since the ABC never had any methods, knowing that an object was an
-  instance of :class:`!ByteString` never actually told you anything useful
-  about the object. Other common buffer types such as :class:`memoryview` were
-  also never understood as subtypes of :class:`!ByteString` (either at
-  runtime or by static type checkers).
+  :class:`!ByteString` ban đầu được dự định là một lớp trừu tượng đóng vai trò là kiểu siêu của cả :class:`bytes` và :class:`bytearray`. Tuy nhiên, vì ABC này chưa bao giờ có phương thức nào, việc biết một đối tượng là một thể hiện của :class:`!ByteString` thực tế không cho bạn biết điều gì hữu ích về đối tượng đó. Các kiểu buffer phổ biến khác như :class:`memoryview` cũng chưa bao giờ được hiểu là kiểu con của :class:`!ByteString` (dù ở runtime hay bởi các trình kiểm tra kiểu tĩnh).
 
-  See :pep:`PEP 688 <688#current-options>` for more details.
-  (Contributed by Shantanu Jain in :gh:`91896`.)
+  Xem :pep:`PEP 688 <688#current-options>` để biết thêm chi tiết. (Đóng góp bởi Shantanu Jain trong :gh:`91896`.)
 
-* :mod:`datetime`: :class:`datetime.datetime`'s :meth:`~datetime.datetime.utcnow` and
-  :meth:`~datetime.datetime.utcfromtimestamp` are deprecated and will be
-  removed in a future version. Instead, use timezone-aware objects to represent
-  datetimes in UTC: respectively, call :meth:`~datetime.datetime.now` and
-  :meth:`~datetime.datetime.fromtimestamp`  with the *tz* parameter set to
-  :const:`datetime.UTC`.
-  (Contributed by Paul Ganssle in :gh:`103857`.)
+* :mod:`datetime`: :class:`datetime.datetime`'s :meth:`~datetime.datetime.utcnow` và
+  :meth:`~datetime.datetime.utcfromtimestamp` không được khuyến nghị sử dụng và sẽ bị xóa trong một phiên bản tương lai. Thay vào đó, hãy sử dụng các đối tượng có timezone để biểu diễn datetime trong UTC: lần lượt gọi :meth:`~datetime.datetime.now` và
+  :meth:`~datetime.datetime.fromtimestamp`  với tham số *tz* được đặt thành
+  :const:`datetime.UTC`. (Đóng góp bởi Paul Ganssle trong :gh:`103857`.)
 
-* :mod:`email`: Deprecate the *isdst* parameter in :func:`email.utils.localtime`.
-  (Contributed by Alan Williams in :gh:`72346`.)
+* :mod:`email`: Không khuyến nghị sử dụng tham số *isdst* trong :func:`email.utils.localtime`. (Đóng góp bởi Alan Williams trong :gh:`72346`.)
 
-* :mod:`importlib.abc`: Deprecated the following classes, scheduled for removal in
-  Python 3.14:
+* :mod:`importlib.abc`: Không dùng nữa các lớp sau, dự kiến sẽ bị xóa trong Python 3.14:
 
   * :class:`!importlib.abc.ResourceReader`
   * :class:`!importlib.abc.Traversable`
   * :class:`!importlib.abc.TraversableResources`
 
-  Use :mod:`importlib.resources.abc` classes instead:
+  Thay vào đó, hãy sử dụng các lớp :mod:`importlib.resources.abc`:
 
   * :class:`importlib.resources.abc.Traversable`
   * :class:`importlib.resources.abc.TraversableResources`
 
-  (Contributed by Jason R. Coombs and Hugo van Kemenade in :gh:`93963`.)
+  (Do Jason R. Coombs và Hugo van Kemenade đóng góp trong :gh:`93963`.)
 
-* :mod:`itertools`: Deprecate the support for copy, deepcopy, and pickle operations,
-  which is undocumented, inefficient, historically buggy, and inconsistent.
-  This will be removed in 3.14 for a significant reduction in code
-  volume and maintenance burden.
-  (Contributed by Raymond Hettinger in :gh:`101588`.)
+* :mod:`itertools`: Không dùng nữa việc hỗ trợ các thao tác copy, deepcopy và pickle, vốn không được ghi chép, kém hiệu quả, thường có lỗi trong lịch sử và không nhất quán. Hỗ trợ này sẽ bị xóa trong 3.14 để giảm đáng kể khối lượng mã và gánh nặng bảo trì. (Do Raymond Hettinger đóng góp trong :gh:`101588`.)
 
-* :mod:`multiprocessing`: In Python 3.14, the default :mod:`multiprocessing`
-  start method will change to a safer one on Linux, BSDs,
-  and other non-macOS POSIX platforms where ``'fork'`` is currently
-  the default (:gh:`84559`). Adding a runtime warning about this was deemed too
-  disruptive as the majority of code is not expected to care. Use the
-  :func:`~multiprocessing.get_context` or
-  :func:`~multiprocessing.set_start_method` APIs to explicitly specify when
-  your code *requires* ``'fork'``.  See :ref:`contexts and start methods
-  <multiprocessing-start-methods>`.
+* :mod:`multiprocessing`: Trong Python 3.14, phương thức khởi động :mod:`multiprocessing` mặc định sẽ được thay đổi thành một phương thức an toàn hơn trên Linux, BSD và các nền tảng POSIX không phải macOS khác, nơi ``'fork'`` hiện đang là mặc định (:gh:`84559`). Việc thêm cảnh báo runtime về thay đổi này được xem là quá gây gián đoạn vì phần lớn mã được dự kiến là không cần quan tâm.
+  Hãy sử dụng :func:`~multiprocessing.get_context` hoặc
+  các API :func:`~multiprocessing.set_start_method` để chỉ định rõ ràng khi mã của bạn *yêu cầu* ``'fork'``.  Xem :ref:`các context và phương thức khởi động <multiprocessing-start-methods>`.
 
-* :mod:`pkgutil`: :func:`!pkgutil.find_loader` and :func:`!pkgutil.get_loader`
-  are deprecated and will be removed in Python 3.14;
-  use :func:`importlib.util.find_spec` instead.
-  (Contributed by Nikita Sobolev in :gh:`97850`.)
+* :mod:`pkgutil`: :func:`!pkgutil.find_loader` và :func:`!pkgutil.get_loader` đã không còn được khuyến nghị và sẽ bị loại bỏ trong Python 3.14; thay vào đó, hãy sử dụng :func:`importlib.util.find_spec`. (Do Nikita Sobolev đóng góp trong :gh:`97850`.)
 
-* :mod:`pty`: The module has two undocumented ``master_open()`` and ``slave_open()``
-  functions that have been deprecated since Python 2 but only gained a
-  proper :exc:`DeprecationWarning` in 3.12. Remove them in 3.14.
-  (Contributed by Soumendra Ganguly and Gregory P. Smith in :gh:`85984`.)
+* :mod:`pty`: Mô-đun này có hai hàm ``master_open()`` và ``slave_open()`` chưa được ghi nhận tài liệu, đã không còn được khuyến nghị kể từ Python 2 nhưng chỉ có :exc:`DeprecationWarning` chính thức trong 3.12. Hãy loại bỏ chúng trong 3.14. (Do Soumendra Ganguly và Gregory P. Smith đóng góp trong :gh:`85984`.)
 
 * :mod:`os`:
 
-  * The ``st_ctime`` fields return by :func:`os.stat` and :func:`os.lstat` on
-    Windows are deprecated. In a future release, they will contain the last
-    metadata change time, consistent with other platforms. For now, they still
-    contain the creation time, which is also available in the new ``st_birthtime``
-    field. (Contributed by Steve Dower in :gh:`99726`.)
+  * Các trường ``st_ctime`` được :func:`os.stat` và :func:`os.lstat` trả về trên Windows đã không còn được khuyến nghị. Trong một bản phát hành tương lai, chúng sẽ chứa thời điểm thay đổi metadata gần nhất, nhất quán với các nền tảng khác. Hiện tại, chúng vẫn chứa thời điểm tạo, vốn cũng có trong trường ``st_birthtime`` mới. (Do Steve Dower đóng góp trong :gh:`99726`.)
 
-  * On POSIX platforms, :func:`os.fork` can now raise a
-    :exc:`DeprecationWarning` when it can detect being called from a
-    multithreaded process. There has always been a fundamental incompatibility
-    with the POSIX platform when doing so. Even if such code *appeared* to work.
-    We added the warning to raise awareness as issues encountered by code doing
-    this are becoming more frequent. See the :func:`os.fork` documentation for
-    more details along with `this discussion on fork being incompatible with threads
-    <https://discuss.python.org/t/concerns-regarding-deprecation-of-fork-with-alive-threads/33555>`_ for *why* we're now surfacing this
-    longstanding platform compatibility problem to developers.
+  * Trên các nền tảng POSIX, :func:`os.fork` hiện có thể phát sinh một
+    :exc:`DeprecationWarning` khi phát hiện lời gọi được thực hiện từ một tiến trình đa luồng. Từ trước đến nay, việc này vốn không tương thích về căn bản với nền tảng POSIX. Ngay cả khi mã như vậy *có vẻ* hoạt động. Chúng tôi đã thêm cảnh báo này để nâng cao nhận thức, vì các vấn đề gặp phải trong mã thực hiện việc này đang trở nên thường xuyên hơn. Xem tài liệu :func:`os.fork` để biết thêm chi tiết, cũng như `cuộc thảo luận này về việc fork không tương thích với các luồng <https://discuss.python.org/t/concerns-regarding-deprecation-of-fork-with-alive-threads/33555>`_ để hiểu *tại sao* hiện chúng tôi đang đưa vấn đề tương thích nền tảng tồn tại lâu nay này ra trước các nhà phát triển.
 
-  When this warning appears due to usage of :mod:`multiprocessing` or
-  :mod:`concurrent.futures` the fix is to use a different
-  :mod:`multiprocessing` start method such as ``"spawn"`` or ``"forkserver"``.
+  Khi cảnh báo này xuất hiện do việc sử dụng :mod:`multiprocessing` hoặc
+  :mod:`concurrent.futures`, cách khắc phục là sử dụng một
+  phương thức start như ``"spawn"`` hoặc ``"forkserver"`` :mod:`multiprocessing`.
 
-* :mod:`shutil`: The *onerror* argument of :func:`shutil.rmtree` is deprecated;
-  use *onexc* instead. (Contributed by Irit Katriel in :gh:`102828`.)
+* :mod:`shutil`: Đối số *onerror* của :func:`shutil.rmtree` đã bị deprecated; thay vào đó hãy sử dụng *onexc*. (Đóng góp của Irit Katriel trong :gh:`102828`.)
 
 * :mod:`sqlite3`:
 
-  * :ref:`default adapters and converters
-    <sqlite3-default-converters>` are now deprecated.
-    Instead, use the :ref:`sqlite3-adapter-converter-recipes`
-    and tailor them to your needs.
-    (Contributed by Erlend E. Aasland in :gh:`90016`.)
+  * :ref:`adapter và converter mặc định <sqlite3-default-converters>` hiện đã bị deprecated. Thay vào đó, hãy sử dụng :ref:`sqlite3-adapter-converter-recipes` và điều chỉnh chúng theo nhu cầu của bạn. (Đóng góp của Erlend E. Aasland trong :gh:`90016`.)
 
-  * In :meth:`~sqlite3.Cursor.execute`, :exc:`DeprecationWarning` is now emitted
-    when :ref:`named placeholders <sqlite3-placeholders>` are used together with
-    parameters supplied as a :term:`sequence` instead of as a :class:`dict`.
-    Starting from Python 3.14, using named placeholders with parameters supplied
-    as a sequence will raise a :exc:`~sqlite3.ProgrammingError`.
-    (Contributed by Erlend E. Aasland in :gh:`101698`.)
+  * Trong :meth:`~sqlite3.Cursor.execute`, :exc:`DeprecationWarning` hiện được phát ra khi sử dụng :ref:`placeholder có tên <sqlite3-placeholders>` cùng với các tham số được cung cấp dưới dạng :term:`sequence` thay vì dưới dạng :class:`dict`. Kể từ Python 3.14, việc sử dụng placeholder có tên với các tham số được cung cấp dưới dạng sequence sẽ phát sinh :exc:`~sqlite3.ProgrammingError`. (Đóng góp của Erlend E. Aasland trong :gh:`101698`.)
 
-* :mod:`sys`: The :data:`sys.last_type`, :data:`sys.last_value` and :data:`sys.last_traceback`
-  fields are deprecated. Use :data:`sys.last_exc` instead.
-  (Contributed by Irit Katriel in :gh:`102778`.)
+* :mod:`sys`: Các trường :data:`sys.last_type`, :data:`sys.last_value` và :data:`sys.last_traceback` đã bị deprecated. Thay vào đó, hãy sử dụng :data:`sys.last_exc`. (Đóng góp của Irit Katriel trong :gh:`102778`.)
 
-* :mod:`tarfile`: Extracting tar archives without specifying *filter* is deprecated until
-  Python 3.14, when ``'data'`` filter will become the default.
-  See :ref:`tarfile-extraction-filter` for details.
+* :mod:`tarfile`: Việc giải nén các kho lưu trữ tar mà không chỉ định *filter* đã bị deprecated cho đến Python 3.14, khi bộ lọc ``'data'`` sẽ trở thành mặc định. Xem :ref:`tarfile-extraction-filter` để biết chi tiết.
 
 * :mod:`typing`:
 
-  * :class:`typing.Hashable` and :class:`typing.Sized`, aliases for
-    :class:`collections.abc.Hashable` and :class:`collections.abc.Sized` respectively, are
-    deprecated. (:gh:`94309`.)
+  * :class:`typing.Hashable` và :class:`typing.Sized`, các bí danh của
+    :class:`collections.abc.Hashable` và :class:`collections.abc.Sized` lần lượt không còn được khuyến nghị. (:gh:`94309`.)
 
-  * :class:`typing.ByteString`, deprecated since Python 3.9, now causes a
-    :exc:`DeprecationWarning` to be emitted when it is used.
-    (Contributed by Alex Waygood in :gh:`91896`.)
+  * :class:`typing.ByteString`, không còn được khuyến nghị kể từ Python 3.9, giờ khiến một
+    :exc:`DeprecationWarning` được phát ra khi nó được sử dụng. (Do Alex Waygood đóng góp trong :gh:`91896`.)
 
-* :mod:`xml.etree.ElementTree`: The module now emits :exc:`DeprecationWarning`
-  when testing the truth value of an :class:`xml.etree.ElementTree.Element`.
-  Before, the Python implementation emitted :exc:`FutureWarning`, and the C
-  implementation emitted nothing.
-  (Contributed by Jacob Walls in :gh:`83122`.)
+* :mod:`xml.etree.ElementTree`: Giờ đây, module sẽ phát ra :exc:`DeprecationWarning` khi kiểm tra giá trị đúng của một :class:`xml.etree.ElementTree.Element`. Trước đây, bản triển khai Python phát ra :exc:`FutureWarning`, còn bản triển khai C không phát ra gì. (Do Jacob Walls đóng góp trong :gh:`83122`.)
 
-* The 3-arg signatures (type, value, traceback) of :meth:`coroutine throw()
-  <coroutine.throw>`, :meth:`generator throw() <generator.throw>` and
-  :meth:`async generator throw() <agen.athrow>` are deprecated and
-  may be removed in a future version of Python. Use the single-arg versions
-  of these functions instead. (Contributed by Ofey Chan in :gh:`89874`.)
+* Các chữ ký 3 đối số (type, value, traceback) của :meth:`coroutine throw() <coroutine.throw>`, :meth:`generator throw() <generator.throw>` và
+  :meth:`async generator throw() <agen.athrow>` không còn được khuyến nghị và có thể bị loại bỏ trong một phiên bản Python tương lai. Thay vào đó, hãy sử dụng các phiên bản một đối số của những hàm này. (Do Ofey Chan đóng góp trong :gh:`89874`.)
 
-* :exc:`DeprecationWarning` is now raised when :attr:`~module.__package__` on a
-  module differs from
-  :attr:`__spec__.parent <importlib.machinery.ModuleSpec.parent>` (previously
-  it was :exc:`ImportWarning`).
-  (Contributed by Brett Cannon in :gh:`65961`.)
+* :exc:`DeprecationWarning` hiện được raise khi :attr:`~module.__package__` trên một module khác với
+  :attr:`__spec__.parent <importlib.machinery.ModuleSpec.parent>` (trước đây là :exc:`ImportWarning`). (Do Brett Cannon đóng góp trong :gh:`65961`.)
 
-* Setting :attr:`~module.__package__` or :attr:`~module.__cached__` on a
-  module is deprecated, and will cease to be set or taken into consideration by
-  the import system in Python 3.14. (Contributed by Brett Cannon in :gh:`65961`.)
+* Việc đặt :attr:`~module.__package__` hoặc :attr:`~module.__cached__` trên một module đã lỗi thời và hệ thống import sẽ ngừng đặt hoặc xem xét chúng kể từ Python 3.14. (Do Brett Cannon đóng góp trong :gh:`65961`.)
 
-* The bitwise inversion operator (``~``) on bool is deprecated. It will throw an
-  error in Python 3.16. Use ``not`` for logical negation of bools instead.
-  In the rare case that you really need the bitwise inversion of the underlying
-  ``int``, convert to int explicitly: ``~int(x)``. (Contributed by Tim Hoffmann
-  in :gh:`103487`.)
+* Toán tử đảo bit (``~``) trên bool đã lỗi thời. Toán tử này sẽ gây ra lỗi trong Python 3.16. Thay vào đó, hãy sử dụng ``not`` để phủ định logic các giá trị bool. Trong trường hợp hiếm gặp khi bạn thực sự cần đảo bit của ``int`` bên dưới, hãy chuyển đổi rõ ràng sang int: ``~int(x)``. (Do Tim Hoffmann đóng góp trong :gh:`103487`.)
 
-* Accessing :attr:`~codeobject.co_lnotab` on code objects was deprecated in
-  Python 3.10 via :pep:`626`,
-  but it only got a proper :exc:`DeprecationWarning` in 3.12.
-  May be removed in 3.15.
-  (Contributed by Nikita Sobolev in :gh:`101866`.)
+* Việc truy cập :attr:`~codeobject.co_lnotab` trên các đối tượng code đã lỗi thời trong Python 3.10 thông qua :pep:`626`, nhưng mãi đến 3.12 mới có :exc:`DeprecationWarning` phù hợp. Có thể bị loại bỏ trong 3.15. (Do Nikita Sobolev đóng góp trong :gh:`101866`.)
 
 .. include:: ../deprecations/pending-removal-in-3.13.rst
 
@@ -1367,141 +909,113 @@ Deprecated
 
 .. _whatsnew312-removed:
 
-Removed
-=======
+Đã loại bỏ
+==========
 
-asynchat and asyncore
----------------------
+asynchat và asyncore
+--------------------
 
-* These two modules have been removed
-  according to the schedule in :pep:`594`,
-  having been deprecated in Python 3.6.
-  Use :mod:`asyncio` instead.
-  (Contributed by Nikita Sobolev in :gh:`96580`.)
+* Hai module này đã bị loại bỏ theo lịch trình trong :pep:`594`, sau khi bị đánh dấu lỗi thời từ Python 3.6. Thay vào đó, hãy sử dụng :mod:`asyncio`. (Do Nikita Sobolev đóng góp trong :gh:`96580`.)
 
 configparser
 ------------
 
-* Several names deprecated in the :mod:`configparser` way back in 3.2 have
-  been removed per :gh:`89336`:
+* Một số tên đã bị deprecated trong :mod:`configparser` từ tận phiên bản 3.2 đã bị xóa theo :gh:`89336`:
 
-  * :class:`configparser.ParsingError` no longer has a ``filename`` attribute
-    or argument. Use the ``source`` attribute and argument instead.
-  * :mod:`configparser` no longer has a ``SafeConfigParser`` class. Use the
-    shorter :class:`~configparser.ConfigParser` name instead.
-  * :class:`configparser.ConfigParser` no longer has a ``readfp`` method.
-    Use :meth:`~configparser.ConfigParser.read_file` instead.
+  * :class:`configparser.ParsingError` không còn có thuộc tính hoặc đối số ``filename``. Thay vào đó, hãy sử dụng thuộc tính và đối số ``source``.
+  * :mod:`configparser` không còn có lớp ``SafeConfigParser``. Thay vào đó, hãy sử dụng tên ngắn hơn là :class:`~configparser.ConfigParser`.
+  * :class:`configparser.ConfigParser` không còn có phương thức ``readfp``. Thay vào đó, hãy sử dụng :meth:`~configparser.ConfigParser.read_file`.
 
 .. _whatsnew312-removed-distutils:
 
 distutils
 ---------
 
-* Remove the :py:mod:`!distutils` package. It was deprecated in Python 3.10 by
-  :pep:`632` "Deprecate distutils module". For projects still using
-  ``distutils`` and cannot be updated to something else, the ``setuptools``
-  project can be installed: it still provides ``distutils``.
-  (Contributed by Victor Stinner in :gh:`92584`.)
+* Xóa gói :py:mod:`!distutils`. Gói này đã bị deprecated trong Python 3.10 bởi
+  :pep:`632` "Ngừng sử dụng mô-đun distutils". Đối với các dự án vẫn sử dụng ``distutils`` và không thể cập nhật sang một lựa chọn khác, có thể cài đặt dự án ``setuptools``: dự án này vẫn cung cấp ``distutils``. (Do Victor Stinner đóng góp trong :gh:`92584`.)
 
 ensurepip
 ---------
 
-* Remove the bundled setuptools wheel from :mod:`ensurepip`,
-  and stop installing setuptools in environments created by :mod:`venv`.
+* Xóa wheel setuptools đi kèm khỏi :mod:`ensurepip`, và ngừng cài đặt setuptools vào các môi trường được tạo bởi :mod:`venv`.
 
-  ``pip (>= 22.1)`` does not require setuptools to be installed in the
-  environment. ``setuptools``-based (and ``distutils``-based) packages
-  can still be used with ``pip install``, since pip will provide
-  ``setuptools`` in the build environment it uses for building a
-  package.
+  ``pip (>= 22.1)`` không yêu cầu setuptools được cài đặt trong môi trường. Các gói dựa trên ``setuptools`` (và dựa trên ``distutils``) vẫn có thể được sử dụng với ``pip install``, vì pip sẽ cung cấp ``setuptools`` trong build environment mà pip sử dụng để build một gói.
 
-  ``easy_install``, ``pkg_resources``, ``setuptools`` and ``distutils``
-  are no longer provided by default in environments created with
-  ``venv`` or bootstrapped with ``ensurepip``, since they are part of
-  the ``setuptools`` package. For projects relying on these at runtime,
-  the ``setuptools`` project should be declared as a dependency and
-  installed separately (typically, using pip).
+  ``easy_install``, ``pkg_resources``, ``setuptools`` và ``distutils`` không còn được cung cấp theo mặc định trong các môi trường được tạo bằng ``venv`` hoặc được bootstrapped bằng ``ensurepip``, vì chúng thuộc gói ``setuptools``. Đối với các dự án phụ thuộc vào những thành phần này khi runtime, dự án ``setuptools`` nên được khai báo là dependency và cài đặt riêng (thông thường bằng pip).
 
-  (Contributed by Pradyun Gedam in :gh:`95299`.)
+  (Do Pradyun Gedam đóng góp trong :gh:`95299`.)
 
 enum
 ----
 
-* Remove :mod:`enum`'s ``EnumMeta.__getattr__``, which is no longer needed for
-  enum attribute access.
-  (Contributed by Ethan Furman in :gh:`95083`.)
+* Xóa ``EnumMeta.__getattr__`` của :mod:`enum`, không còn cần thiết cho việc truy cập thuộc tính enum. (Do Ethan Furman đóng góp trong :gh:`95083`.)
 
 ftplib
 ------
 
-* Remove :mod:`ftplib`'s ``FTP_TLS.ssl_version`` class attribute: use the
-  *context* parameter instead.
-  (Contributed by Victor Stinner in :gh:`94172`.)
+* Xóa thuộc tính lớp của :mod:`ftplib` trong ``FTP_TLS.ssl_version``: thay vào đó, sử dụng tham số *context*. (Do Victor Stinner đóng góp trong :gh:`94172`.)
 
 gzip
 ----
 
-* Remove the ``filename`` attribute of :mod:`gzip`'s :class:`gzip.GzipFile`,
-  deprecated since Python 2.6, use the :attr:`~gzip.GzipFile.name` attribute
-  instead. In write mode, the ``filename`` attribute added ``'.gz'`` file
-  extension if it was not present.
-  (Contributed by Victor Stinner in :gh:`94196`.)
+* Xóa thuộc tính ``filename`` của :class:`gzip.GzipFile` thuộc :mod:`gzip`, đã không còn được dùng kể từ Python 2.6; thay vào đó, sử dụng thuộc tính :attr:`~gzip.GzipFile.name`. Ở chế độ ghi, thuộc tính ``filename`` đã thêm phần mở rộng tệp ``'.gz'`` nếu phần mở rộng này chưa có. (Do Victor Stinner đóng góp trong :gh:`94196`.)
 
 hashlib
 -------
 
-* Remove the pure Python implementation of :mod:`hashlib`'s
-  :func:`hashlib.pbkdf2_hmac`, deprecated in Python 3.10. Python 3.10 and
-  newer requires OpenSSL 1.1.1 (:pep:`644`): this OpenSSL version provides
-  a C implementation of :func:`~hashlib.pbkdf2_hmac` which is faster.
-  (Contributed by Victor Stinner in :gh:`94199`.)
+* Xóa phần triển khai Python thuần túy của :mod:`hashlib` thuộc hashlib
+  :func:`hashlib.pbkdf2_hmac`, đã bị loại bỏ dần trong Python 3.10. Python 3.10 trở lên yêu cầu OpenSSL 1.1.1 (:pep:`644`): phiên bản OpenSSL này cung cấp triển khai C của :func:`~hashlib.pbkdf2_hmac` nhanh hơn. (Do Victor Stinner đóng góp trong :gh:`94199`.)
 
 importlib
 ---------
 
-* Many previously deprecated cleanups in :mod:`importlib` have now been
-  completed:
+* Nhiều thay đổi dọn dẹp trước đây đã bị loại bỏ dần trong :mod:`importlib` nay đã được hoàn tất:
 
-  * References to, and support for :meth:`!module_repr` has been removed.
-    (Contributed by Barry Warsaw in :gh:`97850`.)
+  * Các tham chiếu đến và hỗ trợ cho :meth:`!module_repr` đã bị loại bỏ. (Do Barry Warsaw đóng góp trong :gh:`97850`.)
 
-  * ``importlib.util.set_package``, ``importlib.util.set_loader`` and
-    ``importlib.util.module_for_loader`` have all been removed. (Contributed by
-    Brett Cannon and Nikita Sobolev in :gh:`65961` and :gh:`97850`.)
+  * ``importlib.util.set_package``, ``importlib.util.set_loader`` và ``importlib.util.module_for_loader`` đều đã bị loại bỏ. (Do Brett Cannon và Nikita Sobolev đóng góp trong :gh:`65961` và :gh:`97850`.)
 
-  * Support for ``find_loader()`` and ``find_module()`` APIs have been
-    removed.  (Contributed by Barry Warsaw in :gh:`98040`.)
+  * Hỗ trợ cho các API ``find_loader()`` và ``find_module()`` đã bị loại bỏ. (Do Barry Warsaw đóng góp trong :gh:`98040`.)
 
-  * ``importlib.abc.Finder``, ``pkgutil.ImpImporter``, and ``pkgutil.ImpLoader``
-    have been removed.  (Contributed by Barry Warsaw in :gh:`98040`.)
+  * ``importlib.abc.Finder``, ``pkgutil.ImpImporter`` và ``pkgutil.ImpLoader`` đã bị loại bỏ. (Do Barry Warsaw đóng góp trong :gh:`98040`.)
 
 .. _whatsnew312-removed-imp:
 
 imp
 ---
 
-* The :mod:`!imp` module has been removed.  (Contributed by Barry Warsaw in
+* Mô-đun :mod:`!imp` đã bị xóa.  (Đóng góp bởi Barry Warsaw trong
   :gh:`98040`.)
 
-  To migrate, consult the following correspondence table:
+  Để di chuyển, hãy tham khảo bảng đối chiếu sau:
 
-    =================================  =======================================
-       imp                                importlib
-    =================================  =======================================
-    ``imp.NullImporter``               Insert ``None`` into ``sys.path_importer_cache``
-    ``imp.cache_from_source()``        :func:`importlib.util.cache_from_source`
-    ``imp.find_module()``              :func:`importlib.util.find_spec`
-    ``imp.get_magic()``                :const:`importlib.util.MAGIC_NUMBER`
-    ``imp.get_suffixes()``             :const:`importlib.machinery.SOURCE_SUFFIXES`, :const:`importlib.machinery.EXTENSION_SUFFIXES`, and :const:`importlib.machinery.BYTECODE_SUFFIXES`
-    ``imp.get_tag()``                  :attr:`sys.implementation.cache_tag <sys.implementation>`
-    ``imp.load_module()``              :func:`importlib.import_module`
-    ``imp.new_module(name)``           ``types.ModuleType(name)``
-    ``imp.reload()``                   :func:`importlib.reload`
-    ``imp.source_from_cache()``        :func:`importlib.util.source_from_cache`
-    ``imp.load_source()``              *See below*
-    =================================  =======================================
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | imp                         | importlib                                                                                                                                        |
+    +=============================+==================================================================================================================================================+
+    | ``imp.NullImporter``        | Chèn ``None`` vào ``sys.path_importer_cache``                                                                                                    |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.cache_from_source()`` | :func:`importlib.util.cache_from_source`                                                                                                         |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.find_module()``       | :func:`importlib.util.find_spec`                                                                                                                 |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.get_magic()``         | :const:`importlib.util.MAGIC_NUMBER`                                                                                                             |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.get_suffixes()``      | :const:`importlib.machinery.SOURCE_SUFFIXES`, :const:`importlib.machinery.EXTENSION_SUFFIXES`, và :const:`importlib.machinery.BYTECODE_SUFFIXES` |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.get_tag()``           | :attr:`sys.implementation.cache_tag <sys.implementation>`                                                                                        |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.load_module()``       | :func:`importlib.import_module`                                                                                                                  |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.new_module(name)``    | ``types.ModuleType(name)``                                                                                                                       |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.reload()``            | :func:`importlib.reload`                                                                                                                         |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.source_from_cache()`` | :func:`importlib.util.source_from_cache`                                                                                                         |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``imp.load_source()``       | *Xem bên dưới*                                                                                                                                   |
+    +-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+
 
-  Replace ``imp.load_source()`` with::
+  Thay thế ``imp.load_source()`` bằng::
 
         import importlib.util
         import importlib.machinery
@@ -1516,263 +1030,188 @@ imp
             loader.exec_module(module)
             return module
 
-* Remove :mod:`!imp` functions and attributes with no replacements:
+* Xóa các hàm và thuộc tính :mod:`!imp` không có phần thay thế:
 
-  * Undocumented functions:
+  * Các hàm không được ghi chép:
 
     * ``imp.init_builtin()``
     * ``imp.load_compiled()``
     * ``imp.load_dynamic()``
     * ``imp.load_package()``
 
-  * ``imp.lock_held()``, ``imp.acquire_lock()``, ``imp.release_lock()``:
-    the locking scheme has changed in Python 3.3 to per-module locks.
-  * ``imp.find_module()`` constants: ``SEARCH_ERROR``, ``PY_SOURCE``,
-    ``PY_COMPILED``, ``C_EXTENSION``, ``PY_RESOURCE``, ``PKG_DIRECTORY``,
-    ``C_BUILTIN``, ``PY_FROZEN``, ``PY_CODERESOURCE``, ``IMP_HOOK``.
+  * ``imp.lock_held()``, ``imp.acquire_lock()``, ``imp.release_lock()``: cơ chế khóa đã thay đổi trong Python 3.3 thành khóa theo từng mô-đun.
+  * Các hằng số ``imp.find_module()``: ``SEARCH_ERROR``, ``PY_SOURCE``, ``PY_COMPILED``, ``C_EXTENSION``, ``PY_RESOURCE``, ``PKG_DIRECTORY``, ``C_BUILTIN``, ``PY_FROZEN``, ``PY_CODERESOURCE``, ``IMP_HOOK``.
 
 io
 --
 
-* Remove :mod:`io`'s ``io.OpenWrapper`` and ``_pyio.OpenWrapper``, deprecated in Python
-  3.10: just use :func:`open` instead. The :func:`open` (:func:`io.open`)
-  function is a built-in function. Since Python 3.10, :func:`!_pyio.open` is
-  also a static method.
-  (Contributed by Victor Stinner in :gh:`94169`.)
+* Loại bỏ ``io.OpenWrapper`` và ``_pyio.OpenWrapper`` của :mod:`io`, vốn không còn được dùng trong Python 3.10: chỉ cần sử dụng :func:`open` thay thế. Hàm :func:`open` (:func:`io.open`) là một hàm tích hợp sẵn. Kể từ Python 3.10, :func:`!_pyio.open` cũng là một phương thức tĩnh. (Do Victor Stinner đóng góp trong :gh:`94169`.)
 
 locale
 ------
 
-* Remove :mod:`locale`'s :func:`!locale.format` function, deprecated in Python 3.7:
-  use :func:`locale.format_string` instead.
-  (Contributed by Victor Stinner in :gh:`94226`.)
+* Loại bỏ hàm :func:`!locale.format` của :mod:`locale`, vốn không còn được dùng trong Python 3.7: sử dụng :func:`locale.format_string` thay thế. (Do Victor Stinner đóng góp trong :gh:`94226`.)
 
 smtpd
 -----
 
-* The ``smtpd`` module has been removed according to the schedule in :pep:`594`,
-  having been deprecated in Python 3.4.7 and 3.5.4.
-  Use the :pypi:`aiosmtpd` PyPI module or any other
-  :mod:`asyncio`-based server instead.
-  (Contributed by Oleg Iarygin in :gh:`93243`.)
+* Mô-đun ``smtpd`` đã bị loại bỏ theo lịch trình trong :pep:`594`, sau khi không còn được dùng trong Python 3.4.7 và 3.5.4. Hãy sử dụng mô-đun PyPI :pypi:`aiosmtpd` hoặc bất kỳ
+  máy chủ dựa trên :mod:`asyncio` nào khác thay thế. (Do Oleg Iarygin đóng góp trong :gh:`93243`.)
 
 sqlite3
 -------
 
-* The following undocumented :mod:`sqlite3` features, deprecated in Python
-  3.10, are now removed:
+* Các tính năng :mod:`sqlite3` sau đây chưa được ghi chép, đã bị ngừng sử dụng trong Python 3.10, nay đã bị loại bỏ:
 
   * ``sqlite3.enable_shared_cache()``
   * ``sqlite3.OptimizedUnicode``
 
-  If a shared cache must be used, open the database in URI mode using the
-  ``cache=shared`` query parameter.
+  Nếu bắt buộc phải sử dụng shared cache, hãy mở cơ sở dữ liệu ở chế độ URI bằng tham số truy vấn ``cache=shared``.
 
-  The ``sqlite3.OptimizedUnicode`` text factory has been an alias for
-  :class:`str` since Python 3.3. Code that previously set the text factory to
-  ``OptimizedUnicode`` can either use ``str`` explicitly, or rely on the
-  default value which is also ``str``.
+  text factory ``sqlite3.OptimizedUnicode`` đã là bí danh của
+  :class:`str` kể từ Python 3.3. Mã trước đây đặt text factory thành ``OptimizedUnicode`` có thể sử dụng ``str`` một cách rõ ràng hoặc dựa vào giá trị mặc định, cũng là ``str``.
 
-  (Contributed by Erlend E. Aasland in :gh:`92548`.)
+  (Do Erlend E. Aasland đóng góp trong :gh:`92548`.)
 
 ssl
 ---
 
-* Remove :mod:`ssl`'s :func:`!ssl.RAND_pseudo_bytes` function, deprecated in Python 3.6:
-  use :func:`os.urandom` or :func:`ssl.RAND_bytes` instead.
-  (Contributed by Victor Stinner in :gh:`94199`.)
+* Loại bỏ hàm :func:`!ssl.RAND_pseudo_bytes` của :mod:`ssl`, đã bị ngừng sử dụng trong Python 3.6: thay vào đó hãy sử dụng :func:`os.urandom` hoặc :func:`ssl.RAND_bytes`. (Do Victor Stinner đóng góp trong :gh:`94199`.)
 
-* Remove the :func:`!ssl.match_hostname` function.
-  It was deprecated in Python 3.7. OpenSSL performs
-  hostname matching since Python 3.7, Python no longer uses the
-  :func:`!ssl.match_hostname` function.
-  (Contributed by Victor Stinner in :gh:`94199`.)
+* Xóa hàm :func:`!ssl.match_hostname`. Hàm này đã bị phản đối trong Python 3.7. OpenSSL thực hiện việc khớp tên máy chủ kể từ Python 3.7, Python không còn sử dụng
+  hàm :func:`!ssl.match_hostname`. (Do Victor Stinner đóng góp trong :gh:`94199`.)
 
-* Remove the :func:`!ssl.wrap_socket` function, deprecated in Python 3.7:
-  instead, create a :class:`ssl.SSLContext` object and call its
-  :class:`ssl.SSLContext.wrap_socket` method. Any package that still uses
-  :func:`!ssl.wrap_socket` is broken and insecure. The function neither sends a
-  SNI TLS extension nor validates the server hostname. Code is subject to :cwe:`295`
-  (Improper Certificate Validation).
-  (Contributed by Victor Stinner in :gh:`94199`.)
+* Xóa hàm :func:`!ssl.wrap_socket`, đã bị phản đối trong Python 3.7: thay vào đó, hãy tạo một đối tượng :class:`ssl.SSLContext` và gọi
+  phương thức :class:`ssl.SSLContext.wrap_socket` của đối tượng đó. Bất kỳ package nào vẫn sử dụng
+  :func:`!ssl.wrap_socket` đều bị lỗi và không an toàn. Hàm này không gửi phần mở rộng SNI TLS cũng không xác thực tên máy chủ của server. Code có nguy cơ :cwe:`295` (Xác thực chứng chỉ không đúng). (Do Victor Stinner đóng góp trong :gh:`94199`.)
 
 unittest
 --------
 
-* Remove many long-deprecated :mod:`unittest` features:
+* Xóa nhiều tính năng :mod:`unittest` đã bị phản đối từ lâu:
 
   .. _unittest-TestCase-removed-aliases:
 
-  * A number of :class:`~unittest.TestCase` method aliases:
+  * Một số bí danh phương thức :class:`~unittest.TestCase`:
 
-    ============================ =============================== ===============
-       Deprecated alias           Method Name                     Deprecated in
-    ============================ =============================== ===============
-     ``failUnless``               :meth:`.assertTrue`             3.1
-     ``failIf``                   :meth:`.assertFalse`            3.1
-     ``failUnlessEqual``          :meth:`.assertEqual`            3.1
-     ``failIfEqual``              :meth:`.assertNotEqual`         3.1
-     ``failUnlessAlmostEqual``    :meth:`.assertAlmostEqual`      3.1
-     ``failIfAlmostEqual``        :meth:`.assertNotAlmostEqual`   3.1
-     ``failUnlessRaises``         :meth:`.assertRaises`           3.1
-     ``assert_``                  :meth:`.assertTrue`             3.2
-     ``assertEquals``             :meth:`.assertEqual`            3.2
-     ``assertNotEquals``          :meth:`.assertNotEqual`         3.2
-     ``assertAlmostEquals``       :meth:`.assertAlmostEqual`      3.2
-     ``assertNotAlmostEquals``    :meth:`.assertNotAlmostEqual`   3.2
-     ``assertRegexpMatches``      :meth:`.assertRegex`            3.2
-     ``assertRaisesRegexp``       :meth:`.assertRaisesRegex`      3.2
-     ``assertNotRegexpMatches``   :meth:`.assertNotRegex`         3.5
-    ============================ =============================== ===============
+    +------------------------------------+-------------------------------+-------------------------------+
+    | Bí danh không còn được khuyến nghị | Tên phương thức               | Không còn được khuyến nghị từ |
+    +====================================+===============================+===============================+
+    | ``failUnless``                     | :meth:`.assertTrue`           | 3.1                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``failIf``                         | :meth:`.assertFalse`          | 3.1                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``failUnlessEqual``                | :meth:`.assertEqual`          | 3.1                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``failIfEqual``                    | :meth:`.assertNotEqual`       | 3.1                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``failUnlessAlmostEqual``          | :meth:`.assertAlmostEqual`    | 3.1                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``failIfAlmostEqual``              | :meth:`.assertNotAlmostEqual` | 3.1                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``failUnlessRaises``               | :meth:`.assertRaises`         | 3.1                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assert_``                        | :meth:`.assertTrue`           | 3.2                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assertEquals``                   | :meth:`.assertEqual`          | 3.2                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assertNotEquals``                | :meth:`.assertNotEqual`       | 3.2                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assertAlmostEquals``             | :meth:`.assertAlmostEqual`    | 3.2                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assertNotAlmostEquals``          | :meth:`.assertNotAlmostEqual` | 3.2                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assertRegexpMatches``            | :meth:`.assertRegex`          | 3.2                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assertRaisesRegexp``             | :meth:`.assertRaisesRegex`    | 3.2                           |
+    +------------------------------------+-------------------------------+-------------------------------+
+    | ``assertNotRegexpMatches``         | :meth:`.assertNotRegex`       | 3.5                           |
+    +------------------------------------+-------------------------------+-------------------------------+
 
-    You can use https://github.com/isidentical/teyit to automatically modernise
-    your unit tests.
+    Bạn có thể sử dụng https://github.com/isidentical/teyit để tự động hiện đại hóa các unit test của mình.
 
-  * Undocumented and broken :class:`~unittest.TestCase` method
-    ``assertDictContainsSubset`` (deprecated in Python 3.2).
+  * Phương thức :class:`~unittest.TestCase` không được ghi lại và bị hỏng ``assertDictContainsSubset`` (không còn được khuyến nghị từ Python 3.2).
 
-  * Undocumented :meth:`TestLoader.loadTestsFromModule
-    <unittest.TestLoader.loadTestsFromModule>` parameter *use_load_tests*
-    (deprecated and ignored since Python 3.5).
+  * Tham số :meth:`TestLoader.loadTestsFromModule <unittest.TestLoader.loadTestsFromModule>` không được ghi chép *use_load_tests* (đã lỗi thời và bị bỏ qua kể từ Python 3.5).
 
-  * An alias of the :class:`~unittest.TextTestResult` class:
-    ``_TextTestResult`` (deprecated in Python 3.2).
+  * Bí danh của lớp :class:`~unittest.TextTestResult`: ``_TextTestResult`` (không dùng nữa trong Python 3.2).
 
-  (Contributed by Serhiy Storchaka in :gh:`89325`.)
+  (Do Serhiy Storchaka đóng góp trong :gh:`89325`.)
 
 webbrowser
 ----------
 
-* Remove support for obsolete browsers from :mod:`webbrowser`.
-  The removed browsers include: Grail, Mosaic, Netscape, Galeon, Skipstone,
-  Iceape, Firebird, and Firefox versions 35 and below (:gh:`102871`).
+* Xóa hỗ trợ cho các trình duyệt lỗi thời khỏi :mod:`webbrowser`. Các trình duyệt bị xóa gồm: Grail, Mosaic, Netscape, Galeon, Skipstone, Iceape, Firebird và các phiên bản Firefox 35 trở xuống (:gh:`102871`).
 
 xml.etree.ElementTree
 ---------------------
 
-* Remove the ``ElementTree.Element.copy()`` method of the
-  pure Python implementation, deprecated in Python 3.10, use the
-  :func:`copy.copy` function instead.  The C implementation of :mod:`xml.etree.ElementTree`
-  has no ``copy()`` method, only a ``__copy__()`` method.
-  (Contributed by Victor Stinner in :gh:`94383`.)
+* Xóa phương thức ``ElementTree.Element.copy()`` của phần triển khai Python thuần túy, không dùng nữa kể từ Python 3.10; thay vào đó, hãy sử dụng
+  hàm :func:`copy.copy`. Phần triển khai C của :mod:`xml.etree.ElementTree` không có phương thức ``copy()``, mà chỉ có phương thức ``__copy__()``. (Do Victor Stinner đóng góp trong :gh:`94383`.)
 
 zipimport
 ---------
 
-* Remove :mod:`zipimport`'s ``find_loader()`` and ``find_module()`` methods,
-  deprecated in Python 3.10: use the ``find_spec()`` method instead.  See
-  :pep:`451` for the rationale.
-  (Contributed by Victor Stinner in :gh:`94379`.)
+* Xóa các phương thức ``find_loader()`` và ``find_module()`` của :mod:`zipimport`, đã bị deprecated trong Python 3.10: thay vào đó, hãy sử dụng phương thức ``find_spec()``. Xem
+  :pep:`451` để biết lý do. (Do Victor Stinner đóng góp trong :gh:`94379`.)
 
-Others
-------
+Các mục khác
+------------
 
-* Remove the ``suspicious`` rule from the documentation :file:`Makefile` and
-  :file:`Doc/tools/rstlint.py`, both in favor of `sphinx-lint
-  <https://github.com/sphinx-contrib/sphinx-lint>`_.
-  (Contributed by Julien Palard in :gh:`98179`.)
+* Xóa quy tắc ``suspicious`` khỏi tài liệu :file:`Makefile` và
+  :file:`Doc/tools/rstlint.py`, cả hai đều chuyển sang sử dụng `sphinx-lint <https://github.com/sphinx-contrib/sphinx-lint>`_. (Do Julien Palard đóng góp trong :gh:`98179`.)
 
-* Remove the *keyfile* and *certfile* parameters from the
-  :mod:`ftplib`, :mod:`imaplib`, :mod:`poplib` and :mod:`smtplib` modules,
-  and the *key_file*, *cert_file* and *check_hostname* parameters from the
-  :mod:`http.client` module,
-  all deprecated since Python 3.6. Use the *context* parameter
-  (*ssl_context* in :mod:`imaplib`) instead.
-  (Contributed by Victor Stinner in :gh:`94172`.)
+* Xóa các tham số *keyfile* và *certfile* khỏi
+  các module :mod:`ftplib`, :mod:`imaplib`, :mod:`poplib` và :mod:`smtplib`, cùng các tham số *key_file*, *cert_file* và *check_hostname* từ
+  module :mod:`http.client`, tất cả đều đã không còn được dùng kể từ Python 3.6. Thay vào đó, hãy sử dụng tham số *context* (*ssl_context* trong :mod:`imaplib`). (Do Victor Stinner đóng góp trong :gh:`94172`.)
 
-* Remove ``Jython`` compatibility hacks from several stdlib modules and tests.
-  (Contributed by Nikita Sobolev in :gh:`99482`.)
+* Xóa các phần xử lý tương thích với ``Jython`` khỏi một số module và bài kiểm thử trong stdlib. (Do Nikita Sobolev đóng góp trong :gh:`99482`.)
 
-* Remove ``_use_broken_old_ctypes_structure_semantics_`` flag
-  from :mod:`ctypes` module.
-  (Contributed by Nikita Sobolev in :gh:`99285`.)
+* Xóa cờ ``_use_broken_old_ctypes_structure_semantics_`` khỏi module :mod:`ctypes`. (Do Nikita Sobolev đóng góp trong :gh:`99285`.)
 
 
 .. _whatsnew312-porting-to-python312:
 
-Porting to Python 3.12
-======================
+Chuyển mã sang Python 3.12
+==========================
 
-This section lists previously described changes and other bugfixes
-that may require changes to your code.
+Phần này liệt kê các thay đổi đã được mô tả trước đó và những bản sửa lỗi khác có thể yêu cầu bạn thay đổi mã của mình.
 
-Changes in the Python API
--------------------------
+Các thay đổi trong Python API
+-----------------------------
 
-* More strict rules are now applied for numerical group references and
-  group names in regular expressions.
-  Only sequence of ASCII digits is now accepted as a numerical reference.
-  The group name in bytes patterns and replacement strings can now only
-  contain ASCII letters and digits and underscore.
-  (Contributed by Serhiy Storchaka in :gh:`91760`.)
+* Các quy tắc nghiêm ngặt hơn hiện được áp dụng cho các tham chiếu nhóm dạng số và tên nhóm trong biểu thức chính quy. Hiện chỉ chấp nhận chuỗi chữ số ASCII làm tham chiếu dạng số. Tên nhóm trong các mẫu bytes và chuỗi thay thế giờ đây chỉ có thể chứa chữ cái ASCII, chữ số và dấu gạch dưới. (Đóng góp của Serhiy Storchaka trong :gh:`91760`.)
 
-* Remove ``randrange()`` functionality deprecated since Python 3.10.  Formerly,
-  ``randrange(10.0)`` losslessly converted to ``randrange(10)``. Now, it raises a
-  :exc:`TypeError`. Also, the exception raised for non-integer values such as
-  ``randrange(10.5)`` or ``randrange('10')`` has been changed from :exc:`ValueError` to
-  :exc:`TypeError`.  This also prevents bugs where ``randrange(1e25)`` would silently
-  select from a larger range than ``randrange(10**25)``.
-  (Originally suggested by Serhiy Storchaka :gh:`86388`.)
+* Xóa chức năng ``randrange()`` đã không còn được dùng kể từ Python 3.10. Trước đây, ``randrange(10.0)`` chuyển đổi không mất dữ liệu thành ``randrange(10)``. Hiện tại, chức năng này đưa ra một
+  :exc:`TypeError`. Ngoài ra, ngoại lệ được đưa ra đối với các giá trị không phải số nguyên như ``randrange(10.5)`` hoặc ``randrange('10')`` đã được thay đổi từ :exc:`ValueError` thành
+  :exc:`TypeError`. Điều này cũng ngăn các lỗi trong đó ``randrange(1e25)`` sẽ âm thầm chọn từ một phạm vi lớn hơn ``randrange(10**25)``. (Ban đầu do Serhiy Storchaka đề xuất :gh:`86388`.)
 
-* :class:`argparse.ArgumentParser` changed encoding and error handler
-  for reading arguments from file (e.g. ``fromfile_prefix_chars`` option)
-  from default text encoding (e.g. :func:`locale.getpreferredencoding(False) <locale.getpreferredencoding>`)
-  to :term:`filesystem encoding and error handler`.
-  Argument files should be encoded in UTF-8 instead of ANSI Codepage on Windows.
+* :class:`argparse.ArgumentParser` đã thay đổi encoding và error handler dùng để đọc các đối số từ tệp (ví dụ: tùy chọn ``fromfile_prefix_chars``) từ encoding văn bản mặc định (ví dụ: :func:`locale.getpreferredencoding(False) <locale.getpreferredencoding>`) thành :term:`filesystem encoding and error handler`. Các tệp đối số nên được mã hóa bằng UTF-8 thay vì ANSI Codepage trên Windows.
 
-* Remove the ``asyncore``-based ``smtpd`` module deprecated in Python 3.4.7
-  and 3.5.4.  A recommended replacement is the
-  :mod:`asyncio`-based :pypi:`aiosmtpd` PyPI module.
+* Xóa module ``smtpd`` dựa trên ``asyncore``, đã không còn được dùng kể từ Python 3.4.7 và 3.5.4. Thay thế được khuyến nghị là module PyPI
+  :mod:`asyncio` dựa trên :pypi:`aiosmtpd`.
 
-* :func:`shlex.split`: Passing ``None`` for *s* argument now raises an
-  exception, rather than reading :data:`sys.stdin`. The feature was deprecated
-  in Python 3.9.
-  (Contributed by Victor Stinner in :gh:`94352`.)
+* :func:`shlex.split`: Việc truyền ``None`` cho đối số *s* hiện sẽ gây ra ngoại lệ, thay vì đọc :data:`sys.stdin`. Tính năng này đã bị phản đối trong Python 3.9. (Do Victor Stinner đóng góp trong :gh:`94352`.)
 
-* The :mod:`os` module no longer accepts bytes-like paths, like
-  :class:`bytearray` and :class:`memoryview` types: only the exact
-  :class:`bytes` type is accepted for bytes strings.
-  (Contributed by Victor Stinner in :gh:`98393`.)
+* Mô-đun :mod:`os` không còn chấp nhận các đường dẫn dạng bytes, chẳng hạn như
+  các kiểu :class:`bytearray` và :class:`memoryview`: chỉ kiểu chính xác
+  :class:`bytes` được chấp nhận cho các chuỗi bytes. (Do Victor Stinner đóng góp trong :gh:`98393`.)
 
-* :func:`syslog.openlog` and :func:`syslog.closelog` now fail if used in subinterpreters.
-  :func:`syslog.syslog` may still be used in subinterpreters,
-  but now only if :func:`syslog.openlog` has already been called in the main interpreter.
-  These new restrictions do not apply to the main interpreter,
-  so only a very small set of users might be affected.
-  This change helps with interpreter isolation.  Furthermore, :mod:`syslog` is a wrapper
-  around process-global resources, which are best managed from the main interpreter.
-  (Contributed by Donghee Na in :gh:`99127`.)
+* :func:`syslog.openlog` và :func:`syslog.closelog` hiện sẽ thất bại nếu được sử dụng trong các subinterpreter.
+  :func:`syslog.syslog` vẫn có thể được sử dụng trong các subinterpreter, nhưng giờ đây chỉ khi :func:`syslog.openlog` đã được gọi trong interpreter chính. Những hạn chế mới này không áp dụng cho interpreter chính, vì vậy chỉ một nhóm người dùng rất nhỏ có thể bị ảnh hưởng. Thay đổi này giúp tăng khả năng cô lập interpreter. Hơn nữa, :mod:`syslog` là một wrapper quanh các tài nguyên cấp tiến trình, vốn nên được quản lý từ interpreter chính. (Do Donghee Na đóng góp trong :gh:`99127`.)
 
-* The undocumented locking behavior of :deco:`~functools.cached_property`
-  is removed, because it locked across all instances of the class, leading to high
-  lock contention. This means that a cached property getter function could now run
-  more than once for a single instance, if two threads race. For most simple
-  cached properties (e.g. those that are idempotent and simply calculate a value
-  based on other attributes of the instance) this will be fine.  If
-  synchronization is needed, implement locking within the cached property getter
-  function or around multi-threaded access points.
+* Hành vi khóa không được ghi nhận của :deco:`~functools.cached_property` đã bị loại bỏ vì nó khóa trên tất cả các instance của lớp, dẫn đến tình trạng tranh chấp khóa nghiêm trọng. Điều này có nghĩa là hàm getter của cached property hiện có thể chạy nhiều hơn một lần cho cùng một instance nếu hai thread tranh nhau. Với hầu hết cached property đơn giản (ví dụ, những cached property có tính idempotent và chỉ tính toán một giá trị dựa trên các thuộc tính khác của instance), điều này sẽ không gây vấn đề. Nếu cần đồng bộ hóa, hãy triển khai cơ chế khóa bên trong hàm getter của cached property hoặc xung quanh các điểm truy cập đa luồng.
 
-* :func:`sys._current_exceptions` now returns a mapping from thread-id to an
-  exception instance, rather than to a ``(typ, exc, tb)`` tuple.
-  (Contributed by Irit Katriel in :gh:`103176`.)
+* :func:`sys._current_exceptions` hiện trả về một mapping từ thread-id đến một exception instance, thay vì đến một tuple ``(typ, exc, tb)``. (Do Irit Katriel đóng góp trong :gh:`103176`.)
 
-* When extracting tar files using :mod:`tarfile` or
-  :func:`shutil.unpack_archive`, pass the *filter* argument to limit features
-  that may be surprising or dangerous.
-  See :ref:`tarfile-extraction-filter` for details.
+* Khi trích xuất các tệp tar bằng :mod:`tarfile` hoặc
+  :func:`shutil.unpack_archive`, hãy truyền đối số *filter* để giới hạn các tính năng có thể gây bất ngờ hoặc nguy hiểm. Xem :ref:`tarfile-extraction-filter` để biết chi tiết.
 
-* The output of the :func:`tokenize.tokenize` and :func:`tokenize.generate_tokens`
-  functions is now changed due to the changes introduced in :pep:`701`. This
-  means that ``STRING`` tokens are not emitted any more for f-strings and the
-  tokens described in :pep:`701` are now produced instead: ``FSTRING_START``,
-  ``FSTRING_MIDDLE`` and ``FSTRING_END`` are now emitted for f-string "string"
-  parts in addition to the appropriate tokens for the tokenization in the
-  expression components. For example for the f-string ``f"start {1+1} end"``
-  the old version of the tokenizer emitted::
+* Đầu ra của các hàm :func:`tokenize.tokenize` và :func:`tokenize.generate_tokens` hiện đã thay đổi do những thay đổi được giới thiệu trong :pep:`701`. Điều này có nghĩa là các token ``STRING`` không còn được phát ra cho f-string nữa, và thay vào đó các token được mô tả trong :pep:`701` được tạo ra: ``FSTRING_START``, ``FSTRING_MIDDLE`` và ``FSTRING_END`` hiện được phát ra cho các phần "string" của f-string, cùng với các token thích hợp cho quá trình tokenization trong các thành phần biểu thức. Ví dụ, đối với f-string ``f"start {1+1} end"``, phiên bản tokenizer cũ đã phát ra::
 
     1,0-1,18:           STRING         'f"start {1+1} end"'
 
-  while the new version emits::
+  trong khi phiên bản mới phát ra::
 
       1,0-1,2:            FSTRING_START  'f"'
       1,2-1,8:            FSTRING_MIDDLE 'start '
@@ -1784,123 +1223,87 @@ Changes in the Python API
       1,13-1,17:          FSTRING_MIDDLE ' end'
       1,17-1,18:          FSTRING_END    '"'
 
-  Additionally, there may be some minor behavioral changes as a consequence of the
-  changes required to support :pep:`701`. Some of these changes include:
+  Ngoài ra, có thể có một số thay đổi nhỏ về hành vi do những thay đổi cần thiết để hỗ trợ :pep:`701`. Một số thay đổi bao gồm:
 
-  * The ``type`` attribute of the tokens emitted when tokenizing some invalid Python
-    characters such as ``!`` has changed from ``ERRORTOKEN`` to ``OP``.
+  * Thuộc tính ``type`` của các token được phát ra khi tokenization một số ký tự Python không hợp lệ, chẳng hạn như ``!``, đã thay đổi từ ``ERRORTOKEN`` thành ``OP``.
 
-  * Incomplete single-line strings now also raise :exc:`tokenize.TokenError` as incomplete
-    multiline strings do.
+  * Các chuỗi một dòng chưa hoàn chỉnh giờ đây cũng phát sinh :exc:`tokenize.TokenError`, giống như các chuỗi nhiều dòng chưa hoàn chỉnh.
 
-  * Some incomplete or invalid Python code now raises :exc:`tokenize.TokenError` instead of
-    returning arbitrary ``ERRORTOKEN`` tokens when tokenizing it.
+  * Một số mã Python chưa hoàn chỉnh hoặc không hợp lệ giờ đây phát sinh :exc:`tokenize.TokenError` thay vì trả về các token ``ERRORTOKEN`` tùy ý khi phân tích mã đó.
 
-  * Mixing tabs and spaces as indentation in the same file is not supported anymore and will
-    raise a :exc:`TabError`.
+  * Việc trộn tab và dấu cách làm thụt lề trong cùng một tệp không còn được hỗ trợ và sẽ phát sinh một :exc:`TabError`.
 
-* The :mod:`threading` module now expects the :mod:`!_thread` module to have
-  an ``_is_main_interpreter`` attribute.  It is a function with no
-  arguments that returns ``True`` if the current interpreter is the
-  main interpreter.
+* Mô-đun :mod:`threading` giờ đây yêu cầu mô-đun :mod:`!_thread` có thuộc tính ``_is_main_interpreter``. Đây là một hàm không có đối số, trả về ``True`` nếu interpreter hiện tại là interpreter chính.
 
-  Any library or application that provides a custom ``_thread`` module
-  should provide ``_is_main_interpreter()``.
-  (See :gh:`112826`.)
+  Mọi thư viện hoặc ứng dụng cung cấp mô-đun ``_thread`` tùy chỉnh đều phải cung cấp ``_is_main_interpreter()``. (Xem :gh:`112826`.)
 
-Build Changes
-=============
+Các thay đổi về quá trình build
+===============================
 
-* Python no longer uses :file:`setup.py` to build shared C extension modules.
-  Build parameters like headers and libraries are detected in ``configure``
-  script. Extensions are built by :file:`Makefile`. Most extensions use
-  ``pkg-config`` and fall back to manual detection.
-  (Contributed by Christian Heimes in :gh:`93939`.)
+* Python không còn sử dụng :file:`setup.py` để build các mô-đun mở rộng C dùng chung. Các tham số build như header và thư viện được phát hiện trong script ``configure``. Các mô-đun mở rộng được build bằng :file:`Makefile`. Hầu hết các mô-đun mở rộng đều sử dụng ``pkg-config`` và chuyển sang phát hiện thủ công khi cần. (Do Christian Heimes đóng góp trong :gh:`93939`.)
 
-* ``va_start()`` with two parameters, like ``va_start(args, format),``
-  is now required to build Python.
-  ``va_start()`` is no longer called with a single parameter.
-  (Contributed by Kumar Aditya in :gh:`93207`.)
+* ``va_start()`` với hai tham số, chẳng hạn như ``va_start(args, format),``, hiện là bắt buộc để build Python. ``va_start()`` không còn được gọi với một tham số duy nhất. (Do Kumar Aditya đóng góp trong :gh:`93207`.)
 
-* CPython now uses the ThinLTO option as the default link time optimization policy
-  if the Clang compiler accepts the flag.
-  (Contributed by Donghee Na in :gh:`89536`.)
+* CPython hiện sử dụng tùy chọn ThinLTO làm chính sách tối ưu hóa thời gian liên kết mặc định nếu trình biên dịch Clang chấp nhận cờ này. (Do Donghee Na đóng góp trong :gh:`89536`.)
 
-* Add ``COMPILEALL_OPTS`` variable in :file:`Makefile` to override :mod:`compileall`
-  options (default: ``-j0``) in ``make install``. Also merged the 3
-  ``compileall`` commands into a single command to build .pyc files for all
-  optimization levels (0, 1, 2) at once.
-  (Contributed by Victor Stinner in :gh:`99289`.)
+* Thêm biến ``COMPILEALL_OPTS`` trong :file:`Makefile` để ghi đè các tùy chọn :mod:`compileall` (mặc định: ``-j0``) trong ``make install``. Đồng thời hợp nhất 3 lệnh ``compileall`` thành một lệnh duy nhất để build các tệp .pyc cho tất cả các mức tối ưu hóa (0, 1, 2) cùng lúc. (Do Victor Stinner đóng góp trong :gh:`99289`.)
 
-* Add platform triplets for 64-bit LoongArch:
+* Thêm các platform triplet cho LoongArch 64-bit:
 
   * loongarch64-linux-gnusf
   * loongarch64-linux-gnuf32
   * loongarch64-linux-gnu
 
-  (Contributed by Zhang Na in :gh:`90656`.)
+  (Đóng góp bởi Zhang Na trong :gh:`90656`.)
 
-* ``PYTHON_FOR_REGEN`` now require Python 3.10 or newer.
+* ``PYTHON_FOR_REGEN`` hiện yêu cầu Python 3.10 trở lên.
 
-* Autoconf 2.71 and aclocal 1.16.4 is now required to regenerate
-  :file:`configure`.
-  (Contributed by Christian Heimes in :gh:`89886`.)
+* Hiện cần Autoconf 2.71 và aclocal 1.16.4 để tạo lại
+  :file:`configure`. (Đóng góp bởi Christian Heimes trong :gh:`89886`.)
 
-* Windows builds and macOS installers from python.org now use OpenSSL 3.0.
+* Các bản build cho Windows và trình cài đặt macOS từ python.org hiện sử dụng OpenSSL 3.0.
 
 
-C API Changes
-=============
+Các thay đổi API C
+==================
 
-New Features
-------------
+Tính năng mới
+-------------
 
 .. _whatsnew312-pep697:
 
-* :pep:`697`: Introduce the :ref:`Unstable C API tier <unstable-c-api>`,
-  intended for low-level tools like debuggers and JIT compilers.
-  This API may change in each minor release of CPython without deprecation
-  warnings.
-  Its contents are marked by the ``PyUnstable_`` prefix in names.
+* :pep:`697`: Giới thiệu :ref:`tầng C API Unstable <unstable-c-api>`, dành cho các công cụ cấp thấp như trình gỡ lỗi và trình biên dịch JIT. API này có thể thay đổi trong mỗi bản phát hành phụ của CPython mà không có cảnh báo ngừng hỗ trợ. Các thành phần của API được đánh dấu bằng tiền tố ``PyUnstable_`` trong tên.
 
-  Code object constructors:
+  Các hàm khởi tạo đối tượng code:
 
-  - ``PyUnstable_Code_New()`` (renamed from ``PyCode_New``)
-  - ``PyUnstable_Code_NewWithPosOnlyArgs()`` (renamed from ``PyCode_NewWithPosOnlyArgs``)
+  - ``PyUnstable_Code_New()`` (đổi tên từ ``PyCode_New``)
+  - ``PyUnstable_Code_NewWithPosOnlyArgs()`` (đổi tên từ ``PyCode_NewWithPosOnlyArgs``)
 
-  Extra storage for code objects (:pep:`523`):
+  Bộ nhớ lưu trữ bổ sung cho các đối tượng code (:pep:`523`):
 
-  - ``PyUnstable_Eval_RequestCodeExtraIndex()`` (renamed from ``_PyEval_RequestCodeExtraIndex``)
-  - ``PyUnstable_Code_GetExtra()`` (renamed from ``_PyCode_GetExtra``)
-  - ``PyUnstable_Code_SetExtra()`` (renamed from ``_PyCode_SetExtra``)
+  - ``PyUnstable_Eval_RequestCodeExtraIndex()`` (đổi tên từ ``_PyEval_RequestCodeExtraIndex``)
+  - ``PyUnstable_Code_GetExtra()`` (đổi tên từ ``_PyCode_GetExtra``)
+  - ``PyUnstable_Code_SetExtra()`` (được đổi tên từ ``_PyCode_SetExtra``)
 
-  The original names will continue to be available until the respective
-  API changes.
+  Các tên ban đầu sẽ tiếp tục khả dụng cho đến khi API tương ứng thay đổi.
 
-  (Contributed by Petr Viktorin in :gh:`101101`.)
+  (Do Petr Viktorin đóng góp trong :gh:`101101`.)
 
-* :pep:`697`: Add an API for extending types whose instance memory layout is
-  opaque:
+* :pep:`697`: Thêm một API để mở rộng các kiểu có bố cục bộ nhớ của instance không công khai:
 
-  - :c:member:`PyType_Spec.basicsize` can be zero or negative to specify
-    inheriting or extending the base class size.
-  - :c:func:`PyObject_GetTypeData` and :c:func:`PyType_GetTypeDataSize`
-    added to allow access to subclass-specific instance data.
-  - :c:macro:`Py_TPFLAGS_ITEMS_AT_END` and :c:func:`PyObject_GetItemData`
-    added to allow safely extending certain variable-sized types, including
+  - :c:member:`PyType_Spec.basicsize` có thể bằng không hoặc âm để chỉ định việc kế thừa hoặc mở rộng kích thước của lớp cơ sở.
+  - :c:func:`PyObject_GetTypeData` và :c:func:`PyType_GetTypeDataSize` được thêm vào để cho phép truy cập dữ liệu instance dành riêng cho lớp con.
+  - :c:macro:`Py_TPFLAGS_ITEMS_AT_END` và :c:func:`PyObject_GetItemData` được thêm vào để cho phép mở rộng an toàn một số kiểu có kích thước thay đổi, bao gồm
     :c:var:`PyType_Type`.
-  - :c:macro:`Py_RELATIVE_OFFSET` added to allow defining
-    :c:type:`members <PyMemberDef>` in terms of a subclass-specific struct.
+  - :c:macro:`Py_RELATIVE_OFFSET` được bổ sung để cho phép định nghĩa
+    :c:type:`các thành viên <PyMemberDef>` theo một struct dành riêng cho lớp con.
 
-  (Contributed by Petr Viktorin in :gh:`103509`.)
+  (Do Petr Viktorin đóng góp trong :gh:`103509`.)
 
-* Add the new :ref:`limited C API <limited-c-api>` function :c:func:`PyType_FromMetaclass`,
-  which generalizes the existing :c:func:`PyType_FromModuleAndSpec` using
-  an additional metaclass argument.
-  (Contributed by Wenzel Jakob in :gh:`93012`.)
+* Bổ sung hàm :ref:`limited C API <limited-c-api>` mới :c:func:`PyType_FromMetaclass`, hàm này tổng quát hóa hàm :c:func:`PyType_FromModuleAndSpec` hiện có bằng cách sử dụng thêm một đối số metaclass. (Do Wenzel Jakob đóng góp trong :gh:`93012`.)
 
-* API for creating objects that can be called using
-  :ref:`the vectorcall protocol <vectorcall>` was added to the
+* API để tạo các đối tượng có thể được gọi bằng
+  :ref:`giao thức vectorcall <vectorcall>` đã được bổ sung vào
   :ref:`Limited API <stable>`:
 
   * :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL`
@@ -1908,338 +1311,203 @@ New Features
   * :c:func:`PyVectorcall_Call`
   * :c:type:`vectorcallfunc`
 
-  The :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` flag is now removed from a class
-  when the class's :py:meth:`~object.__call__` method is reassigned.
-  This makes vectorcall safe to use with mutable types (i.e. heap types
-  without the immutable flag, :c:macro:`Py_TPFLAGS_IMMUTABLETYPE`).
-  Mutable types that do not override :c:member:`~PyTypeObject.tp_call` now
-  inherit the ``Py_TPFLAGS_HAVE_VECTORCALL`` flag.
-  (Contributed by Petr Viktorin in :gh:`93274`.)
+  Cờ :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` hiện sẽ bị xóa khỏi một lớp khi phương thức :py:meth:`~object.__call__` của lớp đó được gán lại. Điều này giúp vectorcall an toàn khi sử dụng với các kiểu có thể thay đổi (tức là các kiểu heap không có cờ bất biến, :c:macro:`Py_TPFLAGS_IMMUTABLETYPE`). Các kiểu có thể thay đổi không ghi đè :c:member:`~PyTypeObject.tp_call` giờ đây sẽ kế thừa cờ ``Py_TPFLAGS_HAVE_VECTORCALL``. (Do Petr Viktorin đóng góp trong :gh:`93274`.)
 
-  The :c:macro:`Py_TPFLAGS_MANAGED_DICT` and :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF`
-  flags have been added. This allows extensions classes to support object
-  :attr:`~object.__dict__` and weakrefs with less bookkeeping,
-  using less memory and with faster access.
+  Các cờ :c:macro:`Py_TPFLAGS_MANAGED_DICT` và :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` đã được bổ sung. Điều này cho phép các lớp extension hỗ trợ object
+  :attr:`~object.__dict__` và weakref với ít công việc quản lý hơn, sử dụng ít bộ nhớ hơn và truy cập nhanh hơn.
 
-* API for performing calls using
-  :ref:`the vectorcall protocol <vectorcall>` was added to the
+* API để thực hiện các lời gọi bằng
+  :ref:`giao thức vectorcall <vectorcall>` đã được bổ sung vào
   :ref:`Limited API <stable>`:
 
   * :c:func:`PyObject_Vectorcall`
   * :c:func:`PyObject_VectorcallMethod`
   * :c:macro:`PY_VECTORCALL_ARGUMENTS_OFFSET`
 
-  This means that both the incoming and outgoing ends of the vector call
-  protocol are now available in the :ref:`Limited API <stable>`. (Contributed
-  by Wenzel Jakob in :gh:`98586`.)
+  Điều này có nghĩa là cả đầu vào và đầu ra của giao thức vector call giờ đây đều khả dụng trong :ref:`Limited API <stable>`. (Do Wenzel Jakob đóng góp trong :gh:`98586`.)
 
-* Add two new public functions,
-  :c:func:`PyEval_SetProfileAllThreads` and
-  :c:func:`PyEval_SetTraceAllThreads`, that allow to set tracing and profiling
-  functions in all running threads in addition to the calling one. (Contributed
-  by Pablo Galindo in :gh:`93503`.)
+* Thêm hai hàm public mới,
+  :c:func:`PyEval_SetProfileAllThreads` và
+  :c:func:`PyEval_SetTraceAllThreads`, cho phép thiết lập các hàm tracing và profiling trong tất cả các thread đang chạy, ngoài thread đang gọi. (Đóng góp của Pablo Galindo trong :gh:`93503`.)
 
-* Add new function :c:func:`PyFunction_SetVectorcall` to the C API
-  which sets the vectorcall field of a given :c:type:`PyFunctionObject`.
-  (Contributed by Andrew Frost in :gh:`92257`.)
+* Thêm hàm mới :c:func:`PyFunction_SetVectorcall` vào C API để thiết lập trường vectorcall của một :c:type:`PyFunctionObject` nhất định. (Đóng góp của Andrew Frost trong :gh:`92257`.)
 
-* The C API now permits registering callbacks via :c:func:`PyDict_AddWatcher`,
-  :c:func:`PyDict_Watch` and related APIs to be called whenever a dictionary
-  is modified. This is intended for use by optimizing interpreters, JIT
-  compilers, or debuggers.
-  (Contributed by Carl Meyer in :gh:`91052`.)
+* C API hiện cho phép đăng ký callback thông qua :c:func:`PyDict_AddWatcher`,
+  :c:func:`PyDict_Watch` và các API liên quan được gọi mỗi khi một dictionary được sửa đổi. Tính năng này dành cho các trình thông dịch tối ưu hóa, trình biên dịch JIT hoặc trình debugger. (Đóng góp của Carl Meyer trong :gh:`91052`.)
 
-* Add :c:func:`PyType_AddWatcher` and :c:func:`PyType_Watch` API to register
-  callbacks to receive notification on changes to a type.
-  (Contributed by Carl Meyer in :gh:`91051`.)
+* Thêm API :c:func:`PyType_AddWatcher` và :c:func:`PyType_Watch` để đăng ký callback nhận thông báo khi một type thay đổi. (Đóng góp của Carl Meyer trong :gh:`91051`.)
 
-* Add :c:func:`PyCode_AddWatcher` and :c:func:`PyCode_ClearWatcher`
-  APIs to register callbacks to receive notification on creation and
-  destruction of code objects.
-  (Contributed by Itamar Oren in :gh:`91054`.)
+* Thêm các API :c:func:`PyCode_AddWatcher` và :c:func:`PyCode_ClearWatcher` để đăng ký callback nhận thông báo khi các đối tượng mã được tạo và hủy. (Đóng góp của Itamar Oren trong :gh:`91054`.)
 
-* Add :c:func:`PyFrame_GetVar` and :c:func:`PyFrame_GetVarString` functions to
-  get a frame variable by its name.
-  (Contributed by Victor Stinner in :gh:`91248`.)
+* Thêm các hàm :c:func:`PyFrame_GetVar` và :c:func:`PyFrame_GetVarString` để lấy một biến trong frame theo tên của biến đó. (Đóng góp của Victor Stinner trong :gh:`91248`.)
 
-* Add :c:func:`PyErr_GetRaisedException` and :c:func:`PyErr_SetRaisedException`
-  for saving and restoring the current exception.
-  These functions return and accept a single exception object,
-  rather than the triple arguments of the now-deprecated
-  :c:func:`PyErr_Fetch` and :c:func:`PyErr_Restore`.
-  This is less error prone and a bit more efficient.
-  (Contributed by Mark Shannon in :gh:`101578`.)
+* Thêm :c:func:`PyErr_GetRaisedException` và :c:func:`PyErr_SetRaisedException` để lưu và khôi phục exception hiện tại. Các hàm này trả về và nhận một đối tượng exception duy nhất, thay vì ba đối số của các hàm hiện không còn được khuyến nghị
+  :c:func:`PyErr_Fetch` và :c:func:`PyErr_Restore`. Cách này ít dễ gây lỗi hơn và hiệu quả hơn một chút. (Đóng góp của Mark Shannon trong :gh:`101578`.)
 
-* Add ``_PyErr_ChainExceptions1``, which takes an exception instance,
-  to replace the legacy-API ``_PyErr_ChainExceptions``, which is now
-  deprecated. (Contributed by Mark Shannon in :gh:`101578`.)
+* Thêm ``_PyErr_ChainExceptions1``, nhận một instance exception, để thay thế ``_PyErr_ChainExceptions`` của legacy API, hiện đã bị deprecated. (Đóng góp của Mark Shannon trong :gh:`101578`.)
 
-* Add :c:func:`PyException_GetArgs` and :c:func:`PyException_SetArgs`
-  as convenience functions for retrieving and modifying
-  the :attr:`~BaseException.args` passed to the exception's constructor.
-  (Contributed by Mark Shannon in :gh:`101578`.)
+* Thêm :c:func:`PyException_GetArgs` và :c:func:`PyException_SetArgs` dưới dạng các hàm tiện ích để truy xuất và sửa đổi :attr:`~BaseException.args` được truyền vào constructor của exception. (Đóng góp của Mark Shannon trong :gh:`101578`.)
 
-* Add :c:func:`PyErr_DisplayException`, which takes an exception instance,
-  to replace the legacy-api :c:func:`!PyErr_Display`. (Contributed by
-  Irit Katriel in :gh:`102755`).
+* Thêm :c:func:`PyErr_DisplayException`, nhận một instance exception, để thay thế :c:func:`!PyErr_Display` của legacy API. (Đóng góp của Irit Katriel trong :gh:`102755`).
 
 .. _whatsnew312-pep683:
 
-* :pep:`683`: Introduce *Immortal Objects*, which allows objects
-  to bypass reference counts, and related changes to the C-API:
+* :pep:`683`: Giới thiệu *Đối tượng bất tử*, cho phép các đối tượng bỏ qua reference count và các thay đổi liên quan đến C-API:
 
-  - ``_Py_IMMORTAL_REFCNT``: The reference count that defines an object
-      as immortal.
-  - ``_Py_IsImmortal`` Checks if an object has the immortal reference count.
-  - ``PyObject_HEAD_INIT`` This will now initialize reference count to
-      ``_Py_IMMORTAL_REFCNT`` when used with ``Py_BUILD_CORE``.
-  - ``SSTATE_INTERNED_IMMORTAL`` An identifier for interned unicode objects
-       that are immortal.
-  - ``SSTATE_INTERNED_IMMORTAL_STATIC`` An identifier for interned unicode
-       objects that are immortal and static
-  - ``sys.getunicodeinternedsize`` This returns the total number of unicode
-      objects that have been interned. This is now needed for :file:`refleak.py` to
-      correctly track reference counts and allocated blocks
+  - ``_Py_IMMORTAL_REFCNT``: Reference count xác định một đối tượng
+      là bất tử.
+  - ``_Py_IsImmortal`` Kiểm tra xem một đối tượng có reference count bất tử hay không.
+  - ``PyObject_HEAD_INIT`` Giờ đây, thao tác này sẽ khởi tạo reference count thành
+      ``_Py_IMMORTAL_REFCNT`` khi được sử dụng với ``Py_BUILD_CORE``.
+  - ``SSTATE_INTERNED_IMMORTAL`` Một identifier cho các đối tượng Unicode đã được intern
+       là bất tử.
+  - ``SSTATE_INTERNED_IMMORTAL_STATIC`` Một mã định danh cho unicode được intern
+       các đối tượng bất tử và tĩnh
+  - ``sys.getunicodeinternedsize`` Hàm này trả về tổng số đối tượng unicode
+      đã được intern. Điều này hiện cần thiết để :file:`refleak.py` theo dõi chính xác số lượng tham chiếu và các block đã cấp phát
 
-  (Contributed by Eddie Elizondo in :gh:`84436`.)
+  (Do Eddie Elizondo đóng góp trong :gh:`84436`.)
 
-* :pep:`684`: Add the new :c:func:`Py_NewInterpreterFromConfig`
-  function and :c:type:`PyInterpreterConfig`, which may be used
-  to create sub-interpreters with their own GILs.
-  (See :ref:`whatsnew312-pep684` for more info.)
-  (Contributed by Eric Snow in :gh:`104110`.)
+* :pep:`684`: Thêm hàm :c:func:`Py_NewInterpreterFromConfig` mới và :c:type:`PyInterpreterConfig`, có thể được dùng để tạo các sub-interpreter với GIL riêng. (Xem :ref:`whatsnew312-pep684` để biết thêm thông tin.) (Do Eric Snow đóng góp trong :gh:`104110`.)
 
-* In the limited C API version 3.12, :c:func:`Py_INCREF` and
-  :c:func:`Py_DECREF` functions are now implemented as opaque function calls to
-  hide implementation details.
-  (Contributed by Victor Stinner in :gh:`105387`.)
+* Trong Limited C API phiên bản 3.12, :c:func:`Py_INCREF` và
+  các hàm :c:func:`Py_DECREF` hiện được triển khai dưới dạng các lời gọi hàm opaque để ẩn chi tiết triển khai. (Do Victor Stinner đóng góp trong :gh:`105387`.)
 
-Porting to Python 3.12
-----------------------
+Chuyển mã sang Python 3.12
+--------------------------
 
-* Legacy Unicode APIs based on ``Py_UNICODE*`` representation has been removed.
-  Please migrate to APIs based on UTF-8 or ``wchar_t*``.
+* Các API Unicode cũ dựa trên biểu diễn ``Py_UNICODE*`` đã bị loại bỏ. Vui lòng chuyển sang các API dựa trên UTF-8 hoặc ``wchar_t*``.
 
-* Argument parsing functions like :c:func:`PyArg_ParseTuple` doesn't support
-  ``Py_UNICODE*`` based format (e.g. ``u``, ``Z``) anymore. Please migrate
-  to other formats for Unicode like ``s``, ``z``, ``es``, and ``U``.
+* Các hàm phân tích đối số như :c:func:`PyArg_ParseTuple` không còn hỗ trợ định dạng dựa trên ``Py_UNICODE*`` (ví dụ: ``u``, ``Z``). Vui lòng chuyển sang các định dạng Unicode khác như ``s``, ``z``, ``es`` và ``U``.
 
-* ``tp_weaklist`` for all static builtin types is always ``NULL``.
-  This is an internal-only field on ``PyTypeObject``
-  but we're pointing out the change in case someone happens to be
-  accessing the field directly anyway.  To avoid breakage, consider
-  using the existing public C-API instead, or, if necessary, the
-  (internal-only) ``_PyObject_GET_WEAKREFS_LISTPTR()`` macro.
+* ``tp_weaklist`` của tất cả các kiểu builtin tĩnh luôn là ``NULL``. Đây là một trường chỉ dùng nội bộ trên ``PyTypeObject``, nhưng chúng tôi nêu rõ thay đổi này phòng trường hợp ai đó vẫn truy cập trực tiếp vào trường này. Để tránh sự cố, hãy cân nhắc sử dụng C-API công khai hiện có; hoặc, nếu cần, macro ``_PyObject_GET_WEAKREFS_LISTPTR()`` (chỉ dùng nội bộ).
 
-* This internal-only :c:member:`PyTypeObject.tp_subclasses` may now not be
-  a valid object pointer.  Its type was changed to :c:expr:`void *` to
-  reflect this.  We mention this in case someone happens to be accessing the
-  internal-only field directly.
+* :c:member:`PyTypeObject.tp_subclasses` chỉ dùng nội bộ này giờ đây có thể không còn là một con trỏ đối tượng hợp lệ. Kiểu của nó đã được đổi thành :c:expr:`void *` để phản ánh điều này. Chúng tôi đề cập đến điều này phòng trường hợp ai đó truy cập trực tiếp vào trường chỉ dùng nội bộ này.
 
-  To get a list of subclasses, call the Python method
-  :py:meth:`~type.__subclasses__` (using :c:func:`PyObject_CallMethod`,
-  for example).
+  Để lấy danh sách các lớp con, hãy gọi phương thức Python
+  :py:meth:`~type.__subclasses__` (chẳng hạn như sử dụng :c:func:`PyObject_CallMethod`).
 
-* Add support of more formatting options (left aligning, octals, uppercase
-  hexadecimals, :c:type:`intmax_t`, :c:type:`ptrdiff_t`, :c:type:`wchar_t` C
-  strings, variable width and precision) in :c:func:`PyUnicode_FromFormat` and
-  :c:func:`PyUnicode_FromFormatV`.
-  (Contributed by Serhiy Storchaka in :gh:`98836`.)
+* Bổ sung hỗ trợ cho nhiều tùy chọn định dạng hơn (căn trái, số bát phân, số thập lục phân viết hoa, :c:type:`intmax_t`, :c:type:`ptrdiff_t`, chuỗi C :c:type:`wchar_t`, độ rộng và độ chính xác thay đổi) trong :c:func:`PyUnicode_FromFormat` và
+  :c:func:`PyUnicode_FromFormatV`. (Được Serhiy Storchaka đóng góp trong :gh:`98836`.)
 
-* An unrecognized format character in :c:func:`PyUnicode_FromFormat` and
-  :c:func:`PyUnicode_FromFormatV` now sets a :exc:`SystemError`.
-  In previous versions it caused all the rest of the format string to be
-  copied as-is to the result string, and any extra arguments discarded.
-  (Contributed by Serhiy Storchaka in :gh:`95781`.)
+* Một ký tự định dạng không được nhận dạng trong :c:func:`PyUnicode_FromFormat` và
+  :c:func:`PyUnicode_FromFormatV` giờ đây đặt một :exc:`SystemError`. Trong các phiên bản trước, thao tác này khiến toàn bộ phần còn lại của chuỗi định dạng được sao chép nguyên trạng vào chuỗi kết quả và mọi đối số bổ sung bị loại bỏ. (Được Serhiy Storchaka đóng góp trong :gh:`95781`.)
 
-* Fix wrong sign placement in :c:func:`PyUnicode_FromFormat` and
-  :c:func:`PyUnicode_FromFormatV`.
-  (Contributed by Philip Georgi in :gh:`95504`.)
+* Sửa lỗi đặt dấu không chính xác trong :c:func:`PyUnicode_FromFormat` và
+  :c:func:`PyUnicode_FromFormatV`. (Do Philip Georgi đóng góp trong :gh:`95504`.)
 
-* Extension classes wanting to add a :attr:`~object.__dict__` or weak reference slot
-  should use :c:macro:`Py_TPFLAGS_MANAGED_DICT` and
-  :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` instead of ``tp_dictoffset`` and
-  ``tp_weaklistoffset``, respectively.
-  The use of ``tp_dictoffset`` and ``tp_weaklistoffset`` is still
-  supported, but does not fully support multiple inheritance
-  (:gh:`95589`), and performance may be worse.
-  Classes declaring :c:macro:`Py_TPFLAGS_MANAGED_DICT` must call
-  :c:func:`!_PyObject_VisitManagedDict` and :c:func:`!_PyObject_ClearManagedDict`
-  to traverse and clear their instance's dictionaries.
-  To clear weakrefs, call :c:func:`PyObject_ClearWeakRefs`, as before.
+* Các lớp extension muốn thêm một :attr:`~object.__dict__` hoặc một slot weak reference nên sử dụng :c:macro:`Py_TPFLAGS_MANAGED_DICT` và
+  :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` thay cho ``tp_dictoffset`` và ``tp_weaklistoffset``, theo thứ tự tương ứng. Việc sử dụng ``tp_dictoffset`` và ``tp_weaklistoffset`` vẫn được hỗ trợ, nhưng không hỗ trợ đầy đủ multiple inheritance (:gh:`95589`), và hiệu suất có thể kém hơn. Các lớp khai báo :c:macro:`Py_TPFLAGS_MANAGED_DICT` phải gọi
+  :c:func:`!_PyObject_VisitManagedDict` và :c:func:`!_PyObject_ClearManagedDict` để duyệt và xóa các dictionary của instance. Để xóa weakref, hãy gọi :c:func:`PyObject_ClearWeakRefs` như trước đây.
 
-* The :c:func:`PyUnicode_FSDecoder` function no longer accepts bytes-like
-  paths, like :class:`bytearray` and :class:`memoryview` types: only the exact
-  :class:`bytes` type is accepted for bytes strings.
-  (Contributed by Victor Stinner in :gh:`98393`.)
+* Hàm :c:func:`PyUnicode_FSDecoder` không còn chấp nhận các path dạng bytes, chẳng hạn như các kiểu :class:`bytearray` và :class:`memoryview`: chỉ kiểu
+  :class:`bytes` chính xác được chấp nhận cho các chuỗi bytes. (Do Victor Stinner đóng góp trong :gh:`98393`.)
 
-* The :c:macro:`Py_CLEAR`, :c:macro:`Py_SETREF` and :c:macro:`Py_XSETREF`
-  macros now only evaluate their arguments once. If an argument has side
-  effects, these side effects are no longer duplicated.
-  (Contributed by Victor Stinner in :gh:`98724`.)
+* Các macro :c:macro:`Py_CLEAR`, :c:macro:`Py_SETREF` và :c:macro:`Py_XSETREF` hiện chỉ đánh giá các đối số của chúng một lần. Nếu một đối số có side effect, các side effect này sẽ không còn bị lặp lại. (Do Victor Stinner đóng góp trong :gh:`98724`.)
 
-* The interpreter's error indicator is now always normalized. This means
-  that :c:func:`PyErr_SetObject`, :c:func:`PyErr_SetString` and the other
-  functions that set the error indicator now normalize the exception
-  before storing it. (Contributed by Mark Shannon in :gh:`101578`.)
+* Chỉ báo lỗi của interpreter giờ đây luôn được chuẩn hóa. Điều này có nghĩa là :c:func:`PyErr_SetObject`, :c:func:`PyErr_SetString` và các hàm khác thiết lập chỉ báo lỗi giờ đây sẽ chuẩn hóa ngoại lệ trước khi lưu trữ. (Do Mark Shannon đóng góp trong :gh:`101578`.)
 
-* ``_Py_RefTotal`` is no longer authoritative and only kept around
-  for ABI compatibility.  Note that it is an internal global and only
-  available on debug builds.  If you happen to be using it then you'll
-  need to start using ``_Py_GetGlobalRefTotal()``.
+* ``_Py_RefTotal`` không còn là nguồn thông tin chính thức và chỉ được giữ lại để tương thích ABI. Lưu ý rằng đây là một biến toàn cục nội bộ và chỉ có trong các bản build debug. Nếu bạn đang sử dụng nó thì bạn sẽ cần bắt đầu sử dụng ``_Py_GetGlobalRefTotal()``.
 
-* The following functions now select an appropriate metaclass for the newly
-  created type:
+* Các hàm sau đây giờ sẽ chọn một metaclass phù hợp cho type mới được tạo:
 
   * :c:func:`PyType_FromSpec`
   * :c:func:`PyType_FromSpecWithBases`
   * :c:func:`PyType_FromModuleAndSpec`
 
-  Creating classes whose metaclass overrides :c:member:`~PyTypeObject.tp_new`
-  is deprecated, and in Python 3.14+ it will be disallowed.
-  Note that these functions ignore ``tp_new`` of the metaclass, possibly
-  allowing incomplete initialization.
+  Việc tạo các class có metaclass ghi đè :c:member:`~PyTypeObject.tp_new` đã không còn được khuyến nghị, và sẽ bị cấm trong Python 3.14 trở lên. Lưu ý rằng các hàm này bỏ qua ``tp_new`` của metaclass, nên có thể cho phép quá trình khởi tạo chưa hoàn tất.
 
-  Note that :c:func:`PyType_FromMetaclass` (added in Python 3.12)
-  already disallows creating classes whose metaclass overrides ``tp_new``
-  (:meth:`~object.__new__` in Python).
+  Lưu ý rằng :c:func:`PyType_FromMetaclass` (được thêm vào Python 3.12) đã không cho phép tạo các class có metaclass ghi đè ``tp_new`` (:meth:`~object.__new__` trong Python).
 
-  Since ``tp_new`` overrides almost everything ``PyType_From*`` functions do,
-  the two are incompatible with each other.
-  The existing behavior -- ignoring the metaclass for several steps
-  of type creation -- is unsafe in general, since (meta)classes assume that
-  ``tp_new`` was called.
-  There is no simple general workaround. One of the following may work for you:
+  Vì ``tp_new`` ghi đè gần như mọi việc mà các hàm ``PyType_From*`` thực hiện, hai thành phần này không tương thích với nhau. Hành vi hiện tại -- bỏ qua metaclass trong một số bước tạo type -- nhìn chung không an toàn, vì các (meta)class giả định rằng ``tp_new`` đã được gọi. Không có cách giải quyết chung nào đơn giản. Một trong các cách sau có thể phù hợp với bạn:
 
-  - If you control the metaclass, avoid using ``tp_new`` in it:
+  - Nếu bạn kiểm soát metaclass, hãy tránh sử dụng ``tp_new`` trong đó:
 
-    - If initialization can be skipped, it can be done in
-      :c:member:`~PyTypeObject.tp_init` instead.
-    - If the metaclass doesn't need to be instantiated from Python,
-      set its ``tp_new`` to ``NULL`` using
-      the :c:macro:`Py_TPFLAGS_DISALLOW_INSTANTIATION` flag.
-      This makes it acceptable for ``PyType_From*`` functions.
+    - Nếu có thể bỏ qua bước khởi tạo, bạn có thể thực hiện việc đó bằng
+      :c:member:`~PyTypeObject.tp_init` thay thế.
+    - Nếu metaclass không cần được khởi tạo từ Python, hãy đặt ``tp_new`` của nó thành ``NULL`` bằng cờ :c:macro:`Py_TPFLAGS_DISALLOW_INSTANTIATION`. Điều này khiến nó phù hợp với các hàm ``PyType_From*``.
 
-  - Avoid ``PyType_From*`` functions: if you don't need C-specific features
-    (slots or setting the instance size), create types by :ref:`calling <call>`
-    the metaclass.
+  - Tránh các hàm ``PyType_From*``: nếu bạn không cần các tính năng dành riêng cho C (slots hoặc thiết lập kích thước instance), hãy tạo các type bằng cách :ref:`gọi <call>` metaclass.
 
-  - If you *know* the ``tp_new`` can be skipped safely, filter the deprecation
-    warning out using :func:`warnings.catch_warnings` from Python.
+  - Nếu bạn *biết* rằng có thể bỏ qua ``tp_new`` một cách an toàn, hãy lọc cảnh báo ngừng hỗ trợ bằng cách sử dụng :func:`warnings.catch_warnings` từ Python.
 
-* :c:var:`PyOS_InputHook` and :c:var:`PyOS_ReadlineFunctionPointer` are no
-  longer called in :ref:`subinterpreters <sub-interpreter-support>`. This is
-  because clients generally rely on process-wide global state (since these
-  callbacks have no way of recovering extension module state).
+* :c:var:`PyOS_InputHook` và :c:var:`PyOS_ReadlineFunctionPointer` không còn được gọi trong :ref:`subinterpreter <sub-interpreter-support>`. Điều này là do các client thường dựa vào trạng thái global trên toàn process (vì các callback này không có cách khôi phục trạng thái của extension module).
 
-  This also avoids situations where extensions may find themselves running in a
-  subinterpreter that they don't support (or haven't yet been loaded in). See
-  :gh:`104668` for more info.
+  Điều này cũng tránh các tình huống trong đó extension có thể thấy mình đang chạy trong một subinterpreter mà chúng không hỗ trợ (hoặc chưa được load vào đó). Xem
+  :gh:`104668` để biết thêm thông tin.
 
-* :c:struct:`PyLongObject` has had its internals changed for better performance.
-  Although the internals of :c:struct:`PyLongObject` are private, they are used
-  by some extension modules.
-  The internal fields should no longer be accessed directly, instead the API
-  functions beginning ``PyLong_...`` should be used instead.
-  Two new *unstable* API functions are provided for efficient access to the
-  value of :c:struct:`PyLongObject`\s which fit into a single machine word:
+* :c:struct:`PyLongObject` đã thay đổi phần triển khai bên trong để cải thiện hiệu năng. Mặc dù phần triển khai bên trong của :c:struct:`PyLongObject` là riêng tư, một số extension module vẫn sử dụng chúng. Không nên truy cập trực tiếp các trường nội bộ nữa; thay vào đó, nên sử dụng các hàm API bắt đầu bằng ``PyLong_...``. Hai hàm API *không ổn định* mới được cung cấp để truy cập hiệu quả vào giá trị của :c:struct:`PyLongObject`\s phù hợp với một machine word duy nhất:
 
   * :c:func:`PyUnstable_Long_IsCompact`
   * :c:func:`PyUnstable_Long_CompactValue`
 
-* Custom allocators, set via :c:func:`PyMem_SetAllocator`, are now
-  required to be thread-safe, regardless of memory domain.  Allocators
-  that don't have their own state, including "hooks", are not affected.
-  If your custom allocator is not already thread-safe and you need
-  guidance then please create a new GitHub issue
-  and CC ``@ericsnowcurrently``.
+* Các custom allocator được thiết lập qua :c:func:`PyMem_SetAllocator` giờ đây bắt buộc phải thread-safe, bất kể memory domain. Các allocator không có state riêng, bao gồm cả "hooks", không bị ảnh hưởng. Nếu custom allocator của bạn chưa thread-safe và bạn cần hướng dẫn, hãy tạo một issue mới trên GitHub và CC ``@ericsnowcurrently``.
 
-Deprecated
-----------
+Không còn được khuyến nghị
+--------------------------
 
-* In accordance with :pep:`699`, the ``ma_version_tag`` field in :c:type:`PyDictObject`
-  is deprecated for extension modules. Accessing this field will generate a compiler
-  warning at compile time. This field will be removed in Python 3.14.
-  (Contributed by Ramvikrams and Kumar Aditya in :gh:`101193`. PEP by Ken Jin.)
+* Theo :pep:`699`, trường ``ma_version_tag`` trong :c:type:`PyDictObject` đã bị deprecated đối với extension module. Việc truy cập trường này sẽ tạo cảnh báo compiler tại thời điểm biên dịch. Trường này sẽ bị xóa trong Python 3.14. (Do Ramvikrams và Kumar Aditya đóng góp trong :gh:`101193`. PEP do Ken Jin thực hiện.)
 
-* Deprecate global configuration variable:
+* Deprecated biến cấu hình toàn cục:
 
-  * :c:var:`Py_DebugFlag`: use :c:member:`PyConfig.parser_debug`
-  * :c:var:`Py_VerboseFlag`: use :c:member:`PyConfig.verbose`
-  * :c:var:`Py_QuietFlag`: use :c:member:`PyConfig.quiet`
-  * :c:var:`Py_InteractiveFlag`: use :c:member:`PyConfig.interactive`
-  * :c:var:`Py_InspectFlag`: use :c:member:`PyConfig.inspect`
-  * :c:var:`Py_OptimizeFlag`: use :c:member:`PyConfig.optimization_level`
-  * :c:var:`Py_NoSiteFlag`: use :c:member:`PyConfig.site_import`
-  * :c:var:`Py_BytesWarningFlag`: use :c:member:`PyConfig.bytes_warning`
-  * :c:var:`Py_FrozenFlag`: use :c:member:`PyConfig.pathconfig_warnings`
-  * :c:var:`Py_IgnoreEnvironmentFlag`: use :c:member:`PyConfig.use_environment`
-  * :c:var:`Py_DontWriteBytecodeFlag`: use :c:member:`PyConfig.write_bytecode`
-  * :c:var:`Py_NoUserSiteDirectory`: use :c:member:`PyConfig.user_site_directory`
-  * :c:var:`Py_UnbufferedStdioFlag`: use :c:member:`PyConfig.buffered_stdio`
-  * :c:var:`Py_HashRandomizationFlag`: use :c:member:`PyConfig.use_hash_seed`
-    and :c:member:`PyConfig.hash_seed`
-  * :c:var:`Py_IsolatedFlag`: use :c:member:`PyConfig.isolated`
-  * :c:var:`Py_LegacyWindowsFSEncodingFlag`: use :c:member:`PyPreConfig.legacy_windows_fs_encoding`
-  * :c:var:`Py_LegacyWindowsStdioFlag`: use :c:member:`PyConfig.legacy_windows_stdio`
-  * :c:var:`!Py_FileSystemDefaultEncoding`: use :c:member:`PyConfig.filesystem_encoding`
-  * :c:var:`!Py_HasFileSystemDefaultEncoding`: use :c:member:`PyConfig.filesystem_encoding`
-  * :c:var:`!Py_FileSystemDefaultEncodeErrors`: use :c:member:`PyConfig.filesystem_errors`
-  * :c:var:`!Py_UTF8Mode`: use :c:member:`PyPreConfig.utf8_mode` (see :c:func:`Py_PreInitialize`)
+  * :c:var:`Py_DebugFlag`: sử dụng :c:member:`PyConfig.parser_debug`
+  * :c:var:`Py_VerboseFlag`: sử dụng :c:member:`PyConfig.verbose`
+  * :c:var:`Py_QuietFlag`: sử dụng :c:member:`PyConfig.quiet`
+  * :c:var:`Py_InteractiveFlag`: sử dụng :c:member:`PyConfig.interactive`
+  * :c:var:`Py_InspectFlag`: sử dụng :c:member:`PyConfig.inspect`
+  * :c:var:`Py_OptimizeFlag`: sử dụng :c:member:`PyConfig.optimization_level`
+  * :c:var:`Py_NoSiteFlag`: sử dụng :c:member:`PyConfig.site_import`
+  * :c:var:`Py_BytesWarningFlag`: sử dụng :c:member:`PyConfig.bytes_warning`
+  * :c:var:`Py_FrozenFlag`: sử dụng :c:member:`PyConfig.pathconfig_warnings`
+  * :c:var:`Py_IgnoreEnvironmentFlag`: sử dụng :c:member:`PyConfig.use_environment`
+  * :c:var:`Py_DontWriteBytecodeFlag`: sử dụng :c:member:`PyConfig.write_bytecode`
+  * :c:var:`Py_NoUserSiteDirectory`: sử dụng :c:member:`PyConfig.user_site_directory`
+  * :c:var:`Py_UnbufferedStdioFlag`: sử dụng :c:member:`PyConfig.buffered_stdio`
+  * :c:var:`Py_HashRandomizationFlag`: sử dụng :c:member:`PyConfig.use_hash_seed` và :c:member:`PyConfig.hash_seed`
+  * :c:var:`Py_IsolatedFlag`: sử dụng :c:member:`PyConfig.isolated`
+  * :c:var:`Py_LegacyWindowsFSEncodingFlag`: sử dụng :c:member:`PyPreConfig.legacy_windows_fs_encoding`
+  * :c:var:`Py_LegacyWindowsStdioFlag`: sử dụng :c:member:`PyConfig.legacy_windows_stdio`
+  * :c:var:`!Py_FileSystemDefaultEncoding`: sử dụng :c:member:`PyConfig.filesystem_encoding`
+  * :c:var:`!Py_HasFileSystemDefaultEncoding`: sử dụng :c:member:`PyConfig.filesystem_encoding`
+  * :c:var:`!Py_FileSystemDefaultEncodeErrors`: sử dụng :c:member:`PyConfig.filesystem_errors`
+  * :c:var:`!Py_UTF8Mode`: sử dụng :c:member:`PyPreConfig.utf8_mode` (xem :c:func:`Py_PreInitialize`)
 
-  The :c:func:`Py_InitializeFromConfig` API should be used with
-  :c:type:`PyConfig` instead.
-  (Contributed by Victor Stinner in :gh:`77782`.)
+  API :c:func:`Py_InitializeFromConfig` nên được sử dụng cùng với
+  thay vào đó là :c:type:`PyConfig`. (Do Victor Stinner đóng góp trong :gh:`77782`.)
 
-* Creating :c:data:`immutable types <Py_TPFLAGS_IMMUTABLETYPE>` with mutable
-  bases is deprecated and will be disabled in Python 3.14. (:gh:`95388`)
+* Việc tạo các :c:data:`kiểu bất biến <Py_TPFLAGS_IMMUTABLETYPE>` với các lớp cơ sở có thể thay đổi đã không còn được khuyến nghị và sẽ bị vô hiệu hóa trong Python 3.14. (:gh:`95388`)
 
-* The :file:`structmember.h` header is deprecated, though it continues to be
-  available and there are no plans to remove it.
+* Tiêu đề :file:`structmember.h` không còn được khuyến nghị, mặc dù vẫn tiếp tục khả dụng và chưa có kế hoạch xóa nó.
 
-  Its contents are now available just by including :file:`Python.h`,
-  with a ``Py`` prefix added if it was missing:
+  Nội dung của nó hiện có thể được sử dụng chỉ bằng cách đưa :file:`Python.h` vào, với tiền tố ``Py`` được thêm vào nếu còn thiếu:
 
-  - :c:struct:`PyMemberDef`, :c:func:`PyMember_GetOne` and
+  - :c:struct:`PyMemberDef`, :c:func:`PyMember_GetOne` và
     :c:func:`PyMember_SetOne`
-  - Type macros like :c:macro:`Py_T_INT`, :c:macro:`Py_T_DOUBLE`, etc.
-    (previously ``T_INT``, ``T_DOUBLE``, etc.)
-  - The flags :c:macro:`Py_READONLY` (previously ``READONLY``) and
-    :c:macro:`Py_AUDIT_READ` (previously all uppercase)
+  - Các macro kiểu như :c:macro:`Py_T_INT`, :c:macro:`Py_T_DOUBLE`, v.v. (trước đây là ``T_INT``, ``T_DOUBLE``, v.v.)
+  - Các cờ :c:macro:`Py_READONLY` (trước đây là ``READONLY``) và
+    :c:macro:`Py_AUDIT_READ` (trước đây viết toàn bộ bằng chữ hoa)
 
-  Several items are not exposed from :file:`Python.h`:
+  Một số mục không được cung cấp từ :file:`Python.h`:
 
-  - :c:macro:`T_OBJECT` (use :c:macro:`Py_T_OBJECT_EX`)
-  - :c:macro:`T_NONE` (previously undocumented, and pretty quirky)
-  - The macro ``WRITE_RESTRICTED`` which does nothing.
-  - The macros ``RESTRICTED`` and ``READ_RESTRICTED``, equivalents of
+  - :c:macro:`T_OBJECT` (sử dụng :c:macro:`Py_T_OBJECT_EX`)
+  - :c:macro:`T_NONE` (trước đây chưa được ghi lại tài liệu và khá kỳ quặc)
+  - Macro ``WRITE_RESTRICTED``, không thực hiện tác vụ nào.
+  - Các macro ``RESTRICTED`` và ``READ_RESTRICTED``, tương đương với
     :c:macro:`Py_AUDIT_READ`.
-  - In some configurations, ``<stddef.h>`` is not included from :file:`Python.h`.
-    It should be included manually when using ``offsetof()``.
+  - Trong một số cấu hình, ``<stddef.h>`` không được bao gồm từ :file:`Python.h`. Cần bao gồm thủ công khi sử dụng ``offsetof()``.
 
-  The deprecated header continues to provide its original
-  contents under the original names.
-  Your old code can stay unchanged, unless the extra include and non-namespaced
-  macros bother you greatly.
+  Header không còn được khuyến nghị này vẫn cung cấp nội dung ban đầu dưới các tên ban đầu. Mã cũ của bạn có thể giữ nguyên, trừ khi việc include bổ sung và các macro không thuộc namespace khiến bạn đặc biệt khó chịu.
 
-  (Contributed in :gh:`47146` by Petr Viktorin, based on
-  earlier work by Alexander Belopolsky and Matthias Braun.)
+  (Được Petr Viktorin đóng góp trong :gh:`47146`, dựa trên công trình trước đó của Alexander Belopolsky và Matthias Braun.)
 
-* :c:func:`PyErr_Fetch` and :c:func:`PyErr_Restore` are deprecated.
-  Use :c:func:`PyErr_GetRaisedException` and
-  :c:func:`PyErr_SetRaisedException` instead.
-  (Contributed by Mark Shannon in :gh:`101578`.)
+* :c:func:`PyErr_Fetch` và :c:func:`PyErr_Restore` không còn được khuyến nghị. Hãy sử dụng :c:func:`PyErr_GetRaisedException` và
+  :c:func:`PyErr_SetRaisedException` thay thế. (Được Mark Shannon đóng góp trong :gh:`101578`.)
 
-* :c:func:`!PyErr_Display` is deprecated. Use :c:func:`PyErr_DisplayException`
-  instead. (Contributed by Irit Katriel in :gh:`102755`).
+* :c:func:`!PyErr_Display` không còn được khuyến nghị. Hãy sử dụng :c:func:`PyErr_DisplayException` thay thế. (Được Irit Katriel đóng góp trong :gh:`102755`).
 
-* ``_PyErr_ChainExceptions`` is deprecated. Use ``_PyErr_ChainExceptions1``
-  instead. (Contributed by Irit Katriel in :gh:`102192`.)
+* ``_PyErr_ChainExceptions`` không còn được khuyến nghị. Hãy sử dụng ``_PyErr_ChainExceptions1`` thay thế. (Được Irit Katriel đóng góp trong :gh:`102192`.)
 
-* Using :c:func:`PyType_FromSpec`, :c:func:`PyType_FromSpecWithBases`
-  or :c:func:`PyType_FromModuleAndSpec` to create a class whose metaclass
-  overrides :c:member:`~PyTypeObject.tp_new` is deprecated.
-  Call the metaclass instead.
+* Việc sử dụng :c:func:`PyType_FromSpec`, :c:func:`PyType_FromSpecWithBases` hoặc :c:func:`PyType_FromModuleAndSpec` để tạo một class có metaclass ghi đè :c:member:`~PyTypeObject.tp_new` không còn được khuyến nghị. Hãy gọi trực tiếp metaclass.
 
 .. Add deprecations above alphabetically, not here at the end.
 
@@ -2251,15 +1519,12 @@ Deprecated
 
 .. include:: ../deprecations/c-api-pending-removal-in-future.rst
 
-Removed
--------
+Đã loại bỏ
+----------
 
-* Remove the :file:`token.h` header file. There was never any public tokenizer C
-  API. The :file:`token.h` header file was only designed to be used by Python
-  internals.
-  (Contributed by Victor Stinner in :gh:`92651`.)
+* Xóa tệp header :file:`token.h`. Chưa từng có C API tokenizer công khai nào. Tệp header :file:`token.h` chỉ được thiết kế để sử dụng bởi các thành phần nội bộ của Python. (Do Victor Stinner đóng góp trong :gh:`92651`.)
 
-* Legacy Unicode APIs have been removed. See :pep:`623` for detail.
+* Các Unicode API cũ đã bị xóa. Xem :pep:`623` để biết chi tiết.
 
   * :c:macro:`!PyUnicode_WCHAR_KIND`
   * :c:func:`!PyUnicode_AS_UNICODE`
@@ -2271,5 +1536,10 @@ Removed
   * :c:func:`!PyUnicode_GetSize`
   * :c:func:`!PyUnicode_GET_DATA_SIZE`
 
-* Remove the ``PyUnicode_InternImmortal()`` function macro.
-  (Contributed by Victor Stinner in :gh:`85858`.)
+* Xóa macro hàm ``PyUnicode_InternImmortal()``. (Do Victor Stinner đóng góp trong :gh:`85858`.)
+
+.. _`Improved 'Did you mean ...' suggestions`: improved error messages_
+.. _`method aliases`: unittest-TestCase-removed-aliases_
+.. _`old-demos project`: https://github.com/gvanrossum/old-demos
+.. _`this discussion on fork being incompatible with threads`: https://discuss.python.org/t/concerns-regarding-deprecation-of-fork-with-alive-threads/33555
+.. _`sphinx-lint`: https://github.com/sphinx-contrib/sphinx-lint

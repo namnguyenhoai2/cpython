@@ -1,12 +1,10 @@
 .. _whatsnew-index:
 
 ######################
- What's New in Python
+Có gì mới trong Python
 ######################
 
-The "What's New in Python" series of essays takes tours through the most
-important changes between major Python versions.  They are a "must read" for
-anyone wishing to stay up-to-date after a new release.
+Loạt bài "Có gì mới trong Python" điểm qua những thay đổi quan trọng nhất giữa các phiên bản chính của Python. Đây là tài liệu "nhất định phải đọc" đối với bất kỳ ai muốn luôn cập nhật sau một bản phát hành mới.
 
 .. toctree::
    :maxdepth: 2
@@ -35,10 +33,8 @@ anyone wishing to stay up-to-date after a new release.
    2.1.rst
    2.0.rst
 
-The "Changelog" is an HTML version of the :pypi:`file built<blurb>`
-from the contents of the
-:source:`Misc/NEWS.d` directory tree, which contains *all* nontrivial changes
-to Python for the current version.
+"Changelog" là phiên bản HTML của :pypi:`file built<blurb>` trong cây nội dung của thư mục
+:source:`Misc/NEWS.d`, trong đó có *all* thay đổi đáng kể đối với Python trong phiên bản hiện tại.
 
 .. toctree::
    :maxdepth: 2

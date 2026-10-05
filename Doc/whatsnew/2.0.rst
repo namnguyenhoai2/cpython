@@ -1,138 +1,55 @@
-****************************
-  What's New in Python 2.0
-****************************
+**************************
+Có gì mới trong Python 2.0
+**************************
 
-:Author: A.M. Kuchling and Moshe Zadka
+:Author: A.M. Kuchling và Moshe Zadka
 
 .. |release| replace:: 1.02
 
 .. $Id: whatsnew20.tex 50964 2006-07-30 03:03:43Z fred.drake $
 
 
-Introduction
-============
+Giới thiệu
+==========
 
-A new release of Python, version 2.0, was released on October 16, 2000. This
-article covers the exciting new features in 2.0, highlights some other useful
-changes, and points out a few incompatible changes that may require rewriting
-code.
+Một bản phát hành mới của Python, phiên bản 2.0, đã được phát hành vào ngày 16 tháng 10 năm 2000. Bài viết này trình bày các tính năng mới đầy hấp dẫn trong 2.0, nêu bật một số thay đổi hữu ích khác và chỉ ra một vài thay đổi không tương thích có thể yêu cầu viết lại mã.
 
-Python's development never completely stops between releases, and a steady flow
-of bug fixes and improvements are always being submitted. A host of minor fixes,
-a few optimizations, additional docstrings, and better error messages went into
-2.0; to list them all would be impossible, but they're certainly significant.
-Consult the publicly available CVS logs if you want to see the full list.  This
-progress is due to the five developers working for  PythonLabs are now getting
-paid to spend their days fixing bugs, and also due to the improved communication
-resulting  from moving to SourceForge.
+Quá trình phát triển Python không bao giờ hoàn toàn dừng lại giữa các bản phát hành, và một dòng ổn định các bản sửa lỗi cùng cải tiến luôn được gửi đến. Rất nhiều bản sửa lỗi nhỏ, một vài tối ưu hóa, các docstring bổ sung và thông báo lỗi tốt hơn đã được đưa vào 2.0; sẽ không thể liệt kê tất cả, nhưng chắc chắn chúng rất đáng kể. Hãy xem các nhật ký CVS được công khai nếu bạn muốn biết danh sách đầy đủ. Tiến bộ này có được là nhờ năm nhà phát triển làm việc cho PythonLabs nay đã được trả lương để dành cả ngày sửa lỗi, đồng thời nhờ việc chuyển sang SourceForge đã cải thiện hoạt động giao tiếp.
 
 .. ======================================================================
 
 
-What About Python 1.6?
-======================
-
-Python 1.6 can be thought of as the Contractual Obligations Python release.
-After the core development team left CNRI in May 2000, CNRI requested that a 1.6
-release be created, containing all the work on Python that had been performed at
-CNRI.  Python 1.6 therefore represents the state of the CVS tree as of May 2000,
-with the most significant new feature being Unicode support.  Development
-continued after May, of course, so the 1.6 tree received a few fixes to ensure
-that it's forward-compatible with Python 2.0.  1.6 is therefore part of Python's
-evolution, and not a side branch.
-
-So, should you take much interest in Python 1.6?  Probably not.  The 1.6final
-and 2.0beta1 releases were made on the same day (September 5, 2000), the plan
-being to finalize Python 2.0 within a month or so.  If you have applications to
-maintain, there seems little point in breaking things by moving to 1.6, fixing
-them, and then having another round of breakage within a month by moving to 2.0;
-you're better off just going straight to 2.0.  Most of the really interesting
-features described in this document are only in 2.0, because a lot of work was
-done between May and September.
-
-.. ======================================================================
-
-
-New Development Process
+Còn Python 1.6 thì sao?
 =======================
 
-The most important change in Python 2.0 may not be to the code at all, but to
-how Python is developed: in May 2000 the Python developers began using the tools
-made available by SourceForge for storing  source code, tracking bug reports,
-and managing the queue of patch submissions.  To report bugs or submit patches
-for Python 2.0, use the bug tracking and patch manager tools available from
-Python's project page, located at https://sourceforge.net/projects/python/.
+Có thể xem Python 1.6 là bản phát hành Python về Nghĩa vụ theo hợp đồng. Sau khi nhóm phát triển cốt lõi rời CNRI vào tháng 5 năm 2000, CNRI yêu cầu tạo một bản phát hành 1.6, bao gồm toàn bộ công việc về Python đã được thực hiện tại CNRI. Vì vậy, Python 1.6 phản ánh trạng thái của cây CVS vào tháng 5 năm 2000, trong đó tính năng mới quan trọng nhất là hỗ trợ Unicode. Tất nhiên, quá trình phát triển vẫn tiếp tục sau tháng 5, nên cây 1.6 đã nhận được một vài bản sửa lỗi để đảm bảo tương thích về sau với Python 2.0. Do đó, 1.6 là một phần trong quá trình phát triển của Python, chứ không phải một nhánh phụ.
 
-The most important of the services now hosted at SourceForge is the Python CVS
-tree, the version-controlled repository containing the source code for Python.
-Previously, there were roughly 7 or so people who had write access to the CVS
-tree, and all patches had to be inspected and checked in by one of the people on
-this short list. Obviously, this wasn't very scalable.  By moving the CVS tree
-to SourceForge, it became possible to grant write access to more people; as of
-September 2000 there were 27 people able to check in changes, a fourfold
-increase.  This makes possible large-scale changes that wouldn't be attempted if
-they'd have to be filtered through the small group of core developers.  For
-example, one day Peter Schneider-Kamp took it into his head to drop K&R C
-compatibility and convert the C source for Python to ANSI C. After getting
-approval on the python-dev mailing list, he launched into a flurry of checkins
-that lasted about a week, other developers joined in to help, and the job was
-done.  If there were only 5 people with write access, probably that task would
-have been viewed as "nice, but not worth the time and effort needed" and it
-would never have gotten done.
+Vậy, bạn có nên quan tâm nhiều đến Python 1.6 không? Có lẽ là không. Bản phát hành 1.6final và 2.0beta1 được phát hành cùng ngày (ngày 5 tháng 9 năm 2000), với kế hoạch hoàn thiện Python 2.0 trong khoảng một tháng. Nếu bạn có các ứng dụng cần bảo trì, dường như chẳng có ích gì khi chuyển sang 1.6, sửa chúng, rồi lại phải trải qua một vòng lỗi khác trong vòng một tháng khi chuyển sang 2.0; tốt hơn hết là chuyển thẳng sang 2.0. Hầu hết các tính năng thực sự thú vị được mô tả trong tài liệu này chỉ có trong 2.0, vì đã có rất nhiều công việc được thực hiện từ tháng 5 đến tháng 9.
 
-The shift to using SourceForge's services has resulted in a remarkable increase
-in the speed of development.  Patches now get submitted, commented on, revised
-by people other than the original submitter, and bounced back and forth between
-people until the patch is deemed worth checking in.  Bugs are tracked in one
-central location and can be assigned to a specific person for fixing, and we can
-count the number of open bugs to measure progress.  This didn't come without a
-cost: developers now have more e-mail to deal with, more mailing lists to
-follow, and special tools had to be written for the new environment. For
-example, SourceForge sends default patch and bug notification e-mail messages
-that are completely unhelpful, so Ka-Ping Yee wrote an HTML screen-scraper that
-sends more useful messages.
+.. ======================================================================
 
-The ease of adding code caused a few initial growing pains, such as code was
-checked in before it was ready or without getting clear agreement from the
-developer group.  The approval process that has emerged is somewhat similar to
-that used by the Apache group. Developers can vote +1, +0, -0, or -1 on a patch;
-+1 and -1 denote acceptance or rejection, while +0 and -0 mean the developer is
-mostly indifferent to the change, though with a slight positive or negative
-slant.  The most significant change from the Apache model is that the voting is
-essentially advisory, letting Guido van Rossum, who has Benevolent Dictator For
-Life status, know what the general opinion is. He can still ignore the result of
-a vote, and approve or reject a change even if the community disagrees with him.
 
-Producing an actual patch is the last step in adding a new feature, and is
-usually easy compared to the earlier task of coming up with a good design.
-Discussions of new features can often explode into lengthy mailing list threads,
-making the discussion hard to follow, and no one can read every posting to
-python-dev.  Therefore, a relatively formal process has been set up to write
-Python Enhancement Proposals (PEPs), modelled on the internet RFC process.  PEPs
-are draft documents that describe a proposed new feature, and are continually
-revised until the community reaches a consensus, either accepting or rejecting
-the proposal.  Quoting from the introduction to :pep:`1`, "PEP Purpose and
-Guidelines":
+Quy trình phát triển mới
+========================
+
+Thay đổi quan trọng nhất trong Python 2.0 có thể không nằm ở code, mà nằm ở cách Python được phát triển: vào tháng 5 năm 2000, các nhà phát triển Python bắt đầu sử dụng những công cụ do SourceForge cung cấp để lưu trữ mã nguồn, theo dõi báo cáo lỗi và quản lý hàng đợi các bản vá được gửi. Để báo cáo lỗi hoặc gửi bản vá cho Python 2.0, hãy sử dụng các công cụ theo dõi lỗi và quản lý bản vá có trên trang dự án của Python, tại https://sourceforge.net/projects/python/.
+
+Dịch vụ quan trọng nhất hiện được lưu trữ trên SourceForge là cây CVS của Python, kho lưu trữ có kiểm soát phiên bản chứa mã nguồn của Python. Trước đây, có khoảng 7 người có quyền ghi vào cây CVS, và mọi bản vá đều phải được một trong số ít người này kiểm tra và đưa vào. Rõ ràng, cách này không có khả năng mở rộng tốt. Bằng cách chuyển cây CVS sang SourceForge, việc cấp quyền ghi cho nhiều người hơn trở nên khả thi; tính đến tháng 9 năm 2000, đã có 27 người có thể đưa các thay đổi vào, tăng gấp bốn lần. Điều này cho phép thực hiện những thay đổi quy mô lớn mà có lẽ sẽ không được thử nếu chúng phải qua bộ lọc của nhóm nhỏ các nhà phát triển cốt lõi. Ví dụ, một ngày nọ Peter Schneider-Kamp nảy ra ý định loại bỏ khả năng tương thích với K&R C và chuyển mã nguồn C của Python sang ANSI C. Sau khi được phê duyệt trên mailing list python-dev, ông bắt đầu thực hiện hàng loạt lần checkin kéo dài khoảng một tuần, các nhà phát triển khác cũng tham gia hỗ trợ, và công việc đã hoàn tất. Nếu chỉ có 5 người có quyền ghi, có lẽ nhiệm vụ đó sẽ bị xem là "hay đấy, nhưng không đáng với thời gian và công sức cần thiết" và sẽ không bao giờ được thực hiện.
+
+Việc chuyển sang sử dụng các dịch vụ của SourceForge đã giúp tốc độ phát triển tăng đáng kể. Các bản vá hiện được gửi, nhận xét, chỉnh sửa bởi những người không phải người gửi ban đầu, rồi được chuyển qua chuyển lại giữa nhiều người cho đến khi bản vá được xem là đáng để đưa vào. Các lỗi được theo dõi tại một địa điểm trung tâm và có thể được giao cho một người cụ thể để sửa; chúng ta cũng có thể đếm số lỗi đang mở để đo lường tiến độ. Điều này không phải không có cái giá của nó: các nhà phát triển giờ phải xử lý nhiều e-mail hơn, theo dõi nhiều mailing list hơn, và phải viết các công cụ riêng cho môi trường mới. Ví dụ, SourceForge gửi các e-mail thông báo bản vá và lỗi mặc định hoàn toàn không hữu ích, nên Ka-Ping Yee đã viết một trình quét màn hình HTML để gửi các thông báo hữu ích hơn.
+
+Việc thêm code dễ dàng đã gây ra một số khó khăn ban đầu trong quá trình phát triển, chẳng hạn như code được đưa vào trước khi sẵn sàng hoặc khi chưa có sự đồng thuận rõ ràng từ nhóm phát triển. Quy trình phê duyệt hình thành sau đó có phần tương tự quy trình được nhóm Apache sử dụng. Các nhà phát triển có thể bỏ phiếu +1, +0, -0 hoặc -1 cho một bản vá; +1 và -1 thể hiện chấp thuận hoặc từ chối, còn +0 và -0 có nghĩa là nhà phát triển phần lớn không quan tâm đến thay đổi này, dù hơi nghiêng về phía tích cực hoặc tiêu cực. Điểm khác biệt đáng kể nhất so với mô hình Apache là việc bỏ phiếu về cơ bản chỉ mang tính tư vấn, giúp Guido van Rossum, người có vị thế Benevolent Dictator For Life, biết ý kiến chung là gì. Ông vẫn có thể bỏ qua kết quả bỏ phiếu và phê duyệt hoặc từ chối một thay đổi ngay cả khi cộng đồng không đồng ý với ông.
+
+Tạo một bản vá thực tế là bước cuối cùng để thêm một tính năng mới và thường dễ hơn so với nhiệm vụ trước đó là đưa ra một thiết kế tốt. Các cuộc thảo luận về tính năng mới thường có thể bùng nổ thành những chuỗi trao đổi dài trên mailing list, khiến việc theo dõi cuộc thảo luận trở nên khó khăn, và không ai có thể đọc mọi bài đăng trên python-dev. Vì vậy, một quy trình tương đối chính thức đã được thiết lập để viết Python Enhancement Proposals (PEP), mô phỏng quy trình RFC trên internet. PEP là các tài liệu dự thảo mô tả một tính năng mới được đề xuất và liên tục được sửa đổi cho đến khi cộng đồng đạt được đồng thuận, либо chấp nhận hoặc từ chối đề xuất. Trích từ phần giới thiệu của :pep:`1`, "Mục đích và hướng dẫn PEP":
 
 
 .. epigraph::
 
-   PEP stands for Python Enhancement Proposal.  A PEP is a design document
-   providing information to the Python community, or describing a new feature for
-   Python.  The PEP should provide a concise technical specification of the feature
-   and a rationale for the feature.
+   PEP là viết tắt của Python Enhancement Proposal. PEP là một tài liệu thiết kế cung cấp thông tin cho cộng đồng Python hoặc mô tả một tính năng mới cho Python. PEP cần cung cấp đặc tả kỹ thuật súc tích về tính năng và lý do cần có tính năng đó.
 
-   We intend PEPs to be the primary mechanisms for proposing new features, for
-   collecting community input on an issue, and for documenting the design decisions
-   that have gone into Python.  The PEP author is responsible for building
-   consensus within the community and documenting dissenting opinions.
+   Chúng tôi dự định sử dụng PEP làm cơ chế chính để đề xuất các tính năng mới, thu thập ý kiến đóng góp của cộng đồng về một vấn đề và ghi lại các quyết định thiết kế đã được đưa ra cho Python. Tác giả PEP chịu trách nhiệm xây dựng sự đồng thuận trong cộng đồng và ghi lại các ý kiến bất đồng.
 
-Read the rest of :pep:`1` for the details of the PEP editorial process, style, and
-format.  PEPs are kept in the Python CVS tree on SourceForge, though they're not
-part of the Python 2.0 distribution, and are also available in HTML form from
-https://peps.python.org/.  As of September 2000, there are 25 PEPs, ranging
-from :pep:`201`, "Lockstep Iteration", to PEP 225, "Elementwise/Objectwise
-Operators".
+Đọc phần còn lại của :pep:`1` để biết chi tiết về quy trình biên tập, kiểu trình bày và định dạng PEP. Các PEP được lưu trong cây CVS của Python trên SourceForge, mặc dù chúng không nằm trong bản phân phối Python 2.0, và cũng có sẵn ở dạng HTML tại https://peps.python.org/. Tính đến tháng 9 năm 2000, có 25 PEP, từ :pep:`201`, "Lockstep Iteration", đến PEP 225, "Elementwise/Objectwise Operators".
 
 .. ======================================================================
 
@@ -140,94 +57,43 @@ Operators".
 Unicode
 =======
 
-The largest new feature in Python 2.0 is a new fundamental data type: Unicode
-strings.  Unicode uses 16-bit numbers to represent characters instead of the
-8-bit number used by ASCII, meaning that 65,536 distinct characters can be
-supported.
+Tính năng mới lớn nhất trong Python 2.0 là một kiểu dữ liệu nền tảng mới: chuỗi Unicode. Unicode sử dụng các số 16 bit để biểu diễn ký tự thay vì số 8 bit được ASCII sử dụng, nghĩa là có thể hỗ trợ 65.536 ký tự riêng biệt.
 
-The final interface for Unicode support was arrived at through countless
-often-stormy discussions on the python-dev mailing list, and mostly implemented by
-Marc-André Lemburg, based on a Unicode string type implementation by Fredrik
-Lundh.  A detailed explanation of the interface was written up as :pep:`100`,
-"Python Unicode Integration". This article will simply cover the most
-significant points about the Unicode interfaces.
+Giao diện cuối cùng cho khả năng hỗ trợ Unicode được hình thành qua vô số cuộc thảo luận thường khá căng thẳng trên mailing list python-dev và phần lớn được triển khai bởi Marc-André Lemburg, dựa trên một triển khai kiểu chuỗi Unicode của Fredrik Lundh. Một giải thích chi tiết về giao diện đã được viết trong :pep:`100`, "Python Unicode Integration". Bài viết này chỉ đề cập đến những điểm quan trọng nhất về các giao diện Unicode.
 
-In Python source code, Unicode strings are written as ``u"string"``.  Arbitrary
-Unicode characters can be written using a new escape sequence, :samp:`\\u{HHHH}`, where
-*HHHH* is a 4-digit hexadecimal number from 0000 to FFFF.  The existing
-:samp:`\\x{HH}` escape sequence can also be used, and octal escapes can be used for
-characters up to U+01FF, which is represented by ``\777``.
+Trong mã nguồn Python, các chuỗi Unicode được viết dưới dạng ``u"string"``. Các ký tự Unicode tùy ý có thể được viết bằng một escape sequence mới, :samp:`\\u{HHHH}`, trong đó *HHHH* là một số thập lục phân gồm 4 chữ số, từ 0000 đến FFFF. Cách hiện có
+Chuỗi escape :samp:`\\x{HH}` cũng có thể được sử dụng, và có thể dùng các escape bát phân cho những ký tự tối đa đến U+01FF, được biểu diễn bằng ``\777``.
 
-Unicode strings, just like regular strings, are an immutable sequence type.
-They can be indexed and sliced, but not modified in place. Unicode strings have
-an ``encode( [encoding] )`` method that returns an 8-bit string in the desired
-encoding.  Encodings are named by strings, such as ``'ascii'``, ``'utf-8'``,
-``'iso-8859-1'``, or whatever.  A codec API is defined for implementing and
-registering new encodings that are then available throughout a Python program.
-If an encoding isn't specified, the default encoding is usually 7-bit ASCII,
-though it can be changed for your Python installation by calling the
-``sys.setdefaultencoding(encoding)`` function in a customized version of
+Các chuỗi Unicode, cũng giống như chuỗi thông thường, là một kiểu chuỗi bất biến. Chúng có thể được lập chỉ mục và cắt lát, nhưng không thể sửa đổi tại chỗ. Chuỗi Unicode có một phương thức ``encode( [encoding] )`` trả về một chuỗi 8 bit theo encoding mong muốn. Các encoding được đặt tên bằng chuỗi, chẳng hạn như ``'ascii'``, ``'utf-8'``, ``'iso-8859-1'``, hoặc bất kỳ tên nào khác. Một codec API được định nghĩa để triển khai và đăng ký các encoding mới, sau đó các encoding này có thể được sử dụng trong toàn bộ chương trình Python. Nếu không chỉ định encoding, encoding mặc định thường là ASCII 7 bit, mặc dù có thể thay đổi encoding này cho bản cài đặt Python của bạn bằng cách gọi hàm ``sys.setdefaultencoding(encoding)`` trong một phiên bản tùy chỉnh của
 :file:`site.py`.
 
-Combining 8-bit and Unicode strings always coerces to Unicode, using the default
-ASCII encoding; the result of ``'a' + u'bc'`` is ``u'abc'``.
+Việc kết hợp chuỗi 8 bit và chuỗi Unicode luôn ép kiểu về Unicode, sử dụng encoding ASCII mặc định; kết quả của ``'a' + u'bc'`` là ``u'abc'``.
 
-New built-in functions have been added, and existing built-ins modified to
-support Unicode:
+Các hàm dựng sẵn mới đã được thêm vào, đồng thời các hàm dựng sẵn hiện có được sửa đổi để hỗ trợ Unicode:
 
-* ``unichr(ch)`` returns a Unicode string 1 character long, containing the
-  character *ch*.
+* ``unichr(ch)`` trả về một chuỗi Unicode dài 1 ký tự, chứa ký tự *ch*.
 
-* ``ord(u)``, where *u* is a 1-character regular or Unicode string, returns the
-  number of the character as an integer.
+* ``ord(u)``, trong đó *u* là một chuỗi thông thường hoặc Unicode dài 1 ký tự, trả về số của ký tự đó dưới dạng số nguyên.
 
-* ``unicode(string [, encoding]  [, errors] )`` creates a Unicode string
-  from an 8-bit string.  ``encoding`` is a string naming the encoding to use. The
-  ``errors`` parameter specifies the treatment of characters that are invalid for
-  the current encoding; passing ``'strict'`` as the value causes an exception to
-  be raised on any encoding error, while ``'ignore'`` causes errors to be silently
-  ignored and ``'replace'`` uses U+FFFD, the official replacement character, in
-  case of any problems.
+* ``unicode(string [, encoding]  [, errors] )`` tạo một chuỗi Unicode từ một chuỗi 8 bit. ``encoding`` là một chuỗi chỉ định encoding cần sử dụng. Tham số ``errors`` xác định cách xử lý các ký tự không hợp lệ đối với encoding hiện tại; truyền ``'strict'`` làm giá trị sẽ khiến một ngoại lệ được phát sinh khi có bất kỳ lỗi encoding nào, trong khi ``'ignore'`` khiến các lỗi bị bỏ qua một cách im lặng và ``'replace'`` sử dụng U+FFFD, ký tự thay thế chính thức, khi xảy ra bất kỳ vấn đề nào.
 
-* The ``exec`` statement, and various built-ins such as ``eval()``,
-  ``getattr()``, and ``setattr()`` will also accept Unicode strings as well as
-  regular strings.  (It's possible that the process of fixing this missed some
-  built-ins; if you find a built-in function that accepts strings but doesn't
-  accept Unicode strings at all, please report it as a bug.)
+* Câu lệnh ``exec``, cùng với nhiều hàm dựng sẵn như ``eval()``, ``getattr()`` và ``setattr()``, cũng sẽ chấp nhận chuỗi Unicode bên cạnh chuỗi thông thường. (Có thể quá trình khắc phục vấn đề này đã bỏ sót một số hàm dựng sẵn; nếu bạn tìm thấy một hàm dựng sẵn chấp nhận chuỗi nhưng hoàn toàn không chấp nhận chuỗi Unicode, vui lòng báo cáo đó là một lỗi.)
 
-A new module, :mod:`unicodedata`, provides an interface to Unicode character
-properties.  For example, ``unicodedata.category(u'A')`` returns the 2-character
-string 'Lu', the 'L' denoting it's a letter, and 'u' meaning that it's
-uppercase. ``unicodedata.bidirectional(u'\u0660')`` returns 'AN', meaning that
-U+0660 is an Arabic number.
+Một module mới, :mod:`unicodedata`, cung cấp giao diện cho các thuộc tính của ký tự Unicode. Ví dụ, ``unicodedata.category(u'A')`` trả về chuỗi gồm 2 ký tự 'Lu', trong đó 'L' cho biết đây là một chữ cái, còn 'u' nghĩa là chữ hoa. ``unicodedata.bidirectional(u'\u0660')`` trả về 'AN', nghĩa là U+0660 là một chữ số Ả Rập.
 
-The :mod:`codecs` module contains functions to look up existing encodings and
-register new ones.  Unless you want to implement a new encoding, you'll most
-often use the ``codecs.lookup(encoding)`` function, which returns a
-4-element tuple: ``(encode_func, decode_func, stream_reader, stream_writer)``.
+Module :mod:`codecs` chứa các hàm để tra cứu những encoding hiện có và đăng ký encoding mới. Trừ khi bạn muốn triển khai một encoding mới, phần lớn thời gian bạn sẽ sử dụng hàm ``codecs.lookup(encoding)``, hàm này trả về một tuple gồm 4 phần tử: ``(encode_func, decode_func, stream_reader, stream_writer)``.
 
-* *encode_func* is a function that takes a Unicode string, and returns a 2-tuple
-  ``(string, length)``.  *string* is an 8-bit string containing a portion (perhaps
-  all) of the Unicode string converted into the given encoding, and *length* tells
-  you how much of the Unicode string was converted.
+* *encode_func* là một hàm nhận vào một chuỗi Unicode và trả về một tuple gồm 2 phần tử ``(string, length)``. *string* là một chuỗi 8-bit chứa một phần (có thể là toàn bộ) chuỗi Unicode đã được chuyển đổi sang encoding đã cho, còn *length* cho biết bao nhiêu phần của chuỗi Unicode đã được chuyển đổi.
 
-* *decode_func* is the opposite of *encode_func*, taking an 8-bit string and
-  returning a 2-tuple ``(ustring, length)``, consisting of the resulting Unicode
-  string *ustring* and the integer *length* telling how much of the 8-bit string
-  was consumed.
+* *decode_func* là hàm ngược lại với *encode_func*, nhận vào một chuỗi 8-bit và trả về một tuple gồm 2 phần tử ``(ustring, length)``, bao gồm chuỗi Unicode kết quả *ustring* và số nguyên *length* cho biết bao nhiêu phần của chuỗi 8-bit đã được đọc.
 
-* *stream_reader* is a class that supports decoding input from a stream.
-  *stream_reader(file_obj)* returns an object that supports the :meth:`!read`,
-  :meth:`!readline`, and :meth:`!readlines` methods.  These methods will all
-  translate from the given encoding and return Unicode strings.
+* *stream_reader* là một class hỗ trợ giải mã dữ liệu đầu vào từ một stream. *stream_reader(file_obj)* trả về một đối tượng hỗ trợ các phương thức :meth:`!read`,
+  :meth:`!readline`, và :meth:`!readlines`. Tất cả các phương thức này sẽ chuyển đổi từ encoding đã cho và trả về các chuỗi Unicode.
 
-* *stream_writer*, similarly, is a class that supports encoding output to a
-  stream.  *stream_writer(file_obj)* returns an object that supports the
-  :meth:`!write` and :meth:`!writelines` methods.  These methods expect Unicode
-  strings, translating them to the given encoding on output.
+* *stream_writer*, tương tự, là một lớp hỗ trợ mã hóa đầu ra vào một stream. *stream_writer(file_obj)* trả về một đối tượng hỗ trợ các
+  :meth:`!write` và :meth:`!writelines`. Các phương thức này nhận các chuỗi Unicode, chuyển chúng sang encoding đã cho khi xuất.
 
-For example, the following code writes a Unicode string into a file,  encoding
-it as UTF-8::
+Ví dụ, đoạn mã sau ghi một chuỗi Unicode vào một tệp, mã hóa chuỗi đó dưới dạng UTF-8::
 
    import codecs
 
@@ -240,42 +106,25 @@ it as UTF-8::
    output.write( unistr )
    output.close()
 
-The following code would then read UTF-8 input from the file::
+Sau đó, đoạn mã sau sẽ đọc đầu vào UTF-8 từ tệp::
 
    input = UTF8_streamreader( open( '/tmp/output', 'rb') )
    print repr(input.read())
    input.close()
 
-Unicode-aware regular expressions are available through the :mod:`re` module,
-which has a new underlying implementation called SRE written by Fredrik Lundh of
-Secret Labs AB.
+Các regular expression hỗ trợ Unicode có sẵn thông qua module :mod:`re`, module này có một implementation nền tảng mới có tên là SRE, do Fredrik Lundh của Secret Labs AB viết.
 
-A ``-U`` command line option was added which causes the Python compiler to
-interpret all string literals as Unicode string literals. This is intended to be
-used in testing and future-proofing your Python code, since some future version
-of Python may drop support for 8-bit strings and provide only Unicode strings.
+Một tùy chọn dòng lệnh ``-U`` đã được thêm vào, khiến Python compiler diễn giải tất cả string literal là Unicode string literal. Tùy chọn này nhằm dùng trong việc kiểm thử và giúp code Python của bạn tương thích với tương lai, vì một phiên bản Python trong tương lai có thể loại bỏ hỗ trợ cho chuỗi 8-bit và chỉ cung cấp chuỗi Unicode.
 
 .. ======================================================================
 
 
-List Comprehensions
+Phép hiểu danh sách
 ===================
 
-Lists are a workhorse data type in Python, and many programs manipulate a list
-at some point.  Two common operations on lists are to loop over them, and either
-pick out the elements that meet a certain criterion, or apply some function to
-each element.  For example, given a list of strings, you might want to pull out
-all the strings containing a given substring, or strip off trailing whitespace
-from each line.
+List là một kiểu dữ liệu chủ lực trong Python và nhiều chương trình sẽ thao tác với list vào một thời điểm nào đó. Hai thao tác phổ biến với list là lặp qua chúng, rồi либо chọn ra các phần tử đáp ứng một tiêu chí nhất định, hoặc áp dụng một hàm cho từng phần tử. Ví dụ, với một list các chuỗi, bạn có thể muốn lấy ra tất cả các chuỗi chứa một chuỗi con nhất định, hoặc loại bỏ khoảng trắng ở cuối mỗi dòng.
 
-The existing :func:`map` and :func:`filter` functions can be used for this
-purpose, but they require a function as one of their arguments.  This is fine if
-there's an existing built-in function that can be passed directly, but if there
-isn't, you have to create a little function to do the required work, and
-Python's scoping rules make the result ugly if the little function needs
-additional information.  Take the first example in the previous paragraph,
-finding all the strings in the list containing a given substring.  You could
-write the following to do it::
+Các hàm :func:`map` và :func:`filter` hiện có có thể được dùng cho mục đích này, nhưng chúng yêu cầu một hàm làm một trong các đối số. Điều này không vấn đề nếu có một hàm dựng sẵn hiện có có thể được truyền trực tiếp, nhưng nếu không có, bạn phải tạo một hàm nhỏ để thực hiện công việc cần thiết, và quy tắc phạm vi của Python khiến kết quả trở nên khó coi nếu hàm nhỏ đó cần thêm thông tin. Hãy xét ví dụ đầu tiên trong đoạn trước: tìm tất cả các chuỗi trong list chứa một chuỗi con nhất định. Bạn có thể viết như sau để thực hiện việc đó::
 
    # Given the list L, make a list of all strings
    # containing the substring S.
@@ -283,29 +132,20 @@ write the following to do it::
                         string.find(s, substring) != -1,
                      L)
 
-Because of Python's scoping rules, a default argument is used so that the
-anonymous function created by the :keyword:`lambda` expression knows what
-substring is being searched for.  List comprehensions make this cleaner::
+Do quy tắc phạm vi của Python, một đối số mặc định được sử dụng để hàm ẩn danh được tạo bởi biểu thức :keyword:`lambda` biết chuỗi con nào đang được tìm kiếm. List comprehension giúp đoạn mã này rõ ràng hơn::
 
    sublist = [ s for s in L if string.find(s, S) != -1 ]
 
-List comprehensions have the form::
+List comprehension có dạng::
 
    [ expression for expr in sequence1
                 for expr2 in sequence2 ...
                 for exprN in sequenceN
                 if condition ]
 
-The :keyword:`!for`...\ :keyword:`!in` clauses contain the sequences to be
-iterated over.  The sequences do not have to be the same length, because they
-are *not* iterated over in parallel, but from left to right; this is explained
-more clearly in the following paragraphs.  The elements of the generated list
-will be the successive values of *expression*.  The final :keyword:`!if` clause
-is optional; if present, *expression* is only evaluated and added to the result
-if *condition* is true.
+Các mệnh đề :keyword:`!for`...\ :keyword:`!in` chứa các sequence cần được lặp qua. Các sequence không nhất thiết phải có cùng độ dài, vì chúng *not* được lặp qua song song mà theo thứ tự từ trái sang phải; điều này được giải thích rõ hơn trong các đoạn sau. Các phần tử của list được tạo sẽ là các giá trị liên tiếp của *expression*. Mệnh đề :keyword:`!if` cuối cùng là tùy chọn; nếu có, *expression* chỉ được đánh giá và thêm vào kết quả nếu *condition* là đúng.
 
-To make the semantics very clear, a list comprehension is equivalent to the
-following Python code::
+Để làm rõ ngữ nghĩa, list comprehension tương đương với đoạn mã Python sau::
 
    for expr1 in sequence1:
        for expr2 in sequence2:
@@ -316,10 +156,7 @@ following Python code::
                      # the expression to the
                      # resulting list.
 
-This means that when there are multiple :keyword:`!for`...\ :keyword:`!in`
-clauses, the resulting list will be equal to the product of the lengths of all
-the sequences.  If you have two lists of length 3, the output list is 9 elements
-long::
+Điều này có nghĩa là khi có nhiều mệnh đề :keyword:`!for`...\ :keyword:`!in`, list kết quả sẽ có số phần tử bằng tích độ dài của tất cả các sequence. Nếu bạn có hai list, mỗi list dài 3 phần tử, list đầu ra sẽ dài 9 phần tử::
 
    seq1 = 'abc'
    seq2 = (1,2,3)
@@ -327,38 +164,25 @@ long::
    [('a', 1), ('a', 2), ('a', 3), ('b', 1), ('b', 2), ('b', 3), ('c', 1),
    ('c', 2), ('c', 3)]
 
-To avoid introducing an ambiguity into Python's grammar, if *expression* is
-creating a tuple, it must be surrounded with parentheses.  The first list
-comprehension below is a syntax error, while the second one is correct::
+Để tránh đưa sự mơ hồ vào cú pháp của Python, nếu *expression* tạo một tuple, nó phải được đặt trong dấu ngoặc đơn. Phép list comprehension đầu tiên dưới đây là lỗi cú pháp, còn phép thứ hai thì đúng::
 
    # Syntax error
    [ x,y for x in seq1 for y in seq2]
    # Correct
    [ (x,y) for x in seq1 for y in seq2]
 
-The idea of list comprehensions originally comes from the functional programming
-language Haskell (https://www.haskell.org).  Greg Ewing argued most effectively
-for adding them to Python and wrote the initial list comprehension patch, which
-was then discussed for a seemingly endless time on the python-dev mailing list
-and kept up-to-date by Skip Montanaro.
+Ý tưởng về list comprehension ban đầu xuất phát từ ngôn ngữ lập trình hàm Haskell (https://www.haskell.org).  Greg Ewing là người lập luận thuyết phục nhất cho việc bổ sung chúng vào Python và viết bản vá list comprehension ban đầu; sau đó bản vá này được thảo luận trong một thời gian tưởng như vô tận trên mailing list python-dev và được Skip Montanaro cập nhật thường xuyên.
 
 .. ======================================================================
 
 
-Augmented Assignment
-====================
+Phép gán tăng cường
+===================
 
-Augmented assignment operators, another long-requested feature, have been added
-to Python 2.0.  Augmented assignment operators include ``+=``, ``-=``, ``*=``,
-and so forth.  For example, the statement ``a += 2`` increments the value of the
-variable  ``a`` by 2, equivalent to the slightly lengthier ``a = a + 2``.
+Các toán tử gán tăng cường, một tính năng đã được yêu cầu từ lâu, đã được bổ sung vào Python 2.0. Các toán tử gán tăng cường gồm ``+=``, ``-=``, ``*=``, v.v. Ví dụ, câu lệnh ``a += 2`` tăng giá trị của biến  ``a`` lên 2, tương đương với câu lệnh dài hơn một chút là ``a = a + 2``.
 
-The full list of supported assignment operators is ``+=``, ``-=``, ``*=``,
-``/=``, ``%=``, ``**=``, ``&=``, ``|=``, ``^=``, ``>>=``, and ``<<=``.  Python
-classes can override the augmented assignment operators by defining methods
-named :meth:`!__iadd__`, :meth:`!__isub__`, etc.  For example, the following
-:class:`!Number` class stores a number and supports using += to create a new
-instance with an incremented value.
+Danh sách đầy đủ các toán tử gán được hỗ trợ là ``+=``, ``-=``, ``*=``, ``/=``, ``%=``, ``**=``, ``&=``, ``|=``, ``^=``, ``>>=`` và ``<<=``. Các lớp Python có thể override các toán tử gán tăng cường bằng cách định nghĩa những phương thức có tên :meth:`!__iadd__`, :meth:`!__isub__`, v.v. Ví dụ sau đây
+:class:`!Number` class lưu trữ một số và hỗ trợ sử dụng += để tạo một instance mới với giá trị được tăng lên.
 
 .. The empty groups below prevent conversion to guillemets.
 
@@ -374,32 +198,19 @@ instance with an incremented value.
    n += 3
    print n.value
 
-The :meth:`!__iadd__` special method is called with the value of the increment,
-and should return a new instance with an appropriately modified value; this
-return value is bound as the new value of the variable on the left-hand side.
+Phương thức đặc biệt :meth:`!__iadd__` được gọi với giá trị tăng thêm và phải trả về một instance mới có giá trị được sửa đổi tương ứng; giá trị trả về này được gán làm giá trị mới của biến ở vế trái.
 
-Augmented assignment operators were first introduced in the C programming
-language, and most C-derived languages, such as :program:`awk`, C++, Java, Perl,
-and PHP also support them.  The augmented assignment patch was implemented by
-Thomas Wouters.
+Các toán tử phép gán tăng cường được giới thiệu lần đầu trong ngôn ngữ lập trình C, và hầu hết các ngôn ngữ bắt nguồn từ C, chẳng hạn như :program:`awk`, C++, Java, Perl và PHP, cũng hỗ trợ chúng. Bản vá phép gán tăng cường được Thomas Wouters triển khai.
 
 .. ======================================================================
 
 
-String Methods
-==============
+Phương thức chuỗi
+=================
 
-Until now string-manipulation functionality was in the :mod:`string` module,
-which was usually a front-end for the :mod:`!strop` module written in C.  The
-addition of Unicode posed a difficulty for the :mod:`!strop` module, because the
-functions would all need to be rewritten in order to accept either 8-bit or
-Unicode strings.  For functions such as :func:`!string.replace`, which takes 3
-string arguments, that means eight possible permutations, and correspondingly
-complicated code.
+Cho đến nay, chức năng thao tác chuỗi nằm trong module :mod:`string`, vốn thường là front-end cho module :mod:`!strop` được viết bằng C. Việc bổ sung Unicode đã gây khó khăn cho module :mod:`!strop`, vì tất cả các hàm sẽ phải được viết lại để chấp nhận chuỗi 8 bit hoặc chuỗi Unicode. Với các hàm như :func:`!string.replace`, nhận 3 đối số chuỗi, điều đó có nghĩa là có tám hoán vị khả dĩ và phần mã tương ứng cũng phức tạp hơn.
 
-Instead, Python 2.0 pushes the problem onto the string type, making string
-manipulation functionality available through methods on both 8-bit strings and
-Unicode strings.   ::
+Thay vào đó, Python 2.0 chuyển vấn đề này sang kiểu chuỗi, cung cấp chức năng thao tác chuỗi thông qua các phương thức trên cả chuỗi 8 bit và chuỗi Unicode.::
 
    >>> 'andrew'.capitalize()
    'Andrew'
@@ -408,325 +219,161 @@ Unicode strings.   ::
    >>> 'moshe'.find('sh')
    2
 
-One thing that hasn't changed, a noteworthy April Fools' joke notwithstanding,
-is that Python strings are immutable. Thus, the string methods return new
-strings, and do not modify the string on which they operate.
+Một điều không thay đổi, bất chấp một trò đùa Cá tháng Tư đáng chú ý, là các chuỗi Python là bất biến. Vì vậy, các phương thức chuỗi trả về những chuỗi mới và không sửa đổi chuỗi mà chúng thao tác trên đó.
 
-The old :mod:`string` module is still around for backwards compatibility, but it
-mostly acts as a front-end to the new string methods.
+Module :mod:`string` cũ vẫn được duy trì để đảm bảo khả năng tương thích ngược, nhưng phần lớn chỉ hoạt động như một front-end cho các phương thức chuỗi mới.
 
-Two methods which have no parallel in pre-2.0 versions, although they did exist
-in JPython for quite some time, are :meth:`!startswith` and :meth:`!endswith`.
-``s.startswith(t)`` is equivalent to ``s[:len(t)] == t``, while
-``s.endswith(t)`` is equivalent to ``s[-len(t):] == t``.
+Hai phương thức không có phiên bản tương đương trong các phiên bản trước 2.0, mặc dù đã tồn tại khá lâu trong JPython, là :meth:`!startswith` và :meth:`!endswith`. ``s.startswith(t)`` tương đương với ``s[:len(t)] == t``, còn ``s.endswith(t)`` tương đương với ``s[-len(t):] == t``.
 
-One other method which deserves special mention is :meth:`!join`.  The
-:meth:`!join` method of a string receives one parameter, a sequence of strings,
-and is equivalent to the :func:`!string.join` function from the old :mod:`string`
-module, with the arguments reversed. In other words, ``s.join(seq)`` is
-equivalent to the old ``string.join(seq, s)``.
+Một phương thức khác đáng được đề cập đặc biệt là :meth:`!join`. Phương thức
+:meth:`!join` của một chuỗi nhận một tham số, là một chuỗi các chuỗi, và tương đương với hàm :func:`!string.join` của mô-đun :mod:`string` cũ, nhưng các đối số bị đảo ngược. Nói cách khác, ``s.join(seq)`` tương đương với ``string.join(seq, s)`` cũ.
 
 .. ======================================================================
 
 
-Garbage Collection of Cycles
-============================
+Thu gom rác đối với các chu kỳ
+==============================
 
-The C implementation of Python uses reference counting to implement garbage
-collection.  Every Python object maintains a count of the number of references
-pointing to itself, and adjusts the count as references are created or
-destroyed.  Once the reference count reaches zero, the object is no longer
-accessible, since you need to have a reference to an object to access it, and if
-the count is zero, no references exist any longer.
+Bản triển khai Python bằng C sử dụng cơ chế đếm tham chiếu để thực hiện việc thu gom rác. Mỗi đối tượng Python duy trì số lượng tham chiếu trỏ đến chính nó và điều chỉnh số lượng này khi các tham chiếu được tạo hoặc bị hủy. Khi số lượng tham chiếu bằng không, đối tượng không còn truy cập được nữa, vì bạn cần có một tham chiếu đến đối tượng để truy cập nó, và nếu số lượng bằng không thì không còn tham chiếu nào tồn tại.
 
-Reference counting has some pleasant properties: it's easy to understand and
-implement, and the resulting implementation is portable, fairly fast, and reacts
-well with other libraries that implement their own memory handling schemes.  The
-major problem with reference counting is that it sometimes doesn't realise that
-objects are no longer accessible, resulting in a memory leak.  This happens when
-there are cycles of references.
+Cơ chế đếm tham chiếu có một số ưu điểm đáng kể: dễ hiểu và dễ triển khai, đồng thời bản triển khai thu được có tính portable, khá nhanh và tương tác tốt với các thư viện khác triển khai cơ chế quản lý bộ nhớ riêng. Vấn đề lớn nhất của cơ chế đếm tham chiếu là đôi khi nó không nhận ra rằng các đối tượng không còn truy cập được, dẫn đến rò rỉ bộ nhớ. Điều này xảy ra khi tồn tại các chu kỳ tham chiếu.
 
-Consider the simplest possible cycle,  a class instance which has a reference to
-itself::
+Hãy xét chu kỳ đơn giản nhất có thể: một thể hiện lớp có tham chiếu đến chính nó::
 
    instance = SomeClass()
    instance.myself = instance
 
-After the above two lines of code have been executed, the reference count of
-``instance`` is 2; one reference is from the variable named ``'instance'``, and
-the other is from the ``myself`` attribute of the instance.
+Sau khi hai dòng mã trên được thực thi, số lượng tham chiếu của ``instance`` là 2; một tham chiếu đến từ biến có tên ``'instance'``, và tham chiếu còn lại đến từ thuộc tính ``myself`` của thể hiện.
 
-If the next line of code is ``del instance``, what happens?  The reference count
-of ``instance`` is decreased by 1, so it has a reference count of 1; the
-reference in the ``myself`` attribute still exists.  Yet the instance is no
-longer accessible through Python code, and it could be deleted.  Several objects
-can participate in a cycle if they have references to each other, causing all of
-the objects to be leaked.
+Nếu dòng mã tiếp theo là ``del instance``, điều gì sẽ xảy ra? Số lượng tham chiếu của ``instance`` giảm đi 1, nên nó có số lượng tham chiếu là 1; tham chiếu trong thuộc tính ``myself`` vẫn tồn tại. Tuy nhiên, thực thể này không còn có thể được truy cập thông qua mã Python và có thể bị xóa. Nhiều đối tượng có thể tham gia vào một chu kỳ nếu chúng tham chiếu lẫn nhau, khiến tất cả các đối tượng bị rò rỉ.
 
-Python 2.0 fixes this problem by periodically executing a cycle detection
-algorithm which looks for inaccessible cycles and deletes the objects involved.
-A new :mod:`gc` module provides functions to perform a garbage collection,
-obtain debugging statistics, and tuning the collector's parameters.
+Python 2.0 khắc phục vấn đề này bằng cách định kỳ thực thi một thuật toán phát hiện chu kỳ, thuật toán này tìm các chu kỳ không thể truy cập và xóa những đối tượng liên quan. Một module :mod:`gc` mới cung cấp các hàm để thực hiện thu gom rác, lấy số liệu thống kê gỡ lỗi và tinh chỉnh các tham số của bộ thu gom.
 
-Running the cycle detection algorithm takes some time, and therefore will result
-in some additional overhead.  It is hoped that after we've gotten experience
-with the cycle collection from using 2.0, Python 2.1 will be able to minimize
-the overhead with careful tuning.  It's not yet obvious how much performance is
-lost, because benchmarking this is tricky and depends crucially on how often the
-program creates and destroys objects.  The detection of cycles can be disabled
-when Python is compiled, if you can't afford even a tiny speed penalty or
-suspect that the cycle collection is buggy, by specifying the
-:option:`!--without-cycle-gc` switch when running the :program:`configure`
-script.
+Việc chạy thuật toán phát hiện chu kỳ mất một khoảng thời gian, do đó sẽ tạo ra thêm một phần overhead. Hy vọng rằng sau khi có thêm kinh nghiệm với việc thu gom chu kỳ từ quá trình sử dụng 2.0, Python 2.1 sẽ có thể giảm thiểu overhead bằng cách tinh chỉnh cẩn thận. Hiện vẫn chưa rõ hiệu năng bị giảm bao nhiêu, vì việc benchmark điều này khá khó và phụ thuộc rất nhiều vào tần suất chương trình tạo và hủy các đối tượng. Có thể tắt tính năng phát hiện chu kỳ khi biên dịch Python nếu bạn không thể chấp nhận dù chỉ một mức giảm tốc độ nhỏ hoặc nghi ngờ việc thu gom chu kỳ có lỗi, bằng cách chỉ định
+switch :option:`!--without-cycle-gc` khi chạy script :program:`configure`.
 
-Several people tackled this problem and contributed to a solution.  An early
-implementation of the cycle detection approach was written by Toby Kelsey.  The
-current algorithm was suggested by Eric Tiedemann during a visit to CNRI, and
-Guido van Rossum and Neil Schemenauer wrote two different implementations, which
-were later integrated by Neil.  Lots of other people offered suggestions along
-the way; the March 2000 archives of the python-dev mailing list contain most of
-the relevant discussion, especially in the threads titled "Reference cycle
-collection for Python" and "Finalization again".
+Một số người đã giải quyết vấn đề này và đóng góp vào một giải pháp. Toby Kelsey đã viết một bản triển khai ban đầu của phương pháp phát hiện chu kỳ. Thuật toán hiện tại được Eric Tiedemann đề xuất trong một chuyến thăm CNRI, còn Guido van Rossum và Neil Schemenauer đã viết hai bản triển khai khác nhau, sau đó được Neil tích hợp. Nhiều người khác cũng đưa ra đề xuất trong quá trình này; các kho lưu trữ của mailing list python-dev vào tháng 3 năm 2000 chứa phần lớn các cuộc thảo luận liên quan, đặc biệt là trong các chuỗi có tiêu đề "Reference cycle collection for Python" và "Finalization again".
 
 .. ======================================================================
 
 
-Other Core Changes
-==================
+Các thay đổi khác trong lõi
+===========================
 
-Various minor changes have been made to Python's syntax and built-in functions.
-None of the changes are very far-reaching, but they're handy conveniences.
+Nhiều thay đổi nhỏ đã được thực hiện đối với cú pháp và các hàm tích hợp sẵn của Python. Không thay đổi nào có phạm vi ảnh hưởng quá lớn, nhưng chúng mang lại những tiện ích thuận tay.
 
 
-Minor Language Changes
-----------------------
+Các thay đổi nhỏ về ngôn ngữ
+----------------------------
 
-A new syntax makes it more convenient to call a given function with a tuple of
-arguments and/or a dictionary of keyword arguments. In Python 1.5 and earlier,
-you'd use the :func:`!apply` built-in function: ``apply(f, args, kw)`` calls the
-function :func:`!f` with the argument tuple *args* and the keyword arguments in
-the dictionary *kw*.  :func:`!apply`  is the same in 2.0, but thanks to a patch
-from Greg Ewing, ``f(*args, **kw)`` is a shorter and clearer way to achieve the
-same effect.  This syntax is symmetrical with the syntax for defining
-functions::
+Cú pháp mới giúp việc gọi một hàm cụ thể với một tuple đối số và/hoặc một dictionary đối số từ khóa trở nên thuận tiện hơn. Trong Python 1.5 trở về trước, bạn sẽ dùng hàm dựng sẵn :func:`!apply`: ``apply(f, args, kw)`` gọi hàm :func:`!f` với tuple đối số *args* và các đối số từ khóa trong dictionary *kw*. :func:`!apply` cũng tương tự trong 2.0, nhưng nhờ một bản vá từ Greg Ewing, ``f(*args, **kw)`` là cách ngắn gọn và rõ ràng hơn để đạt được hiệu ứng tương tự. Cú pháp này đối xứng với cú pháp dùng để định nghĩa hàm::
 
    def f(*args, **kw):
        # args is a tuple of positional args,
        # kw is a dictionary of keyword args
        ...
 
-The ``print`` statement can now have its output directed to a file-like
-object by following the ``print`` with  ``>> file``, similar to the
-redirection operator in Unix shells. Previously you'd either have to use the
-:meth:`!write` method of the file-like object, which lacks the convenience and
-simplicity of ``print``, or you could assign a new value to
-``sys.stdout`` and then restore the old value.  For sending output to standard
-error, it's much easier to write this::
+Câu lệnh ``print`` giờ đây có thể chuyển đầu ra của nó đến một đối tượng tương tự tệp bằng cách đặt ``>> file`` sau ``print``, tương tự toán tử chuyển hướng trong Unix shell. Trước đây, bạn либо phải sử dụng
+phương thức :meth:`!write` của đối tượng tương tự tệp, vốn thiếu sự tiện lợi và đơn giản của ``print``, hoặc bạn có thể gán một giá trị mới cho ``sys.stdout`` rồi khôi phục giá trị cũ. Để gửi đầu ra đến standard error, việc viết như sau sẽ dễ hơn nhiều::
 
    print >> sys.stderr, "Warning: action field not supplied"
 
-Modules can now be renamed on importing them, using the syntax ``import module
-as name`` or ``from module import name as othername``.  The patch was submitted
-by Thomas Wouters.
+Giờ đây, các module có thể được đổi tên khi import bằng cú pháp ``import module as name`` hoặc ``from module import name as othername``. Bản vá do Thomas Wouters gửi.
 
-A new format style is available when using the ``%`` operator; '%r' will insert
-the :func:`repr` of its argument.  This was also added from symmetry
-considerations, this time for symmetry with the existing '%s' format style,
-which inserts the :func:`str` of its argument.  For example, ``'%r %s' % ('abc',
-'abc')`` returns a string containing ``'abc' abc``.
+Một kiểu định dạng mới có sẵn khi sử dụng toán tử ``%``; '%r' sẽ chèn :func:`repr` của đối số đó. Tính năng này cũng được bổ sung vì lý do đối xứng, lần này để đối xứng với kiểu định dạng '%s' hiện có, kiểu này chèn :func:`str` của đối số đó. Ví dụ, ``'%r %s' % ('abc', 'abc')`` trả về một chuỗi chứa ``'abc' abc``.
 
-Previously there was no way to implement a class that overrode Python's built-in
-:keyword:`in` operator and implemented a custom version.  ``obj in seq`` returns
-true if *obj* is present in the sequence *seq*; Python computes this by simply
-trying every index of the sequence until either *obj* is found or an
-:exc:`IndexError` is encountered.  Moshe Zadka contributed a patch which adds a
-:meth:`!__contains__` magic method for providing a custom implementation for
-:keyword:`!in`. Additionally, new built-in objects written in C can define what
-:keyword:`!in` means for them via a new slot in the sequence protocol.
+Trước đây, không có cách nào để triển khai một class ghi đè
+:keyword:`in` toán tử và đã triển khai một phiên bản tùy chỉnh. ``obj in seq`` trả về true nếu *obj* có trong dãy *seq*; Python thực hiện việc này bằng cách lần lượt thử từng chỉ mục của dãy cho đến khi tìm thấy *obj* hoặc một
+:exc:`IndexError` được gặp. Moshe Zadka đã đóng góp một bản vá bổ sung một
+:meth:`!__contains__` magic method để cung cấp một triển khai tùy chỉnh cho
+:keyword:`!in`. Ngoài ra, các đối tượng tích hợp mới được viết bằng C có thể định nghĩa ý nghĩa của
+:keyword:`!in` đối với chúng thông qua một slot mới trong sequence protocol.
 
-Earlier versions of Python used a recursive algorithm for deleting objects.
-Deeply nested data structures could cause the interpreter to fill up the C stack
-and crash; Christian Tismer rewrote the deletion logic to fix this problem.  On
-a related note, comparing recursive objects recursed infinitely and crashed;
-Jeremy Hylton rewrote the code to no longer crash, producing a useful result
-instead.  For example, after this code::
+Các phiên bản Python trước đây sử dụng một thuật toán đệ quy để xóa đối tượng. Các cấu trúc dữ liệu lồng nhau quá sâu có thể khiến trình thông dịch làm đầy ngăn xếp C và bị crash; Christian Tismer đã viết lại logic xóa để khắc phục vấn đề này. Liên quan đến vấn đề đó, việc so sánh các đối tượng đệ quy sẽ đệ quy vô hạn và bị crash; Jeremy Hylton đã viết lại mã để không còn crash mà thay vào đó tạo ra một kết quả hữu ích. Ví dụ, sau đoạn mã này::
 
    a = []
    b = []
    a.append(a)
    b.append(b)
 
-The comparison ``a==b`` returns true, because the two recursive data structures
-are isomorphic. See the thread "trashcan and PR#7" in the April 2000 archives of
-the python-dev mailing list for the discussion leading up to this
-implementation, and some useful relevant links.    Note that comparisons can now
-also raise exceptions. In earlier versions of Python, a comparison operation
-such as ``cmp(a,b)`` would always produce an answer, even if a user-defined
-:meth:`!__cmp__` method encountered an error, since the resulting exception would
-simply be silently swallowed.
+Phép so sánh ``a==b`` trả về true, vì hai cấu trúc dữ liệu đệ quy là đẳng cấu. Hãy xem cuộc thảo luận "trashcan and PR#7" trong kho lưu trữ tháng 4 năm 2000 của mailing list python-dev để biết quá trình dẫn đến việc triển khai này và một số liên kết liên quan hữu ích. Lưu ý rằng các phép so sánh hiện cũng có thể raise exception. Trong các phiên bản Python trước đây, một phép toán so sánh như ``cmp(a,b)`` luôn tạo ra một kết quả, ngay cả khi một đối tượng do người dùng định nghĩa
+Phương thức :meth:`!__cmp__` đã gặp lỗi, vì ngoại lệ phát sinh sau đó đơn giản sẽ bị nuốt một cách âm thầm.
 
 .. Starting URL:
 .. https://www.python.org/pipermail/python-dev/2000-April/004834.html
 
-Work has been done on porting Python to 64-bit Windows on the Itanium processor,
-mostly by Trent Mick of ActiveState.  (Confusingly, ``sys.platform`` is still
-``'win32'`` on Win64 because it seems that for ease of porting, MS Visual C++
-treats code as 32 bit on Itanium.) PythonWin also supports Windows CE; see the
-Python CE page at https://pythonce.sourceforge.net/ for more information.
+Công việc chuyển Python sang Windows 64-bit trên bộ xử lý Itanium đã được thực hiện, phần lớn bởi Trent Mick của ActiveState. (Điều gây nhầm lẫn là ``sys.platform`` vẫn là ``'win32'`` trên Win64 vì có vẻ như để dễ chuyển đổi, MS Visual C++ xử lý mã như mã 32-bit trên Itanium.) PythonWin cũng hỗ trợ Windows CE; xem trang Python CE tại https://pythonce.sourceforge.net/ để biết thêm thông tin.
 
-Another new platform is Darwin/MacOS X; initial support for it is in Python 2.0.
-Dynamic loading works, if you specify "configure --with-dyld --with-suffix=.x".
-Consult the README in the Python source distribution for more instructions.
+Một nền tảng mới khác là Darwin/MacOS X; Python 2.0 đã có hỗ trợ ban đầu cho nền tảng này. Tính năng dynamic loading hoạt động nếu bạn chỉ định "configure --with-dyld --with-suffix=.x". Hãy xem README trong bản phân phối mã nguồn Python để biết thêm hướng dẫn.
 
-An attempt has been made to alleviate one of Python's warts, the often-confusing
-:exc:`NameError` exception when code refers to a local variable before the
-variable has been assigned a value.  For example, the following code raises an
-exception on the ``print`` statement in both 1.5.2 and 2.0; in 1.5.2 a
-:exc:`NameError` exception is raised, while 2.0 raises a new
-:exc:`UnboundLocalError` exception. :exc:`UnboundLocalError` is a subclass of
-:exc:`NameError`, so any existing code that expects :exc:`NameError` to be
-raised should still work. ::
+Một nỗ lực đã được thực hiện nhằm khắc phục một điểm bất tiện của Python, đó là vấn đề thường gây nhầm lẫn
+:exc:`NameError` khi mã tham chiếu đến một biến cục bộ trước khi biến đó được gán giá trị. Ví dụ, đoạn mã sau đây sẽ phát sinh một ngoại lệ tại câu lệnh ``print`` trong cả 1.5.2 và 2.0; trong 1.5.2, một
+ngoại lệ :exc:`NameError` được phát sinh, còn 2.0 phát sinh một ngoại lệ mới
+ngoại lệ :exc:`UnboundLocalError`. :exc:`UnboundLocalError` là một lớp con của
+:exc:`NameError`, vì vậy mọi mã hiện có mong đợi :exc:`NameError` được phát sinh vẫn sẽ hoạt động.::
 
    def f():
        print "i=",i
        i = i + 1
    f()
 
-Two new exceptions, :exc:`TabError` and :exc:`IndentationError`, have been
-introduced.  They're both subclasses of :exc:`SyntaxError`, and are raised when
-Python code is found to be improperly indented.
+Hai exception mới, :exc:`TabError` và :exc:`IndentationError`, đã được giới thiệu. Cả hai đều là lớp con của :exc:`SyntaxError`, và được phát sinh khi phát hiện mã Python bị thụt lề không đúng.
 
 
-Changes to Built-in Functions
------------------------------
+Các thay đổi đối với hàm tích hợp sẵn
+-------------------------------------
 
-A new built-in, ``zip(seq1, seq2, ...)``, has been added.  :func:`zip`
-returns a list of tuples where each tuple contains the i-th element from each of
-the argument sequences.  The difference between :func:`zip` and ``map(None,
-seq1, seq2)`` is that :func:`map` pads the sequences with ``None`` if the
-sequences aren't all of the same length, while :func:`zip` truncates the
-returned list to the length of the shortest argument sequence.
+Một hàm tích hợp sẵn mới, ``zip(seq1, seq2, ...)``, đã được thêm. :func:`zip` trả về một danh sách các tuple, trong đó mỗi tuple chứa phần tử thứ i từ mỗi chuỗi đối số. Sự khác biệt giữa :func:`zip` và ``map(None, seq1, seq2)`` là :func:`map` bổ sung ``None`` vào các chuỗi nếu chúng không có cùng độ dài, còn :func:`zip` cắt ngắn danh sách được trả về theo độ dài của chuỗi đối số ngắn nhất.
 
-The :func:`int` and :func:`!long` functions now accept an optional "base"
-parameter when the first argument is a string. ``int('123', 10)`` returns 123,
-while ``int('123', 16)`` returns 291.  ``int(123, 16)`` raises a
-:exc:`TypeError` exception with the message "can't convert non-string with
-explicit base".
+Các hàm :func:`int` và :func:`!long` hiện chấp nhận tham số "base" tùy chọn khi đối số đầu tiên là một chuỗi. ``int('123', 10)`` trả về 123, còn ``int('123', 16)`` trả về 291. ``int(123, 16)`` phát sinh một
+exception :exc:`TypeError` với thông báo "can't convert non-string with explicit base".
 
-A new variable holding more detailed version information has been added to the
-:mod:`sys` module.  ``sys.version_info`` is a tuple ``(major, minor, micro,
-level, serial)`` For example, in a hypothetical 2.0.1beta1, ``sys.version_info``
-would be ``(2, 0, 1, 'beta', 1)``. *level* is a string such as ``"alpha"``,
-``"beta"``, or ``"final"`` for a final release.
+Một biến mới chứa thông tin phiên bản chi tiết hơn đã được thêm vào
+:mod:`sys` mô-đun. ``sys.version_info`` là một tuple ``(major, minor, micro, level, serial)`` Ví dụ, trong một phiên bản 2.0.1beta1 giả định, ``sys.version_info`` sẽ là ``(2, 0, 1, 'beta', 1)``. *level* là một chuỗi như ``"alpha"``, ``"beta"``, hoặc ``"final"`` đối với một bản phát hành chính thức.
 
-Dictionaries have an odd new method, ``setdefault(key, default)``, which
-behaves similarly to the existing :meth:`!get` method.  However, if the key is
-missing, :meth:`!setdefault` both returns the value of *default* as :meth:`!get`
-would do, and also inserts it into the dictionary as the value for *key*.  Thus,
-the following lines of code::
+Dictionary có một phương thức mới khá đặc biệt là ``setdefault(key, default)``, hoạt động tương tự như phương thức :meth:`!get` hiện có. Tuy nhiên, nếu thiếu key, :meth:`!setdefault` vừa trả về giá trị của *default* như :meth:`!get` vẫn làm, vừa chèn giá trị đó vào dictionary làm giá trị cho *key*. Vì vậy, các dòng mã sau đây::
 
    if dict.has_key( key ): return dict[key]
    else:
        dict[key] = []
        return dict[key]
 
-can be reduced to a single ``return dict.setdefault(key, [])`` statement.
+có thể được rút gọn thành một câu lệnh ``return dict.setdefault(key, [])`` duy nhất.
 
-The interpreter sets a maximum recursion depth in order to catch runaway
-recursion before filling the C stack and causing a core dump or GPF..
-Previously this limit was fixed when you compiled Python, but in 2.0 the maximum
-recursion depth can be read and modified using :func:`sys.getrecursionlimit` and
-:func:`sys.setrecursionlimit`. The default value is 1000, and a rough maximum
-value for a given platform can be found by running a new script,
+Interpreter đặt giới hạn độ sâu đệ quy tối đa để phát hiện đệ quy không dừng trước khi làm đầy stack C và gây ra core dump hoặc GPF. Trước đây, giới hạn này được cố định khi bạn biên dịch Python, nhưng trong 2.0, độ sâu đệ quy tối đa có thể được đọc và sửa đổi bằng :func:`sys.getrecursionlimit` và
+:func:`sys.setrecursionlimit`. Giá trị mặc định là 1000; có thể tìm giá trị tối đa gần đúng cho một nền tảng nhất định bằng cách chạy một script mới,
 :file:`Misc/find_recursionlimit.py`.
 
 .. ======================================================================
 
 
-Porting to 2.0
-==============
+Chuyển mã sang 2.0
+==================
 
-New Python releases try hard to be compatible with previous releases, and the
-record has been pretty good.  However, some changes are considered useful
-enough, usually because they fix initial design decisions that turned out to be
-actively mistaken, that breaking backward compatibility can't always be avoided.
-This section lists the changes in Python 2.0 that may cause old Python code to
-break.
+Các bản phát hành Python mới luôn cố gắng tương thích với những bản phát hành trước, và thành tích tương thích nhìn chung khá tốt. Tuy nhiên, một số thay đổi được xem là đủ hữu ích, thường là vì chúng sửa những quyết định thiết kế ban đầu hóa ra thực sự sai lầm, nên không phải lúc nào cũng có thể tránh việc phá vỡ tính tương thích ngược. Phần này liệt kê những thay đổi trong Python 2.0 có thể khiến mã Python cũ bị lỗi.
 
-The change which will probably break the most code is tightening up the
-arguments accepted by some methods.  Some methods would take multiple arguments
-and treat them as a tuple, particularly various list methods such as
-:meth:`~list.append` and :meth:`~list.insert`.
-In earlier versions of Python, if ``L`` is
-a list, ``L.append( 1,2 )`` appends the tuple ``(1,2)`` to the list.  In Python
-2.0 this causes a :exc:`TypeError` exception to be raised, with the message:
-'append requires exactly 1 argument; 2 given'.  The fix is to simply add an
-extra set of parentheses to pass both values as a tuple:  ``L.append( (1,2) )``.
+Thay đổi có lẽ sẽ làm hỏng nhiều code nhất là việc siết chặt các đối số được một số phương thức chấp nhận. Một số phương thức nhận nhiều đối số và xử lý chúng như một tuple, đặc biệt là nhiều phương thức xử lý list như
+:meth:`~list.append` và :meth:`~list.insert`. Trong các phiên bản Python trước đây, nếu ``L`` là một list thì ``L.append( 1,2 )`` sẽ thêm tuple ``(1,2)`` vào list. Trong Python 2.0, điều này khiến một ngoại lệ :exc:`TypeError` được phát sinh với thông báo: 'append requires exactly 1 argument; 2 given'. Cách sửa là chỉ cần thêm một cặp dấu ngoặc đơn để truyền cả hai giá trị dưới dạng một tuple: ``L.append( (1,2) )``.
 
-The earlier versions of these methods were more forgiving because they used an
-old function in Python's C interface to parse their arguments; 2.0 modernizes
-them to use :c:func:`PyArg_ParseTuple`, the current argument parsing function,
-which provides more helpful error messages and treats multi-argument calls as
-errors.  If you absolutely must use 2.0 but can't fix your code, you can edit
-:file:`Objects/listobject.c` and define the preprocessor symbol
-``NO_STRICT_LIST_APPEND`` to preserve the old behaviour; this isn't recommended.
+Các phiên bản trước đây của những phương thức này dễ dãi hơn vì chúng sử dụng một hàm cũ trong C interface của Python để phân tích các đối số; 2.0 hiện đại hóa chúng bằng cách sử dụng :c:func:`PyArg_ParseTuple`, hàm phân tích đối số hiện tại, cung cấp các thông báo lỗi hữu ích hơn và coi các lời gọi có nhiều đối số là lỗi. Nếu nhất thiết phải sử dụng 2.0 nhưng không thể sửa code, bạn có thể chỉnh sửa
+:file:`Objects/listobject.c` và định nghĩa symbol tiền xử lý ``NO_STRICT_LIST_APPEND`` để giữ lại hành vi cũ; cách này không được khuyến nghị.
 
-Some of the functions in the :mod:`socket` module are still forgiving in this
-way.  For example, ``socket.connect( ('hostname', 25) )`` is the correct
-form, passing a tuple representing an IP address, but ``socket.connect('hostname', 25)``
-also works. :meth:`socket.connect_ex <socket.socket.connect_ex>` and :meth:`socket.bind <socket.socket.bind>`
-are similarly easy-going.  2.0alpha1 tightened these functions up, but because
-the documentation actually used the erroneous multiple argument form, many
-people wrote code which would break with the stricter checking.  GvR backed out
-the changes in the face of public reaction, so for the :mod:`socket` module, the
-documentation was fixed and the multiple argument form is simply marked as
-deprecated; it *will* be tightened up again in a future Python version.
+Một số hàm trong module :mod:`socket` vẫn dễ dãi theo cách này. Ví dụ, ``socket.connect( ('hostname', 25) )`` là dạng đúng, truyền một tuple biểu diễn một địa chỉ IP, nhưng ``socket.connect('hostname', 25)`` cũng hoạt động. :meth:`socket.connect_ex <socket.socket.connect_ex>` và :meth:`socket.bind <socket.socket.bind>` cũng tương tự. 2.0alpha1 đã siết chặt các hàm này, nhưng vì tài liệu thực sự sử dụng dạng nhiều đối số sai nên nhiều người đã viết code sẽ bị lỗi khi kiểm tra nghiêm ngặt hơn. GvR đã rút lại các thay đổi trước phản ứng của công chúng, vì vậy đối với module :mod:`socket`, tài liệu đã được sửa và dạng nhiều đối số chỉ được đánh dấu là deprecated; *sẽ* lại được siết chặt trong một phiên bản Python tương lai.
 
-The ``\x`` escape in string literals now takes exactly 2 hex digits.  Previously
-it would consume all the hex digits following the 'x' and take the lowest 8 bits
-of the result, so ``\x123456`` was equivalent to ``\x56``.
+Escape ``\x`` trong các string literal giờ đây nhận chính xác 2 chữ số hexa. Trước đây, nó sẽ dùng hết mọi chữ số hexa đứng sau 'x' và lấy 8 bit thấp nhất của kết quả, vì vậy ``\x123456`` tương đương với ``\x56``.
 
-The :exc:`AttributeError` and :exc:`NameError` exceptions have a more friendly
-error message, whose text will be something like ``'Spam' instance has no
-attribute 'eggs'`` or ``name 'eggs' is not defined``.  Previously the error
-message was just the missing attribute name ``eggs``, and code written to take
-advantage of this fact will break in 2.0.
+Các ngoại lệ :exc:`AttributeError` và :exc:`NameError` có thông báo lỗi thân thiện hơn, với nội dung sẽ gần giống ``'Spam' instance has no attribute 'eggs'`` hoặc ``name 'eggs' is not defined``. Trước đây, thông báo lỗi chỉ là tên thuộc tính bị thiếu ``eggs``, và code được viết để tận dụng thực tế này sẽ bị lỗi trong 2.0.
 
-Some work has been done to make integers and long integers a bit more
-interchangeable.  In 1.5.2, large-file support was added for Solaris, to allow
-reading files larger than 2 GiB; this made the :meth:`!tell` method of file
-objects return a long integer instead of a regular integer.  Some code would
-subtract two file offsets and attempt to use the result to multiply a sequence
-or slice a string, but this raised a :exc:`TypeError`.  In 2.0, long integers
-can be used to multiply or slice a sequence, and it'll behave as you'd
-intuitively expect it to; ``3L * 'abc'`` produces 'abcabcabc', and
-``(0,1,2,3)[2L:4L]`` produces (2,3). Long integers can also be used in various
-contexts where previously only integers were accepted, such as in the
-:meth:`!seek` method of file objects, and in the formats supported by the ``%``
-operator (``%d``, ``%i``, ``%x``, etc.).  For example, ``"%d" % 2L**64`` will
-produce the string ``18446744073709551616``.
+Một số công việc đã được thực hiện để làm cho số nguyên và số nguyên dài có thể thay thế cho nhau tốt hơn. Trong 1.5.2, hỗ trợ tệp lớn đã được bổ sung cho Solaris, cho phép đọc các tệp lớn hơn 2 GiB; điều này khiến phương thức :meth:`!tell` của các đối tượng tệp trả về một số nguyên dài thay vì một số nguyên thông thường. Một số mã sẽ trừ hai vị trí trong tệp rồi cố gắng dùng kết quả để nhân một chuỗi hoặc cắt một chuỗi, nhưng việc này gây ra :exc:`TypeError`. Trong 2.0, số nguyên dài có thể được dùng để nhân hoặc cắt một chuỗi, và sẽ hoạt động đúng như trực giác của bạn; ``3L * 'abc'`` tạo ra 'abcabcabc', còn ``(0,1,2,3)[2L:4L]`` tạo ra (2,3). Số nguyên dài cũng có thể được dùng trong nhiều ngữ cảnh mà trước đây chỉ chấp nhận số nguyên, chẳng hạn như trong
+phương thức :meth:`!seek` của các đối tượng tệp, và trong các định dạng được toán tử ``%`` hỗ trợ (``%d``, ``%i``, ``%x``, v.v.). Ví dụ, ``"%d" % 2L**64`` sẽ tạo ra chuỗi ``18446744073709551616``.
 
-The subtlest long integer change of all is that the :func:`str` of a long
-integer no longer has a trailing 'L' character, though :func:`repr` still
-includes it.  The 'L' annoyed many people who wanted to print long integers that
-looked just like regular integers, since they had to go out of their way to chop
-off the character.  This is no longer a problem in 2.0, but code which does
-``str(longval)[:-1]`` and assumes the 'L' is there, will now lose the final
-digit.
+Thay đổi tinh tế nhất đối với số nguyên dài là :func:`str` của một số nguyên dài giờ đây không còn ký tự 'L' ở cuối, mặc dù :func:`repr` vẫn bao gồm ký tự này. Nhiều người thấy ký tự 'L' gây khó chịu khi muốn in số nguyên dài trông giống hệt số nguyên thông thường, vì họ phải thực hiện thêm thao tác để cắt bỏ ký tự đó. Đây không còn là vấn đề trong 2.0, nhưng mã thực hiện ``str(longval)[:-1]`` và giả định rằng ký tự 'L' vẫn tồn tại giờ đây sẽ làm mất chữ số cuối cùng.
 
-Taking the :func:`repr` of a float now uses a different formatting precision
-than :func:`str`.  :func:`repr` uses ``%.17g`` format string for C's
-:func:`!sprintf`, while :func:`str` uses ``%.12g`` as before.  The effect is that
-:func:`repr` may occasionally show more decimal places than  :func:`str`, for
-certain numbers.  For example, the number 8.1 can't be represented exactly in
-binary, so ``repr(8.1)`` is ``'8.0999999999999996'``, while str(8.1) is
-``'8.1'``.
+Việc lấy :func:`repr` của một số thực giờ đây sử dụng độ chính xác định dạng khác với :func:`str`. :func:`repr` sử dụng chuỗi định dạng ``%.17g`` của C cho
+:func:`!sprintf`, trong khi :func:`str` vẫn sử dụng ``%.12g`` như trước. Tác động của việc này là
+:func:`repr` đôi khi có thể hiển thị nhiều chữ số thập phân hơn :func:`str` đối với một số giá trị nhất định. Ví dụ, số 8.1 không thể được biểu diễn chính xác trong hệ nhị phân, vì vậy ``repr(8.1)`` là ``'8.0999999999999996'``, trong khi str(8.1) là ``'8.1'``.
 
-The ``-X`` command-line option, which turned all standard exceptions into
-strings instead of classes, has been removed; the standard exceptions will now
-always be classes.  The :mod:`!exceptions` module containing the standard
-exceptions was translated from Python to a built-in C module, written by Barry
-Warsaw and Fredrik Lundh.
+Tùy chọn dòng lệnh ``-X``, vốn chuyển tất cả ngoại lệ chuẩn thành chuỗi thay vì lớp, đã bị loại bỏ; các ngoại lệ chuẩn giờ đây sẽ luôn là các lớp. Mô-đun :mod:`!exceptions` chứa các ngoại lệ chuẩn đã được chuyển từ Python sang một mô-đun C tích hợp sẵn, do Barry Warsaw và Fredrik Lundh viết.
 
 .. Commented out for now -- I don't think anyone will care.
    The pattern and match objects provided by SRE are C types, not Python
@@ -737,117 +384,58 @@ Warsaw and Fredrik Lundh.
 .. ======================================================================
 
 
-Extending/Embedding Changes
-===========================
+Thay đổi về mở rộng/nhúng
+=========================
 
-Some of the changes are under the covers, and will only be apparent to people
-writing C extension modules or embedding a Python interpreter in a larger
-application.  If you aren't dealing with Python's C API, you can safely skip
-this section.
+Một số thay đổi nằm bên trong và chỉ những người viết các extension module bằng C hoặc nhúng trình thông dịch Python vào một ứng dụng lớn hơn mới nhận thấy. Nếu bạn không làm việc với Python's C API, bạn có thể an toàn bỏ qua phần này.
 
-The version number of the Python C API was incremented, so C extensions compiled
-for 1.5.2 must be recompiled in order to work with 2.0.  On Windows, it's not
-possible for Python 2.0 to import a third party extension built for Python 1.5.x
-due to how Windows DLLs work, so Python will raise an exception and the import
-will fail.
+Số phiên bản của Python C API đã được tăng lên, vì vậy các extension được biên dịch cho 1.5.2 phải được biên dịch lại để hoạt động với 2.0. Trên Windows, Python 2.0 không thể import extension bên thứ ba được xây dựng cho Python 1.5.x do cách Windows DLL hoạt động, vì vậy Python sẽ raise một exception và việc import sẽ thất bại.
 
-Users of Jim Fulton's ExtensionClass module will be pleased to find out that
-hooks have been added so that ExtensionClasses are now supported by
-:func:`isinstance` and :func:`issubclass`. This means you no longer have to
-remember to write code such as ``if type(obj) == myExtensionClass``, but can use
-the more natural ``if isinstance(obj, myExtensionClass)``.
+Người dùng module ExtensionClass của Jim Fulton sẽ vui mừng khi biết rằng các hook đã được thêm để ExtensionClasses hiện được hỗ trợ bởi
+:func:`isinstance` và :func:`issubclass`. Điều này có nghĩa là bạn không còn phải nhớ viết mã như ``if type(obj) == myExtensionClass``, mà có thể sử dụng cách tự nhiên hơn là ``if isinstance(obj, myExtensionClass)``.
 
-The :file:`Python/importdl.c` file, which was a mass of #ifdefs to support
-dynamic loading on many different platforms, was cleaned up and reorganised by
-Greg Stein.  :file:`importdl.c` is now quite small, and platform-specific code
-has been moved into a bunch of :file:`Python/dynload_\*.c` files.  Another
-cleanup: there were also a number of :file:`my\*.h` files in the Include/
-directory that held various portability hacks; they've been merged into a single
-file, :file:`Include/pyport.h`.
+Tệp :file:`Python/importdl.c`, vốn chứa rất nhiều #ifdef để hỗ trợ việc dynamic loading trên nhiều nền tảng khác nhau, đã được Greg Stein dọn dẹp và tổ chức lại. :file:`importdl.c` hiện khá nhỏ, còn mã dành riêng cho từng nền tảng đã được chuyển vào một loạt tệp :file:`Python/dynload_\*.c`. Một lần dọn dẹp khác: cũng có một số tệp :file:`my\*.h` trong thư mục Include/ chứa nhiều thủ thuật portability; chúng đã được hợp nhất vào một tệp duy nhất là :file:`Include/pyport.h`.
 
-Vladimir Marangozov's long-awaited malloc restructuring was completed, to make
-it easy to have the Python interpreter use a custom allocator instead of C's
-standard :c:func:`malloc`.  For documentation, read the comments in
-:file:`Include/pymem.h` and :file:`Include/objimpl.h`.  For the lengthy
-discussions during which the interface was hammered out, see the web archives of
-the 'patches' and 'python-dev' lists at python.org.
+Công việc tái cấu trúc malloc được chờ đợi từ lâu của Vladimir Marangozov đã hoàn tất, giúp trình thông dịch Python dễ dàng sử dụng một allocator tùy chỉnh thay cho :c:func:`malloc` tiêu chuẩn của C. Để xem tài liệu, hãy đọc các chú thích trong
+:file:`Include/pymem.h` và :file:`Include/objimpl.h`. Để xem các cuộc thảo luận dài về quá trình hoàn thiện interface, hãy xem kho lưu trữ web của các mailing list 'patches' và 'python-dev' trên python.org.
 
-Recent versions of the GUSI development environment for MacOS support POSIX
-threads.  Therefore, Python's POSIX threading support now works on the
-Macintosh.  Threading support using the user-space GNU ``pth`` library was also
-contributed.
+Các phiên bản gần đây của môi trường phát triển GUSI dành cho MacOS hỗ trợ POSIX threads. Do đó, hỗ trợ POSIX threading của Python hiện hoạt động trên Macintosh. Hỗ trợ threading sử dụng thư viện GNU ``pth`` ở user space cũng đã được đóng góp.
 
-Threading support on Windows was enhanced, too.  Windows supports thread locks
-that use kernel objects only in case of contention; in the common case when
-there's no contention, they use simpler functions which are an order of
-magnitude faster.  A threaded version of Python 1.5.2 on NT is twice as slow as
-an unthreaded version; with the 2.0 changes, the difference is only 10%.  These
-improvements were contributed by Yakov Markovitch.
+Hỗ trợ threading trên Windows cũng được cải thiện. Windows hỗ trợ các thread lock chỉ sử dụng kernel object khi xảy ra contention; trong trường hợp phổ biến khi không có contention, chúng sử dụng các hàm đơn giản hơn và nhanh hơn một bậc độ lớn. Phiên bản Python 1.5.2 có threading trên NT chậm gấp đôi phiên bản không có threading; với các thay đổi trong 2.0, chênh lệch chỉ còn 10%. Những cải tiến này do Yakov Markovitch đóng góp.
 
-Python 2.0's source now uses only ANSI C prototypes, so compiling Python now
-requires an ANSI C compiler, and can no longer be done using a compiler that
-only supports K&R C.
+Mã nguồn Python 2.0 hiện chỉ sử dụng các prototype ANSI C, vì vậy việc biên dịch Python hiện yêu cầu một trình biên dịch ANSI C và không thể thực hiện bằng trình biên dịch chỉ hỗ trợ K&R C.
 
-Previously the Python virtual machine used 16-bit numbers in its bytecode,
-limiting the size of source files.  In particular, this affected the maximum
-size of literal lists and dictionaries in Python source; occasionally people who
-are generating Python code would run into this limit.  A patch by Charles G.
-Waldman raises the limit from ``2**16`` to ``2**32``.
+Trước đây, máy ảo Python sử dụng các số 16 bit trong bytecode, giới hạn kích thước của các tệp mã nguồn. Cụ thể, điều này ảnh hưởng đến kích thước tối đa của các list và dictionary literal trong mã nguồn Python; đôi khi những người tạo mã Python sẽ gặp phải giới hạn này. Một patch của Charles G. Waldman nâng giới hạn từ ``2**16`` lên ``2**32``.
 
-Three new convenience functions intended for adding constants to a module's
-dictionary at module initialization time were added: :c:func:`PyModule_AddObject`,
-:c:func:`PyModule_AddIntConstant`, and :c:func:`PyModule_AddStringConstant`.  Each
-of these functions takes a module object, a null-terminated C string containing
-the name to be added, and a third argument for the value to be assigned to the
-name.  This third argument is, respectively, a Python object, a C long, or a C
-string.
+Đã bổ sung ba hàm tiện ích mới nhằm thêm các hằng số vào dictionary của module trong thời gian khởi tạo module: :c:func:`PyModule_AddObject`,
+:c:func:`PyModule_AddIntConstant`, và :c:func:`PyModule_AddStringConstant`. Mỗi hàm này nhận một đối tượng module, một chuỗi C kết thúc bằng null chứa tên cần thêm, và đối số thứ ba là giá trị sẽ được gán cho tên đó. Đối số thứ ba này lần lượt là một đối tượng Python, một số C long hoặc một chuỗi C.
 
-A wrapper API was added for Unix-style signal handlers. :c:func:`PyOS_getsig` gets
-a signal handler and :c:func:`PyOS_setsig` will set a new handler.
+Một wrapper API đã được bổ sung cho các signal handler kiểu Unix. :c:func:`PyOS_getsig` lấy một signal handler và :c:func:`PyOS_setsig` sẽ thiết lập một handler mới.
 
 .. ======================================================================
 
 
-Distutils: Making Modules Easy to Install
-=========================================
+Distutils: Giúp cài đặt module dễ dàng
+======================================
 
-Before Python 2.0, installing modules was a tedious affair -- there was no way
-to figure out automatically where Python is installed, or what compiler options
-to use for extension modules.  Software authors had to go through an arduous
-ritual of editing Makefiles and configuration files, which only really work on
-Unix and leave Windows and MacOS unsupported.  Python users faced wildly
-differing installation instructions which varied between different extension
-packages, which made administering a Python installation something of  a chore.
+Trước Python 2.0, việc cài đặt module là một công việc tẻ nhạt -- không có cách nào tự động xác định Python được cài đặt ở đâu hoặc nên sử dụng những tùy chọn compiler nào cho extension module. Các tác giả phần mềm phải trải qua một quy trình chỉnh sửa Makefile và các tệp cấu hình đầy gian nan; những tệp này chỉ thực sự hoạt động trên Unix, khiến Windows và MacOS không được hỗ trợ. Người dùng Python phải đối mặt với những hướng dẫn cài đặt khác biệt đáng kể giữa các extension package, khiến việc quản trị một bản cài đặt Python trở thành một việc khá phiền toái.
 
-The SIG for distribution utilities, shepherded by Greg Ward, has created the
-Distutils, a system to make package installation much easier.  They form the
-``distutils`` package, a new part of Python's standard library. In the best
-case, installing a Python module from source will require the same steps: first
-you simply mean unpack the tarball or zip archive, and the run "``python
-setup.py install``".  The platform will be automatically detected, the compiler
-will be recognized, C extension modules will be compiled, and the distribution
-installed into the proper directory.  Optional command-line arguments provide
-more control over the installation process, the distutils package offers many
-places to override defaults -- separating the build from the install, building
-or installing in non-default directories, and more.
+SIG phụ trách các tiện ích phân phối, dưới sự dẫn dắt của Greg Ward, đã tạo ra Distutils, một hệ thống giúp việc cài đặt package dễ dàng hơn nhiều. Chúng tạo thành package ``distutils``, một phần mới trong thư viện chuẩn của Python. Trong trường hợp lý tưởng, việc cài đặt một module Python từ mã nguồn sẽ chỉ yêu cầu các bước giống nhau: trước hết, bạn chỉ cần giải nén tarball hoặc zip archive, rồi chạy "``python setup.py install``". Nền tảng sẽ được tự động phát hiện, compiler sẽ được nhận diện, các C extension module sẽ được biên dịch và distribution sẽ được cài đặt vào đúng thư mục. Các đối số dòng lệnh tùy chọn cho phép kiểm soát quy trình cài đặt nhiều hơn; package distutils cung cấp nhiều cách để ghi đè các giá trị mặc định -- tách riêng việc build khỏi việc install, build hoặc install vào các thư mục không mặc định và nhiều tùy chọn khác.
 
-In order to use the Distutils, you need to write a :file:`setup.py` script.  For
-the simple case, when the software contains only .py files, a minimal
-:file:`setup.py` can be just a few lines long::
+Để sử dụng Distutils, bạn cần viết một script :file:`setup.py`. Trong trường hợp đơn giản, khi phần mềm chỉ chứa các tệp .py, một
+:file:`setup.py` có thể chỉ dài vài dòng::
 
    from distutils.core import setup
    setup (name = "foo", version = "1.0",
           py_modules = ["module1", "module2"])
 
-The :file:`setup.py` file isn't much more complicated if the software consists
-of a few packages::
+Tệp :file:`setup.py` không phức tạp hơn nhiều nếu phần mềm gồm một vài package::
 
    from distutils.core import setup
    setup (name = "foo", version = "1.0",
           packages = ["package", "package.subpackage"])
 
-A C extension can be the most complicated case; here's an example taken from
-the PyXML package::
+Một phần mở rộng C có thể là trường hợp phức tạp nhất; sau đây là một ví dụ lấy từ gói PyXML::
 
    from distutils.core import setup, Extension
 
@@ -862,57 +450,29 @@ the PyXML package::
    setup (name = "PyXML", version = "0.5.4",
           ext_modules =[ expat_extension ] )
 
-The Distutils can also take care of creating source and binary distributions.
-The "sdist" command, run by "``python setup.py sdist``', builds a source
-distribution such as :file:`foo-1.0.tar.gz`. Adding new commands isn't
-difficult, "bdist_rpm" and "bdist_wininst" commands have already been
-contributed to create an RPM distribution and a Windows installer for the
-software, respectively.  Commands to create other distribution formats such as
-Debian packages and Solaris :file:`.pkg` files are in various stages of
-development.
+Distutils cũng có thể đảm nhiệm việc tạo các bản phân phối source và binary. Lệnh "sdist", được chạy bằng "``python setup.py sdist``', sẽ xây dựng một bản phân phối source như :file:`foo-1.0.tar.gz`. Việc thêm các lệnh mới không khó; các lệnh "bdist_rpm" và "bdist_wininst" đã được đóng góp để lần lượt tạo bản phân phối RPM và trình cài đặt Windows cho phần mềm. Các lệnh để tạo những định dạng bản phân phối khác như gói Debian và các tệp Solaris :file:`.pkg` đang được phát triển ở nhiều giai đoạn khác nhau.
 
-All this is documented in a new manual, *Distributing Python Modules*, that
-joins the basic set of Python documentation.
+Tất cả nội dung này được ghi lại trong một tài liệu hướng dẫn mới, *Distributing Python Modules*, bổ sung vào bộ tài liệu Python cơ bản.
 
 .. ======================================================================
 
 
-XML Modules
-===========
+Các module XML
+==============
 
-Python 1.5.2 included a simple XML parser in the form of the :mod:`!xmllib`
-module, contributed by Sjoerd Mullender.  Since 1.5.2's release, two different
-interfaces for processing XML have become common: SAX2 (version 2 of the Simple
-API for XML) provides an event-driven interface with some similarities to
-:mod:`!xmllib`, and the DOM (Document Object Model) provides a tree-based
-interface, transforming an XML document into a tree of nodes that can be
-traversed and modified.  Python 2.0 includes a SAX2 interface and a stripped-down
-DOM interface as part of the :mod:`xml` package. Here we will give a brief
-overview of these new interfaces; consult the Python documentation or the source
-code for complete details. The Python XML SIG is also working on improved
-documentation.
+Python 1.5.2 bao gồm một trình phân tích XML đơn giản dưới dạng module :mod:`!xmllib`, do Sjoerd Mullender đóng góp. Kể từ khi 1.5.2 được phát hành, hai interface khác nhau để xử lý XML đã trở nên phổ biến: SAX2 (phiên bản 2 của Simple API for XML) cung cấp một interface hướng sự kiện với một số điểm tương đồng với
+:mod:`!xmllib`, còn DOM (Document Object Model) cung cấp một interface dựa trên cây, chuyển đổi tài liệu XML thành một cây gồm các node có thể được duyệt và sửa đổi. Python 2.0 bao gồm một interface SAX2 và một interface DOM tinh gọn dưới dạng một phần của gói :mod:`xml`. Ở đây, chúng ta sẽ trình bày khái quát ngắn gọn về các interface mới này; hãy tham khảo tài liệu Python hoặc mã nguồn để biết đầy đủ chi tiết. Python XML SIG cũng đang nghiên cứu việc cải thiện tài liệu.
 
 
-SAX2 Support
-------------
+Hỗ trợ SAX2
+-----------
 
-SAX defines an event-driven interface for parsing XML.  To use SAX, you must
-write a SAX handler class.  Handler classes inherit from various classes
-provided by SAX, and override various methods that will then be called by the
-XML parser.  For example, the :meth:`~xml.sax.handler.ContentHandler.startElement` and :meth:`~xml.sax.handler.ContentHandler.endElement`
-methods are called for every starting and end tag encountered by the parser, the
-:meth:`~xml.sax.handler.ContentHandler.characters` method is called for every chunk of character data, and so
-forth.
+SAX định nghĩa một giao diện hướng sự kiện để phân tích cú pháp XML. Để sử dụng SAX, bạn phải viết một lớp trình xử lý SAX. Các lớp trình xử lý kế thừa từ nhiều lớp do SAX cung cấp và ghi đè nhiều phương thức khác nhau, sau đó các phương thức này sẽ được trình phân tích cú pháp XML gọi. Ví dụ, các phương thức :meth:`~xml.sax.handler.ContentHandler.startElement` và :meth:`~xml.sax.handler.ContentHandler.endElement` được gọi cho mỗi thẻ mở và thẻ đóng mà trình phân tích cú pháp gặp, còn
+phương thức :meth:`~xml.sax.handler.ContentHandler.characters` được gọi cho mỗi đoạn dữ liệu ký tự, v.v.
 
-The advantage of the event-driven approach is that the whole document doesn't
-have to be resident in memory at any one time, which matters if you are
-processing really huge documents.  However, writing the SAX handler class can
-get very complicated if you're trying to modify the document structure in some
-elaborate way.
+Ưu điểm của cách tiếp cận hướng sự kiện là toàn bộ tài liệu không cần phải thường trực trong bộ nhớ cùng một lúc, điều này rất quan trọng nếu bạn đang xử lý những tài liệu cực kỳ lớn. Tuy nhiên, việc viết lớp trình xử lý SAX có thể trở nên rất phức tạp nếu bạn muốn sửa đổi cấu trúc tài liệu theo một cách cầu kỳ nào đó.
 
-For example, this little example program defines a handler that prints a message
-for every starting and ending tag, and then parses the file :file:`hamlet.xml`
-using it::
+Ví dụ, chương trình mẫu nhỏ này định nghĩa một trình xử lý in ra thông báo cho mỗi thẻ mở và thẻ đóng, sau đó phân tích cú pháp tệp :file:`hamlet.xml` bằng trình xử lý đó::
 
    from xml import sax
 
@@ -933,55 +493,34 @@ using it::
    # Parse a file!
    parser.parse( 'hamlet.xml' )
 
-For more information, consult the Python documentation, or the XML HOWTO at
-https://pyxml.sourceforge.net/topics/howto/xml-howto.html.
+Để biết thêm thông tin, hãy tham khảo tài liệu Python hoặc XML HOWTO tại https://pyxml.sourceforge.net/topics/howto/xml-howto.html.
 
 
-DOM Support
------------
+Hỗ trợ DOM
+----------
 
-The Document Object Model is a tree-based representation for an XML document.  A
-top-level :class:`!Document` instance is the root of the tree, and has a single
-child which is the top-level :class:`!Element` instance. This :class:`!Element`
-has children nodes representing character data and any sub-elements, which may
-have further children of their own, and so forth.  Using the DOM you can
-traverse the resulting tree any way you like, access element and attribute
-values, insert and delete nodes, and convert the tree back into XML.
+Document Object Model là một biểu diễn dựa trên cây cho tài liệu XML. Một thực thể :class:`!Document` cấp cao nhất là gốc của cây và có một nút con duy nhất là thực thể :class:`!Element` cấp cao nhất. :class:`!Element` này có các nút con biểu diễn dữ liệu ký tự và mọi phần tử con, những phần tử này có thể có các nút con riêng, v.v. Bằng DOM, bạn có thể duyệt cây kết quả theo bất kỳ cách nào mình muốn, truy cập các giá trị phần tử và thuộc tính, chèn và xóa các nút, rồi chuyển đổi cây trở lại thành XML.
 
-The DOM is useful for modifying XML documents, because you can create a DOM
-tree, modify it by adding new nodes or rearranging subtrees, and then produce a
-new XML document as output.  You can also construct a DOM tree manually and
-convert it to XML, which can be a more flexible way of producing XML output than
-simply writing ``<tag1>``...\ ``</tag1>`` to a file.
+DOM hữu ích để sửa đổi các tài liệu XML, vì bạn có thể tạo một cây DOM, sửa đổi cây bằng cách thêm các node mới hoặc sắp xếp lại các subtree, rồi tạo một tài liệu XML mới làm đầu ra. Bạn cũng có thể tự xây dựng một cây DOM và chuyển đổi nó thành XML; đây có thể là cách linh hoạt hơn để tạo đầu ra XML so với việc chỉ ghi ``<tag1>``...\ ``</tag1>`` vào một tệp.
 
-The DOM implementation included with Python lives in the :mod:`xml.dom.minidom`
-module.  It's a lightweight implementation of the Level 1 DOM with support for
-XML namespaces.  The  :func:`!parse` and :func:`!parseString` convenience
-functions are provided for generating a DOM tree::
+Cài đặt DOM đi kèm với Python nằm trong module :mod:`xml.dom.minidom`. Đây là một cài đặt nhẹ của DOM Level 1 có hỗ trợ namespace XML. Hai hàm tiện ích :func:`!parse` và :func:`!parseString` được cung cấp để tạo một cây DOM::
 
    from xml.dom import minidom
    doc = minidom.parse('hamlet.xml')
 
-``doc`` is a :class:`!Document` instance.  :class:`!Document`, like all the other
-DOM classes such as :class:`!Element` and :class:`Text`, is a subclass of the
-:class:`!Node` base class.  All the nodes in a DOM tree therefore support certain
-common methods, such as :meth:`!toxml` which returns a string containing the XML
-representation of the node and its children.  Each class also has special
-methods of its own; for example, :class:`!Element` and :class:`!Document`
-instances have a method to find all child elements with a given tag name.
-Continuing from the previous 2-line example::
+``doc`` là một thể hiện :class:`!Document`. :class:`!Document`, giống như tất cả các lớp DOM khác chẳng hạn như :class:`!Element` và :class:`Text`, là một lớp con của
+lớp cơ sở :class:`!Node`. Do đó, tất cả các node trong một cây DOM đều hỗ trợ một số phương thức chung, chẳng hạn như :meth:`!toxml`, phương thức trả về một chuỗi chứa biểu diễn XML của node và các node con của nó. Mỗi lớp cũng có các phương thức riêng; ví dụ, các thể hiện :class:`!Element` và :class:`!Document` có một phương thức để tìm tất cả phần tử con có tên thẻ đã cho. Tiếp tục từ ví dụ 2 dòng trước::
 
    perslist = doc.getElementsByTagName( 'PERSONA' )
    print perslist[0].toxml()
    print perslist[1].toxml()
 
-For the *Hamlet* XML file, the above few lines output::
+Đối với tệp XML *Hamlet*, vài dòng trên sẽ xuất ra::
 
    <PERSONA>CLAUDIUS, king of Denmark. </PERSONA>
    <PERSONA>HAMLET, son to the late, and nephew to the present king.</PERSONA>
 
-The root element of the document is available as ``doc.documentElement``, and
-its children can be easily modified by deleting, adding, or removing nodes::
+Phần tử gốc của tài liệu có sẵn dưới dạng ``doc.documentElement``, và bạn có thể dễ dàng sửa đổi các phần tử con của nó bằng cách xóa, thêm hoặc loại bỏ các node::
 
    root = doc.documentElement
 
@@ -995,213 +534,127 @@ its children can be easily modified by deleting, adding, or removing nodes::
    # the third child) before the 20th child.
    root.insertBefore( root.childNodes[0], root.childNodes[20] )
 
-Again, I will refer you to the Python documentation for a complete listing of
-the different :class:`!Node` classes and their various methods.
+Một lần nữa, tôi xin giới thiệu tài liệu Python để xem danh sách đầy đủ các lớp :class:`!Node` khác nhau và những phương thức tương ứng của chúng.
 
 
-Relationship to PyXML
+Mối quan hệ với PyXML
 ---------------------
 
-The XML Special Interest Group has been working on XML-related Python code for a
-while.  Its code distribution, called PyXML, is available from the SIG's web
-pages at https://www.python.org/community/sigs/current/xml-sig. The PyXML distribution also used
-the package name ``xml``.  If you've written programs that used PyXML, you're
-probably wondering about its compatibility with the 2.0 :mod:`xml` package.
+Nhóm Đặc biệt về XML đã làm việc với mã Python liên quan đến XML trong một thời gian. Bản phân phối mã của nhóm, có tên là PyXML, có sẵn trên các trang web của SIG tại https://www.python.org/community/sigs/current/xml-sig. Bản phân phối PyXML cũng sử dụng tên package ``xml``. Nếu bạn đã viết các chương trình sử dụng PyXML, có lẽ bạn đang thắc mắc về khả năng tương thích của nó với package :mod:`xml` của Python 2.0.
 
-The answer is that Python 2.0's :mod:`xml` package isn't compatible with PyXML,
-but can be made compatible by installing a recent version PyXML.  Many
-applications can get by with the XML support that is included with Python 2.0,
-but more complicated applications will require that the full PyXML package will
-be installed.  When installed, PyXML versions 0.6.0 or greater will replace the
-:mod:`xml` package shipped with Python, and will be a strict superset of the
-standard package, adding a bunch of additional features.  Some of the additional
-features in PyXML include:
+Câu trả lời là package :mod:`xml` của Python 2.0 không tương thích với PyXML, nhưng có thể được làm cho tương thích bằng cách cài đặt phiên bản PyXML mới đây. Nhiều ứng dụng có thể sử dụng phần hỗ trợ XML đi kèm Python 2.0, nhưng các ứng dụng phức tạp hơn sẽ yêu cầu cài đặt package PyXML đầy đủ. Khi được cài đặt, các phiên bản PyXML từ 0.6.0 trở lên sẽ thay thế
+package :mod:`xml` được cung cấp cùng Python, và sẽ là một superset nghiêm ngặt của package chuẩn, bổ sung một loạt tính năng khác. Một số tính năng bổ sung trong PyXML bao gồm:
 
-* 4DOM, a full DOM implementation from FourThought, Inc.
+* 4DOM, một triển khai DOM đầy đủ của FourThought, Inc.
 
-* The xmlproc validating parser, written by Lars Marius Garshol.
+* Parser xác thực xmlproc, do Lars Marius Garshol viết.
 
-* The :mod:`!sgmlop` parser accelerator module, written by Fredrik Lundh.
+* Mô-đun tăng tốc parser :mod:`!sgmlop`, do Fredrik Lundh viết.
 
 .. ======================================================================
 
 
-Module changes
-==============
+Thay đổi module
+===============
 
-Lots of improvements and bugfixes were made to Python's extensive standard
-library; some of the affected modules include :mod:`readline`,
+Thư viện chuẩn mở rộng của Python đã có rất nhiều cải tiến và bản sửa lỗi; một số module bị ảnh hưởng gồm :mod:`readline`,
 :mod:`ConfigParser <configparser>`, :mod:`!cgi`, :mod:`calendar`, :mod:`posix`, :mod:`readline`,
-:mod:`!xmllib`, :mod:`!aifc`, :mod:`!chunk`, :mod:`wave`, :mod:`random`, :mod:`shelve`,
-and :mod:`!nntplib`.  Consult the CVS logs for the exact patch-by-patch details.
+:mod:`!xmllib`, :mod:`!aifc`, :mod:`!chunk`, :mod:`wave`, :mod:`random`, :mod:`shelve` và :mod:`!nntplib`. Hãy tham khảo các log CVS để biết chính xác chi tiết của từng bản vá.
 
-Brian Gallew contributed OpenSSL support for the :mod:`socket` module.  OpenSSL
-is an implementation of the Secure Socket Layer, which encrypts the data being
-sent over a socket.  When compiling Python, you can edit :file:`Modules/Setup`
-to include SSL support, which adds an additional function to the :mod:`socket`
-module: ``socket.ssl(socket, keyfile, certfile)``, which takes a socket
-object and returns an SSL socket.  The :mod:`httplib <http>` and :mod:`urllib` modules
-were also changed to support ``https://`` URLs, though no one has implemented
-FTP or SMTP over SSL.
+Brian Gallew đã đóng góp hỗ trợ OpenSSL cho module :mod:`socket`. OpenSSL là một triển khai của Secure Socket Layer, dùng để mã hóa dữ liệu được gửi qua socket. Khi biên dịch Python, bạn có thể chỉnh sửa :file:`Modules/Setup` để thêm hỗ trợ SSL, thao tác này bổ sung một hàm vào module :mod:`socket`: ``socket.ssl(socket, keyfile, certfile)``, nhận một đối tượng socket và trả về một SSL socket. Các module :mod:`httplib <http>` và :mod:`urllib` cũng được thay đổi để hỗ trợ các URL ``https://``, mặc dù chưa có ai triển khai FTP hoặc SMTP qua SSL.
 
-The :mod:`httplib <http>` module has been rewritten by Greg Stein to support HTTP/1.1.
+Module :mod:`httplib <http>` đã được Greg Stein viết lại để hỗ trợ HTTP/1.1.
 
-Backward compatibility with the 1.5 version of :mod:`!httplib` is provided,
-though using HTTP/1.1 features such as pipelining will require rewriting code to
-use a different set of interfaces.
+Khả năng tương thích ngược với phiên bản 1.5 của :mod:`!httplib` được cung cấp, mặc dù để sử dụng các tính năng HTTP/1.1 như pipelining, bạn sẽ phải viết lại mã để dùng một bộ interface khác.
 
-The :mod:`!Tkinter` module now supports Tcl/Tk version 8.1, 8.2, or 8.3, and
-support for the older 7.x versions has been dropped.  The Tkinter module now
-supports displaying Unicode strings in Tk widgets. Also, Fredrik Lundh
-contributed an optimization which makes operations like ``create_line`` and
-``create_polygon`` much faster, especially when using lots of coordinates.
+Module :mod:`!Tkinter` hiện hỗ trợ Tcl/Tk phiên bản 8.1, 8.2 hoặc 8.3, còn hỗ trợ cho các phiên bản 7.x cũ hơn đã bị loại bỏ. Module Tkinter hiện hỗ trợ hiển thị các chuỗi Unicode trong các widget Tk. Fredrik Lundh cũng đã đóng góp một tối ưu hóa giúp các thao tác như ``create_line`` và ``create_polygon`` nhanh hơn nhiều, đặc biệt khi sử dụng nhiều tọa độ.
 
-The :mod:`curses` module has been greatly extended, starting from Oliver
-Andrich's enhanced version, to provide many additional functions from ncurses
-and SYSV curses, such as colour, alternative character set support, pads, and
-mouse support.  This means the module is no longer compatible with operating
-systems that only have BSD curses, but there don't seem to be any currently
-maintained OSes that fall into this category.
+Mô-đun :mod:`curses` đã được mở rộng đáng kể, bắt đầu từ phiên bản cải tiến của Oliver Andrich, nhằm cung cấp nhiều hàm bổ sung từ ncurses và SYSV curses, chẳng hạn như hỗ trợ màu sắc, bộ ký tự thay thế, pad và chuột. Điều này có nghĩa là mô-đun không còn tương thích với các hệ điều hành chỉ có BSD curses, nhưng dường như hiện không có hệ điều hành nào còn được duy trì thuộc loại này.
 
-As mentioned in the earlier discussion of 2.0's Unicode support, the underlying
-implementation of the regular expressions provided by the :mod:`re` module has
-been changed.  SRE, a new regular expression engine written by Fredrik Lundh and
-partially funded by Hewlett Packard, supports matching against both 8-bit
-strings and Unicode strings.
+Như đã đề cập trong phần thảo luận trước đó về hỗ trợ Unicode của 2.0, phần triển khai bên dưới của các biểu thức chính quy do mô-đun :mod:`re` cung cấp đã được thay đổi. SRE, một regex engine mới do Fredrik Lundh viết và được Hewlett Packard tài trợ một phần, hỗ trợ so khớp cả chuỗi 8-bit và chuỗi Unicode.
 
 .. ======================================================================
 
 
-New modules
-===========
+Mô-đun mới
+==========
 
-A number of new modules were added.  We'll simply list them with brief
-descriptions; consult the 2.0 documentation for the details of a particular
-module.
+Một số mô-đun mới đã được bổ sung. Chúng tôi sẽ chỉ liệt kê các mô-đun này cùng phần mô tả ngắn; hãy tham khảo tài liệu 2.0 để biết chi tiết về từng mô-đun cụ thể.
 
-* :mod:`atexit`:  For registering functions to be called before the Python
-  interpreter exits. Code that currently sets ``sys.exitfunc`` directly should be
-  changed to  use the :mod:`atexit` module instead, importing :mod:`atexit` and
-  calling :func:`atexit.register` with  the function to be called on exit.
-  (Contributed by Skip Montanaro.)
+* :mod:`atexit`: Dùng để đăng ký các hàm sẽ được gọi trước khi trình thông dịch Python thoát. Mã hiện đang đặt trực tiếp ``sys.exitfunc`` nên được thay đổi để sử dụng mô-đun :mod:`atexit` thay vào đó, bằng cách import :mod:`atexit` và gọi :func:`atexit.register` với hàm sẽ được gọi khi thoát. (Do Skip Montanaro đóng góp.)
 
-* :mod:`codecs`, :mod:`!encodings`, :mod:`unicodedata`:  Added as part of the new
-  Unicode support.
+* :mod:`codecs`, :mod:`!encodings`, :mod:`unicodedata`: Được bổ sung như một phần của hỗ trợ Unicode mới.
 
-* :mod:`filecmp`: Supersedes the old :mod:`!cmp`, :mod:`!cmpcache` and
-  :mod:`!dircmp` modules, which have now become deprecated. (Contributed by Gordon
-  MacMillan and Moshe Zadka.)
+* :mod:`filecmp`: Thay thế :mod:`!cmp`, :mod:`!cmpcache` cũ và
+  :mod:`!dircmp` các module hiện đã không còn được khuyến nghị sử dụng. (Đóng góp bởi Gordon MacMillan và Moshe Zadka.)
 
-* :mod:`gettext`: This module provides internationalization (I18N) and
-  localization (L10N) support for Python programs by providing an interface to the
-  GNU gettext message catalog library. (Integrated by Barry Warsaw, from separate
-  contributions by Martin  von Löwis, Peter Funk, and James Henstridge.)
+* :mod:`gettext`: Module này cung cấp hỗ trợ quốc tế hóa (I18N) và bản địa hóa (L10N) cho các chương trình Python bằng cách cung cấp một giao diện cho thư viện danh mục thông báo GNU gettext. (Do Barry Warsaw tích hợp, từ các đóng góp riêng biệt của Martin  von Löwis, Peter Funk và James Henstridge.)
 
-* :mod:`!linuxaudiodev`: Support for the :file:`/dev/audio` device on Linux, a
-  twin to the existing :mod:`!sunaudiodev` module. (Contributed by Peter Bosch,
-  with fixes by Jeremy Hylton.)
+* :mod:`!linuxaudiodev`: Hỗ trợ thiết bị :file:`/dev/audio` trên Linux, một phiên bản song sinh của module :mod:`!sunaudiodev` hiện có. (Do Peter Bosch đóng góp, với các bản sửa lỗi của Jeremy Hylton.)
 
-* :mod:`mmap`: An interface to memory-mapped files on both Windows and Unix.  A
-  file's contents can be mapped directly into memory, at which point it behaves
-  like a mutable string, so its contents can be read and modified.  They can even
-  be passed to functions that expect ordinary strings, such as the :mod:`re`
-  module. (Contributed by Sam Rushing, with some extensions by A.M. Kuchling.)
+* :mod:`mmap`: Một giao diện cho các tệp được ánh xạ vào bộ nhớ trên cả Windows và Unix. Nội dung của tệp có thể được ánh xạ trực tiếp vào bộ nhớ; khi đó, nó hoạt động như một chuỗi có thể thay đổi, nên nội dung của nó có thể được đọc và sửa đổi. Chúng thậm chí có thể được truyền cho các hàm mong đợi các chuỗi thông thường, chẳng hạn như module :mod:`re`. (Do Sam Rushing đóng góp, với một số mở rộng của A.M. Kuchling.)
 
-* :mod:`!pyexpat`: An interface to the Expat XML parser. (Contributed by Paul
-  Prescod.)
+* :mod:`!pyexpat`: Một giao diện cho bộ phân tích cú pháp XML Expat. (Do Paul Prescod đóng góp.)
 
-* :mod:`robotparser <urllib.robotparser>`: Parse a :file:`robots.txt` file, which is used for writing
-  web spiders that politely avoid certain areas of a web site.  The parser accepts
-  the contents of a :file:`robots.txt` file, builds a set of rules from it, and
-  can then answer questions about the fetchability of a given URL.  (Contributed
-  by Skip Montanaro.)
+* :mod:`robotparser <urllib.robotparser>`: Phân tích cú pháp tệp :file:`robots.txt`, được dùng để viết các web spider có thể lịch sự tránh một số khu vực nhất định của một trang web. Bộ phân tích cú pháp tiếp nhận nội dung của tệp :file:`robots.txt`, xây dựng một tập hợp quy tắc từ đó, rồi có thể trả lời các câu hỏi về việc một URL nhất định có thể được tải xuống hay không. (Do Skip Montanaro đóng góp.)
 
-* :mod:`tabnanny`: A module/script to  check Python source code for ambiguous
-  indentation. (Contributed by Tim Peters.)
+* :mod:`tabnanny`: Một module/tập lệnh để kiểm tra mã nguồn Python nhằm phát hiện thụt lề không rõ ràng. (Do Tim Peters đóng góp.)
 
-* :mod:`!UserString`: A base class useful for deriving objects that behave like
-  strings.
+* :mod:`!UserString`: Một lớp cơ sở hữu ích để tạo các đối tượng hoạt động giống như chuỗi.
 
-* :mod:`webbrowser`: A module that provides a platform independent way to launch
-  a web browser on a specific URL. For each platform, various browsers are tried
-  in a specific order. The user can alter which browser is launched by setting the
-  *BROWSER* environment variable.  (Originally inspired by Eric S. Raymond's patch
-  to :mod:`urllib` which added similar functionality, but the final module comes
-  from code originally  implemented by Fred Drake as
-  :file:`Tools/idle/BrowserControl.py`, and adapted for the standard library by
-  Fred.)
+* :mod:`webbrowser`: Một module cung cấp cách độc lập với nền tảng để khởi chạy trình duyệt web tại một URL cụ thể. Với mỗi nền tảng, nhiều trình duyệt khác nhau được thử theo một thứ tự cụ thể. Người dùng có thể thay đổi trình duyệt được khởi chạy bằng cách đặt biến môi trường *BROWSER*.  (Ban đầu được lấy cảm hứng từ bản vá của Eric S. Raymond cho :mod:`urllib`, bổ sung chức năng tương tự, nhưng module cuối cùng được xây dựng từ mã do Fred Drake triển khai ban đầu dưới dạng
+  :file:`Tools/idle/BrowserControl.py`, và được Fred chuyển thể cho thư viện chuẩn.)
 
-* :mod:`_winreg <winreg>`: An interface to the Windows registry.  :mod:`!_winreg` is an
-  adaptation of functions that have been part of PythonWin since 1995, but has now
-  been added to the core  distribution, and enhanced to support Unicode.
-  :mod:`!_winreg` was written by Bill Tutt and Mark Hammond.
+* :mod:`_winreg <winreg>`: Một giao diện với Windows registry.  :mod:`!_winreg` là bản chuyển thể của các hàm đã là một phần của PythonWin từ năm 1995, nhưng hiện đã được thêm vào bản phân phối cốt lõi và được cải tiến để hỗ trợ Unicode.
+  :mod:`!_winreg` được viết bởi Bill Tutt và Mark Hammond.
 
-* :mod:`zipfile`: A module for reading and writing ZIP-format archives.  These
-  are archives produced by :program:`PKZIP` on DOS/Windows or :program:`zip` on
-  Unix, not to be confused with :program:`gzip`\ -format files (which are
-  supported by the :mod:`gzip` module) (Contributed by James C. Ahlstrom.)
+* :mod:`zipfile`: Một module dùng để đọc và ghi các archive ở định dạng ZIP.  Đây là các archive được tạo bởi :program:`PKZIP` trên DOS/Windows hoặc :program:`zip` trên Unix, không nên nhầm với các tệp ở định dạng :program:`gzip`\  (được module :mod:`gzip` hỗ trợ) (Do James C. Ahlstrom đóng góp.)
 
-* :mod:`!imputil`: A module that provides a simpler way for writing customized
-  import hooks, in comparison to the existing :mod:`!ihooks` module.  (Implemented
-  by Greg Stein, with much discussion on python-dev along the way.)
+* :mod:`!imputil`: Một module cung cấp cách đơn giản hơn để viết các import hook tùy chỉnh, so với module :mod:`!ihooks` hiện có.  (Được Greg Stein triển khai, cùng với nhiều cuộc thảo luận trên python-dev trong quá trình đó.)
 
 .. ======================================================================
 
 
-IDLE Improvements
-=================
+Cải tiến IDLE
+=============
 
-IDLE is the official Python cross-platform IDE, written using Tkinter. Python
-2.0 includes IDLE 0.6, which adds a number of new features and improvements.  A
-partial list:
+IDLE là IDE đa nền tảng chính thức của Python, được viết bằng Tkinter. Python 2.0 bao gồm IDLE 0.6, bổ sung một số tính năng và cải tiến mới. Danh sách chưa đầy đủ:
 
-* UI improvements and optimizations, especially in the area of syntax
-  highlighting and auto-indentation.
+* Cải tiến và tối ưu hóa UI, đặc biệt trong lĩnh vực tô sáng cú pháp và tự động thụt lề.
 
-* The class browser now shows more information, such as the top level functions
-  in a module.
+* Trình duyệt lớp hiện hiển thị nhiều thông tin hơn, chẳng hạn như các hàm cấp cao nhất trong một module.
 
-* Tab width is now a user settable option. When opening an existing Python file,
-  IDLE automatically detects the indentation conventions, and adapts.
+* Độ rộng tab hiện là một tùy chọn mà người dùng có thể thiết lập. Khi mở một tệp Python hiện có, IDLE tự động phát hiện quy ước thụt lề và điều chỉnh theo.
 
-* There is now support for calling browsers on various platforms, used to open
-  the Python documentation in a browser.
+* Hiện đã hỗ trợ gọi trình duyệt trên nhiều nền tảng khác nhau, dùng để mở tài liệu Python trong trình duyệt.
 
-* IDLE now has a command line, which is largely similar to  the vanilla Python
-  interpreter.
+* IDLE hiện có dòng lệnh, nhìn chung tương tự trình thông dịch Python nguyên bản.
 
-* Call tips were added in many places.
+* Đã bổ sung gợi ý gọi hàm ở nhiều nơi.
 
-* IDLE can now be installed as a package.
+* Giờ đây có thể cài đặt IDLE dưới dạng package.
 
-* In the editor window, there is now a line/column bar at the bottom.
+* Trong cửa sổ trình soạn thảo, giờ đây có thanh dòng/cột ở phía dưới.
 
-* Three new keystroke commands: Check module (:kbd:`Alt-F5`), Import module (:kbd:`F5`) and
-  Run script (:kbd:`Ctrl-F5`).
+* Ba lệnh gõ phím mới: Check module (:kbd:`Alt-F5`), Import module (:kbd:`F5`) và Run script (:kbd:`Ctrl-F5`).
 
 .. ======================================================================
 
 
-Deleted and Deprecated Modules
-==============================
+Các module đã bị xóa và không còn được khuyến nghị
+==================================================
 
-A few modules have been dropped because they're obsolete, or because there are
-now better ways to do the same thing.  The :mod:`!stdwin` module is gone; it was
-for a platform-independent windowing toolkit that's no longer developed.
+Một vài module đã bị loại bỏ vì chúng đã lỗi thời hoặc vì hiện đã có những cách tốt hơn để thực hiện cùng một việc. Module :mod:`!stdwin` đã bị loại bỏ; module này dùng cho một bộ công cụ cửa sổ độc lập với nền tảng nhưng hiện không còn được phát triển.
 
-A number of modules have been moved to the :file:`lib-old` subdirectory:
+Một số module đã được chuyển vào thư mục con :file:`lib-old`:
 :mod:`!cmp`, :mod:`!cmpcache`, :mod:`!dircmp`, :mod:`!dump`,  :mod:`!find`,
 :mod:`!grep`, :mod:`!packmail`,  :mod:`!poly`, :mod:`!util`, :mod:`!whatsound`,
-:mod:`!zmod`.  If you have code which relies on a module  that's been moved to
-:file:`lib-old`, you can simply add that directory to ``sys.path``   to get them
-back, but you're encouraged to update any code that uses these modules.
+:mod:`!zmod`. Nếu bạn có mã dựa vào một module đã được chuyển đến
+:file:`lib-old`, bạn chỉ cần thêm thư mục đó vào ``sys.path`` để khôi phục chúng, nhưng chúng tôi khuyến khích bạn cập nhật mọi mã sử dụng các module này.
 
 
-Acknowledgements
-================
+Lời cảm ơn
+==========
 
-The authors would like to thank the following people for offering suggestions on
-various drafts of this article: David Bolen, Mark Hammond, Gregg Hauser, Jeremy
-Hylton, Fredrik Lundh, Detlef Lannert, Aahz Maruch, Skip Montanaro, Vladimir
-Marangozov, Tobias Polzin, Guido van Rossum, Neil Schemenauer, and Russ Schmidt.
+Các tác giả xin cảm ơn những người sau đây đã đưa ra đề xuất cho nhiều bản thảo khác nhau của bài viết này: David Bolen, Mark Hammond, Gregg Hauser, Jeremy Hylton, Fredrik Lundh, Detlef Lannert, Aahz Maruch, Skip Montanaro, Vladimir Marangozov, Tobias Polzin, Guido van Rossum, Neil Schemenauer và Russ Schmidt.
 

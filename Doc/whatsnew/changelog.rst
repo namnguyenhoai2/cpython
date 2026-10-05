@@ -2,8 +2,8 @@
 
 .. default-role:: py:obj
 
-+++++++++
-Changelog
-+++++++++
+++++++++++++++++
+Nhật ký thay đổi
+++++++++++++++++
 
 .. miscnews:: ../build/NEWS

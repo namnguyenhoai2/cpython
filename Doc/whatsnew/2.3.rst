@@ -1,6 +1,6 @@
-****************************
-  What's New in Python 2.3
-****************************
+**************************
+Có gì mới trong Python 2.3
+**************************
 
 :Author: A.M. Kuchling
 
@@ -8,46 +8,25 @@
 
 .. $Id: whatsnew23.tex 54631 2007-03-31 11:58:36Z georg.brandl $
 
-This article explains the new features in Python 2.3.  Python 2.3 was released
-on July 29, 2003.
+Bài viết này giải thích các tính năng mới trong Python 2.3. Python 2.3 được phát hành vào ngày 29 tháng 7 năm 2003.
 
-The main themes for Python 2.3 are polishing some of the features added in 2.2,
-adding various small but useful enhancements to the core language, and expanding
-the standard library.  The new object model introduced in the previous version
-has benefited from 18 months of bugfixes and from optimization efforts that have
-improved the performance of new-style classes.  A few new built-in functions
-have been added such as :func:`sum` and :func:`enumerate`.  The :keyword:`in`
-operator can now be used for substring searches (e.g. ``"ab" in "abc"`` returns
+Các chủ đề chính của Python 2.3 là hoàn thiện một số tính năng được thêm vào trong 2.2, bổ sung nhiều cải tiến nhỏ nhưng hữu ích cho ngôn ngữ cốt lõi và mở rộng thư viện chuẩn. Mô hình đối tượng mới được giới thiệu trong phiên bản trước đã được hưởng lợi từ 18 tháng sửa lỗi và các nỗ lực tối ưu hóa, giúp cải thiện hiệu năng của các lớp kiểu mới. Một vài hàm dựng sẵn mới đã được thêm vào, chẳng hạn như :func:`sum` và :func:`enumerate`. Toán tử :keyword:`in` giờ đây có thể được sử dụng để tìm kiếm chuỗi con (ví dụ: ``"ab" in "abc"`` trả về
 :const:`True`).
 
-Some of the many new library features include Boolean, set, heap, and date/time
-data types, the ability to import modules from ZIP-format archives, metadata
-support for the long-awaited Python catalog, an updated version of IDLE, and
-modules for logging messages, wrapping text, parsing CSV files, processing
-command-line options, using BerkeleyDB databases...  the list of new and
-enhanced modules is lengthy.
+Một số trong rất nhiều tính năng thư viện mới bao gồm các kiểu dữ liệu Boolean, tập hợp, heap và ngày/giờ, khả năng import module từ các kho lưu trữ định dạng ZIP, hỗ trợ metadata cho Python catalog được mong đợi từ lâu, phiên bản IDLE được cập nhật và các module để ghi log message, ngắt dòng văn bản, phân tích tệp CSV, xử lý tùy chọn dòng lệnh, sử dụng cơ sở dữ liệu BerkeleyDB... danh sách các module mới và được cải tiến rất dài.
 
-This article doesn't attempt to provide a complete specification of the new
-features, but instead provides a convenient overview.  For full details, you
-should refer to the documentation for Python 2.3, such as the Python Library
-Reference and the Python Reference Manual.  If you want to understand the
-complete implementation and design rationale, refer to the PEP for a particular
-new feature.
+Bài viết này không nhằm cung cấp đặc tả đầy đủ về các tính năng mới mà chỉ cung cấp một phần tổng quan thuận tiện. Để biết đầy đủ chi tiết, bạn nên tham khảo tài liệu dành cho Python 2.3, chẳng hạn như Python Library Reference và Python Reference Manual. Nếu muốn hiểu toàn bộ cách triển khai và cơ sở lý luận thiết kế, hãy tham khảo PEP tương ứng với từng tính năng mới.
 
 .. ======================================================================
 
 
-PEP 218: A Standard Set Datatype
-================================
+PEP 218: Kiểu dữ liệu tập hợp tiêu chuẩn
+========================================
 
-The new :mod:`!sets` module contains an implementation of a set datatype.  The
-:class:`Set` class is for mutable sets, sets that can have members added and
-removed.  The :class:`!ImmutableSet` class is for sets that can't be modified,
-and instances of :class:`!ImmutableSet` can therefore be used as dictionary keys.
-Sets are built on top of dictionaries, so the elements within a set must be
-hashable.
+Mô-đun :mod:`!sets` mới chứa một cách triển khai kiểu dữ liệu set.
+Lớp :class:`Set` dùng cho các set có thể thay đổi, tức là có thể thêm và xóa phần tử.  Lớp :class:`!ImmutableSet` dùng cho các set không thể sửa đổi, vì vậy các thực thể của :class:`!ImmutableSet` có thể được dùng làm khóa từ điển. Set được xây dựng dựa trên dictionary, nên các phần tử trong một set phải có thể băm được.
 
-Here's a simple example::
+Dưới đây là một ví dụ đơn giản::
 
    >>> import sets
    >>> S = sets.Set([1,2,3])
@@ -63,10 +42,9 @@ Here's a simple example::
    Set([1, 2, 5])
    >>>
 
-The union and intersection of sets can be computed with the :meth:`~frozenset.union` and
-:meth:`~frozenset.intersection` methods; an alternative notation uses the bitwise operators
-``&`` and ``|``. Mutable sets also have in-place versions of these methods,
-:meth:`!union_update` and :meth:`~set.intersection_update`. ::
+Có thể tính hợp và giao của các set bằng các phương thức :meth:`~frozenset.union` và
+:meth:`~frozenset.intersection`; một ký hiệu thay thế sử dụng các toán tử bitwise ``&`` và ``|``. Các set có thể thay đổi cũng có các phiên bản tại chỗ của những phương thức này là
+:meth:`!union_update` và :meth:`~set.intersection_update`.::
 
    >>> S1 = sets.Set([1,2,3])
    >>> S2 = sets.Set([4,5,6])
@@ -83,11 +61,7 @@ The union and intersection of sets can be computed with the :meth:`~frozenset.un
    Set([1, 2, 3, 4, 5, 6])
    >>>
 
-It's also possible to take the symmetric difference of two sets.  This is the
-set of all elements in the union that aren't in the intersection.  Another way
-of putting it is that the symmetric difference contains all elements that are in
-exactly one set.  Again, there's an alternative notation (``^``), and an
-in-place version with the ungainly name :meth:`~set.symmetric_difference_update`. ::
+Bạn cũng có thể lấy hiệu đối xứng của hai set. Đây là tập hợp tất cả các phần tử trong hợp nhưng không nằm trong giao. Nói cách khác, hiệu đối xứng chứa tất cả các phần tử chỉ nằm trong đúng một set. Một lần nữa, có một ký hiệu thay thế (``^``) và một phiên bản tại chỗ với tên gọi khá vụng về là :meth:`~set.symmetric_difference_update`.::
 
    >>> S1 = sets.Set([1,2,3,4])
    >>> S2 = sets.Set([3,4,5,6])
@@ -97,8 +71,7 @@ in-place version with the ungainly name :meth:`~set.symmetric_difference_update`
    Set([1, 2, 5, 6])
    >>>
 
-There are also :meth:`!issubset` and :meth:`!issuperset` methods for checking
-whether one set is a subset or superset of another::
+Ngoài ra còn có các phương thức :meth:`!issubset` và :meth:`!issuperset` để kiểm tra xem một tập hợp có phải là tập con hoặc tập cha của một tập hợp khác hay không::
 
    >>> S1 = sets.Set([1,2,3])
    >>> S2 = sets.Set([2,3])
@@ -113,60 +86,37 @@ whether one set is a subset or superset of another::
 
 .. seealso::
 
-   :pep:`218` - Adding a Built-In Set Object Type
-      PEP written by Greg V. Wilson. Implemented by Greg V. Wilson, Alex Martelli, and
-      GvR.
+   :pep:`218` - Thêm kiểu đối tượng Set tích hợp sẵn
+      PEP do Greg V. Wilson viết. Được triển khai bởi Greg V. Wilson, Alex Martelli và GvR.
 
 .. ======================================================================
 
 
 .. _section-generators:
 
-PEP 255: Simple Generators
-==========================
+PEP 255: Generator đơn giản
+===========================
 
-In Python 2.2, generators were added as an optional feature, to be enabled by a
-``from __future__ import generators`` directive.  In 2.3 generators no longer
-need to be specially enabled, and are now always present; this means that
-:keyword:`yield` is now always a keyword.  The rest of this section is a copy of
-the description of generators from the "What's New in Python 2.2" document; if
-you read it back when Python 2.2 came out, you can skip the rest of this
-section.
+Trong Python 2.2, generator được bổ sung dưới dạng một tính năng tùy chọn, cần được bật bằng chỉ thị ``from __future__ import generators``. Trong 2.3, generator không còn cần được bật riêng và hiện luôn có sẵn; điều này có nghĩa là
+:keyword:`yield` hiện luôn là một keyword. Phần còn lại của mục này là bản sao phần mô tả về generator trong tài liệu "What's New in Python 2.2"; nếu bạn đã đọc phần đó khi Python 2.2 ra mắt, bạn có thể bỏ qua phần còn lại của mục này.
 
-You're doubtless familiar with how function calls work in Python or C. When you
-call a function, it gets a private namespace where its local variables are
-created.  When the function reaches a :keyword:`return` statement, the local
-variables are destroyed and the resulting value is returned to the caller.  A
-later call to the same function will get a fresh new set of local variables.
-But, what if the local variables weren't thrown away on exiting a function?
-What if you could later resume the function where it left off?  This is what
-generators provide; they can be thought of as resumable functions.
+Chắc hẳn bạn đã quen với cách lời gọi hàm hoạt động trong Python hoặc C. Khi gọi một hàm, hàm đó nhận được một namespace riêng, nơi các biến cục bộ của nó được tạo ra. Khi hàm gặp câu lệnh :keyword:`return`, các biến cục bộ sẽ bị hủy và giá trị thu được được trả về cho bên gọi. Lần gọi sau đến cùng hàm đó sẽ nhận một tập biến cục bộ mới hoàn toàn. Nhưng nếu các biến cục bộ không bị loại bỏ khi thoát khỏi hàm thì sao? Nếu sau đó bạn có thể tiếp tục hàm từ nơi nó dừng lại thì sao? Đây chính là điều generator cung cấp; có thể xem chúng như những hàm có thể tiếp tục thực thi.
 
-Here's the simplest example of a generator function::
+Đây là ví dụ đơn giản nhất về một hàm generator::
 
    def generate_ints(N):
        for i in range(N):
            yield i
 
-A new keyword, :keyword:`yield`, was introduced for generators.  Any function
-containing a :keyword:`!yield` statement is a generator function; this is
-detected by Python's bytecode compiler which compiles the function specially as
-a result.
+Một từ khóa mới, :keyword:`yield`, đã được giới thiệu cho generator. Bất kỳ hàm nào chứa câu lệnh :keyword:`!yield` đều là một hàm generator; điều này được trình biên dịch bytecode của Python phát hiện, và do đó hàm được biên dịch theo cách đặc biệt.
 
-When you call a generator function, it doesn't return a single value; instead it
-returns a generator object that supports the iterator protocol.  On executing
-the :keyword:`yield` statement, the generator outputs the value of ``i``,
-similar to a :keyword:`return` statement.  The big difference between
-:keyword:`!yield` and a :keyword:`!return` statement is that on reaching a
-:keyword:`!yield` the generator's state of execution is suspended and local
-variables are preserved.  On the next call to the generator's ``.next()``
-method, the function will resume executing immediately after the
-:keyword:`!yield` statement.  (For complicated reasons, the :keyword:`!yield`
-statement isn't allowed inside the :keyword:`try` block of a
-:keyword:`!try`...\ :keyword:`!finally` statement; read :pep:`255` for a full
-explanation of the interaction between :keyword:`!yield` and exceptions.)
+Khi bạn gọi một hàm generator, hàm không trả về một giá trị duy nhất; thay vào đó, hàm trả về một đối tượng generator hỗ trợ iterator protocol. Khi thực thi câu lệnh :keyword:`yield`, generator xuất ra giá trị của ``i``, tương tự như một câu lệnh :keyword:`return`. Điểm khác biệt lớn giữa
+:keyword:`!yield` và một câu lệnh :keyword:`!return` là khi gặp một
+:keyword:`!yield`, trạng thái thực thi của generator bị tạm dừng và các biến cục bộ được bảo toàn. Trong lần gọi tiếp theo đến phương thức ``.next()`` của generator, hàm sẽ tiếp tục thực thi ngay sau
+câu lệnh :keyword:`!yield`. (Vì những lý do phức tạp, câu lệnh :keyword:`!yield` không được phép nằm trong khối :keyword:`try` của một
+câu lệnh :keyword:`!try`...\ :keyword:`!finally`; hãy đọc :pep:`255` để biết giải thích đầy đủ về sự tương tác giữa :keyword:`!yield` và các ngoại lệ.)
 
-Here's a sample usage of the :func:`!generate_ints` generator::
+Sau đây là một ví dụ sử dụng generator :func:`!generate_ints`::
 
    >>> gen = generate_ints(3)
    >>> gen
@@ -183,25 +133,11 @@ Here's a sample usage of the :func:`!generate_ints` generator::
      File "stdin", line 2, in generate_ints
    StopIteration
 
-You could equally write ``for i in generate_ints(5)``, or ``a,b,c =
-generate_ints(3)``.
+Bạn cũng có thể viết ``for i in generate_ints(5)``, hoặc ``a,b,c = generate_ints(3)``.
 
-Inside a generator function, the :keyword:`return` statement can only be used
-without a value, and signals the end of the procession of values; afterwards the
-generator cannot return any further values. :keyword:`!return` with a value, such
-as ``return 5``, is a syntax error inside a generator function.  The end of the
-generator's results can also be indicated by raising :exc:`StopIteration`
-manually, or by just letting the flow of execution fall off the bottom of the
-function.
+Bên trong một hàm generator, câu lệnh :keyword:`return` chỉ có thể được sử dụng mà không có giá trị và báo hiệu kết thúc chuỗi giá trị; sau đó generator không thể trả về thêm giá trị nào nữa. :keyword:`!return` kèm một giá trị, chẳng hạn như ``return 5``, là lỗi cú pháp bên trong hàm generator. Phần kết quả cuối cùng của generator cũng có thể được chỉ ra bằng cách tự raising :exc:`StopIteration`, hoặc đơn giản là để luồng thực thi đi hết phần cuối của hàm.
 
-You could achieve the effect of generators manually by writing your own class
-and storing all the local variables of the generator as instance variables.  For
-example, returning a list of integers could be done by setting ``self.count`` to
-0, and having the :meth:`next` method increment ``self.count`` and return it.
-However, for a moderately complicated generator, writing a corresponding class
-would be much messier. :file:`Lib/test/test_generators.py` contains a number of
-more interesting examples.  The simplest one implements an in-order traversal of
-a tree using generators recursively. ::
+Bạn có thể tự thực hiện hiệu ứng của generator bằng cách viết một class riêng và lưu tất cả biến cục bộ của generator dưới dạng biến instance. Ví dụ, để trả về một danh sách các số nguyên, bạn có thể đặt ``self.count`` thành 0, rồi để phương thức :meth:`next` tăng ``self.count`` và trả về nó. Tuy nhiên, với một generator phức tạp vừa phải, việc viết một class tương ứng sẽ rắc rối hơn nhiều. :file:`Lib/test/test_generators.py` chứa một số ví dụ thú vị hơn. Ví dụ đơn giản nhất thực hiện việc duyệt cây theo thứ tự bằng cách sử dụng các generator đệ quy.::
 
    # A recursive generator that generates Tree leaves in in-order.
    def inorder(t):
@@ -212,86 +148,54 @@ a tree using generators recursively. ::
            for x in inorder(t.right):
                yield x
 
-Two other examples in :file:`Lib/test/test_generators.py` produce solutions for
-the N-Queens problem (placing $N$ queens on an $NxN$ chess board so that no
-queen threatens another) and the Knight's Tour (a route that takes a knight to
-every square of an $NxN$ chessboard without visiting any square twice).
+Hai ví dụ khác trong :file:`Lib/test/test_generators.py` đưa ra lời giải cho bài toán N-Queens (đặt $N$ quân hậu trên một bàn cờ $NxN$ sao cho không quân hậu nào đe dọa quân hậu khác) và Knight's Tour (một lộ trình đưa một quân mã đi qua mọi ô trên bàn cờ $NxN$ mà không đi qua bất kỳ ô nào hai lần).
 
-The idea of generators comes from other programming languages, especially Icon
-(https://www2.cs.arizona.edu/icon/), where the idea of generators is central.  In
-Icon, every expression and function call behaves like a generator.  One example
-from "An Overview of the Icon Programming Language" at
-https://www2.cs.arizona.edu/icon/docs/ipd266.htm gives an idea of what this looks
-like::
+Ý tưởng về generator bắt nguồn từ các ngôn ngữ lập trình khác, đặc biệt là Icon (https://www2.cs.arizona.edu/icon/), nơi ý tưởng về generator giữ vai trò trung tâm. Trong Icon, mọi biểu thức và lời gọi hàm đều hoạt động như một generator. Một ví dụ từ "An Overview of the Icon Programming Language" tại https://www2.cs.arizona.edu/icon/docs/ipd266.htm cho thấy điều này trông như thế nào::
 
    sentence := "Store it in the neighboring harbor"
    if (i := find("or", sentence)) > 5 then write(i)
 
-In Icon the :func:`!find` function returns the indexes at which the substring
-"or" is found: 3, 23, 33.  In the :keyword:`if` statement, ``i`` is first
-assigned a value of 3, but 3 is less than 5, so the comparison fails, and Icon
-retries it with the second value of 23.  23 is greater than 5, so the comparison
-now succeeds, and the code prints the value 23 to the screen.
+Trong Icon, hàm :func:`!find` trả về các chỉ mục tại đó chuỗi con "or" được tìm thấy: 3, 23, 33. Trong câu lệnh :keyword:`if`, ``i`` trước tiên được gán giá trị 3, nhưng 3 nhỏ hơn 5 nên phép so sánh thất bại, và Icon thử lại với giá trị thứ hai là 23. 23 lớn hơn 5, vì vậy phép so sánh lần này thành công và mã in giá trị 23 ra màn hình.
 
-Python doesn't go nearly as far as Icon in adopting generators as a central
-concept.  Generators are considered part of the core Python language, but
-learning or using them isn't compulsory; if they don't solve any problems that
-you have, feel free to ignore them. One novel feature of Python's interface as
-compared to Icon's is that a generator's state is represented as a concrete
-object (the iterator) that can be passed around to other functions or stored in
-a data structure.
+Python không tiến xa đến mức như Icon trong việc áp dụng generator như một khái niệm trung tâm. Generator được xem là một phần của ngôn ngữ Python cốt lõi, nhưng việc học hoặc sử dụng chúng không bắt buộc; nếu chúng không giải quyết vấn đề nào của bạn, bạn hoàn toàn có thể bỏ qua. Một tính năng mới lạ trong interface của Python so với Icon là trạng thái của generator được biểu diễn bằng một đối tượng cụ thể (iterator) có thể được truyền cho các hàm khác hoặc lưu trữ trong một cấu trúc dữ liệu.
 
 
 .. seealso::
 
-   :pep:`255` - Simple Generators
-      Written by Neil Schemenauer, Tim Peters, Magnus Lie Hetland.  Implemented mostly
-      by Neil Schemenauer and Tim Peters, with other fixes from the Python Labs crew.
+   :pep:`255` - Generator đơn giản
+      Được viết bởi Neil Schemenauer, Tim Peters, Magnus Lie Hetland. Được triển khai phần lớn bởi Neil Schemenauer và Tim Peters, cùng các bản sửa lỗi khác từ đội ngũ Python Labs.
 
 .. ======================================================================
 
 
 .. _section-encodings:
 
-PEP 263: Source Code Encodings
-==============================
+PEP 263: Mã hóa mã nguồn
+========================
 
-Python source files can now be declared as being in different character set
-encodings.  Encodings are declared by including a specially formatted comment in
-the first or second line of the source file.  For example, a UTF-8 file can be
-declared with::
+Các tệp mã nguồn Python giờ đây có thể được khai báo là sử dụng những encoding bộ ký tự khác nhau. Encoding được khai báo bằng cách đưa một comment có định dạng đặc biệt vào dòng đầu tiên hoặc dòng thứ hai của tệp mã nguồn. Ví dụ, một tệp UTF-8 có thể được khai báo bằng::
 
    #!/usr/bin/env python
    # -*- coding: UTF-8 -*-
 
-Without such an encoding declaration, the default encoding used is 7-bit ASCII.
-Executing or importing modules that contain string literals with 8-bit
-characters and have no encoding declaration will result in a
-:exc:`DeprecationWarning` being signalled by Python 2.3; in 2.4 this will be a
-syntax error.
+Nếu không có khai báo encoding như vậy, encoding mặc định được sử dụng là ASCII 7-bit. Việc thực thi hoặc import các module chứa string literal có ký tự 8-bit nhưng không có khai báo encoding sẽ dẫn đến việc
+:exc:`DeprecationWarning` được Python 2.3 phát sinh; trong 2.4, đây sẽ là một lỗi cú pháp.
 
-The encoding declaration only affects Unicode string literals, which will be
-converted to Unicode using the specified encoding.  Note that Python identifiers
-are still restricted to ASCII characters, so you can't have variable names that
-use characters outside of the usual alphanumerics.
+Khai báo encoding chỉ ảnh hưởng đến các literal chuỗi Unicode, vốn sẽ được chuyển đổi sang Unicode bằng encoding đã chỉ định. Lưu ý rằng các identifier của Python vẫn bị giới hạn ở các ký tự ASCII, vì vậy bạn không thể có tên biến sử dụng các ký tự nằm ngoài các ký tự chữ và số thông thường.
 
 
 .. seealso::
 
-   :pep:`263` - Defining Python Source Code Encodings
-      Written by Marc-André Lemburg and Martin von Löwis; implemented by Suzuki Hisao
-      and Martin von Löwis.
+   :pep:`263` - Xác định encoding cho mã nguồn Python
+      Do Marc-André Lemburg và Martin von Löwis viết; được Suzuki Hisao và Martin von Löwis triển khai.
 
 .. ======================================================================
 
 
-PEP 273: Importing Modules from ZIP Archives
-============================================
+PEP 273: Nhập module từ các kho lưu trữ ZIP
+===========================================
 
-The new :mod:`zipimport` module adds support for importing modules from a
-ZIP-format archive.  You don't need to import the module explicitly; it will be
-automatically imported if a ZIP archive's filename is added to ``sys.path``.
-For example:
+Module :mod:`zipimport` mới bổ sung khả năng nhập module từ một kho lưu trữ định dạng ZIP. Bạn không cần nhập module này một cách rõ ràng; module sẽ được tự động nhập nếu tên tệp của một kho lưu trữ ZIP được thêm vào ``sys.path``. Ví dụ:
 
 .. code-block:: shell-session
 
@@ -311,59 +215,43 @@ For example:
    '/tmp/example.zip/jwzthreading.py'
    >>>
 
-An entry in ``sys.path`` can now be the filename of a ZIP archive. The ZIP
-archive can contain any kind of files, but only files named :file:`\*.py`,
-:file:`\*.pyc`, or :file:`\*.pyo` can be imported.  If an archive only contains
-:file:`\*.py` files, Python will not attempt to modify the archive by adding the
-corresponding :file:`\*.pyc` file, meaning that if a ZIP archive doesn't contain
-:file:`\*.pyc` files, importing may be rather slow.
+Một mục trong ``sys.path`` giờ đây có thể là tên tệp của một kho lưu trữ ZIP. Kho lưu trữ ZIP có thể chứa bất kỳ loại tệp nào, nhưng chỉ các tệp có tên :file:`\*.py`,
+:file:`\*.pyc`, hoặc :file:`\*.pyo` mới có thể được nhập. Nếu một kho lưu trữ chỉ chứa
+:file:`\*.py` tệp, Python sẽ không cố gắng sửa đổi kho lưu trữ bằng cách thêm tệp :file:`\*.pyc` tương ứng, nghĩa là nếu một kho lưu trữ ZIP không chứa
+:file:`\*.pyc` tệp, việc import có thể khá chậm.
 
-A path within the archive can also be specified to only import from a
-subdirectory; for example, the path :file:`/tmp/example.zip/lib/` would only
-import from the :file:`lib/` subdirectory within the archive.
+Bạn cũng có thể chỉ định một đường dẫn bên trong kho lưu trữ để chỉ import từ một thư mục con; ví dụ: đường dẫn :file:`/tmp/example.zip/lib/` sẽ chỉ import từ thư mục con :file:`lib/` bên trong kho lưu trữ.
 
 
 .. seealso::
 
    :pep:`273` - Import Modules from Zip Archives
-      Written by James C. Ahlstrom,  who also provided an implementation. Python 2.3
-      follows the specification in :pep:`273`,  but uses an implementation written by
-      Just van Rossum  that uses the import hooks described in :pep:`302`. See section
-      :ref:`section-pep302` for a description of the new import hooks.
+      Được viết bởi James C. Ahlstrom, người cũng cung cấp một bản triển khai. Python 2.3 tuân theo đặc tả trong :pep:`273`, nhưng sử dụng bản triển khai do Just van Rossum viết, dùng các import hook được mô tả trong :pep:`302`. Xem phần
+      :ref:`section-pep302` để biết mô tả về các import hook mới.
 
 .. ======================================================================
 
 
-PEP 277: Unicode file name support for Windows NT
-=================================================
+PEP 277: Hỗ trợ tên tệp Unicode cho Windows NT
+==============================================
 
-On Windows NT, 2000, and XP, the system stores file names as Unicode strings.
-Traditionally, Python has represented file names as byte strings, which is
-inadequate because it renders some file names inaccessible.
+Trên Windows NT, 2000 và XP, hệ thống lưu tên tệp dưới dạng chuỗi Unicode. Theo cách truyền thống, Python biểu diễn tên tệp dưới dạng chuỗi byte, điều này không phù hợp vì khiến một số tên tệp không thể truy cập được.
 
-Python now allows using arbitrary Unicode strings (within the limitations of the
-file system) for all functions that expect file names, most notably the
-:func:`open` built-in function. If a Unicode string is passed to
-:func:`os.listdir`, Python now returns a list of Unicode strings.  A new
-function, :func:`!os.getcwdu`, returns the current directory as a Unicode string.
+Python hiện cho phép sử dụng các chuỗi Unicode bất kỳ (trong phạm vi giới hạn của hệ thống tệp) cho mọi hàm yêu cầu tên tệp, đáng chú ý nhất là
+:func:`open` hàm dựng sẵn. Nếu truyền một chuỗi Unicode cho
+:func:`os.listdir`, Python hiện trả về một danh sách các chuỗi Unicode. Một hàm mới, :func:`!os.getcwdu`, trả về thư mục hiện tại dưới dạng chuỗi Unicode.
 
-Byte strings still work as file names, and on Windows Python will transparently
-convert them to Unicode using the ``mbcs`` encoding.
+Các chuỗi byte vẫn có thể được dùng làm tên tệp, và trên Windows, Python sẽ tự động chuyển đổi chúng sang Unicode bằng cách sử dụng encoding ``mbcs``.
 
-Other systems also allow Unicode strings as file names but convert them to byte
-strings before passing them to the system, which can cause a :exc:`UnicodeError`
-to be raised. Applications can test whether arbitrary Unicode strings are
-supported as file names by checking :const:`os.path.supports_unicode_filenames`,
-a Boolean value.
+Các hệ thống khác cũng cho phép sử dụng chuỗi Unicode làm tên tệp nhưng sẽ chuyển đổi chúng thành chuỗi byte trước khi truyền cho hệ thống, điều này có thể khiến :exc:`UnicodeError` được phát sinh. Ứng dụng có thể kiểm tra xem các chuỗi Unicode bất kỳ có được hỗ trợ làm tên tệp hay không bằng cách kiểm tra :const:`os.path.supports_unicode_filenames`, một giá trị Boolean.
 
-Under MacOS, :func:`os.listdir` may now return Unicode filenames.
+Trên MacOS, :func:`os.listdir` hiện có thể trả về tên tệp Unicode.
 
 
 .. seealso::
 
-   :pep:`277` - Unicode file name support for Windows NT
-      Written by Neil Hodgson; implemented by Neil Hodgson, Martin von Löwis, and Mark
-      Hammond.
+   :pep:`277` - Hỗ trợ tên tệp Unicode cho Windows NT
+      Do Neil Hodgson viết; Neil Hodgson, Martin von Löwis và Mark Hammond triển khai.
 
 .. ======================================================================
 
@@ -371,37 +259,25 @@ Under MacOS, :func:`os.listdir` may now return Unicode filenames.
 .. index::
    single: universal newlines; What's new
 
-PEP 278: Universal Newline Support
-==================================
+PEP 278: Hỗ trợ xuống dòng phổ quát
+===================================
 
-The three major operating systems used today are Microsoft Windows, Apple's
-Macintosh OS, and the various Unix derivatives.  A minor irritation of
-cross-platform work  is that these three platforms all use different characters to
-mark the ends of lines in text files.  Unix uses the linefeed (ASCII character
-10), MacOS uses the carriage return (ASCII character 13), and Windows uses a
-two-character sequence of a carriage return plus a newline.
+Ba hệ điều hành chính được sử dụng hiện nay là Microsoft Windows, Macintosh OS của Apple và các biến thể Unix khác nhau. Một điều khá bất tiện khi làm việc đa nền tảng là cả ba nền tảng này đều sử dụng các ký tự khác nhau để đánh dấu phần cuối dòng trong tệp văn bản. Unix sử dụng linefeed (ký tự ASCII 10), MacOS sử dụng carriage return (ký tự ASCII 13), còn Windows sử dụng một chuỗi gồm hai ký tự: carriage return cộng với newline.
 
-Python's file objects can now support end of line conventions other than the
-one followed by the platform on which Python is running. Opening a file with
-the mode ``'U'`` or ``'rU'`` will open a file for reading in :term:`universal
-newlines` mode.  All three line ending conventions will be translated to a
-``'\n'`` in the strings returned by the various file methods such as
-:meth:`!read` and :meth:`!readline`.
+Các đối tượng tệp của Python giờ đây có thể hỗ trợ những quy ước về phần cuối dòng khác với quy ước được nền tảng đang chạy Python sử dụng. Mở một tệp với chế độ ``'U'`` hoặc ``'rU'`` sẽ mở tệp để đọc ở chế độ :term:`universal newlines`. Cả ba quy ước kết thúc dòng sẽ được chuyển thành một ``'\n'`` trong các chuỗi được trả về bởi nhiều phương thức tệp khác nhau, chẳng hạn như
+:meth:`!read` và :meth:`!readline`.
 
-Universal newline support is also used when importing modules and when executing
-a file with the :func:`!execfile` function.  This means that Python modules can
-be shared between all three operating systems without needing to convert the
-line-endings.
+Hỗ trợ xuống dòng phổ quát cũng được sử dụng khi nhập các module và khi thực thi một tệp bằng hàm :func:`!execfile`. Điều này có nghĩa là các module Python có thể được chia sẻ giữa cả ba hệ điều hành mà không cần chuyển đổi phần cuối dòng.
 
-This feature can be disabled when compiling Python by specifying the
-:option:`!--without-universal-newlines` switch when running Python's
+Tính năng này có thể bị vô hiệu hóa khi biên dịch Python bằng cách chỉ định
+:option:`!--without-universal-newlines` switch khi chạy Python's
 :program:`configure` script.
 
 
 .. seealso::
 
    :pep:`278` - Universal Newline Support
-      Written and implemented by Jack Jansen.
+      Được viết và triển khai bởi Jack Jansen.
 
 .. ======================================================================
 
@@ -411,19 +287,16 @@ This feature can be disabled when compiling Python by specifying the
 PEP 279: enumerate()
 ====================
 
-A new built-in function, :func:`enumerate`, will make certain loops a bit
-clearer.  ``enumerate(thing)``, where *thing* is either an iterator or a
-sequence, returns an iterator that will return ``(0, thing[0])``, ``(1,
-thing[1])``, ``(2, thing[2])``, and so forth.
+Một hàm tích hợp sẵn mới, :func:`enumerate`, sẽ giúp một số vòng lặp trở nên rõ ràng hơn. ``enumerate(thing)``, trong đó *thing* là một iterator hoặc sequence, trả về một iterator lần lượt trả về ``(0, thing[0])``, ``(1, thing[1])``, ``(2, thing[2])``, v.v.
 
-A common idiom to change every element of a list looks like this::
+Một cách viết phổ biến để thay đổi mọi phần tử của một danh sách có dạng như sau::
 
    for i in range(len(L)):
        item = L[i]
        # ... compute some result based on item ...
        L[i] = result
 
-This can be rewritten using :func:`enumerate` as::
+Có thể viết lại đoạn này bằng cách sử dụng :func:`enumerate` như sau::
 
    for i, item in enumerate(L):
        # ... compute some result based on item ...
@@ -432,37 +305,20 @@ This can be rewritten using :func:`enumerate` as::
 
 .. seealso::
 
-   :pep:`279` - The enumerate() built-in function
-      Written and implemented by Raymond D. Hettinger.
+   :pep:`279` - Hàm tích hợp enumerate()
+      Được viết và triển khai bởi Raymond D. Hettinger.
 
 .. ======================================================================
 
 
-PEP 282: The logging Package
-============================
+PEP 282: Gói logging
+====================
 
-A standard package for writing logs, :mod:`logging`, has been added to Python
-2.3.  It provides a powerful and flexible mechanism for generating logging
-output which can then be filtered and processed in various ways.  A
-configuration file written in a standard format can be used to control the
-logging behavior of a program.  Python includes handlers that will write log
-records to standard error or to a file or socket, send them to the system log,
-or even e-mail them to a particular address; of course, it's also possible to
-write your own handler classes.
+Một package tiêu chuẩn để ghi log, :mod:`logging`, đã được thêm vào Python 2.3. Package này cung cấp một cơ chế mạnh mẽ và linh hoạt để tạo đầu ra log, sau đó có thể lọc và xử lý theo nhiều cách khác nhau. Có thể sử dụng tệp cấu hình được viết theo một định dạng tiêu chuẩn để điều khiển hành vi logging của chương trình. Python bao gồm các handler có thể ghi bản ghi log vào standard error, tệp hoặc socket, gửi chúng đến system log, hoặc thậm chí gửi chúng qua email đến một địa chỉ cụ thể; tất nhiên, bạn cũng có thể tự viết các lớp handler của riêng mình.
 
-The :class:`~logging.Logger` class is the primary class. Most application code will deal
-with one or more :class:`~logging.Logger` objects, each one used by a particular
-subsystem of the application. Each :class:`~logging.Logger` is identified by a name, and
-names are organized into a hierarchy using ``.``  as the component separator.
-For example, you might have :class:`~logging.Logger` instances named ``server``,
-``server.auth`` and ``server.network``.  The latter two instances are below
-``server`` in the hierarchy.  This means that if you turn up the verbosity for
-``server`` or direct ``server`` messages to a different handler, the changes
-will also apply to records logged to ``server.auth`` and ``server.network``.
-There's also a root :class:`~logging.Logger` that's the parent of all other loggers.
+Lớp :class:`~logging.Logger` là lớp chính. Hầu hết mã ứng dụng sẽ làm việc với một hoặc nhiều đối tượng :class:`~logging.Logger`, mỗi đối tượng được một subsystem cụ thể của ứng dụng sử dụng. Mỗi :class:`~logging.Logger` được xác định bằng một tên, và các tên được tổ chức theo cấu trúc phân cấp bằng ``.`` làm dấu phân cách thành phần. Ví dụ: bạn có thể có các instance :class:`~logging.Logger` có tên là ``server``, ``server.auth`` và ``server.network``. Hai instance sau nằm bên dưới ``server`` trong cấu trúc phân cấp. Điều này có nghĩa là nếu bạn tăng mức độ chi tiết cho ``server`` hoặc chuyển các message của ``server`` đến một handler khác, những thay đổi đó cũng sẽ áp dụng cho các bản ghi được ghi vào ``server.auth`` và ``server.network``. Ngoài ra còn có một :class:`~logging.Logger` root là cấp cha của tất cả logger khác.
 
-For simple uses, the :mod:`logging` package contains some convenience functions
-that always use the root log::
+Đối với những trường hợp sử dụng đơn giản, gói :mod:`logging` cung cấp một số hàm tiện ích luôn sử dụng root log::
 
    import logging
 
@@ -472,24 +328,17 @@ that always use the root log::
    logging.error('Error occurred')
    logging.critical('Critical error -- shutting down')
 
-This produces the following output::
+Lệnh này tạo ra kết quả sau::
 
    WARNING:root:Warning:config file server.conf not found
    ERROR:root:Error occurred
    CRITICAL:root:Critical error -- shutting down
 
-In the default configuration, informational and debugging messages are
-suppressed and the output is sent to standard error.  You can enable the display
-of informational and debugging messages by calling the :meth:`~logging.Logger.setLevel` method
-on the root logger.
+Trong cấu hình mặc định, các thông báo thông tin và debug bị ẩn, còn kết quả được gửi đến standard error. Bạn có thể bật hiển thị các thông báo thông tin và debug bằng cách gọi phương thức :meth:`~logging.Logger.setLevel` trên root logger.
 
-Notice the :func:`~logging.warning` call's use of string formatting operators; all of the
-functions for logging messages take the arguments ``(msg, arg1, arg2, ...)`` and
-log the string resulting from ``msg % (arg1, arg2, ...)``.
+Lưu ý rằng lời gọi :func:`~logging.warning` sử dụng các toán tử định dạng chuỗi; tất cả các hàm ghi log đều nhận các đối số ``(msg, arg1, arg2, ...)`` và ghi lại chuỗi tạo ra từ ``msg % (arg1, arg2, ...)``.
 
-There's also an :func:`~logging.exception` function that records the most recent
-traceback.  Any of the other functions will also record the traceback if you
-specify a true value for the keyword argument *exc_info*. ::
+Ngoài ra còn có hàm :func:`~logging.exception` ghi lại traceback gần nhất. Bất kỳ hàm nào khác cũng sẽ ghi lại traceback nếu bạn chỉ định giá trị true cho đối số từ khóa *exc_info*.::
 
    def f():
        try:    1/0
@@ -497,7 +346,7 @@ specify a true value for the keyword argument *exc_info*. ::
 
    f()
 
-This produces the following output::
+Lệnh này tạo ra kết quả sau::
 
    ERROR:root:Problem recorded
    Traceback (most recent call last):
@@ -505,9 +354,7 @@ This produces the following output::
        1/0
    ZeroDivisionError: integer division or modulo by zero
 
-Slightly more advanced programs will use a logger other than the root logger.
-The ``getLogger(name)`` function is used to get a particular log, creating
-it if it doesn't exist yet. ``getLogger(None)`` returns the root logger. ::
+Các chương trình nâng cao hơn một chút sẽ sử dụng logger khác với root logger. Hàm ``getLogger(name)`` được dùng để lấy một log cụ thể và tạo log đó nếu nó chưa tồn tại. ``getLogger(None)`` trả về root logger.::
 
    log = logging.getLogger('server')
     ...
@@ -516,47 +363,33 @@ it if it doesn't exist yet. ``getLogger(None)`` returns the root logger. ::
    log.critical('Disk full')
     ...
 
-Log records are usually propagated up the hierarchy, so a message logged to
-``server.auth`` is also seen by ``server`` and ``root``, but a :class:`~logging.Logger`
-can prevent this by setting its :attr:`~logging.Logger.propagate` attribute to :const:`False`.
+Các bản ghi log thường được truyền lên theo hệ thống phân cấp, vì vậy một thông báo được ghi vào ``server.auth`` cũng được thấy bởi ``server`` và ``root``, nhưng :class:`~logging.Logger` có thể ngăn việc này bằng cách đặt thuộc tính :attr:`~logging.Logger.propagate` của nó thành :const:`False`.
 
-There are more classes provided by the :mod:`logging` package that can be
-customized.  When a :class:`~logging.Logger` instance is told to log a message, it
-creates a :class:`~logging.LogRecord` instance that is sent to any number of different
-:class:`~logging.Handler` instances.  Loggers and handlers can also have an attached list
-of filters, and each filter can cause the :class:`~logging.LogRecord` to be ignored or
-can modify the record before passing it along.  When they're finally output,
-:class:`~logging.LogRecord` instances are converted to text by a :class:`~logging.Formatter`
-class.  All of these classes can be replaced by your own specially written
-classes.
+Gói :mod:`logging` còn cung cấp nhiều lớp khác có thể tùy chỉnh. Khi một đối tượng :class:`~logging.Logger` được yêu cầu ghi một thông báo, nó tạo một đối tượng :class:`~logging.LogRecord` và gửi đối tượng này đến bất kỳ số lượng nào trong các đối tượng khác nhau
+:class:`~logging.Handler`. Logger và handler cũng có thể có một danh sách filter đính kèm, và mỗi filter có thể khiến :class:`~logging.LogRecord` bị bỏ qua hoặc sửa đổi bản ghi trước khi truyền đi. Khi cuối cùng được xuất ra,
+các đối tượng :class:`~logging.LogRecord` được chuyển đổi thành văn bản bởi một lớp :class:`~logging.Formatter`. Tất cả các lớp này đều có thể được thay thế bằng những lớp do chính bạn viết riêng.
 
-With all of these features the :mod:`logging` package should provide enough
-flexibility for even the most complicated applications.  This is only an
-incomplete overview of its features, so please see the package's reference
-documentation for all of the details.  Reading :pep:`282` will also be helpful.
+Với tất cả các tính năng này, gói :mod:`logging` sẽ cung cấp đủ tính linh hoạt ngay cả cho những ứng dụng phức tạp nhất. Đây chỉ là phần tổng quan chưa đầy đủ về các tính năng của gói, vì vậy hãy xem tài liệu tham khảo của gói để biết tất cả chi tiết. Đọc :pep:`282` cũng sẽ hữu ích.
 
 
 .. seealso::
 
-   :pep:`282` - A Logging System
-      Written by Vinay Sajip and Trent Mick; implemented by Vinay Sajip.
+   :pep:`282` - Một hệ thống ghi log
+      Do Vinay Sajip và Trent Mick viết; Vinay Sajip triển khai.
 
 .. ======================================================================
 
 
 .. _section-bool:
 
-PEP 285: A Boolean Type
-=======================
+PEP 285: Kiểu Boolean
+=====================
 
-A Boolean type was added to Python 2.3.  Two new constants were added to the
-:mod:`!__builtin__` module, :const:`True` and :const:`False`.  (:const:`True` and
-:const:`False` constants were added to the built-ins in Python 2.2.1, but the
-2.2.1 versions are simply set to integer values of 1 and 0 and aren't a
-different type.)
+Kiểu Boolean được thêm vào Python 2.3. Hai hằng số mới được thêm vào
+:mod:`!__builtin__` module, :const:`True` và :const:`False`. (:const:`True` và
+:const:`False` constants được thêm vào các built-in trong Python 2.2.1, nhưng các phiên bản 2.2.1 chỉ được đặt thành các giá trị số nguyên 1 và 0 và không phải là một kiểu khác.)
 
-The type object for this new type is named :class:`bool`; the constructor for it
-takes any Python value and converts it to :const:`True` or :const:`False`. ::
+Đối tượng kiểu cho kiểu mới này có tên là :class:`bool`; constructor của nó nhận bất kỳ giá trị Python nào và chuyển đổi giá trị đó thành :const:`True` hoặc :const:`False`.::
 
    >>> bool(1)
    True
@@ -567,8 +400,7 @@ takes any Python value and converts it to :const:`True` or :const:`False`. ::
    >>> bool( (1,) )
    True
 
-Most of the standard library modules and built-in functions have been changed to
-return Booleans. ::
+Hầu hết các module trong standard library và các hàm built-in đã được thay đổi để trả về các giá trị Boolean.::
 
    >>> obj = []
    >>> hasattr(obj, 'append')
@@ -578,20 +410,9 @@ return Booleans. ::
    >>> isinstance(obj, tuple)
    False
 
-Python's Booleans were added with the primary goal of making code clearer.  For
-example, if you're reading a function and encounter the statement ``return 1``,
-you might wonder whether the ``1`` represents a Boolean truth value, an index,
-or a coefficient that multiplies some other quantity.  If the statement is
-``return True``, however, the meaning of the return value is quite clear.
+Boolean của Python được thêm vào với mục tiêu chính là làm cho code rõ ràng hơn. Ví dụ, nếu bạn đang đọc một hàm và gặp câu lệnh ``return 1``, bạn có thể tự hỏi liệu ``1`` biểu thị một giá trị đúng/sai Boolean, một chỉ mục hay một hệ số nhân với một đại lượng khác. Tuy nhiên, nếu câu lệnh là ``return True``, ý nghĩa của giá trị trả về khá rõ ràng.
 
-Python's Booleans were *not* added for the sake of strict type-checking.  A very
-strict language such as Pascal would also prevent you performing arithmetic with
-Booleans, and would require that the expression in an :keyword:`if` statement
-always evaluate to a Boolean result.  Python is not this strict and never will
-be, as :pep:`285` explicitly says.  This means you can still use any expression
-in an :keyword:`!if` statement, even ones that evaluate to a list or tuple or
-some random object.  The Boolean type is a subclass of the :class:`int` class so
-that arithmetic using a Boolean still works. ::
+Boolean của Python *không* được bổ sung chỉ để phục vụ việc kiểm tra kiểu nghiêm ngặt. Một ngôn ngữ rất nghiêm ngặt như Pascal cũng sẽ ngăn bạn thực hiện phép tính số học với Boolean và yêu cầu biểu thức trong câu lệnh :keyword:`if` luôn cho kết quả Boolean. Python không nghiêm ngặt đến mức đó và sẽ không bao giờ như vậy, như :pep:`285` đã nêu rõ. Điều này có nghĩa là bạn vẫn có thể sử dụng bất kỳ biểu thức nào trong câu lệnh :keyword:`!if`, kể cả những biểu thức cho kết quả là một list, tuple hoặc một đối tượng bất kỳ. Kiểu Boolean là lớp con của lớp :class:`int` để các phép tính số học sử dụng Boolean vẫn hoạt động.::
 
    >>> True + 1
    2
@@ -602,72 +423,48 @@ that arithmetic using a Boolean still works. ::
    >>> True * 75
    75
 
-To sum up :const:`True` and :const:`False` in a sentence: they're alternative
-ways to spell the integer values 1 and 0, with the single difference that
-:func:`str` and :func:`repr` return the strings ``'True'`` and ``'False'``
-instead of ``'1'`` and ``'0'``.
+Tóm lại :const:`True` và :const:`False` trong một câu: chúng là những cách viết thay thế cho các giá trị số nguyên 1 và 0, với điểm khác biệt duy nhất là
+:func:`str` và :func:`repr` trả về các chuỗi ``'True'`` và ``'False'`` thay vì ``'1'`` và ``'0'``.
 
 
 .. seealso::
 
-   :pep:`285` - Adding a bool type
-      Written and implemented by GvR.
+   :pep:`285` - Thêm kiểu bool
+      Được viết và triển khai bởi GvR.
 
 .. ======================================================================
 
 
-PEP 293: Codec Error Handling Callbacks
-=======================================
+PEP 293: Callback xử lý lỗi Codec
+=================================
 
-When encoding a Unicode string into a byte string, unencodable characters may be
-encountered.  So far, Python has allowed specifying the error processing as
-either "strict" (raising :exc:`UnicodeError`), "ignore" (skipping the
-character), or "replace" (using a question mark in the output string), with
-"strict" being the default behavior. It may be desirable to specify alternative
-processing of such errors, such as inserting an XML character reference or HTML
-entity reference into the converted string.
+Khi mã hóa một chuỗi Unicode thành chuỗi byte, có thể gặp các ký tự không thể mã hóa. Cho đến nay, Python cho phép chỉ định cách xử lý lỗi là "strict" (phát sinh :exc:`UnicodeError`), "ignore" (bỏ qua ký tự) hoặc "replace" (sử dụng dấu hỏi trong chuỗi đầu ra), trong đó "strict" là hành vi mặc định. Có thể sẽ hữu ích nếu chỉ định cách xử lý thay thế cho những lỗi như vậy, chẳng hạn như chèn tham chiếu ký tự XML hoặc tham chiếu thực thể HTML vào chuỗi đã chuyển đổi.
 
-Python now has a flexible framework to add different processing strategies.  New
-error handlers can be added with :func:`codecs.register_error`, and codecs then
-can access the error handler with :func:`codecs.lookup_error`. An equivalent C
-API has been added for codecs written in C. The error handler gets the necessary
-state information such as the string being converted, the position in the string
-where the error was detected, and the target encoding.  The handler can then
-either raise an exception or return a replacement string.
+Python giờ đây có một framework linh hoạt để bổ sung các chiến lược xử lý khác nhau. Có thể thêm các error handler mới bằng :func:`codecs.register_error`, sau đó codec có thể truy cập error handler bằng :func:`codecs.lookup_error`. Một C API tương đương cũng đã được bổ sung cho các codec viết bằng C. Error handler nhận được thông tin trạng thái cần thiết, chẳng hạn như chuỗi đang được chuyển đổi, vị trí trong chuỗi nơi phát hiện lỗi và encoding đích. Sau đó, handler có thể either raise một exception hoặc trả về một chuỗi thay thế.
 
-Two additional error handlers have been implemented using this framework:
-"backslashreplace" uses Python backslash quoting to represent unencodable
-characters and "xmlcharrefreplace" emits XML character references.
+Hai error handler bổ sung đã được triển khai bằng framework này: "backslashreplace" sử dụng cách trích dẫn bằng dấu gạch chéo ngược của Python để biểu diễn các ký tự không thể encode, còn "xmlcharrefreplace" tạo ra các tham chiếu ký tự XML.
 
 
 .. seealso::
 
-   :pep:`293` - Codec Error Handling Callbacks
-      Written and implemented by Walter Dörwald.
+   :pep:`293` - Callback xử lý lỗi của Codec
+      Được viết và triển khai bởi Walter Dörwald.
 
 .. ======================================================================
 
 
 .. _section-pep301:
 
-PEP 301: Package Index and Metadata for Distutils
-=================================================
+PEP 301: Chỉ mục gói và siêu dữ liệu cho Distutils
+==================================================
 
-Support for the long-requested Python catalog makes its first appearance in 2.3.
+Hỗ trợ cho catalog Python được mong đợi từ lâu lần đầu tiên xuất hiện trong phiên bản 2.3.
 
-The heart of the catalog is the new Distutils :command:`register` command.
-Running ``python setup.py register`` will collect the metadata describing a
-package, such as its name, version, maintainer, description, &c., and send it to
-a central catalog server.  The resulting catalog is available from
-https://pypi.org.
+Trung tâm của catalog là lệnh Distutils mới :command:`register`. Việc chạy ``python setup.py register`` sẽ thu thập siêu dữ liệu mô tả một package, chẳng hạn như tên, phiên bản, người duy trì, mô tả, &c., rồi gửi siêu dữ liệu đó đến một catalog server trung tâm. Catalog kết quả có sẵn tại https://pypi.org.
 
-To make the catalog a bit more useful, a new optional *classifiers* keyword
-argument has been added to the Distutils :func:`!setup` function.  A list of
-`Trove <http://catb.org/~esr/trove/>`_-style strings can be supplied to help
-classify the software.
+Để catalog hữu ích hơn một chút, một keyword argument *classifiers* tùy chọn mới đã được thêm vào hàm :func:`!setup` của Distutils. Có thể cung cấp một danh sách các chuỗi theo kiểu `Trove <http://catb.org/~esr/trove/>`_ để hỗ trợ phân loại phần mềm.
 
-Here's an example :file:`setup.py` with classifiers, written to be compatible
-with older versions of the Distutils::
+Dưới đây là một ví dụ :file:`setup.py` có classifiers, được viết để tương thích với các phiên bản Distutils cũ hơn::
 
    from distutils import core
    kw = {'name': "Quixote",
@@ -685,55 +482,37 @@ with older versions of the Distutils::
 
    core.setup(**kw)
 
-The full list of classifiers can be obtained by running  ``python setup.py
-register --list-classifiers``.
+Có thể lấy danh sách đầy đủ các classifiers bằng cách chạy  ``python setup.py register --list-classifiers``.
 
 
 .. seealso::
 
-   :pep:`301` - Package Index and Metadata for Distutils
-      Written and implemented by Richard Jones.
+   :pep:`301` - Chỉ mục Gói và Metadata cho Distutils
+      Được viết và triển khai bởi Richard Jones.
 
 .. ======================================================================
 
 
 .. _section-pep302:
 
-PEP 302: New Import Hooks
+PEP 302: Import Hooks mới
 =========================
 
-While it's been possible to write custom import hooks ever since the
-:mod:`!ihooks` module was introduced in Python 1.3, no one has ever been really
-happy with it because writing new import hooks is difficult and messy.  There
-have been various proposed alternatives such as the :mod:`!imputil` and :mod:`!iu`
-modules, but none of them has ever gained much acceptance, and none of them were
-easily usable from C code.
+Mặc dù từ trước đến nay đã có thể viết các import hook tùy chỉnh
+Mô-đun :mod:`!ihooks` được giới thiệu trong Python 1.3, nhưng chưa bao giờ thực sự được mọi người hài lòng vì việc viết các import hook mới rất khó khăn và rắc rối. Đã có nhiều phương án thay thế được đề xuất, chẳng hạn như các mô-đun :mod:`!imputil` và :mod:`!iu`, nhưng chưa phương án nào trong số đó nhận được nhiều sự chấp nhận, và cũng không phương án nào dễ dàng sử dụng từ mã C.
 
-:pep:`302` borrows ideas from its predecessors, especially from Gordon
-McMillan's :mod:`!iu` module.  Three new items  are added to the :mod:`sys`
-module:
+:pep:`302` vay mượn các ý tưởng từ những mô-đun tiền nhiệm, đặc biệt là mô-đun :mod:`!iu` của Gordon McMillan. Ba thành phần mới được thêm vào mô-đun :mod:`sys`:
 
-* ``sys.path_hooks`` is a list of callable objects; most  often they'll be
-  classes.  Each callable takes a string containing a path and either returns an
-  importer object that will handle imports from this path or raises an
-  :exc:`ImportError` exception if it can't handle this path.
+* ``sys.path_hooks`` là một danh sách các đối tượng có thể gọi; thường thì chúng sẽ là các lớp. Mỗi đối tượng có thể gọi nhận một chuỗi chứa một đường dẫn và либо trả về một đối tượng importer sẽ xử lý việc import từ đường dẫn này, hoặc đưa ra một
+  ngoại lệ :exc:`ImportError` nếu nó không thể xử lý đường dẫn này.
 
-* ``sys.path_importer_cache`` caches importer objects for each path, so
-  ``sys.path_hooks`` will only need to be traversed once for each path.
+* ``sys.path_importer_cache`` lưu vào bộ nhớ đệm các đối tượng importer cho từng đường dẫn, vì vậy ``sys.path_hooks`` sẽ chỉ cần được duyệt một lần cho mỗi đường dẫn.
 
-* ``sys.meta_path`` is a list of importer objects that will be traversed before
-  ``sys.path`` is checked.  This list is initially empty, but user code can add
-  objects to it.  Additional built-in and frozen modules can be imported by an
-  object added to this list.
+* ``sys.meta_path`` là một danh sách các đối tượng importer sẽ được duyệt trước khi kiểm tra ``sys.path``. Ban đầu, danh sách này trống, nhưng mã của người dùng có thể thêm các đối tượng vào đó. Có thể import các mô-đun dựng sẵn và mô-đun frozen bổ sung bằng một đối tượng được thêm vào danh sách này.
 
-Importer objects must have a single method, ``find_module(fullname,
-path=None)``.  *fullname* will be a module or package name, e.g. ``string`` or
-``distutils.core``.  :meth:`!find_module` must return a loader object that has a
-single method, ``load_module(fullname)``, that creates and returns the
-corresponding module object.
+Các đối tượng importer phải có một phương thức duy nhất là ``find_module(fullname, path=None)``. *fullname* sẽ là tên của một mô-đun hoặc package, ví dụ ``string`` hoặc ``distutils.core``. :meth:`!find_module` phải trả về một đối tượng loader có một phương thức duy nhất là ``load_module(fullname)``, phương thức này tạo và trả về đối tượng mô-đun tương ứng.
 
-Pseudo-code for Python's new import logic, therefore, looks something like this
-(simplified a bit; see :pep:`302` for the full details)::
+Mã giả cho logic import mới của Python, do đó, trông sẽ giống như thế này (đã được đơn giản hóa đôi chút; xem :pep:`302` để biết đầy đủ chi tiết)::
 
    for mp in sys.meta_path:
        loader = mp(fullname)
@@ -757,31 +536,28 @@ Pseudo-code for Python's new import logic, therefore, looks something like this
 
 .. seealso::
 
-   :pep:`302` - New Import Hooks
-      Written by Just van Rossum and Paul Moore. Implemented by Just van Rossum.
+   :pep:`302` - Import Hooks mới
+      Được viết bởi Just van Rossum và Paul Moore. Được triển khai bởi Just van Rossum.
 
 .. ======================================================================
 
 
 .. _section-pep305:
 
-PEP 305: Comma-separated Files
-==============================
+PEP 305: Tệp phân tách bằng dấu phẩy
+====================================
 
-Comma-separated files are a format frequently used for exporting data from
-databases and spreadsheets.  Python 2.3 adds a parser for comma-separated files.
+Tệp phân tách bằng dấu phẩy là một định dạng thường được dùng để xuất dữ liệu từ cơ sở dữ liệu và bảng tính. Python 2.3 bổ sung một parser cho các tệp phân tách bằng dấu phẩy.
 
-Comma-separated format is deceptively simple at first glance::
+Thoạt nhìn, định dạng phân tách bằng dấu phẩy có vẻ đơn giản đến mức dễ gây nhầm lẫn::
 
    Costs,150,200,3.95
 
-Read a line and call ``line.split(',')``: what could be simpler? But toss in
-string data that can contain commas, and things get more complicated::
+Đọc một dòng và gọi ``line.split(',')``: còn gì đơn giản hơn? Nhưng khi thêm dữ liệu chuỗi có thể chứa dấu phẩy, mọi thứ trở nên phức tạp hơn::
 
    "Costs",150,200,3.95,"Includes taxes, shipping, and sundry items"
 
-A big ugly regular expression can parse this, but using the new  :mod:`csv`
-package is much simpler::
+Một biểu thức chính quy dài và khó đọc có thể phân tích dữ liệu này, nhưng sử dụng package :mod:`csv` mới đơn giản hơn nhiều::
 
    import csv
 
@@ -790,94 +566,65 @@ package is much simpler::
    for line in reader:
        print line
 
-The :func:`~csv.reader` function takes a number of different options. The field
-separator isn't limited to the comma and can be changed to any character, and so
-can the quoting and line-ending characters.
+Hàm :func:`~csv.reader` có nhiều tùy chọn khác nhau. Dấu phân cách trường không bị giới hạn ở dấu phẩy mà có thể đổi thành bất kỳ ký tự nào, tương tự như các ký tự dùng để đặt trong dấu trích dẫn và kết thúc dòng.
 
-Different dialects of comma-separated files can be defined and registered;
-currently there are two dialects, both used by Microsoft Excel. A separate
-:class:`csv.writer` class will generate comma-separated files from a succession
-of tuples or lists, quoting strings that contain the delimiter.
+Có thể định nghĩa và đăng ký các dialect khác nhau của tệp được phân tách bằng dấu phẩy; hiện có hai dialect, cả hai đều được Microsoft Excel sử dụng. Một
+class :class:`csv.writer` sẽ tạo các tệp được phân tách bằng dấu phẩy từ một chuỗi tuple hoặc list, đồng thời đặt trong dấu trích dẫn các chuỗi chứa dấu phân cách.
 
 
 .. seealso::
 
-   :pep:`305` - CSV File API
-      Written and implemented  by Kevin Altis, Dave Cole, Andrew McNamara, Skip
-      Montanaro, Cliff Wells.
+   :pep:`305` - API Tệp CSV
+      Được Kevin Altis, Dave Cole, Andrew McNamara, Skip Montanaro và Cliff Wells viết và triển khai.
 
 .. ======================================================================
 
 
 .. _section-pep307:
 
-PEP 307: Pickle Enhancements
-============================
+PEP 307: Cải tiến Pickle
+========================
 
-The :mod:`pickle` and :mod:`!cPickle` modules received some attention during the
-2.3 development cycle.  In 2.2, new-style classes could be pickled without
-difficulty, but they weren't pickled very compactly; :pep:`307` quotes a trivial
-example where a new-style class results in a pickled string three times longer
-than that for a classic class.
+Các module :mod:`pickle` và :mod:`!cPickle` đã nhận được một số cải tiến trong chu kỳ phát triển 2.3. Trong 2.2, các class kiểu mới có thể được pickle mà không gặp khó khăn, nhưng dữ liệu pickle không thật sự nhỏ gọn; :pep:`307` trích dẫn một ví dụ đơn giản, trong đó một class kiểu mới tạo ra chuỗi pickle dài gấp ba lần so với một class kiểu cũ.
 
-The solution was to invent a new pickle protocol.  The :func:`pickle.dumps`
-function has supported a text-or-binary flag  for a long time.  In 2.3, this
-flag is redefined from a Boolean to an integer: 0 is the old text-mode pickle
-format, 1 is the old binary format, and now 2 is a new 2.3-specific format.  A
-new constant, :const:`pickle.HIGHEST_PROTOCOL`, can be used to select the
-fanciest protocol available.
+Giải pháp là tạo ra một pickle protocol mới. Hàm :func:`pickle.dumps` từ lâu đã hỗ trợ cờ text-or-binary. Trong 2.3, cờ này được định nghĩa lại từ Boolean thành số nguyên: 0 là định dạng pickle text-mode cũ, 1 là định dạng binary cũ, và giờ đây 2 là định dạng mới dành riêng cho 2.3. Có thể dùng hằng số mới :const:`pickle.HIGHEST_PROTOCOL` để chọn protocol tiên tiến nhất hiện có.
 
-Unpickling is no longer considered a safe operation.  2.2's :mod:`pickle`
-provided hooks for trying to prevent unsafe classes from being unpickled
-(specifically, a :attr:`!__safe_for_unpickling__` attribute), but none of this
-code was ever audited and therefore it's all been ripped out in 2.3.  You should
-not unpickle untrusted data in any version of Python.
+Unpickling không còn được xem là một thao tác an toàn. :mod:`pickle` của 2.2 cung cấp các hook nhằm ngăn các class không an toàn được unpickle (cụ thể là một thuộc tính :attr:`!__safe_for_unpickling__`), nhưng chưa từng có ai kiểm tra toàn bộ mã này, vì vậy tất cả đã bị loại bỏ trong 2.3. Bạn không nên unpickle dữ liệu không đáng tin cậy trong bất kỳ phiên bản Python nào.
 
-To reduce the pickling overhead for new-style classes, a new interface for
-customizing pickling was added using three special methods:
-:meth:`~object.__getstate__`, :meth:`~object.__setstate__`, and :meth:`~object.__getnewargs__`.  Consult
-:pep:`307` for the full semantics  of these methods.
+Để giảm overhead khi pickle các class kiểu mới, một interface mới nhằm tùy chỉnh việc pickle đã được bổ sung, sử dụng ba phương thức đặc biệt:
+:meth:`~object.__getstate__`, :meth:`~object.__setstate__` và :meth:`~object.__getnewargs__`. Hãy tham khảo
+:pep:`307` để biết đầy đủ ngữ nghĩa của các phương thức này.
 
-As a way to compress pickles yet further, it's now possible to use integer codes
-instead of long strings to identify pickled classes. The Python Software
-Foundation will maintain a list of standardized codes; there's also a range of
-codes for private use.  Currently no codes have been specified.
+Để nén pickle hơn nữa, giờ đây có thể sử dụng các mã số nguyên thay cho những chuỗi dài để xác định các class được pickle. Python Software Foundation sẽ duy trì một danh sách các mã được chuẩn hóa; đồng thời cũng có một dải mã dành cho mục đích sử dụng riêng. Hiện chưa có mã nào được chỉ định.
 
 
 .. seealso::
 
-   :pep:`307` - Extensions to the pickle protocol
-      Written and implemented  by Guido van Rossum and Tim Peters.
+   :pep:`307` - Các mở rộng đối với giao thức pickle
+      Được viết và triển khai bởi Guido van Rossum và Tim Peters.
 
 .. ======================================================================
 
 
 .. _section-slices:
 
-Extended Slices
-===============
+Các lát cắt mở rộng
+===================
 
-Ever since Python 1.4, the slicing syntax has supported an optional third "step"
-or "stride" argument.  For example, these are all legal Python syntax:
-``L[1:10:2]``, ``L[:-1:1]``, ``L[::-1]``.  This was added to Python at the
-request of the developers of Numerical Python, which uses the third argument
-extensively.  However, Python's built-in list, tuple, and string sequence types
-have never supported this feature, raising a :exc:`TypeError` if you tried it.
-Michael Hudson contributed a patch to fix this shortcoming.
+Kể từ Python 1.4, cú pháp lát cắt đã hỗ trợ một đối số thứ ba tùy chọn là "step" hoặc "stride". Ví dụ, tất cả những cách viết sau đều là cú pháp Python hợp lệ: ``L[1:10:2]``, ``L[:-1:1]``, ``L[::-1]``. Tính năng này được thêm vào Python theo yêu cầu của các nhà phát triển Numerical Python, vốn sử dụng rộng rãi đối số thứ ba. Tuy nhiên, các kiểu sequence list, tuple và string tích hợp sẵn của Python chưa bao giờ hỗ trợ tính năng này và sẽ phát sinh :exc:`TypeError` nếu bạn thử sử dụng. Michael Hudson đã đóng góp một bản vá để khắc phục hạn chế này.
 
-For example, you can now easily extract the elements of a list that have even
-indexes::
+Ví dụ, giờ đây bạn có thể dễ dàng trích xuất các phần tử của một list có chỉ mục là số chẵn::
 
    >>> L = range(10)
    >>> L[::2]
    [0, 2, 4, 6, 8]
 
-Negative values also work to make a copy of the same list in reverse order::
+Các giá trị âm cũng hoạt động, cho phép tạo một bản sao của cùng list đó theo thứ tự ngược lại::
 
    >>> L[::-1]
    [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
-This also works for tuples, arrays, and strings::
+Tính năng này cũng hoạt động với tuple, array và string::
 
    >>> s='abcd'
    >>> s[::2]
@@ -885,10 +632,7 @@ This also works for tuples, arrays, and strings::
    >>> s[::-1]
    'dcba'
 
-If you have a mutable sequence such as a list or an array you can assign to or
-delete an extended slice, but there are some differences between assignment to
-extended and regular slices.  Assignment to a regular slice can be used to
-change the length of the sequence::
+Nếu bạn có một mutable sequence như list hoặc array, bạn có thể gán cho hoặc xóa một extended slice, nhưng có một số khác biệt giữa việc gán cho extended slice và regular slice. Việc gán cho regular slice có thể được dùng để thay đổi độ dài của sequence::
 
    >>> a = range(3)
    >>> a
@@ -897,9 +641,7 @@ change the length of the sequence::
    >>> a
    [0, 4, 5, 6]
 
-Extended slices aren't this flexible.  When assigning to an extended slice, the
-list on the right hand side of the statement must contain the same number of
-items as the slice it is replacing::
+Extended slice không linh hoạt như vậy. Khi gán cho một extended slice, list ở vế phải của câu lệnh phải chứa cùng số lượng phần tử với slice mà nó thay thế::
 
    >>> a = range(4)
    >>> a
@@ -914,7 +656,7 @@ items as the slice it is replacing::
      File "<stdin>", line 1, in ?
    ValueError: attempt to assign sequence of size 3 to extended slice of size 2
 
-Deletion is more straightforward::
+Việc xóa thì đơn giản hơn::
 
    >>> a = range(4)
    >>> a
@@ -925,23 +667,18 @@ Deletion is more straightforward::
    >>> a
    [1, 3]
 
-One can also now pass slice objects to the :meth:`~object.__getitem__` methods of the
-built-in sequences::
+Giờ đây, bạn cũng có thể truyền các đối tượng slice cho các phương thức :meth:`~object.__getitem__` của những sequence dựng sẵn::
 
    >>> range(10).__getitem__(slice(0, 5, 2))
    [0, 2, 4]
 
-Or use slice objects directly in subscripts::
+Hoặc sử dụng trực tiếp các đối tượng slice trong chỉ mục::
 
    >>> range(10)[slice(0, 5, 2)]
    [0, 2, 4]
 
-To simplify implementing sequences that support extended slicing, slice objects
-now have a method ``indices(length)`` which, given the length of a sequence,
-returns a ``(start, stop, step)`` tuple that can be passed directly to
-:func:`range`. :meth:`!indices` handles omitted and out-of-bounds indices in a
-manner consistent with regular slices (and this innocuous phrase hides a welter
-of confusing details!).  The method is intended to be used like this::
+Để đơn giản hóa việc triển khai các sequence hỗ trợ extended slicing, các đối tượng slice giờ đây có một phương thức ``indices(length)``, với đầu vào là độ dài của một sequence và trả về một tuple ``(start, stop, step)`` có thể được truyền trực tiếp cho
+:func:`range`. :meth:`!indices` xử lý các chỉ mục bị bỏ qua và nằm ngoài giới hạn theo cách nhất quán với các regular slice (và cụm từ vô hại này che giấu một mớ chi tiết khó hiểu!). Phương thức này được thiết kế để sử dụng như sau::
 
    class FakeSeq:
        ...
@@ -954,56 +691,34 @@ of confusing details!).  The method is intended to be used like this::
            else:
                return self.calc_item(i)
 
-From this example you can also see that the built-in :class:`slice` object is
-now the type object for the slice type, and is no longer a function.  This is
-consistent with Python 2.2, where :class:`int`, :class:`str`, etc., underwent
-the same change.
+Từ ví dụ này, bạn cũng có thể thấy rằng đối tượng :class:`slice` tích hợp sẵn giờ đây là đối tượng kiểu của kiểu slice và không còn là một hàm nữa. Điều này phù hợp với Python 2.2, trong đó :class:`int`, :class:`str`, v.v. cũng trải qua thay đổi tương tự.
 
 .. ======================================================================
 
 
-Other Language Changes
-======================
+Các thay đổi khác về ngôn ngữ
+=============================
 
-Here are all of the changes that Python 2.3 makes to the core Python language.
+Dưới đây là tất cả những thay đổi mà Python 2.3 thực hiện đối với ngôn ngữ Python cốt lõi.
 
-* The :keyword:`yield` statement is now always a keyword, as described in
-  section :ref:`section-generators` of this document.
+* Câu lệnh :keyword:`yield` giờ đây luôn là một keyword, như được mô tả trong phần :ref:`section-generators` của tài liệu này.
 
-* A new built-in function :func:`enumerate` was added, as described in section
-  :ref:`section-enumerate` of this document.
+* Một hàm tích hợp sẵn mới, :func:`enumerate`, đã được thêm vào, như được mô tả trong phần
+  :ref:`section-enumerate` của tài liệu này.
 
-* Two new constants, :const:`True` and :const:`False` were added along with the
-  built-in :class:`bool` type, as described in section :ref:`section-bool` of this
-  document.
+* Hai hằng số mới, :const:`True` và :const:`False`, đã được thêm vào cùng với kiểu :class:`bool` tích hợp sẵn, như được mô tả trong phần :ref:`section-bool` của tài liệu này.
 
-* The :func:`int` type constructor will now return a long integer instead of
-  raising an :exc:`OverflowError` when a string or floating-point number is too
-  large to fit into an integer.  This can lead to the paradoxical result that
-  ``isinstance(int(expression), int)`` is false, but that seems unlikely to cause
-  problems in practice.
+* Hàm khởi tạo kiểu :func:`int` giờ đây sẽ trả về một số nguyên dài thay vì phát sinh :exc:`OverflowError` khi một chuỗi hoặc số dấu phẩy động quá lớn để chứa trong một số nguyên. Điều này có thể dẫn đến kết quả nghịch lý là ``isinstance(int(expression), int)`` bằng false, nhưng trong thực tế điều đó có vẻ khó gây ra vấn đề.
 
-* Built-in types now support the extended slicing syntax, as described in
-  section :ref:`section-slices` of this document.
+* Các kiểu dựng sẵn giờ đây hỗ trợ cú pháp cắt mở rộng, như được mô tả trong phần :ref:`section-slices` của tài liệu này.
 
-* A new built-in function, ``sum(iterable, start=0)``,  adds up the numeric
-  items in the iterable object and returns their sum.  :func:`sum` only accepts
-  numbers, meaning that you can't use it to concatenate a bunch of strings.
-  (Contributed by Alex Martelli.)
+* Một hàm dựng sẵn mới, ``sum(iterable, start=0)``, cộng các mục số trong đối tượng iterable và trả về tổng của chúng. :func:`sum` chỉ chấp nhận các số, nghĩa là bạn không thể dùng nó để nối một loạt chuỗi. (Đóng góp của Alex Martelli.)
 
-* ``list.insert(pos, value)`` used to  insert *value* at the front of the list
-  when *pos* was negative.  The behaviour has now been changed to be consistent
-  with slice indexing, so when *pos* is -1 the value will be inserted before the
-  last element, and so forth.
+* ``list.insert(pos, value)`` trước đây chèn *value* vào đầu danh sách khi *pos* là số âm. Hành vi này giờ đã được thay đổi để nhất quán với việc lập chỉ mục lát cắt, vì vậy khi *pos* là -1, giá trị sẽ được chèn trước phần tử cuối cùng, v.v.
 
-* ``list.index(value)``, which searches for *value*  within the list and returns
-  its index, now takes optional  *start* and *stop* arguments to limit the search
-  to  only part of the list.
+* ``list.index(value)``, dùng để tìm *value* trong danh sách và trả về chỉ mục của nó, giờ đây nhận các đối số tùy chọn *start* và *stop* để giới hạn phạm vi tìm kiếm chỉ trong một phần của danh sách.
 
-* Dictionaries have a new method, ``pop(key[, *default*])``, that returns
-  the value corresponding to *key* and removes that key/value pair from the
-  dictionary.  If the requested key isn't present in the dictionary, *default* is
-  returned if it's specified and :exc:`KeyError` raised if it isn't. ::
+* Từ điển có một phương thức mới, ``pop(key[, *default*])``, trả về giá trị tương ứng với *key* và xóa cặp khóa/giá trị đó khỏi từ điển. Nếu khóa được yêu cầu không có trong từ điển, *default* sẽ được trả về nếu được chỉ định, còn nếu không thì :exc:`KeyError` sẽ được phát sinh.::
 
      >>> d = {1:2}
      >>> d
@@ -1022,30 +737,20 @@ Here are all of the changes that Python 2.3 makes to the core Python language.
      {}
      >>>
 
-  There's also a new class method,  ``dict.fromkeys(iterable, value)``, that
-  creates a dictionary with keys taken from the supplied iterator *iterable* and
-  all values set to *value*, defaulting to ``None``.
+  Ngoài ra còn có một class method mới, ``dict.fromkeys(iterable, value)``, tạo một từ điển với các khóa lấy từ iterator được cung cấp *iterable* và tất cả giá trị được đặt thành *value*, mặc định là ``None``.
 
-  (Patches contributed by Raymond Hettinger.)
+  (Các bản vá do Raymond Hettinger đóng góp.)
 
-  Also, the :func:`dict` constructor now accepts keyword arguments to simplify
-  creating small dictionaries::
+  Ngoài ra, hàm tạo :func:`dict` hiện chấp nhận các keyword arguments để đơn giản hóa việc tạo các dictionary nhỏ::
 
      >>> dict(red=1, blue=2, green=3, black=4)
      {'blue': 2, 'black': 4, 'green': 3, 'red': 1}
 
-  (Contributed by Just van Rossum.)
+  (Do Just van Rossum đóng góp.)
 
-* The :keyword:`assert` statement no longer checks the ``__debug__`` flag, so
-  you can no longer disable assertions by assigning to ``__debug__``. Running
-  Python with the :option:`-O` switch will still generate code that doesn't
-  execute any assertions.
+* Câu lệnh :keyword:`assert` không còn kiểm tra cờ ``__debug__``, vì vậy bạn không thể vô hiệu hóa các assertion bằng cách gán giá trị cho ``__debug__``. Chạy Python với switch :option:`-O` vẫn sẽ tạo ra mã không thực thi bất kỳ assertion nào.
 
-* Most type objects are now callable, so you can use them to create new objects
-  such as functions, classes, and modules.  (This means that the :mod:`!new` module
-  can be deprecated in a future Python version, because you can now use the type
-  objects available in the :mod:`types` module.) For example, you can create a new
-  module object with the following code:
+* Hầu hết các type object hiện có thể được gọi, vì vậy bạn có thể sử dụng chúng để tạo các object mới như function, class và module. (Điều này có nghĩa là module :mod:`!new` có thể bị ngừng sử dụng trong một phiên bản Python tương lai, vì giờ đây bạn có thể sử dụng các type object có trong module :mod:`types`.) Ví dụ: bạn có thể tạo một module object mới bằng đoạn mã sau:
 
   ::
 
@@ -1056,79 +761,42 @@ Here are all of the changes that Python 2.3 makes to the core Python language.
      >>> m.__doc__
      'docstring'
 
-* A new warning, :exc:`PendingDeprecationWarning` was added to indicate features
-  which are in the process of being deprecated.  The warning will *not* be printed
-  by default.  To check for use of features that will be deprecated in the future,
-  supply :option:`-Walways::PendingDeprecationWarning:: <-W>` on the command line or
-  use :func:`warnings.filterwarnings`.
+* Một cảnh báo mới, :exc:`PendingDeprecationWarning`, đã được thêm vào để chỉ ra các tính năng đang trong quá trình bị ngừng sử dụng. Theo mặc định, cảnh báo này sẽ *không* được in ra. Để kiểm tra việc sử dụng các tính năng sẽ bị ngừng sử dụng trong tương lai, hãy cung cấp :option:`-Walways::PendingDeprecationWarning:: <-W>` trên dòng lệnh hoặc sử dụng :func:`warnings.filterwarnings`.
 
-* The process of deprecating string-based exceptions, as in ``raise "Error
-  occurred"``, has begun.  Raising a string will now trigger
+* Quá trình loại bỏ các exception dựa trên chuỗi, như trong ``raise "Error occurred"``, đã bắt đầu. Việc raise một chuỗi giờ đây sẽ kích hoạt
   :exc:`PendingDeprecationWarning`.
 
-* Using ``None`` as a variable name will now result in a :exc:`SyntaxWarning`
-  warning.  In a future version of Python, ``None`` may finally become a keyword.
+* Việc sử dụng ``None`` làm tên biến giờ đây sẽ dẫn đến cảnh báo :exc:`SyntaxWarning`. Trong một phiên bản Python tương lai, ``None`` cuối cùng có thể trở thành một keyword.
 
-* The :meth:`!xreadlines` method of file objects, introduced in Python 2.1, is no
-  longer necessary because files now behave as their own iterator.
-  :meth:`!xreadlines` was originally introduced as a faster way to loop over all
-  the lines in a file, but now you can simply write ``for line in file_obj``.
-  File objects also have a new read-only :attr:`!encoding` attribute that gives the
-  encoding used by the file; Unicode strings written to the file will be
-  automatically  converted to bytes using the given encoding.
+* Phương thức :meth:`!xreadlines` của các đối tượng file, được giới thiệu trong Python 2.1, không còn cần thiết vì giờ đây các file hoạt động như iterator của chính chúng.
+  :meth:`!xreadlines` ban đầu được giới thiệu như một cách nhanh hơn để lặp qua tất cả các dòng trong một file, nhưng giờ đây bạn chỉ cần viết ``for line in file_obj``. Các đối tượng file cũng có thuộc tính :attr:`!encoding` chỉ đọc mới, cho biết encoding được file sử dụng; các chuỗi Unicode được ghi vào file sẽ tự động được chuyển đổi thành byte bằng encoding đã cho.
 
-* The method resolution order used by new-style classes has changed, though
-  you'll only notice the difference if you have a really complicated inheritance
-  hierarchy.  Classic classes are unaffected by this change.  Python 2.2
-  originally used a topological sort of a class's ancestors, but 2.3 now uses the
-  C3 algorithm as described in the paper `"A Monotonic Superclass Linearization
-  for Dylan" <https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.19.3910>`_. To
-  understand the motivation for this change,  read Michele Simionato's article
-  :ref:`python_2.3_mro`, or
-  read the thread on python-dev starting with the message at
-  https://mail.python.org/pipermail/python-dev/2002-October/029035.html. Samuele
-  Pedroni first pointed out the problem and also implemented the fix by coding the
-  C3 algorithm.
+* Thứ tự phân giải phương thức được các class kiểu mới sử dụng đã thay đổi, mặc dù bạn chỉ nhận thấy sự khác biệt nếu có một hệ thống phân cấp kế thừa thực sự phức tạp. Các class kiểu cổ điển không bị ảnh hưởng bởi thay đổi này. Python 2.2 ban đầu sử dụng phép sắp xếp topo các lớp tổ tiên của một class, nhưng 2.3 giờ đây sử dụng thuật toán C3 như được mô tả trong bài viết `"A Monotonic Superclass Linearization for Dylan" <https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.19.3910>`_. Để hiểu động lực của thay đổi này, hãy đọc bài viết của Michele Simionato
+  :ref:`python_2.3_mro`, hoặc đọc chuỗi thảo luận trên python-dev bắt đầu bằng thông báo tại https://mail.python.org/pipermail/python-dev/2002-October/029035.html. Samuele Pedroni là người đầu tiên chỉ ra vấn đề và cũng triển khai bản sửa lỗi bằng cách lập trình thuật toán C3.
 
-* Python runs multithreaded programs by switching between threads after
-  executing N bytecodes.  The default value for N has been increased from 10 to
-  100 bytecodes, speeding up single-threaded applications by reducing the
-  switching overhead.  Some multithreaded applications may suffer slower response
-  time, but that's easily fixed by setting the limit back to a lower number using
-  ``sys.setcheckinterval(N)``. The limit can be retrieved with the new
-  :func:`!sys.getcheckinterval` function.
+* Python chạy các chương trình đa luồng bằng cách chuyển đổi giữa các luồng sau khi thực thi N bytecode. Giá trị mặc định của N đã được tăng từ 10 lên 100 bytecode, giúp tăng tốc các ứng dụng đơn luồng bằng cách giảm overhead chuyển đổi. Một số ứng dụng đa luồng có thể bị chậm thời gian phản hồi, nhưng có thể dễ dàng khắc phục bằng cách đặt giới hạn về một số nhỏ hơn bằng ``sys.setcheckinterval(N)``. Có thể lấy giới hạn này bằng hàm mới
+  :func:`!sys.getcheckinterval`.
 
-* One minor but far-reaching change is that the names of extension types defined
-  by the modules included with Python now contain the module and a ``'.'`` in
-  front of the type name.  For example, in Python 2.2, if you created a socket and
-  printed its :attr:`!__class__`, you'd get this output::
+* Một thay đổi nhỏ nhưng có ảnh hưởng sâu rộng là tên của các kiểu mở rộng được định nghĩa bởi những module đi kèm Python giờ đây chứa module và một ``'.'`` ở trước tên kiểu.  Ví dụ, trong Python 2.2, nếu bạn tạo một socket và in :attr:`!__class__` của nó, bạn sẽ nhận được kết quả sau::
 
      >>> s = socket.socket()
      >>> s.__class__
      <type 'socket'>
 
-  In 2.3, you get this::
+  Trong 2.3, bạn nhận được kết quả này::
 
      >>> s.__class__
      <type '_socket.socket'>
 
-* One of the noted incompatibilities between old- and new-style classes has been
-  removed: you can now assign to the :attr:`~type.__name__` and :attr:`~type.__bases__`
-  attributes of new-style classes.  There are some restrictions on what can be
-  assigned to :attr:`!__bases__` along the lines of those relating to assigning to
-  an instance's :attr:`~object.__class__` attribute.
+* Một trong những điểm không tương thích đáng chú ý giữa class kiểu cũ và kiểu mới đã được loại bỏ: giờ đây bạn có thể gán cho các thuộc tính :attr:`~type.__name__` và :attr:`~type.__bases__` của class kiểu mới.  Có một số hạn chế đối với những gì có thể được gán cho :attr:`!__bases__`, tương tự như các hạn chế khi gán cho thuộc tính :attr:`~object.__class__` của một instance.
 
 .. ======================================================================
 
 
-String Changes
---------------
+Các thay đổi về chuỗi
+---------------------
 
-* The :keyword:`in` operator now works differently for strings. Previously, when
-  evaluating ``X in Y`` where *X* and *Y* are strings, *X* could only be a single
-  character. That's now changed; *X* can be a string of any length, and ``X in Y``
-  will return :const:`True` if *X* is a substring of *Y*.  If *X* is the empty
-  string, the result is always :const:`True`. ::
+* Toán tử :keyword:`in` giờ hoạt động khác với chuỗi. Trước đây, khi đánh giá ``X in Y`` trong đó *X* và *Y* là các chuỗi, *X* chỉ có thể là một ký tự. Điều đó đã thay đổi; *X* có thể là một chuỗi có độ dài bất kỳ, và ``X in Y`` sẽ trả về :const:`True` nếu *X* là chuỗi con của *Y*.  Nếu *X* là chuỗi rỗng, kết quả luôn là :const:`True`.::
 
      >>> 'ab' in 'abcd'
      True
@@ -1137,12 +805,9 @@ String Changes
      >>> '' in 'abcd'
      True
 
-  Note that this doesn't tell you where the substring starts; if you need that
-  information, use the :meth:`~str.find` string method.
+  Lưu ý rằng điều này không cho biết chuỗi con bắt đầu ở đâu; nếu cần thông tin đó, hãy sử dụng string method :meth:`~str.find`.
 
-* The :meth:`~str.strip`, :meth:`~str.lstrip`, and :meth:`~str.rstrip` string methods now have
-  an optional argument for specifying the characters to strip.  The default is
-  still to remove all whitespace characters::
+* Các string method :meth:`~str.strip`, :meth:`~str.lstrip` và :meth:`~str.rstrip` giờ đây có thêm một đối số tùy chọn để chỉ định các ký tự cần loại bỏ.  Mặc định vẫn là loại bỏ tất cả ký tự khoảng trắng::
 
      >>> '   abc '.strip()
      'abc'
@@ -1154,15 +819,12 @@ String Changes
      u'\u4001abc'
      >>>
 
-  (Suggested by Simon Brunning and implemented by Walter Dörwald.)
+  (Do Simon Brunning đề xuất và Walter Dörwald triển khai.)
 
-* The :meth:`~str.startswith` and :meth:`~str.endswith` string methods now accept negative
-  numbers for the *start* and *end* parameters.
+* Các phương thức chuỗi :meth:`~str.startswith` và :meth:`~str.endswith` hiện chấp nhận các số âm cho các tham số *start* và *end*.
 
-* Another new string method is :meth:`~str.zfill`, originally a function in the
-  :mod:`string` module.  :meth:`~str.zfill` pads a numeric string with zeros on the
-  left until it's the specified width. Note that the ``%`` operator is still more
-  flexible and powerful than :meth:`~str.zfill`. ::
+* Một phương thức chuỗi mới khác là :meth:`~str.zfill`, vốn ban đầu là một hàm trong
+  mô-đun :mod:`string`.  :meth:`~str.zfill` thêm các số 0 vào bên trái của một chuỗi số cho đến khi chuỗi đạt độ rộng được chỉ định. Lưu ý rằng toán tử ``%`` vẫn linh hoạt và mạnh mẽ hơn :meth:`~str.zfill`.::
 
      >>> '45'.zfill(4)
      '0045'
@@ -1171,149 +833,89 @@ String Changes
      >>> 'goofy'.zfill(6)
      '0goofy'
 
-  (Contributed by Walter Dörwald.)
+  (Do Walter Dörwald đóng góp.)
 
-* A new type object, :class:`!basestring`, has been added. Both 8-bit strings and
-  Unicode strings inherit from this type, so ``isinstance(obj, basestring)`` will
-  return :const:`True` for either kind of string.  It's a completely abstract
-  type, so you can't create :class:`!basestring` instances.
+* Một đối tượng kiểu mới, :class:`!basestring`, đã được thêm vào. Cả chuỗi 8 bit và chuỗi Unicode đều kế thừa từ kiểu này, vì vậy ``isinstance(obj, basestring)`` sẽ trả về :const:`True` cho cả hai loại chuỗi.  Đây là một kiểu hoàn toàn trừu tượng, nên bạn không thể tạo các thể hiện :class:`!basestring`.
 
-* Interned strings are no longer immortal and will now be garbage-collected in
-  the usual way when the only reference to them is from the internal dictionary of
-  interned strings.  (Implemented by Oren Tirosh.)
+* Các chuỗi intern không còn bất tử nữa và giờ đây sẽ được garbage collection theo cách thông thường khi tham chiếu duy nhất đến chúng là từ dictionary nội bộ của các chuỗi intern.  (Do Oren Tirosh triển khai.)
 
 .. ======================================================================
 
 
-Optimizations
--------------
+Các tối ưu hóa
+--------------
 
-* The creation of new-style class instances has been made much faster; they're
-  now faster than classic classes!
+* Việc tạo các instance của class kiểu mới đã nhanh hơn rất nhiều; hiện chúng còn nhanh hơn các class kiểu cũ!
 
-* The :meth:`~list.sort` method of list objects has been extensively rewritten by Tim
-  Peters, and the implementation is significantly faster.
+* Phương thức :meth:`~list.sort` của các đối tượng list đã được Tim Peters viết lại đáng kể, và phần triển khai nhanh hơn rõ rệt.
 
-* Multiplication of large long integers is now much faster thanks to an
-  implementation of Karatsuba multiplication, an algorithm that scales better than
-  the *O*\ (*n*\ :sup:`2`) required for the grade-school multiplication algorithm.  (Original
-  patch by Christopher A. Craig, and significantly reworked by Tim Peters.)
+* Việc nhân các số nguyên long lớn hiện nhanh hơn nhiều nhờ triển khai phép nhân Karatsuba, một thuật toán có khả năng mở rộng tốt hơn *O*\ (*n*\ :sup:`2`) cần thiết cho thuật toán nhân kiểu học sinh tiểu học.  (Bản vá ban đầu do Christopher A. Craig thực hiện và Tim Peters viết lại đáng kể.)
 
-* The ``SET_LINENO`` opcode is now gone.  This may provide a small speed
-  increase, depending on your compiler's idiosyncrasies. See section
-  :ref:`23section-other` for a longer explanation. (Removed by Michael Hudson.)
+* opcode ``SET_LINENO`` hiện đã bị loại bỏ.  Điều này có thể giúp tăng tốc đôi chút, tùy thuộc vào những đặc điểm riêng của compiler của bạn. Xem phần
+  :ref:`23section-other` để biết giải thích dài hơn. (Michael Hudson đã loại bỏ.)
 
-* :func:`!xrange` objects now have their own iterator, making ``for i in
-  xrange(n)`` slightly faster than ``for i in range(n)``.  (Patch by Raymond
-  Hettinger.)
+* Các đối tượng :func:`!xrange` hiện có iterator riêng, giúp ``for i in xrange(n)`` nhanh hơn một chút so với ``for i in range(n)``.  (Bản vá do Raymond Hettinger thực hiện.)
 
-* A number of small rearrangements have been made in various hotspots to improve
-  performance, such as inlining a function or removing some code.  (Implemented
-  mostly by GvR, but lots of people have contributed single changes.)
+* Một số sắp xếp lại nhỏ đã được thực hiện tại nhiều điểm nóng khác nhau để cải thiện hiệu năng, chẳng hạn như inline một hàm hoặc loại bỏ một phần mã.  (Phần lớn do GvR thực hiện, nhưng nhiều người đã đóng góp các thay đổi riêng lẻ.)
 
-The net result of the 2.3 optimizations is that Python 2.3 runs the  pystone
-benchmark around 25% faster than Python 2.2.
+Kết quả tổng thể của các tối ưu hóa trong 2.3 là Python 2.3 chạy benchmark  pystone nhanh hơn khoảng 25% so với Python 2.2.
 
 .. ======================================================================
 
 
-New, Improved, and Deprecated Modules
-=====================================
+Các module mới, được cải tiến và không còn được khuyến nghị
+===========================================================
 
-As usual, Python's standard library received a number of enhancements and bug
-fixes.  Here's a partial list of the most notable changes, sorted alphabetically
-by module name. Consult the :file:`Misc/NEWS` file in the source tree for a more
-complete list of changes, or look through the CVS logs for all the details.
+Như thường lệ, thư viện chuẩn của Python đã nhận được một số cải tiến và bản sửa lỗi.  Sau đây là danh sách chưa đầy đủ những thay đổi đáng chú ý nhất, được sắp xếp theo thứ tự bảng chữ cái của tên module. Hãy tham khảo tệp :file:`Misc/NEWS` trong cây mã nguồn để xem danh sách thay đổi đầy đủ hơn, hoặc xem các nhật ký CVS để biết mọi chi tiết.
 
-* The :mod:`array` module now supports arrays of Unicode characters using the
-  ``'u'`` format character.  Arrays also now support using the ``+=`` assignment
-  operator to add another array's contents, and the ``*=`` assignment operator to
-  repeat an array. (Contributed by Jason Orendorff.)
+* Module :mod:`array` hiện hỗ trợ các mảng ký tự Unicode bằng ký tự định dạng ``'u'``.  Các mảng hiện cũng hỗ trợ sử dụng toán tử gán ``+=`` để thêm nội dung của một mảng khác và toán tử gán ``*=`` để lặp lại một mảng. (Do Jason Orendorff đóng góp.)
 
-* The :mod:`!bsddb` module has been replaced by version 4.1.6 of the `PyBSDDB
-  <https://pybsddb.sourceforge.net>`_ package, providing a more complete interface
-  to the transactional features of the BerkeleyDB library.
+* Module :mod:`!bsddb` đã được thay thế bằng gói `PyBSDDB <https://pybsddb.sourceforge.net>`_ phiên bản 4.1.6, cung cấp giao diện đầy đủ hơn cho các tính năng giao dịch của thư viện BerkeleyDB.
 
-  The old version of the module has been renamed to  :mod:`!bsddb185` and is no
-  longer built automatically; you'll  have to edit :file:`Modules/Setup` to enable
-  it.  Note that the new :mod:`!bsddb` package is intended to be compatible with
-  the  old module, so be sure to file bugs if you discover any incompatibilities.
-  When upgrading to Python 2.3, if the new interpreter is compiled with a new
-  version of  the underlying BerkeleyDB library, you will almost certainly have to
-  convert your database files to the new version.  You can do this fairly easily
-  with the new scripts :file:`db2pickle.py` and :file:`pickle2db.py` which you
-  will find in the distribution's :file:`Tools/scripts` directory.  If you've
-  already been using the PyBSDDB package and importing it as :mod:`!bsddb3`, you
-  will have to change your ``import`` statements to import it as :mod:`!bsddb`.
+  Phiên bản cũ của module đã được đổi tên thành  :mod:`!bsddb185` và không còn được build tự động; bạn sẽ phải chỉnh sửa :file:`Modules/Setup` để bật nó.  Lưu ý rằng gói :mod:`!bsddb` mới được thiết kế để tương thích với module cũ, vì vậy hãy nhớ báo lỗi nếu phát hiện bất kỳ điểm không tương thích nào. Khi nâng cấp lên Python 2.3, nếu interpreter mới được biên dịch với phiên bản mới của thư viện BerkeleyDB bên dưới, gần như chắc chắn bạn sẽ phải chuyển đổi các tệp cơ sở dữ liệu sang phiên bản mới.  Bạn có thể thực hiện việc này khá dễ dàng bằng các script mới :file:`db2pickle.py` và :file:`pickle2db.py`, nằm trong thư mục :file:`Tools/scripts` của bản phân phối.  Nếu bạn đã sử dụng gói PyBSDDB và import nó dưới tên :mod:`!bsddb3`, bạn sẽ phải thay đổi các câu lệnh ``import`` để import nó dưới tên :mod:`!bsddb`.
 
-* The new :mod:`bz2` module is an interface to the bz2 data compression library.
-  bz2-compressed data is usually smaller than  corresponding
-  :mod:`zlib`\ -compressed data. (Contributed by Gustavo Niemeyer.)
+* module :mod:`bz2` mới là một giao diện cho thư viện nén dữ liệu bz2. Dữ liệu được nén bằng bz2 thường nhỏ hơn dữ liệu tương ứng
+  dữ liệu được nén bằng :mod:`zlib`\ . (Do Gustavo Niemeyer đóng góp.)
 
-* A set of standard date/time types has been added in the new :mod:`datetime`
-  module.  See the following section for more details.
+* Một tập hợp các kiểu ngày/giờ tiêu chuẩn đã được thêm vào module :mod:`datetime` mới. Xem phần sau để biết thêm chi tiết.
 
-* The Distutils :class:`!Extension` class now supports an extra constructor
-  argument named *depends* for listing additional source files that an extension
-  depends on.  This lets Distutils recompile the module if any of the dependency
-  files are modified.  For example, if :file:`sampmodule.c` includes the header
-  file :file:`sample.h`, you would create the :class:`!Extension` object like
-  this::
+* Lớp :class:`!Extension` của Distutils hiện hỗ trợ thêm một đối số khởi tạo có tên *depends* để liệt kê các tệp mã nguồn bổ sung mà một extension phụ thuộc vào. Điều này cho phép Distutils biên dịch lại module nếu bất kỳ tệp phụ thuộc nào bị sửa đổi. Ví dụ, nếu :file:`sampmodule.c` bao gồm tệp header :file:`sample.h`, bạn sẽ tạo đối tượng :class:`!Extension` như sau::
 
      ext = Extension("samp",
                      sources=["sampmodule.c"],
                      depends=["sample.h"])
 
-  Modifying :file:`sample.h` would then cause the module to be recompiled.
-  (Contributed by Jeremy Hylton.)
+  Việc sửa đổi :file:`sample.h` sau đó sẽ khiến module được biên dịch lại. (Do Jeremy Hylton đóng góp.)
 
-* Other minor changes to Distutils: it now checks for the :envvar:`CC`,
-  :envvar:`CFLAGS`, :envvar:`!CPP`, :envvar:`LDFLAGS`, and :envvar:`CPPFLAGS`
-  environment variables, using them to override the settings in Python's
-  configuration (contributed by Robert Weber).
+* Các thay đổi nhỏ khác đối với Distutils: hiện nó kiểm tra các biến môi trường :envvar:`CC`,
+  :envvar:`CFLAGS`, :envvar:`!CPP`, :envvar:`LDFLAGS` và :envvar:`CPPFLAGS`, sử dụng chúng để ghi đè các thiết lập trong cấu hình của Python (do Robert Weber đóng góp).
 
-* Previously the :mod:`doctest` module would only search the docstrings of
-  public methods and functions for test cases, but it now also examines private
-  ones as well.  The :func:`~doctest.DocTestSuite` function creates a
-  :class:`unittest.TestSuite` object from a set of :mod:`doctest` tests.
+* Trước đây, module :mod:`doctest` chỉ tìm các test case trong docstring của các method và function public, nhưng hiện nay cũng kiểm tra cả các method và function private. Function :func:`~doctest.DocTestSuite` tạo một
+  object :class:`unittest.TestSuite` từ một tập hợp các test :mod:`doctest`.
 
-* The new ``gc.get_referents(object)`` function returns a list of all the
-  objects referenced by *object*.
+* Function mới ``gc.get_referents(object)`` trả về danh sách tất cả các object được *object* tham chiếu.
 
-* The :mod:`getopt` module gained a new function, :func:`~getopt.gnu_getopt`, that
-  supports the same arguments as the existing :func:`~getopt.getopt` function but uses
-  GNU-style scanning mode. The existing :func:`~getopt.getopt` stops processing options as
-  soon as a non-option argument is encountered, but in GNU-style mode processing
-  continues, meaning that options and arguments can be mixed.  For example::
+* Module :mod:`getopt` có thêm function mới :func:`~getopt.gnu_getopt`, hỗ trợ các đối số giống function :func:`~getopt.getopt` hiện có nhưng sử dụng chế độ quét kiểu GNU. :func:`~getopt.getopt` hiện có sẽ dừng xử lý các option ngay khi gặp một đối số không phải option, nhưng ở chế độ kiểu GNU, việc xử lý vẫn tiếp tục, nghĩa là có thể trộn lẫn option và đối số. Ví dụ::
 
      >>> getopt.getopt(['-f', 'filename', 'output', '-v'], 'f:v')
      ([('-f', 'filename')], ['output', '-v'])
      >>> getopt.gnu_getopt(['-f', 'filename', 'output', '-v'], 'f:v')
      ([('-f', 'filename'), ('-v', '')], ['output'])
 
-  (Contributed by Peter Åstrand.)
+  (Do Peter Åstrand đóng góp.)
 
-* The :mod:`grp`, :mod:`pwd`, and :mod:`resource` modules now return enhanced
-  tuples::
+* Các module :mod:`grp`, :mod:`pwd` và :mod:`resource` hiện trả về các tuple nâng cao::
 
      >>> import grp
      >>> g = grp.getgrnam('amk')
      >>> g.gr_name, g.gr_gid
      ('amk', 500)
 
-* The :mod:`gzip` module can now handle files exceeding 2 GiB.
+* Module :mod:`gzip` hiện có thể xử lý các file lớn hơn 2 GiB.
 
-* The new :mod:`heapq` module contains an implementation of a heap queue
-  algorithm.  A heap is an array-like data structure that keeps items in a
-  partially sorted order such that, for every index *k*, ``heap[k] <=
-  heap[2*k+1]`` and ``heap[k] <= heap[2*k+2]``.  This makes it quick to remove the
-  smallest item, and inserting a new item while maintaining the heap property is
-  *O*\ (log *n*).  (See https://xlinux.nist.gov/dads//HTML/priorityque.html for more
-  information about the priority queue data structure.)
+* Mô-đun :mod:`heapq` mới chứa một cách triển khai thuật toán hàng đợi heap. Heap là một cấu trúc dữ liệu giống mảng, giữ các phần tử theo thứ tự được sắp xếp một phần sao cho, với mọi chỉ số *k*, ``heap[k] <= heap[2*k+1]`` và ``heap[k] <= heap[2*k+2]``. Điều này giúp việc loại bỏ phần tử nhỏ nhất diễn ra nhanh chóng, còn việc chèn một phần tử mới trong khi vẫn duy trì thuộc tính heap có độ phức tạp *O*\ (log *n*). (Xem https://xlinux.nist.gov/dads//HTML/priorityque.html để biết thêm thông tin về cấu trúc dữ liệu priority queue.)
 
-  The :mod:`heapq` module provides :func:`~heapq.heappush` and :func:`~heapq.heappop` functions
-  for adding and removing items while maintaining the heap property on top of some
-  other mutable Python sequence type.  Here's an example that uses a Python list::
+  Mô-đun :mod:`heapq` cung cấp các hàm :func:`~heapq.heappush` và :func:`~heapq.heappop` để thêm và loại bỏ các phần tử trong khi duy trì thuộc tính heap trên một kiểu sequence Python có thể thay đổi khác. Sau đây là một ví dụ sử dụng Python list::
 
      >>> import heapq
      >>> heap = []
@@ -1329,49 +931,26 @@ complete list of changes, or look through the CVS logs for all the details.
      >>> heap
      [5, 7, 11]
 
-  (Contributed by Kevin O'Connor.)
+  (Do Kevin O'Connor đóng góp.)
 
-* The IDLE integrated development environment has been updated using the code
-  from the IDLEfork project (https://idlefork.sourceforge.net).  The most notable feature is
-  that the code being developed is now executed in a subprocess, meaning that
-  there's no longer any need for manual ``reload()`` operations. IDLE's core code
-  has been incorporated into the standard library as the :mod:`idlelib` package.
+* Môi trường phát triển tích hợp IDLE đã được cập nhật bằng cách sử dụng mã từ dự án IDLEfork (https://idlefork.sourceforge.net).  Tính năng đáng chú ý nhất là mã đang được phát triển hiện được thực thi trong một subprocess, nghĩa là không còn cần các thao tác ``reload()`` thủ công. Mã cốt lõi của IDLE đã được đưa vào standard library dưới dạng package :mod:`idlelib`.
 
-* The :mod:`imaplib` module now supports IMAP over SSL. (Contributed by Piers
-  Lauder and Tino Lange.)
+* Mô-đun :mod:`imaplib` hiện hỗ trợ IMAP qua SSL. (Do Piers Lauder và Tino Lange đóng góp.)
 
-* The :mod:`itertools` contains a number of useful functions for use with
-  iterators, inspired by various functions provided by the ML and Haskell
-  languages.  For example, ``itertools.ifilter(predicate, iterator)`` returns all
-  elements in the iterator for which the function :func:`!predicate` returns
-  :const:`True`, and ``itertools.repeat(obj, N)`` returns ``obj`` *N* times.
-  There are a number of other functions in the module; see the package's reference
-  documentation for details.
-  (Contributed by Raymond Hettinger.)
+* :mod:`itertools` chứa một số hàm hữu ích để sử dụng với iterator, lấy cảm hứng từ nhiều hàm do các ngôn ngữ ML và Haskell cung cấp. Ví dụ, ``itertools.ifilter(predicate, iterator)`` trả về tất cả các phần tử trong iterator mà với chúng, hàm :func:`!predicate` trả về
+  :const:`True`, còn ``itertools.repeat(obj, N)`` trả về ``obj`` *N* lần. Mô-đun này còn có một số hàm khác; hãy xem tài liệu tham khảo của package để biết chi tiết. (Do Raymond Hettinger đóng góp.)
 
-* Two new functions in the :mod:`math` module, ``degrees(rads)`` and
-  ``radians(degs)``, convert between radians and degrees.  Other functions in
-  the :mod:`math` module such as :func:`math.sin` and :func:`math.cos` have always
-  required input values measured in radians.  Also, an optional *base* argument
-  was added to :func:`math.log` to make it easier to compute logarithms for bases
-  other than ``e`` and ``10``.  (Contributed by Raymond Hettinger.)
+* Hai hàm mới trong module :mod:`math`, ``degrees(rads)`` và ``radians(degs)``, chuyển đổi giữa radian và độ. Các hàm khác trong module :mod:`math` như :func:`math.sin` và :func:`math.cos` trước đây luôn yêu cầu các giá trị đầu vào được đo bằng radian. Ngoài ra, một đối số *base* tùy chọn đã được thêm vào :func:`math.log` để giúp việc tính logarithm với các cơ số khác ``e`` và ``10`` trở nên dễ dàng hơn. (Đóng góp của Raymond Hettinger.)
 
-* Several new POSIX functions (:func:`!getpgid`, :func:`!killpg`, :func:`!lchown`,
-  :func:`!loadavg`, :func:`!major`, :func:`!makedev`, :func:`!minor`, and
-  :func:`!mknod`) were added to the :mod:`posix` module that underlies the
-  :mod:`os` module. (Contributed by Gustavo Niemeyer, Geert Jansen, and Denis S.
-  Otkidach.)
+* Một số hàm POSIX mới (:func:`!getpgid`, :func:`!killpg`, :func:`!lchown`,
+  :func:`!loadavg`, :func:`!major`, :func:`!makedev`, :func:`!minor`, và
+  :func:`!mknod`) đã được thêm vào module :mod:`posix`, nền tảng của
+  module :mod:`os`. (Đóng góp của Gustavo Niemeyer, Geert Jansen và Denis S. Otkidach.)
 
-* In the :mod:`os` module, the :func:`!\*stat` family of functions can now report
-  fractions of a second in a timestamp.  Such time stamps are represented as
-  floats, similar to the value returned by :func:`time.time`.
+* Trong module :mod:`os`, nhóm hàm :func:`!\*stat` hiện có thể báo cáo phần lẻ của một giây trong timestamp. Các timestamp như vậy được biểu diễn dưới dạng số thực, tương tự như giá trị do :func:`time.time` trả về.
 
-  During testing, it was found that some applications will break if time stamps
-  are floats.  For compatibility, when using the tuple interface of the
-  :class:`~os.stat_result` time stamps will be represented as integers. When using
-  named fields (a feature first introduced in Python 2.2), time stamps are still
-  represented as integers, unless :func:`!os.stat_float_times` is invoked to enable
-  float return values::
+  Trong quá trình kiểm thử, người ta phát hiện rằng một số ứng dụng sẽ bị lỗi nếu timestamp là số thực. Để đảm bảo khả năng tương thích, khi sử dụng giao diện tuple của
+  Dấu thời gian :class:`~os.stat_result` sẽ được biểu diễn dưới dạng số nguyên. Khi sử dụng các trường có tên (một tính năng lần đầu được giới thiệu trong Python 2.2), dấu thời gian vẫn được biểu diễn dưới dạng số nguyên, trừ khi gọi :func:`!os.stat_float_times` để bật giá trị trả về dạng số thực::
 
      >>> os.stat("/tmp").st_mtime
      1034791200
@@ -1379,39 +958,20 @@ complete list of changes, or look through the CVS logs for all the details.
      >>> os.stat("/tmp").st_mtime
      1034791200.6335014
 
-  In Python 2.4, the default will change to always returning floats.
+  Trong Python 2.4, mặc định sẽ thay đổi thành luôn trả về số thực.
 
-  Application developers should enable this feature only if all their libraries
-  work properly when confronted with floating-point time stamps, or if they use
-  the tuple API. If used, the feature should be activated on an application level
-  instead of trying to enable it on a per-use basis.
+  Nhà phát triển ứng dụng chỉ nên bật tính năng này nếu tất cả thư viện của họ hoạt động đúng khi gặp dấu thời gian dấu phẩy động, hoặc nếu họ sử dụng tuple API. Nếu sử dụng, nên kích hoạt tính năng này ở cấp ứng dụng thay vì cố gắng bật tính năng này cho từng lần sử dụng.
 
-* The :mod:`optparse` module contains a new parser for command-line arguments
-  that can convert option values to a particular Python type  and will
-  automatically generate a usage message.  See the following section for  more
-  details.
+* Module :mod:`optparse` chứa một parser mới cho các đối số dòng lệnh, có thể chuyển đổi giá trị tùy chọn thành một kiểu Python cụ thể và sẽ tự động tạo thông báo cách sử dụng. Xem phần sau để biết thêm chi tiết.
 
-* The old and never-documented :mod:`!linuxaudiodev` module has been deprecated,
-  and a new version named :mod:`!ossaudiodev` has been added.  The module was
-  renamed because the OSS sound drivers can be used on platforms other than Linux,
-  and the interface has also been tidied and brought up to date in various ways.
-  (Contributed by Greg Ward and Nicholas FitzRoy-Dale.)
+* Module :mod:`!linuxaudiodev` cũ và chưa từng được ghi chép tài liệu đã bị deprecated, đồng thời một phiên bản mới có tên :mod:`!ossaudiodev` đã được bổ sung. Module này được đổi tên vì các driver âm thanh OSS có thể được sử dụng trên những nền tảng khác ngoài Linux, đồng thời interface cũng đã được tinh chỉnh và cập nhật theo nhiều cách. (Do Greg Ward và Nicholas FitzRoy-Dale đóng góp.)
 
-* The new :mod:`platform` module contains a number of functions that try to
-  determine various properties of the platform you're running on.  There are
-  functions for getting the architecture, CPU type, the Windows OS version, and
-  even the Linux distribution version. (Contributed by Marc-André Lemburg.)
+* Module :mod:`platform` mới chứa một số hàm cố gắng xác định nhiều thuộc tính khác nhau của nền tảng mà bạn đang chạy. Có các hàm để lấy kiến trúc, loại CPU, phiên bản hệ điều hành Windows và thậm chí cả phiên bản bản phân phối Linux. (Do Marc-André Lemburg đóng góp.)
 
-* The parser objects provided by the :mod:`pyexpat <xml.parsers.expat>` module can now optionally
-  buffer character data, resulting in fewer calls to your character data handler
-  and therefore faster performance.  Setting the parser object's
-  :attr:`~xml.parsers.expat.xmlparser.buffer_text` attribute to :const:`True` will enable buffering.
+* Các đối tượng parser do module :mod:`pyexpat <xml.parsers.expat>` cung cấp giờ đây có thể tùy chọn buffer dữ liệu ký tự, nhờ đó giảm số lần gọi đến trình xử lý dữ liệu ký tự và cải thiện hiệu suất. Việc thiết lập đối tượng parser
+  Thuộc tính :attr:`~xml.parsers.expat.xmlparser.buffer_text` thành :const:`True` sẽ bật buffering.
 
-* The ``sample(population, k)`` function was added to the :mod:`random`
-  module.  *population* is a sequence or :class:`!xrange` object containing the
-  elements of a population, and :func:`~random.sample` chooses *k* elements from the
-  population without replacing chosen elements.  *k* can be any value up to
-  ``len(population)``. For example::
+* Hàm ``sample(population, k)`` đã được thêm vào module :mod:`random`. *population* là một sequence hoặc đối tượng :class:`!xrange` chứa các phần tử của một population, còn :func:`~random.sample` chọn *k* phần tử từ population mà không thay thế các phần tử đã chọn. *k* có thể là bất kỳ giá trị nào tối đa bằng ``len(population)``. Ví dụ::
 
      >>> days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'St', 'Sn']
      >>> random.sample(days, 3)      # Choose 3 elements
@@ -1429,64 +989,36 @@ complete list of changes, or look through the CVS logs for all the details.
      >>> random.sample(xrange(1,10000,2), 10)   # Choose ten odd nos. under 10000
      [3407, 3805, 1505, 7023, 2401, 2267, 9733, 3151, 8083, 9195]
 
-  The :mod:`random` module now uses a new algorithm, the Mersenne Twister,
-  implemented in C.  It's faster and more extensively studied than the previous
-  algorithm.
+  Module :mod:`random` hiện sử dụng một thuật toán mới, Mersenne Twister, được triển khai bằng C. Thuật toán này nhanh hơn và được nghiên cứu chuyên sâu hơn thuật toán trước đó.
 
-  (All changes contributed by Raymond Hettinger.)
+  (Mọi thay đổi đều do Raymond Hettinger đóng góp.)
 
-* The :mod:`readline` module also gained a number of new functions:
-  :func:`~readline.get_history_item`, :func:`~readline.get_current_history_length`, and
+* Module :mod:`readline` cũng có thêm một số hàm mới:
+  :func:`~readline.get_history_item`, :func:`~readline.get_current_history_length`, và
   :func:`~readline.redisplay`.
 
-* The :mod:`!rexec` and :mod:`!Bastion` modules have been declared dead, and
-  attempts to import them will fail with a :exc:`RuntimeError`.  New-style classes
-  provide new ways to break out of the restricted execution environment provided
-  by :mod:`!rexec`, and no one has interest in fixing them or time to do so.  If
-  you have applications using :mod:`!rexec`, rewrite them to use something else.
+* Các module :mod:`!rexec` và :mod:`!Bastion` đã được tuyên bố là không còn được duy trì, và việc import chúng sẽ thất bại với :exc:`RuntimeError`. Các class kiểu mới cung cấp những cách mới để thoát khỏi môi trường thực thi bị hạn chế do :mod:`!rexec` cung cấp, và không ai quan tâm hoặc có thời gian để sửa chúng. Nếu bạn có ứng dụng sử dụng :mod:`!rexec`, hãy viết lại chúng để sử dụng một giải pháp khác.
 
-  (Sticking with Python 2.2 or 2.1 will not make your applications any safer
-  because there are known bugs in the :mod:`!rexec` module in those versions.  To
-  repeat: if you're using :mod:`!rexec`, stop using it immediately.)
+  (Việc tiếp tục sử dụng Python 2.2 hoặc 2.1 sẽ không làm các ứng dụng của bạn an toàn hơn, vì các phiên bản đó có những lỗi đã biết trong module :mod:`!rexec`. Nhắc lại: nếu bạn đang sử dụng :mod:`!rexec`, hãy ngừng sử dụng ngay lập tức.)
 
-* The :mod:`!rotor` module has been deprecated because the  algorithm it uses for
-  encryption is not believed to be secure.  If you need encryption, use one of the
-  several AES Python modules that are available separately.
+* Module :mod:`!rotor` đã bị ngừng dùng vì thuật toán mã hóa mà nó sử dụng được cho là không an toàn. Nếu cần mã hóa, hãy sử dụng một trong số các module AES Python được cung cấp riêng.
 
-* The :mod:`shutil` module gained a ``move(src, dest)`` function that
-  recursively moves a file or directory to a new location.
+* Module :mod:`shutil` được bổ sung hàm ``move(src, dest)``, dùng để đệ quy di chuyển một tệp hoặc thư mục đến vị trí mới.
 
-* Support for more advanced POSIX signal handling was added to the :mod:`signal`
-  but then removed again as it proved impossible to make it work reliably across
-  platforms.
+* Hỗ trợ xử lý signal POSIX nâng cao hơn đã được bổ sung vào :mod:`signal`, nhưng sau đó lại bị gỡ bỏ vì không thể khiến nó hoạt động đáng tin cậy trên nhiều nền tảng.
 
-* The :mod:`socket` module now supports timeouts.  You can call the
-  ``settimeout(t)`` method on a socket object to set a timeout of *t* seconds.
-  Subsequent socket operations that take longer than *t* seconds to complete will
-  abort and raise a :exc:`socket.timeout` exception.
+* Module :mod:`socket` hiện hỗ trợ timeout. Bạn có thể gọi phương thức ``settimeout(t)`` trên một đối tượng socket để đặt timeout là *t* giây. Các thao tác socket tiếp theo mất nhiều hơn *t* giây để hoàn tất sẽ bị hủy và phát sinh ngoại lệ :exc:`socket.timeout`.
 
-  The original timeout implementation was by Tim O'Malley.  Michael Gilfix
-  integrated it into the Python :mod:`socket` module and shepherded it through a
-  lengthy review.  After the code was checked in, Guido van Rossum rewrote parts
-  of it.  (This is a good example of a collaborative development process in
-  action.)
+  Triển khai timeout ban đầu do Tim O'Malley thực hiện. Michael Gilfix đã tích hợp nó vào module :mod:`socket` của Python và dẫn dắt nó qua một quá trình review kéo dài. Sau khi mã được check in, Guido van Rossum đã viết lại một số phần. (Đây là một ví dụ điển hình về quy trình phát triển cộng tác.)
 
-* On Windows, the :mod:`socket` module now ships with Secure  Sockets Layer
-  (SSL) support.
+* Trên Windows, module :mod:`socket` hiện được cung cấp kèm hỗ trợ Secure  Sockets Layer (SSL).
 
-* The value of the C :c:macro:`!PYTHON_API_VERSION` macro is now exposed at the
-  Python level as ``sys.api_version``.  The current exception can be cleared by
-  calling the new :func:`!sys.exc_clear` function.
+* Giá trị của macro C :c:macro:`!PYTHON_API_VERSION` hiện được cung cấp ở cấp Python dưới dạng ``sys.api_version``. Có thể xóa exception hiện tại bằng cách gọi hàm :func:`!sys.exc_clear` mới.
 
-* The new :mod:`tarfile` module  allows reading from and writing to
-  :program:`tar`\ -format archive files. (Contributed by Lars Gustäbel.)
+* Mô-đun :mod:`tarfile` mới cho phép đọc và ghi vào
+  các tệp lưu trữ định dạng :program:`tar`\ . (Do Lars Gustäbel đóng góp.)
 
-* The new :mod:`textwrap` module contains functions for wrapping strings
-  containing paragraphs of text.  The ``wrap(text, width)`` function takes a
-  string and returns a list containing the text split into lines of no more than
-  the chosen width.  The ``fill(text, width)`` function returns a single
-  string, reformatted to fit into lines no longer than the chosen width. (As you
-  can guess, :func:`~textwrap.fill` is built on top of :func:`~textwrap.wrap`.  For example::
+* Mô-đun :mod:`textwrap` mới chứa các hàm để bao bọc các chuỗi chứa những đoạn văn bản. Hàm ``wrap(text, width)`` nhận một chuỗi và trả về một danh sách chứa văn bản được tách thành các dòng có độ dài không vượt quá chiều rộng đã chọn. Hàm ``fill(text, width)`` trả về một chuỗi duy nhất, được định dạng lại để vừa với các dòng không dài hơn chiều rộng đã chọn. (Như bạn có thể đoán, :func:`~textwrap.fill` được xây dựng dựa trên :func:`~textwrap.wrap`. Ví dụ::
 
      >>> import textwrap
      >>> paragraph = "Not a whit, we defy augury: ... more text ..."
@@ -1503,44 +1035,22 @@ complete list of changes, or look through the CVS logs for all the details.
      it will come: the readiness is all.
      >>>
 
-  The module also contains a :class:`~textwrap.TextWrapper` class that actually implements
-  the text wrapping strategy.   Both the :class:`~textwrap.TextWrapper` class and the
-  :func:`~textwrap.wrap` and :func:`~textwrap.fill` functions support a number of additional keyword
-  arguments for fine-tuning the formatting; consult the module's documentation
-  for details. (Contributed by Greg Ward.)
+  Mô-đun này cũng chứa một lớp :class:`~textwrap.TextWrapper` thực sự triển khai chiến lược wrapping văn bản. Cả lớp :class:`~textwrap.TextWrapper` và
+  các hàm :func:`~textwrap.wrap` và :func:`~textwrap.fill` đều hỗ trợ một số đối số keyword bổ sung để tinh chỉnh định dạng; hãy xem tài liệu của mô-đun để biết chi tiết. (Do Greg Ward đóng góp.)
 
-* The :mod:`!thread` and :mod:`threading` modules now have companion modules,
-  :mod:`!dummy_thread` and :mod:`!dummy_threading`, that provide a do-nothing
-  implementation of the :mod:`!thread` module's interface for platforms where
-  threads are not supported.  The intention is to simplify thread-aware modules
-  (ones that *don't* rely on threads to run) by putting the following code at the
-  top::
+* Các mô-đun :mod:`!thread` và :mod:`threading` hiện đã có các mô-đun đi kèm,
+  :mod:`!dummy_thread` và :mod:`!dummy_threading`, cung cấp một triển khai không thực hiện thao tác nào cho giao diện của mô-đun :mod:`!thread` trên các nền tảng không hỗ trợ thread. Mục đích là đơn giản hóa các mô-đun có nhận biết thread (những mô-đun *don't* phụ thuộc vào thread để chạy) bằng cách đặt đoạn mã sau ở đầu::
 
      try:
          import threading as _threading
      except ImportError:
          import dummy_threading as _threading
 
-  In this example, :mod:`!_threading` is used as the module name to make it clear
-  that the module being used is not necessarily the actual :mod:`threading`
-  module. Code can call functions and use classes in :mod:`!_threading` whether or
-  not threads are supported, avoiding an :keyword:`if` statement and making the
-  code slightly clearer.  This module will not magically make multithreaded code
-  run without threads; code that waits for another thread to return or to do
-  something will simply hang forever.
+  Trong ví dụ này, :mod:`!_threading` được dùng làm tên mô-đun để làm rõ rằng mô-đun đang được sử dụng không nhất thiết là mô-đun :mod:`threading` thực tế. Mã có thể gọi các hàm và sử dụng các lớp trong :mod:`!_threading` независимо việc có hỗ trợ thread hay không, nhờ đó tránh được câu lệnh :keyword:`if` và làm cho mã dễ hiểu hơn đôi chút. Mô-đun này sẽ không thể biến mã multithreaded thành mã chạy được mà không cần thread; mã chờ một thread khác trả về hoặc thực hiện việc gì đó sẽ đơn giản là treo vĩnh viễn.
 
-* The :mod:`time` module's :func:`~time.strptime` function has long been an annoyance
-  because it uses the platform C library's :func:`~time.strptime` implementation, and
-  different platforms sometimes have odd bugs.  Brett Cannon contributed a
-  portable implementation that's written in pure Python and should behave
-  identically on all platforms.
+* Hàm :func:`~time.strptime` của mô-đun :mod:`time` từ lâu đã gây khó chịu vì sử dụng triển khai :func:`~time.strptime` của thư viện C trên nền tảng, và các nền tảng khác nhau đôi khi có những lỗi kỳ lạ. Brett Cannon đã đóng góp một triển khai portable được viết hoàn toàn bằng Python và sẽ hoạt động giống hệt nhau trên mọi nền tảng.
 
-* The new :mod:`timeit` module helps measure how long snippets of Python code
-  take to execute.  The :file:`timeit.py` file can be run directly from the
-  command line, or the module's :class:`~timeit.Timer` class can be imported and used
-  directly.  Here's a short example that figures out whether it's faster to
-  convert an 8-bit string to Unicode by appending an empty Unicode string to it or
-  by using the :func:`!unicode` function::
+* Mô-đun mới :mod:`timeit` giúp đo thời gian thực thi các đoạn mã Python. Tệp :file:`timeit.py` có thể được chạy trực tiếp từ command line, hoặc có thể import và sử dụng trực tiếp lớp :class:`~timeit.Timer` của mô-đun. Dưới đây là một ví dụ ngắn xác định cách nào nhanh hơn để chuyển đổi một chuỗi 8-bit thành Unicode: nối thêm một chuỗi Unicode rỗng vào chuỗi đó hay sử dụng hàm :func:`!unicode`::
 
      import timeit
 
@@ -1555,49 +1065,25 @@ complete list of changes, or look through the CVS logs for all the details.
      # [0.36831796169281006, 0.37441694736480713, 0.35304892063140869]
      # [0.17574405670166016, 0.18193507194519043, 0.17565798759460449]
 
-* The :mod:`!Tix` module has received various bug fixes and updates for the
-  current version of the Tix package.
+* Mô-đun :mod:`!Tix` đã nhận được nhiều bản sửa lỗi và cập nhật cho phiên bản hiện tại của gói Tix.
 
-* The :mod:`!Tkinter` module now works with a thread-enabled  version of Tcl.
-  Tcl's threading model requires that widgets only be accessed from the thread in
-  which they're created; accesses from another thread can cause Tcl to panic.  For
-  certain Tcl interfaces, :mod:`!Tkinter` will now automatically avoid this  when a
-  widget is accessed from a different thread by marshalling a command, passing it
-  to the correct thread, and waiting for the results.  Other interfaces can't be
-  handled automatically but :mod:`!Tkinter` will now raise an exception on such an
-  access so that you can at least find out about the problem.  See
-  https://mail.python.org/pipermail/python-dev/2002-December/031107.html for a more
-  detailed explanation of this change.  (Implemented by Martin von Löwis.)
+* Mô-đun :mod:`!Tkinter` hiện hoạt động với phiên bản Tcl hỗ trợ thread. Mô hình threading của Tcl yêu cầu widget chỉ được truy cập từ thread nơi chúng được tạo; việc truy cập từ một thread khác có thể khiến Tcl panic. Đối với một số giao diện Tcl, :mod:`!Tkinter` hiện sẽ tự động tránh tình huống này khi một widget được truy cập từ thread khác bằng cách marshal một command, truyền nó đến thread thích hợp và chờ kết quả. Các giao diện khác không thể được xử lý tự động, nhưng :mod:`!Tkinter` hiện sẽ raise một exception khi có việc truy cập như vậy, để ít nhất bạn có thể phát hiện vấn đề. Xem https://mail.python.org/pipermail/python-dev/2002-December/031107.html để biết giải thích chi tiết hơn về thay đổi này. (Do Martin von Löwis thực hiện.)
 
-* Calling Tcl methods through :mod:`!_tkinter` no longer  returns only strings.
-  Instead, if Tcl returns other objects those objects are converted to their
-  Python equivalent, if one exists, or wrapped with a :class:`!_tkinter.Tcl_Obj`
-  object if no Python equivalent exists. This behavior can be controlled through
-  the :meth:`!wantobjects` method of :class:`!tkapp` objects.
+* Việc gọi các phương thức Tcl thông qua :mod:`!_tkinter` không còn chỉ trả về các chuỗi. Thay vào đó, nếu Tcl trả về các đối tượng khác, những đối tượng đó sẽ được chuyển đổi sang đối tượng tương đương trong Python nếu có, hoặc được bọc bằng một đối tượng :class:`!_tkinter.Tcl_Obj` nếu không có đối tượng tương đương trong Python. Hành vi này có thể được kiểm soát thông qua phương thức :meth:`!wantobjects` của các đối tượng :class:`!tkapp`.
 
-  When using :mod:`!_tkinter` through the :mod:`!Tkinter` module (as most Tkinter
-  applications will), this feature is always activated. It should not cause
-  compatibility problems, since Tkinter would always convert string results to
-  Python types where possible.
+  Khi sử dụng :mod:`!_tkinter` thông qua module :mod:`!Tkinter` (như hầu hết các ứng dụng Tkinter sẽ làm), tính năng này luôn được kích hoạt. Tính năng này không gây ra vấn đề tương thích, vì Tkinter vốn luôn chuyển đổi các kết quả chuỗi thành kiểu Python khi có thể.
 
-  If any incompatibilities are found, the old behavior can be restored by setting
-  the :attr:`!wantobjects` variable in the :mod:`!Tkinter` module to false before
-  creating the first :class:`!tkapp` object. ::
+  Nếu phát hiện bất kỳ điểm không tương thích nào, có thể khôi phục hành vi cũ bằng cách đặt biến :attr:`!wantobjects` trong module :mod:`!Tkinter` thành false trước khi tạo đối tượng :class:`!tkapp` đầu tiên.::
 
      import Tkinter
      Tkinter.wantobjects = 0
 
-  Any breakage caused by this change should be reported as a bug.
+  Mọi lỗi phát sinh do thay đổi này nên được báo cáo dưới dạng bug.
 
-* The :mod:`!UserDict` module has a new :class:`!DictMixin` class which defines
-  all dictionary methods for classes that already have a minimum mapping
-  interface.  This greatly simplifies writing classes that need to be
-  substitutable for dictionaries, such as the classes in  the :mod:`shelve`
-  module.
+* Module :mod:`!UserDict` có một class :class:`!DictMixin` mới, định nghĩa tất cả các phương thức của dictionary cho những class đã có giao diện mapping tối thiểu. Điều này giúp đơn giản hóa đáng kể việc viết các class cần có thể thay thế cho dictionary, chẳng hạn như các class trong module :mod:`shelve`.
 
-  Adding the mix-in as a superclass provides the full dictionary interface
-  whenever the class defines :meth:`~object.__getitem__`, :meth:`~object.__setitem__`,
-  :meth:`~object.__delitem__`, and :meth:`!keys`. For example::
+  Việc thêm mix-in làm superclass sẽ cung cấp giao diện dictionary đầy đủ khi class định nghĩa :meth:`~object.__getitem__`, :meth:`~object.__setitem__`,
+  :meth:`~object.__delitem__`, và :meth:`!keys`. Ví dụ::
 
      >>> import UserDict
      >>> class SeqDict(UserDict.DictMixin):
@@ -1636,67 +1122,40 @@ complete list of changes, or look through the CVS logs for all the details.
       'iterkeys', 'itervalues', 'keylist', 'keys', 'pop', 'popitem',
       'setdefault', 'update', 'valuelist', 'values']
 
-  (Contributed by Raymond Hettinger.)
+  (Đóng góp của Raymond Hettinger.)
 
-* The DOM implementation in :mod:`xml.dom.minidom` can now generate XML output
-  in a particular encoding by providing an optional encoding argument to the
-  :meth:`~xml.dom.minidom.Node.toxml` and :meth:`~xml.dom.minidom.Node.toprettyxml` methods of DOM nodes.
+* Giờ đây, triển khai DOM trong :mod:`xml.dom.minidom` có thể tạo đầu ra XML bằng một encoding cụ thể bằng cách cung cấp đối số encoding tùy chọn cho
+  các phương thức :meth:`~xml.dom.minidom.Node.toxml` và :meth:`~xml.dom.minidom.Node.toprettyxml` của các node DOM.
 
-* The :mod:`!xmlrpclib` module now supports an XML-RPC extension for handling nil
-  data values such as Python's ``None``.  Nil values are always supported on
-  unmarshalling an XML-RPC response.  To generate requests containing ``None``,
-  you must supply a true value for the *allow_none* parameter when creating a
-  :class:`!Marshaller` instance.
+* Mô-đun :mod:`!xmlrpclib` hiện hỗ trợ một phần mở rộng XML-RPC để xử lý các giá trị dữ liệu nil như ``None`` của Python. Các giá trị nil luôn được hỗ trợ khi giải mã phản hồi XML-RPC. Để tạo các request chứa ``None``, bạn phải cung cấp giá trị true cho tham số *allow_none* khi tạo một
+  instance :class:`!Marshaller`.
 
-* The new :mod:`!DocXMLRPCServer` module allows writing self-documenting XML-RPC
-  servers. Run it in demo mode (as a program) to see it in action.   Pointing the
-  web browser to the RPC server produces pydoc-style documentation; pointing
-  xmlrpclib to the server allows invoking the actual methods. (Contributed by
-  Brian Quinlan.)
+* Mô-đun :mod:`!DocXMLRPCServer` mới cho phép viết các máy chủ XML-RPC tự mô tả. Hãy chạy mô-đun này ở chế độ demo (dưới dạng một chương trình) để xem cách hoạt động. Trỏ trình duyệt web đến máy chủ RPC sẽ tạo tài liệu theo kiểu pydoc; trỏ xmlrpclib đến máy chủ sẽ cho phép gọi các phương thức thực tế. (Do Brian Quinlan đóng góp.)
 
-* Support for internationalized domain names (RFCs 3454, 3490, 3491, and 3492)
-  has been added. The "idna" encoding can be used to convert between a Unicode
-  domain name and the ASCII-compatible encoding (ACE) of that name. ::
+* Đã bổ sung hỗ trợ cho tên miền quốc tế hóa (RFC 3454, 3490, 3491 và 3492). Có thể dùng encoding "idna" để chuyển đổi giữa tên miền Unicode và encoding tương thích ASCII (ACE) của tên miền đó.::
 
      >{}>{}> u"www.Alliancefrançaise.nu".encode("idna")
      'www.xn--alliancefranaise-npb.nu'
 
-  The :mod:`socket` module has also been extended to transparently convert
-  Unicode hostnames to the ACE version before passing them to the C library.
-  Modules that deal with hostnames such as :mod:`!httplib` and :mod:`ftplib`)
-  also support Unicode host names; :mod:`!httplib` also sends HTTP ``Host``
-  headers using the ACE version of the domain name.  :mod:`urllib` supports
-  Unicode URLs with non-ASCII host names as long as the ``path`` part of the URL
-  is ASCII only.
+  Mô-đun :mod:`socket` cũng đã được mở rộng để tự động chuyển đổi tên máy chủ Unicode sang phiên bản ACE trước khi truyền chúng cho thư viện C. Các mô-đun xử lý tên máy chủ như :mod:`!httplib` và :mod:`ftplib`) cũng hỗ trợ tên máy chủ Unicode; :mod:`!httplib` cũng gửi các header HTTP ``Host`` bằng phiên bản ACE của tên miền. :mod:`urllib` hỗ trợ các URL Unicode có tên máy chủ không phải ASCII miễn là phần ``path`` của URL chỉ chứa ASCII.
 
-  To implement this change, the :mod:`stringprep` module, the  ``mkstringprep``
-  tool and the ``punycode`` encoding have been added.
+  Để triển khai thay đổi này, module :mod:`stringprep`, công cụ ``mkstringprep`` và encoding ``punycode`` đã được bổ sung.
 
 .. ======================================================================
 
 
-Date/Time Type
---------------
+Kiểu ngày/giờ
+-------------
 
-Date and time types suitable for expressing timestamps were added as the
-:mod:`datetime` module.  The types don't support different calendars or many
-fancy features, and just stick to the basics of representing time.
+Các kiểu ngày và giờ phù hợp để biểu diễn timestamp đã được bổ sung dưới dạng
+module :mod:`datetime`. Các kiểu này không hỗ trợ những lịch khác nhau hoặc nhiều tính năng nâng cao, mà chỉ tập trung vào những điều cơ bản trong việc biểu diễn thời gian.
 
-The three primary types are: :class:`~datetime.date`, representing a day, month, and year;
-:class:`~datetime.time`, consisting of hour, minute, and second; and :class:`~datetime.datetime`,
-which contains all the attributes of both :class:`~datetime.date` and :class:`~datetime.time`.
-There's also a :class:`~datetime.timedelta` class representing differences between two
-points in time, and time zone logic is implemented by classes inheriting from
-the abstract :class:`~datetime.tzinfo` class.
+Ba kiểu chính là: :class:`~datetime.date`, biểu diễn ngày, tháng và năm;
+:class:`~datetime.time`, gồm giờ, phút và giây; và :class:`~datetime.datetime`, chứa tất cả thuộc tính của cả :class:`~datetime.date` và :class:`~datetime.time`. Ngoài ra còn có lớp :class:`~datetime.timedelta` biểu diễn khoảng chênh lệch giữa hai thời điểm, còn logic múi giờ được triển khai bởi các lớp kế thừa lớp trừu tượng :class:`~datetime.tzinfo`.
 
-You can create instances of :class:`~datetime.date` and :class:`~datetime.time` by either supplying
-keyword arguments to the appropriate constructor, e.g.
-``datetime.date(year=1972, month=10, day=15)``, or by using one of a number of
-class methods.  For example, the :meth:`~datetime.date.today` class method returns the
-current local date.
+Bạn có thể tạo các thực thể của :class:`~datetime.date` và :class:`~datetime.time` bằng cách cung cấp các đối số keyword cho constructor tương ứng, chẳng hạn như ``datetime.date(year=1972, month=10, day=15)``, hoặc sử dụng một trong nhiều phương thức lớp. Ví dụ, phương thức lớp :meth:`~datetime.date.today` trả về ngày cục bộ hiện tại.
 
-Once created, instances of the date/time classes are all immutable. There are a
-number of methods for producing formatted strings from objects::
+Sau khi được tạo, các instance của những lớp ngày/giờ đều không thể thay đổi. Có một số phương thức để tạo chuỗi đã được định dạng từ các đối tượng::
 
    >>> import datetime as dt
    >>> now = dt.datetime.now()
@@ -1707,8 +1166,8 @@ number of methods for producing formatted strings from objects::
    >>> now.strftime('%Y %d %b')
    '2002 30 Dec'
 
-The :meth:`~datetime.datetime.replace` method allows modifying one or more fields  of a
-:class:`~datetime.date` or :class:`~datetime.datetime` instance, returning a new instance::
+Phương thức :meth:`~datetime.datetime.replace` cho phép sửa đổi một hoặc nhiều trường của một
+instance :class:`~datetime.date` hoặc :class:`~datetime.datetime`, đồng thời trả về một instance mới::
 
    >>> d = dt.datetime.now()
    >>> d
@@ -1717,30 +1176,20 @@ The :meth:`~datetime.datetime.replace` method allows modifying one or more field
    datetime.datetime(2001, 12, 30, 12, 15, 38, 827738)
    >>>
 
-Instances can be compared, hashed, and converted to strings (the result is the
-same as that of :meth:`~datetime.datetime.isoformat`).  :class:`~datetime.date` and :class:`~datetime.datetime`
-instances can be subtracted from each other, and added to :class:`~datetime.timedelta`
-instances.  The largest missing feature is that there's no standard library
-support for parsing strings and getting back a :class:`~datetime.date` or
+Các instance có thể được so sánh, băm và chuyển đổi thành chuỗi (kết quả giống với kết quả của :meth:`~datetime.datetime.isoformat`). Các instance :class:`~datetime.date` và :class:`~datetime.datetime` có thể được trừ cho nhau và cộng với các instance :class:`~datetime.timedelta`. Tính năng lớn nhất còn thiếu là thư viện chuẩn không hỗ trợ phân tích cú pháp chuỗi để lấy lại một :class:`~datetime.date` hoặc
 :class:`~datetime.datetime`.
 
-For more information, refer to the module's reference documentation.
-(Contributed by Tim Peters.)
+Để biết thêm thông tin, hãy tham khảo tài liệu tham chiếu của mô-đun. (Do Tim Peters đóng góp.)
 
 .. ======================================================================
 
 
-The optparse Module
--------------------
+Mô-đun optparse
+---------------
 
-The :mod:`getopt` module provides simple parsing of command-line arguments.  The
-new :mod:`optparse` module (originally named Optik) provides more elaborate
-command-line parsing that follows the Unix conventions, automatically creates
-the output for :option:`!--help`, and can perform different actions for different
-options.
+Mô-đun :mod:`getopt` cung cấp khả năng phân tích cú pháp đơn giản cho các đối số dòng lệnh. Mô-đun :mod:`optparse` mới (ban đầu có tên là Optik) cung cấp khả năng phân tích cú pháp dòng lệnh chi tiết hơn, tuân theo các quy ước của Unix, tự động tạo đầu ra cho :option:`!--help` và có thể thực hiện các hành động khác nhau cho từng tùy chọn.
 
-You start by creating an instance of :class:`~optparse.OptionParser` and telling it what
-your program's options are. ::
+Trước tiên, bạn tạo một instance của :class:`~optparse.OptionParser` và cho nó biết các tùy chọn của chương trình.::
 
    import sys
    from optparse import OptionParser
@@ -1753,17 +1202,15 @@ your program's options are. ::
                  action='store', type='int', dest='length',
                  help='set maximum length of output')
 
-Parsing a command line is then done by calling the :meth:`~optparse.OptionParser.parse_args` method. ::
+Sau đó, việc phân tích command line được thực hiện bằng cách gọi phương thức :meth:`~optparse.OptionParser.parse_args`.::
 
    options, args = op.parse_args(sys.argv[1:])
    print options
    print args
 
-This returns an object containing all of the option values, and a list of
-strings containing the remaining arguments.
+Phương thức này trả về một object chứa tất cả giá trị tùy chọn và một danh sách các chuỗi chứa những đối số còn lại.
 
-Invoking the script with the various arguments now works as you'd expect it to.
-Note that the length argument is automatically converted to an integer.
+Giờ đây, việc gọi script với nhiều đối số khác nhau hoạt động đúng như bạn mong đợi. Lưu ý rằng đối số length được tự động chuyển đổi thành một số nguyên.
 
 .. code-block:: shell-session
 
@@ -1775,7 +1222,7 @@ Note that the length argument is automatically converted to an integer.
    []
    $
 
-The help message is automatically generated for you:
+Thông báo trợ giúp được tự động tạo cho bạn:
 
 .. code-block:: shell-session
 
@@ -1790,270 +1237,155 @@ The help message is automatically generated for you:
                            set maximum length of output
    $
 
-See the module's documentation for more details.
+Xem tài liệu của module để biết thêm chi tiết.
 
 
-Optik was written by Greg Ward, with suggestions from the readers of the Getopt
-SIG.
+Optik được viết bởi Greg Ward, cùng với các đề xuất từ những độc giả của Getopt SIG.
 
 .. ======================================================================
 
 
 .. _section-pymalloc:
 
-Pymalloc: A Specialized Object Allocator
-========================================
+Pymalloc: Trình cấp phát đối tượng chuyên biệt
+==============================================
 
-Pymalloc, a specialized object allocator written by Vladimir Marangozov, was a
-feature added to Python 2.1.  Pymalloc is intended to be faster than the system
-:c:func:`malloc` and to have less memory overhead for allocation patterns typical
-of Python programs. The allocator uses C's :c:func:`malloc` function to get large
-pools of memory and then fulfills smaller memory requests from these pools.
+Pymalloc, một trình cấp phát đối tượng chuyên biệt do Vladimir Marangozov viết, là một tính năng được bổ sung vào Python 2.1. Pymalloc được thiết kế để nhanh hơn trình cấp phát của hệ thống
+:c:func:`malloc` và giảm chi phí bộ nhớ cho các mẫu cấp phát thường thấy trong các chương trình Python. Trình cấp phát sử dụng hàm :c:func:`malloc` của C để lấy các pool bộ nhớ lớn, sau đó đáp ứng những yêu cầu bộ nhớ nhỏ hơn từ các pool này.
 
-In 2.1 and 2.2, pymalloc was an experimental feature and wasn't enabled by
-default; you had to explicitly enable it when compiling Python by providing the
-:option:`!--with-pymalloc` option to the :program:`configure` script.  In 2.3,
-pymalloc has had further enhancements and is now enabled by default; you'll have
-to supply :option:`!--without-pymalloc` to disable it.
+Trong 2.1 và 2.2, pymalloc là một tính năng thử nghiệm và không được bật theo mặc định; bạn phải bật rõ ràng khi biên dịch Python bằng cách cung cấp tùy chọn
+:option:`!--with-pymalloc` cho script :program:`configure`. Trong 2.3, pymalloc đã được cải tiến thêm và hiện được bật theo mặc định; bạn sẽ phải cung cấp :option:`!--without-pymalloc` để tắt nó.
 
-This change is transparent to code written in Python; however, pymalloc may
-expose bugs in C extensions.  Authors of C extension modules should test their
-code with pymalloc enabled, because some incorrect code may cause core dumps at
-runtime.
+Thay đổi này không ảnh hưởng đến mã được viết bằng Python; tuy nhiên, pymalloc có thể làm lộ ra các lỗi trong C extension. Tác giả của các mô-đun C extension nên kiểm thử mã của mình khi pymalloc được bật, vì một số mã không chính xác có thể khiến core dump trong runtime.
 
-There's one particularly common error that causes problems.  There are a number
-of memory allocation functions in Python's C API that have previously just been
-aliases for the C library's :c:func:`malloc` and :c:func:`free`, meaning that if
-you accidentally called mismatched functions the error wouldn't be noticeable.
-When the object allocator is enabled, these functions aren't aliases of
-:c:func:`malloc` and :c:func:`free` any more, and calling the wrong function to
-free memory may get you a core dump.  For example, if memory was allocated using
-:c:func:`PyObject_Malloc`, it has to be freed using :c:func:`PyObject_Free`, not
-:c:func:`free`.  A few modules included with Python fell afoul of this and had to
-be fixed; doubtless there are more third-party modules that will have the same
-problem.
+Có một lỗi đặc biệt phổ biến gây ra vấn đề. Python's C API có một số hàm cấp phát bộ nhớ trước đây chỉ là bí danh của :c:func:`malloc` và :c:func:`free` của thư viện C, nghĩa là nếu bạn vô tình gọi các hàm không tương ứng thì lỗi sẽ không dễ nhận thấy. Khi trình cấp phát đối tượng được bật, các hàm này không phải là bí danh của
+không còn sử dụng :c:func:`malloc` và :c:func:`free` nữa, và việc gọi sai hàm để giải phóng bộ nhớ có thể khiến bạn gặp một core dump. Ví dụ, nếu bộ nhớ được cấp phát bằng
+:c:func:`PyObject_Malloc`, thì phải được giải phóng bằng :c:func:`PyObject_Free`, không phải
+:c:func:`free`. Một vài module đi kèm Python đã gặp phải vấn đề này và phải được sửa; chắc chắn sẽ còn nhiều module bên thứ ba khác gặp vấn đề tương tự.
 
-As part of this change, the confusing multiple interfaces for allocating memory
-have been consolidated down into two API families. Memory allocated with one
-family must not be manipulated with functions from the other family.  There is
-one family for allocating chunks of memory and another family of functions
-specifically for allocating Python objects.
+Trong khuôn khổ thay đổi này, các interface đa dạng và khó hiểu để cấp phát bộ nhớ đã được hợp nhất thành hai nhóm API. Bộ nhớ được cấp phát bằng nhóm này không được thao tác bằng các hàm thuộc nhóm kia. Một nhóm dùng để cấp phát các khối bộ nhớ, còn nhóm hàm kia chuyên dùng để cấp phát các đối tượng Python.
 
-* To allocate and free an undistinguished chunk of memory use the "raw memory"
-  family: :c:func:`PyMem_Malloc`, :c:func:`PyMem_Realloc`, and :c:func:`PyMem_Free`.
+* Để cấp phát và giải phóng một khối bộ nhớ không phân biệt, hãy sử dụng nhóm "raw memory": :c:func:`PyMem_Malloc`, :c:func:`PyMem_Realloc` và :c:func:`PyMem_Free`.
 
-* The "object memory" family is the interface to the pymalloc facility described
-  above and is biased towards a large number of "small" allocations:
-  :c:func:`PyObject_Malloc`, :c:func:`PyObject_Realloc`, and :c:func:`PyObject_Free`.
+* Nhóm "object memory" là interface cho cơ chế pymalloc được mô tả ở trên và được tối ưu cho số lượng lớn các lần cấp phát "nhỏ":
+  :c:func:`PyObject_Malloc`, :c:func:`PyObject_Realloc` và :c:func:`PyObject_Free`.
 
-* To allocate and free Python objects, use the "object" family
-  :c:macro:`PyObject_New`, :c:macro:`PyObject_NewVar`, and :c:func:`PyObject_Del`.
+* Để cấp phát và giải phóng các object Python, hãy sử dụng họ "object"
+  :c:macro:`PyObject_New`, :c:macro:`PyObject_NewVar`, và :c:func:`PyObject_Del`.
 
-Thanks to lots of work by Tim Peters, pymalloc in 2.3 also provides debugging
-features to catch memory overwrites and doubled frees in both extension modules
-and in the interpreter itself.  To enable this support, compile a debugging
-version of the Python interpreter by running :program:`configure` with
+Nhờ rất nhiều công sức của Tim Peters, pymalloc trong 2.3 cũng cung cấp các tính năng gỡ lỗi để phát hiện việc ghi đè bộ nhớ và giải phóng bộ nhớ hai lần trong cả các mô-đun mở rộng lẫn chính trình thông dịch. Để bật tính năng hỗ trợ này, hãy biên dịch một phiên bản debug của trình thông dịch Python bằng cách chạy :program:`configure` với
 :option:`!--with-pydebug`.
 
-To aid extension writers, a header file :file:`Misc/pymemcompat.h` is
-distributed with the source to Python 2.3 that allows Python extensions to use
-the 2.3 interfaces to memory allocation while compiling against any version of
-Python since 1.5.2.  You would copy the file from Python's source distribution
-and bundle it with the source of your extension.
+Để hỗ trợ những người viết extension, một tệp header :file:`Misc/pymemcompat.h` được phân phối cùng mã nguồn Python 2.3, cho phép các extension Python sử dụng các giao diện cấp phát bộ nhớ của 2.3 trong khi biên dịch trên bất kỳ phiên bản Python nào kể từ 1.5.2. Bạn sẽ sao chép tệp này từ bản phân phối mã nguồn của Python và đóng gói nó cùng mã nguồn của extension.
 
 
 .. seealso::
 
    https://hg.python.org/cpython/file/default/Objects/obmalloc.c
-      For the full details of the pymalloc implementation, see the comments at
-      the top of the file :file:`Objects/obmalloc.c` in the Python source code.
-      The above link points to the file within the python.org SVN browser.
+      Để biết đầy đủ chi tiết về cách triển khai pymalloc, hãy xem các chú thích ở đầu tệp :file:`Objects/obmalloc.c` trong mã nguồn Python. Liên kết ở trên trỏ đến tệp trong trình duyệt SVN của python.org.
 
 .. ======================================================================
 
 
-Build and C API Changes
-=======================
+Các thay đổi về quá trình build và C API
+========================================
 
-Changes to Python's build process and to the C API include:
+Các thay đổi đối với quá trình build của Python và C API bao gồm:
 
-* The cycle detection implementation used by the garbage collection has proven
-  to be stable, so it's now been made mandatory.  You can no longer compile Python
-  without it, and the :option:`!--with-cycle-gc` switch to :program:`configure` has
-  been removed.
+* Việc triển khai phát hiện chu trình được bộ thu gom rác sử dụng đã chứng minh tính ổn định, vì vậy giờ đây nó đã trở thành bắt buộc. Bạn không thể biên dịch Python nếu thiếu nó nữa, và tùy chọn :option:`!--with-cycle-gc` chuyển sang :program:`configure` đã bị loại bỏ.
 
-* Python can now optionally be built as a shared library
-  (:file:`libpython2.3.so`) by supplying :option:`!--enable-shared` when running
-  Python's :program:`configure` script.  (Contributed by Ondrej Palkovsky.)
+* Giờ đây, Python có thể được build tùy chọn dưới dạng shared library (:file:`libpython2.3.so`) bằng cách cung cấp :option:`!--enable-shared` khi chạy script :program:`configure` của Python. (Do Ondrej Palkovsky đóng góp.)
 
-* The :c:macro:`!DL_EXPORT` and :c:macro:`!DL_IMPORT` macros are now deprecated.
-  Initialization functions for Python extension modules should now be declared
-  using the new macro :c:macro:`PyMODINIT_FUNC`, while the Python core will
-  generally use the :c:macro:`!PyAPI_FUNC` and :c:macro:`!PyAPI_DATA` macros.
+* Các macro :c:macro:`!DL_EXPORT` và :c:macro:`!DL_IMPORT` hiện đã không còn được khuyến nghị sử dụng. Các hàm khởi tạo cho Python extension module giờ đây nên được khai báo bằng macro mới :c:macro:`PyMODINIT_FUNC`, trong khi phần lõi Python thường sẽ sử dụng các macro :c:macro:`!PyAPI_FUNC` và :c:macro:`!PyAPI_DATA`.
 
-* The interpreter can be compiled without any docstrings for the built-in
-  functions and modules by supplying :option:`!--without-doc-strings` to the
-  :program:`configure` script. This makes the Python executable about 10% smaller,
-  but will also mean that you can't get help for Python's built-ins.  (Contributed
-  by Gustavo Niemeyer.)
+* Có thể biên dịch interpreter mà không có bất kỳ docstring nào cho các hàm và module tích hợp sẵn bằng cách cung cấp :option:`!--without-doc-strings` cho
+  script :program:`configure`. Điều này làm cho tệp thực thi Python nhỏ hơn khoảng 10%, nhưng cũng có nghĩa là bạn không thể nhận trợ giúp về các thành phần tích hợp sẵn của Python. (Do Gustavo Niemeyer đóng góp.)
 
-* The :c:func:`!PyArg_NoArgs` macro is now deprecated, and code that uses it
-  should be changed.  For Python 2.2 and later, the method definition table can
-  specify the :c:macro:`METH_NOARGS` flag, signalling that there are no arguments,
-  and the argument checking can then be removed.  If compatibility with pre-2.2
-  versions of Python is important, the code could use ``PyArg_ParseTuple(args,
-  "")`` instead, but this will be slower than using :c:macro:`METH_NOARGS`.
+* Macro :c:func:`!PyArg_NoArgs` hiện đã không còn được khuyến nghị sử dụng và mã sử dụng nó nên được thay đổi. Với Python 2.2 trở lên, bảng định nghĩa phương thức có thể chỉ định cờ :c:macro:`METH_NOARGS`, cho biết rằng không có đối số, sau đó có thể loại bỏ việc kiểm tra đối số. Nếu cần tương thích với các phiên bản Python trước 2.2, mã có thể sử dụng ``PyArg_ParseTuple(args, "")`` thay thế, nhưng cách này sẽ chậm hơn so với sử dụng :c:macro:`METH_NOARGS`.
 
-* :c:func:`PyArg_ParseTuple` accepts new format characters for various sizes of
-  unsigned integers: ``B`` for :c:expr:`unsigned char`, ``H`` for :c:expr:`unsigned
-  short int`,  ``I`` for :c:expr:`unsigned int`,  and ``K`` for :c:expr:`unsigned
-  long long`.
+* :c:func:`PyArg_ParseTuple` chấp nhận các ký tự định dạng mới cho nhiều kích thước khác nhau của số nguyên không dấu: ``B`` cho :c:expr:`unsigned char`, ``H`` cho :c:expr:`unsigned short int`, ``I`` cho :c:expr:`unsigned int`, và ``K`` cho :c:expr:`unsigned long long`.
 
-* A new function, ``PyObject_DelItemString(mapping, char *key)`` was added
-  as shorthand for ``PyObject_DelItem(mapping, PyString_New(key))``.
+* Một hàm mới, ``PyObject_DelItemString(mapping, char *key)`` đã được thêm làm cách viết tắt cho ``PyObject_DelItem(mapping, PyString_New(key))``.
 
-* File objects now manage their internal string buffer differently, increasing
-  it exponentially when needed.  This results in the benchmark tests in
-  :file:`Lib/test/test_bufio.py` speeding up considerably (from 57 seconds to 1.7
-  seconds, according to one measurement).
+* Các đối tượng file hiện quản lý bộ đệm chuỗi nội bộ theo cách khác, tăng kích thước theo cấp số nhân khi cần. Điều này khiến các bài kiểm thử benchmark trong
+  :file:`Lib/test/test_bufio.py` nhanh hơn đáng kể (từ 57 giây xuống còn 1,7 giây, theo một phép đo).
 
-* It's now possible to define class and static methods for a C extension type by
-  setting either the :c:macro:`METH_CLASS` or :c:macro:`METH_STATIC` flags in a
-  method's :c:type:`PyMethodDef` structure.
+* Giờ đây có thể định nghĩa các phương thức class và static cho một kiểu C extension bằng cách đặt cờ :c:macro:`METH_CLASS` hoặc :c:macro:`METH_STATIC` trong cấu trúc :c:type:`PyMethodDef` của một phương thức.
 
-* Python now includes a copy of the Expat XML parser's source code, removing any
-  dependence on a system version or local installation of Expat.
+* Python hiện bao gồm một bản sao mã nguồn của trình phân tích cú pháp XML Expat, loại bỏ mọi phụ thuộc vào phiên bản trên hệ thống hoặc bản cài đặt Expat cục bộ.
 
-* If you dynamically allocate type objects in your extension, you should be
-  aware of a change in the rules relating to the :attr:`~type.__module__` and
-  :attr:`~type.__name__` attributes.  In summary, you will want to ensure the type's
-  dictionary contains a ``'__module__'`` key; making the module name the part of
-  the type name leading up to the final period will no longer have the desired
-  effect.  For more detail, read the API reference documentation or the  source.
+* Nếu cấp phát động các đối tượng kiểu trong extension, bạn nên lưu ý đến thay đổi trong các quy tắc liên quan đến thuộc tính :attr:`~type.__module__` và
+  :attr:`~type.__name__`. Tóm lại, bạn cần đảm bảo từ điển của kiểu chứa khóa ``'__module__'``; việc đặt tên module làm phần đứng trước dấu chấm cuối cùng trong tên kiểu sẽ không còn mang lại hiệu quả mong muốn. Để biết thêm chi tiết, hãy đọc tài liệu tham khảo API hoặc mã nguồn.
 
 .. ======================================================================
 
 
-Port-Specific Changes
----------------------
+Các thay đổi dành riêng cho từng port
+-------------------------------------
 
-Support for a port to IBM's OS/2 using the EMX runtime environment was merged
-into the main Python source tree.  EMX is a POSIX emulation layer over the OS/2
-system APIs.  The Python port for EMX tries to support all the POSIX-like
-capability exposed by the EMX runtime, and mostly succeeds; :func:`!fork` and
-:func:`fcntl` are restricted by the limitations of the underlying emulation
-layer.  The standard OS/2 port, which uses IBM's Visual Age compiler, also
-gained support for case-sensitive import semantics as part of the integration of
-the EMX port into CVS.  (Contributed by Andrew MacIntyre.)
+Hỗ trợ port cho IBM's OS/2 sử dụng môi trường runtime EMX đã được hợp nhất vào cây mã nguồn chính của Python. EMX là một lớp mô phỏng POSIX trên các system API của OS/2. Port Python cho EMX cố gắng hỗ trợ mọi khả năng tương tự POSIX được runtime EMX cung cấp và phần lớn đã thành công; :func:`!fork` và
+:func:`fcntl` bị giới hạn bởi những hạn chế của lớp mô phỏng bên dưới. Port OS/2 tiêu chuẩn, sử dụng trình biên dịch Visual Age của IBM, cũng được bổ sung hỗ trợ ngữ nghĩa import phân biệt chữ hoa chữ thường trong quá trình tích hợp port EMX vào CVS. (Đóng góp bởi Andrew MacIntyre.)
 
-On MacOS, most toolbox modules have been weaklinked to improve backward
-compatibility.  This means that modules will no longer fail to load if a single
-routine is missing on the current OS version. Instead calling the missing
-routine will raise an exception. (Contributed by Jack Jansen.)
+Trên MacOS, hầu hết các module toolbox đã được weaklink để cải thiện khả năng tương thích ngược. Điều này có nghĩa là các module sẽ không còn không tải được nếu thiếu một routine trên phiên bản OS hiện tại. Thay vào đó, việc gọi routine bị thiếu sẽ phát sinh một exception. (Đóng góp bởi Jack Jansen.)
 
-The RPM spec files, found in the :file:`Misc/RPM/` directory in the Python
-source distribution, were updated for 2.3.  (Contributed by Sean Reifschneider.)
+Các tệp spec của RPM, nằm trong thư mục :file:`Misc/RPM/` của bản phân phối mã nguồn Python, đã được cập nhật cho phiên bản 2.3. (Đóng góp bởi Sean Reifschneider.)
 
-Other new platforms now supported by Python include AtheOS
-(http://www.atheos.cx/), GNU/Hurd, and OpenVMS.
+Các platform mới khác hiện được Python hỗ trợ bao gồm AtheOS (http://www.atheos.cx/), GNU/Hurd và OpenVMS.
 
 .. ======================================================================
 
 
 .. _23section-other:
 
-Other Changes and Fixes
-=======================
+Các thay đổi và bản sửa lỗi khác
+================================
 
-As usual, there were a bunch of other improvements and bugfixes scattered
-throughout the source tree.  A search through the CVS change logs finds there
-were 523 patches applied and 514 bugs fixed between Python 2.2 and 2.3.  Both
-figures are likely to be underestimates.
+Như thường lệ, còn có một loạt cải tiến và bản sửa lỗi khác rải rác trong toàn bộ cây mã nguồn. Việc tìm kiếm trong nhật ký thay đổi của CVS cho thấy đã có 523 bản vá được áp dụng và 514 lỗi được sửa trong khoảng thời gian từ Python 2.2 đến 2.3. Cả hai con số này có thể đều là những ước tính thấp hơn thực tế.
 
-Some of the more notable changes are:
+Một số thay đổi đáng chú ý hơn gồm có:
 
-* If the :envvar:`PYTHONINSPECT` environment variable is set, the Python
-  interpreter will enter the interactive prompt after running a Python program, as
-  if Python had been invoked with the :option:`-i` option. The environment
-  variable can be set before running the Python interpreter, or it can be set by
-  the Python program as part of its execution.
+* Nếu biến môi trường :envvar:`PYTHONINSPECT` được thiết lập, trình thông dịch Python sẽ vào dấu nhắc tương tác sau khi chạy một chương trình Python, như thể Python được gọi với tùy chọn :option:`-i`. Biến môi trường này có thể được thiết lập trước khi chạy trình thông dịch Python hoặc được chương trình Python thiết lập trong quá trình thực thi.
 
-* The :file:`regrtest.py` script now provides a way to allow "all resources
-  except *foo*."  A resource name passed to the :option:`!-u` option can now be
-  prefixed with a hyphen (``'-'``) to mean "remove this resource."  For example,
-  the option '``-uall,-bsddb``' could be used to enable the use of all resources
-  except ``bsddb``.
+* Script :file:`regrtest.py` hiện cung cấp một cách để cho phép "tất cả tài nguyên ngoại trừ *foo*." Tên tài nguyên được truyền cho tùy chọn :option:`!-u` hiện có thể được đặt trước bằng dấu gạch ngang (``'-'``) để có nghĩa là "loại bỏ tài nguyên này." Ví dụ, có thể dùng tùy chọn '``-uall,-bsddb``' để bật việc sử dụng tất cả tài nguyên ngoại trừ ``bsddb``.
 
-* The tools used to build the documentation now work under Cygwin as well as
-  Unix.
+* Các công cụ dùng để xây dựng tài liệu hiện cũng hoạt động trên Cygwin cũng như Unix.
 
-* The ``SET_LINENO`` opcode has been removed.  Back in the mists of time, this
-  opcode was needed to produce line numbers in tracebacks and support trace
-  functions (for, e.g., :mod:`pdb`). Since Python 1.5, the line numbers in
-  tracebacks have been computed using a different mechanism that works with
-  "python -O".  For Python 2.3 Michael Hudson implemented a similar scheme to
-  determine when to call the trace function, removing the need for ``SET_LINENO``
-  entirely.
+* Opcode ``SET_LINENO`` đã bị loại bỏ. Từ xa xưa, opcode này cần thiết để tạo số dòng trong traceback và hỗ trợ các hàm trace (chẳng hạn như :mod:`pdb`). Kể từ Python 1.5, số dòng trong traceback được tính bằng một cơ chế khác, hoạt động với "python -O". Đối với Python 2.3, Michael Hudson đã triển khai một cơ chế tương tự để xác định thời điểm gọi hàm trace, qua đó loại bỏ hoàn toàn nhu cầu sử dụng ``SET_LINENO``.
 
-  It would be difficult to detect any resulting difference from Python code, apart
-  from a slight speed up when Python is run without :option:`-O`.
+  Sẽ khó phát hiện bất kỳ khác biệt nào do thay đổi này gây ra từ mã Python, ngoài việc tốc độ được cải thiện đôi chút khi Python được chạy mà không có :option:`-O`.
 
-  C extensions that access the :attr:`~frame.f_lineno` field of frame objects should
-  instead call ``PyCode_Addr2Line(f->f_code, f->f_lasti)``. This will have the
-  added effect of making the code work as desired under "python -O" in earlier
-  versions of Python.
+  Các phần mở rộng C truy cập trường :attr:`~frame.f_lineno` của các đối tượng frame nên thay vào đó gọi ``PyCode_Addr2Line(f->f_code, f->f_lasti)``. Điều này còn khiến mã hoạt động như mong muốn khi chạy dưới "python -O" trong các phiên bản Python trước.
 
-  A nifty new feature is that trace functions can now assign to the
-  :attr:`~frame.f_lineno` attribute of frame objects, changing the line that will be
-  executed next.  A ``jump`` command has been added to the :mod:`pdb` debugger
-  taking advantage of this new feature. (Implemented by Richie Hindle.)
+  Một tính năng mới hữu ích là các hàm trace giờ đây có thể gán cho
+  thuộc tính :attr:`~frame.f_lineno` của các đối tượng frame, thay đổi dòng sẽ được thực thi tiếp theo. Một lệnh ``jump`` đã được thêm vào trình gỡ lỗi :mod:`pdb`, tận dụng tính năng mới này. (Do Richie Hindle triển khai.)
 
 .. ======================================================================
 
 
-Porting to Python 2.3
-=====================
+Chuyển sang Python 2.3
+======================
 
-This section lists previously described changes that may require changes to your
-code:
+Phần này liệt kê các thay đổi đã mô tả trước đó có thể yêu cầu bạn thay đổi mã của mình:
 
-* :keyword:`yield` is now always a keyword; if it's used as a variable name in
-  your code, a different name must be chosen.
+* :keyword:`yield` giờ đây luôn là một từ khóa; nếu được dùng làm tên biến trong mã của bạn, bạn phải chọn một tên khác.
 
-* For strings *X* and *Y*, ``X in Y`` now works if *X* is more than one
-  character long.
+* Đối với các chuỗi *X* và *Y*, ``X in Y`` giờ đây hoạt động nếu *X* dài hơn một ký tự.
 
-* The :func:`int` type constructor will now return a long integer instead of
-  raising an :exc:`OverflowError` when a string or floating-point number is too
-  large to fit into an integer.
+* Giờ đây, hàm dựng kiểu :func:`int` sẽ trả về một số nguyên long thay vì phát sinh :exc:`OverflowError` khi một chuỗi hoặc số dấu phẩy động quá lớn để vừa với một số nguyên.
 
-* If you have Unicode strings that contain 8-bit characters, you must declare
-  the file's encoding (UTF-8, Latin-1, or whatever) by adding a comment to the top
-  of the file.  See section :ref:`section-encodings` for more information.
+* Nếu bạn có các chuỗi Unicode chứa ký tự 8-bit, bạn phải khai báo encoding của tệp (UTF-8, Latin-1 hoặc bất kỳ encoding nào khác) bằng cách thêm một chú thích ở đầu tệp. Xem phần :ref:`section-encodings` để biết thêm thông tin.
 
-* Calling Tcl methods through :mod:`!_tkinter` no longer  returns only strings.
-  Instead, if Tcl returns other objects those objects are converted to their
-  Python equivalent, if one exists, or wrapped with a :class:`!_tkinter.Tcl_Obj`
-  object if no Python equivalent exists.
+* Việc gọi các phương thức Tcl thông qua :mod:`!_tkinter` không còn chỉ trả về các chuỗi. Thay vào đó, nếu Tcl trả về các đối tượng khác, những đối tượng đó sẽ được chuyển đổi sang dạng tương đương trong Python, nếu có, hoặc được bọc bằng một đối tượng :class:`!_tkinter.Tcl_Obj` nếu không có dạng tương đương trong Python.
 
-* Large octal and hex literals such as ``0xffffffff`` now trigger a
-  :exc:`FutureWarning`. Currently they're stored as 32-bit numbers and result in a
-  negative value, but in Python 2.4 they'll become positive long integers.
+* Các literal bát phân và thập lục phân lớn như ``0xffffffff`` giờ sẽ kích hoạt một
+  :exc:`FutureWarning`. Hiện tại, chúng được lưu dưới dạng số 32-bit và cho kết quả là một giá trị âm, nhưng trong Python 2.4, chúng sẽ trở thành các số nguyên long dương.
 
-  There are a few ways to fix this warning.  If you really need a positive number,
-  just add an ``L`` to the end of the literal.  If you're trying to get a 32-bit
-  integer with low bits set and have previously used an expression such as ``~(1
-  << 31)``, it's probably clearest to start with all bits set and clear the
-  desired upper bits. For example, to clear just the top bit (bit 31), you could
-  write ``0xffffffffL &~(1L<<31)``.
+  Có một vài cách để sửa cảnh báo này. Nếu bạn thực sự cần một số dương, chỉ cần thêm ``L`` vào cuối literal. Nếu bạn đang cố lấy một số nguyên 32-bit có các bit thấp được thiết lập và trước đây đã dùng một biểu thức như ``~(1 << 31)``, có lẽ rõ ràng nhất là bắt đầu với tất cả các bit được thiết lập rồi xóa các bit phía trên mong muốn. Ví dụ, để chỉ xóa bit cao nhất (bit 31), bạn có thể viết ``0xffffffffL &~(1L<<31)``.
 
-* You can no longer disable assertions by assigning to ``__debug__``.
+* Bạn không còn có thể vô hiệu hóa các assertion bằng cách gán giá trị cho ``__debug__``.
 
-* The Distutils :func:`!setup` function has gained various new keyword arguments
-  such as *depends*.  Old versions of the Distutils will abort if passed unknown
-  keywords.  A solution is to check for the presence of the new
-  :func:`!get_distutil_options` function in your :file:`setup.py` and only uses the
-  new keywords with a version of the Distutils that supports them::
+* Hàm Distutils :func:`!setup` đã được bổ sung nhiều đối số từ khóa mới, chẳng hạn như *depends*. Các phiên bản Distutils cũ sẽ dừng hoạt động nếu nhận các từ khóa không xác định. Một giải pháp là kiểm tra sự hiện diện của hàm mới
+  :func:`!get_distutil_options` trong :file:`setup.py` của bạn và chỉ sử dụng các từ khóa mới với phiên bản Distutils hỗ trợ chúng::
 
      from distutils import core
 
@@ -2062,25 +1394,20 @@ code:
          kw['depends'] = ['foo.h']
      ext = Extension(**kw)
 
-* Using ``None`` as a variable name will now result in a :exc:`SyntaxWarning`
-  warning.
+* Việc sử dụng ``None`` làm tên biến giờ đây sẽ dẫn đến cảnh báo :exc:`SyntaxWarning`.
 
-* Names of extension types defined by the modules included with Python now
-  contain the module and a ``'.'`` in front of the type name.
+* Tên của các kiểu mở rộng được định nghĩa bởi những module đi kèm Python giờ đây chứa module và một ``'.'`` ở phía trước tên kiểu.
 
 .. ======================================================================
 
 
 .. _23acks:
 
-Acknowledgements
-================
+Lời cảm ơn
+==========
 
-The author would like to thank the following people for offering suggestions,
-corrections and assistance with various drafts of this article: Jeff Bauer,
-Simon Brunning, Brett Cannon, Michael Chermside, Andrew Dalke, Scott David
-Daniels, Fred L. Drake, Jr., David Fraser,  Kelly Gerber, Raymond Hettinger,
-Michael Hudson, Chris Lambert, Detlef Lannert, Martin von Löwis, Andrew
-MacIntyre, Lalo Martins, Chad Netzer, Gustavo Niemeyer, Neal Norwitz, Hans
-Nowak, Chris Reedy, Francesco Ricciardi, Vinay Sajip, Neil Schemenauer, Roman
-Suzi, Jason Tishler, Just van Rossum.
+Tác giả xin cảm ơn những người sau đây vì đã đưa ra các đề xuất, góp ý và hỗ trợ cho nhiều bản thảo của bài viết này: Jeff Bauer, Simon Brunning, Brett Cannon, Michael Chermside, Andrew Dalke, Scott David Daniels, Fred L. Drake, Jr., David Fraser, Kelly Gerber, Raymond Hettinger, Michael Hudson, Chris Lambert, Detlef Lannert, Martin von Löwis, Andrew MacIntyre, Lalo Martins, Chad Netzer, Gustavo Niemeyer, Neal Norwitz, Hans Nowak, Chris Reedy, Francesco Ricciardi, Vinay Sajip, Neil Schemenauer, Roman Suzi, Jason Tishler, Just van Rossum.
+
+.. _`Trove`: http://catb.org/~esr/trove/
+.. _`"A Monotonic Superclass Linearization for Dylan"`: https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.19.3910
+.. _`PyBSDDB`: https://pybsddb.sourceforge.net
