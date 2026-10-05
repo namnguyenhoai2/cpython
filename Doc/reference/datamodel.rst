@@ -1,23 +1,21 @@
 
 .. _datamodel:
 
-**********
-Data model
-**********
+***************
+Mô hình dữ liệu
+***************
 
 
 .. _objects:
 
-Objects, values and types
-=========================
+Đối tượng, giá trị và kiểu
+==========================
 
 .. index::
    single: object
    single: data
 
-:dfn:`Objects` are Python's abstraction for data.  All data in a Python program
-is represented by objects or by relations between objects. Even code is
-represented by objects.
+:dfn:`Đối tượng` là sự trừu tượng hóa dữ liệu của Python. Mọi dữ liệu trong một chương trình Python đều được biểu diễn bằng các đối tượng hoặc bằng các mối quan hệ giữa các đối tượng. Ngay cả mã cũng được biểu diễn bằng các đối tượng.
 
 .. index::
    pair: built-in function; id
@@ -28,96 +26,43 @@ represented by objects.
    single: mutable object
    single: immutable object
 
-Every object has an identity, a type and a value.  An object's *identity* never
-changes once it has been created; you may think of it as the object's address in
-memory.  The :keyword:`is` operator compares the identity of two objects; the
-:func:`id` function returns an integer representing its identity.
+Mỗi đối tượng có một danh tính, một kiểu và một giá trị. *Danh tính* của một đối tượng không bao giờ thay đổi sau khi được tạo; bạn có thể xem nó là địa chỉ của đối tượng trong bộ nhớ. Toán tử :keyword:`is` so sánh danh tính của hai đối tượng; hàm
+:func:`id` trả về một số nguyên biểu thị danh tính của đối tượng đó.
 
 .. impl-detail::
 
-   For CPython, ``id(x)`` is the memory address where ``x`` is stored.
+   Đối với CPython, ``id(x)`` là địa chỉ bộ nhớ nơi ``x`` được lưu trữ.
 
-An object's type determines the operations that the object supports (e.g., "does
-it have a length?") and also defines the possible values for objects of that
-type.  The :func:`type` function returns an object's type (which is an object
-itself).  Like its identity, an object's :dfn:`type` is also unchangeable.
-[#]_
+Kiểu của một đối tượng xác định các thao tác mà đối tượng hỗ trợ (ví dụ: "nó có độ dài không?") và cũng xác định các giá trị có thể có cho những đối tượng thuộc kiểu đó. Hàm :func:`type` trả về kiểu của một đối tượng (bản thân kiểu đó cũng là một đối tượng). Cũng như danh tính của nó, :dfn:`kiểu` của một đối tượng cũng không thể thay đổi. [#]_
 
-The *value* of some objects can change.  Objects whose value can
-change are said to be *mutable*; objects whose value is unchangeable once they
-are created are called *immutable*. (The value of an immutable container object
-that contains a reference to a mutable object can change when the latter's value
-is changed; however the container is still considered immutable, because the
-collection of objects it contains cannot be changed.  So, immutability is not
-strictly the same as having an unchangeable value, it is more subtle.) An
-object's mutability is determined by its type; for instance, numbers, strings
-and tuples are immutable, while dictionaries and lists are mutable.
+*Giá trị* của một số đối tượng có thể thay đổi. Các đối tượng có giá trị có thể thay đổi được gọi là *mutable*; các đối tượng có giá trị không thể thay đổi sau khi được tạo được gọi là *immutable*. (Giá trị của một đối tượng container immutable chứa tham chiếu đến một đối tượng mutable có thể thay đổi khi giá trị của đối tượng sau thay đổi; tuy nhiên, container vẫn được xem là immutable, vì tập hợp các đối tượng mà nó chứa không thể thay đổi. Vì vậy, tính bất biến không hoàn toàn giống với việc có một giá trị không thể thay đổi, mà tinh tế hơn.) Tính mutable của một đối tượng được xác định bởi kiểu của nó; chẳng hạn, số, chuỗi và tuple là immutable, trong khi dictionary và list là mutable.
 
 .. index::
    single: garbage collection
    single: reference counting
    single: unreachable object
 
-Objects are never explicitly destroyed; however, when they become unreachable
-they may be garbage-collected.  An implementation is allowed to postpone garbage
-collection or omit it altogether --- it is a matter of implementation quality
-how garbage collection is implemented, as long as no objects are collected that
-are still reachable.
+Các đối tượng không bao giờ bị hủy một cách tường minh; tuy nhiên, khi chúng trở nên không thể truy cập, chúng có thể được thu gom rác. Một implementation được phép trì hoãn việc thu gom rác hoặc bỏ qua hoàn toàn việc này --- cách thu gom rác được triển khai là vấn đề về chất lượng implementation, miễn là không thu gom bất kỳ đối tượng nào vẫn còn có thể truy cập.
 
 .. impl-detail::
 
-   CPython currently uses a reference-counting scheme with (optional) delayed
-   detection of cyclically linked garbage, which collects most objects as soon
-   as they become unreachable, but is not guaranteed to collect garbage
-   containing circular references.  See the documentation of the :mod:`gc`
-   module for information on controlling the collection of cyclic garbage.
-   Other implementations act differently and CPython may change.
-   Do not depend on immediate finalization of objects when they become
-   unreachable (so you should always close files explicitly).
+   Hiện tại, CPython sử dụng cơ chế đếm tham chiếu cùng với việc phát hiện trì hoãn (tùy chọn) các rác được liên kết theo chu kỳ; cơ chế này thu gom hầu hết đối tượng ngay khi chúng không thể truy cập, nhưng không đảm bảo thu gom rác chứa tham chiếu vòng. Xem tài liệu của module :mod:`gc` để biết thông tin về cách kiểm soát việc thu gom rác tuần hoàn. Các implementation khác hoạt động khác nhau và CPython có thể thay đổi. Đừng phụ thuộc vào việc các đối tượng được hoàn tất ngay lập tức khi chúng không thể truy cập (vì vậy bạn nên luôn đóng file một cách tường minh).
 
-Note that the use of the implementation's tracing or debugging facilities may
-keep objects alive that would normally be collectable. Also note that catching
-an exception with a :keyword:`try`...\ :keyword:`except` statement may keep
-objects alive.
+Lưu ý rằng việc sử dụng các công cụ tracing hoặc debugging của implementation có thể giữ lại các đối tượng mà bình thường có thể thu gom. Cũng lưu ý rằng việc bắt một exception bằng câu lệnh :keyword:`try`...\ :keyword:`except` có thể giữ các đối tượng tồn tại.
 
-Some objects contain references to "external" resources such as open files or
-windows.  It is understood that these resources are freed when the object is
-garbage-collected, but since garbage collection is not guaranteed to happen,
-such objects also provide an explicit way to release the external resource,
-usually a :meth:`!close` method. Programs are strongly recommended to explicitly
-close such objects.  The :keyword:`try`...\ :keyword:`finally` statement
-and the :keyword:`with` statement provide convenient ways to do this.
+Một số đối tượng chứa tham chiếu đến các tài nguyên "bên ngoài" như file hoặc cửa sổ đang mở. Các tài nguyên này được hiểu là sẽ được giải phóng khi đối tượng được thu gom rác, nhưng vì việc thu gom rác không được đảm bảo xảy ra, các đối tượng như vậy cũng cung cấp một cách tường minh để giải phóng tài nguyên bên ngoài, thường là một method :meth:`!close`. Các chương trình được đặc biệt khuyến nghị đóng các đối tượng như vậy một cách tường minh. Câu lệnh :keyword:`try`...\ :keyword:`finally` và câu lệnh :keyword:`with` cung cấp những cách thuận tiện để thực hiện việc này.
 
 .. index:: single: container
 
-Some objects contain references to other objects; these are called *containers*.
-Examples of containers are tuples, lists and dictionaries.  The references are
-part of a container's value.  In most cases, when we talk about the value of a
-container, we imply the values, not the identities of the contained objects;
-however, when we talk about the mutability of a container, only the identities
-of the immediately contained objects are implied.  So, if an immutable container
-(like a tuple) contains a reference to a mutable object, its value changes if
-that mutable object is changed.
+Một số đối tượng chứa tham chiếu đến các đối tượng khác; chúng được gọi là *container*. Ví dụ về container là tuple, list và dictionary. Các tham chiếu là một phần trong giá trị của container. Trong đa số trường hợp, khi nói về giá trị của container, chúng ta ngụ ý giá trị chứ không phải danh tính của các đối tượng được chứa; tuy nhiên, khi nói về tính mutable của container, chỉ danh tính của các đối tượng được chứa trực tiếp mới được ngụ ý. Vì vậy, nếu một container immutable (như tuple) chứa tham chiếu đến một đối tượng mutable, giá trị của nó sẽ thay đổi nếu đối tượng mutable đó thay đổi.
 
-Types affect almost all aspects of object behavior.  Even the importance of
-object identity is affected in some sense: for immutable types, operations that
-compute new values may actually return a reference to any existing object with
-the same type and value, while for mutable objects this is not allowed.
-For example, after ``a = 1; b = 1``, *a* and *b* may or may not refer to
-the same object with the value one, depending on the implementation.
-This is because :class:`int` is an immutable type, so the reference to ``1``
-can be reused. This behaviour depends on the implementation used, so should
-not be relied upon, but is something to be aware of when making use of object
-identity tests.
-However, after ``c = []; d = []``, *c* and *d* are guaranteed to refer to two
-different, unique, newly created empty lists. (Note that ``e = f = []`` assigns
-the *same* object to both *e* and *f*.)
+Kiểu ảnh hưởng đến gần như mọi khía cạnh trong hành vi của đối tượng. Theo một nghĩa nào đó, ngay cả tầm quan trọng của danh tính đối tượng cũng bị ảnh hưởng: với các kiểu immutable, những thao tác tính giá trị mới thực tế có thể trả về tham chiếu đến bất kỳ đối tượng hiện có nào có cùng kiểu và giá trị, trong khi điều này không được phép với đối tượng mutable. Ví dụ, sau ``a = 1; b = 1``, *a* và *b* có thể có hoặc không cùng tham chiếu đến một đối tượng có giá trị là một, tùy thuộc vào implementation. Điều này là do :class:`int` là một kiểu immutable, nên tham chiếu đến ``1`` có thể được tái sử dụng. Hành vi này phụ thuộc vào implementation được sử dụng, vì vậy không nên dựa vào nó, nhưng cần lưu ý khi sử dụng các phép kiểm tra danh tính đối tượng. Tuy nhiên, sau ``c = []; d = []``, *c* và *d* được đảm bảo tham chiếu đến hai list rỗng khác nhau, duy nhất, vừa được tạo. (Lưu ý rằng ``e = f = []`` gán đối tượng *cùng một* cho cả *e* và *f*.)
 
 
 .. _types:
 
-The standard type hierarchy
-===========================
+Hệ phân cấp kiểu chuẩn
+======================
 
 .. index::
    single: type
@@ -126,20 +71,14 @@ The standard type hierarchy
    pair: extension; module
    pair: C; language
 
-Below is a list of the types that are built into Python.  Extension modules
-(written in C, Java, or other languages, depending on the implementation) can
-define additional types.  Future versions of Python may add types to the type
-hierarchy (e.g., rational numbers, efficiently stored arrays of integers, etc.),
-although such additions will often be provided via the standard library instead.
+Dưới đây là danh sách các kiểu được tích hợp sẵn trong Python. Các extension module (được viết bằng C, Java hoặc các ngôn ngữ khác, tùy thuộc vào implementation) có thể định nghĩa các kiểu bổ sung. Các phiên bản Python trong tương lai có thể thêm kiểu vào hệ phân cấp kiểu (ví dụ: số hữu tỉ, mảng số nguyên được lưu trữ hiệu quả, v.v.), mặc dù những phần bổ sung như vậy thường sẽ được cung cấp thông qua standard library.
 
 .. index::
    single: attribute
    pair: special; attribute
    triple: generic; special; attribute
 
-Some of the type descriptions below contain a paragraph listing 'special
-attributes.'  These are attributes that provide access to the implementation and
-are not intended for general use.  Their definition may change in the future.
+Một số mô tả kiểu bên dưới có một đoạn liệt kê các 'thuộc tính đặc biệt'. Đây là các thuộc tính cung cấp quyền truy cập vào implementation và không предназначены для общего использования. Định nghĩa của chúng có thể thay đổi trong tương lai.
 
 
 None
@@ -147,10 +86,7 @@ None
 
 .. index:: pair: object; None
 
-This type has a single value.  There is a single object with this value. This
-object is accessed through the built-in name ``None``. It is used to signify the
-absence of a value in many situations, e.g., it is returned from functions that
-don't explicitly return anything. Its truth value is false.
+Kiểu này có một giá trị duy nhất. Có một đối tượng duy nhất với giá trị này. Đối tượng này được truy cập thông qua tên tích hợp sẵn ``None``. Nó được dùng để biểu thị sự vắng mặt của một giá trị trong nhiều tình huống, ví dụ, nó được trả về từ các hàm không trả về rõ ràng bất cứ thứ gì. Giá trị chân lý của nó là false.
 
 
 NotImplemented
@@ -158,24 +94,16 @@ NotImplemented
 
 .. index:: pair: object; NotImplemented
 
-This type has a single value.  There is a single object with this value. This
-object is accessed through the built-in name :data:`NotImplemented`. Numeric methods
-and rich comparison methods should return this value if they do not implement the
-operation for the operands provided.  (The interpreter will then try the
-reflected operation, or some other fallback, depending on the operator.)  It
-should not be evaluated in a boolean context.
+Kiểu này có một giá trị duy nhất. Có một đối tượng duy nhất với giá trị này. Đối tượng này được truy cập thông qua tên tích hợp sẵn :data:`NotImplemented`. Các phương thức số học và phương thức so sánh phong phú nên trả về giá trị này nếu chúng không triển khai phép toán cho các toán hạng được cung cấp. (Khi đó, trình thông dịch sẽ thử phép toán phản chiếu hoặc một phương án dự phòng khác, tùy thuộc vào toán tử.) Nó không nên được đánh giá trong ngữ cảnh boolean.
 
-See
-:ref:`implementing-the-arithmetic-operations`
-for more details.
+Xem
+:ref:`implementing-the-arithmetic-operations` để biết thêm chi tiết.
 
 .. versionchanged:: 3.9
-   Evaluating :data:`NotImplemented` in a boolean context was deprecated.
+   Việc đánh giá :data:`NotImplemented` trong ngữ cảnh boolean đã bị phản đối sử dụng.
 
 .. versionchanged:: 3.14
-   Evaluating :data:`NotImplemented` in a boolean context now raises a :exc:`TypeError`.
-   It previously evaluated to :const:`True` and emitted a :exc:`DeprecationWarning`
-   since Python 3.9.
+   Việc đánh giá :data:`NotImplemented` trong ngữ cảnh boolean hiện sẽ phát sinh :exc:`TypeError`. Trước đây, nó được đánh giá thành :const:`True` và phát ra :exc:`DeprecationWarning` kể từ Python 3.9.
 
 
 Ellipsis
@@ -184,9 +112,7 @@ Ellipsis
    pair: object; Ellipsis
    single: ...; ellipsis literal
 
-This type has a single value.  There is a single object with this value. This
-object is accessed through the literal ``...`` or the built-in name
-``Ellipsis``.  Its truth value is true.
+Kiểu này có một giá trị duy nhất. Có một đối tượng duy nhất mang giá trị này. Đối tượng này được truy cập thông qua literal ``...`` hoặc tên built-in ``Ellipsis``. Giá trị chân trị của nó là true.
 
 
 :class:`numbers.Number`
@@ -194,32 +120,22 @@ object is accessed through the literal ``...`` or the built-in name
 
 .. index:: pair: object; numeric
 
-These are created by numeric literals and returned as results by arithmetic
-operators and arithmetic built-in functions.  Numeric objects are immutable;
-once created their value never changes.  Python numbers are of course strongly
-related to mathematical numbers, but subject to the limitations of numerical
-representation in computers.
+Các đối tượng này được tạo bởi các literal số và được trả về làm kết quả bởi các toán tử số học cùng các hàm built-in số học. Đối tượng số là bất biến; sau khi được tạo, giá trị của chúng không bao giờ thay đổi. Dĩ nhiên, các số Python có liên hệ chặt chẽ với các số trong toán học, nhưng chịu những giới hạn của việc biểu diễn số trong máy tính.
 
-The string representations of the numeric classes, computed by
-:meth:`~object.__repr__` and :meth:`~object.__str__`, have the following
-properties:
+Biểu diễn chuỗi của các lớp số, được tính bởi
+:meth:`~object.__repr__` và :meth:`~object.__str__`, có các đặc tính sau:
 
-* They are valid numeric literals which, when passed to their
-  class constructor, produce an object having the value of the
-  original numeric.
+* Chúng là các literal số hợp lệ; khi được truyền vào constructor của lớp tương ứng, chúng sẽ tạo ra một đối tượng có giá trị bằng số ban đầu.
 
-* The representation is in base 10, when possible.
+* Biểu diễn dùng cơ số 10 khi có thể.
 
-* Leading zeros, possibly excepting a single zero before a
-  decimal point, are not shown.
+* Không hiển thị các số 0 ở đầu, ngoại trừ có thể là một số 0 duy nhất trước dấu thập phân.
 
-* Trailing zeros, possibly excepting a single zero after a
-  decimal point, are not shown.
+* Không hiển thị các số 0 ở cuối, ngoại trừ có thể là một số 0 duy nhất sau dấu thập phân.
 
-* A sign is shown only when the number is negative.
+* Chỉ hiển thị dấu khi số là số âm.
 
-Python distinguishes between integers, floating-point numbers, and complex
-numbers:
+Python phân biệt giữa số nguyên, số dấu phẩy động và số phức:
 
 
 :class:`numbers.Integral`
@@ -227,35 +143,25 @@ numbers:
 
 .. index:: pair: object; integer
 
-These represent elements from the mathematical set of integers (positive and
-negative).
+Chúng biểu thị các phần tử thuộc tập hợp toán học các số nguyên (dương và âm).
 
 .. note::
    .. index:: pair: integer; representation
 
-   The rules for integer representation are intended to give the most meaningful
-   interpretation of shift and mask operations involving negative integers.
+   Các quy tắc biểu diễn số nguyên nhằm đưa ra cách diễn giải có ý nghĩa nhất cho các phép toán dịch và che có liên quan đến số nguyên âm.
 
-There are two types of integers:
+Có hai loại số nguyên:
 
-Integers (:class:`int`)
-   These represent numbers in an unlimited range, subject to available (virtual)
-   memory only.  For the purpose of shift and mask operations, a binary
-   representation is assumed, and negative numbers are represented in a variant of
-   2's complement which gives the illusion of an infinite string of sign bits
-   extending to the left.
+Số nguyên (:class:`int`)
+   Chúng biểu thị các số trong phạm vi không giới hạn, chỉ bị giới hạn bởi bộ nhớ (ảo) sẵn có. Đối với các phép toán dịch và che, giả định một biểu diễn nhị phân, trong đó các số âm được biểu diễn bằng một biến thể của bù 2, tạo cảm giác về một chuỗi vô hạn các bit dấu kéo dài về bên trái.
 
-Booleans (:class:`bool`)
+Giá trị Boolean (:class:`bool`)
    .. index::
       pair: object; Boolean
       single: False
       single: True
 
-   These represent the truth values False and True.  The two objects representing
-   the values ``False`` and ``True`` are the only Boolean objects. The Boolean type is a
-   subtype of the integer type, and Boolean values behave like the values 0 and 1,
-   respectively, in almost all contexts, the exception being that when converted to
-   a string, the strings ``"False"`` or ``"True"`` are returned, respectively.
+   Chúng biểu thị các giá trị chân lý False và True. Hai đối tượng biểu thị các giá trị ``False`` và ``True`` là các đối tượng Boolean duy nhất. Kiểu Boolean là một kiểu con của kiểu integer, và các giá trị Boolean hoạt động tương ứng như các giá trị 0 và 1 trong gần như mọi ngữ cảnh; ngoại lệ là khi được chuyển đổi thành chuỗi, chúng lần lượt trả về các chuỗi ``"False"`` hoặc ``"True"``.
 
 
 .. _datamodel-float:
@@ -269,13 +175,7 @@ Booleans (:class:`bool`)
    pair: C; language
    pair: Java; language
 
-These represent machine-level double precision floating-point numbers. You are
-at the mercy of the underlying machine architecture (and C or Java
-implementation) for the accepted range and handling of overflow. Python does not
-support single-precision floating-point numbers; the savings in processor and
-memory usage that are usually the reason for using these are dwarfed by the
-overhead of using objects in Python, so there is no reason to complicate the
-language with two kinds of floating-point numbers.
+Chúng biểu thị các số dấu phẩy động độ chính xác kép ở cấp máy. Phạm vi được chấp nhận và cách xử lý tràn số phụ thuộc vào kiến trúc máy bên dưới (cũng như việc triển khai C hoặc Java). Python không hỗ trợ số dấu phẩy động độ chính xác đơn; mức tiết kiệm tài nguyên bộ xử lý và bộ nhớ vốn thường là lý do để sử dụng chúng bị chi phí xử lý của việc dùng đối tượng trong Python lấn át, vì vậy không có lý do gì để làm ngôn ngữ phức tạp hơn bằng hai loại số dấu phẩy động.
 
 
 :class:`numbers.Complex` (:class:`complex`)
@@ -285,15 +185,12 @@ language with two kinds of floating-point numbers.
    pair: object; complex
    pair: complex; number
 
-These represent complex numbers as a pair of machine-level double precision
-floating-point numbers.  The same caveats apply as for floating-point numbers.
-The real and imaginary parts of a complex number ``z`` can be retrieved through
-the read-only attributes ``z.real`` and ``z.imag``.
+Chúng biểu thị số phức dưới dạng một cặp số dấu phẩy động độ chính xác kép ở cấp máy. Các lưu ý tương tự như đối với số dấu phẩy động cũng được áp dụng. Phần thực và phần ảo của một số phức ``z`` có thể được truy xuất qua các thuộc tính chỉ đọc ``z.real`` và ``z.imag``.
 
 .. _datamodel-sequences:
 
-Sequences
----------
+Các sequence
+------------
 
 .. index::
    pair: built-in function; len
@@ -302,16 +199,9 @@ Sequences
    single: item selection
    single: subscription
 
-These represent finite ordered sets indexed by non-negative numbers. The
-built-in function :func:`len` returns the number of items of a sequence. When
-the length of a sequence is *n*, the index set contains the numbers 0, 1,
-..., *n*-1.  Item *i* of sequence *a* is selected by ``a[i]``. Some sequences,
-including built-in sequences, interpret negative subscripts by adding the
-sequence length. For example, ``a[-2]`` equals ``a[n-2]``, the second to last
-item of sequence a with length ``n``.
+Chúng biểu thị các tập hợp hữu hạn có thứ tự, được đánh chỉ mục bằng các số không âm. Hàm tích hợp :func:`len` trả về số lượng phần tử của một sequence. Khi độ dài của một sequence là *n*, tập chỉ mục chứa các số 0, 1, ..., *n*-1. Phần tử *i* của sequence *a* được chọn bằng ``a[i]``. Một số sequence, bao gồm các sequence tích hợp, diễn giải chỉ số âm bằng cách cộng với độ dài của sequence. Ví dụ, ``a[-2]`` bằng ``a[n-2]``, là phần tử áp chót của sequence a có độ dài ``n``.
 
-The resulting value must be a nonnegative integer less than the number of items
-in the sequence. If it is not, an :exc:`IndexError` is raised.
+Giá trị kết quả phải là một số nguyên không âm nhỏ hơn số lượng phần tử trong sequence. Nếu không, một :exc:`IndexError` sẽ được phát sinh.
 
 .. index::
    single: slicing
@@ -319,42 +209,30 @@ in the sequence. If it is not, an :exc:`IndexError` is raised.
    single: stop (slice object attribute)
    single: step (slice object attribute)
 
-Sequences also support slicing: ``a[start:stop]`` selects all items with index *k* such
-that *start* ``<=`` *k* ``<`` *stop*.  When used as an expression, a slice is a
-sequence of the same type. The comment above about negative subscripts also applies
-to negative slice positions.
-Note that no error is raised if a slice position is less than zero or larger
-than the length of the sequence.
+Sequence cũng hỗ trợ slicing: ``a[start:stop]`` chọn tất cả các phần tử có chỉ mục *k* sao cho *start* ``<=`` *k* ``<`` *stop*. Khi được dùng làm biểu thức, một slice là một sequence cùng kiểu. Nhận xét ở trên về chỉ số âm cũng áp dụng cho các vị trí slice âm. Lưu ý rằng không có lỗi nào được phát sinh nếu một vị trí slice nhỏ hơn không hoặc lớn hơn độ dài của sequence.
 
-If *start* is missing or :data:`None`, slicing behaves as if *start* was zero.
-If *stop* is missing or ``None``, slicing behaves as if *stop* was equal to
-the length of the sequence.
+Nếu *start* bị thiếu hoặc là :data:`None`, thao tác cắt hoạt động như thể *start* bằng không. Nếu *stop* bị thiếu hoặc là ``None``, thao tác cắt hoạt động như thể *stop* bằng độ dài của sequence.
 
-Some sequences also support "extended slicing" with a third "step" parameter:
-``a[i:j:k]`` selects all items of *a* with index *x* where ``x = i + n*k``, *n*
-``>=`` ``0`` and *i* ``<=`` *x* ``<`` *j*.
+Một số sequence cũng hỗ trợ "extended slicing" với tham số "step" thứ ba: ``a[i:j:k]`` chọn tất cả phần tử của *a* có chỉ mục *x* sao cho ``x = i + n*k``, *n* ``>=`` ``0`` và *i* ``<=`` *x* ``<`` *j*.
 
-Sequences are distinguished according to their mutability:
+Các sequence được phân biệt theo tính có thể thay đổi của chúng:
 
 
-Immutable sequences
-^^^^^^^^^^^^^^^^^^^
+Sequence bất biến
+^^^^^^^^^^^^^^^^^
 
 .. index::
    pair: object; immutable sequence
    pair: object; immutable
 
-An object of an immutable sequence type cannot change once it is created.  (If
-the object contains references to other objects, these other objects may be
-mutable and may be changed; however, the collection of objects directly
-referenced by an immutable object cannot change.)
+Một object thuộc kiểu sequence bất biến không thể thay đổi sau khi được tạo. (Nếu object đó chứa các reference đến những object khác, các object khác này có thể thay đổi được và có thể bị thay đổi; tuy nhiên, tập hợp các object được một object bất biến tham chiếu trực tiếp không thể thay đổi.)
 
-The following types are immutable sequences:
+Các kiểu sau là sequence bất biến:
 
 .. index::
    single: string; immutable sequences
 
-Strings
+String
    .. index::
       pair: built-in function; chr
       pair: built-in function; ord
@@ -362,48 +240,32 @@ Strings
       pair: string; item
       single: Unicode
 
-   A string (:class:`str`) is a sequence of values that represent
-   :dfn:`characters`, or more formally, *Unicode code points*.
-   All the code points in the range ``0`` to ``0x10FFFF`` can be
-   represented in a string.
+   Một string (:class:`str`) là một chuỗi các giá trị biểu diễn
+   :dfn:`ký tự`, hay chính xác hơn là *các điểm mã Unicode*. Mọi điểm mã trong phạm vi từ ``0`` đến ``0x10FFFF`` đều có thể được biểu diễn trong một string.
 
-   Python doesn't have a dedicated *character* type.
-   Instead, every code point in the string is represented as a string
-   object with length ``1``.
+   Python không có kiểu *ký tự* chuyên biệt. Thay vào đó, mỗi điểm mã trong string được biểu diễn bằng một đối tượng string có độ dài ``1``.
 
-   The built-in function :func:`ord`
-   converts a code point from its string form to an integer in the
-   range ``0`` to ``0x10FFFF``; :func:`chr` converts an integer in the range
-   ``0`` to ``0x10FFFF`` to the corresponding length ``1`` string object.
-   :meth:`str.encode` can be used to convert a :class:`str` to
-   :class:`bytes` using the given text encoding, and
-   :meth:`bytes.decode` can be used to achieve the opposite.
+   Hàm dựng sẵn :func:`ord` chuyển đổi một điểm mã từ dạng string của nó thành một số nguyên trong phạm vi từ ``0`` đến ``0x10FFFF``; :func:`chr` chuyển đổi một số nguyên trong phạm vi từ ``0`` đến ``0x10FFFF`` thành đối tượng string có độ dài ``1`` tương ứng.
+   Có thể dùng :meth:`str.encode` để chuyển đổi một :class:`str` thành
+   :class:`bytes` bằng cách sử dụng mã hóa văn bản đã cho, và
+   có thể dùng :meth:`bytes.decode` để thực hiện thao tác ngược lại.
 
-Tuples
+Tuple
    .. index::
       pair: object; tuple
       pair: singleton; tuple
       pair: empty; tuple
 
-   The items of a :class:`tuple` are arbitrary Python objects. Tuples of two or
-   more items are formed by comma-separated lists of expressions.  A tuple
-   of one item (a 'singleton') can be formed by affixing a comma to an
-   expression (an expression by itself does not create a tuple, since
-   parentheses must be usable for grouping of expressions).  An empty
-   tuple can be formed by an empty pair of parentheses.
+   Các phần tử của một :class:`tuple` là các đối tượng Python bất kỳ. Tuple có từ hai phần tử trở lên được tạo thành bằng danh sách các biểu thức phân tách bằng dấu phẩy. Tuple có một phần tử (một 'singleton') có thể được tạo bằng cách thêm dấu phẩy vào một biểu thức (một biểu thức tự nó không tạo ra tuple, vì dấu ngoặc đơn phải có thể dùng để nhóm các biểu thức). Một tuple rỗng có thể được tạo bằng một cặp dấu ngoặc đơn rỗng.
 
 Bytes
    .. index:: bytes, byte
 
-   A :class:`bytes` object is an immutable array.  The items are 8-bit bytes,
-   represented by integers in the range 0 <= x < 256.  Bytes literals
-   (like ``b'abc'``) and the built-in :func:`bytes` constructor
-   can be used to create bytes objects.  Also, bytes objects can be
-   decoded to strings via the :meth:`~bytes.decode` method.
+   Một đối tượng :class:`bytes` là một mảng bất biến. Các phần tử là byte 8-bit, được biểu diễn bằng các số nguyên trong phạm vi 0 <= x < 256. Các literal bytes (như ``b'abc'``) và constructor dựng sẵn :func:`bytes` có thể được dùng để tạo đối tượng bytes. Ngoài ra, các đối tượng bytes có thể được giải mã thành chuỗi thông qua phương thức :meth:`~bytes.decode`.
 
 
-Mutable sequences
-^^^^^^^^^^^^^^^^^
+Các sequence có thể thay đổi
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    pair: object; mutable sequence
@@ -412,131 +274,96 @@ Mutable sequences
    single: subscription
    single: slicing
 
-Mutable sequences can be changed after they are created.  The subscription and
-slicing notations can be used as the target of assignment and :keyword:`del`
-(delete) statements.
+Các sequence có thể thay đổi có thể được sửa đổi sau khi được tạo. Ký pháp subscription và slicing có thể được dùng làm đích của các câu lệnh gán và :keyword:`del` (xóa).
 
 .. note::
    .. index:: pair: module; array
    .. index:: pair: module; collections
 
-   The :mod:`collections` and :mod:`array` module provide
-   additional examples of mutable sequence types.
+   Module :mod:`collections` và :mod:`array` cung cấp thêm các ví dụ về các kiểu sequence có thể thay đổi.
 
-There are currently two intrinsic mutable sequence types:
+Hiện có hai kiểu sequence có thể thay đổi (mutable) nội tại:
 
-Lists
+List
    .. index:: pair: object; list
 
-   The items of a list are arbitrary Python objects.  Lists are formed by
-   placing a comma-separated list of expressions in square brackets. (Note
-   that there are no special cases needed to form lists of length 0 or 1.)
+   Các phần tử của một list có thể là các đối tượng Python bất kỳ. List được tạo bằng cách đặt một danh sách biểu thức phân tách bằng dấu phẩy trong dấu ngoặc vuông. (Lưu ý rằng không cần trường hợp đặc biệt nào để tạo list có độ dài 0 hoặc 1.)
 
-Byte Arrays
+Mảng byte
    .. index:: bytearray
 
-   A bytearray object is a mutable array. They are created by the built-in
-   :func:`bytearray` constructor.  Aside from being mutable
-   (and hence unhashable), byte arrays otherwise provide the same interface
-   and functionality as immutable :class:`bytes` objects.
+   Đối tượng bytearray là một mảng có thể thay đổi. Chúng được tạo bởi hàm dựng tích hợp sẵn
+   :func:`bytearray`. Ngoài việc có thể thay đổi (và do đó không thể băm), mảng byte còn cung cấp cùng interface và chức năng như các đối tượng :class:`bytes` bất biến.
 
 
-Set types
----------
+Các kiểu set
+------------
 
 .. index::
    pair: built-in function; len
    pair: object; set type
 
-These represent unordered, finite sets of unique, immutable objects. As such,
-they cannot be indexed by any subscript. However, they can be iterated over, and
-the built-in function :func:`len` returns the number of items in a set. Common
-uses for sets are fast membership testing, removing duplicates from a sequence,
-and computing mathematical operations such as intersection, union, difference,
-and symmetric difference.
+Chúng biểu diễn các tập hợp hữu hạn, không có thứ tự, gồm những đối tượng duy nhất và bất biến. Do đó, không thể truy cập chúng bằng chỉ số. Tuy nhiên, có thể lặp qua chúng, và hàm dựng sẵn :func:`len` trả về số lượng phần tử trong một tập hợp. Các cách dùng phổ biến của tập hợp là kiểm tra thành viên nhanh, loại bỏ phần tử trùng lặp khỏi một chuỗi, và tính các phép toán toán học như giao, hợp, hiệu và hiệu đối xứng.
 
-For set elements, the same immutability rules apply as for dictionary keys. Note
-that numeric types obey the normal rules for numeric comparison: if two numbers
-compare equal (e.g., ``1`` and ``1.0``), only one of them can be contained in a
-set.
+Đối với các phần tử của tập hợp, áp dụng cùng các quy tắc bất biến như đối với khóa từ điển. Lưu ý rằng các kiểu số tuân theo các quy tắc thông thường về so sánh số: nếu hai số được so sánh là bằng nhau (ví dụ: ``1`` và ``1.0``), chỉ một trong số chúng có thể nằm trong một tập hợp.
 
-There are currently two intrinsic set types:
+Hiện có hai kiểu tập hợp nội tại:
 
 
-Sets
+Tập hợp
    .. index:: pair: object; set
 
-   These represent a mutable set. They are created by the built-in :func:`set`
-   constructor and can be modified afterwards by several methods, such as
+   Chúng biểu diễn một tập hợp có thể thay đổi. Chúng được tạo bằng constructor dựng sẵn :func:`set` và sau đó có thể được sửa đổi bằng một số phương thức, chẳng hạn như
    :meth:`~set.add`.
 
 
-Frozen sets
+Tập hợp đóng băng
    .. index:: pair: object; frozenset
 
-   These represent an immutable set.  They are created by the built-in
-   :func:`frozenset` constructor.  As a frozenset is immutable and
-   :term:`hashable`, it can be used again as an element of another set, or as
-   a dictionary key.
+   Chúng biểu diễn một tập hợp bất biến. Chúng được tạo bằng hàm dựng sẵn
+   constructor :func:`frozenset`. Vì frozenset là bất biến và
+   :term:`hashable`, nó có thể კვლავ được dùng làm phần tử của một set khác hoặc làm khóa dictionary.
 
 
 .. _datamodel-mappings:
 
-Mappings
---------
+Ánh xạ
+------
 
 .. index::
    pair: built-in function; len
    single: subscription
    pair: object; mapping
 
-These represent finite sets of objects indexed by arbitrary index sets. The
-subscript notation ``a[k]`` selects the item indexed by ``k`` from the mapping
-``a``; this can be used in expressions and as the target of assignments or
-:keyword:`del` statements. The built-in function :func:`len` returns the number
-of items in a mapping.
+Các kiểu này biểu diễn những tập hợp hữu hạn các đối tượng được lập chỉ mục bởi các tập chỉ mục tùy ý. Ký pháp chỉ số ``a[k]`` chọn mục được lập chỉ mục bởi ``k`` từ ánh xạ ``a``; ký pháp này có thể được dùng trong biểu thức và làm đích của phép gán hoặc
+các câu lệnh :keyword:`del`. Hàm dựng sẵn :func:`len` trả về số lượng mục trong một ánh xạ.
 
-There is currently a single intrinsic mapping type:
+Hiện tại có một kiểu ánh xạ nội tại duy nhất:
 
 
-Dictionaries
-^^^^^^^^^^^^
+Dictionary
+^^^^^^^^^^
 
 .. index:: pair: object; dictionary
 
-These represent finite sets of objects indexed by nearly arbitrary values.  The
-only types of values not acceptable as keys are values containing lists or
-dictionaries or other mutable types that are compared by value rather than by
-object identity, the reason being that the efficient implementation of
-dictionaries requires a key's hash value to remain constant. Numeric types used
-for keys obey the normal rules for numeric comparison: if two numbers compare
-equal (e.g., ``1`` and ``1.0``) then they can be used interchangeably to index
-the same dictionary entry.
+Chúng biểu diễn các tập hợp hữu hạn gồm những đối tượng được lập chỉ mục bằng các giá trị gần như tùy ý. Những kiểu giá trị duy nhất không thể dùng làm khóa là các giá trị chứa list hoặc dictionary hay các kiểu mutable khác được so sánh theo giá trị thay vì theo định danh đối tượng, vì việc triển khai dictionary hiệu quả đòi hỏi giá trị hash của khóa phải không đổi. Các kiểu số dùng làm khóa tuân theo các quy tắc thông thường về so sánh số: nếu hai số so sánh bằng nhau (ví dụ: ``1`` và ``1.0``) thì chúng có thể được dùng thay thế cho nhau để lập chỉ mục cùng một mục dictionary.
 
-Dictionaries preserve insertion order, meaning that keys will be produced
-in the same order they were added sequentially over the dictionary.
-Replacing an existing key does not change the order, however removing a key
-and re-inserting it will add it to the end instead of keeping its old place.
+Dictionary bảo toàn thứ tự chèn, nghĩa là các khóa sẽ được tạo ra theo đúng thứ tự chúng đã được thêm tuần tự vào dictionary. Tuy nhiên, việc thay thế một khóa hiện có không làm thay đổi thứ tự; còn việc xóa một khóa rồi chèn lại sẽ thêm khóa đó vào cuối thay vì giữ vị trí cũ.
 
-Dictionaries are mutable; they can be created by the ``{}`` notation (see
-section :ref:`dict`).
+Dictionary là mutable; chúng có thể được tạo bằng ký pháp ``{}`` (xem phần :ref:`dict`).
 
 .. index::
    pair: module; dbm.ndbm
    pair: module; dbm.gnu
 
-The extension modules :mod:`dbm.ndbm` and :mod:`dbm.gnu` provide
-additional examples of mapping types, as does the :mod:`collections`
-module.
+Các extension module :mod:`dbm.ndbm` và :mod:`dbm.gnu` cung cấp thêm các ví dụ về kiểu mapping, cũng như module :mod:`collections`.
 
 .. versionchanged:: 3.7
-   Dictionaries did not preserve insertion order in versions of Python before 3.6.
-   In CPython 3.6, insertion order was preserved, but it was considered
-   an implementation detail at that time rather than a language guarantee.
+   Dictionary không bảo toàn thứ tự chèn trong các phiên bản Python trước 3.6. Trong CPython 3.6, thứ tự chèn được bảo toàn, nhưng khi đó điều này được xem là một chi tiết triển khai thay vì một bảo đảm của ngôn ngữ.
 
 
-Callable types
---------------
+Các kiểu callable
+-----------------
 
 .. index::
    pair: object; callable
@@ -544,27 +371,24 @@ Callable types
    single: invocation
    pair: function; argument
 
-These are the types to which the function call operation (see section
-:ref:`calls`) can be applied:
+Đây là các kiểu mà thao tác gọi hàm áp dụng được (xem phần
+:ref:`calls`) có thể được áp dụng:
 
 
 .. _user-defined-funcs:
 
-User-defined functions
-^^^^^^^^^^^^^^^^^^^^^^
+Các hàm do người dùng định nghĩa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    pair: user-defined; function
    pair: object; function
    pair: object; user-defined function
 
-A user-defined function object is created by a function definition (see
-section :ref:`function`).  It should be called with an argument list
-containing the same number of items as the function's formal parameter
-list.
+Một đối tượng hàm do người dùng định nghĩa được tạo bởi một định nghĩa hàm (xem mục :ref:`function`). Hàm này nên được gọi với một danh sách đối số chứa số lượng mục bằng với danh sách tham số hình thức của hàm.
 
-Special read-only attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các thuộc tính chỉ đọc đặc biệt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. index::
    single: __builtins__ (function attribute)
@@ -575,30 +399,26 @@ Special read-only attributes
 .. list-table::
    :header-rows: 1
 
-   * - Attribute
-     - Meaning
+   * - Thuộc tính
+     - Ý nghĩa
 
    * - .. attribute:: function.__builtins__
-     - A reference to the :class:`dictionary <dict>` that holds the function's
-       builtins namespace.
+     - Một tham chiếu đến :class:`dictionary <dict>` chứa không gian tên builtins của hàm.
 
        .. versionadded:: 3.10
 
    * - .. attribute:: function.__globals__
-     - A reference to the :class:`dictionary <dict>` that holds the function's
-       :ref:`global variables <naming>` -- the global namespace of the module
-       in which the function was defined.
+     - Tham chiếu đến :class:`dictionary <dict>` chứa các biến của hàm
+       :ref:`biến toàn cục <naming>` -- không gian tên toàn cục của mô-đun nơi hàm được định nghĩa.
 
    * - .. attribute:: function.__closure__
-     - ``None`` or a :class:`tuple` of cells that contain bindings for the names specified
-       in the :attr:`~codeobject.co_freevars` attribute of the function's
+     - ``None`` hoặc một :class:`tuple` gồm các ô chứa các liên kết cho những tên được chỉ định trong thuộc tính :attr:`~codeobject.co_freevars` của hàm
        :attr:`code object <function.__code__>`.
 
-       A cell object has the attribute ``cell_contents``.
-       This can be used to get the value of the cell, as well as set the value.
+       Một đối tượng ô có thuộc tính ``cell_contents``. Thuộc tính này có thể được dùng để lấy giá trị của ô cũng như đặt giá trị.
 
-Special writable attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các thuộc tính đặc biệt có thể ghi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. index::
    single: __doc__ (function attribute)
@@ -612,99 +432,80 @@ Special writable attributes
    single: __kwdefaults__ (function attribute)
    single: __type_params__ (function attribute)
 
-Most of these attributes check the type of the assigned value:
+Hầu hết các thuộc tính này đều kiểm tra kiểu của giá trị được gán:
 
 .. list-table::
    :header-rows: 1
 
-   * - Attribute
-     - Meaning
+   * - Thuộc tính
+     - Ý nghĩa
 
    * - .. attribute:: function.__doc__
-     - The function's documentation string, or ``None`` if unavailable.
+     - Chuỗi tài liệu của hàm hoặc ``None`` nếu không có.
 
    * - .. attribute:: function.__name__
-     - The function's name.
-       See also: :attr:`__name__ attributes <definition.__name__>`.
+     - Tên của hàm. Xem thêm: :attr:`__name__ attributes <definition.__name__>`.
 
    * - .. attribute:: function.__qualname__
-     - The function's :term:`qualified name`.
-       See also: :attr:`__qualname__ attributes <definition.__qualname__>`.
+     - :term:`qualified name` của hàm. Xem thêm: :attr:`__qualname__ attributes <definition.__qualname__>`.
 
        .. versionadded:: 3.3
 
    * - .. attribute:: function.__module__
-     - The name of the module the function was defined in,
-       or ``None`` if unavailable.
+     - Tên của module nơi hàm được định nghĩa hoặc ``None`` nếu không có.
 
    * - .. attribute:: function.__defaults__
-     - A :class:`tuple` containing default :term:`parameter` values
-       for those parameters that have defaults,
-       or ``None`` if no parameters have a default value.
+     - Một :class:`tuple` chứa các giá trị :term:`parameter` mặc định cho những tham số có giá trị mặc định, hoặc ``None`` nếu không có tham số nào có giá trị mặc định.
 
    * - .. attribute:: function.__code__
-     - The :ref:`code object <code-objects>` representing
-       the compiled function body.
+     - :ref:`đối tượng mã <code-objects>` biểu diễn phần thân hàm đã được biên dịch.
 
    * - .. attribute:: function.__dict__
-     - The namespace supporting arbitrary function attributes.
-       See also: :attr:`__dict__ attributes <object.__dict__>`.
+     - Không gian tên hỗ trợ các thuộc tính hàm tùy ý. Xem thêm: :attr:`__dict__ attributes <object.__dict__>`.
 
    * - .. attribute:: function.__annotations__
-     - A :class:`dictionary <dict>` containing annotations of
-       :term:`parameters <parameter>`.
-       The keys of the dictionary are the parameter names,
-       and ``'return'`` for the return annotation, if provided.
-       See also: :attr:`object.__annotations__`.
+     - Một :class:`dictionary <dict>` chứa các annotation của
+       :term:`parameters <parameter>`. Các khóa của dictionary là tên tham số, và ``'return'`` dành cho annotation trả về, nếu được cung cấp. Xem thêm: :attr:`object.__annotations__`.
 
        .. versionchanged:: 3.14
-          Annotations are now :ref:`lazily evaluated <lazy-evaluation>`.
-          See :pep:`649`.
+          Các annotation hiện được :ref:`đánh giá lười <lazy-evaluation>`. Xem :pep:`649`.
 
    * - .. attribute:: function.__annotate__
-     - The :term:`annotate function` for this function, or ``None``
-       if the function has no annotations. See :attr:`object.__annotate__`.
+     - :term:`annotate function` dành cho hàm này, hoặc ``None`` nếu hàm không có annotation. Xem :attr:`object.__annotate__`.
 
        .. versionadded:: 3.14
 
    * - .. attribute:: function.__kwdefaults__
-     - A :class:`dictionary <dict>` containing defaults for keyword-only
+     - Một :class:`dictionary <dict>` chứa các giá trị mặc định cho các tham số chỉ nhận keyword
        :term:`parameters <parameter>`.
 
    * - .. attribute:: function.__type_params__
-     - A :class:`tuple` containing the :ref:`type parameters <type-params>` of
-       a :ref:`generic function <generic-functions>`.
+     - Một :class:`tuple` chứa các :ref:`tham số kiểu <type-params>` của một :ref:`hàm generic <generic-functions>`.
 
        .. versionadded:: 3.12
 
-Function objects also support getting and setting arbitrary attributes, which
-can be used, for example, to attach metadata to functions.  Regular attribute
-dot-notation is used to get and set such attributes.
+Các đối tượng hàm cũng hỗ trợ lấy và thiết lập các thuộc tính tùy ý; chẳng hạn, có thể dùng chúng để gắn metadata vào hàm. Ký pháp dấu chấm thuộc tính thông thường được dùng để lấy và thiết lập các thuộc tính đó.
 
 .. impl-detail::
 
-   CPython's current implementation only supports function attributes
-   on user-defined functions. Function attributes on
-   :ref:`built-in functions <builtin-functions>` may be supported in the
-   future.
+   Cách triển khai hiện tại của CPython chỉ hỗ trợ các thuộc tính hàm trên những hàm do người dùng định nghĩa. Các thuộc tính hàm trên
+   :ref:`các hàm built-in <builtin-functions>` có thể được hỗ trợ trong tương lai.
 
-Additional information about a function's definition can be retrieved from its
-:ref:`code object <code-objects>`
-(accessible via the :attr:`~function.__code__` attribute).
+Thông tin bổ sung về định nghĩa của một hàm có thể được truy xuất từ
+:ref:`code object <code-objects>` của nó (có thể truy cập thông qua thuộc tính :attr:`~function.__code__`).
 
 
 .. _instance-methods:
 
-Instance methods
-^^^^^^^^^^^^^^^^
+Các phương thức instance
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    pair: object; method
    pair: object; user-defined method
    pair: user-defined; method
 
-An instance method object combines a class, a class instance and any
-callable object (normally a user-defined function).
+Một đối tượng phương thức instance kết hợp một lớp, một instance của lớp và bất kỳ đối tượng callable nào (thông thường là một hàm do người dùng định nghĩa).
 
 .. index::
    single: __func__ (method attribute)
@@ -713,208 +514,148 @@ callable object (normally a user-defined function).
    single: __name__ (method attribute)
    single: __module__ (method attribute)
 
-Special read-only attributes:
+Các thuộc tính đặc biệt chỉ đọc:
 
 .. list-table::
 
    * - .. attribute:: method.__self__
-     - Refers to the class instance object to which the method is
+     - Tham chiếu đến đối tượng instance của lớp mà phương thức được
        :ref:`bound <method-binding>`
 
    * - .. attribute:: method.__func__
-     - Refers to the original :ref:`function object <user-defined-funcs>`
+     - Tham chiếu đến :ref:`đối tượng function gốc <user-defined-funcs>`
 
    * - .. attribute:: method.__doc__
-     - The method's documentation
-       (same as :attr:`method.__func__.__doc__ <function.__doc__>`).
-       A :class:`string <str>` if the original function had a docstring, else
-       ``None``.
+     - Tài liệu của phương thức (giống như :attr:`method.__func__.__doc__ <function.__doc__>`). Là :class:`string <str>` nếu hàm gốc có docstring, nếu không thì là ``None``.
 
    * - .. attribute:: method.__name__
-     - The name of the method
-       (same as :attr:`method.__func__.__name__ <function.__name__>`)
+     - Tên của phương thức (giống như :attr:`method.__func__.__name__ <function.__name__>`)
 
    * - .. attribute:: method.__module__
-     - The name of the module the method was defined in, or ``None`` if
-       unavailable.
+     - Tên của module nơi phương thức được định nghĩa, hoặc ``None`` nếu không khả dụng.
 
-Methods also support accessing (but not setting) the arbitrary function
-attributes on the underlying :ref:`function object <user-defined-funcs>`.
+Các phương thức cũng hỗ trợ truy cập (nhưng không thiết lập) các thuộc tính hàm tùy ý trên :ref:`function object <user-defined-funcs>` cơ sở.
 
-User-defined method objects may be created when getting an attribute of a
-class (perhaps via an instance of that class), if that attribute is a
-user-defined :ref:`function object <user-defined-funcs>` or a
-:class:`classmethod` object.
+Các đối tượng phương thức do người dùng định nghĩa có thể được tạo khi lấy một thuộc tính của một lớp (có thể thông qua một instance của lớp đó), nếu thuộc tính đó là một :ref:`function object <user-defined-funcs>` do người dùng định nghĩa hoặc một
+đối tượng :class:`classmethod`.
 
 .. _method-binding:
 
-When an instance method object is created by retrieving a user-defined
-:ref:`function object <user-defined-funcs>` from a class via one of its
-instances, its :attr:`~method.__self__` attribute is the instance, and the
-method object is said to be *bound*.  The new method's :attr:`~method.__func__`
-attribute is the original function object.
+Khi một đối tượng phương thức instance được tạo bằng cách truy xuất một đối tượng do người dùng định nghĩa
+:ref:`đối tượng hàm <user-defined-funcs>` từ một class thông qua một trong các instance của nó, thuộc tính :attr:`~method.__self__` của đối tượng đó là instance này, và đối tượng phương thức được gọi là đã được *ràng buộc*. Thuộc tính :attr:`~method.__func__` của phương thức mới là đối tượng hàm gốc.
 
-When an instance method object is created by retrieving a :class:`classmethod`
-object from a class or instance, its :attr:`~method.__self__` attribute is the
-class itself, and its :attr:`~method.__func__` attribute is the function object
-underlying the class method.
+Khi một đối tượng phương thức instance được tạo bằng cách truy xuất một đối tượng :class:`classmethod` từ một class hoặc instance, thuộc tính :attr:`~method.__self__` của nó là chính class đó, và thuộc tính :attr:`~method.__func__` của nó là đối tượng hàm nền tảng của phương thức class.
 
-When an instance method object is called, the underlying function
-(:attr:`~method.__func__`) is called, inserting the class instance
-(:attr:`~method.__self__`) in front of the argument list.  For instance, when
-:class:`!C` is a class which contains a definition for a function
-:meth:`!f`, and ``x`` is an instance of :class:`!C`, calling ``x.f(1)`` is
-equivalent to calling ``C.f(x, 1)``.
+Khi một đối tượng phương thức instance được gọi, hàm cơ sở (:attr:`~method.__func__`) sẽ được gọi, với instance của lớp (:attr:`~method.__self__`) được chèn vào đầu danh sách đối số. Ví dụ, khi
+:class:`!C` là một lớp chứa định nghĩa cho một hàm
+:meth:`!f`, và ``x`` là một instance của :class:`!C`, việc gọi ``x.f(1)`` tương đương với việc gọi ``C.f(x, 1)``.
 
-When an instance method object is derived from a :class:`classmethod` object, the
-"class instance" stored in :attr:`~method.__self__` will actually be the class
-itself, so that calling either ``x.f(1)`` or ``C.f(1)`` is equivalent to
-calling ``f(C,1)`` where ``f`` is the underlying function.
+Khi một đối tượng phương thức instance được tạo từ một đối tượng :class:`classmethod`, "instance của lớp" được lưu trong :attr:`~method.__self__` thực chất sẽ là chính lớp đó, vì vậy việc gọi ``x.f(1)`` hoặc ``C.f(1)`` đều tương đương với việc gọi ``f(C,1)``, trong đó ``f`` là hàm cơ sở.
 
-It is important to note that user-defined functions
-which are attributes of a class instance are not converted to bound
-methods; this *only* happens when the function is an attribute of the
-class.
+Điều quan trọng cần lưu ý là các hàm do người dùng định nghĩa, vốn là thuộc tính của một instance lớp, sẽ không được chuyển đổi thành các bound method; điều này *chỉ* xảy ra khi hàm là một thuộc tính của lớp.
 
 
-Generator functions
-^^^^^^^^^^^^^^^^^^^
+Hàm generator
+^^^^^^^^^^^^^
 
 .. index::
    single: generator; function
    single: generator; iterator
 
-A function or method which contains a :keyword:`yield` expression (see section
-:ref:`yieldexpr`) is called a :dfn:`generator function`.  Such a function, when
-called, always returns an :term:`iterator` object which can be used to
-execute the body of the function:  calling the iterator's
-:meth:`iterator.__next__` method will cause the function to execute until
-it provides a value using the :keyword:`!yield` expression.  When the
-function executes a :keyword:`return` statement or falls off the end, a
-:exc:`StopIteration` exception is raised and the iterator will have
-reached the end of the set of values to be returned.
+Một hàm hoặc phương thức chứa biểu thức :keyword:`yield` (xem phần
+:ref:`yieldexpr`) được gọi là một :dfn:`hàm generator`. Khi được gọi, một hàm như vậy luôn trả về một :term:`iterator` đối tượng có thể dùng để thực thi phần thân của hàm: việc gọi phương thức của iterator
+:meth:`iterator.__next__` sẽ khiến hàm thực thi cho đến khi cung cấp một giá trị bằng biểu thức :keyword:`!yield`. Khi hàm thực thi một câu lệnh :keyword:`return` hoặc chạy đến cuối hàm, một
+:exc:`StopIteration` ngoại lệ được phát sinh và iterator sẽ đi đến cuối tập hợp các giá trị cần trả về.
 
 
-Coroutine functions
-^^^^^^^^^^^^^^^^^^^
+Hàm coroutine
+^^^^^^^^^^^^^
 
 .. index::
    single: coroutine; function
 
-A function or method which is defined using :keyword:`async def` is called
-a :dfn:`coroutine function`.  Such a function, when called, returns a
-:term:`coroutine` object.  It may contain :keyword:`await` expressions,
-as well as :keyword:`async with` and :keyword:`async for` statements. See
-also the :ref:`coroutine-objects` section.
+Một hàm hoặc phương thức được định nghĩa bằng :keyword:`async def` được gọi là một :dfn:`hàm coroutine`. Khi được gọi, một hàm như vậy trả về một
+:term:`coroutine` đối tượng. Nó có thể chứa các biểu thức :keyword:`await`, cũng như các câu lệnh :keyword:`async with` và :keyword:`async for`. Xem thêm phần :ref:`coroutine-objects`.
 
 
-Asynchronous generator functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Hàm generator bất đồng bộ
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    single: asynchronous generator; function
    single: asynchronous generator; asynchronous iterator
 
-A function or method which is defined using :keyword:`async def` and
-which contains a :keyword:`yield` expression is called a
-:dfn:`asynchronous generator function`.  Such a function, when called,
-returns an :term:`asynchronous iterator` object which can be used in an
-:keyword:`async for` statement to execute the body of the function.
+Một hàm hoặc phương thức được định nghĩa bằng :keyword:`async def` và chứa biểu thức :keyword:`yield` được gọi là một
+:dfn:`hàm generator bất đồng bộ`. Khi được gọi, một hàm như vậy trả về một đối tượng :term:`asynchronous iterator` có thể được dùng trong một
+câu lệnh :keyword:`async for` để thực thi phần thân của hàm.
 
-Calling the asynchronous iterator's
-:meth:`aiterator.__anext__ <object.__anext__>` method
-will return an :term:`awaitable` which when awaited
-will execute until it provides a value using the :keyword:`yield`
-expression.  When the function executes an empty :keyword:`return`
-statement or falls off the end, a :exc:`StopAsyncIteration` exception
-is raised and the asynchronous iterator will have reached the end of
-the set of values to be yielded.
+Việc gọi
+phương thức :meth:`aiterator.__anext__ <object.__anext__>` của iterator bất đồng bộ sẽ trả về một :term:`awaitable`; khi await đối tượng này, quá trình thực thi sẽ tiếp tục cho đến khi nó cung cấp một giá trị bằng biểu thức :keyword:`yield`. Khi hàm thực thi một câu lệnh :keyword:`return` rỗng hoặc chạy đến cuối, một ngoại lệ :exc:`StopAsyncIteration` sẽ được phát sinh và iterator bất đồng bộ sẽ đạt đến cuối tập giá trị cần yield.
 
 
 .. _builtin-functions:
 
-Built-in functions
-^^^^^^^^^^^^^^^^^^
+Các hàm tích hợp sẵn
+^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    pair: object; built-in function
    pair: object; function
    pair: C; language
 
-A built-in function object is a wrapper around a C function.  Examples of
-built-in functions are :func:`len` and :func:`math.sin` (:mod:`math` is a
-standard built-in module). The number and type of the arguments are
-determined by the C function. Special read-only attributes:
+Đối tượng hàm tích hợp sẵn là một wrapper quanh một hàm C. Ví dụ về các hàm tích hợp sẵn là :func:`len` và :func:`math.sin` (:mod:`math` là một module tích hợp sẵn chuẩn). Số lượng và kiểu đối số được xác định bởi hàm C. Các thuộc tính đặc biệt chỉ đọc:
 
-* :attr:`!__doc__` is the function's documentation string, or ``None`` if
-  unavailable. See :attr:`function.__doc__`.
-* :attr:`!__name__` is the function's name. See :attr:`function.__name__`.
-* :attr:`!__self__` is set to ``None`` (but see the next item).
-* :attr:`!__module__` is the name of
-  the module the function was defined in or ``None`` if unavailable.
-  See :attr:`function.__module__`.
+* :attr:`!__doc__` là chuỗi tài liệu của hàm, hoặc ``None`` nếu không có. Xem :attr:`function.__doc__`.
+* :attr:`!__name__` là tên của hàm. Xem :attr:`function.__name__`.
+* :attr:`!__self__` được đặt thành ``None`` (nhưng hãy xem mục tiếp theo).
+* :attr:`!__module__` là tên của mô-đun nơi hàm được định nghĩa, hoặc ``None`` nếu không có. Xem :attr:`function.__module__`.
 
 
 .. _builtin-methods:
 
-Built-in methods
-^^^^^^^^^^^^^^^^
+Các phương thức dựng sẵn
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    pair: object; built-in method
    pair: object; method
    pair: built-in; method
 
-This is really a different disguise of a built-in function, this time containing
-an object passed to the C function as an implicit extra argument.  An example of
-a built-in method is ``alist.append()``, assuming *alist* is a list object. In
-this case, the special read-only attribute :attr:`!__self__` is set to the object
-denoted by *alist*. (The attribute has the same semantics as it does with
+Đây thực chất là một dạng khác của hàm dựng sẵn, lần này chứa một đối tượng được truyền tới hàm C như một đối số bổ sung ngầm định. Một ví dụ về phương thức dựng sẵn là ``alist.append()``, giả sử *alist* là một đối tượng danh sách. Trong trường hợp này, thuộc tính chỉ đọc đặc biệt :attr:`!__self__` được đặt thành đối tượng được biểu thị bởi *alist*. (Thuộc tính này có cùng ngữ nghĩa như khi dùng với
 :attr:`other instance methods <method.__self__>`.)
 
 .. _classes:
 
-Classes
-^^^^^^^
+Lớp
+^^^
 
-Classes are callable.  These objects normally act as factories for new
-instances of themselves, but variations are possible for class types that
-override :meth:`~object.__new__`.  The arguments of the call are passed to
-:meth:`!__new__` and, in the typical case, to :meth:`~object.__init__` to
-initialize the new instance.
+Các lớp có thể gọi được. Những đối tượng này thường hoạt động như các factory để tạo các instance mới của chính chúng, nhưng có thể có các biến thể đối với những kiểu lớp ghi đè :meth:`~object.__new__`. Các đối số của lời gọi được փոխանց cho
+:meth:`!__new__` và, trong trường hợp điển hình, cho :meth:`~object.__init__` để khởi tạo instance mới.
 
 
-Class Instances
-^^^^^^^^^^^^^^^
+Các instance của lớp
+^^^^^^^^^^^^^^^^^^^^
 
-Instances of arbitrary classes can be made callable by defining a
-:meth:`~object.__call__` method in their class.
+Có thể làm cho các instance của những lớp tùy ý có thể gọi được bằng cách định nghĩa một
+phương thức :meth:`~object.__call__` trong lớp của chúng.
 
 
 .. _module-objects:
 
-Modules
--------
+Module
+------
 
 .. index::
    pair: statement; import
    pair: object; module
 
-Modules are a basic organizational unit of Python code, and are created by
-the :ref:`import system <importsystem>` as invoked either by the
-:keyword:`import` statement, or by calling
-functions such as :func:`importlib.import_module` and built-in
-:func:`__import__`.  A module object has a namespace implemented by a
-:class:`dictionary <dict>` object (this is the dictionary referenced by the
-:attr:`~function.__globals__`
-attribute of functions defined in the module).  Attribute references are
-translated to lookups in this dictionary, e.g., ``m.x`` is equivalent to
-``m.__dict__["x"]``. A module object does not contain the code object used
-to initialize the module (since it isn't needed once the initialization is
-done).
+Module là một đơn vị tổ chức cơ bản của mã Python và được tạo bởi :ref:`hệ thống import <importsystem>`, như được gọi bởi một trong hai cách sau
+câu lệnh :keyword:`import`, hoặc bằng cách gọi các hàm như :func:`importlib.import_module` và hàm dựng sẵn
+:func:`__import__`. Một đối tượng module có một namespace được triển khai bởi một
+đối tượng :class:`dictionary <dict>` (đây là dictionary được tham chiếu bởi thuộc tính
+:attr:`~function.__globals__` của các hàm được định nghĩa trong module). Các tham chiếu thuộc tính được chuyển thành các thao tác tra cứu trong dictionary này, ví dụ, ``m.x`` tương đương với ``m.__dict__["x"]``. Một đối tượng module không chứa code object được dùng để khởi tạo module (vì nó không cần thiết sau khi quá trình khởi tạo hoàn tất).
 
-Attribute assignment updates the module's namespace dictionary, e.g.,
-``m.x = 1`` is equivalent to ``m.__dict__["x"] = 1``.
+Việc gán thuộc tính sẽ cập nhật dictionary namespace của module, ví dụ, ``m.x = 1`` tương đương với ``m.__dict__["x"] = 1``.
 
 .. index::
    single: __name__ (module attribute)
@@ -931,30 +672,18 @@ Attribute assignment updates the module's namespace dictionary, e.g.,
 
 .. _import-mod-attrs:
 
-Import-related attributes on module objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các thuộc tính liên quan đến import trên đối tượng module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Module objects have the following attributes that relate to the
-:ref:`import system <importsystem>`. When a module is created using the machinery associated
-with the import system, these attributes are filled in based on the module's
-:term:`spec <module spec>`, before the :term:`loader` executes and loads the
-module.
+Các đối tượng module có các thuộc tính sau đây liên quan đến
+:ref:`import system <importsystem>`. Khi một module được tạo bằng cơ chế liên kết với import system, các thuộc tính này được điền dựa trên module đó
+:term:`spec <module spec>`, trước khi :term:`loader` thực thi và tải module.
 
-To create a module dynamically rather than using the import system,
-it's recommended to use :func:`importlib.util.module_from_spec`,
-which will set the various import-controlled attributes to appropriate values.
-It's also possible to use the :class:`types.ModuleType` constructor to create
-modules directly, but this technique is more error-prone, as most attributes
-must be manually set on the module object after it has been created when using
-this approach.
+Để tạo một module động thay vì sử dụng import system, bạn nên dùng :func:`importlib.util.module_from_spec`, hàm này sẽ đặt các thuộc tính do import kiểm soát thành những giá trị phù hợp. Bạn cũng có thể dùng constructor :class:`types.ModuleType` để tạo module trực tiếp, nhưng kỹ thuật này dễ gây lỗi hơn, vì với cách này, hầu hết thuộc tính phải được đặt thủ công trên đối tượng module sau khi nó được tạo.
 
 .. caution::
 
-   With the exception of :attr:`~module.__name__`, it is **strongly**
-   recommended that you rely on :attr:`~module.__spec__` and its attributes
-   instead of any of the other individual attributes listed in this subsection.
-   Note that updating an attribute on :attr:`!__spec__` will not update the
-   corresponding attribute on the module itself:
+   Ngoại trừ :attr:`~module.__name__`, bạn **rất** nên dựa vào :attr:`~module.__spec__` và các thuộc tính của nó thay vì bất kỳ thuộc tính riêng lẻ nào khác được liệt kê trong tiểu mục này. Lưu ý rằng việc cập nhật một thuộc tính trên :attr:`!__spec__` sẽ không cập nhật thuộc tính tương ứng trên chính module:
 
    .. doctest::
 
@@ -970,54 +699,38 @@ this approach.
 
 .. attribute:: module.__name__
 
-   The name used to uniquely identify the module in the import system.
-   For a directly executed module, this will be set to ``"__main__"``.
+   Tên được dùng để nhận diện duy nhất module trong import system. Với một module được thực thi trực tiếp, thuộc tính này sẽ được đặt thành ``"__main__"``.
 
-   This attribute must be set to the fully qualified name of the module.
-   It is expected to match the value of
+   Thuộc tính này phải được đặt thành tên đầy đủ của module. Giá trị này được kỳ vọng khớp với giá trị của
    :attr:`module.__spec__.name <importlib.machinery.ModuleSpec.name>`.
 
 .. attribute:: module.__spec__
 
-   A record of the module's import-system-related state.
+   Bản ghi về trạng thái liên quan đến import system của module.
 
-   Set to the :class:`module spec <importlib.machinery.ModuleSpec>` that was
-   used when importing the module. See :ref:`module-specs` for more details.
+   Đặt thành :class:`module spec <importlib.machinery.ModuleSpec>` đã được dùng khi import module. Xem :ref:`module-specs` để biết thêm chi tiết.
 
    .. versionadded:: 3.4
 
 .. attribute:: module.__package__
 
-   The :term:`package` a module belongs to.
+   :term:`package` mà một module thuộc về.
 
-   If the module is top-level (that is, not a part of any specific package)
-   then the attribute should be set to ``''`` (the empty string). Otherwise,
-   it should be set to the name of the module's package (which can be equal to
-   :attr:`module.__name__` if the module itself is a package). See :pep:`366`
-   for further details.
+   Nếu module ở cấp cao nhất (nghĩa là không thuộc bất kỳ package cụ thể nào) thì thuộc tính này phải được đặt thành ``''`` (chuỗi rỗng). Nếu không, thuộc tính này phải được đặt thành tên package của module (có thể bằng
+   :attr:`module.__name__` nếu bản thân module là một package). Xem :pep:`366` để biết thêm chi tiết.
 
-   This attribute is used instead of :attr:`~module.__name__` to calculate
-   explicit relative imports for main modules. It defaults to ``None`` for
-   modules created dynamically using the :class:`types.ModuleType` constructor;
-   use :func:`importlib.util.module_from_spec` instead to ensure the attribute
-   is set to a :class:`str`.
+   Thuộc tính này được dùng thay cho :attr:`~module.__name__` để tính các import tương đối tường minh cho các module chính. Theo mặc định, thuộc tính này là ``None`` đối với các module được tạo động bằng constructor :class:`types.ModuleType`; thay vào đó, hãy dùng :func:`importlib.util.module_from_spec` để bảo đảm thuộc tính được đặt thành một :class:`str`.
 
-   It is **strongly** recommended that you use
-   :attr:`module.__spec__.parent <importlib.machinery.ModuleSpec.parent>`
-   instead of :attr:`!module.__package__`. :attr:`__package__` is now only used
-   as a fallback if :attr:`!__spec__.parent` is not set, and this fallback
-   path is deprecated.
+   Bạn **nên** sử dụng
+   :attr:`module.__spec__.parent <importlib.machinery.ModuleSpec.parent>` thay vì :attr:`!module.__package__`. :attr:`__package__` hiện chỉ được dùng làm phương án dự phòng nếu :attr:`!__spec__.parent` chưa được đặt, và đường dẫn dự phòng này đã bị phản đối.
 
    .. versionchanged:: 3.4
-      This attribute now defaults to ``None`` for modules created dynamically
-      using the :class:`types.ModuleType` constructor.
-      Previously the attribute was optional.
+      Thuộc tính này hiện mặc định là ``None`` đối với các module được tạo động bằng constructor :class:`types.ModuleType`. Trước đây, thuộc tính này là tùy chọn.
 
    .. versionchanged:: 3.6
-      The value of :attr:`!__package__` is expected to be the same as
+      Giá trị của :attr:`!__package__` được kỳ vọng giống như
       :attr:`__spec__.parent <importlib.machinery.ModuleSpec.parent>`.
-      :attr:`__package__` is now only used as a fallback during import
-      resolution if :attr:`!__spec__.parent` is not defined.
+      :attr:`__package__` hiện chỉ được dùng làm phương án dự phòng trong quá trình phân giải import nếu :attr:`!__spec__.parent` chưa được định nghĩa.
 
    .. versionchanged:: 3.10
       :exc:`ImportWarning` is raised if an import resolution falls back to
@@ -1025,153 +738,105 @@ this approach.
       :attr:`__spec__.parent <importlib.machinery.ModuleSpec.parent>`.
 
    .. versionchanged:: 3.12
-      Raise :exc:`DeprecationWarning` instead of :exc:`ImportWarning` when
-      falling back to :attr:`!__package__` during import resolution.
+      Phát sinh :exc:`DeprecationWarning` thay vì :exc:`ImportWarning` khi dùng :attr:`!__package__` làm phương án dự phòng trong quá trình phân giải import.
 
    .. deprecated-removed:: 3.13 3.15
       :attr:`!__package__` will cease to be set or taken into consideration
-      by the import system or standard library.
+      bởi hệ thống import hoặc standard library.
 
 .. attribute:: module.__loader__
 
-   The :term:`loader` object that the import machinery used to load the module.
+   Đối tượng :term:`loader` mà cơ chế import đã dùng để tải module.
 
-   This attribute is mostly useful for introspection, but can be used for
-   additional loader-specific functionality, for example getting data
-   associated with a loader.
+   Thuộc tính này chủ yếu hữu ích cho việc introspection, nhưng có thể được dùng cho chức năng bổ sung dành riêng cho loader, ví dụ như lấy dữ liệu liên kết với một loader.
 
-   :attr:`!__loader__` defaults to ``None`` for modules created dynamically
-   using the :class:`types.ModuleType` constructor;
-   use :func:`importlib.util.module_from_spec` instead to ensure the attribute
-   is set to a :term:`loader` object.
+   :attr:`!__loader__` mặc định là ``None`` đối với các module được tạo động bằng constructor :class:`types.ModuleType`; thay vào đó, hãy dùng :func:`importlib.util.module_from_spec` để bảo đảm thuộc tính được đặt thành một đối tượng :term:`loader`.
 
-   It is **strongly** recommended that you use
-   :attr:`module.__spec__.loader <importlib.machinery.ModuleSpec.loader>`
-   instead of :attr:`!module.__loader__`.
+   Bạn **nên** sử dụng
+   :attr:`module.__spec__.loader <importlib.machinery.ModuleSpec.loader>` thay vì :attr:`!module.__loader__`.
 
    .. versionchanged:: 3.4
-      This attribute now defaults to ``None`` for modules created dynamically
-      using the :class:`types.ModuleType` constructor.
-      Previously the attribute was optional.
+      Thuộc tính này hiện mặc định là ``None`` đối với các module được tạo động bằng constructor :class:`types.ModuleType`. Trước đây, thuộc tính này là tùy chọn.
 
    .. deprecated-removed:: 3.12 3.16
-      Setting :attr:`!__loader__` on a module while failing to set
-      :attr:`!__spec__.loader` is deprecated. In Python 3.16,
-      :attr:`!__loader__` will cease to be set or taken into consideration by
-      the import system or the standard library.
+      Việc đặt :attr:`!__loader__` trên một module nhưng không đặt
+      :attr:`!__spec__.loader` đã lỗi thời. Trong Python 3.16,
+      :attr:`!__loader__` sẽ không còn được hệ thống import hoặc thư viện chuẩn đặt hay xem xét.
 
 .. attribute:: module.__path__
 
-   A (possibly empty) :term:`sequence` of strings enumerating the locations
-   where the package's submodules will be found. Non-package modules should
-   not have a :attr:`!__path__` attribute. See :ref:`package-path-rules` for
-   more details.
+   Một :term:`sequence` chuỗi (có thể rỗng) liệt kê các vị trí nơi tìm thấy các submodule của package. Các module không phải package không nên có thuộc tính :attr:`!__path__`. Xem :ref:`package-path-rules` để biết thêm chi tiết.
 
-   It is **strongly** recommended that you use
-   :attr:`module.__spec__.submodule_search_locations <importlib.machinery.ModuleSpec.submodule_search_locations>`
-   instead of :attr:`!module.__path__`.
+   Bạn **nên** sử dụng
+   :attr:`module.__spec__.submodule_search_locations <importlib.machinery.ModuleSpec.submodule_search_locations>` thay vì :attr:`!module.__path__`.
 
 .. attribute:: module.__file__
 .. attribute:: module.__cached__
 
-   :attr:`!__file__` and :attr:`!__cached__` are both optional attributes that
-   may or may not be set. Both attributes should be a :class:`str` when they
-   are available.
+   :attr:`!__file__` và :attr:`!__cached__` đều là các thuộc tính tùy chọn, có thể được thiết lập hoặc không. Cả hai thuộc tính nên là một :class:`str` khi khả dụng.
 
-   :attr:`!__file__` indicates the pathname of the file from which the module
-   was loaded (if loaded from a file), or the pathname of the shared library
-   file for extension modules loaded dynamically from a shared library.
-   It might be missing for certain types of modules, such as C modules that are
-   statically linked into the interpreter, and the
-   :ref:`import system <importsystem>` may opt to leave it unset if it
-   has no semantic meaning (for example, a module loaded from a database).
+   :attr:`!__file__` cho biết pathname của tệp mà module được tải từ đó (nếu được tải từ một tệp), hoặc pathname của tệp shared library dành cho các extension module được tải động từ một shared library. Thuộc tính này có thể không có đối với một số loại module nhất định, chẳng hạn như các C module được liên kết tĩnh vào interpreter, và
+   :ref:`import system <importsystem>` có thể chọn không thiết lập thuộc tính này nếu nó không có ý nghĩa ngữ nghĩa (ví dụ: một module được tải từ cơ sở dữ liệu).
 
-   If :attr:`!__file__` is set then the :attr:`!__cached__` attribute might
-   also be set,  which is the path to any compiled version of
-   the code (for example, a byte-compiled file). The file does not need to exist
-   to set this attribute; the path can simply point to where the
-   compiled file *would* exist (see :pep:`3147`).
+   Nếu :attr:`!__file__` được thiết lập thì thuộc tính :attr:`!__cached__` cũng có thể được thiết lập, đây là đường dẫn đến bất kỳ phiên bản đã biên dịch nào của mã (ví dụ: một tệp đã byte-compiled). Tệp không cần tồn tại để thiết lập thuộc tính này; đường dẫn chỉ cần trỏ đến nơi tệp đã biên dịch *sẽ* tồn tại (xem :pep:`3147`).
 
-   Note that :attr:`!__cached__` may be set even if :attr:`!__file__` is not
-   set.  However, that scenario is quite atypical.  Ultimately, the
-   :term:`loader` is what makes use of the module spec provided by the
-   :term:`finder` (from which :attr:`!__file__` and :attr:`!__cached__` are
-   derived).  So if a loader can load from a cached module but otherwise does
-   not load from a file, that atypical scenario may be appropriate.
+   Lưu ý rằng :attr:`!__cached__` có thể được đặt ngay cả khi :attr:`!__file__` chưa được đặt. Tuy nhiên, tình huống đó khá không điển hình. Cuối cùng, việc
+   :term:`loader` mới là điều khiến việc sử dụng module spec được cung cấp bởi
+   :term:`finder` (từ đó :attr:`!__file__` và :attr:`!__cached__` được suy ra). Vì vậy, nếu một loader có thể tải từ một module đã được lưu trong bộ nhớ đệm nhưng ngoài trường hợp đó không tải từ tệp, thì tình huống không điển hình này có thể phù hợp.
 
-   It is **strongly** recommended that you use
-   :attr:`module.__spec__.cached <importlib.machinery.ModuleSpec.cached>`
-   instead of :attr:`!module.__cached__`.
+   Bạn **nên** sử dụng
+   :attr:`module.__spec__.cached <importlib.machinery.ModuleSpec.cached>` thay vì :attr:`!module.__cached__`.
 
    .. deprecated-removed:: 3.13 3.15
-      Setting :attr:`!__cached__` on a module while failing to set
-      :attr:`!__spec__.cached` is deprecated. In Python 3.15,
-      :attr:`!__cached__` will cease to be set or taken into consideration by
-      the import system or standard library.
+      Việc đặt :attr:`!__cached__` trên một module nhưng không đặt
+      :attr:`!__spec__.cached` đã bị phản đối. Trong Python 3.15,
+      :attr:`!__cached__` sẽ không còn được hệ thống import hoặc standard library thiết lập hay xem xét nữa.
 
-Other writable attributes on module objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các thuộc tính có thể ghi khác trên đối tượng module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As well as the import-related attributes listed above, module objects also have
-the following writable attributes:
+Ngoài các thuộc tính liên quan đến import được liệt kê ở trên, đối tượng module cũng có các thuộc tính có thể ghi sau đây:
 
 .. attribute:: module.__doc__
 
-   The module's documentation string, or ``None`` if unavailable.
-   See also: :attr:`__doc__ attributes <definition.__doc__>`.
+   Chuỗi tài liệu của module, hoặc ``None`` nếu không có. Xem thêm: :attr:`__doc__ attributes <definition.__doc__>`.
 
 .. attribute:: module.__annotations__
 
-   A dictionary containing :term:`variable annotations <variable annotation>`
-   collected during module body execution.  For best practices on working with
-   :attr:`!__annotations__`, see :mod:`annotationlib`.
+   Một dictionary chứa :term:`các chú giải biến <variable annotation>` được thu thập trong quá trình thực thi phần thân module. Để biết các phương pháp tốt nhất khi làm việc với
+   :attr:`!__annotations__`, xem :mod:`annotationlib`.
 
    .. versionchanged:: 3.14
-      Annotations are now :ref:`lazily evaluated <lazy-evaluation>`.
-      See :pep:`649`.
+      Các chú giải hiện được :ref:`đánh giá lười (lazily evaluated) <lazy-evaluation>`. Xem :pep:`649`.
 
 .. attribute:: module.__annotate__
 
-   The :term:`annotate function` for this module, or ``None`` if the module has
-   no annotations. See also: :attr:`~object.__annotate__` attributes.
+   :term:`annotate function` của mô-đun này, hoặc ``None`` nếu mô-đun không có annotation. Xem thêm: các thuộc tính :attr:`~object.__annotate__`.
 
    .. versionadded:: 3.14
 
-Module dictionaries
-^^^^^^^^^^^^^^^^^^^
+Từ điển của mô-đun
+^^^^^^^^^^^^^^^^^^
 
-Module objects also have the following special read-only attribute:
+Các đối tượng mô-đun cũng có thuộc tính chỉ đọc đặc biệt sau:
 
 .. index:: single: __dict__ (module attribute)
 .. attribute:: module.__dict__
 
-   The module's namespace as a dictionary object. Uniquely among the attributes
-   listed here, :attr:`!__dict__` cannot be accessed as a global variable from
-   within a module; it can only be accessed as an attribute on module objects.
+   Namespace của mô-đun dưới dạng một đối tượng từ điển. Không giống các thuộc tính khác được liệt kê ở đây, :attr:`!__dict__` không thể được truy cập như một biến toàn cục từ bên trong mô-đun; nó chỉ có thể được truy cập như một thuộc tính trên các đối tượng mô-đun.
 
    .. impl-detail::
 
-      Because of the way CPython clears module dictionaries, the module
-      dictionary will be cleared when the module falls out of scope even if the
-      dictionary still has live references.  To avoid this, copy the dictionary
-      or keep the module around while using its dictionary directly.
+      Do cách CPython xóa các từ điển mô-đun, từ điển mô-đun sẽ bị xóa khi mô-đun ra khỏi phạm vi ngay cả khi từ điển vẫn còn các tham chiếu đang hoạt động. Để tránh điều này, hãy sao chép từ điển hoặc giữ mô-đun tồn tại trong khi sử dụng trực tiếp từ điển của nó.
 
 
 .. _class-attrs-and-methods:
 
-Custom classes
---------------
+Các lớp tùy chỉnh
+-----------------
 
-Custom class types are typically created by class definitions (see section
-:ref:`class`).  A class has a namespace implemented by a dictionary object.
-Class attribute references are translated to lookups in this dictionary, e.g.,
-``C.x`` is translated to ``C.__dict__["x"]`` (although there are a number of
-hooks which allow for other means of locating attributes). When the attribute
-name is not found there, the attribute search continues in the base classes.
-This search of the base classes uses the C3 method resolution order which
-behaves correctly even in the presence of 'diamond' inheritance structures
-where there are multiple inheritance paths leading back to a common ancestor.
-Additional details on the C3 MRO used by Python can be found at
+Các kiểu lớp tùy chỉnh thường được tạo bằng định nghĩa lớp (xem phần
+:ref:`class`). Một lớp có một không gian tên được triển khai bằng đối tượng dictionary. Các tham chiếu thuộc tính của lớp được chuyển thành các thao tác tra cứu trong dictionary này, ví dụ, ``C.x`` được chuyển thành ``C.__dict__["x"]`` (mặc dù có một số hook cho phép dùng các cách khác để xác định vị trí thuộc tính). Khi không tìm thấy tên thuộc tính ở đó, việc tìm kiếm thuộc tính tiếp tục trong các lớp cơ sở. Việc tìm kiếm trong các lớp cơ sở này sử dụng thứ tự phân giải phương thức C3, hoạt động chính xác ngay cả khi có các cấu trúc kế thừa 'kim cương', trong đó nhiều đường dẫn kế thừa cùng dẫn trở lại một tổ tiên chung. Bạn có thể tìm thêm chi tiết về C3 MRO mà Python sử dụng tại
 :ref:`python_2.3_mro`.
 
 .. index::
@@ -1183,26 +848,20 @@ Additional details on the C3 MRO used by Python can be found at
    pair: object; dictionary
    pair: class; attribute
 
-When a class attribute reference (for class :class:`!C`, say) would yield a
-class method object, it is transformed into an instance method object whose
-:attr:`~method.__self__` attribute is :class:`!C`.
-When it would yield a :class:`staticmethod` object,
-it is transformed into the object wrapped by the static method
-object. See section :ref:`descriptors` for another way in which attributes
-retrieved from a class may differ from those actually contained in its
+Khi một tham chiếu thuộc tính của lớp (ví dụ đối với lớp :class:`!C`) sẽ cho ra một đối tượng class method, nó được chuyển thành một đối tượng instance method có
+thuộc tính :attr:`~method.__self__` là :class:`!C`. Khi nó sẽ cho ra một đối tượng :class:`staticmethod`, nó được chuyển thành đối tượng được bao bọc bởi đối tượng static method. Xem phần :ref:`descriptors` để biết một cách khác mà các thuộc tính lấy từ một lớp có thể khác với những thuộc tính thực sự chứa trong
 :attr:`~object.__dict__`.
 
 .. index:: triple: class; attribute; assignment
 
-Class attribute assignments update the class's dictionary, never the dictionary
-of a base class.
+Các phép gán thuộc tính lớp cập nhật dictionary của lớp, không bao giờ cập nhật dictionary của một lớp cơ sở.
 
 .. index:: pair: class object; call
 
-A class object can be called (see above) to yield a class instance (see below).
+Một đối tượng lớp có thể được gọi (xem ở trên) để tạo ra một instance của lớp (xem bên dưới).
 
-Special attributes
-^^^^^^^^^^^^^^^^^^
+Các thuộc tính đặc biệt
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    single: __name__ (class attribute)
@@ -1220,117 +879,87 @@ Special attributes
 .. list-table::
    :header-rows: 1
 
-   * - Attribute
-     - Meaning
+   * - Thuộc tính
+     - Ý nghĩa
 
    * - .. attribute:: type.__name__
-     - The class's name.
-       See also: :attr:`__name__ attributes <definition.__name__>`.
+     - Tên của lớp. Xem thêm: :attr:`__name__ attributes <definition.__name__>`.
 
    * - .. attribute:: type.__qualname__
-     - The class's :term:`qualified name`.
-       See also: :attr:`__qualname__ attributes <definition.__qualname__>`.
+     - :term:`qualified name` của lớp. Xem thêm: :attr:`__qualname__ attributes <definition.__qualname__>`.
 
    * - .. attribute:: type.__module__
-     - The name of the module in which the class was defined.
+     - Tên của module nơi lớp được định nghĩa.
 
    * - .. attribute:: type.__dict__
-     - A :class:`mapping proxy <types.MappingProxyType>`
-       providing a read-only view of the class's namespace.
-       See also: :attr:`__dict__ attributes <object.__dict__>`.
+     - Một :class:`mapping proxy <types.MappingProxyType>` cung cấp chế độ xem chỉ đọc của namespace của lớp. Xem thêm: :attr:`__dict__ attributes <object.__dict__>`.
 
    * - .. attribute:: type.__bases__
-     - A :class:`tuple` containing the class's bases.
-       In most cases, for a class defined as ``class X(A, B, C)``,
-       ``X.__bases__`` will be exactly equal to ``(A, B, C)``.
+     - Một :class:`tuple` chứa các lớp cơ sở của lớp. Trong hầu hết trường hợp, với một lớp được định nghĩa là ``class X(A, B, C)``, ``X.__bases__`` sẽ hoàn toàn bằng ``(A, B, C)``.
 
    * - .. attribute:: type.__base__
      - .. impl-detail::
 
-          The single base class in the inheritance chain that is responsible
-          for the memory layout of instances. This attribute corresponds to
-          :c:member:`~PyTypeObject.tp_base` at the C level.
+          Lớp cơ sở duy nhất trong chuỗi kế thừa chịu trách nhiệm về bố cục bộ nhớ của các instance. Thuộc tính này tương ứng với
+          :c:member:`~PyTypeObject.tp_base` ở cấp độ C.
 
    * - .. attribute:: type.__doc__
-     - The class's documentation string, or ``None`` if undefined.
-       Not inherited by subclasses.
+     - Chuỗi tài liệu của lớp, hoặc ``None`` nếu không được định nghĩa. Không được các lớp con kế thừa.
 
    * - .. attribute:: type.__annotations__
-     - A dictionary containing
-       :term:`variable annotations <variable annotation>`
-       collected during class body execution. See also:
+     - Một dictionary chứa
+       :term:`các chú giải biến <variable annotation>` được thu thập trong quá trình thực thi thân lớp. Xem thêm:
        :attr:`__annotations__ attributes <object.__annotations__>`.
 
-       For best practices on working with :attr:`~object.__annotations__`,
-       please see :mod:`annotationlib`. Use
-       :func:`annotationlib.get_annotations` instead of accessing this
-       attribute directly.
+       Để biết các thực hành tốt nhất khi làm việc với :attr:`~object.__annotations__`, vui lòng xem :mod:`annotationlib`. Hãy dùng
+       :func:`annotationlib.get_annotations` thay vì truy cập trực tiếp thuộc tính này.
 
        .. warning::
 
-          Accessing the :attr:`!__annotations__` attribute directly
-          on a class object may return annotations for the wrong class, specifically
-          in certain cases where the class, its base class, or a metaclass
-          is defined under ``from __future__ import annotations``.
-          See :pep:`749 <749#pep749-metaclasses>` for details.
+          Việc truy cập trực tiếp thuộc tính :attr:`!__annotations__` trên một đối tượng lớp có thể trả về các chú giải của nhầm lớp, cụ thể trong một số trường hợp khi lớp, lớp cơ sở của nó hoặc một metaclass được định nghĩa dưới ``from __future__ import annotations``. Xem :pep:`749 <749#pep749-metaclasses>` để biết chi tiết.
 
-          This attribute does not exist on certain builtin classes. On
-          user-defined classes without ``__annotations__``, it is an
-          empty dictionary.
+          Thuộc tính này không tồn tại trên một số lớp dựng sẵn. Trên các lớp do người dùng định nghĩa không có ``__annotations__``, đây là một từ điển rỗng.
 
        .. versionchanged:: 3.14
-          Annotations are now :ref:`lazily evaluated <lazy-evaluation>`.
-          See :pep:`649`.
+          Các annotation hiện được :ref:`đánh giá trì hoãn <lazy-evaluation>`. Xem :pep:`649`.
 
    * - .. method:: type.__annotate__
-     - The :term:`annotate function` for this class, or ``None``
-       if the class has no annotations.
-       See also: :attr:`__annotate__ attributes <object.__annotate__>`.
+     - :term:`annotate function` của lớp này, hoặc ``None`` nếu lớp không có annotation. Xem thêm: :attr:`__annotate__ attributes <object.__annotate__>`.
 
        .. versionadded:: 3.14
 
    * - .. attribute:: type.__type_params__
-     - A :class:`tuple` containing the :ref:`type parameters <type-params>` of
-       a :ref:`generic class <generic-classes>`.
+     - Một :class:`tuple` chứa các :ref:`tham số kiểu <type-params>` của một :ref:`lớp generic <generic-classes>`.
 
        .. versionadded:: 3.12
 
    * - .. attribute:: type.__static_attributes__
-     - A :class:`tuple` containing names of attributes of this class which are
-       assigned through ``self.X`` from any function in its body.
+     - Một :class:`tuple` chứa tên các thuộc tính của lớp này được gán thông qua ``self.X`` từ bất kỳ hàm nào trong thân lớp.
 
        .. versionadded:: 3.13
 
    * - .. attribute:: type.__firstlineno__
-     - The line number of the first line of the class definition,
-       including decorators.
-       Setting the :attr:`~type.__module__` attribute removes the
-       :attr:`!__firstlineno__` item from the type's dictionary.
+     - Số dòng của dòng đầu tiên trong định nghĩa lớp, bao gồm cả decorator. Việc thiết lập thuộc tính :attr:`~type.__module__` sẽ xóa
+       mục :attr:`!__firstlineno__` khỏi từ điển của kiểu.
 
        .. versionadded:: 3.13
 
    * - .. attribute:: type.__mro__
-     - The :class:`tuple` of classes that are considered when looking for
-       base classes during method resolution.
+     - :class:`tuple` của các lớp được xem xét khi tìm kiếm các lớp cơ sở trong quá trình phân giải phương thức.
 
 
-Special methods
-^^^^^^^^^^^^^^^
+Các phương thức đặc biệt
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-In addition to the special attributes described above, all Python classes also
-have the following two methods available:
+Ngoài các thuộc tính đặc biệt được mô tả ở trên, mọi lớp Python cũng có sẵn hai phương thức sau:
 
 .. method:: type.mro
 
-   This method can be overridden by a metaclass to customize the method
-   resolution order for its instances.  It is called at class instantiation,
-   and its result is stored in :attr:`~type.__mro__`.
+   Phương thức này có thể được metaclass ghi đè để tùy chỉnh thứ tự phân giải phương thức cho các instance của nó. Phương thức này được gọi khi khởi tạo lớp, và kết quả của nó được lưu trong :attr:`~type.__mro__`.
 
 .. method:: type.__subclasses__
 
-   Each class keeps a list of weak references to its immediate subclasses. This
-   method returns a list of all those references still alive. The list is in
-   definition order. Example:
+   Mỗi lớp duy trì một danh sách các weak reference đến các lớp con trực tiếp của nó. Phương thức này trả về một danh sách gồm tất cả các reference đó vẫn còn tồn tại. Danh sách theo thứ tự định nghĩa. Ví dụ:
 
    .. doctest::
 
@@ -1339,8 +968,8 @@ have the following two methods available:
       >>> A.__subclasses__()
       [<class 'B'>]
 
-Class instances
----------------
+Các instance của lớp
+--------------------
 
 .. index::
    pair: object; class instance
@@ -1348,37 +977,22 @@ Class instances
    pair: class; instance
    pair: class instance; attribute
 
-A class instance is created by calling a class object (see above).  A class
-instance has a namespace implemented as a dictionary which is the first place
-in which attribute references are searched.  When an attribute is not found
-there, and the instance's class has an attribute by that name, the search
-continues with the class attributes.  If a class attribute is found that is a
-user-defined function object, it is transformed into an instance method
-object whose :attr:`~method.__self__` attribute is the instance.  Static method and
-class method objects are also transformed; see above under "Classes".  See
-section :ref:`descriptors` for another way in which attributes of a class
-retrieved via its instances may differ from the objects actually stored in
-the class's :attr:`~object.__dict__`.  If no class attribute is found, and the
-object's class has a :meth:`~object.__getattr__` method, that is called to satisfy
-the lookup.
+Một instance của lớp được tạo bằng cách gọi một đối tượng lớp (xem ở trên). Một instance của lớp có một namespace được triển khai dưới dạng dictionary, đây là nơi đầu tiên được tìm kiếm khi tham chiếu thuộc tính. Khi không tìm thấy một thuộc tính ở đó và lớp của instance có thuộc tính mang tên đó, quá trình tìm kiếm tiếp tục với các thuộc tính của lớp. Nếu tìm thấy một thuộc tính lớp là đối tượng hàm do người dùng định nghĩa, nó sẽ được chuyển đổi thành một đối tượng phương thức instance có thuộc tính :attr:`~method.__self__` là instance đó. Các đối tượng static method và class method cũng được chuyển đổi; xem phần "Classes" ở trên. Xem phần :ref:`descriptors` để biết một cách khác mà các thuộc tính của một lớp được truy xuất thông qua các instance của lớp đó có thể khác với các đối tượng thực sự được lưu trong :attr:`~object.__dict__` của lớp. Nếu không tìm thấy thuộc tính lớp nào và lớp của đối tượng có phương thức :meth:`~object.__getattr__`, phương thức đó sẽ được gọi để đáp ứng việc tra cứu.
 
 .. index:: triple: class instance; attribute; assignment
 
-Attribute assignments and deletions update the instance's dictionary, never a
-class's dictionary.  If the class has a :meth:`~object.__setattr__` or
-:meth:`~object.__delattr__` method, this is called instead of updating the instance
-dictionary directly.
+Việc gán và xóa thuộc tính cập nhật dictionary của instance, không bao giờ cập nhật dictionary của class. Nếu class có một :meth:`~object.__setattr__` hoặc
+phương thức :meth:`~object.__delattr__`, phương thức này sẽ được gọi thay vì cập nhật trực tiếp dictionary của instance.
 
 .. index::
    pair: object; numeric
    pair: object; sequence
    pair: object; mapping
 
-Class instances can pretend to be numbers, sequences, or mappings if they have
-methods with certain special names.  See section :ref:`specialnames`.
+Các instance của class có thể hoạt động như số, sequence hoặc mapping nếu chúng có các phương thức mang những tên đặc biệt nhất định. Xem mục :ref:`specialnames`.
 
-Special attributes
-^^^^^^^^^^^^^^^^^^
+Các thuộc tính đặc biệt
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    single: __dict__ (instance attribute)
@@ -1386,17 +1000,15 @@ Special attributes
 
 .. attribute:: object.__class__
 
-   The class to which a class instance belongs.
+   Class mà một instance của class thuộc về.
 
 .. attribute:: object.__dict__
 
-   A dictionary or other mapping object used to store an object's (writable)
-   attributes. Not all instances have a :attr:`!__dict__` attribute; see the
-   section on :ref:`slots` for more details.
+   Một dictionary hoặc đối tượng mapping khác được dùng để lưu trữ các thuộc tính (có thể ghi) của một object. Không phải mọi instance đều có thuộc tính :attr:`!__dict__`; xem mục về :ref:`slots` để biết thêm chi tiết.
 
 
-I/O objects (also known as file objects)
-----------------------------------------
+Các đối tượng I/O (còn được gọi là file object)
+-----------------------------------------------
 
 .. index::
    pair: built-in function; open
@@ -1411,62 +1023,44 @@ I/O objects (also known as file objects)
    single: stdout (in module sys)
    single: stderr (in module sys)
 
-A :term:`file object` represents an open file.  Various shortcuts are
-available to create file objects: the :func:`open` built-in function, and
-also :func:`os.popen`, :func:`os.fdopen`, and the
-:meth:`~socket.socket.makefile` method of socket objects (and perhaps by
-other functions or methods provided by extension modules).
+Một :term:`file object` đại diện cho một tệp đang mở. Có nhiều lối tắt để tạo đối tượng tệp: hàm dựng sẵn :func:`open`, cùng với :func:`os.popen`, :func:`os.fdopen` và
+phương thức :meth:`~socket.socket.makefile` của các đối tượng socket (và có thể bởi các hàm hoặc phương thức khác do các extension module cung cấp).
 
-File objects implement common methods, listed below, to simplify usage in
-generic code. They are expected to be :ref:`context-managers`.
+Các đối tượng tệp triển khai các phương thức phổ biến, được liệt kê bên dưới, để đơn giản hóa việc sử dụng trong mã generic. Chúng được kỳ vọng là :ref:`context-managers`.
 
-The objects ``sys.stdin``, ``sys.stdout`` and ``sys.stderr`` are
-initialized to file objects corresponding to the interpreter's standard
-input, output and error streams; they are all open in text mode and
-therefore follow the interface defined by the :class:`io.TextIOBase`
-abstract class.
+Các đối tượng ``sys.stdin``, ``sys.stdout`` và ``sys.stderr`` được khởi tạo thành các đối tượng tệp tương ứng với các luồng đầu vào, đầu ra và lỗi chuẩn của interpreter; tất cả đều được mở ở text mode và do đó tuân theo interface do abstract class :class:`io.TextIOBase` xác định.
 
 .. method:: file.read(size=-1, /)
 
-   Retrieve up to *size* data from the file. As a convenience if *size* is
-   unspecified or -1 retrieve all data available.
+   Lấy tối đa *size* dữ liệu từ tệp. Để thuận tiện, nếu *size* không được chỉ định hoặc là -1, hãy lấy toàn bộ dữ liệu hiện có.
 
 .. method:: file.write(data, /)
 
-   Store *data* to the file.
+   Lưu *data* vào tệp.
 
 .. method:: file.close()
 
-   Flush any buffers and close the underlying file.
+   Flush mọi buffer và đóng tệp bên dưới.
 
 
-Internal types
---------------
+Các kiểu nội bộ
+---------------
 
 .. index::
    single: internal type
    single: types, internal
 
-A few types used internally by the interpreter are exposed to the user. Their
-definitions may change with future versions of the interpreter, but they are
-mentioned here for completeness.
+Một vài kiểu được trình thông dịch sử dụng nội bộ được cung cấp cho người dùng. Định nghĩa của chúng có thể thay đổi trong các phiên bản trình thông dịch sau này, nhưng chúng được đề cập ở đây để đảm bảo tính đầy đủ.
 
 
 .. _code-objects:
 
-Code objects
+Đối tượng mã
 ^^^^^^^^^^^^
 
 .. index:: bytecode, object; code, code object
 
-Code objects represent *byte-compiled* executable Python code, or :term:`bytecode`.
-The difference between a code object and a function object is that the function
-object contains an explicit reference to the function's globals (the module in
-which it was defined), while a code object contains no context; also the default
-argument values are stored in the function object, not in the code object
-(because they represent values calculated at run-time).  Unlike function
-objects, code objects are immutable and contain no references (directly or
-indirectly) to mutable objects.
+Đối tượng mã biểu diễn mã Python thực thi đã được *biên dịch thành bytecode*, hoặc :term:`bytecode`. Điểm khác biệt giữa đối tượng mã và đối tượng hàm là đối tượng hàm chứa một tham chiếu tường minh đến globals của hàm (module nơi hàm được định nghĩa), trong khi đối tượng mã không chứa ngữ cảnh nào; ngoài ra, các giá trị đối số mặc định được lưu trong đối tượng hàm, không phải trong đối tượng mã (vì chúng biểu diễn các giá trị được tính tại run-time). Không giống đối tượng hàm, đối tượng mã là bất biến và không chứa tham chiếu nào (trực tiếp hoặc gián tiếp) đến các đối tượng có thể thay đổi.
 
 .. index::
    single: co_argcount (code object attribute)
@@ -1487,207 +1081,159 @@ indirectly) to mutable objects.
    single: co_freevars (code object attribute)
    single: co_qualname (code object attribute)
 
-Special read-only attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các thuộc tính chỉ đọc đặc biệt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
 
    * - .. attribute:: codeobject.co_name
-     - The function name
+     - Tên hàm
 
    * - .. attribute:: codeobject.co_qualname
-     - The fully qualified function name
+     - Tên đầy đủ của hàm
 
        .. versionadded:: 3.11
 
    * - .. attribute:: codeobject.co_argcount
-     - The total number of positional :term:`parameters <parameter>`
-       (including positional-only parameters and parameters with default values)
-       that the function has
+     - Tổng số :term:`tham số <parameter>` vị trí (bao gồm tham số chỉ vị trí và tham số có giá trị mặc định) mà hàm có
 
    * - .. attribute:: codeobject.co_posonlyargcount
-     - The number of positional-only :term:`parameters <parameter>`
-       (including arguments with default values) that the function has
+     - Số :term:`tham số <parameter>` chỉ vị trí (bao gồm đối số có giá trị mặc định) mà hàm có
 
    * - .. attribute:: codeobject.co_kwonlyargcount
-     - The number of keyword-only :term:`parameters <parameter>`
-       (including arguments with default values) that the function has
+     - Số :term:`tham số <parameter>` chỉ từ khóa (bao gồm đối số có giá trị mặc định) mà hàm có
 
    * - .. attribute:: codeobject.co_nlocals
-     - The number of :ref:`local variables <naming>` used by the function
-       (including parameters)
+     - Số :ref:`biến cục bộ <naming>` được hàm sử dụng (bao gồm cả tham số)
 
    * - .. attribute:: codeobject.co_varnames
-     - A :class:`tuple` containing the names of the local variables in the
-       function (starting with the parameter names)
+     - Một :class:`tuple` chứa tên của các biến cục bộ trong hàm (bắt đầu bằng tên tham số)
 
    * - .. attribute:: codeobject.co_cellvars
-     - A :class:`tuple` containing the names of :ref:`local variables <naming>`
-       that are referenced from at least one :term:`nested scope` inside the function
+     - Một :class:`tuple` chứa tên của các :ref:`biến cục bộ <naming>` được tham chiếu từ ít nhất một :term:`nested scope` bên trong hàm
 
    * - .. attribute:: codeobject.co_freevars
-     - A :class:`tuple` containing the names of
-       :term:`free (closure) variables <closure variable>` that a :term:`nested scope`
-       references in an outer scope. See also :attr:`function.__closure__`.
+     - Một :class:`tuple` chứa tên của
+       :term:`các biến tự do (closure) <closure variable>` mà một :term:`nested scope` tham chiếu trong phạm vi bên ngoài. Xem thêm :attr:`function.__closure__`.
 
-       Note: references to global and builtin names are *not* included.
+       Lưu ý: các tham chiếu đến tên global và builtin *không* được bao gồm.
 
    * - .. attribute:: codeobject.co_code
-     - A string representing the sequence of :term:`bytecode` instructions in
-       the function
+     - Một chuỗi biểu thị dãy lệnh :term:`bytecode` trong hàm
 
    * - .. attribute:: codeobject.co_consts
-     - A :class:`tuple` containing the literals used by the :term:`bytecode` in
-       the function
+     - Một :class:`tuple` chứa các literal được :term:`bytecode` trong hàm sử dụng
 
    * - .. attribute:: codeobject.co_names
-     - A :class:`tuple` containing the names used by the :term:`bytecode` in
-       the function
+     - Một :class:`tuple` chứa các tên được :term:`bytecode` trong hàm sử dụng
 
    * - .. attribute:: codeobject.co_filename
-     - The name of the file from which the code was compiled
+     - Tên của tệp mà mã được biên dịch từ đó
 
    * - .. attribute:: codeobject.co_firstlineno
-     - The line number of the first line of the function
+     - Số dòng của dòng đầu tiên của hàm
 
    * - .. attribute:: codeobject.co_lnotab
-     - A string encoding the mapping from :term:`bytecode` offsets to line
-       numbers. For details, see the source code of the interpreter.
+     - Một chuỗi mã hóa ánh xạ từ các độ lệch :term:`bytecode` sang số dòng. Để biết chi tiết, hãy xem mã nguồn của interpreter.
 
        .. deprecated:: 3.12
-          This attribute of code objects is deprecated, and may be removed in
-          Python 3.15.
+          Thuộc tính này của các code object đã bị phản đối và có thể bị loại bỏ trong Python 3.15.
 
    * - .. attribute:: codeobject.co_linetable
-     - A :class:`bytes` object containing encoded source location information.
-       The exact format is an implementation detail and may change between
-       Python versions. Use :meth:`~codeobject.co_lines` and
-       :meth:`~codeobject.co_positions` for supported access to line and
-       position information. To create a modified copy of a code object,
-       use :meth:`~codeobject.replace`.
+     - Một object :class:`bytes` chứa thông tin vị trí nguồn đã được mã hóa. Định dạng chính xác là một chi tiết triển khai và có thể thay đổi giữa các phiên bản Python. Hãy dùng :meth:`~codeobject.co_lines` và
+       :meth:`~codeobject.co_positions` để truy cập thông tin về dòng và vị trí theo cách được hỗ trợ. Để tạo một bản sao đã sửa đổi của code object, hãy dùng :meth:`~codeobject.replace`.
 
        .. versionadded:: 3.10
 
    * - .. attribute:: codeobject.co_stacksize
-     - The required stack size of the code object
+     - Kích thước stack cần thiết của code object
 
    * - .. attribute:: codeobject.co_flags
-     - An :class:`integer <int>` encoding a number of flags for the
-       interpreter.
+     - Một :class:`integer <int>` mã hóa một số cờ cho interpreter.
 
 .. index:: pair: object; generator
 
-The following flag bits are defined for :attr:`~codeobject.co_flags`:
-bit ``0x04`` is set if
-the function uses the ``*arguments`` syntax to accept an arbitrary number of
-positional arguments; bit ``0x08`` is set if the function uses the
-``**keywords`` syntax to accept arbitrary keyword arguments; bit ``0x20`` is set
-if the function is a generator. See :ref:`inspect-module-co-flags` for details
-on the semantics of each flags that might be present.
+Các bit cờ sau được định nghĩa cho :attr:`~codeobject.co_flags`: bit ``0x04`` được đặt nếu hàm sử dụng cú pháp ``*arguments`` để chấp nhận số lượng tùy ý đối số vị trí; bit ``0x08`` được đặt nếu hàm sử dụng cú pháp ``**keywords`` để chấp nhận các đối số từ khóa tùy ý; bit ``0x20`` được đặt nếu hàm là một generator. Xem :ref:`inspect-module-co-flags` để biết chi tiết về ngữ nghĩa của từng cờ có thể xuất hiện.
 
-Future feature declarations (for example, ``from __future__ import division``) also use bits
-in :attr:`~codeobject.co_flags` to indicate whether a code object was compiled with a
-particular feature enabled. See :attr:`~__future__._Feature.compiler_flag`.
+Các khai báo tính năng tương lai (ví dụ: ``from __future__ import division``) cũng sử dụng các bit trong :attr:`~codeobject.co_flags` để cho biết liệu một đối tượng mã có được biên dịch với một tính năng cụ thể được bật hay không. Xem :attr:`~__future__._Feature.compiler_flag`.
 
-Other bits in :attr:`~codeobject.co_flags` are reserved for internal use.
+Các bit khác trong :attr:`~codeobject.co_flags` được dành riêng cho mục đích sử dụng nội bộ.
 
 .. index:: single: documentation string
 
-If a code object represents a function and has a docstring,
-the :data:`~inspect.CO_HAS_DOCSTRING` bit is set in :attr:`~codeobject.co_flags`
-and the first item in :attr:`~codeobject.co_consts` is
-the docstring of the function.
+Nếu một đối tượng mã biểu diễn một hàm và có docstring, bit :data:`~inspect.CO_HAS_DOCSTRING` được đặt trong :attr:`~codeobject.co_flags` và mục đầu tiên trong :attr:`~codeobject.co_consts` là docstring của hàm.
 
-Methods on code objects
-~~~~~~~~~~~~~~~~~~~~~~~
+Các phương thức trên đối tượng mã
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: codeobject.co_positions()
 
-   Returns an iterable over the source code positions of each :term:`bytecode`
-   instruction in the code object.
+   Trả về một iterable qua các vị trí mã nguồn của từng lệnh :term:`bytecode` trong đối tượng mã.
 
-   The iterator returns :class:`tuple`\s containing the ``(start_line, end_line,
-   start_column, end_column)``. The *i-th* tuple corresponds to the
-   position of the source code that compiled to the *i-th* code unit.
-   Column information is 0-indexed utf-8 byte offsets on the given source
-   line.
+   Iterator trả về :class:`tuple`\s chứa ``(start_line, end_line, start_column, end_column)``. Bộ tuple thứ *i-th* tương ứng với vị trí của mã nguồn đã được biên dịch thành đơn vị mã thứ *i-th*. Thông tin cột là các offset byte utf-8 đánh chỉ mục từ 0 trên dòng mã nguồn đã cho.
 
-   This positional information can be missing. A non-exhaustive lists of
-   cases where this may happen:
+   Thông tin vị trí này có thể bị thiếu. Danh sách không đầy đủ các trường hợp có thể xảy ra điều này:
 
-   - Running the interpreter with :option:`-X` ``no_debug_ranges``.
-   - Loading a pyc file compiled while using :option:`-X` ``no_debug_ranges``.
-   - Position tuples corresponding to artificial instructions.
-   - Line and column numbers that can't be represented due to
-     implementation specific limitations.
+   - Chạy trình thông dịch với :option:`-X` ``no_debug_ranges``.
+   - Tải tệp pyc đã được biên dịch khi sử dụng :option:`-X` ``no_debug_ranges``.
+   - Các bộ tuple vị trí tương ứng với các chỉ thị nhân tạo.
+   - Các số dòng và cột không thể biểu diễn do những giới hạn đặc thù của phần triển khai.
 
-   When this occurs, some or all of the tuple elements can be
+   Khi điều này xảy ra, một số hoặc toàn bộ phần tử của bộ tuple có thể là
    :const:`None`.
 
    .. versionadded:: 3.11
 
    .. note::
-      This feature requires storing column positions in code objects which may
-      result in a small increase of disk usage of compiled Python files or
-      interpreter memory usage. To avoid storing the extra information and/or
-      deactivate printing the extra traceback information, the
-      :option:`-X` ``no_debug_ranges`` command line flag or the :envvar:`PYTHONNODEBUGRANGES`
-      environment variable can be used.
+      Tính năng này yêu cầu lưu trữ vị trí cột trong các code object, điều này có thể làm tăng nhẹ dung lượng đĩa mà các tệp Python đã biên dịch sử dụng hoặc mức sử dụng bộ nhớ của trình thông dịch. Để tránh lưu trữ thông tin bổ sung và/hoặc vô hiệu hóa việc in thông tin traceback bổ sung,
+      Có thể sử dụng cờ dòng lệnh :option:`-X` ``no_debug_ranges`` hoặc biến môi trường :envvar:`PYTHONNODEBUGRANGES`.
 
 .. method:: codeobject.co_lines()
 
-   Returns an iterator that yields information about successive ranges of
-   :term:`bytecode`\s. Each item yielded is a ``(start, end, lineno)``
+   Trả về một iterator cung cấp thông tin về các phạm vi liên tiếp của
+   :term:`bytecode`\s. Mỗi mục được cung cấp là một ``(start, end, lineno)``
    :class:`tuple`:
 
-   * ``start`` (an :class:`int`) represents the offset (inclusive) of the start
-     of the :term:`bytecode` range
-   * ``end`` (an :class:`int`) represents the offset (exclusive) of the end of
-     the :term:`bytecode` range
-   * ``lineno`` is an :class:`int` representing the line number of the
-     :term:`bytecode` range, or ``None`` if the bytecodes in the given range
-     have no line number
+   * ``start`` (một :class:`int`) biểu thị offset (bao gồm) của điểm bắt đầu phạm vi :term:`bytecode`
+   * ``end`` (một :class:`int`) biểu thị offset (không bao gồm) của điểm kết thúc phạm vi :term:`bytecode`
+   * ``lineno`` là một :class:`int` biểu thị số dòng của
+     phạm vi :term:`bytecode`, hoặc ``None`` nếu các bytecode trong phạm vi đã cho không có số dòng
 
-   The items yielded will have the following properties:
+   Các mục được cung cấp sẽ có các thuộc tính sau:
 
-   * The first range yielded will have a ``start`` of 0.
-   * The ``(start, end)`` ranges will be non-decreasing and consecutive. That
-     is, for any pair of :class:`tuple`\s, the ``start`` of the second will be
-     equal to the ``end`` of the first.
-   * No range will be backwards: ``end >= start`` for all triples.
-   * The last :class:`tuple` yielded will have ``end`` equal to the size of the
+   * Phạm vi đầu tiên được trả về sẽ có ``start`` bằng 0.
+   * Các phạm vi ``(start, end)`` sẽ không giảm và liên tiếp. Nghĩa là, với bất kỳ cặp :class:`tuple`\s nào, ``start`` của phạm vi thứ hai sẽ bằng ``end`` của phạm vi thứ nhất.
+   * Không có phạm vi nào đi lùi: ``end >= start`` đối với mọi bộ ba.
+   * :class:`tuple` cuối cùng được trả về sẽ có ``end`` bằng kích thước của
      :term:`bytecode`.
 
-   Zero-width ranges, where ``start == end``, are allowed. Zero-width ranges
-   are used for lines that are present in the source code, but have been
-   eliminated by the :term:`bytecode` compiler.
+   Các phạm vi có độ rộng bằng 0, trong đó ``start == end``, được cho phép. Các phạm vi có độ rộng bằng 0 được dùng cho những dòng có mặt trong mã nguồn nhưng đã bị compiler :term:`bytecode` loại bỏ.
 
    .. versionadded:: 3.10
 
    .. seealso::
 
-      :pep:`626` - Precise line numbers for debugging and other tools.
-         The PEP that introduced the :meth:`!co_lines` method.
+      :pep:`626` - Số dòng chính xác để debug và cho các công cụ khác.
+         PEP đã giới thiệu phương thức :meth:`!co_lines`.
 
 .. method:: codeobject.replace(**kwargs)
 
-   Return a copy of the code object with new values for the specified fields.
+   Trả về một bản sao của đối tượng code với các giá trị mới cho những trường được chỉ định.
 
-   Code objects are also supported by the generic function :func:`copy.replace`.
+   Đối tượng code cũng được hỗ trợ bởi hàm tổng quát :func:`copy.replace`.
 
    .. versionadded:: 3.8
 
 
 .. _frame-objects:
 
-Frame objects
-^^^^^^^^^^^^^
+Đối tượng frame
+^^^^^^^^^^^^^^^
 
 .. index:: pair: object; frame
 
-Frame objects represent execution frames.  They may occur in
-:ref:`traceback objects <traceback-objects>`,
-and are also passed to registered trace functions.
+Đối tượng frame biểu diễn các frame thực thi. Chúng có thể xuất hiện trong
+:ref:`đối tượng traceback <traceback-objects>`, và cũng được truyền đến các hàm trace đã đăng ký.
 
 .. index::
    single: f_back (frame attribute)
@@ -1698,45 +1244,38 @@ and are also passed to registered trace functions.
    single: f_builtins (frame attribute)
    single: f_generator (frame attribute)
 
-Special read-only attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các thuộc tính chỉ đọc đặc biệt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
 
    * - .. attribute:: frame.f_back
-     - Points to the previous stack frame (towards the caller),
-       or ``None`` if this is the bottom stack frame
+     - Trỏ đến stack frame trước đó (về phía caller), hoặc ``None`` nếu đây là stack frame ở đáy
 
    * - .. attribute:: frame.f_code
-     - The :ref:`code object <code-objects>` being executed in this frame.
-       Accessing this attribute raises an :ref:`auditing event <auditing>`
-       ``object.__getattr__`` with arguments ``obj`` and ``"f_code"``.
+     - Đối tượng :ref:`code object <code-objects>` đang được thực thi trong frame này. Việc truy cập thuộc tính này tạo ra một :ref:`auditing event <auditing>` ``object.__getattr__`` với các đối số ``obj`` và ``"f_code"``.
 
    * - .. attribute:: frame.f_locals
-     - The mapping used by the frame to look up
-       :ref:`local variables <naming>`.
-       If the frame refers to an :term:`optimized scope`,
-       this may return a write-through proxy object.
+     - Ánh xạ được frame dùng để tra cứu
+       :ref:`các biến cục bộ <naming>`. Nếu frame tham chiếu đến một :term:`optimized scope`, điều này có thể trả về một đối tượng proxy ghi xuyên.
 
        .. versionchanged:: 3.13
-          Return a proxy for optimized scopes.
+          Trả về một proxy cho các scope được tối ưu hóa.
 
    * - .. attribute:: frame.f_globals
-     - The dictionary used by the frame to look up
-       :ref:`global variables <naming>`
+     - Từ điển được frame dùng để tra cứu
+       :ref:`các biến toàn cục <naming>`
 
    * - .. attribute:: frame.f_builtins
-     - The dictionary used by the frame to look up
-       :ref:`built-in (intrinsic) names <naming>`
+     - Từ điển được frame dùng để tra cứu
+       :ref:`các tên dựng sẵn (nội tại) <naming>`
 
    * - .. attribute:: frame.f_lasti
-     - The "precise instruction" of the frame object
-       (this is an index into the :term:`bytecode` string of the
-       :ref:`code object <code-objects>`)
+     - "Lệnh chính xác" của đối tượng frame (đây là một chỉ mục vào chuỗi :term:`bytecode` của
+       :ref:`đối tượng code <code-objects>`)"
 
    * - .. attribute:: frame.f_generator
-     - The :term:`generator` or :term:`coroutine` object that owns this frame,
-       or ``None`` if the frame is a normal function.
+     - Đối tượng :term:`generator` hoặc :term:`coroutine` sở hữu frame này, hoặc ``None`` nếu frame là một hàm thông thường.
 
        .. versionadded:: 3.14
 
@@ -1746,59 +1285,44 @@ Special read-only attributes
    single: f_trace_opcodes (frame attribute)
    single: f_lineno (frame attribute)
 
-Special writable attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các thuộc tính đặc biệt có thể ghi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
 
    * - .. attribute:: frame.f_trace
-     - If not ``None``, this is a function called for various events during
-       code execution (this is used by debuggers). Normally an event is
-       triggered for each new source line (see :attr:`~frame.f_trace_lines`).
+     - Nếu không phải ``None``, đây là một hàm được gọi cho nhiều sự kiện khác nhau trong quá trình thực thi code (được các debugger sử dụng). Thông thường, một sự kiện được kích hoạt cho mỗi dòng mã nguồn mới (xem :attr:`~frame.f_trace_lines`).
 
    * - .. attribute:: frame.f_trace_lines
-     - Set this attribute to :const:`False` to disable triggering a tracing
-       event for each source line.
+     - Đặt thuộc tính này thành :const:`False` để vô hiệu hóa việc kích hoạt sự kiện tracing cho mỗi dòng mã nguồn.
 
    * - .. attribute:: frame.f_trace_opcodes
-     - Set this attribute to :const:`True` to allow per-opcode events to be
-       requested. Note that this may lead to
-       undefined interpreter behaviour if exceptions raised by the trace
-       function escape to the function being traced.
+     - Đặt thuộc tính này thành :const:`True` để cho phép yêu cầu các event theo từng opcode. Lưu ý rằng điều này có thể dẫn đến hành vi interpreter không xác định nếu các exception do hàm trace phát sinh thoát ra khỏi hàm đang được trace.
 
    * - .. attribute:: frame.f_lineno
-     - The current line number of the frame -- writing to this
-       from within a trace function jumps to the given line (only for the bottom-most
-       frame).  A debugger can implement a Jump command (aka Set Next Statement)
-       by writing to this attribute.
+     - Số dòng hiện tại của frame -- việc ghi vào thuộc tính này từ bên trong một hàm trace sẽ nhảy đến dòng đã cho (chỉ áp dụng cho frame ở dưới cùng). Debugger có thể triển khai lệnh Jump (còn gọi là Set Next Statement) bằng cách ghi vào thuộc tính này.
 
-Frame object methods
-~~~~~~~~~~~~~~~~~~~~
+Các phương thức của đối tượng frame
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Frame objects support one method:
+Các đối tượng frame hỗ trợ một phương thức:
 
 .. method:: frame.clear()
 
-   This method clears all references to :ref:`local variables <naming>` held by the
-   frame.  Also, if the frame belonged to a :term:`generator`, the generator
-   is finalized.  This helps break reference cycles involving frame
-   objects (for example when catching an :ref:`exception <bltin-exceptions>`
-   and storing its :ref:`traceback <traceback-objects>` for later use).
+   Phương thức này xóa mọi tham chiếu đến :ref:`biến cục bộ <naming>` được frame giữ lại. Ngoài ra, nếu frame thuộc về một :term:`generator`, generator sẽ được hoàn tất. Điều này giúp phá vỡ các chu trình tham chiếu liên quan đến đối tượng frame (ví dụ, khi bắt một :ref:`exception <bltin-exceptions>` và lưu :ref:`traceback <traceback-objects>` của nó để sử dụng sau).
 
-   :exc:`RuntimeError` is raised if the frame is currently executing
-   or suspended.
+   :exc:`RuntimeError` được phát sinh nếu frame hiện đang thực thi hoặc bị tạm dừng.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.13
-      Attempting to clear a suspended frame raises :exc:`RuntimeError`
-      (as has always been the case for executing frames).
+      Cố gắng xóa một frame đang tạm dừng sẽ phát sinh :exc:`RuntimeError` (điều này vốn luôn xảy ra đối với các frame đang thực thi).
 
 
 .. _traceback-objects:
 
-Traceback objects
-^^^^^^^^^^^^^^^^^
+Đối tượng traceback
+^^^^^^^^^^^^^^^^^^^
 
 .. index::
    pair: object; traceback
@@ -1811,31 +1335,18 @@ Traceback objects
    single: sys.exception
    single: sys.last_traceback
 
-Traceback objects represent the stack trace of an :ref:`exception <tut-errors>`.
-A traceback object
-is implicitly created when an exception occurs, and may also be explicitly
-created by calling :class:`types.TracebackType`.
+Đối tượng traceback biểu diễn stack trace của một :ref:`exception <tut-errors>`. Một đối tượng traceback được tạo ngầm khi xảy ra exception, và cũng có thể được tạo tường minh bằng cách gọi :class:`types.TracebackType`.
 
 .. versionchanged:: 3.7
-   Traceback objects can now be explicitly instantiated from Python code.
+   Các đối tượng traceback giờ đây có thể được khởi tạo tường minh từ mã Python.
 
-For implicitly created tracebacks, when the search for an exception handler
-unwinds the execution stack, at each unwound level a traceback object is
-inserted in front of the current traceback.  When an exception handler is
-entered, the stack trace is made available to the program. (See section
-:ref:`try`.) It is accessible as the third item of the
-tuple returned by :func:`sys.exc_info`, and as the
-:attr:`~BaseException.__traceback__` attribute
-of the caught exception.
+Đối với các traceback được tạo ngầm, khi việc tìm kiếm exception handler tháo ngăn xếp thực thi, tại mỗi cấp được tháo, một đối tượng traceback được chèn vào trước traceback hiện tại. Khi đi vào một exception handler, stack trace sẽ được cung cấp cho chương trình. (Xem phần
+:ref:`try`.) Nó có thể được truy cập dưới dạng phần tử thứ ba của tuple được trả về bởi :func:`sys.exc_info`, và dưới dạng thuộc tính
+:attr:`~BaseException.__traceback__` của exception đã được bắt.
 
-When the program contains no suitable
-handler, the stack trace is written (nicely formatted) to the standard error
-stream; if the interpreter is interactive, it is also made available to the user
-as :data:`sys.last_traceback`.
+Khi chương trình không có handler phù hợp, stack trace được ghi (với định dạng đẹp) vào luồng lỗi chuẩn; nếu interpreter ở chế độ tương tác, nó cũng được cung cấp cho người dùng dưới dạng :data:`sys.last_traceback`.
 
-For explicitly created tracebacks, it is up to the creator of the traceback
-to determine how the :attr:`~traceback.tb_next` attributes should be linked to
-form a full stack trace.
+Đối với các traceback được tạo tường minh, người tạo traceback sẽ tự quyết định cách liên kết các thuộc tính :attr:`~traceback.tb_next` để tạo thành một stack trace hoàn chỉnh.
 
 .. index::
    single: tb_frame (traceback attribute)
@@ -1843,178 +1354,120 @@ form a full stack trace.
    single: tb_lasti (traceback attribute)
    pair: statement; try
 
-Special read-only attributes:
+Các thuộc tính chỉ đọc đặc biệt:
 
 .. list-table::
 
    * - .. attribute:: traceback.tb_frame
-     - Points to the execution :ref:`frame <frame-objects>` of the current
-       level.
+     - Trỏ đến :ref:`frame <frame-objects>` thực thi của cấp hiện tại.
 
-       Accessing this attribute raises an
-       :ref:`auditing event <auditing>` ``object.__getattr__`` with arguments
-       ``obj`` and ``"tb_frame"``.
+       Việc truy cập thuộc tính này sẽ phát sinh một
+       :ref:`sự kiện auditing <auditing>` ``object.__getattr__`` với các đối số ``obj`` và ``"tb_frame"``.
 
    * - .. attribute:: traceback.tb_lineno
-     - Gives the line number where the exception occurred
+     - Cho biết số dòng nơi ngoại lệ xảy ra
 
    * - .. attribute:: traceback.tb_lasti
-     - Indicates the "precise instruction".
+     - Cho biết "lệnh chính xác".
 
-The line number and last instruction in the traceback may differ from the
-line number of its :ref:`frame object <frame-objects>` if the exception
-occurred in a
-:keyword:`try` statement with no matching except clause or with a
-:keyword:`finally` clause.
+Số dòng và lệnh cuối cùng trong traceback có thể khác với số dòng của :ref:`đối tượng frame <frame-objects>` của nó nếu ngoại lệ xảy ra trong một
+câu lệnh :keyword:`try` không có mệnh đề except tương ứng hoặc có một
+mệnh đề :keyword:`finally`.
 
 .. index::
    single: tb_next (traceback attribute)
 
 .. attribute:: traceback.tb_next
 
-   The special writable attribute :attr:`!tb_next` is the next level in the
-   stack trace (towards the frame where the exception occurred), or ``None`` if
-   there is no next level.
+   Thuộc tính đặc biệt có thể ghi :attr:`!tb_next` là cấp tiếp theo trong stack trace (hướng về frame nơi xảy ra ngoại lệ), hoặc ``None`` nếu không có cấp tiếp theo.
 
    .. versionchanged:: 3.7
-      This attribute is now writable
+      Thuộc tính này hiện có thể ghi được
 
 
-Slice objects
-^^^^^^^^^^^^^
+Đối tượng slice
+^^^^^^^^^^^^^^^
 
 .. index:: pair: built-in function; slice
 
-Slice objects are used to represent slices for
-:meth:`~object.__getitem__`
-methods.  They are also created by the built-in :func:`slice` function.
+Đối tượng slice được dùng để biểu diễn các lát cắt cho
+các phương thức :meth:`~object.__getitem__`. Chúng cũng được tạo bởi hàm dựng sẵn :func:`slice`.
 
 .. index::
    single: start (slice object attribute)
    single: stop (slice object attribute)
    single: step (slice object attribute)
 
-Special read-only attributes: :attr:`~slice.start` is the lower bound;
-:attr:`~slice.stop` is the upper bound; :attr:`~slice.step` is the step
-value; each is ``None`` if omitted.  These attributes can have any type.
+Các thuộc tính đặc biệt chỉ đọc: :attr:`~slice.start` là cận dưới;
+:attr:`~slice.stop` là cận trên; :attr:`~slice.step` là giá trị bước; mỗi giá trị là ``None`` nếu bị bỏ qua. Các thuộc tính này có thể thuộc bất kỳ kiểu nào.
 
-Slice objects support one method:
+Các đối tượng slice hỗ trợ một phương thức:
 
 .. method:: slice.indices(self, length)
 
-   This method takes a single integer argument *length* and computes
-   information about the slice that the slice object would describe if
-   applied to a sequence of *length* items.  It returns a tuple of three
-   integers; respectively these are the *start* and *stop* indices and the
-   *step* or stride length of the slice. Missing or out-of-bounds indices
-   are handled in a manner consistent with regular slices.
+   Phương thức này nhận một đối số số nguyên duy nhất *length* và tính toán thông tin về slice mà đối tượng slice sẽ mô tả nếu được áp dụng cho một sequence gồm *length* phần tử. Nó trả về một tuple gồm ba số nguyên; lần lượt là các chỉ mục *start* và *stop*, cùng *step* hoặc độ dài stride của slice. Các chỉ mục bị thiếu hoặc nằm ngoài giới hạn được xử lý theo cách nhất quán với các slice thông thường.
 
 
-Static method objects
-^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng phương thức tĩnh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Static method objects provide a way of defeating the transformation of function
-objects to method objects described above. A static method object is a wrapper
-around any other object, usually a user-defined method object. When a static
-method object is retrieved from a class or a class instance, the object actually
-returned is the wrapped object, which is not subject to any further
-transformation. Static method objects are also callable. Static method
-objects are created by the built-in :func:`staticmethod` constructor.
+Các đối tượng phương thức tĩnh cung cấp cách ngăn việc chuyển đổi các đối tượng hàm thành đối tượng phương thức được mô tả ở trên. Một đối tượng phương thức tĩnh là một wrapper bao quanh bất kỳ đối tượng nào khác, thường là một đối tượng phương thức do người dùng định nghĩa. Khi một đối tượng phương thức tĩnh được lấy từ một lớp hoặc một instance của lớp, đối tượng thực sự được trả về là đối tượng được bọc, đối tượng này không chịu bất kỳ sự chuyển đổi nào thêm. Các đối tượng phương thức tĩnh cũng có thể gọi được. Các đối tượng phương thức tĩnh được tạo bởi constructor dựng sẵn :func:`staticmethod`.
 
 
-Class method objects
-^^^^^^^^^^^^^^^^^^^^
+Các đối tượng phương thức lớp
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A class method object, like a static method object, is a wrapper around another
-object that alters the way in which that object is retrieved from classes and
-class instances. The behaviour of class method objects upon such retrieval is
-described above, under :ref:`"instance methods" <instance-methods>`. Class method objects are created
-by the built-in :func:`classmethod` constructor.
+Một đối tượng phương thức lớp, giống như một đối tượng phương thức tĩnh, là một trình bao bọc quanh một đối tượng khác, làm thay đổi cách đối tượng đó được truy xuất từ các lớp và các thể hiện của lớp. Hành vi của các đối tượng phương thức lớp khi được truy xuất như vậy được mô tả ở trên, trong phần :ref:`"phương thức thể hiện" <instance-methods>`. Các đối tượng phương thức lớp được tạo bởi constructor tích hợp sẵn :func:`classmethod`.
 
 
 .. _specialnames:
 
-Special method names
-====================
+Tên phương thức đặc biệt
+========================
 
 .. index::
    pair: operator; overloading
    single: __getitem__() (mapping object method)
 
-A class can implement certain operations that are invoked by special syntax
-(such as arithmetic operations or subscripting and slicing) by defining methods
-with special names. This is Python's approach to :dfn:`operator overloading`,
-allowing classes to define their own behavior with respect to language
-operators.  For instance, if a class defines a method named
-:meth:`~object.__getitem__`,
-and ``x`` is an instance of this class, then ``x[i]`` is roughly equivalent
-to ``type(x).__getitem__(x, i)``.  Except where mentioned, attempts to execute an
-operation raise an exception when no appropriate method is defined (typically
-:exc:`AttributeError` or :exc:`TypeError`).
+Một lớp có thể triển khai một số thao tác nhất định được gọi bằng cú pháp đặc biệt (chẳng hạn như các phép toán số học hoặc truy cập chỉ số và lát cắt) bằng cách định nghĩa các phương thức có tên đặc biệt. Đây là cách Python tiếp cận :dfn:`nạp chồng toán tử`, cho phép các lớp tự định nghĩa hành vi của chúng đối với các toán tử ngôn ngữ. Ví dụ, nếu một lớp định nghĩa một phương thức có tên là
+:meth:`~object.__getitem__`, và ``x`` là một thể hiện của lớp này, thì ``x[i]`` gần tương đương với ``type(x).__getitem__(x, i)``. Ngoại trừ những trường hợp được đề cập, các nỗ lực thực hiện một thao tác sẽ phát sinh ngoại lệ khi không có phương thức phù hợp nào được định nghĩa (thông thường là
+:exc:`AttributeError` hoặc :exc:`TypeError`).
 
-Setting a special method to ``None`` indicates that the corresponding
-operation is not available.  For example, if a class sets
-:meth:`~object.__iter__` to ``None``, the class is not iterable, so calling
-:func:`iter` on its instances will raise a :exc:`TypeError` (without
-falling back to :meth:`~object.__getitem__`). [#]_
+Đặt một phương thức đặc biệt thành ``None`` cho biết thao tác tương ứng không khả dụng. Ví dụ, nếu một lớp đặt
+Từ :meth:`~object.__iter__` đến ``None``, lớp không thể lặp, vì vậy việc gọi
+:func:`iter` trên các instance của nó sẽ phát sinh :exc:`TypeError` (mà không quay về dùng :meth:`~object.__getitem__`). [#]_
 
-When implementing a class that emulates any built-in type, it is important that
-the emulation only be implemented to the degree that it makes sense for the
-object being modelled.  For example, some sequences may work well with retrieval
-of individual elements, but extracting a slice may not make sense.
-(One example of this is the :ref:`NodeList <dom-nodelist-objects>` interface
-in the W3C's Document Object Model.)
+Khi triển khai một lớp mô phỏng bất kỳ kiểu dựng sẵn nào, điều quan trọng là chỉ triển khai việc mô phỏng ở mức độ phù hợp với đối tượng đang được mô hình hóa. Ví dụ, một số sequence có thể hoạt động tốt khi truy xuất từng phần tử riêng lẻ, nhưng việc trích xuất một slice có thể không hợp lý. (Một ví dụ là interface :ref:`NodeList <dom-nodelist-objects>` trong Document Object Model của W3C.)
 
 
 .. _customization:
 
-Basic customization
--------------------
+Tùy biến cơ bản
+---------------
 
 .. method:: object.__new__(cls[, ...])
 
    .. index:: pair: subclassing; immutable types
 
-   Called to create a new instance of class *cls*.  :meth:`__new__` is a static
-   method (special-cased so you need not declare it as such) that takes the class
-   of which an instance was requested as its first argument.  The remaining
-   arguments are those passed to the object constructor expression (the call to the
-   class).  The return value of :meth:`__new__` should be the new object instance
-   (usually an instance of *cls*).
+   Được gọi để tạo một instance mới của lớp *cls*. :meth:`__new__` là một static method (được xử lý đặc biệt nên bạn không cần khai báo nó như vậy), nhận lớp mà instance được yêu cầu tạo làm đối số đầu tiên. Các đối số còn lại là những đối số được truyền vào biểu thức constructor của đối tượng (lời gọi đến lớp). Giá trị trả về của :meth:`__new__` phải là instance đối tượng mới (thường là một instance của *cls*).
 
-   Typical implementations create a new instance of the class by invoking the
-   superclass's :meth:`__new__` method using ``super().__new__(cls[, ...])``
-   with appropriate arguments and then modifying the newly created instance
-   as necessary before returning it.
+   Các cách triển khai điển hình tạo một instance mới của lớp bằng cách gọi method :meth:`__new__` của superclass thông qua ``super().__new__(cls[, ...])`` với các đối số phù hợp, rồi sửa đổi instance mới tạo khi cần trước khi trả về nó.
 
-   If :meth:`__new__` is invoked during object construction and it returns an
-   instance of *cls*, then the new instance’s :meth:`__init__` method
-   will be invoked like ``__init__(self[, ...])``, where *self* is the new instance
-   and the remaining arguments are the same as were passed to the object constructor.
+   Nếu :meth:`__new__` được gọi trong quá trình khởi tạo đối tượng và nó trả về một instance của *cls*, thì method :meth:`__init__` của instance mới sẽ được gọi như ``__init__(self[, ...])``, trong đó *self* là instance mới và các đối số còn lại giống với những đối số đã được truyền vào constructor của đối tượng.
 
-   If :meth:`__new__` does not return an instance of *cls*, then the new instance's
-   :meth:`__init__` method will not be invoked.
+   Nếu :meth:`__new__` không trả về một instance của *cls*, thì :meth:`__new__` của instance mới
+   Phương thức :meth:`__init__` sẽ không được gọi.
 
-   :meth:`__new__` is intended mainly to allow subclasses of immutable types (like
-   int, str, or tuple) to customize instance creation.  It is also commonly
-   overridden in custom metaclasses in order to customize class creation.
+   :meth:`__new__` chủ yếu được dùng để cho phép các lớp con của những kiểu bất biến (như int, str hoặc tuple) tùy chỉnh việc tạo instance. Nó cũng thường được override trong các metaclass tùy chỉnh để tùy chỉnh việc tạo lớp.
 
 
 .. method:: object.__init__(self[, ...])
 
    .. index:: pair: class; constructor
 
-   Called after the instance has been created (by :meth:`__new__`), but before
-   it is returned to the caller.  The arguments are those passed to the
-   class constructor expression.  If a base class has an :meth:`__init__`
-   method, the derived class's :meth:`__init__` method, if any, must explicitly
-   call it to ensure proper initialization of the base class part of the
-   instance; for example: ``super().__init__([args...])``.
+   Được gọi sau khi instance đã được tạo (bởi :meth:`__new__`), nhưng trước khi được trả về cho caller. Các đối số là những đối số được truyền vào biểu thức constructor của lớp. Nếu một lớp cơ sở có phương thức :meth:`__init__`, thì phương thức :meth:`__init__` của lớp dẫn xuất, nếu có, phải gọi rõ ràng phương thức đó để bảo đảm phần thuộc lớp cơ sở của instance được khởi tạo đúng cách; ví dụ: ``super().__init__([args...])``.
 
-   Because :meth:`__new__` and :meth:`__init__` work together in constructing
-   objects (:meth:`__new__` to create it, and :meth:`__init__` to customize it),
-   no non-``None`` value may be returned by :meth:`__init__`; doing so will
-   cause a :exc:`TypeError` to be raised at runtime.
+   Vì :meth:`__new__` và :meth:`__init__` phối hợp với nhau khi xây dựng object (:meth:`__new__` để tạo object và :meth:`__init__` để tùy chỉnh object), :meth:`__init__` không được trả về bất kỳ giá trị nào khác ngoài ``None``; nếu làm vậy, một :exc:`TypeError` sẽ được phát sinh tại runtime.
 
 
 .. method:: object.__del__(self)
@@ -2024,63 +1477,32 @@ Basic customization
       single: finalizer
       pair: statement; del
 
-   Called when the instance is about to be destroyed.  This is also called a
-   finalizer or (improperly) a destructor.  If a base class has a
-   :meth:`__del__` method, the derived class's :meth:`__del__` method,
-   if any, must explicitly call it to ensure proper deletion of the base
-   class part of the instance.
+   Được gọi khi instance sắp bị hủy. Đây cũng được gọi là finalizer hoặc (không chính xác) destructor. Nếu một lớp cơ sở có một
+   phương thức :meth:`__del__`, thì phương thức :meth:`__del__` của lớp dẫn xuất, nếu có, phải gọi rõ ràng phương thức đó để bảo đảm phần thuộc lớp cơ sở của instance được xóa đúng cách.
 
-   It is possible (though not recommended!) for the :meth:`__del__` method
-   to postpone destruction of the instance by creating a new reference to
-   it.  This is called object *resurrection*.  It is implementation-dependent
-   whether :meth:`__del__` is called a second time when a resurrected object
-   is about to be destroyed; the current :term:`CPython` implementation
-   only calls it once.
+   Có thể (mặc dù không được khuyến nghị!) để phương thức :meth:`__del__` trì hoãn việc hủy instance bằng cách tạo một reference mới đến nó. Điều này được gọi là *hồi sinh* object. Việc :meth:`__del__` có được gọi lần thứ hai khi một object đã hồi sinh sắp bị hủy hay không phụ thuộc vào implementation; implementation :term:`CPython` hiện tại chỉ gọi nó một lần.
 
-   It is not guaranteed that :meth:`__del__` methods are called for objects
-   that still exist when the interpreter exits.
-   :class:`weakref.finalize` provides a straightforward way to register
-   a cleanup function to be called when an object is garbage collected.
+   Không có gì đảm bảo rằng các phương thức :meth:`__del__` được gọi cho những object vẫn còn tồn tại khi interpreter thoát.
+   :class:`weakref.finalize` cung cấp một cách trực tiếp để đăng ký một hàm dọn dẹp được gọi khi một object được garbage collected.
 
    .. note::
 
-      ``del x`` doesn't directly call ``x.__del__()`` --- the former decrements
-      the reference count for ``x`` by one, and the latter is only called when
-      ``x``'s reference count reaches zero.
+      ``del x`` không gọi trực tiếp ``x.__del__()`` --- phương thức trước giảm reference count của ``x`` đi một, và phương thức sau chỉ được gọi khi reference count của ``x`` đạt đến không.
 
    .. impl-detail::
-      It is possible for a reference cycle to prevent the reference count
-      of an object from going to zero.  In this case, the cycle will be
-      later detected and deleted by the :term:`cyclic garbage collector
-      <garbage collection>`.  A common cause of reference cycles is when
-      an exception has been caught in a local variable.  The frame's
-      locals then reference the exception, which references its own
-      traceback, which references the locals of all frames caught in the
-      traceback.
+      Có thể một reference cycle ngăn reference count của một object giảm về không. Trong trường hợp này, cycle sau đó sẽ được :term:`cyclic garbage collector <garbage collection>` phát hiện và xóa. Một nguyên nhân phổ biến của reference cycle là khi một exception đã được bắt trong một biến local. Khi đó, các local của frame reference đến exception, exception reference đến traceback của chính nó, và traceback reference đến các local của mọi frame được bắt trong traceback.
 
       .. seealso::
-         Documentation for the :mod:`gc` module.
+         Tài liệu cho module :mod:`gc`.
 
    .. warning::
 
-      Due to the precarious circumstances under which :meth:`__del__` methods are
-      invoked, exceptions that occur during their execution are ignored, and a warning
-      is printed to ``sys.stderr`` instead.  In particular:
+      Do các tình huống không ổn định mà trong đó các phương thức :meth:`__del__` được gọi, các exception xảy ra trong quá trình thực thi chúng sẽ bị bỏ qua và thay vào đó một cảnh báo được in ra ``sys.stderr``. Cụ thể:
 
-      * :meth:`__del__` can be invoked when arbitrary code is being executed,
-        including from any arbitrary thread.  If :meth:`__del__` needs to take
-        a lock or invoke any other blocking resource, it may deadlock as
-        the resource may already be taken by the code that gets interrupted
-        to execute :meth:`__del__`.
+      * :meth:`__del__` có thể được gọi khi mã tùy ý đang được thực thi, kể cả từ bất kỳ thread tùy ý nào. Nếu :meth:`__del__` cần lấy lock hoặc gọi bất kỳ tài nguyên chặn nào khác, nó có thể bị deadlock vì tài nguyên đó có thể đã được mã bị ngắt để thực thi :meth:`__del__` chiếm giữ.
 
-      * :meth:`__del__` can be executed during interpreter shutdown.  As a
-        consequence, the global variables it needs to access (including other
-        modules) may already have been deleted or set to ``None``. Python
-        guarantees that globals whose name begins with a single underscore
-        are deleted from their module before other globals are deleted; if
-        no other references to such globals exist, this may help in assuring
-        that imported modules are still available at the time when the
-        :meth:`__del__` method is called.
+      * :meth:`__del__` có thể được thực thi trong quá trình interpreter tắt. Do đó, các biến global mà nó cần truy cập (bao gồm cả các module khác) có thể đã bị xóa hoặc được đặt thành ``None``. Python đảm bảo rằng các global có tên bắt đầu bằng một dấu gạch dưới sẽ bị xóa khỏi module của chúng trước khi các global khác bị xóa; nếu không có tham chiếu nào khác đến các global đó, điều này có thể giúp đảm bảo rằng các module đã import vẫn khả dụng tại thời điểm phương thức
+        :meth:`__del__` được gọi.
 
 
    .. index::
@@ -2088,18 +1510,10 @@ Basic customization
 
 .. method:: object.__repr__(self)
 
-   Called by the :func:`repr` built-in function to compute the "official" string
-   representation of an object.  If at all possible, this should look like a
-   valid Python expression that could be used to recreate an object with the
-   same value (given an appropriate environment).  If this is not possible, a
-   string of the form ``<...some useful description...>`` should be returned.
-   The return value must be a string object. If a class defines :meth:`__repr__`
-   but not :meth:`__str__`, then :meth:`__repr__` is also used when an
-   "informal" string representation of instances of that class is required.
+   Được hàm built-in :func:`repr` gọi để tính biểu diễn chuỗi "chính thức" của một đối tượng. Nếu có thể, biểu diễn này nên trông như một biểu thức Python hợp lệ có thể dùng để tạo lại một đối tượng có cùng giá trị (trong một môi trường phù hợp). Nếu không thể, nên trả về một chuỗi có dạng ``<...some useful description...>``. Giá trị trả về phải là một đối tượng chuỗi. Nếu một class định nghĩa :meth:`__repr__` nhưng không định nghĩa :meth:`__str__`, thì :meth:`__repr__` cũng được dùng khi cần biểu diễn chuỗi "không chính thức" cho các instance của class đó.
 
-   This is typically used for debugging, so it is important that the representation
-   is information-rich and unambiguous. A default implementation is provided by the
-   :class:`object` class itself.
+   Điều này thường được dùng để debugging, vì vậy điều quan trọng là biểu diễn phải giàu thông tin và không mơ hồ. Một implementation mặc định được cung cấp bởi chính class
+   :class:`object`.
 
    .. index::
       single: string; __str__() (object method)
@@ -2109,17 +1523,12 @@ Basic customization
 
 .. method:: object.__str__(self)
 
-   Called by :func:`str(object) <str>`, the default :meth:`__format__` implementation,
-   and the built-in function :func:`print`, to compute the "informal" or nicely
-   printable string representation of an object.  The return value must be a
-   :ref:`str <textseq>` object.
+   Được :func:`str(object) <str>`, implementation :meth:`__format__` mặc định và hàm built-in :func:`print` gọi để tính biểu diễn chuỗi "không chính thức" hoặc có thể in đẹp của một đối tượng. Giá trị trả về phải là một
+   Đối tượng :ref:`str <textseq>`.
 
-   This method differs from :meth:`object.__repr__` in that there is no
-   expectation that :meth:`__str__` return a valid Python expression: a more
-   convenient or concise representation can be used.
+   Phương thức này khác với :meth:`object.__repr__` ở chỗ không yêu cầu :meth:`__str__` trả về một biểu thức Python hợp lệ: có thể dùng một biểu diễn thuận tiện hoặc ngắn gọn hơn.
 
-   The default implementation defined by the built-in type :class:`object`
-   calls :meth:`object.__repr__`.
+   Cách triển khai mặc định do kiểu dựng sẵn :class:`object` xác định sẽ gọi :meth:`object.__repr__`.
 
    .. XXX what about subclasses of string?
 
@@ -2128,9 +1537,7 @@ Basic customization
 
    .. index:: pair: built-in function; bytes
 
-   Called by :ref:`bytes <func-bytes>` to compute a byte-string representation
-   of an object. This should return a :class:`bytes` object. The :class:`object`
-   class itself does not provide this method.
+   Được :ref:`bytes <func-bytes>` gọi để tính toán biểu diễn chuỗi byte của một đối tượng. Phương thức này phải trả về một đối tượng :class:`bytes`. Bản thân lớp :class:`object` không cung cấp phương thức này.
 
    .. index::
       single: string; __format__() (object method)
@@ -2140,88 +1547,47 @@ Basic customization
 
 .. method:: object.__format__(self, format_spec)
 
-   Called by the :func:`format` built-in function,
-   and by extension, evaluation of :ref:`formatted string literals
-   <f-strings>` and the :meth:`str.format` method, to produce a "formatted"
-   string representation of an object. The *format_spec* argument is
-   a string that contains a description of the formatting options desired.
-   The interpretation of the *format_spec* argument is up to the type
-   implementing :meth:`__format__`, however most classes will either
-   delegate formatting to one of the built-in types, or use a similar
-   formatting option syntax.
+   Được hàm dựng sẵn :func:`format` gọi, cũng như gián tiếp bởi việc đánh giá :ref:`chuỗi ký tự định dạng <f-strings>` và phương thức :meth:`str.format`, để tạo ra biểu diễn chuỗi "được định dạng" của một đối tượng. Đối số *format_spec* là một chuỗi chứa mô tả về các tùy chọn định dạng mong muốn. Việc diễn giải đối số *format_spec* tùy thuộc vào kiểu triển khai :meth:`__format__`, tuy nhiên hầu hết các lớp sẽ hoặc ủy quyền việc định dạng cho một trong các kiểu dựng sẵn, hoặc sử dụng cú pháp tùy chọn định dạng tương tự.
 
-   See :ref:`formatspec` for a description of the standard formatting syntax.
+   Xem :ref:`formatspec` để biết mô tả về cú pháp định dạng chuẩn.
 
-   The return value must be a string object.
+   Giá trị trả về phải là một đối tượng chuỗi.
 
-   The default implementation by the :class:`object` class should be given
-   an empty *format_spec* string. It delegates to :meth:`__str__`.
+   Triển khai mặc định của lớp :class:`object` nên được truyền một chuỗi *format_spec* rỗng. Nó ủy quyền cho :meth:`__str__`.
 
    .. versionchanged:: 3.4
-      The __format__ method of ``object`` itself raises a :exc:`TypeError`
-      if passed any non-empty string.
+      Phương thức __format__ của chính ``object`` sẽ phát sinh một :exc:`TypeError` nếu được truyền bất kỳ chuỗi không rỗng nào.
 
    .. versionchanged:: 3.7
-      ``object.__format__(x, '')`` is now equivalent to ``str(x)`` rather
-      than ``format(str(x), '')``.
+      ``object.__format__(x, '')`` hiện tương đương với ``str(x)`` thay vì ``format(str(x), '')``.
 
 
 .. _richcmpfuncs:
 .. method:: object.__lt__(self, other)
-            object.__le__(self, other)
-            object.__eq__(self, other)
-            object.__ne__(self, other)
-            object.__gt__(self, other)
-            object.__ge__(self, other)
+            object.__le__(self, other) object.__eq__(self, other) object.__ne__(self, other) object.__gt__(self, other) object.__ge__(self, other)
 
    .. index::
       single: comparisons
 
-   These are the so-called "rich comparison" methods. The correspondence between
-   operator symbols and method names is as follows: ``x<y`` calls ``x.__lt__(y)``,
-   ``x<=y`` calls ``x.__le__(y)``, ``x==y`` calls ``x.__eq__(y)``, ``x!=y`` calls
-   ``x.__ne__(y)``, ``x>y`` calls ``x.__gt__(y)``, and ``x>=y`` calls
-   ``x.__ge__(y)``.
+   Đây là các phương thức được gọi là "so sánh phong phú" (rich comparison). Mối tương ứng giữa các ký hiệu toán tử và tên phương thức như sau: ``x<y`` gọi ``x.__lt__(y)``, ``x<=y`` gọi ``x.__le__(y)``, ``x==y`` gọi ``x.__eq__(y)``, ``x!=y`` gọi ``x.__ne__(y)``, ``x>y`` gọi ``x.__gt__(y)``, và ``x>=y`` gọi ``x.__ge__(y)``.
 
-   A rich comparison method may return the singleton :data:`NotImplemented` if it does
-   not implement the operation for a given pair of arguments. By convention,
-   ``False`` and ``True`` are returned for a successful comparison. However, these
-   methods can return any value, so if the comparison operator is used in a Boolean
-   context (e.g., in the condition of an ``if`` statement), Python will call
-   :func:`bool` on the value to determine if the result is true or false.
+   Một phương thức so sánh phong phú có thể trả về singleton :data:`NotImplemented` nếu nó không triển khai thao tác cho một cặp đối số nhất định. Theo quy ước, ``False`` và ``True`` được trả về khi so sánh thành công. Tuy nhiên, các phương thức này có thể trả về bất kỳ giá trị nào, vì vậy nếu toán tử so sánh được dùng trong ngữ cảnh Boolean (ví dụ: trong điều kiện của một câu lệnh ``if``), Python sẽ gọi
+   :func:`bool` trên giá trị đó để xác định liệu kết quả là đúng hay sai.
 
-   By default, ``object`` implements :meth:`__eq__` by using ``is``, returning
-   :data:`NotImplemented` in the case of a false comparison:
-   ``True if x is y else NotImplemented``. For :meth:`__ne__`, by default it
-   delegates to :meth:`__eq__` and inverts the result unless it is
-   :data:`!NotImplemented`.  There are no other implied relationships among the
-   comparison operators or default implementations; for example, the truth of
-   ``(x<y or x==y)`` does not imply ``x<=y``. To automatically generate ordering
-   operations from a single root operation, see :deco:`functools.total_ordering`.
+   Theo mặc định, ``object`` triển khai :meth:`__eq__` bằng cách sử dụng ``is``, trả về
+   :data:`NotImplemented` trong trường hợp phép so sánh cho kết quả false: ``True if x is y else NotImplemented``. Đối với :meth:`__ne__`, theo mặc định, nó ủy quyền cho :meth:`__eq__` và đảo ngược kết quả, trừ khi kết quả là
+   :data:`!NotImplemented`. Không có mối quan hệ ngầm định nào khác giữa các toán tử so sánh hoặc các phần triển khai mặc định; ví dụ, tính đúng của ``(x<y or x==y)`` không hàm ý ``x<=y``. Để tự động tạo các phép toán sắp thứ tự từ một phép toán gốc duy nhất, hãy xem :deco:`functools.total_ordering`.
 
-   By default, the :class:`object` class provides implementations consistent
-   with :ref:`expressions-value-comparisons`: equality compares according to
-   object identity, and order comparisons raise :exc:`TypeError`. Each default
-   method may generate these results directly, but may also return
+   Theo mặc định, lớp :class:`object` cung cấp các phần triển khai nhất quán với :ref:`expressions-value-comparisons`: phép so sánh bằng so sánh theo định danh đối tượng, và các phép so sánh thứ tự sẽ phát sinh :exc:`TypeError`. Mỗi phương thức mặc định có thể trực tiếp tạo ra các kết quả này, nhưng cũng có thể trả về
    :data:`NotImplemented`.
 
-   See the paragraph on :meth:`__hash__` for
-   some important notes on creating :term:`hashable` objects which support
-   custom comparison operations and are usable as dictionary keys.
+   Xem đoạn về :meth:`__hash__` để biết một số lưu ý quan trọng khi tạo các đối tượng :term:`hashable` hỗ trợ phép so sánh tùy chỉnh và có thể dùng làm khóa từ điển.
 
-   There are no swapped-argument versions of these methods (to be used when the
-   left argument does not support the operation but the right argument does);
-   rather, :meth:`__lt__` and :meth:`__gt__` are each other's reflection,
-   :meth:`__le__` and :meth:`__ge__` are each other's reflection, and
-   :meth:`__eq__` and :meth:`__ne__` are their own reflection.
-   If the operands are of different types, and the right operand's type is
-   a direct or indirect subclass of the left operand's type,
-   the reflected method of the right operand has priority, otherwise
-   the left operand's method has priority.  Virtual subclassing is
-   not considered.
+   Không có các phiên bản hoán đổi đối số của những phương thức này (để dùng khi đối số bên trái không hỗ trợ thao tác nhưng đối số bên phải có hỗ trợ); thay vào đó, :meth:`__lt__` và :meth:`__gt__` là phép phản chiếu của nhau,
+   :meth:`__le__` và :meth:`__ge__` là phép phản chiếu của nhau, và
+   :meth:`__eq__` và :meth:`__ne__` là phép phản chiếu của chính chúng. Nếu các toán hạng có kiểu khác nhau, và kiểu của toán hạng bên phải là lớp con trực tiếp hoặc gián tiếp của kiểu toán hạng bên trái, thì phương thức phản chiếu của toán hạng bên phải được ưu tiên; nếu không, phương thức của toán hạng bên trái được ưu tiên. Không xét đến việc kế thừa lớp con ảo.
 
-   When no appropriate method returns any value other than :data:`NotImplemented`, the
-   ``==`` and ``!=`` operators will fall back to ``is`` and ``is not``, respectively.
+   Khi không có phương thức phù hợp nào trả về giá trị khác :data:`NotImplemented`, các toán tử ``==`` và ``!=`` sẽ lần lượt quay về sử dụng ``is`` và ``is not``.
 
 .. method:: object.__hash__(self)
 
@@ -2229,187 +1595,120 @@ Basic customization
       pair: object; dictionary
       pair: built-in function; hash
 
-   Called by built-in function :func:`hash` and for operations on members of
-   hashed collections including :class:`set`, :class:`frozenset`, and
-   :class:`dict`.  The ``__hash__()`` method should return an integer. The only required
-   property is that objects which compare equal have the same hash value; it is
-   advised to mix together the hash values of the components of the object that
-   also play a part in comparison of objects by packing them into a tuple and
-   hashing the tuple. Example::
+   Được gọi bởi hàm dựng sẵn :func:`hash` và cho các thao tác trên các phần tử của tập hợp được băm, bao gồm :class:`set`, :class:`frozenset`, và
+   :class:`dict`. Phương thức ``__hash__()`` phải trả về một số nguyên. Thuộc tính duy nhất được yêu cầu là các đối tượng so sánh bằng nhau phải có cùng giá trị băm; bạn nên kết hợp các giá trị băm của những thành phần trong đối tượng cũng tham gia vào việc so sánh đối tượng bằng cách đóng gói chúng vào một tuple rồi băm tuple đó. Ví dụ::
 
        def __hash__(self):
            return hash((self.name, self.nick, self.color))
 
    .. note::
 
-     :func:`hash` truncates the value returned from an object's custom
-     :meth:`__hash__` method to the size of a :c:type:`Py_ssize_t`.  This is
-     typically 8 bytes on 64-bit builds and 4 bytes on 32-bit builds.  If an
-     object's   :meth:`__hash__` must interoperate on builds of different bit
-     sizes, be sure to check the width on all supported builds.  An easy way
-     to do this is with
-     ``python -c "import sys; print(sys.hash_info.width)"``.
+     :func:`hash` cắt ngắn giá trị được trả về từ phương thức tùy chỉnh của một đối tượng
+     :meth:`__hash__` theo kích thước của một :c:type:`Py_ssize_t`. Kích thước này thường là 8 byte trên các bản dựng 64-bit và 4 byte trên các bản dựng 32-bit. Nếu :meth:`__hash__` của một đối tượng phải tương tác được trên các bản dựng có kích thước bit khác nhau, hãy chắc chắn kiểm tra độ rộng trên mọi bản dựng được hỗ trợ. Một cách dễ dàng để làm điều này là dùng ``python -c "import sys; print(sys.hash_info.width)"``.
 
-   If a class does not define an :meth:`__eq__` method it should not define a
-   :meth:`__hash__` operation either; if it defines :meth:`__eq__` but not
-   :meth:`__hash__`, its instances will not be usable as items in hashable
-   collections.  If a class defines mutable objects and implements an
-   :meth:`__eq__` method, it should not implement :meth:`__hash__`, since the
-   implementation of :term:`hashable` collections requires that a key's hash value is
-   immutable (if the object's hash value changes, it will be in the wrong hash
-   bucket).
+   Nếu một lớp không định nghĩa phương thức :meth:`__eq__` thì lớp đó không nên định nghĩa một
+   thao tác :meth:`__hash__` cũng vậy; nếu nó định nghĩa :meth:`__eq__` nhưng không định nghĩa
+   :meth:`__hash__`, các thể hiện của nó sẽ không thể dùng làm phần tử trong các collection có thể băm. Nếu một lớp định nghĩa các đối tượng mutable và triển khai một
+   phương thức :meth:`__eq__`, thì không nên triển khai :meth:`__hash__`, vì cách triển khai các collection :term:`hashable` yêu cầu giá trị hash của một khóa là bất biến (nếu giá trị hash của đối tượng thay đổi, nó sẽ nằm trong hash bucket không đúng).
 
-   User-defined classes have :meth:`__eq__` and :meth:`__hash__` methods
-   by default (inherited from the :class:`object` class); with them, all objects compare
-   unequal (except with themselves) and ``x.__hash__()`` returns an appropriate
-   value such that ``x == y`` implies both that ``x is y`` and ``hash(x) == hash(y)``.
+   Theo mặc định, các lớp do người dùng định nghĩa có các phương thức :meth:`__eq__` và :meth:`__hash__` (được kế thừa từ lớp :class:`object`); với các phương thức này, mọi đối tượng được so sánh là không bằng nhau (trừ chính nó) và ``x.__hash__()`` trả về một giá trị phù hợp sao cho ``x == y`` ngụ ý cả ``x is y`` lẫn ``hash(x) == hash(y)``.
 
-   A class that overrides :meth:`__eq__` and does not define :meth:`__hash__`
-   will have its :meth:`__hash__` implicitly set to ``None``.  When the
-   :meth:`__hash__` method of a class is ``None``, instances of the class will
-   raise an appropriate :exc:`TypeError` when a program attempts to retrieve
-   their hash value, and will also be correctly identified as unhashable when
-   checking ``isinstance(obj, collections.abc.Hashable)``.
+   Một lớp ghi đè :meth:`__eq__` và không định nghĩa :meth:`__hash__` sẽ có :meth:`__hash__` được ngầm đặt thành ``None``. Khi phương thức
+   :meth:`__hash__` của một lớp là ``None``, các thể hiện của lớp sẽ phát sinh một :exc:`TypeError` phù hợp khi chương trình cố lấy giá trị hash của chúng, và cũng sẽ được nhận diện đúng là không thể băm khi kiểm tra ``isinstance(obj, collections.abc.Hashable)``.
 
-   If a class that overrides :meth:`__eq__` needs to retain the implementation
-   of :meth:`__hash__` from a parent class, the interpreter must be told this
-   explicitly by setting ``__hash__ = <ParentClass>.__hash__``.
+   Nếu một lớp ghi đè :meth:`__eq__` cần giữ lại cách triển khai :meth:`__hash__` từ một lớp cha, phải báo rõ điều này cho interpreter bằng cách đặt ``__hash__ = <ParentClass>.__hash__``.
 
-   If a class that does not override :meth:`__eq__` wishes to suppress hash
-   support, it should include ``__hash__ = None`` in the class definition.
-   A class which defines its own :meth:`__hash__` that explicitly raises
-   a :exc:`TypeError` would be incorrectly identified as hashable by
-   an ``isinstance(obj, collections.abc.Hashable)`` call.
+   Nếu một lớp không override :meth:`__eq__` muốn vô hiệu hóa hỗ trợ hash, lớp đó nên đưa ``__hash__ = None`` vào định nghĩa lớp. Một lớp định nghĩa :meth:`__hash__` riêng và chủ động raise :exc:`TypeError` sẽ bị một lệnh gọi ``isinstance(obj, collections.abc.Hashable)`` xác định nhầm là có thể hash.
 
 
    .. note::
 
-      By default, the :meth:`__hash__` values of str and bytes objects are
-      "salted" with an unpredictable random value.  Although they
-      remain constant within an individual Python process, they are not
-      predictable between repeated invocations of Python.
+      Theo mặc định, các giá trị :meth:`__hash__` của đối tượng str và bytes được "salt" bằng một giá trị ngẫu nhiên không thể dự đoán. Mặc dù chúng vẫn không đổi trong một process Python riêng lẻ, chúng không thể dự đoán giữa các lần gọi Python lặp lại.
 
-      This is intended to provide protection against a denial-of-service caused
-      by carefully chosen inputs that exploit the worst case performance of a
-      dict insertion, *O*\ (*n*\ :sup:`2`) complexity.  See
-      https://ocert.org/advisories/ocert-2011-003.html for details.
+      Điều này nhằm bảo vệ khỏi tấn công từ chối dịch vụ do các input được lựa chọn cẩn thận khai thác hiệu năng trường hợp xấu nhất của thao tác chèn dict, với độ phức tạp *O*\ (*n*\ :sup:`2`). Xem https://ocert.org/advisories/ocert-2011-003.html để biết chi tiết.
 
-      Changing hash values affects the iteration order of sets.
-      Python has never made guarantees about this ordering
-      (and it typically varies between 32-bit and 64-bit builds).
+      Việc thay đổi giá trị hash ảnh hưởng đến thứ tự lặp của các set. Python chưa từng đảm bảo về thứ tự này (và thứ tự này thường khác nhau giữa các bản build 32-bit và 64-bit).
 
-      See also :envvar:`PYTHONHASHSEED`.
+      Xem thêm :envvar:`PYTHONHASHSEED`.
 
    .. versionchanged:: 3.3
-      Hash randomization is enabled by default.
+      Tính năng ngẫu nhiên hóa hash được bật theo mặc định.
 
 
 .. method:: object.__bool__(self)
 
    .. index:: single: __len__() (mapping object method)
 
-   Called to implement truth value testing and the built-in operation
-   ``bool()``; should return ``False`` or ``True``.  When this method is not
-   defined, :meth:`~object.__len__` is called, if it is defined, and the object is
-   considered true if its result is nonzero.  If a class defines neither
-   :meth:`!__len__` nor :meth:`!__bool__` (which is true of the :class:`object`
-   class itself), all its instances are considered true.
+   Được gọi để triển khai việc kiểm tra giá trị chân lý và thao tác built-in ``bool()``; phải trả về ``False`` hoặc ``True``. Khi phương thức này không được định nghĩa, :meth:`~object.__len__` sẽ được gọi, nếu nó được định nghĩa, và đối tượng được xem là true nếu kết quả của nó khác 0. Nếu một lớp không định nghĩa phương thức nào trong hai phương thức này
+   :meth:`!__len__` cũng không phải :meth:`!__bool__` (điều này đúng với chính lớp :class:`object`), thì mọi instance của nó đều được xem là true.
 
 
 .. _attribute-access:
 
-Customizing attribute access
-----------------------------
+Tùy chỉnh việc truy cập attribute
+---------------------------------
 
-The following methods can be defined to customize the meaning of attribute
-access (use of, assignment to, or deletion of ``x.name``) for class instances.
+Có thể định nghĩa các method sau để tùy chỉnh ý nghĩa của việc truy cập attribute (sử dụng, gán hoặc xóa ``x.name``) đối với các instance của lớp.
 
 .. XXX explain how descriptors interfere here!
 
 
 .. method:: object.__getattr__(self, name)
 
-   Called when the default attribute access fails with an :exc:`AttributeError`
-   (either :meth:`__getattribute__` raises an :exc:`AttributeError` because
-   *name* is not an instance attribute or an attribute in the class tree
-   for ``self``; or :meth:`__get__` of a *name* property raises
-   :exc:`AttributeError`).  This method should either return the (computed)
-   attribute value or raise an :exc:`AttributeError` exception.
-   The :class:`object` class itself does not provide this method.
+   Được gọi khi việc truy cập attribute mặc định thất bại với một :exc:`AttributeError` (hoặc :meth:`__getattribute__` phát sinh một :exc:`AttributeError` vì *name* không phải là attribute của instance hoặc attribute trong cây lớp dành cho ``self``; hoặc :meth:`__get__` của một property *name* phát sinh
+   :exc:`AttributeError`). Method này phải trả về giá trị attribute (đã được tính toán) hoặc phát sinh một exception :exc:`AttributeError`. Chính lớp :class:`object` không cung cấp method này.
 
-   Note that if the attribute is found through the normal mechanism,
-   :meth:`__getattr__` is not called.  (This is an intentional asymmetry between
-   :meth:`__getattr__` and :meth:`__setattr__`.) This is done both for efficiency
-   reasons and because otherwise :meth:`__getattr__` would have no way to access
-   other attributes of the instance.  Note that at least for instance variables,
-   you can take total control by not inserting any values in the instance attribute
-   dictionary (but instead inserting them in another object).  See the
-   :meth:`__getattribute__` method below for a way to actually get total control
-   over attribute access.
+   Lưu ý rằng nếu attribute được tìm thấy thông qua cơ chế thông thường,
+   :meth:`__getattr__` không được gọi. (Đây là sự bất đối xứng có chủ ý giữa
+   :meth:`__getattr__` và :meth:`__setattr__`.) Điều này được thực hiện vừa vì lý do hiệu quả, vừa vì nếu không thì :meth:`__getattr__` sẽ không có cách nào truy cập các thuộc tính khác của instance. Lưu ý rằng, ít nhất đối với biến instance, bạn có thể nắm toàn quyền kiểm soát bằng cách không chèn bất kỳ giá trị nào vào từ điển thuộc tính của instance (mà thay vào đó chèn chúng vào một object khác). Xem
+   phương thức :meth:`__getattribute__` bên dưới để biết cách thực sự giành toàn quyền kiểm soát việc truy cập thuộc tính.
 
 
 .. method:: object.__getattribute__(self, name)
 
-   Called unconditionally to implement attribute accesses for instances of the
-   class. If the class also defines :meth:`__getattr__`, the latter will not be
-   called unless :meth:`__getattribute__` either calls it explicitly or raises an
-   :exc:`AttributeError`. This method should return the (computed) attribute value
-   or raise an :exc:`AttributeError` exception. In order to avoid infinite
-   recursion in this method, its implementation should always call the base class
-   method with the same name to access any attributes it needs, for example,
-   ``object.__getattribute__(self, name)``.
+   Được gọi vô điều kiện để triển khai việc truy cập thuộc tính cho các instance của class. Nếu class cũng định nghĩa :meth:`__getattr__`, phương thức sau sẽ không được gọi trừ khi :meth:`__getattribute__` hoặc gọi nó một cách tường minh, hoặc phát sinh một
+   :exc:`AttributeError`. Phương thức này nên trả về giá trị thuộc tính (đã được tính toán) hoặc phát sinh ngoại lệ :exc:`AttributeError`. Để tránh đệ quy vô hạn trong phương thức này, phần triển khai của nó phải luôn gọi phương thức cùng tên của base class để truy cập bất kỳ thuộc tính nào mà nó cần, ví dụ: ``object.__getattribute__(self, name)``.
 
    .. note::
 
-      This method may still be bypassed when looking up special methods as the
-      result of implicit invocation via language syntax or
-      :ref:`built-in functions <builtin-functions>`.
-      See :ref:`special-lookup`.
+      Phương thức này vẫn có thể bị bỏ qua khi tra cứu các special method do được gọi ngầm thông qua cú pháp ngôn ngữ hoặc
+      :ref:`các built-in function <builtin-functions>`. Xem :ref:`special-lookup`.
 
    .. audit-event:: object.__getattr__ obj,name object.__getattribute__
 
-      For certain sensitive attribute accesses, raises an
-      :ref:`auditing event <auditing>` ``object.__getattr__`` with arguments
-      ``obj`` and ``name``.
+      Đối với một số thao tác truy cập thuộc tính nhạy cảm, sẽ phát sinh một
+      Sự kiện kiểm tra :ref:`auditing event <auditing>` ``object.__getattr__`` với các đối số ``obj`` và ``name``.
 
 
 .. method:: object.__setattr__(self, name, value)
 
-   Called when an attribute assignment is attempted.  This is called instead of
-   the normal mechanism (i.e. store the value in the instance dictionary).
-   *name* is the attribute name, *value* is the value to be assigned to it.
+   Được gọi khi có thao tác gán thuộc tính được thực hiện. Phương thức này được gọi thay cho cơ chế thông thường (tức là lưu giá trị vào từ điển instance). *name* là tên thuộc tính, *value* là giá trị sẽ được gán cho thuộc tính đó.
 
-   If :meth:`__setattr__` wants to assign to an instance attribute, it should
-   call the base class method with the same name, for example,
-   ``object.__setattr__(self, name, value)``.
+   Nếu :meth:`__setattr__` muốn gán cho một thuộc tính instance, nó nên gọi phương thức của lớp cơ sở có cùng tên, ví dụ: ``object.__setattr__(self, name, value)``.
 
    .. audit-event:: object.__setattr__ obj,name,value object.__setattr__
 
-      For certain sensitive attribute assignments, raises an
-      :ref:`auditing event <auditing>` ``object.__setattr__`` with arguments
-      ``obj``, ``name``, ``value``.
+      Đối với một số thao tác gán thuộc tính nhạy cảm, phát sinh một
+      Sự kiện kiểm tra :ref:`auditing event <auditing>` ``object.__setattr__`` với các đối số ``obj``, ``name``, ``value``.
 
 
 .. method:: object.__delattr__(self, name)
 
-   Like :meth:`__setattr__` but for attribute deletion instead of assignment.  This
-   should only be implemented if ``del obj.name`` is meaningful for the object.
+   Tương tự :meth:`__setattr__` nhưng dành cho việc xóa thuộc tính thay vì gán. Chỉ nên triển khai phương thức này nếu ``del obj.name`` có ý nghĩa đối với đối tượng.
 
    .. audit-event:: object.__delattr__ obj,name object.__delattr__
 
-      For certain sensitive attribute deletions, raises an
-      :ref:`auditing event <auditing>` ``object.__delattr__`` with arguments
-      ``obj`` and ``name``.
+      Đối với một số thao tác xóa thuộc tính nhạy cảm, phát sinh một
+      :ref:`sự kiện auditing <auditing>` ``object.__delattr__`` với các đối số ``obj`` và ``name``.
 
 
 .. method:: object.__dir__(self)
 
-   Called when :func:`dir` is called on the object. An iterable must be
-   returned. :func:`dir` converts the returned iterable to a list and sorts it.
+   Được gọi khi :func:`dir` được gọi trên đối tượng. Phải trả về một iterable. :func:`dir` chuyển iterable được trả về thành một list và sắp xếp nó.
 
 
-Customizing module attribute access
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tùy chỉnh quyền truy cập thuộc tính của module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    single: __getattr__ (module attribute)
@@ -2419,24 +1718,14 @@ Customizing module attribute access
 .. method:: module.__getattr__
             module.__dir__
 
-Special names ``__getattr__`` and ``__dir__`` can be also used to customize
-access to module attributes. The ``__getattr__`` function at the module level
-should accept one argument which is the name of an attribute and return the
-computed value or raise an :exc:`AttributeError`. If an attribute is
-not found on a module object through the normal lookup, i.e.
-:meth:`object.__getattribute__`, then ``__getattr__`` is searched in
-the module ``__dict__`` before raising an :exc:`AttributeError`. If found,
-it is called with the attribute name and the result is returned.
+Các tên đặc biệt ``__getattr__`` và ``__dir__`` cũng có thể được dùng để tùy chỉnh quyền truy cập vào các thuộc tính của module. Hàm ``__getattr__`` ở cấp module phải nhận một đối số là tên của một thuộc tính, rồi trả về giá trị đã tính toán hoặc phát sinh :exc:`AttributeError`. Nếu không tìm thấy một thuộc tính trên đối tượng module bằng cách tra cứu thông thường, tức là
+:meth:`object.__getattribute__`, thì ``__getattr__`` được tìm trong ``__dict__`` của module trước khi phát sinh :exc:`AttributeError`. Nếu tìm thấy, nó được gọi với tên thuộc tính và kết quả được trả về.
 
-The ``__dir__`` function should accept no arguments, and return an iterable of
-strings that represents the names accessible on module. If present, this
-function overrides the standard :func:`dir` search on a module.
+Hàm ``__dir__`` không được nhận đối số nào và phải trả về một iterable các string biểu thị những tên có thể truy cập trên module. Nếu có mặt, hàm này ghi đè việc tìm kiếm :func:`dir` tiêu chuẩn trên một module.
 
 .. attribute:: module.__class__
 
-For a more fine grained customization of the module behavior (setting
-attributes, properties, etc.), one can set the ``__class__`` attribute of
-a module object to a subclass of :class:`types.ModuleType`. For example::
+Để tùy chỉnh chi tiết hơn hành vi của module (thiết lập thuộc tính, property, v.v.), có thể đặt thuộc tính ``__class__`` của một đối tượng module thành một subclass của :class:`types.ModuleType`. Ví dụ::
 
    import sys
    from types import ModuleType
@@ -2452,121 +1741,78 @@ a module object to a subclass of :class:`types.ModuleType`. For example::
    sys.modules[__name__].__class__ = VerboseModule
 
 .. note::
-   Defining module ``__getattr__`` and setting module ``__class__`` only
-   affect lookups made using the attribute access syntax -- directly accessing
-   the module globals (whether by code within the module, or via a reference
-   to the module's globals dictionary) is unaffected.
+   Việc định nghĩa mô-đun ``__getattr__`` và thiết lập mô-đun ``__class__`` chỉ ảnh hưởng đến các tra cứu được thực hiện bằng cú pháp truy cập thuộc tính -- việc truy cập trực tiếp các biến toàn cục của mô-đun (dù bằng mã bên trong mô-đun hay thông qua tham chiếu đến dictionary biến toàn cục của mô-đun) không bị ảnh hưởng.
 
 .. versionchanged:: 3.5
-   ``__class__`` module attribute is now writable.
+   Thuộc tính mô-đun ``__class__`` giờ đây có thể ghi được.
 
 .. versionadded:: 3.7
-   ``__getattr__`` and ``__dir__`` module attributes.
+   Các thuộc tính mô-đun ``__getattr__`` và ``__dir__``.
 
 .. seealso::
 
-   :pep:`562` - Module __getattr__ and __dir__
-      Describes the ``__getattr__`` and ``__dir__`` functions on modules.
+   :pep:`562` - Mô-đun __getattr__ và __dir__
+      Mô tả các hàm ``__getattr__`` và ``__dir__`` trên mô-đun.
 
 
 .. _descriptors:
 
-Implementing Descriptors
-^^^^^^^^^^^^^^^^^^^^^^^^
+Triển khai Descriptors
+^^^^^^^^^^^^^^^^^^^^^^
 
-The following methods only apply when an instance of the class containing the
-method (a so-called *descriptor* class) appears in an *owner* class (the
-descriptor must be in either the owner's class dictionary or in the class
-dictionary for one of its parents).  In the examples below, "the attribute"
-refers to the attribute whose name is the key of the property in the owner
-class' :attr:`~object.__dict__`.  The :class:`object` class itself does not
-implement any of these protocols.
+Các phương thức sau chỉ áp dụng khi một instance của lớp chứa phương thức (còn gọi là lớp *descriptor*) xuất hiện trong một lớp *owner* (descriptor phải nằm trong class dictionary của owner hoặc trong class dictionary của một trong các lớp cha của nó). Trong các ví dụ bên dưới, "thuộc tính" đề cập đến thuộc tính có tên là khóa của property trong :attr:`~object.__dict__` của lớp owner. Bản thân lớp :class:`object` không triển khai bất kỳ protocol nào trong số này.
 
 .. method:: object.__get__(self, instance, owner=None)
 
-   Called to get the attribute of the owner class (class attribute access) or
-   of an instance of that class (instance attribute access). The optional
-   *owner* argument is the owner class, while *instance* is the instance that
-   the attribute was accessed through, or ``None`` when the attribute is
-   accessed through the *owner*.
+   Được gọi để lấy thuộc tính của lớp sở hữu (truy cập thuộc tính lớp) hoặc của một instance của lớp đó (truy cập thuộc tính instance). Đối số tùy chọn *owner* là lớp sở hữu, còn *instance* là instance mà qua đó thuộc tính được truy cập, hoặc ``None`` khi thuộc tính được truy cập qua *owner*.
 
-   This method should return the computed attribute value or raise an
+   Phương thức này phải trả về giá trị thuộc tính đã được tính toán hoặc phát sinh một
    :exc:`AttributeError` exception.
 
-   :PEP:`252` specifies that :meth:`__get__` is callable with one or two
-   arguments.  Python's own built-in descriptors support this specification;
-   however, it is likely that some third-party tools have descriptors
-   that require both arguments.  Python's own :meth:`__getattribute__`
-   implementation always passes in both arguments whether they are required
-   or not.
+   :PEP:`252` chỉ định rằng :meth:`__get__` có thể gọi được với một hoặc hai đối số. Các descriptor dựng sẵn của chính Python hỗ trợ đặc tả này; tuy nhiên, có thể một số công cụ bên thứ ba có các descriptor yêu cầu cả hai đối số. Phần cài đặt :meth:`__getattribute__` của chính Python luôn truyền cả hai đối số, dù chúng có bắt buộc hay không.
 
 .. method:: object.__set__(self, instance, value)
 
-   Called to set the attribute on an instance *instance* of the owner class to a
-   new value, *value*.
+   Được gọi để đặt thuộc tính trên một instance *instance* của lớp sở hữu thành một giá trị mới, *value*.
 
-   Note, adding :meth:`__set__` or :meth:`__delete__` changes the kind of
-   descriptor to a "data descriptor".  See :ref:`descriptor-invocation` for
-   more details.
+   Lưu ý, việc thêm :meth:`__set__` hoặc :meth:`__delete__` sẽ thay đổi loại descriptor thành một "data descriptor". Xem :ref:`descriptor-invocation` để biết thêm chi tiết.
 
 .. method:: object.__delete__(self, instance)
 
-   Called to delete the attribute on an instance *instance* of the owner class.
+   Được gọi để xóa thuộc tính trên một instance *instance* của lớp sở hữu.
 
-Instances of descriptors may also have the :attr:`!__objclass__` attribute
-present:
+Các instance của descriptor cũng có thể có thuộc tính :attr:`!__objclass__`:
 
 .. attribute:: object.__objclass__
 
-   The attribute :attr:`!__objclass__` is interpreted by the :mod:`inspect` module
-   as specifying the class where this object was defined (setting this
-   appropriately can assist in runtime introspection of dynamic class attributes).
-   For callables, it may indicate that an instance of the given type (or a
-   subclass) is expected or required as the first positional argument (for example,
-   CPython sets this attribute for unbound methods that are implemented in C).
+   Module :mod:`inspect` diễn giải thuộc tính :attr:`!__objclass__` là chỉ định lớp nơi đối tượng này được định nghĩa (thiết lập thuộc tính này phù hợp có thể hỗ trợ introspection tại runtime đối với các thuộc tính lớp động). Đối với callable, thuộc tính này có thể cho biết một instance của kiểu đã cho (hoặc một lớp con) được mong đợi hoặc bắt buộc làm đối số vị trí đầu tiên (ví dụ, CPython đặt thuộc tính này cho các unbound method được triển khai bằng C).
 
 
 .. _descriptor-invocation:
 
-Invoking Descriptors
-^^^^^^^^^^^^^^^^^^^^
+Gọi Descriptor
+^^^^^^^^^^^^^^
 
-In general, a descriptor is an object attribute with "binding behavior", one
-whose attribute access has been overridden by methods in the descriptor
-protocol:  :meth:`~object.__get__`, :meth:`~object.__set__`, and
-:meth:`~object.__delete__`. If any of
-those methods are defined for an object, it is said to be a descriptor.
+Nói chung, descriptor là một thuộc tính đối tượng có "hành vi liên kết", tức là thuộc tính có việc truy cập đã bị ghi đè bởi các phương thức trong descriptor protocol: :meth:`~object.__get__`, :meth:`~object.__set__`, và
+:meth:`~object.__delete__`. Nếu bất kỳ phương thức nào trong số đó được định nghĩa cho một đối tượng, đối tượng đó được gọi là descriptor.
 
-The default behavior for attribute access is to get, set, or delete the
-attribute from an object's dictionary. For instance, ``a.x`` has a lookup chain
-starting with ``a.__dict__['x']``, then ``type(a).__dict__['x']``, and
-continuing through the base classes of ``type(a)`` excluding metaclasses.
+Hành vi mặc định khi truy cập thuộc tính là lấy, thiết lập hoặc xóa thuộc tính khỏi dictionary của một đối tượng. Ví dụ, ``a.x`` có chuỗi tra cứu bắt đầu với ``a.__dict__['x']``, sau đó là ``type(a).__dict__['x']``, và tiếp tục qua các lớp cơ sở của ``type(a)``, không bao gồm metaclass.
 
-However, if the looked-up value is an object defining one of the descriptor
-methods, then Python may override the default behavior and invoke the descriptor
-method instead.  Where this occurs in the precedence chain depends on which
-descriptor methods were defined and how they were called.
+Tuy nhiên, nếu giá trị được tra cứu là một đối tượng định nghĩa một trong các phương thức descriptor, Python có thể ghi đè hành vi mặc định và thay vào đó gọi phương thức descriptor. Vị trí xảy ra điều này trong chuỗi ưu tiên phụ thuộc vào các phương thức descriptor nào đã được định nghĩa và cách chúng được gọi.
 
-The starting point for descriptor invocation is a binding, ``a.x``. How the
-arguments are assembled depends on ``a``:
+Điểm khởi đầu để gọi descriptor là một binding, ``a.x``. Cách các đối số được tập hợp phụ thuộc vào ``a``:
 
-Direct Call
-   The simplest and least common call is when user code directly invokes a
-   descriptor method:    ``x.__get__(a)``.
+Lời gọi trực tiếp
+   Lời gọi đơn giản nhất và ít gặp nhất là khi mã người dùng trực tiếp gọi một phương thức descriptor: ``x.__get__(a)``.
 
-Instance Binding
-   If binding to an object instance, ``a.x`` is transformed into the call:
-   ``type(a).__dict__['x'].__get__(a, type(a))``.
+Binding với instance
+   Nếu binding với một object instance, ``a.x`` được chuyển thành lời gọi: ``type(a).__dict__['x'].__get__(a, type(a))``.
 
-Class Binding
-   If binding to a class, ``A.x`` is transformed into the call:
-   ``A.__dict__['x'].__get__(None, A)``.
+Binding với class
+   Nếu binding với một class, ``A.x`` được chuyển thành lời gọi: ``A.__dict__['x'].__get__(None, A)``.
 
-Super Binding
-   A dotted lookup such as ``super(A, a).x`` searches
-   ``a.__class__.__mro__`` for a base class ``B`` following ``A`` and then
-   returns ``B.__dict__['x'].__get__(a, A)``.  If not a descriptor, ``x`` is
-   returned unchanged.
+Liên kết Super
+   Một phép tra cứu có dấu chấm như ``super(A, a).x`` sẽ tìm kiếm ``a.__class__.__mro__`` để lấy một lớp cơ sở ``B`` theo sau ``A``, rồi trả về ``B.__dict__['x'].__get__(a, A)``. Nếu không phải là descriptor, ``x`` sẽ được trả về không thay đổi.
 
 .. testcode::
     :hide:
@@ -2600,29 +1846,14 @@ Super Binding
     >>> a.m()
     True
 
-For instance bindings, the precedence of descriptor invocation depends on
-which descriptor methods are defined.  A descriptor can define any combination
-of :meth:`~object.__get__`, :meth:`~object.__set__` and
-:meth:`~object.__delete__`.  If it does not
-define :meth:`!__get__`, then accessing the attribute will return the descriptor
-object itself unless there is a value in the object's instance dictionary.  If
-the descriptor defines :meth:`!__set__` and/or :meth:`!__delete__`, it is a data
-descriptor; if it defines neither, it is a non-data descriptor.  Normally, data
-descriptors define both :meth:`!__get__` and :meth:`!__set__`, while non-data
-descriptors have just the :meth:`!__get__` method.  Data descriptors with
-:meth:`!__get__` and :meth:`!__set__` (and/or :meth:`!__delete__`) defined
-always override a redefinition in an
-instance dictionary.  In contrast, non-data descriptors can be overridden by
-instances.
+Đối với các liên kết instance, thứ tự ưu tiên khi gọi descriptor phụ thuộc vào những phương thức descriptor nào được định nghĩa. Một descriptor có thể định nghĩa bất kỳ tổ hợp nào của :meth:`~object.__get__`, :meth:`~object.__set__` và
+:meth:`~object.__delete__`. Nếu nó không định nghĩa :meth:`!__get__`, thì việc truy cập attribute sẽ trả về chính đối tượng descriptor, trừ khi có một giá trị trong instance dictionary của đối tượng. Nếu descriptor định nghĩa :meth:`!__set__` và/hoặc :meth:`!__delete__`, đó là data descriptor; nếu không định nghĩa cả hai, đó là non-data descriptor. Thông thường, data descriptor định nghĩa cả :meth:`!__get__` và :meth:`!__set__`, trong khi non-data descriptor chỉ có phương thức :meth:`!__get__`. Data descriptor có
+:meth:`!__get__` và :meth:`!__set__` (và/hoặc :meth:`!__delete__`) được định nghĩa luôn ghi đè một định nghĩa lại trong instance dictionary. Ngược lại, non-data descriptor có thể bị các instance ghi đè.
 
-Python methods (including those decorated with
-:deco:`staticmethod` and :deco:`classmethod`) are
-implemented as non-data descriptors.  Accordingly, instances can redefine and
-override methods.  This allows individual instances to acquire behaviors that
-differ from other instances of the same class.
+Các phương thức Python (bao gồm cả những phương thức được trang trí bằng
+:deco:`staticmethod` và :deco:`classmethod`) được triển khai dưới dạng non-data descriptor. Do đó, các instance có thể định nghĩa lại và ghi đè phương thức. Điều này cho phép từng instance có được hành vi khác với các instance khác của cùng một lớp.
 
-The :deco:`property` decorator is implemented as a data descriptor. Accordingly,
-instances cannot override the behavior of a property.
+Decorator :deco:`property` được triển khai dưới dạng một data descriptor. Do đó, các instance không thể ghi đè hành vi của một property.
 
 
 .. _slots:
@@ -2630,109 +1861,62 @@ instances cannot override the behavior of a property.
 __slots__
 ^^^^^^^^^
 
-*__slots__* allow us to explicitly declare data members (like
-properties) and deny the creation of :attr:`~object.__dict__` and *__weakref__*
-(unless explicitly declared in *__slots__* or available in a parent.)
+*__slots__* cho phép chúng ta khai báo tường minh các data member (như property) và ngăn việc tạo :attr:`~object.__dict__` cùng *__weakref__* (trừ khi được khai báo tường minh trong *__slots__* hoặc có sẵn trong lớp cha).
 
-The space saved over using :attr:`~object.__dict__` can be significant.
-Attribute lookup speed can be significantly improved as well.
+Không gian tiết kiệm được so với việc dùng :attr:`~object.__dict__` có thể đáng kể. Tốc độ tra cứu attribute cũng có thể được cải thiện đáng kể.
 
 .. data:: object.__slots__
 
-   This class variable can be assigned a string, iterable, or sequence of
-   strings with variable names used by instances.  *__slots__* reserves space
-   for the declared variables and prevents the automatic creation of
-   :attr:`~object.__dict__`
-   and *__weakref__* for each instance.
+   Biến lớp này có thể được gán một string, iterable hoặc sequence các string chứa tên biến được các instance sử dụng. *__slots__* dành sẵn không gian cho các biến đã khai báo và ngăn việc tự động tạo
+   :attr:`~object.__dict__` và *__weakref__* cho mỗi instance.
 
 
 .. _datamodel-note-slots:
 
-Notes on using *__slots__*:
+Lưu ý khi sử dụng *__slots__*:
 
-* When inheriting from a class without *__slots__*, the
-  :attr:`~object.__dict__` and
-  *__weakref__* attribute of the instances will always be accessible.
+* Khi kế thừa từ một lớp không có *__slots__*, thì
+  thuộc tính :attr:`~object.__dict__` và *__weakref__* của các instance sẽ luôn có thể truy cập được.
 
-* Without a :attr:`~object.__dict__` variable, instances cannot be assigned new
-  variables not
-  listed in the *__slots__* definition.  Attempts to assign to an unlisted
-  variable name raises :exc:`AttributeError`. If dynamic assignment of new
-  variables is desired, then add ``'__dict__'`` to the sequence of strings in
-  the *__slots__* declaration.
+* Nếu không có biến :attr:`~object.__dict__`, các instance không thể được gán các biến mới không được liệt kê trong định nghĩa *__slots__*. Các nỗ lực gán cho một tên biến không được liệt kê sẽ phát sinh :exc:`AttributeError`. Nếu muốn cho phép gán động các biến mới, hãy thêm ``'__dict__'`` vào chuỗi các string trong khai báo *__slots__*.
 
-* Without a *__weakref__* variable for each instance, classes defining
-  *__slots__* do not support :mod:`weak references <weakref>` to its instances.
-  If weak reference
-  support is needed, then add ``'__weakref__'`` to the sequence of strings in the
-  *__slots__* declaration.
+* Nếu không có biến *__weakref__* cho mỗi instance, các lớp định nghĩa *__slots__* không hỗ trợ :mod:`weak references <weakref>` đến các instance của chúng. Nếu cần hỗ trợ weak reference, hãy thêm ``'__weakref__'`` vào chuỗi các string trong khai báo *__slots__*.
 
-* *__slots__* are implemented at the class level by creating :ref:`descriptors <descriptors>`
-  for each variable name.  As a result, class attributes
-  cannot be used to set default values for instance variables defined by
-  *__slots__*; otherwise, the class attribute would overwrite the descriptor
-  assignment.
+* *__slots__* được triển khai ở cấp lớp bằng cách tạo các :ref:`descriptors <descriptors>` cho mỗi tên biến. Do đó, không thể dùng các thuộc tính lớp để đặt giá trị mặc định cho các biến instance được xác định bởi *__slots__*; nếu không, thuộc tính lớp sẽ ghi đè việc gán descriptor.
 
-* The action of a *__slots__* declaration is not limited to the class
-  where it is defined.  *__slots__* declared in parents are available in
-  child classes. However, instances of a child subclass will get a
-  :attr:`~object.__dict__` and *__weakref__* unless the subclass also defines
-  *__slots__* (which should only contain names of any *additional* slots).
+* Tác dụng của một khai báo *__slots__* không chỉ giới hạn ở lớp nơi nó được định nghĩa. *__slots__* được khai báo trong các lớp cha sẽ khả dụng trong các lớp con. Tuy nhiên, các instance của một lớp con sẽ nhận được một
+  :attr:`~object.__dict__` và *__weakref__* trừ khi lớp con cũng định nghĩa *__slots__* (chỉ nên chứa tên của các slot *bổ sung*).
 
-* If a class defines a slot also defined in a base class, the instance variable
-  defined by the base class slot is inaccessible (except by retrieving its
-  descriptor directly from the base class). This renders the meaning of the
-  program undefined.  In the future, a check may be added to prevent this.
+* Nếu một lớp định nghĩa một slot cũng đã được định nghĩa trong lớp cơ sở, biến thực thể do slot của lớp cơ sở định nghĩa sẽ không thể truy cập được (trừ khi truy xuất descriptor của nó trực tiếp từ lớp cơ sở). Điều này khiến ý nghĩa của chương trình trở nên không xác định. Trong tương lai, có thể sẽ bổ sung một kiểm tra để ngăn điều này.
 
-* :exc:`TypeError` will be raised if nonempty *__slots__* are defined for a
-  class derived from a
-  :c:member:`"variable-length" built-in type <PyTypeObject.tp_itemsize>` such as
-  :class:`int`, :class:`bytes`, and :class:`tuple`.
+* :exc:`TypeError` sẽ được raise nếu các *__slots__* không rỗng được định nghĩa cho một lớp kế thừa từ một
+  kiểu dựng sẵn "variable-length" :c:member:`như <PyTypeObject.tp_itemsize>`
+  :class:`int`, :class:`bytes` và :class:`tuple`.
 
-* Any non-string :term:`iterable` may be assigned to *__slots__*.
+* Có thể gán bất kỳ :term:`iterable` không phải chuỗi nào cho *__slots__*.
 
-* If a :class:`dictionary <dict>` is used to assign *__slots__*, the dictionary
-  keys will be used as the slot names. The values of the dictionary can be used
-  to provide per-attribute docstrings that will be recognised by
-  :func:`inspect.getdoc` and displayed in the output of :func:`help`.
+* Nếu dùng một :class:`dictionary <dict>` để gán *__slots__*, các khóa của dictionary sẽ được dùng làm tên slot. Các giá trị của dictionary có thể được dùng để cung cấp docstring cho từng thuộc tính; các docstring này sẽ được nhận diện bởi
+  :func:`inspect.getdoc` và hiển thị trong đầu ra của :func:`help`.
 
-* :attr:`~object.__class__` assignment works only if both classes have the
-  same *__slots__*.
+* Việc gán :attr:`~object.__class__` chỉ hoạt động nếu cả hai lớp có cùng *__slots__*.
 
-* :ref:`Multiple inheritance <tut-multiple>` with multiple slotted parent
-  classes can be used,
-  but only one parent is allowed to have attributes created by slots
-  (the other bases must have empty slot layouts) - violations raise
+* :ref:`Đa kế thừa <tut-multiple>` với nhiều lớp cha có slot có thể được sử dụng, nhưng chỉ một lớp cha được phép có các thuộc tính được tạo bởi slot (các lớp cơ sở khác phải có bố cục slot rỗng) - các trường hợp vi phạm sẽ phát sinh
   :exc:`TypeError`.
 
-* If an :term:`iterator` is used for *__slots__* then a :term:`descriptor` is
-  created for each
-  of the iterator's values. However, the *__slots__* attribute will be an empty
-  iterator.
+* Nếu một :term:`iterator` được dùng cho *__slots__* thì một :term:`descriptor` được tạo cho mỗi giá trị của iterator. Tuy nhiên, thuộc tính *__slots__* sẽ là một iterator rỗng.
 
 .. _class-customization:
 
-Customizing class creation
---------------------------
+Tùy chỉnh việc tạo lớp
+----------------------
 
-Whenever a class inherits from another class, :meth:`~object.__init_subclass__` is
-called on the parent class. This way, it is possible to write classes which
-change the behavior of subclasses. This is closely related to class
-decorators, but where class decorators only affect the specific class they're
-applied to, ``__init_subclass__`` solely applies to future subclasses of the
-class defining the method.
+Bất cứ khi nào một lớp kế thừa từ lớp khác, :meth:`~object.__init_subclass__` sẽ được gọi trên lớp cha. Bằng cách này, có thể viết các lớp thay đổi hành vi của các lớp con. Điều này có liên hệ chặt chẽ với class decorator, nhưng trong khi class decorator chỉ ảnh hưởng đến lớp cụ thể mà chúng được áp dụng, ``__init_subclass__`` chỉ áp dụng cho các lớp con được tạo sau này của lớp định nghĩa phương thức đó.
 
 .. classmethod:: object.__init_subclass__(cls)
 
-   This method is called whenever the containing class is subclassed.
-   *cls* is then the new subclass. If defined as a normal instance method,
-   this method is implicitly converted to a class method.
+   Phương thức này được gọi bất cứ khi nào lớp chứa nó được tạo lớp con. Khi đó, *cls* là lớp con mới. Nếu được định nghĩa như một phương thức instance thông thường, phương thức này sẽ được ngầm chuyển thành một class method.
 
-   Keyword arguments which are given to a new class are passed to
-   the parent class's ``__init_subclass__``. For compatibility with
-   other classes using ``__init_subclass__``, one should take out the
-   needed keyword arguments and pass the others over to the base
-   class, as in::
+   Các đối số từ khóa được cung cấp cho một lớp mới sẽ được truyền đến ``__init_subclass__`` của lớp cha. Để tương thích với các lớp khác sử dụng ``__init_subclass__``, cần lấy ra các đối số từ khóa cần thiết và փոխանց các đối số còn lại cho lớp cơ sở, như trong::
 
        class Philosopher:
            def __init_subclass__(cls, /, default_name, **kwargs):
@@ -2742,64 +1926,52 @@ class defining the method.
        class AustralianPhilosopher(Philosopher, default_name="Bruce"):
            pass
 
-   The default implementation ``object.__init_subclass__`` does
-   nothing, but raises an error if it is called with any arguments.
+   Triển khai mặc định ``object.__init_subclass__`` không làm gì cả, nhưng sẽ phát sinh lỗi nếu được gọi với bất kỳ đối số nào.
 
    .. note::
 
-      The metaclass hint ``metaclass`` is consumed by the rest of the type
-      machinery, and is never passed to ``__init_subclass__`` implementations.
-      The actual metaclass (rather than the explicit hint) can be accessed as
-      ``type(cls)``.
+      Gợi ý metaclass ``metaclass`` được phần còn lại của cơ chế type xử lý và không bao giờ được truyền đến các triển khai ``__init_subclass__``. Có thể truy cập metaclass thực tế (thay vì gợi ý tường minh) bằng ``type(cls)``.
 
    .. versionadded:: 3.6
 
 
-When a class is created, :meth:`!type.__new__` scans the class variables
-and makes callbacks to those with a :meth:`~object.__set_name__` hook.
+Khi một lớp được tạo, :meth:`!type.__new__` quét các biến của lớp và gọi callback đến những biến có hook :meth:`~object.__set_name__`.
 
 .. method:: object.__set_name__(self, owner, name)
 
-   Automatically called at the time the owning class *owner* is
-   created. The object has been assigned to *name* in that class::
+   Được tự động gọi khi lớp sở hữu *owner* được tạo. Đối tượng đã được gán cho *name* trong lớp đó.::
 
        class A:
-           x = C()  # Automatically calls: x.__set_name__(A, 'x')
+           x = C()  # Tự động gọi: x.__set_name__(A, 'x')
 
-   If the class variable is assigned after the class is created,
-   :meth:`__set_name__` will not be called automatically.
-   If needed, :meth:`__set_name__` can be called directly::
+   Nếu biến lớp được gán sau khi lớp được tạo,
+   :meth:`__set_name__` sẽ không được gọi tự động. Nếu cần, có thể gọi trực tiếp :meth:`__set_name__`::
 
        class A:
           pass
 
        c = C()
-       A.x = c                  # The hook is not called
-       c.__set_name__(A, 'x')   # Manually invoke the hook
+       A.x = c                  # Hook không được gọi
+       c.__set_name__(A, 'x')   # Gọi hook theo cách thủ công
 
-   See :ref:`class-object-creation` for more details.
+   Xem :ref:`class-object-creation` để biết thêm chi tiết.
 
    .. versionadded:: 3.6
 
 
 .. _metaclasses:
 
-Metaclasses
-^^^^^^^^^^^
+Metaclass
+^^^^^^^^^
 
 .. index::
    single: metaclass
    pair: built-in function; type
    single: = (equals); class definition
 
-By default, classes are constructed using :func:`type`. The class body is
-executed in a new namespace and the class name is bound locally to the
-result of ``type(name, bases, namespace)``.
+Theo mặc định, các lớp được tạo bằng :func:`type`. Phần thân lớp được thực thi trong một namespace mới và tên lớp được liên kết cục bộ với kết quả của ``type(name, bases, namespace)``.
 
-The class creation process can be customized by passing the ``metaclass``
-keyword argument in the class definition line, or by inheriting from an
-existing class that included such an argument. In the following example,
-both ``MyClass`` and ``MySubclass`` are instances of ``Meta``::
+Có thể tùy chỉnh quá trình tạo lớp bằng cách truyền đối số từ khóa ``metaclass`` trong dòng định nghĩa lớp, hoặc bằng cách kế thừa từ một lớp hiện có đã bao gồm đối số này. Trong ví dụ sau, cả ``MyClass`` và ``MySubclass`` đều là các instance của ``Meta``::
 
    class Meta(type):
        pass
@@ -2810,284 +1982,198 @@ both ``MyClass`` and ``MySubclass`` are instances of ``Meta``::
    class MySubclass(MyClass):
        pass
 
-Any other keyword arguments that are specified in the class definition are
-passed through to all metaclass operations described below.
+Mọi đối số từ khóa khác được chỉ định trong định nghĩa lớp sẽ được chuyển tiếp đến tất cả các thao tác metaclass được mô tả bên dưới.
 
-When a class definition is executed, the following steps occur:
+Khi một định nghĩa lớp được thực thi, các bước sau sẽ diễn ra:
 
-* MRO entries are resolved;
-* the appropriate metaclass is determined;
-* the class namespace is prepared;
-* the class body is executed;
-* the class object is created.
+* Các mục nhập MRO được phân giải;
+* metaclass phù hợp được xác định;
+* namespace của lớp được chuẩn bị;
+* phần thân lớp được thực thi;
+* đối tượng lớp được tạo.
 
 
-Resolving MRO entries
-^^^^^^^^^^^^^^^^^^^^^
+Phân giải các mục nhập MRO
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: object.__mro_entries__(self, bases)
 
-   If a base that appears in a class definition is not an instance of
-   :class:`type`, then an :meth:`!__mro_entries__` method is searched on the base.
-   If an :meth:`!__mro_entries__` method is found, the base is substituted with the
-   result of a call to :meth:`!__mro_entries__` when creating the class.
-   The method is called with the original bases tuple
-   passed to the *bases* parameter, and must return a tuple
-   of classes that will be used instead of the base. The returned tuple may be
-   empty: in these cases, the original base is ignored.
+   Nếu một base xuất hiện trong định nghĩa lớp không phải là một instance của
+   :class:`type`, thì một phương thức :meth:`!__mro_entries__` sẽ được tìm kiếm trên base đó. Nếu tìm thấy phương thức :meth:`!__mro_entries__`, base sẽ được thay thế bằng kết quả của lời gọi đến :meth:`!__mro_entries__` khi tạo lớp. Phương thức được gọi với tuple các base gốc được truyền vào tham số *bases*, và phải trả về một tuple các lớp sẽ được sử dụng thay cho base đó. Tuple trả về có thể rỗng: trong những trường hợp này, base gốc sẽ bị bỏ qua.
 
 .. seealso::
 
    :func:`types.resolve_bases`
-      Dynamically resolve bases that are not instances of :class:`type`.
+      Phân giải động các base không phải là instance của :class:`type`.
 
    :func:`types.get_original_bases`
-      Retrieve a class's "original bases" prior to modifications by
+      Truy xuất "các base gốc" của một lớp trước các sửa đổi bởi
       :meth:`~object.__mro_entries__`.
 
    :pep:`560`
-      Core support for typing module and generic types.
+      Hỗ trợ cốt lõi cho module typing và các kiểu generic.
 
 
-Determining the appropriate metaclass
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Xác định metaclass phù hợp
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. index::
     single: metaclass hint
 
-The appropriate metaclass for a class definition is determined as follows:
+Metaclass phù hợp cho một định nghĩa lớp được xác định như sau:
 
-* if no bases and no explicit metaclass are given, then :func:`type` is used;
-* if an explicit metaclass is given and it is *not* an instance of
-  :func:`type`, then it is used directly as the metaclass;
-* if an instance of :func:`type` is given as the explicit metaclass, or
-  bases are defined, then the most derived metaclass is used.
+* nếu không có lớp cơ sở và không có metaclass tường minh nào được cung cấp, thì :func:`type` sẽ được dùng;
+* nếu một metaclass tường minh được cung cấp và nó *không* phải là một instance của
+  :func:`type`, thì nó được dùng trực tiếp làm metaclass;
+* nếu một instance của :func:`type` được cung cấp làm metaclass tường minh, hoặc các lớp cơ sở được định nghĩa, thì metaclass dẫn xuất nhất sẽ được dùng.
 
-The most derived metaclass is selected from the explicitly specified
-metaclass (if any) and the metaclasses (i.e. ``type(cls)``) of all specified
-base classes. The most derived metaclass is one which is a subtype of *all*
-of these candidate metaclasses. If none of the candidate metaclasses meets
-that criterion, then the class definition will fail with ``TypeError``.
+Metaclass dẫn xuất nhất được chọn từ metaclass được chỉ định tường minh (nếu có) và các metaclass (tức là ``type(cls)``) của tất cả các lớp cơ sở được chỉ định. Metaclass dẫn xuất nhất là metaclass là một subtype của *tất cả* các metaclass ứng viên này. Nếu không có metaclass ứng viên nào đáp ứng tiêu chí đó, thì định nghĩa lớp sẽ thất bại với ``TypeError``.
 
 
 .. _prepare:
 
-Preparing the class namespace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Chuẩn bị namespace của lớp
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
     single: __prepare__ (metaclass method)
 
-Once the appropriate metaclass has been identified, then the class namespace
-is prepared. If the metaclass has a ``__prepare__`` attribute, it is called
-as ``namespace = metaclass.__prepare__(name, bases, **kwds)`` (where the
-additional keyword arguments, if any, come from the class definition). The
-``__prepare__`` method should be implemented as a
-:func:`classmethod <classmethod>`. The
-namespace returned by ``__prepare__`` is passed in to ``__new__``, but when
-the final class object is created the namespace is copied into a new ``dict``.
+Sau khi metaclass phù hợp đã được xác định, namespace của lớp sẽ được chuẩn bị. Nếu metaclass có một thuộc tính ``__prepare__``, thuộc tính đó được gọi dưới dạng ``namespace = metaclass.__prepare__(name, bases, **kwds)`` (trong đó các đối số keyword bổ sung, nếu có, đến từ định nghĩa lớp). Phương thức ``__prepare__`` nên được triển khai như một
+:func:`classmethod <classmethod>`. Không gian tên do ``__prepare__`` trả về được truyền vào ``__new__``, nhưng khi đối tượng lớp cuối cùng được tạo, không gian tên sẽ được sao chép vào một ``dict`` mới.
 
-If the metaclass has no ``__prepare__`` attribute, then the class namespace
-is initialised as an empty ordered mapping.
+Nếu metaclass không có thuộc tính ``__prepare__``, thì không gian tên của lớp được khởi tạo dưới dạng một ánh xạ có thứ tự rỗng.
 
 .. seealso::
 
-   :pep:`3115` - Metaclasses in Python 3000
-      Introduced the ``__prepare__`` namespace hook
+   :pep:`3115` - Metaclass trong Python 3000
+      Đã giới thiệu hook không gian tên ``__prepare__``
 
 
-Executing the class body
-^^^^^^^^^^^^^^^^^^^^^^^^
+Thực thi phần thân lớp
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
     single: class; body
 
-The class body is executed (approximately) as
-``exec(body, globals(), namespace)``. The key difference from a normal
-call to :func:`exec` is that lexical scoping allows the class body (including
-any methods) to reference names from the current and outer scopes when the
-class definition occurs inside a function.
+Phần thân lớp được thực thi (xấp xỉ) dưới dạng ``exec(body, globals(), namespace)``. Điểm khác biệt chính so với một lệnh gọi thông thường đến :func:`exec` là phạm vi từ vựng cho phép phần thân lớp (bao gồm mọi method) tham chiếu các tên từ phạm vi hiện tại và các phạm vi bên ngoài khi định nghĩa lớp xuất hiện bên trong một function.
 
-However, even when the class definition occurs inside the function, methods
-defined inside the class still cannot see names defined at the class scope.
-Class variables must be accessed through the first parameter of instance or
-class methods, or through the implicit lexically scoped ``__class__`` reference
-described in the next section.
+Tuy nhiên, ngay cả khi định nghĩa lớp xuất hiện bên trong function, các method được định nghĩa bên trong lớp vẫn không thể thấy các tên được định nghĩa ở phạm vi lớp. Các biến lớp phải được truy cập thông qua tham số đầu tiên của các instance method hoặc class method, hoặc thông qua tham chiếu ``__class__`` có phạm vi từ vựng ngầm định được mô tả trong phần tiếp theo.
 
 .. _class-object-creation:
 
-Creating the class object
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Tạo đối tượng lớp
+^^^^^^^^^^^^^^^^^
 
 .. index::
     single: __class__ (method cell)
     single: __classcell__ (class namespace entry)
 
 
-Once the class namespace has been populated by executing the class body,
-the class object is created by calling
-``metaclass(name, bases, namespace, **kwds)`` (the additional keywords
-passed here are the same as those passed to ``__prepare__``).
+Sau khi namespace của lớp đã được điền đầy bằng cách thực thi thân lớp, đối tượng lớp được tạo bằng cách gọi ``metaclass(name, bases, namespace, **kwds)`` (các từ khóa bổ sung được truyền ở đây cũng giống như các từ khóa được truyền cho ``__prepare__``).
 
-This class object is the one that will be referenced by the zero-argument
-form of :func:`super`. ``__class__`` is an implicit closure reference
-created by the compiler if any methods in a class body refer to either
-``__class__`` or ``super``. This allows the zero argument form of
-:func:`super` to correctly identify the class being defined based on
-lexical scoping, while the class or instance that was used to make the
-current call is identified based on the first argument passed to the method.
+Đối tượng lớp này sẽ được tham chiếu bởi dạng không đối số của :func:`super`. ``__class__`` là một tham chiếu closure ngầm được compiler tạo ra nếu bất kỳ phương thức nào trong thân lớp tham chiếu đến ``__class__`` hoặc ``super``. Điều này cho phép dạng không đối số của
+:func:`super` xác định chính xác lớp đang được định nghĩa dựa trên lexical scoping, trong khi lớp hoặc instance được dùng để thực hiện lời gọi hiện tại được xác định dựa trên đối số đầu tiên truyền vào phương thức.
 
 .. impl-detail::
 
-   In CPython 3.6 and later, the ``__class__`` cell is passed to the metaclass
-   as a ``__classcell__`` entry in the class namespace. If present, this must
-   be propagated up to the ``type.__new__`` call in order for the class to be
-   initialised correctly.
-   Failing to do so will result in a :exc:`RuntimeError` in Python 3.8.
+   Trong CPython 3.6 trở lên, ô ``__class__`` được truyền đến metaclass dưới dạng một mục ``__classcell__`` trong namespace của lớp. Nếu có mặt, nó phải được truyền tiếp đến lời gọi ``type.__new__`` để lớp được khởi tạo đúng cách. Nếu không làm vậy sẽ dẫn đến :exc:`RuntimeError` trong Python 3.8.
 
-When using the default metaclass :class:`type`, or any metaclass that ultimately
-calls ``type.__new__``, the following additional customization steps are
-invoked after creating the class object:
+Khi sử dụng metaclass mặc định :class:`type`, hoặc bất kỳ metaclass nào cuối cùng gọi ``type.__new__``, các bước tùy biến bổ sung sau đây sẽ được gọi sau khi tạo đối tượng lớp:
 
-1) The ``type.__new__`` method collects all of the attributes in the class
-   namespace that define a :meth:`~object.__set_name__` method;
-2) Those ``__set_name__`` methods are called with the class
-   being defined and the assigned name of that particular attribute;
-3) The :meth:`~object.__init_subclass__` hook is called on the
-   immediate parent of the new class in its method resolution order.
+1) Phương thức ``type.__new__`` thu thập mọi thuộc tính trong namespace của lớp có định nghĩa một phương thức :meth:`~object.__set_name__`;
+2) Các phương thức ``__set_name__`` đó được gọi với lớp đang được định nghĩa và tên đã gán của thuộc tính cụ thể đó;
+3) hook :meth:`~object.__init_subclass__` được gọi trên lớp cha trực tiếp của lớp mới trong thứ tự phân giải phương thức của nó.
 
-After the class object is created, it is passed to the class decorators
-included in the class definition (if any) and the resulting object is bound
-in the local namespace as the defined class.
+Sau khi đối tượng lớp được tạo, nó được truyền cho các class decorator có trong định nghĩa lớp (nếu có), và đối tượng kết quả được liên kết trong namespace cục bộ dưới dạng lớp đã định nghĩa.
 
-When a new class is created by ``type.__new__``, the object provided as the
-namespace parameter is copied to a new ordered mapping and the original
-object is discarded. The new copy is wrapped in a read-only proxy, which
-becomes the :attr:`~type.__dict__` attribute of the class object.
+Khi một lớp mới được tạo bởi ``type.__new__``, đối tượng được cung cấp làm tham số namespace sẽ được sao chép vào một mapping có thứ tự mới và đối tượng gốc bị loại bỏ. Bản sao mới được bọc trong một proxy chỉ đọc, rồi trở thành thuộc tính :attr:`~type.__dict__` của đối tượng lớp.
 
 .. seealso::
 
-   :pep:`3135` - New super
-      Describes the implicit ``__class__`` closure reference
+   :pep:`3135` - super mới
+      Mô tả tham chiếu closure ``__class__`` ngầm định
 
 
-Uses for metaclasses
-^^^^^^^^^^^^^^^^^^^^
+Các cách sử dụng metaclass
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The potential uses for metaclasses are boundless. Some ideas that have been
-explored include enum, logging, interface checking, automatic delegation,
-automatic property creation, proxies, frameworks, and automatic resource
-locking/synchronization.
+Các ứng dụng tiềm năng của metaclass là vô hạn. Một số ý tưởng đã được khám phá gồm enum, logging, kiểm tra interface, delegation tự động, tạo property tự động, proxy, framework, và khóa/đồng bộ hóa tài nguyên tự động.
 
 
-Customizing instance and subclass checks
-----------------------------------------
+Tùy chỉnh việc kiểm tra instance và subclass
+--------------------------------------------
 
-The following methods are used to override the default behavior of the
-:func:`isinstance` and :func:`issubclass` built-in functions.
+Các phương thức sau được dùng để ghi đè hành vi mặc định của các
+hàm dựng sẵn :func:`isinstance` và :func:`issubclass`.
 
-In particular, the metaclass :class:`abc.ABCMeta` implements these methods in
-order to allow the addition of Abstract Base Classes (ABCs) as "virtual base
-classes" to any class or type (including built-in types), including other
-ABCs.
+Cụ thể, metaclass :class:`abc.ABCMeta` triển khai các phương thức này để cho phép bổ sung các Abstract Base Class (ABC) dưới dạng "lớp cơ sở ảo" vào bất kỳ class hoặc type nào (kể cả các type dựng sẵn), bao gồm cả các ABC khác.
 
 .. method:: type.__instancecheck__(self, instance)
 
-   Return true if *instance* should be considered a (direct or indirect)
-   instance of *class*. If defined, called to implement ``isinstance(instance,
-   class)``.
+   Trả về true nếu *instance* nên được xem là instance (trực tiếp hoặc gián tiếp) của *class*. Nếu được định nghĩa, được gọi để triển khai ``isinstance(instance, class)``.
 
 
 .. method:: type.__subclasscheck__(self, subclass)
 
-   Return true if *subclass* should be considered a (direct or indirect)
-   subclass of *class*.  If defined, called to implement ``issubclass(subclass,
-   class)``.
+   Trả về true nếu *subclass* nên được xem là subclass (trực tiếp hoặc gián tiếp) của *class*. Nếu được định nghĩa, được gọi để triển khai ``issubclass(subclass, class)``.
 
 
-Note that these methods are looked up on the type (metaclass) of a class.  They
-cannot be defined as class methods in the actual class.  This is consistent with
-the lookup of special methods that are called on instances, only in this
-case the instance is itself a class.
+Lưu ý rằng các phương thức này được tra cứu trên type (metaclass) của một lớp. Chúng không thể được định nghĩa dưới dạng class method trong chính lớp đó. Điều này nhất quán với việc tra cứu các special method được gọi trên instance, chỉ khác là trong trường hợp này instance tự nó là một lớp.
 
 .. seealso::
 
-   :pep:`3119` - Introducing Abstract Base Classes
-      Includes the specification for customizing :func:`isinstance` and
-      :func:`issubclass` behavior through :meth:`~type.__instancecheck__` and
-      :meth:`~type.__subclasscheck__`, with motivation for this functionality
-      in the context of adding Abstract Base Classes (see the :mod:`abc`
-      module) to the language.
+   :pep:`3119` - Giới thiệu về Abstract Base Classes
+      Bao gồm đặc tả để tùy biến hành vi của :func:`isinstance` và
+      :func:`issubclass` thông qua :meth:`~type.__instancecheck__` và
+      :meth:`~type.__subclasscheck__`, kèm theo động cơ cho chức năng này trong bối cảnh bổ sung Abstract Base Classes (xem module :mod:`abc`) vào ngôn ngữ.
 
 
-Emulating generic types
------------------------
+Mô phỏng generic type
+---------------------
 
-When using :term:`type annotations<annotation>`, it is often useful to
-*parameterize* a :term:`generic type` using Python's square-brackets notation.
-For example, the annotation ``list[int]`` might be used to signify a
-:class:`list` in which all the elements are of type :class:`int`.
+Khi sử dụng :term:`type annotation <annotation>`, thường sẽ hữu ích khi *tham số hóa* một :term:`generic type` bằng ký pháp dấu ngoặc vuông của Python. Ví dụ, annotation ``list[int]`` có thể được dùng để biểu thị một
+:class:`list` trong đó mọi phần tử đều có kiểu :class:`int`.
 
 .. seealso::
 
-   :pep:`484` - Type Hints
-      Introducing Python's framework for type annotations
+   :pep:`484` - Gợi ý kiểu (Type Hints)
+      Giới thiệu framework của Python cho các chú thích kiểu
 
-   :ref:`Generic Alias Types<types-genericalias>`
-      Documentation for objects representing parameterized generic classes
+   :ref:`Các kiểu Generic Alias <types-genericalias>`
+      Tài liệu về các đối tượng biểu diễn các lớp generic được tham số hóa
 
-   :ref:`Generics`, :ref:`user-defined generics<user-defined-generics>` and :class:`typing.Generic`
-      Documentation on how to implement generic classes that can be
-      parameterized at runtime and understood by static type-checkers.
+   :ref:`Generics`, :ref:`generic do người dùng định nghĩa <user-defined-generics>` và :class:`typing.Generic`
+      Tài liệu về cách triển khai các lớp generic có thể được tham số hóa tại runtime và được các static type-checker hiểu.
 
-A class can *generally* only be parameterized if it defines the special
-class method ``__class_getitem__()``.
+Nhìn *chung*, một lớp chỉ có thể được tham số hóa nếu nó định nghĩa phương thức lớp đặc biệt ``__class_getitem__()``.
 
 .. classmethod:: object.__class_getitem__(cls, key)
 
-   Return an object representing the specialization of a generic class
-   by type arguments found in *key*.
+   Trả về một đối tượng biểu thị sự chuyên biệt hóa của một lớp generic theo các đối số kiểu được tìm thấy trong *key*.
 
-   When defined on a class, ``__class_getitem__()`` is automatically a class
-   method. As such, there is no need for it to be decorated with
-   :deco:`classmethod` when it is defined.
+   Khi được định nghĩa trên một lớp, ``__class_getitem__()`` tự động là một phương thức lớp. Do đó, không cần trang trí nó bằng
+   :deco:`classmethod` khi định nghĩa nó.
 
 
-The purpose of *__class_getitem__*
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mục đích của *__class_getitem__*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The purpose of :meth:`~object.__class_getitem__` is to allow runtime
-parameterization of standard-library generic classes in order to more easily
-apply :term:`type hints<type hint>` to these classes.
+Mục đích của :meth:`~object.__class_getitem__` là cho phép tham số hóa tại runtime các lớp generic của standard library để áp dụng :term:`type hints <type hint>` cho các lớp này dễ dàng hơn.
 
-To implement custom generic classes that can be parameterized at runtime and
-understood by static type-checkers, users should either inherit from a standard
-library class that already implements :meth:`~object.__class_getitem__`, or
-inherit from :class:`typing.Generic`, which has its own implementation of
-``__class_getitem__()``.
+Để triển khai các lớp generic tùy chỉnh có thể được tham số hóa tại runtime và được static type-checker hiểu, người dùng nên kế thừa từ một lớp standard library đã triển khai :meth:`~object.__class_getitem__`, hoặc kế thừa từ :class:`typing.Generic`, vốn có cách triển khai riêng cho ``__class_getitem__()``.
 
-Custom implementations of :meth:`~object.__class_getitem__` on classes defined
-outside of the standard library may not be understood by third-party
-type-checkers such as mypy. Using ``__class_getitem__()`` on any class for
-purposes other than type hinting is discouraged.
+Các cách triển khai tùy chỉnh của :meth:`~object.__class_getitem__` trên các lớp được định nghĩa bên ngoài thư viện chuẩn có thể không được các type-checker bên thứ ba như mypy hiểu. Không khuyến khích sử dụng ``__class_getitem__()`` trên bất kỳ lớp nào cho mục đích ngoài type hinting.
 
 
 .. _classgetitem-versus-getitem:
 
 
-*__class_getitem__* versus *__getitem__*
+*__class_getitem__* so với *__getitem__*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Usually, the :ref:`subscription<subscriptions>` of an object using square
-brackets will call the :meth:`~object.__getitem__` instance method defined on
-the object's class. However, if the object being subscribed is itself a class,
-the class method :meth:`~object.__class_getitem__` may be called instead.
-``__class_getitem__()`` should return a :ref:`GenericAlias<types-genericalias>`
-object if it is properly defined.
+Thông thường, thao tác :ref:`subscription <subscriptions>` của một đối tượng bằng dấu ngoặc vuông sẽ gọi instance method :meth:`~object.__getitem__` được định nghĩa trên lớp của đối tượng đó. Tuy nhiên, nếu đối tượng được subscription tự nó là một lớp, class method :meth:`~object.__class_getitem__` có thể được gọi thay thế. Nếu được định nghĩa đúng cách, ``__class_getitem__()`` sẽ trả về một đối tượng :ref:`GenericAlias <types-genericalias>`.
 
-Presented with the :term:`expression` ``obj[x]``, the Python interpreter
-follows something like the following process to decide whether
-:meth:`~object.__getitem__` or :meth:`~object.__class_getitem__` should be
-called::
+Khi gặp biểu thức :term:`expression` ``obj[x]``, trình thông dịch Python sẽ thực hiện quy trình gần giống như sau để quyết định liệu
+:meth:`~object.__getitem__` hay :meth:`~object.__class_getitem__` nên được gọi::
 
    from inspect import isclass
 
@@ -3096,44 +2182,41 @@ called::
 
        class_of_obj = type(obj)
 
-       # If the class of obj defines __getitem__,
-       # call class_of_obj.__getitem__(obj, x)
+       # Nếu lớp của obj định nghĩa __getitem__,
+       # gọi class_of_obj.__getitem__(obj, x)
        if hasattr(class_of_obj, '__getitem__'):
            return class_of_obj.__getitem__(obj, x)
 
-       # Else, if obj is a class and defines __class_getitem__,
-       # call obj.__class_getitem__(x)
+       # Ngược lại, nếu obj là một class và định nghĩa __class_getitem__,
+       # gọi obj.__class_getitem__(x)
        elif isclass(obj) and hasattr(obj, '__class_getitem__'):
            return obj.__class_getitem__(x)
 
-       # Else, raise an exception
+       # Ngược lại, phát sinh một exception
        else:
            raise TypeError(
                f"'{class_of_obj.__name__}' object is not subscriptable"
            )
 
-In Python, all classes are themselves instances of other classes. The class of
-a class is known as that class's :term:`metaclass`, and most classes have the
-:class:`type` class as their metaclass. :class:`type` does not define
-:meth:`~object.__getitem__`, meaning that expressions such as ``list[int]``,
-``dict[str, float]`` and ``tuple[str, bytes]`` all result in
-:meth:`~object.__class_getitem__` being called::
+Trong Python, mọi class đều tự thân là instance của các class khác. Class của một class được gọi là :term:`metaclass` của class đó, và hầu hết các class có
+class :class:`type` làm metaclass. :class:`type` không định nghĩa
+:meth:`~object.__getitem__`, nghĩa là các biểu thức như ``list[int]``, ``dict[str, float]`` và ``tuple[str, bytes]`` đều dẫn đến việc
+:meth:`~object.__class_getitem__` được gọi::
 
-   >>> # list has class "type" as its metaclass, like most classes:
+   >>> # list có lớp "type" làm metaclass, giống như hầu hết các lớp:
    >>> type(list)
    <class 'type'>
    >>> type(dict) == type(list) == type(tuple) == type(str) == type(bytes)
    True
-   >>> # "list[int]" calls "list.__class_getitem__(int)"
+   >>> # "list[int]" gọi "list.__class_getitem__(int)"
    >>> list[int]
    list[int]
-   >>> # list.__class_getitem__ returns a GenericAlias object:
+   >>> # list.__class_getitem__ trả về một đối tượng GenericAlias:
    >>> type(list[int])
    <class 'types.GenericAlias'>
 
-However, if a class has a custom metaclass that defines
-:meth:`~object.__getitem__`, subscribing the class may result in different
-behaviour. An example of this can be found in the :mod:`enum` module::
+Tuy nhiên, nếu một lớp có metaclass tùy chỉnh định nghĩa
+:meth:`~object.__getitem__`, việc subscript lớp có thể dẫn đến hành vi khác. Bạn có thể tìm thấy một ví dụ về điều này trong module :mod:`enum`::
 
    >>> from enum import Enum
    >>> class Menu(Enum):
@@ -3141,12 +2224,12 @@ behaviour. An example of this can be found in the :mod:`enum` module::
    ...     SPAM = 'spam'
    ...     BACON = 'bacon'
    ...
-   >>> # Enum classes have a custom metaclass:
+   >>> # Các lớp Enum có một metaclass tùy chỉnh:
    >>> type(Menu)
    <class 'enum.EnumMeta'>
-   >>> # EnumMeta defines __getitem__,
-   >>> # so __class_getitem__ is not called,
-   >>> # and the result is not a GenericAlias object:
+   >>> # EnumMeta định nghĩa __getitem__,
+   >>> # vì vậy __class_getitem__ không được gọi,
+   >>> # và kết quả không phải là một đối tượng GenericAlias:
    >>> Menu['SPAM']
    <Menu.SPAM: 'spam'>
    >>> type(Menu['SPAM'])
@@ -3162,63 +2245,43 @@ behaviour. An example of this can be found in the :mod:`enum` module::
 
 .. _callable-types:
 
-Emulating callable objects
---------------------------
+Mô phỏng các đối tượng có thể gọi
+---------------------------------
 
 
 .. method:: object.__call__(self[, args...])
 
    .. index:: pair: call; instance
 
-   Called when the instance is "called" as a function; if this method is defined,
-   ``x(arg1, arg2, ...)`` roughly translates to ``type(x).__call__(x, arg1, ...)``.
-   The :class:`object` class itself does not provide this method.
+   Được gọi khi instance được "gọi" như một hàm; nếu phương thức này được định nghĩa, ``x(arg1, arg2, ...)`` gần tương đương với ``type(x).__call__(x, arg1, ...)``. Bản thân lớp :class:`object` không cung cấp phương thức này.
 
 
 .. _sequence-types:
 
-Emulating container types
--------------------------
+Mô phỏng các kiểu container
+---------------------------
 
-The following methods can be defined to implement container objects. None of them
-are provided by the :class:`object` class itself. Containers usually are
-:term:`sequences <sequence>` (such as :class:`lists <list>` or
-:class:`tuples <tuple>`) or :term:`mappings <mapping>` (like
-:term:`dictionaries <dictionary>`),
-but can represent other containers as well.  The first set of methods is used
-either to emulate a sequence or to emulate a mapping; the difference is that for
-a sequence, the allowable keys should be the integers *k* for which ``0 <= k <
-N`` where *N* is the length of the sequence, or :class:`slice` objects, which define a
-range of items.  It is also recommended that mappings provide the methods
+Có thể định nghĩa các phương thức sau để triển khai các đối tượng container. Không phương thức nào trong số này được chính lớp :class:`object` cung cấp. Container thường là
+:term:`các sequence <sequence>` (chẳng hạn như :class:`lists <list>` hoặc
+:class:`tuples <tuple>`) hoặc :term:`mappings <mapping>` (chẳng hạn như
+:term:`dictionaries <dictionary>`), nhưng cũng có thể biểu diễn các container khác. Tập phương thức đầu tiên được dùng để mô phỏng sequence hoặc mapping; điểm khác biệt là đối với sequence, các khóa được phép phải là các số nguyên *k* sao cho ``0 <= k < N`` với *N* là độ dài của sequence, hoặc các đối tượng :class:`slice`, vốn xác định một phạm vi các mục. Mapping cũng nên cung cấp các phương thức
 :meth:`!keys`, :meth:`!values`, :meth:`!items`, :meth:`!get`, :meth:`!clear`,
-:meth:`!setdefault`, :meth:`!pop`, :meth:`!popitem`, :meth:`!copy`, and
-:meth:`!update` behaving similar to those for Python's standard :class:`dictionary <dict>`
-objects.  The :mod:`collections.abc` module provides a
+:meth:`!setdefault`, :meth:`!pop`, :meth:`!popitem`, :meth:`!copy`, và
+:meth:`!update` hoạt động tương tự các phương thức dành cho đối tượng :class:`dictionary <dict>` tiêu chuẩn của Python. Module :mod:`collections.abc` cung cấp một
 :class:`~collections.abc.MutableMapping`
-:term:`abstract base class` to help create those methods from a base set of
+:term:`abstract base class` để giúp tạo các phương thức đó từ một tập cơ sở gồm
 :meth:`~object.__getitem__`, :meth:`~object.__setitem__`,
-:meth:`~object.__delitem__`, and :meth:`!keys`.
+:meth:`~object.__delitem__`, và :meth:`!keys`.
 
-Mutable sequences should provide methods
+Các sequence có thể thay đổi nên cung cấp các phương thức
 :meth:`~sequence.append`, :meth:`~sequence.clear`, :meth:`~sequence.count`,
 :meth:`~sequence.extend`, :meth:`~sequence.index`, :meth:`~sequence.insert`,
-:meth:`~sequence.pop`, :meth:`~sequence.remove`, and :meth:`~sequence.reverse`,
-like Python standard :class:`list` objects.
-Finally, sequence types should implement addition (meaning concatenation) and
-multiplication (meaning repetition) by defining the methods
+:meth:`~sequence.pop`, :meth:`~sequence.remove` và :meth:`~sequence.reverse`, giống như các đối tượng :class:`list` chuẩn của Python. Cuối cùng, các kiểu sequence nên triển khai phép cộng (nghĩa là nối) và phép nhân (nghĩa là lặp lại) bằng cách định nghĩa các phương thức
 :meth:`~object.__add__`, :meth:`~object.__radd__`, :meth:`~object.__iadd__`,
-:meth:`~object.__mul__`, :meth:`~object.__rmul__` and :meth:`~object.__imul__`
-described below; they should not define other numerical
-operators.
+:meth:`~object.__mul__`, :meth:`~object.__rmul__` và :meth:`~object.__imul__` được mô tả bên dưới; chúng không nên định nghĩa các toán tử số học khác.
 
-It is recommended that both mappings and sequences implement the
-:meth:`~object.__contains__` method to allow efficient use of the ``in``
-operator; for
-mappings, ``in`` should search the mapping's keys; for sequences, it should
-search through the values.  It is further recommended that both mappings and
-sequences implement the :meth:`~object.__iter__` method to allow efficient iteration
-through the container; for mappings, :meth:`!__iter__` should iterate
-through the object's keys; for sequences, it should iterate through the values.
+Khuyến nghị rằng cả mapping lẫn sequence đều triển khai phương thức
+:meth:`~object.__contains__` để cho phép sử dụng hiệu quả toán tử ``in``; với mapping, ``in`` nên tìm kiếm trong các khóa của mapping; với sequence, phương thức này nên tìm kiếm trong các giá trị. Cũng khuyến nghị rằng cả mapping lẫn sequence đều triển khai phương thức :meth:`~object.__iter__` để cho phép lặp hiệu quả qua container; với mapping, :meth:`!__iter__` nên lặp qua các khóa của đối tượng; với sequence, nó nên lặp qua các giá trị.
 
 .. method:: object.__len__(self)
 
@@ -3226,320 +2289,185 @@ through the object's keys; for sequences, it should iterate through the values.
       pair: built-in function; len
       single: __bool__() (object method)
 
-   Called to implement the built-in function :func:`len`.  Should return the length
-   of the object, an integer ``>=`` 0.  Also, an object that doesn't define a
-   :meth:`~object.__bool__` method and whose :meth:`!__len__` method returns zero is
-   considered to be false in a Boolean context.
+   Được gọi để triển khai hàm built-in :func:`len`. Phải trả về độ dài của đối tượng, là một số nguyên ``>=`` 0. Ngoài ra, một đối tượng không định nghĩa phương thức
+   :meth:`~object.__bool__` và có phương thức :meth:`!__len__` trả về không thì được xem là false trong ngữ cảnh Boolean.
 
    .. impl-detail::
 
-      In CPython, the length is required to be at most :data:`sys.maxsize`.
-      If the length is larger than :data:`!sys.maxsize` some features (such as
-      :func:`len`) may raise :exc:`OverflowError`.  To prevent raising
-      :exc:`!OverflowError` by truth value testing, an object must define a
-      :meth:`~object.__bool__` method.
+      Trong CPython, độ dài bắt buộc phải không vượt quá :data:`sys.maxsize`. Nếu độ dài lớn hơn :data:`!sys.maxsize`, một số tính năng (chẳng hạn như
+      :func:`len` có thể phát sinh :exc:`OverflowError`. Để ngăn việc phát sinh
+      :exc:`!OverflowError` thông qua kiểm tra giá trị chân lý, một đối tượng phải định nghĩa một
+      phương thức :meth:`~object.__bool__`.
 
 
 .. method:: object.__length_hint__(self)
 
-   Called to implement :func:`operator.length_hint`. Should return an estimated
-   length for the object (which may be greater or less than the actual length).
-   The length must be an integer ``>=`` 0. The return value may also be
-   :data:`NotImplemented`, which is treated the same as if the
-   ``__length_hint__`` method didn't exist at all. This method is purely an
-   optimization and is never required for correctness.
+   Được gọi để triển khai :func:`operator.length_hint`. Phải trả về độ dài ước tính của đối tượng (có thể lớn hơn hoặc nhỏ hơn độ dài thực tế). Độ dài phải là một số nguyên ``>=`` 0. Giá trị trả về cũng có thể là
+   :data:`NotImplemented`, được xử lý giống như thể phương thức ``__length_hint__`` hoàn toàn không tồn tại. Phương thức này thuần túy là một tối ưu hóa và không bao giờ cần thiết để đảm bảo tính đúng đắn.
 
    .. versionadded:: 3.4
 
 
 .. method:: object.__getitem__(self, subscript)
 
-   Called to implement *subscription*, that is, ``self[subscript]``.
-   See :ref:`subscriptions` for details on the syntax.
+   Được gọi để triển khai phép truy cập chỉ mục *subscription*, tức là ``self[subscript]``. Xem :ref:`subscriptions` để biết chi tiết về cú pháp.
 
-   There are two types of built-in objects that support subscription
-   via :meth:`!__getitem__`:
+   Có hai loại đối tượng built-in hỗ trợ truy cập chỉ mục thông qua :meth:`!__getitem__`:
 
-   - **sequences**, where *subscript* (also called
-     :term:`index`) should be an integer or a :class:`slice` object.
-     See the :ref:`sequence documentation <datamodel-sequences>` for the expected
-     behavior, including handling :class:`slice` objects and negative indices.
-   - **mappings**, where *subscript* is also called the :term:`key`.
-     See :ref:`mapping documentation <datamodel-mappings>` for the expected
-     behavior.
+   - **sequence**, trong đó *subscript* (còn được gọi là
+     :term:`index`) phải là một số nguyên hoặc một đối tượng :class:`slice`. Xem :ref:`tài liệu về sequence <datamodel-sequences>` để biết hành vi được mong đợi, bao gồm cả cách xử lý các đối tượng :class:`slice` và chỉ số âm.
+   - **mapping**, trong đó *subscript* cũng được gọi là :term:`key`. Xem :ref:`tài liệu về mapping <datamodel-mappings>` để biết hành vi được mong đợi.
 
-   If *subscript* is of an inappropriate type, :meth:`!__getitem__`
-   should raise :exc:`TypeError`.
-   If *subscript* has an inappropriate value, :meth:`!__getitem__`
-   should raise an :exc:`LookupError` or one of its subclasses
-   (:exc:`IndexError` for sequences; :exc:`KeyError` for mappings).
+   Nếu *subscript* có kiểu không phù hợp, :meth:`!__getitem__` phải phát sinh :exc:`TypeError`. Nếu *subscript* có giá trị không phù hợp, :meth:`!__getitem__` phải phát sinh một :exc:`LookupError` hoặc một trong các lớp con của nó (:exc:`IndexError` cho sequence; :exc:`KeyError` cho mapping).
 
    .. index:: pair: object; slice
 
    .. note::
 
-      Slicing is handled by :meth:`!__getitem__`, :meth:`~object.__setitem__`,
-      and :meth:`~object.__delitem__`.
-      A call like ::
+      Việc cắt lát được xử lý bởi :meth:`!__getitem__`, :meth:`~object.__setitem__` và :meth:`~object.__delitem__`. Một lời gọi như::
 
          a[1:2] = b
 
-      is translated to ::
+      được chuyển đổi thành::
 
          a[slice(1, 2, None)] = b
 
-      and so forth. Missing slice items are always filled in with ``None``.
+      và tương tự. Các thành phần slice bị thiếu luôn được điền bằng ``None``.
 
    .. note::
 
-      The sequence iteration protocol (used, for example, in :keyword:`for`
-      loops), expects that an :exc:`IndexError` will be raised for illegal
-      indexes to allow proper detection of the end of a sequence.
+      Giao thức lặp sequence (ví dụ được dùng trong vòng lặp :keyword:`for`) kỳ vọng rằng một :exc:`IndexError` sẽ được phát sinh đối với các chỉ số không hợp lệ để có thể phát hiện đúng điểm kết thúc của một sequence.
 
    .. note::
 
-      When :ref:`subscripting <subscriptions>` a *class*, the special
-      class method :meth:`~object.__class_getitem__` may be called instead of
-      :meth:`!__getitem__`. See :ref:`classgetitem-versus-getitem` for more
-      details.
+      Khi :ref:`lập chỉ mục <subscriptions>` một *class*, phương thức lớp đặc biệt :meth:`~object.__class_getitem__` có thể được gọi thay cho
+      :meth:`!__getitem__`. Xem :ref:`classgetitem-versus-getitem` để biết thêm chi tiết.
 
 
 .. method:: object.__setitem__(self, key, value)
 
-   Called to implement assignment to ``self[key]``.  Same note as for
-   :meth:`__getitem__`.  This should only be implemented for mappings if the
-   objects support changes to the values for keys, or if new keys can be added, or
-   for sequences if elements can be replaced.  The same exceptions should be raised
-   for improper *key* values as for the :meth:`__getitem__` method.
+   Được gọi để triển khai việc gán cho ``self[key]``. Lưu ý tương tự như đối với
+   :meth:`__getitem__`. Điều này chỉ nên được triển khai cho mapping nếu các đối tượng hỗ trợ thay đổi giá trị của các key, hoặc có thể thêm key mới, hoặc cho sequence nếu các phần tử có thể được thay thế. Cần phát sinh các exception tương tự cho các giá trị *key* không phù hợp như đối với phương thức :meth:`__getitem__`.
 
 
 .. method:: object.__delitem__(self, key)
 
-   Called to implement deletion of ``self[key]``.  Same note as for
-   :meth:`__getitem__`.  This should only be implemented for mappings if the
-   objects support removal of keys, or for sequences if elements can be removed
-   from the sequence.  The same exceptions should be raised for improper *key*
-   values as for the :meth:`__getitem__` method.
+   Được gọi để triển khai việc xóa ``self[key]``. Lưu ý tương tự như đối với
+   :meth:`__getitem__`. Điều này chỉ nên được triển khai cho mapping nếu các đối tượng hỗ trợ xóa key, hoặc cho sequence nếu các phần tử có thể bị xóa khỏi sequence. Cần phát sinh các exception tương tự cho các giá trị *key* không phù hợp như đối với phương thức :meth:`__getitem__`.
 
 
 .. method:: object.__missing__(self, key)
 
-   Called by :class:`dict`\ .\ :meth:`__getitem__` to implement ``self[key]`` for dict subclasses
-   when key is not in the dictionary.
+   Được :class:`dict`\ .\ :meth:`__getitem__` gọi để triển khai ``self[key]`` cho các lớp con của dict khi khóa không có trong từ điển.
 
 
 .. method:: object.__iter__(self)
 
-   This method is called when an :term:`iterator` is required for a container.
-   This method should return a new iterator object that can iterate over all the
-   objects in the container.  For mappings, it should iterate over the keys of
-   the container.
+   Phương thức này được gọi khi cần một :term:`iterator` cho một container. Phương thức này phải trả về một đối tượng iterator mới có thể lặp qua tất cả các đối tượng trong container. Đối với mapping, nó phải lặp qua các khóa của container.
 
 
 .. method:: object.__reversed__(self)
 
-   Called (if present) by the :func:`reversed` built-in to implement
-   reverse iteration.  It should return a new iterator object that iterates
-   over all the objects in the container in reverse order.
+   Được built-in :func:`reversed` gọi (nếu có) để triển khai việc lặp ngược. Phương thức này phải trả về một đối tượng iterator mới lặp qua tất cả các đối tượng trong container theo thứ tự ngược lại.
 
-   If the :meth:`__reversed__` method is not provided, the :func:`reversed`
-   built-in will fall back to using the sequence protocol (:meth:`__len__` and
-   :meth:`__getitem__`).  Objects that support the sequence protocol should
-   only provide :meth:`__reversed__` if they can provide an implementation
-   that is more efficient than the one provided by :func:`reversed`.
+   Nếu không cung cấp phương thức :meth:`__reversed__`, built-in :func:`reversed` sẽ quay lại sử dụng giao thức sequence (:meth:`__len__` và
+   :meth:`__getitem__`). Các đối tượng hỗ trợ giao thức sequence chỉ nên cung cấp :meth:`__reversed__` nếu chúng có thể cung cấp một cách triển khai hiệu quả hơn cách do :func:`reversed` cung cấp.
 
 
-The membership test operators (:keyword:`in` and :keyword:`not in`) are normally
-implemented as an iteration through a container. However, container objects can
-supply the following special method with a more efficient implementation, which
-also does not require the object be iterable.
+Các toán tử kiểm tra membership (:keyword:`in` và :keyword:`not in`) thường được triển khai bằng cách lặp qua một container. Tuy nhiên, các đối tượng container có thể cung cấp phương thức đặc biệt sau với cách triển khai hiệu quả hơn, đồng thời không yêu cầu đối tượng phải có thể lặp.
 
 .. method:: object.__contains__(self, item)
 
-   Called to implement membership test operators.  Should return true if *item*
-   is in *self*, false otherwise.  For mapping objects, this should consider the
-   keys of the mapping rather than the values or the key-item pairs.
+   Được gọi để triển khai các toán tử kiểm tra membership. Phải trả về true nếu *item* nằm trong *self*, nếu không thì trả về false. Đối với các đối tượng mapping, phương thức này phải xét các khóa của mapping thay vì các giá trị hoặc các cặp khóa-item.
 
-   For objects that don't define :meth:`__contains__`, the membership test first
-   tries iteration via :meth:`__iter__`, then the old sequence iteration
-   protocol via :meth:`__getitem__`, see :ref:`this section in the language
-   reference <membership-test-details>`.
+   Đối với các đối tượng không định nghĩa :meth:`__contains__`, phép kiểm tra thành viên trước tiên thử lặp qua :meth:`__iter__`, sau đó thử giao thức lặp sequence cũ qua :meth:`__getitem__`; xem :ref:`phần này trong tài liệu tham chiếu ngôn ngữ <membership-test-details>`.
 
 
 .. _numeric-types:
 
-Emulating numeric types
------------------------
+Mô phỏng các kiểu số
+--------------------
 
-The following methods can be defined to emulate numeric objects. Methods
-corresponding to operations that are not supported by the particular kind of
-number implemented (e.g., bitwise operations for non-integral numbers) should be
-left undefined.
+Có thể định nghĩa các phương thức sau để mô phỏng đối tượng số. Những phương thức tương ứng với các phép toán không được hỗ trợ bởi loại số cụ thể được triển khai (ví dụ: các phép toán bitwise đối với số không nguyên) nên được để không định nghĩa.
 
 
 .. method:: object.__add__(self, other)
-            object.__sub__(self, other)
-            object.__mul__(self, other)
-            object.__matmul__(self, other)
-            object.__truediv__(self, other)
-            object.__floordiv__(self, other)
-            object.__mod__(self, other)
-            object.__divmod__(self, other)
-            object.__pow__(self, other[, modulo])
-            object.__lshift__(self, other)
-            object.__rshift__(self, other)
-            object.__and__(self, other)
-            object.__xor__(self, other)
-            object.__or__(self, other)
+            object.__sub__(self, other) object.__mul__(self, other) object.__matmul__(self, other) object.__truediv__(self, other) object.__floordiv__(self, other) object.__mod__(self, other) object.__divmod__(self, other) object.__pow__(self, other[, modulo]) object.__lshift__(self, other) object.__rshift__(self, other) object.__and__(self, other) object.__xor__(self, other) object.__or__(self, other)
 
    .. index::
       pair: built-in function; divmod
       pair: built-in function; pow
       pair: built-in function; pow
 
-   These methods are called to implement the binary arithmetic operations
-   (``+``, ``-``, ``*``, ``@``, ``/``, ``//``, ``%``, :func:`divmod`,
-   :func:`pow`, ``**``, ``<<``, ``>>``, ``&``, ``^``, ``|``).  For instance, to
-   evaluate the expression ``x + y``, where *x* is an instance of a class that
-   has an :meth:`__add__` method, ``type(x).__add__(x, y)`` is called.  The
-   :meth:`__divmod__` method should be the equivalent to using
-   :meth:`__floordiv__` and :meth:`__mod__`; it should not be related to
-   :meth:`__truediv__`.  Note that :meth:`__pow__` should be defined to accept
-   an optional third argument if the three-argument version of the built-in :func:`pow`
-   function is to be supported.
+   Các phương thức này được gọi để triển khai các phép toán số học nhị phân (``+``, ``-``, ``*``, ``@``, ``/``, ``//``, ``%``, :func:`divmod`,
+   :func:`pow`, ``**``, ``<<``, ``>>``, ``&``, ``^``, ``|``). Ví dụ, để đánh giá biểu thức ``x + y``, trong đó *x* là một instance của lớp có phương thức :meth:`__add__`, ``type(x).__add__(x, y)`` được gọi. Phương thức
+   :meth:`__divmod__` phải tương đương với việc sử dụng
+   :meth:`__floordiv__` và :meth:`__mod__`; nó không nên liên quan đến
+   :meth:`__truediv__`. Lưu ý rằng :meth:`__pow__` nên được định nghĩa để chấp nhận đối số thứ ba tùy chọn nếu cần hỗ trợ phiên bản ba đối số của hàm dựng sẵn :func:`pow`.
 
-   If one of those methods does not support the operation with the supplied
-   arguments, it should return :data:`NotImplemented`.
+   Nếu một trong các phương thức đó không hỗ trợ phép toán với các đối số được cung cấp, phương thức đó nên trả về :data:`NotImplemented`.
 
 
 .. method:: object.__radd__(self, other)
-            object.__rsub__(self, other)
-            object.__rmul__(self, other)
-            object.__rmatmul__(self, other)
-            object.__rtruediv__(self, other)
-            object.__rfloordiv__(self, other)
-            object.__rmod__(self, other)
-            object.__rdivmod__(self, other)
-            object.__rpow__(self, other[, modulo])
-            object.__rlshift__(self, other)
-            object.__rrshift__(self, other)
-            object.__rand__(self, other)
-            object.__rxor__(self, other)
-            object.__ror__(self, other)
+            object.__rsub__(self, other) object.__rmul__(self, other) object.__rmatmul__(self, other) object.__rtruediv__(self, other) object.__rfloordiv__(self, other) object.__rmod__(self, other) object.__rdivmod__(self, other) object.__rpow__(self, other[, modulo]) object.__rlshift__(self, other) object.__rrshift__(self, other) object.__rand__(self, other) object.__rxor__(self, other) object.__ror__(self, other)
 
    .. index::
       pair: built-in function; divmod
       pair: built-in function; pow
 
-   These methods are called to implement the binary arithmetic operations
-   (``+``, ``-``, ``*``, ``@``, ``/``, ``//``, ``%``, :func:`divmod`,
-   :func:`pow`, ``**``, ``<<``, ``>>``, ``&``, ``^``, ``|``) with reflected
-   (swapped) operands.  These functions are only called if the operands
-   are of different types, when the left operand does not support the corresponding
-   operation [#]_, or the right operand's class is derived from the left operand's
-   class. [#]_ For instance, to evaluate the expression ``x - y``, where *y* is
-   an instance of a class that has an :meth:`__rsub__` method, ``type(y).__rsub__(y, x)``
-   is called if ``type(x).__sub__(x, y)`` returns :data:`NotImplemented` or ``type(y)``
-   is a subclass of ``type(x)``. [#]_
+   Các phương thức này được gọi để triển khai các phép toán số học nhị phân (``+``, ``-``, ``*``, ``@``, ``/``, ``//``, ``%``, :func:`divmod`,
+   :func:`pow`, ``**``, ``<<``, ``>>``, ``&``, ``^``, ``|``) với các toán hạng phản chiếu (hoán đổi). Các hàm này chỉ được gọi nếu các toán hạng có kiểu khác nhau, khi toán hạng bên trái không hỗ trợ phép toán tương ứng [#]_, hoặc lớp của toán hạng bên phải được dẫn xuất từ lớp của toán hạng bên trái. [#]_ Ví dụ, để đánh giá biểu thức ``x - y``, trong đó *y* là một thực thể của lớp có phương thức :meth:`__rsub__`, ``type(y).__rsub__(y, x)`` được gọi nếu ``type(x).__sub__(x, y)`` trả về :data:`NotImplemented` hoặc ``type(y)`` là một lớp con của ``type(x)``. [#]_
 
-   Note that :meth:`__rpow__` should be defined to accept an optional third
-   argument if the three-argument version of the built-in :func:`pow` function
-   is to be supported.
+   Lưu ý rằng :meth:`__rpow__` nên được định nghĩa để chấp nhận đối số thứ ba tùy chọn nếu cần hỗ trợ phiên bản ba đối số của hàm dựng sẵn :func:`pow`.
 
    .. versionchanged:: 3.14
 
-      Three-argument :func:`pow` now try calling :meth:`~object.__rpow__` if necessary.
-      Previously it was only called in two-argument :func:`!pow` and the binary
-      power operator.
+      Các :func:`pow` ba đối số hiện sẽ cố gọi :meth:`~object.__rpow__` nếu cần. Trước đây, phương thức này chỉ được gọi trong các :func:`!pow` hai đối số và toán tử lũy thừa nhị phân.
 
    .. note::
 
-      If the right operand's type is a subclass of the left operand's type and
-      that subclass provides a different implementation of the reflected method
-      for the operation, this method will be called before the left operand's
-      non-reflected method. This behavior allows subclasses to override their
-      ancestors' operations.
+      Nếu kiểu của toán hạng bên phải là lớp con của kiểu của toán hạng bên trái và lớp con đó cung cấp một cách triển khai khác cho phương thức phản chiếu của phép toán, phương thức này sẽ được gọi trước phương thức không phản chiếu của toán hạng bên trái. Hành vi này cho phép các lớp con ghi đè các phép toán của tổ tiên chúng.
 
 .. method:: object.__iadd__(self, other)
-            object.__isub__(self, other)
-            object.__imul__(self, other)
-            object.__imatmul__(self, other)
-            object.__itruediv__(self, other)
-            object.__ifloordiv__(self, other)
-            object.__imod__(self, other)
-            object.__ipow__(self, other[, modulo])
-            object.__ilshift__(self, other)
-            object.__irshift__(self, other)
-            object.__iand__(self, other)
-            object.__ixor__(self, other)
-            object.__ior__(self, other)
+            object.__isub__(self, other) object.__imul__(self, other) object.__imatmul__(self, other) object.__itruediv__(self, other) object.__ifloordiv__(self, other) object.__imod__(self, other) object.__ipow__(self, other[, modulo]) object.__ilshift__(self, other) object.__irshift__(self, other) object.__iand__(self, other) object.__ixor__(self, other) object.__ior__(self, other)
 
-   These methods are called to implement the augmented arithmetic assignments
-   (``+=``, ``-=``, ``*=``, ``@=``, ``/=``, ``//=``, ``%=``, ``**=``, ``<<=``,
-   ``>>=``, ``&=``, ``^=``, ``|=``).  These methods should attempt to do the
-   operation in-place (modifying *self*) and return the result (which could be,
-   but does not have to be, *self*).  If a specific method is not defined, or if
-   that method returns :data:`NotImplemented`, the
-   augmented assignment falls back to the normal methods.  For instance, if *x*
-   is an instance of a class with an :meth:`__iadd__` method, ``x += y`` is
-   equivalent to ``x = x.__iadd__(y)`` . If :meth:`__iadd__` does not exist, or if ``x.__iadd__(y)``
-   returns :data:`!NotImplemented`, ``x.__add__(y)`` and
-   ``y.__radd__(x)`` are considered, as with the evaluation of ``x + y``. In
-   certain situations, augmented assignment can result in unexpected errors (see
-   :ref:`faq-augmented-assignment-tuple-error`), but this behavior is in fact
-   part of the data model.
+   Các phương thức này được gọi để triển khai các phép gán số học tăng cường (``+=``, ``-=``, ``*=``, ``@=``, ``/=``, ``//=``, ``%=``, ``**=``, ``<<=``, ``>>=``, ``&=``, ``^=``, ``|=``). Các phương thức này nên cố thực hiện phép toán tại chỗ (sửa đổi *self*) và trả về kết quả (có thể là, nhưng không bắt buộc phải là, *self*). Nếu một phương thức cụ thể không được định nghĩa, hoặc nếu phương thức đó trả về :data:`NotImplemented`, phép gán tăng cường sẽ quay về dùng các phương thức thông thường. Ví dụ, nếu *x* là một instance của lớp có phương thức :meth:`__iadd__`, thì ``x += y`` tương đương với ``x = x.__iadd__(y)`` . Nếu :meth:`__iadd__` không tồn tại, hoặc nếu ``x.__iadd__(y)`` trả về :data:`!NotImplemented`, thì ``x.__add__(y)`` và ``y.__radd__(x)`` được xét đến, như khi đánh giá ``x + y``. Trong một số tình huống nhất định, phép gán tăng cường có thể gây ra các lỗi không mong muốn (xem
+   :ref:`faq-augmented-assignment-tuple-error`), nhưng hành vi này thực tế là một phần của mô hình dữ liệu.
 
 
 .. method:: object.__neg__(self)
-            object.__pos__(self)
-            object.__abs__(self)
-            object.__invert__(self)
+            object.__pos__(self) object.__abs__(self) object.__invert__(self)
 
    .. index:: pair: built-in function; abs
 
-   Called to implement the unary arithmetic operations (``-``, ``+``, :func:`abs`
-   and ``~``).
+   Được gọi để triển khai các phép toán số học một ngôi (``-``, ``+``, :func:`abs` và ``~``).
 
 
 .. method:: object.__complex__(self)
-            object.__int__(self)
-            object.__float__(self)
+            object.__int__(self) object.__float__(self)
 
    .. index::
       pair: built-in function; complex
       pair: built-in function; int
       pair: built-in function; float
 
-   Called to implement the built-in functions :func:`complex`,
-   :func:`int` and :func:`float`.  Should return a value
-   of the appropriate type.
+   Được gọi để triển khai các hàm dựng sẵn :func:`complex`,
+   :func:`int` và :func:`float`. Phải trả về một giá trị thuộc kiểu phù hợp.
 
 
 .. method:: object.__index__(self)
 
-   Called to implement :func:`operator.index`, and whenever Python needs to
-   losslessly convert the numeric object to an integer object (such as in
-   slicing, or in the built-in :func:`bin`, :func:`hex` and :func:`oct`
-   functions). Presence of this method indicates that the numeric object is
-   an integer type.  Must return an integer.
+   Được gọi để triển khai :func:`operator.index`, và bất cứ khi nào Python cần chuyển đổi đối tượng số sang đối tượng số nguyên mà không mất dữ liệu (chẳng hạn như trong slicing, hoặc trong các hàm dựng sẵn :func:`bin`, :func:`hex` và :func:`oct`). Sự hiện diện của phương thức này cho biết đối tượng số là một kiểu số nguyên. Phải trả về một số nguyên.
 
-   If :meth:`__int__`, :meth:`__float__` and :meth:`__complex__` are not
-   defined then corresponding built-in functions :func:`int`, :func:`float`
-   and :func:`complex` fall back to :meth:`__index__`.
+   Nếu :meth:`__int__`, :meth:`__float__` và :meth:`__complex__` không được định nghĩa, thì các hàm dựng sẵn tương ứng :func:`int`, :func:`float` và :func:`complex` sẽ dự phòng sang :meth:`__index__`.
 
 
 .. method:: object.__round__(self, [,ndigits])
-            object.__trunc__(self)
-            object.__floor__(self)
-            object.__ceil__(self)
+            object.__trunc__(self) object.__floor__(self) object.__ceil__(self)
 
    .. index:: pair: built-in function; round
 
-   Called to implement the built-in function :func:`round` and :mod:`math`
-   functions :func:`~math.trunc`, :func:`~math.floor` and :func:`~math.ceil`.
-   Unless *ndigits* is passed to :meth:`!__round__` all these methods should
-   return the value of the object truncated to an :class:`~numbers.Integral`
-   (typically an :class:`int`).
+   Được gọi để triển khai hàm dựng sẵn :func:`round` và các hàm :mod:`math` :func:`~math.trunc`, :func:`~math.floor` và :func:`~math.ceil`. Trừ khi *ndigits* được truyền cho :meth:`!__round__`, tất cả các phương thức này phải trả về giá trị của đối tượng được cắt ngắn thành một :class:`~numbers.Integral` (thông thường là một :class:`int`).
 
    .. versionchanged:: 3.14
       :func:`int` no longer delegates to the :meth:`~object.__trunc__` method.
@@ -3547,195 +2475,142 @@ left undefined.
 
 .. _context-managers:
 
-With Statement Context Managers
--------------------------------
+Context Manager của câu lệnh With
+---------------------------------
 
-A :dfn:`context manager` is an object that defines the runtime context to be
-established when executing a :keyword:`with` statement. The context manager
-handles the entry into, and the exit from, the desired runtime context for the
-execution of the block of code.  Context managers are normally invoked using the
-:keyword:`!with` statement (described in section :ref:`with`), but can also be
-used by directly invoking their methods.
+:dfn:`context manager` là một đối tượng xác định ngữ cảnh runtime cần được thiết lập khi thực thi một câu lệnh :keyword:`with`. Context manager xử lý việc đi vào và thoát khỏi ngữ cảnh runtime mong muốn để thực thi khối mã. Context manager thường được gọi bằng cách sử dụng
+câu lệnh :keyword:`!with` (được mô tả trong phần :ref:`with`), nhưng cũng có thể được sử dụng bằng cách gọi trực tiếp các phương thức của chúng.
 
 .. index::
    pair: statement; with
    single: context manager
 
-Typical uses of context managers include saving and restoring various kinds of
-global state, locking and unlocking resources, closing opened files, etc.
+Các cách sử dụng điển hình của context manager bao gồm lưu và khôi phục nhiều loại trạng thái global, khóa và mở khóa tài nguyên, đóng các tệp đã mở, v.v.
 
-For more information on context managers, see :ref:`typecontextmanager`.
-The :class:`object` class itself does not provide the context manager methods.
+Để biết thêm thông tin về context manager, xem :ref:`typecontextmanager`. Bản thân lớp :class:`object` không cung cấp các phương thức context manager.
 
 
 .. method:: object.__enter__(self)
 
-   Enter the runtime context related to this object. The :keyword:`with` statement
-   will bind this method's return value to the target(s) specified in the
-   :keyword:`!as` clause of the statement, if any.
+   Đi vào ngữ cảnh runtime liên quan đến đối tượng này. Câu lệnh :keyword:`with` sẽ gán giá trị trả về của phương thức này cho (các) target được chỉ định trong
+   mệnh đề :keyword:`!as` của câu lệnh, nếu có.
 
 
 .. method:: object.__exit__(self, exc_type, exc_value, traceback)
 
-   Exit the runtime context related to this object. The parameters describe the
-   exception that caused the context to be exited. If the context was exited
-   without an exception, all three arguments will be :const:`None`.
+   Thoát khỏi context runtime liên quan đến đối tượng này. Các tham số mô tả exception đã khiến context bị thoát. Nếu context được thoát mà không có exception, cả ba đối số sẽ là :const:`None`.
 
-   If an exception is supplied, and the method wishes to suppress the exception
-   (i.e., prevent it from being propagated), it should return a true value.
-   Otherwise, the exception will be processed normally upon exit from this method.
+   Nếu có một exception được cung cấp và phương thức muốn chặn exception đó (tức là ngăn nó được lan truyền), phương thức nên trả về một giá trị true. Nếu không, exception sẽ được xử lý bình thường khi thoát khỏi phương thức này.
 
-   Note that :meth:`~object.__exit__` methods should not reraise the passed-in exception;
-   this is the caller's responsibility.
+   Lưu ý rằng các phương thức :meth:`~object.__exit__` không nên ném lại exception đã truyền vào; đây là trách nhiệm của caller.
 
 
 .. seealso::
 
-   :pep:`343` - The "with" statement
-      The specification, background, and examples for the Python :keyword:`with`
-      statement.
+   :pep:`343` - Câu lệnh "with"
+      Đặc tả, bối cảnh và ví dụ cho câu lệnh :keyword:`with` của Python.
 
 
 .. _class-pattern-matching:
 
-Customizing positional arguments in class pattern matching
-----------------------------------------------------------
+Tùy chỉnh đối số vị trí trong pattern matching của class
+--------------------------------------------------------
 
-When using a class name in a pattern, positional arguments in the pattern are not
-allowed by default, i.e. ``case MyClass(x, y)`` is typically invalid without special
-support in ``MyClass``. To be able to use that kind of pattern, the class needs to
-define a *__match_args__* attribute.
+Khi sử dụng tên class trong một pattern, theo mặc định không được phép dùng đối số vị trí trong pattern, tức là ``case MyClass(x, y)`` thường không hợp lệ nếu không có hỗ trợ đặc biệt trong ``MyClass``. Để có thể sử dụng kiểu pattern đó, class cần định nghĩa một thuộc tính *__match_args__*.
 
 .. data:: object.__match_args__
 
-   This class variable can be assigned a tuple of strings. When this class is
-   used in a class pattern with positional arguments, each positional argument will
-   be converted into a keyword argument, using the corresponding value in
-   *__match_args__* as the keyword. The absence of this attribute is equivalent to
-   setting it to ``()``.
+   Biến lớp này có thể được gán một tuple các chuỗi. Khi lớp này được sử dụng trong một class pattern có các đối số vị trí, mỗi đối số vị trí sẽ được chuyển đổi thành một đối số từ khóa, sử dụng giá trị tương ứng trong *__match_args__* làm từ khóa. Việc không có thuộc tính này tương đương với việc đặt nó thành ``()``.
 
-For example, if ``MyClass.__match_args__`` is ``("left", "center", "right")`` that means
-that ``case MyClass(x, y)`` is equivalent to ``case MyClass(left=x, center=y)``. Note
-that the number of arguments in the pattern must be smaller than or equal to the number
-of elements in *__match_args__*; if it is larger, the pattern match attempt will raise
-a :exc:`TypeError`.
+Ví dụ, nếu ``MyClass.__match_args__`` là ``("left", "center", "right")`` thì điều đó có nghĩa là ``case MyClass(x, y)`` tương đương với ``case MyClass(left=x, center=y)``. Lưu ý rằng số lượng đối số trong pattern phải nhỏ hơn hoặc bằng số phần tử trong *__match_args__*; nếu lớn hơn, lần thử khớp pattern sẽ phát sinh :exc:`TypeError`.
 
 .. versionadded:: 3.10
 
 .. seealso::
 
-   :pep:`634` - Structural Pattern Matching
-      The specification for the Python ``match`` statement.
+   :pep:`634` - Đối sánh mẫu cấu trúc
+      Đặc tả cho câu lệnh ``match`` của Python.
 
 
 .. _python-buffer-protocol:
 
-Emulating buffer types
-----------------------
+Mô phỏng các kiểu buffer
+------------------------
 
-The :ref:`buffer protocol <bufferobjects>` provides a way for Python
-objects to expose efficient access to a low-level memory array. This protocol
-is implemented by builtin types such as :class:`bytes` and :class:`memoryview`,
-and third-party libraries may define additional buffer types.
+:ref:`buffer protocol <bufferobjects>` cung cấp cách để các đối tượng Python cung cấp quyền truy cập hiệu quả vào một mảng bộ nhớ cấp thấp. Protocol này được triển khai bởi các kiểu dựng sẵn như :class:`bytes` và :class:`memoryview`, đồng thời các thư viện bên thứ ba có thể định nghĩa thêm các kiểu buffer.
 
-While buffer types are usually implemented in C, it is also possible to
-implement the protocol in Python.
+Mặc dù các kiểu buffer thường được triển khai bằng C, bạn cũng có thể triển khai protocol này bằng Python.
 
 .. method:: object.__buffer__(self, flags)
 
-   Called when a buffer is requested from *self* (for example, by the
-   :class:`memoryview` constructor). The *flags* argument is an integer
-   representing the kind of buffer requested, affecting for example whether
-   the returned buffer is read-only or writable. :class:`inspect.BufferFlags`
-   provides a convenient way to interpret the flags. The method must return
-   a :class:`memoryview` object.
+   Được gọi khi một buffer được yêu cầu từ *self* (ví dụ, bởi
+   :class:`memoryview` constructor). Đối số *flags* là một số nguyên biểu thị loại buffer được yêu cầu, chẳng hạn ảnh hưởng đến việc buffer trả về là chỉ đọc hay có thể ghi. :class:`inspect.BufferFlags` cung cấp một cách thuận tiện để diễn giải các cờ này. Phương thức phải trả về một đối tượng :class:`memoryview`.
 
-   **Thread safety:** In :term:`free-threaded <free threading>` Python,
-   implementations must manage any internal export counter using atomic
-   operations. The method must be safe to call concurrently from multiple
-   threads, and the returned buffer's underlying data must remain valid
-   until the corresponding :meth:`~object.__release_buffer__` call
-   completes. See :ref:`thread-safety-memoryview` for details.
+   **An toàn luồng:** Trong Python :term:`free-threaded <free threading>`, các implementation phải quản lý mọi bộ đếm export nội bộ bằng các thao tác atomic. Phương thức phải an toàn khi được gọi đồng thời từ nhiều luồng, và dữ liệu nền tảng của buffer được trả về phải vẫn hợp lệ cho đến khi lời gọi :meth:`~object.__release_buffer__` tương ứng hoàn tất. Xem :ref:`thread-safety-memoryview` để biết chi tiết.
 
 .. method:: object.__release_buffer__(self, buffer)
 
-   Called when a buffer is no longer needed. The *buffer* argument is a
-   :class:`memoryview` object that was previously returned by
-   :meth:`~object.__buffer__`. The method must release any resources associated
-   with the buffer. This method should return ``None``.
+   Được gọi khi một buffer không còn cần thiết. Đối số *buffer* là một
+   đối tượng :class:`memoryview` đã được trả về trước đó bởi
+   :meth:`~object.__buffer__`. Phương thức phải giải phóng mọi tài nguyên liên kết với buffer. Phương thức này nên trả về ``None``.
 
-   **Thread safety:** In :term:`free-threaded <free threading>` Python,
-   any export counter decrement must use atomic operations. Resource
-   cleanup must be thread-safe, as the final release may race with
-   concurrent releases from other threads.
+   **An toàn luồng:** Trong Python :term:`free-threaded <free threading>`, mọi thao tác giảm bộ đếm export phải sử dụng các thao tác atomic. Việc dọn dẹp tài nguyên phải an toàn luồng, vì lần giải phóng cuối cùng có thể xảy ra đồng thời với các lần giải phóng từ những luồng khác.
 
-   Buffer objects that do not need to perform any cleanup are not required
-   to implement this method.
+   Các đối tượng buffer không cần thực hiện bất kỳ thao tác dọn dẹp nào thì không bắt buộc phải triển khai phương thức này.
 
 .. versionadded:: 3.12
 
 .. seealso::
 
-   :pep:`688` - Making the buffer protocol accessible in Python
-      Introduces the Python ``__buffer__`` and ``__release_buffer__`` methods.
+   :pep:`688` - Giúp buffer protocol có thể truy cập được trong Python
+      Giới thiệu các phương thức Python ``__buffer__`` và ``__release_buffer__``.
 
    :class:`collections.abc.Buffer`
-      ABC for buffer types.
+      ABC cho các kiểu buffer.
 
-Annotations
------------
+Chú thích
+---------
 
-Functions, classes, and modules may contain :term:`annotations <annotation>`,
-which are a way to associate information (usually :term:`type hints <type hint>`)
-with a symbol.
+Các hàm, lớp và mô-đun có thể chứa :term:`annotations <annotation>`, là một cách để liên kết thông tin (thường là :term:`type hints <type hint>`) với một ký hiệu.
 
 .. attribute:: object.__annotations__
 
-   This attribute contains the annotations for an object. It is
-   :ref:`lazily evaluated <lazy-evaluation>`, so accessing the attribute may
-   execute arbitrary code and raise exceptions. If evaluation is successful, the
-   attribute is set to a dictionary mapping from variable names to annotations.
+   Thuộc tính này chứa các chú thích cho một đối tượng. Nó là
+   :ref:`được đánh giá lười (lazily evaluated) <lazy-evaluation>`, vì vậy việc truy cập thuộc tính có thể thực thi mã tùy ý và phát sinh ngoại lệ. Nếu đánh giá thành công, thuộc tính được đặt thành một dictionary ánh xạ từ tên biến đến các annotation.
 
    .. versionchanged:: 3.14
-      Annotations are now lazily evaluated.
+      Annotation hiện được đánh giá lười.
 
 .. method:: object.__annotate__(format)
 
-   An :term:`annotate function`.
-   Returns a new dictionary object mapping attribute/parameter names to their annotation values.
+   Một :term:`annotate function`. Trả về một đối tượng dictionary mới ánh xạ tên thuộc tính/tham số tới các giá trị annotation của chúng.
 
-   Takes a format parameter specifying the format in which annotations values should be provided.
-   It must be a member of the :class:`annotationlib.Format` enum, or an integer with
-   a value corresponding to a member of the enum.
+   Nhận một tham số format chỉ định định dạng mà các giá trị annotation sẽ được cung cấp. Nó phải là một thành viên của enum :class:`annotationlib.Format`, hoặc một số nguyên có giá trị tương ứng với một thành viên của enum.
 
-   If an annotate function doesn't support the requested format, it must raise
-   :exc:`NotImplementedError`. Annotate functions must always support
-   :attr:`~annotationlib.Format.VALUE` format; they must not raise
-   :exc:`NotImplementedError()` when called with this format.
+   Nếu một hàm annotate không hỗ trợ format được yêu cầu, hàm đó phải phát sinh
+   :exc:`NotImplementedError`. Các hàm annotate phải luôn hỗ trợ
+   format :attr:`~annotationlib.Format.VALUE`; chúng không được phát sinh
+   :exc:`NotImplementedError()` khi được gọi với định dạng này.
 
-   When called with  :attr:`~annotationlib.Format.VALUE` format, an annotate function may raise
-   :exc:`NameError`; it must not raise :exc:`!NameError` when called requesting any other format.
+   Khi được gọi với định dạng :attr:`~annotationlib.Format.VALUE`, một hàm annotate có thể phát sinh
+   :exc:`NameError`; hàm này không được phát sinh :exc:`!NameError` khi được gọi yêu cầu bất kỳ định dạng nào khác.
 
-   If an object does not have any annotations, :attr:`~object.__annotate__` should preferably be set
-   to ``None`` (it can’t be deleted), rather than set to a function that returns an empty dict.
+   Nếu một đối tượng không có annotation nào, tốt nhất nên đặt :attr:`~object.__annotate__` thành ``None`` (không thể xóa nó), thay vì đặt thành một hàm trả về dict rỗng.
 
    .. versionadded:: 3.14
 
 .. seealso::
 
-   :pep:`649` --- Deferred evaluation of annotation using descriptors
-      Introduces lazy evaluation of annotations and the ``__annotate__`` function.
+   :pep:`649` --- Đánh giá trì hoãn annotation bằng descriptor
+      Giới thiệu việc đánh giá lười (lazy evaluation) các annotation và hàm ``__annotate__``.
 
 
 .. _special-lookup:
 
-Special method lookup
----------------------
+Tra cứu special method
+----------------------
 
-For custom classes, implicit invocations of special methods are only guaranteed
-to work correctly if defined on an object's type, not in the object's instance
-dictionary.  That behaviour is the reason why the following code raises an
-exception::
+Đối với các lớp tùy chỉnh, những lời gọi ngầm các phương thức đặc biệt chỉ được đảm bảo hoạt động đúng nếu được định nghĩa trên type của đối tượng, không phải trong từ điển instance của đối tượng. Hành vi đó là lý do đoạn mã sau phát sinh một ngoại lệ::
 
    >>> class C:
    ...     pass
@@ -3747,12 +2622,7 @@ exception::
      File "<stdin>", line 1, in <module>
    TypeError: object of type 'C' has no len()
 
-The rationale behind this behaviour lies with a number of special methods such
-as :meth:`~object.__hash__` and :meth:`~object.__repr__` that are implemented
-by all objects,
-including type objects. If the implicit lookup of these methods used the
-conventional lookup process, they would fail when invoked on the type object
-itself::
+Cơ sở lý luận đằng sau hành vi này nằm ở một số phương thức đặc biệt như :meth:`~object.__hash__` và :meth:`~object.__repr__`, vốn được mọi đối tượng, bao gồm cả các đối tượng type, triển khai. Nếu việc tra cứu ngầm các phương thức này sử dụng quy trình tra cứu thông thường, chúng sẽ thất bại khi được gọi trên chính đối tượng type::
 
    >>> 1 .__hash__() == hash(1)
    True
@@ -3761,18 +2631,15 @@ itself::
      File "<stdin>", line 1, in <module>
    TypeError: descriptor '__hash__' of 'int' object needs an argument
 
-Incorrectly attempting to invoke an unbound method of a class in this way is
-sometimes referred to as 'metaclass confusion', and is avoided by bypassing
-the instance when looking up special methods::
+Việc cố gọi không đúng cách một phương thức unbound của một lớp theo cách này đôi khi được gọi là 'metaclass confusion', và được tránh bằng cách bỏ qua instance khi tra cứu các phương thức đặc biệt::
 
    >>> type(1).__hash__(1) == hash(1)
    True
    >>> type(int).__hash__(int) == hash(int)
    True
 
-In addition to bypassing any instance attributes in the interest of
-correctness, implicit special method lookup generally also bypasses the
-:meth:`~object.__getattribute__` method even of the object's metaclass::
+Ngoài việc bỏ qua mọi thuộc tính instance để đảm bảo tính đúng đắn, việc tra cứu ngầm phương thức đặc biệt nói chung cũng bỏ qua
+phương thức :meth:`~object.__getattribute__` ngay cả của metaclass của đối tượng::
 
    >>> class Meta(type):
    ...     def __getattribute__(*args):
@@ -3787,150 +2654,108 @@ correctness, implicit special method lookup generally also bypasses the
    ...         return object.__getattribute__(*args)
    ...
    >>> c = C()
-   >>> c.__len__()                 # Explicit lookup via instance
+   >>> c.__len__()                 # Tra cứu tường minh qua instance
    Class getattribute invoked
    10
-   >>> type(c).__len__(c)          # Explicit lookup via type
+   >>> type(c).__len__(c)          # Tra cứu tường minh qua type
    Metaclass getattribute invoked
    10
-   >>> len(c)                      # Implicit lookup
+   >>> len(c)                      # Tra cứu ngầm định
    10
 
-Bypassing the :meth:`~object.__getattribute__` machinery in this fashion
-provides significant scope for speed optimisations within the
-interpreter, at the cost of some flexibility in the handling of
-special methods (the special method *must* be set on the class
-object itself in order to be consistently invoked by the interpreter).
+Việc bỏ qua cơ chế :meth:`~object.__getattribute__` theo cách này tạo ra đáng kể cơ hội tối ưu hoá tốc độ trong interpreter, đổi lại là giảm một phần tính linh hoạt khi xử lý các phương thức đặc biệt (phương thức đặc biệt *phải* được đặt trên chính đối tượng lớp để được interpreter gọi một cách nhất quán).
 
 
 .. index::
    single: coroutine
 
-Coroutines
-==========
+Coroutine
+=========
 
 
-Awaitable Objects
------------------
+Đối tượng Awaitable
+-------------------
 
-An :term:`awaitable` object generally implements an :meth:`~object.__await__` method.
-:term:`Coroutine objects <coroutine>` returned from :keyword:`async def` functions
-are awaitable.
+Một đối tượng :term:`awaitable` thường triển khai một phương thức :meth:`~object.__await__`.
+:term:`Các đối tượng coroutine <coroutine>` được trả về từ các hàm :keyword:`async def` là awaitable.
 
 .. note::
 
-   The :term:`generator iterator` objects returned from generators
-   decorated with :func:`types.coroutine`
-   are also awaitable, but they do not implement :meth:`~object.__await__`.
+   Các đối tượng :term:`generator iterator` được trả về từ các generator được trang trí bằng :func:`types.coroutine` cũng là awaitable, nhưng chúng không triển khai :meth:`~object.__await__`.
 
 .. method:: object.__await__(self)
 
-   Must return an :term:`iterator`.  Should be used to implement
-   :term:`awaitable` objects.  For instance, :class:`asyncio.Future` implements
-   this method to be compatible with the :keyword:`await` expression.
-   The :class:`object` class itself is not awaitable and does not provide
-   this method.
+   Phải trả về một :term:`iterator`. Nên được dùng để triển khai
+   các đối tượng :term:`awaitable`. Ví dụ, :class:`asyncio.Future` triển khai phương thức này để tương thích với biểu thức :keyword:`await`. Bản thân lớp :class:`object` không phải là awaitable và không cung cấp phương thức này.
 
    .. note::
 
-      The language doesn't place any restriction on the type or value of the
-      objects yielded by the iterator returned by ``__await__``, as this is
-      specific to the implementation of the asynchronous execution framework
-      (e.g. :mod:`asyncio`) that will be managing the :term:`awaitable` object.
+      Ngôn ngữ không đặt ra bất kỳ hạn chế nào đối với kiểu hoặc giá trị của các đối tượng được yield bởi iterator do ``__await__`` trả về, vì điều này phụ thuộc vào cách triển khai của framework thực thi bất đồng bộ (ví dụ: :mod:`asyncio`) sẽ quản lý đối tượng :term:`awaitable`.
 
 
 .. versionadded:: 3.5
 
-.. seealso:: :pep:`492` for additional information about awaitable objects.
+.. seealso:: :pep:`492` để biết thêm thông tin về các đối tượng awaitable.
 
 
 .. _coroutine-objects:
 
-Coroutine Objects
------------------
+Đối tượng Coroutine
+-------------------
 
-:term:`Coroutine objects <coroutine>` are :term:`awaitable` objects.
-A coroutine's execution can be controlled by calling :meth:`~object.__await__` and
-iterating over the result.  When the coroutine has finished executing and
-returns, the iterator raises :exc:`StopIteration`, and the exception's
-:attr:`~StopIteration.value` attribute holds the return value.  If the
-coroutine raises an exception, it is propagated by the iterator.  Coroutines
-should not directly raise unhandled :exc:`StopIteration` exceptions.
+:term:`Đối tượng coroutine <coroutine>` là các đối tượng :term:`awaitable`. Việc thực thi một coroutine có thể được điều khiển bằng cách gọi :meth:`~object.__await__` và lặp qua kết quả. Khi coroutine thực thi xong và trả về, iterator sẽ phát sinh :exc:`StopIteration`, và ngoại lệ này
+có thuộc tính :attr:`~StopIteration.value` chứa giá trị trả về. Nếu coroutine phát sinh một ngoại lệ, ngoại lệ đó sẽ được iterator truyền đi. Coroutine không nên trực tiếp phát sinh các ngoại lệ :exc:`StopIteration` chưa được xử lý.
 
-Coroutines also have the methods listed below, which are analogous to
-those of generators (see :ref:`generator-methods`).  However, unlike
-generators, coroutines do not directly support iteration.
+Coroutine cũng có các phương thức được liệt kê bên dưới, tương tự như các phương thức của generator (xem :ref:`generator-methods`). Tuy nhiên, không giống generator, coroutine không trực tiếp hỗ trợ việc lặp.
 
-Coroutines are :ref:`generic <generics>` over the types of their yield, send,
-and return values, respectively.
+Coroutine là :ref:`generic <generics>` theo các kiểu của giá trị yield, send và return tương ứng.
 
 .. versionchanged:: 3.5.2
-   It is a :exc:`RuntimeError` to await on a coroutine more than once.
+   Đây là một :exc:`RuntimeError` khi await một coroutine nhiều hơn một lần.
 
 
 .. method:: coroutine.send(value)
 
-   Starts or resumes execution of the coroutine.  If *value* is ``None``,
-   this is equivalent to advancing the iterator returned by
-   :meth:`~object.__await__`.  If *value* is not ``None``, this method delegates
-   to the :meth:`~generator.send` method of the iterator that caused
-   the coroutine to suspend.  The result (return value,
-   :exc:`StopIteration`, or other exception) is the same as when
-   iterating over the :meth:`!__await__` return value, described above.
+   Bắt đầu hoặc tiếp tục thực thi coroutine. Nếu *value* là ``None``, điều này tương đương với việc tiến iterator được trả về bởi
+   :meth:`~object.__await__`. Nếu *value* không phải là ``None``, phương thức này ủy quyền cho phương thức :meth:`~generator.send` của iterator đã khiến coroutine tạm dừng. Kết quả (giá trị return,
+   :exc:`StopIteration`, hoặc ngoại lệ khác) giống như khi lặp qua giá trị return của :meth:`!__await__`, được mô tả ở trên.
 
 .. method:: coroutine.throw(value)
             coroutine.throw(type[, value[, traceback]])
 
-   Raises the specified exception in the coroutine.  This method delegates
-   to the :meth:`~generator.throw` method of the iterator that caused
-   the coroutine to suspend, if it has such a method.  Otherwise,
-   the exception is raised at the suspension point.  The result
-   (return value, :exc:`StopIteration`, or other exception) is the same as
-   when iterating over the :meth:`~object.__await__` return value, described
-   above.  If the exception is not caught in the coroutine, it propagates
-   back to the caller.
+   Phát sinh ngoại lệ đã chỉ định trong coroutine. Phương thức này ủy quyền cho phương thức :meth:`~generator.throw` của iterator đã khiến coroutine bị tạm dừng, nếu iterator đó có phương thức này. Nếu không, ngoại lệ được phát sinh tại điểm tạm dừng. Kết quả (giá trị trả về, :exc:`StopIteration` hoặc ngoại lệ khác) giống như khi lặp qua giá trị trả về :meth:`~object.__await__` được mô tả ở trên. Nếu ngoại lệ không được bắt trong coroutine, nó sẽ truyền ngược về caller.
 
    .. versionchanged:: 3.12
 
-      The second signature \(type\[, value\[, traceback\]\]\) is deprecated and
-      may be removed in a future version of Python.
+      Chữ ký thứ hai \(type\[, value\[, traceback\]\]\) đã lỗi thời và có thể bị loại bỏ trong một phiên bản Python tương lai.
 
 .. method:: coroutine.close()
 
-   Causes the coroutine to clean itself up and exit.  If the coroutine
-   is suspended, this method first delegates to the :meth:`~generator.close`
-   method of the iterator that caused the coroutine to suspend, if it
-   has such a method.  Then it raises :exc:`GeneratorExit` at the
-   suspension point, causing the coroutine to immediately clean itself up.
-   Finally, the coroutine is marked as having finished executing, even if
-   it was never started.
+   Khiến coroutine tự dọn dẹp và thoát. Nếu coroutine đang bị tạm dừng, phương thức này trước tiên ủy quyền cho phương thức :meth:`~generator.close` của iterator đã khiến coroutine bị tạm dừng, nếu iterator đó có phương thức này. Sau đó, nó phát sinh :exc:`GeneratorExit` tại điểm tạm dừng, khiến coroutine ngay lập tức tự dọn dẹp. Cuối cùng, coroutine được đánh dấu là đã thực thi xong, ngay cả khi nó chưa từng được khởi chạy.
 
-   Coroutine objects are automatically closed using the above process when
-   they are about to be destroyed.
+   Các đối tượng coroutine được tự động đóng bằng quy trình ở trên khi chúng sắp bị hủy.
 
 .. _async-iterators:
 
-Asynchronous Iterators
-----------------------
+Các Iterator Bất đồng bộ
+------------------------
 
-An *asynchronous iterator* can call asynchronous code in
-its ``__anext__`` method.
+Một *iterator bất đồng bộ* có thể gọi code bất đồng bộ trong phương thức ``__anext__`` của nó.
 
-Asynchronous iterators can be used in an :keyword:`async for` statement.
+Các iterator bất đồng bộ có thể được dùng trong một câu lệnh :keyword:`async for`.
 
-The :class:`object` class itself does not provide these methods.
+Bản thân lớp :class:`object` không cung cấp các phương thức này.
 
 
 .. method:: object.__aiter__(self)
 
-   Must return an *asynchronous iterator* object.
+   Phải trả về một đối tượng *asynchronous iterator*.
 
 .. method:: object.__anext__(self)
 
-   Must return an *awaitable* resulting in a next value of the iterator.  Should
-   raise a :exc:`StopAsyncIteration` error when the iteration is over.
+   Phải trả về một *awaitable* cho kết quả là giá trị tiếp theo của iterator. Phải phát sinh lỗi :exc:`StopAsyncIteration` khi quá trình lặp kết thúc.
 
-An example of an asynchronous iterable object::
+Ví dụ về một đối tượng iterable bất đồng bộ::
 
     class Reader:
         async def readline(self):
@@ -3948,38 +2773,32 @@ An example of an asynchronous iterable object::
 .. versionadded:: 3.5
 
 .. versionchanged:: 3.7
-   Prior to Python 3.7, :meth:`~object.__aiter__` could return an *awaitable*
-   that would resolve to an
+   Trước Python 3.7, :meth:`~object.__aiter__` có thể trả về một *awaitable* sẽ resolve thành một
    :term:`asynchronous iterator <asynchronous iterator>`.
 
-   Starting with Python 3.7, :meth:`~object.__aiter__` must return an
-   asynchronous iterator object.  Returning anything else
-   will result in a :exc:`TypeError` error.
+   Kể từ Python 3.7, :meth:`~object.__aiter__` phải trả về một đối tượng asynchronous iterator. Việc trả về bất kỳ thứ gì khác sẽ dẫn đến lỗi :exc:`TypeError`.
 
 
 .. _async-context-managers:
 
-Asynchronous Context Managers
------------------------------
+Trình quản lý ngữ cảnh bất đồng bộ
+----------------------------------
 
-An *asynchronous context manager* is a *context manager* that is able to
-suspend execution in its ``__aenter__`` and ``__aexit__`` methods.
+Một *trình quản lý ngữ cảnh bất đồng bộ* là một *trình quản lý ngữ cảnh* có thể tạm dừng việc thực thi trong các phương thức ``__aenter__`` và ``__aexit__`` của nó.
 
-Asynchronous context managers can be used in an :keyword:`async with` statement.
+Có thể sử dụng trình quản lý ngữ cảnh bất đồng bộ trong một câu lệnh :keyword:`async with`.
 
-The :class:`object` class itself does not provide these methods.
+Bản thân lớp :class:`object` không cung cấp các phương thức này.
 
 .. method:: object.__aenter__(self)
 
-   Semantically similar to :meth:`~object.__enter__`, the only
-   difference being that it must return an *awaitable*.
+   Về ngữ nghĩa tương tự :meth:`~object.__enter__`, điểm khác biệt duy nhất là nó phải trả về một *awaitable*.
 
 .. method:: object.__aexit__(self, exc_type, exc_value, traceback)
 
-   Semantically similar to :meth:`~object.__exit__`, the only
-   difference being that it must return an *awaitable*.
+   Về ngữ nghĩa tương tự :meth:`~object.__exit__`, điểm khác biệt duy nhất là nó phải trả về một *awaitable*.
 
-An example of an asynchronous context manager class::
+Ví dụ về một lớp trình quản lý ngữ cảnh bất đồng bộ::
 
     class AsyncContextManager:
         async def __aenter__(self):
@@ -3991,29 +2810,16 @@ An example of an asynchronous context manager class::
 .. versionadded:: 3.5
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] It *is* possible in some cases to change an object's type, under certain
-   controlled conditions. It generally isn't a good idea though, since it can
-   lead to some very strange behaviour if it is handled incorrectly.
+.. [#] Trong một số trường hợp, *có thể* thay đổi kiểu của một đối tượng, theo những điều kiện được kiểm soát nhất định. Tuy nhiên, nhìn chung đây không phải là ý hay, vì có thể dẫn đến những hành vi rất lạ nếu được xử lý không đúng cách.
 
-.. [#] The :meth:`~object.__hash__`, :meth:`~object.__iter__`,
+.. [#] Các phương thức :meth:`~object.__hash__`, :meth:`~object.__iter__`,
    :meth:`~object.__reversed__`, :meth:`~object.__contains__`,
-   :meth:`~object.__class_getitem__` and :meth:`~os.PathLike.__fspath__`
-   methods have special handling for this. Others
-   will still raise a :exc:`TypeError`, but may do so by relying on
-   the behavior that ``None`` is not callable.
+   :meth:`~object.__class_getitem__` và :meth:`~os.PathLike.__fspath__` được xử lý đặc biệt cho việc này. Các phương thức khác vẫn sẽ phát sinh :exc:`TypeError`, nhưng có thể làm vậy bằng cách dựa vào hành vi rằng ``None`` không thể gọi được.
 
-.. [#] "Does not support" here means that the class has no such method, or
-   the method returns :data:`NotImplemented`.  Do not set the method to
-   ``None`` if you want to force fallback to the right operand's reflected
-   method—that will instead have the opposite effect of explicitly
-   *blocking* such fallback.
+.. [#] "Không hỗ trợ" ở đây nghĩa là lớp không có phương thức như vậy, hoặc phương thức trả về :data:`NotImplemented`. Không đặt phương thức thành ``None`` nếu bạn muốn buộc quay lui về phương thức phản chiếu của toán hạng bên phải—thay vào đó, điều này sẽ có tác dụng ngược lại là *chặn* rõ ràng việc quay lui đó.
 
-.. [#] For operands of the same type, it is assumed that if the non-reflected method
-   (such as :meth:`~object.__add__`) fails then the operation is not supported, which is why the
-   reflected method is not called.
+.. [#] Đối với các toán hạng cùng kiểu, giả định rằng nếu phương thức không phản chiếu (chẳng hạn như :meth:`~object.__add__`) thất bại thì phép toán không được hỗ trợ, vì vậy phương thức phản chiếu không được gọi.
 
-.. [#] If the right operand's type is a subclass of the left operand's type, the
-   reflected method having precedence allows subclasses to override their ancestors'
-   operations.
+.. [#] Nếu kiểu của toán hạng bên phải là lớp con của kiểu của toán hạng bên trái, việc phương thức phản chiếu được ưu tiên cho phép các lớp con ghi đè các phép toán của tổ tiên.
