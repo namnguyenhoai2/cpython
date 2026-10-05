@@ -1,7 +1,7 @@
 :orphan:
 
 ****************************
-Improve a documentation page
+Cải thiện một trang tài liệu
 ****************************
 
 .. This is the no-javascript version of this page. The one most people
@@ -10,20 +10,18 @@ Improve a documentation page
 
 .. only:: html and not epub
 
-We are always interested to hear ideas about improvements to the documentation.
+Chúng tôi luôn mong muốn được lắng nghe các ý tưởng về việc cải thiện tài liệu.
 
 .. only:: translation
 
-   If the bug or suggested improvement concerns the translation of this
-   documentation, open an issue or edit the page in
-   `translation's repository <TRANSLATION_REPO_>`_ instead.
+   Nếu lỗi hoặc đề xuất cải thiện liên quan đến bản dịch của tài liệu này, thay vào đó, hãy mở một issue hoặc chỉnh sửa trang trong `kho lưu trữ của bản dịch <TRANSLATION_REPO_>`_.
 
-You have a few ways to ask questions or suggest changes:
+Bạn có một vài cách để đặt câu hỏi hoặc đề xuất thay đổi:
 
-- You can start a discussion about the page on the Python discussion forum.
-  This link will start a topic in the Documentation category:
-  `New Documentation topic <https://discuss.python.org/new-topic?category=documentation>`_.
+- Bạn có thể bắt đầu thảo luận về trang này trên diễn đàn thảo luận Python. Liên kết này sẽ bắt đầu một chủ đề trong danh mục Documentation: `Chủ đề Documentation mới <https://discuss.python.org/new-topic?category=documentation>`_.
 
-- You can open an issue on the Python GitHub issue tracker. This link will
-  create a new issue with the "docs" label:
-  `New docs issue <https://github.com/python/cpython/issues/new?template=documentation.yml>`_.
+- Bạn có thể mở một issue trên trình theo dõi issue GitHub của Python. Liên kết này sẽ tạo một issue mới với nhãn "docs": `Issue docs mới <https://github.com/python/cpython/issues/new?template=documentation.yml>`_.
+
+.. _`translation's repository`: TRANSLATION_REPO_
+.. _`New Documentation topic`: https://discuss.python.org/new-topic?category=documentation
+.. _`New docs issue`: https://github.com/python/cpython/issues/new?template=documentation.yml

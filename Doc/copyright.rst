@@ -1,19 +1,18 @@
 *********
-Copyright
+Bản quyền
 *********
 
-Python and this documentation is:
+Python và tài liệu này thuộc:
 
-Copyright © 2001 Python Software Foundation. All rights reserved.
+Bản quyền © 2001 Python Software Foundation. Bảo lưu mọi quyền.
 
-Copyright © 2000 BeOpen.com. All rights reserved.
+Bản quyền © 2000 BeOpen.com. Bảo lưu mọi quyền.
 
-Copyright © 1995-2000 Corporation for National Research Initiatives. All rights
-reserved.
+Bản quyền © 1995-2000 Corporation for National Research Initiatives. Bảo lưu mọi quyền.
 
-Copyright © 1991-1995 Stichting Mathematisch Centrum. All rights reserved.
+Bản quyền © 1991-1995 Stichting Mathematisch Centrum. Bảo lưu mọi quyền.
 
 -------
 
-See :ref:`history-and-license` for complete license and permissions information.
+Xem :ref:`history-and-license` để biết đầy đủ thông tin về giấy phép và quyền được cấp.
 

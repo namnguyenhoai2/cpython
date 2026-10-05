@@ -1,7 +1,7 @@
 :orphan:
 
 ****************************
-Improve a documentation page
+Cải thiện một trang tài liệu
 ****************************
 
 .. This is the JavaScript-enabled version of this page. Another version
@@ -40,26 +40,24 @@ Improve a documentation page
          });
       </script>
 
-We are always interested to hear ideas about improvements to the documentation.
+Chúng tôi luôn sẵn lòng lắng nghe các ý tưởng về việc cải thiện tài liệu.
 
-You were reading "PAGETITLE" at `<PAGEURL>`_.  The source for that page is on
-`GitHub <https://github.com/python/cpython/blob/main/Doc/PAGESOURCE?plain=1>`_.
+Bạn đang đọc "PAGETITLE" tại ` <PAGEURL>`_. Mã nguồn của trang đó nằm trên `GitHub <https://github.com/python/cpython/blob/main/Doc/PAGESOURCE?plain=1>`_.
 
 .. only:: translation
 
-   If the bug or suggested improvement concerns the translation of this
-   documentation, open an issue or edit the page in
-   `translation's repository <TRANSLATION_REPO_>`_ instead.
+   Nếu lỗi hoặc đề xuất cải thiện liên quan đến bản dịch của tài liệu này, thay vào đó hãy mở một issue hoặc chỉnh sửa trang trong `repository bản dịch <TRANSLATION_REPO_>`_.
 
-You have a few ways to ask questions or suggest changes:
+Bạn có một vài cách để đặt câu hỏi hoặc đề xuất thay đổi:
 
-- You can start a discussion about the page on the Python discussion forum.
-  This link will start a pre-populated topic:
-  `Question about page "PAGETITLE" <https://discuss.python.org/new-topic?category=documentation&title=Question+about+page+%22PAGETITLE%22&body=About+the+page+at+PAGEURL%3A>`_.
+- Bạn có thể bắt đầu một cuộc thảo luận về trang này trên diễn đàn thảo luận Python. Liên kết này sẽ bắt đầu một chủ đề được điền sẵn: `Câu hỏi về trang "PAGETITLE" <https://discuss.python.org/new-topic?category=documentation&title=Question+about+page+%22PAGETITLE%22&body=About+the+page+at+PAGEURL%3A>`_.
 
-- You can open an issue on the Python GitHub issue tracker. This link will
-  create a new pre-populated issue:
-  `Docs: problem with page "PAGETITLE" <https://github.com/python/cpython/issues/new?template=documentation.yml&title=Docs%3A+problem+with+page+%22PAGETITLE%22&description=The+page+at+PAGEURL+has+a+problem%3A>`_.
+- Bạn có thể mở một issue trên trình theo dõi issue GitHub của Python. Liên kết này sẽ tạo một issue mới được điền sẵn: `Tài liệu: vấn đề với trang "PAGETITLE" <https://github.com/python/cpython/issues/new?template=documentation.yml&title=Docs%3A+problem+with+page+%22PAGETITLE%22&description=The+page+at+PAGEURL+has+a+problem%3A>`_.
 
-- You can `edit the page on GitHub <https://github.com/python/cpython/blob/main/Doc/PAGESOURCE?plain=1>`_
-  to open a pull request and begin the contribution process.
+- Bạn có thể `chỉnh sửa trang trên GitHub <https://github.com/python/cpython/blob/main/Doc/PAGESOURCE?plain=1>`_ để mở một pull request và bắt đầu quy trình đóng góp.
+
+.. _`GitHub`: https://github.com/python/cpython/blob/main/Doc/PAGESOURCE?plain=1
+.. _`translation's repository`: TRANSLATION_REPO_
+.. _`Question about page "PAGETITLE"`: https://discuss.python.org/new-topic?category=documentation&title=Question+about+page+%22PAGETITLE%22&body=About+the+page+at+PAGEURL%3A
+.. _`Docs: problem with page "PAGETITLE"`: https://github.com/python/cpython/issues/new?template=documentation.yml&title=Docs%3A+problem+with+page+%22PAGETITLE%22&description=The+page+at+PAGEURL+has+a+problem%3A
+.. _`edit the page on GitHub`: https://github.com/python/cpython/blob/main/Doc/PAGESOURCE?plain=1

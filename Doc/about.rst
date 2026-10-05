@@ -1,11 +1,9 @@
-========================
-About this documentation
-========================
+===============
+Về tài liệu này
+===============
 
 
-Python's documentation is generated from `reStructuredText`_ sources
-using `Sphinx`_, a documentation generator originally created for Python
-and now maintained as an independent project.
+Tài liệu Python được tạo từ các nguồn `reStructuredText`_ bằng `Sphinx`_, một trình tạo tài liệu ban đầu được tạo cho Python và hiện được duy trì như một dự án độc lập.
 
 .. _reStructuredText: https://docutils.sourceforge.io/rst.html
 .. _Sphinx: https://www.sphinx-doc.org/
@@ -13,27 +11,20 @@ and now maintained as an independent project.
 .. In the online version of this documentation, you can submit comments and suggest
    changes directly on the documentation pages.
 
-Development of the documentation and its toolchain is an entirely volunteer
-effort, just like Python itself.  If you want to contribute, please take a
-look at the :ref:`reporting-bugs` page for information on how to do so.  New
-volunteers are always welcome!
+Việc phát triển tài liệu và chuỗi công cụ của tài liệu hoàn toàn dựa trên nỗ lực tình nguyện, giống như chính Python. Nếu bạn muốn đóng góp, hãy xem trang :ref:`reporting-bugs` để biết thông tin về cách thực hiện. Những tình nguyện viên mới luôn được chào đón!
 
-Many thanks go to:
+Xin chân thành cảm ơn:
 
-* Fred L. Drake, Jr., the creator of the original Python documentation toolset
-  and author of much of the content;
-* the `Docutils <https://docutils.sourceforge.io/>`_ project for creating
-  reStructuredText and the Docutils suite;
-* Fredrik Lundh for his Alternative Python Reference project from which Sphinx
-  got many good ideas.
+* Fred L. Drake, Jr., người tạo ra bộ công cụ tài liệu Python ban đầu và là tác giả của phần lớn nội dung;
+* dự án `Docutils <https://docutils.sourceforge.io/>`_ vì đã tạo ra reStructuredText và bộ Docutils;
+* Fredrik Lundh vì dự án Alternative Python Reference của ông, từ đó Sphinx đã tiếp thu nhiều ý tưởng hay.
 
 
-Contributors to the Python documentation
+Những người đóng góp cho tài liệu Python
 ----------------------------------------
 
-Many people have contributed to the Python language, the Python standard
-library, and the Python documentation.  See :source:`Misc/ACKS` in the Python
-source distribution for a partial list of contributors.
+Nhiều người đã đóng góp cho ngôn ngữ Python, thư viện chuẩn Python và tài liệu Python. Xem :source:`Misc/ACKS` trong bản phân phối mã nguồn Python để biết danh sách chưa đầy đủ những người đóng góp.
 
-It is only with the input and contributions of the Python community
-that Python has such wonderful documentation -- Thank You!
+Chính nhờ những ý kiến và đóng góp của cộng đồng Python mà Python có được tài liệu tuyệt vời như vậy — Xin cảm ơn!
+
+.. _`Docutils`: https://docutils.sourceforge.io/
