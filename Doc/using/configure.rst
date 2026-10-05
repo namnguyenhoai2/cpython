@@ -1,97 +1,81 @@
-****************
-Configure Python
-****************
+***************
+Cấu hình Python
+***************
 
 .. highlight:: sh
 
 
 .. _build-requirements:
 
-Build Requirements
-==================
+Yêu cầu để build
+================
 
-To build CPython, you will need:
+Để build CPython, bạn sẽ cần:
 
-* A `C11 <https://en.cppreference.com/w/c/11>`_ compiler. `Optional C11
-  features
-  <https://en.wikipedia.org/wiki/C11_(C_standard_revision)#Optional_features>`_
-  are not required.
+* Một trình biên dịch `C11 <https://en.cppreference.com/w/c/11>`_. Không yêu cầu `các tính năng C11 tùy chọn <https://en.wikipedia.org/wiki/C11_(C_standard_revision)#Optional_features>`_.
 
-* On Windows, Microsoft Visual Studio 2017 or later is required.
+* Trên Windows, cần có Microsoft Visual Studio 2017 hoặc phiên bản mới hơn.
 
-* Support for `IEEE 754 <https://en.wikipedia.org/wiki/IEEE_754>`_
-  floating-point numbers and `floating-point Not-a-Number (NaN)
-  <https://en.wikipedia.org/wiki/NaN#Floating_point>`_.
+* Hỗ trợ số dấu phẩy động `IEEE 754 <https://en.wikipedia.org/wiki/IEEE_754>`_ và `giá trị Không-phải-số (NaN) dấu phẩy động <https://en.wikipedia.org/wiki/NaN#Floating_point>`_.
 
-* Support for threads.
+* Hỗ trợ luồng.
 
 .. versionchanged:: 3.5
-   On Windows, Visual Studio 2015 or later is now required.
+   Trên Windows, hiện yêu cầu Visual Studio 2015 trở lên.
 
 .. versionchanged:: 3.6
-   Selected C99 features, like ``<stdint.h>`` and ``static inline`` functions,
-   are now required.
+   Hiện yêu cầu một số tính năng C99 được chọn, chẳng hạn như các hàm ``<stdint.h>`` và ``static inline``.
 
 .. versionchanged:: 3.7
-   Thread support is now required.
+   Hiện yêu cầu hỗ trợ thread.
 
 .. versionchanged:: 3.11
-   C11 compiler, IEEE 754 and NaN support are now required.
-   On Windows, Visual Studio 2017 or later is required.
+   Hiện yêu cầu trình biên dịch C11, IEEE 754 và hỗ trợ NaN. Trên Windows, yêu cầu Visual Studio 2017 trở lên.
 
-See also :pep:`7` "Style Guide for C Code" and :pep:`11` "CPython platform
-support".
+Xem thêm :pep:`7` "Hướng dẫn phong cách viết mã C" và :pep:`11` "Hỗ trợ nền tảng CPython".
 
 
 .. _optional-module-requirements:
 
-Requirements for optional modules
----------------------------------
+Yêu cầu đối với các module tùy chọn
+-----------------------------------
 
-Some :term:`optional modules <optional module>` of the standard library
-require third-party libraries installed for development
-(for example, header files must be available).
+Một số :term:`module tùy chọn <optional module>` của thư viện chuẩn yêu cầu cài đặt các thư viện bên thứ ba để phát triển (ví dụ: phải có sẵn các tệp header).
 
-Missing requirements are reported in the ``configure`` output.
-Modules that are missing due to missing dependencies are listed near the end
-of the ``make`` output,
-sometimes using an internal name, for example, ``_ctypes`` for :mod:`ctypes`
-module.
+Các yêu cầu còn thiếu được báo cáo trong đầu ra ``configure``. Các mô-đun bị thiếu do thiếu dependency được liệt kê gần cuối đầu ra ``make``, đôi khi sử dụng tên nội bộ; ví dụ: ``_ctypes`` cho mô-đun :mod:`ctypes`.
 
-If you distribute a CPython interpreter without optional modules,
-it's best practice to advise users, who generally expect that
-standard library modules are available.
+Nếu bạn phân phối một trình thông dịch CPython không có các mô-đun tùy chọn, cách làm tốt nhất là thông báo cho người dùng, vì họ thường kỳ vọng các mô-đun trong standard library luôn khả dụng.
 
-Dependencies to build optional modules are:
+Các dependency để build các mô-đun tùy chọn là:
 
 .. list-table::
    :header-rows: 1
    :align: left
 
    * - Dependency
-     - Minimum version
-     - Python module
+     - Phiên bản tối thiểu
+     - Mô-đun Python
    * - `libbz2 <https://sourceware.org/bzip2/>`_
-     -
+   ---------------------------------------------
      - :mod:`bz2`
    * - `libffi <https://sourceware.org/libffi/>`_
-     - 3.3.0 recommended
+     - khuyến nghị dùng 3.3.0
      - :mod:`ctypes`
    * - `liblzma <https://tukaani.org/xz/>`_
-     -
+   ----------------------------------------
      - :mod:`lzma`
    * - `libmpdec <https://www.bytereef.org/mpdecimal/doc/libmpdec/>`_
      - 2.5.0
      - :mod:`decimal` [1]_
-   * - `libreadline <https://tiswww.case.edu/php/chet/readline/rltop.html>`_ or
+   * - `libreadline <https://tiswww.case.edu/php/chet/readline/rltop.html>`_ hoặc
        `libedit <https://www.thrysoee.dk/editline/>`_ [2]_
-     -
+       ---------------------------------------------------
      - :mod:`readline`
    * - `libuuid <https://linux.die.net/man/3/libuuid>`_
-     -
+   ----------------------------------------------------
      - ``_uuid`` [3]_
    * - `ncurses <https://gnu.org/software/ncurses/ncurses.html>`_ [4]_
-     -
+   -------------------------------------------------------------------
      - :mod:`curses`
    * - `OpenSSL <https://openssl-library.org/>`_
      - [6]_
@@ -109,115 +93,85 @@ Dependencies to build optional modules are:
      - 1.4.5
      - :mod:`compression.zstd`
 
-.. [1] If *libmpdec* is not available, the :mod:`decimal` module will use
-   a pure-Python implementation.
-   See :option:`--with-system-libmpdec` for details.
-.. [2] See :option:`--with-readline` for choosing the backend for the
-   :mod:`readline` module.
-.. [3] The :mod:`uuid` module uses ``_uuid`` to generate "safe" UUIDs.
-   See the module documentation for details.
-.. [4] The :mod:`curses` module requires the ``libncurses`` or ``libncursesw``
-   library.
-   The :mod:`curses.panel` module additionally requires the ``libpanel`` or
-   ``libpanelw`` library.
-.. [5] If OpenSSL is not available, the :mod:`hashlib` module will use
-   bundled implementations of several hash functions.
-   See :option:`--with-builtin-hashlib-hashes` for *forcing* usage of OpenSSL.
-.. [6] OpenSSL 1.1.1 is the minimum possible version to build against,
-   but the series is end-of-life and no longer receives public security
-   fixes.  Use the latest patch release of a currently supported LTS
-   release series (see the `OpenSSL Roadmap
-   <https://openssl-library.org/roadmap/index.html>`__), or the package
-   provided by your operating system if available.  Other libraries that
-   offer an API compatible with OpenSSL 1.1.1 or later may work, but are
-   not officially supported.
+.. [1] Nếu *libmpdec* không khả dụng, module :mod:`decimal` sẽ sử dụng một implementation thuần Python. Xem :option:`--with-system-libmpdec` để biết chi tiết.
+.. [2] Xem :option:`--with-readline` để biết cách chọn backend cho
+   module :mod:`readline`.
+.. [3] Module :mod:`uuid` sử dụng ``_uuid`` để tạo UUID “an toàn”. Xem tài liệu của module để biết chi tiết.
+.. [4] Module :mod:`curses` yêu cầu thư viện ``libncurses`` hoặc ``libncursesw``. Module :mod:`curses.panel` cũng yêu cầu thư viện ``libpanel`` hoặc ``libpanelw``.
+.. [5] Nếu OpenSSL không khả dụng, module :mod:`hashlib` sẽ sử dụng các implementation đi kèm của một số hàm băm. Xem :option:`--with-builtin-hashlib-hashes` để *buộc* sử dụng OpenSSL.
+.. [6] OpenSSL 1.1.1 là phiên bản tối thiểu có thể dùng để build, nhưng dòng phiên bản này đã hết vòng đời và không còn nhận được các bản sửa lỗi bảo mật công khai. Hãy sử dụng bản phát hành vá mới nhất của một dòng bản phát hành LTS hiện đang được hỗ trợ (xem `OpenSSL Roadmap <https://openssl-library.org/roadmap/index.html>`__), hoặc gói do hệ điều hành cung cấp nếu có. Các thư viện khác cung cấp API tương thích với OpenSSL 1.1.1 trở lên có thể hoạt động, nhưng không được hỗ trợ chính thức.
 
-Note that the table does not include all optional modules; in particular,
-platform-specific modules like :mod:`winreg` are not listed here.
+Lưu ý rằng bảng này không bao gồm tất cả các module tùy chọn; đặc biệt là các module dành riêng cho từng nền tảng như :mod:`winreg` không được liệt kê ở đây.
 
 .. seealso::
 
-   * The `devguide <https://devguide.python.org/getting-started/setup-building/#install-dependencies>`_
-     includes a full list of dependencies required to build all modules and
-     instructions on how to install them on common platforms.
-   * :option:`--with-system-expat` allows building with an external
-     `libexpat <https://libexpat.github.io/>`_ library.
+   * `devguide <https://devguide.python.org/getting-started/setup-building/#install-dependencies>`_ bao gồm danh sách đầy đủ các dependency cần thiết để xây dựng tất cả các module và hướng dẫn cách cài đặt chúng trên các nền tảng phổ biến.
+   * :option:`--with-system-expat` cho phép xây dựng với thư viện bên ngoài `libexpat <https://libexpat.github.io/>`_.
    * :ref:`configure-options-for-dependencies`
 
 .. versionchanged:: 3.1
-   Tcl/Tk version 8.3.1 is now required for :mod:`tkinter`.
+   Tcl/Tk phiên bản 8.3.1 hiện được yêu cầu cho :mod:`tkinter`.
 
 .. versionchanged:: 3.5
-   Tcl/Tk version 8.4 is now required for :mod:`tkinter`.
+   Tcl/Tk phiên bản 8.4 hiện được yêu cầu cho :mod:`tkinter`.
 
 .. versionchanged:: 3.7
-   OpenSSL 1.0.2 is now required for :mod:`hashlib` and :mod:`ssl`.
+   OpenSSL 1.0.2 hiện được yêu cầu cho :mod:`hashlib` và :mod:`ssl`.
 
 .. versionchanged:: 3.10
-   OpenSSL 1.1.1 is now required for :mod:`hashlib` and :mod:`ssl`.
-   SQLite 3.7.15 is now required for :mod:`sqlite3`.
+   OpenSSL 1.1.1 hiện được yêu cầu cho :mod:`hashlib` và :mod:`ssl`. SQLite 3.7.15 hiện được yêu cầu cho :mod:`sqlite3`.
 
 .. versionchanged:: 3.11
-   Tcl/Tk version 8.5.12 is now required for :mod:`tkinter`.
+   Tcl/Tk phiên bản 8.5.12 hiện được yêu cầu cho :mod:`tkinter`.
 
 .. versionchanged:: 3.13
-   SQLite 3.15.2 is now required for :mod:`sqlite3`.
+   SQLite 3.15.2 hiện được yêu cầu cho :mod:`sqlite3`.
 
 
-Generated files
-===============
+Các tệp được tạo
+================
 
-To reduce build dependencies, Python source code contains multiple generated
-files. Commands to regenerate all generated files::
+Để giảm các dependency khi build, mã nguồn Python chứa nhiều tệp được tạo. Các lệnh để tạo lại tất cả các tệp được tạo::
 
     make regen-all
     make regen-stdlib-module-names
     make regen-limited-abi
     make regen-configure
 
-The ``Makefile.pre.in`` file documents generated files, their inputs, and tools used
-to regenerate them. Search for ``regen-*`` make targets.
+Tệp ``Makefile.pre.in`` ghi lại các tệp được tạo, đầu vào của chúng và các công cụ được sử dụng để tạo lại chúng. Tìm các target make ``regen-*``.
 
-configure script
-----------------
+Tập lệnh configure
+------------------
 
-The ``make regen-configure`` command regenerates the ``aclocal.m4`` file and
-the ``configure`` script using the ``Tools/build/regen-configure.sh`` shell
-script which uses an Ubuntu container to get the same tools versions and have a
-reproducible output.
+Lệnh ``make regen-configure`` tạo lại tệp ``aclocal.m4`` và tập lệnh ``configure`` bằng tập lệnh shell ``Tools/build/regen-configure.sh``, sử dụng một container Ubuntu để có cùng phiên bản công cụ và tạo ra đầu ra có thể tái lập.
 
-The container is optional, the following command can be run locally::
+Container là tùy chọn; bạn có thể chạy lệnh sau locally::
 
     autoreconf -ivf -Werror
 
-The generated files can change depending on the exact versions of the
-tools used.
-The container that CPython uses has
-`Autoconf <https://gnu.org/software/autoconf>`_ 2.72,
-``aclocal`` from `Automake <https://www.gnu.org/software/automake>`_ 1.16.5,
-and `pkg-config <https://www.freedesktop.org/wiki/Software/pkg-config/>`_ 1.8.1.
+Các tệp được tạo có thể thay đổi tùy thuộc vào phiên bản chính xác của các công cụ được sử dụng. Container mà CPython sử dụng có `Autoconf <https://gnu.org/software/autoconf>`_ 2.72, ``aclocal`` từ `Automake <https://www.gnu.org/software/automake>`_ 1.16.5 và `pkg-config <https://www.freedesktop.org/wiki/Software/pkg-config/>`_ 1.8.1.
 
 .. versionchanged:: 3.13
-   Autoconf 2.71 and aclocal 1.16.5 and are now used to regenerate
+   Autoconf 2.71 và aclocal 1.16.5 hiện được sử dụng để tạo lại
    :file:`configure`.
 
 .. versionchanged:: 3.14
-   Autoconf 2.72 is now used to regenerate :file:`configure`.
+   Autoconf 2.72 hiện được sử dụng để tạo lại :file:`configure`.
 
 
 .. _configure-options:
 
-Configure Options
-=================
+Các tùy chọn Configure
+======================
 
-List all :file:`configure` script options using::
+Liệt kê tất cả các tùy chọn của script :file:`configure` bằng cách sử dụng::
 
     ./configure --help
 
-See also the :file:`Misc/SpecialBuilds.txt` in the Python source distribution.
+Xem thêm :file:`Misc/SpecialBuilds.txt` trong bản phân phối mã nguồn Python.
 
-General Options
----------------
+Tùy chọn chung
+--------------
 
 .. option:: --enable-loadable-sqlite-extensions
 
@@ -444,8 +398,8 @@ General Options
    ``pkg-config`` options.
 
 
-C compiler options
-------------------
+Tùy chọn trình biên dịch C
+--------------------------
 
 .. option:: CC
 
@@ -464,8 +418,8 @@ C compiler options
    C preprocessor flags, e.g. :samp:`-I{include_dir}`.
 
 
-Linker options
---------------
+Tùy chọn linker
+---------------
 
 .. option:: LDFLAGS
 
@@ -482,8 +436,8 @@ Linker options
 
 .. _configure-options-for-dependencies:
 
-Options for third-party dependencies
-------------------------------------
+Tùy chọn cho các dependency bên thứ ba
+--------------------------------------
 
 .. versionadded:: 3.11
 
@@ -579,8 +533,8 @@ Options for third-party dependencies
    overriding ``pkg-config``.
 
 
-WebAssembly Options
--------------------
+Tùy chọn WebAssembly
+--------------------
 
 .. option:: --enable-wasm-dynamic-linking
 
@@ -598,8 +552,8 @@ WebAssembly Options
    .. versionadded:: 3.11
 
 
-Install Options
----------------
+Tùy chọn cài đặt
+----------------
 
 .. option:: --prefix=PREFIX
 
@@ -636,12 +590,10 @@ Install Options
    .. versionadded:: 3.6
 
 
-Performance options
--------------------
+Tùy chọn hiệu năng
+------------------
 
-Configuring Python using ``--enable-optimizations --with-lto`` (PGO + LTO) is
-recommended for best performance. The experimental ``--enable-bolt`` flag can
-also be used to improve performance.
+Bạn nên cấu hình Python bằng ``--enable-optimizations --with-lto`` (PGO + LTO) để đạt hiệu năng tốt nhất. Cũng có thể sử dụng cờ thử nghiệm ``--enable-bolt`` để cải thiện hiệu năng.
 
 .. option:: --enable-optimizations
 
@@ -805,55 +757,40 @@ also be used to improve performance.
 
 .. _debug-build:
 
-Python Debug Build
-------------------
+Bản dựng gỡ lỗi Python
+----------------------
 
-A debug build is Python built with the :option:`--with-pydebug` configure
-option.
+Bản dựng gỡ lỗi là Python được xây dựng với tùy chọn cấu hình :option:`--with-pydebug`.
 
-Effects of a debug build:
+Các tác động của bản dựng gỡ lỗi:
 
-* Display all warnings by default: the list of default warning filters is empty
-  in the :mod:`warnings` module.
-* Add ``d`` to :data:`sys.abiflags`.
-* Add :func:`!sys.gettotalrefcount` function.
-* Add :option:`-X showrefcount <-X>` command line option.
-* Add :option:`-d` command line option and :envvar:`PYTHONDEBUG` environment
-  variable to debug the parser.
-* Add support for the ``__lltrace__`` variable: enable low-level tracing in the
-  bytecode evaluation loop if the variable is defined.
-* Install :ref:`debug hooks on memory allocators <default-memory-allocators>`
-  to detect buffer overflow and other memory errors.
-* Define ``Py_DEBUG`` and ``Py_REF_DEBUG`` macros.
-* Add runtime checks: code surrounded by ``#ifdef Py_DEBUG`` and ``#endif``.
-  Enable ``assert(...)`` and ``_PyObject_ASSERT(...)`` assertions: don't set
-  the ``NDEBUG`` macro (see also the :option:`--with-assertions` configure
-  option). Main runtime checks:
+* Hiển thị tất cả cảnh báo theo mặc định: danh sách các bộ lọc cảnh báo mặc định trong mô-đun :mod:`warnings` là rỗng.
+* Thêm ``d`` vào :data:`sys.abiflags`.
+* Thêm hàm :func:`!sys.gettotalrefcount`.
+* Thêm tùy chọn dòng lệnh :option:`-X showrefcount <-X>`.
+* Thêm tùy chọn dòng lệnh :option:`-d` và biến môi trường :envvar:`PYTHONDEBUG` để gỡ lỗi parser.
+* Thêm hỗ trợ cho biến ``__lltrace__``: bật tracing cấp thấp trong vòng lặp đánh giá bytecode nếu biến này được định nghĩa.
+* Cài đặt :ref:`hook debug trên các trình cấp phát bộ nhớ <default-memory-allocators>` để phát hiện lỗi tràn bộ đệm và các lỗi bộ nhớ khác.
+* Định nghĩa các macro ``Py_DEBUG`` và ``Py_REF_DEBUG``.
+* Thêm các kiểm tra runtime: mã được bao quanh bởi ``#ifdef Py_DEBUG`` và ``#endif``. Bật các assertion ``assert(...)`` và ``_PyObject_ASSERT(...)``: không đặt macro ``NDEBUG`` (xem thêm tùy chọn configure :option:`--with-assertions`). Các kiểm tra runtime chính:
 
-  * Add sanity checks on the function arguments.
-  * Unicode and int objects are created with their memory filled with a pattern
-    to detect usage of uninitialized objects.
-  * Ensure that functions which can clear or replace the current exception are
-    not called with an exception raised.
-  * Check that deallocator functions don't change the current exception.
-  * The garbage collector (:func:`gc.collect` function) runs some basic checks
-    on objects consistency.
-  * The :c:macro:`!Py_SAFE_DOWNCAST()` macro checks for integer underflow and
-    overflow when downcasting from wide types to narrow types.
+  * Thêm các kiểm tra tính hợp lệ cho các đối số của hàm.
+  * Các đối tượng Unicode và int được tạo với vùng nhớ được điền bằng một mẫu để phát hiện việc sử dụng các đối tượng chưa được khởi tạo.
+  * Đảm bảo rằng các hàm có thể xóa hoặc thay thế exception hiện tại không được gọi khi đang có một exception được phát sinh.
+  * Kiểm tra để đảm bảo các hàm deallocator không thay đổi exception hiện tại.
+  * Bộ thu gom rác (hàm :func:`gc.collect`) thực hiện một số kiểm tra cơ bản về tính nhất quán của các đối tượng.
+  * Macro :c:macro:`!Py_SAFE_DOWNCAST()` kiểm tra underflow và overflow của số nguyên khi downcast từ các kiểu có độ rộng lớn sang các kiểu có độ rộng nhỏ hơn.
 
-See also the :ref:`Python Development Mode <devmode>` and the
-:option:`--with-trace-refs` configure option.
+Xem thêm :ref:`Chế độ Phát triển Python <devmode>` và
+:option:`--with-trace-refs` là tùy chọn configure.
 
 .. versionchanged:: 3.8
-   Release builds are now ABI compatible with debug builds: defining the
-   ``Py_DEBUG`` macro no longer implies the ``Py_TRACE_REFS`` macro (see the
-   :option:`--with-trace-refs` option). However, debug builds still expose
-   more symbols than release builds and code built against a debug build is not
-   necessarily compatible with a release build.
+   Các bản build release hiện tương thích ABI với các bản build debug: việc định nghĩa macro ``Py_DEBUG`` không còn ngụ ý macro ``Py_TRACE_REFS`` (xem
+   tùy chọn :option:`--with-trace-refs`). Tuy nhiên, các bản build debug vẫn cung cấp nhiều symbol hơn các bản build release, và mã được build dựa trên bản build debug không nhất thiết tương thích với bản build release.
 
 
-Debug options
--------------
+Các tùy chọn debug
+------------------
 
 .. option:: --with-pydebug
 
@@ -941,8 +878,8 @@ Debug options
    .. versionadded:: 3.13
 
 
-Linker options
---------------
+Tùy chọn linker
+---------------
 
 .. option:: --enable-shared
 
@@ -956,8 +893,8 @@ Linker options
    .. versionadded:: 3.10
 
 
-Libraries options
------------------
+Các tùy chọn thư viện
+---------------------
 
 .. option:: --with-libs='lib1 ...'
 
@@ -1034,8 +971,8 @@ Libraries options
    .. versionadded:: 3.10
 
 
-Security Options
-----------------
+Các tùy chọn bảo mật
+--------------------
 
 .. option:: --with-hash-algorithm=[fnv|siphash13|siphash24]
 
@@ -1112,10 +1049,10 @@ Security Options
    .. versionadded:: 3.14
 
 
-macOS Options
--------------
+Các tùy chọn macOS
+------------------
 
-See :source:`Mac/README.rst`.
+Xem :source:`Mac/README.rst`.
 
 .. option:: --enable-universalsdk
 .. option:: --enable-universalsdk=SDKDIR
@@ -1167,10 +1104,10 @@ See :source:`Mac/README.rst`.
 
    .. versionadded:: 3.13
 
-iOS Options
------------
+Tùy chọn iOS
+------------
 
-See :source:`iOS/README.rst`.
+Xem :source:`iOS/README.rst`.
 
 .. option:: --enable-framework=INSTALLDIR
 
@@ -1182,13 +1119,10 @@ See :source:`iOS/README.rst`.
    Specify the name for the framework (default: ``Python``).
 
 
-Cross Compiling Options
+Tùy chọn biên dịch chéo
 -----------------------
 
-Cross compiling, also known as cross building, can be used to build Python
-for another CPU architecture or platform. Cross compiling requires a Python
-interpreter for the build platform. The version of the build Python must match
-the version of the cross compiled host Python.
+Biên dịch chéo, còn được gọi là cross building, có thể được sử dụng để xây dựng Python cho một kiến trúc CPU hoặc nền tảng khác. Biên dịch chéo yêu cầu một trình thông dịch Python cho build platform. Phiên bản của Python dùng để build phải khớp với phiên bản của Python trên host được biên dịch chéo.
 
 .. option:: --build=BUILD
 
@@ -1224,7 +1158,7 @@ the version of the cross compiled host Python.
    .. versionadded:: 3.11
 
 
-Cross compiling example::
+Ví dụ về biên dịch chéo::
 
    CONFIG_SITE=config.site-aarch64 ../configure \
        --build=x86_64-pc-linux-gnu \
@@ -1232,113 +1166,86 @@ Cross compiling example::
        --with-build-python=../x86_64/python
 
 
-Python Build System
-===================
+Hệ thống xây dựng Python
+========================
 
-Main files of the build system
-------------------------------
+Các tệp chính của hệ thống build
+--------------------------------
 
 * :file:`configure.ac` => :file:`configure`;
-* :file:`Makefile.pre.in` => :file:`Makefile` (created by :file:`configure`);
-* :file:`pyconfig.h` (created by :file:`configure`);
-* :file:`Modules/Setup`: C extensions built by the Makefile using
-  :file:`Module/makesetup` shell script;
+* :file:`Makefile.pre.in` => :file:`Makefile` (được tạo bởi :file:`configure`);
+* :file:`pyconfig.h` (được tạo bởi :file:`configure`);
+* :file:`Modules/Setup`: Các phần mở rộng C được build bởi Makefile bằng
+  tập lệnh shell :file:`Module/makesetup`;
 
-Main build steps
-----------------
+Các bước build chính
+--------------------
 
-* C files (``.c``) are built as object files (``.o``).
-* A static ``libpython`` library (``.a``) is created from objects files.
-* ``python.o`` and the static ``libpython`` library are linked into the
-  final ``python`` program.
-* C extensions are built by the Makefile (see :file:`Modules/Setup`).
+* Các tệp C (``.c``) được build thành các tệp đối tượng (``.o``).
+* Một thư viện ``libpython`` tĩnh (``.a``) được tạo từ các tệp đối tượng.
+* ``python.o`` và thư viện ``libpython`` tĩnh được liên kết vào chương trình ``python`` cuối cùng.
+* Các phần mở rộng C được Makefile xây dựng (xem :file:`Modules/Setup`).
 
-Main Makefile targets
----------------------
+Các target chính của Makefile
+-----------------------------
 
 make
 ^^^^
 
-For the most part, when rebuilding after editing some code or
-refreshing your checkout from upstream, all you need to do is execute
-``make``, which (per Make's semantics) builds the default target, the
-first one defined in the Makefile.  By tradition (including in the
-CPython project) this is usually the ``all`` target. The
-``configure`` script expands an ``autoconf`` variable,
-``@DEF_MAKE_ALL_RULE@`` to describe precisely which targets ``make
-all`` will build. The three choices are:
+Trong phần lớn trường hợp, khi xây dựng lại sau khi chỉnh sửa mã hoặc cập nhật checkout của bạn từ upstream, tất cả những gì bạn cần làm là thực thi ``make``, lệnh này (theo semantics của Make) sẽ xây dựng target mặc định, tức target đầu tiên được định nghĩa trong Makefile. Theo thông lệ (bao gồm cả trong dự án CPython), đây thường là target ``all``. Script ``configure`` mở rộng một biến ``autoconf``, ``@DEF_MAKE_ALL_RULE@`` để mô tả chính xác những target nào ``make all`` sẽ xây dựng. Có ba lựa chọn:
 
-* ``profile-opt`` (configured with ``--enable-optimizations``)
-* ``build_wasm`` (chosen if the host platform matches ``wasm32-wasi*`` or
-  ``wasm32-emscripten``)
-* ``build_all`` (configured without explicitly using either of the others)
+* ``profile-opt`` (được cấu hình bằng ``--enable-optimizations``)
+* ``build_wasm`` (được chọn nếu nền tảng máy chủ khớp với ``wasm32-wasi*`` hoặc ``wasm32-emscripten``)
+* ``build_all`` (được cấu hình mà không sử dụng rõ ràng một trong hai tùy chọn còn lại)
 
-Depending on the most recent source file changes, Make will rebuild
-any targets (object files and executables) deemed out-of-date,
-including running ``configure`` again if necessary. Source/target
-dependencies are many and maintained manually however, so Make
-sometimes doesn't have all the information necessary to correctly
-detect all targets which need to be rebuilt.  Depending on which
-targets aren't rebuilt, you might experience a number of problems. If
-you have build or test problems which you can't otherwise explain,
-``make clean && make`` should work around most dependency problems, at
-the expense of longer build times.
+Tùy thuộc vào những thay đổi gần đây nhất đối với các tệp nguồn, Make sẽ xây dựng lại mọi target (tệp đối tượng và tệp thực thi) được xác định là đã lỗi thời, bao gồm cả việc chạy lại ``configure`` nếu cần. Tuy nhiên, các dependency giữa nguồn và target rất nhiều và được duy trì thủ công, nên đôi khi Make không có đủ thông tin cần thiết để phát hiện chính xác tất cả target cần được xây dựng lại. Tùy thuộc vào những target không được xây dựng lại, bạn có thể gặp một số vấn đề. Nếu bạn gặp vấn đề khi build hoặc test mà không thể giải thích theo cách nào khác, ``make clean && make`` sẽ xử lý phần lớn vấn đề về dependency, đổi lại thời gian build sẽ lâu hơn.
 
 
 make platform
 ^^^^^^^^^^^^^
 
-Build the ``python`` program, but don't build the standard library
-extension modules. This generates a file named ``platform`` which
-contains a single line describing the details of the build platform,
-e.g., ``macosx-14.3-arm64-3.12`` or ``linux-x86_64-3.13``.
+Xây dựng chương trình ``python``, nhưng không xây dựng các module mở rộng của standard library. Thao tác này tạo một tệp có tên ``platform``, chứa một dòng duy nhất mô tả chi tiết về nền tảng build, chẳng hạn như ``macosx-14.3-arm64-3.12`` hoặc ``linux-x86_64-3.13``.
 
 
 make profile-opt
 ^^^^^^^^^^^^^^^^
 
-Build Python using profile-guided optimization (PGO).  You can use the
-configure :option:`--enable-optimizations` option to make this the
-default target of the ``make`` command (``make all`` or just
-``make``).
+Xây dựng Python bằng profile-guided optimization (PGO). Bạn có thể sử dụng tùy chọn configure :option:`--enable-optimizations` để đặt đây làm target mặc định của lệnh ``make`` (``make all`` hoặc chỉ ``make``).
 
 
 
 make clean
 ^^^^^^^^^^
 
-Remove built files.
+Xóa các tệp đã được build.
 
 
 make distclean
 ^^^^^^^^^^^^^^
 
-In addition to the work done by ``make clean``, remove files
-created by the configure script.  ``configure`` will have to be run
-before building again. [#]_
+Ngoài những gì ``make clean`` thực hiện, hãy xóa các tệp do configure script tạo ra. Cần chạy ``configure`` trước khi build lại. [#]_
 
 
 make install
 ^^^^^^^^^^^^
 
-Build the ``all`` target and install Python.
+Build target ``all`` và cài đặt Python.
 
 
 make test
 ^^^^^^^^^
 
-Build the ``all`` target and run the Python test suite with the
-``--fast-ci`` option without GUI tests. Variables:
+Xây dựng target ``all`` và chạy bộ kiểm thử Python với tùy chọn ``--fast-ci`` mà không chạy các bài kiểm thử GUI. Các biến:
 
-* ``TESTOPTS``: additional regrtest command-line options.
-* ``TESTPYTHONOPTS``: additional Python command-line options.
-* ``TESTTIMEOUT``: timeout in seconds (default: 10 minutes).
+* ``TESTOPTS``: các tùy chọn dòng lệnh regrtest bổ sung.
+* ``TESTPYTHONOPTS``: các tùy chọn dòng lệnh Python bổ sung.
+* ``TESTTIMEOUT``: thời gian chờ tính bằng giây (mặc định: 10 phút).
 
 
 make ci
 ^^^^^^^
 
-This is similar to ``make test``, but uses the ``-ugui`` to also run GUI tests.
+Tương tự như ``make test``, nhưng sử dụng ``-ugui`` để chạy thêm các bài kiểm thử GUI.
 
 .. versionadded:: 3.14
 
@@ -1346,25 +1253,19 @@ This is similar to ``make test``, but uses the ``-ugui`` to also run GUI tests.
 make buildbottest
 ^^^^^^^^^^^^^^^^^
 
-This is similar to ``make test``, but uses the ``--slow-ci``
-option and default timeout of 20 minutes, instead of ``--fast-ci`` option.
+Tương tự như ``make test``, nhưng sử dụng tùy chọn ``--slow-ci`` và thời gian chờ mặc định là 20 phút, thay vì tùy chọn ``--fast-ci``.
 
 
 make regen-all
 ^^^^^^^^^^^^^^
 
-Regenerate (almost) all generated files. These include (but are not
-limited to) bytecode cases, and parser generator file.
-``make regen-stdlib-module-names`` and ``autoconf`` must be run
-separately for the remaining `generated files <#generated-files>`_.
+Tạo lại (gần như) tất cả các tệp được tạo tự động. Các tệp này bao gồm (nhưng không chỉ giới hạn ở) các trường hợp bytecode và tệp trình tạo parser. Phải chạy riêng ``make regen-stdlib-module-names`` và ``autoconf`` cho các `tệp được tạo còn lại <#generated-files>`_.
 
 
-C extensions
-------------
+C extension
+-----------
 
-Some C extensions are built as built-in modules, like the ``sys`` module.
-They are built with the ``Py_BUILD_CORE_BUILTIN`` macro defined.
-Built-in modules have no ``__file__`` attribute:
+Một số C extension được build dưới dạng built-in module, chẳng hạn như module ``sys``. Chúng được build với macro ``Py_BUILD_CORE_BUILTIN`` được định nghĩa. Built-in module không có thuộc tính ``__file__``:
 
 .. code-block:: pycon
 
@@ -1376,9 +1277,7 @@ Built-in modules have no ``__file__`` attribute:
       File "<stdin>", line 1, in <module>
     AttributeError: module 'sys' has no attribute '__file__'
 
-Other C extensions are built as dynamic libraries, like the ``_asyncio`` module.
-They are built with the ``Py_BUILD_CORE_MODULE`` macro defined.
-Example on Linux x86-64:
+Các C extension khác được build dưới dạng dynamic library, chẳng hạn như module ``_asyncio``. Chúng được build với macro ``Py_BUILD_CORE_MODULE`` được định nghĩa. Ví dụ trên Linux x86-64:
 
 .. code-block:: pycon
 
@@ -1388,30 +1287,24 @@ Example on Linux x86-64:
     >>> _asyncio.__file__
     '/usr/lib64/python3.9/lib-dynload/_asyncio.cpython-39-x86_64-linux-gnu.so'
 
-:file:`Modules/Setup` is used to generate Makefile targets to build C extensions.
-At the beginning of the files, C extensions are built as built-in modules.
-Extensions defined after the ``*shared*`` marker are built as dynamic libraries.
+:file:`Modules/Setup` được dùng để tạo các target Makefile nhằm build C extension. Ở phần đầu của các tệp, C extension được build dưới dạng built-in module. Các extension được định nghĩa sau marker ``*shared*`` sẽ được build dưới dạng dynamic library.
 
-The :c:macro:`!PyAPI_FUNC()`, :c:macro:`!PyAPI_DATA()` and
-:c:macro:`PyMODINIT_FUNC` macros of :file:`Include/exports.h` are defined
-differently depending if the ``Py_BUILD_CORE_MODULE`` macro is defined:
+Các :c:macro:`!PyAPI_FUNC()`, :c:macro:`!PyAPI_DATA()` và
+macro :c:macro:`PyMODINIT_FUNC` của :file:`Include/exports.h` được định nghĩa khác nhau tùy thuộc vào việc macro ``Py_BUILD_CORE_MODULE`` có được định nghĩa hay không:
 
-* Use ``Py_EXPORTED_SYMBOL`` if the ``Py_BUILD_CORE_MODULE`` is defined
-* Use ``Py_IMPORTED_SYMBOL`` otherwise.
+* Sử dụng ``Py_EXPORTED_SYMBOL`` nếu ``Py_BUILD_CORE_MODULE`` được định nghĩa
+* Nếu không, sử dụng ``Py_IMPORTED_SYMBOL``.
 
-If the ``Py_BUILD_CORE_BUILTIN`` macro is used by mistake on a C extension
-built as a shared library, its :samp:`PyInit_{xxx}()` function is not exported,
-causing an :exc:`ImportError` on import.
+Nếu vô tình sử dụng macro ``Py_BUILD_CORE_BUILTIN`` cho một C extension được xây dựng dưới dạng shared library, hàm :samp:`PyInit_{xxx}()` của nó sẽ không được export, gây ra :exc:`ImportError` khi import.
 
 
-Compiler and linker flags
-=========================
+Cờ compiler và linker
+=====================
 
-Options set by the ``./configure`` script and environment variables and used by
-``Makefile``.
+Các tùy chọn được thiết lập bởi script ``./configure`` và các biến môi trường, đồng thời được ``Makefile`` sử dụng.
 
-Preprocessor flags
-------------------
+Cờ preprocessor
+---------------
 
 .. envvar:: CONFIGURE_CPPFLAGS
 
@@ -1440,8 +1333,8 @@ Preprocessor flags
 
    .. versionadded:: 3.2
 
-Compiler flags
---------------
+Cờ compiler
+-----------
 
 .. envvar:: CC
 
@@ -1576,8 +1469,8 @@ Compiler flags
    Default: empty string (not used).
 
 
-Linker flags
-------------
+Cờ linker
+---------
 
 .. envvar:: LINKCC
 
@@ -1660,12 +1553,26 @@ Linker flags
    .. versionadded:: 3.8
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] ``git clean -fdx`` is an even more extreme way to "clean" your
-   checkout. It removes all files not known to Git.
-   When bug hunting using ``git bisect``, this is
-   `recommended between probes <https://github.com/python/cpython/issues/114505#issuecomment-1907021718>`_
-   to guarantee a completely clean build. **Use with care**, as it
-   will delete all files not checked into Git, including your
-   new, uncommitted work.
+.. [#] ``git clean -fdx`` là một cách thậm chí cực đoan hơn để "dọn dẹp" checkout của bạn. Nó xóa mọi tệp mà Git không nhận diện. Khi tìm lỗi bằng ``git bisect``, bạn `được khuyến nghị thực hiện việc này giữa các lần thăm dò <https://github.com/python/cpython/issues/114505#issuecomment-1907021718>`_ để đảm bảo một bản build hoàn toàn sạch. **Hãy sử dụng cẩn thận**, vì thao tác này sẽ xóa mọi tệp chưa được đưa vào Git, bao gồm cả phần công việc mới chưa commit của bạn.
+
+.. _`C11`: https://en.cppreference.com/w/c/11
+.. _`Optional C11 features`: https://en.wikipedia.org/wiki/C11_(C_standard_revision)#Optional_features
+.. _`IEEE 754`: https://en.wikipedia.org/wiki/IEEE_754
+.. _`floating-point Not-a-Number (NaN)`: https://en.wikipedia.org/wiki/NaN#Floating_point
+.. _`libffi`: https://sourceware.org/libffi/
+.. _`libmpdec`: https://www.bytereef.org/mpdecimal/doc/libmpdec/
+.. _`libreadline`: https://tiswww.case.edu/php/chet/readline/rltop.html
+.. _`OpenSSL`: https://openssl-library.org/
+.. _`SQLite`: https://sqlite.org/
+.. _`Tcl/Tk`: https://www.tcl-lang.org/
+.. _`zlib`: https://www.zlib.net
+.. _`zstd`: https://facebook.github.io/zstd/
+.. _`devguide`: https://devguide.python.org/getting-started/setup-building/#install-dependencies
+.. _`libexpat`: https://libexpat.github.io/
+.. _`Autoconf`: https://gnu.org/software/autoconf
+.. _`Automake`: https://www.gnu.org/software/automake
+.. _`pkg-config`: https://www.freedesktop.org/wiki/Software/pkg-config/
+.. _`generated files`: #generated-files
+.. _`recommended between probes`: https://github.com/python/cpython/issues/114505#issuecomment-1907021718

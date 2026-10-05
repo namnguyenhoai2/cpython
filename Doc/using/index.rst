@@ -1,13 +1,11 @@
 .. _using-index:
 
-##########################
-  Python Setup and Usage
-##########################
+###########################
+Thiết lập và sử dụng Python
+###########################
 
 
-This part of the documentation is devoted to general information on the setup
-of the Python environment on different platforms, the invocation of the
-interpreter and things that make working with Python easier.
+Phần tài liệu này cung cấp thông tin chung về việc thiết lập môi trường Python trên các nền tảng khác nhau, cách gọi trình thông dịch và những điều giúp làm việc với Python dễ dàng hơn.
 
 
 .. toctree::

@@ -1,81 +1,56 @@
 .. _using-android:
 
-=======================
-Using Python on Android
-=======================
+===========================
+Sử dụng Python trên Android
+===========================
 
-Python on Android is unlike Python on desktop platforms. On a desktop platform,
-Python is generally installed as a system resource that can be used by any user
-of that computer. Users then interact with Python by running a :program:`python`
-executable and entering commands at an interactive prompt, or by running a
-Python script.
+Python trên Android khác với Python trên các nền tảng máy tính để bàn. Trên nền tảng máy tính để bàn, Python thường được cài đặt dưới dạng tài nguyên hệ thống mà bất kỳ người dùng nào trên máy tính đó cũng có thể sử dụng. Sau đó, người dùng tương tác với Python bằng cách chạy tệp thực thi :program:`python` và nhập lệnh tại lời nhắc tương tác, hoặc chạy một tập lệnh Python.
 
-On Android, there is no concept of installing as a system resource. The only unit
-of software distribution is an "app". There is also no console where you could
-run a :program:`python` executable, or interact with a Python REPL.
+Trên Android, không có khái niệm cài đặt dưới dạng tài nguyên hệ thống. Đơn vị phân phối phần mềm duy nhất là một "app". Cũng không có console nơi bạn có thể chạy tệp thực thi :program:`python` hoặc tương tác với Python REPL.
 
-As a result, the only way you can use Python on Android is in embedded mode – that
-is, by writing a native Android application, embedding a Python interpreter
-using ``libpython``, and invoking Python code using the :ref:`Python embedding
-API <embedding>`. The full Python interpreter, the standard library, and all
-your Python code is then packaged into your app for its own private use.
+Do đó, cách duy nhất để sử dụng Python trên Android là ở embedded mode – tức là viết một ứng dụng Android native, nhúng trình thông dịch Python bằng ``libpython``, rồi gọi mã Python bằng :ref:`Python embedding API <embedding>`. Sau đó, toàn bộ trình thông dịch Python, standard library và tất cả mã Python của bạn được đóng gói vào ứng dụng để ứng dụng sử dụng riêng.
 
-The Python standard library has some notable omissions and restrictions on
-Android. See the :ref:`API availability guide <mobile-availability>` for
-details.
+Python standard library có một số thiếu sót và hạn chế đáng chú ý trên Android. Xem :ref:`hướng dẫn về khả năng cung cấp API <mobile-availability>` để biết chi tiết.
 
-Adding Python to an Android app
--------------------------------
+Thêm Python vào ứng dụng Android
+--------------------------------
 
-Most app developers should use one of the following tools, which will provide a
-much easier experience:
+Hầu hết nhà phát triển ứng dụng nên sử dụng một trong các công cụ sau, vì chúng mang lại trải nghiệm dễ dàng hơn nhiều:
 
-* `Briefcase <https://briefcase.beeware.org>`__, from the BeeWare project
-* `Buildozer <https://buildozer.readthedocs.io>`__, from the Kivy project
+* `Briefcase <https://briefcase.beeware.org>`__, từ dự án BeeWare
+* `Buildozer <https://buildozer.readthedocs.io>`__, từ dự án Kivy
 * `Chaquopy <https://chaquo.com/chaquopy>`__
 * `pyqtdeploy <https://www.riverbankcomputing.com/static/Docs/pyqtdeploy/>`__
 * `Termux <https://termux.dev/en/>`__
 
-If you're sure you want to do all of this manually, read on. You can use the
-:source:`testbed app <Android/testbed>` as a guide; each step below contains a
-link to the relevant file.
+Nếu bạn chắc chắn muốn tự mình thực hiện tất cả các bước này, hãy đọc tiếp. Bạn có thể sử dụng
+:source:`testbed app <Android/testbed>` làm hướng dẫn; mỗi bước dưới đây đều có liên kết đến tệp liên quan.
 
-* First, acquire a build of Python for Android:
+* Trước tiên, hãy lấy một bản build Python dành cho Android:
 
-  * The easiest way is to download an Android release from `python.org
-    <https://www.python.org/downloads/android/>`__. The ``prefix`` directory
-    mentioned below is at the top level of the package.
+  * Cách dễ nhất là tải xuống một bản phát hành Android từ `python.org <https://www.python.org/downloads/android/>`__. Thư mục ``prefix`` được đề cập bên dưới nằm ở cấp cao nhất của package.
 
-  * Or if you want to build it yourself, follow the instructions in
-    :source:`Android/README.md`. The ``prefix`` directory will be created under
+  * Hoặc nếu bạn muốn tự build, hãy làm theo hướng dẫn trong
+    :source:`Android/README.md`. Thư mục ``prefix`` sẽ được tạo bên dưới
     :samp:`cross-build/{HOST}`.
 
-* Add code to your :source:`build.gradle <Android/testbed/app/build.gradle.kts>`
-  file to copy the following items into your project. All except your own Python
-  code can be copied from ``prefix/lib``:
+* Thêm code vào tệp :source:`build.gradle <Android/testbed/app/build.gradle.kts>` của bạn để sao chép các mục sau vào project. Bạn có thể sao chép tất cả các mục, ngoại trừ code Python của riêng bạn, từ ``prefix/lib``:
 
-  * In your JNI libraries:
+  * Trong các thư viện JNI của bạn:
 
     * ``libpython*.*.so``
-    * ``lib*_python.so`` (external libraries such as OpenSSL)
+    * ``lib*_python.so`` (các thư viện bên ngoài như OpenSSL)
 
-  * In your assets:
+  * Trong assets của bạn:
 
-    * ``python*.*`` (the Python standard library)
-    * ``python*.*/site-packages`` (your own Python code)
+    * ``python*.*`` (thư viện chuẩn của Python)
+    * ``python*.*/site-packages`` (mã Python của riêng bạn)
 
-* Add code to your app to :source:`extract the assets to the filesystem
-  <Android/testbed/app/src/main/java/org/python/testbed/MainActivity.kt>`.
+* Thêm mã vào ứng dụng của bạn để :source:`extract the assets to the filesystem <Android/testbed/app/src/main/java/org/python/testbed/MainActivity.kt>`.
 
-* Add code to your app to :source:`start Python in embedded mode
-  <Android/testbed/app/src/main/c/main_activity.c>`. This will need to be C code
-  called via JNI.
+* Thêm mã vào ứng dụng của bạn để :source:`start Python in embedded mode <Android/testbed/app/src/main/c/main_activity.c>`. Mã này cần là mã C được gọi thông qua JNI.
 
-Building a Python package for Android
--------------------------------------
+Xây dựng một package Python cho Android
+---------------------------------------
 
-Python packages can be built for Android as wheels and released on PyPI. The
-recommended tool for doing this is `cibuildwheel
-<https://cibuildwheel.pypa.io/en/stable/platforms/#android>`__, which automates
-all the details of setting up a cross-compilation environment, building the
-wheel, and testing it on an emulator.
+Các package Python có thể được xây dựng cho Android dưới dạng wheel và phát hành trên PyPI. Công cụ được khuyến nghị để thực hiện việc này là `cibuildwheel <https://cibuildwheel.pypa.io/en/stable/platforms/#android>`__, công cụ tự động hóa mọi chi tiết trong việc thiết lập môi trường cross-compilation, xây dựng wheel và kiểm thử trên emulator.

@@ -5,11 +5,10 @@
 
 .. _using-on-general:
 
-Command line and environment
-============================
+Dòng lệnh và môi trường
+=======================
 
-The CPython interpreter scans the command line and the environment for various
-settings.
+Trình thông dịch CPython quét dòng lệnh và môi trường để tìm nhiều thiết lập khác nhau.
 
 .. impl-detail::
 
@@ -19,46 +18,34 @@ settings.
 
 .. _using-on-cmdline:
 
-Command line
-------------
+Dòng lệnh
+---------
 
-When invoking Python, you may specify any of these options::
+Khi gọi Python, bạn có thể chỉ định bất kỳ tùy chọn nào sau đây::
 
     python [-bBdEhiIOPqRsSuvVWx?] [-c command | -m module-name | script | - ] [args]
 
-The most common use case is, of course, a simple invocation of a script::
+Trường hợp sử dụng phổ biến nhất dĩ nhiên là gọi một script đơn giản::
 
     python myscript.py
 
 
 .. _using-on-interface-options:
 
-Interface options
-~~~~~~~~~~~~~~~~~
+Tùy chọn giao diện
+~~~~~~~~~~~~~~~~~~
 
-The interpreter interface resembles that of the UNIX shell, but provides some
-additional methods of invocation:
+Giao diện của trình thông dịch tương tự giao diện của UNIX shell, nhưng cung cấp thêm một số phương thức gọi:
 
-* When called with standard input connected to a tty device, it prompts for
-  commands and executes them until an EOF (an end-of-file character, you can
-  produce that with :kbd:`Ctrl-D` on UNIX or :kbd:`Ctrl-Z, Enter` on Windows) is read.
-  For more on interactive mode, see :ref:`tut-interac`.
-* When called with a file name argument or with a file as standard input, it
-  reads and executes a script from that file.
-* When called with a directory name argument, it reads and executes an
-  appropriately named script from that directory.
-* When called with ``-c command``, it executes the Python statement(s) given as
-  *command*.  Here *command* may contain multiple statements separated by
-  newlines. Leading whitespace is significant in Python statements!
-* When called with ``-m module-name``, the given module is located using the standard
-  import mechanism and executed as a script.
+* Khi được gọi với đầu vào chuẩn được kết nối với thiết bị tty, chương trình sẽ nhắc nhập các lệnh và thực thi chúng cho đến khi đọc được EOF (ký tự kết thúc tệp; trên UNIX, bạn có thể tạo ký tự này bằng :kbd:`Ctrl-D`, còn trên Windows bằng :kbd:`Ctrl-Z, Enter`). Để biết thêm về chế độ tương tác, xem :ref:`tut-interac`.
+* Khi được gọi với đối số là tên tệp hoặc với một tệp làm đầu vào chuẩn, chương trình sẽ đọc và thực thi script từ tệp đó.
+* Khi được gọi với đối số là tên thư mục, chương trình sẽ đọc và thực thi một script có tên phù hợp từ thư mục đó.
+* Khi được gọi với ``-c command``, chương trình sẽ thực thi các câu lệnh Python được cung cấp dưới dạng *command*. Ở đây, *command* có thể chứa nhiều câu lệnh được phân tách bằng ký tự xuống dòng. Khoảng trắng ở đầu có ý nghĩa trong các câu lệnh Python!
+* Khi được gọi với ``-m module-name``, module đã cho sẽ được định vị bằng cơ chế import tiêu chuẩn và được thực thi như một script.
 
-In non-interactive mode, the entire input is parsed before it is executed.
+Trong chế độ không tương tác, toàn bộ đầu vào được phân tích cú pháp trước khi thực thi.
 
-An interface option terminates the list of options consumed by the interpreter,
-all consecutive arguments will end up in :data:`sys.argv` -- note that the first
-element, subscript zero (``sys.argv[0]``), is a string reflecting the program's
-source.
+Một tùy chọn giao diện sẽ kết thúc danh sách các tùy chọn được interpreter sử dụng; tất cả các đối số liên tiếp sẽ được đưa vào :data:`sys.argv` -- lưu ý rằng phần tử đầu tiên, chỉ số con bằng 0 (``sys.argv[0]``), là một chuỗi phản ánh mã nguồn của chương trình.
 
 .. option:: -c <command>
 
@@ -175,22 +162,19 @@ source.
          Equivalent functionality directly available to Python code
 
 
-If no interface option is given, :option:`-i` is implied, ``sys.argv[0]`` is
-an empty string (``""``) and the current directory will be added to the
-start of :data:`sys.path`.  Also, tab-completion and history editing is
-automatically enabled, if available on your platform (see
+Nếu không chỉ định tùy chọn giao diện, :option:`-i` được ngầm định, ``sys.argv[0]`` là một chuỗi rỗng (``""``) và thư mục hiện tại sẽ được thêm vào đầu :data:`sys.path`. Ngoài ra, tính năng tự động hoàn thành bằng phím Tab và chỉnh sửa lịch sử cũng được bật tự động nếu nền tảng của bạn hỗ trợ (xem
 :ref:`rlcompleter-config`).
 
 .. seealso::  :ref:`tut-invoking`
 
 .. versionchanged:: 3.4
-   Automatic enabling of tab-completion and history editing.
+   Tự động bật tính năng tự động hoàn thành bằng phím Tab và chỉnh sửa lịch sử.
 
 
 .. _using-on-generic-options:
 
-Generic options
-~~~~~~~~~~~~~~~
+Tùy chọn chung
+~~~~~~~~~~~~~~
 
 .. option:: -?
             -h
@@ -241,8 +225,8 @@ Generic options
 
 .. _using-on-misc-options:
 
-Miscellaneous options
-~~~~~~~~~~~~~~~~~~~~~
+Tùy chọn khác
+~~~~~~~~~~~~~
 
 .. option:: -b
 
@@ -707,45 +691,33 @@ Miscellaneous options
 
 .. versionremoved:: 3.14
 
-   :option:`!-J` is no longer reserved for use by Jython_,
-   and now has no special meaning.
+   :option:`!-J` không còn được dành riêng để Jython_ sử dụng và hiện không có ý nghĩa đặc biệt nào.
 
    .. _Jython: https://www.jython.org/
 
 .. _using-on-controlling-color:
 
-Controlling color
-~~~~~~~~~~~~~~~~~
+Điều khiển màu sắc
+~~~~~~~~~~~~~~~~~~
 
-The Python interpreter is configured by default to use colors to highlight
-output in certain situations such as when displaying tracebacks. This
-behavior can be controlled by setting different environment variables.
+Theo mặc định, trình thông dịch Python được cấu hình để sử dụng màu nhằm làm nổi bật đầu ra trong một số tình huống nhất định, chẳng hạn như khi hiển thị traceback. Có thể kiểm soát hành vi này bằng cách thiết lập các biến môi trường khác nhau.
 
-Setting the environment variable ``TERM`` to ``dumb`` will disable color.
+Đặt biến môi trường ``TERM`` thành ``dumb`` sẽ tắt màu.
 
-If the |FORCE_COLOR|_ environment variable is set, then color will be
-enabled regardless of the value of TERM. This is useful on CI systems which
-aren’t terminals but can still display ANSI escape sequences.
+Nếu biến môi trường |FORCE_COLOR|_ được đặt, màu sẽ được bật bất kể giá trị của TERM. Điều này hữu ích trên các hệ thống CI không phải là terminal nhưng vẫn có thể hiển thị các chuỗi thoát ANSI.
 
-If the |NO_COLOR|_ environment variable is set, Python will disable all color
-in the output. This takes precedence over ``FORCE_COLOR``.
+Nếu biến môi trường |NO_COLOR|_ được đặt, Python sẽ tắt mọi màu trong đầu ra. Thiết lập này được ưu tiên hơn ``FORCE_COLOR``.
 
-All these environment variables are used also by other tools to control color
-output. To control the color output only in the Python interpreter, the
-:envvar:`PYTHON_COLORS` environment variable can be used. This variable takes
-precedence over ``NO_COLOR``, which in turn takes precedence over
-``FORCE_COLOR``.
+Tất cả các biến môi trường này cũng được các công cụ khác sử dụng để điều khiển màu đầu ra. Để chỉ điều khiển màu đầu ra trong trình thông dịch Python, có thể sử dụng
+biến môi trường :envvar:`PYTHON_COLORS`. Biến này được ưu tiên hơn ``NO_COLOR``, còn ``NO_COLOR`` được ưu tiên hơn ``FORCE_COLOR``.
 
 
 .. _using-on-envvars:
 
-Environment variables
----------------------
+Các biến môi trường
+-------------------
 
-These environment variables influence Python's behavior, they are processed
-before the command-line switches other than -E or -I.  It is customary that
-command-line switches override environmental variables where there is a
-conflict.
+Các biến môi trường này ảnh hưởng đến hành vi của Python và được xử lý trước các tùy chọn dòng lệnh, ngoại trừ -E hoặc -I. Theo thông lệ, các tùy chọn dòng lệnh sẽ ghi đè các biến môi trường khi có xung đột.
 
 .. envvar:: PYTHONHOME
 
@@ -1344,8 +1316,8 @@ conflict.
 
    .. versionadded:: 3.14
 
-Debug-mode variables
-~~~~~~~~~~~~~~~~~~~~
+Các biến ở chế độ debug
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. envvar:: PYTHONDUMPREFS
 
