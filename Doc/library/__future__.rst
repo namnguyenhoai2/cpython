@@ -1,88 +1,75 @@
-:mod:`!__future__` --- Future statement definitions
-===================================================
+:mod:`!__future__` --- Định nghĩa các câu lệnh future
+=====================================================
 
 .. module:: __future__
    :synopsis: Future statement definitions
 
-**Source code:** :source:`Lib/__future__.py`
+**Mã nguồn:** :source:`Lib/__future__.py`
 
 --------------
 
-Imports of the form ``from __future__ import feature`` are called
-:ref:`future statements <future>`. These are special-cased by the Python compiler
-to allow the use of new Python features in modules containing the future statement
-before the release in which the feature becomes standard.
+Các import có dạng ``from __future__ import feature`` được gọi là
+:ref:`các câu lệnh future <future>`. Trình biên dịch Python xử lý đặc biệt các câu lệnh này để cho phép sử dụng những tính năng Python mới trong các module chứa câu lệnh future trước bản phát hành mà trong đó tính năng đó trở thành tiêu chuẩn.
 
-While these future statements are given additional special meaning by the
-Python compiler, they are still executed like any other import statement and
-the :mod:`!__future__` exists and is handled by the import system the same way
-any other Python module would be. This design serves three purposes:
+Mặc dù các câu lệnh future này được trình biên dịch Python gán thêm ý nghĩa đặc biệt, chúng vẫn được thực thi như mọi câu lệnh import khác và :mod:`!__future__` vẫn tồn tại, đồng thời được hệ thống import xử lý giống như bất kỳ module Python nào khác. Thiết kế này phục vụ ba mục đích:
 
-* To avoid confusing existing tools that analyze import statements and expect to
-  find the modules they're importing.
+* Tránh gây nhầm lẫn cho các công cụ hiện có vốn phân tích các câu lệnh import và mong đợi tìm thấy những module mà chúng đang import.
 
-* To document when incompatible changes were introduced, and when they will be
-  --- or were --- made mandatory.  This is a form of executable documentation, and
-  can be inspected programmatically via importing :mod:`!__future__` and examining
-  its contents.
+* Ghi lại thời điểm các thay đổi không tương thích được giới thiệu, cũng như thời điểm chúng sẽ được — hoặc đã được — bắt buộc áp dụng. Đây là một dạng tài liệu có thể thực thi và có thể được kiểm tra bằng lập trình thông qua việc import :mod:`!__future__` rồi kiểm tra nội dung của nó.
 
-* To ensure that :ref:`future statements <future>` run under releases prior to
-  Python 2.1 at least yield runtime exceptions (the import of :mod:`!__future__`
-  will fail, because there was no module of that name prior to 2.1).
+* Để đảm bảo rằng các :ref:`câu lệnh future <future>` chạy trên các bản phát hành trước Python 2.1 ít nhất cũng tạo ra ngoại lệ runtime (việc import :mod:`!__future__` sẽ thất bại vì trước phiên bản 2.1 không có module nào mang tên đó).
 
-Module Contents
+Nội dung module
 ---------------
 
-No feature description will ever be deleted from :mod:`!__future__`. Since its
-introduction in Python 2.1 the following features have found their way into the
-language using this mechanism:
+Mô tả về bất kỳ tính năng nào cũng sẽ không bao giờ bị xóa khỏi :mod:`!__future__`. Kể từ khi được giới thiệu trong Python 2.1, các tính năng sau đã được đưa vào ngôn ngữ bằng cơ chế này:
 
 
 .. list-table::
    :widths: auto
    :header-rows: 1
 
-   * * feature
-     * optional in
-     * mandatory in
-     * effect
+   * * tính năng
+     * tùy chọn trong
+     * bắt buộc trong
+     * tác động
    * * .. data:: nested_scopes
      * 2.1.0b1
      * 2.2
-     * :pep:`227`: *Statically Nested Scopes*
+     * :pep:`227`: *Phạm vi lồng nhau tĩnh*
    * * .. data:: generators
      * 2.2.0a1
      * 2.3
-     * :pep:`255`: *Simple Generators*
+     * :pep:`255`: *Generator đơn giản*
    * * .. data:: division
      * 2.2.0a2
      * 3.0
-     * :pep:`238`: *Changing the Division Operator*
+     * :pep:`238`: *Thay đổi toán tử chia*
    * * .. data:: absolute_import
      * 2.5.0a1
      * 3.0
-     * :pep:`328`: *Imports: Multi-Line and Absolute/Relative*
+     * :pep:`328`: *Import: Nhiều dòng và tuyệt đối/tương đối*
    * * .. data:: with_statement
      * 2.5.0a1
      * 2.6
-     * :pep:`343`: *The “with” Statement*
+     * :pep:`343`: *Câu lệnh “with”*
    * * .. data:: print_function
      * 2.6.0a2
      * 3.0
-     * :pep:`3105`: *Make print a function*
+     * :pep:`3105`: *Biến print thành một hàm*
    * * .. data:: unicode_literals
      * 2.6.0a2
      * 3.0
-     * :pep:`3112`: *Bytes literals in Python 3000*
+     * :pep:`3112`: *Literal bytes trong Python 3000*
    * * .. data:: generator_stop
      * 3.5.0b1
      * 3.7
-     * :pep:`479`: *StopIteration handling inside generators*
+     * :pep:`479`: *Xử lý StopIteration bên trong generator*
    * * .. data:: annotations
      * 3.7.0b1
      * Never [1]_
-     * :pep:`563`: *Postponed evaluation of annotations*,
-       :pep:`649`: *Deferred evaluation of annotations using descriptors*
+     * :pep:`563`: *Đánh giá trì hoãn các chú thích*,
+       :pep:`649`: *Đánh giá trì hoãn các chú thích bằng descriptor*
 
 .. XXX Adding a new entry?  Remember to update simple_stmts.rst, too.
 
@@ -107,39 +94,28 @@ language using this mechanism:
 
 .. method:: _Feature.getOptionalRelease()
 
-   *OptionalRelease* records the first release in which the feature was accepted.
+   *OptionalRelease* ghi nhận bản phát hành đầu tiên mà tính năng được chấp nhận.
 
 .. method:: _Feature.getMandatoryRelease()
 
-   In the case of a *MandatoryRelease* that has not yet occurred,
-   *MandatoryRelease* predicts the release in which the feature will become part of
-   the language.
+   Trong trường hợp một *MandatoryRelease* chưa xảy ra, *MandatoryRelease* dự đoán bản phát hành mà trong đó tính năng sẽ trở thành một phần của ngôn ngữ.
 
-   Else *MandatoryRelease* records when the feature became part of the language; in
-   releases at or after that, modules no longer need a future statement to use the
-   feature in question, but may continue to use such imports.
+   Nếu không, *MandatoryRelease* ghi lại thời điểm tính năng trở thành một phần của ngôn ngữ; trong các bản phát hành từ thời điểm đó trở đi, các module không còn cần câu lệnh future để sử dụng tính năng nói trên, nhưng vẫn có thể tiếp tục dùng các import như vậy.
 
-   *MandatoryRelease* may also be ``None``, meaning that a planned feature got
-   dropped or that it is not yet decided.
+   *MandatoryRelease* cũng có thể là ``None``, nghĩa là một tính năng đã được lên kế hoạch bị loại bỏ hoặc vẫn chưa có quyết định.
 
 .. attribute:: _Feature.compiler_flag
 
-   *CompilerFlag* is the (bitfield) flag that should be passed in the fourth
-   argument to the built-in function :func:`compile` to enable the feature in
-   dynamically compiled code.  This flag is stored in the :attr:`_Feature.compiler_flag`
-   attribute on :class:`_Feature` instances.
+   *CompilerFlag* là cờ (bitfield) cần được truyền vào đối số thứ tư của hàm tích hợp :func:`compile` để bật tính năng trong mã được biên dịch động. Cờ này được lưu trong thuộc tính :attr:`_Feature.compiler_flag` trên các thực thể :class:`_Feature`.
 
-.. [1]
-   ``from __future__ import annotations`` was previously scheduled to
-   become mandatory in Python 3.10, but the change was delayed and ultimately
-   canceled. This feature will eventually be deprecated and removed. See
-   :pep:`649` and :pep:`749`.
+.. [1]``from __future__ import annotations`` trước đây được dự kiến sẽ trở thành bắt buộc trong Python 3.10, nhưng thay đổi này đã bị trì hoãn và cuối cùng bị hủy bỏ. Tính năng này cuối cùng sẽ bị deprecated và loại bỏ. Xem
+   :pep:`649` và :pep:`749`.
 
 
 .. seealso::
 
    :ref:`future`
-      How the compiler treats future imports.
+      Cách compiler xử lý các import future.
 
-   :pep:`236` - Back to the __future__
-      The original proposal for the __future__ mechanism.
+   :pep:`236` - Quay lại __future__
+      Đề xuất ban đầu cho cơ chế __future__.

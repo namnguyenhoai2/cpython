@@ -1,8 +1,8 @@
-:mod:`!_thread` --- Low-level threading API
+:mod:`!_thread` --- API phân luồng cấp thấp
 ===========================================
 
 .. module:: _thread
-   :synopsis: Low-level threading API.
+   :synopsis: API phân luồng cấp thấp.
 
 .. index::
    single: light-weight processes
@@ -12,45 +12,35 @@
 
 --------------
 
-This module provides low-level primitives for working with multiple threads
-(also called :dfn:`light-weight processes` or :dfn:`tasks`) --- multiple threads of
-control sharing their global data space.  For synchronization, simple locks
-(also called :dfn:`mutexes` or :dfn:`binary semaphores`) are provided.
-The :mod:`threading` module provides an easier to use and higher-level
-threading API built on top of this module.
+Mô-đun này cung cấp các primitive cấp thấp để làm việc với nhiều thread (còn gọi là :dfn:`tiến trình nhẹ` hoặc :dfn:`tác vụ`) --- nhiều luồng điều khiển cùng chia sẻ không gian dữ liệu toàn cục. Để đồng bộ hóa, mô-đun cung cấp các khóa đơn giản (còn gọi là :dfn:`mutex` hoặc :dfn:`semaphore nhị phân`). Mô-đun :mod:`threading` cung cấp API phân luồng cấp cao hơn và dễ sử dụng hơn, được xây dựng dựa trên mô-đun này.
 
 .. index::
    single: pthreads
    pair: threads; POSIX
 
 .. versionchanged:: 3.7
-   This module used to be optional, it is now always available.
+   Trước đây, mô-đun này là tùy chọn; hiện tại, mô-đun luôn khả dụng.
 
-This module defines the following constants and functions:
+Mô-đun này định nghĩa các hằng số và hàm sau:
 
 .. exception:: error
 
-   Raised on thread-specific errors.
+   Được phát sinh khi xảy ra lỗi liên quan đến thread.
 
    .. versionchanged:: 3.3
-      This is now a synonym of the built-in :exc:`RuntimeError`.
+      Hiện đây là từ đồng nghĩa với :exc:`RuntimeError` có sẵn.
 
 
 .. function:: start_new_thread(function, args[, kwargs])
 
-   Start a new thread and return its identifier.  The thread executes the
-   function *function* with the argument list *args* (which must be a tuple).
-   The optional *kwargs* argument specifies a dictionary of keyword arguments.
+   Khởi chạy một thread mới và trả về mã định danh của thread đó. Thread thực thi hàm *function* với danh sách đối số *args* (phải là một tuple). Đối số tùy chọn *kwargs* chỉ định một dictionary chứa các keyword argument.
 
-   When the function returns, the thread silently exits.
+   Khi hàm trả về, thread sẽ âm thầm thoát.
 
-   When the function terminates with an unhandled exception,
-   :func:`sys.unraisablehook` is called to handle the exception. The *object*
-   attribute of the hook argument is *function*. By default, a stack trace is
-   printed and then the thread exits (but other threads continue to run).
+   Khi hàm kết thúc do một ngoại lệ chưa được xử lý,
+   :func:`sys.unraisablehook` được gọi để xử lý ngoại lệ. Thuộc tính *object* của đối số hook là *function*. Theo mặc định, một stack trace được in ra rồi thread thoát (nhưng các thread khác vẫn tiếp tục chạy).
 
-   When the function raises a :exc:`SystemExit` exception, it is silently
-   ignored.
+   Khi hàm phát sinh một ngoại lệ :exc:`SystemExit`, ngoại lệ đó sẽ bị bỏ qua một cách im lặng.
 
    .. audit-event:: _thread.start_new_thread function,args,kwargs start_new_thread
 
@@ -60,96 +50,65 @@ This module defines the following constants and functions:
 
 .. function:: interrupt_main(signum=signal.SIGINT, /)
 
-   Simulate the effect of a signal arriving in the main thread.
-   A thread can use this function to interrupt the main thread, though
-   there is no guarantee that the interruption will happen immediately.
+   Mô phỏng hiệu ứng của một signal đến trong thread chính. Một thread có thể sử dụng hàm này để ngắt thread chính, mặc dù không có gì đảm bảo rằng việc ngắt sẽ xảy ra ngay lập tức.
 
-   If given, *signum* is the number of the signal to simulate.
-   If *signum* is not given, :const:`signal.SIGINT` is simulated.
+   Nếu được cung cấp, *signum* là số của signal cần mô phỏng. Nếu không cung cấp *signum*, :const:`signal.SIGINT` sẽ được mô phỏng.
 
-   If the given signal isn't handled by Python (it was set to
-   :const:`signal.SIG_DFL` or :const:`signal.SIG_IGN`), this function does
-   nothing.
+   Nếu tín hiệu đã cho không được Python xử lý (nó đã được đặt thành
+   :const:`signal.SIG_DFL` hoặc :const:`signal.SIG_IGN`), hàm này không thực hiện thao tác nào.
 
    .. versionchanged:: 3.10
-      The *signum* argument is added to customize the signal number.
+      Đối số *signum* được thêm vào để tùy chỉnh số hiệu tín hiệu.
 
    .. note::
-      This does not emit the corresponding signal but schedules a call to
-      the associated handler (if it exists).
-      If you want to truly emit the signal, use :func:`signal.raise_signal`.
+      Thao tác này không phát ra tín hiệu tương ứng mà lên lịch gọi trình xử lý liên kết (nếu trình xử lý đó tồn tại). Nếu bạn muốn thực sự phát tín hiệu, hãy sử dụng :func:`signal.raise_signal`.
 
 
 .. function:: exit()
 
-   Raise the :exc:`SystemExit` exception.  When not caught, this will cause the
-   thread to exit silently.
+   Ném ngoại lệ :exc:`SystemExit`. Nếu không được bắt, ngoại lệ này sẽ khiến thread kết thúc trong im lặng.
 
 ..
    function:: exit_prog(status)
 
-      Exit all threads and report the value of the integer argument
-      *status* as the exit status of the entire program.
-      **Caveat:** code in pending :keyword:`finally` clauses, in this thread
-      or in other threads, is not executed.
+      Thoát khỏi tất cả các thread và báo cáo giá trị của đối số số nguyên *status* làm trạng thái thoát của toàn bộ chương trình. **Lưu ý:** mã trong các mệnh đề :keyword:`finally` đang chờ xử lý, dù trong thread này hay các thread khác, đều không được thực thi.
 
 
 .. function:: allocate_lock()
 
-   Return a new lock object.  Methods of locks are described below.  The lock is
-   initially unlocked.
+   Trả về một đối tượng lock mới. Các phương thức của lock được mô tả bên dưới. Lock ban đầu ở trạng thái mở khóa.
 
 
 .. function:: get_ident()
 
-   Return the 'thread identifier' of the current thread.  This is a nonzero
-   integer.  Its value has no direct meaning; it is intended as a magic cookie to
-   be used e.g. to index a dictionary of thread-specific data.  Thread identifiers
-   may be recycled when a thread exits and another thread is created.
+   Trả về 'thread identifier' của thread hiện tại. Đây là một số nguyên khác không. Giá trị của nó không có ý nghĩa trực tiếp; nó được dùng như một magic cookie, chẳng hạn để lập chỉ mục cho một dictionary chứa dữ liệu dành riêng cho thread. Thread identifier có thể được tái sử dụng khi một thread kết thúc và một thread khác được tạo.
 
 
 .. function:: get_native_id()
 
-   Return the native integral Thread ID of the current thread assigned by the kernel.
-   This is a non-negative integer.
-   Its value may be used to uniquely identify this particular thread system-wide
-   (until the thread terminates, after which the value may be recycled by the OS).
+   Trả về Thread ID dạng số nguyên gốc của thread hiện tại, do kernel gán. Đây là một số nguyên không âm. Giá trị này có thể được dùng để định danh duy nhất thread cụ thể này trên toàn hệ thống (cho đến khi thread kết thúc; sau đó giá trị có thể được OS tái sử dụng).
 
    .. availability:: Windows, FreeBSD, Linux, macOS, OpenBSD, NetBSD, AIX, DragonFlyBSD, GNU/kFreeBSD.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.13
-      Added support for GNU/kFreeBSD.
+      Đã bổ sung hỗ trợ cho GNU/kFreeBSD.
 
 
 .. function:: stack_size([size])
 
-   Return the thread stack size used when creating new threads.  The optional
-   *size* argument specifies the stack size to be used for subsequently created
-   threads, and must be 0 (use platform or configured default) or a positive
-   integer value of at least 32,768 (32 KiB). If *size* is not specified,
-   0 is used.  If changing the thread stack size is
-   unsupported, a :exc:`RuntimeError` is raised.  If the specified stack size is
-   invalid, a :exc:`ValueError` is raised and the stack size is unmodified.  32 KiB
-   is currently the minimum supported stack size value to guarantee sufficient
-   stack space for the interpreter itself.  Note that some platforms may have
-   particular restrictions on values for the stack size, such as requiring a
-   minimum stack size > 32 KiB or requiring allocation in multiples of the system
-   memory page size - platform documentation should be referred to for more
-   information (4 KiB pages are common; using multiples of 4096 for the stack size is
-   the suggested approach in the absence of more specific information).
+   Trả về kích thước stack của thread được sử dụng khi tạo các thread mới. Đối số *size* tùy chọn chỉ định kích thước stack sẽ được sử dụng cho các thread được tạo sau đó, và phải là 0 (sử dụng giá trị mặc định của platform hoặc giá trị đã cấu hình) hoặc một giá trị số nguyên dương ít nhất là 32.768 (32 KiB). Nếu không chỉ định *size*, giá trị 0 sẽ được sử dụng. Nếu không hỗ trợ thay đổi kích thước stack của thread, một :exc:`RuntimeError` sẽ được raise. Nếu kích thước stack được chỉ định không hợp lệ, một :exc:`ValueError` sẽ được raise và kích thước stack không thay đổi. Hiện tại, 32 KiB là giá trị kích thước stack tối thiểu được hỗ trợ để bảo đảm đủ không gian stack cho chính interpreter. Lưu ý rằng một số platform có thể áp đặt các hạn chế cụ thể đối với giá trị kích thước stack, chẳng hạn yêu cầu kích thước stack tối thiểu > 32 KiB hoặc yêu cầu cấp phát theo bội số của kích thước trang bộ nhớ hệ thống — cần tham khảo tài liệu của platform để biết thêm thông tin (trang 4 KiB là phổ biến; khi không có thông tin cụ thể hơn, nên sử dụng các bội số của 4096 cho kích thước stack).
 
    .. availability:: Windows, pthreads.
 
-      Unix platforms with POSIX threads support.
+      Các platform Unix hỗ trợ POSIX threads.
 
 
 .. data:: TIMEOUT_MAX
 
-   The maximum value allowed for the *timeout* parameter of
-   :meth:`Lock.acquire <threading.Lock.acquire>`. Specifying a timeout greater
-   than this value will raise an :exc:`OverflowError`.
+   Giá trị tối đa được phép cho tham số *timeout* của
+   :meth:`Lock.acquire <threading.Lock.acquire>`. Việc chỉ định thời gian chờ lớn hơn giá trị này sẽ phát sinh một :exc:`OverflowError`.
 
    .. versionadded:: 3.2
 
@@ -163,50 +122,39 @@ This module defines the following constants and functions:
 
 .. class:: LockType
 
-   This is the type of lock objects.
+   Đây là kiểu của các đối tượng khóa.
 
-   Lock objects have the following methods:
+   Các đối tượng khóa có những phương thức sau:
 
    .. method:: acquire(blocking=True, timeout=-1)
 
-      Without any optional argument, this method acquires the lock unconditionally, if
-      necessary waiting until it is released by another thread (only one thread at a
-      time can acquire a lock --- that's their reason for existence).
+      Nếu không có đối số tùy chọn, phương thức này sẽ luôn lấy khóa, nếu cần thì chờ cho đến khi khóa được một thread khác giải phóng (mỗi lần chỉ một thread có thể lấy khóa — đó là lý do các khóa tồn tại).
 
-      If the *blocking* argument is present, the action depends on its
-      value: if it is false, the lock is only acquired if it can be acquired
-      immediately without waiting, while if it is true, the lock is acquired
-      unconditionally as above.
+      Nếu có đối số *blocking*, hành động sẽ phụ thuộc vào giá trị của nó: nếu giá trị là false, khóa chỉ được lấy nếu có thể lấy ngay mà không cần chờ; còn nếu giá trị là true, khóa sẽ luôn được lấy như trên.
 
-      If the floating-point *timeout* argument is present and positive, it
-      specifies the maximum wait time in seconds before returning.  A negative
-      *timeout* argument specifies an unbounded wait.  You cannot specify
-      a *timeout* if *blocking* is false.
+      Nếu có đối số *timeout* dạng số thực và có giá trị dương, đối số này chỉ định thời gian chờ tối đa tính bằng giây trước khi trả về. Đối số *timeout* âm chỉ định thời gian chờ không giới hạn. Bạn không thể chỉ định *timeout* nếu *blocking* là false.
 
-      The return value is ``True`` if the lock is acquired successfully,
-      ``False`` if not.
+      Giá trị trả về là ``True`` nếu lấy khóa thành công, và là ``False`` nếu không thành công.
 
       .. versionchanged:: 3.2
-         The *timeout* parameter is new.
+         Tham số *timeout* là tham số mới.
 
       .. versionchanged:: 3.2
-         Lock acquires can now be interrupted by signals on POSIX.
+         Việc acquire lock hiện có thể bị gián đoạn bởi các signal trên POSIX.
 
       .. versionchanged:: 3.14
-         Lock acquires can now be interrupted by signals on Windows.
+         Việc acquire lock hiện có thể bị gián đoạn bởi các signal trên Windows.
 
    .. method:: release()
 
-      Releases the lock.  The lock must have been acquired earlier, but not
-      necessarily by the same thread.
+      Giải phóng lock. Lock phải được acquire trước đó, nhưng không nhất thiết phải bởi cùng một thread.
 
    .. method:: locked()
 
-      Return the status of the lock: ``True`` if it has been acquired by some thread,
-      ``False`` if not.
+      Trả về trạng thái của lock: ``True`` nếu lock đã được một thread nào đó acquire, ``False`` nếu chưa.
 
-   In addition to these methods, lock objects can also be used via the
-   :keyword:`with` statement, e.g.::
+   Ngoài các phương thức này, các đối tượng lock cũng có thể được sử dụng thông qua
+   :keyword:`with` câu lệnh, ví dụ::
 
       import _thread
 
@@ -215,18 +163,14 @@ This module defines the following constants and functions:
       with a_lock:
           print("a_lock is locked while this executes")
 
-**Caveats:**
+**Lưu ý:**
 
 .. index:: pair: module; signal
 
-* Interrupts always go to the main thread (the :exc:`KeyboardInterrupt`
-  exception will be received by that thread.)
+* Các ngắt luôn được gửi đến main thread (thread đó sẽ nhận được exception :exc:`KeyboardInterrupt`.)
 
-* Calling :func:`sys.exit` or raising the :exc:`SystemExit` exception is
-  equivalent to calling :func:`_thread.exit`.
+* Việc gọi :func:`sys.exit` hoặc raise exception :exc:`SystemExit` tương đương với việc gọi :func:`_thread.exit`.
 
-* When the main thread exits, it is system defined whether the other threads
-  survive.  On most systems, they are killed without executing
-  :keyword:`try` ... :keyword:`finally` clauses or executing object
-  destructors.
+* Khi main thread thoát, việc các thread khác có tiếp tục hoạt động hay không là do hệ thống quyết định. Trên hầu hết các hệ thống, chúng bị kết thúc mà không thực thi
+  :keyword:`try` ... :keyword:`finally` hoặc thực thi các object destructor.
 
