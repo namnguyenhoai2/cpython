@@ -6,18 +6,15 @@
 Streams
 =======
 
-**Source code:** :source:`Lib/asyncio/streams.py`
+**Mã nguồn:** :source:`Lib/asyncio/streams.py`
 
 -------------------------------------------------
 
-Streams are high-level async/await-ready primitives to work with
-network connections.  Streams allow sending and receiving data without
-using callbacks or low-level protocols and transports.
+Streams là các primitive bất đồng bộ cấp cao, sẵn sàng sử dụng với async/await, để làm việc với các kết nối mạng. Streams cho phép gửi và nhận dữ liệu mà không cần sử dụng callback hoặc các protocol và transport cấp thấp.
 
 .. _asyncio_example_stream:
 
-Here is an example of a TCP echo client written using asyncio
-streams::
+Sau đây là một TCP echo client được viết bằng streams của asyncio::
 
     import asyncio
 
@@ -39,171 +36,142 @@ streams::
     asyncio.run(tcp_echo_client('Hello World!'))
 
 
-See also the `Examples`_ section below.
+Xem thêm phần `Examples`_ bên dưới.
 
 
-.. rubric:: Stream Functions
+.. rubric:: Các hàm Stream
 
-The following top-level asyncio functions can be used to create
-and work with streams:
+Có thể sử dụng các hàm asyncio cấp cao nhất sau đây để tạo và làm việc với streams:
 
 
 .. function:: open_connection(host=None, port=None, *, \
-                 limit=65536, ssl=None, family=0, proto=0, \
-                 flags=0, sock=None, local_addr=None, \
-                 server_hostname=None, ssl_handshake_timeout=None, \
-                 ssl_shutdown_timeout=None, \
-                 happy_eyeballs_delay=None, interleave=None)
+                 limit=65536, ssl=None, family=0, proto=0, \ flags=0, sock=None, local_addr=None, \ server_hostname=None, ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None, \ happy_eyeballs_delay=None, interleave=None)
    :async:
 
-   Establish a network connection and return a pair of
-   ``(reader, writer)`` objects.
+   Thiết lập kết nối mạng và trả về một cặp ``(reader, writer)`` đối tượng.
 
-   The returned *reader* and *writer* objects are instances of
-   :class:`StreamReader` and :class:`StreamWriter` classes.
+   Các đối tượng *reader* và *writer* được trả về là các thể hiện của
+   :class:`StreamReader` và :class:`StreamWriter` các lớp.
 
-   *limit* determines the buffer size limit used by the
-   returned :class:`StreamReader` instance.  By default the *limit*
-   is set to 64 KiB.
+   *limit* xác định giới hạn kích thước bộ đệm được sử dụng bởi thể hiện :class:`StreamReader` được trả về. Theo mặc định, *limit* được đặt thành 64 KiB.
 
-   The rest of the arguments are passed directly to
+   Các đối số còn lại được truyền trực tiếp tới
    :meth:`loop.create_connection`.
 
    .. note::
 
-      The *sock* argument transfers ownership of the socket to the
-      :class:`StreamWriter` created. To close the socket, call its
-      :meth:`~asyncio.StreamWriter.close` method.
+      Đối số *sock* chuyển quyền sở hữu socket cho
+      :class:`StreamWriter` đã được tạo. Để đóng socket, hãy gọi
+      phương thức :meth:`~asyncio.StreamWriter.close`.
 
    .. versionchanged:: 3.7
-      Added the *ssl_handshake_timeout* parameter.
+      Đã thêm tham số *ssl_handshake_timeout*.
 
    .. versionchanged:: 3.8
-      Added the *happy_eyeballs_delay* and *interleave* parameters.
+      Đã thêm các tham số *happy_eyeballs_delay* và *interleave*.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. versionchanged:: 3.11
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã thêm tham số *ssl_shutdown_timeout*.
 
 
 .. function:: start_server(client_connected_cb, host=None, \
-                 port=None, *, limit=65536, \
-                 family=socket.AF_UNSPEC, \
-                 flags=socket.AI_PASSIVE, sock=None, \
-                 backlog=100, ssl=None, reuse_address=None, \
-                 reuse_port=None, keep_alive=None, \
-                 ssl_handshake_timeout=None, \
-                 ssl_shutdown_timeout=None, start_serving=True)
+                 port=None, *, limit=65536, \ family=socket.AF_UNSPEC, \ flags=socket.AI_PASSIVE, sock=None, \ backlog=100, ssl=None, reuse_address=None, \ reuse_port=None, keep_alive=None, \ ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None, start_serving=True
    :async:
 
-   Start a socket server.
+   Khởi động một máy chủ socket.
 
-   The *client_connected_cb* callback is called whenever a new client
-   connection is established.  It receives a ``(reader, writer)`` pair
-   as two arguments, instances of the :class:`StreamReader` and
-   :class:`StreamWriter` classes.
+   Callback *client_connected_cb* được gọi bất cứ khi nào một kết nối client mới được thiết lập. Callback này nhận một cặp ``(reader, writer)`` dưới dạng hai đối số, là các thể hiện của :class:`StreamReader` và
+   :class:`StreamWriter` các lớp.
 
-   *client_connected_cb* can be a plain callable or a
-   :ref:`coroutine function <coroutine>`; if it is a coroutine function,
-   it will be automatically scheduled as a :class:`Task`.
+   *client_connected_cb* có thể là một callable thông thường hoặc một
+   :ref:`hàm coroutine <coroutine>`; nếu là một hàm coroutine, hàm này sẽ tự động được lập lịch dưới dạng một :class:`Task`.
 
-   *limit* determines the buffer size limit used by the
-   returned :class:`StreamReader` instance.  By default the *limit*
-   is set to 64 KiB.
+   *limit* xác định giới hạn kích thước bộ đệm được sử dụng bởi thể hiện :class:`StreamReader` được trả về. Theo mặc định, *limit* được đặt thành 64 KiB.
 
-   The rest of the arguments are passed directly to
+   Các đối số còn lại được truyền trực tiếp tới
    :meth:`loop.create_server`.
 
    .. note::
 
-      The *sock* argument transfers ownership of the socket to the
-      server created. To close the socket, call the server's
-      :meth:`~asyncio.Server.close` method.
+      Đối số *sock* chuyển quyền sở hữu socket cho server được tạo. Để đóng socket, hãy gọi phương thức của server
+      :meth:`~asyncio.Server.close`.
 
    .. versionchanged:: 3.7
-      Added the *ssl_handshake_timeout* and *start_serving* parameters.
+      Đã thêm các tham số *ssl_handshake_timeout* và *start_serving*.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. versionchanged:: 3.11
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã thêm tham số *ssl_shutdown_timeout*.
 
    .. versionchanged:: 3.13
-      Added the *keep_alive* parameter.
+      Đã thêm tham số *keep_alive*.
 
 
-.. rubric:: Unix Sockets
+.. rubric:: Socket Unix
 
 .. function:: open_unix_connection(path=None, *, limit=65536, \
-               ssl=None, sock=None, server_hostname=None, \
-               ssl_handshake_timeout=None, ssl_shutdown_timeout=None)
+               ssl=None, sock=None, server_hostname=None, \ ssl_handshake_timeout=None, ssl_shutdown_timeout=None)
    :async:
 
-   Establish a Unix socket connection and return a pair of
-   ``(reader, writer)``.
+   Thiết lập kết nối socket Unix và trả về một cặp ``(reader, writer)``.
 
-   Similar to :func:`open_connection` but operates on Unix sockets.
+   Tương tự như :func:`open_connection` nhưng hoạt động trên các socket Unix.
 
-   See also the documentation of :meth:`loop.create_unix_connection`.
+   Xem thêm tài liệu về :meth:`loop.create_unix_connection`.
 
    .. note::
 
-      The *sock* argument transfers ownership of the socket to the
-      :class:`StreamWriter` created. To close the socket, call its
-      :meth:`~asyncio.StreamWriter.close` method.
+      Đối số *sock* chuyển quyền sở hữu socket cho
+      :class:`StreamWriter` đã được tạo. Để đóng socket, hãy gọi
+      phương thức :meth:`~asyncio.StreamWriter.close`.
 
    .. availability:: Unix.
 
    .. versionchanged:: 3.7
-      Added the *ssl_handshake_timeout* parameter.
-      The *path* parameter can now be a :term:`path-like object`
+      Đã thêm tham số *ssl_handshake_timeout*. Tham số *path* giờ đây có thể là :term:`path-like object`
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. versionchanged:: 3.11
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã thêm tham số *ssl_shutdown_timeout*.
 
 
 .. function:: start_unix_server(client_connected_cb, path=None, \
-                 *, limit=65536, sock=None, backlog=100, ssl=None, \
-                 ssl_handshake_timeout=None, \
-                 ssl_shutdown_timeout=None, start_serving=True, cleanup_socket=True)
+                 *, limit=65536, sock=None, backlog=100, ssl=None, \ ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None, start_serving=True, cleanup_socket=True)
    :async:
 
-   Start a Unix socket server.
+   Khởi động máy chủ Unix socket.
 
-   Similar to :func:`start_server` but works with Unix sockets.
+   Tương tự như :func:`start_server` nhưng hoạt động với Unix socket.
 
-   If *cleanup_socket* is true then the Unix socket will automatically
-   be removed from the filesystem when the server is closed, unless the
-   socket has been replaced after the server has been created.
+   Nếu *cleanup_socket* là true thì Unix socket sẽ tự động bị xóa khỏi hệ thống tệp khi máy chủ được đóng, trừ khi socket đã được thay thế sau khi máy chủ được tạo.
 
-   See also the documentation of :meth:`loop.create_unix_server`.
+   Xem thêm tài liệu về :meth:`loop.create_unix_server`.
 
    .. note::
 
-      The *sock* argument transfers ownership of the socket to the
-      server created. To close the socket, call the server's
-      :meth:`~asyncio.Server.close` method.
+      Đối số *sock* chuyển quyền sở hữu socket cho server được tạo. Để đóng socket, hãy gọi phương thức của server
+      :meth:`~asyncio.Server.close`.
 
    .. availability:: Unix.
 
    .. versionchanged:: 3.7
-      Added the *ssl_handshake_timeout* and *start_serving* parameters.
-      The *path* parameter can now be a :term:`path-like object`.
+      Đã thêm các tham số *ssl_handshake_timeout* và *start_serving*. Tham số *path* hiện có thể là một :term:`path-like object`.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. versionchanged:: 3.11
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã thêm tham số *ssl_shutdown_timeout*.
 
    .. versionchanged:: 3.13
-      Added the *cleanup_socket* parameter.
+      Đã thêm tham số *cleanup_socket*.
 
 
 StreamReader
@@ -211,91 +179,64 @@ StreamReader
 
 .. class:: StreamReader
 
-   Represents a reader object that provides APIs to read data
-   from the IO stream. As an :term:`asynchronous iterable`, the
-   object supports the :keyword:`async for` statement.
+   Đại diện cho một đối tượng reader cung cấp các API để đọc dữ liệu từ luồng IO. Với vai trò là một :term:`asynchronous iterable`, đối tượng hỗ trợ câu lệnh :keyword:`async for`.
 
-   It is not recommended to instantiate *StreamReader* objects
-   directly; use :func:`open_connection` and :func:`start_server`
-   instead.
+   Không nên khởi tạo trực tiếp các đối tượng *StreamReader*; thay vào đó, hãy sử dụng :func:`open_connection` và :func:`start_server`.
 
    .. method:: feed_eof()
 
-      Acknowledge the EOF.
+      Xác nhận EOF.
 
    .. method:: read(n=-1)
       :async:
 
-      Read up to *n* bytes from the stream.
+      Đọc tối đa *n* byte từ luồng.
 
-      If *n* is not provided or set to ``-1``,
-      read until EOF, then return all read :class:`bytes`.
-      If EOF was received and the internal buffer is empty,
-      return an empty ``bytes`` object.
+      Nếu *n* không được cung cấp hoặc được đặt thành ``-1``, hãy đọc cho đến EOF, sau đó trả về toàn bộ :class:`bytes` đã đọc. Nếu đã nhận EOF và bộ đệm nội bộ trống, hãy trả về một đối tượng ``bytes`` rỗng.
 
-      If *n* is ``0``, return an empty ``bytes`` object immediately.
+      Nếu *n* là ``0``, hãy trả về ngay một đối tượng ``bytes`` rỗng.
 
-      If *n* is positive, return at most *n* available ``bytes``
-      as soon as at least 1 byte is available in the internal buffer.
-      If EOF is received before any byte is read, return an empty
-      ``bytes`` object.
+      Nếu *n* dương, trả về tối đa *n* ``bytes`` có sẵn ngay khi có ít nhất 1 byte trong bộ đệm nội bộ. Nếu nhận được EOF trước khi đọc bất kỳ byte nào, trả về một đối tượng ``bytes`` rỗng.
 
    .. method:: readline()
       :async:
 
-      Read one line, where "line" is a sequence of bytes
-      ending with ``\n``.
+      Đọc một dòng, trong đó "dòng" là một chuỗi byte kết thúc bằng ``\n``.
 
-      If EOF is received and ``\n`` was not found, the method
-      returns partially read data.
+      Nếu nhận được EOF và không tìm thấy ``\n``, phương thức sẽ trả về dữ liệu đã đọc được một phần.
 
-      If EOF is received and the internal buffer is empty,
-      return an empty ``bytes`` object.
+      Nếu nhận được EOF và bộ đệm nội bộ trống, trả về một đối tượng ``bytes`` rỗng.
 
    .. method:: readexactly(n)
       :async:
 
-      Read exactly *n* bytes.
+      Đọc chính xác *n* byte.
 
-      Raise an :exc:`IncompleteReadError` if EOF is reached before *n*
-      can be read.  Use the :attr:`IncompleteReadError.partial`
-      attribute to get the partially read data.
+      Phát sinh :exc:`IncompleteReadError` nếu đạt đến EOF trước khi có thể đọc *n*. Sử dụng thuộc tính :attr:`IncompleteReadError.partial` để lấy dữ liệu đã đọc được một phần.
 
    .. method:: readuntil(separator=b'\n')
       :async:
 
-      Read data from the stream until *separator* is found.
+      Đọc dữ liệu từ stream cho đến khi tìm thấy *separator*.
 
-      On success, the data and separator will be removed from the
-      internal buffer (consumed). Returned data will include the
-      separator at the end.
+      Khi thành công, dữ liệu và dấu phân cách sẽ được xóa khỏi bộ đệm nội bộ (đã tiêu thụ). Dữ liệu được trả về sẽ bao gồm dấu phân cách ở cuối.
 
-      If the amount of data read exceeds the configured stream limit, a
-      :exc:`LimitOverrunError` exception is raised, and the data
-      is left in the internal buffer and can be read again.
+      Nếu lượng dữ liệu đã đọc vượt quá giới hạn stream được cấu hình, một
+      :exc:`LimitOverrunError` exception sẽ được phát sinh và dữ liệu vẫn nằm trong bộ đệm nội bộ, nên có thể được đọc lại.
 
-      If EOF is reached before the complete separator is found,
-      an :exc:`IncompleteReadError` exception is raised, and the internal
-      buffer is reset.  The :attr:`IncompleteReadError.partial` attribute
-      may contain a portion of the separator.
+      Nếu đạt đến EOF trước khi tìm thấy đầy đủ dấu phân cách, một :exc:`IncompleteReadError` exception sẽ được phát sinh và bộ đệm nội bộ sẽ được đặt lại. Thuộc tính :attr:`IncompleteReadError.partial` có thể chứa một phần của dấu phân cách.
 
-      The *separator* may also be a tuple of separators. In this
-      case the return value will be the shortest possible that has any
-      separator as the suffix. For the purposes of :exc:`LimitOverrunError`,
-      the shortest possible separator is considered to be the one that
-      matched.
+      *separator* cũng có thể là một tuple gồm các dấu phân cách. Trong trường hợp này, giá trị trả về sẽ là giá trị ngắn nhất có thể với bất kỳ dấu phân cách nào làm hậu tố. Đối với :exc:`LimitOverrunError`, dấu phân cách ngắn nhất có thể được xem là dấu phân cách đã khớp.
 
       .. versionadded:: 3.5.2
 
       .. versionchanged:: 3.13
 
-         The *separator* parameter may now be a :class:`tuple` of
-         separators.
+         Tham số *separator* giờ đây có thể là một :class:`tuple` gồm các dấu phân cách.
 
    .. method:: at_eof()
 
-      Return ``True`` if the buffer is empty and :meth:`feed_eof`
-      was called.
+      Trả về ``True`` nếu bộ đệm trống và :meth:`feed_eof` đã được gọi.
 
 
 StreamWriter
@@ -303,23 +244,17 @@ StreamWriter
 
 .. class:: StreamWriter
 
-   Represents a writer object that provides APIs to write data
-   to the IO stream.
+   Đại diện cho một đối tượng writer cung cấp các API để ghi dữ liệu vào luồng IO.
 
-   It is not recommended to instantiate *StreamWriter* objects
-   directly; use :func:`open_connection` and :func:`start_server`
-   instead.
+   Không nên khởi tạo trực tiếp các đối tượng *StreamWriter*; thay vào đó, hãy sử dụng :func:`open_connection` và :func:`start_server`.
 
    .. method:: write(data)
 
-      The method attempts to write the *data* to the underlying socket immediately.
-      If that fails, the data is queued in an internal write buffer until it can be
-      sent.
+      Phương thức này cố gắng ghi *data* vào socket bên dưới ngay lập tức. Nếu không thành công, dữ liệu sẽ được xếp vào bộ đệm ghi nội bộ cho đến khi có thể được gửi đi.
 
-      The *data* buffer should be a bytes, bytearray, or C-contiguous one-dimensional
-      memoryview object.
+      Bộ đệm *data* phải là một đối tượng bytes, bytearray hoặc memoryview một chiều liên tục theo C (C-contiguous).
 
-      The method should be used along with the ``drain()`` method::
+      Nên sử dụng phương thức này cùng với ``drain()`` method::
 
          stream.write(data)
          await stream.drain()
@@ -327,130 +262,106 @@ StreamWriter
 
    .. method:: writelines(data)
 
-      The method writes a list (or any iterable) of bytes to the underlying socket
-      immediately.
-      If that fails, the data is queued in an internal write buffer until it can be
-      sent.
+      Phương thức này ghi một danh sách (hoặc bất kỳ iterable nào) gồm các byte vào socket bên dưới ngay lập tức. Nếu không thành công, dữ liệu sẽ được xếp vào bộ đệm ghi nội bộ cho đến khi có thể được gửi đi.
 
-      The method should be used along with the ``drain()`` method::
+      Nên sử dụng phương thức này cùng với ``drain()`` method::
 
          stream.writelines(lines)
          await stream.drain()
 
    .. method:: close()
 
-      The method closes the stream and the underlying socket.
+      Phương thức này đóng stream và socket bên dưới.
 
-      The method should be used, though not mandatory,
-      along with the ``wait_closed()`` method::
+      Nên sử dụng phương thức này, dù không bắt buộc, cùng với phương thức ``wait_closed()``::
 
          stream.close()
          await stream.wait_closed()
 
    .. method:: can_write_eof()
 
-      Return ``True`` if the underlying transport supports
-      the :meth:`write_eof` method, ``False`` otherwise.
+      Trả về ``True`` nếu transport bên dưới hỗ trợ phương thức :meth:`write_eof`, nếu không thì trả về ``False``.
 
    .. method:: write_eof()
 
-      Close the write end of the stream after the buffered write
-      data is flushed.
+      Đóng đầu ghi của stream sau khi dữ liệu ghi được đệm đã được flush.
 
    .. attribute:: transport
 
-      Return the underlying asyncio transport.
+      Trả về asyncio transport bên dưới.
 
    .. method:: get_extra_info(name, default=None)
 
-      Access optional transport information; see
-      :meth:`BaseTransport.get_extra_info` for details.
+      Truy cập thông tin transport tùy chọn; xem
+      :meth:`BaseTransport.get_extra_info` để biết thêm chi tiết.
 
    .. method:: drain()
       :async:
 
-      Wait until it is appropriate to resume writing to the stream.
-      Example::
+      Chờ cho đến khi thích hợp để tiếp tục ghi vào stream. Ví dụ::
 
           writer.write(data)
           await writer.drain()
 
-      This is a flow control method that interacts with the underlying
-      IO write buffer.  When the size of the buffer reaches
-      the high watermark, *drain()* blocks until the size of the
-      buffer is drained down to the low watermark and writing can
-      be resumed.  When there is nothing to wait for, the :meth:`drain`
-      returns immediately.
+      Đây là một phương thức điều khiển luồng dữ liệu tương tác với bộ đệm ghi IO bên dưới. Khi kích thước bộ đệm đạt đến ngưỡng cao, *drain()* sẽ chặn cho đến khi kích thước bộ đệm giảm xuống ngưỡng thấp và có thể tiếp tục ghi. Khi không có gì cần chờ, :meth:`drain` sẽ trả về ngay lập tức.
 
       .. note::
 
-         When the write buffer is below the high watermark,
-         :meth:`drain` returns immediately without yielding to
-         the event loop.  As a result, code which repeatedly calls
-         ``write()`` followed by ``await drain()`` may prevent other
-         tasks from running.  To prevent blocking behavior, yield
-         to the event loop explicitly with ``await asyncio.sleep(0)``
-         (see :func:`asyncio.sleep`).
+         Khi bộ đệm ghi thấp hơn ngưỡng cao,
+         :meth:`drain` sẽ trả về ngay lập tức mà không nhường quyền cho event loop. Do đó, mã liên tục gọi ``write()`` rồi đến ``await drain()`` có thể ngăn các task khác chạy. Để tránh hành vi chặn, hãy chủ động nhường quyền cho event loop bằng ``await asyncio.sleep(0)`` (xem :func:`asyncio.sleep`).
 
    .. method:: start_tls(sslcontext, *, server_hostname=None, \
                          ssl_handshake_timeout=None, ssl_shutdown_timeout=None)
       :async:
 
-      Upgrade an existing stream-based connection to TLS.
+      Nâng cấp một kết nối hiện có dựa trên stream lên TLS.
 
-      Parameters:
+      Tham số:
 
-      * *sslcontext*: a configured instance of :class:`~ssl.SSLContext`.
+      * *sslcontext*: một instance đã được cấu hình của :class:`~ssl.SSLContext`.
 
-      * *server_hostname*: sets or overrides the host name that the target
-        server's certificate will be matched against.
+      * *server_hostname*: đặt hoặc ghi đè tên máy chủ mà chứng chỉ của máy chủ đích sẽ được đối chiếu.
 
-      * *ssl_handshake_timeout* is the time in seconds to wait for the TLS
-        handshake to complete before aborting the connection.  ``60.0`` seconds
-        if ``None`` (default).
+      * *ssl_handshake_timeout* là thời gian tính bằng giây chờ quá trình bắt tay TLS hoàn tất trước khi hủy kết nối. ``60.0`` giây nếu ``None`` (mặc định).
 
-      * *ssl_shutdown_timeout* is the time in seconds to wait for the SSL shutdown
-        to complete before aborting the connection. ``30.0`` seconds if ``None``
-        (default).
+      * *ssl_shutdown_timeout* là thời gian tính bằng giây chờ quá trình tắt SSL hoàn tất trước khi hủy kết nối. ``30.0`` giây nếu ``None`` (mặc định).
 
       .. versionadded:: 3.11
 
       .. versionchanged:: 3.12
-         Added the *ssl_shutdown_timeout* parameter.
+         Đã thêm tham số *ssl_shutdown_timeout*.
 
       .. versionchanged:: 3.14.8
-         Raises a ``ValueError`` if ``sslcontext.check_hostname`` is ``True``
-         and ``server_hostname`` is not supplied.
+         Ném ``ValueError`` nếu ``sslcontext.check_hostname`` là ``True`` và ``server_hostname`` không được cung cấp.
 
 
    .. method:: is_closing()
 
-      Return ``True`` if the stream is closed or in the process of
-      being closed.
+      Trả về ``True`` nếu stream đã đóng hoặc đang trong quá trình đóng.
 
       .. versionadded:: 3.7
 
    .. method:: wait_closed()
       :async:
 
-      Wait until the stream is closed.
+      Chờ cho đến khi stream được đóng.
 
-      Should be called after :meth:`close` to wait until the underlying
-      connection is closed, ensuring that all data has been flushed
-      before e.g. exiting the program.
+      Nên được gọi sau :meth:`close` để chờ cho đến khi kết nối bên dưới được đóng, đảm bảo mọi dữ liệu đã được flush trước khi thoát chương trình, chẳng hạn.
 
       .. versionadded:: 3.7
 
 
-Examples
-========
+.. _`Examples`:
+
+Ví dụ
+=====
 
 .. _asyncio-tcp-echo-client-streams:
 
-TCP echo client using streams
------------------------------
+Máy khách echo TCP sử dụng streams
+----------------------------------
 
-TCP echo client using the :func:`asyncio.open_connection` function::
+Máy khách echo TCP sử dụng hàm :func:`asyncio.open_connection`::
 
     import asyncio
 
@@ -474,16 +385,15 @@ TCP echo client using the :func:`asyncio.open_connection` function::
 
 .. seealso::
 
-   The :ref:`TCP echo client protocol <asyncio_example_tcp_echo_client_protocol>`
-   example uses the low-level :meth:`loop.create_connection` method.
+   Ví dụ :ref:`giao thức máy khách echo TCP <asyncio_example_tcp_echo_client_protocol>` sử dụng phương thức cấp thấp :meth:`loop.create_connection`.
 
 
 .. _asyncio-tcp-echo-server-streams:
 
-TCP echo server using streams
------------------------------
+Máy chủ echo TCP sử dụng streams
+--------------------------------
 
-TCP echo server using the :func:`asyncio.start_server` function::
+Máy chủ echo TCP sử dụng hàm :func:`asyncio.start_server`::
 
     import asyncio
 
@@ -517,14 +427,13 @@ TCP echo server using the :func:`asyncio.start_server` function::
 
 .. seealso::
 
-   The :ref:`TCP echo server protocol <asyncio_example_tcp_echo_server_protocol>`
-   example uses the :meth:`loop.create_server` method.
+   Ví dụ :ref:`giao thức máy chủ echo TCP <asyncio_example_tcp_echo_server_protocol>` sử dụng phương thức :meth:`loop.create_server`.
 
 
-Get HTTP headers
-----------------
+Lấy các header HTTP
+-------------------
 
-Simple example querying HTTP headers of the URL passed on the command line::
+Ví dụ đơn giản truy vấn các header HTTP của URL được truyền trên dòng lệnh::
 
     import asyncio
     import urllib.parse
@@ -555,7 +464,7 @@ Simple example querying HTTP headers of the URL passed on the command line::
             if line:
                 print(f'HTTP header> {line}')
 
-        # Ignore the body, close the socket
+        # Bỏ qua body, đóng socket
         writer.close()
         await writer.wait_closed()
 
@@ -563,59 +472,56 @@ Simple example querying HTTP headers of the URL passed on the command line::
     asyncio.run(print_http_headers(url))
 
 
-Usage::
+Cách sử dụng::
 
     python example.py http://example.com/path/page.html
 
-or with HTTPS::
+hoặc với HTTPS::
 
     python example.py https://example.com/path/page.html
 
 
 .. _asyncio_example_create_connection-streams:
 
-Register an open socket to wait for data using streams
+Đăng ký một socket đang mở để chờ dữ liệu bằng streams
 ------------------------------------------------------
 
-Coroutine waiting until a socket receives data using the
-:func:`open_connection` function::
+Coroutine chờ cho đến khi một socket nhận dữ liệu bằng
+hàm :func:`open_connection`::
 
     import asyncio
     import socket
 
     async def wait_for_data():
-        # Get a reference to the current event loop because
-        # we want to access low-level APIs.
+        # Lấy tham chiếu đến event loop hiện tại vì
+        # chúng ta muốn truy cập các API cấp thấp.
         loop = asyncio.get_running_loop()
 
-        # Create a pair of connected sockets.
+        # Tạo một cặp socket được kết nối với nhau.
         rsock, wsock = socket.socketpair()
 
-        # Register the open socket to wait for data.
+        # Đăng ký socket đang mở để chờ dữ liệu.
         reader, writer = await asyncio.open_connection(sock=rsock)
 
-        # Simulate the reception of data from the network
+        # Mô phỏng việc nhận dữ liệu từ mạng
         loop.call_soon(wsock.send, 'abc'.encode())
 
-        # Wait for data
+        # Chờ dữ liệu
         data = await reader.read(100)
 
-        # Got data, we are done: close the socket
+        # Đã nhận dữ liệu, hoàn tất: đóng socket
         print("Received:", data.decode())
         writer.close()
         await writer.wait_closed()
 
-        # Close the second socket
+        # Đóng socket thứ hai
         wsock.close()
 
     asyncio.run(wait_for_data())
 
 .. seealso::
 
-   The :ref:`register an open socket to wait for data using a protocol
-   <asyncio_example_create_connection>` example uses a low-level protocol and
-   the :meth:`loop.create_connection` method.
+   Ví dụ :ref:`đăng ký socket đang mở để chờ dữ liệu bằng một protocol <asyncio_example_create_connection>` sử dụng protocol cấp thấp và phương thức :meth:`loop.create_connection`.
 
-   The :ref:`watch a file descriptor for read events
-   <asyncio_example_watch_fd>` example uses the low-level
-   :meth:`loop.add_reader` method to watch a file descriptor.
+   Ví dụ :ref:`theo dõi một file descriptor để phát hiện các sự kiện đọc <asyncio_example_watch_fd>` sử dụng cấp thấp
+   :meth:`loop.add_reader` là phương thức để theo dõi một file descriptor.

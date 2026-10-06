@@ -1,176 +1,139 @@
-:mod:`!array` --- Efficient arrays of numeric values
-====================================================
+:mod:`!array` --- Mảng hiệu quả gồm các giá trị số
+==================================================
 
 .. module:: array
-   :synopsis: Space efficient arrays of uniformly typed numeric values.
+   :synopsis: Các mảng tiết kiệm không gian gồm các giá trị số có cùng kiểu.
 
 .. index:: single: arrays
 
 --------------
 
-This module defines an object type which can compactly represent an array of
-basic values: characters, integers, floating-point numbers.  Arrays are mutable :term:`sequence`
-types and behave very much like lists, except that the type of objects stored in
-them is constrained.  The type is specified at object creation time by using a
-:dfn:`type code`, which is a single character.  The following type codes are
-defined:
+Mô-đun này định nghĩa một kiểu đối tượng có thể biểu diễn gọn một mảng gồm các giá trị cơ bản: ký tự, số nguyên, số dấu phẩy động. Các mảng là các kiểu :term:`sequence` có thể thay đổi và hoạt động gần giống như danh sách, ngoại trừ việc kiểu của các đối tượng được lưu trữ trong chúng bị giới hạn. Kiểu này được chỉ định tại thời điểm tạo đối tượng bằng cách sử dụng một
+:dfn:`mã kiểu`, là một ký tự đơn. Các mã kiểu sau được định nghĩa:
 
-+-----------+--------------------+-------------------+-----------------------+-------+
-| Type code | C Type             | Python Type       | Minimum size in bytes | Notes |
-+===========+====================+===================+=======================+=======+
-| ``'b'``   | signed char        | int               | 1                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'B'``   | unsigned char      | int               | 1                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'u'``   | wchar_t            | Unicode character | 2                     | \(1)  |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'w'``   | Py_UCS4            | Unicode character | 4                     | \(2)  |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'h'``   | signed short       | int               | 2                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'H'``   | unsigned short     | int               | 2                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'i'``   | signed int         | int               | 2                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'I'``   | unsigned int       | int               | 2                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'l'``   | signed long        | int               | 4                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'L'``   | unsigned long      | int               | 4                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'q'``   | signed long long   | int               | 8                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'Q'``   | unsigned long long | int               | 8                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'f'``   | float              | float             | 4                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
-| ``'d'``   | double             | float             | 8                     |       |
-+-----------+--------------------+-------------------+-----------------------+-------+
++---------+--------------------+---------------+-------------------------------------+---------+
+| Mã kiểu | Kiểu C             | Kiểu Python   | Kích thước tối thiểu tính bằng byte | Ghi chú |
++=========+====================+===============+=====================================+=========+
+| ``'b'`` | signed char        | int           | 1                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'B'`` | unsigned char      | int           | 1                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'u'`` | wchar_t            | Ký tự Unicode | 2                                   | \(1)    |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'w'`` | Py_UCS4            | Ký tự Unicode | 4                                   | \(2)    |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'h'`` | short có dấu       | int           | 2                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'H'`` | short không dấu    | int           | 2                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'i'`` | signed int         | int           | 2                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'I'`` | unsigned int       | int           | 2                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'l'`` | signed long        | int           | 4                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'L'`` | unsigned long      | int           | 4                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'q'`` | signed long long   | int           | 8                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'Q'`` | unsigned long long | int           | 8                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'f'`` | float              | float         | 4                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
+| ``'d'`` | double             | float         | 8                                   |         |
++---------+--------------------+---------------+-------------------------------------+---------+
 
-Notes:
+Ghi chú:
 
 (1)
-   It can be 16 bits or 32 bits depending on the platform.
+   Giá trị này có thể là 16 bit hoặc 32 bit tùy thuộc vào nền tảng.
 
    .. versionchanged:: 3.9
-      ``array('u')`` now uses :c:type:`wchar_t` as C type instead of deprecated
-      ``Py_UNICODE``. This change doesn't affect its behavior because
-      ``Py_UNICODE`` is alias of :c:type:`wchar_t` since Python 3.3.
+      ``array('u')`` hiện sử dụng :c:type:`wchar_t` làm kiểu C thay cho ``Py_UNICODE`` đã lỗi thời. Thay đổi này không ảnh hưởng đến hành vi của nó vì ``Py_UNICODE`` là bí danh của :c:type:`wchar_t` kể từ Python 3.3.
 
    .. deprecated-removed:: 3.3 3.16
-      Please migrate to ``'w'`` typecode.
+      Vui lòng chuyển sang mã kiểu ``'w'``.
 
 (2)
    .. versionadded:: 3.13
 
 .. seealso::
 
-   The :ref:`ctypes <ctypes-fundamental-data-types>` and
-   :ref:`struct <format-characters>` modules,
-   as well as third-party modules like `numpy <https://numpy.org/doc/stable/reference/arrays.interface.html#object.__array_interface__>`__,
-   use similar -- but slightly different -- type codes.
+   :ref:`ctypes <ctypes-fundamental-data-types>` và
+   Các mô-đun :ref:`struct <format-characters>`, cũng như các mô-đun bên thứ ba như `numpy <https://numpy.org/doc/stable/reference/arrays.interface.html#object.__array_interface__>`__, sử dụng các mã kiểu tương tự -- nhưng hơi khác nhau --.
 
 
-The actual representation of values is determined by the machine architecture
-(strictly speaking, by the C implementation).  The actual size can be accessed
-through the :attr:`array.itemsize` attribute.
+Biểu diễn thực tế của các giá trị được xác định bởi kiến trúc máy (nói chính xác hơn là bởi cách triển khai C). Có thể truy cập kích thước thực tế thông qua thuộc tính :attr:`array.itemsize`.
 
-The module defines the following item:
+Mô-đun định nghĩa mục sau:
 
 
 .. data:: typecodes
 
-   A string with all available type codes.
+   Một chuỗi chứa tất cả các mã kiểu có sẵn.
 
 
-The module defines the following type:
+Mô-đun định nghĩa kiểu sau:
 
 
 .. class:: array(typecode[, initializer])
 
-   A new array whose items are restricted by *typecode*, and initialized
-   from the optional *initializer* value, which must be a :class:`bytes`
-   or :class:`bytearray` object, a Unicode string, or iterable over elements
-   of the appropriate type.
+   Một mảng mới có các phần tử bị giới hạn bởi *typecode*, và được khởi tạo từ giá trị *initializer* tùy chọn, giá trị này phải là một đối tượng :class:`bytes` hoặc :class:`bytearray`, một chuỗi Unicode hoặc một đối tượng có thể lặp chứa các phần tử thuộc kiểu tương ứng.
 
-   If given a :class:`bytes` or :class:`bytearray` object, the initializer
-   is passed to the new array's :meth:`frombytes` method;
-   if given a Unicode string, the initializer is passed to the
-   :meth:`fromunicode` method;
-   otherwise, the initializer's iterator is passed to the :meth:`extend` method
-   to add initial items to the array.
+   Nếu được cung cấp một đối tượng :class:`bytes` hoặc :class:`bytearray`, giá trị khởi tạo sẽ được truyền cho phương thức :meth:`frombytes` của mảng mới; nếu được cung cấp một chuỗi Unicode, giá trị khởi tạo sẽ được truyền cho
+   :meth:`fromunicode` method; nếu không, iterator của initializer sẽ được truyền cho :meth:`extend` method để thêm các phần tử ban đầu vào mảng.
 
-   Array objects support the ordinary :ref:`mutable <typesseq-mutable>` :term:`sequence` operations of indexing, slicing,
-   concatenation, and multiplication.  When using slice assignment, the assigned
-   value must be an array object with the same type code; in all other cases,
-   :exc:`TypeError` is raised. Array objects also implement the buffer interface,
-   and may be used wherever :term:`bytes-like objects <bytes-like object>` are supported.
+   Các đối tượng mảng hỗ trợ các thao tác :ref:`mutable <typesseq-mutable>` :term:`sequence` thông thường gồm lập chỉ mục, cắt lát, nối và nhân. Khi sử dụng phép gán lát cắt, giá trị được gán phải là một đối tượng mảng có cùng mã kiểu; trong mọi trường hợp khác,
+   :exc:`TypeError` được phát sinh. Các đối tượng mảng cũng triển khai buffer interface và có thể được sử dụng ở bất cứ nơi nào hỗ trợ :term:`bytes-like objects <bytes-like object>`.
 
-   Arrays are :ref:`generic <generics>` over the type of their contents.
+   Mảng có tính :ref:`generic <generics>` theo kiểu của các phần tử bên trong.
 
    .. audit-event:: array.__new__ typecode,initializer array.array
 
 
    .. attribute:: typecode
 
-      The typecode character used to create the array.
+      Ký tự typecode được dùng để tạo mảng.
 
 
    .. attribute:: itemsize
 
-      The length in bytes of one array item in the internal representation.
+      Độ dài tính bằng byte của một phần tử mảng trong biểu diễn nội bộ.
 
 
    .. method:: append(value, /)
 
-      Append a new item with the specified value to the end of the array.
+      Thêm một phần tử mới có giá trị được chỉ định vào cuối mảng.
 
 
    .. method:: buffer_info()
 
-      Return a tuple ``(address, length)`` giving the current memory address and the
-      length in elements of the buffer used to hold array's contents.  The size of the
-      memory buffer in bytes can be computed as ``array.buffer_info()[1] *
-      array.itemsize``.  This is occasionally useful when working with low-level (and
-      inherently unsafe) I/O interfaces that require memory addresses, such as certain
-      :c:func:`!ioctl` operations.  The returned numbers are valid as long as the array
-      exists and no length-changing operations are applied to it.
+      Trả về một tuple ``(address, length)`` cung cấp địa chỉ bộ nhớ hiện tại và độ dài theo số phần tử của buffer dùng để lưu nội dung của mảng. Kích thước của buffer bộ nhớ tính theo byte có thể được tính bằng ``array.buffer_info()[1] * array.itemsize``. Điều này đôi khi hữu ích khi làm việc với các interface I/O cấp thấp (và vốn không an toàn) yêu cầu địa chỉ bộ nhớ, chẳng hạn như một số
+      thao tác :c:func:`!ioctl`. Các số được trả về hợp lệ miễn là mảng còn tồn tại và không có thao tác nào làm thay đổi độ dài được áp dụng cho mảng.
 
       .. note::
 
-         When using array objects from code written in C or C++ (the only way to
-         effectively make use of this information), it makes more sense to use the buffer
-         interface supported by array objects.  This method is maintained for backward
-         compatibility and should be avoided in new code.  The buffer interface is
-         documented in :ref:`bufferobjects`.
+         Khi sử dụng các đối tượng array từ mã được viết bằng C hoặc C++ (cách duy nhất để thực sự sử dụng được thông tin này), việc sử dụng buffer interface được các đối tượng array hỗ trợ sẽ hợp lý hơn. Phương thức này được duy trì để tương thích ngược và nên tránh sử dụng trong mã mới. Buffer interface được mô tả trong :ref:`bufferobjects`.
 
 
    .. method:: byteswap()
 
-      "Byteswap" all items of the array.  This is only supported for values which are
-      1, 2, 4, or 8 bytes in size; for other types of values, :exc:`RuntimeError` is
-      raised.  It is useful when reading data from a file written on a machine with a
-      different byte order.
+      "Hoán đổi byte" tất cả các mục trong mảng. Thao tác này chỉ được hỗ trợ cho các giá trị có kích thước 1, 2, 4 hoặc 8 byte; với các kiểu giá trị khác, :exc:`RuntimeError` sẽ được nâng lên. Thao tác này hữu ích khi đọc dữ liệu từ một tệp được ghi trên máy có thứ tự byte khác.
 
 
    .. method:: count(value, /)
 
-      Return the number of occurrences of *value* in the array.
+      Trả về số lần xuất hiện của *value* trong mảng.
 
 
    .. method:: extend(iterable, /)
 
-      Append items from *iterable* to the end of the array.  If *iterable* is another
-      array, it must have *exactly* the same type code; if not, :exc:`TypeError` will
-      be raised.  If *iterable* is not an array, it must be iterable and its elements
-      must be the right type to be appended to the array.
+      Nối các mục từ *iterable* vào cuối mảng. Nếu *iterable* là một array khác, nó phải có mã kiểu *exactly* giống nhau; nếu không, :exc:`TypeError` sẽ được nâng lên. Nếu *iterable* không phải là một array, nó phải là iterable và các phần tử của nó phải có đúng kiểu để được nối vào mảng.
 
 
    .. method:: frombytes(buffer, /)
 
-      Appends items from the :term:`bytes-like object`, interpreting
-      its content as an array of machine values (as if it had been read
-      from a file using the :meth:`fromfile` method).
+      Nối các mục từ :term:`bytes-like object`, diễn giải nội dung của đối tượng này dưới dạng một array gồm các giá trị máy (như thể đối tượng này đã được đọc từ một tệp bằng phương thức :meth:`fromfile`).
 
       .. versionadded:: 3.2
          :meth:`!fromstring` is renamed to :meth:`frombytes` for clarity.
@@ -178,72 +141,59 @@ The module defines the following type:
 
    .. method:: fromfile(f, n, /)
 
-      Read *n* items (as machine values) from the :term:`file object` *f* and append
-      them to the end of the array.  If less than *n* items are available,
-      :exc:`EOFError` is raised, but the items that were available are still
-      inserted into the array.
+      Đọc *n* mục (dưới dạng các giá trị máy) từ :term:`file object` *f* và nối chúng vào cuối mảng.  Nếu có ít hơn *n* mục khả dụng,
+      :exc:`EOFError` được phát sinh, nhưng các mục đã có vẫn được chèn vào mảng.
 
 
    .. method:: fromlist(list, /)
 
-      Append items from the list.  This is equivalent to ``for x in list:
-      a.append(x)`` except that if there is a type error, the array is unchanged.
+      Nối các mục từ danh sách.  Thao tác này tương đương với ``for x in list: a.append(x)``, ngoại trừ việc nếu xảy ra lỗi kiểu, mảng sẽ không thay đổi.
 
 
    .. method:: fromunicode(ustr, /)
 
-      Extends this array with data from the given Unicode string.
-      The array must have type code ``'u'`` or ``'w'``; otherwise a :exc:`ValueError` is raised.
-      Use ``array.frombytes(unicodestring.encode(enc))`` to append Unicode data to an
-      array of some other type.
+      Mở rộng mảng này bằng dữ liệu từ chuỗi Unicode đã cho. Mảng phải có mã kiểu ``'u'`` hoặc ``'w'``; nếu không, :exc:`ValueError` sẽ được phát sinh. Sử dụng ``array.frombytes(unicodestring.encode(enc))`` để nối dữ liệu Unicode vào một mảng thuộc kiểu khác.
 
 
    .. method:: index(value[, start[, stop]])
 
-      Return the smallest *i* such that *i* is the index of the first occurrence of
-      *value* in the array.  The optional arguments *start* and *stop* can be
-      specified to search for *value* within a subsection of the array.  Raise
-      :exc:`ValueError` if *value* is not found.
+      Trả về *i* nhỏ nhất sao cho *i* là chỉ mục của lần xuất hiện đầu tiên của *value* trong mảng.  Có thể chỉ định các đối số tùy chọn *start* và *stop* để tìm *value* trong một phần của mảng.  Phát sinh
+      :exc:`ValueError` nếu không tìm thấy *value*.
 
       .. versionchanged:: 3.10
-         Added optional *start* and *stop* parameters.
+         Đã thêm các tham số tùy chọn *start* và *stop*.
 
 
    .. method:: insert(index, value, /)
 
-      Insert a new item *value* in the array before position *index*. Negative
-      values are treated as being relative to the end of the array.
+      Chèn một phần tử mới *value* vào mảng trước vị trí *index*. Các giá trị âm được tính tương đối từ cuối mảng.
 
 
    .. method:: pop(index=-1, /)
 
-      Removes the item with the index *i* from the array and returns it. The optional
-      argument defaults to ``-1``, so that by default the last item is removed and
-      returned.
+      Xóa phần tử có chỉ mục *i* khỏi mảng và trả về phần tử đó. Đối số tùy chọn mặc định là ``-1``, vì vậy theo mặc định, phần tử cuối cùng sẽ được xóa và trả về.
 
 
    .. method:: remove(value, /)
 
-      Remove the first occurrence of *value* from the array.
+      Xóa lần xuất hiện đầu tiên của *value* khỏi mảng.
 
 
    .. method:: clear()
 
-      Remove all elements from the array.
+      Xóa tất cả phần tử khỏi mảng.
 
       .. versionadded:: 3.13
 
 
    .. method:: reverse()
 
-      Reverse the order of the items in the array.
+      Đảo ngược thứ tự các phần tử trong mảng.
 
 
    .. method:: tobytes()
 
-      Convert the array to an array of machine values and return the bytes
-      representation (the same sequence of bytes that would be written to a file by
-      the :meth:`tofile` method.)
+      Chuyển mảng thành một mảng gồm các giá trị máy và trả về biểu diễn dạng byte (cùng một chuỗi byte sẽ được ghi vào một tệp bằng phương thức :meth:`tofile`.)
 
       .. versionadded:: 3.2
          :meth:`!tostring` is renamed to :meth:`tobytes` for clarity.
@@ -251,32 +201,21 @@ The module defines the following type:
 
    .. method:: tofile(f, /)
 
-      Write all items (as machine values) to the :term:`file object` *f*.
+      Ghi tất cả các phần tử (dưới dạng giá trị máy) vào :term:`file object` *f*.
 
 
    .. method:: tolist()
 
-      Convert the array to an ordinary list with the same items.
+      Chuyển mảng thành một danh sách thông thường với các phần tử giống nhau.
 
 
    .. method:: tounicode()
 
-      Convert the array to a Unicode string.  The array must have a type ``'u'`` or ``'w'``;
-      otherwise a :exc:`ValueError` is raised. Use ``array.tobytes().decode(enc)`` to
-      obtain a Unicode string from an array of some other type.
+      Chuyển mảng thành một chuỗi Unicode. Mảng phải có kiểu ``'u'`` hoặc ``'w'``; nếu không, một :exc:`ValueError` sẽ được phát sinh. Sử dụng ``array.tobytes().decode(enc)`` để lấy chuỗi Unicode từ một mảng thuộc kiểu khác.
 
 
-The string representation of array objects has the form
-``array(typecode, initializer)``.
-The *initializer* is omitted if the array is empty, otherwise it is
-a Unicode string if the *typecode* is ``'u'`` or ``'w'``, otherwise it is
-a list of numbers.
-The string representation is guaranteed to be able to be converted back to an
-array with the same type and value using :func:`eval`, so long as the
-:class:`~array.array` class has been imported using ``from array import array``.
-Variables ``inf`` and ``nan`` must also be defined if it contains
-corresponding floating-point values.
-Examples::
+Biểu diễn chuỗi của các đối tượng mảng có dạng ``array(typecode, initializer)``. *initializer* bị bỏ qua nếu mảng rỗng; nếu không, đó là một chuỗi Unicode nếu *typecode* là ``'u'`` hoặc ``'w'``, còn nếu không thì là một danh sách các số. Biểu diễn chuỗi được đảm bảo có thể chuyển đổi trở lại thành một mảng có cùng kiểu và giá trị bằng :func:`eval`, miễn là
+lớp :class:`~array.array` đã được import bằng ``from array import array``. Các biến ``inf`` và ``nan`` cũng phải được định nghĩa nếu lớp này chứa các giá trị dấu phẩy động tương ứng. Ví dụ::
 
    array('l')
    array('w', 'hello \u2641')
@@ -286,8 +225,10 @@ Examples::
 
 .. seealso::
 
-   Module :mod:`struct`
-      Packing and unpacking of heterogeneous binary data.
+   Mô-đun :mod:`struct`
+      Đóng gói và giải nén dữ liệu nhị phân không đồng nhất.
 
    `NumPy <https://numpy.org/>`_
-      The NumPy package defines another array type.
+      Gói NumPy định nghĩa một kiểu mảng khác.
+
+.. _`NumPy`: https://numpy.org/

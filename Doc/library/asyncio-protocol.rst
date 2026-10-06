@@ -4,376 +4,281 @@
 .. _asyncio-transports-protocols:
 
 
-========================
-Transports and Protocols
-========================
+=====================
+Transport và Protocol
+=====================
 
-.. rubric:: Preface
+.. rubric:: Lời nói đầu
 
-Transports and Protocols are used by the **low-level** event loop
-APIs such as :meth:`loop.create_connection`.  They use
-callback-based programming style and enable high-performance
-implementations of network or IPC protocols (e.g. HTTP).
+Transport và Protocol được các API event loop **cấp thấp** như :meth:`loop.create_connection` sử dụng. Chúng sử dụng phong cách lập trình dựa trên callback và cho phép triển khai hiệu năng cao các protocol mạng hoặc IPC (ví dụ: HTTP).
 
-Essentially, transports and protocols should only be used in
-libraries and frameworks and never in high-level asyncio
-applications.
+Về cơ bản, transport và protocol chỉ nên được sử dụng trong các thư viện và framework, không nên được sử dụng trong các ứng dụng asyncio cấp cao.
 
-This documentation page covers both `Transports`_ and `Protocols`_.
+Trang tài liệu này bao quát cả `Transports`_ và `Protocols`_.
 
-.. rubric:: Introduction
+.. rubric:: Giới thiệu
 
-At the highest level, the transport is concerned with *how* bytes
-are transmitted, while the protocol determines *which* bytes to
-transmit (and to some extent when).
+Ở cấp độ cao nhất, transport chịu trách nhiệm về *cách* các byte được truyền, trong khi protocol xác định *những* byte nào sẽ được truyền (và ở một mức độ nào đó là thời điểm truyền).
 
-A different way of saying the same thing: a transport is an
-abstraction for a socket (or similar I/O endpoint) while a protocol
-is an abstraction for an application, from the transport's point
-of view.
+Một cách diễn đạt khác cho cùng một điều: transport là một abstraction cho socket (hoặc endpoint I/O tương tự), còn protocol là một abstraction cho application, xét từ góc nhìn của transport.
 
-Yet another view is the transport and protocol interfaces
-together define an abstract interface for using network I/O and
-interprocess I/O.
+Một góc nhìn khác là các interface của transport và protocol khi kết hợp với nhau sẽ định nghĩa một interface trừu tượng để sử dụng network I/O và interprocess I/O.
 
-There is always a 1:1 relationship between transport and protocol
-objects: the protocol calls transport methods to send data,
-while the transport calls protocol methods to pass it data that
-has been received.
+Luôn có mối quan hệ 1:1 giữa các đối tượng transport và protocol: protocol gọi các phương thức của transport để gửi dữ liệu, còn transport gọi các phương thức của protocol để truyền cho protocol dữ liệu đã nhận.
 
-Most of connection oriented event loop methods
-(such as :meth:`loop.create_connection`) usually accept a
-*protocol_factory* argument used to create a *Protocol* object
-for an accepted connection, represented by a *Transport* object.
-Such methods usually return a tuple of ``(transport, protocol)``.
+Hầu hết các phương thức của event loop hướng kết nối (chẳng hạn như :meth:`loop.create_connection`) thường nhận một đối số *protocol_factory* dùng để tạo một đối tượng *Protocol* cho một kết nối được chấp nhận, được biểu diễn bằng một đối tượng *Transport*. Những phương thức này thường trả về một tuple gồm ``(transport, protocol)``.
 
-.. rubric:: Contents
+.. rubric:: Nội dung
 
-This documentation page contains the following sections:
+Trang tài liệu này chứa các phần sau:
 
-* The `Transports`_ section documents asyncio :class:`BaseTransport`,
+* Phần `Transports`_ trình bày về asyncio :class:`BaseTransport`,
   :class:`ReadTransport`, :class:`WriteTransport`, :class:`Transport`,
-  :class:`DatagramTransport`, and :class:`SubprocessTransport`
-  classes.
+  :class:`DatagramTransport`, và các lớp :class:`SubprocessTransport`.
 
-* The `Protocols`_ section documents asyncio :class:`BaseProtocol`,
+* Phần `Protocols`_ trình bày về asyncio :class:`BaseProtocol`,
   :class:`Protocol`, :class:`BufferedProtocol`,
-  :class:`DatagramProtocol`, and :class:`SubprocessProtocol` classes.
+  :class:`DatagramProtocol`, và các lớp :class:`SubprocessProtocol`.
 
-* The `Examples`_ section showcases how to work with transports,
-  protocols, and low-level event loop APIs.
+* Phần `Examples`_ minh họa cách làm việc với transports, protocols và các API event loop cấp thấp.
 
 
 .. _asyncio-transport:
 
+.. _`Transports`:
+
 Transports
 ==========
 
-**Source code:** :source:`Lib/asyncio/transports.py`
+**Mã nguồn:** :source:`Lib/asyncio/transports.py`
 
 ----------------------------------------------------
 
-Transports are classes provided by :mod:`asyncio` in order to abstract
-various kinds of communication channels.
+Transports là các lớp do :mod:`asyncio` cung cấp nhằm trừu tượng hóa nhiều loại kênh giao tiếp.
 
-Transport objects are always instantiated by an
-:ref:`asyncio event loop <asyncio-event-loop>`.
+Các đối tượng transport luôn được khởi tạo bởi một
+:ref:`vòng lặp sự kiện asyncio <asyncio-event-loop>`.
 
-asyncio implements transports for TCP, UDP, SSL, and subprocess pipes.
-The methods available on a transport depend on the transport's kind.
+asyncio triển khai transport cho TCP, UDP, SSL và các pipe của subprocess. Các phương thức có sẵn trên một transport phụ thuộc vào loại transport đó.
 
-The transport classes are :ref:`not thread safe <asyncio-multithreading>`.
+Các lớp transport :ref:`không an toàn khi sử dụng trong thread <asyncio-multithreading>`.
 
 
-Transports Hierarchy
---------------------
+Phân cấp Transports
+-------------------
 
 .. class:: BaseTransport
 
-   Base class for all transports.  Contains methods that all
-   asyncio transports share.
+   Lớp cơ sở cho tất cả transport. Chứa các phương thức mà mọi transport của asyncio đều dùng chung.
 
 .. class:: WriteTransport(BaseTransport)
 
-   A base transport for write-only connections.
+   Một transport cơ sở cho các kết nối chỉ ghi.
 
-   Instances of the *WriteTransport* class are returned from
-   the :meth:`loop.connect_write_pipe` event loop method and
-   are also used by subprocess-related methods like
+   Các instance của lớp *WriteTransport* được trả về từ phương thức event loop :meth:`loop.connect_write_pipe` và cũng được sử dụng bởi các phương thức liên quan đến subprocess như
    :meth:`loop.subprocess_exec`.
 
 .. class:: ReadTransport(BaseTransport)
 
-   A base transport for read-only connections.
+   Một transport cơ sở dành cho các kết nối chỉ đọc.
 
-   Instances of the *ReadTransport* class are returned from
-   the :meth:`loop.connect_read_pipe` event loop method and
-   are also used by subprocess-related methods like
+   Các instance của lớp *ReadTransport* được trả về từ phương thức event loop :meth:`loop.connect_read_pipe` và cũng được sử dụng bởi các phương thức liên quan đến subprocess như
    :meth:`loop.subprocess_exec`.
 
 .. class:: Transport(WriteTransport, ReadTransport)
 
-   Interface representing a bidirectional transport, such as a
-   TCP connection.
+   Interface đại diện cho một transport hai chiều, chẳng hạn như kết nối TCP.
 
-   The user does not instantiate a transport directly; they call a
-   utility function, passing it a protocol factory and other
-   information necessary to create the transport and protocol.
+   Người dùng không khởi tạo transport trực tiếp; họ gọi một hàm tiện ích, truyền vào đó một protocol factory cùng các thông tin khác cần thiết để tạo transport và protocol.
 
-   Instances of the *Transport* class are returned from or used by
-   event loop methods like :meth:`loop.create_connection`,
+   Các instance của lớp *Transport* được trả về hoặc được sử dụng bởi các phương thức event loop như :meth:`loop.create_connection`,
    :meth:`loop.create_unix_connection`,
-   :meth:`loop.create_server`, :meth:`loop.sendfile`, etc.
+   :meth:`loop.create_server`, :meth:`loop.sendfile`, v.v.
 
 
 .. class:: DatagramTransport(BaseTransport)
 
-   A transport for datagram (UDP) connections.
+   Một transport cho các kết nối datagram (UDP).
 
-   Instances of the *DatagramTransport* class are returned from
-   the :meth:`loop.create_datagram_endpoint` event loop method.
+   Các instance của lớp *DatagramTransport* được trả về từ phương thức vòng lặp sự kiện :meth:`loop.create_datagram_endpoint`.
 
 
 .. class:: SubprocessTransport(BaseTransport)
 
-   An abstraction to represent a connection between a parent and its
-   child OS process.
+   Một abstraction dùng để biểu diễn kết nối giữa một tiến trình OS cha và tiến trình con của nó.
 
-   Instances of the *SubprocessTransport* class are returned from
-   event loop methods :meth:`loop.subprocess_shell` and
+   Các instance của lớp *SubprocessTransport* được trả về từ các phương thức vòng lặp sự kiện :meth:`loop.subprocess_shell` và
    :meth:`loop.subprocess_exec`.
 
 
-Base Transport
---------------
+Transport cơ sở
+---------------
 
 .. method:: BaseTransport.close()
 
-   Close the transport.
+   Đóng transport.
 
-   If the transport has a buffer for outgoing
-   data, buffered data will be flushed asynchronously.  No more data
-   will be received.  After all buffered data is flushed, the
-   protocol's :meth:`protocol.connection_lost()
-   <BaseProtocol.connection_lost>` method will be called with
-   :const:`None` as its argument. The transport should not be
-   used once it is closed.
+   Nếu transport có bộ đệm cho dữ liệu gửi đi, dữ liệu trong bộ đệm sẽ được flush một cách bất đồng bộ. Sẽ không nhận thêm dữ liệu nào nữa. Sau khi toàn bộ dữ liệu trong bộ đệm được flush, phương thức :meth:`protocol.connection_lost() <BaseProtocol.connection_lost>` của protocol sẽ được gọi với
+   :const:`None` làm đối số của nó. Không nên sử dụng transport sau khi đã đóng.
 
 .. method:: BaseTransport.is_closing()
 
-   Return ``True`` if the transport is closing or is closed.
+   Trả về ``True`` nếu transport đang đóng hoặc đã đóng.
 
 .. method:: BaseTransport.get_extra_info(name, default=None)
 
-   Return information about the transport or underlying resources
-   it uses.
+   Trả về thông tin về transport hoặc các tài nguyên bên dưới mà nó sử dụng.
 
-   *name* is a string representing the piece of transport-specific
-   information to get.
+   *name* là một chuỗi biểu thị phần thông tin dành riêng cho transport cần lấy.
 
-   *default* is the value to return if the information is not
-   available, or if the transport does not support querying it
-   with the given third-party event loop implementation or on the
-   current platform.
+   *default* là giá trị cần trả về nếu không có thông tin này hoặc nếu transport không hỗ trợ truy vấn thông tin đó bằng cách triển khai event loop của bên thứ ba đã cho hoặc trên nền tảng hiện tại.
 
-   For example, the following code attempts to get the underlying
-   socket object of the transport::
+   Ví dụ, đoạn mã sau đây cố gắng lấy đối tượng socket bên dưới của transport::
 
       sock = transport.get_extra_info('socket')
       if sock is not None:
           print(sock.getsockopt(...))
 
-   Categories of information that can be queried on some transports:
+   Các danh mục thông tin có thể được truy vấn trên một số transport:
 
    * socket:
 
-     - ``'peername'``: the remote address to which the socket is
-       connected, result of :meth:`socket.socket.getpeername`
-       (``None`` on error)
+     - ``'peername'``: địa chỉ từ xa mà socket được kết nối tới, kết quả của :meth:`socket.socket.getpeername` (``None`` khi có lỗi)
 
-     - ``'socket'``: :class:`socket.socket` instance
+     - ``'socket'``: instance của :class:`socket.socket`
 
-     - ``'sockname'``: the socket's own address,
-       result of :meth:`socket.socket.getsockname`
+     - ``'sockname'``: địa chỉ của chính socket, kết quả của :meth:`socket.socket.getsockname`
 
    * SSL socket:
 
-     - ``'compression'``: the compression algorithm being used as a
-       string, or ``None`` if the connection isn't compressed; result
-       of :meth:`ssl.SSLSocket.compression`
+     - ``'compression'``: thuật toán nén đang được sử dụng dưới dạng chuỗi, hoặc ``None`` nếu kết nối không được nén; kết quả của :meth:`ssl.SSLSocket.compression`
 
-     - ``'cipher'``: a three-value tuple containing the name of the
-       cipher being used, the version of the SSL protocol that defines
-       its use, and the number of secret bits being used; result of
+     - ``'cipher'``: tuple gồm ba giá trị, chứa tên của cipher đang được sử dụng, phiên bản của giao thức SSL quy định việc sử dụng cipher đó và số lượng bit bí mật đang được sử dụng; kết quả của
        :meth:`ssl.SSLSocket.cipher`
 
-     - ``'peercert'``: peer certificate; result of
+     - ``'peercert'``: chứng chỉ ngang hàng; kết quả của
        :meth:`ssl.SSLSocket.getpeercert`
 
-     - ``'sslcontext'``: :class:`ssl.SSLContext` instance
+     - ``'sslcontext'``: thực thể :class:`ssl.SSLContext`
 
-     - ``'ssl_object'``: :class:`ssl.SSLObject` or
-       :class:`ssl.SSLSocket` instance
+     - ``'ssl_object'``: :class:`ssl.SSLObject` hoặc
+       thực thể :class:`ssl.SSLSocket`
 
    * pipe:
 
-     - ``'pipe'``: pipe object
+     - ``'pipe'``: đối tượng pipe
 
    * subprocess:
 
-     - ``'subprocess'``: :class:`subprocess.Popen` instance
+     - ``'subprocess'``: một instance của :class:`subprocess.Popen`
 
 .. method:: BaseTransport.set_protocol(protocol)
 
-   Set a new protocol.
+   Thiết lập protocol mới.
 
-   Switching protocol should only be done when both
-   protocols are documented to support the switch.
+   Chỉ nên chuyển đổi protocol khi cả hai protocol đều được ghi rõ là hỗ trợ việc chuyển đổi.
 
 .. method:: BaseTransport.get_protocol()
 
-   Return the current protocol.
+   Trả về protocol hiện tại.
 
 
-Read-only Transports
---------------------
+Transport chỉ đọc
+-----------------
 
 .. method:: ReadTransport.is_reading()
 
-   Return ``True`` if the transport is receiving new data.
+   Trả về ``True`` nếu transport đang nhận dữ liệu mới.
 
    .. versionadded:: 3.7
 
 .. method:: ReadTransport.pause_reading()
 
-   Pause the receiving end of the transport.  No data will be passed to
-   the protocol's :meth:`protocol.data_received() <Protocol.data_received>`
-   method until :meth:`resume_reading` is called.
+   Tạm dừng đầu nhận của transport. Sẽ không có dữ liệu nào được truyền đến phương thức :meth:`protocol.data_received() <Protocol.data_received>` của protocol cho đến khi :meth:`resume_reading` được gọi.
 
    .. versionchanged:: 3.7
-      The method is idempotent, i.e. it can be called when the
-      transport is already paused or closed.
+      Phương thức này có tính idempotent, tức là có thể được gọi khi transport đã tạm dừng hoặc đóng.
 
 .. method:: ReadTransport.resume_reading()
 
-   Resume the receiving end.  The protocol's
-   :meth:`protocol.data_received() <Protocol.data_received>` method
-   will be called once again if some data is available for reading.
+   Tiếp tục hoạt động ở đầu nhận. Phương thức của protocol
+   :meth:`protocol.data_received() <Protocol.data_received>` sẽ lại được gọi nếu có dữ liệu để đọc.
 
    .. versionchanged:: 3.7
-      The method is idempotent, i.e. it can be called when the
-      transport is already reading.
+      Phương thức này có tính idempotent, tức là có thể được gọi khi transport đang đọc.
 
 
-Write-only Transports
----------------------
+Transport chỉ ghi
+-----------------
 
 .. method:: WriteTransport.abort()
 
-   Close the transport immediately, without waiting for pending operations
-   to complete.  Buffered data will be lost.  No more data will be received.
-   The protocol's :meth:`protocol.connection_lost()
-   <BaseProtocol.connection_lost>` method will eventually be
-   called with :const:`None` as its argument.
+   Đóng transport ngay lập tức mà không chờ các thao tác đang chờ hoàn tất. Dữ liệu được đệm sẽ bị mất. Sẽ không nhận thêm dữ liệu nào. Cuối cùng, phương thức :meth:`protocol.connection_lost() <BaseProtocol.connection_lost>` của protocol sẽ được gọi với :const:`None` làm đối số.
 
 .. method:: WriteTransport.can_write_eof()
 
-   Return :const:`True` if the transport supports
-   :meth:`~WriteTransport.write_eof`, :const:`False` if not.
+   Trả về :const:`True` nếu transport hỗ trợ
+   :meth:`~WriteTransport.write_eof`, :const:`False` nếu không.
 
 .. method:: WriteTransport.get_write_buffer_size()
 
-   Return the current size of the output buffer used by the transport.
+   Trả về kích thước hiện tại của bộ đệm đầu ra được transport sử dụng.
 
 .. method:: WriteTransport.get_write_buffer_limits()
 
-   Get the *high* and *low* watermarks for write flow control. Return a
-   tuple ``(low, high)`` where *low* and *high* are positive number of
-   bytes.
+   Lấy các ngưỡng *cao* và *thấp* để điều khiển luồng ghi. Trả về một tuple ``(low, high)`` trong đó *thấp* và *cao* là số byte dương.
 
-   Use :meth:`set_write_buffer_limits` to set the limits.
+   Sử dụng :meth:`set_write_buffer_limits` để thiết lập các giới hạn.
 
    .. versionadded:: 3.4.2
 
 .. method:: WriteTransport.set_write_buffer_limits(high=None, low=None)
 
-   Set the *high* and *low* watermarks for write flow control.
+   Thiết lập các ngưỡng *cao* và *thấp* để điều khiển luồng ghi.
 
-   These two values (measured in number of
-   bytes) control when the protocol's
-   :meth:`protocol.pause_writing() <BaseProtocol.pause_writing>`
-   and :meth:`protocol.resume_writing() <BaseProtocol.resume_writing>`
-   methods are called. If specified, the low watermark must be less
-   than or equal to the high watermark.  Neither *high* nor *low*
-   can be negative.
+   Hai giá trị này (được đo bằng số byte) kiểm soát thời điểm các phương thức của protocol
+   :meth:`protocol.pause_writing() <BaseProtocol.pause_writing>` và :meth:`protocol.resume_writing() <BaseProtocol.resume_writing>` được gọi. Nếu được chỉ định, ngưỡng thấp phải nhỏ hơn hoặc bằng ngưỡng cao. Cả *cao* và *thấp* đều không được là số âm.
 
-   :meth:`~BaseProtocol.pause_writing` is called when the buffer size
-   becomes greater than or equal to the *high* value. If writing has
-   been paused, :meth:`~BaseProtocol.resume_writing` is called when
-   the buffer size becomes less than or equal to the *low* value.
+   :meth:`~BaseProtocol.pause_writing` được gọi khi kích thước bộ đệm lớn hơn hoặc bằng giá trị *high*. Nếu việc ghi đã bị tạm dừng, :meth:`~BaseProtocol.resume_writing` được gọi khi kích thước bộ đệm nhỏ hơn hoặc bằng giá trị *low*.
 
-   The defaults are implementation-specific.  If only the
-   high watermark is given, the low watermark defaults to an
-   implementation-specific value less than or equal to the
-   high watermark.  Setting *high* to zero forces *low* to zero as
-   well, and causes :meth:`~BaseProtocol.pause_writing` to be called
-   whenever the buffer becomes non-empty.  Setting *low* to zero causes
-   :meth:`~BaseProtocol.resume_writing` to be called only once the
-   buffer is empty. Use of zero for either limit is generally
-   sub-optimal as it reduces opportunities for doing I/O and
-   computation concurrently.
+   Các giá trị mặc định phụ thuộc vào từng implementation. Nếu chỉ cung cấp high watermark, low watermark sẽ mặc định là một giá trị phụ thuộc vào implementation và nhỏ hơn hoặc bằng high watermark. Đặt *high* thành zero cũng buộc *low* thành zero và khiến :meth:`~BaseProtocol.pause_writing` được gọi bất cứ khi nào bộ đệm trở nên không rỗng. Đặt *low* thành zero khiến
+   :meth:`~BaseProtocol.resume_writing` chỉ được gọi khi bộ đệm đã rỗng. Nhìn chung, việc sử dụng zero cho một trong hai giới hạn là không tối ưu vì làm giảm cơ hội thực hiện I/O và tính toán đồng thời.
 
-   Use :meth:`~WriteTransport.get_write_buffer_limits`
-   to get the limits.
+   Sử dụng :meth:`~WriteTransport.get_write_buffer_limits` để lấy các giới hạn.
 
 .. method:: WriteTransport.write(data)
 
-   Write some *data* bytes to the transport.
+   Ghi một số byte *data* vào transport.
 
-   This method does not block; it buffers the data and arranges for it
-   to be sent out asynchronously.
+   Phương thức này không chặn; phương thức đệm dữ liệu và sắp xếp để dữ liệu được gửi đi một cách bất đồng bộ.
 
 .. method:: WriteTransport.writelines(list_of_data)
 
-   Write a list (or any iterable) of data bytes to the transport.
-   This is functionally equivalent to calling :meth:`write` on each
-   element yielded by the iterable, but may be implemented more
-   efficiently.
+   Ghi một danh sách (hoặc bất kỳ iterable nào) gồm các byte dữ liệu vào transport. Về chức năng, thao tác này tương đương với việc gọi :meth:`write` trên từng phần tử do iterable cung cấp, nhưng có thể được triển khai hiệu quả hơn.
 
 .. method:: WriteTransport.write_eof()
 
-   Close the write end of the transport after flushing all buffered data.
-   Data may still be received.
+   Đóng đầu ghi của transport sau khi flush toàn bộ dữ liệu đã được đệm. Dữ liệu vẫn có thể được nhận.
 
-   This method can raise :exc:`NotImplementedError` if the transport
-   (e.g. SSL) doesn't support half-closed connections.
+   Phương thức này có thể raise :exc:`NotImplementedError` nếu transport (ví dụ: SSL) không hỗ trợ các kết nối đóng một nửa.
 
 
-Datagram Transports
--------------------
+Transport Datagram
+------------------
 
 .. method:: DatagramTransport.sendto(data, addr=None)
 
-   Send the *data* bytes to the remote peer given by *addr* (a
-   transport-dependent target address).  If *addr* is :const:`None`,
-   the data is sent to the target address given on transport
-   creation.
+   Gửi các byte *data* đến peer từ xa được chỉ định bởi *addr* (một địa chỉ đích phụ thuộc vào transport). Nếu *addr* là :const:`None`, dữ liệu sẽ được gửi đến địa chỉ đích được chỉ định khi tạo transport.
 
-   This method does not block; it buffers the data and arranges
-   for it to be sent out asynchronously.
+   Phương thức này không block; nó đệm dữ liệu và sắp xếp để dữ liệu được gửi đi một cách bất đồng bộ.
 
    .. versionchanged:: 3.13
-      This method can be called with an empty bytes object to send a
-      zero-length datagram. The buffer size calculation used for flow
-      control is also updated to account for the datagram header.
+      Có thể gọi phương thức này với một đối tượng bytes rỗng để gửi một datagram có độ dài bằng không. Việc tính kích thước bộ đệm được dùng cho flow control cũng được cập nhật để tính đến header của datagram.
 
 .. method:: DatagramTransport.abort()
 
-   Close the transport immediately, without waiting for pending
-   operations to complete.  Buffered data will be lost.
-   No more data will be received.  The protocol's
-   :meth:`protocol.connection_lost() <BaseProtocol.connection_lost>`
-   method will eventually be called with :const:`None` as its argument.
+   Đóng transport ngay lập tức mà không chờ các thao tác đang chờ hoàn tất. Dữ liệu đã đệm sẽ bị mất. Sẽ không nhận thêm dữ liệu nào. protocol's
+   Phương thức :meth:`protocol.connection_lost() <BaseProtocol.connection_lost>` cuối cùng sẽ được gọi với :const:`None` làm đối số.
 
 
 .. _asyncio-subprocess-transports:
@@ -383,204 +288,162 @@ Subprocess Transports
 
 .. method:: SubprocessTransport.get_pid()
 
-   Return the subprocess process id as an integer.
+   Trả về mã định danh tiến trình subprocess dưới dạng số nguyên.
 
 .. method:: SubprocessTransport.get_pipe_transport(fd)
 
-   Return the transport for the communication pipe corresponding to the
-   integer file descriptor *fd*:
+   Trả về transport cho pipe giao tiếp tương ứng với file descriptor số nguyên *fd*:
 
-   * ``0``: writable streaming transport of the standard input (*stdin*),
-     or :const:`None` if the subprocess was not created with ``stdin=PIPE``
-   * ``1``: readable streaming transport of the standard output (*stdout*),
-     or :const:`None` if the subprocess was not created with ``stdout=PIPE``
-   * ``2``: readable streaming transport of the standard error (*stderr*),
-     or :const:`None` if the subprocess was not created with ``stderr=PIPE``
-   * other *fd*: :const:`None`
+   * ``0``: transport dạng streaming có thể ghi của đầu vào chuẩn (*stdin*), hoặc :const:`None` nếu subprocess không được tạo bằng ``stdin=PIPE``
+   * ``1``: transport dạng streaming có thể đọc của đầu ra chuẩn (*stdout*), hoặc :const:`None` nếu subprocess không được tạo bằng ``stdout=PIPE``
+   * ``2``: transport dạng streaming có thể đọc của lỗi chuẩn (*stderr*), hoặc :const:`None` nếu subprocess không được tạo bằng ``stderr=PIPE``
+   * fd khác: *fd*: :const:`None`
 
 .. method:: SubprocessTransport.get_returncode()
 
-   Return the subprocess return code as an integer or :const:`None`
-   if it hasn't returned, which is similar to the
-   :attr:`subprocess.Popen.returncode` attribute.
+   Trả về mã thoát của subprocess dưới dạng số nguyên hoặc :const:`None` nếu subprocess chưa kết thúc, tương tự như
+   thuộc tính :attr:`subprocess.Popen.returncode`.
 
 .. method:: SubprocessTransport.kill()
 
-   Kill the subprocess.
+   Dừng subprocess.
 
-   On POSIX systems, the function sends SIGKILL to the subprocess.
-   On Windows, this method is an alias for :meth:`terminate`.
+   Trên các hệ thống POSIX, hàm này gửi SIGKILL đến subprocess. Trên Windows, phương thức này là bí danh của :meth:`terminate`.
 
-   See also :meth:`subprocess.Popen.kill`.
+   Xem thêm :meth:`subprocess.Popen.kill`.
 
 .. method:: SubprocessTransport.send_signal(signal)
 
-   Send the *signal* number to the subprocess, as in
+   Gửi số *signal* đến subprocess, như trong
    :meth:`subprocess.Popen.send_signal`.
 
 .. method:: SubprocessTransport.terminate()
 
-   Stop the subprocess.
+   Dừng subprocess.
 
-   On POSIX systems, this method sends :py:const:`~signal.SIGTERM` to the subprocess.
-   On Windows, the Windows API function :c:func:`!TerminateProcess` is called to
-   stop the subprocess.
+   Trên các hệ thống POSIX, phương thức này gửi :py:const:`~signal.SIGTERM` đến subprocess. Trên Windows, hàm API của Windows :c:func:`!TerminateProcess` được gọi để dừng subprocess.
 
-   See also :meth:`subprocess.Popen.terminate`.
+   Xem thêm :meth:`subprocess.Popen.terminate`.
 
 .. method:: SubprocessTransport.close()
 
-   Kill the subprocess by calling the :meth:`kill` method.
+   Kết thúc subprocess bằng cách gọi phương thức :meth:`kill`.
 
-   If the subprocess hasn't returned yet, and close transports of
-   *stdin*, *stdout*, and *stderr* pipes.
+   Nếu subprocess vẫn chưa trả về, hãy đóng các pipe stdin *stdin*, stdout *stdout* và stderr *stderr* của transport.
 
 
 .. _asyncio-protocol:
 
+.. _`Protocols`:
+
 Protocols
 =========
 
-**Source code:** :source:`Lib/asyncio/protocols.py`
+**Mã nguồn:** :source:`Lib/asyncio/protocols.py`
 
 ---------------------------------------------------
 
-asyncio provides a set of abstract base classes that should be used
-to implement network protocols.  Those classes are meant to be used
-together with :ref:`transports <asyncio-transport>`.
+asyncio cung cấp một tập hợp các lớp cơ sở trừu tượng nên được dùng để triển khai các network protocol. Những lớp này được thiết kế để dùng cùng với :ref:`transports <asyncio-transport>`.
 
-Subclasses of abstract base protocol classes may implement some or
-all methods.  All these methods are callbacks: they are called by
-transports on certain events, for example when some data is received.
-A base protocol method should be called by the corresponding transport.
+Các lớp con của những lớp protocol cơ sở trừu tượng có thể triển khai một số hoặc tất cả các phương thức. Tất cả những phương thức này đều là callback: chúng được transport gọi khi xảy ra các sự kiện nhất định, chẳng hạn như khi nhận được dữ liệu. Một phương thức protocol cơ sở phải được transport tương ứng gọi.
 
 
-Base Protocols
---------------
+Các Protocol cơ sở
+------------------
 
 .. class:: BaseProtocol
 
-   Base protocol with methods that all protocols share.
+   Protocol cơ sở với các phương thức được mọi protocol dùng chung.
 
 .. class:: Protocol(BaseProtocol)
 
-   The base class for implementing streaming protocols
-   (TCP, Unix sockets, etc).
+   Lớp cơ sở để triển khai các protocol dạng streaming (TCP, Unix socket, v.v.).
 
 .. class:: BufferedProtocol(BaseProtocol)
 
-   A base class for implementing streaming protocols with manual
-   control of the receive buffer.
+   Lớp cơ sở để triển khai các protocol dạng streaming với quyền kiểm soát thủ công đối với bộ đệm nhận.
 
 .. class:: DatagramProtocol(BaseProtocol)
 
-   The base class for implementing datagram (UDP) protocols.
+   Lớp cơ sở để triển khai các protocol datagram (UDP).
 
 .. class:: SubprocessProtocol(BaseProtocol)
 
-   The base class for implementing protocols communicating with child
-   processes (unidirectional pipes).
+   Lớp cơ sở để triển khai các protocol giao tiếp với tiến trình con (pipe một chiều).
 
 
-Base Protocol
--------------
+Protocol cơ sở
+--------------
 
-All asyncio protocols can implement Base Protocol callbacks.
+Tất cả protocol asyncio đều có thể triển khai các callback của Base Protocol.
 
-.. rubric:: Connection Callbacks
+.. rubric:: Callback kết nối
 
-Connection callbacks are called on all protocols, exactly once per
-a successful connection.  All other protocol callbacks can only be
-called between those two methods.
+Các callback kết nối được gọi trên tất cả protocol, chính xác một lần cho mỗi kết nối thành công. Tất cả callback protocol khác chỉ có thể được gọi giữa hai phương thức đó.
 
 .. method:: BaseProtocol.connection_made(transport)
 
-   Called when a connection is made.
+   Được gọi khi một kết nối được thiết lập.
 
-   The *transport* argument is the transport representing the
-   connection.  The protocol is responsible for storing the reference
-   to its transport.
+   Được gọi khi một kết nối được thiết lập. Đối số *transport* là transport đại diện cho kết nối. Protocol chịu trách nhiệm lưu tham chiếu đến transport của nó.
 
 .. method:: BaseProtocol.connection_lost(exc)
 
-   Called when the connection is lost or closed.
+   Được gọi khi kết nối bị mất hoặc bị đóng.
 
-   The argument is either an exception object or :const:`None`.
-   The latter means a regular EOF is received, or the connection was
-   aborted or closed by this side of the connection.
+   Đối số là một đối tượng exception hoặc :const:`None`. Trường hợp sau có nghĩa là đã nhận EOF thông thường, hoặc kết nối đã bị phía này của kết nối hủy bỏ hoặc đóng.
 
 
-.. rubric:: Flow Control Callbacks
+.. rubric:: Callback kiểm soát luồng
 
-Flow control callbacks can be called by transports to pause or
-resume writing performed by the protocol.
+Các callback kiểm soát luồng có thể được transport gọi để tạm dừng hoặc tiếp tục hoạt động ghi do protocol thực hiện.
 
-See the documentation of the :meth:`~WriteTransport.set_write_buffer_limits`
-method for more details.
+Xem tài liệu về phương thức :meth:`~WriteTransport.set_write_buffer_limits` để biết thêm chi tiết.
 
 .. method:: BaseProtocol.pause_writing()
 
-   Called when the transport's buffer goes over the high watermark.
+   Được gọi khi bộ đệm của transport vượt quá ngưỡng cao.
 
 .. method:: BaseProtocol.resume_writing()
 
-   Called when the transport's buffer drains below the low watermark.
+   Được gọi khi bộ đệm của transport giảm xuống dưới ngưỡng thấp.
 
-If the buffer size equals the high watermark,
-:meth:`~BaseProtocol.pause_writing` is not called: the buffer size must
-go strictly over.
+Nếu kích thước bộ đệm bằng ngưỡng cao nhất,
+:meth:`~BaseProtocol.pause_writing` sẽ không được gọi: kích thước bộ đệm phải lớn hơn hoàn toàn.
 
-Conversely, :meth:`~BaseProtocol.resume_writing` is called when the
-buffer size is equal or lower than the low watermark.  These end
-conditions are important to ensure that things go as expected when
-either mark is zero.
+Ngược lại, :meth:`~BaseProtocol.resume_writing` được gọi khi kích thước bộ đệm bằng hoặc thấp hơn ngưỡng thấp nhất. Những điều kiện kết thúc này rất quan trọng để bảo đảm mọi thứ diễn ra như mong đợi khi một trong hai mốc bằng không.
 
 
-Streaming Protocols
--------------------
+.. _`Streaming Protocols`:
 
-Event methods, such as :meth:`loop.create_server`,
+Các Streaming Protocol
+----------------------
+
+Các phương thức sự kiện, chẳng hạn như :meth:`loop.create_server`,
 :meth:`loop.create_unix_server`, :meth:`loop.create_connection`,
 :meth:`loop.create_unix_connection`, :meth:`loop.connect_accepted_socket`,
-:meth:`loop.connect_read_pipe`, and :meth:`loop.connect_write_pipe`
-accept factories that return streaming protocols.
+:meth:`loop.connect_read_pipe`, và :meth:`loop.connect_write_pipe` chấp nhận các factory trả về các streaming protocol.
 
 .. method:: Protocol.data_received(data)
 
-   Called when some data is received.  *data* is a non-empty bytes
-   object containing the incoming data.
+   Được gọi khi nhận được một số dữ liệu. *data* là một đối tượng bytes không rỗng chứa dữ liệu đến.
 
-   Whether the data is buffered, chunked or reassembled depends on
-   the transport.  In general, you shouldn't rely on specific semantics
-   and instead make your parsing generic and flexible. However,
-   data is always received in the correct order.
+   Việc dữ liệu được đệm, chia thành các đoạn hay tập hợp lại phụ thuộc vào transport. Nhìn chung, bạn không nên dựa vào các ngữ nghĩa cụ thể mà thay vào đó hãy làm cho việc phân tích cú pháp của mình mang tính tổng quát và linh hoạt. Tuy nhiên, dữ liệu luôn được nhận theo đúng thứ tự.
 
-   The method can be called an arbitrary number of times while
-   a connection is open.
+   Phương thức này có thể được gọi số lần tùy ý trong khi kết nối đang mở.
 
-   However, :meth:`protocol.eof_received() <Protocol.eof_received>`
-   is called at most once.  Once ``eof_received()`` is called,
-   ``data_received()`` is not called anymore.
+   Tuy nhiên, :meth:`protocol.eof_received() <Protocol.eof_received>` được gọi nhiều nhất một lần. Sau khi ``eof_received()`` được gọi, ``data_received()`` sẽ không được gọi nữa.
 
 .. method:: Protocol.eof_received()
 
-   Called when the other end signals it won't send any more data
-   (for example by calling :meth:`transport.write_eof()
-   <WriteTransport.write_eof>`, if the other end also uses
-   asyncio).
+   Được gọi khi đầu bên kia báo hiệu rằng nó sẽ không gửi thêm dữ liệu nào nữa (ví dụ bằng cách gọi :meth:`transport.write_eof() <WriteTransport.write_eof>`, nếu đầu bên kia cũng sử dụng asyncio).
 
-   This method may return a false value (including ``None``), in which case
-   the transport will close itself.  Conversely, if this method returns a
-   true value, the protocol used determines whether to close the transport.
-   Since the default implementation returns ``None``, it implicitly closes the
-   connection.
+   Phương thức này có thể trả về một giá trị false (bao gồm ``None``), trong trường hợp đó transport sẽ tự đóng. Ngược lại, nếu phương thức này trả về một giá trị true, giao thức được sử dụng sẽ quyết định có đóng transport hay không. Vì phần triển khai mặc định trả về ``None``, nên kết nối sẽ được đóng một cách ngầm định.
 
-   Some transports, including SSL, don't support half-closed connections,
-   in which case returning true from this method will result in the connection
-   being closed.
+   Một số transport, bao gồm SSL, không hỗ trợ các kết nối đóng một nửa, trong trường hợp đó việc trả về true từ phương thức này sẽ khiến kết nối bị đóng.
 
 
-State machine:
+Máy trạng thái:
 
 .. code-block:: none
 
@@ -590,55 +453,41 @@ State machine:
     -> connection_lost -> end
 
 
-Buffered Streaming Protocols
-----------------------------
+Các giao thức streaming có bộ đệm
+---------------------------------
 
 .. versionadded:: 3.7
 
-Buffered Protocols can be used with any event loop method
-that supports `Streaming Protocols`_.
+Các Buffered Protocol có thể được sử dụng với bất kỳ phương thức event loop nào hỗ trợ `Streaming Protocols <Streaming Protocols_>`_.
 
-``BufferedProtocol`` implementations allow explicit manual allocation
-and control of the receive buffer.  Event loops can then use the buffer
-provided by the protocol to avoid unnecessary data copies.  This
-can result in noticeable performance improvement for protocols that
-receive big amounts of data.  Sophisticated protocol implementations
-can significantly reduce the number of buffer allocations.
+Các triển khai ``BufferedProtocol`` cho phép cấp phát và kiểm soát bộ đệm nhận một cách thủ công, rõ ràng. Sau đó, event loop có thể sử dụng bộ đệm do protocol cung cấp để tránh các thao tác sao chép dữ liệu không cần thiết. Điều này có thể cải thiện hiệu suất đáng kể đối với các protocol nhận lượng dữ liệu lớn. Những triển khai protocol nâng cao có thể giảm đáng kể số lần cấp phát bộ đệm.
 
-The following callbacks are called on :class:`BufferedProtocol`
-instances:
+Các callback sau được gọi trên các instance :class:`BufferedProtocol`:
 
 .. method:: BufferedProtocol.get_buffer(sizehint)
 
-   Called to allocate a new receive buffer.
+   Được gọi để cấp phát một bộ đệm nhận mới.
 
-   *sizehint* is the recommended minimum size for the returned
-   buffer.  It is acceptable to return smaller or larger buffers
-   than what *sizehint* suggests.  When set to -1, the buffer size
-   can be arbitrary. It is an error to return a buffer with a zero size.
+   *sizehint* là kích thước tối thiểu được khuyến nghị cho bộ đệm được trả về. Có thể trả về bộ đệm nhỏ hơn hoặc lớn hơn kích thước mà *sizehint* đề xuất. Khi được đặt thành -1, kích thước bộ đệm có thể tùy ý. Trả về bộ đệm có kích thước bằng 0 là một lỗi.
 
-   ``get_buffer()`` must return an object implementing the
+   ``get_buffer()`` phải trả về một đối tượng triển khai
    :ref:`buffer protocol <bufferobjects>`.
 
 .. method:: BufferedProtocol.buffer_updated(nbytes)
 
-   Called when the buffer was updated with the received data.
+   Được gọi khi buffer được cập nhật với dữ liệu đã nhận.
 
-   *nbytes* is the total number of bytes that were written to the buffer.
+   *nbytes* là tổng số byte đã được ghi vào buffer.
 
 .. method:: BufferedProtocol.eof_received()
 
-   See the documentation of the :meth:`protocol.eof_received()
-   <Protocol.eof_received>` method.
+   Xem tài liệu về :meth:`protocol.eof_received() <Protocol.eof_received>` method.
 
 
-:meth:`~BufferedProtocol.get_buffer` can be called an arbitrary number
-of times during a connection.  However, :meth:`protocol.eof_received()
-<Protocol.eof_received>` is called at most once
-and, if called, :meth:`~BufferedProtocol.get_buffer` and
-:meth:`~BufferedProtocol.buffer_updated` won't be called after it.
+:meth:`~BufferedProtocol.get_buffer` có thể được gọi một số lần tùy ý trong suốt một kết nối. Tuy nhiên, :meth:`protocol.eof_received() <Protocol.eof_received>` được gọi nhiều nhất một lần và nếu được gọi, :meth:`~BufferedProtocol.get_buffer` và
+:meth:`~BufferedProtocol.buffer_updated` sẽ không được gọi sau đó.
 
-State machine:
+Máy trạng thái:
 
 .. code-block:: none
 
@@ -650,83 +499,72 @@ State machine:
     -> connection_lost -> end
 
 
-Datagram Protocols
-------------------
+Các giao thức Datagram
+----------------------
 
-Datagram Protocol instances should be constructed by protocol
-factories passed to the :meth:`loop.create_datagram_endpoint` method.
+Các instance của Datagram Protocol nên được tạo bởi các protocol factory được truyền vào phương thức :meth:`loop.create_datagram_endpoint`.
 
 .. method:: DatagramProtocol.datagram_received(data, addr)
 
-   Called when a datagram is received.  *data* is a bytes object containing
-   the incoming data.  *addr* is the address of the peer sending the data;
-   the exact format depends on the transport.
+   Được gọi khi nhận một datagram. *data* là một đối tượng bytes chứa dữ liệu đến. *addr* là địa chỉ của peer gửi dữ liệu; định dạng chính xác phụ thuộc vào transport.
 
 .. method:: DatagramProtocol.error_received(exc)
 
-   Called when a previous send or receive operation raises an
-   :class:`OSError`.  *exc* is the :class:`OSError` instance.
+   Được gọi khi một thao tác gửi hoặc nhận trước đó phát sinh một
+   :class:`OSError`. *exc* là instance :class:`OSError`.
 
-   This method is called in rare conditions, when the transport (e.g. UDP)
-   detects that a datagram could not be delivered to its recipient.
-   In many conditions though, undeliverable datagrams will be silently
-   dropped.
+   Phương thức này được gọi trong những điều kiện hiếm gặp, khi transport (ví dụ: UDP) phát hiện rằng một datagram không thể được chuyển đến bên nhận. Tuy nhiên, trong nhiều trường hợp, các datagram không thể chuyển đến nơi nhận sẽ bị loại bỏ một cách im lặng.
 
 .. note::
 
-   On BSD systems (macOS, FreeBSD, etc.) flow control is not supported
-   for datagram protocols, because there is no reliable way to detect send
-   failures caused by writing too many packets.
+   Trên các hệ thống BSD (macOS, FreeBSD, v.v.), flow control không được hỗ trợ cho các giao thức datagram vì không có cách đáng tin cậy để phát hiện lỗi gửi do ghi quá nhiều packet gây ra.
 
-   The socket always appears 'ready' and excess packets are dropped. An
-   :class:`OSError` with ``errno`` set to :const:`errno.ENOBUFS` may
-   or may not be raised; if it is raised, it will be reported to
-   :meth:`DatagramProtocol.error_received` but otherwise ignored.
+   Socket luôn xuất hiện ở trạng thái 'ready' và các gói tin dư thừa sẽ bị loại bỏ. Một
+   :class:`OSError` với ``errno`` được đặt thành :const:`errno.ENOBUFS` có thể được phát sinh hoặc không; nếu được phát sinh, nó sẽ được báo cáo cho
+   :meth:`DatagramProtocol.error_received`, nhưng nếu không thì sẽ bị bỏ qua.
 
 
 .. _asyncio-subprocess-protocols:
 
-Subprocess Protocols
---------------------
+Protocol của tiến trình con
+---------------------------
 
-Subprocess Protocol instances should be constructed by protocol
-factories passed to the :meth:`loop.subprocess_exec` and
-:meth:`loop.subprocess_shell` methods.
+Các instance Subprocess Protocol nên được tạo bởi các protocol factory được truyền vào :meth:`loop.subprocess_exec` và
+các phương thức :meth:`loop.subprocess_shell`.
 
 .. method:: SubprocessProtocol.pipe_data_received(fd, data)
 
-   Called when the child process writes data into its stdout or stderr
-   pipe.
+   Được gọi khi tiến trình con ghi dữ liệu vào pipe stdout hoặc stderr của nó.
 
-   *fd* is the integer file descriptor of the pipe.
+   *fd* là bộ mô tả tệp dạng số nguyên của pipe.
 
-   *data* is a non-empty bytes object containing the received data.
+   *data* là một đối tượng bytes không rỗng chứa dữ liệu đã nhận.
 
 .. method:: SubprocessProtocol.pipe_connection_lost(fd, exc)
 
-   Called when one of the pipes communicating with the child process
-   is closed.
+   Được gọi khi một trong các pipe giao tiếp với tiến trình con bị đóng.
 
-   *fd* is the integer file descriptor that was closed.
+   *fd* là bộ mô tả tệp dạng số nguyên đã bị đóng.
 
 .. method:: SubprocessProtocol.process_exited()
 
-   Called when the child process has exited.
+   Được gọi khi tiến trình con đã thoát.
 
-   It can be called before :meth:`~SubprocessProtocol.pipe_data_received` and
-   :meth:`~SubprocessProtocol.pipe_connection_lost` methods.
+   Nó có thể được gọi trước :meth:`~SubprocessProtocol.pipe_data_received` và
+   :meth:`~SubprocessProtocol.pipe_connection_lost` các phương thức.
 
 
-Examples
-========
+.. _`Examples`:
+
+Ví dụ
+=====
 
 .. _asyncio_example_tcp_echo_server_protocol:
 
-TCP Echo Server
----------------
+Máy chủ echo TCP
+----------------
 
-Create a TCP echo server using the :meth:`loop.create_server` method, send back
-received data, and close the connection::
+Tạo máy chủ echo TCP bằng phương thức :meth:`loop.create_server`, gửi lại dữ liệu đã nhận và đóng kết nối::
 
     import asyncio
 
@@ -749,8 +587,8 @@ received data, and close the connection::
 
 
     async def main():
-        # Get a reference to the event loop as we plan to use
-        # low-level APIs.
+        # Lấy tham chiếu đến event loop vì chúng ta dự định sử dụng
+        # các API cấp thấp.
         loop = asyncio.get_running_loop()
 
         server = await loop.create_server(
@@ -766,16 +604,14 @@ received data, and close the connection::
 
 .. seealso::
 
-   The :ref:`TCP echo server using streams <asyncio-tcp-echo-server-streams>`
-   example uses the high-level :func:`asyncio.start_server` function.
+   Ví dụ :ref:`máy chủ echo TCP sử dụng streams <asyncio-tcp-echo-server-streams>` dùng hàm :func:`asyncio.start_server` cấp cao.
 
 .. _asyncio_example_tcp_echo_client_protocol:
 
-TCP Echo Client
----------------
+Máy khách echo TCP
+------------------
 
-A TCP echo client using the :meth:`loop.create_connection` method, sends
-data, and waits until the connection is closed::
+TCP echo client sử dụng phương thức :meth:`loop.create_connection`, gửi dữ liệu và chờ cho đến khi connection được đóng::
 
     import asyncio
 
@@ -798,8 +634,8 @@ data, and waits until the connection is closed::
 
 
     async def main():
-        # Get a reference to the event loop as we plan to use
-        # low-level APIs.
+        # Lấy tham chiếu đến event loop vì chúng ta dự định sử dụng các
+        # API cấp thấp.
         loop = asyncio.get_running_loop()
 
         on_con_lost = loop.create_future()
@@ -809,8 +645,8 @@ data, and waits until the connection is closed::
             lambda: EchoClientProtocol(message, on_con_lost),
             '127.0.0.1', 8888)
 
-        # Wait until the protocol signals that the connection
-        # is lost and close the transport.
+        # Chờ cho đến khi protocol báo hiệu rằng connection
+        # đã bị mất rồi đóng transport.
         try:
             await on_con_lost
         finally:
@@ -822,17 +658,15 @@ data, and waits until the connection is closed::
 
 .. seealso::
 
-   The :ref:`TCP echo client using streams <asyncio-tcp-echo-client-streams>`
-   example uses the high-level :func:`asyncio.open_connection` function.
+   Ví dụ :ref:`TCP echo client sử dụng streams <asyncio-tcp-echo-client-streams>` sử dụng hàm cấp cao :func:`asyncio.open_connection`.
 
 
 .. _asyncio-udp-echo-server-protocol:
 
-UDP Echo Server
----------------
+Máy chủ UDP Echo
+----------------
 
-A UDP echo server, using the :meth:`loop.create_datagram_endpoint`
-method, sends back received data::
+Một UDP echo server, sử dụng phương thức :meth:`loop.create_datagram_endpoint`, gửi lại dữ liệu đã nhận::
 
     import asyncio
 
@@ -851,18 +685,18 @@ method, sends back received data::
     async def main():
         print("Starting UDP server")
 
-        # Get a reference to the event loop as we plan to use
-        # low-level APIs.
+        # Lấy tham chiếu đến event loop vì chúng ta dự định sử dụng
+        # các API cấp thấp.
         loop = asyncio.get_running_loop()
 
-        # One protocol instance will be created to serve all
-        # client requests.
+        # Một protocol instance sẽ được tạo để phục vụ tất cả
+        # các yêu cầu của client.
         transport, protocol = await loop.create_datagram_endpoint(
             EchoServerProtocol,
             local_addr=('127.0.0.1', 9999))
 
         try:
-            await asyncio.sleep(3600)  # Serve for 1 hour.
+            await asyncio.sleep(3600)  # Phục vụ trong 1 giờ.
         finally:
             transport.close()
 
@@ -875,8 +709,7 @@ method, sends back received data::
 UDP Echo Client
 ---------------
 
-A UDP echo client, using the :meth:`loop.create_datagram_endpoint`
-method, sends data and closes the transport when it receives the answer::
+Một UDP echo client, sử dụng phương thức :meth:`loop.create_datagram_endpoint`, gửi dữ liệu và đóng transport khi nhận được câu trả lời::
 
     import asyncio
 
@@ -907,8 +740,8 @@ method, sends data and closes the transport when it receives the answer::
 
 
     async def main():
-        # Get a reference to the event loop as we plan to use
-        # low-level APIs.
+        # Lấy tham chiếu đến event loop vì chúng ta dự định sử dụng
+        # các API cấp thấp.
         loop = asyncio.get_running_loop()
 
         on_con_lost = loop.create_future()
@@ -929,11 +762,11 @@ method, sends data and closes the transport when it receives the answer::
 
 .. _asyncio_example_create_connection:
 
-Connecting Existing Sockets
----------------------------
+Kết nối các socket hiện có
+--------------------------
 
-Wait until a socket receives data using the
-:meth:`loop.create_connection` method with a protocol::
+Chờ cho đến khi một socket nhận dữ liệu bằng
+phương thức :meth:`loop.create_connection` với một protocol::
 
     import asyncio
     import socket
@@ -951,29 +784,29 @@ Wait until a socket receives data using the
         def data_received(self, data):
             print("Received:", data.decode())
 
-            # We are done: close the transport;
-            # connection_lost() will be called automatically.
+            # Chúng ta đã hoàn tất: đóng transport;
+            # connection_lost() sẽ được gọi tự động.
             self.transport.close()
 
         def connection_lost(self, exc):
-            # The socket has been closed
+            # Socket đã được đóng
             self.on_con_lost.set_result(True)
 
 
     async def main():
-        # Get a reference to the event loop as we plan to use
-        # low-level APIs.
+        # Lấy tham chiếu đến event loop vì chúng ta dự định sử dụng
+        # các API cấp thấp.
         loop = asyncio.get_running_loop()
         on_con_lost = loop.create_future()
 
-        # Create a pair of connected sockets
+        # Tạo một cặp socket được kết nối
         rsock, wsock = socket.socketpair()
 
-        # Register the socket to wait for data.
+        # Đăng ký socket để chờ dữ liệu.
         transport, protocol = await loop.create_connection(
             lambda: MyProtocol(on_con_lost), sock=rsock)
 
-        # Simulate the reception of data from the network.
+        # Mô phỏng việc nhận dữ liệu từ mạng.
         loop.call_soon(wsock.send, 'abc'.encode())
 
         try:
@@ -986,23 +819,19 @@ Wait until a socket receives data using the
 
 .. seealso::
 
-   The :ref:`watch a file descriptor for read events
-   <asyncio_example_watch_fd>` example uses the low-level
-   :meth:`loop.add_reader` method to register an FD.
+   Ví dụ :ref:`theo dõi một bộ mô tả tệp để phát hiện các sự kiện đọc <asyncio_example_watch_fd>` sử dụng API cấp thấp
+   phương thức :meth:`loop.add_reader` để đăng ký một FD.
 
-   The :ref:`register an open socket to wait for data using streams
-   <asyncio_example_create_connection-streams>` example uses high-level streams
-   created by the :func:`open_connection` function in a coroutine.
+   Ví dụ :ref:`đăng ký một socket đang mở để chờ dữ liệu bằng streams <asyncio_example_create_connection-streams>` sử dụng các stream cấp cao được tạo bởi hàm :func:`open_connection` trong một coroutine.
 
 .. _asyncio_example_subprocess_proto:
 
 loop.subprocess_exec() and SubprocessProtocol
 ---------------------------------------------
 
-An example of a subprocess protocol used to get the output of a
-subprocess and to wait for the subprocess exit.
+Ví dụ về một subprocess protocol được dùng để lấy đầu ra của một subprocess và chờ subprocess kết thúc.
 
-The subprocess is created by the :meth:`loop.subprocess_exec` method::
+Subprocess được tạo bởi phương thức :meth:`loop.subprocess_exec`::
 
     import asyncio
     import sys
@@ -1023,9 +852,9 @@ The subprocess is created by the :meth:`loop.subprocess_exec` method::
 
         def process_exited(self):
             self.exited = True
-            # process_exited() method can be called before
-            # pipe_connection_lost() method: wait until both methods are
-            # called.
+            # phương thức process_exited() có thể được gọi trước
+            # phương thức pipe_connection_lost(): chờ cho đến khi cả hai phương thức đều
+            # được gọi.
             self.check_for_exit()
 
         def check_for_exit(self):
@@ -1033,34 +862,33 @@ The subprocess is created by the :meth:`loop.subprocess_exec` method::
                 self.exit_future.set_result(True)
 
     async def get_date():
-        # Get a reference to the event loop as we plan to use
-        # low-level APIs.
+        # Lấy tham chiếu đến event loop vì chúng ta dự định sử dụng
+        # các API cấp thấp.
         loop = asyncio.get_running_loop()
 
         code = 'import datetime as dt; print(dt.datetime.now())'
         exit_future = asyncio.Future(loop=loop)
 
-        # Create the subprocess controlled by DateProtocol;
-        # redirect the standard output into a pipe.
+        # Tạo subprocess do DateProtocol điều khiển;
+        # chuyển hướng đầu ra tiêu chuẩn vào một pipe.
         transport, protocol = await loop.subprocess_exec(
             lambda: DateProtocol(exit_future),
             sys.executable, '-c', code,
             stdin=None, stderr=None)
 
-        # Wait for the subprocess exit using the process_exited()
-        # method of the protocol.
+        # Chờ subprocess thoát bằng process_exited()
+        # phương thức của protocol.
         await exit_future
 
-        # Close the stdout pipe.
+        # Đóng pipe stdout.
         transport.close()
 
-        # Read the output which was collected by the
-        # pipe_data_received() method of the protocol.
+        # Đọc đầu ra đã được thu thập bởi
+        # phương thức pipe_data_received() của protocol.
         data = bytes(protocol.output)
         return data.decode('ascii').rstrip()
 
     date = asyncio.run(get_date())
     print(f"Current date: {date}")
 
-See also the :ref:`same example <asyncio_example_create_subprocess_exec>`
-written using high-level APIs.
+Xem thêm :ref:`ví dụ tương tự <asyncio_example_create_subprocess_exec>` được viết bằng các API cấp cao.

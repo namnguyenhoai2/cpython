@@ -2,22 +2,20 @@
 
 .. _asyncio-subprocess:
 
-============
-Subprocesses
-============
+==================
+Các tiến trình con
+==================
 
-**Source code:** :source:`Lib/asyncio/subprocess.py`,
+**Mã nguồn:** :source:`Lib/asyncio/subprocess.py`,
 :source:`Lib/asyncio/base_subprocess.py`
 
 ----------------------------------------
 
-This section describes high-level async/await asyncio APIs to
-create and manage subprocesses.
+Phần này mô tả các API asyncio cấp cao sử dụng async/await để tạo và quản lý các tiến trình con.
 
 .. _asyncio_example_subprocess_shell:
 
-Here's an example of how asyncio can run a shell command and
-obtain its result::
+Sau đây là ví dụ về cách asyncio có thể chạy một lệnh shell và nhận kết quả của lệnh đó::
 
     import asyncio
 
@@ -37,16 +35,13 @@ obtain its result::
 
     asyncio.run(run('ls /zzz'))
 
-will print::
+sẽ in ra::
 
     ['ls /zzz' exited with 1]
     [stderr]
     ls: /zzz: No such file or directory
 
-Because all asyncio subprocess functions are asynchronous and asyncio
-provides many tools to work with such functions, it is easy to execute
-and monitor multiple subprocesses in parallel.  It is indeed trivial
-to modify the above example to run several commands simultaneously::
+Vì tất cả các hàm subprocess của asyncio đều là bất đồng bộ (asynchronous) và asyncio cung cấp nhiều công cụ để làm việc với các hàm như vậy, nên việc thực thi và giám sát nhiều tiến trình con song song rất dễ dàng. Thực tế, việc sửa đổi ví dụ trên để chạy đồng thời một số lệnh là điều hết sức đơn giản::
 
     async def main():
         await asyncio.gather(
@@ -55,305 +50,239 @@ to modify the above example to run several commands simultaneously::
 
     asyncio.run(main())
 
-See also the `Examples`_ subsection.
+Xem thêm phần `Examples`_.
 
 
-Creating Subprocesses
-=====================
+Tạo subprocess
+==============
 
 .. function:: create_subprocess_exec(program, *args, stdin=None, \
-                 stdout=None, stderr=None, limit=65536, **kwds)
+                 stdout=None, stderr=None, limit=65536, ****kwds)
    :async:
 
-   Create a subprocess.
+   Tạo một subprocess.
 
-   The *limit* argument sets the buffer limit for :class:`StreamReader`
-   wrappers for :attr:`~asyncio.subprocess.Process.stdout` and :attr:`~asyncio.subprocess.Process.stderr`
-   (if :const:`subprocess.PIPE` is passed to *stdout* and *stderr* arguments).
+   Đối số *limit* đặt giới hạn bộ đệm cho các wrapper :class:`StreamReader` dành cho :attr:`~asyncio.subprocess.Process.stdout` và :attr:`~asyncio.subprocess.Process.stderr` (nếu :const:`subprocess.PIPE` được truyền vào các đối số *stdout* và *stderr*).
 
-   Return a :class:`~asyncio.subprocess.Process` instance.
+   Trả về một instance :class:`~asyncio.subprocess.Process`.
 
-   See the documentation of :meth:`loop.subprocess_exec` for other
-   parameters.
+   Xem tài liệu của :meth:`loop.subprocess_exec` để biết các tham số khác.
 
-   If the process object is garbage collected while the process is still
-   running, the child process will be killed.
+   Nếu đối tượng tiến trình được thu gom rác trong khi tiến trình vẫn đang chạy, tiến trình con sẽ bị kết thúc.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
 
 .. function:: create_subprocess_shell(cmd, stdin=None, \
-                 stdout=None, stderr=None, limit=65536, **kwds)
+                 stdout=None, stderr=None, limit=65536, ****kwds)
    :async:
 
-   Run the *cmd* shell command.
+   Chạy lệnh shell *cmd*.
 
-   The *limit* argument sets the buffer limit for :class:`StreamReader`
-   wrappers for :attr:`~asyncio.subprocess.Process.stdout` and :attr:`~asyncio.subprocess.Process.stderr`
-   (if :const:`subprocess.PIPE` is passed to *stdout* and *stderr* arguments).
+   Đối số *limit* đặt giới hạn bộ đệm cho các wrapper :class:`StreamReader` dành cho :attr:`~asyncio.subprocess.Process.stdout` và :attr:`~asyncio.subprocess.Process.stderr` (nếu :const:`subprocess.PIPE` được truyền vào các đối số *stdout* và *stderr*).
 
-   Return a :class:`~asyncio.subprocess.Process` instance.
+   Trả về một instance :class:`~asyncio.subprocess.Process`.
 
-   See the documentation of :meth:`loop.subprocess_shell` for other
-   parameters.
+   Xem tài liệu của :meth:`loop.subprocess_shell` để biết các tham số khác.
 
-   If the process object is garbage collected while the process is still
-   running, the child process will be killed.
+   Nếu đối tượng tiến trình được thu gom rác trong khi tiến trình vẫn đang chạy, tiến trình con sẽ bị kết thúc.
 
    .. important::
 
-      It is the application's responsibility to ensure that all whitespace and
-      special characters are quoted appropriately to avoid `shell injection
-      <https://en.wikipedia.org/wiki/Shell_injection#Shell_injection>`_
-      vulnerabilities. The :func:`shlex.quote` function can be used to properly
-      escape whitespace and special shell characters in strings that are going
-      to be used to construct shell commands.
+      Ứng dụng có trách nhiệm đảm bảo rằng mọi khoảng trắng và ký tự đặc biệt đều được đặt trong dấu trích dẫn phù hợp để tránh các lỗ hổng `shell injection <https://en.wikipedia.org/wiki/Shell_injection#Shell_injection>`_. Có thể sử dụng hàm :func:`shlex.quote` để escape đúng khoảng trắng và các ký tự shell đặc biệt trong những chuỗi sẽ được dùng để tạo các lệnh shell.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
 .. note::
 
-   Subprocesses are available for Windows if a :class:`ProactorEventLoop` is
-   used. See :ref:`Subprocess Support on Windows <asyncio-windows-subprocess>`
-   for details.
+   Có thể sử dụng subprocess trên Windows nếu dùng :class:`ProactorEventLoop`. Xem :ref:`Hỗ trợ subprocess trên Windows <asyncio-windows-subprocess>` để biết chi tiết.
 
 .. seealso::
 
-   asyncio also has the following *low-level* APIs to work with subprocesses:
+   asyncio cũng có các API *cấp thấp* sau để làm việc với subprocess:
    :meth:`loop.subprocess_exec`, :meth:`loop.subprocess_shell`,
-   :meth:`loop.connect_read_pipe`, :meth:`loop.connect_write_pipe`,
-   as well as the :ref:`Subprocess Transports <asyncio-subprocess-transports>`
-   and :ref:`Subprocess Protocols <asyncio-subprocess-protocols>`.
+   :meth:`loop.connect_read_pipe`, :meth:`loop.connect_write_pipe`, cũng như :ref:`Transport của subprocess <asyncio-subprocess-transports>` và :ref:`Protocol của subprocess <asyncio-subprocess-protocols>`.
 
 
-Constants
-=========
+Hằng số
+=======
 
 .. data:: asyncio.subprocess.PIPE
    :module:
 
-   Can be passed to the *stdin*, *stdout* or *stderr* parameters.
+   Có thể truyền vào các tham số *stdin*, *stdout* hoặc *stderr*.
 
-   If *PIPE* is passed to *stdin* argument, the
-   :attr:`Process.stdin <asyncio.subprocess.Process.stdin>` attribute
-   will point to a :class:`~asyncio.StreamWriter` instance.
+   Nếu *PIPE* được truyền vào đối số *stdin*, thì
+   thuộc tính :attr:`Process.stdin <asyncio.subprocess.Process.stdin>` sẽ trỏ đến một instance :class:`~asyncio.StreamWriter`.
 
-   If *PIPE* is passed to *stdout* or *stderr* arguments, the
-   :attr:`Process.stdout <asyncio.subprocess.Process.stdout>` and
-   :attr:`Process.stderr <asyncio.subprocess.Process.stderr>`
-   attributes will point to :class:`~asyncio.StreamReader` instances.
+   Nếu *PIPE* được truyền vào đối số *stdout* hoặc *stderr*, thì
+   :attr:`Process.stdout <asyncio.subprocess.Process.stdout>` và
+   các thuộc tính :attr:`Process.stderr <asyncio.subprocess.Process.stderr>` sẽ trỏ đến các instance :class:`~asyncio.StreamReader`.
 
 .. data:: asyncio.subprocess.STDOUT
    :module:
 
-   Special value that can be used as the *stderr* argument and indicates
-   that standard error should be redirected into standard output.
+   Giá trị đặc biệt có thể được dùng làm đối số *stderr* và cho biết rằng standard error sẽ được chuyển hướng vào standard output.
 
 .. data:: asyncio.subprocess.DEVNULL
    :module:
 
-   Special value that can be used as the *stdin*, *stdout* or *stderr* argument
-   to process creation functions.  It indicates that the special file
-   :data:`os.devnull` will be used for the corresponding subprocess stream.
+   Giá trị đặc biệt có thể được dùng làm đối số *stdin*, *stdout* hoặc *stderr* cho các hàm tạo tiến trình. Giá trị này cho biết rằng tệp đặc biệt
+   :data:`os.devnull` sẽ được sử dụng cho stream của subprocess tương ứng.
 
 
-Interacting with Subprocesses
-=============================
+Tương tác với Subprocesses
+==========================
 
-Both :func:`create_subprocess_exec` and :func:`create_subprocess_shell`
-functions return instances of the *Process* class.  *Process* is a high-level
-wrapper that allows communicating with subprocesses and watching for
-their completion.
+Cả hai hàm :func:`create_subprocess_exec` và :func:`create_subprocess_shell` đều trả về các thực thể của lớp *Process*. *Process* là một wrapper cấp cao cho phép giao tiếp với các subprocess và theo dõi khi chúng hoàn tất.
 
 .. class:: asyncio.subprocess.Process
    :module:
 
-   An object that wraps OS processes created by the
-   :func:`~asyncio.create_subprocess_exec` and :func:`~asyncio.create_subprocess_shell`
-   functions.
+   Một đối tượng bao bọc các tiến trình OS được tạo bởi
+   các hàm :func:`~asyncio.create_subprocess_exec` và :func:`~asyncio.create_subprocess_shell`.
 
-   This class is designed to have a similar API to the
-   :class:`subprocess.Popen` class, but there are some
-   notable differences:
+   Lớp này được thiết kế để có API tương tự như lớp
+   :class:`subprocess.Popen`, nhưng có một số điểm khác biệt đáng chú ý:
 
-   * unlike Popen, Process instances do not have an equivalent to
-     the :meth:`~subprocess.Popen.poll` method;
+   * không giống Popen, các thực thể Process không có phương thức tương đương với :meth:`~subprocess.Popen.poll`;
 
-   * the :meth:`~asyncio.subprocess.Process.communicate` and
-     :meth:`~asyncio.subprocess.Process.wait` methods don't have a
-     *timeout* parameter: use the :func:`~asyncio.wait_for` function;
+   * :meth:`~asyncio.subprocess.Process.communicate` và
+     :meth:`~asyncio.subprocess.Process.wait` Các phương thức không có tham số *timeout*: hãy sử dụng :func:`~asyncio.wait_for` hàm;
 
-   * the :meth:`Process.wait() <asyncio.subprocess.Process.wait>` method
-     is asynchronous, whereas :meth:`subprocess.Popen.wait` method
-     is implemented as a blocking busy loop;
+   * phương thức :meth:`Process.wait() <asyncio.subprocess.Process.wait>` là bất đồng bộ, trong khi phương thức :meth:`subprocess.Popen.wait` được triển khai dưới dạng vòng lặp bận chặn;
 
-   * the *universal_newlines* parameter is not supported.
+   * tham số *universal_newlines* không được hỗ trợ.
 
-   This class is :ref:`not thread safe <asyncio-multithreading>`.
+   Lớp này :ref:`không an toàn với thread <asyncio-multithreading>`.
 
-   See also the :ref:`Subprocess and Threads <asyncio-subprocess-threads>`
-   section.
+   Xem thêm phần :ref:`Subprocess và Threads <asyncio-subprocess-threads>`.
 
    .. method:: wait()
       :async:
 
-      Wait for the child process to terminate.
+      Chờ tiến trình con kết thúc.
 
-      Set and return the :attr:`returncode` attribute.
+      Thiết lập và trả về thuộc tính :attr:`returncode`.
 
       .. note::
 
-         This method can deadlock when using ``stdout=PIPE`` or
-         ``stderr=PIPE`` and the child process generates so much output
-         that it blocks waiting for the OS pipe buffer to accept
-         more data. Use the :meth:`communicate` method when using pipes
-         to avoid this condition.
+         Phương thức này có thể bị deadlock khi sử dụng ``stdout=PIPE`` hoặc ``stderr=PIPE`` và tiến trình con tạo ra quá nhiều đầu ra đến mức bị chặn do chờ bộ đệm pipe của hệ điều hành tiếp nhận thêm dữ liệu. Sử dụng phương thức :meth:`communicate` khi dùng pipe để tránh tình trạng này.
 
    .. method:: communicate(input=None)
       :async:
 
-      Interact with process:
+      Tương tác với tiến trình:
 
-      1. send data to *stdin* (if *input* is not ``None``);
-      2. closes *stdin*;
-      3. read data from *stdout* and *stderr*, until EOF is reached;
-      4. wait for process to terminate.
+      1. gửi dữ liệu đến *stdin* (nếu *input* không phải là ``None``);
+      2. đóng *stdin*;
+      3. đọc dữ liệu từ *stdout* và *stderr*, cho đến khi gặp EOF;
+      4. chờ tiến trình kết thúc.
 
-      The optional *input* argument is the data (:class:`bytes` object)
-      that will be sent to the child process.
+      Đối số *input* tùy chọn là dữ liệu (:class:`bytes` object) sẽ được gửi đến tiến trình con.
 
-      Return a tuple ``(stdout_data, stderr_data)``.
+      Trả về một tuple ``(stdout_data, stderr_data)``.
 
-      If either :exc:`BrokenPipeError` or :exc:`ConnectionResetError`
-      exception is raised when writing *input* into *stdin*, the
-      exception is ignored.  This condition occurs when the process
-      exits before all data are written into *stdin*.
+      Nếu ngoại lệ :exc:`BrokenPipeError` hoặc :exc:`ConnectionResetError` được phát sinh khi ghi *input* vào *stdin*, ngoại lệ đó sẽ bị bỏ qua. Điều kiện này xảy ra khi tiến trình kết thúc trước khi tất cả dữ liệu được ghi vào *stdin*.
 
-      If it is desired to send data to the process' *stdin*,
-      the process needs to be created with ``stdin=PIPE``.  Similarly,
-      to get anything other than ``None`` in the result tuple, the
-      process has to be created with ``stdout=PIPE`` and/or
-      ``stderr=PIPE`` arguments.
+      Nếu muốn gửi dữ liệu đến *stdin* của tiến trình, cần tạo tiến trình bằng ``stdin=PIPE``. Tương tự, để nhận được bất kỳ giá trị nào khác ``None`` trong tuple kết quả, phải tạo tiến trình bằng các đối số ``stdout=PIPE`` và/hoặc ``stderr=PIPE``.
 
-      Note, that the data read is buffered in memory, so do not use
-      this method if the data size is large or unlimited.
+      Lưu ý rằng dữ liệu được đọc sẽ được đệm trong bộ nhớ, vì vậy không sử dụng phương thức này nếu kích thước dữ liệu lớn hoặc không giới hạn.
 
       .. versionchanged:: 3.12
 
-         *stdin* gets closed when ``input=None`` too.
+         *stdin* cũng được đóng khi ``input=None``.
 
    .. method:: send_signal(signal)
 
-      Sends the signal *signal* to the child process.
+      Gửi tín hiệu *signal* đến tiến trình con.
 
       .. note::
 
-         On Windows, :py:const:`~signal.SIGTERM` is an alias for :meth:`terminate`.
-         ``CTRL_C_EVENT`` and ``CTRL_BREAK_EVENT`` can be sent to processes
-         started with a *creationflags* parameter which includes
-         ``CREATE_NEW_PROCESS_GROUP``.
+         Trên Windows, :py:const:`~signal.SIGTERM` là bí danh của :meth:`terminate`. ``CTRL_C_EVENT`` và ``CTRL_BREAK_EVENT`` có thể được gửi đến các tiến trình được khởi chạy với tham số *creationflags* bao gồm ``CREATE_NEW_PROCESS_GROUP``.
 
    .. method:: terminate()
 
-      Stop the child process.
+      Dừng tiến trình con.
 
-      On POSIX systems this method sends :py:const:`~signal.SIGTERM` to the
-      child process.
+      Trên các hệ thống POSIX, phương thức này gửi :py:const:`~signal.SIGTERM` đến tiến trình con.
 
-      On Windows the Win32 API function :c:func:`!TerminateProcess` is
-      called to stop the child process.
+      Trên Windows, hàm API Win32 :c:func:`!TerminateProcess` được gọi để dừng tiến trình con.
 
    .. method:: kill()
 
-      Kill the child process.
+      Buộc dừng tiến trình con.
 
-      On POSIX systems this method sends :py:data:`~signal.SIGKILL` to the child
-      process.
+      Trên các hệ thống POSIX, phương thức này gửi :py:data:`~signal.SIGKILL` đến tiến trình con.
 
-      On Windows this method is an alias for :meth:`terminate`.
+      Trên Windows, phương thức này là bí danh cho :meth:`terminate`.
 
    .. attribute:: stdin
 
-      Standard input stream (:class:`~asyncio.StreamWriter`) or ``None``
-      if the process was created with ``stdin=None``.
+      Luồng đầu vào tiêu chuẩn (:class:`~asyncio.StreamWriter`) hoặc ``None`` nếu tiến trình được tạo bằng ``stdin=None``.
 
    .. attribute:: stdout
 
-      Standard output stream (:class:`~asyncio.StreamReader`) or ``None``
-      if the process was created with ``stdout=None``.
+      Luồng đầu ra tiêu chuẩn (:class:`~asyncio.StreamReader`) hoặc ``None`` nếu tiến trình được tạo bằng ``stdout=None``.
 
    .. attribute:: stderr
 
-      Standard error stream (:class:`~asyncio.StreamReader`) or ``None``
-      if the process was created with ``stderr=None``.
+      Luồng lỗi tiêu chuẩn (:class:`~asyncio.StreamReader`) hoặc ``None`` nếu tiến trình được tạo bằng ``stderr=None``.
 
    .. warning::
 
-      Use the :meth:`communicate` method rather than
+      Sử dụng phương thức :meth:`communicate` thay vì
       :attr:`process.stdin.write() <stdin>`,
-      :attr:`await process.stdout.read() <stdout>` or
-      :attr:`await process.stderr.read() <stderr>`.
-      This avoids deadlocks due to streams pausing reading or writing
-      and blocking the child process.
+      :attr:`await process.stdout.read() <stdout>` hoặc
+      :attr:`await process.stderr.read() <stderr>`. Điều này tránh deadlock do các luồng tạm dừng việc đọc hoặc ghi và chặn tiến trình con.
 
    .. attribute:: pid
 
-      Process identification number (PID).
+      Số nhận dạng tiến trình (PID).
 
-      Note that for processes created by the :func:`~asyncio.create_subprocess_shell`
-      function, this attribute is the PID of the spawned shell.
+      Lưu ý rằng đối với các tiến trình được tạo bởi hàm :func:`~asyncio.create_subprocess_shell`, thuộc tính này là PID của shell được tạo ra.
 
    .. attribute:: returncode
 
-      Return code of the process when it exits.
+      Mã trả về của tiến trình khi tiến trình kết thúc.
 
-      A ``None`` value indicates that the process has not terminated yet.
+      Giá trị ``None`` cho biết tiến trình chưa kết thúc.
 
-      For processes created with :func:`~asyncio.create_subprocess_exec`, a negative
-      value ``-N`` indicates that the child was terminated by signal ``N``
-      (POSIX only).
+      Đối với các tiến trình được tạo bằng :func:`~asyncio.create_subprocess_exec`, giá trị âm ``-N`` cho biết tiến trình con đã bị kết thúc bởi signal ``N`` (chỉ dành cho POSIX).
 
-      For processes created with :func:`~asyncio.create_subprocess_shell`, the
-      return code reflects the exit status of the shell itself (e.g. ``/bin/sh``),
-      which may map signals to codes such as ``128+N``. See the
-      documentation of the shell (for example, the Bash manual's Exit Status)
-      for details.
+      Đối với các tiến trình được tạo bằng :func:`~asyncio.create_subprocess_shell`, mã trả về phản ánh trạng thái thoát của chính shell (ví dụ: ``/bin/sh``), trạng thái này có thể ánh xạ các signal tới những mã như ``128+N``. Xem tài liệu của shell (chẳng hạn như Exit Status trong hướng dẫn sử dụng Bash) để biết thêm chi tiết.
 
 
 
 .. _asyncio-subprocess-threads:
 
-Subprocess and Threads
-----------------------
+Tiến trình con và Luồng
+-----------------------
 
-Standard asyncio event loop supports running subprocesses from different threads by
-default.
+Vòng lặp sự kiện asyncio tiêu chuẩn hỗ trợ chạy các tiến trình con từ những thread khác theo mặc định.
 
-On Windows subprocesses are provided by :class:`ProactorEventLoop` only (default),
-:class:`SelectorEventLoop` has no subprocess support.
+Trên Windows, các tiến trình con chỉ được cung cấp bởi :class:`ProactorEventLoop` (mặc định),
+:class:`SelectorEventLoop` không hỗ trợ tiến trình con.
 
-Note that alternative event loop implementations might have own limitations;
-please refer to their documentation.
+Lưu ý rằng các triển khai vòng lặp sự kiện thay thế có thể có những giới hạn riêng; vui lòng tham khảo tài liệu của chúng.
 
 .. seealso::
 
-   The :ref:`Concurrency and multithreading in asyncio
-   <asyncio-multithreading>` section.
+   Mục :ref:`Tính đồng thời và đa luồng trong asyncio <asyncio-multithreading>`.
 
 
-Examples
---------
+.. _`Examples`:
 
-An example using the :class:`~asyncio.subprocess.Process` class to
-control a subprocess and the :class:`StreamReader` class to read from
-its standard output.
+Ví dụ
+-----
+
+Một ví dụ sử dụng lớp :class:`~asyncio.subprocess.Process` để điều khiển một tiến trình con và lớp :class:`StreamReader` để đọc đầu ra tiêu chuẩn của tiến trình đó.
 
 .. _asyncio_example_create_subprocess_exec:
 
-The subprocess is created by the :func:`create_subprocess_exec`
-function::
+Tiến trình con được tạo bởi hàm :func:`create_subprocess_exec`::
 
     import asyncio
     import sys
@@ -361,17 +290,17 @@ function::
     async def get_date():
         code = 'import datetime as dt; print(dt.datetime.now())'
 
-        # Create the subprocess; redirect the standard output
-        # into a pipe.
+        # Tạo tiến trình con; chuyển hướng đầu ra tiêu chuẩn
+        # vào một pipe.
         proc = await asyncio.create_subprocess_exec(
             sys.executable, '-c', code,
             stdout=asyncio.subprocess.PIPE)
 
-        # Read one line of output.
+        # Đọc một dòng đầu ra.
         data = await proc.stdout.readline()
         line = data.decode('ascii').rstrip()
 
-        # Wait for the subprocess exit.
+        # Chờ tiến trình con thoát.
         await proc.wait()
         return line
 
@@ -379,5 +308,6 @@ function::
     print(f"Current date: {date}")
 
 
-See also the :ref:`same example <asyncio_example_subprocess_proto>`
-written using low-level APIs.
+Xem thêm :ref:`cùng ví dụ <asyncio_example_subprocess_proto>` được viết bằng các API cấp thấp.
+
+.. _`shell injection`: https://en.wikipedia.org/wiki/Shell_injection#Shell_injection

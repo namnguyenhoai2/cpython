@@ -1,99 +1,99 @@
 .. currentmodule:: asyncio
 
 
-===================
-Low-level API Index
-===================
+====================
+Chỉ mục API cấp thấp
+====================
 
-This page lists all low-level asyncio APIs.
+Trang này liệt kê tất cả API asyncio cấp thấp.
 
 
-Obtaining the Event Loop
-========================
+Lấy Event Loop
+==============
 
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :func:`asyncio.get_running_loop`
-      - The **preferred** function to get the running event loop.
+      - Hàm **được khuyến nghị** để lấy event loop đang chạy.
 
     * - :func:`asyncio.get_event_loop`
-      - Get an event loop instance (running or current via the current policy).
+      - Lấy một thực thể event loop (đang chạy hoặc hiện tại thông qua policy hiện tại).
 
     * - :func:`asyncio.set_event_loop`
-      - Set the event loop as current via the current policy.
+      - Đặt event loop làm event loop hiện tại thông qua policy hiện tại.
 
     * - :func:`asyncio.new_event_loop`
-      - Create a new event loop.
+      - Tạo một event loop mới.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Using asyncio.get_running_loop() <asyncio_example_future>`.
+* :ref:`Sử dụng asyncio.get_running_loop() <asyncio_example_future>`.
 
 
-Event Loop Methods
-==================
+Các phương thức của Event Loop
+==============================
 
-See also the main documentation section about the
+Xem thêm phần tài liệu chính về
 :ref:`asyncio-event-loop-methods`.
 
-.. rubric:: Lifecycle
+.. rubric:: Vòng đời
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`loop.run_until_complete`
-      - Run a Future/Task/awaitable until complete.
+      - Chạy một Future/Task/awaitable cho đến khi hoàn tất.
 
     * - :meth:`loop.run_forever`
-      - Run the event loop forever.
+      - Chạy event loop vô hạn.
 
     * - :meth:`loop.stop`
-      - Stop the event loop.
+      - Dừng vòng lặp sự kiện.
 
     * - :meth:`loop.close`
-      - Close the event loop.
+      - Đóng vòng lặp sự kiện.
 
     * - :meth:`loop.is_running`
-      - Return ``True`` if the event loop is running.
+      - Trả về ``True`` nếu vòng lặp sự kiện đang chạy.
 
     * - :meth:`loop.is_closed`
-      - Return ``True`` if the event loop is closed.
+      - Trả về ``True`` nếu vòng lặp sự kiện đã đóng.
 
     * - ``await`` :meth:`loop.shutdown_asyncgens`
-      - Close asynchronous generators.
+      - Đóng các trình tạo bất đồng bộ.
 
 
-.. rubric:: Debugging
+.. rubric:: Gỡ lỗi
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`loop.set_debug`
-      - Enable or disable the debug mode.
+      - Bật hoặc tắt chế độ gỡ lỗi.
 
     * - :meth:`loop.get_debug`
-      - Get the current debug mode.
+      - Lấy chế độ debug hiện tại.
 
 
-.. rubric:: Scheduling Callbacks
+.. rubric:: Lập lịch callback
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`loop.call_soon`
-      - Invoke a callback soon.
+      - Gọi callback sớm.
 
     * - :meth:`loop.call_soon_threadsafe`
-      - A thread-safe variant of :meth:`loop.call_soon`.
+      - Một biến thể an toàn luồng của :meth:`loop.call_soon`.
 
     * - :meth:`loop.call_later`
-      - Invoke a callback *after* the given time.
+      - Gọi callback *sau* khoảng thời gian đã cho.
 
     * - :meth:`loop.call_at`
-      - Invoke a callback *at* the given time.
+      - Gọi callback *vào* thời điểm đã cho.
 
 
 .. rubric:: Thread/Interpreter/Process Pool
@@ -102,31 +102,28 @@ See also the main documentation section about the
     :class: full-width-table
 
     * - ``await`` :meth:`loop.run_in_executor`
-      - Run a CPU-bound or other blocking function in
-        a :mod:`concurrent.futures` executor.
+      - Chạy một hàm sử dụng CPU-bound hoặc một hàm blocking khác trong một executor :mod:`concurrent.futures`.
 
     * - :meth:`loop.set_default_executor`
-      - Set the default executor for :meth:`loop.run_in_executor`.
+      - Đặt executor mặc định cho :meth:`loop.run_in_executor`.
 
 
-.. rubric:: Tasks and Futures
+.. rubric:: Tasks và Futures
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`loop.create_future`
-      - Create a :class:`Future` object.
+      - Tạo một đối tượng :class:`Future`.
 
     * - :meth:`loop.create_task`
-      - Schedule coroutine as a :class:`Task`.
+      - Lên lịch coroutine dưới dạng :class:`Task`.
 
     * - :meth:`loop.set_task_factory`
-      - Set a factory used by :meth:`loop.create_task` to
-        create :class:`Tasks <Task>`.
+      - Đặt factory được :meth:`loop.create_task` sử dụng để tạo :class:`Tasks <Task>`.
 
     * - :meth:`loop.get_task_factory`
-      - Get the factory :meth:`loop.create_task` uses
-        to create :class:`Tasks <Task>`.
+      - Lấy factory mà :meth:`loop.create_task` sử dụng để tạo :class:`Tasks <Task>`.
 
 
 .. rubric:: DNS
@@ -135,389 +132,377 @@ See also the main documentation section about the
     :class: full-width-table
 
     * - ``await`` :meth:`loop.getaddrinfo`
-      - Asynchronous version of :meth:`socket.getaddrinfo`.
+      - Phiên bản bất đồng bộ của :meth:`socket.getaddrinfo`.
 
     * - ``await`` :meth:`loop.getnameinfo`
-      - Asynchronous version of :meth:`socket.getnameinfo`.
+      - Phiên bản bất đồng bộ của :meth:`socket.getnameinfo`.
 
 
-.. rubric:: Networking and IPC
+.. rubric:: Mạng và IPC
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``await`` :meth:`loop.create_connection`
-      - Open a TCP connection.
+      - Mở kết nối TCP.
 
     * - ``await`` :meth:`loop.create_server`
-      - Create a TCP server.
+      - Tạo máy chủ TCP.
 
     * - ``await`` :meth:`loop.create_unix_connection`
-      - Open a Unix socket connection.
+      - Mở kết nối socket Unix.
 
     * - ``await`` :meth:`loop.create_unix_server`
-      - Create a Unix socket server.
+      - Tạo một máy chủ socket Unix.
 
     * - ``await`` :meth:`loop.connect_accepted_socket`
-      - Wrap a :class:`~socket.socket` into a ``(transport, protocol)``
-        pair.
+      - Bọc một :class:`~socket.socket` vào một cặp ``(transport, protocol)``.
 
     * - ``await`` :meth:`loop.create_datagram_endpoint`
-      - Open a datagram (UDP) connection.
+      - Mở một kết nối datagram (UDP).
 
     * - ``await`` :meth:`loop.sendfile`
-      - Send a file over a transport.
+      - Gửi một tệp qua transport.
 
     * - ``await`` :meth:`loop.start_tls`
-      - Upgrade an existing connection to TLS.
+      - Nâng cấp một kết nối hiện có lên TLS.
 
     * - ``await`` :meth:`loop.connect_read_pipe`
-      - Wrap a read end of a pipe into a ``(transport, protocol)`` pair.
+      - Bọc đầu đọc của một pipe vào một cặp ``(transport, protocol)``.
 
     * - ``await`` :meth:`loop.connect_write_pipe`
-      - Wrap a write end of a pipe into a ``(transport, protocol)`` pair.
+      - Bọc đầu ghi của một pipe vào một cặp ``(transport, protocol)``.
 
 
-.. rubric:: Sockets
+.. rubric:: Socket
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``await`` :meth:`loop.sock_recv`
-      - Receive data from the :class:`~socket.socket`.
+      - Nhận dữ liệu từ :class:`~socket.socket`.
 
     * - ``await`` :meth:`loop.sock_recv_into`
-      - Receive data from the :class:`~socket.socket` into a buffer.
+      - Nhận dữ liệu từ :class:`~socket.socket` vào một buffer.
 
     * - ``await`` :meth:`loop.sock_recvfrom`
-      - Receive a datagram from the :class:`~socket.socket`.
+      - Nhận một datagram từ :class:`~socket.socket`.
 
     * - ``await`` :meth:`loop.sock_recvfrom_into`
-      - Receive a datagram from the :class:`~socket.socket` into a buffer.
+      - Nhận một datagram từ :class:`~socket.socket` vào một buffer.
 
     * - ``await`` :meth:`loop.sock_sendall`
-      - Send data to the :class:`~socket.socket`.
+      - Gửi dữ liệu đến :class:`~socket.socket`.
 
     * - ``await`` :meth:`loop.sock_sendto`
-      - Send a datagram via the :class:`~socket.socket` to the given address.
+      - Gửi một datagram qua :class:`~socket.socket` đến địa chỉ được cung cấp.
 
     * - ``await`` :meth:`loop.sock_connect`
-      - Connect the :class:`~socket.socket`.
+      - Kết nối :class:`~socket.socket`.
 
     * - ``await`` :meth:`loop.sock_accept`
-      - Accept a :class:`~socket.socket` connection.
+      - Chấp nhận một kết nối :class:`~socket.socket`.
 
     * - ``await`` :meth:`loop.sock_sendfile`
-      - Send a file over the :class:`~socket.socket`.
+      - Gửi một tệp qua :class:`~socket.socket`.
 
     * - :meth:`loop.add_reader`
-      - Start watching a file descriptor for read availability.
+      - Bắt đầu theo dõi một file descriptor để biết khi có thể đọc.
 
     * - :meth:`loop.remove_reader`
-      - Stop watching a file descriptor for read availability.
+      - Dừng theo dõi một file descriptor để biết khi có thể đọc.
 
     * - :meth:`loop.add_writer`
-      - Start watching a file descriptor for write availability.
+      - Bắt đầu theo dõi một file descriptor để biết khi có thể ghi.
 
     * - :meth:`loop.remove_writer`
-      - Stop watching a file descriptor for write availability.
+      - Dừng theo dõi một file descriptor để biết khi có thể ghi.
 
 
-.. rubric:: Unix Signals
+.. rubric:: Tín hiệu Unix
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`loop.add_signal_handler`
-      - Add a handler for a :mod:`signal`.
+      - Thêm một handler cho :mod:`signal`.
 
     * - :meth:`loop.remove_signal_handler`
-      - Remove a handler for a :mod:`signal`.
+      - Xóa một handler cho :mod:`signal`.
 
 
-.. rubric:: Subprocesses
+.. rubric:: Tiến trình con
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`loop.subprocess_exec`
-      - Spawn a subprocess.
+      - Khởi chạy một tiến trình con.
 
     * - :meth:`loop.subprocess_shell`
-      - Spawn a subprocess from a shell command.
+      - Khởi chạy một tiến trình con từ một lệnh shell.
 
 
-.. rubric:: Error Handling
+.. rubric:: Xử lý lỗi
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`loop.call_exception_handler`
-      - Call the exception handler.
+      - Gọi trình xử lý ngoại lệ.
 
     * - :meth:`loop.set_exception_handler`
-      - Set a new exception handler.
+      - Thiết lập trình xử lý ngoại lệ mới.
 
     * - :meth:`loop.get_exception_handler`
-      - Get the current exception handler.
+      - Lấy trình xử lý ngoại lệ hiện tại.
 
     * - :meth:`loop.default_exception_handler`
-      - The default exception handler implementation.
+      - Triển khai trình xử lý ngoại lệ mặc định.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Using asyncio.new_event_loop() and loop.run_forever()
-  <asyncio_example_lowlevel_helloworld>`.
+* :ref:`Using asyncio.new_event_loop() and loop.run_forever() <asyncio_example_lowlevel_helloworld>`.
 
 * :ref:`Using loop.call_later() <asyncio_example_call_later>`.
 
-* Using ``loop.create_connection()`` to implement
-  :ref:`an echo-client <asyncio_example_tcp_echo_client_protocol>`.
+* Sử dụng ``loop.create_connection()`` để triển khai
+  :ref:`một echo-client <asyncio_example_tcp_echo_client_protocol>`.
 
-* Using ``loop.create_connection()`` to
-  :ref:`connect a socket <asyncio_example_create_connection>`.
+* Sử dụng ``loop.create_connection()`` để
+  :ref:`kết nối một socket <asyncio_example_create_connection>`.
 
-* :ref:`Using add_reader() to watch an FD for read events
-  <asyncio_example_watch_fd>`.
+* :ref:`Sử dụng add_reader() để theo dõi một FD cho các sự kiện đọc <asyncio_example_watch_fd>`.
 
-* :ref:`Using loop.add_signal_handler() <asyncio_example_unix_signals>`.
+* :ref:`Sử dụng loop.add_signal_handler() <asyncio_example_unix_signals>`.
 
-* :ref:`Using loop.subprocess_exec() <asyncio_example_subprocess_proto>`.
+* :ref:`Sử dụng loop.subprocess_exec() <asyncio_example_subprocess_proto>`.
 
 
-Transports
-==========
+Các transport
+=============
 
-All transports implement the following methods:
+Tất cả transport đều triển khai các phương thức sau:
 
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`transport.close() <BaseTransport.close>`
-      - Close the transport.
+      - Đóng transport.
 
     * - :meth:`transport.is_closing() <BaseTransport.is_closing>`
-      - Return ``True`` if the transport is closing or is closed.
+      - Trả về ``True`` nếu transport đang đóng hoặc đã đóng.
 
     * - :meth:`transport.get_extra_info() <BaseTransport.get_extra_info>`
-      - Request for information about the transport.
+      - Yêu cầu thông tin về transport.
 
     * - :meth:`transport.set_protocol() <BaseTransport.set_protocol>`
-      - Set a new protocol.
+      - Thiết lập protocol mới.
 
     * - :meth:`transport.get_protocol() <BaseTransport.get_protocol>`
-      - Return the current protocol.
+      - Trả về protocol hiện tại.
 
 
-Transports that can receive data (TCP and Unix connections,
-pipes, etc).  Returned from methods like
+Các transport có thể nhận dữ liệu (kết nối TCP và Unix, pipe, v.v.). Được trả về từ các phương thức như
 :meth:`loop.create_connection`, :meth:`loop.create_unix_connection`,
-:meth:`loop.connect_read_pipe`, etc:
+:meth:`loop.connect_read_pipe`, v.v.:
 
-.. rubric:: Read Transports
+.. rubric:: Đọc Transports
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`transport.is_reading() <ReadTransport.is_reading>`
-      - Return ``True`` if the transport is receiving.
+      - Trả về ``True`` nếu transport đang nhận dữ liệu.
 
     * - :meth:`transport.pause_reading() <ReadTransport.pause_reading>`
-      - Pause receiving.
+      - Tạm dừng việc nhận dữ liệu.
 
     * - :meth:`transport.resume_reading() <ReadTransport.resume_reading>`
-      - Resume receiving.
+      - Tiếp tục việc nhận dữ liệu.
 
 
-Transports that can Send data (TCP and Unix connections,
-pipes, etc).  Returned from methods like
+Các transport có thể gửi dữ liệu (kết nối TCP và Unix, pipe, v.v.). Được trả về từ các phương thức như
 :meth:`loop.create_connection`, :meth:`loop.create_unix_connection`,
-:meth:`loop.connect_write_pipe`, etc:
+:meth:`loop.connect_write_pipe`, v.v.:
 
-.. rubric:: Write Transports
+.. rubric:: Ghi vào Transports
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`transport.write() <WriteTransport.write>`
-      - Write data to the transport.
+      - Ghi dữ liệu vào transport.
 
     * - :meth:`transport.writelines() <WriteTransport.writelines>`
-      - Write buffers to the transport.
+      - Ghi các buffer vào transport.
 
     * - :meth:`transport.can_write_eof() <WriteTransport.can_write_eof>`
-      - Return :const:`True` if the transport supports sending EOF.
+      - Trả về :const:`True` nếu transport hỗ trợ gửi EOF.
 
     * - :meth:`transport.write_eof() <WriteTransport.write_eof>`
-      - Close and send EOF after flushing buffered data.
+      - Đóng và gửi EOF sau khi flush dữ liệu trong buffer.
 
     * - :meth:`transport.abort() <WriteTransport.abort>`
-      - Close the transport immediately.
+      - Đóng transport ngay lập tức.
 
     * - :meth:`transport.get_write_buffer_size()
         <WriteTransport.get_write_buffer_size>`
-      - Return the current size of the output buffer.
+      - Trả về kích thước hiện tại của bộ đệm đầu ra.
 
     * - :meth:`transport.get_write_buffer_limits()
         <WriteTransport.get_write_buffer_limits>`
-      - Return high and low water marks for write flow control.
+      - Trả về các ngưỡng cao và thấp để kiểm soát luồng ghi.
 
     * - :meth:`transport.set_write_buffer_limits()
         <WriteTransport.set_write_buffer_limits>`
-      - Set new high and low water marks for write flow control.
+      - Đặt các ngưỡng cao và thấp mới để kiểm soát luồng ghi.
 
 
-Transports returned by :meth:`loop.create_datagram_endpoint`:
+Các transport được trả về bởi :meth:`loop.create_datagram_endpoint`:
 
-.. rubric:: Datagram Transports
+.. rubric:: Transport datagram
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`transport.sendto() <DatagramTransport.sendto>`
-      - Send data to the remote peer.
+      - Gửi dữ liệu đến peer từ xa.
 
     * - :meth:`transport.abort() <DatagramTransport.abort>`
-      - Close the transport immediately.
+      - Đóng transport ngay lập tức.
 
 
-Low-level transport abstraction over subprocesses.
-Returned by :meth:`loop.subprocess_exec` and
+Lớp trừu tượng transport cấp thấp trên các subprocess. Được trả về bởi :meth:`loop.subprocess_exec` và
 :meth:`loop.subprocess_shell`:
 
-.. rubric:: Subprocess Transports
+.. rubric:: Các transport của subprocess
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`transport.get_pid() <SubprocessTransport.get_pid>`
-      - Return the subprocess process id.
+      - Trả về process id của subprocess.
 
     * - :meth:`transport.get_pipe_transport()
         <SubprocessTransport.get_pipe_transport>`
-      - Return the transport for the requested communication pipe
-        (*stdin*, *stdout*, or *stderr*).
+      - Trả về transport cho pipe giao tiếp được yêu cầu (*stdin*, *stdout*, hoặc *stderr*).
 
     * - :meth:`transport.get_returncode() <SubprocessTransport.get_returncode>`
-      - Return the subprocess return code.
+      - Trả về mã return của subprocess.
 
     * - :meth:`transport.kill() <SubprocessTransport.kill>`
-      - Kill the subprocess.
+      - Kill subprocess.
 
     * - :meth:`transport.send_signal() <SubprocessTransport.send_signal>`
-      - Send a signal to the subprocess.
+      - Gửi signal đến subprocess.
 
     * - :meth:`transport.terminate() <SubprocessTransport.terminate>`
-      - Stop the subprocess.
+      - Dừng subprocess.
 
     * - :meth:`transport.close() <SubprocessTransport.close>`
-      - Kill the subprocess and close all pipes.
+      - Dừng subprocess và đóng tất cả các pipe.
 
 
 Protocols
 =========
 
-Protocol classes can implement the following **callback methods**:
+Các lớp Protocol có thể triển khai những **phương thức callback** sau:
 
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``callback`` :meth:`connection_made() <BaseProtocol.connection_made>`
-      - Called when a connection is made.
+      - Được gọi khi một kết nối được thiết lập.
 
     * - ``callback`` :meth:`connection_lost() <BaseProtocol.connection_lost>`
-      - Called when the connection is lost or closed.
+      - Được gọi khi kết nối bị mất hoặc bị đóng.
 
     * - ``callback`` :meth:`pause_writing() <BaseProtocol.pause_writing>`
-      - Called when the transport's buffer goes over the high water mark.
+      - Được gọi khi bộ đệm của transport vượt quá ngưỡng high water mark.
 
     * - ``callback`` :meth:`resume_writing() <BaseProtocol.resume_writing>`
-      - Called when the transport's buffer drains below the low water mark.
+      - Được gọi khi bộ đệm của transport giảm xuống dưới ngưỡng thấp.
 
 
-.. rubric:: Streaming Protocols (TCP, Unix Sockets, Pipes)
+.. rubric:: Các Protocol Streaming (TCP, Unix Sockets, Pipes)
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``callback`` :meth:`data_received() <Protocol.data_received>`
-      - Called when some data is received.
+      - Được gọi khi nhận được một phần dữ liệu.
 
     * - ``callback`` :meth:`eof_received() <Protocol.eof_received>`
-      - Called when an EOF is received.
+      - Được gọi khi nhận được EOF.
 
 
-.. rubric:: Buffered Streaming Protocols
+.. rubric:: Các Protocol Streaming có bộ đệm
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``callback`` :meth:`get_buffer() <BufferedProtocol.get_buffer>`
-      - Called to allocate a new receive buffer.
+      - Được gọi để cấp phát một bộ đệm nhận mới.
 
     * - ``callback`` :meth:`buffer_updated() <BufferedProtocol.buffer_updated>`
-      - Called when the buffer was updated with the received data.
+      - Được gọi khi bộ đệm được cập nhật bằng dữ liệu đã nhận.
 
     * - ``callback`` :meth:`eof_received() <BufferedProtocol.eof_received>`
-      - Called when an EOF is received.
+      - Được gọi khi nhận được EOF.
 
 
-.. rubric:: Datagram Protocols
+.. rubric:: Các giao thức Datagram
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``callback`` :meth:`datagram_received()
         <DatagramProtocol.datagram_received>`
-      - Called when a datagram is received.
+      - Được gọi khi nhận được một datagram.
 
     * - ``callback`` :meth:`error_received() <DatagramProtocol.error_received>`
-      - Called when a previous send or receive operation raises an
+      - Được gọi khi một thao tác gửi hoặc nhận trước đó phát sinh một
         :class:`OSError`.
 
 
-.. rubric:: Subprocess Protocols
+.. rubric:: Các giao thức Subprocess
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``callback`` :meth:`~SubprocessProtocol.pipe_data_received`
-      - Called when the child process writes data into its
-        *stdout* or *stderr* pipe.
+      - Được gọi khi tiến trình con ghi dữ liệu vào pipe *stdout* hoặc *stderr* của tiến trình đó.
 
     * - ``callback`` :meth:`~SubprocessProtocol.pipe_connection_lost`
-      - Called when one of the pipes communicating with
-        the child process is closed.
+      - Được gọi khi một trong các pipe giao tiếp với tiến trình con bị đóng.
 
     * - ``callback`` :meth:`process_exited()
         <SubprocessProtocol.process_exited>`
-      - Called when the child process has exited. It can be called before
-        :meth:`~SubprocessProtocol.pipe_data_received` and
-        :meth:`~SubprocessProtocol.pipe_connection_lost` methods.
+      - Được gọi khi tiến trình con đã thoát. Nó có thể được gọi trước
+        :meth:`~SubprocessProtocol.pipe_data_received` và
+        :meth:`~SubprocessProtocol.pipe_connection_lost` các phương thức.
 
 
-Event Loop Policies
-===================
+Các Policy của Event Loop
+=========================
 
-Policies is a low-level mechanism to alter the behavior of
-functions like :func:`asyncio.get_event_loop`.  See also
-the main :ref:`policies section <asyncio-policies>` for more
-details.
+Policies là một cơ chế cấp thấp để thay đổi hành vi của các hàm như :func:`asyncio.get_event_loop`. Xem thêm :ref:`phần policies chính <asyncio-policies>` để biết thêm chi tiết.
 
 
-.. rubric:: Accessing Policies
+.. rubric:: Truy cập Policies
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :meth:`asyncio.get_event_loop_policy`
-      - Return the current process-wide policy.
+      - Trả về policy hiện tại trên toàn bộ tiến trình.
 
     * - :meth:`asyncio.set_event_loop_policy`
-      - Set a new process-wide policy.
+      - Đặt một policy mới áp dụng trên toàn bộ tiến trình.
 
     * - :class:`AbstractEventLoopPolicy`
-      - Base class for policy objects.
+      - Lớp cơ sở cho các đối tượng policy.

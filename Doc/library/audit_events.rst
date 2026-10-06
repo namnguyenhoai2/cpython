@@ -2,29 +2,24 @@
 
 .. index:: single: audit events
 
-Audit events table
+Bảng sự kiện audit
 ==================
 
-This table contains all events raised by :func:`sys.audit` or
-:c:func:`PySys_Audit` calls throughout the CPython runtime and the
-standard library.  These calls were added in 3.8 or later (see :pep:`578`).
+Bảng này chứa tất cả các sự kiện được phát ra bởi :func:`sys.audit` hoặc
+các lệnh gọi :c:func:`PySys_Audit` trong runtime CPython và thư viện chuẩn. Các lệnh gọi này được bổ sung từ phiên bản 3.8 trở lên (xem :pep:`578`).
 
-See :func:`sys.addaudithook` and :c:func:`PySys_AddAuditHook` for
-information on handling these events.
+Xem :func:`sys.addaudithook` và :c:func:`PySys_AddAuditHook` để biết thông tin về cách xử lý các sự kiện này.
 
 .. impl-detail::
 
-   This table is generated from the CPython documentation, and may not
-   represent events raised by other implementations. See your runtime
-   specific documentation for actual events raised.
+   Bảng này được tạo từ tài liệu CPython và có thể không thể hiện các sự kiện do những implementation khác phát ra. Hãy xem tài liệu dành riêng cho runtime của bạn để biết các sự kiện thực sự được phát ra.
 
 .. audit-event-table::
 
-The following events are raised internally and do not correspond to any
-public API of CPython:
+Các sự kiện sau được phát ra bên trong và không tương ứng với bất kỳ public API nào của CPython:
 
 +----------------------------+-------------------------------------------+
-| Audit event                | Arguments                                 |
+| Sự kiện audit              | Đối số                                    |
 +============================+===========================================+
 | _winapi.CreateFile         | ``file_name``, ``desired_access``,        |
 |                            | ``share_mode``, ``creation_disposition``, |
@@ -49,4 +44,4 @@ public API of CPython:
 +----------------------------+-------------------------------------------+
 
 .. versionadded:: 3.14
-   The ``_posixsubprocess.fork_exec`` internal audit event.
+   Sự kiện audit nội bộ ``_posixsubprocess.fork_exec``.

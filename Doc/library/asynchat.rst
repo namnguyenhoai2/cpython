@@ -1,17 +1,16 @@
-:mod:`!asynchat` --- Asynchronous socket command/response handler
-=================================================================
+:mod:`!asynchat` --- Bộ xử lý lệnh/phản hồi socket bất đồng bộ
+==============================================================
 
 .. module:: asynchat
-   :synopsis: Removed in 3.12.
+   :synopsis: Đã bị xóa trong 3.12.
    :deprecated:
 
 .. deprecated-removed:: 3.6 3.12
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.12 <whatsnew312-removed>` after
-being deprecated in Python 3.6.  The removal was decided in :pep:`594`.
+Mô-đun này không còn là một phần của thư viện chuẩn Python. Mô-đun này đã :ref:`bị xóa trong Python 3.12 <whatsnew312-removed>` sau khi bị phản đối trong Python 3.6. Việc xóa mô-đun đã được quyết định trong :pep:`594`.
 
-Applications should use the :mod:`asyncio` module instead.
+Các ứng dụng nên sử dụng mô-đun :mod:`asyncio` thay thế.
 
-The last version of Python that provided the :mod:`!asynchat` module was
-`Python 3.11 <https://docs.python.org/3.11/library/asynchat.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!asynchat` là `Python 3.11 <https://docs.python.org/3.11/library/asynchat.html>`_.
+
+.. _`Python 3.11`: https://docs.python.org/3.11/library/asynchat.html

@@ -1,140 +1,102 @@
-:mod:`!argparse` --- Parser for command-line options, arguments and subcommands
-================================================================================
+:mod:`!argparse` --- Trình phân tích cú pháp cho các tùy chọn, đối số và lệnh con trên dòng lệnh
+================================================================================================
 
 .. module:: argparse
-   :synopsis: Command-line option and argument parsing library.
+   :synopsis: Thư viện phân tích cú pháp tùy chọn và đối số trên dòng lệnh.
 
 .. moduleauthor:: Steven Bethard <steven.bethard@gmail.com>
 .. sectionauthor:: Steven Bethard <steven.bethard@gmail.com>
 
 .. versionadded:: 3.2
 
-**Source code:** :source:`Lib/argparse.py`
+**Mã nguồn:** :source:`Lib/argparse.py`
 
 .. note::
 
-   While :mod:`!argparse` is the default recommended standard library module
-   for implementing basic command line applications, authors with more
-   exacting requirements for exactly how their command line applications
-   behave may find it doesn't provide the necessary level of control.
-   Refer to :ref:`choosing-an-argument-parser` for alternatives to
-   consider when ``argparse`` doesn't support behaviors that the application
-   requires (such as entirely disabling support for interspersed options and
-   positional arguments, or accepting option parameter values that start
-   with ``-`` even when they correspond to another defined option).
+   Mặc dù :mod:`!argparse` là module thư viện chuẩn được khuyến nghị mặc định để triển khai các ứng dụng dòng lệnh cơ bản, những tác giả có yêu cầu khắt khe hơn về chính xác cách hoạt động của ứng dụng dòng lệnh có thể nhận thấy module này không cung cấp mức độ kiểm soát cần thiết. Hãy tham khảo :ref:`choosing-an-argument-parser` để xem xét các giải pháp thay thế khi ``argparse`` không hỗ trợ những hành vi mà ứng dụng yêu cầu (chẳng hạn như vô hiệu hóa hoàn toàn hỗ trợ cho các tùy chọn và đối số vị trí xen kẽ, hoặc chấp nhận các giá trị tham số tùy chọn bắt đầu bằng ``-`` ngay cả khi chúng tương ứng với một tùy chọn khác đã được định nghĩa).
 
 --------------
 
-.. sidebar:: Tutorial
+.. sidebar:: Hướng dẫn
 
-   This page contains the API reference information. For a more gentle
-   introduction to Python command-line parsing, have a look at the
-   :ref:`argparse tutorial <argparse-tutorial>`.
+   Trang này chứa thông tin tham khảo về API. Để làm quen nhẹ nhàng hơn với việc phân tích cú pháp dòng lệnh trong Python, hãy xem
+   :ref:`hướng dẫn argparse <argparse-tutorial>`.
 
-The :mod:`!argparse` module makes it easy to write user-friendly command-line
-interfaces. The program defines what arguments it requires, and :mod:`!argparse`
-will figure out how to parse those out of :data:`sys.argv`.  The :mod:`!argparse`
-module also automatically generates help and usage messages.  The module
-will also issue errors when users give the program invalid arguments.
+Mô-đun :mod:`!argparse` giúp dễ dàng viết các giao diện dòng lệnh thân thiện với người dùng. Chương trình xác định những đối số mà nó yêu cầu, còn :mod:`!argparse` sẽ tự phân tích cú pháp các đối số đó từ :data:`sys.argv`. Mô-đun :mod:`!argparse` cũng tự động tạo các thông báo trợ giúp và cách sử dụng. Mô-đun này cũng sẽ báo lỗi khi người dùng cung cấp cho chương trình các đối số không hợp lệ.
 
-The :mod:`!argparse` module's support for command-line interfaces is built
-around an instance of :class:`argparse.ArgumentParser`.  It is a container for
-argument specifications and has options that apply to the parser as whole::
+Khả năng hỗ trợ giao diện dòng lệnh của mô-đun :mod:`!argparse` được xây dựng xoay quanh một thực thể :class:`argparse.ArgumentParser`. Đây là một vùng chứa các đặc tả đối số và có các tùy chọn áp dụng cho toàn bộ parser::
 
    parser = argparse.ArgumentParser(
                        prog='ProgramName',
                        description='What the program does',
                        epilog='Text at the bottom of help')
 
-The :meth:`ArgumentParser.add_argument` method attaches individual argument
-specifications to the parser.  It supports positional arguments, options that
-accept values, and on/off flags::
+Phương thức :meth:`ArgumentParser.add_argument` gắn từng đặc tả đối số vào parser. Phương thức này hỗ trợ các đối số vị trí, các tùy chọn nhận giá trị và các cờ bật/tắt::
 
-   parser.add_argument('filename')           # positional argument
-   parser.add_argument('-c', '--count')      # option that takes a value
+   parser.add_argument('filename')           # đối số vị trí
+   parser.add_argument('-c', '--count')      # tùy chọn nhận giá trị
    parser.add_argument('-v', '--verbose',
-                       action='store_true')  # on/off flag
+                       action='store_true')  # cờ bật/tắt
 
-The :meth:`ArgumentParser.parse_args` method runs the parser and places
-the extracted data in a :class:`argparse.Namespace` object::
+Phương thức :meth:`ArgumentParser.parse_args` chạy parser và đặt dữ liệu đã trích xuất vào một đối tượng :class:`argparse.Namespace`::
 
    args = parser.parse_args()
    print(args.filename, args.count, args.verbose)
 
 .. note::
-   If you're looking for a guide about how to upgrade :mod:`optparse` code
-   to :mod:`!argparse`, see :ref:`Upgrading Optparse Code <upgrading-optparse-code>`.
+   Nếu bạn đang tìm hướng dẫn về cách nâng cấp mã :mod:`optparse` lên :mod:`!argparse`, hãy xem :ref:`Nâng cấp mã Optparse <upgrading-optparse-code>`.
 
-ArgumentParser objects
-----------------------
+Các đối tượng ArgumentParser
+----------------------------
 
 .. class:: ArgumentParser(prog=None, usage=None, description=None, \
-                          epilog=None, parents=[], \
-                          formatter_class=argparse.HelpFormatter, \
-                          prefix_chars='-', fromfile_prefix_chars=None, \
-                          argument_default=None, conflict_handler='error', \
-                          add_help=True, allow_abbrev=True, exit_on_error=True, \
-                          *, suggest_on_error=False, color=True)
+                          epilog=None, parents=[], \ formatter_class=argparse.HelpFormatter, \ prefix_chars='-', fromfile_prefix_chars=None, \ argument_default=None, conflict_handler='error', \ add_help=True, allow_abbrev=True, exit_on_error=True, \ *, suggest_on_error=False, color=True)
 
-   Create a new :class:`ArgumentParser` object. All parameters should be passed
-   as keyword arguments. Each parameter has its own more detailed description
-   below, but in short they are:
+   Tạo một đối tượng :class:`ArgumentParser` mới. Tất cả tham số phải được truyền dưới dạng đối số từ khóa. Mỗi tham số đều có phần mô tả chi tiết hơn bên dưới, nhưng tóm lại, chúng là:
 
-   * prog_ - The name of the program (default: generated from the ``__main__``
-     module attributes and ``sys.argv[0]``)
+   * prog_ - Tên của chương trình (mặc định: được tạo từ các thuộc tính của module ``__main__`` và ``sys.argv[0]``)
 
-   * usage_ - The string describing the program usage (default: generated from
-     arguments added to parser)
+   * usage_ - Chuỗi mô tả cách sử dụng chương trình (mặc định: được tạo từ các đối số đã thêm vào parser)
 
-   * description_ - Text to display before the argument help
-     (by default, no text)
+   * description_ - Văn bản hiển thị trước phần trợ giúp về đối số (mặc định là không có văn bản)
 
-   * epilog_ - Text to display after the argument help (by default, no text)
+   * epilog_ - Văn bản hiển thị sau phần trợ giúp về đối số (mặc định: không có văn bản)
 
-   * parents_ - A list of :class:`ArgumentParser` objects whose arguments should
-     also be included
+   * parents_ - Danh sách các đối tượng :class:`ArgumentParser` có các đối số cũng sẽ được bao gồm
 
-   * formatter_class_ - A class for customizing the help output
+   * formatter_class_ - Một lớp dùng để tùy chỉnh nội dung trợ giúp
 
-   * prefix_chars_ - The set of characters that prefix optional arguments
-     (default: '-')
+   * prefix_chars_ - Tập hợp các ký tự đứng trước các đối số tùy chọn (mặc định: '-')
 
-   * fromfile_prefix_chars_ - The set of characters that prefix files from
-     which additional arguments should be read (default: ``None``)
+   * fromfile_prefix_chars_ - Tập hợp các ký tự đứng trước các tệp mà từ đó sẽ đọc thêm các đối số (mặc định: ``None``)
 
-   * argument_default_ - The global default value for arguments
-     (default: ``None``)
+   * argument_default_ - Giá trị mặc định chung cho các đối số (mặc định: ``None``)
 
-   * conflict_handler_ - The strategy for resolving conflicting optionals
-     (usually unnecessary)
+   * conflict_handler_ - Chiến lược giải quyết các tùy chọn xung đột (thường không cần thiết)
 
-   * add_help_ - Add a ``-h/--help`` option to the parser (default: ``True``)
+   * add_help_ - Thêm tùy chọn ``-h/--help`` vào parser (mặc định: ``True``)
 
-   * allow_abbrev_ - Allows long options to be abbreviated if the
-     abbreviation is unambiguous (default: ``True``)
+   * allow_abbrev_ - Cho phép viết tắt các tùy chọn dài nếu cách viết tắt đó không gây nhập nhằng (mặc định: ``True``)
 
-   * exit_on_error_ - Determines whether or not :class:`!ArgumentParser` exits with
-     error info when an error occurs. (default: ``True``)
+   * exit_on_error_ - Xác định liệu :class:`!ArgumentParser` có thoát kèm thông tin lỗi khi xảy ra lỗi hay không (mặc định: ``True``)
 
-   * suggest_on_error_ - Enables suggestions for mistyped argument choices
-     and subparser names (default: ``False``)
+   * suggest_on_error_ - Bật gợi ý cho các lựa chọn đối số và tên subparser bị nhập sai (mặc định: ``False``)
 
-   * color_ - Allow color output (default: ``True``)
+   * color_ - Cho phép đầu ra có màu (mặc định: ``True``)
 
    .. versionchanged:: 3.5
-      *allow_abbrev* parameter was added.
+      Đã thêm tham số *allow_abbrev*.
 
    .. versionchanged:: 3.8
-      In previous versions, *allow_abbrev* also disabled grouping of short
-      flags such as ``-vv`` to mean ``-v -v``.
+      Trong các phiên bản trước, *allow_abbrev* cũng vô hiệu hóa việc nhóm các cờ ngắn, chẳng hạn như ``-vv`` để biểu thị ``-v -v``.
 
    .. versionchanged:: 3.9
-      *exit_on_error* parameter was added.
+      Đã thêm tham số *exit_on_error*.
 
    .. versionchanged:: 3.14
-      *suggest_on_error* and *color* parameters were added.
+      Đã thêm các tham số *suggest_on_error* và *color*.
 
-The following sections describe how each of these are used.
+Các phần sau đây mô tả cách sử dụng từng tham số này.
 
 
 .. _prog:
@@ -143,20 +105,13 @@ prog
 ^^^^
 
 
-By default, :class:`ArgumentParser` calculates the name of the program
-to display in help messages depending on the way the Python interpreter was run:
+Theo mặc định, :class:`ArgumentParser` tính tên của chương trình sẽ hiển thị trong các thông báo trợ giúp, tùy thuộc vào cách chạy trình thông dịch Python:
 
-* The :func:`base name <os.path.basename>` of ``sys.argv[0]`` if a file was
-  passed as argument.
-* The Python interpreter name followed by ``sys.argv[0]`` if a directory or
-  a zipfile was passed as argument.
-* The Python interpreter name followed by ``-m`` followed by the
-  module or package name if the :option:`-m` option was used.
+* :func:`base name <os.path.basename>` của ``sys.argv[0]`` nếu một tệp được truyền làm đối số.
+* Tên trình thông dịch Python theo sau là ``sys.argv[0]`` nếu một thư mục hoặc tệp zip được truyền làm đối số.
+* Tên của trình thông dịch Python, theo sau là ``-m``, rồi đến tên module hoặc package nếu đã sử dụng tùy chọn :option:`-m`.
 
-This default is almost always desirable because it will make the help messages
-match the string that was used to invoke the program on the command line.
-However, to change this default behavior, another value can be supplied using
-the ``prog=`` argument to :class:`ArgumentParser`::
+Giá trị mặc định này hầu như luôn phù hợp vì nó sẽ khiến các thông báo trợ giúp khớp với chuỗi được dùng để gọi chương trình trên dòng lệnh. Tuy nhiên, để thay đổi hành vi mặc định này, có thể cung cấp một giá trị khác bằng cách sử dụng đối số ``prog=`` cho :class:`ArgumentParser`::
 
    >>> parser = argparse.ArgumentParser(prog='myprogram')
    >>> parser.print_help()
@@ -165,10 +120,7 @@ the ``prog=`` argument to :class:`ArgumentParser`::
    options:
     -h, --help  show this help message and exit
 
-Note that the program name, whether determined from ``sys.argv[0]``,
-from the ``__main__`` module attributes or from the
-``prog=`` argument, is available to help messages using the ``%(prog)s`` format
-specifier.
+Lưu ý rằng tên chương trình, dù được xác định từ ``sys.argv[0]``, từ các thuộc tính module ``__main__`` hay từ đối số ``prog=``, đều có thể được sử dụng trong các thông báo trợ giúp thông qua định dạng ``%(prog)s``.
 
 ::
 
@@ -182,15 +134,12 @@ specifier.
     --foo FOO   foo of the myprogram program
 
 .. versionchanged:: 3.14
-   The default ``prog`` value now reflects how ``__main__`` was actually executed,
-   rather than always being ``os.path.basename(sys.argv[0])``.
+   Giá trị ``prog`` mặc định hiện phản ánh cách ``__main__`` thực sự được thực thi, thay vì luôn là ``os.path.basename(sys.argv[0])``.
 
-usage
-^^^^^
+cách sử dụng
+^^^^^^^^^^^^
 
-By default, :class:`ArgumentParser` calculates the usage message from the
-arguments it contains. The default message can be overridden with the
-``usage=`` keyword argument::
+Theo mặc định, :class:`ArgumentParser` tính toán thông báo cách sử dụng từ các đối số mà nó chứa. Có thể ghi đè thông báo mặc định bằng đối số từ khóa ``usage=``::
 
    >>> parser = argparse.ArgumentParser(prog='PROG', usage='%(prog)s [options]')
    >>> parser.add_argument('--foo', nargs='?', help='foo help')
@@ -205,14 +154,10 @@ arguments it contains. The default message can be overridden with the
     -h, --help   show this help message and exit
     --foo [FOO]  foo help
 
-The ``%(prog)s`` format specifier is available to fill in the program name in
-your usage messages.
+Định dạng ``%(prog)s`` có thể được sử dụng để điền tên chương trình vào các thông báo cách sử dụng.
 
-When a custom usage message is specified for the main parser, you may also want to
-consider passing  the ``prog`` argument to :meth:`~ArgumentParser.add_subparsers`
-or the ``prog`` and the ``usage`` arguments to
-:meth:`~_SubParsersAction.add_parser`, to ensure consistent command prefixes and
-usage information across subparsers.
+Khi chỉ định thông báo usage tùy chỉnh cho parser chính, bạn cũng có thể cân nhắc truyền đối số ``prog`` cho :meth:`~ArgumentParser.add_subparsers` hoặc các đối số ``prog`` và ``usage`` cho
+:meth:`~_SubParsersAction.add_parser`, để đảm bảo các tiền tố lệnh và thông tin usage nhất quán giữa các subparser.
 
 
 .. _description:
@@ -220,22 +165,15 @@ usage information across subparsers.
 description
 ^^^^^^^^^^^
 
-Most calls to the :class:`ArgumentParser` constructor will use the
-``description=`` keyword argument.  This argument gives a brief description of
-what the program does and how it works.  In help messages, the description is
-displayed between the command-line usage string and the help messages for the
-various arguments.
+Hầu hết các lệnh gọi đến constructor :class:`ArgumentParser` sẽ sử dụng keyword argument ``description=``. Đối số này cung cấp mô tả ngắn gọn về chức năng và cách hoạt động của chương trình. Trong các thông báo trợ giúp, phần mô tả được hiển thị giữa chuỗi usage trên dòng lệnh và thông báo trợ giúp cho các đối số khác nhau.
 
-By default, the description will be line-wrapped so that it fits within the
-given space.  To change this behavior, see the formatter_class_ argument.
+Theo mặc định, phần mô tả sẽ được ngắt dòng để vừa với không gian được cung cấp. Để thay đổi hành vi này, hãy xem đối số formatter_class_.
 
 
 epilog
 ^^^^^^
 
-Some programs like to display additional description of the program after the
-description of the arguments.  Such text can be specified using the ``epilog=``
-argument to :class:`ArgumentParser`::
+Một số chương trình muốn hiển thị thêm phần mô tả về chương trình sau phần mô tả các đối số. Bạn có thể chỉ định văn bản đó bằng đối số ``epilog=`` cho :class:`ArgumentParser`::
 
    >>> parser = argparse.ArgumentParser(
    ...     description='A foo that bars',
@@ -250,20 +188,13 @@ argument to :class:`ArgumentParser`::
 
    And that's how you'd foo a bar
 
-As with the description_ argument, the ``epilog=`` text is by default
-line-wrapped, but this behavior can be adjusted with the formatter_class_
-argument to :class:`ArgumentParser`.
+Cũng như đối số description_, văn bản ``epilog=`` theo mặc định sẽ được ngắt dòng, nhưng bạn có thể điều chỉnh hành vi này bằng đối số formatter_class_ cho :class:`ArgumentParser`.
 
 
-parents
-^^^^^^^
+các parser cha
+^^^^^^^^^^^^^^
 
-Sometimes, several parsers share a common set of arguments. Rather than
-repeating the definitions of these arguments, a single parser with all the
-shared arguments and passed to ``parents=`` argument to :class:`ArgumentParser`
-can be used.  The ``parents=`` argument takes a list of :class:`ArgumentParser`
-objects, collects all the positional and optional actions from them, and adds
-these actions to the :class:`ArgumentParser` object being constructed::
+Đôi khi, một số parser dùng chung một tập hợp đối số. Thay vì lặp lại định nghĩa của các đối số này, bạn có thể sử dụng một parser duy nhất chứa tất cả các đối số dùng chung và truyền parser đó vào đối số ``parents=`` của :class:`ArgumentParser`. Đối số ``parents=`` nhận một danh sách các đối tượng :class:`ArgumentParser`, thu thập tất cả action positional và optional từ các đối tượng đó, rồi thêm các action này vào đối tượng :class:`ArgumentParser` đang được xây dựng::
 
    >>> parent_parser = argparse.ArgumentParser(add_help=False)
    >>> parent_parser.add_argument('--parent', type=int)
@@ -278,14 +209,11 @@ these actions to the :class:`ArgumentParser` object being constructed::
    >>> bar_parser.parse_args(['--bar', 'YYY'])
    Namespace(bar='YYY', parent=None)
 
-Note that most parent parsers will specify ``add_help=False``.  Otherwise, the
-:class:`ArgumentParser` will see two ``-h/--help`` options (one in the parent
-and one in the child) and raise an error.
+Lưu ý rằng hầu hết các parser cha sẽ chỉ định ``add_help=False``. Nếu không thì
+:class:`ArgumentParser` sẽ thấy hai tùy chọn ``-h/--help`` (một ở parser cha và một ở parser con) rồi phát sinh lỗi.
 
 .. note::
-   You must fully initialize the parsers before passing them via ``parents=``.
-   If you change the parent parsers after the child parser, those changes will
-   not be reflected in the child.
+   Bạn phải khởi tạo đầy đủ các parser trước khi truyền chúng qua ``parents=``. Nếu bạn thay đổi các parser cha sau khi tạo parser con, những thay đổi đó sẽ không được phản ánh trong parser con.
 
 
 .. _formatter_class:
@@ -293,19 +221,12 @@ and one in the child) and raise an error.
 formatter_class
 ^^^^^^^^^^^^^^^
 
-:class:`ArgumentParser` objects allow the help formatting to be customized by
-specifying an alternate formatting class.  Currently, there are four such
-classes:
+Các đối tượng :class:`ArgumentParser` cho phép tùy chỉnh định dạng trợ giúp bằng cách chỉ định một lớp định dạng thay thế. Hiện tại có bốn lớp như vậy:
 
 .. class:: RawDescriptionHelpFormatter
-           RawTextHelpFormatter
-           ArgumentDefaultsHelpFormatter
-           MetavarTypeHelpFormatter
+           RawTextHelpFormatter ArgumentDefaultsHelpFormatter MetavarTypeHelpFormatter
 
-:class:`RawDescriptionHelpFormatter` and :class:`RawTextHelpFormatter` give
-more control over how textual descriptions are displayed.
-By default, :class:`ArgumentParser` objects line-wrap the description_ and
-epilog_ texts in command-line help messages::
+:class:`RawDescriptionHelpFormatter` và :class:`RawTextHelpFormatter` cho phép kiểm soát tốt hơn cách hiển thị các mô tả dạng văn bản. Theo mặc định, các đối tượng :class:`ArgumentParser` tự động xuống dòng các văn bản description_ và epilog_ trong thông báo trợ giúp dòng lệnh::
 
    >>> parser = argparse.ArgumentParser(
    ...     prog='PROG',
@@ -327,9 +248,7 @@ epilog_ texts in command-line help messages::
    likewise for this epilog whose whitespace will be cleaned up and whose words
    will be wrapped across a couple lines
 
-Passing :class:`RawDescriptionHelpFormatter` as ``formatter_class=``
-indicates that description_ and epilog_ are already correctly formatted and
-should not be line-wrapped::
+Truyền :class:`RawDescriptionHelpFormatter` dưới dạng ``formatter_class=`` cho biết rằng description_ và epilog_ đã được định dạng chính xác và không nên được tự động xuống dòng::
 
    >>> parser = argparse.ArgumentParser(
    ...     prog='PROG',
@@ -353,13 +272,9 @@ should not be line-wrapped::
    options:
     -h, --help  show this help message and exit
 
-:class:`RawTextHelpFormatter` maintains whitespace for all sorts of help text,
-including argument descriptions. However, multiple newlines are replaced with
-one. If you wish to preserve multiple blank lines, add spaces between the
-newlines.
+:class:`RawTextHelpFormatter` giữ nguyên khoảng trắng cho mọi loại văn bản trợ giúp, bao gồm cả mô tả đối số. Tuy nhiên, nhiều dòng mới sẽ được thay thế bằng một dòng mới. Nếu muốn giữ lại nhiều dòng trống, hãy thêm dấu cách giữa các dòng mới.
 
-:class:`ArgumentDefaultsHelpFormatter` automatically adds information about
-default values to each of the argument help messages::
+:class:`ArgumentDefaultsHelpFormatter` tự động thêm thông tin về các giá trị mặc định vào từng thông báo trợ giúp đối số::
 
    >>> parser = argparse.ArgumentParser(
    ...     prog='PROG',
@@ -376,9 +291,7 @@ default values to each of the argument help messages::
     -h, --help  show this help message and exit
     --foo FOO   FOO! (default: 42)
 
-:class:`MetavarTypeHelpFormatter` uses the name of the type_ argument for each
-argument as the display name for its values (rather than using the dest_
-as the regular formatter does)::
+:class:`MetavarTypeHelpFormatter` sử dụng tên của đối số type_ cho mỗi đối số làm tên hiển thị cho các giá trị của đối số đó (thay vì sử dụng dest_ như formatter thông thường)::
 
    >>> parser = argparse.ArgumentParser(
    ...     prog='PROG',
@@ -399,11 +312,7 @@ as the regular formatter does)::
 prefix_chars
 ^^^^^^^^^^^^
 
-Most command-line options will use ``-`` as the prefix, e.g. ``-f/--foo``.
-Parsers that need to support different or additional prefix
-characters, e.g. for options
-like ``+f`` or ``/foo``, may specify them using the ``prefix_chars=`` argument
-to the :class:`ArgumentParser` constructor::
+Hầu hết các tùy chọn dòng lệnh sẽ sử dụng ``-`` làm tiền tố, ví dụ ``-f/--foo``. Các parser cần hỗ trợ những ký tự tiền tố khác hoặc bổ sung, chẳng hạn cho các tùy chọn như ``+f`` hoặc ``/foo``, có thể chỉ định chúng bằng đối số ``prefix_chars=`` cho constructor :class:`ArgumentParser`::
 
    >>> parser = argparse.ArgumentParser(prog='PROG', prefix_chars='-+')
    >>> parser.add_argument('+f')
@@ -411,20 +320,14 @@ to the :class:`ArgumentParser` constructor::
    >>> parser.parse_args('+f X ++bar Y'.split())
    Namespace(bar='Y', f='X')
 
-The ``prefix_chars=`` argument defaults to ``'-'``. Supplying a set of
-characters that does not include ``-`` will cause ``-f/--foo`` options to be
-disallowed.
+Đối số ``prefix_chars=`` mặc định là ``'-'``. Việc cung cấp một tập ký tự không bao gồm ``-`` sẽ khiến các tùy chọn ``-f/--foo`` không được phép sử dụng.
 
 
 fromfile_prefix_chars
 ^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes, when dealing with a particularly long argument list, it
-may make sense to keep the list of arguments in a file rather than typing it out
-at the command line.  If the ``fromfile_prefix_chars=`` argument is given to the
-:class:`ArgumentParser` constructor, then arguments that start with any of the
-specified characters will be treated as files, and will be replaced by the
-arguments they contain.  For example::
+Đôi khi, khi làm việc với một danh sách đối số đặc biệt dài, việc lưu danh sách đối số trong một tệp thay vì nhập trực tiếp tại dòng lệnh có thể hợp lý. Nếu đối số ``fromfile_prefix_chars=`` được truyền cho constructor
+:class:`ArgumentParser`, thì các đối số bắt đầu bằng bất kỳ ký tự nào được chỉ định sẽ được coi là các tệp và được thay thế bằng những đối số mà chúng chứa. Ví dụ::
 
    >>> with open('args.txt', 'w', encoding=sys.getfilesystemencoding()) as fp:
    ...     fp.write('-f\nbar')
@@ -434,41 +337,28 @@ arguments they contain.  For example::
    >>> parser.parse_args(['-f', 'foo', '@args.txt'])
    Namespace(f='bar')
 
-Arguments read from a file must be one per line by default (but see also
-:meth:`~ArgumentParser.convert_arg_line_to_args`) and are treated as if they
-were in the same place as the original file referencing argument on the command
-line.  So in the example above, the expression ``['-f', 'foo', '@args.txt']``
-is considered equivalent to the expression ``['-f', 'foo', '-f', 'bar']``.
+Theo mặc định, các đối số được đọc từ một tệp phải nằm trên từng dòng riêng biệt (nhưng cũng xem
+:meth:`~ArgumentParser.convert_arg_line_to_args`) và được xử lý như thể chúng nằm cùng vị trí với đối số tham chiếu đến tệp ban đầu trên dòng lệnh. Vì vậy, trong ví dụ trên, biểu thức ``['-f', 'foo', '@args.txt']`` được xem là tương đương với biểu thức ``['-f', 'foo', '-f', 'bar']``.
 
 .. note::
 
-   Each line is treated as a single argument, so an empty line is read as an
-   empty string (``''``).
+   Mỗi dòng được xử lý như một đối số duy nhất, vì vậy một dòng trống được đọc dưới dạng chuỗi rỗng (``''``).
 
-:class:`ArgumentParser` uses :term:`filesystem encoding and error handler`
-to read the file containing arguments.
+:class:`ArgumentParser` sử dụng :term:`filesystem encoding and error handler` để đọc tệp chứa các đối số.
 
-The ``fromfile_prefix_chars=`` argument defaults to ``None``, meaning that
-arguments will never be treated as file references.
+Đối số ``fromfile_prefix_chars=`` mặc định là ``None``, nghĩa là các đối số sẽ không bao giờ được xử lý như tham chiếu đến tệp.
 
 .. versionchanged:: 3.12
    :class:`ArgumentParser` changed encoding and errors to read arguments files
-   from default (e.g. :func:`locale.getpreferredencoding(False) <locale.getpreferredencoding>`
-   and ``"strict"``) to the :term:`filesystem encoding and error handler`.
-   Arguments file should be encoded in UTF-8 instead of ANSI Codepage on Windows.
+   từ giá trị mặc định (ví dụ: :func:`locale.getpreferredencoding(False) <locale.getpreferredencoding>` và ``"strict"``) đến :term:`filesystem encoding and error handler`. Tệp đối số phải được mã hóa bằng UTF-8 thay vì ANSI Codepage trên Windows.
 
 
 argument_default
 ^^^^^^^^^^^^^^^^
 
-Generally, argument defaults are specified either by passing a default to
-:meth:`~ArgumentParser.add_argument` or by calling the
-:meth:`~ArgumentParser.set_defaults` methods with a specific set of name-value
-pairs.  Sometimes however, it may be useful to specify a single parser-wide
-default for arguments.  This can be accomplished by passing the
-``argument_default=`` keyword argument to :class:`ArgumentParser`.  For example,
-to globally suppress attribute creation on :meth:`~ArgumentParser.parse_args`
-calls, we supply ``argument_default=SUPPRESS``::
+Thông thường, giá trị mặc định của đối số được chỉ định bằng cách truyền một giá trị mặc định cho
+:meth:`~ArgumentParser.add_argument` hoặc bằng cách gọi
+các phương thức :meth:`~ArgumentParser.set_defaults` với một tập hợp cặp tên-giá trị cụ thể. Tuy nhiên, đôi khi việc chỉ định một giá trị mặc định chung cho toàn bộ parser đối với các đối số có thể hữu ích. Có thể thực hiện điều này bằng cách truyền đối số từ khóa ``argument_default=`` cho :class:`ArgumentParser`. Ví dụ: để ngăn việc tạo thuộc tính trên toàn cục trong các lệnh gọi :meth:`~ArgumentParser.parse_args`, chúng ta cung cấp ``argument_default=SUPPRESS``::
 
    >>> parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
    >>> parser.add_argument('--foo')
@@ -483,11 +373,10 @@ calls, we supply ``argument_default=SUPPRESS``::
 allow_abbrev
 ^^^^^^^^^^^^
 
-Normally, when you pass an argument list to the
-:meth:`~ArgumentParser.parse_args` method of an :class:`ArgumentParser`,
-it :ref:`recognizes abbreviations <prefix-matching>` of long options.
+Thông thường, khi bạn truyền một danh sách đối số cho phương thức
+phương thức :meth:`~ArgumentParser.parse_args` của :class:`ArgumentParser` sẽ :ref:`nhận dạng các dạng viết tắt <prefix-matching>` của các tùy chọn dài.
 
-This feature can be disabled by setting ``allow_abbrev`` to ``False``::
+Bạn có thể vô hiệu hóa tính năng này bằng cách đặt ``allow_abbrev`` thành ``False``::
 
    >>> parser = argparse.ArgumentParser(prog='PROG', allow_abbrev=False)
    >>> parser.add_argument('--foobar', action='store_true')
@@ -502,10 +391,7 @@ This feature can be disabled by setting ``allow_abbrev`` to ``False``::
 conflict_handler
 ^^^^^^^^^^^^^^^^
 
-:class:`ArgumentParser` objects do not allow two actions with the same option
-string.  By default, :class:`ArgumentParser` objects raise an exception if an
-attempt is made to create an argument with an option string that is already in
-use::
+Các đối tượng :class:`ArgumentParser` không cho phép hai action có cùng option string. Theo mặc định, các đối tượng :class:`ArgumentParser` sẽ phát sinh ngoại lệ nếu cố tạo một argument với option string đã được sử dụng::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-f', '--foo', help='old foo help')
@@ -514,9 +400,7 @@ use::
     ..
    ArgumentError: argument --foo: conflicting option string(s): --foo
 
-Sometimes (e.g. when using parents_) it may be useful to simply override any
-older arguments with the same option string.  To get this behavior, the value
-``'resolve'`` can be supplied to the ``conflict_handler=`` argument of
+Đôi khi (ví dụ: khi sử dụng parents_), việc chỉ cần ghi đè mọi argument cũ có cùng option string có thể hữu ích. Để có hành vi này, có thể cung cấp giá trị ``'resolve'`` cho argument ``conflict_handler=`` của
 :class:`ArgumentParser`::
 
    >>> parser = argparse.ArgumentParser(prog='PROG', conflict_handler='resolve')
@@ -530,21 +414,15 @@ older arguments with the same option string.  To get this behavior, the value
     -f FOO      old foo help
     --foo FOO   new foo help
 
-Note that :class:`ArgumentParser` objects only remove an action if all of its
-option strings are overridden.  So, in the example above, the old ``-f/--foo``
-action is retained as the ``-f`` action, because only the ``--foo`` option
-string was overridden.
+Lưu ý rằng các đối tượng :class:`ArgumentParser` chỉ xóa một action nếu tất cả option string của action đó đều bị ghi đè. Vì vậy, trong ví dụ trên, action ``-f/--foo`` cũ được giữ lại dưới dạng action ``-f``, vì chỉ option string ``--foo`` bị ghi đè.
 
 
 add_help
 ^^^^^^^^
 
-By default, :class:`ArgumentParser` objects add an option which simply displays
-the parser's help message. If ``-h`` or ``--help`` is supplied at the command
-line, the :class:`!ArgumentParser` help will be printed.
+Theo mặc định, các đối tượng :class:`ArgumentParser` thêm một tùy chọn chỉ hiển thị thông báo trợ giúp của parser. Nếu ``-h`` hoặc ``--help`` được cung cấp trên command line, thông báo trợ giúp :class:`!ArgumentParser` sẽ được in ra.
 
-Occasionally, it may be useful to disable the addition of this help option.
-This can be achieved by passing ``False`` as the ``add_help=`` argument to
+Đôi khi, việc tắt tùy chọn trợ giúp này có thể hữu ích. Có thể thực hiện điều này bằng cách truyền ``False`` làm argument ``add_help=`` cho
 :class:`ArgumentParser`::
 
    >>> parser = argparse.ArgumentParser(prog='PROG', add_help=False)
@@ -555,11 +433,7 @@ This can be achieved by passing ``False`` as the ``add_help=`` argument to
    options:
     --foo FOO  foo help
 
-The help option is typically ``-h/--help``. The exception to this is
-if the ``prefix_chars=`` is specified and does not include ``-``, in
-which case ``-h`` and ``--help`` are not valid options.  In
-this case, the first character in ``prefix_chars`` is used to prefix
-the help options::
+Tùy chọn trợ giúp thường là ``-h/--help``. Ngoại lệ là khi ``prefix_chars=`` được chỉ định và không bao gồm ``-``, trong trường hợp đó ``-h`` và ``--help`` không phải là các tùy chọn hợp lệ. Trong trường hợp này, ký tự đầu tiên trong ``prefix_chars`` được dùng làm tiền tố cho các tùy chọn trợ giúp::
 
    >>> parser = argparse.ArgumentParser(prog='PROG', prefix_chars='+/')
    >>> parser.print_help()
@@ -572,12 +446,9 @@ the help options::
 exit_on_error
 ^^^^^^^^^^^^^
 
-Normally, when you pass an invalid argument list to the :meth:`~ArgumentParser.parse_args`
-method of an :class:`ArgumentParser`, it will print a *message* to :data:`sys.stderr` and exit with a status
-code of 2.
+Thông thường, khi bạn truyền một danh sách đối số không hợp lệ cho phương thức :meth:`~ArgumentParser.parse_args` của một :class:`ArgumentParser`, phương thức này sẽ in *thông báo* vào :data:`sys.stderr` và thoát với mã trạng thái 2.
 
-If the user would like to catch errors manually, the feature can be enabled by setting
-``exit_on_error`` to ``False``::
+Nếu người dùng muốn tự bắt lỗi, có thể bật tính năng này bằng cách đặt ``exit_on_error`` thành ``False``::
 
    >>> parser = argparse.ArgumentParser(exit_on_error=False)
    >>> parser.add_argument('--integers', type=int)
@@ -594,14 +465,10 @@ If the user would like to catch errors manually, the feature can be enabled by s
 suggest_on_error
 ^^^^^^^^^^^^^^^^
 
-By default, when a user passes an invalid argument choice or subparser name,
-:class:`ArgumentParser` will exit with error info and list the permissible
-argument choices (if specified) or subparser names as part of the error message.
+Theo mặc định, khi người dùng truyền một lựa chọn đối số hoặc tên subparser không hợp lệ,
+:class:`ArgumentParser` sẽ thoát với thông tin lỗi và liệt kê các lựa chọn đối số được phép (nếu được chỉ định) hoặc tên subparser trong thông báo lỗi.
 
-If the user would like to enable suggestions for mistyped argument choices and
-subparser names, the feature can be enabled by setting ``suggest_on_error`` to
-``True``. Note that this only applies for arguments when the choices specified
-are strings::
+Nếu người dùng muốn bật gợi ý cho các lựa chọn đối số và tên subparser bị nhập sai, có thể bật tính năng này bằng cách đặt ``suggest_on_error`` thành ``True``. Lưu ý rằng tính năng này chỉ áp dụng cho các đối số khi các choices được chỉ định là chuỗi::
 
    >>> parser = argparse.ArgumentParser(suggest_on_error=True)
    >>> parser.add_argument('--action', choices=['debug', 'dryrun'])
@@ -609,10 +476,7 @@ are strings::
    usage: tester.py [-h] [--action {debug,dryrun}]
    tester.py: error: argument --action: invalid choice: 'debugg', maybe you meant 'debug'? (choose from debug, dryrun)
 
-If you're writing code that needs to be compatible with older Python versions
-and want to opportunistically use ``suggest_on_error`` when it's available, you
-can set it as an attribute after initializing the parser instead of using the
-keyword argument::
+Nếu bạn đang viết mã cần tương thích với các phiên bản Python cũ hơn và muốn tận dụng ``suggest_on_error`` khi có sẵn, bạn có thể đặt nó làm thuộc tính sau khi khởi tạo parser thay vì sử dụng đối số từ khóa::
 
    >>> parser = argparse.ArgumentParser(description='Process some integers.')
    >>> parser.suggest_on_error = True
@@ -623,11 +487,7 @@ keyword argument::
 color
 ^^^^^
 
-By default, the help message is printed in color using `ANSI escape sequences
-<https://en.wikipedia.org/wiki/ANSI_escape_code>`__.
-If you want plain text help messages, you can disable this :ref:`in your local
-environment <using-on-controlling-color>`, or in the argument parser itself
-by setting ``color`` to ``False``::
+Theo mặc định, thông báo trợ giúp được in bằng màu thông qua `ANSI escape sequences <https://en.wikipedia.org/wiki/ANSI_escape_code>`__. Nếu muốn thông báo trợ giúp dạng văn bản thuần túy, bạn có thể tắt :ref:`in your local environment <using-on-controlling-color>`, hoặc tắt trong chính argument parser bằng cách đặt ``color`` thành ``False``::
 
    >>> parser = argparse.ArgumentParser(description='Process some integers.',
    ...                                  color=False)
@@ -636,87 +496,70 @@ by setting ``color`` to ``False``::
    ...                     help='an integer for the accumulator')
    >>> parser.parse_args(['--help'])
 
-Note that when ``color=True``, colored output depends on both environment
-variables and terminal capabilities.  However, if ``color=False``, colored
-output is always disabled, even if environment variables like ``FORCE_COLOR``
-are set.
+Lưu ý rằng khi ``color=True``, đầu ra có màu phụ thuộc vào cả các biến môi trường và khả năng của terminal. Tuy nhiên, nếu ``color=False``, đầu ra có màu luôn bị tắt, ngay cả khi các biến môi trường như ``FORCE_COLOR`` được đặt.
 
 .. note::
 
-   Error messages will include color codes when redirecting stderr to a
-   file. To avoid this, set the |NO_COLOR|_ or :envvar:`PYTHON_COLORS`
-   environment variable (for example,
-   ``NO_COLOR=1 python script.py 2> errors.txt``).
+   Thông báo lỗi sẽ bao gồm các mã màu khi chuyển hướng stderr vào một tệp. Để tránh điều này, hãy đặt biến môi trường |NO_COLOR|_ hoặc :envvar:`PYTHON_COLORS` (ví dụ: ``NO_COLOR=1 python script.py 2> errors.txt``).
 
 .. versionadded:: 3.14
 
 
-The add_argument() method
--------------------------
+Phương thức add_argument()
+--------------------------
 
 .. method:: ArgumentParser.add_argument(name or flags..., *, [action], [nargs], \
-                           [const], [default], [type], [choices], [required], \
-                           [help], [metavar], [dest], [deprecated])
+                           [const], [default], [type], [choices], [required], \ [help], [metavar], [dest], [deprecated])
 
-   Define how a single command-line argument should be parsed.  Each parameter
-   has its own more detailed description below, but in short they are:
+   Xác định cách phân tích cú pháp cho một đối số dòng lệnh đơn. Mỗi tham số đều có phần mô tả chi tiết hơn bên dưới, nhưng tóm lại là:
 
-   * `name or flags`_ - Either a name or a list of option strings, e.g. ``'foo'``
-     or ``'-f', '--foo'``.
+   * `name or flags <name or flags_>`_ - Một tên hoặc danh sách các chuỗi tùy chọn, chẳng hạn như ``'foo'`` hoặc ``'-f', '--foo'``.
 
-   * action_ - The basic type of action to be taken when this argument is
-     encountered at the command line.
+   * action_ - Loại hành động cơ bản sẽ được thực hiện khi gặp đối số này trên dòng lệnh.
 
-   * nargs_ - The number of command-line arguments that should be consumed.
+   * nargs_ - Số lượng đối số dòng lệnh sẽ được sử dụng.
 
-   * const_ - A constant value required by some action_ and nargs_ selections.
+   * const_ - Một giá trị hằng số bắt buộc đối với một số lựa chọn action_ và nargs_.
 
-   * default_ - The value produced if the argument is absent from the
-     command line and if it is absent from the namespace object.
+   * default_ - Giá trị được tạo ra nếu đối số không có trên dòng lệnh và cũng không có trong đối tượng namespace.
 
-   * type_ - The type to which the command-line argument should be converted.
+   * type_ - Kiểu dữ liệu mà đối số dòng lệnh sẽ được chuyển đổi sang.
 
-   * choices_ - A sequence of the allowable values for the argument.
+   * choices_ - Một chuỗi các giá trị được phép cho đối số.
 
-   * required_ - Whether or not the command-line option may be omitted
-     (optionals only).
+   * required_ - Tùy chọn dòng lệnh có thể được bỏ qua hay không (chỉ áp dụng cho các tùy chọn).
 
-   * help_ - A brief description of what the argument does.
+   * help_ - Mô tả ngắn gọn về chức năng của đối số.
 
-   * metavar_ - A name for the argument in usage messages.
+   * metavar_ - Tên của đối số trong các thông báo usage.
 
-   * dest_ - The name of the attribute to be added to the object returned by
+   * dest_ - Tên của thuộc tính sẽ được thêm vào đối tượng được trả về bởi
      :meth:`parse_args`.
 
-   * deprecated_ - Whether or not use of the argument is deprecated.
+   * deprecated_ - Việc sử dụng đối số có bị deprecated hay không.
 
-   The method returns an :class:`Action` object representing the argument.
+   Phương thức này trả về một đối tượng :class:`Action` đại diện cho đối số.
 
-The following sections describe how each of these are used.
+Các phần sau đây mô tả cách sử dụng từng thành phần này.
 
 
 .. _`name or flags`:
 
-name or flags
-^^^^^^^^^^^^^
+name hoặc flags
+^^^^^^^^^^^^^^^
 
-The :meth:`~ArgumentParser.add_argument` method must know whether an optional
-argument, like ``-f`` or ``--foo``, or a positional argument, like a list of
-filenames, is expected.  The first arguments passed to
-:meth:`~ArgumentParser.add_argument` must therefore be either a series of
-flags, or a simple argument name.
+Phương thức :meth:`~ArgumentParser.add_argument` phải biết liệu cần một đối số tùy chọn, chẳng hạn như ``-f`` hoặc ``--foo``, hay một đối số vị trí, chẳng hạn như danh sách tên tệp. Các đối số đầu tiên được truyền vào
+:meth:`~ArgumentParser.add_argument` vì vậy phải là một chuỗi flags hoặc một tên đối số đơn giản.
 
-For example, an optional argument could be created like::
+Ví dụ: có thể tạo một đối số tùy chọn như sau::
 
    >>> parser.add_argument('-f', '--foo')
 
-while a positional argument could be created like::
+trong khi có thể tạo một đối số vị trí như sau::
 
    >>> parser.add_argument('bar')
 
-When :meth:`~ArgumentParser.parse_args` is called, optional arguments will be
-identified by the ``-`` prefix, and the remaining arguments will be assumed to
-be positional::
+Khi gọi :meth:`~ArgumentParser.parse_args`, các đối số tùy chọn sẽ được nhận diện bằng tiền tố ``-``, còn các đối số còn lại sẽ được mặc định là đối số vị trí::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-f', '--foo')
@@ -729,13 +572,7 @@ be positional::
    usage: PROG [-h] [-f FOO] bar
    PROG: error: the following arguments are required: bar
 
-By default, :mod:`!argparse` automatically handles the internal naming and
-display names of arguments, simplifying the process without requiring
-additional configuration.
-As such, you do not need to specify the dest_ and metavar_ parameters.
-For optional arguments, the dest_ parameter defaults to the argument name, with
-underscores ``_`` replacing hyphens ``-``. The metavar_ parameter defaults to
-the upper-cased name. For example::
+Theo mặc định, :mod:`!argparse` tự động xử lý tên nội bộ và tên hiển thị của các argument, đơn giản hóa quy trình mà không cần cấu hình bổ sung. Do đó, bạn không cần chỉ định các tham số dest_ và metavar_. Đối với các argument tùy chọn, tham số dest_ mặc định là tên của argument, trong đó dấu gạch dưới ``_`` thay thế dấu gạch ngang ``-``. Tham số metavar_ mặc định là tên được viết hoa. Ví dụ::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('--foo-bar')
@@ -754,29 +591,19 @@ the upper-cased name. For example::
 action
 ^^^^^^
 
-:class:`ArgumentParser` objects associate command-line arguments with actions.  These
-actions can do just about anything with the command-line arguments associated with
-them, though most actions simply add an attribute to the object returned by
-:meth:`~ArgumentParser.parse_args`.  The ``action`` keyword argument specifies
-how the command-line arguments should be handled. The supplied actions are:
+Các đối tượng :class:`ArgumentParser` liên kết các tham số dòng lệnh với các action. Những action này có thể thực hiện gần như mọi thao tác với các tham số dòng lệnh được liên kết với chúng, mặc dù hầu hết action chỉ thêm một thuộc tính vào đối tượng được :class:`ArgumentParser` trả về
+:meth:`~ArgumentParser.parse_args`. Từ khóa ``action`` chỉ định cách xử lý các tham số dòng lệnh. Các action được cung cấp gồm:
 
-* ``'store'`` - This just stores the argument's value.  This is the default
-  action.
+* ``'store'`` - Chỉ lưu giá trị của argument. Đây là action mặc định.
 
-* ``'store_const'`` - This stores the value specified by the const_ keyword
-  argument; note that the const_ keyword argument defaults to ``None``.  The
-  ``'store_const'`` action is most commonly used with optional arguments that
-  specify some sort of flag.  For example::
+* ``'store_const'`` - Lưu giá trị được chỉ định bởi đối số từ khóa const_; lưu ý rằng đối số từ khóa const_ mặc định là ``None``. action ``'store_const'`` thường được sử dụng nhất với các argument tùy chọn chỉ định một loại flag nào đó. Ví dụ::
 
     >>> parser = argparse.ArgumentParser()
     >>> parser.add_argument('--foo', action='store_const', const=42)
     >>> parser.parse_args(['--foo'])
     Namespace(foo=42)
 
-* ``'store_true'`` and ``'store_false'`` - These are special cases of
-  ``'store_const'`` that respectively store the values ``True`` and ``False``
-  with default values of ``False`` and
-  ``True``::
+* ``'store_true'`` và ``'store_false'`` - Đây là các trường hợp đặc biệt của ``'store_const'``, lần lượt lưu các giá trị ``True`` và ``False`` với các giá trị mặc định là ``False`` và ``True``::
 
     >>> parser = argparse.ArgumentParser()
     >>> parser.add_argument('--foo', action='store_true')
@@ -785,22 +612,14 @@ how the command-line arguments should be handled. The supplied actions are:
     >>> parser.parse_args('--foo --bar'.split())
     Namespace(foo=True, bar=False, baz=True)
 
-* ``'append'`` - This appends each argument value to a list.
-  It is useful for allowing an option to be specified multiple times.
-  If the default value is a non-empty list, the parsed value will start
-  with the default list's elements and any values from the command line
-  will be appended after those default values. Example usage::
+* ``'append'`` - Thao tác này thêm giá trị của từng đối số vào một danh sách. Thao tác này hữu ích khi cho phép chỉ định một tùy chọn nhiều lần. Nếu giá trị mặc định là một danh sách không rỗng, giá trị được phân tích sẽ bắt đầu bằng các phần tử của danh sách mặc định, rồi các giá trị từ dòng lệnh sẽ được thêm vào sau những giá trị mặc định đó. Ví dụ sử dụng::
 
     >>> parser = argparse.ArgumentParser()
     >>> parser.add_argument('--foo', action='append', default=['0'])
     >>> parser.parse_args('--foo 1 --foo 2'.split())
     Namespace(foo=['0', '1', '2'])
 
-* ``'append_const'`` - This appends the value specified by
-  the const_ keyword argument to a list; note that the const_ keyword
-  argument defaults to ``None``. The ``'append_const'`` action is typically
-  useful when multiple arguments need to store constants to the same list. For
-  example::
+* ``'append_const'`` - Thao tác này thêm giá trị được chỉ định bởi đối số từ khóa const_ vào một danh sách; lưu ý rằng đối số từ khóa const_ mặc định là ``None``. Thao tác ``'append_const'`` thường hữu ích khi nhiều đối số cần lưu các hằng số vào cùng một danh sách. Ví dụ::
 
     >>> parser = argparse.ArgumentParser()
     >>> parser.add_argument('--str', dest='types', action='append_const', const=str)
@@ -808,13 +627,7 @@ how the command-line arguments should be handled. The supplied actions are:
     >>> parser.parse_args('--str --int'.split())
     Namespace(types=[<class 'str'>, <class 'int'>])
 
-* ``'extend'`` - This appends each item from a multi-value
-  argument to a list.
-  The ``'extend'`` action is typically used with the nargs_ keyword argument
-  value ``'+'`` or ``'*'``.
-  Note that when nargs_ is ``None`` (the default) or ``'?'``, each
-  character of the argument string will be appended to the list.
-  Example usage::
+* ``'extend'`` - Thao tác này thêm từng mục từ một đối số nhiều giá trị vào một danh sách. Thao tác ``'extend'`` thường được dùng với giá trị đối số từ khóa nargs_ là ``'+'`` hoặc ``'*'``. Lưu ý rằng khi nargs_ là ``None`` (mặc định) hoặc ``'?'``, từng ký tự của chuỗi đối số sẽ được thêm vào danh sách. Ví dụ sử dụng::
 
     >>> parser = argparse.ArgumentParser()
     >>> parser.add_argument("--foo", action="extend", nargs="+", type=str)
@@ -823,26 +636,19 @@ how the command-line arguments should be handled. The supplied actions are:
 
   .. versionadded:: 3.8
 
-* ``'count'`` - This counts the number of times an argument occurs. For
-  example, this is useful for increasing verbosity levels::
+* ``'count'`` - Thao tác này đếm số lần một đối số xuất hiện. Ví dụ, thao tác này hữu ích để tăng các mức độ chi tiết của đầu ra::
 
     >>> parser = argparse.ArgumentParser()
     >>> parser.add_argument('--verbose', '-v', action='count', default=0)
     >>> parser.parse_args(['-vvv'])
     Namespace(verbose=3)
 
-  Unless explicitly set, the *default* will be ``None``. If the default
-  value is a non-zero number, the count starts from that number rather
-  than from zero.
+  Trừ khi được đặt rõ ràng, *giá trị mặc định* sẽ là ``None``. Nếu giá trị mặc định là một số khác không, bộ đếm sẽ bắt đầu từ số đó thay vì từ số không.
 
-* ``'help'`` - This prints a complete help message for all the options in the
-  current parser and then exits. By default a help action is automatically
-  added to the parser. See :class:`ArgumentParser` for details of how the
-  output is created.
+* ``'help'`` - Thao tác này in thông báo trợ giúp đầy đủ cho tất cả tùy chọn trong parser hiện tại rồi thoát. Theo mặc định, một thao tác trợ giúp sẽ tự động được thêm vào parser. Xem :class:`ArgumentParser` để biết chi tiết về cách tạo đầu ra.
 
-* ``'version'`` - This expects a ``version=`` keyword argument in the
-  :meth:`~ArgumentParser.add_argument` call, and prints version information
-  and exits when invoked::
+* ``'version'`` - Thao tác này yêu cầu một đối số từ khóa ``version=`` trong
+  gọi :meth:`~ArgumentParser.add_argument`, in thông tin phiên bản rồi thoát khi được gọi::
 
     >>> import argparse
     >>> parser = argparse.ArgumentParser(prog='PROG')
@@ -850,18 +656,13 @@ how the command-line arguments should be handled. The supplied actions are:
     >>> parser.parse_args(['--version'])
     PROG 2.0
 
-You may also specify an arbitrary action by passing an :class:`Action` subclass
-(e.g. :class:`BooleanOptionalAction`) or other object that implements the same
-interface. Only actions that consume command-line arguments (e.g. ``'store'``,
-``'append'``, ``'extend'``, or custom actions with non-zero ``nargs``) can be used
-with positional arguments.
+Bạn cũng có thể chỉ định một action tùy ý bằng cách truyền một lớp con của :class:`Action` (ví dụ: :class:`BooleanOptionalAction`) hoặc đối tượng khác triển khai cùng một interface. Chỉ những action nhận các đối số dòng lệnh (ví dụ: ``'store'``, ``'append'``, ``'extend'`` hoặc action tùy chỉnh có ``nargs`` khác không) mới có thể được sử dụng với các đối số positional.
 
-The recommended way to create a custom action is to extend :class:`Action`,
-overriding the :meth:`!__call__` method and optionally the :meth:`!__init__` and
-:meth:`!format_usage` methods. You can also register custom actions using the
-:meth:`~ArgumentParser.register` method and reference them by their registered name.
+Cách được khuyến nghị để tạo action tùy chỉnh là mở rộng :class:`Action`, ghi đè phương thức :meth:`!__call__` và tùy chọn ghi đè :meth:`!__init__` và
+các phương thức :meth:`!format_usage`. Bạn cũng có thể đăng ký action tùy chỉnh bằng phương thức
+:meth:`~ArgumentParser.register` và tham chiếu đến chúng bằng tên đã đăng ký.
 
-An example of a custom action::
+Ví dụ về một action tùy chỉnh::
 
    >>> class FooAction(argparse.Action):
    ...     def __init__(self, option_strings, dest, nargs=None, **kwargs):
@@ -881,7 +682,7 @@ An example of a custom action::
    >>> args
    Namespace(bar='1', foo='2')
 
-For more details, see :class:`Action`.
+Để biết thêm chi tiết, hãy xem :class:`Action`.
 
 
 .. _nargs:
@@ -889,13 +690,9 @@ For more details, see :class:`Action`.
 nargs
 ^^^^^
 
-:class:`ArgumentParser` objects usually associate a single command-line argument with a
-single action to be taken.  The ``nargs`` keyword argument associates a
-different number of command-line arguments with a single action.
-See also :ref:`specifying-ambiguous-arguments`. The supported values are:
+Các đối tượng :class:`ArgumentParser` thường liên kết một đối số dòng lệnh duy nhất với một hành động duy nhất cần thực hiện. Đối số từ khóa ``nargs`` liên kết một số lượng đối số dòng lệnh khác với một hành động duy nhất. Xem thêm :ref:`specifying-ambiguous-arguments`. Các giá trị được hỗ trợ là:
 
-* ``N`` (an integer).  ``N`` arguments from the command line will be gathered
-  together into a list.  For example::
+* ``N`` (một số nguyên). Các đối số ``N`` từ dòng lệnh sẽ được tập hợp vào một danh sách. Ví dụ::
 
      >>> parser = argparse.ArgumentParser()
      >>> parser.add_argument('--foo', nargs=2)
@@ -903,17 +700,11 @@ See also :ref:`specifying-ambiguous-arguments`. The supported values are:
      >>> parser.parse_args('c --foo a b'.split())
      Namespace(bar=['c'], foo=['a', 'b'])
 
-  Note that ``nargs=1`` produces a list of one item.  This is different from
-  the default, in which the item is produced by itself.
+  Lưu ý rằng ``nargs=1`` tạo ra một danh sách gồm một phần tử. Điều này khác với giá trị mặc định, trong đó phần tử được tạo riêng lẻ.
 
 .. index:: single: ? (question mark); in argparse module
 
-* ``'?'``. One argument will be consumed from the command line if possible, and
-  produced as a single item.  If no command-line argument is present, the value from
-  default_ will be produced.  Note that for optional arguments, there is an
-  additional case - the option string is present but not followed by a
-  command-line argument.  In this case the value from const_ will be produced.  Some
-  examples to illustrate this::
+* ``'?'``. Nếu có thể, một đối số sẽ được lấy từ dòng lệnh và tạo ra dưới dạng một phần tử duy nhất. Nếu không có đối số dòng lệnh nào, giá trị từ default_ sẽ được tạo ra. Lưu ý rằng đối với các đối số tùy chọn, có thêm một trường hợp: chuỗi tùy chọn xuất hiện nhưng không theo sau bởi một đối số dòng lệnh. Trong trường hợp này, giá trị từ const_ sẽ được tạo ra. Một số ví dụ minh họa cho điều này::
 
      >>> parser = argparse.ArgumentParser()
      >>> parser.add_argument('--foo', nargs='?', const='c', default='d')
@@ -925,8 +716,7 @@ See also :ref:`specifying-ambiguous-arguments`. The supported values are:
      >>> parser.parse_args([])
      Namespace(bar='d', foo='d')
 
-  One of the more common uses of ``nargs='?'`` is to allow optional input and
-  output files::
+  Một trong những cách sử dụng phổ biến hơn của ``nargs='?'`` là cho phép các tệp đầu vào và đầu ra là tùy chọn::
 
      >>> parser = argparse.ArgumentParser()
      >>> parser.add_argument('infile', nargs='?')
@@ -940,10 +730,7 @@ See also :ref:`specifying-ambiguous-arguments`. The supported values are:
 
 .. index:: single: * (asterisk); in argparse module
 
-* ``'*'``.  All command-line arguments present are gathered into a list.  Note that
-  it generally doesn't make much sense to have more than one positional argument
-  with ``nargs='*'``, but multiple optional arguments with ``nargs='*'`` is
-  possible.  For example::
+* ``'*'``. Tất cả đối số dòng lệnh hiện có sẽ được tập hợp vào một danh sách. Lưu ý rằng nhìn chung, việc có nhiều hơn một đối số vị trí với ``nargs='*'`` không có nhiều ý nghĩa, nhưng có thể có nhiều đối số tùy chọn với ``nargs='*'``. Ví dụ::
 
      >>> parser = argparse.ArgumentParser()
      >>> parser.add_argument('--foo', nargs='*')
@@ -954,9 +741,7 @@ See also :ref:`specifying-ambiguous-arguments`. The supported values are:
 
 .. index:: single: + (plus); in argparse module
 
-* ``'+'``. Just like ``'*'``, all command-line arguments present are gathered into a
-  list.  Additionally, an error message will be generated if there wasn't at
-  least one command-line argument present.  For example::
+* ``'+'``. Giống như ``'*'``, tất cả các đối số dòng lệnh hiện có đều được tập hợp vào một danh sách. Ngoài ra, một thông báo lỗi sẽ được tạo nếu không có ít nhất một đối số dòng lệnh. Ví dụ::
 
      >>> parser = argparse.ArgumentParser(prog='PROG')
      >>> parser.add_argument('foo', nargs='+')
@@ -966,11 +751,7 @@ See also :ref:`specifying-ambiguous-arguments`. The supported values are:
      usage: PROG [-h] foo [foo ...]
      PROG: error: the following arguments are required: foo
 
-If the ``nargs`` keyword argument is not provided, the number of arguments consumed
-is determined by the action_.  Generally this means a single command-line argument
-will be consumed and a single item (not a list) will be produced.
-Actions that do not consume command-line arguments (e.g.
-``'store_const'``) set ``nargs=0``.
+Nếu không cung cấp đối số từ khóa ``nargs``, số lượng đối số được tiếp nhận sẽ được xác định bởi action_. Nhìn chung, điều này có nghĩa là một đối số dòng lệnh sẽ được tiếp nhận và một mục đơn (không phải danh sách) sẽ được tạo. Các action không tiếp nhận đối số dòng lệnh (ví dụ: ``'store_const'``) sẽ đặt ``nargs=0``.
 
 
 .. _const:
@@ -978,40 +759,24 @@ Actions that do not consume command-line arguments (e.g.
 const
 ^^^^^
 
-The ``const`` argument of :meth:`~ArgumentParser.add_argument` is used to hold
-constant values that are not read from the command line but are required for
-the various :class:`ArgumentParser` actions.  The two most common uses of it are:
+Đối số ``const`` của :meth:`~ArgumentParser.add_argument` được dùng để lưu giữ các giá trị hằng số không được đọc từ dòng lệnh nhưng cần thiết cho nhiều action :class:`ArgumentParser`. Hai cách sử dụng phổ biến nhất là:
 
-* When :meth:`~ArgumentParser.add_argument` is called with
-  ``action='store_const'`` or ``action='append_const'``.  These actions add the
-  ``const`` value to one of the attributes of the object returned by
-  :meth:`~ArgumentParser.parse_args`. See the action_ description for examples.
-  If ``const`` is not provided to :meth:`~ArgumentParser.add_argument`, it will
-  receive a default value of ``None``.
+* Khi :meth:`~ArgumentParser.add_argument` được gọi với ``action='store_const'`` hoặc ``action='append_const'``. Các action này thêm giá trị ``const`` vào một trong các thuộc tính của đối tượng được trả về bởi
+  :meth:`~ArgumentParser.parse_args`. Xem phần mô tả action_ để biết ví dụ. Nếu không cung cấp ``const`` cho :meth:`~ArgumentParser.add_argument`, nó sẽ nhận giá trị mặc định là ``None``.
 
 
-* When :meth:`~ArgumentParser.add_argument` is called with option strings
-  (like ``-f`` or ``--foo``) and ``nargs='?'``.  This creates an optional
-  argument that can be followed by zero or one command-line arguments.
-  When parsing the command line, if the option string is encountered with no
-  command-line argument following it, the value from ``const`` will be used.
-  See the nargs_ description for examples.
+* Khi :meth:`~ArgumentParser.add_argument` được gọi với các chuỗi tùy chọn (chẳng hạn như ``-f`` hoặc ``--foo``) và ``nargs='?'``. Điều này tạo ra một đối số tùy chọn có thể được theo sau bởi không hoặc một đối số dòng lệnh. Khi phân tích cú pháp dòng lệnh, nếu gặp chuỗi tùy chọn mà không có đối số dòng lệnh nào theo sau, giá trị từ ``const`` sẽ được sử dụng. Xem phần mô tả nargs_ để biết ví dụ.
 
 .. versionchanged:: 3.11
-   ``const=None`` by default, including when ``action='append_const'`` or
-   ``action='store_const'``.
+   ``const=None`` theo mặc định, kể cả khi ``action='append_const'`` hoặc ``action='store_const'``.
 
 .. _default:
 
-default
-^^^^^^^
+mặc định
+^^^^^^^^
 
-All optional arguments and some positional arguments may be omitted at the
-command line.  The ``default`` keyword argument of
-:meth:`~ArgumentParser.add_argument`, whose value defaults to ``None``,
-specifies what value should be used if the command-line argument is not present.
-For optional arguments, the ``default`` value is used when the option string
-was not present at the command line::
+Tất cả đối số tùy chọn và một số đối số vị trí có thể được bỏ qua trên dòng lệnh. Đối số từ khóa ``default`` của
+:meth:`~ArgumentParser.add_argument`, có giá trị mặc định là ``None``, chỉ định giá trị sẽ được sử dụng nếu đối số dòng lệnh không xuất hiện. Đối với các đối số tùy chọn, giá trị ``default`` được sử dụng khi chuỗi tùy chọn không xuất hiện trên dòng lệnh::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--foo', default=42)
@@ -1020,18 +785,15 @@ was not present at the command line::
    >>> parser.parse_args([])
    Namespace(foo=42)
 
-If the target namespace already has an attribute set, the action *default*
-will not overwrite it::
+Nếu namespace đích đã có một thuộc tính được thiết lập, action *default* sẽ không ghi đè thuộc tính đó::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--foo', default=42)
    >>> parser.parse_args([], namespace=argparse.Namespace(foo=101))
    Namespace(foo=101)
 
-If the ``default`` value is a string, the parser parses the value as if it
-were a command-line argument.  In particular, the parser applies any type_
-conversion argument, if provided, before setting the attribute on the
-:class:`Namespace` return value.  Otherwise, the parser uses the value as is::
+Nếu giá trị ``default`` là một chuỗi, parser sẽ phân tích giá trị đó như thể nó là một đối số dòng lệnh. Cụ thể, parser sẽ áp dụng đối số chuyển đổi type_, nếu được cung cấp, trước khi thiết lập thuộc tính trên
+giá trị trả về của :class:`Namespace`. Nếu không, parser sẽ sử dụng nguyên trạng giá trị đó::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--length', default='10', type=int)
@@ -1039,8 +801,7 @@ conversion argument, if provided, before setting the attribute on the
    >>> parser.parse_args()
    Namespace(length=10, width=10.5)
 
-For positional arguments with nargs_ equal to ``?`` or ``*``, the ``default`` value
-is used when no command-line argument was present::
+Đối với các positional argument có nargs_ bằng ``?`` hoặc ``*``, giá trị ``default`` sẽ được sử dụng khi không có đối số dòng lệnh nào được cung cấp::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('foo', nargs='?', default=42)
@@ -1049,16 +810,11 @@ is used when no command-line argument was present::
    >>> parser.parse_args([])
    Namespace(foo=42)
 
-Because ``nargs='*'`` gathers any supplied values into a list, an absent
-positional argument yields an empty list (``[]``). Only a non-``None``
-*default* overrides this (so ``default=None`` still gives ``[]``).
+Vì ``nargs='*'`` tập hợp mọi giá trị được cung cấp vào một danh sách, positional argument bị bỏ qua sẽ tạo ra một danh sách rỗng (``[]``). Chỉ *default* không phải ``None`` mới ghi đè hành vi này (vì vậy ``default=None`` vẫn cho kết quả ``[]``).
 
-For required_ arguments, the ``default`` value is ignored. For example, this
-applies to positional arguments with nargs_ values other than ``?`` or ``*``,
-or optional arguments marked as ``required=True``.
+Đối với các argument required_, giá trị ``default`` sẽ bị bỏ qua. Ví dụ, điều này áp dụng cho các positional argument có giá trị nargs_ khác ``?`` hoặc ``*``, hoặc các optional argument được đánh dấu là ``required=True``.
 
-Providing ``default=argparse.SUPPRESS`` causes no attribute to be added if the
-command-line argument was not present::
+Việc cung cấp ``default=argparse.SUPPRESS`` sẽ không thêm thuộc tính nào nếu đối số dòng lệnh không được cung cấp::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--foo', default=argparse.SUPPRESS)
@@ -1073,22 +829,14 @@ command-line argument was not present::
 type
 ^^^^
 
-By default, the parser reads command-line arguments in as simple
-strings. However, quite often the command-line string should instead be
-interpreted as another type, such as a :class:`float` or :class:`int`.  The
-``type`` keyword for :meth:`~ArgumentParser.add_argument` allows any
-necessary type-checking and type conversions to be performed.
+Theo mặc định, parser đọc các đối số dòng lệnh dưới dạng các chuỗi đơn giản. Tuy nhiên, khá thường xuyên chuỗi dòng lệnh cần được diễn giải thành một kiểu khác, chẳng hạn như :class:`float` hoặc :class:`int`. Từ khóa ``type`` dành cho :meth:`~ArgumentParser.add_argument` cho phép thực hiện mọi thao tác kiểm tra kiểu và chuyển đổi kiểu cần thiết.
 
-If the type_ keyword is used with the default_ keyword, the type converter
-is only applied if the default is a string.
+Nếu sử dụng từ khóa type_ cùng với từ khóa default_, bộ chuyển đổi kiểu chỉ được áp dụng nếu giá trị mặc định là một chuỗi.
 
-The argument to ``type`` can be a callable that accepts a single string or
-the name of a registered type (see :meth:`~ArgumentParser.register`)
-If the function raises :exc:`ArgumentTypeError`, :exc:`TypeError`, or
-:exc:`ValueError`, the exception is caught and a nicely formatted error
-message is displayed. Other exception types are not handled.
+Đối số của ``type`` có thể là một callable nhận một chuỗi duy nhất hoặc tên của một kiểu đã đăng ký (xem :meth:`~ArgumentParser.register`) Nếu hàm phát sinh :exc:`ArgumentTypeError`, :exc:`TypeError`, hoặc
+:exc:`ValueError`, exception đó sẽ được bắt và một thông báo lỗi được định dạng rõ ràng sẽ hiển thị. Các kiểu exception khác không được xử lý.
 
-Common built-in types and functions can be used as type converters:
+Có thể sử dụng các kiểu và hàm dựng sẵn phổ biến làm type converter:
 
 .. testcode::
 
@@ -1102,7 +850,7 @@ Common built-in types and functions can be used as type converters:
    parser.add_argument('code_point', type=ord)
    parser.add_argument('datapath', type=pathlib.Path)
 
-User defined functions can be used as well:
+Bạn cũng có thể sử dụng các hàm do người dùng định nghĩa:
 
 .. doctest::
 
@@ -1114,37 +862,24 @@ User defined functions can be used as well:
    >>> parser.parse_args(['"The Tale of Two Cities"'])
    Namespace(short_title='"the-tale-of-two-citi')
 
-The :func:`bool` function is not recommended as a type converter.  All it does
-is convert empty strings to ``False`` and non-empty strings to ``True``.
-This is usually not what is desired::
+Không nên sử dụng hàm :func:`bool` làm type converter. Hàm này chỉ chuyển đổi chuỗi rỗng thành ``False`` và chuỗi không rỗng thành ``True``. Đây thường không phải là điều mong muốn::
 
    >>> parser = argparse.ArgumentParser()
    >>> _ = parser.add_argument('--verbose', type=bool)
    >>> parser.parse_args(['--verbose', 'False'])
    Namespace(verbose=True)
 
-See :class:`BooleanOptionalAction` or ``action='store_true'`` for common
-alternatives.
+Xem :class:`BooleanOptionalAction` hoặc ``action='store_true'`` để biết các lựa chọn thay thế phổ biến.
 
-In general, the ``type`` keyword is a convenience that should only be used for
-simple conversions that can only raise one of the three supported exceptions.
-Anything with more interesting error-handling or resource management should be
-done downstream after the arguments are parsed.
+Nhìn chung, từ khóa ``type`` là một tiện ích chỉ nên được dùng cho các chuyển đổi đơn giản, vốn chỉ có thể phát sinh một trong ba exception được hỗ trợ. Mọi thao tác có xử lý lỗi hoặc quản lý tài nguyên phức tạp hơn nên được thực hiện ở downstream sau khi các đối số đã được phân tích.
 
-For example, JSON or YAML conversions have complex error cases that require
-better reporting than can be given by the ``type`` keyword.  A
-:exc:`~json.JSONDecodeError` would not be well formatted and a
-:exc:`FileNotFoundError` exception would not be handled at all.
+Ví dụ, các chuyển đổi JSON hoặc YAML có những trường hợp lỗi phức tạp, đòi hỏi cách báo cáo tốt hơn mức mà từ khóa ``type`` có thể cung cấp. Một
+:exc:`~json.JSONDecodeError` sẽ không được định dạng tốt và một
+ngoại lệ :exc:`FileNotFoundError` sẽ hoàn toàn không được xử lý.
 
-Even :class:`~argparse.FileType` has its limitations for use with the ``type``
-keyword.  If one argument uses :class:`~argparse.FileType` and then a
-subsequent argument fails, an error is reported but the file is not
-automatically closed.  In this case, it would be better to wait until after
-the parser has run and then use the :keyword:`with`-statement to manage the
-files.
+Ngay cả :class:`~argparse.FileType` cũng có những hạn chế khi dùng với từ khóa ``type``. Nếu một đối số sử dụng :class:`~argparse.FileType` rồi một đối số tiếp theo bị lỗi, một lỗi được báo cáo nhưng tệp không tự động đóng. Trong trường hợp này, tốt hơn là đợi đến khi parser chạy xong rồi dùng câu lệnh :keyword:`with` để quản lý các tệp.
 
-For type checkers that simply check against a fixed set of values, consider
-using the choices_ keyword instead.
+Đối với các trình kiểm tra kiểu chỉ kiểm tra dựa trên một tập giá trị cố định, hãy cân nhắc sử dụng từ khóa choices_ thay thế.
 
 
 .. _choices:
@@ -1152,11 +887,7 @@ using the choices_ keyword instead.
 choices
 ^^^^^^^
 
-Some command-line arguments should be selected from a restricted set of values.
-These can be handled by passing a sequence object as the *choices* keyword
-argument to :meth:`~ArgumentParser.add_argument`.  When the command line is
-parsed, argument values will be checked, and an error message will be displayed
-if the argument was not one of the acceptable values::
+Một số đối số dòng lệnh phải được chọn từ một tập giá trị giới hạn. Có thể xử lý các đối số này bằng cách truyền một đối tượng sequence làm đối số từ khóa *choices* cho :meth:`~ArgumentParser.add_argument`. Khi dòng lệnh được phân tích cú pháp, các giá trị đối số sẽ được kiểm tra và một thông báo lỗi sẽ hiển thị nếu đối số không thuộc một trong các giá trị được chấp nhận::
 
    >>> parser = argparse.ArgumentParser(prog='game.py')
    >>> parser.add_argument('move', choices=['rock', 'paper', 'scissors'])
@@ -1167,36 +898,24 @@ if the argument was not one of the acceptable values::
    game.py: error: argument move: invalid choice: 'fire' (choose from 'rock',
    'paper', 'scissors')
 
-Any sequence can be passed as the *choices* value, so :class:`list` objects,
-:class:`tuple` objects, and custom sequences are all supported.
+Bất kỳ sequence nào cũng có thể được truyền làm giá trị *choices*, vì vậy các đối tượng :class:`list` cũng được hỗ trợ,
+các đối tượng :class:`tuple` và sequence tùy chỉnh đều được hỗ trợ.
 
-Use of :class:`enum.Enum` is not recommended because it is difficult to
-control its appearance in usage, help, and error messages.
+Không nên sử dụng :class:`enum.Enum` vì khó kiểm soát cách nó xuất hiện trong các thông báo về cách sử dụng, trợ giúp và lỗi.
 
-Note that *choices* are checked after any type_
-conversions have been performed, so objects in *choices*
-should match the type_ specified. This can make *choices*
-appear unfamiliar in usage, help, or error messages.
+Lưu ý rằng *choices* được kiểm tra sau khi mọi phép chuyển đổi type_ đã được thực hiện, vì vậy các đối tượng trong *choices* phải khớp với type_ được chỉ định. Điều này có thể khiến *choices* trông không quen thuộc trong các thông báo về cách sử dụng, trợ giúp hoặc lỗi.
 
-To keep *choices* user-friendly, consider a custom type wrapper that
-converts and formats values, or omit type_ and handle conversion in
-your application code.
+Để *choices* thân thiện với người dùng, hãy cân nhắc một trình bao bọc kiểu tùy chỉnh để chuyển đổi và định dạng các giá trị, hoặc bỏ qua type_ và xử lý việc chuyển đổi trong mã ứng dụng của bạn.
 
-Formatted choices override the default *metavar* which is normally derived
-from *dest*.  This is usually what you want because the user never sees the
-*dest* parameter.  If this display isn't desirable (perhaps because there are
-many choices), just specify an explicit metavar_.
+Các choices được định dạng sẽ ghi đè *metavar* mặc định, vốn thường được suy ra từ *dest*. Đây thường là điều bạn muốn vì người dùng không bao giờ thấy tham số *dest*. Nếu cách hiển thị này không phù hợp (có thể vì có nhiều choices), chỉ cần chỉ định một metavar_ rõ ràng.
 
 
 .. _required:
 
-required
+bắt buộc
 ^^^^^^^^
 
-In general, the :mod:`!argparse` module assumes that flags like ``-f`` and ``--bar``
-indicate *optional* arguments, which can always be omitted at the command line.
-To make an option *required*, ``True`` can be specified for the ``required=``
-keyword argument to :meth:`~ArgumentParser.add_argument`::
+Nhìn chung, module :mod:`!argparse` giả định rằng các cờ như ``-f`` và ``--bar`` cho biết các đối số *tùy chọn*, luôn có thể được bỏ qua trên dòng lệnh. Để một tùy chọn trở thành *bắt buộc*, có thể chỉ định ``True`` cho đối số từ khóa ``required=`` của :meth:`~ArgumentParser.add_argument`::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--foo', required=True)
@@ -1206,30 +925,23 @@ keyword argument to :meth:`~ArgumentParser.add_argument`::
    usage: [-h] --foo FOO
    : error: the following arguments are required: --foo
 
-As the example shows, if an option is marked as ``required``,
-:meth:`~ArgumentParser.parse_args` will report an error if that option is not
-present at the command line.
+Như ví dụ cho thấy, nếu một tùy chọn được đánh dấu là ``required``,
+:meth:`~ArgumentParser.parse_args` sẽ báo lỗi nếu tùy chọn đó không có trên dòng lệnh.
 
 .. note::
 
-    Required options are generally considered bad form because users expect
-    *options* to be *optional*, and thus they should be avoided when possible.
+    Các tùy chọn bắt buộc thường bị xem là không phù hợp vì người dùng mong đợi các *tùy chọn* là *tùy chọn*, do đó nên tránh chúng khi có thể.
 
 
 .. _help:
 
-help
-^^^^
+trợ giúp
+^^^^^^^^
 
-The ``help`` value is a string containing a brief description of the argument.
-When a user requests help (usually by using ``-h`` or ``--help`` at the
-command line), these ``help`` descriptions will be displayed with each
-argument.
+Giá trị ``help`` là một chuỗi chứa mô tả ngắn gọn về đối số. Khi người dùng yêu cầu trợ giúp (thường bằng cách sử dụng ``-h`` hoặc ``--help`` trên dòng lệnh), các mô tả ``help`` này sẽ được hiển thị cùng với từng đối số.
 
-The ``help`` strings can include various format specifiers to avoid repetition
-of things like the program name or the argument default_.  The available
-specifiers include the program name, ``%(prog)s`` and most keyword arguments to
-:meth:`~ArgumentParser.add_argument`, e.g. ``%(default)s``, ``%(type)s``, etc.::
+Các chuỗi ``help`` có thể bao gồm nhiều bộ chỉ định định dạng khác nhau để tránh lặp lại những nội dung như tên chương trình hoặc default_ của đối số. Các bộ chỉ định khả dụng bao gồm tên chương trình, ``%(prog)s`` và hầu hết các đối số từ khóa của
+:meth:`~ArgumentParser.add_argument`, ví dụ ``%(default)s``, ``%(type)s``, v.v.::
 
    >>> parser = argparse.ArgumentParser(prog='frobble')
    >>> parser.add_argument('bar', nargs='?', type=int, default=42,
@@ -1243,11 +955,9 @@ specifiers include the program name, ``%(prog)s`` and most keyword arguments to
    options:
     -h, --help  show this help message and exit
 
-As the help string supports %-formatting, if you want a literal ``%`` to appear
-in the help string, you must escape it as ``%%``.
+Vì chuỗi trợ giúp hỗ trợ %-formatting, nếu bạn muốn một ``%`` literal xuất hiện trong chuỗi trợ giúp, bạn phải escape nó thành ``%%``.
 
-:mod:`!argparse` supports silencing the help entry for certain options, by
-setting the ``help`` value to ``argparse.SUPPRESS``::
+:mod:`!argparse` hỗ trợ ẩn mục trợ giúp đối với một số tùy chọn bằng cách đặt giá trị ``help`` thành ``argparse.SUPPRESS``::
 
    >>> parser = argparse.ArgumentParser(prog='frobble')
    >>> parser.add_argument('--foo', help=argparse.SUPPRESS)
@@ -1263,14 +973,7 @@ setting the ``help`` value to ``argparse.SUPPRESS``::
 metavar
 ^^^^^^^
 
-When :class:`ArgumentParser` generates help messages, it needs some way to refer
-to each expected argument.  By default, :class:`!ArgumentParser` objects use the dest_
-value as the "name" of each object.  By default, for positional argument
-actions, the dest_ value is used directly, and for optional argument actions,
-the dest_ value is uppercased.  So, a single positional argument with
-``dest='bar'`` will be referred to as ``bar``. A single
-optional argument ``--foo`` that should be followed by a single command-line argument
-will be referred to as ``FOO``.  An example::
+Khi :class:`ArgumentParser` tạo thông báo trợ giúp, nó cần một cách để tham chiếu đến từng đối số dự kiến. Theo mặc định, các đối tượng :class:`!ArgumentParser` sử dụng giá trị dest_ làm "tên" của mỗi đối tượng. Theo mặc định, đối với các action của đối số vị trí, giá trị dest_ được sử dụng trực tiếp, còn đối với các action của đối số tùy chọn, giá trị dest_ được viết hoa. Vì vậy, một đối số vị trí duy nhất với ``dest='bar'`` sẽ được tham chiếu là ``bar``. Một đối số tùy chọn duy nhất ``--foo`` cần được theo sau bởi một đối số dòng lệnh duy nhất sẽ được tham chiếu là ``FOO``. Ví dụ::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--foo')
@@ -1287,7 +990,7 @@ will be referred to as ``FOO``.  An example::
     -h, --help  show this help message and exit
     --foo FOO
 
-An alternative name can be specified with ``metavar``::
+Có thể chỉ định một tên thay thế bằng ``metavar``::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--foo', metavar='YYY')
@@ -1304,13 +1007,9 @@ An alternative name can be specified with ``metavar``::
     -h, --help  show this help message and exit
     --foo YYY
 
-Note that ``metavar`` only changes the *displayed* name - the name of the
-attribute on the :meth:`~ArgumentParser.parse_args` object is still determined
-by the dest_ value.
+Lưu ý rằng ``metavar`` chỉ thay đổi tên *được hiển thị* - tên của thuộc tính trên đối tượng :meth:`~ArgumentParser.parse_args` vẫn được xác định bởi giá trị dest_.
 
-Different values of ``nargs`` may cause the metavar to be used multiple times.
-Providing a tuple to ``metavar`` specifies a different display for each of the
-arguments::
+Các giá trị khác nhau của ``nargs`` có thể khiến metavar được sử dụng nhiều lần. Cung cấp một tuple cho ``metavar`` sẽ chỉ định cách hiển thị khác nhau cho từng đối số::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-x', nargs=2)
@@ -1329,11 +1028,8 @@ arguments::
 dest
 ^^^^
 
-Most :class:`ArgumentParser` actions add some value as an attribute of the
-object returned by :meth:`~ArgumentParser.parse_args`.  The name of this
-attribute is determined by the ``dest`` keyword argument of
-:meth:`~ArgumentParser.add_argument`.  For positional argument actions,
-``dest`` is normally supplied as the first argument to
+Hầu hết các action của :class:`ArgumentParser` đều thêm một giá trị làm thuộc tính của đối tượng được :meth:`~ArgumentParser.parse_args` trả về. Tên của thuộc tính này được xác định bởi đối số từ khóa ``dest`` của
+:meth:`~ArgumentParser.add_argument`. Đối với các action của positional argument, ``dest`` thường được cung cấp làm đối số đầu tiên cho
 :meth:`~ArgumentParser.add_argument`::
 
    >>> parser = argparse.ArgumentParser()
@@ -1341,14 +1037,7 @@ attribute is determined by the ``dest`` keyword argument of
    >>> parser.parse_args(['XXX'])
    Namespace(bar='XXX')
 
-For optional argument actions, the value of ``dest`` is normally inferred from
-the option strings.  :class:`ArgumentParser` generates the value of ``dest`` by
-taking the first long option string and stripping away the initial ``--``
-string.  If no long option strings were supplied, ``dest`` will be derived from
-the first short option string by stripping the initial ``-`` character.  Any
-internal ``-`` characters will be converted to ``_`` characters to make sure
-the string is a valid attribute name.  The examples below illustrate this
-behavior::
+Đối với các action của optional argument, giá trị của ``dest`` thường được suy ra từ các option string. :class:`ArgumentParser` tạo giá trị của ``dest`` bằng cách lấy option string dài đầu tiên và loại bỏ chuỗi ``--`` ở đầu. Nếu không cung cấp option string dài nào, ``dest`` sẽ được suy ra từ option string ngắn đầu tiên bằng cách loại bỏ ký tự ``-`` ở đầu. Mọi ký tự ``-`` bên trong sẽ được chuyển thành ký tự ``_`` để đảm bảo chuỗi này là một tên thuộc tính hợp lệ. Các ví dụ dưới đây minh họa hành vi này::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('-f', '--foo-bar', '--foo')
@@ -1358,32 +1047,22 @@ behavior::
    >>> parser.parse_args('--foo 1 -y 2'.split())
    Namespace(foo_bar='1', x='2')
 
-``dest`` allows a custom attribute name to be provided::
+``dest`` cho phép cung cấp một tên thuộc tính tùy chỉnh::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument('--foo', dest='bar')
    >>> parser.parse_args('--foo XXX'.split())
    Namespace(bar='XXX')
 
-Multiple arguments may share the same ``dest``.  By default, the value from the
-last such argument given on the command line wins.  Use ``action='append'`` to
-collect values from all of them into a list instead.  For conflicting *option
-strings* rather than ``dest`` names, see conflict_handler_.
+Nhiều đối số có thể dùng chung một ``dest``. Theo mặc định, giá trị từ đối số như vậy được cung cấp sau cùng trên dòng lệnh sẽ được sử dụng. Thay vào đó, hãy dùng ``action='append'`` để thu thập các giá trị từ tất cả chúng vào một danh sách. Đối với các *chuỗi tùy chọn* xung đột thay vì các tên ``dest``, hãy xem conflict_handler_.
 
 .. _deprecated:
 
-deprecated
-^^^^^^^^^^
+không còn được dùng
+^^^^^^^^^^^^^^^^^^^
 
-During a project's lifetime, some arguments may need to be removed from the
-command line. Before removing them, you should inform
-your users that the arguments are deprecated and will be removed.
-The ``deprecated`` keyword argument of
-:meth:`~ArgumentParser.add_argument`, which defaults to ``False``,
-specifies if the argument is deprecated and will be removed
-in the future.
-For arguments, if ``deprecated`` is ``True``, then a warning will be
-printed to :data:`sys.stderr` when the argument is used::
+Trong vòng đời của một dự án, một số đối số có thể cần được xóa khỏi dòng lệnh. Trước khi xóa chúng, bạn nên thông báo cho người dùng rằng các đối số này không còn được dùng và sẽ bị xóa. Đối số từ khóa ``deprecated`` của
+:meth:`~ArgumentParser.add_argument`, mặc định là ``False``, xác định liệu đối số có không còn được dùng và sẽ bị xóa trong tương lai hay không. Đối với các đối số, nếu ``deprecated`` là ``True``, một cảnh báo sẽ được in ra :data:`sys.stderr` khi đối số được sử dụng::
 
    >>> import argparse
    >>> parser = argparse.ArgumentParser(prog='snake.py')
@@ -1397,64 +1076,45 @@ printed to :data:`sys.stderr` when the argument is used::
 .. versionadded:: 3.13
 
 
-Action classes
+Các lớp Action
 ^^^^^^^^^^^^^^
 
-:class:`!Action` classes implement the Action API, a callable which returns a callable
-which processes arguments from the command-line. Any object which follows
-this API may be passed as the ``action`` parameter to
+Các lớp :class:`!Action` triển khai Action API, một callable trả về một callable xử lý các đối số từ dòng lệnh. Bất kỳ đối tượng nào tuân theo API này đều có thể được truyền làm tham số ``action`` cho
 :meth:`~ArgumentParser.add_argument`.
 
 .. class:: Action(option_strings, dest, nargs=None, const=None, default=None, \
-                  type=None, choices=None, required=False, help=None, \
-                  metavar=None)
+                  type=None, choices=None, required=False, help=None, \ metavar=None)
 
-   :class:`!Action` objects are used by an :class:`ArgumentParser` to represent the information
-   needed to parse a single argument from one or more strings from the
-   command line. The :class:`!Action` class must accept the two positional arguments
-   plus any keyword arguments passed to :meth:`ArgumentParser.add_argument`
-   except for the ``action`` itself.
+   Các đối tượng :class:`!Action` được một :class:`ArgumentParser` sử dụng để biểu diễn thông tin cần thiết nhằm phân tích cú pháp một đối số từ một hoặc nhiều chuỗi trên dòng lệnh. Lớp :class:`!Action` phải chấp nhận hai đối số vị trí cùng mọi đối số từ khóa được truyền vào :meth:`ArgumentParser.add_argument`, ngoại trừ chính ``action``.
 
-   Instances of :class:`!Action` (or return value of any callable to the
-   ``action`` parameter) should have attributes :attr:`!dest`,
+   Các instance của :class:`!Action` (hoặc giá trị trả về của bất kỳ callable nào được truyền cho tham số ``action``) phải có các thuộc tính :attr:`!dest`,
    :attr:`!option_strings`, :attr:`!default`, :attr:`!type`, :attr:`!required`,
-   :attr:`!help`, etc. defined. The easiest way to ensure these attributes
-   are defined is to call :meth:`!Action.__init__`.
+   :attr:`!help`, v.v. được định nghĩa. Cách dễ nhất để đảm bảo các thuộc tính này được định nghĩa là gọi :meth:`!Action.__init__`.
 
    .. method:: __call__(parser, namespace, values, option_string=None)
 
-      :class:`!Action` instances should be callable, so subclasses must override the
-      :meth:`!__call__` method, which should accept four parameters:
+      Các instance của :class:`!Action` phải là callable, vì vậy các lớp con phải ghi đè
+      phương thức :meth:`!__call__`, phương thức này phải chấp nhận bốn tham số:
 
-      * *parser* - The :class:`ArgumentParser` object which contains this action.
+      * *parser* - Đối tượng :class:`ArgumentParser` chứa action này.
 
-      * *namespace* - The :class:`Namespace` object that will be returned by
-        :meth:`~ArgumentParser.parse_args`.  Most actions add an attribute to this
-        object using :func:`setattr`.
+      * *namespace* - Đối tượng :class:`Namespace` sẽ được trả về bởi
+        :meth:`~ArgumentParser.parse_args`. Hầu hết các action đều thêm một thuộc tính vào đối tượng này bằng cách sử dụng :func:`setattr`.
 
-      * *values* - The associated command-line arguments, with any type conversions
-        applied.  Type conversions are specified with the type_ keyword argument to
+      * *values* - Các đối số dòng lệnh tương ứng, với mọi chuyển đổi kiểu đã được áp dụng. Chuyển đổi kiểu được chỉ định bằng đối số từ khóa type_ cho
         :meth:`~ArgumentParser.add_argument`.
 
-      * *option_string* - The option string that was used to invoke this action.
-        The ``option_string`` argument is optional, and will be absent if the action
-        is associated with a positional argument.
+      * *option_string* - Chuỗi tùy chọn đã được sử dụng để gọi action này. Đối số ``option_string`` là tùy chọn và sẽ không tồn tại nếu action được liên kết với một đối số vị trí.
 
-      The :meth:`!__call__` method may perform arbitrary actions, but will typically set
-      attributes on the ``namespace`` based on ``dest`` and ``values``.
+      Phương thức :meth:`!__call__` có thể thực hiện các hành động tùy ý, nhưng thường sẽ thiết lập các thuộc tính trên ``namespace`` dựa trên ``dest`` và ``values``.
 
    .. method:: format_usage()
 
-      :class:`!Action` subclasses can define a :meth:`!format_usage` method that takes no argument
-      and return a string which will be used when printing the usage of the program.
-      If such method is not provided, a sensible default will be used.
+      Các lớp con của :class:`!Action` có thể định nghĩa một phương thức :meth:`!format_usage` không nhận đối số và trả về một chuỗi sẽ được sử dụng khi in phần hướng dẫn sử dụng của chương trình. Nếu không cung cấp phương thức này, một giá trị mặc định hợp lý sẽ được sử dụng.
 
 .. class:: BooleanOptionalAction
 
-   A subclass of :class:`Action` for handling boolean flags with positive
-   and negative options. Adding a single argument such as ``--foo`` automatically
-   creates both ``--foo`` and ``--no-foo`` options, storing ``True`` and ``False``
-   respectively::
+   Một lớp con của :class:`Action` dùng để xử lý các cờ boolean với các tùy chọn khẳng định và phủ định. Việc thêm một đối số duy nhất như ``--foo`` sẽ tự động tạo cả hai tùy chọn ``--foo`` và ``--no-foo``, lần lượt lưu trữ ``True`` và ``False``::
 
        >>> import argparse
        >>> parser = argparse.ArgumentParser()
@@ -1465,31 +1125,27 @@ this API may be passed as the ``action`` parameter to
    .. versionadded:: 3.9
 
 
-The parse_args() method
------------------------
+Phương thức parse_args()
+------------------------
 
 .. method:: ArgumentParser.parse_args(args=None, namespace=None)
 
-   Convert argument strings to objects and assign them as attributes of the
-   namespace.  Return the populated namespace.
+   Chuyển đổi các chuỗi đối số thành các đối tượng và gán chúng làm thuộc tính của namespace. Trả về namespace đã được điền dữ liệu.
 
-   Previous calls to :meth:`add_argument` determine exactly what objects are
-   created and how they are assigned. See the documentation for
-   :meth:`!add_argument` for details.
+   Các lần gọi trước đó đến :meth:`add_argument` xác định chính xác những đối tượng nào được tạo và cách chúng được gán. Xem tài liệu về
+   :meth:`!add_argument` để biết chi tiết.
 
-   * args_ - List of strings to parse.  The default is taken from
+   * args_ - Danh sách các chuỗi cần phân tích cú pháp. Giá trị mặc định được lấy từ
      :data:`sys.argv`.
 
-   * namespace_ - An object to take the attributes.  The default is a new empty
-     :class:`Namespace` object.
+   * namespace_ - Một đối tượng để nhận các thuộc tính. Mặc định là một đối tượng mới, rỗng
+     :class:`Namespace`.
 
 
-Option value syntax
-^^^^^^^^^^^^^^^^^^^
+Cú pháp giá trị tùy chọn
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-The :meth:`~ArgumentParser.parse_args` method supports several ways of
-specifying the value of an option (if it takes one).  In the simplest case, the
-option and its value are passed as two separate arguments::
+Phương thức :meth:`~ArgumentParser.parse_args` hỗ trợ một số cách chỉ định giá trị của một tùy chọn (nếu tùy chọn đó nhận giá trị). Trong trường hợp đơn giản nhất, tùy chọn và giá trị của nó được truyền dưới dạng hai đối số riêng biệt::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-x')
@@ -1499,21 +1155,17 @@ option and its value are passed as two separate arguments::
    >>> parser.parse_args(['--foo', 'FOO'])
    Namespace(foo='FOO', x=None)
 
-For long options (options with names longer than a single character), the option
-and value can also be passed as a single command-line argument, using ``=`` to
-separate them::
+Đối với các tùy chọn dài (các tùy chọn có tên dài hơn một ký tự), tùy chọn và giá trị cũng có thể được truyền dưới dạng một đối số dòng lệnh duy nhất, sử dụng ``=`` để phân tách chúng::
 
    >>> parser.parse_args(['--foo=FOO'])
    Namespace(foo='FOO', x=None)
 
-For short options (options only one character long), the option and its value
-can be concatenated::
+Đối với các tùy chọn ngắn (các tùy chọn chỉ dài một ký tự), tùy chọn và giá trị của nó có thể được nối lại với nhau::
 
    >>> parser.parse_args(['-xX'])
    Namespace(foo=None, x='X')
 
-Several short options can be joined together, using only a single ``-`` prefix,
-as long as only the last option (or none of them) requires a value::
+Có thể nối nhiều tùy chọn ngắn với nhau, chỉ sử dụng một tiền tố ``-``, miễn là chỉ tùy chọn cuối cùng (hoặc không có tùy chọn nào) yêu cầu giá trị::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-x', action='store_true')
@@ -1523,54 +1175,45 @@ as long as only the last option (or none of them) requires a value::
    Namespace(x=True, y=True, z='Z')
 
 
-Invalid arguments
-^^^^^^^^^^^^^^^^^
+Đối số không hợp lệ
+^^^^^^^^^^^^^^^^^^^
 
-While parsing the command line, :meth:`~ArgumentParser.parse_args` checks for a
-variety of errors, including ambiguous options, invalid types, invalid options,
-wrong number of positional arguments, etc.  When it encounters such an error,
-it exits and prints the error along with a usage message::
+Trong khi phân tích cú pháp dòng lệnh, :meth:`~ArgumentParser.parse_args` kiểm tra nhiều loại lỗi, bao gồm các tùy chọn không rõ ràng, kiểu không hợp lệ, tùy chọn không hợp lệ, số lượng đối số vị trí không đúng, v.v. Khi gặp lỗi như vậy, nó sẽ thoát và in lỗi cùng với thông báo hướng dẫn sử dụng::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('--foo', type=int)
    >>> parser.add_argument('bar', nargs='?')
 
-   >>> # invalid type
+   >>> # kiểu không hợp lệ
    >>> parser.parse_args(['--foo', 'spam'])
    usage: PROG [-h] [--foo FOO] [bar]
    PROG: error: argument --foo: invalid int value: 'spam'
 
-   >>> # invalid option
+   >>> # tùy chọn không hợp lệ
    >>> parser.parse_args(['--bar'])
    usage: PROG [-h] [--foo FOO] [bar]
    PROG: error: unrecognized arguments: --bar
 
-   >>> # wrong number of arguments
+   >>> # số lượng đối số không đúng
    >>> parser.parse_args(['spam', 'badger'])
    usage: PROG [-h] [--foo FOO] [bar]
    PROG: error: unrecognized arguments: badger
 
 
-Arguments containing ``-``
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối số chứa ``-``
+^^^^^^^^^^^^^^^^^^^^^
 
-The :meth:`~ArgumentParser.parse_args` method attempts to give errors whenever
-the user has clearly made a mistake, but some situations are inherently
-ambiguous.  For example, the command-line argument ``-1`` could either be an
-attempt to specify an option or an attempt to provide a positional argument.
-The :meth:`~ArgumentParser.parse_args` method is cautious here: positional
-arguments may only begin with ``-`` if they look like negative numbers and
-there are no options in the parser that look like negative numbers::
+Phương thức :meth:`~ArgumentParser.parse_args` cố gắng đưa ra lỗi bất cứ khi nào người dùng rõ ràng đã mắc lỗi, nhưng một số tình huống vốn dĩ không rõ ràng. Ví dụ: đối số dòng lệnh ``-1`` có thể là nỗ lực chỉ định một tùy chọn hoặc nỗ lực cung cấp một đối số vị trí. Phương thức :meth:`~ArgumentParser.parse_args` thận trọng trong trường hợp này: các đối số vị trí chỉ có thể bắt đầu bằng ``-`` nếu chúng có dạng số âm và parser không có tùy chọn nào có dạng số âm::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-x')
    >>> parser.add_argument('foo', nargs='?')
 
-   >>> # no negative number options, so -1 is a positional argument
+   >>> # không có tùy chọn số âm, vì vậy -1 là một đối số vị trí
    >>> parser.parse_args(['-x', '-1'])
    Namespace(foo=None, x='-1')
 
-   >>> # no negative number options, so -1 and -5 are positional arguments
+   >>> # không có tùy chọn số âm, vì vậy -1 và -5 là các đối số vị trí
    >>> parser.parse_args(['-x', '-1', '-5'])
    Namespace(foo='-5', x='-1')
 
@@ -1578,44 +1221,37 @@ there are no options in the parser that look like negative numbers::
    >>> parser.add_argument('-1', dest='one')
    >>> parser.add_argument('foo', nargs='?')
 
-   >>> # negative number options present, so -1 is an option
+   >>> # có tùy chọn số âm, vì vậy -1 là một tùy chọn
    >>> parser.parse_args(['-1', 'X'])
    Namespace(foo=None, one='X')
 
-   >>> # negative number options present, so -2 is an option
+   >>> # có các tùy chọn là số âm, nên -2 là một tùy chọn
    >>> parser.parse_args(['-2'])
    usage: PROG [-h] [-1 ONE] [foo]
    PROG: error: unrecognized arguments: -2
 
-   >>> # negative number options present, so both -1s are options
+   >>> # có các tùy chọn là số âm, nên cả hai -1 đều là tùy chọn
    >>> parser.parse_args(['-1', '-1'])
    usage: PROG [-h] [-1 ONE] [foo]
    PROG: error: argument -1: expected one argument
 
-If you have positional arguments that must begin with ``-`` and don't look
-like negative numbers, you can insert the pseudo-argument ``'--'`` which tells
-:meth:`~ArgumentParser.parse_args` that everything after that is a positional
-argument::
+Nếu bạn có các đối số vị trí phải bắt đầu bằng ``-`` và không có dạng số âm, bạn có thể chèn đối số giả ``'--'`` để cho biết
+:meth:`~ArgumentParser.parse_args` rằng mọi thứ sau đó đều là đối số vị trí::
 
    >>> parser.parse_args(['--', '-f'])
    Namespace(foo='-f', one=None)
 
-See also :ref:`the argparse howto on ambiguous arguments <specifying-ambiguous-arguments>`
-for more details.
+Xem thêm :ref:`hướng dẫn argparse về các đối số không rõ ràng <specifying-ambiguous-arguments>` để biết thêm chi tiết.
 
 .. versionchanged:: 3.14
-   Negative-number matching was expanded to include numbers in scientific
-   notation (``-2.5e-6``), numbers containing underscores (``-1_234.5``),
-   and complex numbers (``-1.2e-3j``).
+   Việc nhận diện số âm đã được mở rộng để bao gồm các số ở dạng ký hiệu khoa học (``-2.5e-6``), các số có chứa dấu gạch dưới (``-1_234.5``) và các số phức (``-1.2e-3j``).
 
 .. _prefix-matching:
 
-Argument abbreviations (prefix matching)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Viết tắt đối số (so khớp tiền tố)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The :meth:`~ArgumentParser.parse_args` method :ref:`by default <allow_abbrev>`
-allows long options to be abbreviated to a prefix, if the abbreviation is
-unambiguous (the prefix matches a unique option)::
+Phương thức :meth:`~ArgumentParser.parse_args` :ref:`theo mặc định <allow_abbrev>` cho phép viết tắt các tùy chọn dài thành một tiền tố, nếu cách viết tắt đó không gây mơ hồ (tiền tố khớp với một tùy chọn duy nhất)::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-bacon')
@@ -1628,18 +1264,15 @@ unambiguous (the prefix matches a unique option)::
    usage: PROG [-h] [-bacon BACON] [-badger BADGER]
    PROG: error: ambiguous option: -ba could match -badger, -bacon
 
-An error is produced for arguments that could produce more than one options.
-This feature can be disabled by setting :ref:`allow_abbrev` to ``False``.
+Một lỗi sẽ được tạo ra đối với các đối số có thể khớp với nhiều tùy chọn. Có thể vô hiệu hóa tính năng này bằng cách đặt :ref:`allow_abbrev` thành ``False``.
 
 .. _args:
 
-Beyond ``sys.argv``
-^^^^^^^^^^^^^^^^^^^
+Ngoài ``sys.argv``
+^^^^^^^^^^^^^^^^^^
 
-Sometimes it may be useful to have an :class:`ArgumentParser` parse arguments other than those
-of :data:`sys.argv`.  This can be accomplished by passing a list of strings to
-:meth:`~ArgumentParser.parse_args`.  This is useful for testing at the
-interactive prompt::
+Đôi khi, việc yêu cầu :class:`ArgumentParser` phân tích cú pháp các đối số khác với các đối số của :data:`sys.argv` có thể hữu ích. Có thể thực hiện việc này bằng cách truyền một danh sách chuỗi cho
+:meth:`~ArgumentParser.parse_args`. Điều này hữu ích khi kiểm thử tại dấu nhắc tương tác::
 
    >>> parser = argparse.ArgumentParser()
    >>> parser.add_argument(
@@ -1655,17 +1288,14 @@ interactive prompt::
 
 .. _namespace:
 
-The Namespace object
-^^^^^^^^^^^^^^^^^^^^
+Đối tượng Namespace
+^^^^^^^^^^^^^^^^^^^
 
 .. class:: Namespace
 
-   Simple class used by default by :meth:`~ArgumentParser.parse_args` to create
-   an object holding attributes and return it.
+   Lớp đơn giản được :meth:`~ArgumentParser.parse_args` sử dụng theo mặc định để tạo một đối tượng chứa các thuộc tính và trả về đối tượng đó.
 
-   This class is deliberately simple, just an :class:`object` subclass with a
-   readable string representation. If you prefer to have dict-like view of the
-   attributes, you can use the standard Python idiom, :func:`vars`::
+   Lớp này được thiết kế đơn giản, chỉ là một lớp con :class:`object` với biểu diễn chuỗi dễ đọc. Nếu bạn muốn có dạng xem các thuộc tính giống dict, bạn có thể sử dụng thành ngữ Python tiêu chuẩn, :func:`vars`::
 
       >>> parser = argparse.ArgumentParser()
       >>> parser.add_argument('--foo')
@@ -1673,9 +1303,7 @@ The Namespace object
       >>> vars(args)
       {'foo': 'BAR'}
 
-   It may also be useful to have an :class:`ArgumentParser` assign attributes to an
-   already existing object, rather than a new :class:`Namespace` object.  This can
-   be achieved by specifying the ``namespace=`` keyword argument::
+   Việc để :class:`ArgumentParser` gán các thuộc tính cho một đối tượng đã tồn tại, thay vì một đối tượng :class:`Namespace` mới, cũng có thể hữu ích. Bạn có thể thực hiện điều này bằng cách chỉ định đối số từ khóa ``namespace=``::
 
       >>> class C:
       ...     pass
@@ -1688,97 +1316,65 @@ The Namespace object
       'BAR'
 
 
-Other utilities
----------------
+Các tiện ích khác
+-----------------
 
-Subcommands
+Các lệnh con
 ^^^^^^^^^^^^
 
 .. method:: ArgumentParser.add_subparsers(*, [title], [description], [prog], \
-                                          [parser_class], [action], \
-                                          [dest], [required], \
-                                          [help], [metavar])
+                                          [parser_class], [action], \ [dest], [required], \ [help], [metavar])
 
-   Many programs split up their functionality into a number of subcommands,
-   for example, the ``svn`` program can invoke subcommands like ``svn
-   checkout``, ``svn update``, and ``svn commit``.  Splitting up functionality
-   this way can be a particularly good idea when a program performs several
-   different functions which require different kinds of command-line arguments.
-   :class:`ArgumentParser` supports the creation of such subcommands with the
-   :meth:`!add_subparsers` method.  The :meth:`!add_subparsers` method is normally
-   called with no arguments and returns a special action object.  This object
-   has a single method, :meth:`~_SubParsersAction.add_parser`, which takes a
-   command name and any :class:`!ArgumentParser` constructor arguments, and
-   returns an :class:`!ArgumentParser` object that can be modified as usual.
+   Nhiều chương trình chia chức năng thành một số lệnh con; chẳng hạn, chương trình ``svn`` có thể gọi các lệnh con như ``svn checkout``, ``svn update`` và ``svn commit``. Việc chia chức năng theo cách này có thể đặc biệt hữu ích khi một chương trình thực hiện nhiều chức năng khác nhau, yêu cầu các loại đối số dòng lệnh khác nhau.
+   :class:`ArgumentParser` hỗ trợ tạo các lệnh con như vậy với
+   :meth:`!add_subparsers` phương thức. Phương thức :meth:`!add_subparsers` thường được gọi mà không có đối số và trả về một đối tượng action đặc biệt. Đối tượng này có một phương thức duy nhất là :meth:`~_SubParsersAction.add_parser`, nhận tên lệnh và bất kỳ đối số constructor :class:`!ArgumentParser` nào, rồi trả về một đối tượng :class:`!ArgumentParser` có thể được sửa đổi như bình thường.
 
-   Description of parameters:
+   Mô tả các tham số:
 
-   * *title* - title for the sub-parser group in help output; by default
-     "subcommands" if description is provided, otherwise uses title for
-     positional arguments
+   * *title* - tiêu đề cho nhóm sub-parser trong phần đầu ra trợ giúp; mặc định là "subcommands" nếu description được cung cấp, nếu không thì sử dụng title cho các đối số vị trí
 
-   * *description* - description for the sub-parser group in help output, by
-     default ``None``
+   * *description* - mô tả cho nhóm sub-parser trong phần đầu ra trợ giúp, mặc định là ``None``
 
-   * *prog* - usage information that will be displayed with subcommand help,
-     by default the name of the program and any positional arguments before the
-     subparser argument
+   * *prog* - thông tin sử dụng sẽ được hiển thị cùng với phần trợ giúp của subcommand, mặc định là tên chương trình và mọi đối số vị trí nằm trước đối số subparser
 
-   * *parser_class* - class which will be used to create sub-parser instances, by
-     default the class of the current parser (e.g. :class:`ArgumentParser`)
+   * *parser_class* - class sẽ được sử dụng để tạo các instance sub-parser, mặc định là class của parser hiện tại (ví dụ: :class:`ArgumentParser`)
 
-   * action_ - the basic type of action to be taken when this argument is
-     encountered at the command line
+   * action_ - loại action cơ bản sẽ được thực hiện khi gặp đối số này trên dòng lệnh
 
-   * dest_ - name of the attribute under which subcommand name will be
-     stored; by default ``None`` and no value is stored
+   * dest_ - tên của thuộc tính dùng để lưu tên subcommand; theo mặc định là ``None`` và không có giá trị nào được lưu
 
-   * required_ - Whether or not a subcommand must be provided, by default
-     ``False`` (added in 3.7)
+   * required_ - subcommand có bắt buộc phải được cung cấp hay không, theo mặc định là ``False`` (được thêm trong 3.7)
 
-   * help_ - help for sub-parser group in help output, by default ``None``
+   * help_ - phần trợ giúp cho nhóm sub-parser trong phần hiển thị trợ giúp, theo mặc định là ``None``
 
-   * metavar_ - string presenting available subcommands in help; by default it
-     is ``None`` and presents subcommands in form {cmd1, cmd2, ..}
+   * metavar_ - chuỗi hiển thị các subcommand hiện có trong phần trợ giúp; theo mặc định là ``None`` và hiển thị các subcommand dưới dạng {cmd1, cmd2, ..}
 
-   Some example usage::
+   Một số ví dụ sử dụng::
 
-     >>> # create the top-level parser
+     >>> # tạo parser cấp cao nhất
      >>> parser = argparse.ArgumentParser(prog='PROG')
      >>> parser.add_argument('--foo', action='store_true', help='foo help')
      >>> subparsers = parser.add_subparsers(help='subcommand help')
      >>>
-     >>> # create the parser for the "a" command
+     >>> # tạo parser cho lệnh "a"
      >>> parser_a = subparsers.add_parser('a', help='a help')
      >>> parser_a.add_argument('bar', type=int, help='bar help')
      >>>
-     >>> # create the parser for the "b" command
+     >>> # tạo parser cho lệnh "b"
      >>> parser_b = subparsers.add_parser('b', help='b help')
      >>> parser_b.add_argument('--baz', choices=('X', 'Y', 'Z'), help='baz help')
      >>>
-     >>> # parse some argument lists
+     >>> # phân tích một số danh sách đối số
      >>> parser.parse_args(['a', '12'])
      Namespace(bar=12, foo=False)
      >>> parser.parse_args(['--foo', 'b', '--baz', 'Z'])
      Namespace(baz='Z', foo=True)
 
-   Note that the object returned by :meth:`parse_args` will only contain
-   attributes for the main parser and the subparser that was selected by the
-   command line (and not any other subparsers).  So in the example above, when
-   the ``a`` command is specified, only the ``foo`` and ``bar`` attributes are
-   present, and when the ``b`` command is specified, only the ``foo`` and
-   ``baz`` attributes are present.
+   Lưu ý rằng đối tượng được trả về bởi :meth:`parse_args` sẽ chỉ chứa các thuộc tính của parser chính và subparser được chọn trên dòng lệnh (không chứa bất kỳ subparser nào khác). Vì vậy, trong ví dụ trên, khi chỉ định lệnh ``a``, chỉ các thuộc tính ``foo`` và ``bar`` hiện diện; còn khi chỉ định lệnh ``b``, chỉ các thuộc tính ``foo`` và ``baz`` hiện diện.
 
-   If a subparser defines an argument with the same ``dest`` as the parent
-   parser, the two share a single namespace attribute, so the parent's value
-   won't be retained. Users should give them  distinct ``dest`` values to
-   keep both.
+   Nếu một subparser định nghĩa một đối số có cùng ``dest`` với parser cha, cả hai sẽ dùng chung một thuộc tính namespace, nên giá trị của parser cha sẽ không được giữ lại. Người dùng nên cung cấp cho chúng các giá trị ``dest`` khác nhau để giữ lại cả hai.
 
-   Similarly, when a help message is requested from a subparser, only the help
-   for that particular parser will be printed.  The help message will not
-   include parent parser or sibling parser messages.  (A help message for each
-   subparser command, however, can be given by supplying the ``help=`` argument
-   to :meth:`~_SubParsersAction.add_parser` as above.)
+   Tương tự, khi yêu cầu thông báo trợ giúp từ một subparser, chỉ thông báo trợ giúp của parser cụ thể đó được in ra. Thông báo trợ giúp sẽ không bao gồm thông báo của parser cha hoặc parser cùng cấp. (Tuy nhiên, có thể cung cấp thông báo trợ giúp cho từng lệnh subparser bằng cách truyền đối số ``help=`` cho :meth:`~_SubParsersAction.add_parser` như trên.)
 
    ::
 
@@ -1810,9 +1406,7 @@ Subcommands
        -h, --help     show this help message and exit
        --baz {X,Y,Z}  baz help
 
-   The :meth:`add_subparsers` method also supports ``title`` and ``description``
-   keyword arguments.  When either is present, the subparser's commands will
-   appear in their own group in the help output.  For example::
+   Phương thức :meth:`add_subparsers` cũng hỗ trợ các đối số keyword ``title`` và ``description``. Khi có một trong hai đối số này, các lệnh của subparser sẽ xuất hiện trong nhóm riêng của chúng trong phần đầu ra trợ giúp. Ví dụ:::
 
      >>> parser = argparse.ArgumentParser()
      >>> subparsers = parser.add_subparsers(title='subcommands',
@@ -1831,10 +1425,7 @@ Subcommands
 
        {foo,bar}   additional help
 
-   Furthermore, :meth:`~_SubParsersAction.add_parser` supports an additional
-   *aliases* argument,
-   which allows multiple strings to refer to the same subparser. This example,
-   like ``svn``, aliases ``co`` as a shorthand for ``checkout``::
+   Ngoài ra, :meth:`~_SubParsersAction.add_parser` hỗ trợ một đối số *aliases* bổ sung, cho phép dùng nhiều chuỗi để tham chiếu đến cùng một subparser. Ví dụ này, giống như ``svn``, dùng ``co`` làm bí danh viết tắt cho ``checkout``::
 
      >>> parser = argparse.ArgumentParser()
      >>> subparsers = parser.add_subparsers()
@@ -1843,8 +1434,7 @@ Subcommands
      >>> parser.parse_args(['co', 'bar'])
      Namespace(foo='bar')
 
-   :meth:`~_SubParsersAction.add_parser` supports also an additional
-   *deprecated* argument, which allows to deprecate the subparser.
+   :meth:`~_SubParsersAction.add_parser` cũng hỗ trợ một đối số *deprecated*, cho phép đánh dấu subparser là không còn được khuyến nghị.
 
       >>> import argparse
       >>> parser = argparse.ArgumentParser(prog='chicken.py')
@@ -1857,49 +1447,41 @@ Subcommands
 
    .. versionadded:: 3.13
 
-   One particularly effective way of handling subcommands is to combine the use
-   of the :meth:`add_subparsers` method with calls to :meth:`set_defaults` so
-   that each subparser knows which Python function it should execute.  For
-   example::
+   Một cách đặc biệt hiệu quả để xử lý các subcommand là kết hợp việc sử dụng phương thức :meth:`add_subparsers` với các lệnh gọi đến :meth:`set_defaults`, để mỗi subparser biết mình nên thực thi hàm Python nào. Ví dụ::
 
-     >>> # subcommand functions
+     >>> # các hàm subcommand
      >>> def foo(args):
      ...     print(args.x * args.y)
      ...
      >>> def bar(args):
      ...     print('((%s))' % args.z)
      ...
-     >>> # create the top-level parser
+     >>> # tạo parser cấp cao nhất
      >>> parser = argparse.ArgumentParser()
      >>> subparsers = parser.add_subparsers(required=True)
      >>>
-     >>> # create the parser for the "foo" command
+     >>> # tạo parser cho lệnh "foo"
      >>> parser_foo = subparsers.add_parser('foo')
      >>> parser_foo.add_argument('-x', type=int, default=1)
      >>> parser_foo.add_argument('y', type=float)
      >>> parser_foo.set_defaults(func=foo)
      >>>
-     >>> # create the parser for the "bar" command
+     >>> # tạo parser cho lệnh "bar"
      >>> parser_bar = subparsers.add_parser('bar')
      >>> parser_bar.add_argument('z')
      >>> parser_bar.set_defaults(func=bar)
      >>>
-     >>> # parse the args and call whatever function was selected
+     >>> # phân tích các đối số và gọi hàm đã được chọn
      >>> args = parser.parse_args('foo 1 -x 2'.split())
      >>> args.func(args)
      2.0
      >>>
-     >>> # parse the args and call whatever function was selected
+     >>> # phân tích các đối số và gọi hàm đã được chọn
      >>> args = parser.parse_args('bar XYZYX'.split())
      >>> args.func(args)
      ((XYZYX))
 
-   This way, you can let :meth:`parse_args` do the job of calling the
-   appropriate function after argument parsing is complete.  Associating
-   functions with actions like this is typically the easiest way to handle the
-   different actions for each of your subparsers.  However, if it is necessary
-   to check the name of the subparser that was invoked, the ``dest`` keyword
-   argument to the :meth:`add_subparsers` call will work::
+   Bằng cách này, bạn có thể để :meth:`parse_args` thực hiện việc gọi hàm thích hợp sau khi hoàn tất phân tích đối số. Việc liên kết các hàm với những action như thế này thường là cách dễ nhất để xử lý các action khác nhau cho từng subparser. Tuy nhiên, nếu cần kiểm tra tên của subparser đã được gọi, đối số từ khóa ``dest`` trong lệnh gọi :meth:`add_subparsers` sẽ hoạt động::
 
      >>> parser = argparse.ArgumentParser()
      >>> subparsers = parser.add_subparsers(dest='subparser_name')
@@ -1911,23 +1493,19 @@ Subcommands
      Namespace(subparser_name='2', y='frobble')
 
    .. versionchanged:: 3.7
-      New *required* keyword-only parameter.
+      Tham số chỉ từ khóa *required* mới.
 
    .. versionchanged:: 3.14
-      Subparser's *prog* is no longer affected by a custom usage message in
-      the main parser.
+      *prog* của subparser không còn bị ảnh hưởng bởi thông báo usage tùy chỉnh trong parser chính.
 
 
-FileType objects
-^^^^^^^^^^^^^^^^
+Đối tượng FileType
+^^^^^^^^^^^^^^^^^^
 
 .. class:: FileType(mode='r', bufsize=-1, encoding=None, errors=None)
 
-   The :class:`FileType` factory creates objects that can be passed to the type
-   argument of :meth:`ArgumentParser.add_argument`.  Arguments that have
-   :class:`FileType` objects as their type will open command-line arguments as
-   files with the requested modes, buffer sizes, encodings and error handling
-   (see the :func:`open` function for more details)::
+   Factory :class:`FileType` tạo các đối tượng có thể được truyền vào đối số type của :meth:`ArgumentParser.add_argument`. Các đối số có
+   kiểu là đối tượng :class:`FileType` sẽ mở các đối số dòng lệnh dưới dạng tệp với các chế độ, kích thước bộ đệm, encoding và cách xử lý lỗi được yêu cầu (xem hàm :func:`open` để biết thêm chi tiết)::
 
       >>> parser = argparse.ArgumentParser()
       >>> parser.add_argument('--raw', type=argparse.FileType('wb', 0))
@@ -1935,9 +1513,8 @@ FileType objects
       >>> parser.parse_args(['--raw', 'raw.dat', 'file.txt'])
       Namespace(out=<_io.TextIOWrapper name='file.txt' mode='w' encoding='UTF-8'>, raw=<_io.FileIO name='raw.dat' mode='wb'>)
 
-   FileType objects understand the pseudo-argument ``'-'`` and automatically
-   convert this into :data:`sys.stdin` for readable :class:`FileType` objects and
-   :data:`sys.stdout` for writable :class:`FileType` objects::
+   Các đối tượng FileType hiểu đối số giả ``'-'`` và tự động chuyển đổi đối số này thành :data:`sys.stdin` cho các đối tượng :class:`FileType` có thể đọc và
+   :data:`sys.stdout` cho các đối tượng :class:`FileType` có thể ghi::
 
       >>> parser = argparse.ArgumentParser()
       >>> parser.add_argument('infile', type=argparse.FileType('r'))
@@ -1946,29 +1523,22 @@ FileType objects
 
    .. note::
 
-      If one argument uses *FileType* and then a subsequent argument fails,
-      an error is reported but the file is not automatically closed.
-      This can also clobber the output files.
-      In this case, it would be better to wait until after the parser has
-      run and then use the :keyword:`with`-statement to manage the files.
+      Nếu một đối số sử dụng *FileType* rồi một đối số tiếp theo không thành công, lỗi sẽ được báo cáo nhưng tệp không được tự động đóng. Điều này cũng có thể ghi đè các tệp đầu ra. Trong trường hợp này, tốt hơn nên đợi cho đến khi parser chạy xong rồi sử dụng câu lệnh :keyword:`with` để quản lý các tệp.
 
    .. versionchanged:: 3.4
-      Added the *encoding* and *errors* parameters.
+      Đã thêm các tham số *encoding* và *errors*.
 
    .. deprecated:: 3.14
 
 
-Argument groups
+Các nhóm đối số
 ^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.add_argument_group(title=None, description=None, *, \
                                               [argument_default], [conflict_handler])
 
-   By default, :class:`ArgumentParser` groups command-line arguments into
-   "positional arguments" and "options" when displaying help
-   messages. When there is a better conceptual grouping of arguments than this
-   default one, appropriate groups can be created using the
-   :meth:`!add_argument_group` method::
+   Theo mặc định, :class:`ArgumentParser` nhóm các đối số dòng lệnh thành "positional arguments" và "options" khi hiển thị thông báo trợ giúp. Khi có cách nhóm đối số phù hợp hơn về mặt khái niệm so với cách mặc định này, bạn có thể tạo các nhóm thích hợp bằng cách sử dụng
+   phương thức :meth:`!add_argument_group`::
 
      >>> parser = argparse.ArgumentParser(prog='PROG', add_help=False)
      >>> group = parser.add_argument_group('group')
@@ -1981,13 +1551,8 @@ Argument groups
        bar    bar help
        --foo FOO  foo help
 
-   The :meth:`add_argument_group` method returns an argument group object which
-   has an :meth:`~ArgumentParser.add_argument` method just like a regular
-   :class:`ArgumentParser`.  When an argument is added to the group, the parser
-   treats it just like a normal argument, but displays the argument in a
-   separate group for help messages.  The :meth:`!add_argument_group` method
-   accepts *title* and *description* arguments which can be used to
-   customize this display::
+   Phương thức :meth:`add_argument_group` trả về một đối tượng nhóm đối số có phương thức :meth:`~ArgumentParser.add_argument` giống như một
+   :class:`ArgumentParser` thông thường. Khi một đối số được thêm vào nhóm, parser xử lý nó giống như một đối số thông thường, nhưng hiển thị đối số đó trong một nhóm riêng biệt trong các thông báo trợ giúp. Phương thức :meth:`!add_argument_group` chấp nhận các đối số *title* và *description*, có thể được dùng để tùy chỉnh nội dung hiển thị này::
 
      >>> parser = argparse.ArgumentParser(prog='PROG', add_help=False)
      >>> group1 = parser.add_argument_group('group1', 'group1 description')
@@ -2007,35 +1572,25 @@ Argument groups
 
        --bar BAR  bar help
 
-   The optional, keyword-only parameters argument_default_ and conflict_handler_
-   allow for finer-grained control of the behavior of the argument group. These
-   parameters have the same meaning as in the :class:`ArgumentParser` constructor,
-   but apply specifically to the argument group rather than the entire parser.
+   Các tham số chỉ dành cho từ khóa và không bắt buộc argument_default_ và conflict_handler_ cho phép kiểm soát chi tiết hơn hành vi của nhóm đối số. Các tham số này có cùng ý nghĩa như trong hàm khởi tạo :class:`ArgumentParser`, nhưng chỉ áp dụng cho nhóm đối số thay vì toàn bộ parser.
 
-   Note that any arguments not in your user-defined groups will end up back
-   in the usual "positional arguments" and "optional arguments" sections.
+   Lưu ý rằng mọi đối số không nằm trong các nhóm do bạn định nghĩa sẽ được đưa trở lại các phần thông thường "positional arguments" và "optional arguments".
 
-   Within each argument group, arguments are displayed in help output in the
-   order in which they are added.
+   Trong mỗi nhóm đối số, các đối số được hiển thị trong đầu ra trợ giúp theo thứ tự mà chúng được thêm vào.
 
    .. deprecated-removed:: 3.11 3.14
-      Calling :meth:`add_argument_group` on an argument group now raises an
-      exception. This nesting was never supported, often failed to work
-      correctly, and was unintentionally exposed through inheritance.
+      Hiện tại, việc gọi :meth:`add_argument_group` trên một nhóm đối số sẽ phát sinh ngoại lệ. Việc lồng nhóm này chưa bao giờ được hỗ trợ, thường không hoạt động chính xác và đã vô tình được để lộ thông qua tính kế thừa.
 
    .. deprecated:: 3.14
-      Passing prefix_chars_ to :meth:`add_argument_group`
-      is now deprecated.
+      Việc truyền prefix_chars_ cho :meth:`add_argument_group` hiện không còn được khuyến nghị.
 
 
-Mutual exclusion
-^^^^^^^^^^^^^^^^
+Loại trừ lẫn nhau
+^^^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.add_mutually_exclusive_group(required=False)
 
-   Create a mutually exclusive group. :mod:`!argparse` will make sure that only
-   one of the arguments in the mutually exclusive group was present on the
-   command line::
+   Tạo một nhóm loại trừ lẫn nhau. :mod:`!argparse` sẽ đảm bảo rằng chỉ một trong các đối số thuộc nhóm loại trừ lẫn nhau xuất hiện trên dòng lệnh::
 
      >>> parser = argparse.ArgumentParser(prog='PROG')
      >>> group = parser.add_mutually_exclusive_group()
@@ -2049,9 +1604,7 @@ Mutual exclusion
      usage: PROG [-h] [--foo | --bar]
      PROG: error: argument --bar: not allowed with argument --foo
 
-   The :meth:`add_mutually_exclusive_group` method also accepts a *required*
-   argument, to indicate that at least one of the mutually exclusive arguments
-   is required::
+   Phương thức :meth:`add_mutually_exclusive_group` cũng chấp nhận đối số *required*, để cho biết rằng cần có ít nhất một trong các đối số loại trừ lẫn nhau::
 
      >>> parser = argparse.ArgumentParser(prog='PROG')
      >>> group = parser.add_mutually_exclusive_group(required=True)
@@ -2061,11 +1614,8 @@ Mutual exclusion
      usage: PROG [-h] (--foo | --bar)
      PROG: error: one of the arguments --foo --bar is required
 
-   Note that currently mutually exclusive argument groups do not support the
-   *title* and *description* arguments of
-   :meth:`~ArgumentParser.add_argument_group`. However, a mutually exclusive
-   group can be added to an argument group that has a title and description.
-   For example::
+   Lưu ý rằng hiện tại, các nhóm đối số loại trừ lẫn nhau không hỗ trợ các đối số *title* và *description* của
+   :meth:`~ArgumentParser.add_argument_group`. Tuy nhiên, một nhóm loại trừ lẫn nhau có thể được thêm vào một nhóm đối số có tiêu đề và mô tả. Ví dụ::
 
      >>> parser = argparse.ArgumentParser(prog='PROG')
      >>> group = parser.add_argument_group('Group title', 'Group description')
@@ -2085,22 +1635,15 @@ Mutual exclusion
        --bar BAR   bar help
 
    .. deprecated-removed:: 3.11 3.14
-      Calling :meth:`add_argument_group` or :meth:`add_mutually_exclusive_group`
-      on a mutually exclusive group now raises an exception. This nesting was
-      never supported, often failed to work correctly, and was unintentionally
-      exposed through inheritance.
+      Việc gọi :meth:`add_argument_group` hoặc :meth:`add_mutually_exclusive_group` trên một nhóm loại trừ lẫn nhau hiện sẽ phát sinh ngoại lệ. Kiểu lồng ghép này chưa bao giờ được hỗ trợ, thường không hoạt động chính xác và đã vô tình được cung cấp thông qua tính kế thừa.
 
 
-Parser defaults
-^^^^^^^^^^^^^^^
+Giá trị mặc định của parser
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.set_defaults(**kwargs)
 
-   Most of the time, the attributes of the object returned by :meth:`parse_args`
-   will be fully determined by inspecting the command-line arguments and the argument
-   actions.  :meth:`set_defaults` allows some additional
-   attributes that are determined without any inspection of the command line to
-   be added::
+   Trong hầu hết trường hợp, các thuộc tính của đối tượng được trả về bởi :meth:`parse_args` sẽ được xác định hoàn toàn bằng cách kiểm tra các đối số dòng lệnh và các argument action. :meth:`set_defaults` cho phép thêm một số thuộc tính bổ sung được xác định mà không cần kiểm tra dòng lệnh::
 
      >>> parser = argparse.ArgumentParser()
      >>> parser.add_argument('foo', type=int)
@@ -2108,9 +1651,7 @@ Parser defaults
      >>> parser.parse_args(['736'])
      Namespace(bar=42, baz='badger', foo=736)
 
-   Note that defaults can be set at both the parser level using :meth:`set_defaults`
-   and at the argument level using :meth:`add_argument`. If both are called for the
-   same argument, the last default set for an argument is used::
+   Lưu ý rằng có thể thiết lập giá trị mặc định ở cả cấp parser bằng :meth:`set_defaults` và cấp argument bằng :meth:`add_argument`. Nếu cả hai đều được gọi cho cùng một argument, giá trị mặc định được thiết lập sau cùng cho argument đó sẽ được sử dụng::
 
      >>> parser = argparse.ArgumentParser()
      >>> parser.add_argument('--foo', default='bar')
@@ -2118,14 +1659,12 @@ Parser defaults
      >>> parser.parse_args([])
      Namespace(foo='spam')
 
-   Parser-level defaults can be particularly useful when working with multiple
-   parsers.  See the :meth:`~ArgumentParser.add_subparsers` method for an
-   example of this type.
+   Giá trị mặc định ở cấp parser đặc biệt hữu ích khi làm việc với nhiều parser. Xem phương thức :meth:`~ArgumentParser.add_subparsers` để biết ví dụ về loại này.
 
 .. method:: ArgumentParser.get_default(dest)
 
-   Get the default value for a namespace attribute, as set by either
-   :meth:`~ArgumentParser.add_argument` or by
+   Lấy giá trị mặc định cho một thuộc tính namespace, được thiết lập bởi một trong hai cách sau
+   :meth:`~ArgumentParser.add_argument` hoặc bằng
    :meth:`~ArgumentParser.set_defaults`::
 
      >>> parser = argparse.ArgumentParser()
@@ -2134,53 +1673,39 @@ Parser defaults
      'badger'
 
 
-Printing help
-^^^^^^^^^^^^^
+In thông tin trợ giúp
+^^^^^^^^^^^^^^^^^^^^^
 
-In most typical applications, :meth:`~ArgumentParser.parse_args` will take
-care of formatting and printing any usage or error messages.  However, several
-formatting methods are available:
+Trong hầu hết các ứng dụng thông thường, :meth:`~ArgumentParser.parse_args` sẽ đảm nhiệm việc định dạng và in mọi thông báo về cách sử dụng hoặc lỗi. Tuy nhiên, có sẵn một số phương thức định dạng:
 
 .. method:: ArgumentParser.print_usage(file=None)
 
-   Print a brief description of how the :class:`ArgumentParser` should be
-   invoked on the command line.  If *file* is ``None``, :data:`sys.stdout` is
-   assumed.
+   In mô tả ngắn gọn về cách :class:`ArgumentParser` nên được gọi trên dòng lệnh. Nếu *file* là ``None``, thì :data:`sys.stdout` được giả định.
 
 .. method:: ArgumentParser.print_help(file=None)
 
-   Print a help message, including the program usage and information about the
-   arguments registered with the :class:`ArgumentParser`.  If *file* is
-   ``None``, :data:`sys.stdout` is assumed.
+   In thông báo trợ giúp, bao gồm cách sử dụng chương trình và thông tin về các đối số đã đăng ký với :class:`ArgumentParser`. Nếu *file* là ``None``, thì :data:`sys.stdout` được giả định.
 
-There are also variants of these methods that simply return a string instead of
-printing it:
+Ngoài ra còn có các biến thể của những phương thức này, chỉ trả về một chuỗi thay vì in chuỗi đó:
 
 .. method:: ArgumentParser.format_usage()
 
-   Return a string containing a brief description of how the
-   :class:`ArgumentParser` should be invoked on the command line.
+   Trả về một chuỗi chứa mô tả ngắn gọn về cách
+   :class:`ArgumentParser` nên được gọi trên dòng lệnh.
 
 .. method:: ArgumentParser.format_help()
 
-   Return a string containing a help message, including the program usage and
-   information about the arguments registered with the :class:`ArgumentParser`.
+   Trả về một chuỗi chứa thông báo trợ giúp, bao gồm cách sử dụng chương trình và thông tin về các đối số đã đăng ký với :class:`ArgumentParser`.
 
 
-Partial parsing
-^^^^^^^^^^^^^^^
+Phân tích cú pháp một phần
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.parse_known_args(args=None, namespace=None)
 
-   Sometimes a script only needs to handle a specific set of command-line
-   arguments, leaving any unrecognized arguments for another script or program.
-   In these cases, the :meth:`~ArgumentParser.parse_known_args` method can be
-   useful.
+   Đôi khi, một script chỉ cần xử lý một tập hợp đối số dòng lệnh cụ thể và để các đối số không được nhận dạng cho một script hoặc chương trình khác. Trong những trường hợp này, phương thức :meth:`~ArgumentParser.parse_known_args` có thể hữu ích.
 
-   This method works similarly to :meth:`~ArgumentParser.parse_args`, but it does
-   not raise an error for extra, unrecognized arguments. Instead, it parses the
-   known arguments and returns a two item tuple that contains the populated
-   namespace and the list of any unrecognized arguments.
+   Phương thức này hoạt động tương tự như :meth:`~ArgumentParser.parse_args`, nhưng không báo lỗi đối với các đối số thừa, không được nhận dạng. Thay vào đó, phương thức phân tích các đối số đã biết và trả về một tuple gồm hai phần tử, chứa namespace đã được điền và danh sách mọi đối số không được nhận dạng.
 
    ::
 
@@ -2193,43 +1718,33 @@ Partial parsing
 .. warning::
    :ref:`Prefix matching <prefix-matching>` rules apply to
    :meth:`~ArgumentParser.parse_known_args`. The parser may consume an option even if it's just
-   a prefix of one of its known options, instead of leaving it in the remaining
-   arguments list.
+   một tiền tố của một trong các tùy chọn đã biết, thay vì để nó trong danh sách các đối số còn lại.
 
 
-Customizing file parsing
-^^^^^^^^^^^^^^^^^^^^^^^^
+Tùy chỉnh việc phân tích cú pháp tệp
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.convert_arg_line_to_args(arg_line)
 
-   Arguments that are read from a file (see the *fromfile_prefix_chars*
-   keyword argument to the :class:`ArgumentParser` constructor) are read one
-   argument per line. :meth:`convert_arg_line_to_args` can be overridden for
-   fancier reading.
+   Các đối số được đọc từ một tệp (xem đối số từ khóa *fromfile_prefix_chars* của hàm khởi tạo :class:`ArgumentParser`) được đọc, mỗi dòng một đối số. Có thể ghi đè :meth:`convert_arg_line_to_args` để thực hiện cách đọc nâng cao hơn.
 
-   This method takes a single argument *arg_line* which is a string read from
-   the argument file.  It returns a list of arguments parsed from this string.
-   The method is called once per line read from the argument file, in order.
+   Phương thức này nhận một đối số duy nhất *arg_line*, là một chuỗi được đọc từ tệp đối số. Phương thức trả về một danh sách các đối số được phân tích từ chuỗi này. Phương thức được gọi tuần tự một lần cho mỗi dòng được đọc từ tệp đối số.
 
-   A useful override of this method is one that treats each space-separated word
-   as an argument.  The following example demonstrates how to do this::
+   Một cách override hữu ích cho phương thức này là coi mỗi từ được phân tách bằng dấu cách là một đối số. Ví dụ sau đây minh họa cách thực hiện điều này::
 
     class MyArgumentParser(argparse.ArgumentParser):
         def convert_arg_line_to_args(self, arg_line):
             return arg_line.split()
 
-   Note that with this override an argument can no longer contain spaces, since
-   each space-separated word becomes a separate argument.
+   Lưu ý rằng với cách override này, một đối số không còn có thể chứa dấu cách, vì mỗi từ được phân tách bằng dấu cách sẽ trở thành một đối số riêng biệt.
 
 
-Exiting methods
-^^^^^^^^^^^^^^^
+Các phương thức thoát
+^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.exit(status=0, message=None)
 
-   This method terminates the program, exiting with the specified *status*
-   and, if given, it prints a *message* to :data:`sys.stderr` before that.
-   The user can override this method to handle these steps differently::
+   Phương thức này kết thúc chương trình với *trạng thái* được chỉ định và, nếu được cung cấp, sẽ in *thông báo* tới :data:`sys.stderr` trước đó. Người dùng có thể override phương thức này để xử lý các bước này theo cách khác::
 
     class ErrorCatchingArgumentParser(argparse.ArgumentParser):
         def exit(self, status=0, message=None):
@@ -2239,31 +1754,23 @@ Exiting methods
 
 .. method:: ArgumentParser.error(message)
 
-   This method prints a usage message, including the *message*, to
-   :data:`sys.stderr` and terminates the program with a status code of 2.
+   Phương thức này in thông báo sử dụng, bao gồm *thông báo*, tới
+   :data:`sys.stderr` và kết thúc chương trình với mã trạng thái là 2.
 
 
-Intermixed parsing
-^^^^^^^^^^^^^^^^^^
+Phân tích xen kẽ
+^^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.parse_intermixed_args(args=None, namespace=None)
 .. method:: ArgumentParser.parse_known_intermixed_args(args=None, namespace=None)
 
-   A number of Unix commands allow the user to intermix optional arguments with
-   positional arguments.  The :meth:`~ArgumentParser.parse_intermixed_args`
-   and :meth:`~ArgumentParser.parse_known_intermixed_args` methods
-   support this parsing style.
+   Một số lệnh Unix cho phép người dùng xen kẽ các đối số tùy chọn với các đối số vị trí. Các phương thức :meth:`~ArgumentParser.parse_intermixed_args` và :meth:`~ArgumentParser.parse_known_intermixed_args` hỗ trợ kiểu phân tích cú pháp này.
 
-   These parsers do not support all the :mod:`!argparse` features, and will raise
-   exceptions if unsupported features are used.  In particular, subparsers,
-   and mutually exclusive groups that include both
-   optionals and positionals are not supported.
+   Các parser này không hỗ trợ tất cả các tính năng của :mod:`!argparse` và sẽ phát sinh ngoại lệ nếu sử dụng các tính năng không được hỗ trợ. Cụ thể, subparser và các nhóm loại trừ lẫn nhau có cả đối số tùy chọn lẫn đối số vị trí đều không được hỗ trợ.
 
-   The following example shows the difference between
-   :meth:`~ArgumentParser.parse_known_args` and
-   :meth:`~ArgumentParser.parse_intermixed_args`: the former returns ``['2',
-   '3']`` as unparsed arguments, while the latter collects all the positionals
-   into ``rest``.  ::
+   Ví dụ sau đây cho thấy sự khác biệt giữa
+   :meth:`~ArgumentParser.parse_known_args` và
+   :meth:`~ArgumentParser.parse_intermixed_args`: cái trước trả về ``['2', '3']`` dưới dạng các đối số chưa được phân tích, còn cái sau tập hợp tất cả các đối số vị trí vào ``rest``.::
 
       >>> parser = argparse.ArgumentParser()
       >>> parser.add_argument('--foo')
@@ -2274,30 +1781,22 @@ Intermixed parsing
       >>> parser.parse_intermixed_args('doit 1 --foo bar 2 3'.split())
       Namespace(cmd='doit', foo='bar', rest=[1, 2, 3])
 
-   :meth:`~ArgumentParser.parse_known_intermixed_args` returns a two item tuple
-   containing the populated namespace and the list of remaining argument strings.
-   :meth:`~ArgumentParser.parse_intermixed_args` raises an error if there are any
-   remaining unparsed argument strings.
+   :meth:`~ArgumentParser.parse_known_intermixed_args` trả về một tuple gồm hai phần tử, chứa namespace đã được điền và danh sách các chuỗi đối số còn lại.
+   :meth:`~ArgumentParser.parse_intermixed_args` sẽ báo lỗi nếu còn bất kỳ chuỗi đối số nào chưa được phân tích.
 
    .. versionadded:: 3.7
 
 
-Registering custom types or actions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Đăng ký các kiểu hoặc action tùy chỉnh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: ArgumentParser.register(registry_name, value, object)
 
-   Sometimes it's desirable to use a custom string in error messages to provide
-   more user-friendly output. In these cases, :meth:`!register` can be used to
-   register custom actions or types with a parser and allow you to reference the
-   type by their registered name instead of their callable name.
+   Đôi khi, việc sử dụng một chuỗi tùy chỉnh trong thông báo lỗi là điều hữu ích để tạo ra nội dung thân thiện hơn với người dùng. Trong những trường hợp này, :meth:`!register` có thể được dùng để đăng ký các action hoặc kiểu tùy chỉnh với parser và cho phép bạn tham chiếu đến kiểu bằng tên đã đăng ký thay vì tên callable của kiểu đó.
 
-   The :meth:`!register` method accepts three arguments - a *registry_name*,
-   specifying the internal registry where the object will be stored (e.g.,
-   ``action``, ``type``), *value*, which is the key under which the object will
-   be registered, and object, the callable to be registered.
+   Phương thức :meth:`!register` nhận ba đối số - một *registry_name*, chỉ định registry nội bộ nơi đối tượng sẽ được lưu trữ (ví dụ: ``action``, ``type``), một *value*, là khóa dùng để đăng ký đối tượng, và object, callable cần đăng ký.
 
-   The following example shows how to register a custom type with a parser::
+   Ví dụ sau đây cho biết cách đăng ký một kiểu tùy chỉnh với parser::
 
       >>> import argparse
       >>> parser = argparse.ArgumentParser()
@@ -2310,22 +1809,21 @@ Registering custom types or actions
       usage: PROG [-h] [--foo FOO]
       PROG: error: argument --foo: invalid 'hexadecimal integer' value: '1.2'
 
-Exceptions
-----------
+Ngoại lệ
+--------
 
 .. exception:: ArgumentError
 
-   An error from creating or using an argument (optional or positional).
+   Lỗi phát sinh khi tạo hoặc sử dụng một đối số (tùy chọn hoặc vị trí).
 
-   The string value of this exception is the message, augmented with
-   information about the argument that caused it.
+   Giá trị chuỗi của ngoại lệ này là thông báo, được bổ sung thông tin về đối số gây ra lỗi.
 
 .. exception:: ArgumentTypeError
 
-   Raised when something goes wrong converting a command line string to a type.
+   Được phát sinh khi xảy ra lỗi trong quá trình chuyển đổi chuỗi dòng lệnh sang một kiểu dữ liệu.
 
 
-.. rubric:: Guides and Tutorials
+.. rubric:: Hướng dẫn và Bài hướng dẫn
 
 .. toctree::
    :maxdepth: 1

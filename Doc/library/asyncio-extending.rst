@@ -1,98 +1,84 @@
 .. currentmodule:: asyncio
 
 
-=========
-Extending
-=========
+=======
+Mở rộng
+=======
 
-The main direction for :mod:`asyncio` extending is writing custom *event loop*
-classes. Asyncio has helpers that could be used to simplify this task.
+Hướng chính để mở rộng :mod:`asyncio` là viết các lớp *event loop* tùy chỉnh. Asyncio cung cấp các helper có thể được dùng để đơn giản hóa nhiệm vụ này.
 
 .. note::
 
-   Third-parties should reuse existing asyncio code with caution,
-   a new Python version is free to break backward compatibility
-   in *internal* part of API.
+   Các bên thứ ba nên thận trọng khi sử dụng lại mã asyncio hiện có; một phiên bản Python mới có thể tự do phá vỡ khả năng tương thích ngược trong phần *internal* của API.
 
 
-Writing a Custom Event Loop
-===========================
+Viết Event Loop tùy chỉnh
+=========================
 
-:class:`asyncio.AbstractEventLoop` declares very many methods.  Implementing all them
-from scratch is a tedious job.
+:class:`asyncio.AbstractEventLoop` khai báo rất nhiều phương thức. Việc triển khai tất cả các phương thức đó từ đầu là một công việc tẻ nhạt.
 
-A loop can get many common methods implementation for free by inheriting from
+Một loop có thể được thừa hưởng miễn phí phần triển khai của nhiều phương thức phổ biến bằng cách kế thừa từ
 :class:`asyncio.BaseEventLoop`.
 
-In turn, the successor should implement a bunch of *private* methods declared but not
-implemented in :class:`asyncio.BaseEventLoop`.
+Đổi lại, lớp kế thừa phải triển khai một loạt phương thức *private* được khai báo nhưng chưa được triển khai trong :class:`asyncio.BaseEventLoop`.
 
-For example, ``loop.create_connection()`` checks arguments, resolves DNS addresses, and
-calls ``loop._make_socket_transport()`` that should be implemented by inherited class.
-The ``_make_socket_transport()`` method is not documented and is considered as an
-*internal* API.
+Ví dụ, ``loop.create_connection()`` kiểm tra các đối số, phân giải địa chỉ DNS và gọi ``loop._make_socket_transport()``, vốn cần được triển khai bởi lớp kế thừa. Phương thức ``_make_socket_transport()`` không được ghi chép và được xem là API *nội bộ*.
 
 
 
-Future and Task private constructors
-====================================
+Các constructor riêng tư của Future và Task
+===========================================
 
-:class:`asyncio.Future` and :class:`asyncio.Task` should be never created directly,
-please use corresponding :meth:`loop.create_future` and :meth:`loop.create_task`,
-or :func:`asyncio.create_task` factories instead.
+Không nên tạo trực tiếp :class:`asyncio.Future` và :class:`asyncio.Task`; hãy sử dụng :meth:`loop.create_future` và :meth:`loop.create_task` tương ứng, hoặc các factory :func:`asyncio.create_task`.
 
-However, third-party *event loops* may *reuse* built-in future and task implementations
-for the sake of getting a complex and highly optimized code for free.
+Tuy nhiên, các *event loop* của bên thứ ba có thể *tái sử dụng* các triển khai future và task tích hợp sẵn để có được miễn phí mã phức tạp và được tối ưu hóa cao.
 
-For this purpose the following, *private* constructors are listed:
+Với mục đích này, các constructor *riêng tư* sau đây được liệt kê:
 
 .. method:: Future.__init__(*, loop=None)
 
-   Create a built-in future instance.
+   Tạo một instance future tích hợp sẵn.
 
-   *loop* is an optional event loop instance.
+   *loop* là một instance event loop tùy chọn.
 
 .. method:: Task.__init__(coro, *, loop=None, name=None, context=None)
 
-   Create a built-in task instance.
+   Tạo một instance task tích hợp sẵn.
 
-   *loop* is an optional event loop instance. The rest of arguments are described in
-   :meth:`loop.create_task` description.
+   *loop* là một instance event loop tùy chọn. Các đối số còn lại được mô tả trong
+   :meth:`loop.create_task` mô tả.
 
    .. versionchanged:: 3.11
 
-      *context* argument is added.
+      Đối số *context* được thêm vào.
 
 
 
-Task lifetime support
-=====================
+Hỗ trợ vòng đời task
+====================
 
-A third party task implementation should call the following functions to keep a task
-visible by :func:`asyncio.all_tasks` and :func:`asyncio.current_task`:
+Một implementation task của bên thứ ba nên gọi các hàm sau để task vẫn hiển thị với :func:`asyncio.all_tasks` và :func:`asyncio.current_task`:
 
 .. function:: _register_task(task)
 
-   Register a new *task* as managed by *asyncio*.
+   Đăng ký một *task* mới dưới sự quản lý của *asyncio*.
 
-   Call the function from a task constructor.
+   Gọi hàm từ một constructor của task.
 
 .. function:: _unregister_task(task)
 
-   Unregister a *task* from *asyncio* internal structures.
+   Hủy đăng ký một *task* khỏi các cấu trúc nội bộ của *asyncio*.
 
-   The function should be called when a task is about to finish.
+   Hàm này sẽ được gọi khi một task sắp kết thúc.
 
 .. function:: _enter_task(loop, task)
 
-   Switch the current task to the *task* argument.
+   Chuyển task hiện tại sang đối số *task*.
 
-   Call the function just before executing a portion of embedded *coroutine*
-   (:meth:`coroutine.send` or :meth:`coroutine.throw`).
+   Gọi hàm ngay trước khi thực thi một phần của *coroutine* được nhúng (:meth:`coroutine.send` hoặc :meth:`coroutine.throw`).
 
 .. function:: _leave_task(loop, task)
 
-   Switch the current task back from *task* to ``None``.
+   Chuyển task hiện tại trở lại từ *task* sang ``None``.
 
-   Call the function just after :meth:`coroutine.send` or :meth:`coroutine.throw`
-   execution.
+   Gọi hàm ngay sau khi thực thi :meth:`coroutine.send` hoặc :meth:`coroutine.throw`.

@@ -1,12 +1,12 @@
-:mod:`!annotationlib` --- Functionality for introspecting annotations
-=====================================================================
+:mod:`!annotationlib` --- Chức năng tự kiểm tra các chú thích
+=============================================================
 
 .. module:: annotationlib
-   :synopsis: Functionality for introspecting annotations
+   :synopsis: Chức năng tự kiểm tra các chú thích
 
 .. versionadded:: 3.14
 
-**Source code:** :source:`Lib/annotationlib.py`
+**Mã nguồn:** :source:`Lib/annotationlib.py`
 
 .. testsetup:: default
 
@@ -15,72 +15,48 @@
 
 --------------
 
-The :mod:`!annotationlib` module provides tools for introspecting
-:term:`annotations <annotation>` on modules, classes, and functions.
+Mô-đun :mod:`!annotationlib` cung cấp các công cụ để tự kiểm tra
+:term:`các chú thích <annotation>` trên các mô-đun, lớp và hàm.
 
-Annotations are :ref:`lazily evaluated <lazy-evaluation>` and often contain
-forward references to objects that are not yet defined when the annotation
-is created. This module provides a set of low-level tools that can be used to retrieve annotations in a reliable way, even
-in the presence of forward references and other edge cases.
+Các chú thích được :ref:`đánh giá một cách trì hoãn <lazy-evaluation>` và thường chứa các tham chiếu tiến đến những đối tượng chưa được định nghĩa tại thời điểm chú thích được tạo. Mô-đun này cung cấp một tập hợp các công cụ cấp thấp có thể được sử dụng để truy xuất chú thích một cách đáng tin cậy, ngay cả khi có các tham chiếu tiến và những trường hợp biên khác.
 
-This module supports retrieving annotations in three main formats
-(see :class:`Format`), each of which works best for different use cases:
+Mô-đun này hỗ trợ truy xuất chú thích theo ba định dạng chính (xem :class:`Format`), mỗi định dạng phù hợp nhất với những trường hợp sử dụng khác nhau:
 
-* :attr:`~Format.VALUE` evaluates the annotations and returns their value.
-  This is most straightforward to work with, but it may raise errors,
-  for example if the annotations contain references to undefined names.
-* :attr:`~Format.FORWARDREF` returns :class:`ForwardRef` objects
-  for annotations that cannot be resolved, allowing you to inspect the
-  annotations without evaluating them. This is useful when you need to
-  work with annotations that may contain unresolved forward references.
-* :attr:`~Format.STRING` returns the annotations as a string, similar
-  to how it would appear in the source file. This is useful for documentation
-  generators that want to display annotations in a readable way.
+* :attr:`~Format.VALUE` đánh giá các annotation và trả về giá trị của chúng. Đây là cách làm đơn giản nhất, nhưng có thể phát sinh lỗi, chẳng hạn khi các annotation chứa tham chiếu đến những tên chưa được định nghĩa.
+* :attr:`~Format.FORWARDREF` trả về các đối tượng :class:`ForwardRef` cho những annotation không thể được phân giải, cho phép bạn kiểm tra các annotation mà không cần đánh giá chúng. Điều này hữu ích khi bạn cần làm việc với các annotation có thể chứa các forward reference chưa được phân giải.
+* :attr:`~Format.STRING` trả về các annotation dưới dạng chuỗi, tương tự như cách chúng xuất hiện trong tệp mã nguồn. Điều này hữu ích cho các trình tạo tài liệu muốn hiển thị annotation theo cách dễ đọc.
 
-The :func:`get_annotations` function is the main entry point for
-retrieving annotations. Given a function, class, or module, it returns
-an annotations dictionary in the requested format. This module also provides
-functionality for working directly with the :term:`annotate function`
-that is used to evaluate annotations, such as :func:`get_annotate_from_class_namespace`
-and :func:`call_annotate_function`, as well as the
-:func:`call_evaluate_function` function for working with
+Hàm :func:`get_annotations` là điểm truy cập chính để lấy các annotation. Với một function, class hoặc module, hàm này trả về một dictionary annotation ở định dạng được yêu cầu. Module này cũng cung cấp chức năng làm việc trực tiếp với :term:`annotate function` được dùng để đánh giá annotation, chẳng hạn như :func:`get_annotate_from_class_namespace` và :func:`call_annotate_function`, cũng như
+hàm :func:`call_evaluate_function` để làm việc với
 :term:`evaluate functions <evaluate function>`.
 
 .. caution::
 
-   Most functionality in this module can execute arbitrary code; see
-   :ref:`the security section <annotationlib-security>` for more information.
+   Hầu hết chức năng trong module này có thể thực thi mã tùy ý; hãy xem
+   :ref:`phần bảo mật <annotationlib-security>` để biết thêm thông tin.
 
 .. seealso::
 
-   :pep:`649` proposed the current model for how annotations work in Python.
+   :pep:`649` đã đề xuất mô hình hiện tại về cách annotation hoạt động trong Python.
 
-   :pep:`749` expanded on various aspects of :pep:`649` and introduced the
+   :pep:`749` đã mở rộng nhiều khía cạnh của :pep:`649` và giới thiệu
    :mod:`!annotationlib` module.
 
-   :ref:`annotations-howto` provides best practices for working with
-   annotations.
+   :ref:`annotations-howto` cung cấp các phương pháp hay nhất để làm việc với annotation.
 
-   :pypi:`typing-extensions` provides a backport of :func:`get_annotations`
-   that works on earlier versions of Python.
+   :pypi:`typing-extensions` cung cấp bản backport của :func:`get_annotations` có thể hoạt động trên các phiên bản Python cũ hơn.
 
-Annotation semantics
---------------------
+Ngữ nghĩa của annotation
+------------------------
 
-The way annotations are evaluated has changed over the history of Python 3,
-and currently still depends on a :ref:`future import <future>`.
-There have been execution models for annotations:
+Cách các chú thích được đánh giá đã thay đổi trong suốt lịch sử Python 3 và hiện vẫn phụ thuộc vào một :ref:`lệnh import future <future>`. Có các mô hình thực thi chú thích sau:
 
-* *Stock semantics* (default in Python 3.0 through 3.13; see :pep:`3107`
-  and :pep:`526`): Annotations are evaluated eagerly, as they are
-  encountered in the source code.
-* *Stringified annotations* (used with ``from __future__ import annotations``
-  in Python 3.7 and newer; see :pep:`563`): Annotations are stored as
-  strings only.
-* *Deferred evaluation* (default in Python 3.14 and newer; see :pep:`649` and
-  :pep:`749`): Annotations are evaluated lazily, only when they are accessed.
+* *Ngữ nghĩa mặc định* (mặc định trong Python 3.0 đến 3.13; xem :pep:`3107` và :pep:`526`): Các chú thích được đánh giá ngay khi được gặp trong mã nguồn.
+* *Chú thích dạng chuỗi* (được sử dụng với ``from __future__ import annotations`` trong Python 3.7 trở lên; xem :pep:`563`): Các chú thích chỉ được lưu dưới dạng chuỗi.
+* *Đánh giá trì hoãn* (mặc định trong Python 3.14 trở lên; xem :pep:`649` và
+  :pep:`749`): Các chú thích được đánh giá một cách lười biếng, chỉ khi chúng được truy cập.
 
-As an example, consider the following program::
+Ví dụ, hãy xem xét chương trình sau::
 
    def func(a: Cls) -> None:
        print(a)
@@ -89,154 +65,86 @@ As an example, consider the following program::
 
    print(func.__annotations__)
 
-This will behave as follows:
+Chương trình này sẽ hoạt động như sau:
 
-* Under stock semantics (Python 3.13 and earlier), it will throw a
-  :exc:`NameError` at the line where ``func`` is defined,
-  because ``Cls`` is an undefined name at that point.
-* Under stringified annotations (if ``from __future__ import annotations``
-  is used), it will print ``{'a': 'Cls', 'return': 'None'}``.
-* Under deferred evaluation (Python 3.14 and later), it will print
-  ``{'a': <class 'Cls'>, 'return': None}``.
+* Theo semantics mặc định (Python 3.13 trở về trước), nó sẽ ném ra một
+  :exc:`NameError` tại dòng nơi ``func`` được định nghĩa, vì ``Cls`` là một tên chưa được định nghĩa tại thời điểm đó.
+* Theo annotations dạng chuỗi (nếu sử dụng ``from __future__ import annotations``), nó sẽ in ``{'a': 'Cls', 'return': 'None'}``.
+* Theo đánh giá trì hoãn (Python 3.14 trở lên), nó sẽ in ``{'a': <class 'Cls'>, 'return': None}``.
 
-Stock semantics were used when function annotations were first introduced
-in Python 3.0 (by :pep:`3107`) because this was the simplest, most obvious
-way to implement annotations. The same execution model was used when variable
-annotations were introduced in Python 3.6 (by :pep:`526`). However,
-stock semantics caused problems when using annotations as type hints,
-such as a need to refer to names that are not yet defined when the
-annotation is encountered. In addition, there were performance problems
-with executing annotations at module import time. Therefore, in Python 3.7,
-:pep:`563` introduced the ability to store annotations as strings using the
-``from __future__ import annotations`` syntax. The plan at the time was to
-eventually make this behavior the default, but a problem appeared:
-stringified annotations are more difficult to process for those who
-introspect annotations at runtime. An alternative proposal, :pep:`649`,
-introduced the third execution model, deferred evaluation, and was implemented
-in Python 3.14. Stringified annotations are still used if
-``from __future__ import annotations`` is present, but this behavior will
-eventually be removed.
+Semantics mặc định được sử dụng khi function annotations lần đầu được giới thiệu trong Python 3.0 (bởi :pep:`3107`) vì đây là cách đơn giản và trực quan nhất để triển khai annotations. Cùng mô hình thực thi đó được sử dụng khi variable annotations được giới thiệu trong Python 3.6 (bởi :pep:`526`). Tuy nhiên, semantics mặc định gây ra vấn đề khi sử dụng annotations làm type hints, chẳng hạn như cần tham chiếu đến những tên chưa được định nghĩa khi annotation được gặp. Ngoài ra, việc thực thi annotations tại thời điểm module được import gây ra các vấn đề về hiệu năng. Vì vậy, trong Python 3.7,
+:pep:`563` đã giới thiệu khả năng lưu trữ annotations dưới dạng chuỗi bằng cú pháp ``from __future__ import annotations``. Khi đó, kế hoạch là cuối cùng sẽ đặt hành vi này làm mặc định, nhưng một vấn đề đã xuất hiện: annotations dạng chuỗi khó xử lý hơn đối với những công cụ kiểm tra annotations tại runtime. Một đề xuất thay thế, :pep:`649`, đã giới thiệu mô hình thực thi thứ ba, đó là đánh giá trì hoãn, và được triển khai trong Python 3.14. Annotations dạng chuỗi vẫn được sử dụng nếu có ``from __future__ import annotations``, nhưng hành vi này cuối cùng sẽ bị loại bỏ.
 
-Classes
+Các lớp
 -------
 
 .. class:: Format
 
-   An :class:`~enum.IntEnum` describing the formats in which annotations
-   can be returned. Members of the enum, or their equivalent integer values,
-   can be passed to :func:`get_annotations` and other functions in this
-   module, as well as to :attr:`~object.__annotate__` functions.
+   Một :class:`~enum.IntEnum` mô tả các định dạng mà trong đó chú thích có thể được trả về. Các thành viên của enum hoặc các giá trị số nguyên tương đương của chúng có thể được truyền vào :func:`get_annotations` và các hàm khác trong mô-đun này, cũng như vào các hàm :attr:`~object.__annotate__`.
 
    .. attribute:: VALUE
       :value: 1
 
-      Values are the result of evaluating the annotation expressions.
+      Các giá trị là kết quả của việc đánh giá các biểu thức chú thích.
 
    .. attribute:: VALUE_WITH_FAKE_GLOBALS
       :value: 2
 
-      Special value used to signal that an annotate function is being
-      evaluated in a special environment with fake globals. When passed this
-      value, annotate functions should either return the same value as for
-      the :attr:`Format.VALUE` format, or raise :exc:`NotImplementedError`
-      to signal that they do not support execution in this environment.
-      This format is only used internally and should not be passed to
-      the functions in this module.
+      Giá trị đặc biệt được dùng để báo hiệu rằng một hàm annotate đang được đánh giá trong một môi trường đặc biệt với các biến toàn cục giả. Khi được truyền giá trị này, các hàm annotate phải trả về cùng giá trị như đối với định dạng :attr:`Format.VALUE`, hoặc phát sinh :exc:`NotImplementedError` để báo hiệu rằng chúng không hỗ trợ thực thi trong môi trường này. Định dạng này chỉ được sử dụng nội bộ và không được truyền vào các hàm trong mô-đun này.
 
    .. attribute:: FORWARDREF
       :value: 3
 
-      Values are real annotation values (as per :attr:`Format.VALUE` format)
-      for defined values, and :class:`ForwardRef` proxies for undefined
-      values. Real objects may contain references to :class:`ForwardRef`
-      proxy objects.
+      Đối với các giá trị đã được định nghĩa, các giá trị là những giá trị chú thích thực (theo định dạng :attr:`Format.VALUE`), còn đối với các giá trị chưa được định nghĩa, chúng là các proxy :class:`ForwardRef`. Các đối tượng thực có thể chứa tham chiếu đến các đối tượng proxy :class:`ForwardRef`.
 
    .. attribute:: STRING
       :value: 4
 
-      Values are the text string of the annotation as it appears in the
-      source code, up to modifications including, but not restricted to,
-      whitespace normalizations and constant values optimizations.
+      Các giá trị là chuỗi văn bản của chú thích như xuất hiện trong mã nguồn, có thể đã qua các sửa đổi bao gồm nhưng không giới hạn ở việc chuẩn hóa khoảng trắng và tối ưu hóa các giá trị hằng số.
 
-      The exact values of these strings may change in future versions of Python.
+      Các giá trị chính xác của những chuỗi này có thể thay đổi trong các phiên bản Python tương lai.
 
    .. versionadded:: 3.14
 
 .. class:: ForwardRef
 
-   A proxy object for forward references in annotations.
+   Một đối tượng proxy cho các tham chiếu chuyển tiếp trong chú thích.
 
-   Instances of this class are returned when the :attr:`~Format.FORWARDREF`
-   format is used and annotations contain a name that cannot be resolved.
-   This can happen when a forward reference is used in an annotation, such as
-   when a class is referenced before it is defined.
+   Các instance của lớp này được trả về khi sử dụng định dạng :attr:`~Format.FORWARDREF` và chú thích chứa một tên không thể phân giải. Điều này có thể xảy ra khi sử dụng tham chiếu chuyển tiếp trong chú thích, chẳng hạn khi một lớp được tham chiếu trước khi được định nghĩa.
 
    .. attribute:: __forward_arg__
 
-      A string containing the code that was evaluated to produce the
-      :class:`~ForwardRef`. The string may not be exactly equivalent
-      to the original source.
+      Một chuỗi chứa đoạn mã đã được đánh giá để tạo ra
+      :class:`~ForwardRef`. Chuỗi này có thể không hoàn toàn tương đương với mã nguồn ban đầu.
 
    .. method:: evaluate(*, owner=None, globals=None, locals=None, type_params=None, format=Format.VALUE)
 
-      Evaluate the forward reference, returning its value.
+      Đánh giá tham chiếu chuyển tiếp và trả về giá trị của nó.
 
-      If the *format* argument is :attr:`~Format.VALUE` (the default),
-      this method may throw an exception, such as :exc:`NameError`, if the forward
-      reference refers to a name that cannot be resolved. The arguments to this
-      method can be used to provide bindings for names that would otherwise
-      be undefined. If the *format* argument is :attr:`~Format.FORWARDREF`,
-      the method will never throw an exception, but may return a :class:`~ForwardRef`
-      instance. For example, if the forward reference object contains the code
-      ``list[undefined]``, where ``undefined`` is a name that is not defined,
-      evaluating it with the :attr:`~Format.FORWARDREF` format will return
-      ``list[ForwardRef('undefined')]``. If the *format* argument is
-      :attr:`~Format.STRING`, the method will return :attr:`~ForwardRef.__forward_arg__`.
+      Nếu đối số *format* là :attr:`~Format.VALUE` (giá trị mặc định), phương thức này có thể ném ra một ngoại lệ, chẳng hạn như :exc:`NameError`, nếu tham chiếu chuyển tiếp trỏ đến một tên không thể phân giải. Các đối số của phương thức này có thể được dùng để cung cấp các liên kết cho những tên nếu không sẽ không được định nghĩa. Nếu đối số *format* là :attr:`~Format.FORWARDREF`, phương thức sẽ không bao giờ ném ra ngoại lệ, nhưng có thể trả về một instance :class:`~ForwardRef`. Ví dụ: nếu đối tượng tham chiếu chuyển tiếp chứa đoạn mã ``list[undefined]``, trong đó ``undefined`` là một tên chưa được định nghĩa, việc đánh giá nó bằng định dạng :attr:`~Format.FORWARDREF` sẽ trả về ``list[ForwardRef('undefined')]``. Nếu đối số *format* là
+      :attr:`~Format.STRING`, phương thức sẽ trả về :attr:`~ForwardRef.__forward_arg__`.
 
-      The *owner* parameter provides the preferred mechanism for passing scope
-      information to this method. The owner of a :class:`~ForwardRef` is the
-      object that contains the annotation from which the :class:`~ForwardRef`
-      derives, such as a module object, type object, or function object.
+      Tham số *owner* cung cấp cơ chế được ưu tiên để truyền thông tin về phạm vi đến phương thức này. Owner của một :class:`~ForwardRef` là đối tượng chứa chú thích mà từ đó :class:`~ForwardRef` được tạo ra, chẳng hạn như một đối tượng module, đối tượng kiểu hoặc đối tượng hàm.
 
-      The *globals*, *locals*, and *type_params* parameters provide a more precise
-      mechanism for influencing the names that are available when the :class:`~ForwardRef`
-      is evaluated. *globals* and *locals* are passed to :func:`eval`, representing
-      the global and local namespaces in which the name is evaluated.
-      The *type_params* parameter is relevant for objects created using the native
-      syntax for :ref:`generic classes <generic-classes>` and :ref:`functions <generic-functions>`.
-      It is a tuple of :ref:`type parameters <type-params>` that are in scope
-      while the forward reference is being evaluated. For example, if evaluating a
-      :class:`~ForwardRef` retrieved from an annotation found in the class namespace
-      of a generic class ``C``, *type_params* should be set to ``C.__type_params__``.
+      Các tham số *globals*, *locals* và *type_params* cung cấp một cơ chế chính xác hơn để tác động đến các tên khả dụng khi :class:`~ForwardRef` được đánh giá. *globals* và *locals* được truyền vào :func:`eval`, lần lượt biểu diễn các namespace toàn cục và cục bộ nơi tên đó được đánh giá. Tham số *type_params* liên quan đến các đối tượng được tạo bằng cú pháp native cho :ref:`generic classes <generic-classes>` và :ref:`functions <generic-functions>`. Đây là một tuple gồm các :ref:`type parameters <type-params>` nằm trong phạm vi khi forward reference được đánh giá. Ví dụ, nếu đang đánh giá một
+      :class:`~ForwardRef` được lấy từ một annotation trong namespace của một generic class ``C``, thì *type_params* phải được đặt thành ``C.__type_params__``.
 
-      :class:`~ForwardRef` instances returned by :func:`get_annotations`
-      retain references to information about the scope they originated from,
-      so calling this method with no further arguments may be sufficient to
-      evaluate such objects. :class:`~ForwardRef` instances created by other
-      means may not have any information about their scope, so passing
-      arguments to this method may be necessary to evaluate them successfully.
+      Các instance :class:`~ForwardRef` do :func:`get_annotations` trả về sẽ giữ các tham chiếu đến thông tin về phạm vi mà chúng bắt nguồn, vì vậy việc gọi phương thức này mà không cung cấp thêm đối số có thể đủ để đánh giá các đối tượng đó. Các instance :class:`~ForwardRef` được tạo bằng những cách khác có thể không có thông tin về phạm vi của chúng, vì vậy có thể cần truyền đối số cho phương thức này để đánh giá chúng thành công.
 
-      If no *owner*, *globals*, *locals*, or *type_params* are provided and the
-      :class:`~ForwardRef` does not contain information about its origin,
-      empty globals and locals dictionaries are used.
+      Nếu không cung cấp *owner*, *globals*, *locals* hoặc *type_params* nào và
+      :class:`~ForwardRef` không chứa thông tin về nguồn gốc của nó, các dictionary globals và locals rỗng sẽ được sử dụng.
 
    .. versionadded:: 3.14
 
 
-Functions
----------
+Các hàm
+-------
 
 .. function:: annotations_to_string(annotations)
 
-   Convert an annotations dict containing runtime values to a
-   dict containing only strings. If the values are not already strings,
-   they are converted using :func:`type_repr`.
-   This is meant as a helper for user-provided
-   annotate functions that support the :attr:`~Format.STRING` format but
-   do not have access to the code creating the annotations.
+   Chuyển một dict annotations chứa các giá trị runtime thành một dict chỉ chứa các chuỗi. Nếu các giá trị chưa phải là chuỗi, chúng sẽ được chuyển đổi bằng :func:`type_repr`. Đây là một helper dành cho các hàm annotate do người dùng cung cấp, hỗ trợ định dạng :attr:`~Format.STRING` nhưng không có quyền truy cập vào mã tạo ra các annotations.
 
-   For example, this is used to implement the :attr:`~Format.STRING` format
-   for :class:`typing.TypedDict` classes created through the functional syntax:
+   Ví dụ: cách này được dùng để triển khai định dạng :attr:`~Format.STRING` cho các lớp :class:`typing.TypedDict` được tạo thông qua cú pháp hàm:
 
    .. doctest::
 
@@ -249,58 +157,35 @@ Functions
 
 .. function:: call_annotate_function(annotate, format, *, owner=None)
 
-   Call the :term:`annotate function` *annotate* with the given *format*,
-   a member of the :class:`Format` enum, and return the annotations
-   dictionary produced by the function.
+   Gọi :term:`annotate function` *annotate* với *format* đã cho, là một thành viên của enum :class:`Format`, rồi trả về từ điển chú thích do hàm tạo ra.
 
-   This helper function is required because annotate functions generated by
-   the compiler for functions, classes, and modules only support
-   the :attr:`~Format.VALUE` format when called directly.
-   To support other formats, this function calls the annotate function
-   in a special environment that allows it to produce annotations in the
-   other formats. This is a useful building block when implementing
-   functionality that needs to partially evaluate annotations while a class
-   is being constructed.
+   Hàm trợ giúp này là bắt buộc vì các hàm annotate được compiler tạo cho các hàm, lớp và module chỉ hỗ trợ định dạng :attr:`~Format.VALUE` khi được gọi trực tiếp. Để hỗ trợ các định dạng khác, hàm này gọi hàm annotate trong một môi trường đặc biệt cho phép hàm đó tạo chú thích ở các định dạng khác. Đây là một khối xây dựng hữu ích khi triển khai chức năng cần đánh giá một phần các chú thích trong lúc một lớp đang được tạo.
 
-   *owner* is the object that owns the annotation function, usually
-   a function, class, or module. If provided, it is used in the
-   :attr:`~Format.FORWARDREF` format to produce a :class:`ForwardRef`
-   object that carries more information.
+   *owner* là đối tượng sở hữu hàm chú thích, thường là một hàm, lớp hoặc module. Nếu được cung cấp, nó được dùng trong
+   định dạng :attr:`~Format.FORWARDREF` để tạo ra một đối tượng :class:`ForwardRef` chứa nhiều thông tin hơn.
 
    .. seealso::
 
-      :PEP:`PEP 649 <649#the-stringizer-and-the-fake-globals-environment>`
-      contains an explanation of the implementation technique used by this
-      function.
+      :PEP:`PEP 649 <649#the-stringizer-and-the-fake-globals-environment>` chứa phần giải thích về kỹ thuật triển khai được hàm này sử dụng.
 
    .. versionadded:: 3.14
 
 .. function:: call_evaluate_function(evaluate, format, *, owner=None)
 
-   Call the :term:`evaluate function` *evaluate* with the given *format*,
-   a member of the :class:`Format` enum, and return the value produced by
-   the function. This is similar to :func:`call_annotate_function`,
-   but the latter always returns a dictionary mapping strings to annotations,
-   while this function returns a single value.
+   Gọi :term:`evaluate function` *evaluate* với *format* đã cho, là một thành viên của enum :class:`Format`, rồi trả về giá trị do hàm tạo ra. Cách này tương tự như :func:`call_annotate_function`, nhưng cách sau luôn trả về một từ điển ánh xạ các chuỗi tới các chú thích, trong khi hàm này trả về một giá trị duy nhất.
 
-   This is intended for use with the evaluate functions generated for lazily
-   evaluated elements related to type aliases and type parameters:
+   Nội dung này được dùng với các hàm evaluate được tạo cho những phần tử được đánh giá một cách trì hoãn liên quan đến bí danh kiểu và tham số kiểu:
 
-   * :meth:`typing.TypeAliasType.evaluate_value`, the value of type aliases
-   * :meth:`typing.TypeVar.evaluate_bound`, the bound of type variables
-   * :meth:`typing.TypeVar.evaluate_constraints`, the constraints of
-     type variables
-   * :meth:`typing.TypeVar.evaluate_default`, the default value of
-     type variables
-   * :meth:`typing.ParamSpec.evaluate_default`, the default value of
-     parameter specifications
-   * :meth:`typing.TypeVarTuple.evaluate_default`, the default value of
-     type variable tuples
+   * :meth:`typing.TypeAliasType.evaluate_value`, giá trị của các bí danh kiểu
+   * :meth:`typing.TypeVar.evaluate_bound`, giới hạn của các biến kiểu
+   * :meth:`typing.TypeVar.evaluate_constraints`, các ràng buộc của các biến kiểu
+   * :meth:`typing.TypeVar.evaluate_default`, giá trị mặc định của các biến kiểu
+   * :meth:`typing.ParamSpec.evaluate_default`, giá trị mặc định của các đặc tả tham số
+   * :meth:`typing.TypeVarTuple.evaluate_default`, giá trị mặc định của các bộ giá trị kiểu
 
-   *owner* is the object that owns the evaluate function, such as the type
-   alias or type variable object.
+   *owner* là đối tượng sở hữu hàm evaluate, chẳng hạn như đối tượng type alias hoặc type variable.
 
-   *format* can be used to control the format in which the value is returned:
+   *format* có thể được dùng để kiểm soát định dạng mà giá trị được trả về:
 
    .. doctest::
 
@@ -318,100 +203,53 @@ Functions
 
 .. function:: get_annotate_from_class_namespace(namespace)
 
-   Retrieve the :term:`annotate function` from a class namespace dictionary *namespace*.
-   Return :const:`!None` if the namespace does not contain an annotate function.
-   This is primarily useful before the class has been fully created (e.g., in a metaclass);
-   after the class exists, the annotate function can be retrieved with ``cls.__annotate__``.
-   See :ref:`below <annotationlib-metaclass>` for an example using this function in a metaclass.
+   Lấy :term:`annotate function` từ từ điển namespace của lớp *namespace*. Trả về :const:`!None` nếu namespace không chứa hàm annotate. Điều này chủ yếu hữu ích trước khi lớp được tạo hoàn chỉnh (ví dụ: trong một metaclass); sau khi lớp tồn tại, có thể lấy hàm annotate bằng ``cls.__annotate__``. Xem :ref:`below <annotationlib-metaclass>` để biết ví dụ sử dụng hàm này trong một metaclass.
 
    .. versionadded:: 3.14
 
 .. function:: get_annotations(obj, *, globals=None, locals=None, eval_str=False, format=Format.VALUE)
 
-   Compute the annotations dict for an object.
+   Tính toán dict annotations cho một đối tượng.
 
-   *obj* may be a callable, class, module, or other object with
-   :attr:`~object.__annotate__` or :attr:`~object.__annotations__` attributes.
-   Passing any other object raises :exc:`TypeError`.
+   *obj* có thể là một callable, class, module hoặc đối tượng khác có
+   thuộc tính :attr:`~object.__annotate__` hoặc :attr:`~object.__annotations__`. Việc truyền bất kỳ đối tượng nào khác sẽ làm phát sinh :exc:`TypeError`.
 
-   The *format* parameter controls the format in which annotations are returned,
-   and must be a member of the :class:`Format` enum or its integer equivalent.
-   The different formats work as follows:
+   Tham số *format* kiểm soát định dạng mà annotations được trả về và phải là một thành viên của enum :class:`Format` hoặc giá trị số nguyên tương đương của enum đó. Các định dạng khác nhau hoạt động như sau:
 
-   * VALUE: :attr:`!object.__annotations__` is tried first; if that does not exist,
-     the :attr:`!object.__annotate__` function is called if it exists.
+   * VALUE: :attr:`!object.__annotations__` được thử trước; nếu không tồn tại, hàm :attr:`!object.__annotate__` sẽ được gọi nếu nó tồn tại.
 
-   * FORWARDREF: If :attr:`!object.__annotations__` exists and can be evaluated successfully,
-     it is used; otherwise, the :attr:`!object.__annotate__` function is called. If it
-     does not exist either, :attr:`!object.__annotations__` is tried again and any error
-     from accessing it is re-raised.
+   * FORWARDREF: Nếu :attr:`!object.__annotations__` tồn tại và có thể được đánh giá thành công, nó sẽ được sử dụng; nếu không, hàm :attr:`!object.__annotate__` sẽ được gọi. Nếu hàm này cũng không tồn tại, :attr:`!object.__annotations__` sẽ được thử lại và mọi lỗi khi truy cập nó sẽ được ném lại.
 
-     * When calling :attr:`!object.__annotate__` it is first called with :attr:`~Format.FORWARDREF`.
-       If this is not implemented, it will then check if :attr:`~Format.VALUE_WITH_FAKE_GLOBALS`
-       is supported and use that in the fake globals environment.
-       If neither of these formats are supported, it will fall back to using :attr:`~Format.VALUE`.
-       If :attr:`~Format.VALUE` fails, the error from this call will be raised.
+     * Khi gọi :attr:`!object.__annotate__`, trước tiên hàm được gọi với :attr:`~Format.FORWARDREF`. Nếu cách này chưa được triển khai, hàm sẽ kiểm tra xem :attr:`~Format.VALUE_WITH_FAKE_GLOBALS` có được hỗ trợ hay không và sử dụng nó trong môi trường globals giả lập. Nếu không định dạng nào trong hai định dạng này được hỗ trợ, hàm sẽ chuyển sang sử dụng :attr:`~Format.VALUE`. Nếu :attr:`~Format.VALUE` không thành công, lỗi từ lần gọi này sẽ được ném ra.
 
-   * STRING: If :attr:`!object.__annotate__` exists, it is called first;
-     otherwise, :attr:`!object.__annotations__` is used and stringified
-     using :func:`annotations_to_string`.
+   * STRING: Nếu :attr:`!object.__annotate__` tồn tại, nó sẽ được gọi trước; nếu không, :attr:`!object.__annotations__` sẽ được sử dụng và chuyển thành chuỗi bằng :func:`annotations_to_string`.
 
-     * When calling :attr:`!object.__annotate__` it is first called with :attr:`~Format.STRING`.
-       If this is not implemented, it will then check if :attr:`~Format.VALUE_WITH_FAKE_GLOBALS`
-       is supported and use that in the fake globals environment.
-       If neither of these formats are supported, it will fall back to using :attr:`~Format.VALUE`
-       with the result converted using :func:`annotations_to_string`.
-       If :attr:`~Format.VALUE` fails, the error from this call will be raised.
+     * Khi gọi :attr:`!object.__annotate__`, trước tiên hàm được gọi với :attr:`~Format.STRING`. Nếu cách này chưa được triển khai, hàm sẽ kiểm tra xem :attr:`~Format.VALUE_WITH_FAKE_GLOBALS` có được hỗ trợ hay không và sử dụng nó trong môi trường globals giả lập. Nếu không định dạng nào trong hai định dạng này được hỗ trợ, hàm sẽ chuyển sang sử dụng :attr:`~Format.VALUE` với kết quả được chuyển đổi bằng :func:`annotations_to_string`. Nếu :attr:`~Format.VALUE` không thành công, lỗi từ lần gọi này sẽ được ném ra.
 
-   Returns a dict. :func:`!get_annotations` returns a new dict every time
-   it's called; calling it twice on the same object will return two
-   different but equivalent dicts.
+   Trả về một dict. :func:`!get_annotations` trả về một dict mới mỗi khi được gọi; gọi nó hai lần trên cùng một đối tượng sẽ trả về hai dict khác nhau nhưng tương đương.
 
-   This function handles several details for you:
+   Hàm này xử lý một số chi tiết cho bạn:
 
-   * If *eval_str* is true, values of type :class:`!str` will
-     be un-stringized using :func:`eval`. This is intended
-     for use with stringized annotations
-     (``from __future__ import annotations``). It is an error
-     to set *eval_str* to true with formats other than :attr:`Format.VALUE`.
-   * If *obj* doesn't have an annotations dict, returns an
-     empty dict. (Functions and methods always have an
-     annotations dict; classes, modules, and other types of
-     callables may not.)
-   * Ignores inherited annotations on classes, as well as annotations
-     on metaclasses. If a class
-     doesn't have its own annotations dict, returns an empty dict.
-   * All accesses to object members and dict values are done
-     using ``getattr()`` and ``dict.get()`` for safety.
+   * Nếu *eval_str* là true, các giá trị thuộc kiểu :class:`!str` sẽ được bỏ dạng chuỗi bằng :func:`eval`. Tùy chọn này nhằm sử dụng với các annotation ở dạng chuỗi (``from __future__ import annotations``). Sẽ xảy ra lỗi nếu đặt *eval_str* thành true với các định dạng khác :attr:`Format.VALUE`.
+   * Nếu *obj* không có một dict annotations, hàm trả về một dict rỗng. (Các function và method luôn có một dict annotations; class, module và các kiểu callable khác có thể không có.)
+   * Bỏ qua các annotation được kế thừa trên class, cũng như các annotation trên metaclass. Nếu một class không có dict annotations riêng, hàm trả về một dict rỗng.
+   * Mọi lần truy cập vào member của object và giá trị trong dict đều được thực hiện bằng ``getattr()`` và ``dict.get()`` để đảm bảo an toàn.
 
-   *eval_str* controls whether or not values of type :class:`!str` are
-   replaced with the result of calling :func:`eval` on those values:
+   *eval_str* kiểm soát việc các giá trị thuộc kiểu :class:`!str` có được thay thế bằng kết quả gọi :func:`eval` trên các giá trị đó hay không:
 
-   * If eval_str is true, :func:`eval` is called on values of type
-     :class:`!str`. (Note that :func:`!get_annotations` doesn't catch
-     exceptions; if :func:`eval` raises an exception, it will unwind
-     the stack past the :func:`!get_annotations` call.)
-   * If *eval_str* is false (the default), values of type :class:`!str` are
-     unchanged.
+   * Nếu eval_str là true, :func:`eval` sẽ được gọi trên các giá trị thuộc kiểu
+     :class:`!str`. (Lưu ý rằng :func:`!get_annotations` không bắt các exception; nếu :func:`eval` phát sinh một exception, exception đó sẽ unwound stack vượt qua lệnh gọi :func:`!get_annotations`.)
+   * Nếu *eval_str* là false (mặc định), các giá trị thuộc kiểu :class:`!str` sẽ không thay đổi.
 
-   *globals* and *locals* are passed in to :func:`eval`; see the documentation
-   for :func:`eval` for more information. If *globals* or *locals*
-   is :const:`!None`, this function may replace that value with a
-   context-specific default, contingent on ``type(obj)``:
+   *globals* và *locals* được truyền vào :func:`eval`; xem tài liệu về :func:`eval` để biết thêm thông tin. Nếu *globals* hoặc *locals* là :const:`!None`, hàm này có thể thay thế giá trị đó bằng một giá trị mặc định dành riêng cho ngữ cảnh, tùy thuộc vào ``type(obj)``:
 
-   * If *obj* is a module, *globals* defaults to ``obj.__dict__``.
-   * If *obj* is a class, *globals* defaults to
-     ``sys.modules[obj.__module__].__dict__`` and *locals* defaults
-     to the *obj* class namespace.
-   * If *obj* is a callable, *globals* defaults to
-     :attr:`obj.__globals__ <function.__globals__>`,
-     although if *obj* is a wrapped function (using
-     :func:`functools.update_wrapper`) or a :class:`functools.partial` object,
-     it is unwrapped until a non-wrapped function is found.
+   * Nếu *obj* là một module, *globals* mặc định là ``obj.__dict__``.
+   * Nếu *obj* là một class, *globals* mặc định là ``sys.modules[obj.__module__].__dict__`` và *locals* mặc định là namespace của class *obj*.
+   * Nếu *obj* là một callable, *globals* mặc định là
+     :attr:`obj.__globals__ <function.__globals__>`, mặc dù nếu *obj* là một hàm được bọc (sử dụng
+     :func:`functools.update_wrapper`) hoặc một đối tượng :class:`functools.partial`, nó sẽ được bỏ bọc cho đến khi tìm thấy một hàm không được bọc.
 
-   Calling :func:`!get_annotations` is best practice for accessing the
-   annotations dict of any object. See :ref:`annotations-howto` for
-   more information on annotations best practices.
+   Gọi :func:`!get_annotations` là cách thực hành tốt nhất để truy cập dict annotations của bất kỳ đối tượng nào. Xem :ref:`annotations-howto` để biết thêm thông tin về các cách thực hành tốt nhất với annotations.
 
    .. doctest::
 
@@ -424,44 +262,28 @@ Functions
 
 .. function:: type_repr(value)
 
-   Convert an arbitrary Python value to a format suitable for use by the
-   :attr:`~Format.STRING` format. This calls :func:`repr` for most
-   objects, but has special handling for some objects, such as type objects.
+   Chuyển đổi một giá trị Python bất kỳ sang định dạng phù hợp để sử dụng với
+   định dạng :attr:`~Format.STRING`. Hàm này gọi :func:`repr` cho hầu hết các đối tượng, nhưng có cách xử lý đặc biệt đối với một số đối tượng, chẳng hạn như các đối tượng kiểu.
 
-   This is meant as a helper for user-provided
-   annotate functions that support the :attr:`~Format.STRING` format but
-   do not have access to the code creating the annotations. It can also
-   be used to provide a user-friendly string representation for other
-   objects that contain values that are commonly encountered in annotations.
+   Hàm này được dùng làm helper cho các hàm annotate do người dùng cung cấp, hỗ trợ định dạng :attr:`~Format.STRING` nhưng không có quyền truy cập vào mã tạo annotations. Hàm này cũng có thể được dùng để cung cấp biểu diễn chuỗi thân thiện với người dùng cho các đối tượng khác chứa những giá trị thường gặp trong annotations.
 
    .. versionadded:: 3.14
 
 
-Recipes
--------
+Các công thức
+-------------
 
 .. _annotationlib-metaclass:
 
-Using annotations in a metaclass
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng annotations trong metaclass
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A :ref:`metaclass <metaclasses>` may want to inspect or even modify the annotations
-in a class body during class creation. Doing so requires retrieving annotations
-from the class namespace dictionary. For classes created with
-``from __future__ import annotations``, the annotations will be in the ``__annotations__``
-key of the dictionary. For other classes with annotations,
-:func:`get_annotate_from_class_namespace` can be used to get the
-annotate function, and :func:`call_annotate_function` can be used to call it and
-retrieve the annotations. Using the :attr:`~Format.FORWARDREF` format will usually
-be best, because this allows the annotations to refer to names that cannot yet be
-resolved when the class is created.
+Một :ref:`metaclass <metaclasses>` có thể muốn kiểm tra hoặc thậm chí sửa đổi annotations trong thân lớp trong quá trình tạo lớp. Để làm vậy, cần lấy annotations từ dictionary namespace của lớp. Đối với các lớp được tạo bằng ``from __future__ import annotations``, annotations sẽ nằm trong khóa ``__annotations__`` của dictionary. Đối với các lớp khác có annotations,
+Có thể sử dụng :func:`get_annotate_from_class_namespace` để lấy hàm annotate, và :func:`call_annotate_function` để gọi hàm đó và truy xuất các annotation. Thông thường, sử dụng định dạng :attr:`~Format.FORWARDREF` sẽ là lựa chọn tốt nhất, vì định dạng này cho phép các annotation tham chiếu đến những tên chưa thể được phân giải khi lớp được tạo.
 
-To modify the annotations, it is best to create a wrapper annotate function
-that calls the original annotate function, makes any necessary adjustments, and
-returns the result.
+Để sửa đổi các annotation, tốt nhất là tạo một hàm annotate wrapper gọi hàm annotate ban đầu, thực hiện mọi điều chỉnh cần thiết, rồi trả về kết quả.
 
-Below is an example of a metaclass that filters out all :class:`typing.ClassVar`
-annotations from the class and puts them in a separate attribute:
+Dưới đây là ví dụ về một metaclass lọc tất cả các annotation :class:`typing.ClassVar` khỏi lớp và đặt chúng vào một thuộc tính riêng:
 
 .. code-block:: python
 
@@ -474,8 +296,8 @@ annotations from the class and puts them in a separate attribute:
             annotations = ns["__annotations__"]
             classvar_keys = {
                key for key, value in annotations.items()
-               # Use string comparison for simplicity; a more robust solution
-               # could use annotationlib.ForwardRef.evaluate
+               # Dùng phép so sánh chuỗi cho đơn giản; một giải pháp mạnh mẽ hơn
+               # có thể sử dụng annotationlib.ForwardRef.evaluate
                if value.startswith("ClassVar")
             }
             classvars = {key: annotations[key] for key in classvar_keys}
@@ -498,48 +320,36 @@ annotations from the class and puts them in a separate attribute:
                annos = annotationlib.call_annotate_function(annotate, format, owner=typ)
                return {key: value for key, value in annos.items() if key not in classvar_keys}
 
-         else:  # no annotations
+         else:  # không có annotation
             classvars = {}
             wrapped_annotate = None
          typ = super().__new__(mcls, name, bases, ns)
 
          if wrapped_annotate is not None:
-            # Wrap the original __annotate__ with a wrapper that removes ClassVars
+            # Bọc __annotate__ ban đầu bằng một wrapper để loại bỏ ClassVars
             typ.__annotate__ = wrapped_annotate
-         typ.classvars = classvars  # Store the ClassVars in a separate attribute
+         typ.classvars = classvars  # Lưu ClassVars trong một thuộc tính riêng
          return typ
 
 
-Creating a custom callable annotate function
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tạo một hàm annotate có thể gọi tùy chỉnh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Custom :term:`annotate functions <annotate function>` may be literal functions like those
-automatically generated for functions, classes, and modules. Or, they may wish to utilise
-the encapsulation provided by classes, in which case any :term:`callable` can be used as
-an :term:`annotate function`.
+Các :term:`hàm annotate <annotate function>` tùy chỉnh có thể là các hàm nguyên bản, giống như những hàm được tự động tạo cho các hàm, lớp và mô-đun. Hoặc, chúng có thể tận dụng tính đóng gói do các lớp cung cấp; khi đó, bất kỳ :term:`callable` nào cũng có thể được sử dụng làm một :term:`annotate function`.
 
-To provide the :attr:`~Format.VALUE`, :attr:`~Format.STRING`, or
-:attr:`~Format.FORWARDREF` formats directly, an :term:`annotate function` must provide
-the following attribute:
+Để cung cấp trực tiếp :attr:`~Format.VALUE`, :attr:`~Format.STRING`, hoặc
+các định dạng :attr:`~Format.FORWARDREF` trực tiếp, một :term:`annotate function` phải cung cấp thuộc tính sau:
 
-* A callable ``__call__`` with signature ``__call__(format, /) -> dict``, that does not
-  raise a :exc:`NotImplementedError` when called with a supported format.
+* Một ``__call__`` có thể gọi với chữ ký ``__call__(format, /) -> dict``, không phát sinh :exc:`NotImplementedError` khi được gọi với một định dạng được hỗ trợ.
 
-To provide the :attr:`~Format.VALUE_WITH_FAKE_GLOBALS` format, which is used to
-automatically generate :attr:`~Format.STRING` or :attr:`~Format.FORWARDREF` if they are
-not supported directly, :term:`annotate functions <annotate function>` must provide the
-following attributes:
+Để cung cấp định dạng :attr:`~Format.VALUE_WITH_FAKE_GLOBALS`, được dùng để tự động tạo :attr:`~Format.STRING` hoặc :attr:`~Format.FORWARDREF` nếu chúng không được hỗ trợ trực tiếp, các hàm :term:`annotate functions <annotate function>` phải cung cấp các thuộc tính sau:
 
-* A callable ``__call__`` with signature ``__call__(format, /) -> dict``, that does not
-  raise a :exc:`NotImplementedError` when called with
+* Một ``__call__`` có thể gọi được với chữ ký ``__call__(format, /) -> dict``, không phát sinh :exc:`NotImplementedError` khi được gọi với
   :attr:`~Format.VALUE_WITH_FAKE_GLOBALS`.
-* A :ref:`code object <code-objects>` ``__code__`` containing the compiled code for the
-  annotate function.
-* Optional: A tuple of the function's positional defaults ``__kwdefaults__``, if the
-  function represented by ``__code__`` uses any positional defaults.
-* Optional: A dict of the function's keyword defaults ``__defaults__``, if the function
-  represented by ``__code__`` uses any keyword defaults.
-* Optional: All other :ref:`function attributes <inspect-types>`.
+* Một :ref:`đối tượng code <code-objects>` ``__code__`` chứa code đã biên dịch cho hàm annotate.
+* Tùy chọn: Một tuple chứa các giá trị mặc định cho đối số vị trí của hàm ``__kwdefaults__``, nếu hàm được biểu diễn bởi ``__code__`` sử dụng bất kỳ giá trị mặc định nào cho đối số vị trí.
+* Tùy chọn: Một dict chứa các giá trị mặc định cho đối số từ khóa của hàm ``__defaults__``, nếu hàm được biểu diễn bởi ``__code__`` sử dụng bất kỳ giá trị mặc định nào cho đối số từ khóa.
+* Tùy chọn: Tất cả :ref:`thuộc tính hàm khác <inspect-types>`.
 
 .. code-block:: python
 
@@ -547,13 +357,13 @@ following attributes:
        called_formats = []
 
        def __call__(self, format=None, /, *, _self=None):
-           # When called with fake globals, `_self` will be the
-           # actual self value, and `self` will be the format.
+           # Khi được gọi với các biến toàn cục giả, `_self` sẽ là
+           # giá trị self thực tế, và `self` sẽ là định dạng.
            if _self is not None:
                self, format = _self, self
 
            self.called_formats.append(format)
-           if format <= 2:  # VALUE or VALUE_WITH_FAKE_GLOBALS
+           if format <= 2:  # VALUE hoặc VALUE_WITH_FAKE_GLOBALS
                return {"x": MyType}
            raise NotImplementedError
 
@@ -565,7 +375,7 @@ following attributes:
        __builtins__ = {}
        __closure__ = None
 
-This can then be called with:
+Sau đó có thể gọi hàm này bằng:
 
 .. code-block:: pycon
 
@@ -573,7 +383,7 @@ This can then be called with:
    >>> call_annotate_function(Annotate(), format=Format.STRING)
    {'x': 'MyType'}
 
-Or used as the annotate function for an object:
+Hoặc dùng hàm này làm hàm annotate cho một đối tượng:
 
 .. code-block:: pycon
 
@@ -585,22 +395,14 @@ Or used as the annotate function for an object:
    {'x': 'MyType'}
 
 
-Limitations of the ``STRING`` format
+Các hạn chế của định dạng ``STRING``
 ------------------------------------
 
-The :attr:`~Format.STRING` format is meant to approximate the source code
-of the annotation, but the implementation strategy used means that it is not
-always possible to recover the exact source code.
+Định dạng :attr:`~Format.STRING` nhằm mô phỏng mã nguồn của annotation, nhưng chiến lược triển khai được sử dụng đồng nghĩa với việc không phải lúc nào cũng có thể khôi phục chính xác mã nguồn ban đầu.
 
-First, the stringifier of course cannot recover any information that is not present in
-the compiled code, including comments, whitespace, parenthesization, and operations that
-get simplified by the compiler.
+Trước hết, stringifier tất nhiên không thể khôi phục bất kỳ thông tin nào không có trong mã đã biên dịch, bao gồm chú thích, khoảng trắng, việc đặt dấu ngoặc và các phép toán được trình biên dịch đơn giản hóa.
 
-Second, the stringifier can intercept almost all operations that involve names looked
-up in some scope, but it cannot intercept operations that operate fully on constants.
-As a corollary, this also means it is not safe to request the ``STRING`` format on
-untrusted code: Python is powerful enough that it is possible to achieve arbitrary
-code execution even with no access to any globals or builtins. For example:
+Thứ hai, stringifier có thể chặn gần như mọi thao tác liên quan đến các tên được tra cứu trong một scope nào đó, nhưng không thể chặn các thao tác chỉ hoạt động trên các hằng số. Hệ quả là cũng không an toàn khi yêu cầu định dạng ``STRING`` trên mã không đáng tin cậy: Python đủ mạnh để có thể thực thi mã tùy ý ngay cả khi không có quyền truy cập vào bất kỳ globals hoặc builtins nào. Ví dụ:
 
 .. code-block:: pycon
 
@@ -611,51 +413,44 @@ code execution even with no access to any globals or builtins. For example:
   {'x': 'None'}
 
 .. note::
-   This particular example works as of the time of writing, but it relies on
-   implementation details and is not guaranteed to work in the future.
+   Ví dụ cụ thể này hoạt động tại thời điểm viết tài liệu, nhưng dựa trên các chi tiết triển khai và không được đảm bảo sẽ hoạt động trong tương lai.
 
-Among the different kinds of expressions that exist in Python,
-as represented by the :mod:`ast` module, some expressions are supported,
-meaning that the ``STRING`` format can generally recover the original source code;
-others are unsupported, meaning that they may result in incorrect output or an error.
+Trong số các loại biểu thức khác nhau tồn tại trong Python, được biểu diễn bởi module :mod:`ast`, một số biểu thức được hỗ trợ, nghĩa là định dạng ``STRING`` nhìn chung có thể khôi phục mã nguồn ban đầu; những biểu thức khác không được hỗ trợ, nghĩa là chúng có thể tạo ra đầu ra không chính xác hoặc lỗi.
 
-The following are supported (sometimes with caveats):
+Sau đây là những nội dung được hỗ trợ (đôi khi có điều kiện hạn chế):
 
 * :class:`ast.BinOp`
 * :class:`ast.UnaryOp`
 
-  * :class:`ast.Invert` (``~``), :class:`ast.UAdd` (``+``), and :class:`ast.USub` (``-``) are supported
-  * :class:`ast.Not` (``not``) is not supported
+  * :class:`ast.Invert` (``~``), :class:`ast.UAdd` (``+``) và :class:`ast.USub` (``-``) được hỗ trợ
+  * :class:`ast.Not` (``not``) không được hỗ trợ
 
-* :class:`ast.Dict` (except when using ``**`` unpacking)
+* :class:`ast.Dict` (trừ khi sử dụng phép unpacking ``**``)
 * :class:`ast.Set`
 * :class:`ast.Compare`
 
-  * :class:`ast.Eq` and :class:`ast.NotEq` are supported
-  * :class:`ast.Lt`, :class:`ast.LtE`, :class:`ast.Gt`, and :class:`ast.GtE` are supported, but the operand may be flipped
-  * :class:`ast.Is`, :class:`ast.IsNot`, :class:`ast.In`, and :class:`ast.NotIn` are not supported
+  * :class:`ast.Eq` và :class:`ast.NotEq` được hỗ trợ
+  * :class:`ast.Lt`, :class:`ast.LtE`, :class:`ast.Gt` và :class:`ast.GtE` được hỗ trợ, nhưng toán hạng có thể bị đảo
+  * :class:`ast.Is`, :class:`ast.IsNot`, :class:`ast.In` và :class:`ast.NotIn` không được hỗ trợ
 
-* :class:`ast.Call` (except when using ``**`` unpacking)
-* :class:`ast.Constant` (though not the exact representation of the constant; for example, escape
-  sequences in strings are lost; hexadecimal numbers are converted to decimal)
-* :class:`ast.Attribute` (assuming the value is not a constant)
-* :class:`ast.Subscript` (assuming the value is not a constant)
-* :class:`ast.Starred` (``*`` unpacking)
+* :class:`ast.Call` (ngoại trừ khi sử dụng thao tác unpacking ``**``)
+* :class:`ast.Constant` (tuy nhiên không phải biểu diễn chính xác của hằng số; ví dụ: các escape sequence trong chuỗi bị mất; số thập lục phân được chuyển đổi thành số thập phân)
+* :class:`ast.Attribute` (với giả định giá trị không phải là hằng số)
+* :class:`ast.Subscript` (với giả định giá trị không phải là hằng số)
+* :class:`ast.Starred` (``*`` giải nén)
 * :class:`ast.Name`
 * :class:`ast.List`
 * :class:`ast.Tuple`
 * :class:`ast.Slice`
 
-The following are unsupported, but throw an informative error when encountered by the
-stringifier:
+Những trường hợp sau đây không được hỗ trợ, nhưng sẽ đưa ra lỗi rõ ràng khi stringifier gặp phải:
 
-* :class:`ast.FormattedValue` (f-strings; error is not detected if conversion specifiers like ``!r``
-  are used)
+* :class:`ast.FormattedValue` (f-strings; lỗi không được phát hiện nếu sử dụng các conversion specifier như ``!r``)
 * :class:`ast.JoinedStr` (f-strings)
 
-The following are unsupported and result in incorrect output:
+Những nội dung sau không được hỗ trợ và dẫn đến kết quả đầu ra không chính xác:
 
-* :class:`ast.BoolOp` (``and`` and ``or``)
+* :class:`ast.BoolOp` (``and`` và ``or``)
 * :class:`ast.IfExp`
 * :class:`ast.Lambda`
 * :class:`ast.ListComp`
@@ -663,7 +458,7 @@ The following are unsupported and result in incorrect output:
 * :class:`ast.DictComp`
 * :class:`ast.GeneratorExp`
 
-The following are disallowed in annotation scopes and therefore not relevant:
+Những nội dung sau bị cấm trong các phạm vi chú thích và do đó không liên quan:
 
 * :class:`ast.NamedExpr` (``:=``)
 * :class:`ast.Await`
@@ -671,17 +466,13 @@ The following are disallowed in annotation scopes and therefore not relevant:
 * :class:`ast.YieldFrom`
 
 
-Limitations of the ``FORWARDREF`` format
-----------------------------------------
+Hạn chế của định dạng ``FORWARDREF``
+------------------------------------
 
-The :attr:`~Format.FORWARDREF` format aims to produce real values as much
-as possible, with anything that cannot be resolved replaced with
-:class:`ForwardRef` objects. It is affected by broadly the same Limitations
-as the :attr:`~Format.STRING` format: annotations that perform operations on
-literals or that use unsupported expression types may raise exceptions when
-evaluated using the :attr:`~Format.FORWARDREF` format.
+Định dạng :attr:`~Format.FORWARDREF` hướng đến việc tạo ra các giá trị thực nhiều nhất có thể, trong đó mọi thứ không thể được phân giải sẽ được thay thế bằng
+các đối tượng :class:`ForwardRef`. Định dạng này chịu ảnh hưởng bởi những hạn chế nhìn chung giống với định dạng :attr:`~Format.STRING`: các chú thích thực hiện thao tác trên các literal hoặc sử dụng những kiểu biểu thức không được hỗ trợ có thể phát sinh ngoại lệ khi được đánh giá bằng định dạng :attr:`~Format.FORWARDREF`.
 
-Below are a few examples of the behavior with unsupported expressions:
+Dưới đây là một vài ví dụ về hành vi khi sử dụng các biểu thức không được hỗ trợ:
 
 .. code-block:: pycon
 
@@ -701,20 +492,12 @@ Below are a few examples of the behavior with unsupported expressions:
 
 .. _annotationlib-security:
 
-Security implications of introspecting annotations
---------------------------------------------------
+Hệ quả bảo mật của việc kiểm tra nội quan các chú thích
+-------------------------------------------------------
 
-Much of the functionality in this module involves executing code related to annotations,
-which can then do arbitrary things. For example,
-:func:`get_annotations` may call an arbitrary :term:`annotate function`, and
-:meth:`ForwardRef.evaluate` may call :func:`eval` on an arbitrary string. Code contained
-in an annotation might make arbitrary system calls, enter an infinite loop, or perform any
-other operation. This is also true for any access of the :attr:`~object.__annotations__` attribute,
-and for various functions in the :mod:`typing` module that work with annotations, such as
+Phần lớn chức năng trong module này liên quan đến việc thực thi mã liên quan đến các chú thích, và mã đó có thể thực hiện những hành động tùy ý. Ví dụ:
+:func:`get_annotations` có thể gọi một :term:`annotate function` tùy ý, và
+:meth:`ForwardRef.evaluate` có thể gọi :func:`eval` trên một chuỗi bất kỳ. Mã nằm trong một chú thích có thể thực hiện các lời gọi hệ thống tùy ý, đi vào vòng lặp vô hạn hoặc thực hiện bất kỳ thao tác nào khác. Điều này cũng đúng với mọi lần truy cập thuộc tính :attr:`~object.__annotations__`, cũng như với nhiều hàm trong module :mod:`typing` dùng để làm việc với các chú thích, chẳng hạn như
 :func:`typing.get_type_hints`.
 
-Any security issue arising from this also applies immediately after importing
-code that may contain untrusted annotations: importing code can always cause arbitrary operations
-to be performed. However, it is unsafe to accept strings or other input from an untrusted source and
-pass them to any of the APIs for introspecting annotations, for example by editing an
-``__annotations__`` dictionary or directly creating a :class:`ForwardRef` object.
+Mọi vấn đề bảo mật phát sinh từ việc này cũng áp dụng ngay sau khi nhập mã có thể chứa các chú thích không đáng tin cậy: việc nhập mã luôn có thể khiến các thao tác tùy ý được thực hiện. Tuy nhiên, việc nhận các chuỗi hoặc dữ liệu đầu vào khác từ một nguồn không đáng tin cậy rồi truyền chúng cho bất kỳ API nào dùng để xem xét các chú thích là không an toàn, chẳng hạn như chỉnh sửa một dictionary ``__annotations__`` hoặc trực tiếp tạo một đối tượng :class:`ForwardRef`.

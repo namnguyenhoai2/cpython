@@ -2,83 +2,44 @@
 
 .. _asyncio-threading:
 
-asyncio and free-threaded Python
-================================
+asyncio và Python free-threaded
+===============================
 
-asyncio uses an event loop as a scheduler to enable highly efficient
-concurrency by switching between tasks to allow non-blocking I/O
-operations. This results in better performance for I/O-bound use
-cases. It also allows off-loading CPU-bound work to a thread or
-process pool, but that is still limited by the :term:`global
-interpreter lock` in CPython.
+asyncio sử dụng event loop làm bộ lập lịch để cho phép concurrency đạt hiệu quả cao bằng cách chuyển đổi giữa các task, nhờ đó cho phép thực hiện các thao tác I/O không chặn. Điều này mang lại hiệu năng tốt hơn cho các trường hợp sử dụng bị giới hạn bởi I/O. asyncio cũng cho phép chuyển công việc bị giới hạn bởi CPU sang thread pool hoặc process pool, nhưng việc này vẫn bị giới hạn bởi :term:`global interpreter lock` trong CPython.
 
-However, in :ref:`free-threaded Python <freethreading-python-howto>`,
-the GIL is disabled and Python can run true multi-threaded code. This
-means that asyncio can now take advantage of multiple CPU cores without
-the limitations imposed by the GIL.
+Tuy nhiên, trong :ref:`Python free-threaded <freethreading-python-howto>`, GIL bị vô hiệu hóa và Python có thể chạy mã đa luồng thực sự. Điều này có nghĩa là asyncio giờ đây có thể tận dụng nhiều lõi CPU mà không bị những hạn chế do GIL áp đặt.
 
-Since Python 3.14, asyncio has first-class support for free-threaded
-Python, and the implementation of asyncio is safe to use in a
-multi-threaded environment.
+Kể từ Python 3.14, asyncio hỗ trợ đầy đủ Python free-threaded, và việc triển khai asyncio an toàn khi sử dụng trong môi trường đa luồng.
 
-A single event loop on one core can handle many connections
-concurrently, but the Python code that runs to handle each one still
-executes serially. Once requests involve a non-trivial amount of
-per-request computation, that handling becomes the bottleneck, and a
-single core can no longer keep up. Combining asyncio with threads is
-most useful here: by running an event loop per thread, the handling of
-different requests can run in parallel across multiple CPU cores. It is
-also useful when you need to run blocking or CPU-bound code from an
-asyncio application.
+Một event loop duy nhất trên một lõi có thể xử lý đồng thời nhiều kết nối, nhưng mã Python chạy để xử lý từng kết nối vẫn được thực thi tuần tự. Khi các request cần một lượng tính toán đáng kể cho mỗi request, việc xử lý đó sẽ trở thành điểm nghẽn và một lõi đơn không còn đáp ứng kịp. Kết hợp asyncio với các thread hữu ích nhất trong trường hợp này: bằng cách chạy một event loop trên mỗi thread, việc xử lý các request khác nhau có thể chạy song song trên nhiều lõi CPU. Cách này cũng hữu ích khi bạn cần chạy mã blocking hoặc mã bị giới hạn bởi CPU từ một ứng dụng asyncio.
 
 
 .. seealso::
 
-   `Scaling asyncio on Free-Threaded Python
-   <https://labs.quansight.org/blog/scaling-asyncio-on-free-threaded-python>`__,
-   a blog post by Kumar Aditya which explains the internal changes
-   that make asyncio safe and efficient under free-threaded Python,
-   together with benchmarks of the resulting improvements.
+   `Mở rộng asyncio trên Python Free-Threaded <https://labs.quansight.org/blog/scaling-asyncio-on-free-threaded-python>`__, một bài viết trên blog của Kumar Aditya giải thích những thay đổi nội bộ giúp asyncio an toàn và hiệu quả trên Python free-threaded, cùng với các benchmark về những cải thiện đạt được.
 
 
-Thread safety considerations
-----------------------------
+Các vấn đề cần cân nhắc về tính an toàn khi sử dụng thread
+----------------------------------------------------------
 
-While asyncio is designed to be thread-safe in a free-threaded Python
-environment, there are still some considerations to keep in mind when
-using asyncio with threads:
+Mặc dù asyncio được thiết kế để an toàn với thread trong môi trường Python không bị giới hạn bởi GIL, vẫn có một số điểm cần lưu ý khi sử dụng asyncio với các thread:
 
-1. **Event loop**: Each thread should have its own event loop which
-   should not be shared across threads. This ensures that the event loop
-   can manage its own tasks and callbacks without interference from
-   other threads.
+1. **Vòng lặp sự kiện**: Mỗi thread nên có một event loop riêng và không nên chia sẻ event loop đó giữa các thread. Điều này đảm bảo event loop có thể quản lý các task và callback của riêng mình mà không bị các thread khác can thiệp.
 
-2. **Task management**: Tasks and futures created in one thread should
-   not be awaited or manipulated from another thread.
+2. **Quản lý task**: Không nên await hoặc thao tác với các task và future được tạo trong một thread từ một thread khác.
 
-3. **Thread-safe APIs**: When interacting with asyncio from multiple
-   threads, it's important to use thread-safe APIs provided by asyncio,
-   such as :func:`asyncio.run_coroutine_threadsafe` for submitting
-   coroutines to an event loop from another thread. If you need to
-   call a callback from a different thread, you can use
-   :meth:`loop.call_soon_threadsafe` to schedule it safely.
+3. **API an toàn với thread**: Khi tương tác với asyncio từ nhiều thread, điều quan trọng là sử dụng các API an toàn với thread do asyncio cung cấp, chẳng hạn như :func:`asyncio.run_coroutine_threadsafe` để gửi coroutine đến một event loop từ thread khác. Nếu cần gọi một callback từ thread khác, bạn có thể sử dụng
+   :meth:`loop.call_soon_threadsafe` để lên lịch cho callback đó một cách an toàn.
 
-4. **Synchronization**: The synchronization primitives provided by
-   asyncio (like :class:`asyncio.Lock` and :class:`asyncio.Event`)
-   are not designed to be used across threads. If you need to
-   synchronize between threads, you should use the synchronization
-   primitives from the :mod:`threading` module instead.
+4. **Đồng bộ hóa**: Các primitive đồng bộ hóa do asyncio cung cấp (chẳng hạn như :class:`asyncio.Lock` và :class:`asyncio.Event`) không được thiết kế để sử dụng giữa các thread. Nếu cần đồng bộ hóa giữa các thread, bạn nên sử dụng các primitive đồng bộ hóa từ module :mod:`threading` thay thế.
 
 
-Using asyncio with threads
---------------------------
+Sử dụng asyncio với các thread
+------------------------------
 
-asyncio supports running one event loop per thread, which allows you to
-take advantage of multiple CPU cores in a free-threaded Python
-environment. Each thread can run its own event loop, and tasks can be
-scheduled on those loops independently.
+asyncio hỗ trợ chạy một event loop cho mỗi thread, cho phép bạn tận dụng nhiều CPU core trong môi trường Python free-threaded. Mỗi thread có thể chạy event loop riêng, và các task có thể được lập lịch độc lập trên những event loop đó.
 
-Here's an example of how to use asyncio with threads::
+Dưới đây là một ví dụ về cách sử dụng asyncio với các thread::
 
     import asyncio
     import threading
@@ -100,19 +61,14 @@ Here's an example of how to use asyncio with threads::
     for t in threads:
         t.join()
 
-In this example, each thread creates its own event loop with
-:func:`asyncio.run` and runs a coroutine on it. The threads execute
-concurrently, and in a free-threaded build they can run on separate
-CPU cores in parallel.
+Trong ví dụ này, mỗi thread tạo event loop riêng bằng
+:func:`asyncio.run` và chạy một coroutine trên đó. Các thread thực thi đồng thời, và trong một bản build free-threaded, chúng có thể chạy song song trên các CPU core riêng biệt.
 
 
-Producer/consumer across threads
---------------------------------
+Producer/consumer giữa các thread
+---------------------------------
 
-When a regular (non-asyncio) thread needs to hand work to an asyncio
-event loop running in another thread, use a thread-safe primitive such
-as :class:`queue.Queue` rather than :class:`asyncio.Queue`, which is
-only safe within a single event loop.::
+Khi một thread thông thường (không phải asyncio) cần chuyển công việc cho một event loop của asyncio đang chạy trong thread khác, hãy sử dụng một primitive an toàn với thread, chẳng hạn như :class:`queue.Queue`, thay vì :class:`asyncio.Queue`, vốn chỉ an toàn trong một event loop duy nhất.::
 
     import asyncio
     import queue
@@ -144,11 +100,7 @@ only safe within a single event loop.::
     producer(q)
     consumer_thread.join()
 
-The producer runs on the main thread while the consumer runs inside an
-event loop on its own thread, yet they communicate safely through
-``queue.Queue``. When the queue is empty the consumer sleeps briefly
-and tries again. When the producer is done it calls
-:meth:`~queue.Queue.shutdown`, which causes subsequent
-:meth:`~queue.Queue.get_nowait` calls to raise :exc:`queue.ShutDown`
-so the consumer can exit cleanly.
+Producer chạy trên main thread, còn consumer chạy bên trong một event loop trên thread riêng, nhưng chúng vẫn giao tiếp an toàn thông qua ``queue.Queue``. Khi hàng đợi trống, consumer sẽ tạm dừng trong thời gian ngắn rồi thử lại. Khi producer hoàn tất, nó gọi
+:meth:`~queue.Queue.shutdown`, khiến các lệnh gọi tiếp theo
+:meth:`~queue.Queue.get_nowait` gọi :exc:`queue.ShutDown` để consumer có thể thoát một cách an toàn.
 

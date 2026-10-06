@@ -1,94 +1,88 @@
 .. currentmodule:: asyncio
 
 
-====================
-High-level API Index
-====================
+===================
+Mục lục API cấp cao
+===================
 
-This page lists all high-level async/await enabled asyncio APIs.
+Trang này liệt kê tất cả API asyncio cấp cao hỗ trợ async/await.
 
 
-Tasks
-=====
+Tác vụ
+======
 
-Utilities to run asyncio programs, create Tasks, and
-await on multiple things with timeouts.
+Các tiện ích để chạy chương trình asyncio, tạo Task và chờ nhiều đối tượng với thời gian chờ.
 
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :func:`run`
-      - Create event loop, run a coroutine, close the loop.
+      - Tạo event loop, chạy coroutine, đóng loop.
 
     * - :class:`Runner`
-      - A context manager that simplifies multiple async function calls.
+      - Một context manager giúp đơn giản hóa việc gọi nhiều hàm async.
 
     * - :class:`Task`
-      - Task object.
+      - Đối tượng Task.
 
     * - :class:`TaskGroup`
-      - A context manager that holds a group of tasks. Provides
-        a convenient and reliable way to wait for all tasks in the group to
-        finish.
+      - Một context manager chứa một nhóm task. Cung cấp cách thuận tiện và đáng tin cậy để chờ tất cả task trong nhóm hoàn tất.
 
     * - :func:`create_task`
-      - Start an asyncio Task, then returns it.
+      - Khởi chạy một asyncio Task, sau đó trả về task đó.
 
     * - :func:`current_task`
-      - Return the current Task.
+      - Trả về Task hiện tại.
 
     * - :func:`all_tasks`
-      - Return all tasks that are not yet finished for an event loop.
+      - Trả về tất cả task chưa hoàn tất của một event loop.
 
     * - ``await`` :func:`sleep`
-      - Sleep for a number of seconds.
+      - Tạm dừng trong một số giây.
 
     * - ``await`` :func:`gather`
-      - Schedule and wait for things concurrently.
+      - Lập lịch và chờ các tác vụ chạy đồng thời.
 
     * - ``await`` :func:`wait_for`
-      - Run with a timeout.
+      - Chạy với thời gian chờ.
 
     * - ``await`` :func:`shield`
-      - Shield from cancellation.
+      - Bảo vệ khỏi việc hủy.
 
     * - ``await`` :func:`wait`
-      - Monitor for completion.
+      - Theo dõi quá trình hoàn tất.
 
     * - :func:`timeout`
-      - Run with a timeout. Useful in cases when ``wait_for`` is not suitable.
+      - Chạy với thời gian chờ. Hữu ích trong trường hợp ``wait_for`` không phù hợp.
 
     * - :func:`to_thread`
-      - Asynchronously run a function in a separate OS thread.
+      - Chạy bất đồng bộ một hàm trong một luồng OS riêng.
 
     * - :func:`run_coroutine_threadsafe`
-      - Schedule a coroutine from another OS thread.
+      - Lập lịch một coroutine từ một luồng OS khác.
 
     * - ``for in`` :func:`as_completed`
-      - Monitor for completion with a ``for`` loop.
+      - Theo dõi quá trình hoàn tất bằng vòng lặp ``for``.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Using asyncio.gather() to run things in parallel
-  <asyncio_example_gather>`.
+* :ref:`Sử dụng asyncio.gather() để chạy các tác vụ song song <asyncio_example_gather>`.
 
-* :ref:`Using asyncio.wait_for() to enforce a timeout
-  <asyncio_example_waitfor>`.
+* :ref:`Sử dụng asyncio.wait_for() để áp dụng thời gian chờ <asyncio_example_waitfor>`.
 
-* :ref:`Cancellation <asyncio_example_task_cancel>`.
+* :ref:`Hủy <asyncio_example_task_cancel>`.
 
-* :ref:`Using asyncio.sleep() <asyncio_example_sleep>`.
+* :ref:`Sử dụng asyncio.sleep() <asyncio_example_sleep>`.
 
-* See also the main :ref:`Tasks documentation page <coroutine>`.
+* Xem thêm :ref:`trang tài liệu Tasks chính <coroutine>`.
 
 
-Queues
-======
+Hàng đợi
+========
 
-Queues should be used to distribute work amongst multiple asyncio Tasks,
-implement connection pools, and pub/sub patterns.
+Hàng đợi nên được sử dụng để phân phối công việc giữa nhiều asyncio Task, triển khai connection pool và các mẫu pub/sub.
 
 
 .. list-table::
@@ -96,123 +90,120 @@ implement connection pools, and pub/sub patterns.
     :class: full-width-table
 
     * - :class:`Queue`
-      - A FIFO queue.
+      - Một hàng đợi FIFO.
 
     * - :class:`PriorityQueue`
-      - A priority queue.
+      - Một hàng đợi ưu tiên.
 
     * - :class:`LifoQueue`
-      - A LIFO queue.
+      - Một hàng đợi LIFO.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Using asyncio.Queue to distribute workload between several
-  Tasks <asyncio_example_queue_dist>`.
+* :ref:`Sử dụng asyncio.Queue để phân phối khối lượng công việc giữa nhiều Task <asyncio_example_queue_dist>`.
 
-* See also the :ref:`Queues documentation page <asyncio-queues>`.
+* Xem thêm :ref:`trang tài liệu về Queues <asyncio-queues>`.
 
 
-Subprocesses
-============
+Các tiến trình con
+==================
 
-Utilities to spawn subprocesses and run shell commands.
+Các tiện ích để tạo tiến trình con và chạy lệnh shell.
 
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``await`` :func:`create_subprocess_exec`
-      - Create a subprocess.
+      - Tạo một tiến trình con.
 
     * - ``await`` :func:`create_subprocess_shell`
-      - Run a shell command.
+      - Chạy một lệnh shell.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Executing a shell command <asyncio_example_subprocess_shell>`.
+* :ref:`Thực thi một lệnh shell <asyncio_example_subprocess_shell>`.
 
-* See also the :ref:`subprocess APIs <asyncio-subprocess>`
-  documentation.
+* Xem thêm tài liệu về :ref:`API subprocess <asyncio-subprocess>`.
 
 
 Streams
 =======
 
-High-level APIs to work with network IO.
+Các API cấp cao để làm việc với IO mạng.
 
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - ``await`` :func:`open_connection`
-      -  Establish a TCP connection.
+      -  Thiết lập kết nối TCP.
 
     * - ``await`` :func:`open_unix_connection`
-      -  Establish a Unix socket connection.
+      -  Thiết lập kết nối Unix socket.
 
     * - ``await`` :func:`start_server`
-      - Start a TCP server.
+      - Khởi động máy chủ TCP.
 
     * - ``await`` :func:`start_unix_server`
-      - Start a Unix socket server.
+      - Khởi động máy chủ Unix socket.
 
     * - :class:`StreamReader`
-      - High-level async/await object to receive network data.
+      - Đối tượng async/await cấp cao để nhận dữ liệu mạng.
 
     * - :class:`StreamWriter`
-      - High-level async/await object to send network data.
+      - Đối tượng async/await cấp cao để gửi dữ liệu mạng.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Example TCP client <asyncio_example_stream>`.
+* :ref:`Ví dụ về TCP client <asyncio_example_stream>`.
 
-* See also the :ref:`streams APIs <asyncio-streams>`
-  documentation.
+* Xem thêm tài liệu về :ref:`streams APIs <asyncio-streams>`.
 
 
-Synchronization
-===============
+Đồng bộ hóa
+===========
 
-Threading-like synchronization primitives that can be used in Tasks.
+Các primitive đồng bộ hóa tương tự threading có thể được sử dụng trong Tasks.
 
 .. list-table::
     :widths: 50 50
     :class: full-width-table
 
     * - :class:`Lock`
-      - A mutex lock.
+      - Một khóa mutex.
 
     * - :class:`Event`
-      - An event object.
+      - Một đối tượng event.
 
     * - :class:`Condition`
-      - A condition object.
+      - Một đối tượng điều kiện.
 
     * - :class:`Semaphore`
-      - A semaphore.
+      - Một semaphore.
 
     * - :class:`BoundedSemaphore`
-      - A bounded semaphore.
+      - Một bounded semaphore.
 
     * - :class:`Barrier`
-      - A barrier object.
+      - Một đối tượng barrier.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Using asyncio.Event <asyncio_example_sync_event>`.
+* :ref:`Sử dụng asyncio.Event <asyncio_example_sync_event>`.
 
-* :ref:`Using asyncio.Barrier <asyncio_example_barrier>`.
+* :ref:`Sử dụng asyncio.Barrier <asyncio_example_barrier>`.
 
-* See also the documentation of asyncio
-  :ref:`synchronization primitives <asyncio-sync>`.
+* Xem thêm tài liệu về asyncio
+  :ref:`các primitive đồng bộ hóa <asyncio-sync>`.
 
 
-Exceptions
-==========
+Ngoại lệ
+========
 
 .. list-table::
     :widths: 50 50
@@ -220,16 +211,15 @@ Exceptions
 
 
     * - :exc:`asyncio.CancelledError`
-      - Raised when a Task is cancelled. See also :meth:`Task.cancel`.
+      - Được phát sinh khi một Task bị hủy. Xem thêm :meth:`Task.cancel`.
 
     * - :exc:`asyncio.BrokenBarrierError`
-      - Raised when a Barrier is broken. See also :meth:`Barrier.wait`.
+      - Được phát sinh khi một Barrier bị hỏng. Xem thêm :meth:`Barrier.wait`.
 
 
-.. rubric:: Examples
+.. rubric:: Ví dụ
 
-* :ref:`Handling CancelledError to run code on cancellation request
-  <asyncio_example_task_cancel>`.
+* :ref:`Xử lý CancelledError để chạy mã khi có yêu cầu hủy <asyncio_example_task_cancel>`.
 
-* See also the full list of
-  :ref:`asyncio-specific exceptions <asyncio-exceptions>`.
+* Xem thêm danh sách đầy đủ về
+  :ref:`các ngoại lệ dành riêng cho asyncio <asyncio-exceptions>`.

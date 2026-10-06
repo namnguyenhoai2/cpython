@@ -1,15 +1,14 @@
-:mod:`!aifc` --- Read and write AIFF and AIFC files
-===================================================
+:mod:`!aifc` --- Đọc và ghi các tệp AIFF và AIFC
+================================================
 
 .. module:: aifc
-   :synopsis: Removed in 3.13.
+   :synopsis: Đã bị xóa trong 3.13.
    :deprecated:
 
 .. deprecated-removed:: 3.11 3.13
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.13 <whatsnew313-pep594>` after
-being deprecated in Python 3.11.  The removal was decided in :pep:`594`.
+Mô-đun này không còn là một phần của thư viện chuẩn Python. Mô-đun đã được :ref:`xóa trong Python 3.13 <whatsnew313-pep594>` sau khi không còn được khuyến nghị sử dụng trong Python 3.11. Việc xóa mô-đun được quyết định trong :pep:`594`.
 
-The last version of Python that provided the :mod:`!aifc` module was
-`Python 3.12 <https://docs.python.org/3.12/library/aifc.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!aifc` là `Python 3.12 <https://docs.python.org/3.12/library/aifc.html>`_.
+
+.. _`Python 3.12`: https://docs.python.org/3.12/library/aifc.html

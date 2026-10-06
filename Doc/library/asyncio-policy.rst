@@ -3,161 +3,137 @@
 
 .. _asyncio-policies:
 
-========
-Policies
-========
+==========
+Chính sách
+==========
 
 .. warning::
 
-   Policies are deprecated and will be removed in Python 3.16.
-   Users are encouraged to use the :func:`asyncio.run` function
-   or the :class:`asyncio.Runner` with *loop_factory* to use
-   the desired loop implementation.
+   Các chính sách đã bị phản đối và sẽ bị xóa trong Python 3.16. Người dùng nên sử dụng hàm :func:`asyncio.run` hoặc :class:`asyncio.Runner` với *loop_factory* để sử dụng cách triển khai event loop mong muốn.
 
 
-An event loop policy is a global object
-used to get and set the current :ref:`event loop <asyncio-event-loop>`,
-as well as create new event loops.
-The default policy can be :ref:`replaced <asyncio-policy-get-set>` with
-:ref:`built-in alternatives <asyncio-policy-builtin>`
-to use different event loop implementations,
-or substituted by a :ref:`custom policy <asyncio-custom-policies>`
-that can override these behaviors.
+Policy của event loop là một đối tượng toàn cục được dùng để lấy và thiết lập :ref:`event loop <asyncio-event-loop>` hiện tại, cũng như tạo các event loop mới. Policy mặc định có thể được :ref:`thay thế <asyncio-policy-get-set>` bằng
+:ref:`các lựa chọn tích hợp sẵn <asyncio-policy-builtin>` để sử dụng các cách triển khai event loop khác nhau, hoặc được thay thế bằng một :ref:`policy tùy chỉnh <asyncio-custom-policies>` có thể ghi đè các hành vi này.
 
-The :ref:`policy object <asyncio-policy-objects>`
-gets and sets a separate event loop per *context*.
-This is per-thread by default,
-though custom policies could define *context* differently.
+:ref:`Đối tượng policy <asyncio-policy-objects>` lấy và thiết lập một event loop riêng cho mỗi *ngữ cảnh*. Theo mặc định, ngữ cảnh này là theo thread, nhưng các policy tùy chỉnh có thể định nghĩa *ngữ cảnh* theo cách khác.
 
-Custom event loop policies can control the behavior of
-:func:`get_event_loop`, :func:`set_event_loop`, and :func:`new_event_loop`.
+Các policy event loop tùy chỉnh có thể kiểm soát hành vi của
+:func:`get_event_loop`, :func:`set_event_loop` và :func:`new_event_loop`.
 
-Policy objects should implement the APIs defined
-in the :class:`AbstractEventLoopPolicy` abstract base class.
+Các đối tượng policy phải triển khai các API được định nghĩa trong lớp cơ sở trừu tượng :class:`AbstractEventLoopPolicy`.
 
 
 .. _asyncio-policy-get-set:
 
-Getting and Setting the Policy
-==============================
+Lấy và thiết lập Policy
+=======================
 
-The following functions can be used to get and set the policy
-for the current process:
+Có thể sử dụng các hàm sau để lấy và thiết lập policy cho tiến trình hiện tại:
 
 .. function:: get_event_loop_policy()
 
-   Return the current process-wide policy.
+   Trả về policy áp dụng trên toàn bộ tiến trình hiện tại.
 
    .. deprecated:: 3.14
-      The :func:`get_event_loop_policy` function is deprecated and
-      will be removed in Python 3.16.
+      Hàm :func:`get_event_loop_policy` đã lỗi thời và sẽ bị xóa trong Python 3.16.
 
 .. function:: set_event_loop_policy(policy)
 
-   Set the current process-wide policy to *policy*.
+   Thiết lập policy áp dụng trên toàn bộ tiến trình hiện tại thành *policy*.
 
-   If *policy* is set to ``None``, the default policy is restored.
+   Nếu *policy* được đặt thành ``None``, policy mặc định sẽ được khôi phục.
 
    .. deprecated:: 3.14
-      The :func:`set_event_loop_policy` function is deprecated and
-      will be removed in Python 3.16.
+      Hàm :func:`set_event_loop_policy` không được dùng nữa và sẽ bị loại bỏ trong Python 3.16.
 
 
 .. _asyncio-policy-objects:
 
-Policy Objects
-==============
+Đối tượng Policy
+================
 
-The abstract event loop policy base class is defined as follows:
+Lớp cơ sở policy trừu tượng của event loop được định nghĩa như sau:
 
 .. class:: AbstractEventLoopPolicy
 
-   An abstract base class for asyncio policies.
+   Lớp cơ sở trừu tượng dành cho các policy của asyncio.
 
    .. method:: get_event_loop()
 
-      Get the event loop for the current context.
+      Lấy event loop cho context hiện tại.
 
-      Return an event loop object implementing the
-      :class:`AbstractEventLoop` interface.
+      Trả về một đối tượng event loop triển khai
+      giao diện :class:`AbstractEventLoop`.
 
-      This method should never return ``None``.
+      Phương thức này không bao giờ được trả về ``None``.
 
       .. versionchanged:: 3.6
 
    .. method:: set_event_loop(loop)
 
-      Set the event loop for the current context to *loop*.
+      Đặt event loop cho ngữ cảnh hiện tại thành *loop*.
 
    .. method:: new_event_loop()
 
-      Create and return a new event loop object.
+      Tạo và trả về một đối tượng event loop mới.
 
-      This method should never return ``None``.
+      Phương thức này không bao giờ được trả về ``None``.
 
    .. deprecated:: 3.14
-      The :class:`AbstractEventLoopPolicy` class is deprecated and
-      will be removed in Python 3.16.
+      Lớp :class:`AbstractEventLoopPolicy` đã lỗi thời và sẽ bị xóa trong Python 3.16.
 
 
 .. _asyncio-policy-builtin:
 
-asyncio ships with the following built-in policies:
+asyncio đi kèm các policy tích hợp sẵn sau:
 
 
 .. class:: DefaultEventLoopPolicy
 
-   The default asyncio policy.  Uses :class:`SelectorEventLoop`
-   on Unix and :class:`ProactorEventLoop` on Windows.
+   Policy asyncio mặc định. Sử dụng :class:`SelectorEventLoop` trên Unix và :class:`ProactorEventLoop` trên Windows.
 
-   There is no need to install the default policy manually. asyncio
-   is configured to use the default policy automatically.
+   Không cần cài đặt policy mặc định theo cách thủ công. asyncio được cấu hình để tự động sử dụng policy mặc định.
 
    .. versionchanged:: 3.8
 
-      On Windows, :class:`ProactorEventLoop` is now used by default.
+      Trên Windows, :class:`ProactorEventLoop` hiện được sử dụng theo mặc định.
 
    .. versionchanged:: 3.14
-      The :meth:`get_event_loop` method of the default asyncio policy now
-      raises a :exc:`RuntimeError` if there is no set event loop.
+      Phương thức :meth:`get_event_loop` của policy asyncio mặc định hiện sẽ raise một :exc:`RuntimeError` nếu chưa có event loop nào được thiết lập.
 
    .. deprecated:: 3.14
-      The :class:`DefaultEventLoopPolicy` class is deprecated and
-      will be removed in Python 3.16.
+      Lớp :class:`DefaultEventLoopPolicy` không được dùng nữa và sẽ bị loại bỏ trong Python 3.16.
 
 
 .. class:: WindowsSelectorEventLoopPolicy
 
-   An alternative event loop policy that uses the
-   :class:`SelectorEventLoop` event loop implementation.
+   Một policy event loop thay thế sử dụng
+   triển khai event loop :class:`SelectorEventLoop`.
 
    .. availability:: Windows.
 
    .. deprecated:: 3.14
-      The :class:`WindowsSelectorEventLoopPolicy` class is deprecated and
-      will be removed in Python 3.16.
+      Lớp :class:`WindowsSelectorEventLoopPolicy` không được dùng nữa và sẽ bị loại bỏ trong Python 3.16.
 
 
 .. class:: WindowsProactorEventLoopPolicy
 
-   An alternative event loop policy that uses the
-   :class:`ProactorEventLoop` event loop implementation.
+   Một policy event loop thay thế sử dụng
+   :class:`ProactorEventLoop` triển khai event loop.
 
    .. availability:: Windows.
 
    .. deprecated:: 3.14
-      The :class:`WindowsProactorEventLoopPolicy` class is deprecated and
-      will be removed in Python 3.16.
+      Lớp :class:`WindowsProactorEventLoopPolicy` đã deprecated và sẽ bị xóa trong Python 3.16.
 
 
 .. _asyncio-custom-policies:
 
-Custom Policies
-===============
+Chính sách tùy chỉnh
+====================
 
-To implement a new event loop policy, it is recommended to subclass
-:class:`DefaultEventLoopPolicy` and override the methods for which
-custom behavior is wanted, e.g.::
+Để triển khai một chính sách event loop mới, bạn nên kế thừa
+:class:`DefaultEventLoopPolicy` và ghi đè các phương thức cần hành vi tùy chỉnh, ví dụ:::
 
     class MyEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
 
@@ -167,7 +143,7 @@ custom behavior is wanted, e.g.::
             This may be None or an instance of EventLoop.
             """
             loop = super().get_event_loop()
-            # Do something with loop ...
+            # Làm gì đó với loop ...
             return loop
 
     asyncio.set_event_loop_policy(MyEventLoopPolicy())

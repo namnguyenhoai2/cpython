@@ -3,258 +3,216 @@
 
 .. _asyncio-futures:
 
-=======
-Futures
-=======
+======
+Future
+======
 
-**Source code:** :source:`Lib/asyncio/futures.py`,
+**Mã nguồn:** :source:`Lib/asyncio/futures.py`,
 :source:`Lib/asyncio/base_futures.py`
 
 -------------------------------------
 
-*Future* objects are used to bridge **low-level callback-based code**
-with high-level async/await code.
+Các đối tượng *Future* được dùng để kết nối **mã dựa trên callback cấp thấp** với mã async/await cấp cao.
 
 
-Future Functions
-================
+Các hàm Future
+==============
 
 .. function:: isfuture(obj)
 
-   Return ``True`` if *obj* is either of:
+   Trả về ``True`` nếu *obj* là một trong các trường hợp sau:
 
-   * an instance of :class:`asyncio.Future`,
-   * an instance of :class:`asyncio.Task`,
-   * a Future-like object with a ``_asyncio_future_blocking``
-     attribute.
+   * một thực thể của :class:`asyncio.Future`,
+   * một thực thể của :class:`asyncio.Task`,
+   * một đối tượng tương tự Future có thuộc tính ``_asyncio_future_blocking``.
 
    .. versionadded:: 3.5
 
 
 .. function:: ensure_future(obj, *, loop=None)
 
-   Return:
+   Trả về:
 
-   * *obj* argument as is, if *obj* is a :class:`Future`,
-     a :class:`Task`, or a Future-like object (:func:`isfuture`
-     is used for the test.)
+   * đối số *obj* nguyên trạng nếu *obj* là một :class:`Future`, một :class:`Task` hoặc một đối tượng tương tự Future (:func:`isfuture` được dùng để kiểm tra).
 
-   * a :class:`Task` object wrapping *obj*, if *obj* is a
-     coroutine (:func:`iscoroutine` is used for the test);
-     in this case the coroutine will be scheduled by
-     ``ensure_future()``.
+   * một đối tượng :class:`Task` bao bọc *obj* nếu *obj* là một coroutine (:func:`iscoroutine` được dùng để kiểm tra); trong trường hợp này, coroutine sẽ được ``ensure_future()`` lên lịch.
 
-   * a :class:`Task` object that would await on *obj*, if *obj* is an
-     awaitable (:func:`inspect.isawaitable` is used for the test.)
+   * một đối tượng :class:`Task` sẽ await trên *obj* nếu *obj* là một awaitable (:func:`inspect.isawaitable` được dùng để kiểm tra).
 
-   If *obj* is neither of the above a :exc:`TypeError` is raised.
+   Nếu *obj* không thuộc bất kỳ loại nào nêu trên, một :exc:`TypeError` sẽ được đưa ra.
 
    .. important::
 
-      Save a reference to the result of this function, to avoid
-      a task disappearing mid-execution.
+      Hãy lưu một tham chiếu đến kết quả của hàm này để tránh việc task biến mất giữa chừng trong khi thực thi.
 
-      See also the :func:`create_task` function which is the
-      preferred way for creating new tasks or use :class:`asyncio.TaskGroup`
-      which keeps reference to the task internally.
+      Xem thêm hàm :func:`create_task`, đây là cách được khuyến nghị để tạo các task mới, hoặc sử dụng :class:`asyncio.TaskGroup`, hàm này lưu tham chiếu đến task internally.
 
    .. versionchanged:: 3.5.1
-      The function accepts any :term:`awaitable` object.
+      Hàm này chấp nhận bất kỳ đối tượng :term:`awaitable` nào.
 
    .. deprecated:: 3.10
-      Deprecation warning is emitted if *obj* is not a Future-like object
-      and *loop* is not specified and there is no running event loop.
+      Cảnh báo ngừng sử dụng được phát ra nếu *obj* không phải là đối tượng giống Future, *loop* không được chỉ định và không có event loop đang chạy.
 
 
 .. function:: wrap_future(future, *, loop=None)
 
-   Wrap a :class:`concurrent.futures.Future` object in a
-   :class:`asyncio.Future` object.
+   Bọc một đối tượng :class:`concurrent.futures.Future` vào một
+   đối tượng :class:`asyncio.Future`.
 
    .. deprecated:: 3.10
-      Deprecation warning is emitted if *future* is not a Future-like object
-      and *loop* is not specified and there is no running event loop.
+      Cảnh báo ngừng sử dụng được phát ra nếu *future* không phải là đối tượng giống Future, *loop* không được chỉ định và không có event loop đang chạy.
 
 .. _asyncio-future-obj:
 
-Future Object
-=============
+Đối tượng Future
+================
 
 .. class:: Future(*, loop=None)
 
-   A Future represents an eventual result of an asynchronous
-   operation.  Not thread-safe.
+   Future biểu diễn kết quả sẽ có của một thao tác bất đồng bộ. Không an toàn khi sử dụng giữa các thread.
 
-   Future is an :term:`awaitable` object.  Coroutines can await on
-   Future objects until they either have a result or an exception
-   set, or until they are cancelled. A Future can be awaited multiple
-   times and the result is same.
+   Future là một đối tượng :term:`awaitable`. Coroutine có thể await các đối tượng Future cho đến khi chúng có kết quả hoặc exception, hoặc bị hủy. Có thể await một Future nhiều lần và kết quả vẫn giống nhau.
 
-   Typically Futures are used to enable low-level
-   callback-based code (e.g. in protocols implemented using asyncio
-   :ref:`transports <asyncio-transports-protocols>`)
-   to interoperate with high-level async/await code.
+   Thông thường, Future được dùng để cho phép mã cấp thấp dựa trên callback (ví dụ: trong các protocol được triển khai bằng asyncio
+   :ref:`transports <asyncio-transports-protocols>`) tương tác với mã async/await cấp cao.
 
-   The rule of thumb is to never expose Future objects in user-facing
-   APIs, and the recommended way to create a Future object is to call
-   :meth:`loop.create_future`.  This way alternative event loop
-   implementations can inject their own optimized implementations
-   of a Future object.
+   Quy tắc chung là không bao giờ để lộ các đối tượng Future trong API hướng đến người dùng; cách được khuyến nghị để tạo một đối tượng Future là gọi
+   :meth:`loop.create_future`. Bằng cách này, các triển khai event loop thay thế có thể đưa vào triển khai được tối ưu hóa riêng cho đối tượng Future.
 
-   Futures are :ref:`generic <generics>` over the type of their results.
+   Future là :ref:`generic <generics>` theo kiểu dữ liệu của kết quả.
 
    .. versionchanged:: 3.7
-      Added support for the :mod:`contextvars` module.
+      Đã thêm hỗ trợ cho module :mod:`contextvars`.
 
    .. deprecated:: 3.10
-      Deprecation warning is emitted if *loop* is not specified
-      and there is no running event loop.
+      Cảnh báo ngừng sử dụng được phát ra nếu *loop* không được chỉ định và không có event loop nào đang chạy.
 
    .. method:: result()
 
-      Return the result of the Future.
+      Trả về kết quả của Future.
 
-      If the Future is *done* and has a result set by the
-      :meth:`set_result` method, the result value is returned.
+      Nếu Future ở trạng thái *done* và có kết quả được thiết lập bởi
+      :meth:`set_result` phương thức, giá trị kết quả sẽ được trả về.
 
-      If the Future is *done* and has an exception set by the
-      :meth:`set_exception` method, this method raises the exception.
+      Nếu Future ở trạng thái *done* và có ngoại lệ được thiết lập bởi
+      :meth:`set_exception` phương thức, phương thức này sẽ ném ngoại lệ.
 
-      If the Future has been *cancelled*, this method raises
-      a :exc:`CancelledError` exception.
+      Nếu Future đã bị *hủy*, phương thức này sẽ phát sinh một :exc:`CancelledError` ngoại lệ.
 
-      If the Future's result isn't yet available, this method raises
-      an :exc:`InvalidStateError` exception.
+      Nếu kết quả của Future chưa có sẵn, phương thức này sẽ phát sinh một :exc:`InvalidStateError` ngoại lệ.
 
    .. method:: set_result(result)
 
-      Mark the Future as *done* and set its result.
+      Đánh dấu Future là *hoàn tất* và đặt kết quả cho nó.
 
-      Raises an :exc:`InvalidStateError` error if the Future is
-      already *done*.
+      Phát sinh một :exc:`InvalidStateError` lỗi nếu Future đã *hoàn tất*.
 
    .. method:: set_exception(exception)
 
-      Mark the Future as *done* and set an exception.
+      Đánh dấu Future là *hoàn tất* và đặt một ngoại lệ.
 
-      Raises an :exc:`InvalidStateError` error if the Future is
-      already *done*.
+      Phát sinh một :exc:`InvalidStateError` lỗi nếu Future đã *hoàn tất*.
 
    .. method:: done()
 
-      Return ``True`` if the Future is *done*.
+      Trả về ``True`` nếu Future đã *hoàn tất*.
 
-      A Future is *done* if it was *cancelled* or if it has a result
-      or an exception set with :meth:`set_result` or
-      :meth:`set_exception` calls.
+      Một Future ở trạng thái *hoàn tất* nếu nó đã bị *hủy* hoặc nếu nó đã có kết quả hoặc ngoại lệ được thiết lập bằng :meth:`set_result` hoặc
+      :meth:`set_exception` các lời gọi.
 
    .. method:: cancelled()
 
-      Return ``True`` if the Future was *cancelled*.
+      Trả về ``True`` nếu Future đã bị *hủy*.
 
-      The method is usually used to check if a Future is not
-      *cancelled* before setting a result or an exception for it::
+      Phương thức này thường được dùng để kiểm tra xem Future có chưa bị *hủy* hay không trước khi thiết lập kết quả hoặc ngoại lệ cho nó::
 
           if not fut.cancelled():
               fut.set_result(42)
 
    .. method:: add_done_callback(callback, *, context=None)
 
-      Add a callback to be run when the Future is *done*.
+      Thêm một callback sẽ được chạy khi Future ở trạng thái *hoàn tất*.
 
-      The *callback* is called with the Future object as its only
-      argument.
+      *callback* được gọi với đối tượng Future là đối số duy nhất.
 
-      If the Future is already *done* when this method is called,
-      the callback is scheduled with :meth:`loop.call_soon`.
+      Nếu Future đã ở trạng thái *hoàn tất* khi phương thức này được gọi, callback sẽ được lên lịch bằng :meth:`loop.call_soon`.
 
-      An optional keyword-only *context* argument allows specifying a
-      custom :class:`contextvars.Context` for the *callback* to run in.
-      The current context is used when no *context* is provided.
+      Một đối số *context* chỉ nhận keyword tùy chọn cho phép chỉ định :class:`contextvars.Context` tùy chỉnh để *callback* chạy trong đó. Context hiện tại được sử dụng nếu không cung cấp *context*.
 
-      :func:`functools.partial` can be used to pass parameters
-      to the callback, e.g.::
+      Có thể sử dụng :func:`functools.partial` để truyền tham số cho callback, chẳng hạn như::
 
-          # Call 'print("Future:", fut)' when "fut" is done.
+          # Gọi 'print("Future:", fut)' khi "fut" hoàn tất.
           fut.add_done_callback(
               functools.partial(print, "Future:"))
 
       .. versionchanged:: 3.7
-         The *context* keyword-only parameter was added.
-         See :pep:`567` for more details.
+         Tham số chỉ nhận keyword *context* đã được thêm. Xem :pep:`567` để biết thêm chi tiết.
 
    .. method:: remove_done_callback(callback)
 
-      Remove *callback* from the callbacks list.
+      Xóa *callback* khỏi danh sách callback.
 
-      Returns the number of callbacks removed, which is typically 1,
-      unless a callback was added more than once.
+      Trả về số lượng callback đã xóa, thường là 1, trừ khi một callback được thêm nhiều lần.
 
    .. method:: cancel(msg=None)
 
-      Cancel the Future and schedule callbacks.
+      Hủy Future và lên lịch cho các callback.
 
-      If the Future is already *done* or *cancelled*, return ``False``.
-      Otherwise, change the Future's state to *cancelled*,
-      schedule the callbacks, and return ``True``.
+      Nếu Future đã *done* hoặc *cancelled*, hãy trả về ``False``. Nếu không, hãy chuyển trạng thái của Future thành *cancelled*, lên lịch cho các callback rồi trả về ``True``.
 
-      The optional string argument *msg* is passed as the argument to the
-      :exc:`CancelledError` exception raised when a cancelled Future
-      is awaited.
+      Đối số chuỗi tùy chọn *msg* được truyền làm đối số cho
+      ngoại lệ :exc:`CancelledError` được raise khi await một Future đã bị hủy.
 
       .. versionchanged:: 3.9
-         Added the *msg* parameter.
+         Đã thêm tham số *msg*.
 
    .. method:: exception()
 
-      Return the exception that was set on this Future.
+      Trả về ngoại lệ đã được thiết lập trên Future này.
 
-      The exception (or ``None`` if no exception was set) is
-      returned only if the Future is *done*.
+      Ngoại lệ (hoặc ``None`` nếu chưa có ngoại lệ nào được thiết lập) chỉ được trả về khi Future *done*.
 
-      If the Future has been *cancelled*, this method raises a
-      :exc:`CancelledError` exception.
+      Nếu Future đã bị *cancelled*, phương thức này sẽ raise một
+      :exc:`CancelledError` ngoại lệ.
 
-      If the Future isn't *done* yet, this method raises an
-      :exc:`InvalidStateError` exception.
+      Nếu Future chưa *hoàn tất* thì phương thức này sẽ phát sinh một
+      :exc:`InvalidStateError` ngoại lệ.
 
    .. method:: get_loop()
 
-      Return the event loop the Future object is bound to.
+      Trả về event loop mà đối tượng Future được liên kết.
 
       .. versionadded:: 3.7
 
 
 .. _asyncio_example_future:
 
-This example creates a Future object, creates and schedules an
-asynchronous Task to set result for the Future, and waits until
-the Future has a result::
+Ví dụ này tạo một đối tượng Future, tạo và lên lịch một Task bất đồng bộ để đặt kết quả cho Future, rồi chờ cho đến khi Future có kết quả::
 
     async def set_after(fut, delay, value):
-        # Sleep for *delay* seconds.
+        # Ngủ trong *delay* giây.
         await asyncio.sleep(delay)
 
-        # Set *value* as a result of *fut* Future.
+        # Đặt *value* làm kết quả của Future *fut*.
         fut.set_result(value)
 
     async def main():
-        # Get the current event loop.
+        # Lấy event loop hiện tại.
         loop = asyncio.get_running_loop()
 
-        # Create a new Future object.
+        # Tạo một đối tượng Future mới.
         fut = loop.create_future()
 
-        # Run "set_after()" coroutine in a parallel Task.
-        # We are using the low-level "loop.create_task()" API here because
-        # we already have a reference to the event loop at hand.
-        # Otherwise we could have just used "asyncio.create_task()".
+        # Chạy coroutine "set_after()" trong một Task song song.
+        # Ở đây, chúng ta sử dụng API cấp thấp "loop.create_task()" vì
+        # chúng ta đã có sẵn tham chiếu đến event loop.
+        # Nếu không, chúng ta chỉ cần sử dụng "asyncio.create_task()".
         loop.create_task(
             set_after(fut, 1, '... world'))
 
         print('hello ...')
 
-        # Wait until *fut* has a result (1 second) and print it.
+        # Chờ *fut* có kết quả (1 giây) rồi in kết quả đó.
         print(await fut)
 
     asyncio.run(main())
@@ -262,26 +220,20 @@ the Future has a result::
 
 .. important::
 
-   The Future object was designed to mimic
-   :class:`concurrent.futures.Future`.  Key differences include:
+   Đối tượng Future được thiết kế để mô phỏng
+   :class:`concurrent.futures.Future`.  Các điểm khác biệt chính bao gồm:
 
-   - unlike asyncio Futures, :class:`concurrent.futures.Future`
-     instances cannot be awaited.
+   - không giống như các Future của asyncio, các đối tượng :class:`concurrent.futures.Future` không thể được await.
 
-   - :meth:`asyncio.Future.result` and :meth:`asyncio.Future.exception`
-     do not accept the *timeout* argument.
+   - :meth:`asyncio.Future.result` và :meth:`asyncio.Future.exception` không chấp nhận đối số *timeout*.
 
-   - :meth:`asyncio.Future.result` and :meth:`asyncio.Future.exception`
-     raise an :exc:`InvalidStateError` exception when the Future is not
-     *done*.
+   - :meth:`asyncio.Future.result` và :meth:`asyncio.Future.exception` phát sinh một ngoại lệ :exc:`InvalidStateError` khi Future chưa *done*.
 
-   - Callbacks registered with :meth:`asyncio.Future.add_done_callback`
-     are not called immediately.  They are scheduled with
-     :meth:`loop.call_soon` instead.
+   - Các callback được đăng ký với :meth:`asyncio.Future.add_done_callback` không được gọi ngay lập tức. Chúng được lên lịch bằng
+     :meth:`loop.call_soon` thay vào đó.
 
-   - asyncio Future is not compatible with the
-     :func:`concurrent.futures.wait` and
-     :func:`concurrent.futures.as_completed` functions.
+   - asyncio Future không tương thích với
+     :func:`concurrent.futures.wait` và
+     :func:`concurrent.futures.as_completed` các hàm.
 
-   - :meth:`asyncio.Future.cancel` accepts an optional ``msg`` argument,
-     but :meth:`concurrent.futures.Future.cancel` does not.
+   - :meth:`asyncio.Future.cancel` chấp nhận một đối số ``msg`` tùy chọn, nhưng :meth:`concurrent.futures.Future.cancel` thì không.

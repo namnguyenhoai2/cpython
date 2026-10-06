@@ -2,26 +2,21 @@
 
 .. _asyncio-sync:
 
-==========================
-Synchronization Primitives
-==========================
+=========================
+Các primitive đồng bộ hóa
+=========================
 
-**Source code:** :source:`Lib/asyncio/locks.py`
+**Mã nguồn:** :source:`Lib/asyncio/locks.py`
 
 -----------------------------------------------
 
-asyncio synchronization primitives are designed to be similar to
-those of the :mod:`threading` module with two important caveats:
+Các primitive đồng bộ hóa của asyncio được thiết kế tương tự như các primitive trong mô-đun :mod:`threading` với hai điểm cần lưu ý:
 
-* asyncio primitives are not thread-safe, therefore they should not
-  be used for OS thread synchronization (use :mod:`threading` for
-  that);
+* Các primitive của asyncio không an toàn khi sử dụng với thread, vì vậy không nên dùng chúng để đồng bộ hóa thread của hệ điều hành (hãy sử dụng :mod:`threading` cho mục đích đó);
 
-* methods of these synchronization primitives do not accept the *timeout*
-  argument; use the :func:`asyncio.wait_for` function to perform
-  operations with timeouts.
+* Các phương thức của những primitive đồng bộ hóa này không chấp nhận đối số *timeout*; hãy sử dụng hàm :func:`asyncio.wait_for` để thực hiện các thao tác có thời gian chờ.
 
-asyncio has the following basic synchronization primitives:
+asyncio có các primitive đồng bộ hóa cơ bản sau:
 
 * :class:`Lock`
 * :class:`Event`
@@ -39,60 +34,54 @@ Lock
 
 .. class:: Lock()
 
-   Implements a mutex lock for asyncio tasks.  Not thread-safe.
+   Triển khai khóa mutex cho các tác vụ asyncio. Không an toàn khi sử dụng với nhiều luồng.
 
-   An asyncio lock can be used to guarantee exclusive access to a
-   shared resource.
+   Có thể sử dụng khóa asyncio để đảm bảo quyền truy cập độc quyền vào tài nguyên dùng chung.
 
-   The preferred way to use a Lock is an :keyword:`async with`
-   statement::
+   Cách ưu tiên để sử dụng Lock là một câu lệnh :keyword:`async with`::
 
        lock = asyncio.Lock()
 
-       # ... later
+       # ... về sau
        async with lock:
-           # access shared state
+           # truy cập trạng thái dùng chung
 
-   which is equivalent to::
+   tương đương với::
 
        lock = asyncio.Lock()
 
-       # ... later
+       # ... về sau
        await lock.acquire()
        try:
-           # access shared state
+           # truy cập trạng thái dùng chung
        finally:
            lock.release()
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. method:: acquire()
       :async:
 
-      Acquire the lock.
+      Lấy khóa.
 
-      This method waits until the lock is *unlocked*, sets it to
-      *locked* and returns ``True``.
+      Phương thức này chờ cho đến khi khóa ở trạng thái *unlocked*, đặt khóa thành *locked* rồi trả về ``True``.
 
-      When more than one coroutine is blocked in :meth:`acquire`
-      waiting for the lock to be unlocked, only one coroutine
-      eventually proceeds.
+      Khi có nhiều coroutine bị chặn trong :meth:`acquire` chờ khóa được mở, cuối cùng chỉ một coroutine tiếp tục thực thi.
 
-      Acquiring a lock is *fair*: the coroutine that proceeds will be
-      the first coroutine that started waiting on the lock.
+      Việc lấy khóa là *fair*: coroutine tiếp tục thực thi sẽ là coroutine đầu tiên bắt đầu chờ khóa.
 
    .. method:: release()
 
-      Release the lock.
+      Giải phóng khóa.
 
-      When the lock is *locked*, reset it to *unlocked* and return.
+      Khi lock ở trạng thái *locked*, hãy đặt lại về trạng thái *unlocked* rồi trả về.
 
-      If the lock is *unlocked*, a :exc:`RuntimeError` is raised.
+      Nếu lock ở trạng thái *unlocked*, một :exc:`RuntimeError` sẽ được phát sinh.
 
    .. method:: locked()
 
-      Return ``True`` if the lock is *locked*.
+      Trả về ``True`` nếu lock ở trạng thái *locked*.
 
 
 Event
@@ -100,22 +89,19 @@ Event
 
 .. class:: Event()
 
-   An event object.  Not thread-safe.
+   Một đối tượng event. Không thread-safe.
 
-   An asyncio event can be used to notify multiple asyncio tasks
-   that some event has happened.
+   Có thể sử dụng một event asyncio để thông báo cho nhiều task asyncio rằng một sự kiện nào đó đã xảy ra.
 
-   An Event object manages an internal flag that can be set to *true*
-   with the :meth:`~Event.set` method and reset to *false* with the
-   :meth:`clear` method.  The :meth:`~Event.wait` method blocks until the
-   flag is set to *true*.  The flag is set to *false* initially.
+   Một đối tượng Event quản lý một cờ nội bộ có thể được đặt thành *true* bằng phương thức :meth:`~Event.set` và được đặt lại thành *false* bằng
+   Phương thức :meth:`clear`. Phương thức :meth:`~Event.wait` chặn cho đến khi cờ được đặt thành *true*. Ban đầu, cờ được đặt thành *false*.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã loại bỏ tham số *loop*.
 
    .. _asyncio_example_sync_event:
 
-   Example::
+   Ví dụ::
 
       async def waiter(event):
           print('waiting for it ...')
@@ -123,17 +109,17 @@ Event
           print('... got it!')
 
       async def main():
-          # Create an Event object.
+          # Tạo một đối tượng Event.
           event = asyncio.Event()
 
-          # Spawn a Task to wait until 'event' is set.
+          # Tạo một Task để chờ cho đến khi 'event' được đặt.
           waiter_task = asyncio.create_task(waiter(event))
 
-          # Sleep for 1 second and set the event.
+          # Ngủ trong 1 giây rồi đặt event.
           await asyncio.sleep(1)
           event.set()
 
-          # Wait until the waiter task is finished.
+          # Chờ cho đến khi tác vụ waiter hoàn tất.
           await waiter_task
 
       asyncio.run(main())
@@ -141,68 +127,57 @@ Event
    .. method:: wait()
       :async:
 
-      Wait until the event is set.
+      Chờ cho đến khi event được thiết lập.
 
-      If the event is set, return ``True`` immediately.
-      Otherwise block until another task calls :meth:`~Event.set`.
+      Nếu event đã được thiết lập, lập tức trả về ``True``. Nếu không, hãy chặn cho đến khi một task khác gọi :meth:`~Event.set`.
 
    .. method:: set()
 
-      Set the event.
+      Thiết lập event.
 
-      All tasks waiting for event to be set will be immediately
-      awakened.
+      Tất cả các task đang chờ event được thiết lập sẽ ngay lập tức được đánh thức.
 
    .. method:: clear()
 
-      Clear (unset) the event.
+      Xóa (hủy thiết lập) event.
 
-      Subsequent tasks awaiting on :meth:`~Event.wait` will now block until the
-      :meth:`~Event.set` method is called again.
+      Các task tiếp theo đang chờ :meth:`~Event.wait` giờ đây sẽ bị chặn cho đến khi
+      phương thức :meth:`~Event.set` được gọi lại.
 
    .. method:: is_set()
 
-      Return ``True`` if the event is set.
+      Trả về ``True`` nếu event được thiết lập.
 
 
-Condition
+Điều kiện
 =========
 
 .. class:: Condition(lock=None)
 
-   A Condition object.  Not thread-safe.
+   Một đối tượng Condition. Không an toàn khi sử dụng trong môi trường đa luồng.
 
-   An asyncio condition primitive can be used by a task to wait for
-   some event to happen and then get exclusive access to a shared
-   resource.
+   Một primitive điều kiện asyncio có thể được task sử dụng để chờ một sự kiện xảy ra, sau đó giành quyền truy cập độc quyền vào một tài nguyên dùng chung.
 
-   In essence, a Condition object combines the functionality
-   of an :class:`Event` and a :class:`Lock`.  It is possible to have
-   multiple Condition objects share one Lock, which allows coordinating
-   exclusive access to a shared resource between different tasks
-   interested in particular states of that shared resource.
+   Về cơ bản, một đối tượng Condition kết hợp chức năng của một :class:`Event` và một :class:`Lock`. Có thể để nhiều đối tượng Condition dùng chung một Lock, cho phép điều phối quyền truy cập độc quyền vào một tài nguyên dùng chung giữa các task khác nhau quan tâm đến những trạng thái cụ thể của tài nguyên dùng chung đó.
 
-   The optional *lock* argument must be a :class:`Lock` object or
-   ``None``.  In the latter case a new Lock object is created
-   automatically.
+   Đối số *lock* tùy chọn phải là một đối tượng :class:`Lock` hoặc ``None``. Trong trường hợp sau, một đối tượng Lock mới sẽ được tự động tạo.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
-   The preferred way to use a Condition is an :keyword:`async with`
-   statement::
+   Cách được khuyến nghị để sử dụng Condition là dùng câu lệnh :keyword:`async with`::
 
        cond = asyncio.Condition()
 
-       # ... later
+       # ... sau đó
        async with cond:
            await cond.wait()
 
-   which is equivalent to::
+   tương đương với::
 
        cond = asyncio.Condition()
 
-       # ... later
+       # ... sau đó
        await cond.acquire()
        try:
            await cond.wait()
@@ -212,69 +187,52 @@ Condition
    .. method:: acquire()
       :async:
 
-      Acquire the underlying lock.
+      Acquire khóa nền tảng.
 
-      This method waits until the underlying lock is *unlocked*,
-      sets it to *locked* and returns ``True``.
+      Phương thức này chờ cho đến khi khóa nền tảng được *mở khóa*, đặt khóa thành *đã khóa* rồi trả về ``True``.
 
    .. method:: notify(n=1)
 
-      Wake up *n* tasks (1 by default) waiting on this
-      condition.  If fewer than *n* tasks are waiting they are all awakened.
+      Đánh thức *n* tác vụ (mặc định là 1) đang chờ trên condition này. Nếu có ít hơn *n* tác vụ đang chờ thì tất cả chúng đều được đánh thức.
 
-      The lock must be acquired before this method is called and
-      released shortly after.  If called with an *unlocked* lock
-      a :exc:`RuntimeError` error is raised.
+      Phải giành được khóa trước khi gọi phương thức này và giải phóng khóa ngay sau đó. Nếu được gọi với một khóa *unlocked*, lỗi :exc:`RuntimeError` sẽ được phát sinh.
 
    .. method:: locked()
 
-      Return ``True`` if the underlying lock is acquired.
+      Trả về ``True`` nếu khóa bên dưới được giành quyền.
 
    .. method:: notify_all()
 
-      Wake up all tasks waiting on this condition.
+      Đánh thức tất cả các tác vụ đang chờ trên điều kiện này.
 
-      This method acts like :meth:`notify`, but wakes up all waiting
-      tasks.
+      Phương thức này hoạt động giống :meth:`notify`, nhưng đánh thức tất cả các tác vụ đang chờ.
 
-      The lock must be acquired before this method is called and
-      released shortly after.  If called with an *unlocked* lock
-      a :exc:`RuntimeError` error is raised.
+      Phải giành được khóa trước khi gọi phương thức này và giải phóng khóa ngay sau đó. Nếu được gọi với một khóa *unlocked*, lỗi :exc:`RuntimeError` sẽ được phát sinh.
 
    .. method:: release()
 
-      Release the underlying lock.
+      Giải phóng khóa bên dưới.
 
-      When invoked on an unlocked lock, a :exc:`RuntimeError` is
-      raised.
+      Khi được gọi trên một khóa chưa được khóa, một :exc:`RuntimeError` sẽ được phát sinh.
 
    .. method:: wait()
       :async:
 
-      Wait until notified.
+      Chờ cho đến khi được thông báo.
 
-      If the calling task has not acquired the lock when this method is
-      called, a :exc:`RuntimeError` is raised.
+      Nếu task gọi chưa giành được lock khi phương thức này được gọi, một :exc:`RuntimeError` sẽ được phát sinh.
 
-      This method releases the underlying lock, and then blocks until
-      it is awakened by a :meth:`notify` or :meth:`notify_all` call.
-      Once awakened, the Condition re-acquires its lock and this method
-      returns ``True``.
+      Phương thức này giải phóng lock bên dưới, sau đó chặn cho đến khi được đánh thức bởi lệnh gọi :meth:`notify` hoặc :meth:`notify_all`. Sau khi được đánh thức, Condition giành lại lock của nó và phương thức này trả về ``True``.
 
-      Note that a task *may* return from this call spuriously,
-      which is why the caller should always re-check the state
-      and be prepared to :meth:`~Condition.wait` again. For this reason, you may
-      prefer to use :meth:`~Condition.wait_for` instead.
+      Lưu ý rằng một task *có thể* trở về từ lệnh gọi này một cách ngoài dự kiến; vì vậy, bên gọi luôn phải kiểm tra lại trạng thái và sẵn sàng :meth:`~Condition.wait` một lần nữa. Vì lý do này, bạn có thể muốn sử dụng :meth:`~Condition.wait_for` thay thế.
 
    .. method:: wait_for(predicate)
       :async:
 
-      Wait until a predicate becomes *true*.
+      Chờ cho đến khi một predicate trở thành *đúng*.
 
-      The predicate must be a callable which result will be
-      interpreted as a boolean value.  The method will repeatedly
-      :meth:`~Condition.wait` until the predicate evaluates to *true*. The final value is the
-      return value.
+      Predicate phải là một callable mà kết quả của nó sẽ được diễn giải như một giá trị boolean. Phương thức này sẽ lặp lại
+      :meth:`~Condition.wait` cho đến khi predicate được đánh giá là *đúng*. Giá trị cuối cùng là giá trị trả về.
 
 
 Semaphore
@@ -282,61 +240,52 @@ Semaphore
 
 .. class:: Semaphore(value=1)
 
-   A Semaphore object.  Not thread-safe.
+   Đối tượng Semaphore. Không an toàn khi sử dụng trong nhiều thread.
 
-   A semaphore manages an internal counter which is decremented by each
-   :meth:`acquire` call and incremented by each :meth:`release` call.
-   The counter can never go below zero; when :meth:`acquire` finds
-   that it is zero, it blocks, waiting until some task calls
+   Semaphore quản lý một bộ đếm nội bộ, bộ đếm này được giảm đi sau mỗi
+   :meth:`acquire` lần gọi và được tăng lên sau mỗi lần gọi :meth:`release`. Bộ đếm không bao giờ có thể nhỏ hơn 0; khi :meth:`acquire` phát hiện bộ đếm bằng 0, nó sẽ chặn và chờ cho đến khi một task nào đó gọi
    :meth:`release`.
 
-   The optional *value* argument gives the initial value for the
-   internal counter (``1`` by default). If the given value is
-   less than ``0`` a :exc:`ValueError` is raised.
+   Đối số *value* tùy chọn cung cấp giá trị ban đầu cho bộ đếm nội bộ (mặc định là ``1``). Nếu giá trị được cung cấp nhỏ hơn ``0``, một :exc:`ValueError` sẽ được nâng lên.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
-   The preferred way to use a Semaphore is an :keyword:`async with`
-   statement::
+   Cách được khuyến nghị để sử dụng Semaphore là một câu lệnh :keyword:`async with`::
 
        sem = asyncio.Semaphore(10)
 
-       # ... later
+       # ... sau đó
        async with sem:
-           # work with shared resource
+           # làm việc với tài nguyên dùng chung
 
-   which is equivalent to::
+   tương đương với::
 
        sem = asyncio.Semaphore(10)
 
-       # ... later
+       # ... sau đó
        await sem.acquire()
        try:
-           # work with shared resource
+           # làm việc với tài nguyên dùng chung
        finally:
            sem.release()
 
    .. method:: acquire()
       :async:
 
-      Acquire a semaphore.
+      Acquire một semaphore.
 
-      If the internal counter is greater than zero, decrement
-      it by one and return ``True`` immediately.  If it is zero, wait
-      until a :meth:`release` is called and return ``True``.
+      Nếu bộ đếm nội bộ lớn hơn 0, giảm nó đi một đơn vị và trả về ``True`` ngay lập tức. Nếu bộ đếm bằng 0, hãy chờ cho đến khi :meth:`release` được gọi rồi trả về ``True``.
 
    .. method:: locked()
 
-      Returns ``True`` if semaphore can not be acquired immediately.
+      Trả về ``True`` nếu không thể acquire semaphore ngay lập tức.
 
    .. method:: release()
 
-      Release a semaphore, incrementing the internal counter by one.
-      Can wake up a task waiting to acquire the semaphore.
+      Giải phóng một semaphore, tăng bộ đếm nội bộ lên một. Có thể đánh thức một task đang chờ acquire semaphore.
 
-      Unlike :class:`BoundedSemaphore`, :class:`Semaphore` allows
-      making more ``release()`` calls than ``acquire()`` calls.
+      Không giống :class:`BoundedSemaphore`, :class:`Semaphore` cho phép thực hiện nhiều lời gọi ``release()`` hơn các lời gọi ``acquire()``.
 
 
 BoundedSemaphore
@@ -344,14 +293,12 @@ BoundedSemaphore
 
 .. class:: BoundedSemaphore(value=1)
 
-   A bounded semaphore object.  Not thread-safe.
+   Một đối tượng semaphore có giới hạn. Không an toàn với thread.
 
-   Bounded Semaphore is a version of :class:`Semaphore` that raises
-   a :exc:`ValueError` in :meth:`~Semaphore.release` if it
-   increases the internal counter above the initial *value*.
+   Bounded Semaphore là một phiên bản của :class:`Semaphore` sẽ raise một :exc:`ValueError` trong :meth:`~Semaphore.release` nếu tăng bộ đếm nội bộ vượt quá *value* ban đầu.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã loại bỏ tham số *loop*.
 
 
 Barrier
@@ -359,35 +306,31 @@ Barrier
 
 .. class:: Barrier(parties)
 
-   A barrier object.  Not thread-safe.
+   Một đối tượng barrier. Không an toàn khi sử dụng trong môi trường đa luồng.
 
-   A barrier is a simple synchronization primitive that allows to block until
-   *parties* number of tasks are waiting on it.
-   Tasks can wait on the :meth:`~Barrier.wait` method and would be blocked until
-   the specified number of tasks end up waiting on :meth:`~Barrier.wait`.
-   At that point all of the waiting tasks would unblock simultaneously.
+   Barrier là một primitive đồng bộ hóa đơn giản, cho phép chặn cho đến khi có số lượng tác vụ bằng *bên tham gia* đang chờ trên đó. Các tác vụ có thể chờ bằng phương thức :meth:`~Barrier.wait` và sẽ bị chặn cho đến khi số lượng tác vụ được chỉ định kết thúc chờ tại :meth:`~Barrier.wait`. Khi đó, tất cả các tác vụ đang chờ sẽ đồng thời được bỏ chặn.
 
-   :keyword:`async with` can be used as an alternative to awaiting on
+   :keyword:`async with` có thể được sử dụng như một giải pháp thay thế cho việc await trên
    :meth:`~Barrier.wait`.
 
-   The barrier can be reused any number of times.
+   Có thể tái sử dụng barrier bao nhiêu lần tùy ý.
 
    .. _asyncio_example_barrier:
 
-   Example::
+   Ví dụ::
 
       async def example_barrier():
-         # barrier with 3 parties
+         # barrier với 3 bên tham gia
          b = asyncio.Barrier(3)
 
-         # create 2 new waiting tasks
+         # tạo 2 task đang chờ mới
          asyncio.create_task(b.wait())
          asyncio.create_task(b.wait())
 
          await asyncio.sleep(0)
          print(b)
 
-         # The third .wait() call passes the barrier
+         # Lần gọi .wait() thứ ba vượt qua barrier
          await b.wait()
          print(b)
          print("barrier passed")
@@ -397,7 +340,7 @@ Barrier
 
       asyncio.run(example_barrier())
 
-   Result of this example is::
+   Kết quả của ví dụ này là::
 
       <asyncio.locks.Barrier object at 0x... [filling, waiters:2/3]>
       <asyncio.locks.Barrier object at 0x... [draining, waiters:0/3]>
@@ -409,67 +352,54 @@ Barrier
    .. method:: wait()
       :async:
 
-      Pass the barrier. When all the tasks party to the barrier have called
-      this function, they are all unblocked simultaneously.
+      Vượt qua barrier. Khi tất cả task tham gia barrier đã gọi hàm này, chúng sẽ đồng thời được bỏ chặn.
 
-      When a waiting or blocked task in the barrier is cancelled,
-      this task exits the barrier which stays in the same state.
-      If the state of the barrier is "filling", the number of waiting task
-      decreases by 1.
+      Khi một task đang chờ hoặc bị chặn trong barrier bị hủy, task đó sẽ thoát khỏi barrier, còn barrier vẫn giữ nguyên trạng thái. Nếu trạng thái của barrier là "filling", số task đang chờ sẽ giảm đi 1.
 
-      The return value is an integer in the range of 0 to ``parties-1``, different
-      for each task. This can be used to select a task to do some special
-      housekeeping, e.g.::
+      Giá trị trả về là một số nguyên trong khoảng từ 0 đến ``parties-1``, khác nhau đối với mỗi task. Có thể dùng giá trị này để chọn một task thực hiện một số công việc dọn dẹp đặc biệt, chẳng hạn như::
 
          ...
          async with barrier as position:
             if position == 0:
-               # Only one task prints this
+               # Chỉ một task in dòng này
                print('End of *draining phase*')
 
-      This method may raise a :class:`BrokenBarrierError` exception if the
-      barrier is broken or reset while a task is waiting.
-      It could raise a :exc:`CancelledError` if a task is cancelled.
+      Phương thức này có thể raise exception :class:`BrokenBarrierError` nếu barrier bị phá vỡ hoặc đặt lại trong khi một task đang chờ. Nó có thể raise :exc:`CancelledError` nếu một task bị hủy.
 
    .. method:: reset()
       :async:
 
-      Return the barrier to the default, empty state.  Any tasks waiting on it
-      will receive the :class:`BrokenBarrierError` exception.
+      Đưa barrier về trạng thái mặc định, rỗng. Mọi task đang chờ trên đó sẽ nhận được exception :class:`BrokenBarrierError`.
 
-      If a barrier is broken it may be better to just leave it and create a new one.
+      Nếu barrier bị phá vỡ, có thể tốt hơn là cứ để nguyên và tạo một barrier mới.
 
    .. method:: abort()
       :async:
 
-      Put the barrier into a broken state.  This causes any active or future
-      calls to :meth:`~Barrier.wait` to fail with the :class:`BrokenBarrierError`.
-      Use this for example if one of the tasks needs to abort, to avoid infinite
-      waiting tasks.
+      Đưa barrier vào trạng thái bị phá vỡ. Điều này khiến mọi lệnh gọi đang hoạt động hoặc trong tương lai đến :meth:`~Barrier.wait` thất bại với :class:`BrokenBarrierError`. Ví dụ, hãy sử dụng cách này nếu một trong các task cần hủy bỏ, để tránh các task phải chờ vô hạn.
 
    .. attribute:: parties
 
-      The number of tasks required to pass the barrier.
+      Số lượng task cần thiết để vượt qua barrier.
 
    .. attribute:: n_waiting
 
-      The number of tasks currently waiting in the barrier while filling.
+      Số lượng task hiện đang chờ trong barrier khi barrier đang được lấp đầy.
 
    .. attribute:: broken
 
-      A boolean that is ``True`` if the barrier is in the broken state.
+      Một giá trị boolean là ``True`` nếu barrier đang ở trạng thái bị phá vỡ.
 
 
 .. exception:: BrokenBarrierError
 
-   This exception, a subclass of :exc:`RuntimeError`, is raised when the
-   :class:`Barrier` object is reset or broken.
+   Ngoại lệ này, một lớp con của :exc:`RuntimeError`, được phát sinh khi
+   đối tượng :class:`Barrier` được đặt lại hoặc bị hỏng.
 
 ---------
 
 
 .. versionchanged:: 3.9
 
-   Acquiring a lock using ``await lock`` or ``yield from lock`` and/or
-   :keyword:`with` statement (``with await lock``, ``with (yield from
-   lock)``) was removed.  Use ``async with lock`` instead.
+   Việc acquiring lock bằng ``await lock`` hoặc ``yield from lock`` và/hoặc
+   câu lệnh :keyword:`with` (``with await lock``, ``with (yield from lock)``) đã bị loại bỏ. Thay vào đó, hãy sử dụng ``async with lock``.

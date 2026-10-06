@@ -3,184 +3,149 @@
 
 .. _asyncio-event-loop:
 
-==========
-Event loop
-==========
+================
+Vòng lặp sự kiện
+================
 
-**Source code:** :source:`Lib/asyncio/events.py`,
+**Mã nguồn:** :source:`Lib/asyncio/events.py`,
 :source:`Lib/asyncio/base_events.py`
 
 ------------------------------------
 
-.. rubric:: Preface
+.. rubric:: Lời nói đầu
 
-The event loop is the core of every asyncio application.
-Event loops run asynchronous tasks and callbacks, perform network
-IO operations, and run subprocesses.
+Vòng lặp sự kiện là phần cốt lõi của mọi ứng dụng asyncio. Vòng lặp sự kiện chạy các tác vụ bất đồng bộ và callback, thực hiện các thao tác IO mạng, đồng thời chạy các tiến trình con.
 
-Application developers should typically use the high-level asyncio functions,
-such as :func:`asyncio.run`, and should rarely need to reference the loop
-object or call its methods.  This section is intended mostly for authors
-of lower-level code, libraries, and frameworks, who need finer control over
-the event loop behavior.
+Các nhà phát triển ứng dụng thường nên sử dụng các hàm asyncio cấp cao, chẳng hạn như :func:`asyncio.run`, và hiếm khi cần tham chiếu đến đối tượng vòng lặp hoặc gọi các phương thức của nó. Phần này chủ yếu dành cho tác giả của mã nguồn cấp thấp, thư viện và framework, những người cần kiểm soát chi tiết hơn hành vi của vòng lặp sự kiện.
 
-.. rubric:: Obtaining the Event Loop
+.. rubric:: Lấy vòng lặp sự kiện
 
-The following low-level functions can be used to get, set, or create
-an event loop:
+Có thể sử dụng các hàm cấp thấp sau để lấy, thiết lập hoặc tạo một vòng lặp sự kiện:
 
 .. function:: get_running_loop()
 
-   Return the running event loop in the current OS thread.
+   Trả về event loop đang chạy trong thread OS hiện tại.
 
-   Raise a :exc:`RuntimeError` if there is no running event loop.
+   Phát sinh :exc:`RuntimeError` nếu không có event loop nào đang chạy.
 
-   This function can only be called from a coroutine or a callback.
+   Chỉ có thể gọi hàm này từ một coroutine hoặc callback.
 
    .. versionadded:: 3.7
 
 .. function:: get_event_loop()
 
-   Get the current event loop.
+   Lấy event loop hiện tại.
 
-   When called from a coroutine or a callback (e.g. scheduled with
-   call_soon or similar API), this function will always return the
-   running event loop.
+   Khi được gọi từ một coroutine hoặc callback (ví dụ: được lập lịch bằng call_soon hoặc API tương tự), hàm này sẽ luôn trả về event loop đang chạy.
 
-   If there is no running event loop set, the function will return
-   the result of the ``get_event_loop_policy().get_event_loop()`` call.
+   Nếu không có event loop nào đang chạy được thiết lập, hàm sẽ trả về kết quả của lệnh gọi ``get_event_loop_policy().get_event_loop()``.
 
-   Because this function has rather complex behavior (especially
-   when custom event loop policies are in use), using the
-   :func:`get_running_loop` function is preferred to :func:`get_event_loop`
-   in coroutines and callbacks.
+   Vì hàm này có hành vi khá phức tạp (đặc biệt khi sử dụng các chính sách event loop tùy chỉnh), việc sử dụng
+   Hàm :func:`get_running_loop` được ưu tiên hơn :func:`get_event_loop` trong coroutine và callback.
 
-   As noted above, consider using the higher-level :func:`asyncio.run` function,
-   instead of using these lower level functions to manually create and close an
-   event loop.
+   Như đã lưu ý ở trên, hãy cân nhắc sử dụng hàm :func:`asyncio.run` cấp cao hơn, thay vì sử dụng các hàm cấp thấp hơn này để tự tạo và đóng event loop.
 
    .. versionchanged:: 3.14
-      Raises a :exc:`RuntimeError` if there is no current event loop.
+      Phát sinh :exc:`RuntimeError` nếu không có event loop hiện tại.
 
    .. note::
 
-      The :mod:`!asyncio` policy system is deprecated and will be removed
-      in Python 3.16; from there on, this function will return the current
-      running event loop if present else it will return the
-      loop set by :func:`set_event_loop`.
+      Hệ thống policy :mod:`!asyncio` không còn được khuyến nghị và sẽ bị xóa trong Python 3.16; từ thời điểm đó, hàm này sẽ trả về event loop đang chạy hiện tại nếu có, nếu không thì sẽ trả về loop được thiết lập bởi :func:`set_event_loop`.
 
 .. function:: set_event_loop(loop)
 
-   Set *loop* as the current event loop for the current OS thread.
+   Đặt *loop* làm event loop hiện tại cho thread OS hiện tại.
 
 .. function:: new_event_loop()
 
-   Create and return a new event loop object.
+   Tạo và trả về một đối tượng event loop mới.
 
-Note that the behaviour of :func:`get_event_loop`, :func:`set_event_loop`,
-and :func:`new_event_loop` functions can be altered by
-:ref:`setting a custom event loop policy <asyncio-policies>`.
+Lưu ý rằng hành vi của các hàm :func:`get_event_loop`, :func:`set_event_loop` và :func:`new_event_loop` có thể được thay đổi bởi
+:ref:`thiết lập một chính sách event loop tùy chỉnh <asyncio-policies>`.
 
 
-.. rubric:: Contents
+.. rubric:: Mục lục
 
-This documentation page contains the following sections:
+Trang tài liệu này chứa các phần sau:
 
-* The `Event Loop Methods`_ section is the reference documentation of
-  the event loop APIs;
+* Phần `Event Loop Methods <Event Loop Methods_>`_ là tài liệu tham khảo về các API của event loop;
 
-* The `Callback Handles`_ section documents the :class:`Handle` and
-  :class:`TimerHandle` instances which are returned from scheduling
-  methods such as :meth:`loop.call_soon` and :meth:`loop.call_later`;
+* Phần `Callback Handles <Callback Handles_>`_ mô tả :class:`Handle` và
+  :class:`TimerHandle` các instance được trả về từ những phương thức lập lịch như :meth:`loop.call_soon` và :meth:`loop.call_later`;
 
-* The `Server Objects`_ section documents types returned from
-  event loop methods like :meth:`loop.create_server`;
+* Phần `Server Objects <Server Objects_>`_ mô tả các kiểu được trả về từ những phương thức của event loop như :meth:`loop.create_server`;
 
-* The `Event Loop Implementations`_ section documents the
-  :class:`SelectorEventLoop` and :class:`ProactorEventLoop` classes;
+* Phần `Các triển khai Event Loop <Event Loop Implementations_>`_ trình bày
+  :class:`SelectorEventLoop` và :class:`ProactorEventLoop` các lớp;
 
-* The `Examples`_ section showcases how to work with some event
-  loop APIs.
+* Phần `Examples`_ giới thiệu cách làm việc với một số API của event loop.
 
 
 .. _asyncio-event-loop-methods:
 
-Event loop methods
-==================
+.. _`Event loop methods`:
 
-Event loops have **low-level** APIs for the following:
+Các phương thức của event loop
+==============================
+
+Event loop có các API **cấp thấp** cho những thao tác sau:
 
 .. contents::
    :depth: 1
    :local:
 
 
-Running and stopping the loop
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Chạy và dừng event loop
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: loop.run_until_complete(future)
 
-   Run until the *future* (an instance of :class:`Future`) has
-   completed.
+   Chạy cho đến khi *future* (một đối tượng thuộc :class:`Future`) hoàn tất.
 
-   If the argument is a :ref:`coroutine object <coroutine>` it
-   is implicitly scheduled to run as a :class:`asyncio.Task`.
+   Nếu đối số là một :ref:`coroutine object <coroutine>`, đối số đó sẽ được ngầm định lên lịch để chạy dưới dạng :class:`asyncio.Task`.
 
-   Return the Future's result or raise its exception.
+   Trả về kết quả của Future hoặc phát sinh exception của nó.
 
 .. method:: loop.run_forever()
 
-   Run the event loop until :meth:`stop` is called.
+   Chạy event loop cho đến khi :meth:`stop` được gọi.
 
-   If :meth:`stop` is called before :meth:`run_forever` is called,
-   the loop will poll the I/O selector once with a timeout of zero,
-   run all callbacks scheduled in response to I/O events (and
-   those that were already scheduled), and then exit.
+   Nếu :meth:`stop` được gọi trước khi :meth:`run_forever` được gọi, loop sẽ thăm dò bộ chọn I/O một lần với thời gian chờ bằng không, chạy tất cả callback được lên lịch để phản hồi các sự kiện I/O (cũng như những callback đã được lên lịch trước đó), rồi thoát.
 
-   If :meth:`stop` is called while :meth:`run_forever` is running,
-   the loop will run the current batch of callbacks and then exit.
-   Note that new callbacks scheduled by callbacks will not run in this
-   case; instead, they will run the next time :meth:`run_forever` or
-   :meth:`run_until_complete` is called.
+   Nếu :meth:`stop` được gọi trong khi :meth:`run_forever` đang chạy, loop sẽ chạy lô callback hiện tại rồi thoát. Lưu ý rằng các callback mới được callback lên lịch sẽ không chạy trong trường hợp này; thay vào đó, chúng sẽ chạy vào lần tiếp theo khi :meth:`run_forever` hoặc
+   :meth:`run_until_complete` được gọi.
 
 .. method:: loop.stop()
 
-   Stop the event loop.
+   Dừng event loop.
 
 .. method:: loop.is_running()
 
-   Return ``True`` if the event loop is currently running.
+   Trả về ``True`` nếu event loop hiện đang chạy.
 
 .. method:: loop.is_closed()
 
-   Return ``True`` if the event loop was closed.
+   Trả về ``True`` nếu event loop đã bị đóng.
 
 .. method:: loop.close()
 
-   Close the event loop.
+   Đóng event loop.
 
-   The loop must not be running when this function is called.
-   Any pending callbacks will be discarded.
+   Event loop không được chạy khi gọi hàm này. Mọi callback đang chờ sẽ bị loại bỏ.
 
-   This method clears all queues and shuts down the executor, but does
-   not wait for the executor to finish.
+   Phương thức này xóa tất cả các hàng đợi và tắt executor, nhưng không chờ executor hoàn tất.
 
-   This method is idempotent and irreversible.  No other methods
-   should be called after the event loop is closed.
+   Phương thức này có tính idempotent và không thể đảo ngược. Không nên gọi bất kỳ phương thức nào khác sau khi event loop đã bị đóng.
 
 .. method:: loop.shutdown_asyncgens()
    :async:
 
-   Schedule all currently open :term:`asynchronous generator` objects to
-   close with an :meth:`~agen.aclose` call.  After calling this method,
-   the event loop will issue a warning if a new asynchronous generator
-   is iterated. This should be used to reliably finalize all scheduled
-   asynchronous generators.
+   Lên lịch đóng tất cả các đối tượng :term:`asynchronous generator` hiện đang mở bằng một lệnh gọi :meth:`~agen.aclose`. Sau khi gọi phương thức này, event loop sẽ đưa ra cảnh báo nếu một asynchronous generator mới được lặp qua. Nên sử dụng phương thức này để hoàn tất đáng tin cậy tất cả các asynchronous generator đã được lên lịch.
 
-   Note that there is no need to call this function when
-   :func:`asyncio.run` is used.
+   Lưu ý rằng không cần gọi hàm này khi
+   :func:`asyncio.run` được sử dụng.
 
-   Example::
+   Ví dụ::
 
     try:
         loop.run_forever()
@@ -193,1047 +158,751 @@ Running and stopping the loop
 .. method:: loop.shutdown_default_executor(timeout=None)
    :async:
 
-   Schedule the closure of the default executor and wait for it to join all of
-   the threads in the :class:`~concurrent.futures.ThreadPoolExecutor`.
-   Once this method has been called,
-   using the default executor with :meth:`loop.run_in_executor`
-   will raise a :exc:`RuntimeError`.
+   Lên lịch đóng executor mặc định và chờ executor này join tất cả các thread trong :class:`~concurrent.futures.ThreadPoolExecutor`. Sau khi phương thức này được gọi, việc sử dụng executor mặc định với :meth:`loop.run_in_executor` sẽ gây ra :exc:`RuntimeError`.
 
-   The *timeout* parameter specifies the amount of time
-   (in :class:`float` seconds) the executor will be given to finish joining.
-   With the default, ``None``,
-   the executor is allowed an unlimited amount of time.
+   Tham số *timeout* chỉ khoảng thời gian (tính bằng :class:`float` giây) mà executor được phép để hoàn tất việc join. Với giá trị mặc định là ``None``, executor được phép có khoảng thời gian không giới hạn.
 
-   If the *timeout* is reached, a :exc:`RuntimeWarning` is emitted
-   and the default executor is terminated
-   without waiting for its threads to finish joining.
+   Nếu đạt đến *timeout*, một :exc:`RuntimeWarning` sẽ được phát ra và executor mặc định sẽ bị chấm dứt mà không chờ các thread hoàn tất việc join.
 
    .. note::
 
-      Do not call this method when using :func:`asyncio.run`,
-      as the latter handles default executor shutdown automatically.
+      Không gọi phương thức này khi sử dụng :func:`asyncio.run`, vì :func:`asyncio.run` tự động xử lý việc tắt executor mặc định.
 
    .. versionadded:: 3.9
 
    .. versionchanged:: 3.12
-      Added the *timeout* parameter.
+      Đã thêm tham số *timeout*.
 
-Scheduling callbacks
-^^^^^^^^^^^^^^^^^^^^
+Lập lịch callback
+^^^^^^^^^^^^^^^^^
 
 .. method:: loop.call_soon(callback, *args, context=None)
 
-   Schedule the *callback* :term:`callback` to be called with
-   *args* arguments at the next iteration of the event loop.
+   Lập lịch để *callback* :term:`callback` được gọi với *args* đối số ở lần lặp tiếp theo của event loop.
 
-   Return an instance of :class:`asyncio.Handle`,
-   which can be used later to cancel the callback.
+   Trả về một instance của :class:`asyncio.Handle`, có thể được dùng sau đó để hủy callback.
 
-   Callbacks are called in the order in which they are registered.
-   Each callback will be called exactly once.
+   Các callback được gọi theo thứ tự chúng được đăng ký. Mỗi callback sẽ được gọi đúng một lần.
 
-   The optional keyword-only *context* argument specifies a
-   custom :class:`contextvars.Context` for the *callback* to run in.
-   Callbacks use the current context when no *context* is provided.
+   Đối số chỉ dành cho keyword tùy chọn *context* chỉ định một :class:`contextvars.Context` tùy chỉnh để *callback* chạy trong đó. Callback sử dụng context hiện tại khi không cung cấp *context*.
 
-   Unlike :meth:`call_soon_threadsafe`, this method is not thread-safe.
+   Không giống :meth:`call_soon_threadsafe`, phương thức này không an toàn với thread.
 
 .. method:: loop.call_soon_threadsafe(callback, *args, context=None)
 
-   A thread-safe variant of :meth:`call_soon`. When scheduling callbacks from
-   another thread, this function *must* be used, since :meth:`call_soon` is not
-   thread-safe.
+   Một biến thể an toàn với thread của :meth:`call_soon`. Khi lên lịch callback từ một thread khác, hàm này *phải* được sử dụng, vì :meth:`call_soon` không an toàn với thread.
 
-   This function is safe to be called from a reentrant context or signal handler,
-   however, it is not safe or fruitful to use the returned handle in such contexts.
+   Hàm này có thể được gọi an toàn từ context reentrant hoặc signal handler; tuy nhiên, việc sử dụng handle được trả về trong các context như vậy không an toàn hoặc không mang lại tác dụng.
 
-   Raises :exc:`RuntimeError` if called on a loop that's been closed.
-   This can happen on a secondary thread when the main application is
-   shutting down.
+   Ném :exc:`RuntimeError` nếu được gọi trên một loop đã bị đóng. Điều này có thể xảy ra trên một thread phụ khi ứng dụng chính đang tắt.
 
-   See the :ref:`concurrency and multithreading <asyncio-multithreading>`
-   section of the documentation.
+   Xem phần :ref:`concurrency và multithreading <asyncio-multithreading>` trong tài liệu.
 
    .. versionchanged:: 3.7
-      The *context* keyword-only parameter was added. See :pep:`567`
-      for more details.
+      Tham số chỉ có keyword *context* đã được thêm vào. Xem :pep:`567` để biết thêm chi tiết.
 
 .. _asyncio-pass-keywords:
 
 .. note::
 
-   Most :mod:`asyncio` scheduling functions don't allow passing
-   keyword arguments.  To do that, use :func:`functools.partial`::
+   Hầu hết các hàm :mod:`asyncio` scheduling không cho phép truyền keyword arguments. Để làm vậy, hãy sử dụng :func:`functools.partial`::
 
-      # will schedule "print("Hello", flush=True)"
+      # sẽ lên lịch "print("Hello", flush=True)"
       loop.call_soon(
           functools.partial(print, "Hello", flush=True))
 
-   Using partial objects is usually more convenient than using lambdas,
-   as asyncio can render partial objects better in debug and error
-   messages.
+   Việc sử dụng các partial object thường thuận tiện hơn việc sử dụng lambda, vì asyncio có thể hiển thị partial object tốt hơn trong các thông báo debug và lỗi.
 
 
 .. _asyncio-delayed-calls:
 
-Scheduling delayed callbacks
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Lên lịch callback bị trì hoãn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Event loop provides mechanisms to schedule callback functions
-to be called at some point in the future.  Event loop uses monotonic
-clocks to track time.
+Event loop cung cấp các cơ chế để lên lịch cho các hàm callback được gọi vào một thời điểm nào đó trong tương lai. Event loop sử dụng đồng hồ đơn điệu (monotonic clock) để theo dõi thời gian.
 
 
 .. method:: loop.call_later(delay, callback, *args, context=None)
 
-   Schedule *callback* to be called after the given *delay*
-   number of seconds (can be either an int or a float).
+   Lên lịch để *callback* được gọi sau số giây *delay* đã cho (có thể là int hoặc float).
 
-   An instance of :class:`asyncio.TimerHandle` is returned which can
-   be used to cancel the callback.
+   Một instance của :class:`asyncio.TimerHandle` được trả về và có thể được sử dụng để hủy callback.
 
-   *callback* will be called exactly once.  If two callbacks are
-   scheduled for exactly the same time, the order in which they
-   are called is undefined.
+   *callback* sẽ được gọi chính xác một lần. Nếu hai callback được lên lịch vào chính xác cùng một thời điểm, thứ tự chúng được gọi là không xác định.
 
-   The optional positional *args* will be passed to the callback when
-   it is called. Use :func:`functools.partial`
-   :ref:`to pass keyword arguments <asyncio-pass-keywords>` to
-   *callback*.
+   Các *args* vị trí tùy chọn sẽ được truyền cho callback khi callback được gọi. Sử dụng :func:`functools.partial`
+   :ref:`để truyền các đối số từ khóa <asyncio-pass-keywords>` cho *callback*.
 
-   An optional keyword-only *context* argument allows specifying a
-   custom :class:`contextvars.Context` for the *callback* to run in.
-   The current context is used when no *context* is provided.
+   Đối số chỉ nhận theo từ khóa *context* tùy chọn cho phép chỉ định một :class:`contextvars.Context` tùy chỉnh để *callback* chạy trong đó. Context hiện tại được sử dụng khi không cung cấp *context*.
 
    .. note::
 
-      For performance, callbacks scheduled with :meth:`loop.call_later`
-      may run up to one clock-resolution early (see
-      ``time.get_clock_info('monotonic').resolution``).
+      Để tối ưu hiệu năng, các callback được lập lịch bằng :meth:`loop.call_later` có thể chạy sớm hơn tối đa một độ phân giải đồng hồ (xem ``time.get_clock_info('monotonic').resolution``).
 
    .. versionchanged:: 3.7
-      The *context* keyword-only parameter was added. See :pep:`567`
-      for more details.
+      Tham số chỉ nhận theo từ khóa *context* đã được thêm vào. Xem :pep:`567` để biết thêm chi tiết.
 
    .. versionchanged:: 3.8
-      In Python 3.7 and earlier with the default event loop implementation,
-      the *delay* could not exceed one day.
-      This has been fixed in Python 3.8.
+      Trong Python 3.7 trở về trước với triển khai event loop mặc định, *delay* không thể vượt quá một ngày. Vấn đề này đã được khắc phục trong Python 3.8.
 
 .. method:: loop.call_at(when, callback, *args, context=None)
 
-   Schedule *callback* to be called at the given absolute timestamp
-   *when* (an int or a float), using the same time reference as
+   Lập lịch để *callback* được gọi tại mốc thời gian tuyệt đối *when* đã cho (một int hoặc float), sử dụng cùng tham chiếu thời gian với
    :meth:`loop.time`.
 
-   This method's behavior is the same as :meth:`call_later`.
+   Hành vi của phương thức này giống với :meth:`call_later`.
 
-   An instance of :class:`asyncio.TimerHandle` is returned which can
-   be used to cancel the callback.
+   Một instance của :class:`asyncio.TimerHandle` được trả về và có thể được sử dụng để hủy callback.
 
    .. note::
 
-      For performance, callbacks scheduled with :meth:`loop.call_at`
-      may run up to one clock-resolution early (see
-      ``time.get_clock_info('monotonic').resolution``).
+      Để đạt hiệu suất, các callback được lập lịch bằng :meth:`loop.call_at` có thể chạy sớm tối đa một độ phân giải đồng hồ (xem ``time.get_clock_info('monotonic').resolution``).
 
    .. versionchanged:: 3.7
-      The *context* keyword-only parameter was added. See :pep:`567`
-      for more details.
+      Tham số chỉ nhận theo từ khóa *context* đã được thêm vào. Xem :pep:`567` để biết thêm chi tiết.
 
    .. versionchanged:: 3.8
-      In Python 3.7 and earlier with the default event loop implementation,
-      the difference between *when* and the current time could not exceed
-      one day.  This has been fixed in Python 3.8.
+      Trong Python 3.7 trở về trước với triển khai event loop mặc định, chênh lệch giữa *when* và thời gian hiện tại không thể vượt quá một ngày. Điều này đã được khắc phục trong Python 3.8.
 
 .. method:: loop.time()
 
-   Return the current time, as a :class:`float` value, according to
-   the event loop's internal monotonic clock.
+   Trả về thời gian hiện tại dưới dạng giá trị :class:`float`, theo đồng hồ đơn điệu nội bộ của event loop.
 
 .. note::
    .. versionchanged:: 3.8
-      In Python 3.7 and earlier timeouts (relative *delay* or absolute *when*)
-      should not exceed one day.  This has been fixed in Python 3.8.
+      Trong Python 3.7 trở về trước, các timeout (độ trễ tương đối *delay* hoặc thời điểm tuyệt đối *when*) không được vượt quá một ngày. Điều này đã được khắc phục trong Python 3.8.
 
 .. seealso::
 
-   The :func:`asyncio.sleep` function.
+   Hàm :func:`asyncio.sleep`.
 
 
-Creating futures and tasks
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tạo future và task
+^^^^^^^^^^^^^^^^^^
 
 .. method:: loop.create_future()
 
-   Create an :class:`asyncio.Future` object attached to the event loop.
+   Tạo một :class:`asyncio.Future` object được gắn với event loop.
 
-   This is the preferred way to create Futures in asyncio. This lets
-   third-party event loops provide alternative implementations of
-   the Future object (with better performance or instrumentation).
+   Đây là cách được khuyến nghị để tạo Futures trong asyncio. Cách này cho phép các event loop bên thứ ba cung cấp các triển khai thay thế của đối tượng Future (có hiệu suất hoặc khả năng instrumentation tốt hơn).
 
    .. versionadded:: 3.5.2
 
 .. method:: loop.create_task(coro, *, name=None, context=None, eager_start=None, **kwargs)
 
-   Schedule the execution of :ref:`coroutine <coroutine>` *coro*.
-   Return a :class:`Task` object.
+   Lập lịch thực thi :ref:`coroutine <coroutine>` *coro*. Trả về một :class:`Task` object.
 
-   Third-party event loops can use their own subclass of :class:`Task`
-   for interoperability. In this case, the result type is a subclass
-   of :class:`Task`.
+   Các event loop bên thứ ba có thể sử dụng subclass riêng của :class:`Task` để đảm bảo khả năng tương tác. Trong trường hợp này, kiểu kết quả là một subclass của :class:`Task`.
 
-   The full function signature is largely the same as that of the
-   :class:`Task` constructor (or factory) - all of the keyword arguments to
-   this function are passed through to that interface.
+   Chữ ký hàm đầy đủ phần lớn giống với chữ ký của
+   :class:`Task` constructor (hoặc factory) - tất cả keyword arguments của hàm này đều được truyền tiếp đến interface đó.
 
-   If the *name* argument is provided and not ``None``, it is set as
-   the name of the task using :meth:`Task.set_name`.
+   Nếu đối số *name* được cung cấp và không phải là ``None``, đối số này sẽ được đặt làm tên của task bằng :meth:`Task.set_name`.
 
-   An optional keyword-only *context* argument allows specifying a
-   custom :class:`contextvars.Context` for the *coro* to run in.
-   The current context copy is created when no *context* is provided.
+   Đối số chỉ dành cho keyword tùy chọn *context* cho phép chỉ định một :class:`contextvars.Context` tùy chỉnh để *coro* chạy trong đó. Một bản sao của context hiện tại sẽ được tạo khi không cung cấp *context*.
 
-   An optional keyword-only *eager_start* argument allows specifying
-   if the task should execute eagerly during the call to create_task,
-   or be scheduled later. If *eager_start* is not passed the mode set
-   by :meth:`loop.set_task_factory` will be used.
+   Đối số chỉ dành cho keyword tùy chọn *eager_start* cho phép chỉ định task có thực thi eager trong khi gọi create_task hay được lên lịch sau. Nếu không truyền *eager_start*, chế độ do :meth:`loop.set_task_factory` thiết lập sẽ được sử dụng.
 
    .. versionchanged:: 3.8
-      Added the *name* parameter.
+      Đã thêm tham số *name*.
 
    .. versionchanged:: 3.11
-      Added the *context* parameter.
+      Đã thêm tham số *context*.
 
    .. versionchanged:: 3.13.3
-      Added ``kwargs`` which passes on arbitrary extra parameters, including  ``name`` and ``context``.
+      Đã thêm ``kwargs``, truyền tiếp các tham số bổ sung tùy ý, bao gồm  ``name`` và ``context``.
 
    .. versionchanged:: 3.13.4
-      Rolled back the change that passes on *name* and *context* (if it is None),
-      while still passing on other arbitrary keyword arguments (to avoid breaking backwards compatibility with 3.13.3).
+      Đã hoàn tác thay đổi truyền tiếp *name* và *context* (nếu giá trị là None), đồng thời vẫn truyền tiếp các đối số keyword tùy ý khác (để tránh phá vỡ khả năng tương thích ngược với 3.13.3).
 
    .. versionchanged:: 3.14
-      All *kwargs* are now passed on. The *eager_start* parameter works with eager task factories.
+      Tất cả *kwargs* giờ đây đều được truyền tiếp. Tham số *eager_start* hoạt động với eager task factory.
 
 .. method:: loop.set_task_factory(factory)
 
-   Set a task factory that will be used by
+   Thiết lập một task factory sẽ được sử dụng bởi
    :meth:`loop.create_task`.
 
-   If *factory* is ``None`` the default task factory will be set.
-   Otherwise, *factory* must be a *callable* with the signature matching
-   ``(loop, coro, **kwargs)``, where *loop* is a reference to the active
-   event loop, and *coro* is a coroutine object.  The callable
-   must pass on all *kwargs*, and return a :class:`asyncio.Task`-compatible object.
+   Nếu *factory* là ``None`` thì task factory mặc định sẽ được thiết lập. Nếu không, *factory* phải là một *callable* có signature khớp với ``(loop, coro, **kwargs)``, trong đó *loop* là tham chiếu đến event loop đang hoạt động và *coro* là một đối tượng coroutine. Callable này phải truyền tiếp tất cả *kwargs* và trả về một đối tượng tương thích với :class:`asyncio.Task`.
 
    .. versionchanged:: 3.13.3
-      Required that all *kwargs* are passed on to :class:`asyncio.Task`.
+      Bắt buộc phải truyền tiếp tất cả *kwargs* cho :class:`asyncio.Task`.
 
    .. versionchanged:: 3.13.4
-      *name* is no longer passed to task factories. *context* is no longer passed
-      to task factories if it is ``None``.
+      *name* không còn được truyền cho task factory. *context* không còn được truyền cho task factory nếu nó là ``None``.
 
       .. versionchanged:: 3.14
-         *name* and *context* are now unconditionally passed on to task factories again.
+         *name* và *context* giờ đây lại luôn được truyền cho task factory.
 
 .. method:: loop.get_task_factory()
 
-   Return a task factory or ``None`` if the default one is in use.
+   Trả về một task factory hoặc ``None`` nếu đang sử dụng task factory mặc định.
 
 
-Opening network connections
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mở kết nối mạng
+^^^^^^^^^^^^^^^
 
 .. method:: loop.create_connection(protocol_factory, \
-                 host=None, port=None, *, ssl=None, \
-                 family=0, proto=0, flags=0, sock=None, \
-                 local_addr=None, server_hostname=None, \
-                 ssl_handshake_timeout=None, \
-                 ssl_shutdown_timeout=None, \
-                 happy_eyeballs_delay=None, interleave=None, \
-                 all_errors=False)
+                 host=None, port=None, *, ssl=None, \ family=0, proto=0, flags=0, sock=None, \ local_addr=None, server_hostname=None, \ ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None, \ happy_eyeballs_delay=None, interleave=None, \ all_errors=False)
    :async:
 
-   Open a streaming transport connection to a given
-   address specified by *host* and *port*.
+   Mở một kết nối truyền tải dạng streaming đến địa chỉ được chỉ định bởi *host* và *port*.
 
-   The socket family can be either :py:const:`~socket.AF_INET` or
-   :py:const:`~socket.AF_INET6` depending on *host* (or the *family*
-   argument, if provided).
+   Họ socket có thể là :py:const:`~socket.AF_INET` hoặc
+   :py:const:`~socket.AF_INET6` tùy thuộc vào *host* (hoặc đối số *family*, nếu được cung cấp).
 
-   The socket type will be :py:const:`~socket.SOCK_STREAM`.
+   Loại socket sẽ là :py:const:`~socket.SOCK_STREAM`.
 
-   *protocol_factory* must be a callable returning an
-   :ref:`asyncio protocol <asyncio-protocol>` implementation.
+   *protocol_factory* phải là một callable trả về một
+   Triển khai :ref:`asyncio protocol <asyncio-protocol>`.
 
-   This method will try to establish the connection in the background.
-   When successful, it returns a ``(transport, protocol)`` pair.
+   Phương thức này sẽ cố gắng thiết lập kết nối ở chế độ nền. Khi thành công, phương thức trả về một ``(transport, protocol)`` pair.
 
-   The chronological synopsis of the underlying operation is as follows:
+   Tóm lược theo trình tự thời gian của thao tác bên dưới như sau:
 
-   #. The connection is established and a :ref:`transport <asyncio-transport>`
-      is created for it.
+   #. Kết nối được thiết lập và một :ref:`transport <asyncio-transport>` được tạo cho kết nối đó.
 
-   #. *protocol_factory* is called without arguments and is expected to
-      return a :ref:`protocol <asyncio-protocol>` instance.
+   #. *protocol_factory* được gọi mà không có đối số và được kỳ vọng sẽ trả về một thực thể :ref:`protocol <asyncio-protocol>`.
 
-   #. The protocol instance is coupled with the transport by calling its
-      :meth:`~BaseProtocol.connection_made` method.
+   #. Thực thể protocol được ghép nối với transport bằng cách gọi method của nó
+      :meth:`~BaseProtocol.connection_made`.
 
-   #. A ``(transport, protocol)`` tuple is returned on success.
+   #. Một tuple ``(transport, protocol)`` được trả về khi thành công.
 
-   The created transport is an implementation-dependent bidirectional
-   stream.
+   Transport được tạo là một bidirectional stream phụ thuộc vào implementation.
 
-   Other arguments:
+   Các đối số khác:
 
-   * *ssl*: if given and not false, a SSL/TLS transport is created
-     (by default a plain TCP transport is created).  If *ssl* is
-     a :class:`ssl.SSLContext` object, this context is used to create
-     the transport; if *ssl* is :const:`True`, a default context returned
-     from :func:`ssl.create_default_context` is used.
+   * *ssl*: nếu được cung cấp và không phải false, một transport SSL/TLS sẽ được tạo (mặc định, một transport TCP thuần sẽ được tạo). Nếu *ssl* là một đối tượng :class:`ssl.SSLContext`, context này được dùng để tạo transport; nếu *ssl* là :const:`True`, một context mặc định được trả về từ :func:`ssl.create_default_context` sẽ được sử dụng.
 
-     .. seealso:: :ref:`SSL/TLS security considerations <ssl-security>`
+     .. seealso:: :ref:`Các vấn đề cần cân nhắc về bảo mật SSL/TLS <ssl-security>`
 
-   * *server_hostname* sets or overrides the hostname that the target
-     server's certificate will be matched against.  Should only be passed
-     if *ssl* is not ``None``.  By default the value of the *host* argument
-     is used.  If *host* is empty, there is no default and you must pass a
-     value for *server_hostname*.  If *server_hostname* is an empty
-     string, hostname matching is disabled (which is a serious security
-     risk, allowing for potential man-in-the-middle attacks).
+   * *server_hostname* thiết lập hoặc ghi đè hostname dùng để đối chiếu với chứng chỉ của server đích. Chỉ nên truyền giá trị này nếu *ssl* không phải là ``None``. Theo mặc định, giá trị của đối số *host* được sử dụng. Nếu *host* rỗng, sẽ không có giá trị mặc định và bạn phải truyền một giá trị cho *server_hostname*. Nếu *server_hostname* là một chuỗi rỗng, việc đối chiếu hostname sẽ bị vô hiệu hóa (đây là một rủi ro bảo mật nghiêm trọng, có thể cho phép xảy ra các cuộc tấn công man-in-the-middle).
 
-   * *family*, *proto*, *flags* are the optional address family, protocol
-     and flags to be passed through to getaddrinfo() for *host* resolution.
-     If given, these should all be integers from the corresponding
-     :mod:`socket` module constants.
+   * *family*, *proto*, *flags* là family địa chỉ, protocol và flags tùy chọn được truyền cho getaddrinfo() để phân giải *host*. Nếu được cung cấp, tất cả các giá trị này phải là số nguyên từ giá trị tương ứng
+     :mod:`socket` các hằng số của module.
 
-   * *happy_eyeballs_delay*, if given, enables Happy Eyeballs for this
-     connection. It should
-     be a floating-point number representing the amount of time in seconds
-     to wait for a connection attempt to complete, before starting the next
-     attempt in parallel. This is the "Connection Attempt Delay" as defined
-     in :rfc:`8305`. A sensible default value recommended by the RFC is ``0.25``
-     (250 milliseconds).
+   * *happy_eyeballs_delay*, nếu được cung cấp, sẽ bật Happy Eyeballs cho kết nối này. Giá trị này phải là một số dấu phẩy động biểu thị khoảng thời gian tính bằng giây cần chờ một lần thử kết nối hoàn tất trước khi bắt đầu lần thử tiếp theo song song. Đây là "Connection Attempt Delay" được định nghĩa trong :rfc:`8305`. Giá trị mặc định hợp lý được RFC khuyến nghị là ``0.25`` (250 mili giây).
 
-   * *interleave* controls address reordering when a host name resolves to
-     multiple IP addresses.
-     If ``0`` or unspecified, no reordering is done, and addresses are
-     tried in the order returned by :meth:`getaddrinfo`. If a positive integer
-     is specified, the addresses are interleaved by address family, and the
-     given integer is interpreted as "First Address Family Count" as defined
-     in :rfc:`8305`. The default is ``0`` if *happy_eyeballs_delay* is not
-     specified, and ``1`` if it is.
+   * *interleave* kiểm soát việc sắp xếp lại địa chỉ khi một tên máy chủ phân giải thành nhiều địa chỉ IP. Nếu ``0`` hoặc không được chỉ định, sẽ không thực hiện sắp xếp lại và các địa chỉ được thử theo thứ tự do :meth:`getaddrinfo` trả về. Nếu chỉ định một số nguyên dương, các địa chỉ sẽ được xen kẽ theo họ địa chỉ và số nguyên đã cho được hiểu là "First Address Family Count" như được định nghĩa trong :rfc:`8305`. Giá trị mặc định là ``0`` nếu không chỉ định *happy_eyeballs_delay*, và là ``1`` nếu có chỉ định.
 
-   * *sock*, if given, should be an existing, already connected
-     :class:`socket.socket` object to be used by the transport.
-     If *sock* is given, none of *host*, *port*, *family*, *proto*, *flags*,
-     *happy_eyeballs_delay*, *interleave*
-     and *local_addr* should be specified.
+   * *sock*, nếu được cung cấp, phải là một socket hiện có và đã được kết nối
+     :class:`socket.socket` object được transport sử dụng. Nếu cung cấp *sock*, không được chỉ định bất kỳ giá trị nào cho *host*, *port*, *family*, *proto*, *flags*, *happy_eyeballs_delay*, *interleave* và *local_addr*.
 
      .. note::
 
-        The *sock* argument transfers ownership of the socket to the
-        transport created. To close the socket, call the transport's
-        :meth:`~asyncio.BaseTransport.close` method.
+        Đối số *sock* chuyển quyền sở hữu socket cho transport được tạo. Để đóng socket, hãy gọi
+        :meth:`~asyncio.BaseTransport.close` phương thức.
 
-   * *local_addr*, if given, is a ``(local_host, local_port)`` tuple used
-     to bind the socket locally.  The *local_host* and *local_port*
-     are looked up using ``getaddrinfo()``, similarly to *host* and *port*.
+   * *local_addr*, nếu được cung cấp, là một tuple ``(local_host, local_port)`` dùng để liên kết socket với địa chỉ cục bộ. *local_host* và *local_port* được tra cứu bằng ``getaddrinfo()``, tương tự như *host* và *port*.
 
-   * *ssl_handshake_timeout* is (for a TLS connection) the time in seconds
-     to wait for the TLS handshake to complete before aborting the connection.
-     ``60.0`` seconds if ``None`` (default).
+   * *ssl_handshake_timeout* là (đối với kết nối TLS) thời gian tính bằng giây chờ quá trình bắt tay TLS hoàn tất trước khi hủy kết nối. ``60.0`` giây nếu ``None`` (mặc định).
 
-   * *ssl_shutdown_timeout* is the time in seconds to wait for the SSL shutdown
-     to complete before aborting the connection. ``30.0`` seconds if ``None``
-     (default).
+   * *ssl_shutdown_timeout* là thời gian tính bằng giây chờ quá trình tắt SSL hoàn tất trước khi hủy kết nối. ``30.0`` giây nếu ``None`` (mặc định).
 
-   * *all_errors* determines what exceptions are raised when a connection cannot
-     be created. By default, only a single ``Exception`` is raised: the first
-     exception if there is only one or all errors have same message, or a single
-     ``OSError`` with the error messages combined. When ``all_errors`` is ``True``,
-     an ``ExceptionGroup`` will be raised containing all exceptions (even if there
-     is only one).
+   * *all_errors* xác định các ngoại lệ được raise khi không thể tạo kết nối. Theo mặc định, chỉ một ``Exception`` được raise: ngoại lệ đầu tiên nếu chỉ có một ngoại lệ hoặc tất cả lỗi có cùng thông báo, hoặc một ``OSError`` duy nhất với các thông báo lỗi được kết hợp. Khi ``all_errors`` là ``True``, một ``ExceptionGroup`` sẽ được raise, chứa tất cả các ngoại lệ (ngay cả khi chỉ có một ngoại lệ).
 
 
    .. versionchanged:: 3.5
 
-      Added support for SSL/TLS in :class:`ProactorEventLoop`.
+      Đã bổ sung hỗ trợ SSL/TLS trong :class:`ProactorEventLoop`.
 
    .. versionchanged:: 3.6
 
-      The socket option :ref:`socket.TCP_NODELAY <socket-unix-constants>` is set by default
-      for all TCP connections.
+      Tùy chọn socket :ref:`socket.TCP_NODELAY <socket-unix-constants>` được đặt theo mặc định cho tất cả các kết nối TCP.
 
    .. versionchanged:: 3.7
 
-      Added the *ssl_handshake_timeout* parameter.
+      Đã bổ sung tham số *ssl_handshake_timeout*.
 
    .. versionchanged:: 3.8
 
-      Added the *happy_eyeballs_delay* and *interleave* parameters.
+      Đã thêm các tham số *happy_eyeballs_delay* và *interleave*.
 
-      Happy Eyeballs Algorithm: Success with Dual-Stack Hosts.
-      When a server's IPv4 path and protocol are working, but the server's
-      IPv6 path and protocol are not working, a dual-stack client
-      application experiences significant connection delay compared to an
-      IPv4-only client.  This is undesirable because it causes the
-      dual-stack client to have a worse user experience.  This document
-      specifies requirements for algorithms that reduce this user-visible
-      delay and provides an algorithm.
+      Thuật toán Happy Eyeballs: Kết nối thành công với các máy chủ dual-stack. Khi đường dẫn IPv4 và giao thức của máy chủ hoạt động, nhưng đường dẫn IPv6 và giao thức của máy chủ không hoạt động, ứng dụng client dual-stack sẽ gặp độ trễ kết nối đáng kể so với client chỉ dùng IPv4. Điều này không mong muốn vì khiến trải nghiệm người dùng của client dual-stack kém hơn. Tài liệu này nêu rõ các yêu cầu đối với những thuật toán giúp giảm độ trễ mà người dùng nhận thấy này, đồng thời cung cấp một thuật toán.
 
-      For more information: https://datatracker.ietf.org/doc/html/rfc6555
+      Để biết thêm thông tin: https://datatracker.ietf.org/doc/html/rfc6555
 
    .. versionchanged:: 3.11
 
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã thêm tham số *ssl_shutdown_timeout*.
 
    .. versionchanged:: 3.12
-      *all_errors* was added.
+      Đã thêm *all_errors*.
 
    .. versionchanged:: 3.14.8
-      Raises a ``ValueError`` if ``ssl.check_hostname`` is ``True``
-      and ``server_hostname`` is not supplied.
+      Gây ra một ``ValueError`` nếu ``ssl.check_hostname`` là ``True`` và ``server_hostname`` không được cung cấp.
 
    .. seealso::
 
-      The :func:`open_connection` function is a high-level alternative
-      API.  It returns a pair of (:class:`StreamReader`, :class:`StreamWriter`)
-      that can be used directly in async/await code.
+      Hàm :func:`open_connection` là một API thay thế cấp cao. Hàm này trả về một cặp (:class:`StreamReader`, :class:`StreamWriter`) có thể được sử dụng trực tiếp trong mã async/await.
 
 .. method:: loop.create_datagram_endpoint(protocol_factory, \
-               local_addr=None, remote_addr=None, *, \
-               family=0, proto=0, flags=0, \
-               reuse_port=None, \
-               allow_broadcast=None, sock=None)
+               local_addr=None, remote_addr=None, *, \ family=0, proto=0, flags=0, \ reuse_port=None, \ allow_broadcast=None, sock=None)
    :async:
 
-   Create a datagram connection.
+   Tạo một kết nối datagram.
 
-   The socket family can be either :py:const:`~socket.AF_INET`,
-   :py:const:`~socket.AF_INET6`, or :py:const:`~socket.AF_UNIX`,
-   depending on *host* (or the *family* argument, if provided).
+   Họ socket có thể là :py:const:`~socket.AF_INET`,
+   :py:const:`~socket.AF_INET6`, hoặc :py:const:`~socket.AF_UNIX`, tùy thuộc vào *host* (hoặc đối số *family*, nếu được cung cấp).
 
-   The socket type will be :py:const:`~socket.SOCK_DGRAM`.
+   Loại socket sẽ là :py:const:`~socket.SOCK_DGRAM`.
 
-   *protocol_factory* must be a callable returning a
-   :ref:`protocol <asyncio-protocol>` implementation.
+   *protocol_factory* phải là một đối tượng có thể gọi, trả về một
+   bản triển khai :ref:`protocol <asyncio-protocol>`.
 
-   A tuple of ``(transport, protocol)`` is returned on success.
+   Một tuple gồm ``(transport, protocol)`` sẽ được trả về khi thành công.
 
-   Other arguments:
+   Các đối số khác:
 
-   * *local_addr*, if given, is a ``(local_host, local_port)`` tuple used
-     to bind the socket locally.  The *local_host* and *local_port*
-     are looked up using :meth:`getaddrinfo`.
+   * *local_addr*, nếu được cung cấp, là một tuple ``(local_host, local_port)`` được dùng để liên kết socket trên máy cục bộ. *local_host* và *local_port* được tra cứu bằng :meth:`getaddrinfo`.
 
      .. note::
 
-        On Windows, when using the proactor event loop with ``local_addr=None``,
-        an :exc:`OSError` with :attr:`!errno.WSAEINVAL` will be raised
-        when running it.
+        Trên Windows, khi sử dụng proactor event loop với ``local_addr=None``, một :exc:`OSError` với :attr:`!errno.WSAEINVAL` sẽ được raise khi chạy nó.
 
-   * *remote_addr*, if given, is a ``(remote_host, remote_port)`` tuple used
-     to connect the socket to a remote address.  The *remote_host* and
-     *remote_port* are looked up using :meth:`getaddrinfo`.
+   * *remote_addr*, nếu được cung cấp, là một tuple ``(remote_host, remote_port)`` được dùng để kết nối socket với một địa chỉ từ xa. *remote_host* và *remote_port* được tra cứu bằng :meth:`getaddrinfo`.
 
-   * *family*, *proto*, *flags* are the optional address family, protocol
-     and flags to be passed through to :meth:`getaddrinfo` for *host*
-     resolution. If given, these should all be integers from the
-     corresponding :mod:`socket` module constants.
+   * *family*, *proto*, *flags* là các family địa chỉ, protocol và flag tùy chọn được truyền qua :meth:`getaddrinfo` để phân giải *host*. Nếu được cung cấp, tất cả các giá trị này phải là số nguyên từ các hằng số tương ứng của module :mod:`socket`.
 
-   * *reuse_port* tells the kernel to allow this endpoint to be bound to the
-     same port as other existing endpoints are bound to, so long as they all
-     set this flag when being created. This option is not supported on Windows
-     and some Unixes. If the :ref:`socket.SO_REUSEPORT <socket-unix-constants>` constant is not
-     defined then this capability is unsupported.
+   * *reuse_port* yêu cầu kernel cho phép liên kết endpoint này với cùng một port mà các endpoint hiện có khác đang được liên kết, miễn là tất cả chúng đều đặt flag này khi được tạo. Tùy chọn này không được hỗ trợ trên Windows và một số hệ điều hành Unix. Nếu hằng số :ref:`socket.SO_REUSEPORT <socket-unix-constants>` không được định nghĩa thì khả năng này không được hỗ trợ.
 
-   * *allow_broadcast* tells the kernel to allow this endpoint to send
-     messages to the broadcast address.
+   * *allow_broadcast* yêu cầu kernel cho phép endpoint này gửi thông báo đến địa chỉ broadcast.
 
-   * *sock* can optionally be specified in order to use a preexisting,
-     already connected, :class:`socket.socket` object to be used by the
-     transport. If specified, *local_addr* and *remote_addr* should be omitted
-     (must be :const:`None`).
+   * Có thể tùy chọn chỉ định *sock* để sử dụng một đối tượng :class:`socket.socket` đã tồn tại và đã được kết nối cho transport. Nếu được chỉ định, cần bỏ qua *local_addr* và *remote_addr* (bắt buộc phải là :const:`None`).
 
      .. note::
 
-        The *sock* argument transfers ownership of the socket to the
-        transport created. To close the socket, call the transport's
-        :meth:`~asyncio.BaseTransport.close` method.
+        Đối số *sock* chuyển quyền sở hữu socket cho transport được tạo. Để đóng socket, hãy gọi
+        :meth:`~asyncio.BaseTransport.close` phương thức.
 
-   See :ref:`UDP echo client protocol <asyncio-udp-echo-client-protocol>` and
-   :ref:`UDP echo server protocol <asyncio-udp-echo-server-protocol>` examples.
+   Xem các ví dụ về :ref:`UDP echo client protocol <asyncio-udp-echo-client-protocol>` và
+   :ref:`UDP echo server protocol <asyncio-udp-echo-server-protocol>`.
 
    .. versionchanged:: 3.4.4
-      The *family*, *proto*, *flags*, *reuse_address*, *reuse_port*,
-      *allow_broadcast*, and *sock* parameters were added.
+      Các tham số *family*, *proto*, *flags*, *reuse_address*, *reuse_port*, *allow_broadcast* và *sock* đã được bổ sung.
 
    .. versionchanged:: 3.8
-      Added support for Windows.
+      Đã thêm hỗ trợ cho Windows.
 
    .. versionchanged:: 3.8.1
-      The *reuse_address* parameter is no longer supported, as using
-      :ref:`socket.SO_REUSEADDR <socket-unix-constants>`
-      poses a significant security concern for
-      UDP. Explicitly passing ``reuse_address=True`` will raise an exception.
+      Tham số *reuse_address* không còn được hỗ trợ vì việc sử dụng
+      :ref:`socket.SO_REUSEADDR <socket-unix-constants>` gây ra mối lo ngại đáng kể về bảo mật đối với UDP. Việc truyền rõ ràng ``reuse_address=True`` sẽ gây ra một ngoại lệ.
 
-      When multiple processes with differing UIDs assign sockets to an
-      identical UDP socket address with ``SO_REUSEADDR``, incoming packets can
-      become randomly distributed among the sockets.
+      Khi nhiều tiến trình có UID khác nhau gán socket cho cùng một địa chỉ socket UDP bằng ``SO_REUSEADDR``, các gói tin đến có thể được phân phối ngẫu nhiên giữa các socket.
 
-      For supported platforms, *reuse_port* can be used as a replacement for
-      similar functionality. With *reuse_port*,
-      :ref:`socket.SO_REUSEPORT <socket-unix-constants>`
-      is used instead, which specifically
-      prevents processes with differing UIDs from assigning sockets to the same
-      socket address.
+      Trên các nền tảng được hỗ trợ, có thể sử dụng *reuse_port* để thay thế cho chức năng tương tự. Với *reuse_port*,
+      :ref:`socket.SO_REUSEPORT <socket-unix-constants>` được sử dụng thay thế, qua đó ngăn cụ thể các tiến trình có UID khác nhau gán socket cho cùng một địa chỉ socket.
 
    .. versionchanged:: 3.11
-      The *reuse_address* parameter, disabled since Python 3.8.1,
-      3.7.6 and 3.6.10, has been entirely removed.
+      Tham số *reuse_address*, đã bị vô hiệu hóa kể từ Python 3.8.1, 3.7.6 và 3.6.10, nay đã bị loại bỏ hoàn toàn.
 
 .. method:: loop.create_unix_connection(protocol_factory, \
-               path=None, *, ssl=None, sock=None, \
-               server_hostname=None, ssl_handshake_timeout=None, \
-               ssl_shutdown_timeout=None)
+               path=None, *, ssl=None, sock=None, \ server_hostname=None, ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None)
    :async:
 
-   Create a Unix connection.
+   Tạo một kết nối Unix.
 
-   The socket family will be :py:const:`~socket.AF_UNIX`; socket
-   type will be :py:const:`~socket.SOCK_STREAM`.
+   Họ socket sẽ là :py:const:`~socket.AF_UNIX`; kiểu socket sẽ là :py:const:`~socket.SOCK_STREAM`.
 
-   A tuple of ``(transport, protocol)`` is returned on success.
+   Một tuple gồm ``(transport, protocol)`` sẽ được trả về khi thành công.
 
-   *path* is the name of a Unix domain socket and is required,
-   unless a *sock* parameter is specified.  Abstract Unix sockets,
-   :class:`str`, :class:`bytes`, and :class:`~pathlib.Path` paths are
-   supported.
+   *path* là tên của một Unix domain socket và là bắt buộc, trừ khi tham số *sock* được chỉ định.  Abstract Unix sockets,
+   :class:`str`, :class:`bytes` và :class:`~pathlib.Path` paths được hỗ trợ.
 
-   See the documentation of the :meth:`loop.create_connection` method
-   for information about arguments to this method.
+   Xem tài liệu về phương thức :meth:`loop.create_connection` để biết thông tin về các đối số của phương thức này.
 
    .. availability:: Unix.
 
    .. versionchanged:: 3.7
-      Added the *ssl_handshake_timeout* parameter.
-      The *path* parameter can now be a :term:`path-like object`.
+      Đã thêm tham số *ssl_handshake_timeout*. Tham số *path* giờ đây có thể là một :term:`path-like object`.
 
    .. versionchanged:: 3.11
 
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã thêm tham số *ssl_shutdown_timeout*.
 
 
-Creating network servers
-^^^^^^^^^^^^^^^^^^^^^^^^
+Tạo máy chủ mạng
+^^^^^^^^^^^^^^^^
 
 .. _loop_create_server:
 
 .. method:: loop.create_server(protocol_factory, \
-               host=None, port=None, *, \
-               family=socket.AF_UNSPEC, \
-               flags=socket.AI_PASSIVE, \
-               sock=None, backlog=100, ssl=None, \
-               reuse_address=None, reuse_port=None, \
-               keep_alive=None, \
-               ssl_handshake_timeout=None, \
-               ssl_shutdown_timeout=None, \
-               start_serving=True)
+               host=None, port=None, *, \ family=socket.AF_UNSPEC, \ flags=socket.AI_PASSIVE, \ sock=None, backlog=100, ssl=None, \ reuse_address=None, reuse_port=None, \ keep_alive=None, \ ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None, \ start_serving=True)
    :async:
 
-   Create a TCP server (socket type :const:`~socket.SOCK_STREAM`) listening
-   on *port* of the *host* address.
+   Tạo một máy chủ TCP (loại socket :const:`~socket.SOCK_STREAM`) lắng nghe trên *port* của địa chỉ *host*.
 
-   Returns a :class:`Server` object.
+   Trả về một đối tượng :class:`Server`.
 
-   Arguments:
+   Đối số:
 
-   * *protocol_factory* must be a callable returning a
+   * *protocol_factory* phải là một callable trả về một
      :ref:`protocol <asyncio-protocol>` implementation.
 
-   * The *host* parameter can be set to several types which determine where
-     the server would be listening:
+   * Tham số *host* có thể được đặt thành nhiều kiểu khác nhau, xác định nơi server sẽ lắng nghe:
 
-     - If *host* is a string, the TCP server is bound to a single network
-       interface specified by *host*.
+     - Nếu *host* là một chuỗi, TCP server sẽ được liên kết với một network interface duy nhất được chỉ định bởi *host*.
 
-     - If *host* is a sequence of strings, the TCP server is bound to all
-       network interfaces specified by the sequence.
+     - Nếu *host* là một sequence gồm các chuỗi, TCP server sẽ được liên kết với tất cả network interface được chỉ định bởi sequence đó.
 
-     - If *host* is an empty string or ``None``, all interfaces are
-       assumed and a list of multiple sockets will be returned (most likely
-       one for IPv4 and another one for IPv6).
+     - Nếu *host* là một chuỗi rỗng hoặc ``None``, tất cả interface sẽ được sử dụng và một danh sách gồm nhiều socket sẽ được trả về (nhiều khả năng một socket cho IPv4 và một socket khác cho IPv6).
 
-   * The *port* parameter can be set to specify which port the server should
-     listen on. If ``0`` or ``None`` (the default), a random unused port will
-     be selected (note that if *host* resolves to multiple network interfaces,
-     a different random port will be selected for each interface).
+   * Tham số *port* có thể được đặt để chỉ định port mà server sẽ lắng nghe. Nếu là ``0`` hoặc ``None`` (mặc định), một port chưa được sử dụng ngẫu nhiên sẽ được chọn (lưu ý rằng nếu *host* phân giải thành nhiều network interface, mỗi interface sẽ được chọn một port ngẫu nhiên khác nhau).
 
-   * *family* can be set to either :const:`socket.AF_INET` or
-     :const:`~socket.AF_INET6` to force the socket to use IPv4 or IPv6.
-     If not set, the *family* will be determined from host name
-     (defaults to :const:`~socket.AF_UNSPEC`).
+   * *family* có thể được đặt thành :const:`socket.AF_INET` hoặc
+     :const:`~socket.AF_INET6` để buộc socket sử dụng IPv4 hoặc IPv6. Nếu không được đặt, *family* sẽ được xác định từ tên máy chủ (mặc định là :const:`~socket.AF_UNSPEC`).
 
-   * *flags* is a bitmask for :meth:`getaddrinfo`.
+   * *flags* là một bitmask cho :meth:`getaddrinfo`.
 
-   * *sock* can optionally be specified in order to use a preexisting
-     socket object. If specified, *host* and *port* must not be specified.
+   * *sock* có thể được chỉ định tùy chọn để sử dụng một đối tượng socket có sẵn. Nếu được chỉ định, không được chỉ định *host* và *port*.
 
      .. note::
 
-        The *sock* argument transfers ownership of the socket to the
-        server created. To close the socket, call the server's
-        :meth:`~asyncio.Server.close` method.
+        Đối số *sock* chuyển quyền sở hữu socket cho server được tạo. Để đóng socket, hãy gọi
+        phương thức :meth:`~asyncio.Server.close`.
 
-   * *backlog* is the maximum number of queued connections passed to
-     :meth:`~socket.socket.listen` (defaults to 100).
+   * *backlog* là số lượng kết nối tối đa được xếp hàng truyền cho
+     :meth:`~socket.socket.listen` (mặc định là 100).
 
-   * *ssl* can be set to an :class:`~ssl.SSLContext` instance to enable
-     TLS over the accepted connections.
+   * *ssl* có thể được đặt thành một đối tượng :class:`~ssl.SSLContext` để bật TLS trên các kết nối được chấp nhận.
 
-   * *reuse_address* tells the kernel to reuse a local socket in
-     ``TIME_WAIT`` state, without waiting for its natural timeout to
-     expire. If not specified will automatically be set to ``True`` on
-     Unix.
+   * *reuse_address* yêu cầu kernel sử dụng lại một socket cục bộ đang ở trạng thái ``TIME_WAIT``, mà không cần chờ hết thời gian chờ tự nhiên của socket. Nếu không được chỉ định, tùy chọn này sẽ tự động được đặt thành ``True`` trên Unix.
 
-   * *reuse_port* tells the kernel to allow this endpoint to be bound to the
-     same port as other existing endpoints are bound to, so long as they all
-     set this flag when being created. This option is not supported on
-     Windows.
+   * *reuse_port* yêu cầu kernel cho phép endpoint này được liên kết với cùng một cổng mà các endpoint hiện có khác đang được liên kết, miễn là tất cả chúng đều đặt cờ này khi được tạo. Tùy chọn này không được hỗ trợ trên Windows.
 
-   * *keep_alive* set to ``True`` keeps connections active by enabling the
-     periodic transmission of messages.
+   * *keep_alive* được đặt thành ``True`` sẽ duy trì các kết nối bằng cách bật việc truyền thông báo định kỳ.
 
    .. versionchanged:: 3.13
 
-      Added the *keep_alive* parameter.
+      Đã thêm tham số *keep_alive*.
 
-   * *ssl_handshake_timeout* is (for a TLS server) the time in seconds to wait
-     for the TLS handshake to complete before aborting the connection.
-     ``60.0`` seconds if ``None`` (default).
+   * *ssl_handshake_timeout* là (đối với máy chủ TLS) thời gian tính bằng giây chờ quá trình bắt tay TLS hoàn tất trước khi hủy kết nối. ``60.0`` giây nếu ``None`` (mặc định).
 
-   * *ssl_shutdown_timeout* is the time in seconds to wait for the SSL shutdown
-     to complete before aborting the connection. ``30.0`` seconds if ``None``
-     (default).
+   * *ssl_shutdown_timeout* là thời gian tính bằng giây cần chờ để quá trình tắt SSL hoàn tất trước khi hủy kết nối. ``30.0`` giây nếu ``None`` (mặc định).
 
-   * *start_serving* set to ``True`` (the default) causes the created server
-     to start accepting connections immediately.  When set to ``False``,
-     the user should await on :meth:`Server.start_serving` or
-     :meth:`Server.serve_forever` to make the server to start accepting
-     connections.
+   * *start_serving* được đặt thành ``True`` (mặc định) sẽ khiến server được tạo bắt đầu chấp nhận kết nối ngay lập tức. Khi được đặt thành ``False``, người dùng nên await :meth:`Server.start_serving` hoặc
+     :meth:`Server.serve_forever` để khiến server bắt đầu chấp nhận kết nối.
 
    .. versionchanged:: 3.5
 
-      Added support for SSL/TLS in :class:`ProactorEventLoop`.
+      Đã bổ sung hỗ trợ SSL/TLS trong :class:`ProactorEventLoop`.
 
    .. versionchanged:: 3.5.1
 
-      The *host* parameter can be a sequence of strings.
+      Tham số *host* có thể là một chuỗi các chuỗi.
 
    .. versionchanged:: 3.6
 
-      Added *ssl_handshake_timeout* and *start_serving* parameters.
-      The socket option :ref:`socket.TCP_NODELAY <socket-unix-constants>` is set by default
-      for all TCP connections.
+      Đã bổ sung các tham số *ssl_handshake_timeout* và *start_serving*. Tùy chọn socket :ref:`socket.TCP_NODELAY <socket-unix-constants>` được đặt theo mặc định cho mọi kết nối TCP.
 
    .. versionchanged:: 3.11
 
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã bổ sung tham số *ssl_shutdown_timeout*.
 
    .. seealso::
 
-      The :func:`start_server` function is a higher-level alternative API
-      that returns a pair of :class:`StreamReader` and :class:`StreamWriter`
-      that can be used in an async/await code.
+      Hàm :func:`start_server` là một API thay thế ở cấp cao hơn, trả về một cặp :class:`StreamReader` và :class:`StreamWriter` có thể được sử dụng trong mã async/await.
 
 
 .. method:: loop.create_unix_server(protocol_factory, path=None, \
-                 *, sock=None, backlog=100, ssl=None, \
-                 ssl_handshake_timeout=None, \
-                 ssl_shutdown_timeout=None, \
-                 start_serving=True, cleanup_socket=True)
+                 *, sock=None, backlog=100, ssl=None, \ ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None, \ start_serving=True, cleanup_socket=True)
    :async:
 
-   Similar to :meth:`loop.create_server` but works with the
-   :py:const:`~socket.AF_UNIX` socket family.
+   Tương tự như :meth:`loop.create_server` nhưng hoạt động với họ
+   socket :py:const:`~socket.AF_UNIX`.
 
-   *path* is the name of a Unix domain socket, and is required,
-   unless a *sock* argument is provided.  Abstract Unix sockets,
-   :class:`str`, :class:`bytes`, and :class:`~pathlib.Path` paths
-   are supported.
+   *path* là tên của một Unix domain socket và là bắt buộc, trừ khi cung cấp đối số *sock*. Các Unix socket dạng abstract,
+   các đường dẫn :class:`str`, :class:`bytes` và :class:`~pathlib.Path` đều được hỗ trợ.
 
-   If *cleanup_socket* is true then the Unix socket will automatically
-   be removed from the filesystem when the server is closed, unless the
-   socket has been replaced after the server has been created.
+   Nếu *cleanup_socket* là true thì Unix socket sẽ tự động bị xóa khỏi hệ thống tệp khi server được đóng, trừ khi socket đã được thay thế sau khi server được tạo.
 
-   See the documentation of the :meth:`loop.create_server` method
-   for information about arguments to this method.
+   Xem tài liệu về phương thức :meth:`loop.create_server` để biết thông tin về các đối số của phương thức này.
 
    .. availability:: Unix.
 
    .. versionchanged:: 3.7
 
-      Added the *ssl_handshake_timeout* and *start_serving* parameters.
-      The *path* parameter can now be a :class:`~pathlib.Path` object.
+      Đã thêm các tham số *ssl_handshake_timeout* và *start_serving*. Tham số *path* hiện có thể là một đối tượng :class:`~pathlib.Path`.
 
    .. versionchanged:: 3.11
 
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã bổ sung tham số *ssl_shutdown_timeout*.
 
    .. versionchanged:: 3.13
 
-      Added the *cleanup_socket* parameter.
+      Đã thêm tham số *cleanup_socket*.
 
 
 .. method:: loop.connect_accepted_socket(protocol_factory, \
-               sock, *, ssl=None, ssl_handshake_timeout=None, \
-               ssl_shutdown_timeout=None)
+               sock, *, ssl=None, ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None)
    :async:
 
-   Wrap an already accepted connection into a transport/protocol pair.
+   Đóng gói một kết nối đã được chấp nhận thành một cặp transport/protocol.
 
-   This method can be used by servers that accept connections outside
-   of asyncio but that use asyncio to handle them.
+   Các server chấp nhận kết nối bên ngoài asyncio nhưng sử dụng asyncio để xử lý chúng có thể dùng phương thức này.
 
-   Parameters:
+   Tham số:
 
-   * *protocol_factory* must be a callable returning a
+   * *protocol_factory* phải là một callable trả về một
      :ref:`protocol <asyncio-protocol>` implementation.
 
-   * *sock* is a preexisting socket object returned from
+   * *sock* là một đối tượng socket có sẵn được trả về từ
      :meth:`socket.accept <socket.socket.accept>`.
 
      .. note::
 
-        The *sock* argument transfers ownership of the socket to the
-        transport created. To close the socket, call the transport's
-        :meth:`~asyncio.BaseTransport.close` method.
+        Đối số *sock* chuyển quyền sở hữu socket cho transport được tạo. Để đóng socket, hãy gọi
+        :meth:`~asyncio.BaseTransport.close` phương thức.
 
-   * *ssl* can be set to an :class:`~ssl.SSLContext` to enable SSL over
-     the accepted connections.
+   * *ssl* có thể được đặt thành một :class:`~ssl.SSLContext` để bật SSL trên các kết nối được chấp nhận.
 
-   * *ssl_handshake_timeout* is (for an SSL connection) the time in seconds to
-     wait for the SSL handshake to complete before aborting the connection.
-     ``60.0`` seconds if ``None`` (default).
+   * *ssl_handshake_timeout* là (đối với kết nối SSL) thời gian tính bằng giây chờ quá trình bắt tay SSL hoàn tất trước khi hủy kết nối. ``60.0`` giây nếu ``None`` (mặc định).
 
-   * *ssl_shutdown_timeout* is the time in seconds to wait for the SSL shutdown
-     to complete before aborting the connection. ``30.0`` seconds if ``None``
-     (default).
+   * *ssl_shutdown_timeout* là thời gian tính bằng giây cần chờ để quá trình tắt SSL hoàn tất trước khi hủy kết nối. ``30.0`` giây nếu ``None`` (mặc định).
 
-   Returns a ``(transport, protocol)`` pair.
+   Trả về một ``(transport, protocol)`` cặp.
 
    .. versionadded:: 3.5.3
 
    .. versionchanged:: 3.7
 
-      Added the *ssl_handshake_timeout* parameter.
+      Đã thêm tham số *ssl_handshake_timeout*.
 
    .. versionchanged:: 3.11
 
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã bổ sung tham số *ssl_shutdown_timeout*.
 
 
-Transferring files
-^^^^^^^^^^^^^^^^^^
+Truyền tệp
+^^^^^^^^^^
 
 .. method:: loop.sendfile(transport, file, \
                           offset=0, count=None, *, fallback=True)
    :async:
 
-   Send a *file* over a *transport*.  Return the total number of bytes
-   sent.
+   Gửi một *file* qua một *transport*. Trả về tổng số byte đã gửi.
 
-   The method uses high-performance :meth:`os.sendfile` if available.
+   Phương thức này sử dụng :meth:`os.sendfile` hiệu năng cao nếu có.
 
-   *file* must be a regular file object opened in binary mode.
+   *file* phải là một đối tượng tệp thông thường được mở ở chế độ nhị phân.
 
-   *offset* tells from where to start reading the file. If specified,
-   *count* is the total number of bytes to transmit as opposed to
-   sending the file until EOF is reached. File position is always updated,
-   even when this method raises an error, and
-   :meth:`file.tell() <io.IOBase.tell>` can be used to obtain the actual
-   number of bytes sent.
+   *offset* cho biết vị trí bắt đầu đọc tệp. Nếu được chỉ định, *count* là tổng số byte cần truyền, thay vì gửi tệp cho đến khi đạt EOF. Vị trí tệp luôn được cập nhật, ngay cả khi phương thức này phát sinh lỗi, và
+   :meth:`file.tell() <io.IOBase.tell>` có thể được sử dụng để lấy số byte thực tế đã gửi.
 
-   *fallback* set to ``True`` makes asyncio to manually read and send
-   the file when the platform does not support the sendfile system call
-   (e.g. Windows or SSL socket on Unix).
+   *fallback* được đặt thành ``True`` sẽ khiến asyncio tự đọc và gửi tệp khi nền tảng không hỗ trợ lời gọi hệ thống sendfile (ví dụ: Windows hoặc socket SSL trên Unix).
 
-   Raise :exc:`SendfileNotAvailableError` if the system does not support
-   the *sendfile* syscall and *fallback* is ``False``.
+   Phát sinh :exc:`SendfileNotAvailableError` nếu hệ thống không hỗ trợ syscall *sendfile* và *fallback* là ``False``.
 
    .. versionadded:: 3.7
 
 
-TLS upgrade
-^^^^^^^^^^^
+Nâng cấp TLS
+^^^^^^^^^^^^
 
 .. method:: loop.start_tls(transport, protocol, \
-               sslcontext, *, server_side=False, \
-               server_hostname=None, ssl_handshake_timeout=None, \
-               ssl_shutdown_timeout=None)
+               sslcontext, *, server_side=False, \ server_hostname=None, ssl_handshake_timeout=None, \ ssl_shutdown_timeout=None)
    :async:
 
-   Upgrade an existing transport-based connection to TLS.
+   Nâng cấp một kết nối hiện có dựa trên transport lên TLS.
 
-   Create a TLS coder/decoder instance and insert it between the *transport*
-   and the *protocol*. The coder/decoder implements both *transport*-facing
-   protocol and *protocol*-facing transport.
+   Tạo một bộ mã hóa/giải mã TLS và chèn nó giữa *transport* và *protocol*. Bộ mã hóa/giải mã này triển khai cả protocol hướng về *transport* lẫn transport hướng về *protocol*.
 
-   Return the created two-interface instance. After *await*, the *protocol*
-   must stop using the original *transport* and communicate with the returned
-   object only because the coder caches *protocol*-side data and sporadically
-   exchanges extra TLS session packets with *transport*.
+   Trả về instance hai giao diện đã tạo. Sau *await*, *protocol* phải ngừng sử dụng *transport* ban đầu và chỉ giao tiếp với đối tượng được trả về, vì bộ mã hóa lưu dữ liệu phía *protocol* trong bộ nhớ đệm và thỉnh thoảng trao đổi thêm các gói phiên TLS với *transport*.
 
-   In some situations (e.g. when the passed transport is already closing) this
-   may return ``None``.
+   Trong một số trường hợp (ví dụ: khi transport được truyền vào đã bắt đầu đóng), hàm này có thể trả về ``None``.
 
-   Parameters:
+   Tham số:
 
-   * *transport* and *protocol* instances that methods like
-     :meth:`~loop.create_server` and
-     :meth:`~loop.create_connection` return.
+   * các instance *transport* và *protocol* mà những phương thức như
+     :meth:`~loop.create_server` và
+     :meth:`~loop.create_connection` trả về.
 
-   * *sslcontext*: a configured instance of :class:`~ssl.SSLContext`.
+   * *sslcontext*: một instance đã được cấu hình của :class:`~ssl.SSLContext`.
 
-   * *server_side* pass ``True`` when a server-side connection is being
-     upgraded (like the one created by :meth:`~loop.create_server`).
+   * *server_side* truyền ``True`` khi một kết nối phía máy chủ đang được nâng cấp (như kết nối được tạo bởi :meth:`~loop.create_server`).
 
-   * *server_hostname*: sets or overrides the host name that the target
-     server's certificate will be matched against.
+   * *server_hostname*: đặt hoặc ghi đè tên máy chủ mà chứng chỉ của máy chủ đích sẽ được đối chiếu.
 
-   * *ssl_handshake_timeout* is (for a TLS connection) the time in seconds to
-     wait for the TLS handshake to complete before aborting the connection.
-     ``60.0`` seconds if ``None`` (default).
+   * *ssl_handshake_timeout* là (đối với một kết nối TLS) thời gian tính bằng giây chờ quá trình bắt tay TLS hoàn tất trước khi hủy kết nối. ``60.0`` giây nếu ``None`` (mặc định).
 
-   * *ssl_shutdown_timeout* is the time in seconds to wait for the SSL shutdown
-     to complete before aborting the connection. ``30.0`` seconds if ``None``
-     (default).
+   * *ssl_shutdown_timeout* là thời gian tính bằng giây cần chờ để quá trình SSL shutdown hoàn tất trước khi hủy kết nối. ``30.0`` giây nếu ``None`` (mặc định).
 
    .. versionadded:: 3.7
 
    .. versionchanged:: 3.11
 
-      Added the *ssl_shutdown_timeout* parameter.
+      Đã thêm tham số *ssl_shutdown_timeout*.
 
 
 
-Watching file descriptors
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Theo dõi file descriptor
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. method:: loop.add_reader(fd, callback, *args)
 
-   Start monitoring the *fd* file descriptor for read availability and
-   invoke *callback* with the specified arguments once *fd* is available for
-   reading.
+   Bắt đầu theo dõi file descriptor *fd* để kiểm tra khả năng đọc và gọi *callback* với các đối số được chỉ định khi *fd* sẵn sàng để đọc.
 
-   Any preexisting callback registered for *fd* is cancelled and replaced by
-   *callback*.
+   Mọi callback hiện có đã đăng ký cho *fd* sẽ bị hủy và được thay thế bằng *callback*.
 
 .. method:: loop.remove_reader(fd)
 
-   Stop monitoring the *fd* file descriptor for read availability. Returns
-   ``True`` if *fd* was previously being monitored for reads.
+   Dừng theo dõi file descriptor *fd* để kiểm tra khả năng đọc. Trả về ``True`` nếu *fd* trước đó đang được theo dõi để đọc.
 
 .. method:: loop.add_writer(fd, callback, *args)
 
-   Start monitoring the *fd* file descriptor for write availability and
-   invoke *callback* with the specified arguments *args* once *fd* is
-   available for writing.
+   Bắt đầu theo dõi file descriptor *fd* để kiểm tra khả năng ghi và gọi *callback* với các đối số được chỉ định *args* khi *fd* sẵn sàng để ghi.
 
-   Any preexisting callback registered for *fd* is cancelled and replaced by
-   *callback*.
+   Mọi callback hiện có đã đăng ký cho *fd* sẽ bị hủy và được thay thế bằng *callback*.
 
-   Use :func:`functools.partial` :ref:`to pass keyword arguments
-   <asyncio-pass-keywords>` to *callback*.
+   Sử dụng :func:`functools.partial` :ref:`để truyền các đối số từ khóa <asyncio-pass-keywords>` cho *callback*.
 
 .. method:: loop.remove_writer(fd)
 
-   Stop monitoring the *fd* file descriptor for write availability. Returns
-   ``True`` if *fd* was previously being monitored for writes.
+   Ngừng theo dõi bộ mô tả tệp *fd* để kiểm tra khả năng sẵn sàng ghi. Trả về ``True`` nếu *fd* trước đó đang được theo dõi để ghi.
 
-See also :ref:`Platform Support <asyncio-platform-support>` section
-for some limitations of these methods.
+Xem thêm phần :ref:`Nền tảng được hỗ trợ <asyncio-platform-support>` để biết một số hạn chế của các phương thức này.
 
 
-Working with socket objects directly
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Làm việc trực tiếp với các đối tượng socket
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In general, protocol implementations that use transport-based APIs
-such as :meth:`loop.create_connection` and :meth:`loop.create_server`
-are faster than implementations that work with sockets directly.
-However, there are some use cases when performance is not critical, and
-working with :class:`~socket.socket` objects directly is more
-convenient.
+Nhìn chung, các triển khai protocol sử dụng các API dựa trên transport như :meth:`loop.create_connection` và :meth:`loop.create_server` nhanh hơn các triển khai làm việc trực tiếp với socket. Tuy nhiên, có một số trường hợp hiệu năng không quan trọng và việc làm việc trực tiếp với các đối tượng :class:`~socket.socket` sẽ thuận tiện hơn.
 
 .. method:: loop.sock_recv(sock, nbytes)
    :async:
 
-   Receive up to *nbytes* from *sock*.  Asynchronous version of
+   Nhận tối đa *nbytes* từ *sock*.  Phiên bản bất đồng bộ của
    :meth:`socket.recv() <socket.socket.recv>`.
 
-   Return the received data as a bytes object.
+   Trả về dữ liệu đã nhận dưới dạng đối tượng bytes.
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionchanged:: 3.7
-      Even though this method was always documented as a coroutine
-      method, releases before Python 3.7 returned a :class:`Future`.
-      Since Python 3.7 this is an ``async def`` method.
+      Mặc dù phương thức này luôn được ghi chép là một phương thức coroutine, các bản phát hành trước Python 3.7 trả về một :class:`Future`. Kể từ Python 3.7, đây là một phương thức ``async def``.
 
 .. method:: loop.sock_recv_into(sock, buf)
    :async:
 
-   Receive data from *sock* into the *buf* buffer.  Modeled after the blocking
-   :meth:`socket.recv_into() <socket.socket.recv_into>` method.
+   Nhận dữ liệu từ *sock* vào bộ đệm *buf*. Mô phỏng theo phương thức blocking
+   :meth:`socket.recv_into() <socket.socket.recv_into>`.
 
-   Return the number of bytes written to the buffer.
+   Trả về số byte được ghi vào bộ đệm.
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionadded:: 3.7
 
 .. method:: loop.sock_recvfrom(sock, bufsize)
    :async:
 
-   Receive a datagram of up to *bufsize* from *sock*.  Asynchronous version of
+   Nhận một datagram có kích thước tối đa *bufsize* từ *sock*. Phiên bản bất đồng bộ của
    :meth:`socket.recvfrom() <socket.socket.recvfrom>`.
 
-   Return a tuple of (received data, remote address).
+   Trả về một tuple gồm (dữ liệu đã nhận, địa chỉ từ xa).
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionadded:: 3.11
 
 .. method:: loop.sock_recvfrom_into(sock, buf, nbytes=0)
    :async:
 
-   Receive a datagram of up to *nbytes* from *sock* into *buf*.
-   Asynchronous version of
+   Nhận một datagram có kích thước tối đa *nbytes* từ *sock* vào *buf*. Phiên bản bất đồng bộ của
    :meth:`socket.recvfrom_into() <socket.socket.recvfrom_into>`.
 
-   Return a tuple of (number of bytes received, remote address).
+   Trả về một tuple gồm (số byte đã nhận, địa chỉ từ xa).
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionadded:: 3.11
 
 .. method:: loop.sock_sendall(sock, data)
    :async:
 
-   Send *data* to the *sock* socket. Asynchronous version of
+   Gửi *data* đến socket *sock*. Phiên bản bất đồng bộ của
    :meth:`socket.sendall() <socket.socket.sendall>`.
 
-   This method continues to send to the socket until either all data
-   in *data* has been sent or an error occurs.  ``None`` is returned
-   on success.  On error, an exception is raised. Additionally, there is no way
-   to determine how much data, if any, was successfully processed by the
-   receiving end of the connection.
+   Phương thức này tiếp tục gửi đến socket cho đến khi toàn bộ dữ liệu trong *data* đã được gửi hoặc xảy ra lỗi. ``None`` được trả về khi thành công. Khi xảy ra lỗi, một ngoại lệ sẽ được phát sinh. Ngoài ra, không có cách nào xác định được bao nhiêu dữ liệu, nếu có, đã được phía nhận của kết nối xử lý thành công.
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionchanged:: 3.7
-      Even though the method was always documented as a coroutine
-      method, before Python 3.7 it returned a :class:`Future`.
-      Since Python 3.7, this is an ``async def`` method.
+      Mặc dù phương thức này luôn được ghi trong tài liệu là một phương thức coroutine, trước Python 3.7, nó trả về một :class:`Future`. Kể từ Python 3.7, đây là một phương thức ``async def``.
 
 .. method:: loop.sock_sendto(sock, data, address)
    :async:
 
-   Send a datagram from *sock* to *address*.
-   Asynchronous version of
+   Gửi một datagram từ *sock* đến *address*. Phiên bản bất đồng bộ của
    :meth:`socket.sendto() <socket.socket.sendto>`.
 
-   Return the number of bytes sent.
+   Trả về số byte đã gửi.
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionadded:: 3.11
 
 .. method:: loop.sock_connect(sock, address)
    :async:
 
-   Connect *sock* to a remote socket at *address*.
+   Kết nối *sock* với một socket từ xa tại *address*.
 
-   Asynchronous version of :meth:`socket.connect() <socket.socket.connect>`.
+   Phiên bản bất đồng bộ của :meth:`socket.connect() <socket.socket.connect>`.
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
-   With :class:`SelectorEventLoop`, *address* does not need to be resolved:
-   for :const:`~socket.AF_INET` and :const:`~socket.AF_INET6` sockets,
-   ``sock_connect`` first checks whether *address* is already resolved by
-   calling :func:`socket.inet_pton`, and uses :meth:`loop.getaddrinfo` to
-   resolve it if it is not.
+   Với :class:`SelectorEventLoop`, *address* không cần được phân giải: đối với socket :const:`~socket.AF_INET` và :const:`~socket.AF_INET6`, ``sock_connect`` trước tiên kiểm tra xem *address* đã được phân giải hay chưa bằng cách gọi :func:`socket.inet_pton`, và sử dụng :meth:`loop.getaddrinfo` để phân giải nếu chưa được phân giải.
 
-   :class:`ProactorEventLoop`, the default event loop on Windows, does not
-   resolve *address*.  The host must already be a numeric IP address; passing
-   a host name raises :exc:`OSError`.  Resolve the address with
-   :meth:`loop.getaddrinfo` first, or use :meth:`loop.create_connection`,
-   which resolves the address on every platform.
+   :class:`ProactorEventLoop`, vòng lặp sự kiện mặc định trên Windows, không phân giải *address*. Host phải là một địa chỉ IP dạng số; truyền tên host sẽ gây ra :exc:`OSError`. Hãy phân giải địa chỉ bằng
+   :meth:`loop.getaddrinfo` trước, hoặc sử dụng :meth:`loop.create_connection`, hàm này phân giải địa chỉ trên mọi nền tảng.
 
    .. versionchanged:: 3.5.2
-      With :class:`SelectorEventLoop`, ``address`` no longer needs to be
-      resolved.
+      Với :class:`SelectorEventLoop`, ``address`` không còn cần được phân giải nữa.
 
    .. seealso::
 
-      :meth:`loop.create_connection`
-      and  :func:`asyncio.open_connection() <open_connection>`.
+      :meth:`loop.create_connection` và :func:`asyncio.open_connection() <open_connection>`.
 
 
 .. method:: loop.sock_accept(sock)
    :async:
 
-   Accept a connection.  Modeled after the blocking
-   :meth:`socket.accept() <socket.socket.accept>` method.
+   Chấp nhận một kết nối. Mô phỏng theo phương thức blocking
+   :meth:`socket.accept() <socket.socket.accept>` phương thức.
 
-   The socket must be bound to an address and listening
-   for connections. The return value is a pair ``(conn, address)`` where *conn*
-   is a *new* socket object usable to send and receive data on the connection,
-   and *address* is the address bound to the socket on the other end of the
-   connection.
+   Socket phải được liên kết với một địa chỉ và đang lắng nghe các kết nối. Giá trị trả về là một cặp ``(conn, address)`` trong đó *conn* là một đối tượng socket *new* có thể dùng để gửi và nhận dữ liệu trên kết nối, còn *address* là địa chỉ được liên kết với socket ở đầu kia của kết nối.
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionchanged:: 3.7
-      Even though the method was always documented as a coroutine
-      method, before Python 3.7 it returned a :class:`Future`.
-      Since Python 3.7, this is an ``async def`` method.
+      Mặc dù phương thức này luôn được ghi trong tài liệu là một phương thức coroutine, trước Python 3.7, nó trả về một :class:`Future`. Kể từ Python 3.7, đây là một phương thức ``async def``.
 
    .. seealso::
 
-      :meth:`loop.create_server` and :func:`start_server`.
+      :meth:`loop.create_server` và :func:`start_server`.
 
 .. method:: loop.sock_sendfile(sock, file, offset=0, count=None, \
                                *, fallback=True)
    :async:
 
-   Send a file using high-performance :mod:`os.sendfile` if possible.
-   Return the total number of bytes sent.
+   Gửi một tệp bằng :mod:`os.sendfile` hiệu suất cao nếu có thể. Trả về tổng số byte đã gửi.
 
-   Asynchronous version of :meth:`socket.sendfile() <socket.socket.sendfile>`.
+   Phiên bản bất đồng bộ của :meth:`socket.sendfile() <socket.socket.sendfile>`.
 
-   *sock* must be a non-blocking :const:`socket.SOCK_STREAM`
+   *sock* phải là một :const:`socket.SOCK_STREAM` không chặn
    :class:`~socket.socket`.
 
-   *file* must be a regular file object open in binary mode.
+   *file* phải là một đối tượng tệp thông thường được mở ở chế độ nhị phân.
 
-   *offset* tells from where to start reading the file. If specified,
-   *count* is the total number of bytes to transmit as opposed to
-   sending the file until EOF is reached. File position is always updated,
-   even when this method raises an error, and
-   :meth:`file.tell() <io.IOBase.tell>` can be used to obtain the actual
-   number of bytes sent.
+   *offset* cho biết bắt đầu đọc tệp từ đâu. Nếu được chỉ định, *count* là tổng số byte cần truyền, thay vì gửi tệp cho đến khi đạt EOF. Vị trí tệp luôn được cập nhật, ngay cả khi phương thức này phát sinh lỗi, và
+   :meth:`file.tell() <io.IOBase.tell>` có thể được dùng để lấy số byte thực tế đã gửi.
 
-   *fallback*, when set to ``True``, makes asyncio manually read and send
-   the file when the platform does not support the sendfile syscall
-   (e.g. Windows or SSL socket on Unix).
+   *fallback*, khi được đặt thành ``True``, khiến asyncio tự đọc và gửi tệp khi nền tảng không hỗ trợ syscall sendfile (ví dụ: Windows hoặc socket SSL trên Unix).
 
-   Raise :exc:`SendfileNotAvailableError` if the system does not support
-   *sendfile* syscall and *fallback* is ``False``.
+   Phát sinh :exc:`SendfileNotAvailableError` nếu hệ thống không hỗ trợ syscall *sendfile* và *fallback* là ``False``.
 
-   *sock* must be a non-blocking socket.
+   *sock* phải là socket không blocking.
 
    .. versionadded:: 3.7
 
@@ -1245,199 +914,159 @@ DNS
                type=0, proto=0, flags=0)
    :async:
 
-   Asynchronous version of :meth:`socket.getaddrinfo`.
+   Phiên bản bất đồng bộ của :meth:`socket.getaddrinfo`.
 
 .. method:: loop.getnameinfo(sockaddr, flags=0)
    :async:
 
-   Asynchronous version of :meth:`socket.getnameinfo`.
+   Phiên bản bất đồng bộ của :meth:`socket.getnameinfo`.
 
 .. note::
-   Both *getaddrinfo* and *getnameinfo* internally utilize their synchronous
-   versions through the loop's default thread pool executor.
-   When this executor is saturated, these methods may experience delays,
-   which higher-level networking libraries may report as increased timeouts.
-   To mitigate this, consider using a custom executor for other user tasks,
-   or setting a default executor with a larger number of workers.
+   Cả *getaddrinfo* và *getnameinfo* đều sử dụng nội bộ các phiên bản đồng bộ của chúng thông qua thread pool executor mặc định của loop. Khi executor này đã đạt giới hạn, các phương thức này có thể bị trì hoãn, khiến các thư viện networking cấp cao hơn báo cáo thời gian chờ tăng lên. Để giảm thiểu điều này, hãy cân nhắc sử dụng một executor tùy chỉnh cho các tác vụ khác của người dùng hoặc thiết lập một executor mặc định với số lượng worker lớn hơn.
 
 .. versionchanged:: 3.7
-   Both *getaddrinfo* and *getnameinfo* methods were always documented
-   to return a coroutine, but prior to Python 3.7 they were, in fact,
-   returning :class:`asyncio.Future` objects.  Starting with Python 3.7
-   both methods are coroutines.
+   Cả hai phương thức *getaddrinfo* và *getnameinfo* luôn được tài liệu hóa là trả về một coroutine, nhưng trước Python 3.7, trên thực tế, chúng lại trả về các đối tượng :class:`asyncio.Future`. Kể từ Python 3.7, cả hai phương thức đều là coroutine.
 
 
-Working with pipes
-^^^^^^^^^^^^^^^^^^
+Làm việc với pipe
+^^^^^^^^^^^^^^^^^
 
 .. method:: loop.connect_read_pipe(protocol_factory, pipe)
    :async:
 
-   Register the read end of *pipe* in the event loop.
+   Đăng ký đầu đọc của *pipe* trong event loop.
 
-   *protocol_factory* must be a callable returning an
-   :ref:`asyncio protocol <asyncio-protocol>` implementation.
+   *protocol_factory* phải là một callable trả về một
+   triển khai :ref:`asyncio protocol <asyncio-protocol>`.
 
-   *pipe* is a :term:`file-like object <file object>`.  See
-   :ref:`Supported pipe objects <asyncio-pipe-objects>` for the objects
-   supported as *pipe*.
+   *pipe* là một :term:`đối tượng giống tệp <file object>`. Xem
+   :ref:`Các đối tượng pipe được hỗ trợ <asyncio-pipe-objects>` để biết các đối tượng được hỗ trợ làm *pipe*.
 
-   Return pair ``(transport, protocol)``, where *transport* supports
-   the :class:`ReadTransport` interface and *protocol* is an object
-   instantiated by the *protocol_factory*.
+   Trả về cặp ``(transport, protocol)``, trong đó *transport* hỗ trợ giao diện :class:`ReadTransport` và *protocol* là một đối tượng được khởi tạo bởi *protocol_factory*.
 
-   With :class:`SelectorEventLoop` event loop, the *pipe* is set to
-   non-blocking mode.
+   Với event loop :class:`SelectorEventLoop`, *pipe* được đặt ở chế độ non-blocking.
 
 .. method:: loop.connect_write_pipe(protocol_factory, pipe)
    :async:
 
-   Register the write end of *pipe* in the event loop.
+   Đăng ký đầu ghi của *pipe* trong event loop.
 
-   *protocol_factory* must be a callable returning an
-   :ref:`asyncio protocol <asyncio-protocol>` implementation.
+   *protocol_factory* phải là một callable trả về một
+   triển khai :ref:`asyncio protocol <asyncio-protocol>`.
 
-   *pipe* is a :term:`file-like object <file object>`.  See
-   :ref:`Supported pipe objects <asyncio-pipe-objects>` for the objects
-   supported as *pipe*.
+   *pipe* là một :term:`đối tượng giống tệp <file object>`. Xem
+   :ref:`Các đối tượng pipe được hỗ trợ <asyncio-pipe-objects>` để biết các đối tượng được hỗ trợ làm *pipe*.
 
-   Return pair ``(transport, protocol)``, where *transport* supports
-   :class:`WriteTransport` interface and *protocol* is an object
-   instantiated by the *protocol_factory*.
+   Trả về cặp ``(transport, protocol)``, trong đó *transport* hỗ trợ
+   giao diện :class:`WriteTransport` và *protocol* là một đối tượng được khởi tạo bởi *protocol_factory*.
 
-   With :class:`SelectorEventLoop` event loop, the *pipe* is set to
-   non-blocking mode.
+   Với event loop :class:`SelectorEventLoop`, *pipe* được đặt ở chế độ non-blocking.
 
 .. _asyncio-pipe-objects:
 
-.. rubric:: Supported pipe objects
+.. rubric:: Các đối tượng pipe được hỗ trợ
 
-These methods only work with objects the operating system can poll for
-readiness or perform overlapped I/O on.  Regular files on disk are **not**
-supported on any platform.  There is no asynchronous file I/O in asyncio;
-use :meth:`loop.run_in_executor` to read and write regular files without
-blocking the event loop.
+Các phương thức này chỉ hoạt động với những đối tượng mà hệ điều hành có thể thăm dò trạng thái sẵn sàng hoặc thực hiện I/O chồng lấp. Các tệp thông thường trên đĩa **not** được hỗ trợ trên bất kỳ nền tảng nào. asyncio không có I/O tệp bất đồng bộ; hãy sử dụng :meth:`loop.run_in_executor` để đọc và ghi các tệp thông thường mà không chặn event loop.
 
-On Unix, with :class:`SelectorEventLoop`, *pipe* must wrap one of the
-following:
+Trên Unix, với :class:`SelectorEventLoop`, *pipe* phải bọc một trong các đối tượng sau:
 
-* a pipe, such as an end of an :func:`os.pipe` pair or a FIFO created with
+* một pipe, chẳng hạn như một đầu của một cặp :func:`os.pipe` hoặc một FIFO được tạo bằng
   :func:`os.mkfifo`;
-* a socket;
-* a character device, such as a terminal.
+* một socket;
+* một character device, chẳng hạn như một terminal.
 
-On Windows, where only :class:`ProactorEventLoop` implements these methods,
-*pipe* must wrap a handle opened for overlapped I/O (that is, created with the
-``FILE_FLAG_OVERLAPPED`` flag), since the handle has to be associated with an
-I/O completion port.  Handles that were not opened for overlapped I/O are
-rejected.  In particular, the standard streams (:data:`sys.stdin`,
-:data:`sys.stdout` and :data:`sys.stderr`), console handles, and the pipes
-created by :func:`os.pipe` are **not** opened for overlapped I/O and therefore
-cannot be used with these methods.
+Trên Windows, nơi chỉ có :class:`ProactorEventLoop` triển khai các phương thức này, *pipe* phải bao bọc một handle được mở cho overlapped I/O (tức là được tạo bằng cờ ``FILE_FLAG_OVERLAPPED``), vì handle này phải được liên kết với một I/O completion port. Các handle không được mở cho overlapped I/O sẽ bị từ chối. Cụ thể, các standard stream (:data:`sys.stdin`,
+:data:`sys.stdout` và :data:`sys.stderr`), các console handle và các pipe được tạo bởi :func:`os.pipe` đều **không** được mở cho overlapped I/O, do đó không thể được sử dụng với các phương thức này.
 
 .. note::
 
-   :class:`SelectorEventLoop` does not support the above methods on
-   Windows.  Use :class:`ProactorEventLoop` instead for Windows.
+   :class:`SelectorEventLoop` không hỗ trợ các phương thức trên trong Windows. Thay vào đó, hãy sử dụng :class:`ProactorEventLoop` cho Windows.
 
 .. seealso::
 
-   The :meth:`loop.subprocess_exec` and
-   :meth:`loop.subprocess_shell` methods.
+   Các phương thức :meth:`loop.subprocess_exec` và
+   của :meth:`loop.subprocess_shell`.
 
 
-Unix signals
-^^^^^^^^^^^^
+Tín hiệu Unix
+^^^^^^^^^^^^^
 
 .. _loop_add_signal_handler:
 
 .. method:: loop.add_signal_handler(signum, callback, *args)
 
-   Set *callback* as the handler for the *signum* signal,
-   passing *args* as positional arguments.
+   Đặt *callback* làm trình xử lý cho tín hiệu *signum*, truyền *args* làm các đối số vị trí.
 
-   The callback will be invoked by *loop*, along with other queued callbacks
-   and runnable coroutines of that event loop. Unlike signal handlers
-   registered using :func:`signal.signal`, a callback registered with this
-   function is allowed to interact with the event loop.
+   callback sẽ được *loop* gọi cùng với các callback khác đang chờ và các coroutine có thể chạy của event loop đó. Không giống các trình xử lý tín hiệu được đăng ký bằng :func:`signal.signal`, callback được đăng ký bằng hàm này được phép tương tác với event loop.
 
-   Raise :exc:`ValueError` if the signal number is invalid or uncatchable.
-   Raise :exc:`RuntimeError` if there is a problem setting up the handler.
+   Phát sinh :exc:`ValueError` nếu số hiệu tín hiệu không hợp lệ hoặc không thể bắt. Phát sinh :exc:`RuntimeError` nếu có vấn đề khi thiết lập trình xử lý.
 
-   Use :func:`functools.partial` :ref:`to pass keyword arguments
-   <asyncio-pass-keywords>` to *callback*.
+   Sử dụng :func:`functools.partial` :ref:`để truyền các đối số từ khóa <asyncio-pass-keywords>` cho *callback*.
 
-   Like :func:`signal.signal`, this function must be invoked in the main
-   thread.
+   Giống như :func:`signal.signal`, hàm này phải được gọi trong main thread.
 
 .. method:: loop.remove_signal_handler(sig)
 
-   Remove the handler for the *sig* signal.
+   Xóa trình xử lý cho tín hiệu *sig*.
 
-   Return ``True`` if the signal handler was removed, or ``False`` if
-   no handler was set for the given signal.
+   Trả về ``True`` nếu trình xử lý tín hiệu đã bị xóa, hoặc ``False`` nếu chưa có trình xử lý nào được thiết lập cho tín hiệu đã cho.
 
    .. availability:: Unix.
 
 .. seealso::
 
-   The :mod:`signal` module.
+   Mô-đun :mod:`signal`.
 
 
-Executing code in thread or process pools
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thực thi mã trong các thread hoặc process pool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. awaitablemethod:: loop.run_in_executor(executor, func, *args)
 
-   Arrange for *func* to be called in the specified executor
-   passing *args* as positional arguments.
+   Sắp xếp để *func* được gọi trong executor được chỉ định, với *args* làm các đối số vị trí.
 
-   The *executor* argument should be an :class:`concurrent.futures.Executor`
-   instance. The default executor is used if *executor* is ``None``.
-   The default executor can be set by :meth:`loop.set_default_executor`,
-   otherwise, a :class:`concurrent.futures.ThreadPoolExecutor` will be
-   lazy-initialized and used by :func:`run_in_executor` if needed.
+   Đối số *executor* phải là một thực thể :class:`concurrent.futures.Executor`. Executor mặc định được sử dụng nếu *executor* là ``None``. Executor mặc định có thể được thiết lập bằng :meth:`loop.set_default_executor`; nếu không, một :class:`concurrent.futures.ThreadPoolExecutor` sẽ được khởi tạo theo nhu cầu và được :func:`run_in_executor` sử dụng khi cần.
 
-   Example::
+   Ví dụ::
 
       import asyncio
       import concurrent.futures
 
       def blocking_io():
-          # File operations (such as logging) can block the
-          # event loop: run them in a thread pool.
+          # Các thao tác với tệp (chẳng hạn như ghi nhật ký) có thể chặn
+          # vòng lặp sự kiện: chạy chúng trong thread pool.
           with open('/dev/urandom', 'rb') as f:
               return f.read(100)
 
       def cpu_bound():
-          # CPU-bound operations will block the event loop:
-          # in general it is preferable to run them in a
+          # Các thao tác phụ thuộc CPU sẽ chặn vòng lặp sự kiện:
+          # nhìn chung, nên chạy chúng trong một
           # process pool.
           return sum(i * i for i in range(10 ** 7))
 
       async def main():
           loop = asyncio.get_running_loop()
 
-          ## Options:
+          ## Các tùy chọn:
 
-          # 1. Run in the default loop's executor:
+          # 1. Chạy trong executor mặc định của vòng lặp:
           result = await loop.run_in_executor(
               None, blocking_io)
           print('default thread pool', result)
 
-          # 2. Run in a custom thread pool:
+          # 2. Chạy trong thread pool tùy chỉnh:
           with concurrent.futures.ThreadPoolExecutor() as pool:
               result = await loop.run_in_executor(
                   pool, blocking_io)
               print('custom thread pool', result)
 
-          # 3. Run in a custom process pool:
+          # 3. Chạy trong một process pool tùy chỉnh:
           with concurrent.futures.ProcessPoolExecutor() as pool:
               result = await loop.run_in_executor(
                   pool, cpu_bound)
               print('custom process pool', result)
 
-          # 4. Run in a custom interpreter pool:
+          # 4. Chạy trong một interpreter pool tùy chỉnh:
           with concurrent.futures.InterpreterPoolExecutor() as pool:
               result = await loop.run_in_executor(
                   pool, cpu_bound)
@@ -1446,425 +1075,335 @@ Executing code in thread or process pools
       if __name__ == '__main__':
           asyncio.run(main())
 
-   Note that the entry point guard (``if __name__ == '__main__'``)
-   is required for option 3 due to the peculiarities of :mod:`multiprocessing`,
-   which is used by :class:`~concurrent.futures.ProcessPoolExecutor`.
-   See :ref:`Safe importing of main module <multiprocessing-safe-main-import>`.
+   Lưu ý rằng guard điểm vào (``if __name__ == '__main__'``) là bắt buộc đối với tùy chọn 3 do những đặc thù của :mod:`multiprocessing`, được :class:`~concurrent.futures.ProcessPoolExecutor` sử dụng. Xem :ref:`Nhập main module an toàn <multiprocessing-safe-main-import>`.
 
-   This method returns a :class:`asyncio.Future` object.
+   Phương thức này trả về một đối tượng :class:`asyncio.Future`.
 
-   Use :func:`functools.partial` :ref:`to pass keyword arguments
-   <asyncio-pass-keywords>` to *func*.
+   Sử dụng :func:`functools.partial` :ref:`để truyền các đối số từ khóa <asyncio-pass-keywords>` cho *func*.
 
    .. versionchanged:: 3.5.3
       :meth:`loop.run_in_executor` no longer configures the
-      ``max_workers`` of the thread pool executor it creates, instead
-      leaving it up to the thread pool executor
-      (:class:`~concurrent.futures.ThreadPoolExecutor`) to set the
-      default.
+      ``max_workers`` của thread pool executor mà nó tạo ra, thay vào đó để thread pool executor (:class:`~concurrent.futures.ThreadPoolExecutor`) tự đặt giá trị mặc định.
 
 .. method:: loop.set_default_executor(executor)
 
-   Set *executor* as the default executor used by :meth:`run_in_executor`.
-   *executor* must be an instance of
-   :class:`~concurrent.futures.ThreadPoolExecutor`, which includes
+   Đặt *executor* làm executor mặc định được :meth:`run_in_executor` sử dụng. *executor* phải là một instance của
+   :class:`~concurrent.futures.ThreadPoolExecutor`, bao gồm
    :class:`~concurrent.futures.InterpreterPoolExecutor`.
 
    .. versionchanged:: 3.11
-      *executor* must be an instance of
+      *executor* phải là một thực thể của
       :class:`~concurrent.futures.ThreadPoolExecutor`.
 
 
-Error handling API
-^^^^^^^^^^^^^^^^^^
+API xử lý lỗi
+^^^^^^^^^^^^^
 
-Allows customizing how exceptions are handled in the event loop.
+Cho phép tùy chỉnh cách các ngoại lệ được xử lý trong event loop.
 
 .. method:: loop.set_exception_handler(handler)
 
-   Set *handler* as the new event loop exception handler.
+   Đặt *handler* làm trình xử lý ngoại lệ mới của event loop.
 
-   If *handler* is ``None``, the default exception handler will
-   be set.  Otherwise, *handler* must be a callable with the signature
-   matching ``(loop, context)``, where ``loop``
-   is a reference to the active event loop, and ``context``
-   is a ``dict`` object containing the details of the exception
-   (see :meth:`call_exception_handler` documentation for details
-   about context).
+   Nếu *handler* là ``None``, trình xử lý ngoại lệ mặc định sẽ được đặt. Nếu không, *handler* phải là một callable có signature khớp với ``(loop, context)``, trong đó ``loop`` là tham chiếu đến event loop đang hoạt động và ``context`` là một đối tượng ``dict`` chứa thông tin chi tiết về ngoại lệ (xem tài liệu :meth:`call_exception_handler` để biết chi tiết về context).
 
-   If the handler is called on behalf of a :class:`~asyncio.Task` or
-   :class:`~asyncio.Handle`, it is run in the
-   :class:`contextvars.Context` of that task or callback handle.
+   Nếu trình xử lý được gọi thay mặt cho một :class:`~asyncio.Task` hoặc
+   :class:`~asyncio.Handle`, nó được chạy trong
+   :class:`contextvars.Context` của tác vụ hoặc handle đó.
 
    .. versionchanged:: 3.12
 
-      The handler may be called in the :class:`~contextvars.Context`
-      of the task or handle where the exception originated.
+      Handler có thể được gọi trong :class:`~contextvars.Context` của tác vụ hoặc handle nơi ngoại lệ bắt nguồn.
 
 .. method:: loop.get_exception_handler()
 
-   Return the current exception handler, or ``None`` if no custom
-   exception handler was set.
+   Trả về exception handler hiện tại hoặc ``None`` nếu chưa thiết lập exception handler tùy chỉnh nào.
 
    .. versionadded:: 3.5.2
 
 .. method:: loop.default_exception_handler(context)
 
-   Default exception handler.
+   Exception handler mặc định.
 
-   This is called when an exception occurs and no exception
-   handler is set. This can be called by a custom exception
-   handler that wants to defer to the default handler behavior.
+   Hàm này được gọi khi xảy ra ngoại lệ và chưa thiết lập exception handler nào. Một exception handler tùy chỉnh muốn chuyển việc xử lý cho behavior của handler mặc định cũng có thể gọi hàm này.
 
-   *context* parameter has the same meaning as in
+   Tham số *context* có cùng ý nghĩa như trong
    :meth:`call_exception_handler`.
 
 .. method:: loop.call_exception_handler(context)
 
-   Call the current event loop exception handler.
+   Gọi exception handler của event loop hiện tại.
 
-   *context* is a ``dict`` object containing the following keys
-   (new keys may be introduced in future Python versions):
+   *context* là một ``dict`` đối tượng chứa các khóa sau (các khóa mới có thể được giới thiệu trong những phiên bản Python tương lai):
 
-   * 'message': Error message;
-   * 'exception' (optional): Exception object;
-   * 'future' (optional): :class:`asyncio.Future` instance;
-   * 'task' (optional): :class:`asyncio.Task` instance;
-   * 'handle' (optional): :class:`asyncio.Handle` instance;
+   * 'message': Thông báo lỗi;
+   * 'exception' (tùy chọn): Đối tượng Exception;
+   * 'future' (tùy chọn): :class:`asyncio.Future` instance;
+   * 'task' (tùy chọn): :class:`asyncio.Task` instance;
+   * 'handle' (tùy chọn): :class:`asyncio.Handle` instance;
    * 'protocol' (optional): :ref:`Protocol <asyncio-protocol>` instance;
    * 'transport' (optional): :ref:`Transport <asyncio-transport>` instance;
-   * 'socket' (optional): :class:`socket.socket` instance;
-   * 'source_traceback' (optional): Traceback of the source;
-   * 'handle_traceback' (optional): Traceback of the handle;
-   * 'asyncgen' (optional): Asynchronous generator that caused
-                            the exception.
+   * 'socket' (tùy chọn): instance của :class:`socket.socket`;
+   * 'source_traceback' (optional): Traceback của nguồn;
+   * 'handle_traceback' (optional): Traceback của handle;
+   * 'asyncgen' (optional): Trình sinh bất đồng bộ gây ra
+                            ngoại lệ.
 
    .. note::
 
-       This method should not be overloaded in subclassed
-       event loops.  For custom exception handling, use
-       the :meth:`set_exception_handler` method.
+       Không nên overload phương thức này trong các event loop được phân lớp. Để xử lý ngoại lệ tùy chỉnh, hãy sử dụng phương thức :meth:`set_exception_handler`.
 
-Enabling debug mode
-^^^^^^^^^^^^^^^^^^^
+Bật chế độ debug
+^^^^^^^^^^^^^^^^
 
 .. method:: loop.get_debug()
 
-   Get the debug mode (:class:`bool`) of the event loop.
+   Lấy chế độ debug (:class:`bool`) của event loop.
 
-   The default value is ``True`` if the environment variable
-   :envvar:`PYTHONASYNCIODEBUG` is set to a non-empty string, ``False``
-   otherwise.
+   Giá trị mặc định là ``True`` nếu biến môi trường
+   :envvar:`PYTHONASYNCIODEBUG` được đặt thành một chuỗi không rỗng, ngược lại là ``False``.
 
 .. method:: loop.set_debug(enabled: bool)
 
-   Set the debug mode of the event loop.
+   Đặt chế độ debug của event loop.
 
    .. versionchanged:: 3.7
 
-      The new :ref:`Python Development Mode <devmode>` can now also be used
-      to enable the debug mode.
+      :ref:`Python Development Mode <devmode>` hiện cũng có thể được dùng để bật chế độ debug.
 
 .. attribute:: loop.slow_callback_duration
 
-   This attribute can be used to set the
-   minimum execution duration in seconds that is considered "slow".
-   When debug mode is enabled, "slow" callbacks are logged.
+   Thuộc tính này có thể được dùng để đặt thời lượng thực thi tối thiểu, tính bằng giây, được xem là "chậm". Khi bật chế độ debug, các callback "chậm" sẽ được ghi log.
 
-   Default value is 100 milliseconds.
+   Giá trị mặc định là 100 mili giây.
 
 .. seealso::
 
-   The :ref:`debug mode of asyncio <asyncio-debug-mode>`.
+   Chế độ :ref:`debug của asyncio <asyncio-debug-mode>`.
 
 
-Running subprocesses
-^^^^^^^^^^^^^^^^^^^^
+Chạy các tiến trình con
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Methods described in this subsections are low-level.  In regular
-async/await code consider using the high-level
-:func:`asyncio.create_subprocess_shell` and
-:func:`asyncio.create_subprocess_exec` convenience functions instead.
+Các phương thức được mô tả trong tiểu mục này ở mức thấp. Trong mã async/await thông thường, hãy cân nhắc sử dụng các hàm cấp cao
+:func:`asyncio.create_subprocess_shell` và
+:func:`asyncio.create_subprocess_exec` các hàm tiện lợi thay thế.
 
 .. note::
 
-   On Windows, the default event loop :class:`ProactorEventLoop` supports
-   subprocesses, whereas :class:`SelectorEventLoop` does not. See
-   :ref:`Subprocess Support on Windows <asyncio-windows-subprocess>` for
-   details.
+   Trên Windows, event loop mặc định :class:`ProactorEventLoop` hỗ trợ subprocess, trong khi :class:`SelectorEventLoop` thì không. Xem
+   :ref:`Hỗ trợ subprocess trên Windows <asyncio-windows-subprocess>` để biết chi tiết.
 
 .. _loop_subprocess_exec:
 
 .. method:: loop.subprocess_exec(protocol_factory, *args, \
-             stdin=subprocess.PIPE, stdout=subprocess.PIPE, \
-             stderr=subprocess.PIPE, **kwargs)
+             stdin=subprocess.PIPE, stdout=subprocess.PIPE, \ stderr=subprocess.PIPE, ****kwargs)
    :async:
 
-   Create a subprocess from one or more string arguments specified by
-   *args*.
+   Tạo một subprocess từ một hoặc nhiều đối số chuỗi được chỉ định bởi *args*.
 
-   *args* must be a list of strings represented by:
+   *args* phải là một danh sách các chuỗi được biểu diễn bởi:
 
    * :class:`str`;
-   * or :class:`bytes`, encoded to the
-     :ref:`filesystem encoding <filesystem-encoding>`.
+   * hoặc :class:`bytes`, được mã hóa theo
+     :ref:`mã hóa hệ thống tệp <filesystem-encoding>`.
 
-   The first string specifies the program executable,
-   and the remaining strings specify the arguments.  Together, string
-   arguments form the ``argv`` of the program.
+   Chuỗi đầu tiên chỉ định tệp thực thi của chương trình, còn các chuỗi còn lại chỉ định các đối số. Kết hợp lại, các đối số chuỗi tạo thành ``argv`` của chương trình.
 
-   This is similar to the standard library :class:`subprocess.Popen`
-   class called with ``shell=False`` and the list of strings passed as
-   the first argument; however, where :class:`~subprocess.Popen` takes
-   a single argument which is list of strings, *subprocess_exec*
-   takes multiple string arguments.
+   Điều này tương tự như lớp :class:`subprocess.Popen` của thư viện chuẩn được gọi với ``shell=False`` và danh sách các chuỗi được truyền làm đối số đầu tiên; tuy nhiên, trong khi :class:`~subprocess.Popen` nhận một đối số duy nhất là danh sách các chuỗi, *subprocess_exec* nhận nhiều đối số chuỗi.
 
-   The *protocol_factory* must be a callable returning a subclass of the
-   :class:`asyncio.SubprocessProtocol` class.
+   *protocol_factory* phải là một đối tượng có thể gọi, trả về một lớp con của
+   :class:`asyncio.SubprocessProtocol` lớp.
 
-   Other parameters:
+   Các tham số khác:
 
-   * *stdin* can be any of these:
+   * *stdin* có thể là bất kỳ đối tượng nào sau đây:
 
-     * a file-like object
-     * an existing file descriptor (a positive integer), for example those created with :meth:`os.pipe`
-     * the :const:`subprocess.PIPE` constant (default) which will create a new
-       pipe and connect it,
-     * the value ``None`` which will make the subprocess inherit the file
-       descriptor from this process
-     * the :const:`subprocess.DEVNULL` constant which indicates that the
-       special :data:`os.devnull` file will be used
+     * một đối tượng giống tệp
+     * một file descriptor hiện có (một số nguyên dương), chẳng hạn như những file descriptor được tạo bằng :meth:`os.pipe`
+     * hằng số :const:`subprocess.PIPE` (mặc định), hằng số này sẽ tạo một pipe mới và kết nối với pipe đó,
+     * giá trị ``None``, giá trị này sẽ khiến subprocess kế thừa file descriptor từ process này
+     * hằng số :const:`subprocess.DEVNULL`, cho biết rằng file đặc biệt :data:`os.devnull` sẽ được sử dụng
 
-   * *stdout* can be any of these:
+   * *stdout* có thể là bất kỳ giá trị nào trong số sau:
 
-     * a file-like object
-     * the :const:`subprocess.PIPE` constant (default) which will create a new
-       pipe and connect it,
-     * the value ``None`` which will make the subprocess inherit the file
-       descriptor from this process
-     * the :const:`subprocess.DEVNULL` constant which indicates that the
-       special :data:`os.devnull` file will be used
+     * một đối tượng giống tệp
+     * hằng số :const:`subprocess.PIPE` (mặc định), hằng số này sẽ tạo một pipe mới và kết nối với pipe đó,
+     * giá trị ``None``, giá trị này sẽ khiến subprocess kế thừa file descriptor từ process này
+     * hằng số :const:`subprocess.DEVNULL`, cho biết rằng file đặc biệt :data:`os.devnull` sẽ được sử dụng
 
-   * *stderr* can be any of these:
+   * *stderr* có thể là bất kỳ giá trị nào sau đây:
 
-     * a file-like object
-     * the :const:`subprocess.PIPE` constant (default) which will create a new
-       pipe and connect it,
-     * the value ``None`` which will make the subprocess inherit the file
-       descriptor from this process
-     * the :const:`subprocess.DEVNULL` constant which indicates that the
-       special :data:`os.devnull` file will be used
-     * the :const:`subprocess.STDOUT` constant which will connect the standard
-       error stream to the process' standard output stream
+     * một đối tượng giống tệp
+     * hằng số :const:`subprocess.PIPE` (mặc định), hằng số này sẽ tạo một pipe mới và kết nối với pipe đó,
+     * giá trị ``None``, giá trị này sẽ khiến subprocess kế thừa file descriptor từ process này
+     * hằng số :const:`subprocess.DEVNULL`, cho biết rằng file đặc biệt :data:`os.devnull` sẽ được sử dụng
+     * hằng số :const:`subprocess.STDOUT` sẽ kết nối luồng lỗi chuẩn với luồng đầu ra chuẩn của tiến trình
 
-   * All other keyword arguments are passed to :class:`subprocess.Popen`
-     without interpretation, except for *bufsize*, *universal_newlines*,
-     *shell*, *text*, *encoding* and *errors*, which should not be specified
-     at all.
+   * Tất cả đối số từ khóa khác được truyền cho :class:`subprocess.Popen` mà không được diễn giải, ngoại trừ *bufsize*, *universal_newlines*, *shell*, *text*, *encoding* và *errors*, vốn hoàn toàn không được chỉ định.
 
-     The ``asyncio`` subprocess API does not support decoding the streams
-     as text. :func:`bytes.decode` can be used to convert the bytes returned
-     from the stream to text.
+     API ``asyncio`` subprocess không hỗ trợ giải mã các luồng dưới dạng văn bản. Có thể sử dụng :func:`bytes.decode` để chuyển đổi các byte được trả về từ luồng thành văn bản.
 
-   If a file-like object passed as *stdin*, *stdout* or *stderr* represents a
-   pipe, then the other side of this pipe should be registered with
-   :meth:`~loop.connect_write_pipe` or :meth:`~loop.connect_read_pipe` for use
-   with the event loop.
+   Nếu một đối tượng giống tệp được truyền dưới dạng *stdin*, *stdout* hoặc *stderr* đại diện cho một pipe, thì đầu còn lại của pipe này phải được đăng ký với
+   :meth:`~loop.connect_write_pipe` hoặc :meth:`~loop.connect_read_pipe` để sử dụng với event loop.
 
-   See the constructor of the :class:`subprocess.Popen` class
-   for documentation on other arguments.
+   Xem hàm khởi tạo của lớp :class:`subprocess.Popen` để biết tài liệu về các đối số khác.
 
-   Returns a pair of ``(transport, protocol)``, where *transport*
-   conforms to the :class:`asyncio.SubprocessTransport` base class and
-   *protocol* is an object instantiated by the *protocol_factory*.
+   Trả về một cặp ``(transport, protocol)``, trong đó *transport* tuân theo lớp cơ sở :class:`asyncio.SubprocessTransport` và *protocol* là một đối tượng được khởi tạo bởi *protocol_factory*.
 
-   If the transport is closed or is garbage collected, the child process
-   is killed if it is still running.
+   Nếu transport bị đóng hoặc bị garbage collect, tiến trình con sẽ bị kill nếu vẫn đang chạy.
 
 .. method:: loop.subprocess_shell(protocol_factory, cmd, *, \
-               stdin=subprocess.PIPE, stdout=subprocess.PIPE, \
-               stderr=subprocess.PIPE, **kwargs)
+               stdin=subprocess.PIPE, stdout=subprocess.PIPE, \ stderr=subprocess.PIPE, ****kwargs)
    :async:
 
-   Create a subprocess from *cmd*, which can be a :class:`str` or a
-   :class:`bytes` string encoded to the
-   :ref:`filesystem encoding <filesystem-encoding>`,
-   using the platform's "shell" syntax.
+   Tạo một subprocess từ *cmd*, có thể là một :class:`str` hoặc một
+   :class:`bytes` chuỗi được mã hóa theo
+   :ref:`mã hóa filesystem <filesystem-encoding>`, bằng cú pháp "shell" của nền tảng.
 
-   This is similar to the standard library :class:`subprocess.Popen`
-   class called with ``shell=True``.
+   Điều này tương tự như lớp :class:`subprocess.Popen` trong standard library được gọi với ``shell=True``.
 
-   The *protocol_factory* must be a callable returning a subclass of the
-   :class:`SubprocessProtocol` class.
+   *protocol_factory* phải là một đối tượng có thể gọi, trả về một lớp con của
+   lớp :class:`SubprocessProtocol`.
 
-   See :meth:`~loop.subprocess_exec` for more details about
-   the remaining arguments.
+   Xem :meth:`~loop.subprocess_exec` để biết thêm chi tiết về các đối số còn lại.
 
-   Returns a pair of ``(transport, protocol)``, where *transport*
-   conforms to the :class:`SubprocessTransport` base class and
-   *protocol* is an object instantiated by the *protocol_factory*.
+   Trả về một cặp ``(transport, protocol)``, trong đó *transport* tuân theo lớp cơ sở :class:`SubprocessTransport` và *protocol* là một đối tượng được khởi tạo bởi *protocol_factory*.
 
-   If the transport is closed or is garbage collected, the child process
-   is killed if it is still running.
+   Nếu transport bị đóng hoặc bị garbage collect, tiến trình con sẽ bị kill nếu vẫn đang chạy.
 
 .. note::
-   It is the application's responsibility to ensure that all whitespace
-   and special characters are quoted appropriately to avoid `shell injection
-   <https://en.wikipedia.org/wiki/Shell_injection#Shell_injection>`_
-   vulnerabilities. The :func:`shlex.quote` function can be used to
-   properly escape whitespace and special characters in strings that
-   are going to be used to construct shell commands.
+   Ứng dụng có trách nhiệm đảm bảo rằng mọi khoảng trắng và ký tự đặc biệt đều được trích dẫn phù hợp để tránh các lỗ hổng `shell injection <https://en.wikipedia.org/wiki/Shell_injection#Shell_injection>`_. Có thể sử dụng hàm :func:`shlex.quote` để thoát đúng cách các khoảng trắng và ký tự đặc biệt trong những chuỗi sẽ được dùng để tạo các lệnh shell.
 
 
-Callback handles
-================
+.. _`Callback handles`:
+
+Các handle callback
+===================
 
 .. class:: Handle
 
-   A callback wrapper object returned by :meth:`loop.call_soon`,
+   Một đối tượng wrapper callback được trả về bởi :meth:`loop.call_soon`,
    :meth:`loop.call_soon_threadsafe`.
 
    .. method:: get_context()
 
-      Return the :class:`contextvars.Context` object
-      associated with the handle.
+      Trả về đối tượng :class:`contextvars.Context` được liên kết với handle.
 
       .. versionadded:: 3.12
 
    .. method:: cancel()
 
-      Cancel the callback.  If the callback has already been canceled
-      or executed, this method has no effect.
+      Hủy callback. Nếu callback đã bị hủy hoặc đã được thực thi, phương thức này không có tác dụng.
 
    .. method:: cancelled()
 
-      Return ``True`` if the callback was cancelled.
+      Trả về ``True`` nếu callback đã bị hủy.
 
       .. versionadded:: 3.7
 
 .. class:: TimerHandle
 
-   A callback wrapper object returned by :meth:`loop.call_later`,
-   and :meth:`loop.call_at`.
+   Một đối tượng wrapper của callback được :meth:`loop.call_later` và :meth:`loop.call_at` trả về.
 
-   This class is a subclass of :class:`Handle`.
+   Lớp này là lớp con của :class:`Handle`.
 
    .. method:: when()
 
-      Return a scheduled callback time as :class:`float` seconds.
+      Trả về thời điểm callback được lập lịch dưới dạng số giây :class:`float`.
 
-      The time is an absolute timestamp, using the same time
-      reference as :meth:`loop.time`.
+      Thời điểm này là một dấu thời gian tuyệt đối, sử dụng cùng tham chiếu thời gian với :meth:`loop.time`.
 
       .. versionadded:: 3.7
 
 
-Server objects
-==============
+.. _`Server objects`:
 
-Server objects are created by :meth:`loop.create_server`,
-:meth:`loop.create_unix_server`, :func:`start_server`,
-and :func:`start_unix_server` functions.
+Đối tượng Server
+================
 
-Do not instantiate the :class:`Server` class directly.
+Đối tượng Server được tạo bởi :meth:`loop.create_server`,
+các hàm :meth:`loop.create_unix_server`, :func:`start_server` và :func:`start_unix_server`.
+
+Không khởi tạo trực tiếp lớp :class:`Server`.
 
 .. class:: Server
 
-   *Server* objects are asynchronous context managers.  When used in an
-   ``async with`` statement, it's guaranteed that the Server object is
-   closed and not accepting new connections when the ``async with``
-   statement is completed::
+   *Server* là các asynchronous context manager. Khi được sử dụng trong câu lệnh ``async with``, bạn được đảm bảo rằng đối tượng Server đã được đóng và không chấp nhận kết nối mới khi câu lệnh ``async with`` hoàn tất::
 
       srv = await loop.create_server(...)
 
       async with srv:
-          # some code
+          # một đoạn mã
 
-      # At this point, srv is closed and no longer accepts new connections.
+      # Tại thời điểm này, srv đã được đóng và không còn chấp nhận kết nối mới.
 
 
    .. versionchanged:: 3.7
-      Server object is an asynchronous context manager since Python 3.7.
+      Đối tượng Server là một asynchronous context manager kể từ Python 3.7.
 
    .. versionchanged:: 3.11
-      This class was exposed publicly as ``asyncio.Server`` in Python 3.9.11, 3.10.3 and 3.11.
+      Lớp này được cung cấp công khai dưới dạng ``asyncio.Server`` trong Python 3.9.11, 3.10.3 và 3.11.
 
    .. method:: close()
 
-      Stop serving: close listening sockets and set the :attr:`sockets`
-      attribute to ``None``.
+      Dừng cung cấp dịch vụ: đóng các socket lắng nghe và đặt thuộc tính :attr:`sockets` thành ``None``.
 
-      The sockets that represent existing incoming client connections
-      are left open.
+      Các socket đại diện cho những kết nối client đến hiện có vẫn được giữ mở.
 
-      The server is closed asynchronously; use the :meth:`wait_closed`
-      coroutine to wait until the server is closed (and no more
-      connections are active).
+      Server được đóng bất đồng bộ; sử dụng coroutine :meth:`wait_closed` để chờ cho đến khi server được đóng (và không còn kết nối nào đang hoạt động).
 
    .. method:: close_clients()
 
-      Close all existing incoming client connections.
+      Đóng tất cả các kết nối client đến hiện có.
 
-      Calls :meth:`~asyncio.BaseTransport.close` on all associated
-      transports.
+      Gọi :meth:`~asyncio.BaseTransport.close` trên tất cả các transport liên kết.
 
-      :meth:`close` should be called before :meth:`close_clients` when
-      closing the server to avoid races with new clients connecting.
+      Cần gọi :meth:`close` trước :meth:`close_clients` khi đóng server để tránh tranh chấp với các client mới đang kết nối.
 
       .. versionadded:: 3.13
 
    .. method:: abort_clients()
 
-      Close all existing incoming client connections immediately,
-      without waiting for pending operations to complete.
+      Đóng ngay lập tức tất cả kết nối đến hiện có của client mà không chờ các thao tác đang chờ hoàn tất.
 
-      Calls :meth:`~asyncio.WriteTransport.abort` on all associated
-      transports.
+      Gọi :meth:`~asyncio.WriteTransport.abort` trên tất cả transport liên kết.
 
-      :meth:`close` should be called before :meth:`abort_clients` when
-      closing the server to avoid races with new clients connecting.
+      Cần gọi :meth:`close` trước :meth:`abort_clients` khi đóng server để tránh tranh chấp với các client mới đang kết nối.
 
       .. versionadded:: 3.13
 
    .. method:: get_loop()
 
-      Return the event loop associated with the server object.
+      Trả về event loop liên kết với đối tượng server.
 
       .. versionadded:: 3.7
 
    .. method:: start_serving()
       :async:
 
-      Start accepting connections.
+      Bắt đầu chấp nhận kết nối.
 
-      This method is idempotent, so it can be called when
-      the server is already serving.
+      Phương thức này có tính idempotent, vì vậy có thể gọi khi server đã bắt đầu phục vụ.
 
-      The *start_serving* keyword-only parameter to
-      :meth:`loop.create_server` and
-      :meth:`asyncio.start_server` allows creating a Server object
-      that is not accepting connections initially.  In this case
-      ``Server.start_serving()``, or :meth:`Server.serve_forever` can be used
-      to make the Server start accepting connections.
+      Tham số chỉ nhận theo từ khóa *start_serving* của
+      :meth:`loop.create_server` và
+      :meth:`asyncio.start_server` cho phép tạo một đối tượng Server ban đầu không chấp nhận kết nối. Trong trường hợp này, có thể sử dụng ``Server.start_serving()`` hoặc :meth:`Server.serve_forever` để khiến Server bắt đầu chấp nhận kết nối.
 
       .. versionadded:: 3.7
 
    .. method:: serve_forever()
       :async:
 
-      Start accepting connections until the coroutine is cancelled.
-      Cancellation of ``serve_forever`` task causes the server
-      to be closed.
+      Bắt đầu chấp nhận kết nối cho đến khi coroutine bị hủy. Việc hủy task ``serve_forever`` khiến server bị đóng.
 
-      This method can be called if the server is already accepting
-      connections.  Only one ``serve_forever`` task can exist per
-      one *Server* object.
+      Có thể gọi phương thức này nếu server đã chấp nhận kết nối. Chỉ một task ``serve_forever`` có thể tồn tại trên mỗi đối tượng *Server*.
 
-      Example::
+      Ví dụ::
 
           async def client_connected(reader, writer):
-              # Communicate with the client with
-              # reader/writer streams.  For example:
+              # Giao tiếp với client bằng
+              # các stream reader/writer. Ví dụ:
               await reader.readline()
 
           async def main(host, port):
@@ -1878,53 +1417,46 @@ Do not instantiate the :class:`Server` class directly.
 
    .. method:: is_serving()
 
-      Return ``True`` if the server is accepting new connections.
+      Trả về ``True`` nếu server đang chấp nhận các kết nối mới.
 
       .. versionadded:: 3.7
 
    .. method:: wait_closed()
       :async:
 
-      Wait until the :meth:`close` method completes and all active
-      connections have finished.
+      Chờ cho đến khi phương thức :meth:`close` hoàn tất và tất cả các kết nối đang hoạt động đã kết thúc.
 
       .. versionchanged:: 3.12
-         ``wait_closed()`` now waits until the server is closed and
-         all active connections have finished.  Previously, it returned
-         immediately if the server was already closed, even if
-         connections were still active.
+         ``wait_closed()`` hiện sẽ chờ cho đến khi server được đóng và tất cả các kết nối đang hoạt động đã kết thúc. Trước đây, phương thức này trả về ngay lập tức nếu server đã được đóng, ngay cả khi vẫn còn các kết nối đang hoạt động.
 
    .. attribute:: sockets
 
-      List of socket-like objects, ``asyncio.trsock.TransportSocket``, which
-      the server is listening on.
+      Danh sách các đối tượng giống socket, ``asyncio.trsock.TransportSocket``, mà server đang lắng nghe.
 
       .. versionchanged:: 3.7
-         Prior to Python 3.7 ``Server.sockets`` used to return an
-         internal list of server sockets directly.  In 3.7 a copy
-         of that list is returned.
+         Trước Python 3.7, ``Server.sockets`` thường trả về trực tiếp một danh sách socket nội bộ của server. Trong 3.7, một bản sao của danh sách đó được trả về.
 
 
 .. _asyncio-event-loops:
 .. _asyncio-event-loop-implementations:
 
-Event loop implementations
-==========================
+.. _`Event loop implementations`:
 
-asyncio ships with two different event loop implementations:
-:class:`SelectorEventLoop` and :class:`ProactorEventLoop`.
+Các triển khai event loop
+=========================
 
-By default asyncio is configured to use :class:`EventLoop`.
+asyncio đi kèm với hai cách triển khai event loop khác nhau:
+:class:`SelectorEventLoop` và :class:`ProactorEventLoop`.
+
+Theo mặc định, asyncio được cấu hình để sử dụng :class:`EventLoop`.
 
 
 .. class:: SelectorEventLoop
 
-   A subclass of :class:`AbstractEventLoop` based on the
-   :mod:`selectors` module.
+   Một lớp con của :class:`AbstractEventLoop`, dựa trên
+   module :mod:`selectors`.
 
-   Uses the most efficient *selector* available for the given
-   platform.  It is also possible to manually configure the
-   exact selector implementation to be used::
+   Sử dụng *selector* hiệu quả nhất hiện có cho nền tảng tương ứng. Bạn cũng có thể tự cấu hình chính xác cách triển khai selector sẽ được sử dụng::
 
       import asyncio
       import selectors
@@ -1941,51 +1473,43 @@ By default asyncio is configured to use :class:`EventLoop`.
 
 .. class:: ProactorEventLoop
 
-   A subclass of :class:`AbstractEventLoop` for Windows that uses "I/O Completion Ports" (IOCP).
+   Một lớp con của :class:`AbstractEventLoop` dành cho Windows, sử dụng "I/O Completion Ports" (IOCP).
 
    .. availability:: Windows.
 
    .. seealso::
 
-      `MSDN documentation on I/O Completion Ports
-      <https://learn.microsoft.com/windows/win32/fileio/i-o-completion-ports>`_.
+      `Tài liệu MSDN về I/O Completion Ports <https://learn.microsoft.com/windows/win32/fileio/i-o-completion-ports>`_.
 
 .. class:: EventLoop
 
-    An alias to the most efficient available subclass of :class:`AbstractEventLoop` for the given
-    platform.
+    Bí danh của lớp con hiệu quả nhất hiện có của :class:`AbstractEventLoop` cho nền tảng tương ứng.
 
-    It is an alias to :class:`SelectorEventLoop` on Unix and :class:`ProactorEventLoop` on Windows.
+    Đây là bí danh của :class:`SelectorEventLoop` trên Unix và :class:`ProactorEventLoop` trên Windows.
 
    .. versionadded:: 3.13
 
 .. class:: AbstractEventLoop
 
-   Abstract base class for asyncio-compliant event loops.
+   Lớp cơ sở trừu tượng dành cho các event loop tuân thủ asyncio.
 
-   The :ref:`asyncio-event-loop-methods` section lists all
-   methods that an alternative implementation of ``AbstractEventLoop``
-   should have defined.
+   Phần :ref:`asyncio-event-loop-methods` liệt kê tất cả các phương thức mà một triển khai thay thế của ``AbstractEventLoop`` cần định nghĩa.
 
 
-Examples
-========
+.. _`Examples`:
 
-Note that all examples in this section **purposefully** show how
-to use the low-level event loop APIs, such as :meth:`loop.run_forever`
-and :meth:`loop.call_soon`.  Modern asyncio applications rarely
-need to be written this way; consider using the high-level functions
-like :func:`asyncio.run`.
+Ví dụ
+=====
+
+Lưu ý rằng tất cả các ví dụ trong phần này **cố ý** minh họa cách sử dụng các API event loop cấp thấp, chẳng hạn như :meth:`loop.run_forever` và :meth:`loop.call_soon`. Các ứng dụng asyncio hiện đại hiếm khi cần được viết theo cách này; hãy cân nhắc sử dụng các hàm cấp cao như :func:`asyncio.run`.
 
 
 .. _asyncio_example_lowlevel_helloworld:
 
-Hello World with call_soon()
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Hello World với call_soon()
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An example using the :meth:`loop.call_soon` method to schedule a
-callback. The callback displays ``"Hello World"`` and then stops the
-event loop::
+Ví dụ sử dụng phương thức :meth:`loop.call_soon` để lên lịch một callback. Callback hiển thị ``"Hello World"`` rồi dừng event loop::
 
     import asyncio
 
@@ -1996,10 +1520,10 @@ event loop::
 
     loop = asyncio.new_event_loop()
 
-    # Schedule a call to hello_world()
+    # Lên lịch gọi hello_world()
     loop.call_soon(hello_world, loop)
 
-    # Blocking call interrupted by loop.stop()
+    # Lệnh gọi blocking bị gián đoạn bởi loop.stop()
     try:
         loop.run_forever()
     finally:
@@ -2007,18 +1531,15 @@ event loop::
 
 .. seealso::
 
-   A similar :ref:`Hello World <coroutine>`
-   example created with a coroutine and the :func:`run` function.
+   Một ví dụ :ref:`Hello World <coroutine>` tương tự được tạo bằng coroutine và hàm :func:`run`.
 
 
 .. _asyncio_example_call_later:
 
-Display the current date with call_later()
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Hiển thị ngày hiện tại với call_later()
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An example of a callback displaying the current date every second. The
-callback uses the :meth:`loop.call_later` method to reschedule itself
-after 5 seconds, and then stops the event loop::
+Ví dụ về một callback hiển thị ngày hiện tại mỗi giây. Callback sử dụng phương thức :meth:`loop.call_later` để lên lịch lại chính nó sau 5 giây, rồi dừng event loop::
 
     import asyncio
     import datetime as dt
@@ -2032,11 +1553,11 @@ after 5 seconds, and then stops the event loop::
 
     loop = asyncio.new_event_loop()
 
-    # Schedule the first call to display_date()
+    # Lên lịch cuộc gọi đầu tiên đến display_date()
     end_time = loop.time() + 5.0
     loop.call_soon(display_date, end_time, loop)
 
-    # Blocking call interrupted by loop.stop()
+    # Lệnh gọi chặn bị gián đoạn bởi loop.stop()
     try:
         loop.run_forever()
     finally:
@@ -2044,22 +1565,21 @@ after 5 seconds, and then stops the event loop::
 
 .. seealso::
 
-   A similar :ref:`current date <asyncio_example_sleep>` example
-   created with a coroutine and the :func:`run` function.
+   Một ví dụ tương tự về :ref:`current date <asyncio_example_sleep>` được tạo bằng coroutine và hàm :func:`run`.
 
 
 .. _asyncio_example_watch_fd:
 
-Watch a file descriptor for read events
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Theo dõi một file descriptor để phát hiện các sự kiện đọc
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Wait until a file descriptor received some data using the
-:meth:`loop.add_reader` method and then close the event loop::
+Chờ cho đến khi một file descriptor nhận được dữ liệu bằng cách sử dụng
+:meth:`loop.add_reader` method rồi đóng event loop::
 
     import asyncio
     from socket import socketpair
 
-    # Create a pair of connected file descriptors
+    # Tạo một cặp file descriptor được kết nối
     rsock, wsock = socketpair()
 
     loop = asyncio.new_event_loop()
@@ -2068,47 +1588,43 @@ Wait until a file descriptor received some data using the
         data = rsock.recv(100)
         print("Received:", data.decode())
 
-        # We are done: unregister the file descriptor
+        # Đã xong: hủy đăng ký file descriptor
         loop.remove_reader(rsock)
 
-        # Stop the event loop
+        # Dừng event loop
         loop.stop()
 
-    # Register the file descriptor for read event
+    # Đăng ký file descriptor cho sự kiện đọc
     loop.add_reader(rsock, reader)
 
-    # Simulate the reception of data from the network
+    # Mô phỏng việc nhận dữ liệu từ mạng
     loop.call_soon(wsock.send, 'abc'.encode())
 
     try:
-        # Run the event loop
+        # Chạy event loop
         loop.run_forever()
     finally:
-        # We are done. Close sockets and the event loop.
+        # Đã xong. Đóng các socket và event loop.
         rsock.close()
         wsock.close()
         loop.close()
 
 .. seealso::
 
-   * A similar :ref:`example <asyncio_example_create_connection>`
-     using transports, protocols, and the
-     :meth:`loop.create_connection` method.
+   * Một :ref:`ví dụ <asyncio_example_create_connection>` tương tự sử dụng transports, protocols và
+     phương thức :meth:`loop.create_connection`.
 
-   * Another similar :ref:`example <asyncio_example_create_connection-streams>`
-     using the high-level :func:`asyncio.open_connection` function
-     and streams.
+   * Một :ref:`ví dụ <asyncio_example_create_connection-streams>` tương tự khác sử dụng :func:`asyncio.open_connection` function cấp cao và các stream.
 
 
 .. _asyncio_example_unix_signals:
 
-Set signal handlers for SIGINT and SIGTERM
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thiết lập các trình xử lý tín hiệu cho SIGINT và SIGTERM
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(This ``signal`` example only works on Unix.)
+(Ví dụ ``signal`` này chỉ hoạt động trên Unix.)
 
-Register handlers for signals :const:`~signal.SIGINT` and :const:`~signal.SIGTERM`
-using the :meth:`loop.add_signal_handler` method::
+Đăng ký các trình xử lý cho các tín hiệu :const:`~signal.SIGINT` và :const:`~signal.SIGTERM` bằng phương thức :meth:`loop.add_signal_handler`::
 
     import asyncio
     import functools
@@ -2133,3 +1649,6 @@ using the :meth:`loop.add_signal_handler` method::
     print(f"pid {os.getpid()}: send SIGINT or SIGTERM to exit.")
 
     asyncio.run(main())
+
+.. _`shell injection`: https://en.wikipedia.org/wiki/Shell_injection#Shell_injection
+.. _`MSDN documentation on I/O Completion Ports`: https://learn.microsoft.com/windows/win32/fileio/i-o-completion-ports

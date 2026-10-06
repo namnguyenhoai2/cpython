@@ -1,13 +1,10 @@
 .. _archiving:
 
-******************************
-Data Compression and Archiving
-******************************
+**********************
+Nén và lưu trữ dữ liệu
+**********************
 
-The modules described in this chapter support data compression with the zlib,
-gzip, bzip2, lzma, and zstd algorithms, and the creation of ZIP- and tar-format
-archives.  See also :ref:`archiving-operations` provided by the :mod:`shutil`
-module.
+Các mô-đun được mô tả trong chương này hỗ trợ nén dữ liệu bằng các thuật toán zlib, gzip, bzip2, lzma và zstd, cũng như tạo các kho lưu trữ ở định dạng ZIP và tar. Xem thêm :ref:`archiving-operations` được cung cấp bởi mô-đun :mod:`shutil`.
 
 
 .. toctree::

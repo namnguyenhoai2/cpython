@@ -2,210 +2,170 @@
 
 .. _asyncio-queues:
 
-======
-Queues
-======
+========
+Hàng đợi
+========
 
-**Source code:** :source:`Lib/asyncio/queues.py`
+**Mã nguồn:** :source:`Lib/asyncio/queues.py`
 
 ------------------------------------------------
 
-asyncio queues are designed to be similar to classes of the
-:mod:`queue` module.  Although asyncio queues are not thread-safe,
-they are designed to be used specifically in async/await code.
+Các hàng đợi asyncio được thiết kế tương tự như các lớp của
+:mod:`queue` mô-đun. Mặc dù các hàng đợi asyncio không an toàn đối với thread, chúng được thiết kế đặc biệt để sử dụng trong mã async/await.
 
-Note that methods of asyncio queues don't have a *timeout* parameter;
-use :func:`asyncio.wait_for` function to do queue operations with a
-timeout.
+Lưu ý rằng các phương thức của hàng đợi asyncio không có tham số *timeout*; hãy sử dụng hàm :func:`asyncio.wait_for` để thực hiện các thao tác với hàng đợi có thời gian chờ.
 
-See also the `Examples`_ section below.
+Xem thêm phần `Examples`_ bên dưới.
 
 Queue
 =====
 
 .. class:: Queue(maxsize=0)
 
-   A first in, first out (FIFO) queue.
+   Một hàng đợi vào trước, ra trước (FIFO).
 
-   If *maxsize* is less than or equal to zero, the queue size is
-   infinite.  If it is an integer greater than ``0``, then
-   ``await put()`` blocks when the queue reaches *maxsize*
-   until an item is removed by :meth:`get`.
+   Nếu *maxsize* nhỏ hơn hoặc bằng không, kích thước hàng đợi là vô hạn. Nếu đây là một số nguyên lớn hơn ``0``, thì ``await put()`` sẽ bị chặn khi hàng đợi đạt đến *maxsize* cho đến khi một mục được :meth:`get` xóa.
 
-   Unlike the standard library threading :mod:`queue`, the size of
-   the queue is always known and can be returned by calling the
+   Không giống như :mod:`queue` Queue của thư viện chuẩn threading, kích thước của hàng đợi luôn được biết và có thể được trả về bằng cách gọi
    :meth:`qsize` method.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã loại bỏ tham số *loop*.
 
 
-   This class is :ref:`not thread safe <asyncio-multithreading>`.
+   Lớp này :ref:`không an toàn khi sử dụng trong nhiều luồng <asyncio-multithreading>`.
 
    .. attribute:: maxsize
 
-      Number of items allowed in the queue.
+      Số lượng mục được phép có trong hàng đợi.
 
    .. method:: empty()
 
-      Return ``True`` if the queue is empty, ``False`` otherwise.
+      Trả về ``True`` nếu hàng đợi trống, nếu không thì trả về ``False``.
 
    .. method:: full()
 
-      Return ``True`` if there are :attr:`maxsize` items in the queue.
+      Trả về ``True`` nếu có :attr:`maxsize` mục trong hàng đợi.
 
-      If the queue was initialized with ``maxsize=0`` (the default),
-      then :meth:`full` never returns ``True``.
+      Nếu hàng đợi được khởi tạo bằng ``maxsize=0`` (mặc định), thì :meth:`full` không bao giờ trả về ``True``.
 
    .. method:: get()
       :async:
 
-      Remove and return an item from the queue. If queue is empty,
-      wait until an item is available.
+      Xóa và trả về một mục khỏi hàng đợi. Nếu hàng đợi trống, hãy chờ cho đến khi có mục.
 
-      Raises :exc:`QueueShutDown` if the queue has been shut down and
-      is empty, or if the queue has been shut down immediately.
+      Phát sinh :exc:`QueueShutDown` nếu hàng đợi đã bị tắt và đang trống, hoặc nếu hàng đợi bị tắt ngay lập tức.
 
    .. method:: get_nowait()
 
-      Return an item if one is immediately available, else raise
+      Trả về một mục nếu có sẵn ngay lập tức, nếu không thì phát sinh
       :exc:`QueueEmpty`.
 
-      Raises :exc:`QueueShutDown` if the queue has been shut down and is empty.
+      Phát sinh :exc:`QueueShutDown` nếu hàng đợi đã bị tắt và đang trống.
 
    .. method:: join()
       :async:
 
-      Block until all items in the queue have been received and processed.
+      Chặn cho đến khi tất cả các mục trong hàng đợi đã được nhận và xử lý.
 
-      The count of unfinished tasks goes up whenever an item is added
-      to the queue. The count goes down whenever a consumer coroutine calls
-      :meth:`task_done` to indicate that the item was retrieved and all
-      work on it is complete.  When the count of unfinished tasks drops
-      to zero, :meth:`join` unblocks.
+      Số lượng tác vụ chưa hoàn tất tăng lên mỗi khi một mục được thêm vào hàng đợi. Số lượng này giảm xuống mỗi khi một coroutine consumer gọi
+      :meth:`task_done` để cho biết rằng mục đó đã được truy xuất và mọi công việc liên quan đã hoàn tất. Khi số lượng tác vụ chưa hoàn tất giảm xuống bằng không, :meth:`join` sẽ được bỏ chặn.
 
    .. method:: put(item)
       :async:
 
-      Put an item into the queue. If the queue is full, wait until a
-      free slot is available before adding the item.
+      Đưa một mục vào hàng đợi. Nếu hàng đợi đầy, hãy chờ cho đến khi có chỗ trống trước khi thêm mục đó.
 
-      Raises :exc:`QueueShutDown` if the queue has been shut down.
+      Phát sinh :exc:`QueueShutDown` nếu hàng đợi đã bị tắt.
 
    .. method:: put_nowait(item)
 
-      Put an item into the queue without blocking.
+      Đưa một mục vào hàng đợi mà không chặn.
 
-      If no free slot is immediately available, raise :exc:`QueueFull`.
+      Nếu không có chỗ trống ngay lập tức, hãy phát sinh :exc:`QueueFull`.
 
-      Raises :exc:`QueueShutDown` if the queue has been shut down.
+      Phát sinh :exc:`QueueShutDown` nếu hàng đợi đã bị tắt.
 
    .. method:: qsize()
 
-      Return the number of items in the queue.
+      Trả về số lượng mục trong queue.
 
    .. method:: shutdown(immediate=False)
 
-      Put a :class:`Queue` instance into a shutdown mode.
+      Đưa một instance :class:`Queue` vào chế độ shutdown.
 
-      The queue can no longer grow.
-      Future calls to :meth:`~Queue.put` raise :exc:`QueueShutDown`.
-      Currently blocked callers of :meth:`~Queue.put` will be unblocked
-      and will raise :exc:`QueueShutDown` in the formerly awaiting task.
+      Queue không thể tăng thêm. Các lần gọi :meth:`~Queue.put` trong tương lai sẽ raise :exc:`QueueShutDown`. Các caller hiện đang bị block bởi :meth:`~Queue.put` sẽ được unblock và sẽ raise :exc:`QueueShutDown` trong task trước đó đang chờ.
 
-      If *immediate* is false (the default), the queue can be wound
-      down normally with :meth:`~Queue.get` calls to extract tasks
-      that have already been loaded.
+      Nếu *immediate* là false (giá trị mặc định), queue có thể được xử lý để kết thúc bình thường bằng các lần gọi :meth:`~Queue.get` nhằm lấy ra những task đã được nạp.
 
-      And if :meth:`~Queue.task_done` is called for each remaining task, a
-      pending :meth:`~Queue.join` will be unblocked normally.
+      Và nếu :meth:`~Queue.task_done` được gọi cho từng task còn lại, một :meth:`~Queue.join` đang pending sẽ được unblock bình thường.
 
-      Once the queue is empty, future calls to :meth:`~Queue.get` will
-      raise :exc:`QueueShutDown`.
+      Khi queue trống, các lần gọi :meth:`~Queue.get` trong tương lai sẽ raise :exc:`QueueShutDown`.
 
-      If *immediate* is true, the queue is terminated immediately.
-      The queue is drained to be completely empty and the count
-      of unfinished tasks is reduced by the number of tasks drained.
-      If unfinished tasks is zero, callers of :meth:`~Queue.join`
-      are unblocked.  Also, blocked callers of :meth:`~Queue.get`
-      are unblocked and will raise :exc:`QueueShutDown` because the
-      queue is empty.
+      Nếu *ngay lập tức* là true, hàng đợi sẽ bị chấm dứt ngay lập tức. Hàng đợi được làm trống hoàn toàn và số lượng tác vụ chưa hoàn thành được giảm đi bằng số tác vụ đã được lấy ra. Nếu số tác vụ chưa hoàn thành bằng không, các caller của :meth:`~Queue.join` sẽ được bỏ chặn. Ngoài ra, các caller đang bị chặn của :meth:`~Queue.get` cũng được bỏ chặn và sẽ raise :exc:`QueueShutDown` vì hàng đợi đã trống.
 
-      Use caution when using :meth:`~Queue.join` with *immediate* set
-      to true. This unblocks the join even when no work has been done
-      on the tasks, violating the usual invariant for joining a queue.
+      Hãy thận trọng khi sử dụng :meth:`~Queue.join` với *immediate* được đặt thành true. Lệnh này bỏ chặn thao tác join ngay cả khi chưa có công việc nào được thực hiện trên các tác vụ, vi phạm invariant thông thường khi join một hàng đợi.
 
       .. versionadded:: 3.13
 
    .. method:: task_done()
 
-      Indicate that a formerly enqueued work item is complete.
+      Cho biết một mục công việc trước đây đã được đưa vào hàng đợi đã hoàn tất.
 
-      Used by queue consumers. For each :meth:`~Queue.get` used to
-      fetch a work item, a subsequent call to :meth:`task_done` tells the
-      queue that the processing on the work item is complete.
+      Được các consumer của hàng đợi sử dụng. Với mỗi :meth:`~Queue.get` được sử dụng để lấy một mục công việc, một lệnh gọi tiếp theo đến :meth:`task_done` sẽ cho hàng đợi biết rằng quá trình xử lý mục công việc đó đã hoàn tất.
 
-      If a :meth:`join` is currently blocking, it will resume when all
-      items have been processed (meaning that a :meth:`task_done`
-      call was received for every item that had been :meth:`~Queue.put`
-      into the queue).
+      Nếu một :meth:`join` hiện đang bị chặn, lệnh này sẽ tiếp tục khi tất cả các mục đã được xử lý (nghĩa là đã nhận được một lệnh gọi :meth:`task_done` cho mọi mục đã được :meth:`~Queue.put` vào hàng đợi).
 
-      Raises :exc:`ValueError` if called more times than there were
-      items placed in the queue.
+      Raise :exc:`ValueError` nếu được gọi nhiều lần hơn số mục đã được đưa vào hàng đợi.
 
 
-Priority Queue
-==============
+Hàng đợi ưu tiên
+================
 
 .. class:: PriorityQueue
 
-   A variant of :class:`Queue`; retrieves entries in priority order
-   (lowest first).
+   Một biến thể của :class:`Queue`; truy xuất các mục theo thứ tự ưu tiên (từ thấp nhất trước).
 
-   Entries are typically tuples of the form
-   ``(priority_number, data)``.
+   Các mục thường là các tuple có dạng ``(priority_number, data)``.
 
 
-LIFO Queue
-==========
+Hàng đợi LIFO
+=============
 
 .. class:: LifoQueue
 
-   A variant of :class:`Queue` that retrieves most recently added
-   entries first (last in, first out).
+   Một biến thể của :class:`Queue`, truy xuất các mục được thêm gần đây nhất trước (vào sau, ra trước).
 
 
-Exceptions
-==========
+Ngoại lệ
+========
 
 .. exception:: QueueEmpty
 
-   This exception is raised when the :meth:`~Queue.get_nowait` method
-   is called on an empty queue.
+   Ngoại lệ này được phát sinh khi phương thức :meth:`~Queue.get_nowait` được gọi trên một hàng đợi trống.
 
 
 .. exception:: QueueFull
 
-   Exception raised when the :meth:`~Queue.put_nowait` method is called
-   on a queue that has reached its *maxsize*.
+   Ngoại lệ được phát sinh khi phương thức :meth:`~Queue.put_nowait` được gọi trên một hàng đợi đã đạt đến *maxsize*.
 
 
 .. exception:: QueueShutDown
 
-   Exception raised when :meth:`~Queue.put`, :meth:`~Queue.put_nowait`,
-   :meth:`~Queue.get` or :meth:`~Queue.get_nowait` is called
-   on a queue which has been shut down.
+   Ngoại lệ được đưa ra khi :meth:`~Queue.put`, :meth:`~Queue.put_nowait`,
+   :meth:`~Queue.get` hoặc :meth:`~Queue.get_nowait` được gọi trên một queue đã bị tắt.
 
    .. versionadded:: 3.13
 
 
-Examples
-========
+.. _`Examples`:
+
+Ví dụ
+=====
 
 .. _asyncio_example_queue_dist:
 
-Queues can be used to distribute workload between several
-concurrent tasks::
+Có thể sử dụng queue để phân phối khối lượng công việc giữa nhiều tác vụ đồng thời::
 
    import asyncio
    import random
@@ -214,44 +174,44 @@ concurrent tasks::
 
    async def worker(name, queue):
        while True:
-           # Get a "work item" out of the queue.
+           # Lấy một "work item" ra khỏi queue.
            sleep_for = await queue.get()
 
-           # Sleep for the "sleep_for" seconds.
+           # Tạm dừng trong "sleep_for" giây.
            await asyncio.sleep(sleep_for)
 
-           # Notify the queue that the "work item" has been processed.
+           # Thông báo cho queue rằng "work item" đã được xử lý.
            queue.task_done()
 
            print(f'{name} has slept for {sleep_for:.2f} seconds')
 
 
    async def main():
-       # Create a queue that we will use to store our "workload".
+       # Tạo một queue để lưu trữ "workload" của chúng ta.
        queue = asyncio.Queue()
 
-       # Generate random timings and put them into the queue.
+       # Tạo các khoảng thời gian ngẫu nhiên và đưa chúng vào queue.
        total_sleep_time = 0
        for _ in range(20):
            sleep_for = random.uniform(0.05, 1.0)
            total_sleep_time += sleep_for
            queue.put_nowait(sleep_for)
 
-       # Create three worker tasks to process the queue concurrently.
+       # Tạo ba worker task để xử lý queue đồng thời.
        tasks = []
        for i in range(3):
            task = asyncio.create_task(worker(f'worker-{i}', queue))
            tasks.append(task)
 
-       # Wait until the queue is fully processed.
+       # Chờ cho đến khi queue được xử lý hoàn toàn.
        started_at = time.monotonic()
        await queue.join()
        total_slept_for = time.monotonic() - started_at
 
-       # Cancel our worker tasks.
+       # Hủy các worker task của chúng ta.
        for task in tasks:
            task.cancel()
-       # Wait until all worker tasks are cancelled.
+       # Chờ cho đến khi tất cả worker task bị hủy.
        await asyncio.gather(*tasks, return_exceptions=True)
 
        print('====')

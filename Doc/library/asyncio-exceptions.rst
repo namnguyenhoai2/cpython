@@ -3,76 +3,71 @@
 
 .. _asyncio-exceptions:
 
-==========
-Exceptions
-==========
+========
+Ngoại lệ
+========
 
-**Source code:** :source:`Lib/asyncio/exceptions.py`
+**Mã nguồn:** :source:`Lib/asyncio/exceptions.py`
 
 ----------------------------------------------------
 
 .. exception:: TimeoutError
 
-   A deprecated alias of :exc:`TimeoutError`,
-   raised when the operation has exceeded the given deadline.
+   Một bí danh đã không còn được dùng của :exc:`TimeoutError`, được raise khi thao tác đã vượt quá thời hạn được chỉ định.
 
    .. versionchanged:: 3.11
 
-      This class was made an alias of :exc:`TimeoutError`.
+      Lớp này hiện là bí danh của :exc:`TimeoutError`.
 
 
 .. exception:: CancelledError
 
-   The operation has been cancelled.
+   Thao tác đã bị hủy.
 
-   This exception can be caught to perform custom operations
-   when asyncio Tasks are cancelled.  In almost all situations the
-   exception must be re-raised.
+   Có thể bắt ngoại lệ này để thực hiện các thao tác tùy chỉnh khi các asyncio Tasks bị hủy. Trong hầu hết mọi trường hợp, ngoại lệ này phải được raise lại.
 
    .. versionchanged:: 3.8
 
-      :exc:`CancelledError` is now a subclass of :class:`BaseException` rather than :class:`Exception`.
+      :exc:`CancelledError` hiện là lớp con của :class:`BaseException` thay vì :class:`Exception`.
 
 
 .. exception:: InvalidStateError
 
-   Invalid internal state of :class:`Task` or :class:`Future`.
+   Trạng thái nội bộ không hợp lệ của :class:`Task` hoặc :class:`Future`.
 
-   Can be raised in situations like setting a result value for a
-   *Future* object that already has a result value set.
+   Có thể được phát sinh trong những tình huống như đặt giá trị kết quả cho một đối tượng *Future* đã được đặt giá trị kết quả.
 
 
 .. exception:: SendfileNotAvailableError
 
-   The "sendfile" syscall is not available for the given
-   socket or file type.
+   Lệnh gọi hệ thống "sendfile" không khả dụng cho socket hoặc loại tệp đã cho.
 
-   A subclass of :exc:`RuntimeError`.
+   Một lớp con của :exc:`RuntimeError`.
 
 
 .. exception:: IncompleteReadError
 
-   The requested read operation did not complete fully.
+   Thao tác đọc được yêu cầu chưa hoàn tất đầy đủ.
 
-   Raised by the :ref:`asyncio stream APIs<asyncio-streams>`.
+   Được phát sinh bởi :ref:`các API stream của asyncio <asyncio-streams>`.
 
-   This exception is a subclass of :exc:`EOFError`.
+   Ngoại lệ này là một lớp con của :exc:`EOFError`.
 
    .. attribute:: expected
 
-      The total number (:class:`int`) of expected bytes.
+      Tổng số (:class:`int`) byte dự kiến.
 
    .. attribute:: partial
 
-      A string of :class:`bytes` read before the end of stream was reached.
+      Một chuỗi gồm :class:`bytes` được đọc trước khi đạt đến cuối stream.
 
 
 .. exception:: LimitOverrunError
 
-   Reached the buffer size limit while looking for a separator.
+   Đã đạt đến giới hạn kích thước buffer trong khi tìm dấu phân cách.
 
-   Raised by the :ref:`asyncio stream APIs <asyncio-streams>`.
+   Được phát sinh bởi :ref:`các API stream của asyncio <asyncio-streams>`.
 
    .. attribute:: consumed
 
-      The total number of to be consumed bytes.
+      Tổng số byte sẽ được tiêu thụ.

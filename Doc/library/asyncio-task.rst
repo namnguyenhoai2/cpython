@@ -1,12 +1,11 @@
 .. currentmodule:: asyncio
 
 
-====================
-Coroutines and tasks
-====================
+=================
+Coroutine và task
+=================
 
-This section outlines high-level asyncio APIs to work with coroutines
-and Tasks.
+Phần này trình bày các API asyncio cấp cao để làm việc với coroutine và Task.
 
 .. contents::
    :depth: 1
@@ -15,17 +14,14 @@ and Tasks.
 
 .. _coroutine:
 
-Coroutines
-==========
+Coroutine
+=========
 
-**Source code:** :source:`Lib/asyncio/coroutines.py`
+**Mã nguồn:** :source:`Lib/asyncio/coroutines.py`
 
 ----------------------------------------------------
 
-:term:`Coroutines <coroutine>` declared with the async/await syntax is the
-preferred way of writing asyncio applications.  For example, the following
-snippet of code prints "hello", waits 1 second,
-and then prints "world"::
+:term:`Coroutine <coroutine>` được khai báo bằng cú pháp async/await là cách được khuyến nghị để viết các ứng dụng asyncio. Ví dụ, đoạn mã sau in ra "hello", chờ 1 giây, rồi in ra "world"::
 
     >>> import asyncio
 
@@ -38,20 +34,16 @@ and then prints "world"::
     hello
     world
 
-Note that simply calling a coroutine will not schedule it to
-be executed::
+Lưu ý rằng chỉ gọi một coroutine sẽ không lên lịch để coroutine đó được thực thi::
 
     >>> main()
     <coroutine object main at 0x1053bb7c8>
 
-To actually run a coroutine, asyncio provides the following mechanisms:
+Để thực sự chạy một coroutine, asyncio cung cấp các cơ chế sau:
 
-* The :func:`asyncio.run` function to run the top-level
-  entry point "main()" function (see the above example.)
+* Hàm :func:`asyncio.run` để chạy hàm entry point cấp cao nhất "main()" (xem ví dụ ở trên.)
 
-* Awaiting on a coroutine.  The following snippet of code will
-  print "hello" after waiting for 1 second, and then print "world"
-  after waiting for *another* 2 seconds::
+* Chờ một coroutine. Đoạn mã sau sẽ in "hello" sau khi chờ 1 giây, rồi in "world" sau khi chờ *một* 2 giây::
 
       import asyncio
       import time
@@ -70,18 +62,16 @@ To actually run a coroutine, asyncio provides the following mechanisms:
 
       asyncio.run(main())
 
-  Expected output::
+  Kết quả dự kiến::
 
       started at 17:13:52
       hello
       world
       finished at 17:13:55
 
-* The :func:`asyncio.create_task` function to run coroutines
-  concurrently as asyncio :class:`Tasks <Task>`.
+* Hàm :func:`asyncio.create_task` để chạy đồng thời các coroutine dưới dạng asyncio :class:`Tasks <Task>`.
 
-  Let's modify the above example and run two ``say_after`` coroutines
-  *concurrently*::
+  Hãy sửa đổi ví dụ trên và chạy hai ``say_after`` coroutine *đồng thời*::
 
       async def main():
           task1 = asyncio.create_task(
@@ -92,24 +82,21 @@ To actually run a coroutine, asyncio provides the following mechanisms:
 
           print(f"started at {time.strftime('%X')}")
 
-          # Wait until both tasks are completed (should take
-          # around 2 seconds.)
+          # Chờ cho đến khi cả hai task hoàn tất (mất khoảng
+          # 2 giây.)
           await task1
           await task2
 
           print(f"finished at {time.strftime('%X')}")
 
-  Note that expected output now shows that the snippet runs
-  1 second faster than before::
+  Lưu ý rằng kết quả đầu ra dự kiến hiện cho thấy đoạn mã chạy nhanh hơn 1 giây so với trước đây::
 
       started at 17:14:32
       hello
       world
       finished at 17:14:34
 
-* The :class:`asyncio.TaskGroup` class provides a more modern
-  alternative to :func:`create_task`.
-  Using this API, the last example becomes::
+* Lớp :class:`asyncio.TaskGroup` cung cấp một lựa chọn hiện đại hơn cho :func:`create_task`. Khi sử dụng API này, ví dụ cuối cùng trở thành::
 
       async def main():
           async with asyncio.TaskGroup() as tg:
@@ -121,11 +108,11 @@ To actually run a coroutine, asyncio provides the following mechanisms:
 
               print(f"started at {time.strftime('%X')}")
 
-          # The await is implicit when the context manager exits.
+          # Việc await được thực hiện ngầm khi trình quản lý ngữ cảnh thoát.
 
           print(f"finished at {time.strftime('%X')}")
 
-  The timing and output should be the same as for the previous version.
+  Thời gian và kết quả đầu ra sẽ giống như ở phiên bản trước.
 
   .. versionadded:: 3.11
      :class:`asyncio.TaskGroup`.
@@ -133,21 +120,17 @@ To actually run a coroutine, asyncio provides the following mechanisms:
 
 .. _asyncio-awaitables:
 
-Awaitables
-==========
+Các đối tượng có thể await
+==========================
 
-We say that an object is an **awaitable** object if it can be used
-in an :keyword:`await` expression.  Many asyncio APIs are designed to
-accept awaitables.
+Chúng ta gọi một đối tượng là đối tượng **awaitable** nếu nó có thể được sử dụng trong một biểu thức :keyword:`await`. Nhiều API của asyncio được thiết kế để chấp nhận các awaitable.
 
-There are three main types of *awaitable* objects:
-**coroutines**, **Tasks**, and **Futures**.
+Có ba loại đối tượng *awaitable* chính: **coroutines**, **Tasks** và **Futures**.
 
 
-.. rubric:: Coroutines
+.. rubric:: Các coroutine
 
-Python coroutines are *awaitables* and therefore can be awaited from
-other coroutines::
+Các coroutine Python là *awaitable* và do đó có thể được await từ các coroutine khác::
 
     import asyncio
 
@@ -155,34 +138,31 @@ other coroutines::
         return 42
 
     async def main():
-        # Nothing happens if we just call "nested()".
-        # A coroutine object is created but not awaited,
-        # so it *won't run at all*.
-        nested()  # will raise a "RuntimeWarning".
+        # Sẽ không có gì xảy ra nếu chỉ gọi "nested()".
+        # Một đối tượng coroutine được tạo nhưng không được await,
+        # vì vậy nó *sẽ hoàn toàn không chạy*.
+        nested()  # sẽ tạo ra một "RuntimeWarning".
 
-        # Let's do it differently now and await it:
-        print(await nested())  # will print "42".
+        # Bây giờ hãy làm theo cách khác và await nó:
+        print(await nested())  # sẽ in "42".
 
     asyncio.run(main())
 
 .. important::
 
-   In this documentation the term "coroutine" can be used for
-   two closely related concepts:
+   Trong tài liệu này, thuật ngữ "coroutine" có thể được dùng cho hai khái niệm có liên quan chặt chẽ:
 
-   * a *coroutine function*: an :keyword:`async def` function;
+   * một *hàm coroutine*: một :keyword:`async def` hàm;
 
-   * a *coroutine object*: an object returned by calling a
-     *coroutine function*.
+   * một *đối tượng coroutine*: một đối tượng được trả về khi gọi một *hàm coroutine*.
 
 
-.. rubric:: Tasks
+.. rubric:: Task
 
-*Tasks* are used to schedule coroutines *concurrently*.
+*Task* được dùng để lập lịch cho các coroutine *đồng thời*.
 
-When a coroutine is wrapped into a *Task* with functions like
-:func:`asyncio.create_task` the coroutine is automatically
-scheduled to run soon::
+Khi một coroutine được bọc trong một *Task* bằng các hàm như
+:func:`asyncio.create_task` coroutine được tự động lên lịch để sớm chạy::
 
     import asyncio
 
@@ -190,12 +170,12 @@ scheduled to run soon::
         return 42
 
     async def main():
-        # Schedule nested() to run soon concurrently
-        # with "main()".
+        # Lên lịch để nested() sớm chạy đồng thời
+        # với "main()".
         task = asyncio.create_task(nested())
 
-        # "task" can now be used to cancel "nested()", or
-        # can simply be awaited to wait until it is complete:
+        # Có thể dùng "task" để hủy "nested()", hoặc
+        # chỉ cần await để chờ cho đến khi hoàn tất:
         await task
 
     asyncio.run(main())
@@ -203,97 +183,71 @@ scheduled to run soon::
 
 .. rubric:: Futures
 
-A :class:`Future` is a special **low-level** awaitable object that
-represents an **eventual result** of an asynchronous operation.
+Một :class:`Future` là một đối tượng awaitable **cấp thấp** đặc biệt, đại diện cho **kết quả sau cùng** của một thao tác bất đồng bộ.
 
-When a Future object is *awaited* it means that the coroutine will
-wait until the Future is resolved in some other place.
+Khi một đối tượng Future được *awaited*, điều đó có nghĩa là coroutine sẽ chờ cho đến khi Future được resolve ở một nơi khác.
 
-Future objects in asyncio are needed to allow callback-based code
-to be used with async/await.
+Các đối tượng Future trong asyncio cần thiết để cho phép sử dụng mã dựa trên callback cùng với async/await.
 
-Normally **there is no need** to create Future objects at the
-application level code.
+Thông thường, **there is no need** phải tạo các đối tượng Future ở cấp mã ứng dụng.
 
-Future objects, sometimes exposed by libraries and some asyncio
-APIs, can be awaited::
+Các đối tượng Future, đôi khi được các thư viện và một số API của asyncio cung cấp, có thể được await::
 
     async def main():
         await function_that_returns_a_future_object()
 
-        # this is also valid:
+        # điều này cũng hợp lệ:
         await asyncio.gather(
             function_that_returns_a_future_object(),
             some_python_coroutine()
         )
 
-A good example of a low-level function that returns a Future object
-is :meth:`loop.run_in_executor`.
+Một ví dụ điển hình về hàm cấp thấp trả về một đối tượng Future là :meth:`loop.run_in_executor`.
 
 
-Creating tasks
-==============
+Tạo task
+========
 
-**Source code:** :source:`Lib/asyncio/tasks.py`
+**Mã nguồn:** :source:`Lib/asyncio/tasks.py`
 
 -----------------------------------------------
 
 .. function:: create_task(coro, *, name=None, context=None, eager_start=None, **kwargs)
 
-   Wrap the *coro* :ref:`coroutine <coroutine>` into a :class:`Task`
-   and schedule its execution.  Return the Task object.
+   Đóng gói *coro* :ref:`coroutine <coroutine>` vào một :class:`Task` và lên lịch thực thi. Trả về đối tượng Task.
 
-   The full function signature is largely the same as that of the
-   :class:`Task` constructor (or factory) - all of the keyword arguments to
-   this function are passed through to that interface.
+   Chữ ký hàm đầy đủ phần lớn giống với chữ ký của
+   :class:`Task` constructor (hoặc factory) - tất cả đối số từ khóa của hàm này được truyền tiếp đến interface đó.
 
-   An optional keyword-only *context* argument allows specifying a
-   custom :class:`contextvars.Context` for the *coro* to run in.
-   The current context copy is created when no *context* is provided.
+   Đối số chỉ từ khóa tùy chọn *context* cho phép chỉ định một :class:`contextvars.Context` tùy chỉnh để *coro* chạy trong đó. Bản sao của context hiện tại sẽ được tạo khi không cung cấp *context*.
 
-   An optional keyword-only *eager_start* argument allows specifying
-   if the task should execute eagerly during the call to create_task,
-   or be scheduled later. If *eager_start* is not passed the mode set
-   by :meth:`loop.set_task_factory` will be used.
+   Đối số chỉ từ khóa tùy chọn *eager_start* cho phép chỉ định liệu task có được thực thi ngay trong lúc gọi create_task hay được lên lịch sau đó. Nếu không truyền *eager_start*, chế độ do :meth:`loop.set_task_factory` thiết lập sẽ được sử dụng.
 
-   The task is executed in the loop returned by :func:`get_running_loop`,
-   :exc:`RuntimeError` is raised if there is no running loop in
-   current thread.
+   Task được thực thi trong loop do :func:`get_running_loop` trả về,
+   :exc:`RuntimeError` được đưa ra nếu không có loop đang chạy trong thread hiện tại.
 
    .. note::
 
-      :meth:`asyncio.TaskGroup.create_task` is a new alternative
-      leveraging structural concurrency; it allows for waiting
-      for a group of related tasks with strong safety guarantees.
+      :meth:`asyncio.TaskGroup.create_task` là một lựa chọn thay thế mới tận dụng structural concurrency; cho phép chờ một nhóm các task liên quan với những đảm bảo an toàn chặt chẽ.
 
    .. important::
 
-      Save a reference to the result of this function, to avoid
-      a task disappearing mid-execution. The event loop only keeps
-      weak references to tasks. A task that isn't referenced elsewhere
-      may get garbage collected at any time, even before it's done.
-      For reliable "fire-and-forget" background tasks, gather them in
-      a collection::
+      Hãy lưu một tham chiếu đến kết quả của hàm này để tránh việc một task biến mất giữa chừng khi đang thực thi. Event loop chỉ giữ các tham chiếu yếu đến các task. Một task không được tham chiếu ở nơi khác có thể bị garbage collection bất kỳ lúc nào, ngay cả trước khi hoàn tất. Để các task nền "fire-and-forget" hoạt động đáng tin cậy, hãy tập hợp chúng trong một collection::
 
           background_tasks = set()
 
           for i in range(10):
               task = asyncio.create_task(some_coro(param=i))
 
-              # Add task to the set. This creates a strong reference.
+              # Thêm task vào set. Việc này tạo một tham chiếu mạnh.
               background_tasks.add(task)
 
-              # To prevent keeping references to finished tasks forever,
-              # make each task remove its own reference from the set after
-              # completion:
+              # Để tránh giữ các tham chiếu đến những task đã hoàn tất mãi mãi,
+              # hãy để mỗi task tự xóa tham chiếu của nó khỏi set sau khi
+              # hoàn tất:
               task.add_done_callback(background_tasks.discard)
 
-      Note that this approach never awaits the tasks, so if a task
-      fails, its exception is never retrieved and asyncio logs a
-      "Task exception was never retrieved" message when the task is
-      garbage collected.  To avoid this, use :class:`asyncio.TaskGroup`
-      which keeps a strong reference to each task, awaits them and
-      propagates their exceptions::
+      Lưu ý rằng cách tiếp cận này không bao giờ await các task, vì vậy nếu một task gặp lỗi, exception của nó sẽ không bao giờ được lấy ra và asyncio sẽ ghi log thông báo "Task exception was never retrieved" khi task được garbage collect. Để tránh điều này, hãy sử dụng :class:`asyncio.TaskGroup`, công cụ này giữ tham chiếu mạnh đến từng task, await chúng và truyền lại các exception của chúng::
 
           async with asyncio.TaskGroup() as tg:
               for i in range(10):
@@ -302,71 +256,52 @@ Creating tasks
    .. versionadded:: 3.7
 
    .. versionchanged:: 3.8
-      Added the *name* parameter.
+      Đã thêm tham số *name*.
 
    .. versionchanged:: 3.11
-      Added the *context* parameter.
+      Đã thêm tham số *context*.
 
    .. versionchanged:: 3.14
-      Added the *eager_start* parameter by passing on all *kwargs*.
+      Đã thêm tham số *eager_start* bằng cách truyền tất cả *kwargs*.
 
 
-Task cancellation
-=================
+Hủy task
+========
 
-Tasks can easily and safely be cancelled.
-When a task is cancelled, :exc:`asyncio.CancelledError` will be raised
-in the task at the next opportunity.
+Các task có thể được hủy một cách dễ dàng và an toàn. Khi một task bị hủy, :exc:`asyncio.CancelledError` sẽ được phát sinh trong task vào thời điểm thích hợp tiếp theo.
 
-It is recommended that coroutines use ``try/finally`` blocks to robustly
-perform clean-up logic. In case :exc:`asyncio.CancelledError`
-is explicitly caught, it should generally be propagated when
-clean-up is complete. :exc:`asyncio.CancelledError` directly subclasses
-:exc:`BaseException` so most code will not need to be aware of it.
+Khuyến nghị coroutine sử dụng các block ``try/finally`` để thực hiện logic dọn dẹp một cách đáng tin cậy. Nếu :exc:`asyncio.CancelledError` được bắt một cách rõ ràng, thông thường nên truyền lại nó sau khi hoàn tất việc dọn dẹp. :exc:`asyncio.CancelledError` kế thừa trực tiếp
+:exc:`BaseException` vì vậy hầu hết mã sẽ không cần biết về nó.
 
-The asyncio components that enable structured concurrency, like
-:class:`asyncio.TaskGroup` and :func:`asyncio.timeout`,
-are implemented using cancellation internally and might misbehave if
-a coroutine swallows :exc:`asyncio.CancelledError`. Similarly, user code
-should not generally call :meth:`uncancel <asyncio.Task.uncancel>`.
-However, in cases when suppressing :exc:`asyncio.CancelledError` is
-truly desired, it is necessary to also call ``uncancel()`` to completely
-remove the cancellation state.
+Các thành phần asyncio cho phép concurrency có cấu trúc, chẳng hạn như
+:class:`asyncio.TaskGroup` và :func:`asyncio.timeout`, được triển khai nội bộ bằng cơ chế hủy và có thể hoạt động không đúng nếu một coroutine nuốt :exc:`asyncio.CancelledError`. Tương tự, mã do người dùng viết nhìn chung không nên gọi :meth:`uncancel <asyncio.Task.uncancel>`. Tuy nhiên, trong những trường hợp thực sự cần bỏ qua :exc:`asyncio.CancelledError`, cũng cần gọi ``uncancel()`` để loại bỏ hoàn toàn trạng thái hủy.
 
 .. _taskgroups:
 
-Task groups
-===========
+Nhóm task
+=========
 
-Task groups combine a task creation API with a convenient
-and reliable way to wait for all tasks in the group to finish.
+Nhóm task kết hợp API tạo task với một cách thuận tiện và đáng tin cậy để chờ tất cả task trong nhóm hoàn tất.
 
 .. class:: TaskGroup()
 
-   An :ref:`asynchronous context manager <async-context-managers>`
-   holding a group of tasks.
-   Tasks can be added to the group using :meth:`create_task`.
-   All tasks are awaited when the context manager exits.
+   Một :ref:`trình quản lý ngữ cảnh bất đồng bộ <async-context-managers>` chứa một nhóm task. Có thể thêm task vào nhóm bằng :meth:`create_task`. Tất cả task sẽ được await khi trình quản lý ngữ cảnh kết thúc.
 
    .. versionadded:: 3.11
 
    .. method:: create_task(coro, *, name=None, context=None, eager_start=None, **kwargs)
 
-      Create a task in this task group.
-      The signature matches that of :func:`asyncio.create_task`.
-      If the task group is inactive (e.g. not yet entered,
-      already finished, or in the process of shutting down),
-      we will close the given ``coro`` and raise :exc:`RuntimeError`.
+      Tạo một task trong nhóm task này. Chữ ký khớp với :func:`asyncio.create_task`. Nếu nhóm task không hoạt động (ví dụ: chưa được truy cập, đã hoàn tất hoặc đang trong quá trình tắt), chúng ta sẽ đóng ``coro`` đã cho và phát sinh :exc:`RuntimeError`.
 
       .. versionchanged:: 3.13
 
-         Close the given coroutine if the task group is not active.
+         Đóng coroutine đã cho nếu nhóm tác vụ không hoạt động.
 
       .. versionchanged:: 3.14
 
-         Passes on all *kwargs* to :meth:`loop.create_task`
+         Truyền tất cả *kwargs* tới :meth:`loop.create_task`
 
-Example::
+Ví dụ::
 
     async def main():
         async with asyncio.TaskGroup() as tg:
@@ -374,76 +309,35 @@ Example::
             task2 = tg.create_task(another_coro(...))
         print(f"Both tasks have completed now: {task1.result()}, {task2.result()}")
 
-The ``async with`` statement will wait for all tasks in the group to finish.
-While waiting, new tasks may still be added to the group
-(for example, by passing ``tg`` into one of the coroutines
-and calling ``tg.create_task()`` in that coroutine).
-Once the last task has finished and the ``async with`` block is exited,
-no new tasks may be added to the group.
+Câu lệnh ``async with`` sẽ chờ tất cả tác vụ trong nhóm hoàn tất. Trong khi chờ, bạn vẫn có thể thêm các tác vụ mới vào nhóm (ví dụ: bằng cách truyền ``tg`` vào một trong các coroutine và gọi ``tg.create_task()`` trong coroutine đó). Sau khi tác vụ cuối cùng hoàn tất và thoát khỏi khối ``async with``, không thể thêm tác vụ mới nào vào nhóm.
 
-The first time any of the tasks belonging to the group fails
-with an exception other than :exc:`asyncio.CancelledError`,
-the remaining tasks in the group are cancelled.
-No further tasks can then be added to the group.
-At this point, if the body of the ``async with`` statement is still active
-(i.e., :meth:`~object.__aexit__` hasn't been called yet),
-the task directly containing the ``async with`` statement is also cancelled.
-The resulting :exc:`asyncio.CancelledError` will interrupt an ``await``,
-but it will not bubble out of the containing ``async with`` statement.
+Lần đầu tiên bất kỳ tác vụ nào thuộc nhóm bị lỗi với một ngoại lệ không phải :exc:`asyncio.CancelledError`, các tác vụ còn lại trong nhóm sẽ bị hủy. Sau đó không thể thêm tác vụ nào khác vào nhóm. Tại thời điểm này, nếu phần thân của câu lệnh ``async with`` vẫn đang hoạt động (tức là :meth:`~object.__aexit__` chưa được gọi), tác vụ trực tiếp chứa câu lệnh ``async with`` cũng sẽ bị hủy. :exc:`asyncio.CancelledError` phát sinh sẽ ngắt một ``await``, nhưng sẽ không nổi lên khỏi câu lệnh ``async with`` chứa nó.
 
-Once all tasks have finished, if any tasks have failed
-with an exception other than :exc:`asyncio.CancelledError`,
-those exceptions are combined in an
-:exc:`ExceptionGroup` or :exc:`BaseExceptionGroup`
-(as appropriate; see their documentation)
-which is then raised.
+Sau khi tất cả tác vụ hoàn tất, nếu có tác vụ nào bị lỗi với một ngoại lệ không phải :exc:`asyncio.CancelledError`, các ngoại lệ đó sẽ được kết hợp trong một
+:exc:`ExceptionGroup` hoặc :exc:`BaseExceptionGroup` (tùy trường hợp; xem tài liệu tương ứng), sau đó được phát sinh.
 
-Two base exceptions are treated specially:
-If any task fails with :exc:`KeyboardInterrupt` or :exc:`SystemExit`,
-the task group still cancels the remaining tasks and waits for them,
-but then the initial :exc:`KeyboardInterrupt` or :exc:`SystemExit`
-is re-raised instead of :exc:`ExceptionGroup` or :exc:`BaseExceptionGroup`.
+Hai base exception được xử lý đặc biệt: Nếu bất kỳ task nào thất bại với :exc:`KeyboardInterrupt` hoặc :exc:`SystemExit`, task group vẫn hủy các task còn lại và chờ chúng, nhưng sau đó :exc:`KeyboardInterrupt` hoặc :exc:`SystemExit` ban đầu sẽ được raise lại thay vì :exc:`ExceptionGroup` hoặc :exc:`BaseExceptionGroup`.
 
-If the body of the ``async with`` statement exits with an exception
-(so :meth:`~object.__aexit__` is called with an exception set),
-this is treated the same as if one of the tasks failed:
-the remaining tasks are cancelled and then waited for,
-and non-cancellation exceptions are grouped into an
-exception group and raised.
-The exception passed into :meth:`~object.__aexit__`,
-unless it is :exc:`asyncio.CancelledError`,
-is also included in the exception group.
-The same special case is made for
-:exc:`KeyboardInterrupt` and :exc:`SystemExit` as in the previous paragraph.
+Nếu phần thân của câu lệnh ``async with`` thoát với một exception (do đó :meth:`~object.__aexit__` được gọi khi đã thiết lập exception), trường hợp này được xử lý giống như khi một trong các task thất bại: các task còn lại bị hủy rồi được chờ hoàn tất, và các exception không phải do hủy sẽ được nhóm vào một exception group rồi raise. Exception được truyền vào :meth:`~object.__aexit__`, trừ khi đó là :exc:`asyncio.CancelledError`, cũng được đưa vào exception group. Trường hợp đặc biệt tương tự cũng được áp dụng cho
+:exc:`KeyboardInterrupt` và :exc:`SystemExit` như trong đoạn trước.
 
-Task groups are careful not to mix up the internal cancellation used to
-"wake up" their :meth:`~object.__aexit__` with cancellation requests
-for the task in which they are running made by other parties.
-In particular, when one task group is syntactically nested in another,
-and both experience an exception in one of their child tasks simultaneously,
-the inner task group will process its exceptions, and then the outer task group
-will receive another cancellation and process its own exceptions.
+Task group cẩn thận không nhầm lẫn việc hủy nội bộ được dùng để "đánh thức" :meth:`~object.__aexit__` của chúng với các yêu cầu hủy task mà chúng đang chạy, được thực hiện bởi các bên khác. Cụ thể, khi một task group được lồng về mặt cú pháp bên trong một task group khác, và cả hai đồng thời gặp exception trong một task con của chúng, task group bên trong sẽ xử lý các exception của mình, sau đó task group bên ngoài sẽ nhận một yêu cầu hủy khác và xử lý các exception của chính nó.
 
-In the case where a task group is cancelled externally and also must
-raise an :exc:`ExceptionGroup`, it will call the parent task's
-:meth:`~asyncio.Task.cancel` method. This ensures that a
-:exc:`asyncio.CancelledError` will be raised at the next
-:keyword:`await`, so the cancellation is not lost.
+Trong trường hợp một task group bị hủy từ bên ngoài và đồng thời phải raise một :exc:`ExceptionGroup`, nó sẽ gọi phương thức
+:meth:`~asyncio.Task.cancel` của task cha. Điều này đảm bảo rằng một
+:exc:`asyncio.CancelledError` sẽ được raise ở lần tiếp theo
+:keyword:`await`, vì vậy việc hủy không bị mất.
 
-Task groups preserve the cancellation count
-reported by :meth:`asyncio.Task.cancelling`.
+Các nhóm tác vụ bảo toàn số lần hủy do :meth:`asyncio.Task.cancelling` báo cáo.
 
 .. versionchanged:: 3.13
 
-   Improved handling of simultaneous internal and external cancellations
-   and correct preservation of cancellation counts.
+   Cải thiện việc xử lý các thao tác hủy nội bộ và bên ngoài đồng thời, đồng thời bảo toàn chính xác số lần hủy.
 
-Terminating a task group
+Kết thúc một nhóm tác vụ
 ------------------------
 
-While terminating a task group is not natively supported by the standard
-library, termination can be achieved by adding an exception-raising task
-to the task group and ignoring the raised exception:
+Mặc dù thư viện chuẩn không hỗ trợ việc kết thúc một nhóm tác vụ một cách nguyên gốc, bạn có thể thực hiện việc này bằng cách thêm một tác vụ tạo ngoại lệ vào nhóm tác vụ và bỏ qua ngoại lệ được tạo ra:
 
 .. code-block:: python
 
@@ -465,19 +359,19 @@ to the task group and ignoring the raised exception:
    async def main():
        try:
            async with TaskGroup() as group:
-               # spawn some tasks
+               # tạo một số tác vụ
                group.create_task(job(1, 0.5))
                group.create_task(job(2, 1.5))
-               # sleep for 1 second
+               # ngủ trong 1 giây
                await asyncio.sleep(1)
-               # add an exception-raising task to force the group to terminate
+               # thêm một task phát sinh ngoại lệ để buộc nhóm kết thúc
                group.create_task(force_terminate_task_group())
        except* TerminateTaskGroup:
            pass
 
    asyncio.run(main())
 
-Expected output:
+Đầu ra dự kiến:
 
 .. code-block:: text
 
@@ -485,28 +379,23 @@ Expected output:
    Task 2: start
    Task 1: done
 
-Sleeping
-========
+Ngủ
+===
 
 .. function:: sleep(delay, result=None)
    :async:
 
-   Block for *delay* seconds.
+   Tạm dừng trong *delay* giây.
 
-   If *result* is provided, it is returned to the caller
-   when the coroutine completes.
+   Nếu cung cấp *result*, giá trị này sẽ được trả về cho caller khi coroutine hoàn tất.
 
-   ``sleep()`` always suspends the current task, allowing other tasks
-   to run.
+   ``sleep()`` luôn tạm dừng task hiện tại, cho phép các task khác chạy.
 
-   Setting the delay to 0 provides an optimized path to allow other
-   tasks to run. This can be used by long-running functions to avoid
-   blocking the event loop for the full duration of the function call.
+   Đặt thời gian trễ bằng 0 sẽ cung cấp một nhánh được tối ưu hóa để cho phép các task khác chạy. Có thể sử dụng cách này trong các hàm chạy lâu để tránh chặn event loop trong toàn bộ thời gian thực thi hàm.
 
    .. _asyncio_example_sleep:
 
-   Example of coroutine displaying the current date every second
-   for 5 seconds::
+   Ví dụ về coroutine hiển thị ngày hiện tại mỗi giây trong 5 giây::
 
     import asyncio
     import datetime as dt
@@ -524,55 +413,37 @@ Sleeping
 
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. versionchanged:: 3.13
-      Raises :exc:`ValueError` if *delay* is :data:`~math.nan`.
+      Phát sinh :exc:`ValueError` nếu *delay* là :data:`~math.nan`.
 
 
-Running tasks concurrently
-==========================
+Chạy các task đồng thời
+=======================
 
 .. awaitablefunction:: gather(*aws, return_exceptions=False)
 
-   Run :ref:`awaitable objects <asyncio-awaitables>` in the *aws*
-   sequence *concurrently*.
+   Chạy :ref:`awaitable objects <asyncio-awaitables>` trong chuỗi *aws* một cách *concurrently*.
 
-   If any awaitable in *aws* is a coroutine, it is automatically
-   scheduled as a Task.
+   Nếu bất kỳ awaitable nào trong *aws* là một coroutine, nó sẽ tự động được lập lịch dưới dạng một Task.
 
-   If all awaitables are completed successfully, the result is an
-   aggregate list of returned values.  The order of result values
-   corresponds to the order of awaitables in *aws*.
+   Nếu tất cả awaitable hoàn tất thành công, kết quả là một danh sách tổng hợp các giá trị được trả về. Thứ tự của các giá trị kết quả tương ứng với thứ tự của các awaitable trong *aws*.
 
-   If *return_exceptions* is ``False`` (default), the first
-   raised exception is immediately propagated to the task that
-   awaits on ``gather()``.  Other awaitables in the *aws* sequence
-   **won't be cancelled** and will continue to run.
+   Nếu *return_exceptions* là ``False`` (mặc định), ngoại lệ đầu tiên được phát sinh sẽ ngay lập tức được truyền đến task đang await ``gather()``. Các awaitable khác trong chuỗi *aws* **won't be cancelled** và sẽ tiếp tục chạy.
 
-   If *return_exceptions* is ``True``, exceptions are treated the
-   same as successful results, and aggregated in the result list.
+   Nếu *return_exceptions* là ``True``, các ngoại lệ được xử lý giống như các kết quả thành công và được gom vào danh sách kết quả.
 
-   If ``gather()`` is *cancelled*, all submitted awaitables
-   (that have not completed yet) are also *cancelled*.
+   Nếu ``gather()`` bị *cancelled*, tất cả awaitable đã được gửi (nhưng chưa hoàn tất) cũng sẽ bị *cancelled*.
 
-   If any Task or Future from the *aws* sequence is *cancelled*, it is
-   treated as if it raised :exc:`CancelledError` -- the ``gather()``
-   call is **not** cancelled in this case.  This is to prevent the
-   cancellation of one submitted Task/Future to cause other
-   Tasks/Futures to be cancelled.
+   Nếu bất kỳ Task hoặc Future nào trong chuỗi *aws* bị *cancelled*, nó được xử lý như thể đã phát sinh :exc:`CancelledError` -- lệnh gọi ``gather()`` **not** bị hủy trong trường hợp này. Điều này nhằm ngăn việc hủy một Task/Future đã gửi khiến các Task/Future khác bị hủy.
 
    .. note::
-      A new alternative to create and run tasks concurrently and
-      wait for their completion is :class:`asyncio.TaskGroup`. *TaskGroup*
-      provides stronger safety guarantees than *gather* for scheduling a nesting of subtasks:
-      if a task (or a subtask, a task scheduled by a task)
-      raises an exception, *TaskGroup* will, while *gather* will not,
-      cancel the remaining scheduled tasks.
+      Một lựa chọn mới để tạo và chạy đồng thời các task rồi chờ chúng hoàn tất là :class:`asyncio.TaskGroup`. *TaskGroup* cung cấp các bảo đảm an toàn mạnh hơn *gather* khi lập lịch cho các subtasks lồng nhau: nếu một task (hoặc một subtask, tức task được một task lập lịch) phát sinh ngoại lệ, *TaskGroup* sẽ hủy các task còn lại đã được lập lịch, còn *gather* thì không.
 
    .. _asyncio_example_gather:
 
-   Example::
+   Ví dụ::
 
       import asyncio
 
@@ -586,7 +457,7 @@ Running tasks concurrently
           return f
 
       async def main():
-          # Schedule three calls *concurrently*:
+          # Lập lịch đồng thời cho ba lệnh gọi *concurrently*:
           L = await asyncio.gather(
               factorial("A", 2),
               factorial("B", 3),
@@ -596,116 +467,85 @@ Running tasks concurrently
 
       asyncio.run(main())
 
-      # Expected output:
+      # Kết quả mong đợi:
       #
-      #     Task A: Compute factorial(2), currently i=2...
-      #     Task B: Compute factorial(3), currently i=2...
-      #     Task C: Compute factorial(4), currently i=2...
-      #     Task A: factorial(2) = 2
-      #     Task B: Compute factorial(3), currently i=3...
-      #     Task C: Compute factorial(4), currently i=3...
+      #     Tác vụ A: Tính factorial(2), hiện tại i=2...
+      #     Tác vụ B: Tính factorial(3), hiện tại i=2...
+      #     Tác vụ C: Tính factorial(4), hiện tại i=2...
+      #     Tác vụ A: factorial(2) = 2
+      #     Tác vụ B: Tính factorial(3), hiện tại i=3...
+      #     Tác vụ C: Tính factorial(4), hiện tại i=3...
       #     Task B: factorial(3) = 6
-      #     Task C: Compute factorial(4), currently i=4...
+      #     Task C: Tính factorial(4), hiện tại i=4...
       #     Task C: factorial(4) = 24
       #     [2, 6, 24]
 
    .. note::
-      If *return_exceptions* is false, cancelling gather() after it
-      has been marked done won't cancel any submitted awaitables.
-      For instance, gather can be marked done after propagating an
-      exception to the caller, therefore, calling ``gather.cancel()``
-      after catching an exception (raised by one of the awaitables) from
-      gather won't cancel any other awaitables.
+      Nếu *return_exceptions* là false, việc hủy gather() sau khi nó được đánh dấu là đã hoàn tất sẽ không hủy bất kỳ awaitable nào đã được gửi. Chẳng hạn, gather có thể được đánh dấu là đã hoàn tất sau khi chuyển tiếp một exception đến caller; do đó, việc gọi ``gather.cancel()`` sau khi bắt được một exception (được raise bởi một trong các awaitable) từ gather sẽ không hủy các awaitable khác.
 
    .. versionchanged:: 3.7
-      If the *gather* itself is cancelled, the cancellation is
-      propagated regardless of *return_exceptions*.
+      Nếu chính *gather* bị hủy, việc hủy sẽ được truyền tiếp bất kể *return_exceptions* là gì.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã loại bỏ tham số *loop*.
 
    .. deprecated:: 3.10
-      Deprecation warning is emitted if no positional arguments are provided
-      or not all positional arguments are Future-like objects
-      and there is no running event loop.
+      Cảnh báo ngừng sử dụng được phát ra nếu không cung cấp đối số positional nào, hoặc không phải tất cả đối số positional đều là đối tượng dạng Future, và không có event loop đang chạy.
 
 
 .. _eager-task-factory:
 
-Eager task factory
-==================
+Bộ tạo task eager
+=================
 
 .. function:: eager_task_factory(loop, coro, *, name=None, context=None)
 
-    A task factory for eager task execution.
+    Bộ tạo task để thực thi task eager.
 
-    When using this factory (via :meth:`loop.set_task_factory(asyncio.eager_task_factory) <loop.set_task_factory>`),
-    coroutines begin execution synchronously during :class:`Task` construction.
-    Tasks are only scheduled on the event loop if they block.
-    This can be a performance improvement as the overhead of loop scheduling
-    is avoided for coroutines that complete synchronously.
+    Khi sử dụng bộ tạo này (thông qua :meth:`loop.set_task_factory(asyncio.eager_task_factory) <loop.set_task_factory>`), các coroutine bắt đầu thực thi đồng bộ trong quá trình tạo :class:`Task`. Task chỉ được lên lịch trên event loop nếu chúng bị block. Điều này có thể cải thiện hiệu năng vì tránh được overhead của việc lên lịch trên loop đối với các coroutine hoàn tất đồng bộ.
 
-    A common example where this is beneficial is coroutines which employ
-    caching or memoization to avoid actual I/O when possible.
+    Một ví dụ phổ biến mà cách này hữu ích là các coroutine sử dụng caching hoặc memoization để tránh I/O thực tế khi có thể.
 
     .. note::
 
-        Immediate execution of the coroutine is a semantic change.
-        If the coroutine returns or raises, the task is never scheduled
-        to the event loop. If the coroutine execution blocks, the task is
-        scheduled to the event loop. This change may introduce behavior
-        changes to existing applications. For example,
-        the application's task execution order is likely to change.
+        Việc thực thi coroutine ngay lập tức là một thay đổi về ngữ nghĩa. Nếu coroutine trả về hoặc phát sinh exception, task sẽ không bao giờ được lên lịch trên event loop. Nếu quá trình thực thi coroutine bị block, task sẽ được lên lịch trên event loop. Thay đổi này có thể làm thay đổi hành vi của các ứng dụng hiện có. Ví dụ, thứ tự thực thi task của ứng dụng có khả năng sẽ thay đổi.
 
     .. versionadded:: 3.12
 
 .. function:: create_eager_task_factory(custom_task_constructor)
 
-    Create an eager task factory, similar to :func:`eager_task_factory`,
-    using the provided *custom_task_constructor* when creating a new task instead
-    of the default :class:`Task`.
+    Tạo một bộ tạo task eager, tương tự như :func:`eager_task_factory`, sử dụng *custom_task_constructor* được cung cấp khi tạo task mới thay vì :class:`Task` mặc định.
 
-    *custom_task_constructor* must be a *callable* with the signature matching
-    the signature of :class:`Task.__init__ <Task>`.
-    The callable must return a :class:`asyncio.Task`-compatible object.
+    *custom_task_constructor* phải là một *callable* có signature khớp với signature của :class:`Task.__init__ <Task>`. Callable này phải trả về một đối tượng tương thích với :class:`asyncio.Task`.
 
-    This function returns a *callable* intended to be used as a task factory of an
-    event loop via :meth:`loop.set_task_factory(factory) <loop.set_task_factory>`).
+    Hàm này trả về một *callable* được dùng làm task factory của event loop thông qua :meth:`loop.set_task_factory(factory) <loop.set_task_factory>`).
 
     .. versionadded:: 3.12
 
 
-Shielding from cancellation
-===========================
+Bảo vệ khỏi việc hủy
+====================
 
 .. awaitablefunction:: shield(aw)
 
-   Protect an :ref:`awaitable object <asyncio-awaitables>`
-   from being :meth:`cancelled <Task.cancel>`.
+   Bảo vệ một :ref:`awaitable object <asyncio-awaitables>` khỏi bị :meth:`cancelled <Task.cancel>`.
 
-   If *aw* is a coroutine it is automatically scheduled as a Task.
+   Nếu *aw* là một coroutine, nó sẽ tự động được lên lịch dưới dạng một Task.
 
-   The statement::
+   Câu lệnh::
 
        task = asyncio.create_task(something())
        res = await shield(task)
 
-   is equivalent to::
+   tương đương với::
 
        res = await something()
 
-   *except* that if the coroutine containing it is cancelled, the
-   Task running in ``something()`` is not cancelled.  From the point
-   of view of ``something()``, the cancellation did not happen.
-   Although its caller is still cancelled, so the "await" expression
-   still raises a :exc:`CancelledError`.
+   *except* rằng nếu coroutine chứa nó bị hủy, Task đang chạy trong ``something()`` sẽ không bị hủy. Theo quan điểm của ``something()``, việc hủy đã không xảy ra. Mặc dù caller của nó vẫn bị hủy, nên biểu thức "await" vẫn phát sinh một :exc:`CancelledError`.
 
-   If ``something()`` is cancelled by other means (i.e. from within
-   itself) that would also cancel ``shield()``.
+   Nếu ``something()`` bị hủy bằng cách khác (tức là từ bên trong chính nó), điều đó cũng sẽ hủy ``shield()``.
 
-   If it is desired to completely ignore cancellation (not recommended)
-   the ``shield()`` function should be combined with a try/except
-   clause, as follows::
+   Nếu muốn hoàn toàn bỏ qua việc hủy (không khuyến nghị), nên kết hợp hàm ``shield()`` với mệnh đề try/except như sau::
 
        task = asyncio.create_task(something())
        try:
@@ -715,55 +555,39 @@ Shielding from cancellation
 
    .. important::
 
-      Save a reference to tasks passed to this function, to avoid
-      a task disappearing mid-execution. The event loop only keeps
-      weak references to tasks. A task that isn't referenced elsewhere
-      may get garbage collected at any time, even before it's done.
+      Hãy lưu một tham chiếu đến các task được truyền vào hàm này để tránh task biến mất giữa chừng khi đang thực thi. Event loop chỉ giữ các tham chiếu yếu đến task. Một task không được tham chiếu ở nơi khác có thể bị garbage collection bất kỳ lúc nào, ngay cả trước khi hoàn tất.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã loại bỏ tham số *loop*.
 
    .. deprecated:: 3.10
-      Deprecation warning is emitted if *aw* is not Future-like object
-      and there is no running event loop.
+      Cảnh báo ngừng sử dụng được phát ra nếu *aw* không phải là đối tượng tương tự Future và không có event loop đang chạy.
 
 
-Timeouts
-========
+Timeout
+=======
 
 .. function:: timeout(delay)
 
-    Return an :ref:`asynchronous context manager <async-context-managers>`
-    that can be used to limit the amount of time spent waiting on
-    something.
+    Trả về một :ref:`asynchronous context manager <async-context-managers>` có thể được dùng để giới hạn thời gian chờ đợi một việc nào đó.
 
-    *delay* can either be ``None``, or a float/int number of
-    seconds to wait. If *delay* is ``None``, no time limit will
-    be applied; this can be useful if the delay is unknown when
-    the context manager is created.
+    *delay* có thể là ``None``, hoặc một số giây dạng float/int cần chờ. Nếu *delay* là ``None``, sẽ không áp dụng giới hạn thời gian; điều này hữu ích nếu chưa biết delay khi tạo context manager.
 
-    In either case, the context manager can be rescheduled after
-    creation using :meth:`Timeout.reschedule`.
+    Trong cả hai trường hợp, context manager có thể được lên lịch lại sau khi tạo bằng :meth:`Timeout.reschedule`.
 
-    Example::
+    Ví dụ::
 
         async def main():
             async with asyncio.timeout(10):
                 await long_running_task()
 
-    If ``long_running_task`` takes more than 10 seconds to complete,
-    the context manager will cancel the current task and handle
-    the resulting :exc:`asyncio.CancelledError` internally, transforming it
-    into a :exc:`TimeoutError` which can be caught and handled.
+    Nếu ``long_running_task`` mất hơn 10 giây để hoàn tất, context manager sẽ hủy task hiện tại và xử lý nội bộ :exc:`asyncio.CancelledError` phát sinh, chuyển nó thành :exc:`TimeoutError` để có thể bắt và xử lý.
 
     .. note::
 
-      The :func:`asyncio.timeout` context manager is what transforms
-      the :exc:`asyncio.CancelledError` into a :exc:`TimeoutError`,
-      which means the :exc:`TimeoutError` can only be caught
-      *outside* of the context manager.
+      Context manager :func:`asyncio.timeout` sẽ chuyển :exc:`asyncio.CancelledError` thành :exc:`TimeoutError`, điều đó có nghĩa là chỉ có thể bắt :exc:`TimeoutError` *outside* context manager.
 
-    Example of catching :exc:`TimeoutError`::
+    Ví dụ về việc bắt :exc:`TimeoutError`::
 
         async def main():
             try:
@@ -774,45 +598,38 @@ Timeouts
 
             print("This statement will run regardless.")
 
-    The context manager produced by :func:`asyncio.timeout` can be
-    rescheduled to a different deadline and inspected.
+    Context manager được tạo bởi :func:`asyncio.timeout` có thể được lên lịch lại đến một thời hạn khác và được kiểm tra.
 
     .. class:: Timeout(when)
 
-       An :ref:`asynchronous context manager <async-context-managers>`
-       for cancelling overdue coroutines.
+       Một :ref:`trình quản lý ngữ cảnh bất đồng bộ <async-context-managers>` để hủy các coroutine đã quá thời gian.
 
-       Prefer using :func:`asyncio.timeout` or :func:`asyncio.timeout_at`
-       rather than instantiating :class:`!Timeout` directly.
+       Nên sử dụng :func:`asyncio.timeout` hoặc :func:`asyncio.timeout_at` thay vì khởi tạo trực tiếp :class:`!Timeout`.
 
-       ``when`` should be an absolute time at which the context should time out,
-       as measured by the event loop's clock:
+       ``when`` phải là một thời điểm tuyệt đối mà tại đó ngữ cảnh sẽ hết thời gian chờ, được đo bằng đồng hồ của event loop:
 
-       - If ``when`` is ``None``, the timeout will never trigger.
-       - If ``when < loop.time()``, the timeout will trigger on the next
-         iteration of the event loop.
+       - Nếu ``when`` là ``None``, thời gian chờ sẽ không bao giờ được kích hoạt.
+       - Nếu ``when < loop.time()``, thời gian chờ sẽ được kích hoạt ở lần lặp tiếp theo của event loop.
 
         .. method:: when() -> float | None
 
-           Return the current deadline, or ``None`` if the current
-           deadline is not set.
+           Trả về deadline hiện tại hoặc ``None`` nếu deadline hiện tại chưa được thiết lập.
 
         .. method:: reschedule(when: float | None)
 
-            Reschedule the timeout.
+            Lập lịch lại thời gian chờ.
 
         .. method:: expired() -> bool
 
-           Return whether the context manager has exceeded its deadline
-           (expired).
+           Trả về liệu context manager đã vượt quá thời hạn (expired) hay chưa.
 
-    Example::
+    Ví dụ::
 
         async def main():
             try:
-                # We do not know the timeout when starting, so we pass ``None``.
+                # Khi bắt đầu, chúng ta chưa biết thời gian chờ, nên truyền ``None``.
                 async with asyncio.timeout(None) as cm:
-                    # We know the timeout now, so we reschedule it.
+                    # Bây giờ chúng ta đã biết thời gian chờ, nên lên lịch lại cho nó.
                     new_deadline = get_running_loop().time() + 10
                     cm.reschedule(new_deadline)
 
@@ -823,16 +640,15 @@ Timeouts
             if cm.expired():
                 print("Looks like we haven't finished on time.")
 
-    Timeout context managers can be safely nested.
+    Các context manager timeout có thể được lồng nhau một cách an toàn.
 
     .. versionadded:: 3.11
 
 .. function:: timeout_at(when)
 
-   Similar to :func:`asyncio.timeout`, except *when* is the absolute time
-   to stop waiting, or ``None``.
+   Tương tự như :func:`asyncio.timeout`, ngoại trừ *khi* là thời điểm tuyệt đối để dừng chờ, hoặc ``None``.
 
-   Example::
+   Ví dụ::
 
       async def main():
           loop = get_running_loop()
@@ -850,34 +666,29 @@ Timeouts
 .. function:: wait_for(aw, timeout)
    :async:
 
-   Wait for the *aw* :ref:`awaitable <asyncio-awaitables>`
-   to complete with a timeout.
+   Chờ *aw* :ref:`awaitable <asyncio-awaitables>` hoàn tất trong thời gian chờ.
 
-   *timeout* can either be ``None`` or a float or int number of seconds
-   to wait for.  If *timeout* is ``None``, block until the future
-   completes.
+   *timeout* có thể là ``None`` hoặc một số giây kiểu float hoặc int cần chờ. Nếu *timeout* là ``None``, hãy chặn cho đến khi future hoàn tất.
 
-   If a timeout occurs, it cancels *aw* and raises :exc:`TimeoutError`.
+   Nếu xảy ra timeout, hàm này sẽ hủy *aw* và ném :exc:`TimeoutError`.
 
-   To prevent *aw* from being cancelled, wrap it in :func:`shield`.
+   Để ngăn *aw* bị hủy, hãy bọc nó trong :func:`shield`.
 
-   The function will wait until the future is actually cancelled,
-   so the total wait time may exceed the *timeout*. If an exception
-   happens during cancellation, it is propagated.
+   Hàm sẽ chờ cho đến khi future thực sự bị hủy, vì vậy tổng thời gian chờ có thể vượt quá *timeout*. Nếu xảy ra ngoại lệ trong quá trình hủy, ngoại lệ đó sẽ được truyền lên.
 
-   If the wait is cancelled, the future *aw* is also cancelled.
+   Nếu thao tác chờ bị hủy, future *aw* cũng sẽ bị hủy.
 
    .. _asyncio_example_waitfor:
 
-   Example::
+   Ví dụ::
 
        async def eternity():
-           # Sleep for one hour
+           # Ngủ trong một giờ
            await asyncio.sleep(3600)
            print('yay!')
 
        async def main():
-           # Wait for at most 1 second
+           # Chờ tối đa 1 giây
            try:
                await asyncio.wait_for(eternity(), timeout=1.0)
            except TimeoutError:
@@ -885,106 +696,89 @@ Timeouts
 
        asyncio.run(main())
 
-       # Expected output:
+       # Đầu ra dự kiến:
        #
        #     timeout!
 
    .. versionchanged:: 3.7
-      When *aw* is cancelled due to a timeout, ``wait_for`` waits
-      for *aw* to be cancelled.  Previously, it raised
-      :exc:`TimeoutError` immediately.
+      Khi *aw* bị hủy do timeout, ``wait_for`` chờ *aw* bị hủy. Trước đây, nó đã phát sinh
+      :exc:`TimeoutError` ngay lập tức.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã loại bỏ tham số *loop*.
 
    .. versionchanged:: 3.11
-      Raises :exc:`TimeoutError` instead of :exc:`asyncio.TimeoutError`.
+      Nâng :exc:`TimeoutError` thay vì :exc:`asyncio.TimeoutError`.
 
    .. versionchanged:: 3.12
-      Implemented using :func:`asyncio.timeout`, a coroutine passed as *aw*
-      is no longer wrapped in a :class:`Task` when *timeout* is positive.
+      Được triển khai bằng :func:`asyncio.timeout`, một coroutine được truyền dưới dạng *aw* sẽ không còn được bọc trong một :class:`Task` khi *timeout* có giá trị dương.
 
 
-Waiting primitives
-==================
+Các primitive chờ
+=================
 
 .. function:: wait(aws, *, timeout=None, return_when=ALL_COMPLETED)
    :async:
 
-   Run :class:`~asyncio.Future` and :class:`~asyncio.Task` instances in the *aws*
-   iterable concurrently and block until the condition specified
-   by *return_when*.
+   Chạy đồng thời các instance :class:`~asyncio.Future` và :class:`~asyncio.Task` trong iterable *aws* và chặn cho đến khi điều kiện được chỉ định bởi *return_when* được thỏa mãn.
 
-   The *aws* iterable must not be empty.
+   Iterable *aws* không được để trống.
 
-   Returns two sets of Tasks/Futures: ``(done, pending)``.
+   Trả về hai tập hợp Task/Future: ``(done, pending)``.
 
-   Usage::
+   Cách sử dụng::
 
         done, pending = await asyncio.wait(aws)
 
-   *timeout* (a float or int), if specified, can be used to control
-   the maximum number of seconds to wait before returning.
+   *timeout* (một số thực hoặc số nguyên), nếu được chỉ định, có thể được dùng để kiểm soát số giây tối đa cần chờ trước khi trả về.
 
-   Note that this function does not raise :exc:`TimeoutError`.
-   Futures or Tasks that aren't done when the timeout occurs are simply
-   returned in the second set.
+   Lưu ý rằng hàm này không raise :exc:`TimeoutError`. Các Future hoặc Task chưa hoàn tất khi hết thời gian chờ sẽ được trả về trong tập hợp thứ hai.
 
-   *return_when* indicates when this function should return.  It must
-   be one of the following constants:
+   *return_when* cho biết thời điểm hàm này sẽ trả về. Giá trị này phải là một trong các hằng số sau:
 
    .. list-table::
       :header-rows: 1
 
-      * - Constant
-        - Description
+      * - Hằng số
+        - Mô tả
 
       * - .. data:: FIRST_COMPLETED
-        - The function will return when any future finishes or is cancelled.
+        - Hàm sẽ trả về khi bất kỳ future nào hoàn tất hoặc bị hủy.
 
       * - .. data:: FIRST_EXCEPTION
-        - The function will return when any future finishes by raising an
-          exception. If no future raises an exception
-          then it is equivalent to :const:`ALL_COMPLETED`.
+        - Hàm sẽ trả về khi bất kỳ future nào hoàn tất bằng cách raise một exception. Nếu không có future nào raise exception thì giá trị này tương đương với :const:`ALL_COMPLETED`.
 
       * - .. data:: ALL_COMPLETED
-        - The function will return when all futures finish or are cancelled.
+        - Hàm sẽ trả về khi tất cả future hoàn tất hoặc bị hủy.
 
-   Unlike :func:`~asyncio.wait_for`, ``wait()`` does not cancel the
-   futures when a timeout occurs.
+   Không giống :func:`~asyncio.wait_for`, ``wait()`` không hủy các future khi xảy ra timeout.
 
-   If ``wait()`` is cancelled, the futures in *aws* are not cancelled
-   and continue to run.
+   Nếu ``wait()`` bị hủy, các future trong *aws* sẽ không bị hủy và tiếp tục chạy.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. versionchanged:: 3.11
-      Passing coroutine objects to ``wait()`` directly is forbidden.
+      Không được phép truyền trực tiếp các đối tượng coroutine vào ``wait()``.
 
    .. versionchanged:: 3.12
-      Added support for generators yielding tasks.
+      Đã thêm hỗ trợ cho các generator tạo ra task.
 
 
 .. function:: as_completed(aws, *, timeout=None)
 
-   Run :ref:`awaitable objects <asyncio-awaitables>` in the *aws* iterable
-   concurrently. The returned object can be iterated to obtain the results
-   of the awaitables as they finish.
+   Chạy đồng thời các đối tượng :ref:`awaitable objects <asyncio-awaitables>` trong iterable *aws*. Có thể lặp qua đối tượng được trả về để lấy kết quả của các awaitable khi chúng hoàn tất.
 
-   The object returned by ``as_completed()`` can be iterated as an
-   :term:`asynchronous iterator` or a plain :term:`iterator`. When asynchronous
-   iteration is used, the originally-supplied awaitables are yielded if they
-   are tasks or futures. This makes it easy to correlate previously-scheduled
-   tasks with their results. Example::
+   Đối tượng được ``as_completed()`` trả về có thể được lặp qua dưới dạng một
+   :term:`asynchronous iterator` hoặc một :term:`iterator` thông thường. Khi sử dụng phép lặp bất đồng bộ, các awaitable được cung cấp ban đầu sẽ được trả về nếu chúng là task hoặc future. Điều này giúp dễ dàng liên kết các task đã được lên lịch trước đó với kết quả của chúng. Ví dụ::
 
        ipv4_connect = create_task(open_connection("127.0.0.1", 80))
        ipv6_connect = create_task(open_connection("::1", 80))
        tasks = [ipv4_connect, ipv6_connect]
 
        async for earliest_connect in as_completed(tasks):
-           # earliest_connect is done. The result can be obtained by
-           # awaiting it or calling earliest_connect.result()
+           # earliest_connect đã hoàn tất. Có thể lấy kết quả bằng cách
+           # await nó hoặc gọi earliest_connect.result()
            reader, writer = await earliest_connect
 
            if earliest_connect is ipv6_connect:
@@ -992,69 +786,55 @@ Waiting primitives
            else:
                print("IPv4 connection established.")
 
-   During asynchronous iteration, implicitly-created tasks will be yielded for
-   supplied awaitables that aren't tasks or futures.
+   Trong quá trình lặp bất đồng bộ, các task được tạo ngầm sẽ được trả về đối với những awaitable được cung cấp nhưng không phải là task hoặc future.
 
-   When used as a plain iterator, each iteration yields a new coroutine that
-   returns the result or raises the exception of the next completed awaitable.
-   This pattern is compatible with Python versions older than 3.13::
+   Khi được sử dụng như một iterator thông thường, mỗi lần lặp sẽ trả về một coroutine mới, coroutine này trả về kết quả hoặc phát sinh ngoại lệ của awaitable tiếp theo đã hoàn tất. Mẫu này tương thích với các phiên bản Python cũ hơn 3.13::
 
        ipv4_connect = create_task(open_connection("127.0.0.1", 80))
        ipv6_connect = create_task(open_connection("::1", 80))
        tasks = [ipv4_connect, ipv6_connect]
 
        for next_connect in as_completed(tasks):
-           # next_connect is not one of the original task objects. It must be
-           # awaited to obtain the result value or raise the exception of the
-           # awaitable that finishes next.
+           # next_connect không phải là một trong các đối tượng task ban đầu. Nó phải được
+           # được await để nhận giá trị kết quả hoặc phát sinh ngoại lệ của
+           # awaitable hoàn tất tiếp theo.
            reader, writer = await next_connect
 
-   A :exc:`TimeoutError` is raised if the timeout occurs before all awaitables
-   are done. This is raised by the ``async for`` loop during asynchronous
-   iteration or by the coroutines yielded during plain iteration.
+   Một :exc:`TimeoutError` được phát sinh nếu hết thời gian chờ trước khi tất cả awaitable hoàn tất. Ngoại lệ này được phát sinh bởi vòng lặp ``async for`` trong quá trình lặp bất đồng bộ hoặc bởi các coroutine được yield trong quá trình lặp thông thường.
 
-   ``as_completed()`` does not cancel the tasks running the supplied
-   awaitables: if a timeout occurs or the iteration is cancelled, the
-   remaining tasks continue to run.
+   ``as_completed()`` không hủy các task đang chạy những awaitable được cung cấp: nếu hết thời gian chờ hoặc quá trình lặp bị hủy, các task còn lại vẫn tiếp tục chạy.
 
    .. versionchanged:: 3.10
-      Removed the *loop* parameter.
+      Đã xóa tham số *loop*.
 
    .. deprecated:: 3.10
-      Deprecation warning is emitted if not all awaitable objects in the *aws*
-      iterable are Future-like objects and there is no running event loop.
+      Một cảnh báo ngừng sử dụng được phát ra nếu không phải tất cả đối tượng awaitable trong iterable *aws* đều là đối tượng dạng Future và không có event loop nào đang chạy.
 
    .. versionchanged:: 3.12
-      Added support for generators yielding tasks.
+      Đã thêm hỗ trợ cho các generator tạo ra task.
 
    .. versionchanged:: 3.13
-      The result can now be used as either an :term:`asynchronous iterator`
-      or as a plain :term:`iterator` (previously it was only a plain iterator).
+      Kết quả giờ đây có thể được sử dụng dưới dạng :term:`asynchronous iterator` hoặc dưới dạng :term:`iterator` thuần túy (trước đây nó chỉ là một iterator thuần túy).
 
 
-Running in threads
-==================
+Chạy trong các thread
+=====================
 
 .. function:: to_thread(func, /, *args, **kwargs)
    :async:
 
-   Asynchronously run function *func* in a separate thread.
+   Chạy bất đồng bộ hàm *func* trong một thread riêng biệt.
 
-   Any \*args and \*\*kwargs supplied for this function are directly passed
-   to *func*. Also, the current :class:`contextvars.Context` is propagated,
-   allowing context variables from the event loop thread to be accessed in the
-   separate thread.
+   Mọi \*args và \*\*kwargs được cung cấp cho hàm này đều được truyền trực tiếp đến *func*. Ngoài ra, :class:`contextvars.Context` hiện tại cũng được truyền tiếp, cho phép truy cập các biến context từ thread của event loop trong thread riêng biệt.
 
-   Return a coroutine that can be awaited to get the eventual result of *func*.
+   Trả về một coroutine có thể được await để nhận kết quả sau cùng của *func*.
 
-   This coroutine function is primarily intended to be used for executing
-   IO-bound functions/methods that would otherwise block the event loop if
-   they were run in the main thread. For example::
+   Hàm coroutine này chủ yếu được dùng để thực thi các hàm/phương thức bị giới hạn bởi IO (IO-bound), vốn sẽ chặn event loop nếu được chạy trong thread chính. Ví dụ::
 
        def blocking_io():
            print(f"start blocking_io at {time.strftime('%X')}")
-           # Note that time.sleep() can be replaced with any blocking
-           # IO-bound operation, such as file operations.
+           # Lưu ý rằng time.sleep() có thể được thay thế bằng bất kỳ thao tác chặn nào
+           # Tác vụ bị giới hạn bởi I/O, chẳng hạn như thao tác với tệp.
            time.sleep(1)
            print(f"blocking_io complete at {time.strftime('%X')}")
 
@@ -1070,62 +850,54 @@ Running in threads
 
        asyncio.run(main())
 
-       # Expected output:
+       # Kết quả mong đợi:
        #
-       # started main at 19:50:53
-       # start blocking_io at 19:50:53
-       # blocking_io complete at 19:50:54
-       # finished main at 19:50:54
+       # đã bắt đầu main lúc 19:50:53
+       # bắt đầu blocking_io lúc 19:50:53
+       # blocking_io hoàn tất lúc 19:50:54
+       # đã hoàn tất main lúc 19:50:54
 
-   Directly calling ``blocking_io()`` in any coroutine would block the event loop
-   for its duration, resulting in an additional 1 second of run time. Instead,
-   by using ``asyncio.to_thread()``, we can run it in a separate thread without
-   blocking the event loop.
+   Gọi trực tiếp ``blocking_io()`` trong bất kỳ coroutine nào sẽ chặn event loop trong suốt thời gian thực thi, khiến thời gian chạy tăng thêm 1 giây. Thay vào đó, bằng cách sử dụng ``asyncio.to_thread()``, chúng ta có thể chạy nó trong một thread riêng mà không chặn event loop.
 
    .. note::
 
-      Due to the :term:`GIL`, ``asyncio.to_thread()`` can typically only be used
-      to make IO-bound functions non-blocking. However, for extension modules
-      that release the GIL or alternative Python implementations that don't
-      have one, ``asyncio.to_thread()`` can also be used for CPU-bound functions.
+      Do :term:`GIL`, ``asyncio.to_thread()`` thường chỉ có thể được dùng để làm cho các hàm bị giới hạn bởi IO không chặn. Tuy nhiên, đối với các extension module giải phóng GIL hoặc các triển khai Python thay thế không có GIL, ``asyncio.to_thread()`` cũng có thể được dùng cho các hàm bị giới hạn bởi CPU.
 
    .. versionadded:: 3.9
 
 
-Scheduling from other threads
-=============================
+Lập lịch từ các thread khác
+===========================
 
 .. function:: run_coroutine_threadsafe(coro, loop)
 
-   Submit a coroutine to the given event loop.  Thread-safe.
+   Gửi một coroutine vào event loop được chỉ định. An toàn khi sử dụng từ nhiều thread.
 
-   Return a :class:`concurrent.futures.Future` to wait for the result
-   from another OS thread.
+   Trả về một :class:`concurrent.futures.Future` để chờ kết quả từ một OS thread khác.
 
-   This function is meant to be called from a different OS thread
-   than the one where the event loop is running.  Example::
+   Hàm này được thiết kế để gọi từ một OS thread khác với thread đang chạy event loop. Ví dụ::
 
      def in_thread(loop: asyncio.AbstractEventLoop) -> None:
-         # Run some blocking IO
+         # Chạy một thao tác IO blocking
          pathlib.Path("example.txt").write_text("hello world", encoding="utf8")
 
-         # Create a coroutine
+         # Tạo một coroutine
          coro = asyncio.sleep(1, result=3)
 
-         # Submit the coroutine to a given loop
+         # Gửi coroutine đến loop được chỉ định
          future = asyncio.run_coroutine_threadsafe(coro, loop)
 
-         # Wait for the result with an optional timeout argument
+         # Chờ kết quả với đối số timeout tùy chọn
          assert future.result(timeout=2) == 3
 
      async def amain() -> None:
-         # Get the running loop
+         # Lấy loop đang chạy
          loop = asyncio.get_running_loop()
 
-         # Run something in a thread
+         # Chạy một tác vụ trong thread
          await asyncio.to_thread(in_thread, loop)
 
-   It's also possible to run the other way around.  Example::
+   Cũng có thể thực hiện theo chiều ngược lại. Ví dụ::
 
      @contextlib.contextmanager
      def loop_in_thread() -> Generator[asyncio.AbstractEventLoop]:
@@ -1148,20 +920,18 @@ Scheduling from other threads
                  else:
                      fut.result()
 
-     # Create a loop in another thread
+     # Tạo một loop trong thread khác
      with loop_in_thread() as loop:
-         # Create a coroutine
+         # Tạo một coroutine
          coro = asyncio.sleep(1, result=3)
 
-         # Submit the coroutine to a given loop
+         # Gửi coroutine đến loop được chỉ định
          future = asyncio.run_coroutine_threadsafe(coro, loop)
 
-         # Wait for the result with an optional timeout argument
+         # Chờ kết quả với đối số timeout tùy chọn
          assert future.result(timeout=2) == 3
 
-   If an exception is raised in the coroutine, the returned Future
-   will be notified.  It can also be used to cancel the task in
-   the event loop::
+   Nếu một exception được raise trong coroutine, Future được trả về sẽ nhận thông báo. Future này cũng có thể được dùng để hủy task trong event loop::
 
      try:
          result = future.result(timeout)
@@ -1173,284 +943,215 @@ Scheduling from other threads
      else:
          print(f'The coroutine returned: {result!r}')
 
-   See the :ref:`concurrency and multithreading <asyncio-multithreading>`
-   section of the documentation.
+   Xem phần :ref:`concurrency and multithreading <asyncio-multithreading>` trong tài liệu.
 
-   Unlike other asyncio functions this function requires the *loop*
-   argument to be passed explicitly.
+   Không giống các hàm asyncio khác, hàm này yêu cầu truyền tường minh đối số *loop*.
 
    .. versionadded:: 3.5.1
 
 
-Introspection
-=============
+Tự kiểm tra
+===========
 
 
 .. function:: current_task(loop=None)
 
-   Return the currently running :class:`Task` instance, or ``None`` if
-   no task is running.
+   Trả về instance :class:`Task` đang chạy hiện tại hoặc ``None`` nếu không có task nào đang chạy.
 
-   If *loop* is ``None`` :func:`get_running_loop` is used to get
-   the current loop.
+   Nếu *loop* là ``None`` thì :func:`get_running_loop` được dùng để lấy loop hiện tại.
 
    .. versionadded:: 3.7
 
 
 .. function:: all_tasks(loop=None)
 
-   Return a set of not yet finished :class:`Task` objects run by
-   the loop.
+   Trả về một tập hợp các đối tượng :class:`Task` chưa hoàn tất do loop chạy.
 
-   If *loop* is ``None``, :func:`get_running_loop` is used for getting
-   current loop.
+   Nếu *loop* là ``None`` thì :func:`get_running_loop` được dùng để lấy loop hiện tại.
 
    .. versionadded:: 3.7
 
 
 .. function:: iscoroutine(obj)
 
-   Return ``True`` if *obj* is a coroutine object.
+   Trả về ``True`` nếu *obj* là một đối tượng coroutine.
 
    .. versionadded:: 3.4
 
 .. _asyncio-task-obj:
 
-Task object
-===========
+Đối tượng Task
+==============
 
 .. class:: Task(coro, *, loop=None, name=None, context=None, eager_start=False)
 
-   A :class:`Future-like <Future>` object that runs a Python
-   :ref:`coroutine <coroutine>`.  Not thread-safe.
+   Một đối tượng :class:`Future-like <Future>` chạy một Python
+   :ref:`coroutine <coroutine>`. Không an toàn khi sử dụng với thread.
 
-   Tasks are used to run coroutines in event loops.
-   If a coroutine awaits on a Future, the Task suspends
-   the execution of the coroutine and waits for the completion
-   of the Future.  When the Future is *done*, the execution of
-   the wrapped coroutine resumes.
+   Task được dùng để chạy các coroutine trong event loop. Nếu một coroutine await một Future, Task sẽ tạm dừng việc thực thi coroutine và chờ Future hoàn tất. Khi Future đã *done*, việc thực thi coroutine được bao bọc sẽ tiếp tục.
 
-   Event loops use cooperative scheduling: an event loop runs
-   one Task at a time.  While a Task awaits for the completion of a
-   Future, the event loop runs other Tasks, callbacks, or performs
-   IO operations.
+   Event loop sử dụng cơ chế lập lịch hợp tác: mỗi lần event loop chỉ chạy một Task. Trong khi một Task chờ Future hoàn tất, event loop sẽ chạy các Task khác, các callback hoặc thực hiện các thao tác IO.
 
-   Use the high-level :func:`asyncio.create_task` function to create
-   Tasks, or the low-level :meth:`loop.create_task` or
-   :func:`ensure_future` functions.  Manual instantiation of Tasks
-   is discouraged.
+   Sử dụng hàm :func:`asyncio.create_task` cấp cao để tạo Task hoặc sử dụng :meth:`loop.create_task` cấp thấp hoặc
+   các hàm :func:`ensure_future`. Không khuyến khích khởi tạo Task thủ công.
 
-   To cancel a running Task use the :meth:`cancel` method.  Calling it
-   will cause the Task to throw a :exc:`CancelledError` exception into
-   the wrapped coroutine.  If a coroutine is awaiting on a Future
-   object during cancellation, the Future object will be cancelled.
+   Để hủy một Task đang chạy, hãy sử dụng phương thức :meth:`cancel`. Việc gọi phương thức này sẽ khiến Task ném một ngoại lệ :exc:`CancelledError` vào coroutine được bao bọc. Nếu một coroutine đang chờ một đối tượng Future trong khi bị hủy, đối tượng Future đó sẽ bị hủy.
 
-   :meth:`cancelled` can be used to check if the Task was cancelled.
-   The method returns ``True`` if the wrapped coroutine did not
-   suppress the :exc:`CancelledError` exception and was actually
-   cancelled.
+   Có thể sử dụng :meth:`cancelled` để kiểm tra xem Task đã bị hủy hay chưa. Phương thức này trả về ``True`` nếu coroutine được bao bọc không chặn ngoại lệ :exc:`CancelledError` và thực sự đã bị hủy.
 
-   :class:`asyncio.Task` inherits from :class:`Future` all of its
-   APIs except :meth:`Future.set_result` and
+   :class:`asyncio.Task` kế thừa từ :class:`Future` toàn bộ API của nó, ngoại trừ :meth:`Future.set_result` và
    :meth:`Future.set_exception`.
 
-   An optional keyword-only *context* argument allows specifying a
-   custom :class:`contextvars.Context` for the *coro* to run in.
-   If no *context* is provided, the Task copies the current context
-   and later runs its coroutine in the copied context.
+   Đối số chỉ dùng dưới dạng keyword *context* tùy chọn cho phép chỉ định một :class:`contextvars.Context` tùy chỉnh để *coro* chạy trong đó. Nếu không cung cấp *context*, Task sẽ sao chép context hiện tại và sau đó chạy coroutine của nó trong context đã sao chép.
 
-   An optional keyword-only *eager_start* argument allows eagerly starting
-   the execution of the :class:`asyncio.Task` at task creation time.
-   If set to ``True`` and the event loop is running, the task will start
-   executing the coroutine immediately, until the first time the coroutine
-   blocks. If the coroutine returns or raises without blocking, the task
-   will be finished eagerly and will skip scheduling to the event loop.
+   Đối số chỉ dùng dưới dạng keyword *eager_start* tùy chọn cho phép bắt đầu thực thi :class:`asyncio.Task` ngay khi tạo task. Nếu được đặt thành ``True`` và event loop đang chạy, task sẽ bắt đầu thực thi coroutine ngay lập tức cho đến lần đầu tiên coroutine bị block. Nếu coroutine trả về hoặc phát sinh ngoại lệ mà không bị block, task sẽ được hoàn tất ngay và bỏ qua việc lên lịch vào event loop.
 
-   Tasks are :ref:`generic <generics>` over the return type of their wrapped
-   coroutines.
+   Tasks là :ref:`generic <generics>` theo kiểu trả về của các coroutine được chúng bao bọc.
 
    .. versionchanged:: 3.7
-      Added support for the :mod:`contextvars` module.
+      Đã thêm hỗ trợ cho module :mod:`contextvars`.
 
    .. versionchanged:: 3.8
-      Added the *name* parameter.
+      Đã thêm tham số *name*.
 
    .. deprecated:: 3.10
-      Deprecation warning is emitted if *loop* is not specified
-      and there is no running event loop.
+      Cảnh báo ngừng sử dụng sẽ được phát ra nếu không chỉ định *loop* và không có event loop nào đang chạy.
 
    .. versionchanged:: 3.11
-      Added the *context* parameter.
+      Đã thêm tham số *context*.
 
    .. versionchanged:: 3.12
-      Added the *eager_start* parameter.
+      Đã thêm tham số *eager_start*.
 
    .. method:: done()
 
-      Return ``True`` if the Task is *done*.
+      Trả về ``True`` nếu Task *hoàn tất*.
 
-      A Task is *done* when the wrapped coroutine either returned
-      a value, raised an exception, or the Task was cancelled.
+      Task được *hoàn tất* khi coroutine được bọc trả về một giá trị, phát sinh một exception hoặc Task bị hủy.
 
    .. method:: result()
 
-      Return the result of the Task.
+      Trả về kết quả của Task.
 
-      If the Task is *done*, the result of the wrapped coroutine
-      is returned (or if the coroutine raised an exception, that
-      exception is re-raised.)
+      Nếu Task *hoàn tất*, kết quả của coroutine được bọc sẽ được trả về (hoặc nếu coroutine phát sinh một exception, exception đó sẽ được phát sinh lại).
 
-      If the Task has been *cancelled*, this method raises
-      a :exc:`CancelledError` exception.
+      Nếu Task đã *bị hủy*, phương thức này sẽ phát sinh một :exc:`CancelledError` exception.
 
-      If the Task's result isn't yet available, this method raises
-      an :exc:`InvalidStateError` exception.
+      Nếu kết quả của Task chưa khả dụng, phương thức này sẽ phát sinh một :exc:`InvalidStateError` exception.
 
    .. method:: exception()
 
-      Return the exception of the Task.
+      Trả về ngoại lệ của Task.
 
-      If the wrapped coroutine raised an exception that exception
-      is returned.  If the wrapped coroutine returned normally
-      this method returns ``None``.
+      Nếu coroutine được bao bọc phát sinh một ngoại lệ thì ngoại lệ đó sẽ được trả về. Nếu coroutine được bao bọc kết thúc bình thường thì phương thức này trả về ``None``.
 
-      If the Task has been *cancelled*, this method raises a
-      :exc:`CancelledError` exception.
+      Nếu Task đã được *hủy*, phương thức này sẽ phát sinh một
+      :exc:`CancelledError` ngoại lệ.
 
-      If the Task isn't *done* yet, this method raises an
-      :exc:`InvalidStateError` exception.
+      Nếu Task vẫn chưa *hoàn tất*, phương thức này sẽ phát sinh một
+      :exc:`InvalidStateError` ngoại lệ.
 
    .. method:: add_done_callback(callback, *, context=None)
 
-      Add a callback to be run when the Task is *done*.
+      Thêm một callback sẽ được chạy khi Task *hoàn tất*.
 
-      This method should only be used in low-level callback-based code.
+      Phương thức này chỉ nên được sử dụng trong mã cấp thấp dựa trên callback.
 
-      See the documentation of :meth:`Future.add_done_callback`
-      for more details.
+      Xem tài liệu về :meth:`Future.add_done_callback` để biết thêm chi tiết.
 
    .. method:: remove_done_callback(callback)
 
-      Remove *callback* from the callbacks list.
+      Xóa *callback* khỏi danh sách callback.
 
-      This method should only be used in low-level callback-based code.
+      Phương thức này chỉ nên được sử dụng trong mã cấp thấp dựa trên callback.
 
-      See the documentation of :meth:`Future.remove_done_callback`
-      for more details.
+      Xem tài liệu về :meth:`Future.remove_done_callback` để biết thêm chi tiết.
 
    .. method:: get_stack(*, limit=None)
 
-      Return the list of stack frames for this Task.
+      Trả về danh sách các stack frame của Task này.
 
-      If the wrapped coroutine is not done, this returns the stack
-      where it is suspended.  If the coroutine has completed
-      successfully or was cancelled, this returns an empty list.
-      If the coroutine was terminated by an exception, this returns
-      the list of traceback frames.
+      Nếu coroutine được bọc chưa hoàn tất, hàm này trả về stack nơi coroutine đang tạm dừng. Nếu coroutine đã hoàn tất thành công hoặc đã bị hủy, hàm này trả về một danh sách rỗng. Nếu coroutine bị kết thúc do một exception, hàm này trả về danh sách các frame trong traceback.
 
-      The frames are always ordered from oldest to newest.
+      Các frame luôn được sắp xếp từ cũ nhất đến mới nhất.
 
-      Only one stack frame is returned for a suspended coroutine.
+      Chỉ một stack frame được trả về cho coroutine bị tạm dừng.
 
-      The optional *limit* argument sets the maximum number of frames
-      to return; by default all available frames are returned.
-      The ordering of the returned list differs depending on whether
-      a stack or a traceback is returned: the newest frames of a
-      stack are returned, but the oldest frames of a traceback are
-      returned.  (This matches the behavior of the traceback module.)
+      Đối số *limit* tùy chọn đặt số frame tối đa cần trả về; theo mặc định, tất cả frame hiện có được trả về. Thứ tự của danh sách được trả về sẽ khác nhau tùy thuộc vào việc trả về stack hay traceback: các frame mới nhất của stack được trả về, còn các frame cũ nhất của traceback được trả về. (Điều này khớp với hành vi của module traceback.)
 
    .. method:: print_stack(*, limit=None, file=None)
 
-      Print the stack or traceback for this Task.
+      In stack hoặc traceback cho Task này.
 
-      This produces output similar to that of the traceback module
-      for the frames retrieved by :meth:`get_stack`.
+      Lệnh này tạo ra kết quả tương tự module traceback đối với các frame được truy xuất bởi :meth:`get_stack`.
 
-      The *limit* argument is passed to :meth:`get_stack` directly.
+      Đối số *limit* được truyền trực tiếp cho :meth:`get_stack`.
 
-      The *file* argument is an I/O stream to which the output
-      is written; by default output is written to :data:`sys.stdout`.
+      Đối số *file* là một luồng I/O mà kết quả được ghi vào đó; theo mặc định, kết quả được ghi vào :data:`sys.stdout`.
 
    .. method:: get_coro()
 
-      Return the coroutine object wrapped by the :class:`Task`.
+      Trả về đối tượng coroutine được :class:`Task` bọc.
 
       .. note::
 
-         This will return ``None`` for Tasks which have already
-         completed eagerly. See the :ref:`Eager Task Factory <eager-task-factory>`.
+         Điều này sẽ trả về ``None`` đối với các Task đã hoàn tất một cách eager. Xem :ref:`Eager Task Factory <eager-task-factory>`.
 
       .. versionadded:: 3.8
 
       .. versionchanged:: 3.12
 
-         Newly added eager task execution means result may be ``None``.
+         Việc thực thi eager task mới được bổ sung có nghĩa là result có thể là ``None``.
 
    .. method:: get_context()
 
-      Return the :class:`contextvars.Context` object
-      associated with the task.
+      Trả về đối tượng :class:`contextvars.Context` liên kết với task.
 
       .. versionadded:: 3.12
 
    .. method:: get_name()
 
-      Return the name of the Task.
+      Trả về tên của Task.
 
-      If no name has been explicitly assigned to the Task, the default
-      asyncio Task implementation generates a default name during
-      instantiation.
+      Nếu chưa gán tên rõ ràng cho Task, implementation Task mặc định của asyncio sẽ tạo một tên mặc định trong quá trình khởi tạo.
 
       .. versionadded:: 3.8
 
    .. method:: set_name(value)
 
-      Set the name of the Task.
+      Đặt tên cho Task.
 
-      The *value* argument can be any object, which is then
-      converted to a string.
+      Đối số *value* có thể là bất kỳ đối tượng nào và sau đó sẽ được chuyển đổi thành chuỗi.
 
-      In the default Task implementation, the name will be visible
-      in the :func:`repr` output of a task object.
+      Trong cách triển khai Task mặc định, tên sẽ hiển thị trong :func:`repr` output của một đối tượng Task.
 
       .. versionadded:: 3.8
 
    .. method:: cancel(msg=None)
 
-      Request the Task to be cancelled.
+      Yêu cầu Task bị hủy.
 
-      If the Task is already *done* or *cancelled*, return ``False``,
-      otherwise, return ``True``.
+      Nếu Task đã *done* hoặc *cancelled*, trả về ``False``; nếu không, trả về ``True``.
 
-      The method arranges for a :exc:`CancelledError` exception to be thrown
-      into the wrapped coroutine on the next cycle of the event loop.
+      Phương thức này sắp xếp để một :exc:`CancelledError` exception được ném vào coroutine được bao bọc trong chu kỳ tiếp theo của event loop.
 
-      The coroutine then has a chance to clean up or even deny the
-      request by suppressing the exception with a :keyword:`try` ...
-      ... ``except CancelledError`` ... :keyword:`finally` block.
-      Therefore, unlike :meth:`Future.cancel`, :meth:`Task.cancel` does
-      not guarantee that the Task will be cancelled, although
-      suppressing cancellation completely is not common and is actively
-      discouraged.  Should the coroutine nevertheless decide to suppress
-      the cancellation, it needs to call :meth:`Task.uncancel` in addition
-      to catching the exception.
+      Sau đó, coroutine có cơ hội dọn dẹp hoặc thậm chí từ chối yêu cầu bằng cách ngăn exception với một khối :keyword:`try` ... ... ``except CancelledError`` ... :keyword:`finally`. Do đó, không giống như :meth:`Future.cancel`, :meth:`Task.cancel` không đảm bảo rằng Task sẽ bị hủy, mặc dù việc hoàn toàn ngăn quá trình hủy là không phổ biến và chủ động không được khuyến khích. Tuy nhiên, nếu coroutine vẫn quyết định ngăn quá trình hủy, nó cần gọi :meth:`Task.uncancel` ngoài việc bắt exception.
 
       .. versionchanged:: 3.9
-         Added the *msg* parameter.
+         Đã thêm tham số *msg*.
 
       .. versionchanged:: 3.11
-         The ``msg`` parameter is propagated from cancelled task to its awaiter.
+         Tham số ``msg`` được truyền từ task đã bị hủy đến awaiter của task đó.
 
       .. _asyncio_example_task_cancel:
 
-      The following example illustrates how coroutines can intercept
-      the cancellation request::
+      Ví dụ sau minh họa cách các coroutine có thể chặn yêu cầu hủy::
 
           async def cancel_me():
               print('cancel_me(): before sleep')
 
               try:
-                  # Wait for 1 hour
+                  # Chờ trong 1 giờ
                   await asyncio.sleep(3600)
               except asyncio.CancelledError:
                   print('cancel_me(): cancel sleep')
@@ -1459,10 +1160,10 @@ Task object
                   print('cancel_me(): after sleep')
 
           async def main():
-              # Create a "cancel_me" Task
+              # Tạo một Task "cancel_me"
               task = asyncio.create_task(cancel_me())
 
-              # Wait for 1 second
+              # Chờ trong 1 giây
               await asyncio.sleep(1)
 
               task.cancel()
@@ -1473,82 +1174,62 @@ Task object
 
           asyncio.run(main())
 
-          # Expected output:
+          # Kết quả mong đợi:
           #
-          #     cancel_me(): before sleep
-          #     cancel_me(): cancel sleep
-          #     cancel_me(): after sleep
-          #     main(): cancel_me is cancelled now
+          #     cancel_me(): trước khi sleep
+          #     cancel_me(): hủy sleep
+          #     cancel_me(): sau sleep
+          #     main(): cancel_me hiện đã bị hủy
 
    .. method:: cancelled()
 
-      Return ``True`` if the Task is *cancelled*.
+      Trả về ``True`` nếu Task là *bị hủy*.
 
-      The Task is *cancelled* when the cancellation was requested with
-      :meth:`cancel` and the wrapped coroutine propagated the
-      :exc:`CancelledError` exception thrown into it.
+      Task ở trạng thái *bị hủy* khi yêu cầu hủy được thực hiện bằng
+      :meth:`cancel` và coroutine được bao bọc đã truyền tiếp
+      :exc:`CancelledError` ngoại lệ được ném vào nó.
 
    .. method:: uncancel()
 
-      Decrement the count of cancellation requests to this Task.
+      Giảm số lượng yêu cầu hủy đối với Task này.
 
-      Returns the remaining number of cancellation requests.
+      Trả về số lượng yêu cầu hủy còn lại.
 
-      Note that once execution of a cancelled task completed, further
-      calls to :meth:`uncancel` are ineffective.
+      Lưu ý rằng sau khi quá trình thực thi một task đã bị hủy hoàn tất, các lần gọi tiếp theo đến :meth:`uncancel` sẽ không có tác dụng.
 
       .. versionadded:: 3.11
 
-      This method is used by asyncio's internals and isn't expected to be
-      used by end-user code.  In particular, if a Task gets successfully
-      uncancelled, this allows for elements of structured concurrency like
-      :ref:`taskgroups` and :func:`asyncio.timeout` to continue running,
-      isolating cancellation to the respective structured block.
-      For example::
+      Phương thức này được sử dụng trong nội bộ asyncio và không dành cho mã của người dùng cuối. Cụ thể, nếu một Task được bỏ hủy thành công, phương thức này cho phép các phần tử của structured concurrency như
+      :ref:`taskgroups` và :func:`asyncio.timeout` tiếp tục chạy, giới hạn việc hủy trong block có cấu trúc tương ứng. Ví dụ::
 
         async def make_request_with_timeout():
             try:
                 async with asyncio.timeout(1):
-                    # Structured block affected by the timeout:
+                    # Block có cấu trúc bị ảnh hưởng bởi thời gian chờ:
                     await make_request()
                     await make_another_request()
             except TimeoutError:
                 log("There was a timeout")
-            # Outer code not affected by the timeout:
+            # Mã bên ngoài không bị ảnh hưởng bởi thời gian chờ:
             await unrelated_code()
 
-      While the block with ``make_request()`` and ``make_another_request()``
-      might get cancelled due to the timeout, ``unrelated_code()`` should
-      continue running even in case of the timeout.  This is implemented
-      with :meth:`uncancel`.  :class:`TaskGroup` context managers use
-      :func:`uncancel` in a similar fashion.
+      Mặc dù khối chứa ``make_request()`` và ``make_another_request()`` có thể bị hủy do hết thời gian chờ, ``unrelated_code()`` vẫn sẽ tiếp tục chạy ngay cả khi hết thời gian chờ. Điều này được triển khai bằng :meth:`uncancel`. Các trình quản lý ngữ cảnh :class:`TaskGroup` sử dụng
+      :func:`uncancel` theo cách tương tự.
 
-      If end-user code is, for some reason, suppressing cancellation by
-      catching :exc:`CancelledError`, it needs to call this method to remove
-      the cancellation state.
+      Nếu mã của người dùng cuối vì lý do nào đó ngăn việc hủy bằng cách bắt :exc:`CancelledError`, mã đó cần gọi phương thức này để xóa trạng thái hủy.
 
-      When this method decrements the cancellation count to zero,
-      the method checks if a previous :meth:`cancel` call had arranged
-      for :exc:`CancelledError` to be thrown into the task.
-      If it hasn't been thrown yet, that arrangement will be
-      rescinded (by resetting the internal ``_must_cancel`` flag).
+      Khi phương thức này giảm số lượng yêu cầu hủy xuống 0, phương thức sẽ kiểm tra xem một lệnh gọi :meth:`cancel` trước đó có thiết lập để :exc:`CancelledError` được ném vào task hay chưa. Nếu nó vẫn chưa được ném, thiết lập đó sẽ bị hủy bỏ (bằng cách đặt lại cờ ``_must_cancel`` nội bộ).
 
    .. versionchanged:: 3.13
-      Changed to rescind pending cancellation requests upon reaching zero.
+      Đã thay đổi để hủy bỏ các yêu cầu hủy đang chờ khi số lượng giảm xuống 0.
 
    .. method:: cancelling()
 
-      Return the number of pending cancellation requests to this Task, i.e.,
-      the number of calls to :meth:`cancel` less the number of
-      :meth:`uncancel` calls.
+      Trả về số lượng yêu cầu hủy đang chờ đối với Task này, tức là số lần gọi :meth:`cancel` trừ đi số lần gọi
+      :meth:`uncancel`.
 
-      Note that if this number is greater than zero but the Task is
-      still executing, :meth:`cancelled` will still return ``False``.
-      This is because this number can be lowered by calling :meth:`uncancel`,
-      which can lead to the task not being cancelled after all if the
-      cancellation requests go down to zero.
+      Lưu ý rằng nếu số này lớn hơn 0 nhưng Task vẫn đang thực thi, :meth:`cancelled` vẫn sẽ trả về ``False``. Điều này là do số này có thể được giảm bằng cách gọi :meth:`uncancel`, dẫn đến việc tác vụ cuối cùng có thể không bị hủy nếu số lượng yêu cầu hủy giảm xuống 0.
 
-      This method is used by asyncio's internals and isn't expected to be
-      used by end-user code.  See :meth:`uncancel` for more details.
+      Phương thức này được sử dụng trong nội bộ asyncio và không dự kiến được gọi từ code của người dùng cuối. Xem :meth:`uncancel` để biết thêm chi tiết.
 
       .. versionadded:: 3.11

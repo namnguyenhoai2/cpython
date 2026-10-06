@@ -1,100 +1,60 @@
-:mod:`!atexit` --- Exit handlers
-================================
+:mod:`!atexit` --- Trình xử lý khi thoát
+========================================
 
 .. module:: atexit
-   :synopsis: Register and execute cleanup functions.
+   :synopsis: Đăng ký và thực thi các hàm dọn dẹp.
 
 .. moduleauthor:: Skip Montanaro <skip.montanaro@gmail.com>
 .. sectionauthor:: Skip Montanaro <skip.montanaro@gmail.com>
 
 --------------
 
-The :mod:`!atexit` module defines functions to register and unregister
-:dfn:`exit handlers`: functions that are automatically executed
-"at exit", that is, upon normal program termination (for instance,
-if :func:`sys.exit` is called or the main module's execution completes)
-or, more generally, upon :term:`interpreter shutdown`.
+Mô-đun :mod:`!atexit` định nghĩa các hàm để đăng ký và hủy đăng ký
+:dfn:`trình xử lý khi thoát`: các hàm được tự động thực thi "khi thoát", tức là khi chương trình kết thúc bình thường (ví dụ: nếu :func:`sys.exit` được gọi hoặc quá trình thực thi của mô-đun chính hoàn tất) hoặc nói chung là khi :term:`interpreter shutdown`.
 
-At exit, all registered exit handlers are called
-in the *reverse* order in which they were registered.
-If you register ``A``, ``B``, and ``C``, at interpreter shutdown time they
-will be run in the order ``C``, ``B``, ``A``.
-The assumption is that lower level modules will normally be imported before
-higher level modules and thus must be cleaned up later.
+Khi thoát, tất cả trình xử lý khi thoát đã đăng ký được gọi theo thứ tự *ngược lại* với thứ tự chúng được đăng ký. Nếu bạn đăng ký ``A``, ``B`` và ``C``, khi interpreter tắt, chúng sẽ được chạy theo thứ tự ``C``, ``B``, ``A``. Giả định ở đây là các mô-đun cấp thấp thường được import trước các mô-đun cấp cao hơn và do đó phải được dọn dẹp sau.
 
-If an exception is raised during execution of an exit handler, a traceback is
-printed (unless :exc:`SystemExit` is raised) and the exception information is
-saved.  After all exit handlers have had a chance to run, the last exception to
-be raised is re-raised.
+Nếu một ngoại lệ được phát sinh trong quá trình thực thi trình xử lý khi thoát, một traceback sẽ được in (trừ khi :exc:`SystemExit` được phát sinh) và thông tin ngoại lệ sẽ được lưu lại. Sau khi tất cả trình xử lý khi thoát đã có cơ hội chạy, ngoại lệ cuối cùng được phát sinh sẽ được phát sinh lại.
 
-In programs that use multiple interpreters, each interpreter has its own stack
-of exit handlers, which are executed when the interpreter shuts down
-(for example, with :meth:`concurrent.interpreters.Interpreter.close` or the
-C API :c:func:`Py_EndInterpreter`).
-Registration functions in this module only affect the interpreter they are
-called from.
+Trong các chương trình sử dụng nhiều interpreter, mỗi interpreter có ngăn xếp trình xử lý khi thoát riêng, được thực thi khi interpreter tắt (ví dụ: với :meth:`concurrent.interpreters.Interpreter.close` hoặc C API :c:func:`Py_EndInterpreter`). Các hàm đăng ký trong mô-đun này chỉ ảnh hưởng đến interpreter mà chúng được gọi từ đó.
 
-**Note:** Exit handlers are not called when the
-program is killed by a signal not handled by Python, when a Python fatal
-internal error is detected, or when :func:`os._exit` is called.
+**Lưu ý:** Các trình xử lý khi thoát không được gọi khi chương trình bị kết thúc bởi một signal không được Python xử lý, khi phát hiện lỗi nghiêm trọng nội bộ của Python hoặc khi gọi :func:`os._exit`.
 
-**Note:** The effect of registering or unregistering functions from within
-a cleanup function is undefined.
+**Lưu ý:** Hành vi khi đăng ký hoặc hủy đăng ký các hàm từ bên trong một hàm dọn dẹp là không xác định.
 
 .. warning::
-   When writing exit handlers, especially in C API extensions, keep in mind
-   that other exit handlers may still run arbitrary Python code after you
-   clean up.
-   Such code should succeed or fail with an exception, rather than crash.
+   Khi viết các trình xử lý khi thoát, đặc biệt là trong các phần mở rộng C API, hãy lưu ý rằng những trình xử lý khi thoát khác vẫn có thể chạy mã Python tùy ý sau khi bạn dọn dẹp. Mã đó phải thành công hoặc thất bại với một exception, thay vì làm chương trình bị crash.
 
 .. versionchanged:: 3.12
-   Attempts to start a new thread or :func:`os.fork` a new process
-   in an exit handler now leads to :exc:`RuntimeError`.
-   Previously, this could cause race conditions between the main Python
-   runtime thread freeing thread states while internal :mod:`threading`
-   routines or the new process try to use that state, which could lead to
-   crashes rather than clean shutdown.
+   Việc cố gắng khởi động một thread mới hoặc :func:`os.fork` một process mới trong trình xử lý khi thoát hiện sẽ dẫn đến :exc:`RuntimeError`. Trước đây, điều này có thể gây ra race condition giữa việc thread runtime Python chính giải phóng các thread state trong khi các routine :mod:`threading` nội bộ hoặc process mới cố gắng sử dụng state đó, dẫn đến crash thay vì tắt máy sạch sẽ.
 
 .. versionchanged:: 3.7
-   When used with subinterpreters, registered functions
-   are local to the interpreter they were registered in.
+   Khi được sử dụng với subinterpreter, các hàm đã đăng ký chỉ thuộc về interpreter nơi chúng được đăng ký.
 
 .. function:: register(func, *args, **kwargs)
 
-   Register *func* as an exit handler.
-   Any optional arguments that are to be passed to *func* must be passed as
-   arguments to :func:`register`.
-   It is possible to register the same function and arguments more than once.
+   Đăng ký *func* làm trình xử lý khi thoát. Mọi đối số tùy chọn cần được truyền cho *func* phải được truyền dưới dạng đối số cho :func:`register`. Có thể đăng ký cùng một hàm và các đối số nhiều lần.
 
-   This function returns *func*, which makes it possible to use it as a
-   decorator.
+   Hàm này trả về *func*, nhờ đó có thể sử dụng nó làm decorator.
 
 .. function:: unregister(func)
 
-   Remove *func* from the list of exit handlers.
-   :func:`unregister` silently does nothing if *func* was not previously
-   registered.  If *func* has been registered more than once, every occurrence
-   of that function in the :mod:`!atexit` call stack will be removed.  Equality
-   comparisons (``==``) are used internally during unregistration, so function
-   references do not need to have matching identities.
+   Xóa *func* khỏi danh sách các exit handler.
+   :func:`unregister` không làm gì một cách im lặng nếu *func* chưa được đăng ký trước đó. Nếu *func* đã được đăng ký nhiều lần, mọi lần xuất hiện của hàm đó trong ngăn xếp lời gọi :mod:`!atexit` sẽ bị xóa. Các phép so sánh bằng (``==``) được sử dụng nội bộ trong quá trình hủy đăng ký, vì vậy các tham chiếu hàm không cần có cùng identity.
 
 
 .. seealso::
 
-   Module :mod:`readline`
-      Useful example of :mod:`!atexit` to read and write :mod:`readline` history
-      files.
+   Mô-đun :mod:`readline`
+      Ví dụ hữu ích về :mod:`!atexit` để đọc và ghi các tệp lịch sử :mod:`readline`.
 
 
 .. _atexit-example:
 
-:mod:`!atexit` Example
-----------------------
+Ví dụ :mod:`!atexit`
+--------------------
 
-The following simple example demonstrates how a module can initialize a counter
-from a file when it is imported and save the counter's updated value
-automatically when the program terminates without relying on the application
-making an explicit call into this module at termination. ::
+Ví dụ đơn giản sau đây minh họa cách một mô-đun có thể khởi tạo bộ đếm từ một tệp khi được import và tự động lưu giá trị đã cập nhật của bộ đếm khi chương trình kết thúc mà không cần ứng dụng gọi tường minh vào mô-đun này lúc kết thúc.::
 
    try:
        with open('counterfile') as infile:
@@ -114,8 +74,7 @@ making an explicit call into this module at termination. ::
 
    atexit.register(savecounter)
 
-Positional and keyword arguments may also be passed to :func:`register` to be
-passed along to the registered function when it is called::
+Các đối số vị trí và đối số từ khóa cũng có thể được truyền cho :func:`register` để truyền tiếp cho hàm đã đăng ký khi hàm đó được gọi::
 
    def goodbye(name, adjective):
        print('Goodbye %s, it was %s to meet you.' % (name, adjective))
@@ -123,10 +82,10 @@ passed along to the registered function when it is called::
    import atexit
 
    atexit.register(goodbye, 'Donny', 'nice')
-   # or:
+   # hoặc:
    atexit.register(goodbye, adjective='nice', name='Donny')
 
-Usage as a :term:`decorator`::
+Sử dụng như một :term:`decorator`::
 
    import atexit
 
@@ -134,4 +93,4 @@ Usage as a :term:`decorator`::
    def goodbye():
        print('You are now leaving the Python sector.')
 
-This only works with functions that can be called without arguments.
+Điều này chỉ hoạt động với các hàm có thể được gọi mà không cần đối số.

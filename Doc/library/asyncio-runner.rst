@@ -1,17 +1,16 @@
 .. currentmodule:: asyncio
 
 
-=======
-Runners
-=======
+==========
+Trình chạy
+==========
 
-**Source code:** :source:`Lib/asyncio/runners.py`
+**Mã nguồn:** :source:`Lib/asyncio/runners.py`
 
 
-This section outlines high-level asyncio primitives to run asyncio code.
+Phần này trình bày các primitive asyncio cấp cao để chạy mã asyncio.
 
-They are built on top of an :ref:`event loop <asyncio-event-loop>` with the aim
-to simplify async code usage for common wide-spread scenarios.
+Chúng được xây dựng trên :ref:`vòng lặp sự kiện <asyncio-event-loop>` với mục tiêu đơn giản hóa việc sử dụng mã bất đồng bộ trong các tình huống phổ biến.
 
 .. contents::
    :depth: 1
@@ -19,39 +18,27 @@ to simplify async code usage for common wide-spread scenarios.
 
 
 
-Running an asyncio Program
-==========================
+Chạy một chương trình asyncio
+=============================
 
 .. function:: run(coro, *, debug=None, loop_factory=None)
 
-   Execute *coro* in an asyncio event loop and return the result.
+   Thực thi *coro* trong một event loop của asyncio và trả về kết quả.
 
-   The argument can be any awaitable object.
+   Đối số có thể là bất kỳ đối tượng awaitable nào.
 
-   This function runs the awaitable, taking care of managing the
-   asyncio event loop, *finalizing asynchronous generators*, and
-   closing the executor.
+   Hàm này chạy awaitable, đảm nhiệm việc quản lý event loop của asyncio, *hoàn tất các asynchronous generator*, và đóng executor.
 
-   This function cannot be called when another asyncio event loop is
-   running in the same thread.
+   Không thể gọi hàm này khi một event loop khác của asyncio đang chạy trong cùng thread.
 
-   If *debug* is ``True``, the event loop will be run in debug mode. ``False`` disables
-   debug mode explicitly. ``None`` is used to respect the global
-   :ref:`asyncio-debug-mode` settings.
+   Nếu *debug* là ``True``, event loop sẽ chạy ở chế độ debug. ``False`` tắt chế độ debug một cách rõ ràng. ``None`` được dùng để tuân theo các thiết lập toàn cục
+   :ref:`asyncio-debug-mode`.
 
-   If *loop_factory* is not ``None``, it is used to create a new event loop;
-   otherwise :func:`asyncio.new_event_loop` is used. The loop is closed at the end.
-   This function should be used as a main entry point for asyncio programs,
-   and should ideally only be called once. It is recommended to use
-   *loop_factory* to configure the event loop instead of policies.
-   Passing :class:`asyncio.EventLoop` allows running asyncio without the
-   policy system.
+   Nếu *loop_factory* không phải là ``None``, nó sẽ được dùng để tạo event loop mới; nếu không, :func:`asyncio.new_event_loop` sẽ được dùng. Loop được đóng khi kết thúc. Nên dùng hàm này làm điểm vào chính cho các chương trình asyncio và lý tưởng nhất là chỉ gọi hàm này một lần. Khuyến nghị sử dụng *loop_factory* để cấu hình event loop thay vì các policy. Truyền :class:`asyncio.EventLoop` cho phép chạy asyncio mà không cần hệ thống policy.
 
-   The executor is given a timeout duration of 5 minutes to shutdown.
-   If the executor hasn't finished within that duration, a warning is
-   emitted and the executor is closed.
+   Executor được cấp thời lượng chờ 5 phút để tắt. Nếu executor chưa hoàn tất trong khoảng thời gian đó, một cảnh báo sẽ được phát ra và executor sẽ được đóng.
 
-   Example::
+   Ví dụ::
 
        async def main():
            await asyncio.sleep(1)
@@ -62,48 +49,40 @@ Running an asyncio Program
    .. versionadded:: 3.7
 
    .. versionchanged:: 3.9
-      Updated to use :meth:`loop.shutdown_default_executor`.
+      Đã cập nhật để sử dụng :meth:`loop.shutdown_default_executor`.
 
    .. versionchanged:: 3.10
 
-      *debug* is ``None`` by default to respect the global debug mode settings.
+      *debug* được ``None`` theo mặc định để tuân theo các thiết lập debug toàn cục.
 
    .. versionchanged:: 3.12
 
-      Added *loop_factory* parameter.
+      Đã thêm tham số *loop_factory*.
 
    .. versionchanged:: 3.14
 
-      *coro* can be any awaitable object.
+      *coro* có thể là bất kỳ đối tượng awaitable nào.
 
    .. note::
 
-      The :mod:`!asyncio` policy system is deprecated and will be removed
-      in Python 3.16; from there on, an explicit *loop_factory* is needed
-      to configure the event loop.
+      Hệ thống :mod:`!asyncio` policy đã lỗi thời và sẽ bị xóa trong Python 3.16; kể từ đó, cần có *loop_factory* tường minh để cấu hình event loop.
 
 
-Runner context manager
-======================
+Trình quản lý ngữ cảnh Runner
+=============================
 
 .. class:: Runner(*, debug=None, loop_factory=None)
 
-   A context manager that simplifies *multiple* async function calls in the same
-   context.
+   Một trình quản lý ngữ cảnh giúp đơn giản hóa việc gọi *multiple* hàm async trong cùng một ngữ cảnh.
 
-   Sometimes several top-level async functions should be called in the same :ref:`event
-   loop <asyncio-event-loop>` and :class:`contextvars.Context`.
+   Đôi khi cần gọi một số hàm async cấp cao nhất trong cùng một :ref:`event loop <asyncio-event-loop>` và :class:`contextvars.Context`.
 
-   If *debug* is ``True``, the event loop will be run in debug mode. ``False`` disables
-   debug mode explicitly. ``None`` is used to respect the global
-   :ref:`asyncio-debug-mode` settings.
+   Nếu *debug* là ``True``, event loop sẽ chạy ở chế độ debug. ``False`` tắt chế độ debug một cách rõ ràng. ``None`` được dùng để tôn trọng các thiết lập chung
+   :ref:`asyncio-debug-mode`.
 
-   *loop_factory* could be used for overriding the loop creation.
-   It is the responsibility of the *loop_factory* to set the created loop as the
-   current one. By default :func:`asyncio.new_event_loop` is used and set as
-   current event loop with :func:`asyncio.set_event_loop` if *loop_factory* is ``None``.
+   *loop_factory* có thể được dùng để ghi đè việc tạo loop. Trách nhiệm của *loop_factory* là đặt loop được tạo làm loop hiện tại. Theo mặc định, :func:`asyncio.new_event_loop` được sử dụng và đặt làm event loop hiện tại bằng :func:`asyncio.set_event_loop` nếu *loop_factory* là ``None``.
 
-   Basically, :func:`asyncio.run` example can be rewritten with the runner usage::
+   Về cơ bản, :func:`asyncio.run` ví dụ có thể được viết lại bằng cách sử dụng runner::
 
         async def main():
             await asyncio.sleep(1)
@@ -116,67 +95,53 @@ Runner context manager
 
    .. method:: run(coro, *, context=None)
 
-      Execute *coro* in the embedded event loop.
+      Thực thi *coro* trong event loop được nhúng.
 
-      The argument can be any awaitable object.
+      Đối số có thể là bất kỳ đối tượng awaitable nào.
 
-      If the argument is a coroutine, it is wrapped in a Task.
+      Nếu đối số là một coroutine, nó sẽ được bọc trong một Task.
 
-      An optional keyword-only *context* argument allows specifying a
-      custom :class:`contextvars.Context` for the code to run in.
-      The runner's default context is used if context is ``None``.
+      Đối số chỉ dành cho từ khóa *context* tùy chọn cho phép chỉ định một :class:`contextvars.Context` tùy chỉnh để mã chạy trong đó. Context mặc định của runner được sử dụng nếu context là ``None``.
 
-      Returns the awaitable's result or raises an exception.
+      Trả về kết quả của awaitable hoặc phát sinh một exception.
 
-      This function cannot be called when another asyncio event loop is
-      running in the same thread.
+      Không thể gọi hàm này khi một event loop asyncio khác đang chạy trong cùng thread.
 
       .. versionchanged:: 3.14
 
-         *coro* can be any awaitable object.
+         *coro* có thể là bất kỳ đối tượng awaitable nào.
 
    .. method:: close()
 
-      Close the runner.
+      Đóng runner.
 
-      Finalize asynchronous generators, shutdown default executor, close the event loop
-      and release embedded :class:`contextvars.Context`.
+      Hoàn tất các asynchronous generator, tắt default executor, đóng event loop và giải phóng :class:`contextvars.Context` được nhúng.
 
    .. method:: get_loop()
 
-      Return the event loop associated with the runner instance.
+      Trả về event loop được liên kết với runner instance.
 
    .. note::
 
-      :class:`Runner` uses the lazy initialization strategy, its constructor doesn't
-      initialize underlying low-level structures.
+      :class:`Runner` sử dụng chiến lược khởi tạo lười, constructor của nó không khởi tạo các cấu trúc cấp thấp bên dưới.
 
-      Embedded *loop* and *context* are created at the :keyword:`with` body entering
-      or the first call of :meth:`run` or :meth:`get_loop`.
+      *loop* và *context* được nhúng sẽ được tạo khi bắt đầu đi vào phần thân của :keyword:`with` hoặc trong lần gọi đầu tiên đến :meth:`run` hay :meth:`get_loop`.
 
 
-Handling Keyboard Interruption
-==============================
+Xử lý việc ngắt bằng bàn phím
+=============================
 
 .. versionadded:: 3.11
 
-When :const:`signal.SIGINT` is raised by :kbd:`Ctrl-C`, :exc:`KeyboardInterrupt`
-exception is raised in the main thread by default. However this doesn't work with
-:mod:`asyncio` because it can interrupt asyncio internals and can hang the program from
-exiting.
+Khi :const:`signal.SIGINT` được :kbd:`Ctrl-C` phát sinh, ngoại lệ :exc:`KeyboardInterrupt` mặc định được phát sinh trong main thread. Tuy nhiên, cách này không hoạt động với
+:mod:`asyncio` vì nó có thể làm gián đoạn các thành phần nội bộ của asyncio và khiến chương trình bị treo khi thoát.
 
-To mitigate this issue, :mod:`asyncio` handles :const:`signal.SIGINT` as follows:
+Để giảm thiểu vấn đề này, :mod:`asyncio` xử lý :const:`signal.SIGINT` như sau:
 
-1. :meth:`asyncio.Runner.run` installs a custom :const:`signal.SIGINT` handler before
-   any user code is executed and removes it when exiting from the function.
-2. The :class:`~asyncio.Runner` creates the main task for the passed coroutine for its
-   execution.
-3. When :const:`signal.SIGINT` is raised by :kbd:`Ctrl-C`, the custom signal handler
-   cancels the main task by calling :meth:`asyncio.Task.cancel` which raises
-   :exc:`asyncio.CancelledError` inside the main task.  This causes the Python stack
-   to unwind, ``try/except`` and ``try/finally`` blocks can be used for resource
-   cleanup.  After the main task is cancelled, :meth:`asyncio.Runner.run` raises
+1. :meth:`asyncio.Runner.run` cài đặt một bộ xử lý :const:`signal.SIGINT` tùy chỉnh trước khi bất kỳ mã người dùng nào được thực thi và gỡ bỏ bộ xử lý này khi thoát khỏi hàm.
+2. :class:`~asyncio.Runner` tạo task chính để thực thi coroutine được truyền vào.
+3. Khi :const:`signal.SIGINT` được :kbd:`Ctrl-C` raise, bộ xử lý tín hiệu tùy chỉnh sẽ hủy task chính bằng cách gọi :meth:`asyncio.Task.cancel`, lệnh này raise
+   :exc:`asyncio.CancelledError` bên trong task chính. Điều này khiến stack Python unwind; các block ``try/except`` và ``try/finally`` có thể được dùng để dọn dẹp tài nguyên. Sau khi task chính bị hủy, :meth:`asyncio.Runner.run` raise
    :exc:`KeyboardInterrupt`.
-4. A user could write a tight loop which cannot be interrupted by
-   :meth:`asyncio.Task.cancel`, in which case the second following :kbd:`Ctrl-C`
-   immediately raises the :exc:`KeyboardInterrupt` without cancelling the main task.
+4. Người dùng có thể viết một vòng lặp chặt không thể bị ngắt bởi
+   :meth:`asyncio.Task.cancel`; trong trường hợp đó, lần :kbd:`Ctrl-C` thứ hai ngay sau đó sẽ lập tức raise :exc:`KeyboardInterrupt` mà không hủy task chính.

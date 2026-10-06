@@ -1,13 +1,10 @@
 .. _allos:
 
-*********************************
-Generic Operating System Services
-*********************************
+******************************
+Các dịch vụ hệ điều hành chung
+******************************
 
-The modules described in this chapter provide interfaces to operating system
-features that are available on (almost) all operating systems, such as files and
-a clock.  The interfaces are generally modeled after the Unix or C interfaces,
-but they are available on most other systems as well.  Here's an overview:
+Các module được mô tả trong chương này cung cấp các interface cho những tính năng của hệ điều hành có sẵn trên (gần như) mọi hệ điều hành, chẳng hạn như tệp và đồng hồ. Các interface này thường được mô phỏng theo interface của Unix hoặc C, nhưng cũng có trên hầu hết các hệ thống khác. Dưới đây là phần tổng quan:
 
 
 .. toctree::

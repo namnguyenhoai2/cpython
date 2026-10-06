@@ -1,48 +1,37 @@
-:mod:`!abc` --- Abstract Base Classes
-=====================================
+:mod:`!abc` --- Lớp cơ sở trừu tượng
+====================================
 
 .. module:: abc
-   :synopsis: Abstract base classes according to :pep:`3119`.
+   :synopsis: Các lớp cơ sở trừu tượng theo :pep:`3119`.
 
 .. moduleauthor:: Guido van Rossum
 .. sectionauthor:: Georg Brandl
 .. much of the content adapted from docstrings
 
-**Source code:** :source:`Lib/abc.py`
+**Mã nguồn:** :source:`Lib/abc.py`
 
 --------------
 
-This module provides the infrastructure for defining :term:`abstract base
-classes <abstract base class>` (ABCs) in Python, as outlined in :pep:`3119`;
-see the PEP for why this was added to Python. (See also :pep:`3141` and the
-:mod:`numbers` module regarding a type hierarchy for numbers based on ABCs.)
+Mô-đun này cung cấp cơ sở hạ tầng để định nghĩa :term:`lớp cơ sở trừu tượng <abstract base class>` (ABC) trong Python, như được nêu trong :pep:`3119`; hãy xem PEP để biết lý do tính năng này được thêm vào Python. (Xem thêm :pep:`3141` và
+:mod:`numbers` mô-đun liên quan đến hệ phân cấp kiểu cho các số dựa trên ABC.)
 
-The :mod:`collections` module has some concrete classes that derive from
-ABCs; these can, of course, be further derived. In addition, the
-:mod:`collections.abc` submodule has some ABCs that can be used to test whether
-a class or instance provides a particular interface, for example, if it is
-:term:`hashable` or if it is a :term:`mapping`.
+Mô-đun :mod:`collections` có một số lớp cụ thể kế thừa từ ABC; tất nhiên, bạn có thể tiếp tục tạo các lớp dẫn xuất từ chúng. Ngoài ra,
+mô-đun con :mod:`collections.abc` có một số ABC có thể được dùng để kiểm tra xem một lớp hoặc thực thể có cung cấp một giao diện cụ thể hay không, chẳng hạn như nếu nó
+:term:`hashable` hoặc nếu đó là một :term:`mapping`.
 
 
-This module provides the metaclass :class:`ABCMeta` for defining ABCs and
-a helper class :class:`ABC` to alternatively define ABCs through inheritance:
+Mô-đun này cung cấp metaclass :class:`ABCMeta` để định nghĩa các ABC và một lớp trợ giúp :class:`ABC` để định nghĩa các ABC thông qua kế thừa theo cách khác:
 
 .. class:: ABC
 
-   A helper class that has :class:`ABCMeta` as its metaclass.  With this class,
-   an abstract base class can be created by simply deriving from :class:`!ABC`
-   avoiding sometimes confusing metaclass usage, for example::
+   Một lớp trợ giúp có :class:`ABCMeta` làm metaclass. Với lớp này, có thể tạo một abstract base class bằng cách đơn giản là kế thừa từ :class:`!ABC`, tránh việc đôi khi gây nhầm lẫn khi sử dụng metaclass, ví dụ::
 
      from abc import ABC
 
      class MyABC(ABC):
          pass
 
-   Note that the type of :class:`!ABC` is still :class:`ABCMeta`, therefore
-   inheriting from :class:`!ABC` requires the usual precautions regarding
-   metaclass usage, as multiple inheritance may lead to metaclass conflicts.
-   One may also define an abstract base class by passing the metaclass
-   keyword and using :class:`!ABCMeta` directly, for example::
+   Lưu ý rằng kiểu của :class:`!ABC` vẫn là :class:`ABCMeta`, do đó việc kế thừa từ :class:`!ABC` đòi hỏi các biện pháp thận trọng thông thường khi sử dụng metaclass, vì đa kế thừa có thể dẫn đến xung đột metaclass. Bạn cũng có thể định nghĩa một abstract base class bằng cách truyền từ khóa metaclass và sử dụng trực tiếp :class:`!ABCMeta`, ví dụ::
 
      from abc import ABCMeta
 
@@ -54,23 +43,16 @@ a helper class :class:`ABC` to alternatively define ABCs through inheritance:
 
 .. class:: ABCMeta
 
-   Metaclass for defining Abstract Base Classes (ABCs).
+   Metaclass dùng để định nghĩa Abstract Base Classes (ABC).
 
-   Use this metaclass to create an ABC.  An ABC can be subclassed directly, and
-   then acts as a mix-in class.  You can also register unrelated concrete
-   classes (even built-in classes) and unrelated ABCs as "virtual subclasses" --
-   these and their descendants will be considered subclasses of the registering
-   ABC by the built-in :func:`issubclass` function, but the registering ABC
-   won't show up in their MRO (Method Resolution Order) nor will method
-   implementations defined by the registering ABC be callable (not even via
+   Sử dụng metaclass này để tạo một ABC. Một ABC có thể được phân lớp trực tiếp và sau đó hoạt động như một lớp mix-in. Bạn cũng có thể đăng ký các lớp cụ thể không liên quan (kể cả các lớp tích hợp sẵn) và các ABC không liên quan dưới dạng "virtual subclass" -- các lớp này và các lớp con của chúng sẽ được hàm tích hợp sẵn :func:`issubclass` xem là các lớp con của ABC đăng ký, nhưng ABC đăng ký sẽ không xuất hiện trong MRO (Method Resolution Order) của chúng, và các triển khai phương thức được định nghĩa bởi ABC đăng ký cũng sẽ không thể gọi được (kể cả thông qua
    :func:`super`). [#]_
 
-   Classes created with a metaclass of :class:`!ABCMeta` have the following method:
+   Các lớp được tạo với metaclass là :class:`!ABCMeta` có phương thức sau:
 
    .. method:: register(subclass)
 
-      Register *subclass* as a "virtual subclass" of this ABC. For
-      example::
+      Đăng ký *subclass* dưới dạng một “lớp con ảo” (virtual subclass) của ABC này. Ví dụ::
 
          from abc import ABC
 
@@ -83,35 +65,28 @@ a helper class :class:`ABC` to alternatively define ABCs through inheritance:
          assert isinstance((), MyABC)
 
       .. versionchanged:: 3.3
-         Returns the registered subclass, to allow usage as a class decorator.
+         Trả về lớp con đã đăng ký, cho phép sử dụng làm class decorator.
 
       .. versionchanged:: 3.4
-         To detect calls to :meth:`!register`, you can use the
-         :func:`get_cache_token` function.
+         Để phát hiện các lệnh gọi đến :meth:`!register`, bạn có thể sử dụng
+         hàm :func:`get_cache_token`.
 
-   You can also override this method in an abstract base class:
+   Bạn cũng có thể ghi đè phương thức này trong một abstract base class:
 
    .. method:: __subclasshook__(subclass)
 
-      (Must be defined as a class method.)
+      (Phải được định nghĩa dưới dạng một class method.)
 
-      Check whether *subclass* is considered a subclass of this ABC.  This means
-      that you can customize the behavior of :func:`issubclass` further without the
-      need to call :meth:`register` on every class you want to consider a
-      subclass of the ABC.  (This class method is called from the
-      :meth:`~type.__subclasscheck__` method of the ABC.)
+      Kiểm tra xem *subclass* có được xem là lớp con của ABC này hay không. Điều này có nghĩa là bạn có thể tùy chỉnh thêm hành vi của :func:`issubclass` mà không cần gọi :meth:`register` trên mọi lớp mà bạn muốn xem là lớp con của ABC. (Class method này được gọi từ
+      :meth:`~type.__subclasscheck__` của ABC.)
 
-      This method should return ``True``, ``False`` or :data:`NotImplemented`.  If
-      it returns ``True``, the *subclass* is considered a subclass of this ABC.
-      If it returns ``False``, the *subclass* is not considered a subclass of
-      this ABC, even if it would normally be one.  If it returns
-      :data:`!NotImplemented`, the subclass check is continued with the usual
-      mechanism.
+      Phương thức này phải trả về ``True``, ``False`` hoặc :data:`NotImplemented`. Nếu trả về ``True``, *subclass* được xem là một subclass của ABC này. Nếu trả về ``False``, *subclass* không được xem là một subclass của ABC này, ngay cả khi theo thông thường nó phải là một subclass. Nếu trả về
+      :data:`!NotImplemented`, việc kiểm tra subclass sẽ tiếp tục bằng cơ chế thông thường.
 
       .. XXX explain the "usual mechanism"
 
 
-   For a demonstration of these concepts, look at this example ABC definition::
+   Để minh họa các khái niệm này, hãy xem định nghĩa ABC mẫu sau đây::
 
       class Foo:
           def __getitem__(self, index):
@@ -140,49 +115,32 @@ a helper class :class:`ABC` to alternatively define ABCs through inheritance:
 
       MyIterable.register(Foo)
 
-   The ABC ``MyIterable`` defines the standard iterable method,
-   :meth:`~object.__iter__`, as an abstract method.  The implementation given
-   here can still be called from subclasses.  The :meth:`!get_iterator` method
-   is also part of the ``MyIterable`` abstract base class, but it does not have
-   to be overridden in non-abstract derived classes.
+   ABC ``MyIterable`` định nghĩa phương thức iterable tiêu chuẩn,
+   :meth:`~object.__iter__`, dưới dạng một abstract method. Phần triển khai được cung cấp ở đây vẫn có thể được gọi từ các subclass. Phương thức :meth:`!get_iterator` cũng là một phần của abstract base class ``MyIterable``, nhưng không bắt buộc phải được ghi đè trong các derived class không trừu tượng.
 
-   The :meth:`__subclasshook__` class method defined here says that any class
-   that has an :meth:`~object.__iter__` method in its
-   :attr:`~object.__dict__` (or in that of one of its base classes, accessed
-   via the :attr:`~type.__mro__` list) is considered a ``MyIterable`` too.
+   Phương thức class :meth:`__subclasshook__` được định nghĩa ở đây cho biết rằng mọi class có phương thức :meth:`~object.__iter__` trong
+   :attr:`~object.__dict__` (hoặc trong một lớp cơ sở của nó, được truy cập thông qua danh sách :attr:`~type.__mro__`) cũng được xem là một ``MyIterable``.
 
-   Finally, the last line makes ``Foo`` a virtual subclass of ``MyIterable``,
-   even though it does not define an :meth:`~object.__iter__` method (it uses
-   the old-style iterable protocol, defined in terms of :meth:`~object.__len__` and
-   :meth:`~object.__getitem__`).  Note that this will not make ``get_iterator``
-   available as a method of ``Foo``, so it is provided separately.
+   Cuối cùng, dòng cuối biến ``Foo`` thành một lớp con ảo của ``MyIterable``, dù nó không định nghĩa phương thức :meth:`~object.__iter__` (nó sử dụng giao thức iterable kiểu cũ, được định nghĩa theo :meth:`~object.__len__` và
+   :meth:`~object.__getitem__`). Lưu ý rằng điều này không làm cho ``get_iterator`` khả dụng dưới dạng một phương thức của ``Foo``, vì vậy nó được cung cấp riêng.
 
 
 
 
-The :mod:`!abc` module also provides the following decorator:
+Mô-đun :mod:`!abc` cũng cung cấp decorator sau:
 
 .. decorator:: abstractmethod
 
-   A decorator indicating abstract methods.
+   Một decorator cho biết các phương thức là abstract.
 
-   Using this decorator requires that the class's metaclass is :class:`ABCMeta`
-   or is derived from it.  A class that has a metaclass derived from
-   :class:`!ABCMeta` cannot be instantiated unless all of its abstract methods
-   and properties are overridden.  The abstract methods can be called using any
-   of the normal 'super' call mechanisms.  :deco:`!abstractmethod` may be used
-   to declare abstract methods for properties and descriptors.
+   Việc sử dụng decorator này yêu cầu metaclass của lớp là :class:`ABCMeta` hoặc được kế thừa từ nó. Một lớp có metaclass được kế thừa từ
+   :class:`!ABCMeta` không thể được khởi tạo trừ khi tất cả các phương thức và thuộc tính abstract của nó được ghi đè. Có thể gọi các phương thức abstract bằng bất kỳ cơ chế gọi 'super' thông thường nào. Có thể sử dụng :deco:`!abstractmethod` để khai báo các phương thức abstract cho thuộc tính và descriptor.
 
-   Dynamically adding abstract methods to a class, or attempting to modify the
-   abstraction status of a method or class once it is created, are only
-   supported using the :func:`update_abstractmethods` function.  The
-   :deco:`!abstractmethod` only affects subclasses derived using regular
-   inheritance; "virtual subclasses" registered with the ABC's
-   :meth:`~ABCMeta.register` method are not affected.
+   Việc thêm động các phương thức abstract vào một class hoặc cố gắng thay đổi trạng thái abstraction của một phương thức hay class sau khi đã tạo chỉ được hỗ trợ bằng hàm :func:`update_abstractmethods`.  Hàm
+   :deco:`!abstractmethod` chỉ ảnh hưởng đến các subclass được dẫn xuất bằng cơ chế kế thừa thông thường; các "virtual subclass" được đăng ký với ABC
+   không bị ảnh hưởng bởi phương thức :meth:`~ABCMeta.register`.
 
-   When :deco:`!abstractmethod` is applied in combination with other method
-   descriptors, it should be applied as the innermost decorator, as shown in
-   the following usage examples::
+   Khi áp dụng :deco:`!abstractmethod` kết hợp với các method descriptor khác, nên áp dụng nó làm decorator trong cùng, như minh họa trong các ví dụ sử dụng sau đây::
 
       class C(ABC):
           @abstractmethod
@@ -214,11 +172,8 @@ The :mod:`!abc` module also provides the following decorator:
               ...
           x = property(_get_x, _set_x)
 
-   In order to correctly interoperate with the abstract base class machinery,
-   the descriptor must identify itself as abstract using
-   :attr:`!__isabstractmethod__`. In general, this attribute should be ``True``
-   if any of the methods used to compose the descriptor are abstract. For
-   example, Python's built-in :deco:`property` does the equivalent of::
+   Để tương tác chính xác với cơ chế abstract base class, descriptor phải tự xác định là abstract bằng cách sử dụng
+   :attr:`!__isabstractmethod__`. Nhìn chung, thuộc tính này phải là ``True`` nếu bất kỳ phương thức nào được dùng để tạo descriptor là abstract. Ví dụ, :deco:`property` tích hợp sẵn của Python thực hiện tương đương với::
 
       class Descriptor:
           ...
@@ -229,28 +184,20 @@ The :mod:`!abc` module also provides the following decorator:
 
    .. note::
 
-      Unlike Java abstract methods, these abstract
-      methods may have an implementation. This implementation can be
-      called via the :func:`super` mechanism from the class that
-      overrides it.  This could be useful as an end-point for a
-      super-call in a framework that uses cooperative
-      multiple-inheritance.
+      Không giống các abstract method trong Java, những phương thức abstract này có thể có phần triển khai. Có thể gọi phần triển khai này thông qua cơ chế :func:`super` từ class ghi đè nó. Điều này có thể hữu ích làm điểm kết thúc cho một super-call trong framework sử dụng cơ chế multiple-inheritance mang tính hợp tác.
 
-The :mod:`!abc` module also supports the following legacy decorators:
+Module :mod:`!abc` cũng hỗ trợ các decorator cũ sau đây:
 
 .. decorator:: abstractclassmethod
 
    .. versionadded:: 3.2
    .. deprecated:: 3.3
-       It is now possible to use :deco:`classmethod` with
-       :deco:`abstractmethod`, making this decorator redundant.
+       Giờ đây có thể sử dụng :deco:`classmethod` với
+       :deco:`abstractmethod`, khiến decorator này trở nên thừa.
 
-   A subclass of the built-in :class:`classmethod`, indicating an abstract
-   classmethod. Otherwise it is similar to :deco:`abstractmethod`.
+   Một lớp con của :class:`classmethod` tích hợp sẵn, cho biết một classmethod trừu tượng. Nếu không thì nó tương tự như :deco:`abstractmethod`.
 
-   This special case is deprecated, as the :deco:`classmethod` decorator
-   is now correctly identified as abstract when applied to an abstract
-   method::
+   Trường hợp đặc biệt này không còn được khuyến nghị, vì decorator :deco:`classmethod` hiện được nhận diện chính xác là trừu tượng khi được áp dụng cho một phương thức trừu tượng::
 
       class C(ABC):
           @classmethod
@@ -263,15 +210,12 @@ The :mod:`!abc` module also supports the following legacy decorators:
 
    .. versionadded:: 3.2
    .. deprecated:: 3.3
-       It is now possible to use :deco:`staticmethod` with
-       :deco:`abstractmethod`, making this decorator redundant.
+       Giờ đây có thể sử dụng :deco:`staticmethod` với
+       :deco:`abstractmethod`, khiến decorator này trở nên thừa.
 
-   A subclass of the built-in :class:`staticmethod`, indicating an abstract
-   staticmethod. Otherwise it is similar to :deco:`abstractmethod`.
+   Một lớp con của :class:`staticmethod` tích hợp sẵn, biểu thị một staticmethod trừu tượng. Nếu không thì nó tương tự như :deco:`abstractmethod`.
 
-   This special case is deprecated, as the :deco:`staticmethod` decorator
-   is now correctly identified as abstract when applied to an abstract
-   method::
+   Trường hợp đặc biệt này không còn được khuyến nghị sử dụng, vì decorator :deco:`staticmethod` hiện được nhận diện chính xác là abstract khi được áp dụng cho một abstract method::
 
       class C(ABC):
           @staticmethod
@@ -283,16 +227,13 @@ The :mod:`!abc` module also supports the following legacy decorators:
 .. decorator:: abstractproperty
 
    .. deprecated:: 3.3
-       It is now possible to use :deco:`property`, :deco:`property.getter`,
-       :deco:`property.setter` and :deco:`property.deleter` with
-       :deco:`abstractmethod`, making this decorator redundant.
+       Giờ đây có thể sử dụng :deco:`property`, :deco:`property.getter`,
+       :deco:`property.setter` và :deco:`property.deleter` cùng với
+       :deco:`abstractmethod`, khiến decorator này trở nên thừa.
 
-   A subclass of the built-in :class:`property`, indicating an abstract
-   property.
+   Một lớp con của :class:`property` tích hợp sẵn, biểu thị một property trừu tượng.
 
-   This special case is deprecated, as the :deco:`property` decorator
-   is now correctly identified as abstract when applied to an abstract
-   method::
+   Trường hợp đặc biệt này không còn được khuyến nghị sử dụng, vì decorator :deco:`property` hiện được nhận diện chính xác là abstract khi được áp dụng cho một abstract method::
 
       class C(ABC):
           @property
@@ -300,9 +241,7 @@ The :mod:`!abc` module also supports the following legacy decorators:
           def my_abstract_property(self):
               ...
 
-   The above example defines a read-only property; you can also define a
-   read-write abstract property by appropriately marking one or more of the
-   underlying methods as abstract::
+   Ví dụ trên định nghĩa một thuộc tính chỉ đọc; bạn cũng có thể định nghĩa một thuộc tính trừu tượng vừa đọc vừa ghi bằng cách đánh dấu phù hợp một hoặc nhiều phương thức nền tảng là trừu tượng::
 
       class C(ABC):
           @property
@@ -314,8 +253,7 @@ The :mod:`!abc` module also supports the following legacy decorators:
           def x(self, val):
               ...
 
-   If only some components are abstract, only those components need to be
-   updated to create a concrete property in a subclass::
+   Nếu chỉ một số thành phần là trừu tượng, chỉ cần cập nhật các thành phần đó để tạo một thuộc tính cụ thể trong lớp con::
 
       class D(C):
           @C.x.setter
@@ -323,37 +261,30 @@ The :mod:`!abc` module also supports the following legacy decorators:
               ...
 
 
-The :mod:`!abc` module also provides the following functions:
+Mô-đun :mod:`!abc` cũng cung cấp các hàm sau:
 
 .. function:: get_cache_token()
 
-   Returns the current abstract base class cache token.
+   Trả về token bộ nhớ đệm của lớp cơ sở trừu tượng hiện tại.
 
-   The token is an opaque object (that supports equality testing) identifying
-   the current version of the abstract base class cache for virtual subclasses.
-   The token changes with every call to :meth:`ABCMeta.register` on any ABC.
+   Token này là một đối tượng không minh bạch (hỗ trợ kiểm tra tính bằng nhau), dùng để xác định phiên bản hiện tại của bộ nhớ đệm lớp cơ sở trừu tượng dành cho các lớp con ảo. Token thay đổi sau mỗi lần gọi :meth:`ABCMeta.register` trên bất kỳ ABC nào.
 
    .. versionadded:: 3.4
 
 .. function:: update_abstractmethods(cls)
 
-   A function to recalculate an abstract class's abstraction status. This
-   function should be called if a class's abstract methods have been
-   implemented or changed after it was created. Usually, this function should
-   be called from within a class decorator.
+   Một hàm dùng để tính toán lại trạng thái trừu tượng của một lớp. Nên gọi hàm này nếu các phương thức trừu tượng của một lớp được triển khai hoặc thay đổi sau khi lớp đó được tạo. Thông thường, nên gọi hàm này từ bên trong một class decorator.
 
-   Returns *cls*, to allow usage as a class decorator.
+   Trả về *cls*, cho phép sử dụng hàm này làm class decorator.
 
-   If *cls* is not an instance of :class:`ABCMeta`, does nothing.
+   Nếu *cls* không phải là một thực thể của :class:`ABCMeta`, thì không thực hiện gì.
 
    .. note::
 
-      This function assumes that *cls*'s superclasses are already updated.
-      It does not update any subclasses.
+      Hàm này giả định rằng các lớp cha của *cls* đã được cập nhật. Hàm không cập nhật bất kỳ lớp con nào.
 
    .. versionadded:: 3.10
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] C++ programmers should note that Python's virtual base class
-   concept is not the same as C++'s.
+.. [#] Lập trình viên C++ cần lưu ý rằng khái niệm lớp cơ sở ảo của Python không giống với khái niệm của C++.

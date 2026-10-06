@@ -2,38 +2,31 @@
 
 .. _asyncio-introspection-tools:
 
-================================
-Command-line introspection tools
-================================
+=======================================
+Các công cụ introspection qua dòng lệnh
+=======================================
 
-**Source code:** :source:`Lib/asyncio/tools.py`
+**Mã nguồn:** :source:`Lib/asyncio/tools.py`
 
 -------------------------------------
 
-The :mod:`!asyncio` module can be invoked as a script via ``python -m
-asyncio`` to inspect the task graph of another running Python process without
-modifying it or restarting it.  The :mod:`!asyncio.tools` submodule implements
-this interface.
+Mô-đun :mod:`!asyncio` có thể được gọi như một script thông qua ``python -m asyncio`` để kiểm tra task graph của một tiến trình Python khác đang chạy mà không sửa đổi hoặc khởi động lại tiến trình đó. Submodule :mod:`!asyncio.tools` triển khai giao diện này.
 
-The following commands inspect the process identified by ``PID``:
+Các lệnh sau đây kiểm tra tiến trình được xác định bởi ``PID``:
 
 .. code-block:: shell-session
 
    $ python -m asyncio pstree PID
    $ python -m asyncio ps PID
 
-The commands read the target process state without executing any code in it.
-They are only available on supported platforms and may require permission to
-inspect another process.  See the :ref:`permission requirements <permission-requirements>` for details.
+Các lệnh này đọc trạng thái của tiến trình đích mà không thực thi bất kỳ mã nào trong đó. Chúng chỉ khả dụng trên các nền tảng được hỗ trợ và có thể yêu cầu quyền kiểm tra một tiến trình khác. Xem :ref:`yêu cầu quyền <permission-requirements>` để biết chi tiết.
 
 .. seealso::
 
    :ref:`asyncio-graph`
-      Programmatic APIs for inspecting the async call graph of a task or
-      future in the current process.
+      Các API lập trình để kiểm tra async call graph của một task hoặc future trong tiến trình hiện tại.
 
-The command examples below use this program, which creates a task hierarchy
-suitable for inspection and prints its process ID:
+Các ví dụ về lệnh bên dưới sử dụng chương trình này; chương trình tạo một hệ thống phân cấp task phù hợp để kiểm tra và in ra process ID của nó:
 
 .. code-block:: python
    :caption: example.py
@@ -64,29 +57,23 @@ suitable for inspection and prints its process ID:
 
    asyncio.run(main())
 
-Run the program in one terminal and leave it running:
+Chạy chương trình trong một terminal và để chương trình tiếp tục chạy:
 
 .. code-block:: shell-session
 
    $ python example.py
    PID: 12345
 
-Then pass the printed process ID to the commands from another terminal.
-Thread IDs, task IDs, file paths, and line numbers vary between runs and
-source layouts.
+Sau đó, truyền ID tiến trình được in ra cho các lệnh từ một terminal khác. ID luồng, ID tác vụ, đường dẫn tệp và số dòng thay đổi tùy theo mỗi lần chạy và bố cục mã nguồn.
 
 .. versionadded:: 3.14
 
-Command-line options
-====================
+Tùy chọn dòng lệnh
+==================
 
 .. option:: pstree PID
 
-   Display task and coroutine relationships as a tree.  Each task is shown
-   with its full coroutine stack, nested under the task (if any) that is
-   awaiting it.  This subcommand is useful for quickly identifying which branch
-   of a task hierarchy is blocked and where in its coroutine stack execution
-   has paused:
+   Hiển thị mối quan hệ giữa các task và coroutine dưới dạng cây. Mỗi task được hiển thị cùng với toàn bộ coroutine stack của nó, lồng bên dưới task (nếu có) đang await task đó. Subcommand này hữu ích để nhanh chóng xác định nhánh nào trong hệ thống phân cấp task đang bị chặn và quá trình thực thi đã tạm dừng ở đâu trong coroutine stack của nhánh đó:
 
    .. code-block:: shell-session
 
@@ -116,9 +103,7 @@ Command-line options
                                           └──  play example.py:4
                                               └──  sleep Lib/asyncio/tasks.py:702
 
-   If the await graph contains a cycle, ``pstree`` reports an error instead
-   of printing a tree.  A cycle in the await graph is unusual and typically
-   indicates a programming error:
+   Nếu await graph chứa một chu kỳ, ``pstree`` sẽ báo lỗi thay vì in ra cây. Chu kỳ trong await graph là điều bất thường và thường cho thấy lỗi lập trình:
 
    .. code-block:: shell-session
 
@@ -129,12 +114,9 @@ Command-line options
 
 .. option:: ps PID
 
-   Display a flat table of all pending tasks in the process *PID*.  Each row
-   shows the event-loop thread ID, task ID and name, coroutine stack, and the
-   awaiting task's stack, name, and ID, if any.
+   Hiển thị bảng phẳng gồm tất cả task đang chờ xử lý trong tiến trình *PID*. Mỗi hàng hiển thị ID luồng của event loop, ID và tên task, coroutine stack, cùng stack, tên và ID của task đang await task đó, nếu có.
 
-   This subcommand prints all tasks regardless of whether the await graph
-   contains cycles:
+   Subcommand này in ra tất cả các tác vụ bất kể đồ thị await có chứa chu kỳ hay không:
 
    .. code-block:: shell-session
 
