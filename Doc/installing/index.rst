@@ -3,56 +3,54 @@
 .. _installing-index:
 
 *************************
-Installing Python modules
+Cài đặt các mô-đun Python
 *************************
 
-As a popular open source development project, Python has an active
-supporting community of contributors and users that also make their software
-available for other Python developers to use under open-source license terms.
+Là một dự án phát triển mã nguồn mở phổ biến, Python có một cộng đồng năng động
+gồm các cộng tác viên và người dùng hỗ trợ dự án. Họ cũng cung cấp phần mềm của
+mình để các nhà phát triển Python khác sử dụng theo các điều khoản giấy phép
+mã nguồn mở.
 
-This allows Python users to share and collaborate effectively, benefiting
-from the solutions others have already created to common (and sometimes
-even rare!) problems, as well as potentially contributing their own
-solutions to the common pool.
+Điều này cho phép người dùng Python chia sẻ và hợp tác hiệu quả, hưởng lợi từ
+các giải pháp mà người khác đã tạo ra cho những vấn đề phổ biến (và đôi khi cả
+những vấn đề hiếm gặp!), đồng thời có thể đóng góp các giải pháp của riêng họ
+vào kho dùng chung.
 
-This guide covers the installation part of the process. For a guide to
-creating and sharing your own Python projects, refer to the
+Hướng dẫn này trình bày phần cài đặt của quy trình. Để biết cách tạo và chia sẻ
+các dự án Python của riêng bạn, hãy xem
 `Python packaging user guide`_.
 
 .. _Python Packaging User Guide: https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 .. note::
 
-   For corporate and other institutional users, be aware that many
-   organisations have their own policies around using and contributing to
-   open source software. Please take such policies into account when making
-   use of the distribution and installation tools provided with Python.
+   Người dùng doanh nghiệp và các tổ chức khác cần lưu ý rằng nhiều tổ chức có
+   chính sách riêng về việc sử dụng và đóng góp cho phần mềm mã nguồn mở. Hãy
+   cân nhắc các chính sách đó khi sử dụng công cụ phân phối và cài đặt đi kèm
+   Python.
 
 
-Key terms
+Các thuật ngữ chính
 =========
 
-* :program:`pip` is the preferred installer program. It
-  is included by default with the Python binary installers.
-* A *virtual environment* is a semi-isolated Python environment that allows
-  packages to be installed for use by a particular application, rather than
-  being installed system wide.
-* ``venv`` is the standard tool for creating virtual environments.
-  It defaults to installing :program:`pip` into all created virtual environments.
-* ``virtualenv`` is a third-party alternative (and predecessor) to
+* :program:`pip` là chương trình cài đặt được ưu tiên. Nó được bao gồm mặc định
+  trong các trình cài đặt Python dạng nhị phân.
+* *Môi trường ảo* là môi trường Python được cô lập một phần, cho phép cài đặt
+  gói để dùng cho một ứng dụng cụ thể thay vì cài đặt trên toàn hệ thống.
+* ``venv`` là công cụ chuẩn để tạo môi trường ảo. Theo mặc định, nó cài đặt
+  :program:`pip` vào mọi môi trường ảo được tạo.
+* ``virtualenv`` là một lựa chọn thay thế của bên thứ ba (và là tiền thân) cho
   ``venv``.
-* The `Python Package Index (PyPI) <https://pypi.org>`__ is a public
-  repository of open source licensed packages made available for use by
-  other Python users.
-* The `Python Packaging Authority
-  <https://www.pypa.io/>`__ is the group of
-  developers and documentation authors responsible for the maintenance and
-  evolution of the standard packaging tools and the associated metadata and
-  file format standards. They maintain a variety of tools, documentation,
-  and issue trackers on `GitHub <https://github.com/pypa>`__.
+* `Python Package Index (PyPI) <https://pypi.org>`__ là kho công khai các gói
+  theo giấy phép mã nguồn mở, sẵn có để những người dùng Python khác sử dụng.
+* `Python Packaging Authority
+  <https://www.pypa.io/>`__ là nhóm các nhà phát triển và tác giả tài liệu chịu
+  trách nhiệm bảo trì, phát triển các công cụ đóng gói chuẩn cùng các tiêu chuẩn
+  siêu dữ liệu và định dạng tệp liên quan. Họ duy trì nhiều công cụ, tài liệu và
+  trình theo dõi vấn đề trên `GitHub <https://github.com/pypa>`__.
 
 .. versionchanged:: 3.5
-   The use of ``venv`` is now recommended for creating virtual environments.
+   Hiện nay, nên sử dụng ``venv`` để tạo môi trường ảo.
 
 .. seealso::
 
@@ -60,46 +58,43 @@ Key terms
    <https://packaging.python.org/installing/#creating-virtual-environments>`__
 
 
-Basic usage
+Cách dùng cơ bản
 ===========
 
-The standard packaging tools are all designed to be used from the command
-line.
+Các công cụ đóng gói chuẩn đều được thiết kế để sử dụng từ dòng lệnh.
 
-The following command will install the latest version of a module and its
-dependencies from PyPI::
+Lệnh sau sẽ cài đặt phiên bản mới nhất của một mô-đun và các phần phụ thuộc của
+nó từ PyPI::
 
     python -m pip install SomePackage
 
 .. note::
 
-   For POSIX users (including macOS and Linux users), the examples in
-   this guide assume the use of a :term:`virtual environment`.
+   Đối với người dùng POSIX (bao gồm người dùng macOS và Linux), các ví dụ trong
+   hướng dẫn này giả định rằng bạn sử dụng :term:`môi trường ảo <virtual environment>`.
 
-   For Windows users, the examples in this guide assume that the option to
-   adjust the system PATH environment variable was selected when installing
+   Đối với người dùng Windows, các ví dụ trong hướng dẫn này giả định rằng bạn
+   đã chọn tùy chọn điều chỉnh biến môi trường PATH của hệ thống khi cài đặt
    Python.
 
-It's also possible to specify an exact or minimum version directly on the
-command line. When using comparator operators such as ``>``, ``<`` or some other
-special character which get interpreted by shell, the package name and the
-version should be enclosed within double quotes::
+Cũng có thể chỉ định trực tiếp phiên bản chính xác hoặc tối thiểu trên dòng
+lệnh. Khi dùng các toán tử so sánh như ``>``, ``<`` hoặc ký tự đặc biệt khác mà
+shell sẽ diễn giải, tên gói và phiên bản cần được đặt trong dấu nháy kép::
 
-    python -m pip install SomePackage==1.0.4    # specific version
-    python -m pip install "SomePackage>=1.0.4"  # minimum version
+    python -m pip install SomePackage==1.0.4    # phiên bản cụ thể
+    python -m pip install "SomePackage>=1.0.4"  # phiên bản tối thiểu
 
-Normally, if a suitable module is already installed, attempting to install
-it again will have no effect. Upgrading existing modules must be requested
-explicitly::
+Thông thường, nếu một mô-đun phù hợp đã được cài đặt thì việc cố cài lại sẽ
+không có tác dụng. Bạn phải yêu cầu rõ ràng nếu muốn nâng cấp các mô-đun hiện
+có::
 
     python -m pip install --upgrade SomePackage
 
-More information and resources regarding :program:`pip` and its capabilities can be
-found in the `Python Packaging User Guide <https://packaging.python.org>`__.
+Bạn có thể tìm thêm thông tin và tài nguyên về :program:`pip` cùng các khả năng
+của nó trong `Hướng dẫn người dùng Python Packaging <https://packaging.python.org>`__.
 
-Creation of virtual environments is done through the :mod:`venv` module.
-Installing packages into an active virtual environment uses the commands shown
-above.
+Việc tạo môi trường ảo được thực hiện qua mô-đun :mod:`venv`. Để cài gói vào
+một môi trường ảo đang hoạt động, hãy dùng các lệnh ở trên.
 
 .. seealso::
 
@@ -107,28 +102,28 @@ above.
     <https://packaging.python.org/installing/>`__
 
 
-How do I ...?
+Làm thế nào để ...?
 =============
 
-These are quick answers or links for some common tasks.
+Đây là các câu trả lời nhanh hoặc liên kết cho một số tác vụ thường gặp.
 
 .. installing-per-user-installation:
 
-... install packages just for the current user?
+... chỉ cài đặt gói cho người dùng hiện tại?
 -----------------------------------------------
 
-Passing the ``--user`` option to ``python -m pip install`` will install a
-package just for the current user, rather than for all users of the system.
+Truyền tùy chọn ``--user`` cho ``python -m pip install`` sẽ chỉ cài đặt gói cho
+người dùng hiện tại, thay vì cho mọi người dùng trên hệ thống.
 
 
-... install scientific Python packages?
+... cài đặt các gói Python khoa học?
 ---------------------------------------
 
-A number of scientific Python packages have complex binary dependencies, and
-aren't currently easy to install using :program:`pip` directly.
-It will often be easier for users to install these packages by
+Một số gói Python khoa học có phần phụ thuộc nhị phân phức tạp và hiện chưa dễ
+cài đặt trực tiếp bằng :program:`pip`. Người dùng thường sẽ dễ cài đặt các gói
+này bằng
 `other means <https://packaging.python.org/science/>`__
-rather than attempting to install them with :program:`pip`.
+thay vì cố cài đặt chúng bằng :program:`pip`.
 
 .. seealso::
 
@@ -136,75 +131,72 @@ rather than attempting to install them with :program:`pip`.
    <https://packaging.python.org/science/>`__
 
 
-... work with multiple versions of Python installed in parallel?
+... làm việc với nhiều phiên bản Python được cài song song?
 ----------------------------------------------------------------
 
-On Linux, macOS, and other POSIX systems, use the versioned Python commands
-in combination with the ``-m`` switch to run the appropriate copy of
-:program:`pip`::
+Trên Linux, macOS và các hệ thống POSIX khác, hãy dùng lệnh Python có chỉ định
+phiên bản kết hợp với tùy chọn ``-m`` để chạy bản :program:`pip` phù hợp::
 
-   python3    -m pip install SomePackage  # default Python 3
-   python3.14 -m pip install SomePackage  # specifically Python 3.14
+   python3    -m pip install SomePackage  # Python 3 mặc định
+   python3.14 -m pip install SomePackage  # cụ thể là Python 3.14
 
-Appropriately versioned :program:`pip` commands may also be available.
+Các lệnh :program:`pip` có phiên bản tương ứng cũng có thể khả dụng.
 
-On Windows, use the :program:`py` Python launcher in combination with the ``-m``
-switch::
+Trên Windows, hãy dùng trình khởi chạy Python :program:`py` kết hợp với tùy
+chọn ``-m``::
 
-   py -3    -m pip install SomePackage  # default Python 3
-   py -3.14 -m pip install SomePackage  # specifically Python 3.14
+   py -3    -m pip install SomePackage  # Python 3 mặc định
+   py -3.14 -m pip install SomePackage  # cụ thể là Python 3.14
 
 .. other questions:
 
-   Once the Development & Deployment part of PPUG is fleshed out, some of
-   those sections should be linked from new questions here (most notably,
-   we should have a question about avoiding depending on PyPI that links to
+   Khi phần Phát triển & Triển khai của PPUG được hoàn thiện, nên liên kết một
+   số mục trong đó từ các câu hỏi mới ở đây (đáng chú ý nhất là nên có một câu
+   hỏi về việc tránh phụ thuộc vào PyPI, liên kết đến
    https://packaging.python.org/en/latest/guides/index-mirrors-and-caches/)
 
 
-Common installation issues
+Các vấn đề cài đặt thường gặp
 ==========================
 
-Installing into the system Python on Linux
+Cài đặt vào Python hệ thống trên Linux
 ------------------------------------------
 
-On Linux systems, a Python installation will typically be included as part
-of the distribution. Installing into this Python installation requires
-root access to the system, and may interfere with the operation of the
-system package manager and other components of the system if a component
-is unexpectedly upgraded using :program:`pip`.
+Trên các hệ thống Linux, một bản cài đặt Python thường được bao gồm trong bản
+phân phối. Việc cài đặt vào bản Python này cần quyền root trên hệ thống và có
+thể ảnh hưởng đến hoạt động của trình quản lý gói hệ thống cùng các thành phần
+khác nếu một thành phần bị nâng cấp ngoài dự kiến bằng :program:`pip`.
 
-On such systems, it is often better to use a virtual environment or a
-per-user installation when installing packages with :program:`pip`.
+Trên những hệ thống như vậy, thường tốt hơn khi dùng môi trường ảo hoặc cài đặt
+theo từng người dùng khi cài gói bằng :program:`pip`.
 
 
-Pip not installed
+Chưa cài đặt Pip
 -----------------
 
-It is possible that :program:`pip` does not get installed by default. One potential fix is::
+:program:`pip` có thể không được cài đặt mặc định. Một cách khắc phục khả dĩ là::
 
     python -m ensurepip --default-pip
 
-There are also additional resources for `installing pip
+Ngoài ra còn có các tài nguyên khác về `cài đặt pip
 <https://packaging.python.org/en/latest/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date>`__.
 
 
-Installing binary extensions
+Cài đặt phần mở rộng nhị phân
 ----------------------------
 
-Python once relied heavily on source-based distribution, with end
-users being expected to compile extension modules from source as part of
-the installation process.
+Trước đây Python phụ thuộc nhiều vào việc phân phối dựa trên mã nguồn, trong đó
+người dùng cuối được kỳ vọng biên dịch các mô-đun mở rộng từ mã nguồn trong quá
+trình cài đặt.
 
-With the introduction of the binary wheel format, and the
-ability to publish wheels through PyPI, this problem is diminishing,
-as users are more regularly able to install pre-built extensions rather
-than needing to build them themselves.
+Kể từ khi định dạng wheel nhị phân ra đời và có thể phát hành wheel qua PyPI,
+vấn đề này đang giảm bớt, vì người dùng ngày càng thường xuyên cài được các
+phần mở rộng dựng sẵn thay vì phải tự xây dựng chúng.
 
-Some of the solutions for installing `scientific software
+Một số giải pháp để cài đặt `phần mềm khoa học
 <https://packaging.python.org/science/>`__
-that are not yet available as pre-built wheel files may also help with
-obtaining other binary extensions without needing to build them locally.
+chưa có sẵn dưới dạng tệp wheel dựng sẵn cũng có thể giúp lấy các phần mở rộng
+nhị phân khác mà không cần tự xây dựng trên máy cục bộ.
 
 .. seealso::
 
