@@ -4,7 +4,7 @@
 
 import os
 import smtplib
-# For guessing MIME type based on file name extension
+# Dùng để suy đoán kiểu MIME từ phần mở rộng tên tệp
 import mimetypes
 
 from argparse import ArgumentParser
@@ -39,7 +39,7 @@ must be running an SMTP server.
     directory = args.directory
     if not directory:
         directory = '.'
-    # Create the message
+    # Tạo thư
     msg = EmailMessage()
     msg['Subject'] = f'Contents of directory {os.path.abspath(directory)}'
     msg['To'] = ', '.join(args.recipients)
@@ -50,13 +50,12 @@ must be running an SMTP server.
         path = os.path.join(directory, filename)
         if not os.path.isfile(path):
             continue
-        # Guess the content type based on the file's extension.  Encoding
-        # will be ignored, although we should check for simple things like
-        # gzip'd or compressed files.
+        # Suy đoán kiểu nội dung theo phần mở rộng của tệp. Mã hóa sẽ bị bỏ qua,
+        # dù ta nên kiểm tra những trường hợp đơn giản như tệp gzip hoặc nén.
         ctype, encoding = mimetypes.guess_file_type(path)
         if ctype is None or encoding is not None:
-            # No guess could be made, or the file is encoded (compressed), so
-            # use a generic bag-of-bits type.
+            # Không thể suy đoán, hoặc tệp đã được mã hóa (nén), nên dùng kiểu
+            # dữ liệu nhị phân chung.
             ctype = 'application/octet-stream'
         maintype, subtype = ctype.split('/', 1)
         with open(path, 'rb') as fp:
@@ -64,7 +63,7 @@ must be running an SMTP server.
                                maintype=maintype,
                                subtype=subtype,
                                filename=filename)
-    # Now send or store the message
+    # Bây giờ gửi hoặc lưu thư
     if args.output:
         with open(args.output, 'wb') as fp:
             fp.write(msg.as_bytes(policy=SMTP))

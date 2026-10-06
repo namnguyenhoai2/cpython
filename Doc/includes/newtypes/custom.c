@@ -3,7 +3,7 @@
 
 typedef struct {
     PyObject_HEAD
-    /* Type-specific fields go here. */
+    /* Các trường dành riêng cho kiểu nằm ở đây. */
 } CustomObject;
 
 static PyTypeObject CustomType = {
@@ -32,7 +32,7 @@ custom_module_exec(PyObject *m)
 
 static PyModuleDef_Slot custom_module_slots[] = {
     {Py_mod_exec, custom_module_exec},
-    // Just use this while using static types
+    // Chỉ dùng mục này khi sử dụng kiểu tĩnh
     {Py_mod_multiple_interpreters, Py_MOD_MULTIPLE_INTERPRETERS_NOT_SUPPORTED},
     {0, NULL}
 };

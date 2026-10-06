@@ -4,7 +4,7 @@ import random
 import sys
 
 #
-# Functions used by test code
+# Các hàm được mã kiểm thử sử dụng
 #
 
 def calculate(func, args):
@@ -35,7 +35,7 @@ def noop(x):
     pass
 
 #
-# Test code
+# Mã kiểm thử
 #
 
 def test():
@@ -44,7 +44,7 @@ def test():
 
     with multiprocessing.Pool(PROCESSES) as pool:
         #
-        # Tests
+        # Kiểm thử
         #
 
         TASKS = [(mul, (i, 7)) for i in range(10)] + \
@@ -75,7 +75,7 @@ def test():
         print()
 
         #
-        # Test error handling
+        # Kiểm thử xử lý lỗi
         #
 
         print('Testing error handling:')
@@ -119,7 +119,7 @@ def test():
         print()
 
         #
-        # Testing timeouts
+        # Kiểm thử thời gian chờ
         #
 
         print('Testing ApplyResult.get() with timeout:', end=' ')

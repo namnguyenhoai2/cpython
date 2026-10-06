@@ -43,15 +43,14 @@ def fail(msg):
     out(__doc__)
     return 0
 
-# open a file & return the file object; gripe and return 0 if it
-# couldn't be opened
+# mở tệp và trả về đối tượng tệp; báo lỗi và trả về 0 nếu không thể mở
 def fopen(fname):
     try:
         return open(fname)
     except IOError as detail:
         return fail("couldn't open " + fname + ": " + str(detail))
 
-# open two files & spray the diff to stdout; return false iff a problem
+# mở hai tệp và xuất diff ra stdout; chỉ trả về false nếu có sự cố
 def fcompare(f1name, f2name):
     f1 = fopen(f1name)
     f2 = fopen(f2name)
@@ -65,8 +64,8 @@ def fcompare(f1name, f2name):
 
     return 1
 
-# crack args (sys.argv[1:] is normal) & compare;
-# return false iff a problem
+# phân tích đối số (thông thường là sys.argv[1:]) và so sánh;
+# chỉ trả về false nếu có sự cố
 
 def main(args):
     import getopt
@@ -100,8 +99,8 @@ def main(args):
         print('+:', f2name)
     return fcompare(f1name, f2name)
 
-# read ndiff output from stdin, and print file1 (which=='1') or
-# file2 (which=='2') to stdout
+# đọc kết quả ndiff từ stdin, rồi in file1 (which=='1') hoặc
+# file2 (which=='2') ra stdout
 
 def restore(which):
     restored = difflib.restore(sys.stdin.readlines(), which)

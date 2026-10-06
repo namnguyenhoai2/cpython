@@ -4,7 +4,7 @@ import random
 from multiprocessing import Process, Queue, current_process, freeze_support
 
 #
-# Function run by worker processes
+# Hàm do các tiến trình worker chạy
 #
 
 def worker(input, output):
@@ -13,7 +13,7 @@ def worker(input, output):
         output.put(result)
 
 #
-# Function used to calculate result
+# Hàm dùng để tính kết quả
 #
 
 def calculate(func, args):
@@ -22,7 +22,7 @@ def calculate(func, args):
         (current_process().name, func.__name__, args, result)
 
 #
-# Functions referenced by tasks
+# Các hàm được tác vụ tham chiếu
 #
 
 def mul(a, b):
@@ -42,32 +42,32 @@ def test():
     TASKS1 = [(mul, (i, 7)) for i in range(20)]
     TASKS2 = [(plus, (i, 8)) for i in range(10)]
 
-    # Create queues
+    # Tạo hàng đợi
     task_queue = Queue()
     done_queue = Queue()
 
-    # Submit tasks
+    # Gửi tác vụ
     for task in TASKS1:
         task_queue.put(task)
 
-    # Start worker processes
+    # Khởi động các tiến trình worker
     for i in range(NUMBER_OF_PROCESSES):
         Process(target=worker, args=(task_queue, done_queue)).start()
 
-    # Get and print results
+    # Nhận và in kết quả
     print('Unordered results:')
     for i in range(len(TASKS1)):
         print('\t', done_queue.get())
 
-    # Add more tasks using `put()`
+    # Thêm tác vụ bằng `put()`
     for task in TASKS2:
         task_queue.put(task)
 
-    # Get and print some more results
+    # Nhận và in thêm kết quả
     for i in range(len(TASKS2)):
         print('\t', done_queue.get())
 
-    # Tell child processes to stop
+    # Báo các tiến trình con dừng lại
     for i in range(NUMBER_OF_PROCESSES):
         task_queue.put('STOP')
 

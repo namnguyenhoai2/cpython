@@ -15,14 +15,14 @@ main(int argc, char *argv[])
 
     Py_Initialize();
     pName = PyUnicode_DecodeFSDefault(argv[1]);
-    /* Error checking of pName left out */
+    /* Bỏ qua việc kiểm tra lỗi của pName */
 
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
     if (pModule != NULL) {
         pFunc = PyObject_GetAttrString(pModule, argv[2]);
-        /* pFunc is a new reference */
+        /* pFunc là tham chiếu mới */
 
         if (pFunc && PyCallable_Check(pFunc)) {
             pArgs = PyTuple_New(argc - 3);
@@ -34,7 +34,7 @@ main(int argc, char *argv[])
                     fprintf(stderr, "Cannot convert argument\n");
                     return 1;
                 }
-                /* pValue reference stolen here: */
+                /* Tham chiếu pValue được tiếp quản tại đây: */
                 PyTuple_SetItem(pArgs, i, pValue);
             }
             pValue = PyObject_CallObject(pFunc, pArgs);

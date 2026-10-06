@@ -1,11 +1,11 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
-#include <stddef.h> /* for offsetof() */
+#include <stddef.h> /* dùng cho offsetof() */
 
 typedef struct {
     PyObject_HEAD
-    PyObject *first; /* first name */
-    PyObject *last;  /* last name */
+    PyObject *first; /* tên */
+    PyObject *last;  /* họ */
     int number;
 } CustomObject;
 
@@ -63,7 +63,7 @@ Custom_init(PyObject *op, PyObject *args, PyObject *kwds)
 static PyMemberDef Custom_members[] = {
     {"number", Py_T_INT, offsetof(CustomObject, number), 0,
      "custom number"},
-    {NULL}  /* Sentinel */
+    {NULL}  /* Phần tử canh gác */
 };
 
 static PyObject *
@@ -119,7 +119,7 @@ static PyGetSetDef Custom_getsetters[] = {
      "first name", NULL},
     {"last", Custom_getlast, Custom_setlast,
      "last name", NULL},
-    {NULL}  /* Sentinel */
+    {NULL}  /* Phần tử canh gác */
 };
 
 static PyObject *
@@ -133,7 +133,7 @@ static PyMethodDef Custom_methods[] = {
     {"name", Custom_name, METH_NOARGS,
      "Return the name, combining the first and last name"
     },
-    {NULL}  /* Sentinel */
+    {NULL}  /* Phần tử canh gác */
 };
 
 static PyTypeObject CustomType = {

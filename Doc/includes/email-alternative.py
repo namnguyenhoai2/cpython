@@ -6,7 +6,7 @@ from email.message import EmailMessage
 from email.headerregistry import Address
 from email.utils import make_msgid
 
-# Create the base text message.
+# Tạo thư văn bản cơ sở.
 msg = EmailMessage()
 msg['Subject'] = "Pourquoi pas des asperges pour ce midi ?"
 msg['From'] = Address("Pepé Le Pew", "pepe", "example.com")
@@ -22,9 +22,8 @@ Cette recette [1] sera sûrement un très bon repas.
 --Pepé
 """)
 
-# Add the html version.  This converts the message into a multipart/alternative
-# container, with the original text message as the first part and the new html
-# message as the second part.
+# Thêm phiên bản HTML. Việc này chuyển thư thành vùng chứa multipart/alternative,
+# trong đó thư văn bản gốc là phần đầu và thư HTML mới là phần thứ hai.
 asparagus_cid = make_msgid()
 msg.add_alternative("""\
 <html>
@@ -40,17 +39,17 @@ msg.add_alternative("""\
   </body>
 </html>
 """.format(asparagus_cid=asparagus_cid[1:-1]), subtype='html')
-# note that we needed to peel the <> off the msgid for use in the html.
+# Lưu ý rằng cần bỏ <> khỏi msgid để dùng trong HTML.
 
-# Now add the related image to the html part.
+# Bây giờ thêm ảnh liên quan vào phần HTML.
 with open("roasted-asparagus.jpg", 'rb') as img:
     msg.get_payload()[1].add_related(img.read(), 'image', 'jpeg',
                                      cid=asparagus_cid)
 
-# Make a local copy of what we are going to send.
+# Tạo bản sao cục bộ của nội dung sắp gửi.
 with open('outgoing.msg', 'wb') as f:
     f.write(bytes(msg))
 
-# Send the message via local SMTP server.
+# Gửi thư qua máy chủ SMTP cục bộ.
 with smtplib.SMTP('localhost') as s:
     s.send_message(msg)

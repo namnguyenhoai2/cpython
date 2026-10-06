@@ -4,7 +4,7 @@ import tempfile
 import mimetypes
 import webbrowser
 
-# Import the email modules we'll need
+# Nhập các mô-đun email cần dùng
 from email import policy
 from email.parser import BytesParser
 
@@ -18,20 +18,19 @@ def magic_html_parser(html_text, partfiles):
     raise NotImplementedError("Add the magic needed")
 
 
-# In a real program you'd get the filename from the arguments.
+# Trong chương trình thực tế, bạn sẽ lấy tên tệp từ đối số.
 with open('outgoing.msg', 'rb') as fp:
     msg = BytesParser(policy=policy.default).parse(fp)
 
-# Now the header items can be accessed as a dictionary, and any non-ASCII will
-# be converted to unicode:
+# Giờ có thể truy cập các mục phần đầu như một từ điển; mọi ký tự ngoài ASCII
+# sẽ được chuyển thành Unicode:
 print('To:', msg['to'])
 print('From:', msg['from'])
 print('Subject:', msg['subject'])
 
-# If we want to print a preview of the message content, we can extract whatever
-# the least formatted payload is and print the first three lines.  Of course,
-# if the message has no plain text part printing the first three lines of html
-# is probably useless, but this is just a conceptual example.
+# Nếu muốn in bản xem trước nội dung thư, ta có thể trích xuất phần tải ít định
+# dạng nhất và in ba dòng đầu. Dĩ nhiên, nếu thư không có phần văn bản thuần thì
+# in ba dòng đầu của HTML có lẽ vô ích, nhưng đây chỉ là ví dụ minh họa.
 simplest = msg.get_body(preferencelist=('plain', 'html'))
 print()
 print(''.join(simplest.get_content().splitlines(keepends=True)[:3]))
@@ -40,7 +39,7 @@ ans = input("View full message?")
 if ans.lower()[0] == 'n':
     sys.exit()
 
-# We can extract the richest alternative in order to display it:
+# Ta có thể trích xuất phương án thay thế giàu định dạng nhất để hiển thị:
 richest = msg.get_body()
 partfiles = {}
 if richest['content-type'].maintype == 'text':
@@ -63,7 +62,7 @@ elif richest['content-type'].content_type == 'multipart/related':
             extension = mimetypes.guess_extension(part.get_content_type())
         with tempfile.NamedTemporaryFile(suffix=extension, delete=False) as f:
             f.write(part.get_content())
-            # again strip the <> to go from email form of cid to html form.
+            # Lại bỏ <> để chuyển cid từ dạng email sang dạng HTML.
             partfiles[part['content-id'][1:-1]] = f.name
 else:
     print("Don't know how to display {}".format(richest.get_content_type()))
@@ -75,5 +74,5 @@ os.remove(f.name)
 for fn in partfiles.values():
     os.remove(fn)
 
-# Of course, there are lots of email messages that could break this simple
-# minded program, but it will handle the most common ones.
+# Dĩ nhiên, nhiều thư email có thể làm hỏng chương trình đơn giản này, nhưng nó
+# sẽ xử lý được các trường hợp phổ biến nhất.

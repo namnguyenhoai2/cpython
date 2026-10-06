@@ -1,26 +1,26 @@
-# Import smtplib for the actual sending function.
+# Nhập smtplib để dùng hàm gửi thực tế.
 import smtplib
 
-# Here are the email package modules we'll need.
+# Đây là các mô-đun gói email cần dùng.
 from email.message import EmailMessage
 
-# Create the container email message.
+# Tạo thư email chứa các phần khác.
 msg = EmailMessage()
 msg['Subject'] = 'Our family reunion'
-# me == the sender's email address
-# family = the list of all recipients' email addresses
+# me == địa chỉ email người gửi
+# family = danh sách địa chỉ email của mọi người nhận
 msg['From'] = me
 msg['To'] = ', '.join(family)
 msg.preamble = 'You will not see this in a MIME-aware mail reader.\n'
 
-# Open the files in binary mode.  You can also omit the subtype
-# if you want MIMEImage to guess it.
+# Mở tệp ở chế độ nhị phân. Bạn cũng có thể bỏ subtype
+# nếu muốn MIMEImage tự suy đoán.
 for file in pngfiles:
     with open(file, 'rb') as fp:
         img_data = fp.read()
     msg.add_attachment(img_data, maintype='image',
                                  subtype='png')
 
-# Send the email via our own SMTP server.
+# Gửi email qua máy chủ SMTP của chúng ta.
 with smtplib.SMTP('localhost') as s:
     s.send_message(msg)

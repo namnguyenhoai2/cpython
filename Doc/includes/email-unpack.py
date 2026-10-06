@@ -32,16 +32,16 @@ Unpack a MIME message into a directory of files.
 
     counter = 1
     for part in msg.walk():
-        # multipart/* are just containers
+        # multipart/* chỉ là các vùng chứa
         if part.get_content_maintype() == 'multipart':
             continue
-        # Applications should really sanitize the given filename so that an
-        # email message can't be used to overwrite important files
+        # Ứng dụng thật sự nên làm sạch tên tệp đã cho để thư email không thể
+        # bị dùng để ghi đè các tệp quan trọng
         filename = part.get_filename()
         if not filename:
             ext = mimetypes.guess_extension(part.get_content_type())
             if not ext:
-                # Use a generic bag-of-bits extension
+                # Dùng phần mở rộng dữ liệu nhị phân chung
                 ext = '.bin'
             filename = f'part-{counter:03d}{ext}'
         counter += 1

@@ -1,9 +1,8 @@
 import datetime as dt
 
-# A class capturing the platform's idea of local time.
-# (May result in wrong values on historical times in
-#  timezones where UTC offset and/or the DST rules had
-#  changed in the past.)
+# Lớp thể hiện khái niệm giờ địa phương của nền tảng.
+# (Có thể cho giá trị sai với thời điểm lịch sử tại các múi giờ có
+#  độ lệch UTC và/hoặc quy tắc DST đã thay đổi trong quá khứ.)
 import time
 
 ZERO = dt.timedelta(0)
@@ -26,7 +25,7 @@ class LocalTimezone(dt.tzinfo):
         stamp = (when - dt.datetime(1970, 1, 1, tzinfo=self)) // SECOND
         args = time.localtime(stamp)[:6]
         dst_diff = DSTDIFF // SECOND
-        # Detect fold
+        # Phát hiện fold
         fold = (args == time.localtime(stamp - dst_diff))
         return dt.datetime(*args, microsecond=when.microsecond,
                            tzinfo=self, fold=fold)
@@ -58,7 +57,7 @@ class LocalTimezone(dt.tzinfo):
 Local = LocalTimezone()
 
 
-# A complete implementation of current DST rules for major US time zones.
+# Bản triển khai đầy đủ quy tắc DST hiện hành cho các múi giờ chính tại Hoa Kỳ.
 
 def first_sunday_on_or_after(when):
     days_to_go = 6 - when.weekday()
@@ -67,35 +66,35 @@ def first_sunday_on_or_after(when):
     return when
 
 
-# US DST Rules
+# Quy tắc DST tại Hoa Kỳ
 #
-# This is a simplified (i.e., wrong for a few cases) set of rules for US
-# DST start and end times. For a complete and up-to-date set of DST rules
-# and timezone definitions, visit the Olson Database (or try pytz):
+# Đây là bộ quy tắc đơn giản hóa (nghĩa là sai trong vài trường hợp) cho thời
+# điểm bắt đầu và kết thúc DST tại Hoa Kỳ. Để xem bộ quy tắc DST và định nghĩa
+# múi giờ đầy đủ, cập nhật, hãy truy cập Cơ sở dữ liệu Olson (hoặc thử pytz):
 # http://www.twinsun.com/tz/tz-link.htm
-# https://sourceforge.net/projects/pytz/ (might not be up-to-date)
+# https://sourceforge.net/projects/pytz/ (có thể không được cập nhật)
 #
-# In the US, since 2007, DST starts at 2am (standard time) on the second
-# Sunday in March, which is the first Sunday on or after Mar 8.
+# Tại Hoa Kỳ, từ năm 2007, DST bắt đầu lúc 2 giờ sáng (giờ chuẩn) vào Chủ nhật
+# thứ hai của tháng Ba, tức Chủ nhật đầu tiên vào hoặc sau ngày 8 tháng Ba.
 DSTSTART_2007 = dt.datetime(1, 3, 8, 2)
-# and ends at 2am (DST time) on the first Sunday of Nov.
+# và kết thúc lúc 2 giờ sáng (giờ DST) vào Chủ nhật đầu tiên của tháng Mười Một.
 DSTEND_2007 = dt.datetime(1, 11, 1, 2)
-# From 1987 to 2006, DST used to start at 2am (standard time) on the first
-# Sunday in April and to end at 2am (DST time) on the last
-# Sunday of October, which is the first Sunday on or after Oct 25.
+# Từ năm 1987 đến 2006, DST từng bắt đầu lúc 2 giờ sáng (giờ chuẩn) vào Chủ nhật
+# đầu tiên của tháng Tư và kết thúc lúc 2 giờ sáng (giờ DST) vào Chủ nhật cuối
+# cùng của tháng Mười, tức Chủ nhật đầu tiên vào hoặc sau ngày 25 tháng Mười.
 DSTSTART_1987_2006 = dt.datetime(1, 4, 1, 2)
 DSTEND_1987_2006 = dt.datetime(1, 10, 25, 2)
-# From 1967 to 1986, DST used to start at 2am (standard time) on the last
-# Sunday in April (the one on or after April 24) and to end at 2am (DST time)
-# on the last Sunday of October, which is the first Sunday
-# on or after Oct 25.
+# Từ năm 1967 đến 1986, DST từng bắt đầu lúc 2 giờ sáng (giờ chuẩn) vào Chủ nhật
+# cuối cùng của tháng Tư (vào hoặc sau ngày 24 tháng Tư) và kết thúc lúc 2 giờ
+# sáng (giờ DST) vào Chủ nhật cuối cùng của tháng Mười, tức Chủ nhật đầu tiên
+# vào hoặc sau ngày 25 tháng Mười.
 DSTSTART_1967_1986 = dt.datetime(1, 4, 24, 2)
 DSTEND_1967_1986 = DSTEND_1987_2006
 
 
 def us_dst_range(year):
-    # Find start and end times for US DST. For years before 1967, return
-    # start = end for no DST.
+    # Tìm thời điểm bắt đầu và kết thúc DST tại Hoa Kỳ. Với năm trước 1967,
+    # trả về start = end để biểu thị không có DST.
     if 2006 < year:
         dststart, dstend = DSTSTART_2007, DSTEND_2007
     elif 1986 < year < 2007:
@@ -132,26 +131,26 @@ class USTimeZone(dt.tzinfo):
 
     def dst(self, when):
         if when is None or when.tzinfo is None:
-            # An exception may be sensible here, in one or both cases.
-            # It depends on how you want to treat them.  The default
-            # fromutc() implementation (called by the default astimezone()
-            # implementation) passes a datetime with when.tzinfo is self.
+            # Có thể hợp lý khi phát sinh ngoại lệ ở một hoặc cả hai trường hợp.
+            # Điều đó tùy thuộc cách bạn muốn xử lý chúng. Bản triển khai mặc
+            # định của fromutc() (được astimezone() mặc định gọi) truyền một
+            # datetime có when.tzinfo là self.
             return ZERO
         assert when.tzinfo is self
         start, end = us_dst_range(when.year)
-        # Can't compare naive to aware objects, so strip the timezone from
-        # when first.
+        # Không thể so sánh đối tượng ngây thơ với đối tượng nhận biết múi giờ,
+        # nên trước hết hãy bỏ múi giờ khỏi when.
         when = when.replace(tzinfo=None)
         if start + HOUR <= when < end - HOUR:
-            # DST is in effect.
+            # DST đang có hiệu lực.
             return HOUR
         if end - HOUR <= when < end:
-            # Fold (an ambiguous hour): use when.fold to disambiguate.
+            # Fold (một giờ mơ hồ): dùng when.fold để phân biệt.
             return ZERO if when.fold else HOUR
         if start <= when < start + HOUR:
-            # Gap (a non-existent hour): reverse the fold rule.
+            # Gap (một giờ không tồn tại): đảo ngược quy tắc fold.
             return HOUR if when.fold else ZERO
-        # DST is off.
+        # DST không có hiệu lực.
         return ZERO
 
     def fromutc(self, when):
@@ -162,13 +161,13 @@ class USTimeZone(dt.tzinfo):
         std_time = when + self.stdoffset
         dst_time = std_time + HOUR
         if end <= dst_time < end + HOUR:
-            # Repeated hour
+            # Giờ lặp lại
             return std_time.replace(fold=1)
         if std_time < start or dst_time >= end:
-            # Standard time
+            # Giờ chuẩn
             return std_time
         if start <= std_time < end - HOUR:
-            # Daylight saving time
+            # Giờ mùa hè
             return dst_time
 
 

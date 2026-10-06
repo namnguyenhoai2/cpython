@@ -12,12 +12,12 @@ class Foo:
     def _h(self):
         print('you called Foo._h()')
 
-# A simple generator function
+# Một hàm sinh đơn giản
 def baz():
     for i in range(10):
         yield i*i
 
-# Proxy type for generator objects
+# Kiểu proxy cho đối tượng sinh
 class GeneratorProxy(BaseProxy):
     _exposed_ = ['__next__']
     def __iter__(self):
@@ -25,7 +25,7 @@ class GeneratorProxy(BaseProxy):
     def __next__(self):
         return self._callmethod('__next__')
 
-# Function to return the operator module
+# Hàm trả về mô-đun operator
 def get_operator_module():
     return operator
 
@@ -34,16 +34,16 @@ def get_operator_module():
 class MyManager(BaseManager):
     pass
 
-# register the Foo class; make `f()` and `g()` accessible via proxy
+# đăng ký lớp Foo; cho phép truy cập `f()` và `g()` qua proxy
 MyManager.register('Foo1', Foo)
 
-# register the Foo class; make `g()` and `_h()` accessible via proxy
+# đăng ký lớp Foo; cho phép truy cập `g()` và `_h()` qua proxy
 MyManager.register('Foo2', Foo, exposed=('g', '_h'))
 
-# register the generator function baz; use `GeneratorProxy` to make proxies
+# đăng ký hàm sinh baz; dùng `GeneratorProxy` để tạo proxy
 MyManager.register('baz', baz, proxytype=GeneratorProxy)
 
-# register get_operator_module(); make public functions accessible via proxy
+# đăng ký get_operator_module(); cho phép truy cập hàm công khai qua proxy
 MyManager.register('operator', get_operator_module)
 
 ##

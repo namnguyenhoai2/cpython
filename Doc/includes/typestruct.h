@@ -1,25 +1,25 @@
 typedef struct _typeobject {
     PyObject_VAR_HEAD
-    const char *tp_name; /* For printing, in format "<module>.<name>" */
-    Py_ssize_t tp_basicsize, tp_itemsize; /* For allocation */
+    const char *tp_name; /* Để in, theo định dạng "<module>.<name>" */
+    Py_ssize_t tp_basicsize, tp_itemsize; /* Để cấp phát */
 
-    /* Methods to implement standard operations */
+    /* Các phương thức triển khai thao tác chuẩn */
 
     destructor tp_dealloc;
     Py_ssize_t tp_vectorcall_offset;
     getattrfunc tp_getattr;
     setattrfunc tp_setattr;
-    PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2)
-                                    or tp_reserved (Python 3) */
+    PyAsyncMethods *tp_as_async; /* trước đây có tên là tp_compare (Python 2)
+                                    hoặc tp_reserved (Python 3) */
     reprfunc tp_repr;
 
-    /* Method suites for standard classes */
+    /* Bộ phương thức cho các lớp chuẩn */
 
     PyNumberMethods *tp_as_number;
     PySequenceMethods *tp_as_sequence;
     PyMappingMethods *tp_as_mapping;
 
-    /* More standard operations (here for binary compatibility) */
+    /* Thêm các thao tác chuẩn (đặt ở đây để tương thích nhị phân) */
 
     hashfunc tp_hash;
     ternaryfunc tp_call;
@@ -27,37 +27,37 @@ typedef struct _typeobject {
     getattrofunc tp_getattro;
     setattrofunc tp_setattro;
 
-    /* Functions to access object as input/output buffer */
+    /* Hàm truy cập đối tượng dưới dạng bộ đệm vào/ra */
     PyBufferProcs *tp_as_buffer;
 
-    /* Flags to define presence of optional/expanded features */
+    /* Cờ xác định sự hiện diện của tính năng tùy chọn/mở rộng */
     unsigned long tp_flags;
 
-    const char *tp_doc; /* Documentation string */
+    const char *tp_doc; /* Chuỗi tài liệu */
 
-    /* Assigned meaning in release 2.0 */
-    /* call function for all accessible objects */
+    /* Được gán ý nghĩa trong bản phát hành 2.0 */
+    /* gọi hàm cho mọi đối tượng có thể truy cập */
     traverseproc tp_traverse;
 
-    /* delete references to contained objects */
+    /* xóa các tham chiếu tới đối tượng chứa bên trong */
     inquiry tp_clear;
 
-    /* Assigned meaning in release 2.1 */
-    /* rich comparisons */
+    /* Được gán ý nghĩa trong bản phát hành 2.1 */
+    /* so sánh phong phú */
     richcmpfunc tp_richcompare;
 
-    /* weak reference enabler */
+    /* bộ kích hoạt tham chiếu yếu */
     Py_ssize_t tp_weaklistoffset;
 
-    /* Iterators */
+    /* Bộ lặp */
     getiterfunc tp_iter;
     iternextfunc tp_iternext;
 
-    /* Attribute descriptor and subclassing stuff */
+    /* Nội dung về bộ mô tả thuộc tính và kế thừa lớp con */
     PyMethodDef *tp_methods;
     PyMemberDef *tp_members;
     PyGetSetDef *tp_getset;
-    // Strong reference on a heap type, borrowed reference on a static type
+    // Tham chiếu mạnh với kiểu heap, tham chiếu mượn với kiểu tĩnh
     PyTypeObject *tp_base;
     PyObject *tp_dict;
     descrgetfunc tp_descr_get;
@@ -66,30 +66,30 @@ typedef struct _typeobject {
     initproc tp_init;
     allocfunc tp_alloc;
     newfunc tp_new;
-    freefunc tp_free; /* Low-level free-memory routine */
-    inquiry tp_is_gc; /* For PyObject_IS_GC */
+    freefunc tp_free; /* Thủ tục giải phóng bộ nhớ cấp thấp */
+    inquiry tp_is_gc; /* Dành cho PyObject_IS_GC */
     PyObject *tp_bases;
-    PyObject *tp_mro; /* method resolution order */
-    PyObject *tp_cache; /* no longer used */
-    void *tp_subclasses;  /* for static builtin types this is an index */
-    PyObject *tp_weaklist; /* not used for static builtin types */
+    PyObject *tp_mro; /* thứ tự phân giải phương thức */
+    PyObject *tp_cache; /* không còn được dùng */
+    void *tp_subclasses;  /* với kiểu dựng sẵn tĩnh, đây là một chỉ mục */
+    PyObject *tp_weaklist; /* không dùng cho kiểu dựng sẵn tĩnh */
     destructor tp_del;
 
-    /* Type attribute cache version tag. Added in version 2.6.
-     * If zero, the cache is invalid and must be initialized.
+    /* Thẻ phiên bản của bộ đệm thuộc tính kiểu. Được thêm ở phiên bản 2.6.
+     * Nếu bằng không, bộ đệm không hợp lệ và phải được khởi tạo.
      */
     unsigned int tp_version_tag;
 
     destructor tp_finalize;
     vectorcallfunc tp_vectorcall;
 
-    /* bitset of which type-watchers care about this type */
+    /* tập bit chỉ các trình theo dõi kiểu quan tâm đến kiểu này */
     unsigned char tp_watched;
 
-    /* Number of tp_version_tag values used.
-     * Set to _Py_ATTR_CACHE_UNUSED if the attribute cache is
-     * disabled for this type (e.g. due to custom MRO entries).
-     * Otherwise, limited to MAX_VERSIONS_PER_CLASS (defined elsewhere).
+    /* Số lượng giá trị tp_version_tag đã dùng.
+     * Đặt thành _Py_ATTR_CACHE_UNUSED nếu bộ đệm thuộc tính bị
+     * vô hiệu cho kiểu này (ví dụ do các mục MRO tùy chỉnh).
+     * Nếu không, bị giới hạn bởi MAX_VERSIONS_PER_CLASS (định nghĩa ở nơi khác).
      */
     uint16_t tp_versions_used;
 } PyTypeObject;
