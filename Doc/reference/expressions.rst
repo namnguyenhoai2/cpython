@@ -1,58 +1,48 @@
 
 .. _expressions:
 
-***********
-Expressions
-***********
+*********
+Biểu thức
+*********
 
 .. index:: expression, BNF
 
-This chapter explains the meaning of the elements of expressions in Python.
+Chương này giải thích ý nghĩa của các thành phần trong biểu thức Python.
 
-**Syntax Notes:** In this and the following chapters,
-:ref:`grammar notation <notation>` will be used to describe syntax,
-not lexical analysis.
+**Ghi chú cú pháp:** Trong chương này và các chương tiếp theo,
+:ref:`ký hiệu ngữ pháp <notation>` sẽ được dùng để mô tả cú pháp, không phải phân tích từ vựng.
 
-When (one alternative of) a syntax rule has the form:
+Khi (một lựa chọn của) quy tắc cú pháp có dạng:
 
 .. productionlist:: python-grammar
    name: othername
 
-and no semantics are given, the semantics of this form of ``name`` are the same
-as for ``othername``.
+và không có ngữ nghĩa nào được nêu, ngữ nghĩa của dạng ``name`` này giống với ngữ nghĩa của ``othername``.
 
 
 .. _conversions:
 
-Arithmetic conversions
-======================
+Chuyển đổi số học
+=================
 
 .. index:: pair: arithmetic; conversion
 
-When a description of an arithmetic operator below uses the phrase "the numeric
-arguments are converted to a common real type", this means that the operator
-implementation for built-in numeric types works as described in the
-:ref:`Numeric Types <stdtypes-mixed-arithmetic>` section of the standard
-library documentation.
+Khi phần mô tả một toán tử số học dưới đây sử dụng cụm từ "các đối số số được chuyển đổi sang một kiểu thực chung", điều này có nghĩa là phần triển khai toán tử cho các kiểu số tích hợp sẵn hoạt động như được mô tả trong
+:ref:`Các kiểu số <stdtypes-mixed-arithmetic>` của tài liệu thư viện chuẩn.
 
-Some additional rules apply for certain operators and non-numeric operands
-(for example, a string as a left argument to the ``%`` operator).
-Extensions must define their own conversion behavior.
+Một số quy tắc bổ sung áp dụng cho một số toán tử và toán hạng không phải số (ví dụ: một chuỗi làm đối số bên trái cho ``%`` toán tử). Các phần mở rộng phải tự định nghĩa cách chuyển đổi của mình.
 
 
 .. _atoms:
 
-Atoms
-=====
+Các atom
+========
 
 .. index:: atom
 
-Atoms are the most basic elements of expressions.
-The simplest atoms are :ref:`names <identifiers>` or literals.
-Forms enclosed in parentheses, brackets or braces are also categorized
-syntactically as atoms.
+Atom là những phần tử cơ bản nhất của biểu thức. Các atom đơn giản nhất là :ref:`tên <identifiers>` hoặc literal. Các dạng được đặt trong dấu ngoặc đơn, ngoặc vuông hoặc ngoặc nhọn cũng được phân loại về mặt cú pháp là atom.
 
-Formally, the syntax for atoms is:
+Về hình thức, cú pháp của atom là:
 
 .. grammar-snippet::
    :group: python-grammar
@@ -76,20 +66,17 @@ Formally, the syntax for atoms is:
 
 .. _atom-singletons:
 
-Built-in constants
-------------------
+Hằng số tích hợp sẵn
+--------------------
 
-The keywords ``True``, ``False``, and ``None`` name
-:ref:`built-in constants <built-in-consts>`.
-The token ``...`` names the :py:data:`Ellipsis` constant.
+Các từ khóa ``True``, ``False`` và ``None`` đặt tên
+:ref:`các hằng số dựng sẵn <built-in-consts>`. Token ``...`` đặt tên cho hằng số :py:data:`Ellipsis`.
 
-Evaluation of these atoms yields the corresponding value.
+Việc đánh giá các atom này cho ra giá trị tương ứng.
 
 .. note::
 
-   Several more built-in constants are available as global variables,
-   but only the ones mentioned here are :ref:`keywords <keywords>`.
-   In particular, these names cannot be reassigned or used as attributes:
+   Một số hằng số dựng sẵn khác khả dụng dưới dạng biến toàn cục, nhưng chỉ những hằng số được đề cập ở đây mới là :ref:`từ khóa <keywords>`. Cụ thể, không thể gán lại hoặc sử dụng các tên này làm thuộc tính:
 
    .. code-block:: pycon
 
@@ -101,20 +88,16 @@ Evaluation of these atoms yields the corresponding value.
 
 .. _atom-identifiers:
 
-Identifiers (Names)
--------------------
+Định danh (Tên)
+---------------
 
 .. index:: name, identifier
 
-An identifier occurring as an atom is a name.  See section :ref:`identifiers`
-for lexical definition and section :ref:`naming` for documentation of naming and
-binding.
+Một định danh xuất hiện dưới dạng atom là một tên. Xem mục :ref:`identifiers` để biết định nghĩa từ vựng và mục :ref:`naming` để xem tài liệu về việc đặt tên và liên kết.
 
 .. index:: pair: exception; NameError
 
-When the name is bound to an object, evaluation of the atom yields that object.
-When a name is not bound, an attempt to evaluate it raises a :exc:`NameError`
-exception.
+Khi tên được liên kết với một đối tượng, việc đánh giá atom sẽ cho ra đối tượng đó. Khi một tên chưa được liên kết, nỗ lực đánh giá tên đó sẽ gây ra một ngoại lệ :exc:`NameError`.
 
 .. _private-name-mangling:
 
@@ -122,79 +105,54 @@ exception.
    pair: name; mangling
    pair: private; names
 
-Private name mangling
+Biến đổi tên riêng tư
 ^^^^^^^^^^^^^^^^^^^^^
 
-When an identifier that textually occurs in a class definition begins with two
-or more underscore characters and does not end in two or more underscores, it
-is considered a :dfn:`private name` of that class.
+Khi một định danh xuất hiện dưới dạng văn bản trong định nghĩa lớp bắt đầu bằng từ hai ký tự gạch dưới trở lên và không kết thúc bằng từ hai ký tự gạch dưới trở lên, định danh đó được xem là :dfn:`tên riêng tư` của lớp đó.
 
 .. seealso::
 
-   The :ref:`class specifications <class>`.
+   :ref:`Các đặc tả lớp <class>`.
 
-More precisely, private names are transformed to a longer form before code is
-generated for them.  If the transformed name is longer than 255 characters,
-implementation-defined truncation may happen.
+Cụ thể hơn, tên riêng tư được chuyển đổi thành dạng dài hơn trước khi mã được tạo cho chúng. Nếu tên sau khi chuyển đổi dài hơn 255 ký tự, việc cắt ngắn có thể xảy ra tùy theo triển khai.
 
-The transformation is independent of the syntactical context in which the
-identifier is used but only the following private identifiers are mangled:
+Việc chuyển đổi không phụ thuộc vào ngữ cảnh cú pháp mà định danh được sử dụng, nhưng chỉ các định danh riêng tư sau đây mới được biến đổi:
 
-- Any name used as the name of a variable that is assigned or read or any
-  name of an attribute being accessed.
+- Mọi tên được sử dụng làm tên của một biến được gán hoặc đọc, hoặc mọi tên của một attribute đang được truy cập.
 
-  The :attr:`~definition.__name__` attribute of nested functions, classes, and
-  type aliases is however not mangled.
+  Tuy nhiên, thuộc tính :attr:`~definition.__name__` của các hàm, lớp và bí danh kiểu lồng nhau không bị biến đổi tên.
 
-- The name of imported modules, e.g., ``__spam`` in ``import __spam``.
-  If the module is part of a package (i.e., its name contains a dot),
-  the name is *not* mangled, e.g., the ``__foo`` in ``import __foo.bar``
-  is not mangled.
+- Tên của các mô-đun đã nhập, ví dụ ``__spam`` trong ``import __spam``. Nếu mô-đun là một phần của một package (tức là tên của nó chứa dấu chấm), tên đó *không* bị biến đổi, ví dụ, ``__foo`` trong ``import __foo.bar`` không bị biến đổi.
 
-- The name of an imported member, e.g., ``__f`` in ``from spam import __f``.
+- Tên của một thành phần đã nhập, ví dụ ``__f`` trong ``from spam import __f``.
 
-The transformation rule is defined as follows:
+Quy tắc biến đổi được định nghĩa như sau:
 
-- The class name, with leading underscores removed and a single leading
-  underscore inserted, is inserted in front of the identifier, e.g., the
-  identifier ``__spam`` occurring in a class named ``Foo``, ``_Foo`` or
-  ``__Foo`` is transformed to ``_Foo__spam``.
+- Tên lớp, sau khi loại bỏ các dấu gạch dưới ở đầu và thêm một dấu gạch dưới đơn ở đầu, được chèn vào trước định danh; ví dụ, định danh ``__spam`` xuất hiện trong một lớp có tên ``Foo``, ``_Foo`` hoặc ``__Foo`` sẽ được biến đổi thành ``_Foo__spam``.
 
-- If the class name consists only of underscores, the transformation is the
-  identity, e.g., the identifier ``__spam`` occurring in a class named ``_``
-  or ``__`` is left as is.
+- Nếu tên lớp chỉ gồm các dấu gạch dưới, phép biến đổi giữ nguyên định danh, ví dụ, định danh ``__spam`` xuất hiện trong một lớp có tên ``_`` hoặc ``__`` sẽ được giữ nguyên.
 
 .. _atom-literals:
 
-Literals
---------
+Các literal
+-----------
 
 .. index:: single: literal
 
-A :dfn:`literal` is a textual representation of a value.
-Python supports numeric, string and bytes literals.
-:ref:`Format strings <f-strings>` and :ref:`template strings <t-strings>`
-are treated as string literals.
+Một :dfn:`literal` là biểu diễn dạng văn bản của một giá trị. Python hỗ trợ các literal số, chuỗi và byte.
+:ref:`Format strings <f-strings>` và :ref:`template strings <t-strings>` được xem là các string literal.
 
-Numeric literals consist of a single :token:`NUMBER <python-grammar:NUMBER>`
-token, which names an integer, floating-point number, or an imaginary number.
-See the :ref:`numbers` section in Lexical analysis documentation for details.
+Numeric literal bao gồm một :token:`NUMBER <python-grammar:NUMBER>` token duy nhất, dùng để chỉ một số nguyên, số dấu phẩy động hoặc số ảo. Xem phần :ref:`numbers` trong tài liệu Lexical analysis để biết thêm chi tiết.
 
-String and bytes literals may consist of several tokens.
-See section :ref:`string-concatenation` for details.
+String literal và bytes literal có thể bao gồm nhiều token. Xem phần :ref:`string-concatenation` để biết thêm chi tiết.
 
-Note that negative and complex numbers, like ``-3`` or ``3+4.2j``,
-are syntactically not literals, but :ref:`unary <unary>` or
-:ref:`binary <binary>` arithmetic operations involving the ``-`` or ``+``
-operator.
+Lưu ý rằng các số âm và số phức, chẳng hạn như ``-3`` hoặc ``3+4.2j``, về mặt cú pháp không phải là literal, mà là :ref:`unary <unary>` hoặc
+:ref:`binary <binary>` arithmetic operation liên quan đến toán tử ``-`` hoặc ``+``.
 
-Evaluation of a literal yields an object of the given type
-(:class:`int`, :class:`float`, :class:`complex`, :class:`str`,
-:class:`bytes`, or :class:`~string.templatelib.Template`) with the given value.
-The value may be approximated in the case of floating-point
-and imaginary literals.
+Việc đánh giá một literal tạo ra một object thuộc kiểu đã cho (:class:`int`, :class:`float`, :class:`complex`, :class:`str`,
+:class:`bytes`, hoặc :class:`~string.templatelib.Template`) với giá trị đã cho. Giá trị có thể được xấp xỉ trong trường hợp floating-point literal và imaginary literal.
 
-The formal grammar for literals is:
+Ngữ pháp hình thức cho các literal là:
 
 .. grammar-snippet::
    :group: python-grammar
@@ -206,102 +164,80 @@ The formal grammar for literals is:
    triple: immutable; data; type
    pair: immutable; object
 
-Literals and object identity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Literal và danh tính đối tượng
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All literals correspond to immutable data types, and hence the object's identity
-is less important than its value.  Multiple evaluations of literals with the
-same value (either the same occurrence in the program text or a different
-occurrence) may obtain the same object or a different object with the same
-value.
+Tất cả literal đều tương ứng với các kiểu dữ liệu bất biến, vì vậy danh tính của đối tượng ít quan trọng hơn giá trị của nó. Nhiều lần đánh giá các literal có cùng giá trị (dù là cùng một lần xuất hiện trong văn bản chương trình hay các lần xuất hiện khác nhau) có thể nhận được cùng một đối tượng hoặc các đối tượng khác nhau có cùng giá trị.
 
-.. admonition:: CPython implementation detail
+.. admonition:: Chi tiết triển khai CPython
 
-   For example, in CPython, *small* integers with the same value evaluate
-   to the same object::
+   Ví dụ, trong CPython, các số nguyên *nhỏ* có cùng giá trị sẽ được đánh giá thành cùng một đối tượng::
 
       >>> x = 7
       >>> y = 7
       >>> x is y
       True
 
-   However, large integers evaluate to different objects::
+   Tuy nhiên, các số nguyên lớn sẽ được đánh giá thành các đối tượng khác nhau::
 
       >>> x = 123456789
       >>> y = 123456789
       >>> x is y
       False
 
-   This behavior may change in future versions of CPython.
-   In particular, the boundary between "small" and "large" integers has
-   already changed in the past.
+   Hành vi này có thể thay đổi trong các phiên bản CPython tương lai. Cụ thể, ranh giới giữa các số nguyên "nhỏ" và "lớn" trước đây đã từng thay đổi.
 
-   CPython will emit a :py:exc:`SyntaxWarning` when you compare literals
-   using ``is``::
+   CPython sẽ phát ra một :py:exc:`SyntaxWarning` khi bạn so sánh các literal bằng ``is``::
 
       >>> x = 7
       >>> x is 7
       <input>:1: SyntaxWarning: "is" with 'int' literal. Did you mean "=="?
       True
 
-   See :ref:`faq-identity-with-is` for more information.
+   Xem :ref:`faq-identity-with-is` để biết thêm thông tin.
 
-:ref:`Template strings <t-strings>` are immutable but may reference mutable
-objects as :class:`~string.templatelib.Interpolation` values.
-For the purposes of this section, two t-strings have the "same value" if
-both their structure and the *identity* of the values match.
+:ref:`Template strings <t-strings>` là bất biến nhưng có thể tham chiếu đến các đối tượng khả biến dưới dạng giá trị :class:`~string.templatelib.Interpolation`. Trong phạm vi của phần này, hai t-string được coi là có "cùng giá trị" nếu cả cấu trúc của chúng và *identity* của các giá trị đều khớp nhau.
 
 .. impl-detail::
 
-   Currently, each evaluation of a template string results in
-   a different object.
+   Hiện tại, mỗi lần đánh giá một template string đều tạo ra một đối tượng khác.
 
 
 .. _string-concatenation:
 
-String literal concatenation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Phép nối literal chuỗi
+^^^^^^^^^^^^^^^^^^^^^^
 
-Multiple adjacent string or bytes literals, possibly
-using different quoting conventions, are allowed, and their meaning is the same
-as their concatenation::
+Có thể sử dụng nhiều literal chuỗi hoặc bytes liền kề nhau, có thể theo các quy ước trích dẫn khác nhau, và ý nghĩa của chúng giống với phép nối các literal đó::
 
    >>> "hello" 'world'
    "helloworld"
 
-This feature is defined at the syntactical level, so it only works with literals.
-To concatenate string expressions at run time, the '+' operator may be used::
+Tính năng này được định nghĩa ở cấp độ cú pháp, vì vậy chỉ hoạt động với các literal. Để nối các biểu thức chuỗi trong thời gian chạy, có thể sử dụng toán tử '+'::
 
    >>> greeting = "Hello"
    >>> space = " "
    >>> name = "Blaise"
-   >>> print(greeting + space + name)   # not: print(greeting space name)
+   >>> print(greeting + space + name)   # không phải: print(greeting space name)
    Hello Blaise
 
-Literal concatenation can freely mix raw strings, triple-quoted strings,
-and formatted string literals.
-For example::
+Có thể tự do kết hợp string literal thông thường, string literal được đặt trong ba dấu nháy và formatted string literal. Ví dụ::
 
    >>> "Hello" r', ' f"{name}!"
    "Hello, Blaise!"
 
-This feature can be used to reduce the number of backslashes
-needed, to split long strings conveniently across long lines, or even to add
-comments to parts of strings. For example::
+Có thể sử dụng tính năng này để giảm số lượng dấu gạch chéo ngược cần dùng, thuận tiện chia các chuỗi dài thành nhiều dòng dài, hoặc thậm chí thêm chú thích vào các phần của chuỗi. Ví dụ::
 
-   re.compile("[A-Za-z_]"       # letter or underscore
-              "[A-Za-z0-9_]*"   # letter, digit or underscore
+   re.compile("[A-Za-z_]"       # chữ cái hoặc dấu gạch dưới
+              "[A-Za-z0-9_]*"   # chữ cái, chữ số hoặc dấu gạch dưới
              )
 
-However, bytes literals may only be combined with other byte literals;
-not with string literals of any kind.
-Also, template string literals may only be combined with other template
-string literals::
+Tuy nhiên, bytes literal chỉ có thể được kết hợp với các bytes literal khác, không thể kết hợp với string literal thuộc bất kỳ loại nào. Ngoài ra, template string literal chỉ có thể được kết hợp với các template string literal khác::
 
    >>> t"Hello" t"{name}!"
    Template(strings=('Hello', '!'), interpolations=(...))
 
-Formally:
+Về mặt hình thức:
 
 .. grammar-snippet::
    :group: python-grammar
@@ -311,51 +247,43 @@ Formally:
 
 .. _parenthesized:
 
-Parenthesized forms
--------------------
+Dạng có dấu ngoặc
+-----------------
 
 .. index::
    single: parenthesized form
    single: () (parentheses); tuple display
 
-A parenthesized form is an optional expression list enclosed in parentheses:
+Dạng có dấu ngoặc là một danh sách biểu thức tùy chọn được đặt trong dấu ngoặc đơn:
 
 .. productionlist:: python-grammar
    parenth_form: "(" [`starred_expression`] ")"
 
-A parenthesized expression list yields whatever that expression list yields: if
-the list contains at least one comma, it yields a tuple; otherwise, it yields
-the single expression that makes up the expression list.
+Danh sách biểu thức có dấu ngoặc cho kết quả giống như danh sách biểu thức đó: nếu danh sách chứa ít nhất một dấu phẩy, nó cho kết quả là một tuple; nếu không, nó cho kết quả là biểu thức duy nhất tạo nên danh sách biểu thức đó.
 
 .. index:: pair: empty; tuple
 
-An empty pair of parentheses yields an empty tuple object.  Since tuples are
-immutable, the same rules as for literals apply (i.e., two occurrences of the empty
-tuple may or may not yield the same object).
+Một cặp dấu ngoặc đơn rỗng cho kết quả là một đối tượng tuple rỗng. Vì tuple là bất biến, các quy tắc tương tự như đối với literal được áp dụng (tức là hai lần xuất hiện của tuple rỗng có thể cho kết quả là cùng một đối tượng hoặc không).
 
 .. index::
    single: comma
    single: , (comma)
 
-Note that tuples are not formed by the parentheses, but rather by use of the
-comma.  The exception is the empty tuple, for which parentheses *are*
-required --- allowing unparenthesized "nothing" in expressions would cause
-ambiguities and allow common typos to pass uncaught.
+Lưu ý rằng tuple không được tạo bởi dấu ngoặc, mà bởi việc sử dụng dấu phẩy. Ngoại lệ là tuple rỗng, đối với tuple này, dấu ngoặc *là* bắt buộc --- việc cho phép "không có gì" không đặt trong ngoặc trong các biểu thức sẽ gây ra sự mơ hồ và cho phép các lỗi gõ phổ biến không bị phát hiện.
 
 
 .. _comprehensions:
 
-Displays for lists, sets and dictionaries
------------------------------------------
+Biểu diễn danh sách, tập hợp và từ điển
+---------------------------------------
 
 .. index:: single: comprehensions
 
-For constructing a list, a set or a dictionary Python provides special syntax
-called "displays", each of them in two flavors:
+Để tạo một danh sách, một tập hợp hoặc một từ điển, Python cung cấp cú pháp đặc biệt gọi là "biểu diễn", mỗi loại có hai dạng:
 
-* either the container contents are listed explicitly, or
+* hoặc nội dung của container được liệt kê một cách tường minh, hoặc
 
-* they are computed via a set of looping and filtering instructions, called a
+* được tính thông qua một tập hợp các chỉ dẫn lặp và lọc, gọi là
   :dfn:`comprehension`.
 
 .. index::
@@ -363,7 +291,7 @@ called "displays", each of them in two flavors:
    single: if; in comprehensions
    single: async for; in comprehensions
 
-Common syntax elements for comprehensions are:
+Các thành phần cú pháp phổ biến của comprehension là:
 
 .. productionlist:: python-grammar
    comprehension: `assignment_expression` `comp_for`
@@ -371,61 +299,39 @@ Common syntax elements for comprehensions are:
    comp_iter: `comp_for` | `comp_if`
    comp_if: "if" `or_test` [`comp_iter`]
 
-The comprehension consists of a single expression followed by at least one
-:keyword:`!for` clause and zero or more :keyword:`!for` or :keyword:`!if` clauses.
-In this case, the elements of the new container are those that would be produced
-by considering each of the :keyword:`!for` or :keyword:`!if` clauses a block,
-nesting from left to right, and evaluating the expression to produce an element
-each time the innermost block is reached.
+Comprehension bao gồm một biểu thức duy nhất, theo sau là ít nhất một
+:keyword:`!for` mệnh đề và không hoặc có thêm một hay nhiều mệnh đề :keyword:`!for` hoặc :keyword:`!if`. Trong trường hợp này, các phần tử của container mới là những phần tử sẽ được tạo ra bằng cách coi mỗi mệnh đề :keyword:`!for` hoặc :keyword:`!if` như một khối, lồng từ trái sang phải, rồi đánh giá biểu thức để tạo ra một phần tử mỗi khi đến khối trong cùng.
 
-However, aside from the iterable expression in the leftmost :keyword:`!for` clause,
-the comprehension is executed in a separate implicitly nested scope. This ensures
-that names assigned to in the target list don't "leak" into the enclosing scope.
+Tuy nhiên, ngoại trừ biểu thức iterable trong mệnh đề :keyword:`!for` ngoài cùng bên trái, comprehension được thực thi trong một phạm vi lồng nhau ngầm riêng biệt. Điều này đảm bảo rằng các tên được gán trong danh sách đích không “rò rỉ” vào phạm vi bao quanh.
 
-The iterable expression in the leftmost :keyword:`!for` clause is evaluated
-directly in the enclosing scope and then passed as an argument to the implicitly
-nested scope. Subsequent :keyword:`!for` clauses and any filter condition in the
-leftmost :keyword:`!for` clause cannot be evaluated in the enclosing scope as
-they may depend on the values obtained from the leftmost iterable. For example:
-``[x*y for x in range(10) for y in range(x, x+10)]``.
+Biểu thức iterable trong mệnh đề :keyword:`!for` ngoài cùng bên trái được đánh giá trực tiếp trong phạm vi bao quanh, sau đó được truyền dưới dạng đối số cho phạm vi lồng nhau ngầm định. Các mệnh đề :keyword:`!for` tiếp theo và mọi điều kiện lọc trong mệnh đề :keyword:`!for` ngoài cùng bên trái không thể được đánh giá trong phạm vi bao quanh vì chúng có thể phụ thuộc vào các giá trị nhận được từ iterable ngoài cùng bên trái. Ví dụ: ``[x*y for x in range(10) for y in range(x, x+10)]``.
 
-To ensure the comprehension always results in a container of the appropriate
-type, ``yield`` and ``yield from`` expressions are prohibited in the implicitly
-nested scope.
+Để đảm bảo phép hiểu luôn cho kết quả là một container thuộc kiểu thích hợp, các biểu thức ``yield`` và ``yield from`` bị cấm trong phạm vi lồng nhau ngầm định.
 
 .. index::
    single: await; in comprehensions
 
-Since Python 3.6, in an :keyword:`async def` function, an :keyword:`!async for`
-clause may be used to iterate over a :term:`asynchronous iterator`.
-A comprehension in an :keyword:`!async def` function may consist of either a
-:keyword:`!for` or :keyword:`!async for` clause following the leading
-expression, may contain additional :keyword:`!for` or :keyword:`!async for`
-clauses, and may also use :keyword:`await` expressions.
+Kể từ Python 3.6, trong một hàm :keyword:`async def`, có thể sử dụng mệnh đề :keyword:`!async for` để lặp qua một :term:`asynchronous iterator`. Phép hiểu trong một hàm :keyword:`!async def` có thể bao gồm một trong hai
+mệnh đề :keyword:`!for` hoặc :keyword:`!async for` theo sau biểu thức mở đầu, có thể chứa thêm các mệnh đề :keyword:`!for` hoặc :keyword:`!async for`, và cũng có thể sử dụng các biểu thức :keyword:`await`.
 
-If a comprehension contains :keyword:`!async for` clauses, or if it contains
-:keyword:`!await` expressions or other asynchronous comprehensions anywhere except
-the iterable expression in the leftmost :keyword:`!for` clause, it is called an
-:dfn:`asynchronous comprehension`. An asynchronous comprehension may suspend the
-execution of the coroutine function in which it appears.
-See also :pep:`530`.
+Nếu một phép hiểu chứa các mệnh đề :keyword:`!async for`, hoặc nếu nó chứa
+các biểu thức :keyword:`!await` hoặc các phép hiểu bất đồng bộ khác ở bất kỳ vị trí nào ngoại trừ biểu thức iterable trong mệnh đề :keyword:`!for` ngoài cùng bên trái, thì nó được gọi là một
+:dfn:`phép hiểu bất đồng bộ`. Một phép hiểu bất đồng bộ có thể tạm dừng việc thực thi của hàm coroutine nơi nó xuất hiện. Xem thêm :pep:`530`.
 
 .. versionadded:: 3.6
-   Asynchronous comprehensions were introduced.
+   Phép comprehension bất đồng bộ đã được giới thiệu.
 
 .. versionchanged:: 3.8
-   ``yield`` and ``yield from`` prohibited in the implicitly nested scope.
+   ``yield`` và ``yield from`` không được phép trong phạm vi lồng nhau ngầm định.
 
 .. versionchanged:: 3.11
-   Asynchronous comprehensions are now allowed inside comprehensions in
-   asynchronous functions. Outer comprehensions implicitly become
-   asynchronous.
+   Các phép comprehension bất đồng bộ hiện được phép sử dụng bên trong các phép comprehension trong những hàm bất đồng bộ. Các phép comprehension bên ngoài sẽ mặc định trở thành bất đồng bộ.
 
 
 .. _lists:
 
-List displays
--------------
+Biểu thức hiển thị danh sách
+----------------------------
 
 .. index::
    pair: list; display
@@ -435,23 +341,18 @@ List displays
    single: [] (square brackets); list expression
    single: , (comma); expression list
 
-A list display is a possibly empty series of expressions enclosed in square
-brackets:
+Biểu thức hiển thị danh sách là một chuỗi biểu thức có thể rỗng, được đặt trong dấu ngoặc vuông:
 
 .. productionlist:: python-grammar
    list_display: "[" [`flexible_expression_list` | `comprehension`] "]"
 
-A list display yields a new list object, the contents being specified by either
-a list of expressions or a comprehension.  When a comma-separated list of
-expressions is supplied, its elements are evaluated from left to right and
-placed into the list object in that order.  When a comprehension is supplied,
-the list is constructed from the elements resulting from the comprehension.
+Biểu thức hiển thị danh sách tạo ra một đối tượng danh sách mới; nội dung của danh sách được xác định bằng một danh sách biểu thức hoặc một phép comprehension. Khi cung cấp một danh sách biểu thức được phân tách bằng dấu phẩy, các phần tử của danh sách được đánh giá từ trái sang phải và được đặt vào đối tượng danh sách theo thứ tự đó. Khi cung cấp một phép comprehension, danh sách được tạo từ các phần tử tạo ra bởi phép comprehension.
 
 
 .. _set:
 
-Set displays
-------------
+Biểu thức hiển thị tập hợp
+--------------------------
 
 .. index::
    pair: set; display
@@ -460,26 +361,20 @@ Set displays
    single: {} (curly brackets); set expression
    single: , (comma); expression list
 
-A set display is denoted by curly braces and distinguishable from dictionary
-displays by the lack of colons separating keys and values:
+Biểu thức hiển thị tập hợp được ký hiệu bằng dấu ngoặc nhọn và có thể phân biệt với biểu thức hiển thị từ điển nhờ không có dấu hai chấm ngăn cách khóa và giá trị:
 
 .. productionlist:: python-grammar
    set_display: "{" (`flexible_expression_list` | `comprehension`) "}"
 
-A set display yields a new mutable set object, the contents being specified by
-either a sequence of expressions or a comprehension.  When a comma-separated
-list of expressions is supplied, its elements are evaluated from left to right
-and added to the set object.  When a comprehension is supplied, the set is
-constructed from the elements resulting from the comprehension.
+Biểu thức hiển thị tập hợp tạo ra một đối tượng tập hợp mới có thể thay đổi, với nội dung được xác định bằng một chuỗi biểu thức hoặc một phép dựng tập hợp (comprehension). Khi cung cấp một danh sách biểu thức được phân tách bằng dấu phẩy, các phần tử của danh sách được đánh giá từ trái sang phải và thêm vào đối tượng tập hợp. Khi cung cấp một phép dựng tập hợp, tập hợp được tạo từ các phần tử là kết quả của phép dựng tập hợp đó.
 
-An empty set cannot be constructed with ``{}``; this literal constructs an empty
-dictionary.
+Không thể tạo một tập hợp rỗng bằng ``{}``; literal này tạo ra một từ điển rỗng.
 
 
 .. _dict:
 
-Dictionary displays
--------------------
+Biểu thức hiển thị từ điển
+--------------------------
 
 .. index::
    pair: dictionary; display
@@ -490,8 +385,7 @@ Dictionary displays
    single: : (colon); in dictionary expressions
    single: , (comma); in dictionary displays
 
-A dictionary display is a possibly empty series of dict items (key/value pairs)
-enclosed in curly braces:
+Biểu thức hiển thị từ điển là một chuỗi có thể rỗng gồm các mục từ điển (cặp khóa/giá trị) được đặt trong dấu ngoặc nhọn:
 
 .. productionlist:: python-grammar
    dict_display: "{" [`dict_item_list` | `dict_comprehension`] "}"
@@ -499,74 +393,53 @@ enclosed in curly braces:
    dict_item: `expression` ":" `expression` | "**" `or_expr`
    dict_comprehension: `expression` ":" `expression` `comp_for`
 
-A dictionary display yields a new dictionary object.
+Biểu thức hiển thị từ điển tạo ra một đối tượng từ điển mới.
 
-If a comma-separated sequence of dict items is given, they are evaluated
-from left to right to define the entries of the dictionary: each key object is
-used as a key into the dictionary to store the corresponding value.  This means
-that you can specify the same key multiple times in the dict item list, and the
-final dictionary's value for that key will be the last one given.
+Nếu cung cấp một chuỗi các mục từ điển được phân tách bằng dấu phẩy, các mục này được đánh giá từ trái sang phải để xác định các mục nhập của từ điển: mỗi đối tượng khóa được dùng làm khóa trong từ điển để lưu trữ giá trị tương ứng. Điều này có nghĩa là bạn có thể chỉ định cùng một khóa nhiều lần trong danh sách mục từ điển và giá trị cuối cùng của từ điển cho khóa đó sẽ là giá trị được chỉ định sau cùng.
 
 .. index::
    unpacking; dictionary
    single: **; in dictionary displays
 
-A double asterisk ``**`` denotes :dfn:`dictionary unpacking`.
-Its operand must be a :term:`mapping`.  Each mapping item is added
-to the new dictionary.  Later values replace values already set by
-earlier dict items and earlier dictionary unpackings.
+Hai dấu sao ``**`` biểu thị :dfn:`giải nén dictionary`. Toán hạng của nó phải là một :term:`mapping`. Mỗi mục trong mapping được thêm vào dictionary mới. Các giá trị xuất hiện sau sẽ thay thế những giá trị đã được thiết lập bởi các mục dict và phép giải nén dictionary xuất hiện trước đó.
 
 .. versionadded:: 3.5
-   Unpacking into dictionary displays, originally proposed by :pep:`448`.
+   Phép giải nén vào các biểu diễn dictionary, ban đầu được đề xuất bởi :pep:`448`.
 
-A dict comprehension, in contrast to list and set comprehensions, needs two
-expressions separated with a colon followed by the usual "for" and "if" clauses.
-When the comprehension is run, the resulting key and value elements are inserted
-in the new dictionary in the order they are produced.
+Khác với list comprehension và set comprehension, dict comprehension cần hai biểu thức được phân tách bằng dấu hai chấm, theo sau là các mệnh đề "for" và "if" thông thường. Khi comprehension được thực thi, các phần tử khóa và giá trị tạo ra sẽ được chèn vào dictionary mới theo thứ tự chúng được tạo ra.
 
 .. index:: pair: immutable; object
            hashable
 
-Restrictions on the types of the key values are listed earlier in section
-:ref:`types`.  (To summarize, the key type should be :term:`hashable`, which excludes
-all mutable objects.)  Clashes between duplicate keys are not detected; the last
-value (textually rightmost in the display) stored for a given key value
-prevails.
+Các hạn chế về kiểu của các giá trị khóa được liệt kê trước đó trong phần
+:ref:`types`. (Tóm lại, kiểu khóa phải là :term:`hashable`, tức là loại trừ mọi đối tượng có thể thay đổi.) Các xung đột giữa những khóa trùng lặp không được phát hiện; giá trị cuối cùng (ở vị trí ngoài cùng bên phải trong biểu diễn) được lưu cho một giá trị khóa nhất định sẽ được ưu tiên.
 
 .. versionchanged:: 3.8
-   Prior to Python 3.8, in dict comprehensions, the evaluation order of key
-   and value was not well-defined.  In CPython, the value was evaluated before
-   the key.  Starting with 3.8, the key is evaluated before the value, as
-   proposed by :pep:`572`.
+   Trước Python 3.8, trong dict comprehension, thứ tự đánh giá khóa và giá trị chưa được xác định rõ ràng. Trong CPython, giá trị được đánh giá trước khóa. Kể từ 3.8, khóa được đánh giá trước giá trị, theo đề xuất của :pep:`572`.
 
 
 .. _genexpr:
 
-Generator expressions
----------------------
+Biểu thức generator
+-------------------
 
 .. index::
    pair: generator; expression
    pair: object; generator
    single: () (parentheses); generator expression
 
-The syntax for :dfn:`generator expressions` is the same as for
-list :ref:`comprehensions <comprehensions>`, except that they are enclosed in
-parentheses instead of brackets.
-For example::
+Cú pháp của :dfn:`biểu thức generator (generator expression)` giống với cú pháp của :ref:`list comprehension <comprehensions>`, ngoại trừ việc chúng được đặt trong ngoặc đơn thay vì ngoặc vuông. Ví dụ::
 
    >>> iterator = (x ** 2 for x in range(10))
    >>> iterator
    <generator object <genexpr> at ...>
 
-At runtime, a generator expression evaluates to a :term:`generator iterator`
-which yields the same values as the corresponding list comprehension::
+Trong runtime, một biểu thức generator sẽ đánh giá thành một :term:`generator iterator` cho ra các giá trị giống với list comprehension tương ứng::
 
    >>> list(iterator)
    [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
-Thus, the example above is roughly equivalent to defining and calling
-the following generator function::
+Do đó, ví dụ trên gần tương đương với việc định nghĩa và gọi hàm generator sau đây::
 
    def make_generator_of_squares(iterator):
        for x in iterator:
@@ -574,41 +447,31 @@ the following generator function::
 
    make_generator_of_squares(iter(range(10)))
 
-The enclosing parentheses can be omitted in calls when the generator
-expression is the only positional argument and there are no keyword
-arguments.
-See the :ref:`Calls section <calls>` for details.
-For example::
+Có thể bỏ qua cặp ngoặc đơn bao quanh trong các lệnh gọi khi biểu thức generator là đối số positional duy nhất và không có keyword arguments. Xem :ref:`mục Calls <calls>` để biết chi tiết. Ví dụ::
 
-   # The parentheses after `sum` are part of the call syntax:
+   # Các dấu ngoặc đơn sau `sum` là một phần của cú pháp gọi:
    >>> sum(x ** 2 for x in range(10))
    285
 
-   # The generator needs its own parentheses if it's not the only argument:
+   # Biểu thức generator cần có cặp ngoặc đơn riêng nếu nó không phải là đối số duy nhất:
    >>> sum((x ** 2 for x in range(10)), start=1000)
    1285
 
-The iterable expression in the leftmost :keyword:`!for` clause is
-evaluated immediately, so that an error raised by this expression will be
-emitted at the point where the generator expression is defined,
-rather than at the point where the first value is retrieved::
+Biểu thức iterable trong mệnh đề :keyword:`!for` ngoài cùng bên trái được đánh giá ngay lập tức, vì vậy lỗi do biểu thức này gây ra sẽ được phát ra tại thời điểm định nghĩa biểu thức generator, thay vì tại thời điểm truy xuất giá trị đầu tiên::
 
    >>> (x ** 2 for x in nonexistent_iterable)
    Traceback (most recent call last):
      ...
    NameError: name 'nonexistent_iterable' is not defined
 
-After the expression is evaluated, an iterator is created
-from the result, as if :py:func:`iter` was called on it.
-Any error raised when creating the iterator is also emitted immediately::
+Sau khi biểu thức được đánh giá, một iterator được tạo từ kết quả, như thể :py:func:`iter` được gọi trên kết quả đó. Mọi lỗi phát sinh khi tạo iterator cũng được phát ra ngay lập tức::
 
    >>> (x ** 2 for x in None)
    Traceback (most recent call last):
      ...
    TypeError: 'NoneType' object is not iterable
 
-All other expressions are evaluated lazily, in the same fashion as normal
-generators (that is, when the iterator is asked to yield a value)::
+Tất cả các biểu thức khác đều được đánh giá một cách lazy, theo cùng cách với generator thông thường (tức là khi iterator được yêu cầu trả về một giá trị)::
 
    >>> iterator = (nonexistent_value for x in range(10))
    >>> iterator
@@ -628,17 +491,12 @@ generators (that is, when the iterator is asked to yield a value)::
      ...
    NameError: name 'nonexistent_iterable' is not defined
 
-To avoid interfering with the expected operation of the generator expression
-itself, ``yield`` and ``yield from`` expressions are prohibited inside
-the implicitly nested scope.
+Để không ảnh hưởng đến hoạt động dự kiến của chính generator expression, các biểu thức ``yield`` và ``yield from`` bị cấm trong scope lồng nhau ngầm định.
 
-If a generator expression contains either :keyword:`!async for`
-clauses or :keyword:`await` expressions it is called an
-:dfn:`asynchronous generator expression`.
-An asynchronous generator expression returns a new asynchronous generator
-object, which is an asynchronous iterator (see :ref:`async-iterators`).
+Nếu một generator expression chứa các mệnh đề :keyword:`!async for` hoặc biểu thức :keyword:`await`, nó được gọi là một
+:dfn:`asynchronous generator expression`. Một asynchronous generator expression trả về một đối tượng asynchronous generator mới, đây là một asynchronous iterator (xem :ref:`async-iterators`).
 
-The formal grammar for generator expressions is:
+Cú pháp chính thức của generator expression là:
 
 .. grammar-snippet::
    :group: python-grammar
@@ -646,21 +504,19 @@ The formal grammar for generator expressions is:
    generator_expression: "(" `expression` `comp_for` ")"
 
 .. versionadded:: 3.6
-   Asynchronous generator expressions were introduced.
+   Asynchronous generator expression đã được giới thiệu.
 
 .. versionchanged:: 3.7
-   Prior to Python 3.7, asynchronous generator expressions could
-   only appear in :keyword:`async def` coroutines.  Starting
-   with 3.7, any function can use asynchronous generator expressions.
+   Trước Python 3.7, các biểu thức trình tạo bất đồng bộ chỉ có thể xuất hiện trong các coroutine :keyword:`async def`. Kể từ 3.7, mọi hàm đều có thể sử dụng các biểu thức trình tạo bất đồng bộ.
 
 .. versionchanged:: 3.8
-   ``yield`` and ``yield from`` prohibited in the implicitly nested scope.
+   ``yield`` và ``yield from`` bị cấm trong phạm vi lồng ghép ngầm định.
 
 
 .. _yieldexpr:
 
-Yield expressions
------------------
+Biểu thức yield
+---------------
 
 .. index::
    pair: keyword; yield
@@ -673,200 +529,121 @@ Yield expressions
    yield_from: "yield" "from" `expression`
    yield_expression: "yield" `yield_list` | `yield_from`
 
-The yield expression is used when defining a :term:`generator` function
-or an :term:`asynchronous generator` function and
-thus can only be used in the body of a function definition.  Using a yield
-expression in a function's body causes that function to be a generator function,
-and using it in an :keyword:`async def` function's body causes that
-coroutine function to be an asynchronous generator function. For example::
+Biểu thức yield được sử dụng khi định nghĩa một hàm :term:`generator` hoặc một hàm :term:`asynchronous generator`, vì vậy chỉ có thể được sử dụng trong phần thân của một định nghĩa hàm. Việc sử dụng biểu thức yield trong phần thân của một hàm khiến hàm đó trở thành hàm trình tạo, còn việc sử dụng nó trong phần thân của một hàm :keyword:`async def` khiến hàm coroutine đó trở thành một hàm trình tạo bất đồng bộ. Ví dụ::
 
-    def gen():  # defines a generator function
+    def gen():  # định nghĩa một hàm trình tạo
         yield 123
 
-    async def agen(): # defines an asynchronous generator function
+    async def agen(): # định nghĩa một hàm trình tạo bất đồng bộ
         yield 123
 
-Due to their side effects on the containing scope, ``yield`` expressions
-are not permitted as part of the implicitly defined scopes used to
-implement comprehensions and generator expressions.
+Do có tác động phụ lên phạm vi chứa, các biểu thức ``yield`` không được phép xuất hiện trong các phạm vi được định nghĩa ngầm để triển khai các comprehension và biểu thức trình tạo.
 
 .. versionchanged:: 3.8
-   Yield expressions prohibited in the implicitly nested scopes used to
-   implement comprehensions and generator expressions.
+   Các biểu thức yield bị cấm trong các phạm vi lồng nhau ngầm được dùng để triển khai comprehension và biểu thức generator.
 
-Generator functions are described below, while asynchronous generator
-functions are described separately in section
+Các hàm generator được mô tả bên dưới, còn các hàm generator bất đồng bộ được mô tả riêng trong phần
 :ref:`asynchronous-generator-functions`.
 
-When a generator function is called, it returns an iterator known as a
-generator.  That generator then controls the execution of the generator
-function.  The execution starts when one of the generator's methods is called.
-At that time, the execution proceeds to the first yield expression, where it is
-suspended again, returning the value of :token:`~python-grammar:yield_list`
-to the generator's caller,
-or ``None`` if :token:`~python-grammar:yield_list` is omitted.
-By suspended, we mean that all local state is
-retained, including the current bindings of local variables, the instruction
-pointer, the internal evaluation stack, and the state of any exception handling.
-When the execution is resumed by calling one of the generator's methods, the
-function can proceed exactly as if the yield expression were just another
-external call.  The value of the yield expression after resuming depends on the
-method which resumed the execution.  If :meth:`~generator.__next__` is used
-(typically via either a :keyword:`for` or the :func:`next` builtin) then the
-result is :const:`None`.  Otherwise, if :meth:`~generator.send` is used, then
-the result will be the value passed in to that method.
+Khi một hàm generator được gọi, nó trả về một iterator được gọi là generator. Generator đó sau đó điều khiển việc thực thi hàm generator. Việc thực thi bắt đầu khi một trong các phương thức của generator được gọi. Khi đó, việc thực thi tiếp tục đến biểu thức yield đầu tiên, tại đó lại bị tạm dừng và trả về giá trị của :token:`~python-grammar:yield_list` cho bên gọi generator, hoặc ``None`` nếu :token:`~python-grammar:yield_list` bị bỏ qua. “Bị tạm dừng” nghĩa là toàn bộ trạng thái cục bộ được giữ lại, bao gồm các binding hiện tại của biến cục bộ, con trỏ lệnh, ngăn xếp đánh giá nội bộ và trạng thái của mọi cơ chế xử lý ngoại lệ. Khi việc thực thi được tiếp tục bằng cách gọi một trong các phương thức của generator, hàm có thể tiếp tục chính xác như thể biểu thức yield chỉ là một lời gọi bên ngoài khác. Giá trị của biểu thức yield sau khi tiếp tục phụ thuộc vào phương thức đã tiếp tục việc thực thi. Nếu :meth:`~generator.__next__` được sử dụng (thường thông qua :keyword:`for` hoặc builtin :func:`next`) thì kết quả là :const:`None`. Ngược lại, nếu :meth:`~generator.send` được sử dụng thì kết quả sẽ là giá trị được truyền vào phương thức đó.
 
 .. index:: single: coroutine
 
-All of this makes generator functions quite similar to coroutines; they yield
-multiple times, they have more than one entry point and their execution can be
-suspended.  The only difference is that a generator function cannot control
-where the execution should continue after it yields; the control is always
-transferred to the generator's caller.
+Tất cả những điều này khiến các hàm generator khá giống với coroutine; chúng yield nhiều lần, có nhiều hơn một điểm vào và việc thực thi có thể bị tạm dừng. Điểm khác biệt duy nhất là hàm generator không thể kiểm soát việc thực thi sẽ tiếp tục ở đâu sau khi yield; quyền điều khiển luôn được chuyển cho bên gọi generator.
 
-Yield expressions are allowed anywhere in a :keyword:`try` construct.  If the
-generator is not resumed before it is
-finalized (by reaching a zero reference count or by being garbage collected),
-the generator-iterator's :meth:`~generator.close` method will be called,
-allowing any pending :keyword:`finally` clauses to execute.
+Các biểu thức yield được phép xuất hiện ở bất kỳ đâu trong cấu trúc :keyword:`try`. Nếu generator không được tiếp tục trước khi hoàn tất (do đạt đến số lượng tham chiếu bằng không hoặc do được garbage collector thu gom), phương thức :meth:`~generator.close` của generator-iterator sẽ được gọi, cho phép mọi mệnh đề :keyword:`finally` đang chờ được thực thi.
 
 .. index::
    single: from; yield from expression
 
-When ``yield from <expr>`` is used, the supplied expression must be an
-iterable. The values produced by iterating that iterable are passed directly
-to the caller of the current generator's methods. Any values passed in with
-:meth:`~generator.send` and any exceptions passed in with
-:meth:`~generator.throw` are passed to the underlying iterator if it has the
-appropriate methods.  If this is not the case, then :meth:`~generator.send`
-will raise :exc:`AttributeError` or :exc:`TypeError`, while
-:meth:`~generator.throw` will just raise the passed in exception immediately.
+Khi ``yield from <expr>`` được sử dụng, biểu thức được cung cấp phải là một iterable. Các giá trị được tạo ra khi lặp qua iterable đó được truyền trực tiếp cho bên gọi các phương thức của generator hiện tại. Mọi giá trị được truyền vào cùng với
+:meth:`~generator.send` và mọi ngoại lệ được truyền vào cùng với
+:meth:`~generator.throw` được truyền đến iterator cơ sở nếu iterator đó có các phương thức tương ứng. Nếu không, :meth:`~generator.send` sẽ phát sinh :exc:`AttributeError` hoặc :exc:`TypeError`, trong khi
+:meth:`~generator.throw` chỉ phát sinh ngoại lệ được truyền vào ngay lập tức.
 
-When the underlying iterator is complete, the :attr:`~StopIteration.value`
-attribute of the raised :exc:`StopIteration` instance becomes the value of
-the yield expression. It can be either set explicitly when raising
-:exc:`StopIteration`, or automatically when the subiterator is a generator
-(by returning a value from the subgenerator).
+Khi iterator cơ sở hoàn tất, thuộc tính :attr:`~StopIteration.value` của thực thể :exc:`StopIteration` được phát sinh sẽ trở thành giá trị của biểu thức yield. Giá trị này có thể được đặt rõ ràng khi phát sinh
+:exc:`StopIteration`, hoặc được đặt tự động khi subiterator là một generator (bằng cách trả về một giá trị từ subgenerator).
 
 .. versionchanged:: 3.3
-   Added ``yield from <expr>`` to delegate control flow to a subiterator.
+   Đã thêm ``yield from <expr>`` để ủy quyền luồng điều khiển cho một subiterator.
 
-The parentheses may be omitted when the yield expression is the sole expression
-on the right hand side of an assignment statement.
+Có thể bỏ qua dấu ngoặc đơn khi biểu thức yield là biểu thức duy nhất ở vế phải của một câu lệnh gán.
 
 .. seealso::
 
-   :pep:`255` - Simple Generators
-      The proposal for adding generators and the :keyword:`yield` statement to Python.
+   :pep:`255` - Generator đơn giản
+      Đề xuất bổ sung generator và câu lệnh :keyword:`yield` cho Python.
 
-   :pep:`342` - Coroutines via Enhanced Generators
-      The proposal to enhance the API and syntax of generators, making them
-      usable as simple coroutines.
+   :pep:`342` - Coroutine thông qua generator nâng cao
+      Đề xuất nâng cao API và cú pháp của generator, giúp chúng có thể được sử dụng như các coroutine đơn giản.
 
-   :pep:`380` - Syntax for Delegating to a Subgenerator
-      The proposal to introduce the :token:`~python-grammar:yield_from` syntax,
-      making delegation to subgenerators easy.
+   :pep:`380` - Cú pháp ủy quyền cho subgenerator
+      Đề xuất giới thiệu cú pháp :token:`~python-grammar:yield_from`, giúp việc ủy quyền cho subgenerator trở nên dễ dàng.
 
-   :pep:`525` - Asynchronous Generators
-      The proposal that expanded on :pep:`492` by adding generator capabilities to
-      coroutine functions.
+   :pep:`525` - Generator bất đồng bộ
+      Đề xuất mở rộng :pep:`492` bằng cách bổ sung khả năng generator cho các hàm coroutine.
 
 .. index:: pair: object; generator
 .. _generator-methods:
 
-Generator-iterator methods
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các phương thức của generator-iterator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This subsection describes the methods of a generator iterator.  They can
-be used to control the execution of a generator function.
+Phần này mô tả các phương thức của một generator iterator. Có thể sử dụng chúng để điều khiển việc thực thi một hàm generator.
 
-Note that calling any of the generator methods below when the generator
-is already executing raises a :exc:`ValueError` exception.
+Lưu ý rằng việc gọi bất kỳ phương thức generator nào dưới đây khi generator đang thực thi sẽ phát sinh một ngoại lệ :exc:`ValueError`.
 
 .. index:: pair: exception; StopIteration
 
 
 .. method:: generator.__next__()
 
-   Starts the execution of a generator function or resumes it at the last
-   executed yield expression.  When a generator function is resumed with a
-   :meth:`~generator.__next__` method, the current yield expression always
-   evaluates to :const:`None`.  The execution then continues to the next yield
-   expression, where the generator is suspended again, and the value of the
-   :token:`~python-grammar:yield_list` is returned to :meth:`__next__`'s
-   caller.  If the generator exits without yielding another value, a
-   :exc:`StopIteration` exception is raised.
+   Bắt đầu thực thi một hàm generator hoặc tiếp tục thực thi tại biểu thức yield được thực thi gần nhất. Khi một hàm generator được tiếp tục bằng phương thức
+   :meth:`~generator.__next__`, biểu thức yield hiện tại luôn được đánh giá thành :const:`None`. Sau đó, quá trình thực thi tiếp tục đến biểu thức yield tiếp theo, tại đó generator lại bị tạm dừng, và giá trị của
+   :token:`~python-grammar:yield_list` được trả về cho bên gọi của :meth:`__next__`. Nếu generator kết thúc mà không yield thêm giá trị nào, một ngoại lệ
+   :exc:`StopIteration` sẽ được phát sinh.
 
-   This method is normally called implicitly, e.g. by a :keyword:`for` loop, or
-   by the built-in :func:`next` function.
+   Phương thức này thường được gọi một cách ngầm định, chẳng hạn bởi vòng lặp :keyword:`for`, hoặc bởi hàm dựng sẵn :func:`next`.
 
 
 .. method:: generator.send(value)
 
-   Resumes the execution and "sends" a value into the generator function.  The
-   *value* argument becomes the result of the current yield expression.  The
-   :meth:`send` method returns the next value yielded by the generator, or
-   raises :exc:`StopIteration` if the generator exits without yielding another
-   value.  When :meth:`send` is called to start the generator, it must be called
-   with :const:`None` as the argument, because there is no yield expression that
-   could receive the value.
+   Tiếp tục quá trình thực thi và "gửi" một giá trị vào hàm generator. Đối số *value* trở thành kết quả của biểu thức yield hiện tại. Phương thức
+   :meth:`send` trả về giá trị tiếp theo được generator yield, hoặc phát sinh :exc:`StopIteration` nếu generator kết thúc mà không yield thêm giá trị nào. Khi :meth:`send` được gọi để khởi động generator, nó phải được gọi với :const:`None` làm đối số, vì không có biểu thức yield nào có thể nhận giá trị này.
 
 
 .. method:: generator.throw(value)
             generator.throw(type[, value[, traceback]])
 
-   Raises an exception at the point where the generator was paused,
-   and returns the next value yielded by the generator function.  If the generator
-   exits without yielding another value, a :exc:`StopIteration` exception is
-   raised.  If the generator function does not catch the passed-in exception, or
-   raises a different exception, then that exception propagates to the caller.
+   Phát sinh một ngoại lệ tại điểm generator bị tạm dừng và trả về giá trị tiếp theo được hàm generator yield. Nếu generator kết thúc mà không yield thêm giá trị nào, một ngoại lệ :exc:`StopIteration` sẽ được phát sinh. Nếu hàm generator không bắt ngoại lệ được truyền vào hoặc phát sinh một ngoại lệ khác, ngoại lệ đó sẽ lan truyền đến bên gọi.
 
-   In typical use, this is called with a single exception instance similar to the
-   way the :keyword:`raise` keyword is used.
+   Trong cách sử dụng thông thường, phương thức này được gọi với một instance ngoại lệ duy nhất, tương tự cách sử dụng từ khóa :keyword:`raise`.
 
-   For backwards compatibility, however, the second signature is
-   supported, following a convention from older versions of Python.
-   The *type* argument should be an exception class, and *value*
-   should be an exception instance. If the *value* is not provided, the
-   *type* constructor is called to get an instance. If *traceback*
-   is provided, it is set on the exception, otherwise any existing
-   :attr:`~BaseException.__traceback__` attribute stored in *value* may
-   be cleared.
+   Tuy nhiên, để tương thích ngược, chữ ký thứ hai vẫn được hỗ trợ, theo một quy ước từ các phiên bản Python cũ hơn. Đối số *type* phải là một class ngoại lệ, còn *value* phải là một instance ngoại lệ. Nếu không cung cấp *value*, hàm dựng *type* sẽ được gọi để lấy một instance. Nếu cung cấp *traceback*, nó sẽ được gán cho ngoại lệ; nếu không, mọi
+   Thuộc tính :attr:`~BaseException.__traceback__` được lưu trong *value* có thể bị xóa.
 
    .. versionchanged:: 3.12
 
-      The second signature \(type\[, value\[, traceback\]\]\) is deprecated and
-      may be removed in a future version of Python.
+      Chữ ký thứ hai \(type\[, value\[, traceback\]\]\) không được dùng nữa và có thể bị loại bỏ trong phiên bản Python tương lai.
 
 .. index:: pair: exception; GeneratorExit
 
 
 .. method:: generator.close()
 
-   Raises a :exc:`GeneratorExit` exception at the point where the generator
-   function was paused (equivalent to calling ``throw(GeneratorExit)``).
-   The exception is raised by the yield expression where the generator was paused.
-   If the generator function catches the exception and returns a
-   value, this value is returned from :meth:`close`.  If the generator function
-   is already closed, or raises :exc:`GeneratorExit` (by not catching the
-   exception), :meth:`close` returns :const:`None`.  If the generator yields a
-   value, a :exc:`RuntimeError` is raised.  If the generator raises any other
-   exception, it is propagated to the caller.  If the generator has already
-   exited due to an exception or normal exit, :meth:`close` returns
-   :const:`None` and has no other effect.
+   Tạo ra một ngoại lệ :exc:`GeneratorExit` tại vị trí mà hàm generator bị tạm dừng (tương đương với việc gọi ``throw(GeneratorExit)``). Ngoại lệ được tạo ra bởi biểu thức yield tại nơi generator bị tạm dừng. Nếu hàm generator bắt ngoại lệ và trả về một giá trị, giá trị này được trả về từ :meth:`close`. Nếu hàm generator đã đóng hoặc tạo ra :exc:`GeneratorExit` (do không bắt ngoại lệ), :meth:`close` trả về :const:`None`. Nếu generator tạo ra một giá trị, một :exc:`RuntimeError` sẽ được tạo ra. Nếu generator tạo ra bất kỳ ngoại lệ nào khác, ngoại lệ đó được truyền đến caller. Nếu generator đã thoát do một ngoại lệ hoặc thoát bình thường, :meth:`close` trả về
+   :const:`None` và không có tác dụng nào khác.
 
    .. versionchanged:: 3.13
 
-      If a generator returns a value upon being closed, the value is returned
-      by :meth:`close`.
+      Nếu generator trả về một giá trị khi bị đóng, giá trị đó được :meth:`close` trả về.
 
 .. index:: single: yield; examples
 
-Examples
-^^^^^^^^
+Ví dụ
+^^^^^
 
-Here is a simple example that demonstrates the behavior of generators and
-generator functions::
+Sau đây là một ví dụ đơn giản minh họa hoạt động của các generator và hàm generator::
 
    >>> def echo(value=None):
    ...     print("Execution starts when 'next()' is called for the first time.")
@@ -892,81 +669,40 @@ generator functions::
    >>> generator.close()
    Don't forget to clean up when 'close()' is called.
 
-For examples using ``yield from``, see :ref:`pep-380` in "What's New in
-Python."
+Để xem các ví dụ sử dụng ``yield from``, hãy xem :ref:`pep-380` trong "What's New in Python."
 
 .. _asynchronous-generator-functions:
 
-Asynchronous generator functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các hàm asynchronous generator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The presence of a yield expression in a function or method defined using
-:keyword:`async def` further defines the function as an
-:term:`asynchronous generator` function.
+Sự xuất hiện của biểu thức yield trong một hàm hoặc phương thức được định nghĩa bằng
+:keyword:`async def` tiếp tục xác định hàm đó là một
+:term:`asynchronous generator` hàm.
 
-When an asynchronous generator function is called, it returns an
-asynchronous iterator known as an asynchronous generator object.
-That object then controls the execution of the generator function.
-An asynchronous generator object is typically used in an
-:keyword:`async for` statement in a coroutine function analogously to
-how a generator object would be used in a :keyword:`for` statement.
+Khi một hàm asynchronous generator được gọi, nó trả về một iterator bất đồng bộ được gọi là đối tượng asynchronous generator. Sau đó, đối tượng này điều khiển việc thực thi hàm generator. Một đối tượng asynchronous generator thường được sử dụng trong một
+câu lệnh :keyword:`async for` trong một hàm coroutine, tương tự như cách một đối tượng generator được sử dụng trong câu lệnh :keyword:`for`.
 
-Calling one of the asynchronous generator's methods returns an :term:`awaitable`
-object, and the execution starts when this object is awaited on. At that time,
-the execution proceeds to the first yield expression, where it is suspended
-again, returning the value of :token:`~python-grammar:yield_list` to the
-awaiting coroutine. As with a generator, suspension means that all local state
-is retained, including the current bindings of local variables, the instruction
-pointer, the internal evaluation stack, and the state of any exception handling.
-When the execution is resumed by awaiting on the next object returned by the
-asynchronous generator's methods, the function can proceed exactly as if the
-yield expression were just another external call. The value of the yield
-expression after resuming depends on the method which resumed the execution.  If
-:meth:`~agen.__anext__` is used then the result is :const:`None`. Otherwise, if
-:meth:`~agen.asend` is used, then the result will be the value passed in to that
-method.
+Việc gọi một trong các phương thức của asynchronous generator sẽ trả về một đối tượng :term:`awaitable`, và quá trình thực thi bắt đầu khi đối tượng này được await. Khi đó, quá trình thực thi tiếp tục đến biểu thức yield đầu tiên, tại đó lại bị tạm dừng và trả về giá trị của :token:`~python-grammar:yield_list` cho coroutine đang await. Tương tự generator, việc tạm dừng có nghĩa là toàn bộ trạng thái cục bộ được giữ lại, bao gồm các binding hiện tại của biến cục bộ, con trỏ lệnh, ngăn xếp đánh giá nội bộ và trạng thái của mọi cơ chế xử lý ngoại lệ. Khi quá trình thực thi được tiếp tục bằng cách await đối tượng tiếp theo do các phương thức của asynchronous generator trả về, hàm có thể tiếp tục chính xác như thể biểu thức yield chỉ là một lời gọi bên ngoài khác. Giá trị của biểu thức yield sau khi tiếp tục phụ thuộc vào phương thức đã tiếp tục quá trình thực thi. Nếu
+sử dụng :meth:`~agen.__anext__` thì kết quả là :const:`None`. Ngược lại, nếu
+sử dụng :meth:`~agen.asend`, thì kết quả sẽ là giá trị được truyền vào phương thức đó.
 
-If an asynchronous generator happens to exit early by :keyword:`break`, the caller
-task being cancelled, or other exceptions, the generator's async cleanup code
-will run and possibly raise exceptions or access context variables in an
-unexpected context--perhaps after the lifetime of tasks it depends, or
-during the event loop shutdown when the async-generator garbage collection hook
-is called.
-To prevent this, the caller must explicitly close the async generator by calling
-:meth:`~agen.aclose` method to finalize the generator and ultimately detach it
-from the event loop.
+Nếu một asynchronous generator thoát sớm do :keyword:`break`, task của caller bị hủy hoặc do các ngoại lệ khác, mã dọn dẹp bất đồng bộ của generator sẽ chạy và có thể phát sinh ngoại lệ hoặc truy cập các biến context trong một context không mong muốn--chẳng hạn sau khi các task mà nó phụ thuộc vào đã hết vòng đời hoặc trong khi event loop đang tắt, khi hook thu gom rác của async generator được gọi. Để ngăn điều này, caller phải đóng rõ ràng asynchronous generator bằng cách gọi
+phương thức :meth:`~agen.aclose` để hoàn tất generator và cuối cùng tách nó khỏi event loop.
 
-In an asynchronous generator function, yield expressions are allowed anywhere
-in a :keyword:`try` construct. However, if an asynchronous generator is not
-resumed before it is finalized (by reaching a zero reference count or by
-being garbage collected), then a yield expression within a :keyword:`!try`
-construct could result in a failure to execute pending :keyword:`finally`
-clauses.  In this case, it is the responsibility of the event loop or
-scheduler running the asynchronous generator to call the asynchronous
-generator-iterator's :meth:`~agen.aclose` method and run the resulting
-coroutine object, thus allowing any pending :keyword:`!finally` clauses
-to execute.
+Trong một hàm asynchronous generator, các biểu thức yield được phép xuất hiện ở bất kỳ đâu trong một cấu trúc :keyword:`try`. Tuy nhiên, nếu một asynchronous generator không được tiếp tục trước khi hoàn tất (do số lượng tham chiếu giảm về 0 hoặc do bị thu gom rác), thì một biểu thức yield bên trong cấu trúc :keyword:`!try` có thể khiến các mệnh đề :keyword:`finally` đang chờ không được thực thi. Trong trường hợp này, event loop hoặc scheduler đang chạy asynchronous generator có trách nhiệm gọi phương thức :meth:`~agen.aclose` của asynchronous generator-iterator và chạy đối tượng coroutine được tạo ra, nhờ đó cho phép mọi mệnh đề :keyword:`!finally` đang chờ được thực thi.
 
-To take care of finalization upon event loop termination, an event loop should
-define a *finalizer* function which takes an asynchronous generator-iterator and
-presumably calls :meth:`~agen.aclose` and executes the coroutine.
-This  *finalizer* may be registered by calling :func:`sys.set_asyncgen_hooks`.
-When first iterated over, an asynchronous generator-iterator will store the
-registered *finalizer* to be called upon finalization. For a reference example
-of a *finalizer* method see the implementation of
-``asyncio.Loop.shutdown_asyncgens`` in :source:`Lib/asyncio/base_events.py`.
+Để xử lý việc hoàn tất khi event loop kết thúc, một event loop nên định nghĩa một hàm *finalizer*, hàm này nhận một asynchronous generator-iterator và được cho là sẽ gọi :meth:`~agen.aclose` rồi thực thi coroutine. *finalizer* này có thể được đăng ký bằng cách gọi :func:`sys.set_asyncgen_hooks`. Khi được lặp qua lần đầu, một asynchronous generator-iterator sẽ lưu *finalizer* đã đăng ký để gọi khi hoàn tất. Để xem ví dụ tham khảo về phương thức *finalizer*, hãy xem phần triển khai của ``asyncio.Loop.shutdown_asyncgens`` trong :source:`Lib/asyncio/base_events.py`.
 
-The expression ``yield from <expr>`` is a syntax error when used in an
-asynchronous generator function.
+Biểu thức ``yield from <expr>`` là một lỗi cú pháp khi được sử dụng trong một hàm generator không đồng bộ.
 
 .. index:: pair: object; asynchronous-generator
 .. _asynchronous-generator-methods:
 
-Asynchronous generator-iterator methods
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các phương thức iterator-generator không đồng bộ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This subsection describes the methods of an asynchronous generator iterator,
-which are used to control the execution of a generator function.
+Phần phụ này mô tả các phương thức của một iterator generator không đồng bộ, được sử dụng để điều khiển việc thực thi một hàm generator.
 
 
 .. index:: pair: exception; StopAsyncIteration
@@ -974,55 +710,30 @@ which are used to control the execution of a generator function.
 .. method:: agen.__anext__()
    :async:
 
-   Returns an awaitable which when run starts to execute the asynchronous
-   generator or resumes it at the last executed yield expression.  When an
-   asynchronous generator function is resumed with an :meth:`~agen.__anext__`
-   method, the current yield expression always evaluates to :const:`None` in the
-   returned awaitable, which when run will continue to the next yield
-   expression. The value of the :token:`~python-grammar:yield_list` of the
-   yield expression is the value of the :exc:`StopIteration` exception raised by
-   the completing coroutine.  If the asynchronous generator exits without
-   yielding another value, the awaitable instead raises a
-   :exc:`StopAsyncIteration` exception, signalling that the asynchronous
-   iteration has completed.
+   Trả về một awaitable mà khi được chạy sẽ bắt đầu thực thi generator không đồng bộ hoặc tiếp tục thực thi tại biểu thức yield được thực thi gần nhất. Khi một hàm generator không đồng bộ được tiếp tục bằng phương thức :meth:`~agen.__anext__`, biểu thức yield hiện tại luôn đánh giá thành :const:`None` trong awaitable được trả về; khi được chạy, awaitable này sẽ tiếp tục đến biểu thức yield tiếp theo. Giá trị của :token:`~python-grammar:yield_list` trong biểu thức yield là giá trị của ngoại lệ :exc:`StopIteration` do coroutine hoàn tất đưa ra. Nếu generator không đồng bộ kết thúc mà không yield thêm giá trị nào, awaitable thay vào đó sẽ đưa ra một
+   ngoại lệ :exc:`StopAsyncIteration`, báo hiệu rằng quá trình lặp không đồng bộ đã hoàn tất.
 
-   This method is normally called implicitly by a :keyword:`async for` loop.
+   Phương thức này thường được gọi ngầm bởi một vòng lặp :keyword:`async for`.
 
 
 .. method:: agen.asend(value)
    :async:
 
-   Returns an awaitable which when run resumes the execution of the
-   asynchronous generator. As with the :meth:`~generator.send` method for a
-   generator, this "sends" a value into the asynchronous generator function,
-   and the *value* argument becomes the result of the current yield expression.
-   The awaitable returned by the :meth:`asend` method will return the next
-   value yielded by the generator as the value of the raised
-   :exc:`StopIteration`, or raises :exc:`StopAsyncIteration` if the
-   asynchronous generator exits without yielding another value.  When
-   :meth:`asend` is called to start the asynchronous
-   generator, it must be called with :const:`None` as the argument,
-   because there is no yield expression that could receive the value.
+   Trả về một awaitable mà khi được chạy sẽ tiếp tục thực thi generator không đồng bộ. Tương tự phương thức :meth:`~generator.send` đối với generator, phương thức này “gửi” một giá trị vào hàm generator không đồng bộ, và đối số *value* trở thành kết quả của biểu thức yield hiện tại. Awaitable được phương thức :meth:`asend` trả về sẽ trả về giá trị tiếp theo được generator yield, làm giá trị của ngoại lệ được đưa ra
+   :exc:`StopIteration`, hoặc phát sinh :exc:`StopAsyncIteration` nếu trình sinh bất đồng bộ kết thúc mà không tạo ra giá trị nào khác. Khi
+   :meth:`asend` được gọi để bắt đầu trình sinh bất đồng bộ, nó phải được gọi với :const:`None` làm đối số, vì không có biểu thức yield nào có thể nhận giá trị này.
 
 
 .. method:: agen.athrow(value)
             agen.athrow(type[, value[, traceback]])
    :async:
 
-   Returns an awaitable that raises an exception of type ``type`` at the point
-   where the asynchronous generator was paused, and returns the next value
-   yielded by the generator function as the value of the raised
-   :exc:`StopIteration` exception.  If the asynchronous generator exits
-   without yielding another value, a :exc:`StopAsyncIteration` exception is
-   raised by the awaitable.
-   If the generator function does not catch the passed-in exception, or
-   raises a different exception, then when the awaitable is run that exception
-   propagates to the caller of the awaitable.
+   Trả về một awaitable; khi được thực thi, awaitable này sẽ phát sinh một ngoại lệ có kiểu ``type`` tại điểm trình sinh bất đồng bộ bị tạm dừng, đồng thời trả về giá trị tiếp theo do hàm trình sinh tạo ra làm giá trị của ngoại lệ
+   :exc:`StopIteration`. Nếu trình sinh bất đồng bộ kết thúc mà không tạo ra giá trị nào khác, awaitable sẽ phát sinh ngoại lệ :exc:`StopAsyncIteration`. Nếu hàm trình sinh không bắt ngoại lệ được truyền vào hoặc phát sinh một ngoại lệ khác, thì khi awaitable được thực thi, ngoại lệ đó sẽ lan truyền đến bên gọi awaitable.
 
    .. versionchanged:: 3.12
 
-      The second signature \(type\[, value\[, traceback\]\]\) is deprecated and
-      may be removed in a future version of Python.
+      Cú pháp thứ hai \(type\[, value\[, traceback\]\]\) không được khuyến nghị sử dụng và có thể bị loại bỏ trong một phiên bản Python trong tương lai.
 
 .. index:: pair: exception; GeneratorExit
 
@@ -1030,28 +741,16 @@ which are used to control the execution of a generator function.
 .. method:: agen.aclose()
    :async:
 
-   Returns an awaitable that when run will throw a :exc:`GeneratorExit` into
-   the asynchronous generator function at the point where it was paused.
-   If the asynchronous generator function then exits gracefully, is already
-   closed, or raises :exc:`GeneratorExit` (by not catching the exception),
-   then the returned awaitable will raise a :exc:`StopIteration` exception.
-   Any further awaitables returned by subsequent calls to the asynchronous
-   generator will raise a :exc:`StopAsyncIteration` exception.  If the
-   asynchronous generator yields a value, a :exc:`RuntimeError` is raised
-   by the awaitable.  If the asynchronous generator raises any other exception,
-   it is propagated to the caller of the awaitable.  If the asynchronous
-   generator has already exited due to an exception or normal exit, then
-   further calls to :meth:`aclose` will return an awaitable that does nothing.
+   Trả về một awaitable; khi được thực thi, awaitable này sẽ ném một :exc:`GeneratorExit` vào hàm trình sinh bất đồng bộ tại điểm hàm bị tạm dừng. Nếu sau đó hàm trình sinh bất đồng bộ kết thúc bình thường, đã được đóng hoặc phát sinh :exc:`GeneratorExit` (do không bắt ngoại lệ), thì awaitable được trả về sẽ phát sinh ngoại lệ :exc:`StopIteration`. Mọi awaitable tiếp theo được trả về bởi các lần gọi sau đến trình sinh bất đồng bộ sẽ phát sinh ngoại lệ :exc:`StopAsyncIteration`. Nếu trình sinh bất đồng bộ tạo ra một giá trị, awaitable sẽ phát sinh :exc:`RuntimeError`. Nếu trình sinh bất đồng bộ phát sinh bất kỳ ngoại lệ nào khác, ngoại lệ đó sẽ lan truyền đến bên gọi awaitable. Nếu trình sinh bất đồng bộ đã kết thúc do một ngoại lệ hoặc kết thúc bình thường, thì các lần gọi tiếp theo đến :meth:`aclose` sẽ trả về một awaitable không thực hiện thao tác nào.
 
 .. _primaries:
 
-Primaries
-=========
+Biểu thức chính
+===============
 
 .. index:: single: primary
 
-Primaries represent the most tightly bound operations of the language. Their
-syntax is:
+Biểu thức chính đại diện cho các phép toán liên kết chặt chẽ nhất trong ngôn ngữ. Cú pháp của chúng là:
 
 .. productionlist:: python-grammar
    primary: `atom` | `attributeref` | `subscription` | `call`
@@ -1059,14 +758,14 @@ syntax is:
 
 .. _attribute-references:
 
-Attribute references
---------------------
+Tham chiếu thuộc tính
+---------------------
 
 .. index::
    pair: attribute; reference
    single: . (dot); attribute reference
 
-An attribute reference is a primary followed by a period and a name:
+Một tham chiếu thuộc tính là một biểu thức chính theo sau bởi dấu chấm và một tên:
 
 .. productionlist:: python-grammar
    attributeref: `primary` "." `identifier`
@@ -1076,25 +775,17 @@ An attribute reference is a primary followed by a period and a name:
    pair: object; module
    pair: object; list
 
-The primary must evaluate to an object of a type that supports attribute
-references, which most objects do.  This object is then asked to produce the
-attribute whose name is the identifier. The type and value produced is
-determined by the object.  Multiple evaluations of the same attribute
-reference may yield different objects.
+Biểu thức chính phải được đánh giá thành một đối tượng thuộc kiểu hỗ trợ tham chiếu thuộc tính, mà hầu hết các đối tượng đều hỗ trợ. Sau đó, đối tượng này được yêu cầu cung cấp thuộc tính có tên là mã định danh. Kiểu và giá trị được tạo ra do đối tượng quyết định. Việc đánh giá nhiều lần cùng một tham chiếu thuộc tính có thể cho ra các đối tượng khác nhau.
 
-This production can be customized by overriding the
-:meth:`~object.__getattribute__` method or the :meth:`~object.__getattr__`
-method.  The :meth:`!__getattribute__` method is called first and either
-returns a value or raises :exc:`AttributeError` if the attribute is not
-available.
+Việc tạo này có thể được tùy chỉnh bằng cách ghi đè phương thức
+:meth:`~object.__getattribute__` hoặc phương thức :meth:`~object.__getattr__`. Phương thức :meth:`!__getattribute__` được gọi trước tiên và trả về một giá trị hoặc phát sinh :exc:`AttributeError` nếu thuộc tính không khả dụng.
 
-If an :exc:`AttributeError` is raised and the object has a :meth:`!__getattr__`
-method, that method is called as a fallback.
+Nếu một :exc:`AttributeError` được raise và đối tượng có phương thức :meth:`!__getattr__`, phương thức đó sẽ được gọi như một phương án dự phòng.
 
 .. _subscriptions:
 
-Subscriptions and slicings
---------------------------
+Phép truy cập phần tử và phép cắt
+---------------------------------
 
 .. index::
    single: subscription
@@ -1109,41 +800,30 @@ Subscriptions and slicings
    pair: object; dictionary
    pair: sequence; item
 
-The :dfn:`subscription` syntax is usually used for selecting an element from a
-:ref:`container <sequence-types>` -- for example, to get a value from
-a :class:`dict`::
+Cú pháp :dfn:`subscription` thường được dùng để chọn một phần tử từ một
+:ref:`container <sequence-types>` -- ví dụ, để lấy một giá trị từ một :class:`dict`::
 
    >>> digits_by_name = {'one': 1, 'two': 2}
-   >>> digits_by_name['two']  # Subscripting a dictionary using the key 'two'
+   >>> digits_by_name['two']  # Truy cập dictionary bằng khóa 'two'
    2
 
-In the subscription syntax, the object being subscribed -- a
-:ref:`primary <primaries>` -- is followed by a :dfn:`subscript` in
-square brackets.
-In the simplest case, the subscript is a single expression.
+Trong cú pháp subscription, đối tượng được truy cập -- một
+:ref:`primary <primaries>` -- được theo sau bởi một :dfn:`subscript` trong cặp dấu ngoặc vuông. Trong trường hợp đơn giản nhất, subscript là một biểu thức duy nhất.
 
-Depending on the type of the object being subscribed, the subscript is
-sometimes called a :term:`key` (for mappings), :term:`index` (for sequences),
-or *type argument* (for :term:`generic types <generic type>`).
-Syntactically, these are all equivalent::
+Tùy thuộc vào loại đối tượng được áp dụng phép subscription, chỉ mục đôi khi được gọi là :term:`key` (đối với mapping), :term:`index` (đối với sequence) hoặc *type argument* (đối với :term:`generic types <generic type>`). Về mặt cú pháp, tất cả đều tương đương::
 
    >>> colors = ['red', 'blue', 'green', 'black']
-   >>> colors[3]  # Subscripting a list using the index 3
+   >>> colors[3]  # Truy cập list bằng chỉ mục 3
    'black'
 
-   >>> list[str]  # Parameterizing the list type using the type argument str
+   >>> list[str]  # Tham số hóa kiểu list bằng đối số kiểu str
    list[str]
 
-At runtime, the interpreter will evaluate the primary and
-the subscript, and call the primary's :meth:`~object.__getitem__` or
-:meth:`~object.__class_getitem__` :term:`special method` with the subscript
-as argument.
-For more details on which of these methods is called, see
+Trong runtime, interpreter sẽ đánh giá primary và subscript, rồi gọi :meth:`~object.__getitem__` của primary hoặc
+:meth:`~object.__class_getitem__` :term:`special method` với subscript làm đối số. Để biết thêm chi tiết về phương thức nào được gọi, hãy xem
 :ref:`classgetitem-versus-getitem`.
 
-To show how subscription works, we can define a custom object that
-implements :meth:`~object.__getitem__` and prints out the value of
-the subscript::
+Để minh họa cách subscription hoạt động, chúng ta có thể định nghĩa một đối tượng tùy chỉnh triển khai :meth:`~object.__getitem__` và in ra giá trị của subscript::
 
    >>> class SubscriptionDemo:
    ...     def __getitem__(self, key):
@@ -1155,27 +835,24 @@ the subscript::
    >>> demo['a' * 3]
    subscripted with: 'aaa'
 
-See :meth:`~object.__getitem__` documentation for how built-in types handle
-subscription.
+Xem tài liệu :meth:`~object.__getitem__` để biết cách các kiểu dựng sẵn xử lý subscription.
 
-Subscriptions may also be used as targets in :ref:`assignment <assignment>` or
-:ref:`deletion <del>` statements.
-In these cases, the interpreter will call the subscripted object's
-:meth:`~object.__setitem__` or :meth:`~object.__delitem__`
-:term:`special method`, respectively, instead of :meth:`~object.__getitem__`.
+Subscriptions cũng có thể được dùng làm đích trong các câu lệnh :ref:`gán <assignment>` hoặc
+các câu lệnh :ref:`xóa <del>`. Trong những trường hợp này, trình thông dịch sẽ gọi đối tượng được lập chỉ mục của nó
+:meth:`~object.__setitem__` hoặc :meth:`~object.__delitem__`
+:term:`special method`, tương ứng, thay vì :meth:`~object.__getitem__`.
 
 .. code-block::
 
    >>> colors = ['red', 'blue', 'green', 'black']
-   >>> colors[3] = 'white'  # Setting item at index
+   >>> colors[3] = 'white'  # Đặt mục tại chỉ mục
    >>> colors
    ['red', 'blue', 'green', 'white']
-   >>> del colors[3]  # Deleting item at index 3
+   >>> del colors[3]  # Xóa mục tại chỉ mục 3
    >>> colors
    ['red', 'blue', 'green']
 
-All advanced forms of *subscript* documented in the following sections
-are also usable for assignment and deletion.
+Tất cả các dạng nâng cao của *truy cập bằng chỉ số* được mô tả trong các phần sau cũng có thể được sử dụng cho phép gán và xóa.
 
 
 .. index::
@@ -1192,15 +869,10 @@ are also usable for assignment and deletion.
 
 .. _slicings:
 
-Slicings
+Phép cắt
 ^^^^^^^^
 
-A more advanced form of subscription, :dfn:`slicing`, is commonly used
-to extract a portion of a :ref:`sequence <datamodel-sequences>`.
-In this form, the subscript is a :term:`slice`: up to three
-expressions separated by colons.
-Any of the expressions may be omitted, but a slice must contain at least one
-colon::
+Một dạng nâng cao hơn của phép subscription, :dfn:`slicing`, thường được dùng để trích xuất một phần của :ref:`sequence <datamodel-sequences>`. Ở dạng này, subscript là một :term:`slice`: tối đa ba biểu thức được phân tách bằng dấu hai chấm. Bất kỳ biểu thức nào cũng có thể được bỏ qua, nhưng một phép cắt phải chứa ít nhất một dấu hai chấm::
 
    >>> number_names = ['zero', 'one', 'two', 'three', 'four', 'five']
    >>> number_names[1:3]
@@ -1219,69 +891,55 @@ colon::
    >>> number_names
    ['zero', 'one', 'two', 'three']
 
-When a slice is evaluated, the interpreter constructs a :class:`slice` object
-whose :attr:`~slice.start`, :attr:`~slice.stop` and
-:attr:`~slice.step` attributes, respectively, are the results of the
-expressions between the colons.
-Any missing expression evaluates to :const:`None`.
-This :class:`!slice` object is then passed to the :meth:`~object.__getitem__`
-or :meth:`~object.__class_getitem__` :term:`special method`, as above. ::
+Khi một phép cắt được đánh giá, interpreter tạo một đối tượng :class:`slice` có :attr:`~slice.start`, :attr:`~slice.stop` và
+:attr:`~slice.step` các thuộc tính, lần lượt là kết quả của các biểu thức nằm giữa các dấu hai chấm. Mọi biểu thức bị thiếu đều được đánh giá thành :const:`None`. Đối tượng :class:`!slice` này sau đó được truyền cho :meth:`~object.__getitem__` hoặc :meth:`~object.__class_getitem__` :term:`special method`, như trên.::
 
-   # continuing with the SubscriptionDemo instance defined above:
+   # tiếp tục với instance SubscriptionDemo được định nghĩa ở trên:
    >>> demo[2:3]
    subscripted with: slice(2, 3, None)
    >>> demo[::'spam']
    subscripted with: slice(None, None, 'spam')
 
 
-Comma-separated subscripts
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các subscript được phân tách bằng dấu phẩy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The subscript can also be given as two or more comma-separated expressions
-or slices::
+Subscript cũng có thể được cung cấp dưới dạng từ hai biểu thức hoặc phép cắt trở lên, được phân tách bằng dấu phẩy::
 
-   # continuing with the SubscriptionDemo instance defined above:
+   # tiếp tục với thể hiện SubscriptionDemo được định nghĩa ở trên:
    >>> demo[1, 2, 3]
    subscripted with: (1, 2, 3)
    >>> demo[1:2, 3]
    subscripted with: (slice(1, 2, None), 3)
 
-This form is commonly used with numerical libraries for slicing
-multi-dimensional data.
-In this case, the interpreter constructs a :class:`tuple` of the results of the
-expressions or slices, and passes this tuple to the :meth:`~object.__getitem__`
-or :meth:`~object.__class_getitem__` :term:`special method`, as above.
+Dạng này thường được dùng với các thư viện số để cắt dữ liệu đa chiều. Trong trường hợp này, trình thông dịch tạo một :class:`tuple` từ kết quả của các biểu thức hoặc lát cắt, rồi truyền tuple này cho :meth:`~object.__getitem__` hoặc :meth:`~object.__class_getitem__` :term:`special method`, như trên.
 
-The subscript may also be given as a single expression or slice followed
-by a comma, to specify a one-element tuple::
+Phần chỉ số cũng có thể được cung cấp dưới dạng một biểu thức hoặc lát cắt duy nhất theo sau là dấu phẩy, để chỉ định một tuple gồm một phần tử::
 
    >>> demo['spam',]
    subscripted with: ('spam',)
 
 
-"Starred" subscriptions
+Subscription có dấu sao
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 3.11
-   Expressions in *tuple_slices* may be starred. See :pep:`646`.
+   Các biểu thức trong *tuple_slices* có thể có dấu sao. Xem :pep:`646`.
 
-The subscript can also contain a starred expression.
-In this case, the interpreter unpacks the result into a tuple, and passes
-this tuple to :meth:`~object.__getitem__` or :meth:`~object.__class_getitem__`::
+Phần chỉ số cũng có thể chứa một biểu thức có dấu sao. Trong trường hợp này, trình thông dịch giải nén kết quả thành một tuple rồi truyền tuple này cho :meth:`~object.__getitem__` hoặc :meth:`~object.__class_getitem__`::
 
-   # continuing with the SubscriptionDemo instance defined above:
+   # tiếp tục với thể hiện SubscriptionDemo được định nghĩa ở trên:
    >>> demo[*range(10)]
    subscripted with: (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 
-Starred expressions may be combined with comma-separated expressions
-and slices::
+Các biểu thức có dấu sao có thể được kết hợp với các biểu thức được phân tách bằng dấu phẩy và các lát cắt::
 
    >>> demo['a', 'b', *range(3), 'c']
    subscripted with: ('a', 'b', 0, 1, 2, 'c')
 
 
-Formal subscription grammar
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ngữ pháp đăng ký hình thức
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. grammar-snippet::
    :group: python-grammar
@@ -1292,9 +950,7 @@ Formal subscription grammar
    proper_slice:     [`expression`] ":" [`expression`] [ ":" [`expression`] ]
    tuple_subscript:  ','.(`single_subscript` | `starred_expression`)+ [',']
 
-Recall that the ``|`` operator :ref:`denotes ordered choice <notation>`.
-Specifically, in :token:`!subscript`, if both alternatives would match, the
-first (:token:`!single_subscript`) has priority.
+Hãy nhớ rằng toán tử ``|`` :ref:`biểu thị lựa chọn có thứ tự <notation>`. Cụ thể, trong :token:`!subscript`, nếu cả hai phương án đều khớp, phương án đầu tiên (:token:`!single_subscript`) được ưu tiên.
 
 .. index::
    pair: object; callable
@@ -1306,11 +962,10 @@ first (:token:`!single_subscript`) has priority.
 
 .. _calls:
 
-Calls
------
+Lời gọi
+-------
 
-A call calls a callable object (e.g., a :term:`function`) with a possibly empty
-series of :term:`arguments <argument>`:
+Một lời gọi gọi một đối tượng có thể gọi (ví dụ: một :term:`function`) với một chuỗi :term:`đối số <argument>` có thể rỗng:
 
 .. productionlist:: python-grammar
    call: `primary` "(" [`argument_list` [","] | `comprehension`] ")"
@@ -1326,73 +981,34 @@ series of :term:`arguments <argument>`:
                 : ("," `keyword_item` | "," "**" `expression`)*
    keyword_item: `identifier` "=" `expression`
 
-An optional trailing comma may be present after the positional and keyword arguments
-but does not affect the semantics.
+Có thể có một dấu phẩy tùy chọn ở cuối sau các đối số vị trí và đối số từ khóa, nhưng điều này không ảnh hưởng đến ngữ nghĩa.
 
 .. index::
    single: parameter; call semantics
 
-The primary must evaluate to a callable object (user-defined functions, built-in
-functions, methods of built-in objects, class objects, methods of class
-instances, and all objects having a :meth:`~object.__call__` method are callable).  All
-argument expressions are evaluated before the call is attempted.  Please refer
-to section :ref:`function` for the syntax of formal :term:`parameter` lists.
+Biểu thức chính phải được đánh giá thành một đối tượng có thể gọi (các hàm do người dùng định nghĩa, hàm dựng sẵn, phương thức của các đối tượng dựng sẵn, đối tượng lớp, phương thức của các thể hiện lớp và mọi đối tượng có phương thức :meth:`~object.__call__` đều có thể gọi được). Tất cả các biểu thức đối số được đánh giá trước khi thực hiện lời gọi. Vui lòng tham khảo mục :ref:`function` để biết cú pháp của các danh sách :term:`parameter` hình thức.
 
 .. XXX update with kwonly args PEP
 
-If keyword arguments are present, they are first converted to positional
-arguments, as follows.  First, a list of unfilled slots is created for the
-formal parameters.  If there are N positional arguments, they are placed in the
-first N slots.  Next, for each keyword argument, the identifier is used to
-determine the corresponding slot (if the identifier is the same as the first
-formal parameter name, the first slot is used, and so on).  If the slot is
-already filled, a :exc:`TypeError` exception is raised. Otherwise, the
-argument is placed in the slot, filling it (even if the expression is
-``None``, it fills the slot).  When all arguments have been processed, the slots
-that are still unfilled are filled with the corresponding default value from the
-function definition.  (Default values are calculated, once, when the function is
-defined; thus, a mutable object such as a list or dictionary used as default
-value will be shared by all calls that don't specify an argument value for the
-corresponding slot; this should usually be avoided.)  If there are any unfilled
-slots for which no default value is specified, a :exc:`TypeError` exception is
-raised.  Otherwise, the list of filled slots is used as the argument list for
-the call.
+Nếu có các đối số từ khóa, trước tiên chúng được chuyển đổi thành các đối số vị trí như sau. Trước hết, một danh sách các vị trí chưa được điền được tạo cho các tham số hình thức. Nếu có N đối số vị trí, chúng được đặt vào N vị trí đầu tiên. Tiếp theo, với mỗi đối số từ khóa, mã định danh được dùng để xác định vị trí tương ứng (nếu mã định danh giống với tên tham số hình thức đầu tiên thì sử dụng vị trí đầu tiên, và tiếp tục như vậy). Nếu vị trí đó đã được điền, một ngoại lệ :exc:`TypeError` sẽ được phát sinh. Nếu không, đối số được đặt vào vị trí đó và điền vào vị trí (ngay cả khi biểu thức là ``None``, nó vẫn điền vào vị trí). Khi tất cả các đối số đã được xử lý, những vị trí vẫn chưa được điền sẽ được điền bằng giá trị mặc định tương ứng từ định nghĩa hàm. (Các giá trị mặc định được tính một lần, khi hàm được định nghĩa; vì vậy, một đối tượng có thể thay đổi như danh sách hoặc từ điển được dùng làm giá trị mặc định sẽ được dùng chung bởi mọi lần gọi không chỉ định giá trị đối số cho vị trí tương ứng; thông thường nên tránh điều này.) Nếu còn bất kỳ vị trí chưa được điền nào mà không có giá trị mặc định, một ngoại lệ :exc:`TypeError` sẽ được phát sinh. Nếu không, danh sách các vị trí đã được điền sẽ được dùng làm danh sách đối số cho lần gọi.
 
 .. impl-detail::
 
-   An implementation may provide built-in functions whose positional parameters
-   do not have names, even if they are 'named' for the purpose of documentation,
-   and which therefore cannot be supplied by keyword.  In CPython, this is the
-   case for functions implemented in C that use :c:func:`PyArg_ParseTuple` to
-   parse their arguments.
+   Một implementation có thể cung cấp các hàm tích hợp sẵn mà các tham số vị trí không có tên, ngay cả khi chúng được “đặt tên” nhằm phục vụ mục đích tài liệu, và do đó không thể được cung cấp bằng từ khóa. Trong CPython, điều này xảy ra với các hàm được triển khai bằng C sử dụng :c:func:`PyArg_ParseTuple` để phân tích cú pháp các đối số.
 
-If there are more positional arguments than there are formal parameter slots, a
-:exc:`TypeError` exception is raised, unless a formal parameter using the syntax
-``*identifier`` is present; in this case, that formal parameter receives a tuple
-containing the excess positional arguments (or an empty tuple if there were no
-excess positional arguments).
+Nếu có nhiều đối số vị trí hơn số vị trí tham số hình thức, một
+ngoại lệ :exc:`TypeError` sẽ được phát sinh, trừ khi có một tham số hình thức sử dụng cú pháp ``*identifier``; trong trường hợp này, tham số hình thức đó nhận một tuple chứa các đối số vị trí dư thừa (hoặc một tuple rỗng nếu không có đối số vị trí dư thừa).
 
-If any keyword argument does not correspond to a formal parameter name, a
-:exc:`TypeError` exception is raised, unless a formal parameter using the syntax
-``**identifier`` is present; in this case, that formal parameter receives a
-dictionary containing the excess keyword arguments (using the keywords as keys
-and the argument values as corresponding values), or a (new) empty dictionary if
-there were no excess keyword arguments.
+Nếu bất kỳ đối số từ khóa nào không tương ứng với tên tham số hình thức, một
+ngoại lệ :exc:`TypeError` sẽ được phát sinh, trừ khi có một tham số hình thức sử dụng cú pháp ``**identifier``; trong trường hợp này, tham số hình thức đó nhận một từ điển chứa các đối số từ khóa dư thừa (sử dụng từ khóa làm khóa và giá trị đối số tương ứng làm giá trị), hoặc một từ điển rỗng (mới) nếu không có đối số từ khóa dư thừa.
 
 .. index::
    single: * (asterisk); in function calls
    single: unpacking; in function calls
 
-If the syntax ``*expression`` appears in the function call, ``expression`` must
-evaluate to an :term:`iterable`.  Elements from these iterables are
-treated as if they were additional positional arguments.  For the call
-``f(x1, x2, *y, x3, x4)``, if *y* evaluates to a sequence *y1*, ..., *yM*,
-this is equivalent to a call with M+4 positional arguments *x1*, *x2*,
-*y1*, ..., *yM*, *x3*, *x4*.
+Nếu cú pháp ``*expression`` xuất hiện trong lần gọi hàm, ``expression`` phải được đánh giá thành một :term:`iterable`. Các phần tử từ những đối tượng iterable này được xử lý như các đối số vị trí bổ sung. Đối với lần gọi ``f(x1, x2, *y, x3, x4)``, nếu *y* được đánh giá thành một dãy *y1*, ..., *yM*, thì điều này tương đương với một lần gọi có M+4 đối số vị trí *x1*, *x2*, *y1*, ..., *yM*, *x3*, *x4*.
 
-A consequence of this is that although the ``*expression`` syntax may appear
-*after* explicit keyword arguments, it is processed *before* the
-keyword arguments (and any ``**expression`` arguments -- see below).  So::
+Hệ quả là mặc dù cú pháp ``*expression`` có thể xuất hiện *sau* các đối số từ khóa tường minh, nó lại được xử lý *trước* các đối số từ khóa (và mọi đối số ``**expression`` -- xem bên dưới). Vì vậy::
 
    >>> def f(a, b):
    ...     print(a, b)
@@ -1406,58 +1022,34 @@ keyword arguments (and any ``**expression`` arguments -- see below).  So::
    >>> f(1, *(2,))
    1 2
 
-It is unusual for both keyword arguments and the ``*expression`` syntax to be
-used in the same call, so in practice this confusion does not often arise.
+Việc sử dụng cả các đối số từ khóa và cú pháp ``*expression`` trong cùng một lần gọi là không phổ biến, nên trên thực tế sự nhầm lẫn này hiếm khi xảy ra.
 
 .. index::
    single: **; in function calls
 
-If the syntax ``**expression`` appears in the function call, ``expression`` must
-evaluate to a :term:`mapping`, the contents of which are treated as
-additional keyword arguments. If a parameter matching a key has already been
-given a value (by an explicit keyword argument, or from another unpacking),
-a :exc:`TypeError` exception is raised.
+Nếu cú pháp ``**expression`` xuất hiện trong lời gọi hàm, ``expression`` phải đánh giá thành một :term:`mapping`, nội dung của nó được coi là các đối số từ khóa bổ sung. Nếu một tham số tương ứng với một khóa đã được gán giá trị (bằng một đối số từ khóa tường minh hoặc từ một phép unpacking khác), một ngoại lệ :exc:`TypeError` sẽ được phát sinh.
 
-When ``**expression`` is used, each key in this mapping must be
-a string.
-Each value from the mapping is assigned to the first formal parameter
-eligible for keyword assignment whose name is equal to the key.
-A key need not be a Python identifier (e.g. ``"max-temp °F"`` is acceptable,
-although it will not match any formal parameter that could be declared).
-If there is no match to a formal parameter
-the key-value pair is collected by the ``**`` parameter, if there is one,
-or if there is not, a :exc:`TypeError` exception is raised.
+Khi sử dụng ``**expression``, mỗi khóa trong mapping này phải là một chuỗi. Mỗi giá trị trong mapping được gán cho tham số hình thức đầu tiên đủ điều kiện nhận phép gán theo từ khóa và có tên trùng với khóa. Khóa không nhất thiết phải là một định danh Python (ví dụ: ``"max-temp °F"`` là hợp lệ, mặc dù nó sẽ không khớp với bất kỳ tham số hình thức nào có thể được khai báo). Nếu không có tham số hình thức nào khớp, cặp khóa-giá trị sẽ được thu thập bởi tham số ``**``, nếu có; nếu không, một ngoại lệ :exc:`TypeError` sẽ được phát sinh.
 
-Formal parameters using the syntax ``*identifier`` or ``**identifier`` cannot be
-used as positional argument slots or as keyword argument names.
+Các tham số hình thức sử dụng cú pháp ``*identifier`` hoặc ``**identifier`` không thể được dùng làm vị trí cho đối số vị trí hoặc làm tên đối số từ khóa.
 
 .. versionchanged:: 3.5
-   Function calls accept any number of ``*`` and ``**`` unpackings,
-   positional arguments may follow iterable unpackings (``*``),
-   and keyword arguments may follow dictionary unpackings (``**``).
-   Originally proposed by :pep:`448`.
+   Lời gọi hàm chấp nhận mọi số lượng phép unpacking ``*`` và ``**``; các đối số vị trí có thể đứng sau các phép unpacking iterable (``*``), và các đối số từ khóa có thể đứng sau các phép unpacking dictionary (``**``). Được đề xuất ban đầu bởi :pep:`448`.
 
-A call always returns some value, possibly ``None``, unless it raises an
-exception.  How this value is computed depends on the type of the callable
-object.
+Một lời gọi luôn trả về một giá trị nào đó, có thể là ``None``, trừ khi nó phát sinh một ngoại lệ. Cách tính giá trị này phụ thuộc vào loại đối tượng có thể gọi.
 
-If it is---
+Nếu đó là---
 
-a user-defined function:
+một hàm do người dùng định nghĩa:
    .. index::
       pair: function; call
       triple: user-defined; function; call
       pair: object; user-defined function
       pair: object; function
 
-   The code block for the function is executed, passing it the argument list.  The
-   first thing the code block will do is bind the formal parameters to the
-   arguments; this is described in section :ref:`function`.  When the code block
-   executes a :keyword:`return` statement, this specifies the return value of the
-   function call.  If execution reaches the end of the code block without
-   executing a :keyword:`return` statement, the return value is ``None``.
+   Khối mã của hàm được thực thi và nhận danh sách đối số. Việc đầu tiên khối mã thực hiện là liên kết các tham số hình thức với các đối số; nội dung này được mô tả trong phần :ref:`function`. Khi khối mã thực thi câu lệnh :keyword:`return`, câu lệnh này xác định giá trị trả về của lời gọi hàm. Nếu quá trình thực thi đi đến cuối khối mã mà không thực thi câu lệnh :keyword:`return`, giá trị trả về sẽ là ``None``.
 
-a built-in function or method:
+một hàm hoặc phương thức dựng sẵn:
    .. index::
       pair: function; call
       pair: built-in function; call
@@ -1468,43 +1060,38 @@ a built-in function or method:
       pair: object; method
       pair: object; function
 
-   The result is up to the interpreter; see :ref:`built-in-funcs` for the
-   descriptions of built-in functions and methods.
+   Kết quả do trình thông dịch quyết định; xem :ref:`built-in-funcs` để biết mô tả về các hàm và phương thức dựng sẵn.
 
-a class object:
+một đối tượng lớp:
    .. index::
       pair: object; class
       pair: class object; call
 
-   A new instance of that class is returned.
+   Một thực thể mới của lớp đó được trả về.
 
-a class instance method:
+một phương thức instance của class:
    .. index::
       pair: object; class instance
       pair: object; instance
       pair: class instance; call
 
-   The corresponding user-defined function is called, with an argument list that is
-   one longer than the argument list of the call: the instance becomes the first
-   argument.
+   Hàm do người dùng định nghĩa tương ứng được gọi, với danh sách đối số dài hơn danh sách đối số của lệnh gọi một đối số: instance trở thành đối số đầu tiên.
 
-a class instance:
+một instance của class:
    .. index::
       pair: instance; call
       single: __call__() (object method)
 
-   The class must define a :meth:`~object.__call__` method; the effect is then the same as
-   if that method was called.
+   Class phải định nghĩa một phương thức :meth:`~object.__call__`; khi đó, hiệu ứng sẽ giống như khi phương thức đó được gọi.
 
 
 .. index:: pair: keyword; await
 .. _await:
 
-Await expression
-================
+Biểu thức await
+===============
 
-Suspend the execution of :term:`coroutine` on an :term:`awaitable` object.
-Can only be used inside a :term:`coroutine function`.
+Tạm dừng việc thực thi :term:`coroutine` trên một đối tượng :term:`awaitable`. Chỉ có thể sử dụng bên trong một :term:`coroutine function`.
 
 .. productionlist:: python-grammar
    await_expr: "await" `primary`
@@ -1514,51 +1101,39 @@ Can only be used inside a :term:`coroutine function`.
 
 .. _power:
 
-The power operator
-==================
+Toán tử lũy thừa
+================
 
 .. index::
    pair: power; operation
    pair: operator; **
 
-The power operator binds more tightly than unary operators on its left; it binds
-less tightly than unary operators on its right.  The syntax is:
+Toán tử lũy thừa liên kết chặt hơn các toán tử một ngôi ở bên trái; nó liên kết kém chặt hơn các toán tử một ngôi ở bên phải. Cú pháp là:
 
 .. productionlist:: python-grammar
    power: (`await_expr` | `primary`) ["**" `u_expr`]
 
-Thus, in an unparenthesized sequence of power and unary operators, the operators
-are evaluated from right to left (this does not constrain the evaluation order
-for the operands): ``-1**2`` results in ``-1``.
+Do đó, trong một chuỗi không có dấu ngoặc của các toán tử lũy thừa và một ngôi, các toán tử được đánh giá từ phải sang trái (điều này không ràng buộc thứ tự đánh giá các toán hạng): ``-1**2`` cho kết quả là ``-1``.
 
-The power operator has the same semantics as the built-in :func:`pow` function,
-when called with two arguments: it yields its left argument raised to the power
-of its right argument.
-Numeric arguments are first :ref:`converted to a common type <stdtypes-mixed-arithmetic>`,
-and the result is of that type.
+Toán tử lũy thừa có ngữ nghĩa giống với hàm tích hợp sẵn :func:`pow` khi được gọi với hai đối số: nó cho kết quả là đối số bên trái được nâng lên lũy thừa của đối số bên phải. Các đối số dạng số trước tiên được :ref:`chuyển đổi sang một kiểu chung <stdtypes-mixed-arithmetic>`, và kết quả có kiểu đó.
 
-For int operands, the result has the same type as the operands unless the second
-argument is negative; in that case, all arguments are converted to float and a
-float result is delivered. For example, ``10**2`` returns ``100``, but
-``10**-2`` returns ``0.01``.
+Đối với các toán hạng int, kết quả có cùng kiểu với các toán hạng, trừ khi đối số thứ hai là số âm; trong trường hợp đó, tất cả các đối số được chuyển đổi thành float và kết quả float được trả về. Ví dụ, ``10**2`` trả về ``100``, nhưng ``10**-2`` trả về ``0.01``.
 
-Raising ``0.0`` to a negative power results in a :exc:`ZeroDivisionError`.
-Raising a negative number to a fractional power results in a :class:`complex`
-number. (In earlier versions it raised a :exc:`ValueError`.)
+Nâng ``0.0`` lên một lũy thừa âm sẽ cho kết quả là :exc:`ZeroDivisionError`. Nâng một số âm lên một lũy thừa phân số sẽ cho kết quả là một số :class:`complex`. (Trong các phiên bản trước, thao tác này sẽ phát sinh một :exc:`ValueError`.)
 
-This operation can be customized using the special :meth:`~object.__pow__` and
-:meth:`~object.__rpow__` methods.
+Có thể tùy chỉnh thao tác này bằng cách sử dụng các phương thức đặc biệt :meth:`~object.__pow__` và
+:meth:`~object.__rpow__`.
 
 .. _unary:
 
-Unary arithmetic and bitwise operations
-=======================================
+Các phép toán số học một ngôi và phép toán trên bit
+===================================================
 
 .. index::
    triple: unary; arithmetic; operation
    triple: unary; bitwise; operation
 
-All unary arithmetic and bitwise operations have the same priority:
+Tất cả các phép toán số học một ngôi và phép toán trên bit đều có cùng độ ưu tiên:
 
 .. productionlist:: python-grammar
    u_expr: `power` | "-" `u_expr` | "+" `u_expr` | "~" `u_expr`
@@ -1569,45 +1144,38 @@ All unary arithmetic and bitwise operations have the same priority:
    single: operator; - (minus)
    single: - (minus); unary operator
 
-The unary ``-`` (minus) operator yields the negation of its numeric argument; the
-operation can be overridden with the :meth:`~object.__neg__` special method.
+Toán tử ``-`` (phép trừ) một ngôi cho kết quả là số đối của đối số dạng số; phép toán này có thể được ghi đè bằng phương thức đặc biệt :meth:`~object.__neg__`.
 
 .. index::
    single: plus
    single: operator; + (plus)
    single: + (plus); unary operator
 
-The unary ``+`` (plus) operator yields its numeric argument unchanged; the
-operation can be overridden with the :meth:`~object.__pos__` special method.
+Toán tử ``+`` (phép cộng) một ngôi cho kết quả là đối số dạng số không thay đổi; phép toán này có thể được ghi đè bằng phương thức đặc biệt :meth:`~object.__pos__`.
 
 .. index::
    single: inversion
    pair: operator; ~ (tilde)
 
-The unary ``~`` (invert) operator yields the bitwise inversion of its integer
-argument.  The bitwise inversion of ``x`` is defined as ``-(x+1)``.  It only
-applies to integral numbers or to custom objects that override the
-:meth:`~object.__invert__` special method.
+Toán tử ``~`` (phép đảo) một ngôi cho kết quả là phép đảo bit của đối số số nguyên. Phép đảo bit của ``x`` được định nghĩa là ``-(x+1)``. Phép toán này chỉ áp dụng cho các số nguyên hoặc các đối tượng tùy chỉnh ghi đè
+phương thức đặc biệt :meth:`~object.__invert__`.
 
 
 
 .. index:: pair: exception; TypeError
 
-In all three cases, if the argument does not have the proper type, a
-:exc:`TypeError` exception is raised.
+Trong cả ba trường hợp, nếu đối số không có kiểu thích hợp, một
+Ngoại lệ :exc:`TypeError` được ném ra.
 
 
 .. _binary:
 
-Binary arithmetic operations
-============================
+Các phép toán số học nhị phân
+=============================
 
 .. index:: triple: binary; arithmetic; operation
 
-The binary arithmetic operations have the conventional priority levels.  Note
-that some of these operations also apply to certain non-numeric types.  Apart
-from the power operator, there are only two levels, one for multiplicative
-operators and one for additive operators:
+Các phép toán số học nhị phân có các mức độ ưu tiên thông thường. Lưu ý rằng một số phép toán trong đó cũng áp dụng cho một số kiểu không phải số. Ngoài toán tử lũy thừa, chỉ có hai mức: một mức dành cho các toán tử nhân và một mức dành cho các toán tử cộng:
 
 .. productionlist:: python-grammar
    m_expr: `u_expr` | `m_expr` "*" `u_expr` | `m_expr` "@" `m_expr` |
@@ -1619,29 +1187,23 @@ operators and one for additive operators:
    single: multiplication
    pair: operator; * (asterisk)
 
-The ``*`` (multiplication) operator yields the product of its arguments.  The
-arguments must either both be numbers, or one argument must be an integer and
-the other must be a sequence. In the former case, the numbers are
-:ref:`converted to a common real type <stdtypes-mixed-arithmetic>` and then
-multiplied together.  In the latter case, sequence repetition is performed;
-a negative repetition factor yields an empty sequence.
+Toán tử ``*`` (phép nhân) cho ra tích của các đối số. Các đối số phải либо đều là số, hoặc một đối số phải là số nguyên và đối số còn lại phải là một sequence. Trong trường hợp đầu tiên, các số được
+:ref:`chuyển đổi sang một kiểu số thực chung <stdtypes-mixed-arithmetic>` rồi được nhân với nhau. Trong trường hợp thứ hai, phép lặp sequence được thực hiện; hệ số lặp âm tạo ra một sequence rỗng.
 
-This operation can be customized using the special :meth:`~object.__mul__` and
-:meth:`~object.__rmul__` methods.
+Có thể tùy chỉnh phép toán này bằng cách sử dụng các :meth:`~object.__mul__` đặc biệt và
+các phương thức :meth:`~object.__rmul__`.
 
 .. versionchanged:: 3.14
-   If only one operand is a complex number, the other operand is converted
-   to a floating-point number.
+   Nếu chỉ một toán hạng là số phức, toán hạng còn lại sẽ được chuyển đổi thành số dấu phẩy động.
 
 .. index::
    single: matrix multiplication
    pair: operator; @ (at)
 
-The ``@`` (at) operator is intended to be used for matrix multiplication.  No
-builtin Python types implement this operator.
+Toán tử ``@`` (at) được dùng cho phép nhân ma trận. Không có kiểu dựng sẵn nào của Python triển khai toán tử này.
 
-This operation can be customized using the special :meth:`~object.__matmul__` and
-:meth:`~object.__rmatmul__` methods.
+Có thể tùy chỉnh phép toán này bằng cách sử dụng các phương thức đặc biệt :meth:`~object.__matmul__` và
+:meth:`~object.__rmatmul__`.
 
 .. versionadded:: 3.5
 
@@ -1651,123 +1213,88 @@ This operation can be customized using the special :meth:`~object.__matmul__` an
    pair: operator; / (slash)
    pair: operator; //
 
-The ``/`` (division) and ``//`` (floor division) operators yield the quotient of
-their arguments.  The numeric arguments are first
-:ref:`converted to a common type <stdtypes-mixed-arithmetic>`.
-Division of integers yields a float, while floor division of integers results in an
-integer; the result is that of mathematical division with the 'floor' function
-applied to the result.  Division by zero raises the :exc:`ZeroDivisionError`
-exception.
+Các toán tử ``/`` (phép chia) và ``//`` (phép chia lấy phần nguyên) cho thương của các đối số. Trước tiên, các đối số số học được
+:ref:`chuyển đổi sang một kiểu chung <stdtypes-mixed-arithmetic>`. Phép chia các số nguyên cho kết quả là một số thực, trong khi phép chia lấy phần nguyên các số nguyên cho kết quả là một số nguyên; kết quả là phép chia theo toán học với hàm 'floor' được áp dụng cho kết quả. Chia cho số 0 sẽ phát sinh ngoại lệ :exc:`ZeroDivisionError`.
 
-The division operation can be customized using the special :meth:`~object.__truediv__`
-and :meth:`~object.__rtruediv__` methods.
-The floor division operation can be customized using the special
-:meth:`~object.__floordiv__` and :meth:`~object.__rfloordiv__` methods.
+Có thể tùy chỉnh phép chia bằng cách sử dụng các phương thức đặc biệt :meth:`~object.__truediv__` và :meth:`~object.__rtruediv__`. Có thể tùy chỉnh phép chia lấy phần nguyên bằng cách sử dụng phương thức đặc biệt
+Các phương thức :meth:`~object.__floordiv__` và :meth:`~object.__rfloordiv__`.
 
 .. index::
    single: modulo
    pair: operator; % (percent)
 
-The ``%`` (modulo) operator yields the remainder from the division of the first
-argument by the second.  The numeric arguments are first
-:ref:`converted to a common type <stdtypes-mixed-arithmetic>`.
-A zero right argument raises the :exc:`ZeroDivisionError` exception.  The
-arguments may be floating-point numbers, e.g., ``3.14%0.7`` equals ``0.34``
-(since ``3.14`` equals ``4*0.7 + 0.34``.)  The modulo operator always yields a
-result with the same sign as its second operand (or zero); the absolute value of
-the result is strictly smaller than the absolute value of the second operand
-[#]_.
+Toán tử ``%`` (modulo) trả về phần dư của phép chia đối số thứ nhất cho đối số thứ hai. Trước tiên, các đối số số học được
+:ref:`chuyển đổi sang một kiểu chung <stdtypes-mixed-arithmetic>`. Đối số bên phải bằng không sẽ phát sinh ngoại lệ :exc:`ZeroDivisionError`. Các đối số có thể là số dấu phẩy động, ví dụ ``3.14%0.7`` bằng ``0.34`` (vì ``3.14`` bằng ``4*0.7 + 0.34``.) Toán tử modulo luôn cho kết quả có cùng dấu với toán hạng thứ hai (hoặc bằng không); giá trị tuyệt đối của kết quả luôn nhỏ hơn giá trị tuyệt đối của toán hạng thứ hai [#]_.
 
-The floor division and modulo operators are connected by the following
-identity: ``x == (x//y)*y + (x%y)``.  Floor division and modulo are also
-connected with the built-in function :func:`divmod`: ``divmod(x, y) == (x//y,
-x%y)``. [#]_.
+Toán tử chia lấy phần nguyên và modulo được liên kết bởi đẳng thức sau: ``x == (x//y)*y + (x%y)``. Phép chia lấy phần nguyên và modulo cũng liên kết với hàm dựng sẵn :func:`divmod`: ``divmod(x, y) == (x//y, x%y)``. [#]_.
 
-In addition to performing the modulo operation on numbers, the ``%`` operator is
-also overloaded by string objects to perform old-style string formatting (also
-known as interpolation).  The syntax for string formatting is described in the
-Python Library Reference, section :ref:`old-string-formatting`.
+Ngoài việc thực hiện phép toán modulo trên các số, toán tử ``%`` còn được các đối tượng chuỗi nạp chồng để thực hiện định dạng chuỗi kiểu cũ (còn gọi là interpolation). Cú pháp định dạng chuỗi được mô tả trong Python Library Reference, phần :ref:`old-string-formatting`.
 
-The *modulo* operation can be customized using the special :meth:`~object.__mod__`
-and :meth:`~object.__rmod__` methods.
+Có thể tùy chỉnh phép toán *modulo* bằng các phương thức đặc biệt :meth:`~object.__mod__` và :meth:`~object.__rmod__`.
 
-The floor division operator, the modulo operator, and the :func:`divmod`
-function are not defined for complex numbers.  Instead, convert to a
-floating-point number using the :func:`abs` function if appropriate.
+Toán tử chia lấy phần nguyên, toán tử modulo và hàm :func:`divmod` không được định nghĩa cho số phức. Thay vào đó, hãy chuyển đổi sang số dấu phẩy động bằng hàm :func:`abs` nếu phù hợp.
 
 .. index::
    single: addition
    single: operator; + (plus)
    single: + (plus); binary operator
 
-The ``+`` (addition) operator yields the sum of its arguments.  The arguments
-must either both be numbers or both be sequences of the same type.  In the
-former case, the numbers are
-:ref:`converted to a common real type <stdtypes-mixed-arithmetic>` and then
-added together.
-In the latter case, the sequences are concatenated.
+Toán tử ``+`` (phép cộng) cho kết quả là tổng của các đối số. Các đối số phải hoặc đều là số, hoặc đều là dãy cùng kiểu. Trong trường hợp đầu tiên, các số sẽ
+:ref:`được chuyển đổi sang một kiểu thực chung <stdtypes-mixed-arithmetic>` rồi được cộng với nhau. Trong trường hợp thứ hai, các dãy được nối với nhau.
 
-This operation can be customized using the special :meth:`~object.__add__` and
-:meth:`~object.__radd__` methods.
+Bạn có thể tùy chỉnh phép toán này bằng cách sử dụng các :meth:`~object.__add__` đặc biệt và
+các phương thức :meth:`~object.__radd__`.
 
 .. versionchanged:: 3.14
-   If only one operand is a complex number, the other operand is converted
-   to a floating-point number.
+   Nếu chỉ một toán hạng là số phức, toán hạng còn lại sẽ được chuyển đổi thành số dấu phẩy động.
 
 .. index::
    single: subtraction
    single: operator; - (minus)
    single: - (minus); binary operator
 
-The ``-`` (subtraction) operator yields the difference of its arguments.
-The numeric arguments are first
-:ref:`converted to a common real type <stdtypes-mixed-arithmetic>`.
+Toán tử ``-`` (phép trừ) cho kết quả là hiệu của các đối số. Các đối số số trước tiên được
+:ref:`chuyển đổi sang một kiểu thực chung <stdtypes-mixed-arithmetic>`.
 
-This operation can be customized using the special :meth:`~object.__sub__` and
-:meth:`~object.__rsub__` methods.
+Bạn có thể tùy chỉnh thao tác này bằng các phương thức đặc biệt :meth:`~object.__sub__` và
+:meth:`~object.__rsub__`.
 
 .. versionchanged:: 3.14
-   If only one operand is a complex number, the other operand is converted
-   to a floating-point number.
+   Nếu chỉ một toán hạng là số phức, toán hạng còn lại sẽ được chuyển đổi thành số dấu phẩy động.
 
 
 .. _shifting:
 
-Shifting operations
-===================
+Các thao tác dịch bit
+=====================
 
 .. index::
    pair: shifting; operation
    pair: operator; <<
    pair: operator; >>
 
-The shifting operations have lower priority than the arithmetic operations:
+Các thao tác dịch bit có độ ưu tiên thấp hơn các thao tác số học:
 
 .. productionlist:: python-grammar
    shift_expr: `a_expr` | `shift_expr` ("<<" | ">>") `a_expr`
 
-These operators accept integers as arguments.  They shift the first argument to
-the left or right by the number of bits given by the second argument.
+Các toán tử này nhận số nguyên làm đối số. Chúng dịch đối số thứ nhất sang trái hoặc sang phải theo số bit được chỉ định bởi đối số thứ hai.
 
-The left shift operation can be customized using the special :meth:`~object.__lshift__`
-and :meth:`~object.__rlshift__` methods.
-The right shift operation can be customized using the special :meth:`~object.__rshift__`
-and :meth:`~object.__rrshift__` methods.
+Bạn có thể tùy chỉnh thao tác dịch trái bằng các phương thức đặc biệt :meth:`~object.__lshift__` và :meth:`~object.__rlshift__`. Bạn có thể tùy chỉnh thao tác dịch phải bằng các phương thức đặc biệt :meth:`~object.__rshift__` và :meth:`~object.__rrshift__`.
 
 .. index:: pair: exception; ValueError
 
-A right shift by *n* bits is defined as floor division by ``pow(2,n)``.  A left
-shift by *n* bits is defined as multiplication with ``pow(2,n)``.
+Phép dịch phải *n* bit được định nghĩa là phép chia lấy phần nguyên cho ``pow(2,n)``. Phép dịch trái *n* bit được định nghĩa là phép nhân với ``pow(2,n)``.
 
 
 .. _bitwise:
 
-Binary bitwise operations
-=========================
+Các phép toán bitwise nhị phân
+==============================
 
 .. index:: triple: binary; bitwise; operation
 
-Each of the three bitwise operations has a different priority level:
+Mỗi trong ba phép toán bitwise có một mức độ ưu tiên khác nhau:
 
 .. productionlist:: python-grammar
    and_expr: `shift_expr` | `and_expr` "&" `shift_expr`
@@ -1778,33 +1305,30 @@ Each of the three bitwise operations has a different priority level:
    pair: bitwise; and
    pair: operator; & (ampersand)
 
-The ``&`` operator yields the bitwise AND of its arguments, which must be
-integers or one of them must be a custom object overriding :meth:`~object.__and__` or
-:meth:`~object.__rand__` special methods.
+Toán tử ``&`` cho kết quả là phép AND bitwise của các đối số; các đối số này phải là số nguyên hoặc một trong số đó phải là đối tượng tùy chỉnh ghi đè :meth:`~object.__and__` hoặc
+các phương thức đặc biệt :meth:`~object.__rand__`.
 
 .. index::
    pair: bitwise; xor
    pair: exclusive; or
    pair: operator; ^ (caret)
 
-The ``^`` operator yields the bitwise XOR (exclusive OR) of its arguments, which
-must be integers or one of them must be a custom object overriding :meth:`~object.__xor__` or
-:meth:`~object.__rxor__` special methods.
+Toán tử ``^`` cho kết quả là phép XOR bitwise (OR loại trừ) của các đối số; các đối số này phải là số nguyên hoặc một trong số đó phải là đối tượng tùy chỉnh ghi đè :meth:`~object.__xor__` hoặc
+các phương thức đặc biệt :meth:`~object.__rxor__`.
 
 .. index::
    pair: bitwise; or
    pair: inclusive; or
    pair: operator; | (vertical bar)
 
-The ``|`` operator yields the bitwise (inclusive) OR of its arguments, which
-must be integers or one of them must be a custom object overriding :meth:`~object.__or__` or
-:meth:`~object.__ror__` special methods.
+Toán tử ``|`` cho kết quả là phép OR theo bit (bao gồm) của các đối số, các đối số này phải là số nguyên hoặc một trong số chúng phải là đối tượng tùy chỉnh ghi đè :meth:`~object.__or__` hoặc
+các phương thức đặc biệt :meth:`~object.__ror__`.
 
 
 .. _comparisons:
 
-Comparisons
-===========
+So sánh
+=======
 
 .. index::
    single: comparison
@@ -1816,234 +1340,138 @@ Comparisons
    pair: operator; ==
    pair: operator; !=
 
-Unlike C, all comparison operations in Python have the same priority, which is
-lower than that of any arithmetic, shifting or bitwise operation.  Also unlike
-C, expressions like ``a < b < c`` have the interpretation that is conventional
-in mathematics:
+Không giống C, tất cả các phép toán so sánh trong Python có cùng mức độ ưu tiên, thấp hơn mọi phép toán số học, dịch bit hoặc theo bit. Cũng không giống C, các biểu thức như ``a < b < c`` được hiểu theo cách thông thường trong toán học:
 
 .. productionlist:: python-grammar
    comparison: `or_expr` (`comp_operator` `or_expr`)*
    comp_operator: "<" | ">" | "==" | ">=" | "<=" | "!="
                 : | "is" ["not"] | ["not"] "in"
 
-Comparisons yield boolean values: ``True`` or ``False``. Custom
-:dfn:`rich comparison methods` may return non-boolean values. In this case
-Python will call :func:`bool` on such value in boolean contexts.
+Các phép so sánh cho kết quả là các giá trị boolean: ``True`` hoặc ``False``. Các đối tượng tùy chỉnh
+:dfn:`các phương thức so sánh mở rộng` có thể trả về các giá trị không phải boolean. Trong trường hợp này, Python sẽ gọi :func:`bool` trên giá trị đó trong các ngữ cảnh boolean.
 
 .. index:: pair: chaining; comparisons
 
-Comparisons can be chained arbitrarily, e.g., ``x < y <= z`` is equivalent to
-``x < y and y <= z``, except that ``y`` is evaluated only once (but in both
-cases ``z`` is not evaluated at all when ``x < y`` is found to be false).
+Các phép so sánh có thể được nối tùy ý, chẳng hạn như ``x < y <= z`` tương đương với ``x < y and y <= z``, ngoại trừ việc ``y`` chỉ được đánh giá một lần (nhưng trong cả hai trường hợp, ``z`` hoàn toàn không được đánh giá khi ``x < y`` được xác định là false).
 
-Formally, if *a*, *b*, *c*, ..., *y*, *z* are expressions and *op1*, *op2*, ...,
-*opN* are comparison operators, then ``a op1 b op2 c ... y opN z`` is equivalent
-to ``a op1 b and b op2 c and ... y opN z``, except that each expression is
-evaluated at most once.
+Về mặt hình thức, nếu *a*, *b*, *c*, ..., *y*, *z* là các biểu thức và *op1*, *op2*, ..., *opN* là các toán tử so sánh, thì ``a op1 b op2 c ... y opN z`` tương đương với ``a op1 b and b op2 c and ... y opN z``, ngoại trừ việc mỗi biểu thức được đánh giá nhiều nhất một lần.
 
-Note that ``a op1 b op2 c`` doesn't imply any kind of comparison between *a* and
-*c*, so that, e.g., ``x < y > z`` is perfectly legal (though perhaps not
-pretty).
+Lưu ý rằng ``a op1 b op2 c`` không ngụ ý bất kỳ kiểu so sánh nào giữa *a* và *c*, vì vậy, chẳng hạn, ``x < y > z`` hoàn toàn hợp lệ (dù có thể không đẹp mắt).
 
 .. _expressions-value-comparisons:
 
-Value comparisons
------------------
+So sánh giá trị
+---------------
 
-The operators ``<``, ``>``, ``==``, ``>=``, ``<=``, and ``!=`` compare the
-values of two objects.  The objects do not need to have the same type.
+Các toán tử ``<``, ``>``, ``==``, ``>=``, ``<=`` và ``!=`` so sánh giá trị của hai đối tượng. Hai đối tượng không cần phải có cùng kiểu.
 
-Chapter :ref:`objects` states that objects have a value (in addition to type
-and identity).  The value of an object is a rather abstract notion in Python:
-For example, there is no canonical access method for an object's value.  Also,
-there is no requirement that the value of an object should be constructed in a
-particular way, e.g. comprised of all its data attributes. Comparison operators
-implement a particular notion of what the value of an object is.  One can think
-of them as defining the value of an object indirectly, by means of their
-comparison implementation.
+Chương :ref:`objects` nêu rằng các đối tượng có một giá trị (ngoài kiểu và danh tính). Trong Python, giá trị của một đối tượng là một khái niệm khá trừu tượng: Ví dụ, không có phương thức truy cập chuẩn tắc nào cho giá trị của một đối tượng. Ngoài ra, không có yêu cầu nào rằng giá trị của một đối tượng phải được tạo dựng theo một cách cụ thể, chẳng hạn như bao gồm tất cả các thuộc tính dữ liệu của đối tượng. Các toán tử so sánh triển khai một cách hiểu cụ thể về giá trị của một đối tượng. Có thể coi chúng là cách định nghĩa gián tiếp giá trị của một đối tượng thông qua phần triển khai phép so sánh của chúng.
 
-Because all types are (direct or indirect) subtypes of :class:`object`, they
-inherit the default comparison behavior from :class:`object`.  Types can
-customize their comparison behavior by implementing
-:dfn:`rich comparison methods` like :meth:`~object.__lt__`, described in
+Vì mọi kiểu đều là kiểu con (trực tiếp hoặc gián tiếp) của :class:`object`, chúng kế thừa hành vi so sánh mặc định từ :class:`object`. Các kiểu có thể tùy chỉnh hành vi so sánh của mình bằng cách triển khai
+:dfn:`các phương thức so sánh mở rộng` như :meth:`~object.__lt__`, được mô tả trong
 :ref:`customization`.
 
-The default behavior for equality comparison (``==`` and ``!=``) is based on
-the identity of the objects.  Hence, equality comparison of instances with the
-same identity results in equality, and equality comparison of instances with
-different identities results in inequality.  A motivation for this default
-behavior is the desire that all objects should be reflexive (i.e. ``x is y``
-implies ``x == y``).
+Hành vi mặc định của phép so sánh bằng (``==`` và ``!=``) dựa trên định danh của các đối tượng. Do đó, phép so sánh bằng giữa các instance có cùng định danh cho kết quả bằng nhau, còn phép so sánh bằng giữa các instance có định danh khác nhau cho kết quả không bằng nhau. Một lý do cho hành vi mặc định này là mong muốn tất cả đối tượng đều có tính phản xạ (tức là ``x is y`` kéo theo ``x == y``).
 
-A default order comparison (``<``, ``>``, ``<=``, and ``>=``) is not provided;
-an attempt raises :exc:`TypeError`.  A motivation for this default behavior is
-the lack of a similar invariant as for equality.
+Không có phép so sánh thứ tự mặc định (``<``, ``>``, ``<=`` và ``>=``); một nỗ lực thực hiện phép so sánh này sẽ raise :exc:`TypeError`. Một lý do cho hành vi mặc định này là không có bất biến tương tự như đối với phép so sánh bằng.
 
-The behavior of the default equality comparison, that instances with different
-identities are always unequal, may be in contrast to what types will need that
-have a sensible definition of object value and value-based equality.  Such
-types will need to customize their comparison behavior, and in fact, a number
-of built-in types have done that.
+Hành vi của phép so sánh bằng mặc định, theo đó các instance có định danh khác nhau luôn không bằng nhau, có thể trái với nhu cầu của những kiểu có định nghĩa hợp lý về giá trị đối tượng và phép so sánh bằng dựa trên giá trị. Những kiểu như vậy cần tùy chỉnh hành vi so sánh, và thực tế là một số kiểu dựng sẵn đã làm điều đó.
 
-The following list describes the comparison behavior of the most important
-built-in types.
+Danh sách sau đây mô tả hành vi so sánh của những kiểu dựng sẵn quan trọng nhất.
 
-* Numbers of built-in numeric types (:ref:`typesnumeric`) and of the standard
-  library types :class:`fractions.Fraction` and :class:`decimal.Decimal` can be
-  compared within and across their types, with the restriction that complex
-  numbers do not support order comparison.  Within the limits of the types
-  involved, they compare mathematically (algorithmically) correct without loss
-  of precision.
+* Các số thuộc những kiểu số dựng sẵn (:ref:`typesnumeric`) và các kiểu thuộc standard library :class:`fractions.Fraction` và :class:`decimal.Decimal` có thể được so sánh trong cùng kiểu cũng như giữa các kiểu, với hạn chế là số phức không hỗ trợ phép so sánh thứ tự. Trong giới hạn của các kiểu liên quan, chúng được so sánh một cách đúng đắn về mặt toán học (thuật toán) mà không mất độ chính xác.
 
-  The not-a-number values ``float('NaN')`` and ``decimal.Decimal('NaN')`` are
-  special.  Any ordered comparison of a number to a not-a-number value is false.
-  A counter-intuitive implication is that not-a-number values are not equal to
-  themselves.  For example, if ``x = float('NaN')``, ``3 < x``, ``x < 3`` and
-  ``x == x`` are all false, while ``x != x`` is true.  This behavior is
-  compliant with IEEE 754.
+  Các giá trị not-a-number ``float('NaN')`` và ``decimal.Decimal('NaN')`` là những giá trị đặc biệt. Mọi phép so sánh có thứ tự giữa một số và giá trị not-a-number đều cho kết quả false. Một hệ quả trái với trực giác là các giá trị not-a-number không bằng chính chúng. Ví dụ, nếu ``x = float('NaN')``, ``3 < x``, ``x < 3`` và ``x == x`` đều false, còn ``x != x`` là true. Hành vi này tuân thủ IEEE 754.
 
-* ``None`` and :data:`NotImplemented` are singletons.  :PEP:`8` advises that
-  comparisons for singletons should always be done with ``is`` or ``is not``,
-  never the equality operators.
+* ``None`` và :data:`NotImplemented` là các singleton. :PEP:`8` khuyến nghị rằng việc so sánh các singleton luôn phải được thực hiện bằng ``is`` hoặc ``is not``, không bao giờ dùng các toán tử so sánh bằng.
 
-* Binary sequences (instances of :class:`bytes` or :class:`bytearray`) can be
-  compared within and across their types.  They compare lexicographically using
-  the numeric values of their elements.
+* Các chuỗi nhị phân (các thể hiện của :class:`bytes` hoặc :class:`bytearray`) có thể được so sánh trong cùng một kiểu và giữa các kiểu. Chúng được so sánh theo thứ tự từ điển bằng cách sử dụng các giá trị số của phần tử.
 
-* Strings (instances of :class:`str`) compare lexicographically using the
-  numerical Unicode code points (the result of the built-in function
-  :func:`ord`) of their characters. [#]_
+* Các chuỗi (các thể hiện của :class:`str`) được so sánh theo thứ tự từ điển bằng cách sử dụng các điểm mã Unicode dạng số (kết quả của hàm tích hợp sẵn
+  :func:`ord`) của các ký tự. [#]_
 
-  Strings and binary sequences cannot be directly compared.
+  Không thể so sánh trực tiếp chuỗi và chuỗi nhị phân.
 
-* Sequences (instances of :class:`tuple`, :class:`list`, or :class:`range`) can
-  be compared only within each of their types, with the restriction that ranges
-  do not support order comparison.  Equality comparison across these types
-  results in inequality, and ordering comparison across these types raises
+* Các sequence (các thể hiện của :class:`tuple`, :class:`list` hoặc :class:`range`) chỉ có thể được so sánh trong từng kiểu tương ứng, với hạn chế là các range không hỗ trợ so sánh thứ tự. So sánh bằng giữa các kiểu này cho kết quả không bằng nhau, còn so sánh thứ tự giữa các kiểu này sẽ phát sinh
   :exc:`TypeError`.
 
-  Sequences compare lexicographically using comparison of corresponding
-  elements.  The built-in containers typically assume identical objects are
-  equal to themselves.  That lets them bypass equality tests for identical
-  objects to improve performance and to maintain their internal invariants.
+  Các sequence được so sánh theo thứ tự từ điển bằng cách so sánh các phần tử tương ứng. Các container tích hợp sẵn thường giả định rằng các đối tượng giống hệt nhau thì bằng nhau với chính chúng. Điều này cho phép chúng bỏ qua các phép kiểm tra bằng nhau đối với các đối tượng giống hệt để cải thiện hiệu suất và duy trì các bất biến nội bộ.
 
-  Lexicographical comparison between built-in collections works as follows:
+  So sánh theo thứ tự từ điển giữa các collection tích hợp sẵn hoạt động như sau:
 
-  - For two collections to compare equal, they must be of the same type, have
-    the same length, and each pair of corresponding elements must compare
-    equal (for example, ``[1,2] == (1,2)`` is false because the type is not the
-    same).
+  - Để hai collection được xem là bằng nhau, chúng phải cùng kiểu, có cùng độ dài và mỗi cặp phần tử tương ứng phải bằng nhau (ví dụ: ``[1,2] == (1,2)`` là false vì kiểu không giống nhau).
 
-  - Collections that support order comparison are ordered the same as their
-    first unequal elements (for example, ``[1,2,x] <= [1,2,y]`` has the same
-    value as ``x <= y``).  If a corresponding element does not exist, the
-    shorter collection is ordered first (for example, ``[1,2] < [1,2,3]`` is
-    true).
+  - Các collection hỗ trợ so sánh thứ tự được sắp xếp theo phần tử đầu tiên không bằng nhau của chúng (ví dụ: ``[1,2,x] <= [1,2,y]`` có cùng giá trị với ``x <= y``). Nếu không tồn tại phần tử tương ứng, collection ngắn hơn được sắp xếp trước (ví dụ: ``[1,2] < [1,2,3]`` là true).
 
-* Mappings (instances of :class:`dict`) compare equal if and only if they have
-  equal ``(key, value)`` pairs. Equality comparison of the keys and values
-  enforces reflexivity.
+* Mappings (các instance của :class:`dict`) được xem là bằng nhau khi và chỉ khi chúng có các cặp ``(key, value)`` bằng nhau. Việc so sánh bằng của các khóa và giá trị đảm bảo tính phản xạ.
 
-  Order comparisons (``<``, ``>``, ``<=``, and ``>=``) raise :exc:`TypeError`.
+  Các phép so sánh thứ tự (``<``, ``>``, ``<=`` và ``>=``) sẽ phát sinh :exc:`TypeError`.
 
-* Sets (instances of :class:`set` or :class:`frozenset`) can be compared within
-  and across their types.
+* Các set (các instance của :class:`set` hoặc :class:`frozenset`) có thể được so sánh trong cùng kiểu và giữa các kiểu.
 
-  They define order
-  comparison operators to mean subset and superset tests.  Those relations do
-  not define total orderings (for example, the two sets ``{1,2}`` and ``{2,3}``
-  are not equal, nor subsets of one another, nor supersets of one
-  another).  Accordingly, sets are not appropriate arguments for functions
-  which depend on total ordering (for example, :func:`min`, :func:`max`, and
-  :func:`sorted` produce undefined results given a list of sets as inputs).
+  Chúng định nghĩa các toán tử so sánh thứ tự là các phép kiểm tra tập con và tập cha. Những quan hệ này không xác định thứ tự toàn phần (ví dụ: hai set ``{1,2}`` và ``{2,3}`` không bằng nhau, cũng không là tập con hoặc tập cha của nhau). Vì vậy, set không phù hợp làm đối số cho các hàm phụ thuộc vào thứ tự toàn phần (ví dụ: :func:`min`, :func:`max` và
+  :func:`sorted` cho kết quả không xác định khi đầu vào là một danh sách các set).
 
-  Comparison of sets enforces reflexivity of its elements.
+  Việc so sánh các tập hợp đảm bảo tính phản xạ của các phần tử trong chúng.
 
-* Most other built-in types have no comparison methods implemented, so they
-  inherit the default comparison behavior.
+* Hầu hết các kiểu tích hợp khác không triển khai các phương thức so sánh, vì vậy chúng kế thừa hành vi so sánh mặc định.
 
-User-defined classes that customize their comparison behavior should follow
-some consistency rules, if possible:
+Các lớp do người dùng định nghĩa tùy chỉnh hành vi so sánh nên tuân theo một số quy tắc nhất quán, nếu có thể:
 
-* Equality comparison should be reflexive.
-  In other words, identical objects should compare equal:
+* Phép so sánh bằng nên có tính phản xạ. Nói cách khác, các đối tượng giống hệt nhau nên được so sánh là bằng nhau:
 
-    ``x is y`` implies ``x == y``
+    ``x is y`` ngụ ý ``x == y``
 
-* Comparison should be symmetric.
-  In other words, the following expressions should have the same result:
+* Phép so sánh nên có tính đối xứng. Nói cách khác, các biểu thức sau nên cho cùng một kết quả:
 
-    ``x == y`` and ``y == x``
+    ``x == y`` và ``y == x``
 
-    ``x != y`` and ``y != x``
+    ``x != y`` và ``y != x``
 
-    ``x < y`` and ``y > x``
+    ``x < y`` và ``y > x``
 
-    ``x <= y`` and ``y >= x``
+    ``x <= y`` và ``y >= x``
 
-* Comparison should be transitive.
-  The following (non-exhaustive) examples illustrate that:
+* Phép so sánh phải có tính bắc cầu. Các ví dụ sau đây (không đầy đủ) minh họa điều đó:
 
-    ``x > y and y > z`` implies ``x > z``
+    ``x > y and y > z`` suy ra ``x > z``
 
-    ``x < y and y <= z`` implies ``x < z``
+    ``x < y and y <= z`` suy ra ``x < z``
 
-* Inverse comparison should result in the boolean negation.
-  In other words, the following expressions should have the same result:
+* Phép so sánh nghịch đảo phải cho kết quả là phủ định Boolean. Nói cách khác, các biểu thức sau phải cho cùng một kết quả:
 
-    ``x == y`` and ``not x != y``
+    ``x == y`` và ``not x != y``
 
-    ``x < y`` and ``not x >= y`` (for total ordering)
+    ``x < y`` và ``not x >= y`` (để sắp thứ tự toàn phần)
 
-    ``x > y`` and ``not x <= y`` (for total ordering)
+    ``x > y`` và ``not x <= y`` (để sắp thứ tự toàn phần)
 
-  The last two expressions apply to totally ordered collections (e.g. to
-  sequences, but not to sets or mappings). See also the
-  :deco:`~functools.total_ordering` decorator.
+  Hai biểu thức cuối áp dụng cho các tập hợp có thứ tự toàn phần (ví dụ: các dãy, nhưng không áp dụng cho các tập hợp hoặc ánh xạ). Xem thêm
+  decorator :deco:`~functools.total_ordering`.
 
-* The :func:`hash` result should be consistent with equality.
-  Objects that are equal should either have the same hash value,
-  or be marked as unhashable.
+* Kết quả :func:`hash` phải nhất quán với phép so sánh bằng. Các đối tượng bằng nhau phải có cùng giá trị băm hoặc được đánh dấu là không thể băm.
 
-Python does not enforce these consistency rules. In fact, the not-a-number
-values are an example for not following these rules.
+Python không thực thi các quy tắc nhất quán này. Trên thực tế, các giá trị không phải là số (not-a-number) là một ví dụ về việc không tuân theo các quy tắc này.
 
 
 .. _in:
 .. _not in:
 .. _membership-test-details:
 
-Membership test operations
---------------------------
+Các phép toán kiểm tra thành viên
+---------------------------------
 
-The operators :keyword:`in` and :keyword:`not in` test for membership.  ``x in
-s`` evaluates to ``True`` if *x* is a member of *s*, and ``False`` otherwise.
-``x not in s`` returns the negation of ``x in s``.  All built-in sequences and
-set types support this as well as dictionary, for which :keyword:`!in` tests
-whether the dictionary has a given key. For container types such as list, tuple,
-set, frozenset, dict, or collections.deque, the expression ``x in y`` is equivalent
-to ``any(x is e or x == e for e in y)``.
+Các toán tử :keyword:`in` và :keyword:`not in` dùng để kiểm tra thành viên. ``x in s`` cho kết quả ``True`` nếu *x* là thành viên của *s*, và ``False`` trong trường hợp ngược lại. ``x not in s`` trả về phủ định của ``x in s``. Tất cả các sequence và kiểu set dựng sẵn đều hỗ trợ phép toán này, cũng như dictionary; với dictionary, :keyword:`!in` kiểm tra xem dictionary có một key nhất định hay không. Đối với các kiểu container như list, tuple, set, frozenset, dict hoặc collections.deque, biểu thức ``x in y`` tương đương với ``any(x is e or x == e for e in y)``.
 
-For the string and bytes types, ``x in y`` is ``True`` if and only if *x* is a
-substring of *y*.  An equivalent test is ``y.find(x) != -1``.  Empty strings are
-always considered to be a substring of any other string, so ``"" in "abc"`` will
-return ``True``.
+Đối với kiểu string và bytes, ``x in y`` là ``True`` khi và chỉ khi *x* là một substring của *y*. Một phép kiểm tra tương đương là ``y.find(x) != -1``. String rỗng luôn được xem là substring của mọi string khác, vì vậy ``"" in "abc"`` sẽ trả về ``True``.
 
-For user-defined classes which define the :meth:`~object.__contains__` method, ``x in
-y`` returns ``True`` if ``y.__contains__(x)`` returns a true value, and
-``False`` otherwise.
+Đối với các class do người dùng định nghĩa có phương thức :meth:`~object.__contains__`, ``x in y`` trả về ``True`` nếu ``y.__contains__(x)`` trả về một giá trị đúng, và ``False`` trong trường hợp ngược lại.
 
-For user-defined classes which do not define :meth:`~object.__contains__` but do define
-:meth:`~object.__iter__`, ``x in y`` is ``True`` if some value ``z``, for which the
-expression ``x is z or x == z`` is true, is produced while iterating over ``y``.
-If an exception is raised during the iteration, it is as if :keyword:`in` raised
-that exception.
+Đối với các class do người dùng định nghĩa không có :meth:`~object.__contains__` nhưng có định nghĩa
+:meth:`~object.__iter__`, ``x in y`` là ``True`` nếu một giá trị ``z``, mà biểu thức ``x is z or x == z`` cho kết quả đúng, được tạo ra trong khi lặp qua ``y``. Nếu một exception được phát sinh trong quá trình lặp, thì kết quả giống như :keyword:`in` đã phát sinh exception đó.
 
-Lastly, the old-style iteration protocol is tried: if a class defines
-:meth:`~object.__getitem__`, ``x in y`` is ``True`` if and only if there is a non-negative
-integer index *i* such that ``x is y[i] or x == y[i]``, and no lower integer index
-raises the :exc:`IndexError` exception.  (If any other exception is raised, it is as
-if :keyword:`in` raised that exception).
+Cuối cùng, giao thức lặp kiểu cũ được thử: nếu một class định nghĩa
+:meth:`~object.__getitem__`, ``x in y`` là ``True`` khi và chỉ khi tồn tại một chỉ số nguyên không âm *i* sao cho ``x is y[i] or x == y[i]``, và không có chỉ số nguyên nhỏ hơn nào làm phát sinh ngoại lệ :exc:`IndexError`. (Nếu phát sinh bất kỳ ngoại lệ nào khác thì coi như :keyword:`in` đã phát sinh ngoại lệ đó).
 
 .. index::
    pair: operator; in
@@ -2051,7 +1479,7 @@ if :keyword:`in` raised that exception).
    pair: membership; test
    pair: object; sequence
 
-The operator :keyword:`not in` is defined to have the inverse truth value of
+Toán tử :keyword:`not in` được định nghĩa là có giá trị logic ngược với
 :keyword:`in`.
 
 .. index::
@@ -2063,13 +1491,10 @@ The operator :keyword:`not in` is defined to have the inverse truth value of
 .. _is:
 .. _is not:
 
-Identity comparisons
---------------------
+So sánh định danh
+-----------------
 
-The operators :keyword:`is` and :keyword:`is not` test for an object's identity: ``x
-is y`` is true if and only if *x* and *y* are the same object.  An Object's identity
-is determined using the :meth:`id` function.  ``x is not y`` yields the inverse
-truth value. [#]_
+Các toán tử :keyword:`is` và :keyword:`is not` kiểm tra định danh của một đối tượng: ``x is y`` là đúng khi và chỉ khi *x* và *y* là cùng một đối tượng. Định danh của một Object được xác định bằng hàm :meth:`id`. ``x is not y`` cho giá trị logic ngược lại. [#]_
 
 
 .. _booleans:
@@ -2077,8 +1502,8 @@ truth value. [#]_
 .. _or:
 .. _not:
 
-Boolean operations
-==================
+Các phép toán Boolean
+=====================
 
 .. index::
    pair: Conditional; expression
@@ -2089,35 +1514,21 @@ Boolean operations
    and_test: `not_test` | `and_test` "and" `not_test`
    not_test: `comparison` | "not" `not_test`
 
-In the context of Boolean operations, and also when expressions are used by
-control flow statements, the following values are interpreted as false:
-``False``, ``None``, numeric zero of all types, and empty strings and containers
-(including strings, tuples, lists, dictionaries, sets and frozensets).  All
-other values are interpreted as true.  User-defined objects can customize their
-truth value by providing a :meth:`~object.__bool__` method.
+Trong ngữ cảnh của các phép toán Boolean, cũng như khi các biểu thức được sử dụng bởi các câu lệnh điều khiển luồng, các giá trị sau được diễn giải là false: ``False``, ``None``, số 0 thuộc mọi kiểu, cùng các chuỗi và vùng chứa rỗng (bao gồm chuỗi, tuple, danh sách, dictionary, set và frozenset). Tất cả các giá trị khác được diễn giải là true. Các đối tượng do người dùng định nghĩa có thể tùy chỉnh giá trị truth của chúng bằng cách cung cấp phương thức :meth:`~object.__bool__`.
 
 .. index:: pair: operator; not
 
-The operator :keyword:`not` yields ``True`` if its argument is false, ``False``
-otherwise.
+Toán tử :keyword:`not` cho kết quả ``True`` nếu đối số của nó là false, và ``False`` nếu không.
 
 .. index:: pair: operator; and
 
-The expression ``x and y`` first evaluates *x*; if *x* is false, its value is
-returned; otherwise, *y* is evaluated and the resulting value is returned.
+Biểu thức ``x and y`` trước tiên đánh giá *x*; nếu *x* là false, giá trị của nó được trả về; nếu không, *y* được đánh giá và giá trị thu được được trả về.
 
 .. index:: pair: operator; or
 
-The expression ``x or y`` first evaluates *x*; if *x* is true, its value is
-returned; otherwise, *y* is evaluated and the resulting value is returned.
+Biểu thức ``x or y`` trước tiên đánh giá *x*; nếu *x* là true, giá trị của nó được trả về; nếu không, *y* được đánh giá và giá trị thu được được trả về.
 
-Note that neither :keyword:`and` nor :keyword:`or` restrict the value and type
-they return to ``False`` and ``True``, but rather return the last evaluated
-argument.  This is sometimes useful, e.g., if ``s`` is a string that should be
-replaced by a default value if it is empty, the expression ``s or 'foo'`` yields
-the desired value.  Because :keyword:`not` has to create a new value, it
-returns a boolean value regardless of the type of its argument
-(for example, ``not 'foo'`` produces ``False`` rather than ``''``.)
+Lưu ý rằng cả :keyword:`and` lẫn :keyword:`or` đều không giới hạn giá trị và kiểu mà chúng trả về ở ``False`` và ``True``, mà thay vào đó trả về đối số được đánh giá cuối cùng. Điều này đôi khi hữu ích; ví dụ, nếu ``s`` là một chuỗi cần được thay bằng giá trị mặc định khi rỗng, biểu thức ``s or 'foo'`` sẽ cho ra giá trị mong muốn. Vì :keyword:`not` phải tạo một giá trị mới, nó luôn trả về một giá trị boolean bất kể kiểu của đối số là gì (ví dụ: ``not 'foo'`` tạo ra ``False`` thay vì ``''``.)
 
 
 .. index::
@@ -2129,47 +1540,40 @@ returns a boolean value regardless of the type of its argument
 
 .. _assignment-expressions:
 
-Assignment expressions
-======================
+Biểu thức gán
+=============
 
 .. productionlist:: python-grammar
    assignment_expression: [`identifier` ":="] `expression`
 
-An assignment expression (sometimes also called a "named expression" or
-"walrus") assigns an :token:`~python-grammar:expression` to an
-:token:`~python-grammar:identifier`, while also returning the value of the
+Biểu thức gán (đôi khi còn được gọi là "named expression" hoặc "walrus") gán một :token:`~python-grammar:expression` cho một
+:token:`~python-grammar:identifier`, đồng thời trả về giá trị của
 :token:`~python-grammar:expression`.
 
-One common use case is when handling matched regular expressions:
+Một trường hợp sử dụng phổ biến là khi xử lý các regular expression khớp:
 
 .. code-block:: python
 
    if matching := pattern.search(data):
        do_something(matching)
 
-Or, when processing a file stream in chunks:
+Hoặc khi xử lý một luồng tệp theo từng khối:
 
 .. code-block:: python
 
    while chunk := file.read(9000):
        process(chunk)
 
-Assignment expressions must be surrounded by parentheses when
-used as expression statements and when used as sub-expressions in
-slicing, conditional, lambda,
-keyword-argument, and comprehension-if expressions and
-in ``assert``, ``with``, and ``assignment`` statements.
-In all other places where they can be used, parentheses are not required,
-including in ``if`` and ``while`` statements.
+Các biểu thức gán phải được đặt trong dấu ngoặc đơn khi được sử dụng làm câu lệnh biểu thức và khi được sử dụng làm biểu thức con trong các biểu thức cắt, điều kiện, lambda, đối số từ khóa và if của comprehension, cũng như trong các câu lệnh ``assert``, ``with`` và ``assignment``. Trong mọi trường hợp khác mà chúng có thể được sử dụng, dấu ngoặc đơn không bắt buộc, bao gồm trong các câu lệnh ``if`` và ``while``.
 
 .. versionadded:: 3.8
-   See :pep:`572` for more details about assignment expressions.
+   Xem :pep:`572` để biết thêm chi tiết về các biểu thức gán.
 
 
 .. _if_expr:
 
-Conditional expressions
-=======================
+Biểu thức điều kiện
+===================
 
 .. index::
    pair: conditional; expression
@@ -2181,22 +1585,18 @@ Conditional expressions
    conditional_expression: `or_test` ["if" `or_test` "else" `expression`]
    expression: `conditional_expression` | `lambda_expr`
 
-A conditional expression (sometimes called a "ternary operator") is an
-alternative to the if-else statement. As it is an expression, it returns a value
-and can appear as a sub-expression.
+Biểu thức điều kiện (đôi khi được gọi là "toán tử ba ngôi") là một lựa chọn thay thế cho câu lệnh if-else. Vì là một biểu thức, nó trả về một giá trị và có thể xuất hiện dưới dạng biểu thức con.
 
-The expression ``x if C else y`` first evaluates the condition, *C* rather than *x*.
-If *C* is true, *x* is evaluated and its value is returned; otherwise, *y* is
-evaluated and its value is returned.
+Biểu thức ``x if C else y`` trước tiên đánh giá điều kiện, *C* thay vì *x*. Nếu *C* là đúng, *x* sẽ được đánh giá và giá trị của nó được trả về; nếu không, *y* sẽ được đánh giá và giá trị của nó được trả về.
 
-See :pep:`308` for more details about conditional expressions.
+Xem :pep:`308` để biết thêm chi tiết về các biểu thức điều kiện.
 
 
 .. _lambdas:
 .. _lambda:
 
-Lambdas
-=======
+Lambda
+======
 
 .. index::
    pair: lambda; expression
@@ -2207,24 +1607,20 @@ Lambdas
 .. productionlist:: python-grammar
    lambda_expr: "lambda" [`parameter_list`] ":" `expression`
 
-Lambda expressions (sometimes called lambda forms) are used to create anonymous
-functions. The expression ``lambda parameters: expression`` yields a function
-object.  The unnamed object behaves like a function object defined with:
+Biểu thức lambda (đôi khi được gọi là dạng lambda) được dùng để tạo các hàm ẩn danh. Biểu thức ``lambda parameters: expression`` trả về một đối tượng hàm. Đối tượng không có tên này hoạt động như một đối tượng hàm được định nghĩa bằng:
 
 .. code-block:: none
 
    def <lambda>(parameters):
        return expression
 
-See section :ref:`function` for the syntax of parameter lists.  Note that
-functions created with lambda expressions cannot contain statements or
-annotations.
+Xem phần :ref:`function` để biết cú pháp của danh sách tham số. Lưu ý rằng các hàm được tạo bằng biểu thức lambda không thể chứa câu lệnh hoặc chú thích kiểu.
 
 
 .. _exprlists:
 
-Expression lists
-================
+Danh sách biểu thức
+===================
 
 .. index::
    pair: expression; list
@@ -2240,48 +1636,35 @@ Expression lists
 
 .. index:: pair: object; tuple
 
-Except when part of a list or set display, an expression list
-containing at least one comma yields a tuple.  The length of
-the tuple is the number of expressions in the list.  The expressions are
-evaluated from left to right.
+Ngoại trừ khi là một phần của phép hiển thị danh sách hoặc tập hợp, một danh sách biểu thức chứa ít nhất một dấu phẩy sẽ tạo ra một tuple. Độ dài của tuple là số lượng biểu thức trong danh sách. Các biểu thức được đánh giá từ trái sang phải.
 
 .. index::
    pair: iterable; unpacking
    single: * (asterisk); in expression lists
 
-An asterisk ``*`` denotes :dfn:`iterable unpacking`.  Its operand must be
-an :term:`iterable`.  The iterable is expanded into a sequence of items,
-which are included in the new tuple, list, or set, at the site of
-the unpacking.
+Dấu hoa thị ``*`` biểu thị :dfn:`việc unpack iterable`. Toán hạng của nó phải là một :term:`iterable`. Iterable được mở rộng thành một chuỗi các mục, rồi được đưa vào tuple, list hoặc set mới tại vị trí unpack.
 
 .. versionadded:: 3.5
-   Iterable unpacking in expression lists, originally proposed by :pep:`448`.
+   Việc unpack iterable trong các danh sách biểu thức, được đề xuất lần đầu bởi :pep:`448`.
 
 .. versionadded:: 3.11
-   Any item in an expression list may be starred. See :pep:`646`.
+   Mọi mục trong danh sách biểu thức đều có thể được đánh dấu sao. Xem :pep:`646`.
 
 .. index:: pair: trailing; comma
 
-A trailing comma is required only to create a one-item tuple,
-such as ``1,``; it is optional in all other cases.
-A single expression without a
-trailing comma doesn't create a tuple, but rather yields the value of that
-expression. (To create an empty tuple, use an empty pair of parentheses:
-``()``.)
+Dấu phẩy ở cuối chỉ bắt buộc để tạo một tuple một phần tử, chẳng hạn như ``1,``; trong mọi trường hợp khác, dấu phẩy này là tùy chọn. Một biểu thức đơn lẻ không có dấu phẩy ở cuối không tạo tuple mà trả về giá trị của biểu thức đó. (Để tạo một tuple rỗng, hãy dùng một cặp dấu ngoặc đơn rỗng: ``()``.)
 
 
 .. _evalorder:
 
-Evaluation order
-================
+Thứ tự đánh giá
+===============
 
 .. index:: pair: evaluation; order
 
-Python evaluates expressions from left to right.  Notice that while evaluating
-an assignment, the right-hand side is evaluated before the left-hand side.
+Python đánh giá các biểu thức từ trái sang phải. Lưu ý rằng khi đánh giá một phép gán, vế phải được đánh giá trước vế trái.
 
-In the following lines, expressions will be evaluated in the arithmetic order of
-their suffixes::
+Trong các dòng sau, các biểu thức sẽ được đánh giá theo thứ tự số học của các hậu tố::
 
    expr1, expr2, expr3, expr4
    (expr1, expr2, expr3, expr4)
@@ -2293,115 +1676,81 @@ their suffixes::
 
 .. _operator-summary:
 
-Operator precedence
-===================
+Độ ưu tiên của toán tử
+======================
 
 .. index::
    pair: operator; precedence
 
-The following table summarizes the operator precedence in Python, from highest
-precedence (most binding) to lowest precedence (least binding).  Operators in
-the same box have the same precedence.  Unless the syntax is explicitly given,
-operators are binary.  Operators in the same box group left to right (except for
-exponentiation and conditional expressions, which group from right to left).
+Bảng sau đây tóm tắt độ ưu tiên của các toán tử trong Python, từ độ ưu tiên cao nhất (liên kết chặt nhất) đến thấp nhất (liên kết lỏng nhất). Các toán tử trong cùng một ô có cùng độ ưu tiên. Trừ khi cú pháp được nêu rõ, các toán tử là toán tử nhị phân. Các toán tử trong cùng một ô được nhóm từ trái sang phải (ngoại trừ phép lũy thừa và các biểu thức điều kiện, được nhóm từ phải sang trái).
 
-Note that comparisons, membership tests, and identity tests, all have the same
-precedence and have a left-to-right chaining feature as described in the
-:ref:`comparisons` section.
+Lưu ý rằng các phép so sánh, phép kiểm tra thành viên và phép kiểm tra định danh đều có cùng độ ưu tiên và có tính năng nối từ trái sang phải như được mô tả trong
+:ref:`comparisons`.
 
 
-+-----------------------------------------------+-------------------------------------+
-| Operator                                      | Description                         |
-+===============================================+=====================================+
-| ``(expressions...)``,                         | Binding or parenthesized            |
-|                                               | expression,                         |
-| ``[expressions...]``,                         | list display,                       |
-| ``{key: value...}``,                          | dictionary display,                 |
-| ``{expressions...}``                          | set display                         |
-+-----------------------------------------------+-------------------------------------+
-| ``x[index]``, ``x[index:index]``              | Subscription (including slicing),   |
-| ``x(arguments...)``, ``x.attribute``          | call, attribute reference           |
-+-----------------------------------------------+-------------------------------------+
-| :keyword:`await x <await>`                    | Await expression                    |
-+-----------------------------------------------+-------------------------------------+
-| ``**``                                        | Exponentiation [#]_                 |
-+-----------------------------------------------+-------------------------------------+
-| ``+x``, ``-x``, ``~x``                        | Positive, negative, bitwise NOT     |
-+-----------------------------------------------+-------------------------------------+
-| ``*``, ``@``, ``/``, ``//``, ``%``            | Multiplication, matrix              |
-|                                               | multiplication, division, floor     |
-|                                               | division, remainder [#]_            |
-+-----------------------------------------------+-------------------------------------+
-| ``+``, ``-``                                  | Addition and subtraction            |
-+-----------------------------------------------+-------------------------------------+
-| ``<<``, ``>>``                                | Shifts                              |
-+-----------------------------------------------+-------------------------------------+
-| ``&``                                         | Bitwise AND                         |
-+-----------------------------------------------+-------------------------------------+
-| ``^``                                         | Bitwise XOR                         |
-+-----------------------------------------------+-------------------------------------+
-| ``|``                                         | Bitwise OR                          |
-+-----------------------------------------------+-------------------------------------+
-| :keyword:`in`, :keyword:`not in`,             | Comparisons, including membership   |
-| :keyword:`is`, :keyword:`is not`, ``<``,      | tests and identity tests            |
-| ``<=``, ``>``, ``>=``, ``!=``, ``==``         |                                     |
-+-----------------------------------------------+-------------------------------------+
-| :keyword:`not x <not>`                        | Boolean NOT                         |
-+-----------------------------------------------+-------------------------------------+
-| :keyword:`and`                                | Boolean AND                         |
-+-----------------------------------------------+-------------------------------------+
-| :keyword:`or`                                 | Boolean OR                          |
-+-----------------------------------------------+-------------------------------------+
-| :keyword:`if <if_expr>` -- :keyword:`!else`   | Conditional expression              |
-+-----------------------------------------------+-------------------------------------+
-| :keyword:`lambda`                             | Lambda expression                   |
-+-----------------------------------------------+-------------------------------------+
-| ``:=``                                        | Assignment expression               |
-+-----------------------------------------------+-------------------------------------+
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| Toán tử                                     | Mô tả                                                                                                            |
++=============================================+==================================================================================================================+
+| ``(expressions...)``,                       | Biểu thức liên kết hoặc biểu thức đặt trong dấu ngoặc, biểu diễn danh sách, biểu diễn từ điển, biểu diễn tập hợp |
+|                                             |                                                                                                                  |
+| ``[expressions...]``,                       |                                                                                                                  |
+| ``{key: value...}``,                        |                                                                                                                  |
+| ``{expressions...}``                        |                                                                                                                  |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``x[index]``, ``x[index:index]``            | Phép truy xuất (bao gồm cả việc cắt lát), lời gọi, tham chiếu thuộc tính                                         |
+| ``x(arguments...)``, ``x.attribute``        |                                                                                                                  |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| :keyword:`await x <await>`                  | Biểu thức await                                                                                                  |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``**``                                      | Lũy thừa [#]_                                                                                                    |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``+x``, ``-x``, ``~x``                      | Số dương, số âm, NOT bitwise                                                                                     |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``*``, ``@``, ``/``, ``//``, ``%``          | Phép nhân, phép nhân ma trận, phép chia, phép chia lấy phần nguyên, phần dư [#]_                                 |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``+``, ``-``                                | Phép cộng và phép trừ                                                                                            |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``<<``, ``>>``                              | Phép dịch                                                                                                        |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``&``                                       | AND bitwise                                                                                                      |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``^``                                       | XOR bitwise                                                                                                      |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``|``                                       | Phép OR theo bit                                                                                                 |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| :keyword:`in`, :keyword:`not in`,           | Các phép so sánh, bao gồm kiểm tra thành viên và kiểm tra đồng nhất                                              |
+| :keyword:`is`, :keyword:`is not`, ``<``,    |                                                                                                                  |
+| ``<=``, ``>``, ``>=``, ``!=``, ``==``       |                                                                                                                  |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| :keyword:`not x <not>`                      | Phép NOT logic                                                                                                   |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| :keyword:`and`                              | Phép AND logic                                                                                                   |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| :keyword:`or`                               | Phép OR logic                                                                                                    |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| :keyword:`if <if_expr>` -- :keyword:`!else` | Biểu thức điều kiện                                                                                              |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| :keyword:`lambda`                           | Biểu thức lambda                                                                                                 |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
+| ``:=``                                      | Biểu thức gán                                                                                                    |
++---------------------------------------------+------------------------------------------------------------------------------------------------------------------+
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] While ``abs(x%y) < abs(y)`` is true mathematically, for floats it may not be
-   true numerically due to roundoff.  For example, and assuming a platform on which
-   a Python float is an IEEE 754 double-precision number, in order that ``-1e-100 %
-   1e100`` have the same sign as ``1e100``, the computed result is ``-1e-100 +
-   1e100``, which is numerically exactly equal to ``1e100``.  The function
-   :func:`math.fmod` returns a result whose sign matches the sign of the
-   first argument instead, and so returns ``-1e-100`` in this case. Which approach
-   is more appropriate depends on the application.
+.. [#] Mặc dù ``abs(x%y) < abs(y)`` đúng về mặt toán học, nhưng đối với số thực, điều này có thể không đúng về mặt số học do sai số làm tròn. Ví dụ, giả sử nền tảng sử dụng số thực Python là số dấu phẩy động double-precision theo IEEE 754, để ``-1e-100 % 1e100`` có cùng dấu với ``1e100``, kết quả tính được là ``-1e-100 + 1e100``, về mặt số học chính xác bằng ``1e100``. Hàm
+   :func:`math.fmod` thay vào đó trả về kết quả có dấu trùng với dấu của đối số đầu tiên, vì vậy trong trường hợp này trả về ``-1e-100``. Cách tiếp cận nào phù hợp hơn còn tùy thuộc vào ứng dụng.
 
-.. [#] If x is very close to an exact integer multiple of y, it's possible for
-   ``x//y`` to be one larger than ``(x-x%y)//y`` due to rounding.  In such
-   cases, Python returns the latter result, in order to preserve that
-   ``divmod(x,y)[0] * y + x % y`` be very close to ``x``.
+.. [#] Nếu x rất gần với một bội số nguyên chính xác của y, ``x//y`` có thể lớn hơn ``(x-x%y)//y`` một đơn vị do làm tròn. Trong những trường hợp như vậy, Python trả về kết quả sau, nhằm đảm bảo rằng ``divmod(x,y)[0] * y + x % y`` vẫn rất gần với ``x``.
 
-.. [#] The Unicode standard distinguishes between :dfn:`code points`
-   (e.g. U+0041) and :dfn:`abstract characters` (e.g. "LATIN CAPITAL LETTER A").
-   While most abstract characters in Unicode are only represented using one
-   code point, there is a number of abstract characters that can in addition be
-   represented using a sequence of more than one code point.  For example, the
-   abstract character "LATIN CAPITAL LETTER C WITH CEDILLA" can be represented
-   as a single :dfn:`precomposed character` at code position U+00C7, or as a
-   sequence of a :dfn:`base character` at code position U+0043 (LATIN CAPITAL
-   LETTER C), followed by a :dfn:`combining character` at code position U+0327
-   (COMBINING CEDILLA).
+.. [#] Tiêu chuẩn Unicode phân biệt giữa :dfn:`các điểm mã` (ví dụ U+0041) và :dfn:`các ký tự trừu tượng` (ví dụ "LATIN CAPITAL LETTER A"). Mặc dù hầu hết các ký tự trừu tượng trong Unicode chỉ được biểu diễn bằng một điểm mã, vẫn có một số ký tự trừu tượng có thể được biểu diễn bổ sung bằng một chuỗi gồm nhiều hơn một điểm mã. Ví dụ, ký tự trừu tượng "LATIN CAPITAL LETTER C WITH CEDILLA" có thể được biểu diễn dưới dạng một :dfn:`ký tự dựng sẵn` duy nhất tại vị trí mã U+00C7, hoặc dưới dạng một chuỗi gồm :dfn:`ký tự cơ sở` tại vị trí mã U+0043 (LATIN CAPITAL LETTER C), theo sau là :dfn:`ký tự kết hợp` tại vị trí mã U+0327 (COMBINING CEDILLA).
 
-   The comparison operators on strings compare at the level of Unicode code
-   points. This may be counter-intuitive to humans.  For example,
-   ``"\u00C7" == "\u0043\u0327"`` is ``False``, even though both strings
-   represent the same abstract character "LATIN CAPITAL LETTER C WITH CEDILLA".
+   Các toán tử so sánh trên chuỗi thực hiện so sánh ở cấp độ các điểm mã Unicode. Điều này có thể phản trực giác đối với con người. Ví dụ, ``"\u00C7" == "\u0043\u0327"`` là ``False``, mặc dù cả hai chuỗi đều biểu diễn cùng một ký tự trừu tượng "LATIN CAPITAL LETTER C WITH CEDILLA".
 
-   To compare strings at the level of abstract characters (that is, in a way
-   intuitive to humans), use :func:`unicodedata.normalize`.
+   Để so sánh các chuỗi ở cấp độ ký tự trừu tượng (tức là theo cách trực quan đối với con người), hãy sử dụng :func:`unicodedata.normalize`.
 
-.. [#] Due to automatic garbage-collection, free lists, and the dynamic nature of
-   descriptors, you may notice seemingly unusual behaviour in certain uses of
-   the :keyword:`is` operator, like those involving comparisons between instance
-   methods, or constants.  Check their documentation for more info.
+.. [#] Do cơ chế thu gom rác tự động, các free list và bản chất động của các descriptor, bạn có thể nhận thấy hành vi có vẻ bất thường trong một số trường hợp sử dụng toán tử :keyword:`is`, chẳng hạn như khi so sánh các method của instance hoặc các hằng số. Hãy xem tài liệu của chúng để biết thêm thông tin.
 
-.. [#] The power operator ``**`` binds less tightly than an arithmetic or
-   bitwise unary operator on its right, that is, ``2**-1`` is ``0.5``.
+.. [#] Toán tử lũy thừa ``**`` có độ ưu tiên thấp hơn một toán tử một ngôi số học hoặc bit ở bên phải nó, tức là ``2**-1`` tương đương với ``0.5``.
 
-.. [#] The ``%`` operator is also used for string formatting; the same
-   precedence applies.
+.. [#] Toán tử ``%`` cũng được dùng để định dạng chuỗi; quy tắc ưu tiên tương tự được áp dụng.

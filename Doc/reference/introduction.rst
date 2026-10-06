@@ -1,100 +1,54 @@
 
 .. _introduction:
 
-************
-Introduction
-************
+**********
+Giới thiệu
+**********
 
-This reference manual describes the Python programming language. It is not
-intended as a tutorial.
+Tài liệu tham khảo này mô tả ngôn ngữ lập trình Python. Tài liệu không nhằm mục đích hướng dẫn.
 
-While I am trying to be as precise as possible, I chose to use English rather
-than formal specifications for everything except syntax and lexical analysis.
-This should make the document more understandable to the average reader, but
-will leave room for ambiguities. Consequently, if you were coming from Mars and
-tried to re-implement Python from this document alone, you might have to guess
-things and in fact you would probably end up implementing quite a different
-language. On the other hand, if you are using Python and wonder what the precise
-rules about a particular area of the language are, you should definitely be able
-to find them here. If you would like to see a more formal definition of the
-language, maybe you could volunteer your time --- or invent a cloning machine
-:-).
+Mặc dù cố gắng diễn đạt chính xác nhất có thể, tôi đã chọn sử dụng tiếng Anh thay vì các đặc tả hình thức cho mọi phần, ngoại trừ cú pháp và phân tích từ vựng. Điều này giúp tài liệu dễ hiểu hơn đối với độc giả thông thường, nhưng sẽ để lại chỗ cho những điểm mơ hồ. Vì vậy, nếu bạn đến từ Sao Hỏa và cố gắng triển khai lại Python chỉ dựa trên tài liệu này, bạn có thể phải phỏng đoán một số điều và trên thực tế, có lẽ bạn sẽ kết thúc bằng việc triển khai một ngôn ngữ khá khác biệt. Mặt khác, nếu bạn đang sử dụng Python và muốn biết các quy tắc chính xác về một lĩnh vực cụ thể của ngôn ngữ, chắc chắn bạn sẽ có thể tìm thấy chúng ở đây. Nếu muốn xem một định nghĩa hình thức hơn về ngôn ngữ, có lẽ bạn có thể tình nguyện dành thời gian của mình --- hoặc phát minh một cỗ máy nhân bản :-).
 
-It is dangerous to add too many implementation details to a language reference
-document --- the implementation may change, and other implementations of the
-same language may work differently.  On the other hand, CPython is the one
-Python implementation in widespread use (although alternate implementations
-continue to gain support), and its particular quirks are sometimes worth being
-mentioned, especially where the implementation imposes additional limitations.
-Therefore, you'll find short "implementation notes" sprinkled throughout the
-text.
+Việc thêm quá nhiều chi tiết triển khai vào tài liệu tham khảo ngôn ngữ là rất nguy hiểm --- phần triển khai có thể thay đổi, và các bản triển khai khác của cùng một ngôn ngữ có thể hoạt động khác nhau. Mặt khác, CPython là bản triển khai Python được sử dụng rộng rãi nhất (mặc dù các bản triển khai thay thế vẫn tiếp tục nhận được sự hỗ trợ), và những đặc điểm riêng của nó đôi khi đáng được đề cập, đặc biệt khi phần triển khai áp đặt thêm các giới hạn. Vì vậy, bạn sẽ thấy những "ghi chú triển khai" ngắn được rải rác trong toàn bộ văn bản.
 
-Every Python implementation comes with a number of built-in and standard
-modules.  These are documented in :ref:`library-index`.  A few built-in modules
-are mentioned when they interact in a significant way with the language
-definition.
+Mỗi bản triển khai Python đều đi kèm với một số module tích hợp sẵn và module chuẩn. Các module này được ghi chép trong :ref:`library-index`. Một vài module tích hợp sẵn được đề cập khi chúng tương tác đáng kể với định nghĩa ngôn ngữ.
 
 
 .. _implementations:
 
-Alternate Implementations
-=========================
+Các bản triển khai thay thế
+===========================
 
-Though there is one Python implementation which is by far the most popular,
-there are some alternate implementations which are of particular interest to
-different audiences.
+Mặc dù có một bản triển khai Python phổ biến hơn hẳn, vẫn có một số bản triển khai thay thế đặc biệt đáng chú ý đối với các nhóm đối tượng khác nhau.
 
-Known implementations include:
+Các bản triển khai được biết đến gồm:
 
 CPython
-   This is the original and most-maintained implementation of Python, written in C.
-   New language features generally appear here first.
+   Đây là bản triển khai Python nguyên gốc và được duy trì tích cực nhất, được viết bằng C. Các tính năng ngôn ngữ mới thường xuất hiện đầu tiên ở đây.
 
 Jython
-   Python implemented in Java.  This implementation can be used as a scripting
-   language for Java applications, or can be used to create applications using the
-   Java class libraries.  It is also often used to create tests for Java libraries.
-   More information can be found at `the Jython website <https://www.jython.org/>`_.
+   Python được triển khai bằng Java. Bản triển khai này có thể được sử dụng như một ngôn ngữ scripting cho các ứng dụng Java hoặc để tạo ứng dụng bằng cách sử dụng các thư viện lớp Java. Bản này cũng thường được dùng để tạo các bài kiểm thử cho thư viện Java. Có thể tìm thêm thông tin tại `trang web Jython <https://www.jython.org/>`_.
 
 Python for .NET
-   This implementation actually uses the CPython implementation, but is a managed
-   .NET application and makes .NET libraries available.  It was created by Brian
-   Lloyd.  For more information, see the `Python for .NET home page
-   <https://pythonnet.github.io/>`_.
+   Bản triển khai này thực sự sử dụng bản triển khai CPython, nhưng là một ứng dụng .NET được quản lý và cung cấp các thư viện .NET. Bản này được tạo bởi Brian Lloyd. Để biết thêm thông tin, hãy xem `trang chủ Python for .NET <https://pythonnet.github.io/>`_.
 
 IronPython
-   An alternate Python for .NET.  Unlike Python.NET, this is a complete Python
-   implementation that generates IL, and compiles Python code directly to .NET
-   assemblies.  It was created by Jim Hugunin, the original creator of Jython.  For
-   more information, see `the IronPython website <https://ironpython.net/>`_.
+   Một Python thay thế cho .NET. Khác với Python.NET, đây là một triển khai Python hoàn chỉnh tạo ra IL và biên dịch trực tiếp mã Python thành các assembly .NET. Nó được tạo ra bởi Jim Hugunin, người sáng tạo ban đầu của Jython. Để biết thêm thông tin, hãy xem `trang web IronPython <https://ironpython.net/>`_.
 
 PyPy
-   An implementation of Python written completely in Python. It supports several
-   advanced features not found in other implementations like stackless support
-   and a Just in Time compiler. One of the goals of the project is to encourage
-   experimentation with the language itself by making it easier to modify the
-   interpreter (since it is written in Python).  Additional information is
-   available on `the PyPy project's home page <https://pypy.org/>`_.
+   Một triển khai Python được viết hoàn toàn bằng Python. Nó hỗ trợ một số tính năng nâng cao không có trong các triển khai khác, chẳng hạn như hỗ trợ stackless và trình biên dịch Just in Time. Một trong những mục tiêu của dự án là khuyến khích việc thử nghiệm với chính ngôn ngữ này bằng cách giúp sửa đổi trình thông dịch dễ dàng hơn (vì trình thông dịch được viết bằng Python). Thông tin bổ sung có trên `trang chủ của dự án PyPy <https://pypy.org/>`_.
 
-Each of these implementations varies in some way from the language as documented
-in this manual, or introduces specific information beyond what's covered in the
-standard Python documentation.  Please refer to the implementation-specific
-documentation to determine what else you need to know about the specific
-implementation you're using.
+Mỗi triển khai này đều khác với ngôn ngữ được mô tả trong tài liệu này theo một cách nào đó, hoặc cung cấp những thông tin cụ thể ngoài phạm vi tài liệu Python chuẩn. Vui lòng tham khảo tài liệu dành riêng cho từng triển khai để xác định những điều khác bạn cần biết về triển khai cụ thể đang sử dụng.
 
 
 .. _notation:
 
-Notation
-========
+Ký hiệu
+=======
 
 .. index:: BNF, grammar, syntax, notation
 
-The descriptions of lexical analysis and syntax use a grammar notation that
-is a mixture of
-`EBNF <https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form>`_
-and `PEG <https://en.wikipedia.org/wiki/Parsing_expression_grammar>`_.
-For example:
+Các mô tả về phân tích từ vựng và cú pháp sử dụng một ký pháp ngữ pháp là sự kết hợp giữa `EBNF <https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form>`_ và `PEG <https://en.wikipedia.org/wiki/Parsing_expression_grammar>`_. Ví dụ:
 
 .. grammar-snippet::
    :group: notation
@@ -103,73 +57,49 @@ For example:
    letter: "a"..."z" | "A"..."Z"
    digit:  "0"..."9"
 
-In this example, the first line says that a ``name`` is a ``letter`` followed
-by a sequence of zero or more ``letter``\ s, ``digit``\ s, and underscores.
-A ``letter`` in turn is any of the single characters ``'a'`` through
-``'z'`` and ``A`` through ``Z``; a ``digit`` is a single character from ``0``
-to ``9``.
+Trong ví dụ này, dòng đầu tiên cho biết rằng một ``name`` là một ``letter`` theo sau bởi một chuỗi gồm không hoặc nhiều ``letter``\ s, ``digit``\ s và dấu gạch dưới. Đến lượt mình, một ``letter`` là bất kỳ ký tự đơn nào từ ``'a'`` đến ``'z'`` và từ ``A`` đến ``Z``; một ``digit`` là một ký tự đơn trong khoảng từ ``0`` đến ``9``.
 
-Each rule begins with a name (which identifies the rule that's being defined)
-followed by a colon, ``:``.
-The definition to the right of the colon uses the following syntax elements:
+Mỗi quy tắc bắt đầu bằng một tên (xác định quy tắc đang được định nghĩa), theo sau là dấu hai chấm, ``:``. Phần định nghĩa ở bên phải dấu hai chấm sử dụng các phần tử cú pháp sau:
 
-* ``name``: A name refers to another rule.
-  Where possible, it is a link to the rule's definition.
+* ``name``: Một tên tham chiếu đến một quy tắc khác. Khi có thể, tên đó là một liên kết đến định nghĩa của quy tắc.
 
-  * ``TOKEN``: An uppercase name refers to a :term:`token`.
-    For the purposes of grammar definitions, tokens are the same as rules.
+  * ``TOKEN``: Một tên viết hoa tham chiếu đến một :term:`token`. Đối với các định nghĩa ngữ pháp, token cũng giống như quy tắc.
 
-* ``"text"``, ``'text'``: Text in single or double quotes must match literally
-  (without the quotes). The type of quote is chosen according to the meaning
-  of ``text``:
+* ``"text"``, ``'text'``: Văn bản nằm trong dấu ngoặc đơn hoặc dấu ngoặc kép phải khớp chính xác (không bao gồm dấu ngoặc). Loại dấu ngoặc được chọn tùy theo ý nghĩa của ``text``:
 
-  * ``'if'``: A name in single quotes denotes a :ref:`keyword <keywords>`.
-  * ``"case"``: A name in double quotes denotes a
-    :ref:`soft-keyword <soft-keywords>`.
-  * ``'@'``: A non-letter symbol in single quotes denotes an
-    :py:data:`~token.OP` token, that is, a :ref:`delimiter <delimiters>` or
-    :ref:`operator <operators>`.
+  * ``'if'``: Một tên nằm trong dấu ngoặc đơn biểu thị một :ref:`keyword <keywords>`.
+  * ``"case"``: Một tên nằm trong dấu ngoặc kép biểu thị một
+    :ref:`từ khóa mềm <soft-keywords>`.
+  * ``'@'``: Một ký hiệu không phải chữ cái được đặt trong dấu nháy đơn biểu thị một
+    :py:data:`~token.OP` token, tức là một :ref:`dấu phân cách <delimiters>` hoặc
+    :ref:`toán tử <operators>`.
 
-* ``e1 e2``: Items separated only by whitespace denote a sequence.
-  Here, ``e1`` must be followed by ``e2``.
-* ``e1 | e2``: A vertical bar is used to separate alternatives.
-  It denotes PEG's "ordered choice": if ``e1`` matches, ``e2`` is
-  not considered.
-  In traditional PEG grammars, this is written as a slash, ``/``, rather than
-  a vertical bar.
-  See :pep:`617` for more background and details.
-* ``e*``: A star means zero or more repetitions of the preceding item.
-* ``e+``: Likewise, a plus means one or more repetitions.
-* ``[e]``: A phrase enclosed in square brackets means zero or
-  one occurrences. In other words, the enclosed phrase is optional.
-* ``e?``: A question mark has exactly the same meaning as square brackets:
-  the preceding item is optional.
-* ``(e)``: Parentheses are used for grouping.
+* ``e1 e2``: Các mục chỉ được phân tách bằng khoảng trắng biểu thị một chuỗi. Ở đây, ``e1`` phải được theo sau bởi ``e2``.
+* ``e1 | e2``: Dấu gạch đứng được dùng để phân tách các lựa chọn. Nó biểu thị "lựa chọn theo thứ tự" của PEG: nếu ``e1`` khớp, ``e2`` sẽ không được xét. Trong các văn phạm PEG truyền thống, ký hiệu này được viết là dấu gạch chéo, ``/``, thay vì dấu gạch đứng. Xem :pep:`617` để biết thêm bối cảnh và chi tiết.
+* ``e*``: Dấu sao biểu thị không hoặc nhiều lần lặp của mục đứng trước.
+* ``e+``: Tương tự, dấu cộng có nghĩa là một hoặc nhiều lần lặp.
+* ``[e]``: Một cụm từ được đặt trong dấu ngoặc vuông có nghĩa là xuất hiện không hoặc một lần. Nói cách khác, cụm từ được đặt trong đó là tùy chọn.
+* ``e?``: Dấu chấm hỏi có ý nghĩa hoàn toàn giống với dấu ngoặc vuông: phần tử đứng trước là tùy chọn.
+* ``(e)``: Dấu ngoặc tròn được dùng để nhóm.
 
-The following notation is only used in
-:ref:`lexical definitions <notation-lexical-vs-syntactic>`.
+Ký hiệu sau đây chỉ được sử dụng trong
+:ref:`các định nghĩa từ vựng <notation-lexical-vs-syntactic>`.
 
-* ``"a"..."z"``: Two literal characters separated by three dots mean a choice
-  of any single character in the given (inclusive) range of ASCII characters.
-* ``<...>``: A phrase between angular brackets gives an informal description
-  of the matched symbol (for example, ``<any ASCII character except "\">``),
-  or an abbreviation that is defined in nearby text (for example, ``<Lu>``).
+* ``"a"..."z"``: Hai ký tự literal được phân tách bằng ba dấu chấm có nghĩa là chọn bất kỳ một ký tự nào trong phạm vi ký tự ASCII đã cho (bao gồm cả hai đầu mút).
+* ``<...>``: Một cụm từ nằm giữa các dấu ngoặc nhọn cung cấp mô tả không chính thức về ký hiệu được so khớp (ví dụ: ``<any ASCII character except "\">``), hoặc một chữ viết tắt được định nghĩa trong phần văn bản lân cận (ví dụ: ``<Lu>``).
 
 .. _lexical-lookaheads:
 
-Some definitions also use *lookaheads*, which indicate that an element
-must (or must not) match at a given position, but without consuming any input:
+Một số định nghĩa cũng sử dụng *lookaheads*, cho biết rằng một phần tử phải (hoặc không được) so khớp tại một vị trí nhất định, nhưng không tiêu thụ bất kỳ đầu vào nào:
 
-* ``&e``: a positive lookahead (that is, ``e`` is required to match)
-* ``!e``: a negative lookahead (that is, ``e`` is required *not* to match)
+* ``&e``: lookahead dương (nghĩa là, ``e`` bắt buộc phải so khớp)
+* ``!e``: lookahead âm (nghĩa là, ``e`` bắt buộc *not* phải so khớp)
 
-The unary operators (``*``, ``+``, ``?``) bind as tightly as possible;
-the vertical bar (``|``) binds most loosely.
+Các toán tử một ngôi (``*``, ``+``, ``?``) liên kết chặt nhất có thể; dấu gạch đứng (``|``) liên kết lỏng nhất.
 
-White space is only meaningful to separate tokens.
+Khoảng trắng chỉ có ý nghĩa khi dùng để phân tách các token.
 
-Rules are normally contained on a single line, but rules that are too long
-may be wrapped:
+Các quy tắc thường được viết trên một dòng, nhưng những quy tắc quá dài có thể được xuống dòng:
 
 .. grammar-snippet::
    :group: notation
@@ -177,9 +107,7 @@ may be wrapped:
    literal: stringliteral | bytesliteral
             | integer | floatnumber | imagnumber
 
-Alternatively, rules may be formatted with the first line ending at the colon,
-and each alternative beginning with a vertical bar on a new line.
-For example:
+Ngoài ra, các quy tắc có thể được định dạng sao cho dòng đầu tiên kết thúc bằng dấu hai chấm, và mỗi lựa chọn bắt đầu bằng một dấu gạch đứng trên một dòng mới. Ví dụ:
 
 
 .. grammar-snippet::
@@ -192,28 +120,24 @@ For example:
       | floatnumber
       | imagnumber
 
-This does *not* mean that there is an empty first alternative.
+Điều này *không* có nghĩa là có một lựa chọn đầu tiên rỗng.
 
 .. index:: lexical definitions
 
 .. _notation-lexical-vs-syntactic:
 
-Lexical and Syntactic definitions
----------------------------------
+Định nghĩa từ vựng và cú pháp
+-----------------------------
 
-There is some difference between *lexical* and *syntactic* analysis:
-the :term:`lexical analyzer` operates on the individual characters of the
-input source, while the *parser* (syntactic analyzer) operates on the stream
-of :term:`tokens <token>` generated by the lexical analysis.
-However, in some cases the exact boundary between the two phases is a
-CPython implementation detail.
+Có một số khác biệt giữa việc phân tích *từ vựng* và *cú pháp*: :term:`lexical analyzer` hoạt động trên từng ký tự riêng lẻ của mã nguồn đầu vào, trong khi *bộ phân tích cú pháp* (syntactic analyzer) hoạt động trên luồng :term:`token <token>` được tạo ra từ quá trình phân tích từ vựng. Tuy nhiên, trong một số trường hợp, ranh giới chính xác giữa hai giai đoạn là một chi tiết triển khai của CPython.
 
-The practical difference between the two is that in *lexical* definitions,
-all whitespace is significant.
-The lexical analyzer :ref:`discards <whitespace>` all whitespace that is not
-converted to tokens like :data:`token.INDENT` or :data:`~token.NEWLINE`.
-*Syntactic* definitions then use these tokens, rather than source characters.
+Điểm khác biệt thực tế giữa hai loại này là trong các định nghĩa *từ vựng*, mọi khoảng trắng đều có ý nghĩa. Bộ phân tích từ vựng :ref:`loại bỏ <whitespace>` mọi khoảng trắng không được chuyển thành các token như :data:`token.INDENT` hoặc :data:`~token.NEWLINE`. Sau đó, các định nghĩa *cú pháp* sử dụng những token này thay vì các ký tự mã nguồn.
 
-This documentation uses the same BNF grammar for both styles of definitions.
-All uses of BNF in the next chapter (:ref:`lexical`) are lexical definitions;
-uses in subsequent chapters are syntactic definitions.
+Tài liệu này sử dụng cùng một ngữ pháp BNF cho cả hai kiểu định nghĩa. Mọi trường hợp sử dụng BNF trong chương tiếp theo (:ref:`lexical`) đều là các định nghĩa từ vựng; các trường hợp sử dụng trong những chương tiếp theo là các định nghĩa cú pháp.
+
+.. _`the Jython website`: https://www.jython.org/
+.. _`Python for .NET home page`: https://pythonnet.github.io/
+.. _`the IronPython website`: https://ironpython.net/
+.. _`the PyPy project's home page`: https://pypy.org/
+.. _`EBNF`: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
+.. _`PEG`: https://en.wikipedia.org/wiki/Parsing_expression_grammar

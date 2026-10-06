@@ -2,14 +2,12 @@
 .. _simple:
 
 *****************
-Simple statements
+Câu lệnh đơn giản
 *****************
 
 .. index:: pair: simple; statement
 
-A simple statement is comprised within a single logical line. Several simple
-statements may occur on a single line separated by semicolons.  The syntax for
-simple statements is:
+Một câu lệnh đơn giản nằm trong một dòng logic duy nhất. Một dòng có thể chứa nhiều câu lệnh đơn giản, được phân tách bằng dấu chấm phẩy. Cú pháp của câu lệnh đơn giản là:
 
 .. productionlist:: python-grammar
    simple_stmt: `expression_stmt`
@@ -33,25 +31,20 @@ simple statements is:
 
 .. _exprstmts:
 
-Expression statements
-=====================
+Câu lệnh biểu thức
+==================
 
 .. index::
    pair: expression; statement
    pair: expression; list
 .. index:: pair: expression; list
 
-Expression statements are used (mostly interactively) to compute and write a
-value, or (usually) to call a procedure (a function that returns no meaningful
-result; in Python, procedures return the value ``None``).  Other uses of
-expression statements are allowed and occasionally useful.  The syntax for an
-expression statement is:
+Câu lệnh biểu thức được sử dụng (chủ yếu trong chế độ tương tác) để tính toán và ghi một giá trị, hoặc (thường là) gọi một thủ tục (một hàm không trả về kết quả có ý nghĩa; trong Python, thủ tục trả về giá trị ``None``). Các cách sử dụng khác của câu lệnh biểu thức cũng được cho phép và đôi khi hữu ích. Cú pháp của câu lệnh biểu thức là:
 
 .. productionlist:: python-grammar
    expression_stmt: `starred_expression`
 
-An expression statement evaluates the expression list (which may be a single
-expression).
+Một câu lệnh biểu thức đánh giá danh sách biểu thức (có thể chỉ gồm một biểu thức).
 
 .. index::
    pair: built-in function; repr
@@ -62,15 +55,12 @@ expression).
    pair: writing; values
    pair: procedure; call
 
-In interactive mode, if the value is not ``None``, it is converted to a string
-using the built-in :func:`repr` function and the resulting string is written to
-standard output on a line by itself (except if the result is ``None``, so that
-procedure calls do not cause any output.)
+Trong chế độ tương tác, nếu giá trị không phải là ``None``, giá trị đó được chuyển đổi thành chuỗi bằng hàm tích hợp sẵn :func:`repr`, rồi chuỗi kết quả được ghi ra đầu ra tiêu chuẩn trên một dòng riêng (trừ khi kết quả là ``None``, để các lệnh gọi thủ tục không tạo ra đầu ra nào.)
 
 .. _assignment:
 
-Assignment statements
-=====================
+Câu lệnh gán
+============
 
 .. index::
    single: = (equals); assignment statement
@@ -80,8 +70,7 @@ Assignment statements
    pair: object; mutable
    pair: attribute; assignment
 
-Assignment statements are used to (re)bind names to values and to modify
-attributes or items of mutable objects:
+Câu lệnh gán được dùng để (gán lại) tên với các giá trị và sửa đổi các thuộc tính hoặc mục của những đối tượng có thể thay đổi:
 
 .. productionlist:: python-grammar
    assignment_stmt: (`target_list` "=")+ (`starred_expression` | `yield_expression`)
@@ -93,24 +82,15 @@ attributes or items of mutable objects:
          : | `subscription`
          : | "*" `target`
 
-(See section :ref:`primaries` for the syntax definitions for *attributeref*
-and *subscription*.)
+(Xem mục :ref:`primaries` để biết định nghĩa cú pháp của *attributeref* và *subscription*.)
 
-An assignment statement evaluates the expression list (remember that this can be
-a single expression or a comma-separated list, the latter yielding a tuple) and
-assigns the single resulting object to each of the target lists, from left to
-right.
+Một câu lệnh gán đánh giá danh sách biểu thức (hãy nhớ rằng danh sách này có thể là một biểu thức duy nhất hoặc một danh sách được phân tách bằng dấu phẩy; trường hợp sau tạo ra một tuple) và gán đối tượng duy nhất thu được cho từng danh sách đích, từ trái sang phải.
 
 .. index::
    single: target
    pair: target; list
 
-Assignment is defined recursively depending on the form of the target (list).
-When a target is part of a mutable object (an attribute reference or
-subscription), the mutable object must ultimately perform the assignment and
-decide about its validity, and may raise an exception if the assignment is
-unacceptable.  The rules observed by various types and the exceptions raised are
-given with the definition of the object types (see section :ref:`types`).
+Việc gán được định nghĩa đệ quy tùy thuộc vào dạng của đích (list). Khi một đích là một phần của đối tượng có thể thay đổi (một tham chiếu thuộc tính hoặc phép subscription), đối tượng có thể thay đổi đó cuối cùng phải thực hiện phép gán và quyết định tính hợp lệ của nó, đồng thời có thể phát sinh một exception nếu phép gán không được chấp nhận. Các quy tắc được những kiểu khác nhau tuân theo và các exception được phát sinh được nêu cùng với định nghĩa của các kiểu đối tượng (xem mục :ref:`types`).
 
 .. index:: triple: target; list; assignment
    single: , (comma); in target list
@@ -118,142 +98,86 @@ given with the definition of the object types (see section :ref:`types`).
    single: [] (square brackets); in assignment target list
    single: () (parentheses); in assignment target list
 
-Assignment of an object to a target list, optionally enclosed in parentheses or
-square brackets, is recursively defined as follows.
+Việc gán một đối tượng cho một danh sách đích, tùy chọn được đặt trong dấu ngoặc đơn hoặc dấu ngoặc vuông, được định nghĩa đệ quy như sau.
 
-* If the target list is a single target with no trailing comma,
-  optionally in parentheses, the object is assigned to that target.
+* Nếu danh sách đích là một đích duy nhất không có dấu phẩy ở cuối, tùy chọn được đặt trong dấu ngoặc đơn, thì đối tượng được gán cho đích đó.
 
-* Else:
+* Ngược lại:
 
-  * If the target list contains one target prefixed with an asterisk, called a
-    "starred" target: The object must be an iterable with at least as many items
-    as there are targets in the target list, minus one.  The first items of the
-    iterable are assigned, from left to right, to the targets before the starred
-    target.  The final items of the iterable are assigned to the targets after
-    the starred target.  A list of the remaining items in the iterable is then
-    assigned to the starred target (the list can be empty).
+  * Nếu danh sách đích chứa một đích có tiền tố là dấu hoa thị, được gọi là đích "có dấu sao": Đối tượng phải là một iterable có ít nhất số lượng phần tử bằng số đích trong danh sách đích trừ đi một. Các phần tử đầu tiên của iterable được gán, từ trái sang phải, cho các đích nằm trước đích có dấu sao. Các phần tử cuối cùng của iterable được gán cho các đích nằm sau đích có dấu sao. Sau đó, một danh sách gồm các phần tử còn lại trong iterable được gán cho đích có dấu sao (danh sách này có thể rỗng).
 
-  * Else: The object must be an iterable with the same number of items as there
-    are targets in the target list, and the items are assigned, from left to
-    right, to the corresponding targets.
+  * Nếu không: Đối tượng phải là một iterable có số lượng phần tử bằng số đích trong danh sách đích, và các phần tử được gán, từ trái sang phải, cho các đích tương ứng.
 
-Assignment of an object to a single target is recursively defined as follows.
+Việc gán một đối tượng cho một đích duy nhất được định nghĩa đệ quy như sau.
 
-* If the target is an identifier (name):
+* Nếu đích là một identifier (tên):
 
-  * If the name does not occur in a :keyword:`global` or :keyword:`nonlocal`
-    statement in the current code block: the name is bound to the object in the
-    current local namespace.
+  * Nếu tên không xuất hiện trong câu lệnh :keyword:`global` hoặc :keyword:`nonlocal` trong khối mã hiện tại: tên được liên kết với đối tượng trong namespace cục bộ hiện tại.
 
-  * Otherwise: the name is bound to the object in the global namespace or the
-    outer namespace determined by :keyword:`nonlocal`, respectively.
+  * Nếu không: tên được liên kết với đối tượng trong namespace toàn cục hoặc namespace bên ngoài do :keyword:`nonlocal` xác định, tương ứng.
 
   .. index:: single: destructor
 
-  The name is rebound if it was already bound.  This may cause the reference
-  count for the object previously bound to the name to reach zero, causing the
-  object to be deallocated and its destructor (if it has one) to be called.
+  Tên được liên kết lại nếu trước đó nó đã được liên kết. Điều này có thể khiến số lượng tham chiếu của đối tượng trước đó được liên kết với tên giảm xuống 0, làm đối tượng được giải phóng và destructor của nó (nếu có) được gọi.
 
   .. index:: pair: attribute; assignment
 
-* If the target is an attribute reference: The primary expression in the
-  reference is evaluated.  It should yield an object with assignable attributes;
-  if this is not the case, :exc:`TypeError` is raised.  That object is then
-  asked to assign the assigned object to the given attribute; if it cannot
-  perform the assignment, it raises an exception (usually but not necessarily
+* Nếu đích là một tham chiếu thuộc tính: Biểu thức chính trong tham chiếu được đánh giá. Biểu thức này phải trả về một đối tượng có các thuộc tính có thể gán; nếu không, :exc:`TypeError` sẽ được phát sinh. Sau đó, đối tượng đó được yêu cầu gán đối tượng được gán vào thuộc tính đã cho; nếu không thể thực hiện phép gán, nó sẽ phát sinh một ngoại lệ (thường nhưng không nhất thiết
   :exc:`AttributeError`).
 
   .. _attr-target-note:
 
-  Note: If the object is a class instance and the attribute reference occurs on
-  both sides of the assignment operator, the right-hand side expression, ``a.x`` can access
-  either an instance attribute or (if no instance attribute exists) a class
-  attribute.  The left-hand side target ``a.x`` is always set as an instance attribute,
-  creating it if necessary.  Thus, the two occurrences of ``a.x`` do not
-  necessarily refer to the same attribute: if the right-hand side expression refers to a
-  class attribute, the left-hand side creates a new instance attribute as the target of the
-  assignment::
+  Lưu ý: Nếu đối tượng là một thể hiện của lớp và tham chiếu thuộc tính xuất hiện ở cả hai vế của toán tử gán, biểu thức ở vế phải, ``a.x`` có thể truy cập một thuộc tính của thể hiện hoặc (nếu không có thuộc tính của thể hiện) một thuộc tính của lớp. Đích ở vế trái ``a.x`` luôn được đặt làm thuộc tính của thể hiện, tạo thuộc tính đó nếu cần. Vì vậy, hai lần xuất hiện của ``a.x`` không nhất thiết tham chiếu đến cùng một thuộc tính: nếu biểu thức ở vế phải tham chiếu đến một thuộc tính của lớp, vế trái sẽ tạo một thuộc tính mới của thể hiện làm đích của phép gán::
 
      class Cls:
-         x = 3             # class variable
+         x = 3             # biến lớp
      inst = Cls()
-     inst.x = inst.x + 1   # writes inst.x as 4 leaving Cls.x as 3
+     inst.x = inst.x + 1   # ghi inst.x là 4, giữ Cls.x là 3
 
-  This description does not necessarily apply to descriptor attributes, such as
-  properties created with :deco:`property`.
+  Mô tả này không nhất thiết áp dụng cho các thuộc tính descriptor, chẳng hạn như các property được tạo bằng :deco:`property`.
 
   .. index::
      pair: subscription; assignment
      pair: object; mutable
 
-* If the target is a subscription: The primary expression in the reference is
-  evaluated.
-  Next, the subscript expression is evaluated.
-  Then, the primary's :meth:`~object.__setitem__` method is called with
-  two arguments: the subscript and the assigned object.
+* Nếu đích là một phép truy cập theo chỉ số: Biểu thức chính trong tham chiếu được đánh giá. Tiếp theo, biểu thức chỉ số được đánh giá. Sau đó, phương thức :meth:`~object.__setitem__` của biểu thức chính được gọi với hai đối số: chỉ số và đối tượng được gán.
 
-  Typically, :meth:`~object.__setitem__` is defined on mutable sequence objects
-  (such as lists) and mapping objects (such as dictionaries), and behaves as
-  follows.
+  Thông thường, :meth:`~object.__setitem__` được định nghĩa trên các đối tượng sequence có thể thay đổi (chẳng hạn như list) và các đối tượng mapping (chẳng hạn như dictionary), và hoạt động như sau.
 
   .. index::
      pair: object; sequence
      pair: object; list
 
-  If the primary is a mutable sequence object (such as a list), the subscript
-  must yield an integer.  If it is negative, the sequence's length is added to
-  it.  The resulting value must be a nonnegative integer less than the
-  sequence's length, and the sequence is asked to assign the assigned object to
-  its item with that index.  If the index is out of range, :exc:`IndexError` is
-  raised (assignment to a subscripted sequence cannot add new items to a list).
+  Nếu đối tượng chính là một sequence object có thể thay đổi (chẳng hạn như list), chỉ mục con phải cho kết quả là một số nguyên. Nếu số đó là số âm, độ dài của sequence được cộng vào nó. Giá trị thu được phải là một số nguyên không âm, nhỏ hơn độ dài của sequence, và sequence được yêu cầu gán object được gán vào phần tử có chỉ mục đó. Nếu chỉ mục nằm ngoài phạm vi, :exc:`IndexError` sẽ được phát sinh (phép gán cho sequence được lập chỉ mục không thể thêm phần tử mới vào list).
 
   .. index::
      pair: object; mapping
      pair: object; dictionary
 
-  If the primary is a mapping object (such as a dictionary), the subscript must
-  have a type compatible with the mapping's key type, and the mapping is then
-  asked to create a key/value pair which maps the subscript to the assigned
-  object.  This can either replace an existing key/value pair with the same key
-  value, or insert a new key/value pair (if no key with the same value existed).
+  Nếu đối tượng chính là một mapping object (chẳng hạn như dictionary), chỉ mục con phải có kiểu tương thích với kiểu khóa của mapping, sau đó mapping được yêu cầu tạo một cặp khóa/giá trị ánh xạ chỉ mục con tới object được gán. Thao tác này có thể thay thế một cặp khóa/giá trị hiện có với cùng giá trị khóa, hoặc chèn một cặp khóa/giá trị mới (nếu chưa tồn tại khóa có cùng giá trị).
 
   .. index:: pair: slicing; assignment
 
-  If the target is a slicing: The primary expression should evaluate to
-  a mutable sequence object (such as a list).
-  The assigned object should be :term:`iterable`.
-  The slicing's lower and upper bounds should be integers; if they are ``None``
-  (or not present), the defaults are zero and the sequence's length.
-  If either bound is negative, the sequence's length is added to it.  The
-  resulting bounds are clipped to lie between zero and the sequence's length,
-  inclusive.  Finally, the sequence object is asked to replace the slice with
-  the items of the assigned sequence.  The length of the slice may be different
-  from the length of the assigned sequence, thus changing the length of the
-  target sequence, if the target sequence allows it.
+  Nếu đích là một slicing: Biểu thức chính phải đánh giá thành một sequence object có thể thay đổi (chẳng hạn như list). Object được gán phải là :term:`iterable`. Cận dưới và cận trên của slicing phải là các số nguyên; nếu chúng là ``None`` (hoặc không hiện diện), giá trị mặc định lần lượt là 0 và độ dài của sequence. Nếu một trong hai cận là số âm, độ dài của sequence được cộng vào cận đó. Các cận thu được được giới hạn để nằm trong khoảng từ 0 đến độ dài của sequence, bao gồm cả hai đầu mút. Cuối cùng, sequence object được yêu cầu thay thế slice bằng các phần tử của sequence được gán. Độ dài của slice có thể khác với độ dài của sequence được gán, do đó làm thay đổi độ dài của target sequence, nếu target sequence cho phép điều đó.
 
-Although the definition of assignment implies that overlaps between the
-left-hand side and the right-hand side are 'simultaneous' (for example ``a, b =
-b, a`` swaps two variables), overlaps *within* the collection of assigned-to
-variables occur left-to-right, sometimes resulting in confusion.  For instance,
-the following program prints ``[0, 2]``::
+Mặc dù định nghĩa phép gán ngụ ý rằng các phần chồng lấp giữa vế trái và vế phải là “đồng thời” (chẳng hạn ``a, b = b, a`` hoán đổi hai biến), các phần chồng lấp *trong* tập hợp các biến được gán diễn ra từ trái sang phải, đôi khi gây nhầm lẫn. Ví dụ, chương trình sau in ra ``[0, 2]``::
 
    x = [0, 1]
    i = 0
-   i, x[i] = 1, 2         # i is updated, then x[i] is updated
+   i, x[i] = 1, 2         # i được cập nhật, sau đó x[i] được cập nhật
    print(x)
 
 
 .. seealso::
 
-   :pep:`3132` - Extended Iterable Unpacking
-      The specification for the ``*target`` feature.
+   :pep:`3132` - Giải nén Iterable mở rộng
+      Đặc tả cho tính năng ``*target``.
 
 
 .. _augassign:
 
-Augmented assignment statements
--------------------------------
+Các câu lệnh gán tăng cường
+---------------------------
 
 .. index::
    pair: augmented; assignment
@@ -271,8 +195,7 @@ Augmented assignment statements
    single: >>=; augmented assignment
    single: <<=; augmented assignment
 
-Augmented assignment is the combination, in a single statement, of a binary
-operation and an assignment statement:
+Phép gán tăng cường là sự kết hợp, trong một câu lệnh duy nhất, của một phép toán nhị phân và một câu lệnh gán:
 
 .. productionlist:: python-grammar
    augmented_assignment_stmt: `augtarget` `augop` (`expression_list` | `yield_expression`)
@@ -280,119 +203,83 @@ operation and an assignment statement:
    augop: "+=" | "-=" | "*=" | "@=" | "/=" | "//=" | "%=" | "**="
         : | ">>=" | "<<=" | "&=" | "^=" | "|="
 
-(See section :ref:`primaries` for the syntax definitions of the last three
-symbols.)
+(Xem phần :ref:`primaries` để biết định nghĩa cú pháp của ba ký hiệu cuối.)
 
-An augmented assignment evaluates the target (which, unlike normal assignment
-statements, cannot be an unpacking) and the expression list, performs the binary
-operation specific to the type of assignment on the two operands, and assigns
-the result to the original target.  The target is only evaluated once.
+Phép gán tăng cường đánh giá đích (không giống các câu lệnh gán thông thường, đích không thể là một phép giải nén) và danh sách biểu thức, thực hiện phép toán nhị phân tương ứng với kiểu phép gán trên hai toán hạng, rồi gán kết quả cho đích ban đầu. Đích chỉ được đánh giá một lần.
 
-An augmented assignment statement like ``x += 1`` can be rewritten as ``x = x +
-1`` to achieve a similar, but not exactly equal effect. In the augmented
-version, ``x`` is only evaluated once. Also, when possible, the actual operation
-is performed *in-place*, meaning that rather than creating a new object and
-assigning that to the target, the old object is modified instead.
+Một câu lệnh gán tăng cường như ``x += 1`` có thể được viết lại thành ``x = x + 1`` để đạt được hiệu ứng tương tự, nhưng không hoàn toàn giống nhau. Trong phiên bản tăng cường, ``x`` chỉ được đánh giá một lần. Ngoài ra, khi có thể, phép toán thực tế được thực hiện *in-place*, nghĩa là thay vì tạo một đối tượng mới và gán đối tượng đó cho đích, đối tượng cũ được sửa đổi.
 
-Unlike normal assignments, augmented assignments evaluate the left-hand side
-*before* evaluating the right-hand side.  For example, ``a[i] += f(x)`` first
-looks-up ``a[i]``, then it evaluates ``f(x)`` and performs the addition, and
-lastly, it writes the result back to ``a[i]``.
+Không giống các phép gán thông thường, phép gán tăng cường đánh giá vế trái *before* vế phải. Ví dụ, ``a[i] += f(x)`` trước tiên tra cứu ``a[i]``, sau đó đánh giá ``f(x)`` và thực hiện phép cộng, cuối cùng ghi kết quả trở lại ``a[i]``.
 
-With the exception of assigning to tuples and multiple targets in a single
-statement, the assignment done by augmented assignment statements is handled the
-same way as normal assignments. Similarly, with the exception of the possible
-*in-place* behavior, the binary operation performed by augmented assignment is
-the same as the normal binary operations.
+Ngoại trừ việc gán cho tuple và nhiều đích trong một câu lệnh duy nhất, phép gán do các câu lệnh gán tăng cường thực hiện được xử lý giống như phép gán thông thường. Tương tự, ngoại trừ hành vi *in-place* có thể xảy ra, phép toán nhị phân do phép gán tăng cường thực hiện cũng giống như các phép toán nhị phân thông thường.
 
-For targets which are attribute references, the same :ref:`caveat about class
-and instance attributes <attr-target-note>` applies as for regular assignments.
+Đối với các đích là tham chiếu thuộc tính, :ref:`lưu ý tương tự về thuộc tính lớp và thuộc tính thể hiện <attr-target-note>` cũng được áp dụng như đối với các phép gán thông thường.
 
 
 .. _annassign:
 
-Annotated assignment statements
--------------------------------
+Các câu lệnh gán có chú thích kiểu
+----------------------------------
 
 .. index::
    pair: annotated; assignment
    single: statement; assignment, annotated
    single: : (colon); annotated variable
 
-:term:`Annotation <variable annotation>` assignment is the combination, in a single
-statement, of a variable or attribute annotation and an optional assignment statement:
+Phép gán :term:`chú thích kiểu <variable annotation>` là sự kết hợp, trong một câu lệnh duy nhất, của chú thích kiểu cho biến hoặc thuộc tính và một câu lệnh gán tùy chọn:
 
 .. productionlist:: python-grammar
    annotated_assignment_stmt: `augtarget` ":" `expression`
                             : ["=" (`starred_expression` | `yield_expression`)]
 
-The difference from normal :ref:`assignment` is that only a single target is allowed.
+Điểm khác biệt so với :ref:`assignment` thông thường là chỉ cho phép một đích duy nhất.
 
-The assignment target is considered "simple" if it consists of a single
-name that is not enclosed in parentheses.
-For simple assignment targets, if in class or module scope,
-the annotations are gathered in a lazily evaluated
-:ref:`annotation scope <annotation-scopes>`. The annotations can be
-evaluated using the :attr:`~object.__annotations__` attribute of a
-class or module, or using the facilities in the :mod:`annotationlib`
-module.
+Đích gán được xem là "đơn giản" nếu nó chỉ gồm một tên không được đặt trong dấu ngoặc đơn. Đối với các đích gán đơn giản, nếu ở phạm vi lớp hoặc mô-đun, các chú thích kiểu sẽ được tập hợp trong một
+:ref:`phạm vi chú thích <annotation-scopes>` được đánh giá một cách trì hoãn. Có thể đánh giá các chú thích kiểu bằng thuộc tính :attr:`~object.__annotations__` của một lớp hoặc mô-đun, hoặc bằng các tiện ích trong mô-đun :mod:`annotationlib`.
 
-If the assignment target is not simple (an attribute, subscript node, or
-parenthesized name), the annotation is never evaluated.
+Nếu đích gán không đơn giản (một thuộc tính, nút chỉ mục hoặc tên được đặt trong dấu ngoặc đơn), chú thích kiểu sẽ không bao giờ được đánh giá.
 
-If a name is annotated in a function scope, then this name is local for
-that scope. Annotations are never evaluated and stored in function scopes.
+Nếu một tên được chú thích trong phạm vi hàm, thì tên đó là cục bộ đối với phạm vi đó. Các chú thích không bao giờ được đánh giá và lưu trữ trong phạm vi hàm.
 
-If the right hand side is present, an annotated
-assignment performs the actual assignment as if there was no annotation
-present. If the right hand side is not present for an expression
-target, then the interpreter evaluates the target except for the last
-:meth:`~object.__setitem__` or :meth:`~object.__setattr__` call.
+Nếu vế bên phải hiện diện, phép gán có chú thích thực hiện việc gán thực tế như thể không có chú thích. Nếu vế bên phải không hiện diện đối với một đích biểu thức, thì trình thông dịch đánh giá đích đó, ngoại trừ phần cuối
+lời gọi :meth:`~object.__setitem__` hoặc :meth:`~object.__setattr__` cuối cùng.
 
 .. seealso::
 
-   :pep:`526` - Syntax for Variable Annotations
-      The proposal that added syntax for annotating the types of variables
-      (including class variables and instance variables), instead of expressing
-      them through comments.
+   :pep:`526` - Cú pháp cho chú thích biến
+      Đề xuất bổ sung cú pháp để chú thích kiểu của các biến (bao gồm biến lớp và biến thực thể), thay vì biểu diễn chúng thông qua các chú thích.
 
-   :pep:`484` - Type hints
-      The proposal that added the :mod:`typing` module to provide a standard
-      syntax for type annotations that can be used in static analysis tools and
-      IDEs.
+   :pep:`484` - Gợi ý kiểu
+      Đề xuất bổ sung mô-đun :mod:`typing` để cung cấp cú pháp chuẩn cho chú thích kiểu, có thể được sử dụng trong các công cụ phân tích tĩnh và IDE.
 
 .. versionchanged:: 3.8
-   Now annotated assignments allow the same expressions in the right hand side as
-   regular assignments. Previously, some expressions (like un-parenthesized
-   tuple expressions) caused a syntax error.
+   Giờ đây, phép gán có chú thích cho phép sử dụng cùng các biểu thức ở vế phải như phép gán thông thường. Trước đây, một số biểu thức (chẳng hạn như biểu thức tuple không có dấu ngoặc) gây ra lỗi cú pháp.
 
 .. versionchanged:: 3.14
-   Annotations are now lazily evaluated in a separate :ref:`annotation scope <annotation-scopes>`.
-   If the assignment target is not simple, annotations are never evaluated.
+   Các chú thích giờ đây được đánh giá một cách lười biếng trong một :ref:`phạm vi chú thích <annotation-scopes>` riêng. Nếu đích gán không đơn giản, các chú thích sẽ không bao giờ được đánh giá.
 
 
 .. _assert:
 
-The :keyword:`!assert` statement
-================================
+Câu lệnh :keyword:`!assert`
+===========================
 
 .. index::
    ! pair: statement; assert
    pair: debugging; assertions
    single: , (comma); expression list
 
-Assert statements are a convenient way to insert debugging assertions into a
-program:
+Câu lệnh assert là một cách thuận tiện để chèn các phép kiểm tra gỡ lỗi vào chương trình:
 
 .. productionlist:: python-grammar
    assert_stmt: "assert" `expression` ["," `expression`]
 
-The simple form, ``assert expression``, is equivalent to ::
+Dạng đơn giản, ``assert expression``, tương đương với::
 
    if __debug__:
        if not expression: raise AssertionError
 
-The extended form, ``assert expression1, expression2``, is equivalent to ::
+Dạng mở rộng, ``assert expression1, expression2``, tương đương với::
 
    if __debug__:
        if not expression1: raise AssertionError(expression2)
@@ -401,23 +288,15 @@ The extended form, ``assert expression1, expression2``, is equivalent to ::
    single: __debug__
    pair: exception; AssertionError
 
-These equivalences assume that :const:`__debug__` and :exc:`AssertionError` refer to
-the built-in variables with those names.  In the current implementation, the
-built-in variable ``__debug__`` is ``True`` under normal circumstances,
-``False`` when optimization is requested (command line option :option:`-O`).  The current
-code generator emits no code for an :keyword:`assert` statement when optimization is
-requested at compile time.  Note that it is unnecessary to include the source
-code for the expression that failed in the error message; it will be displayed
-as part of the stack trace.
+Các tương đương này giả định rằng :const:`__debug__` và :exc:`AssertionError` tham chiếu đến các biến tích hợp có những tên đó. Trong triển khai hiện tại, biến tích hợp ``__debug__`` là ``True`` trong những trường hợp bình thường và là ``False`` khi yêu cầu tối ưu hóa (tùy chọn dòng lệnh :option:`-O`). Trình tạo mã hiện tại không phát sinh mã cho câu lệnh :keyword:`assert` khi yêu cầu tối ưu hóa tại thời điểm biên dịch. Lưu ý rằng không cần đưa mã nguồn của biểu thức gây lỗi vào thông báo lỗi; biểu thức đó sẽ được hiển thị như một phần của stack trace.
 
-Assignments to :const:`__debug__` are illegal.  The value for the built-in variable
-is determined when the interpreter starts.
+Việc gán cho :const:`__debug__` là không hợp lệ. Giá trị của biến tích hợp sẵn này được xác định khi trình thông dịch khởi động.
 
 
 .. _pass:
 
-The :keyword:`!pass` statement
-==============================
+Câu lệnh :keyword:`!pass`
+=========================
 
 .. index::
    pair: statement; pass
@@ -427,19 +306,17 @@ The :keyword:`!pass` statement
 .. productionlist:: python-grammar
    pass_stmt: "pass"
 
-:keyword:`pass` is a null operation --- when it is executed, nothing happens.
-It is useful as a placeholder when a statement is required syntactically, but no
-code needs to be executed, for example::
+:keyword:`pass` là một thao tác rỗng --- khi được thực thi, không có gì xảy ra. Nó hữu ích như một phần giữ chỗ khi cú pháp yêu cầu một câu lệnh nhưng không cần thực thi mã nào, chẳng hạn như::
 
-   def f(arg): pass    # a function that does nothing (yet)
+   def f(arg): pass    # một hàm hiện chưa thực hiện thao tác nào
 
-   class C: pass       # a class with no methods (yet)
+   class C: pass       # một lớp hiện chưa có phương thức nào
 
 
 .. _del:
 
-The :keyword:`!del` statement
-=============================
+Câu lệnh :keyword:`!del`
+========================
 
 .. index::
    ! pair: statement; del
@@ -449,36 +326,29 @@ The :keyword:`!del` statement
 .. productionlist:: python-grammar
    del_stmt: "del" `target_list`
 
-Deletion is recursively defined very similar to the way assignment is defined.
-Rather than spelling it out in full details, here are some hints.
+Việc xóa được định nghĩa đệ quy rất giống với cách định nghĩa việc gán. Thay vì trình bày đầy đủ mọi chi tiết, dưới đây là một số gợi ý.
 
-Deletion of a target list recursively deletes each target, from left to right.
+Việc xóa một danh sách đích sẽ đệ quy xóa từng đích, từ trái sang phải.
 
 .. index::
    pair: statement; global
    pair: unbinding; name
 
-Deletion of a name removes the binding of that name from the local or global
-namespace, depending on whether the name occurs in a :keyword:`global` statement
-in the same code block.  Trying to delete an unbound name raises a
-:exc:`NameError` exception.
+Việc xóa một tên sẽ loại bỏ liên kết của tên đó khỏi namespace cục bộ hoặc toàn cục, tùy thuộc vào việc tên đó có xuất hiện trong câu lệnh :keyword:`global` trong cùng một khối mã hay không. Việc cố xóa một tên chưa được liên kết sẽ phát sinh một
+ngoại lệ :exc:`NameError`.
 
 .. index:: pair: attribute; deletion
 
-Deletion of attribute references and subscriptions is passed to the
-primary object involved; deletion of a slicing is in general equivalent to
-assignment of an empty slice of the right type (but even this is determined by
-the sliced object).
+Việc xóa các tham chiếu thuộc tính và phép đăng ký được chuyển cho đối tượng chính liên quan; nhìn chung, việc xóa một phép cắt tương đương với việc gán một lát cắt rỗng thuộc kiểu thích hợp (nhưng ngay cả điều này cũng do đối tượng được cắt quyết định).
 
 .. versionchanged:: 3.2
-   Previously it was illegal to delete a name from the local namespace if it
-   occurs as a free variable in a nested block.
+   Trước đây, việc xóa một tên khỏi namespace cục bộ là không hợp lệ nếu tên đó xuất hiện dưới dạng biến tự do trong một khối lồng nhau.
 
 
 .. _return:
 
-The :keyword:`!return` statement
-================================
+Câu lệnh :keyword:`!return`
+===========================
 
 .. index::
    ! pair: statement; return
@@ -488,34 +358,26 @@ The :keyword:`!return` statement
 .. productionlist:: python-grammar
    return_stmt: "return" [`expression_list`]
 
-:keyword:`return` may only occur syntactically nested in a function definition,
-not within a nested class definition.
+:keyword:`return` chỉ có thể xuất hiện về mặt cú pháp bên trong định nghĩa hàm, không nằm trong định nghĩa lớp lồng nhau.
 
-If an expression list is present, it is evaluated, else ``None`` is substituted.
+Nếu có danh sách biểu thức, danh sách đó được đánh giá; nếu không, ``None`` được thay thế.
 
-:keyword:`return` leaves the current function call with the expression list (or
-``None``) as return value.
+:keyword:`return` thoát khỏi lệnh gọi hàm hiện tại với danh sách biểu thức (hoặc ``None``) làm giá trị trả về.
 
 .. index:: pair: keyword; finally
 
-When :keyword:`return` passes control out of a :keyword:`try` statement with a
-:keyword:`finally` clause, that :keyword:`!finally` clause is executed before
-really leaving the function.
+Khi :keyword:`return` chuyển quyền điều khiển ra khỏi một câu lệnh :keyword:`try` có một
+mệnh đề :keyword:`finally`, mệnh đề :keyword:`!finally` đó sẽ được thực thi trước khi thực sự thoát khỏi hàm.
 
-In a generator function, the :keyword:`return` statement indicates that the
-generator is done and will cause :exc:`StopIteration` to be raised. The returned
-value (if any) is used as an argument to construct :exc:`StopIteration` and
-becomes the :attr:`StopIteration.value` attribute.
+Trong một hàm generator, câu lệnh :keyword:`return` cho biết generator đã hoàn tất và sẽ khiến :exc:`StopIteration` được phát sinh. Giá trị được trả về (nếu có) được dùng làm đối số để khởi tạo :exc:`StopIteration` và trở thành thuộc tính :attr:`StopIteration.value`.
 
-In an asynchronous generator function, an empty :keyword:`return` statement
-indicates that the asynchronous generator is done and will cause
-:exc:`StopAsyncIteration` to be raised.  A non-empty :keyword:`!return`
-statement is a syntax error in an asynchronous generator function.
+Trong một hàm generator bất đồng bộ, câu lệnh :keyword:`return` rỗng cho biết generator bất đồng bộ đã hoàn tất và sẽ khiến
+:exc:`StopAsyncIteration` được phát sinh. Câu lệnh :keyword:`!return` không rỗng là lỗi cú pháp trong một hàm generator bất đồng bộ.
 
 .. _yield:
 
-The :keyword:`!yield` statement
-===============================
+Câu lệnh :keyword:`!yield`
+==========================
 
 .. index::
    pair: statement; yield
@@ -527,31 +389,25 @@ The :keyword:`!yield` statement
 .. productionlist:: python-grammar
    yield_stmt: `yield_expression`
 
-A :keyword:`yield` statement is semantically equivalent to a :ref:`yield
-expression <yieldexpr>`. The ``yield`` statement can be used to omit the
-parentheses that would otherwise be required in the equivalent yield expression
-statement. For example, the yield statements ::
+Một câu lệnh :keyword:`yield` tương đương về ngữ nghĩa với một :ref:`biểu thức yield <yieldexpr>`. Câu lệnh ``yield`` có thể được dùng để bỏ qua cặp dấu ngoặc vốn cần có trong câu lệnh biểu thức yield tương đương. Ví dụ, các câu lệnh yield::
 
   yield <expr>
   yield from <expr>
 
-are equivalent to the yield expression statements ::
+tương đương với các câu lệnh biểu thức yield::
 
   (yield <expr>)
   (yield from <expr>)
 
-Yield expressions and statements are only used when defining a :term:`generator`
-function, and are only used in the body of the generator function.  Using :keyword:`yield`
-in a function definition is sufficient to cause that definition to create a
-generator function instead of a normal function.
+Các biểu thức và câu lệnh Yield chỉ được sử dụng khi định nghĩa một hàm :term:`generator`, và chỉ được sử dụng trong phần thân của hàm generator. Việc sử dụng :keyword:`yield` trong định nghĩa hàm là đủ để khiến định nghĩa đó tạo ra một hàm generator thay vì một hàm thông thường.
 
-For full details of :keyword:`yield` semantics, refer to the
-:ref:`yieldexpr` section.
+Để biết đầy đủ chi tiết về ngữ nghĩa của :keyword:`yield`, hãy tham khảo
+phần :ref:`yieldexpr`.
 
 .. _raise:
 
-The :keyword:`!raise` statement
-===============================
+Câu lệnh :keyword:`!raise`
+==========================
 
 .. index::
    ! pair: statement; raise
@@ -562,26 +418,17 @@ The :keyword:`!raise` statement
 .. productionlist:: python-grammar
    raise_stmt: "raise" [`expression` ["from" `expression`]]
 
-If no expressions are present, :keyword:`raise` re-raises the
-exception that is currently being handled, which is also known as the *active exception*.
-If there isn't currently an active exception, a :exc:`RuntimeError` exception is raised
-indicating that this is an error.
+Nếu không có biểu thức nào, :keyword:`raise` sẽ raise lại exception hiện đang được xử lý, còn được gọi là *exception đang hoạt động*. Nếu hiện không có exception nào đang hoạt động, một exception :exc:`RuntimeError` sẽ được raise để cho biết đây là lỗi.
 
-Otherwise, :keyword:`raise` evaluates the first expression as the exception
-object.  It must be either a subclass or an instance of :class:`BaseException`.
-If it is a class, the exception instance will be obtained when needed by
-instantiating the class with no arguments.
+Nếu không, :keyword:`raise` đánh giá biểu thức đầu tiên thành đối tượng exception. Đối tượng này phải là một subclass hoặc instance của :class:`BaseException`. Nếu đó là một class, instance của exception sẽ được tạo khi cần bằng cách khởi tạo class mà không có đối số.
 
-The :dfn:`type` of the exception is the exception instance's class, the
-:dfn:`value` is the instance itself.
+:dfn:`Kiểu` của exception là class của instance exception, còn
+:dfn:`giá trị` là chính instance đó.
 
 .. index:: pair: object; traceback
 
-A traceback object is normally created automatically when an exception is raised
-and attached to it as the :attr:`~BaseException.__traceback__` attribute.
-You can create an exception and set your own traceback in one step using the
-:meth:`~BaseException.with_traceback` exception method (which returns the
-same exception instance, with its traceback set to its argument), like so::
+Đối tượng traceback thường được tự động tạo khi một exception được raise và được gắn vào exception dưới dạng thuộc tính :attr:`~BaseException.__traceback__`. Bạn có thể tạo một exception và thiết lập traceback riêng trong cùng một bước bằng cách sử dụng
+:meth:`~BaseException.with_traceback` method của exception (trả về chính instance exception đó, với traceback được đặt thành đối số của method), như sau::
 
    raise Exception("foo occurred").with_traceback(tracebackobj)
 
@@ -589,14 +436,8 @@ same exception instance, with its traceback set to its argument), like so::
            __cause__ (exception attribute)
            __context__ (exception attribute)
 
-The ``from`` clause is used for exception chaining: if given, the second
-*expression* must be another exception class or instance. If the second
-expression is an exception instance, it will be attached to the raised
-exception as the :attr:`~BaseException.__cause__` attribute (which is writable). If the
-expression is an exception class, the class will be instantiated and the
-resulting exception instance will be attached to the raised exception as the
-:attr:`!__cause__` attribute. If the raised exception is not handled, both
-exceptions will be printed:
+Mệnh đề ``from`` được dùng cho việc chain exception: nếu được cung cấp, *biểu thức* thứ hai phải là một class hoặc instance exception khác. Nếu biểu thức thứ hai là một instance exception, nó sẽ được gắn vào exception được raise dưới dạng thuộc tính :attr:`~BaseException.__cause__` (thuộc tính này có thể ghi được). Nếu biểu thức là một class exception, class đó sẽ được khởi tạo và instance exception thu được sẽ được gắn vào exception được raise dưới dạng
+thuộc tính :attr:`!__cause__`. Nếu ngoại lệ được phát sinh không được xử lý, cả hai ngoại lệ sẽ được in ra:
 
 .. code-block:: pycon
 
@@ -618,11 +459,8 @@ exceptions will be printed:
        raise RuntimeError("Something bad happened") from exc
    RuntimeError: Something bad happened
 
-A similar mechanism works implicitly if a new exception is raised when
-an exception is already being handled.  An exception may be handled
-when an :keyword:`except` or :keyword:`finally` clause, or a
-:keyword:`with` statement, is used.  The previous exception is then
-attached as the new exception's :attr:`~BaseException.__context__` attribute:
+Cơ chế tương tự cũng hoạt động ngầm nếu một ngoại lệ mới được phát sinh khi một ngoại lệ khác đang được xử lý. Một ngoại lệ có thể được xử lý khi sử dụng mệnh đề :keyword:`except` hoặc :keyword:`finally`, hoặc một
+câu lệnh :keyword:`with`. Khi đó, ngoại lệ trước đó được gắn vào thuộc tính :attr:`~BaseException.__context__` của ngoại lệ mới:
 
 .. code-block:: pycon
 
@@ -644,8 +482,7 @@ attached as the new exception's :attr:`~BaseException.__context__` attribute:
        raise RuntimeError("Something bad happened")
    RuntimeError: Something bad happened
 
-Exception chaining can be explicitly suppressed by specifying :const:`None` in
-the ``from`` clause:
+Có thể ngăn chặn việc liên kết ngoại lệ một cách rõ ràng bằng cách chỉ định :const:`None` trong mệnh đề ``from``:
 
 .. doctest::
 
@@ -658,25 +495,20 @@ the ``from`` clause:
      File "<stdin>", line 4, in <module>
    RuntimeError: Something bad happened
 
-Additional information on exceptions can be found in section :ref:`exceptions`,
-and information about handling exceptions is in section :ref:`try`.
+Bạn có thể tìm thấy thêm thông tin về các ngoại lệ trong phần :ref:`exceptions`, còn thông tin về cách xử lý ngoại lệ nằm trong phần :ref:`try`.
 
 .. versionchanged:: 3.3
     :const:`None` is now permitted as ``Y`` in ``raise X from Y``.
 
-    Added the :attr:`~BaseException.__suppress_context__` attribute to suppress
-    automatic display of the exception context.
+    Đã thêm thuộc tính :attr:`~BaseException.__suppress_context__` để ngăn việc tự động hiển thị ngữ cảnh của ngoại lệ.
 
 .. versionchanged:: 3.11
-    If the traceback of the active exception is modified in an :keyword:`except`
-    clause, a subsequent ``raise`` statement re-raises the exception with the
-    modified traceback. Previously, the exception was re-raised with the
-    traceback it had when it was caught.
+    Nếu traceback của ngoại lệ đang hoạt động được sửa đổi trong mệnh đề :keyword:`except`, thì câu lệnh ``raise`` tiếp theo sẽ phát sinh lại ngoại lệ với traceback đã sửa đổi. Trước đây, ngoại lệ được phát sinh lại với traceback mà nó có khi được bắt.
 
 .. _break:
 
-The :keyword:`!break` statement
-===============================
+Câu lệnh :keyword:`!break`
+==========================
 
 .. index::
    ! pair: statement; break
@@ -687,30 +519,26 @@ The :keyword:`!break` statement
 .. productionlist:: python-grammar
    break_stmt: "break"
 
-:keyword:`break` may only occur syntactically nested in a :keyword:`for` or
-:keyword:`while` loop, but not nested in a function or class definition within
-that loop.
+:keyword:`break` chỉ có thể xuất hiện về mặt cú pháp bên trong một :keyword:`for` hoặc
+:keyword:`while` loop, nhưng không được lồng trong định nghĩa hàm hoặc lớp bên trong loop đó.
 
 .. index:: pair: keyword; else
            pair: loop control; target
 
-It terminates the nearest enclosing loop, skipping the optional :keyword:`!else`
-clause if the loop has one.
+Nó kết thúc loop bao quanh gần nhất, bỏ qua mệnh đề :keyword:`!else` tùy chọn nếu loop có mệnh đề này.
 
-If a :keyword:`for` loop is terminated by :keyword:`break`, the loop control
-target keeps its current value.
+Nếu một :keyword:`for` loop bị kết thúc bởi :keyword:`break`, đích điều khiển của loop vẫn giữ nguyên giá trị hiện tại.
 
 .. index:: pair: keyword; finally
 
-When :keyword:`break` passes control out of a :keyword:`try` statement with a
-:keyword:`finally` clause, that :keyword:`!finally` clause is executed before
-really leaving the loop.
+Khi :keyword:`break` chuyển quyền điều khiển ra khỏi một câu lệnh :keyword:`try` có
+mệnh đề :keyword:`finally`, mệnh đề :keyword:`!finally` đó được thực thi trước khi thực sự rời khỏi loop.
 
 
 .. _continue:
 
-The :keyword:`!continue` statement
-==================================
+Câu lệnh :keyword:`!continue`
+=============================
 
 .. index::
    ! pair: statement; continue
@@ -722,20 +550,18 @@ The :keyword:`!continue` statement
 .. productionlist:: python-grammar
    continue_stmt: "continue"
 
-:keyword:`continue` may only occur syntactically nested in a :keyword:`for` or
-:keyword:`while` loop, but not nested in a function or class definition within
-that loop.  It continues with the next cycle of the nearest enclosing loop.
+:keyword:`continue` chỉ có thể xuất hiện về mặt cú pháp bên trong một :keyword:`for` hoặc
+:keyword:`while` vòng lặp, nhưng không được lồng trong một định nghĩa hàm hoặc lớp bên trong vòng lặp đó. Nó tiếp tục với chu kỳ tiếp theo của vòng lặp bao quanh gần nhất.
 
-When :keyword:`continue` passes control out of a :keyword:`try` statement with a
-:keyword:`finally` clause, that :keyword:`!finally` clause is executed before
-really starting the next loop cycle.
+Khi :keyword:`continue` chuyển quyền điều khiển ra khỏi một câu lệnh :keyword:`try` có
+mệnh đề :keyword:`finally`, mệnh đề :keyword:`!finally` đó sẽ được thực thi trước khi thực sự bắt đầu chu kỳ vòng lặp tiếp theo.
 
 
 .. _import:
 .. _from:
 
-The :keyword:`!import` statement
-================================
+Câu lệnh :keyword:`!import`
+===========================
 
 .. index::
    ! pair: statement; import
@@ -756,115 +582,65 @@ The :keyword:`!import` statement
    module: (`identifier` ".")* `identifier`
    relative_module: "."* `module` | "."+
 
-The basic import statement (no :keyword:`from` clause) is executed in two
-steps:
+Câu lệnh import cơ bản (không có mệnh đề :keyword:`from`) được thực thi theo hai bước:
 
-#. find a module, loading and initializing it if necessary
-#. define a name or names in the current namespace for the scope where
-   the :keyword:`import` statement occurs, just as an assignment statement
-   would (including :keyword:`global` and :keyword:`nonlocal` semantics).
+#. tìm một mô-đun, tải và khởi tạo mô-đun đó nếu cần
+#. định nghĩa một hoặc nhiều tên trong namespace hiện tại cho phạm vi chứa câu lệnh :keyword:`import`, giống như một câu lệnh gán (bao gồm ngữ nghĩa của :keyword:`global` và :keyword:`nonlocal`).
 
-When the statement contains multiple clauses (separated by
-commas) the two steps are carried out separately for each clause, just
-as though the clauses had been separated out into individual import
-statements.
+Khi câu lệnh chứa nhiều mệnh đề (được phân tách bằng dấu phẩy), hai bước này được thực hiện riêng biệt cho từng mệnh đề, giống như khi các mệnh đề được tách thành các câu lệnh import riêng lẻ.
 
-The details of the first step, finding and loading modules, are described in
-greater detail in the section on the :ref:`import system <importsystem>`,
-which also describes the various types of packages and modules that can
-be imported, as well as all the hooks that can be used to customize
-the import system. Note that failures in this step may indicate either
-that the module could not be located, *or* that an error occurred while
-initializing the module, which includes execution of the module's code.
+Thông tin chi tiết về bước đầu tiên, tìm và tải các mô-đun, được mô tả cụ thể hơn trong phần về :ref:`import system <importsystem>`, phần này cũng mô tả các loại package và mô-đun khác nhau có thể được import, cũng như tất cả các hook có thể dùng để tùy chỉnh import system. Lưu ý rằng lỗi ở bước này có thể cho biết mô-đun không thể được định vị, *hoặc* đã xảy ra lỗi trong khi khởi tạo mô-đun, bao gồm cả việc thực thi mã của mô-đun.
 
-If the requested module is retrieved successfully, it will be made
-available in the local namespace in one of three ways:
+Nếu mô-đun được yêu cầu được truy xuất thành công, mô-đun đó sẽ được cung cấp trong namespace cục bộ theo một trong ba cách:
 
 .. index:: single: as; import statement
 
-* If the module name is followed by :keyword:`!as`, then the name
-  following :keyword:`!as` is bound directly to the imported module.
-* If no other name is specified, and the module being imported is a top
-  level module, the module's name is bound in the local namespace as a
-  reference to the imported module
-* If the module being imported is *not* a top level module, then the name
-  of the top level package that contains the module is bound in the local
-  namespace as a reference to the top level package. The imported module
-  must be accessed using its full qualified name rather than directly
+* Nếu sau tên mô-đun là :keyword:`!as`, thì tên đứng sau :keyword:`!as` được liên kết trực tiếp với mô-đun đã import.
+* Nếu không chỉ định tên nào khác và mô-đun đang được import là mô-đun cấp cao nhất, tên của mô-đun được liên kết trong namespace cục bộ dưới dạng tham chiếu đến mô-đun đã import
+* Nếu module được import *không* phải là module cấp cao nhất, thì tên của package cấp cao nhất chứa module đó sẽ được liên kết trong namespace cục bộ như một tham chiếu đến package cấp cao nhất. Module được import phải được truy cập bằng tên đầy đủ của nó thay vì truy cập trực tiếp
 
 
 .. index::
    pair: name; binding
    single: from; import statement
 
-The :keyword:`from` form uses a slightly more complex process:
+Dạng :keyword:`from` sử dụng một quy trình phức tạp hơn một chút:
 
-#. find the module specified in the :keyword:`from` clause, loading and
-   initializing it if necessary;
-#. for each of the identifiers specified in the :keyword:`import` clauses:
+#. tìm module được chỉ định trong mệnh đề :keyword:`from`, tải và khởi tạo module nếu cần;
+#. với mỗi định danh được chỉ định trong các mệnh đề :keyword:`import`:
 
-   #. check if the imported module has an attribute by that name
-   #. if not, attempt to import a submodule with that name and then
-      check the imported module again for that attribute
-   #. if the attribute is not found, :exc:`ImportError` is raised.
-   #. otherwise, a reference to that value is stored in the current namespace,
-      using the name in the :keyword:`!as` clause if it is present,
-      otherwise using the attribute name
+   #. kiểm tra xem module được import có thuộc tính mang tên đó hay không
+   #. nếu không, thử import submodule có tên đó rồi kiểm tra lại module được import để tìm thuộc tính đó
+   #. nếu không tìm thấy thuộc tính, :exc:`ImportError` sẽ được raise.
+   #. nếu không, một tham chiếu đến giá trị đó được lưu trong namespace hiện tại, sử dụng tên trong mệnh đề :keyword:`!as` nếu có, nếu không thì sử dụng tên thuộc tính
 
-Examples::
+Ví dụ::
 
-   import foo                 # foo imported and bound locally
-   import foo.bar.baz         # foo, foo.bar, and foo.bar.baz imported, foo bound locally
-   import foo.bar.baz as fbb  # foo, foo.bar, and foo.bar.baz imported, foo.bar.baz bound as fbb
-   from foo.bar import baz    # foo, foo.bar, and foo.bar.baz imported, foo.bar.baz bound as baz
-   from foo import attr       # foo imported and foo.attr bound as attr
+   import foo                 # foo được import và liên kết trong phạm vi cục bộ
+   import foo.bar.baz         # foo, foo.bar và foo.bar.baz được import, foo được liên kết trong phạm vi cục bộ
+   import foo.bar.baz as fbb  # foo, foo.bar và foo.bar.baz được import, foo.bar.baz được liên kết với tên fbb
+   from foo.bar import baz    # foo, foo.bar và foo.bar.baz được import, foo.bar.baz được liên kết với tên baz
+   from foo import attr       # foo được import và foo.attr được liên kết với tên attr
 
 .. index:: single: * (asterisk); import statement
 
-If the list of identifiers is replaced by a star (``'*'``), all public
-names defined in the module are bound in the local namespace for the scope
-where the :keyword:`import` statement occurs.
+Nếu danh sách các định danh được thay thế bằng dấu sao (``'*'``), tất cả các tên public được định nghĩa trong module sẽ được liên kết trong namespace cục bộ của phạm vi nơi câu lệnh :keyword:`import` xuất hiện.
 
 .. index:: single: __all__ (optional module attribute)
 
 .. attribute:: module.__all__
    :no-typesetting:
 
-The *public names* defined by a module are determined by checking the module's
-namespace for a variable named ``__all__``; if defined, it must be a sequence
-of strings which are names defined or imported by that module.
-Names containing non-ASCII characters must be in the `normalization form`_
-NFKC; see :ref:`lexical-names-nonascii` for details.  The names
-given in ``__all__`` are all considered public and are required to exist.  If
-``__all__`` is not defined, the set of public names includes all names found
-in the module's namespace which do not begin with an underscore character
-(``'_'``).  ``__all__`` should contain the entire public API. It is intended
-to avoid accidentally exporting items that are not part of the API (such as
-library modules which were imported and used within the module).
+Các *tên public* được định nghĩa bởi một module được xác định bằng cách kiểm tra namespace của module để tìm một biến có tên ``__all__``; nếu được định nghĩa, biến này phải là một chuỗi các tên được module đó định nghĩa hoặc import. Các tên chứa ký tự không phải ASCII phải ở dạng `chuẩn hóa <normalization form_>`_ NFKC; xem :ref:`lexical-names-nonascii` để biết chi tiết. Tất cả các tên được nêu trong ``__all__`` đều được xem là public và bắt buộc phải tồn tại. Nếu ``__all__`` chưa được định nghĩa, tập hợp tên public sẽ bao gồm tất cả các tên được tìm thấy trong namespace của module mà không bắt đầu bằng ký tự gạch dưới (``'_'``). ``__all__`` nên chứa toàn bộ public API. Nó nhằm tránh vô tình export các mục không thuộc API (chẳng hạn như các library module được import và sử dụng bên trong module).
 
-The wild card form of import --- ``from module import *`` --- is only allowed at
-the module level.  Attempting to use it in class or function definitions will
-raise a :exc:`SyntaxError`.
+Dạng import wildcard --- ``from module import *`` --- chỉ được phép ở cấp module. Việc cố gắng sử dụng dạng này trong định nghĩa class hoặc function sẽ gây ra :exc:`SyntaxError`.
 
 .. index::
     single: relative; import
 
-When specifying what module to import you do not have to specify the absolute
-name of the module. When a module or package is contained within another
-package it is possible to make a relative import within the same top package
-without having to mention the package name. By using leading dots in the
-specified module or package after :keyword:`from` you can specify how high to
-traverse up the current package hierarchy without specifying exact names. One
-leading dot means the current package where the module making the import
-exists. Two dots means up one package level. Three dots is up two levels, etc.
-So if you execute ``from . import mod`` from a module in the ``pkg`` package
-then you will end up importing ``pkg.mod``. If you execute ``from ..subpkg2
-import mod`` from within ``pkg.subpkg1`` you will import ``pkg.subpkg2.mod``.
-The specification for relative imports is contained in
-the :ref:`relativeimports` section.
+Khi chỉ định module cần import, bạn không phải chỉ định tên tuyệt đối của module. Khi một module hoặc package nằm trong một package khác, bạn có thể thực hiện relative import trong cùng top package mà không cần nêu tên package. Bằng cách sử dụng các dấu chấm ở đầu trong module hoặc package được chỉ định sau :keyword:`from`, bạn có thể chỉ định cần đi lên bao nhiêu cấp trong hệ thống phân cấp package hiện tại mà không cần nêu tên cụ thể. Một dấu chấm ở đầu biểu thị package hiện tại, nơi module thực hiện import tồn tại. Hai dấu chấm nghĩa là đi lên một cấp package. Ba dấu chấm nghĩa là đi lên hai cấp, v.v. Vì vậy, nếu bạn thực thi ``from . import mod`` từ một module trong package ``pkg``, bạn sẽ import ``pkg.mod``. Nếu bạn thực thi ``from ..subpkg2 import mod`` từ bên trong ``pkg.subpkg1``, bạn sẽ import ``pkg.subpkg2.mod``. Đặc tả về relative import nằm trong phần :ref:`relativeimports`.
 
-:func:`importlib.import_module` is provided to support applications that
-determine dynamically the modules to be loaded.
+:func:`importlib.import_module` được cung cấp để hỗ trợ các ứng dụng xác định động các module cần tải.
 
 .. audit-event:: import module,filename,sys.path,sys.meta_path,sys.path_hooks import
 
@@ -872,21 +648,16 @@ determine dynamically the modules to be loaded.
 
 .. _future:
 
-Future statements
------------------
+Các câu lệnh Future
+-------------------
 
 .. index::
    pair: future; statement
    single: __future__; future statement
 
-A :dfn:`future statement` is a directive to the compiler that a particular
-module should be compiled using syntax or semantics that will be available in a
-specified future release of Python where the feature becomes standard.
+Một :dfn:`câu lệnh future` là một chỉ thị cho compiler rằng một module cụ thể phải được biên dịch bằng cú pháp hoặc ngữ nghĩa sẽ có trong một bản phát hành Python tương lai được chỉ định, nơi tính năng đó trở thành tiêu chuẩn.
 
-The future statement is intended to ease migration to future versions of Python
-that introduce incompatible changes to the language.  It allows use of the new
-features on a per-module basis before the release in which the feature becomes
-standard.
+Câu lệnh future nhằm hỗ trợ quá trình chuyển đổi sang các phiên bản Python trong tương lai, vốn giới thiệu những thay đổi không tương thích với ngôn ngữ. Câu lệnh này cho phép sử dụng các tính năng mới theo từng module trước khi phát hành phiên bản mà trong đó tính năng trở thành tiêu chuẩn.
 
 .. productionlist:: python-grammar
    future_stmt: "from" "__future__" "import" `feature` ["as" `identifier`]
@@ -895,71 +666,46 @@ standard.
               : ("," `feature` ["as" `identifier`])* [","] ")"
    feature: `identifier`
 
-A future statement must appear near the top of the module.  The only lines that
-can appear before a future statement are:
+Câu lệnh future phải xuất hiện gần đầu module. Các dòng duy nhất có thể xuất hiện trước câu lệnh future là:
 
-* the module docstring (if any),
-* comments,
-* blank lines, and
-* other future statements.
+* docstring của module (nếu có),
+* comment,
+* các dòng trống, và
+* các câu lệnh future khác.
 
-The only feature that requires using the future statement is
-``annotations`` (see :pep:`563`).
+Tính năng duy nhất bắt buộc phải sử dụng câu lệnh future là ``annotations`` (xem :pep:`563`).
 
-All historical features enabled by the future statement are still recognized
-by Python 3.  The list includes ``absolute_import``, ``division``,
-``generators``, ``generator_stop``, ``unicode_literals``,
-``print_function``, ``nested_scopes`` and ``with_statement``.  They are
-all redundant because they are always enabled, and only kept for
-backwards compatibility.
+Tất cả các tính năng lịch sử được bật bởi câu lệnh future vẫn được Python 3 nhận diện. Danh sách này bao gồm ``absolute_import``, ``division``, ``generators``, ``generator_stop``, ``unicode_literals``, ``print_function``, ``nested_scopes`` và ``with_statement``. Tất cả đều dư thừa vì luôn được bật và chỉ được giữ lại để đảm bảo khả năng tương thích ngược.
 
-A future statement is recognized and treated specially at compile time: Changes
-to the semantics of core constructs are often implemented by generating
-different code.  It may even be the case that a new feature introduces new
-incompatible syntax (such as a new reserved word), in which case the compiler
-may need to parse the module differently.  Such decisions cannot be pushed off
-until runtime.
+Câu lệnh future được nhận diện và xử lý đặc biệt tại thời điểm biên dịch: Các thay đổi về ngữ nghĩa của những cấu trúc cốt lõi thường được triển khai bằng cách tạo ra mã khác. Thậm chí một tính năng mới có thể đưa vào cú pháp không tương thích mới (chẳng hạn như một từ dành riêng mới), trong trường hợp đó trình biên dịch có thể cần phân tích module theo cách khác. Những quyết định như vậy không thể trì hoãn cho đến thời gian chạy.
 
-For any given release, the compiler knows which feature names have been defined,
-and raises a compile-time error if a future statement contains a feature not
-known to it.
+Đối với mỗi bản phát hành cụ thể, trình biên dịch biết những tên tính năng nào đã được định nghĩa và sẽ phát sinh lỗi tại thời điểm biên dịch nếu một câu lệnh future chứa tính năng mà nó không biết.
 
-The direct runtime semantics are the same as for any import statement: there is
-a standard module :mod:`__future__`, described later, and it will be imported in
-the usual way at the time the future statement is executed.
+Ngữ nghĩa runtime trực tiếp giống như đối với bất kỳ câu lệnh import nào: có một module tiêu chuẩn :mod:`__future__`, được mô tả ở phần sau, và module này sẽ được import theo cách thông thường tại thời điểm câu lệnh future được thực thi.
 
-The interesting runtime semantics depend on the specific feature enabled by the
-future statement.
+Ngữ nghĩa runtime đáng chú ý phụ thuộc vào tính năng cụ thể được bật bởi câu lệnh future.
 
-Note that there is nothing special about the statement::
+Lưu ý rằng câu lệnh này không có gì đặc biệt::
 
    import __future__ [as name]
 
-That is not a future statement; it's an ordinary import statement with no
-special semantics or syntax restrictions.
+Đó không phải là câu lệnh future; mà là một câu lệnh import thông thường, không có ngữ nghĩa đặc biệt hay hạn chế cú pháp nào.
 
-Code compiled by calls to the built-in functions :func:`exec` and :func:`compile`
-that occur in a module :mod:`!M` containing a future statement will, by default,
-use the new syntax or semantics associated with the future statement.  This can
-be controlled by optional arguments to :func:`compile` --- see the documentation
-of that function for details.
+Mã được biên dịch bởi các lệnh gọi đến các hàm tích hợp :func:`exec` và :func:`compile` xuất hiện trong một mô-đun :mod:`!M` có chứa câu lệnh future, theo mặc định sẽ sử dụng cú pháp hoặc ngữ nghĩa mới liên kết với câu lệnh future đó. Có thể kiểm soát điều này bằng các đối số tùy chọn của :func:`compile` --- xem tài liệu về hàm đó để biết chi tiết.
 
-A future statement typed at an interactive interpreter prompt will take effect
-for the rest of the interpreter session.  If an interpreter is started with the
-:option:`-i` option, is passed a script name to execute, and the script includes
-a future statement, it will be in effect in the interactive session started
-after the script is executed.
+Một câu lệnh future được nhập tại dấu nhắc của trình thông dịch tương tác sẽ có hiệu lực trong phần còn lại của phiên trình thông dịch. Nếu trình thông dịch được khởi động với
+tùy chọn :option:`-i`, được truyền tên một tập lệnh để thực thi và tập lệnh đó có chứa một câu lệnh future, câu lệnh này sẽ có hiệu lực trong phiên tương tác được khởi động sau khi tập lệnh được thực thi.
 
 .. seealso::
 
-   :pep:`236` - Back to the __future__
-      The original proposal for the __future__ mechanism.
+   :pep:`236` - Quay lại __future__
+      Đề xuất ban đầu cho cơ chế __future__.
 
 
 .. _global:
 
-The :keyword:`!global` statement
-================================
+Câu lệnh :keyword:`!global`
+===========================
 
 .. index::
    ! pair: statement; global
@@ -969,40 +715,25 @@ The :keyword:`!global` statement
 .. productionlist:: python-grammar
    global_stmt: "global" `identifier` ("," `identifier`)*
 
-The :keyword:`global` statement causes the listed identifiers to be interpreted
-as globals. It would be impossible to assign to a global variable without
-:keyword:`!global`, although free variables may refer to globals without being
-declared global.
+Câu lệnh :keyword:`global` khiến các mã định danh được liệt kê được diễn giải là biến toàn cục. Sẽ không thể gán cho một biến toàn cục nếu không
+:keyword:`!global`, mặc dù các biến tự do có thể tham chiếu đến các biến toàn cục mà không cần được khai báo là global.
 
-The :keyword:`!global` statement applies to the entire current scope
-(module, function body or class definition).
-A :exc:`SyntaxError` is raised if a variable is used or
-assigned to prior to its global declaration in the scope.
+Câu lệnh :keyword:`!global` áp dụng cho toàn bộ scope hiện tại (module, thân hàm hoặc định nghĩa lớp). Một :exc:`SyntaxError` sẽ được raised nếu một biến được sử dụng hoặc gán trước khi được khai báo là global trong scope.
 
-At the module level, all variables are global, so a :keyword:`!global`
-statement has no effect.
-However, variables must still not be used or
-assigned to prior to their :keyword:`!global` declaration.
-This requirement is relaxed in the interactive prompt (:term:`REPL`).
+Ở cấp module, tất cả biến đều là biến toàn cục, vì vậy câu lệnh :keyword:`!global` không có tác dụng. Tuy nhiên, các biến vẫn không được sử dụng hoặc gán trước khi có khai báo :keyword:`!global` tương ứng. Yêu cầu này được nới lỏng trong dấu nhắc tương tác (:term:`REPL`).
 
 .. index::
    pair: built-in function; exec
    pair: built-in function; eval
    pair: built-in function; compile
 
-**Programmer's note:** :keyword:`global` is a directive to the parser.  It
-applies only to code parsed at the same time as the :keyword:`!global` statement.
-In particular, a :keyword:`!global` statement contained in a string or code
-object supplied to the built-in :func:`exec` function does not affect the code
-block *containing* the function call, and code contained in such a string is
-unaffected by :keyword:`!global` statements in the code containing the function
-call.  The same applies to the :func:`eval` and :func:`compile` functions.
+**Ghi chú cho lập trình viên:** :keyword:`global` là một chỉ thị dành cho parser. Nó chỉ áp dụng cho mã được phân tích cú pháp cùng lúc với câu lệnh :keyword:`!global`. Cụ thể, một câu lệnh :keyword:`!global` nằm trong chuỗi hoặc code object được cung cấp cho hàm dựng sẵn :func:`exec` không ảnh hưởng đến khối mã *chứa* lệnh gọi hàm, và mã nằm trong chuỗi đó không bị ảnh hưởng bởi các câu lệnh :keyword:`!global` trong mã chứa lệnh gọi hàm. Điều tương tự cũng áp dụng cho các hàm :func:`eval` và :func:`compile`.
 
 
 .. _nonlocal:
 
-The :keyword:`!nonlocal` statement
-==================================
+Câu lệnh :keyword:`!nonlocal`
+=============================
 
 .. index:: pair: statement; nonlocal
    single: , (comma); identifier list
@@ -1010,70 +741,53 @@ The :keyword:`!nonlocal` statement
 .. productionlist:: python-grammar
    nonlocal_stmt: "nonlocal" `identifier` ("," `identifier`)*
 
-When the definition of a function or class is nested (enclosed) within
-the definitions of other functions, its nonlocal scopes are the local
-scopes of the enclosing functions. The :keyword:`nonlocal` statement
-causes the listed identifiers to refer to names previously bound in
-nonlocal scopes. It allows encapsulated code to rebind such nonlocal
-identifiers.  If a name is bound in more than one nonlocal scope, the
-nearest binding is used. If a name is not bound in any nonlocal scope,
-or if there is no nonlocal scope, a :exc:`SyntaxError` is raised.
+Khi định nghĩa một hàm hoặc lớp được lồng (nằm bên trong) các định nghĩa của những hàm khác, các scope nonlocal của nó là các scope cục bộ của những hàm bao quanh. Câu lệnh :keyword:`nonlocal` khiến các identifier được liệt kê tham chiếu đến những tên đã được liên kết trước đó trong các scope nonlocal. Câu lệnh này cho phép mã được đóng gói liên kết lại các identifier nonlocal đó. Nếu một tên được liên kết trong nhiều scope nonlocal, liên kết gần nhất sẽ được sử dụng. Nếu một tên không được liên kết trong bất kỳ scope nonlocal nào, hoặc nếu không có scope nonlocal, một :exc:`SyntaxError` sẽ được raised.
 
-The :keyword:`nonlocal` statement applies to the entire scope of a function or
-class body. A :exc:`SyntaxError` is raised if a variable is used or
-assigned to prior to its nonlocal declaration in the scope.
+Câu lệnh :keyword:`nonlocal` áp dụng cho toàn bộ scope của một hàm hoặc thân lớp. Một :exc:`SyntaxError` sẽ được raised nếu một biến được sử dụng hoặc gán trước khi có khai báo nonlocal tương ứng trong scope.
 
 .. seealso::
 
-   :pep:`3104` - Access to Names in Outer Scopes
-      The specification for the :keyword:`nonlocal` statement.
+   :pep:`3104` - Truy cập các tên trong phạm vi bên ngoài
+      Đặc tả cho câu lệnh :keyword:`nonlocal`.
 
-**Programmer's note:** :keyword:`nonlocal` is a directive to the parser
-and applies only to code parsed along with it.  See the note for the
-:keyword:`global` statement.
+**Ghi chú của lập trình viên:** :keyword:`nonlocal` là một chỉ thị dành cho trình phân tích cú pháp và chỉ áp dụng cho mã được phân tích cùng với nó. Xem ghi chú cho
+câu lệnh :keyword:`global`.
 
 
 .. _type:
 
-The :keyword:`!type` statement
-==============================
+Câu lệnh :keyword:`!type`
+=========================
 
 .. index:: pair: statement; type
 
 .. productionlist:: python-grammar
    type_stmt: 'type' `identifier` [`type_params`] "=" `expression`
 
-The :keyword:`!type` statement declares a type alias, which is an instance
-of :class:`typing.TypeAliasType`.
+Câu lệnh :keyword:`!type` khai báo một bí danh kiểu, là một thể hiện của :class:`typing.TypeAliasType`.
 
-For example, the following statement creates a type alias::
+Ví dụ, câu lệnh sau đây tạo một bí danh kiểu::
 
    type Point = tuple[float, float]
 
-This code is roughly equivalent to::
+Mã này gần tương đương với::
 
    annotation-def VALUE_OF_Point():
        return tuple[float, float]
    Point = typing.TypeAliasType("Point", VALUE_OF_Point())
 
-``annotation-def`` indicates an :ref:`annotation scope <annotation-scopes>`, which behaves
-mostly like a function, but with several small differences.
+``annotation-def`` cho biết một :ref:`phạm vi chú thích <annotation-scopes>`, hoạt động hầu hết như một hàm, nhưng có một số khác biệt nhỏ.
 
-The value of the
-type alias is evaluated in the annotation scope. It is not evaluated when the
-type alias is created, but only when the value is accessed through the type alias's
-:attr:`!__value__` attribute (see :ref:`lazy-evaluation`).
-This allows the type alias to refer to names that are not yet defined.
+Giá trị của bí danh kiểu được đánh giá trong phạm vi chú thích. Giá trị này không được đánh giá khi bí danh kiểu được tạo, mà chỉ khi được truy cập thông qua
+:attr:`!__value__` thuộc tính (xem :ref:`lazy-evaluation`). Điều này cho phép bí danh kiểu tham chiếu đến những tên chưa được định nghĩa.
 
-Type aliases may be made generic by adding a :ref:`type parameter list <type-params>`
-after the name. See :ref:`generic-type-aliases` for more.
+Có thể biến bí danh kiểu thành generic bằng cách thêm một :ref:`danh sách tham số kiểu <type-params>` sau tên. Xem :ref:`generic-type-aliases` để biết thêm thông tin.
 
-:keyword:`!type` is a :ref:`soft keyword <soft-keywords>`.
+:keyword:`!type` là một :ref:`từ khóa mềm <soft-keywords>`.
 
 .. versionadded:: 3.12
 
 .. seealso::
 
-   :pep:`695` - Type Parameter Syntax
-      Introduced the :keyword:`!type` statement and syntax for
-      generic classes and functions.
+   :pep:`695` - Cú pháp tham số kiểu
+      Đã giới thiệu câu lệnh và cú pháp :keyword:`!type` cho các lớp và hàm generic.

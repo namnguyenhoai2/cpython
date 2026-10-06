@@ -1,20 +1,15 @@
 .. _reference-index:
 
-#################################
-  The Python Language Reference
-#################################
+#####################################
+Tài liệu tham khảo về ngôn ngữ Python
+#####################################
 
-This reference manual describes the syntax and core semantics of the
-language. It is terse, but attempts to be exact and complete.
+Tài liệu tham khảo này mô tả cú pháp và ngữ nghĩa cốt lõi của ngôn ngữ. Tài liệu ngắn gọn, nhưng cố gắng đảm bảo tính chính xác và đầy đủ.
 
-Elsewhere, the built-in object types and functions are described in
-:ref:`builtins-index`. Standard library modules are described in :ref:`library-index`.
+Các kiểu đối tượng và hàm dựng sẵn được mô tả ở nơi khác trong
+:ref:`builtins-index`. Các mô-đun thư viện chuẩn được mô tả trong :ref:`library-index`.
 
-For an informal introduction to the
-language, see :ref:`tutorial-index`. For C or C++ programmers, two additional
-manuals exist: :ref:`extending-index` describes the high-level picture of how to
-write a Python extension module, and the :ref:`c-api-index` describes the
-interfaces available to C/C++ programmers in detail.
+Để xem phần giới thiệu không chính thức về ngôn ngữ, hãy xem :ref:`tutorial-index`. Đối với các lập trình viên C hoặc C++, có thêm hai tài liệu: :ref:`extending-index` mô tả tổng quan cấp cao về cách viết một mô-đun mở rộng Python, còn :ref:`c-api-index` mô tả chi tiết các interface dành cho lập trình viên C/C++.
 
 .. toctree::
    :maxdepth: 2

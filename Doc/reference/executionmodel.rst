@@ -1,9 +1,9 @@
 
 .. _execmodel:
 
-***************
-Execution model
-***************
+****************
+Mô hình thực thi
+****************
 
 .. index::
    single: execution model
@@ -11,33 +11,21 @@ Execution model
 
 .. _prog_structure:
 
-Structure of a program
-======================
+Cấu trúc của một chương trình
+=============================
 
 .. index:: block
 
-A Python program is constructed from code blocks.
-A :dfn:`block` is a piece of Python program text that is executed as a unit.
-The following are blocks: a module, a function body, and a class definition.
-Each command typed interactively is a block.  A script file (a file given as
-standard input to the interpreter or specified as a command line argument to the
-interpreter) is a code block.  A script command (a command specified on the
-interpreter command line with the :option:`-c` option) is a code block.
-A module run as a top level script (as module ``__main__``) from the command
-line using a :option:`-m` argument is also a code block. The string
-argument passed to the built-in functions :func:`eval` and :func:`exec` is a
-code block.
+Một chương trình Python được cấu tạo từ các khối mã. Một :dfn:`khối` là một phần văn bản chương trình Python được thực thi như một đơn vị. Các khối bao gồm: một module, phần thân của một hàm và một định nghĩa lớp. Mỗi lệnh được nhập trong chế độ tương tác là một khối. Một tệp script (tệp được cung cấp dưới dạng đầu vào tiêu chuẩn cho trình thông dịch hoặc được chỉ định làm đối số dòng lệnh cho trình thông dịch) là một khối mã. Một lệnh script (lệnh được chỉ định trên dòng lệnh của trình thông dịch bằng tùy chọn :option:`-c`) là một khối mã. Một module được chạy dưới dạng script cấp cao nhất (với module ``__main__``) từ dòng lệnh bằng đối số :option:`-m` cũng là một khối mã. Đối số chuỗi được truyền cho các hàm tích hợp sẵn :func:`eval` và :func:`exec` là một khối mã.
 
 .. index:: pair: execution; frame
 
-A code block is executed in an :dfn:`execution frame`.  A frame contains some
-administrative information (used for debugging) and determines where and how
-execution continues after the code block's execution has completed.
+Một khối mã được thực thi trong một :dfn:`khung thực thi`. Một khung chứa một số thông tin quản trị (được sử dụng để gỡ lỗi) và xác định việc thực thi sẽ tiếp tục ở đâu và như thế nào sau khi quá trình thực thi khối mã hoàn tất.
 
 .. _naming:
 
-Naming and binding
-==================
+Đặt tên và liên kết
+===================
 
 .. index::
    single: namespace
@@ -45,139 +33,89 @@ Naming and binding
 
 .. _bind_names:
 
-Binding of names
-----------------
+Liên kết tên
+------------
 
 .. index::
    single: name
    pair: binding; name
 
-:dfn:`Names` refer to objects.  Names are introduced by name binding operations.
+:dfn:`Tên` tham chiếu đến các đối tượng. Tên được tạo ra bởi các thao tác liên kết tên.
 
 .. index:: single: from; import statement
 
-The following constructs bind names:
+Các cấu trúc sau đây liên kết tên:
 
-* formal parameters to functions,
-* class definitions,
-* function definitions,
-* assignment expressions,
-* :ref:`targets <assignment>` that are identifiers if occurring in
-  an assignment:
+* tham số hình thức của hàm,
+* định nghĩa lớp,
+* định nghĩa hàm,
+* biểu thức gán,
+* :ref:`các đích là identifiers nếu xuất hiện trong phép gán: <assignment>`
 
-  + :keyword:`for` loop header,
-  + after :keyword:`!as` in a :keyword:`with` statement, :keyword:`except`
-    clause, :keyword:`except* <except_star>` clause, or in the as-pattern in structural pattern matching,
-  + in a capture pattern in structural pattern matching
+  + :keyword:`for` phần đầu của vòng lặp,
+  + sau :keyword:`!as` trong một câu lệnh :keyword:`with`, mệnh đề :keyword:`except`, mệnh đề :keyword:`except* <except_star>`, hoặc trong mẫu as khi so khớp mẫu cấu trúc,
+  + trong một mẫu bắt giữ khi so khớp mẫu cấu trúc
 
-* :keyword:`import` statements.
-* :keyword:`type` statements.
-* :ref:`type parameter lists <type-params>`.
+* Các câu lệnh :keyword:`import`.
+* Các câu lệnh :keyword:`type`.
+* :ref:`danh sách tham số kiểu <type-params>`.
 
-The :keyword:`!import` statement of the form ``from ... import *`` binds all
-names defined in the imported module, except those beginning with an underscore.
-This form may only be used at the module level.
+Câu lệnh :keyword:`!import` có dạng ``from ... import *`` liên kết tất cả các tên được định nghĩa trong module được nhập, ngoại trừ những tên bắt đầu bằng dấu gạch dưới. Dạng này chỉ có thể được sử dụng ở cấp module.
 
-A target occurring in a :keyword:`del` statement is also considered bound for
-this purpose (though the actual semantics are to unbind the name).
+Một đích xuất hiện trong câu lệnh :keyword:`del` cũng được xem là đã liên kết cho mục đích này (mặc dù ngữ nghĩa thực tế là hủy liên kết tên đó).
 
-Each assignment or import statement occurs within a block defined by a class or
-function definition or at the module level (the top-level code block).
+Mỗi câu lệnh gán hoặc import đều xuất hiện bên trong một khối được xác định bởi định nghĩa lớp hoặc hàm, hoặc ở cấp mô-đun (khối mã cấp cao nhất).
 
 .. index:: pair: free; variable
 
-If a name is bound in a block, it is a local variable of that block, unless
-declared as :keyword:`nonlocal` or :keyword:`global`.  If a name is bound at
-the module level, it is a global variable.  (The variables of the module code
-block are local and global.)  If a variable is used in a code block but not
-defined there, it is a :term:`free variable`.
+Nếu một tên được liên kết trong một khối, nó là một biến cục bộ của khối đó, trừ khi được khai báo là :keyword:`nonlocal` hoặc :keyword:`global`. Nếu một tên được liên kết ở cấp mô-đun, nó là một biến toàn cục. (Các biến của khối mã mô-đun vừa là cục bộ vừa là toàn cục.) Nếu một biến được sử dụng trong một khối mã nhưng không được định nghĩa ở đó, thì đó là một :term:`free variable`.
 
-Each occurrence of a name in the program text refers to the :dfn:`binding` of
-that name established by the following name resolution rules.
+Mỗi lần xuất hiện của một tên trong văn bản chương trình đều tham chiếu đến :dfn:`liên kết` của tên đó, được thiết lập theo các quy tắc phân giải tên sau đây.
 
 .. _resolve_names:
 
-Resolution of names
--------------------
+Phân giải tên
+-------------
 
 .. index:: scope
 
-A :dfn:`scope` defines the visibility of a name within a block.  If a local
-variable is defined in a block, its scope includes that block.  If the
-definition occurs in a function block, the scope extends to any blocks contained
-within the defining one, unless a contained block introduces a different binding
-for the name.
+Một :dfn:`phạm vi` xác định khả năng hiển thị của một tên bên trong một khối. Nếu một biến cục bộ được định nghĩa trong một khối, phạm vi của biến đó bao gồm khối ấy. Nếu định nghĩa xuất hiện trong một khối hàm, phạm vi sẽ mở rộng đến mọi khối nằm bên trong khối định nghĩa, trừ khi một khối bên trong tạo ra một liên kết khác cho tên đó.
 
 .. index:: single: environment
 
-When a name is used in a code block, it is resolved using the nearest enclosing
-scope.  The set of all such scopes visible to a code block is called the block's
-:dfn:`environment`.
+Khi một tên được sử dụng trong một khối mã, nó được phân giải bằng phạm vi bao quanh gần nhất. Tập hợp tất cả các phạm vi như vậy hiển thị với một khối mã được gọi là
+:dfn:`môi trường`.
 
 .. index::
    single: NameError (built-in exception)
    single: UnboundLocalError
 
-When a name is not found at all, a :exc:`NameError` exception is raised.
-If the current scope is a function scope, and the name refers to a local
-variable that has not yet been bound to a value at the point where the name is
-used, an :exc:`UnboundLocalError` exception is raised.
-:exc:`UnboundLocalError` is a subclass of :exc:`NameError`.
+Khi hoàn toàn không tìm thấy một tên, một exception :exc:`NameError` sẽ được raised. Nếu scope hiện tại là scope của một function và tên đó đề cập đến một biến cục bộ chưa được bind với một giá trị tại thời điểm tên được sử dụng, một exception :exc:`UnboundLocalError` sẽ được raised.
+:exc:`UnboundLocalError` là một subclass của :exc:`NameError`.
 
-If a name binding operation occurs anywhere within a code block, all uses of the
-name within the block are treated as references to the current block.  This can
-lead to errors when a name is used within a block before it is bound.  This rule
-is subtle.  Python lacks declarations and allows name binding operations to
-occur anywhere within a code block.  The local variables of a code block can be
-determined by scanning the entire text of the block for name binding operations.
-See :ref:`the FAQ entry on UnboundLocalError <faq-unboundlocalerror>`
-for examples.
+Nếu một thao tác binding tên xuất hiện ở bất kỳ đâu trong một code block, mọi cách sử dụng tên đó trong block đều được xem là tham chiếu đến block hiện tại. Điều này có thể gây lỗi khi một tên được sử dụng trong block trước khi được bind. Quy tắc này khá tinh tế. Python không có khai báo và cho phép các thao tác binding tên xuất hiện ở bất kỳ đâu trong một code block. Có thể xác định các biến cục bộ của một code block bằng cách quét toàn bộ văn bản của block để tìm các thao tác binding tên. Xem :ref:`mục FAQ về UnboundLocalError <faq-unboundlocalerror>` để biết ví dụ.
 
-If the :keyword:`global` statement occurs within a block, all uses of the names
-specified in the statement refer to the bindings of those names in the top-level
-namespace.  Names are resolved in the top-level namespace by searching the
-global namespace, i.e. the namespace of the module containing the code block,
-and the builtins namespace, the namespace of the module :mod:`builtins`.  The
-global namespace is searched first.  If the names are not found there, the
-builtins namespace is searched next. If the names are also not found in the
-builtins namespace, new variables are created in the global namespace.
-The global statement must precede all uses of the listed names.
+Nếu câu lệnh :keyword:`global` xuất hiện trong một block, mọi cách sử dụng các tên được chỉ định trong câu lệnh đều đề cập đến các binding của những tên đó trong namespace cấp cao nhất. Các tên được phân giải trong namespace cấp cao nhất bằng cách tìm kiếm global namespace, tức namespace của module chứa code block, và builtins namespace, namespace của module :mod:`builtins`. Global namespace được tìm kiếm trước. Nếu không tìm thấy các tên ở đó, builtins namespace sẽ được tìm kiếm tiếp theo. Nếu cũng không tìm thấy các tên trong builtins namespace, các biến mới sẽ được tạo trong global namespace. Câu lệnh global phải đứng trước mọi cách sử dụng các tên được liệt kê.
 
-The :keyword:`global` statement has the same scope as a name binding operation
-in the same block.  If the nearest enclosing scope for a free variable contains
-a global statement, the free variable is treated as a global.
+Câu lệnh :keyword:`global` có cùng scope với một thao tác binding tên trong cùng block. Nếu scope bao quanh gần nhất của một biến tự do có chứa câu lệnh global, biến tự do đó được xem là biến global.
 
 .. XXX say more about "nonlocal" semantics here
 
-The :keyword:`nonlocal` statement causes corresponding names to refer
-to previously bound variables in the nearest enclosing function scope.
-:exc:`SyntaxError` is raised at compile time if the given name does not
-exist in any enclosing function scope. :ref:`Type parameters <type-params>`
-cannot be rebound with the :keyword:`!nonlocal` statement.
+Câu lệnh :keyword:`nonlocal` khiến các tên tương ứng tham chiếu đến những biến đã được bind trước đó trong scope của function bao quanh gần nhất.
+:exc:`SyntaxError` được raised tại thời điểm biên dịch nếu tên đã cho không tồn tại trong bất kỳ scope function bao quanh nào. :ref:`Type parameters <type-params>` không thể được bind lại bằng câu lệnh :keyword:`!nonlocal`.
 
 .. index:: pair: module; __main__
 
-The namespace for a module is automatically created the first time a module is
-imported.  The main module for a script is always called :mod:`__main__`.
+Không gian tên cho một module được tự động tạo lần đầu module được import. Module chính của một script luôn được gọi là :mod:`__main__`.
 
-Class definition blocks and arguments to :func:`exec` and :func:`eval` are
-special in the context of name resolution.
-A class definition is an executable statement that may use and define names.
-These references follow the normal rules for name resolution with an exception
-that unbound local variables are looked up in the global namespace.
-The namespace of the class definition becomes the attribute dictionary of
-the class. The scope of names defined in a class block is limited to the
-class block; it does not extend to the code blocks of methods. This includes
-comprehensions and generator expressions, but it does not include
-:ref:`annotation scopes <annotation-scopes>`,
-which have access to their enclosing class scopes.
-This means that the following will fail::
+Các khối định nghĩa class và các đối số truyền cho :func:`exec` và :func:`eval` có ý nghĩa đặc biệt trong ngữ cảnh phân giải tên. Định nghĩa class là một câu lệnh có thể thực thi, có thể sử dụng và định nghĩa các tên. Những tham chiếu này tuân theo các quy tắc phân giải tên thông thường, ngoại trừ việc các biến cục bộ chưa được liên kết sẽ được tra cứu trong không gian tên toàn cục. Không gian tên của định nghĩa class trở thành dictionary thuộc tính của class. Phạm vi của các tên được định nghĩa trong một khối class chỉ giới hạn ở khối class; phạm vi này không mở rộng đến các khối mã của method. Điều này bao gồm cả các biểu thức tạo và biểu thức trình tạo, nhưng không bao gồm
+:ref:`phạm vi chú thích <annotation-scopes>`, vốn có quyền truy cập vào các phạm vi class bao quanh chúng. Điều này có nghĩa là đoạn sau sẽ thất bại::
 
    class A:
        a = 42
        b = list(a + i for i in range(10))
 
-However, the following will succeed::
+Tuy nhiên, đoạn sau sẽ thành công::
 
    class A:
        type Alias = Nested
@@ -187,75 +125,48 @@ However, the following will succeed::
 
 .. _annotation-scopes:
 
-Annotation scopes
+Phạm vi chú thích
 -----------------
 
-:term:`Annotations <annotation>`, :ref:`type parameter lists <type-params>`
-and :keyword:`type` statements
-introduce *annotation scopes*, which behave mostly like function scopes,
-but with some exceptions discussed below.
+:term:`Chú thích <annotation>`, :ref:`danh sách tham số kiểu <type-params>` và các câu lệnh :keyword:`type` giới thiệu *phạm vi chú thích*, hoạt động phần lớn giống như phạm vi hàm, nhưng có một số ngoại lệ được thảo luận bên dưới.
 
-Annotation scopes are used in the following contexts:
+Phạm vi annotation được sử dụng trong các ngữ cảnh sau:
 
-* :term:`Function annotations <function annotation>`.
-* :term:`Variable annotations <variable annotation>`.
-* Type parameter lists for :ref:`generic type aliases <generic-type-aliases>`.
-* Type parameter lists for :ref:`generic functions <generic-functions>`.
-  A generic function's annotations are
-  executed within the annotation scope, but its defaults and decorators are not.
-* Type parameter lists for :ref:`generic classes <generic-classes>`.
-  A generic class's base classes and
-  keyword arguments are executed within the annotation scope, but its decorators are not.
-* The bounds, constraints, and default values for type parameters
-  (:ref:`lazily evaluated <lazy-evaluation>`).
-* The value of type aliases (:ref:`lazily evaluated <lazy-evaluation>`).
+* :term:`Annotation của hàm <function annotation>`.
+* :term:`Annotation của biến <variable annotation>`.
+* Danh sách tham số kiểu cho :ref:`generic type aliases <generic-type-aliases>`.
+* Danh sách tham số kiểu cho :ref:`generic functions <generic-functions>`. Các annotation của generic function được thực thi trong phạm vi annotation, nhưng các giá trị mặc định và decorator của hàm thì không.
+* Danh sách tham số kiểu cho :ref:`generic classes <generic-classes>`. Các lớp cơ sở và đối số từ khóa của generic class được thực thi trong phạm vi annotation, nhưng các decorator của lớp thì không.
+* Các bound, constraint và giá trị mặc định cho tham số kiểu (:ref:`được đánh giá một cách trì hoãn <lazy-evaluation>`).
+* Giá trị của các bí danh kiểu (:ref:`được đánh giá một cách trì hoãn <lazy-evaluation>`).
 
-Annotation scopes differ from function scopes in the following ways:
+Phạm vi chú thích khác với phạm vi hàm theo những cách sau:
 
-* Annotation scopes have access to their enclosing class namespace.
-  If an annotation scope is immediately within a class scope, or within another
-  annotation scope that is immediately within a class scope, the code in the
-  annotation scope can use names defined in the class scope as if it were
-  executed directly within the class body. This contrasts with regular
-  functions defined within classes, which cannot access names defined in the class scope.
-* Expressions in annotation scopes cannot contain :keyword:`yield`, ``yield from``,
-  :keyword:`await`, or :token:`:= <python-grammar:assignment_expression>`
-  expressions. (These expressions are allowed in other scopes contained within the
-  annotation scope.)
-* Names defined in annotation scopes cannot be rebound with :keyword:`nonlocal`
-  statements in inner scopes. This includes only type parameters, as no other
-  syntactic elements that can appear within annotation scopes can introduce new names.
-* While annotation scopes have an internal name, that name is not reflected in the
-  :term:`qualified name` of objects defined within the scope.
-  Instead, the :attr:`~definition.__qualname__`
-  of such objects is as if the object were defined in the enclosing scope.
+* Phạm vi chú thích có quyền truy cập vào không gian tên của lớp bao quanh chúng. Nếu một phạm vi chú thích nằm ngay trong một phạm vi lớp, hoặc nằm trong một phạm vi chú thích khác vốn nằm ngay trong một phạm vi lớp, mã trong phạm vi chú thích có thể sử dụng các tên được định nghĩa trong phạm vi lớp như thể mã đó được thực thi trực tiếp trong thân lớp. Điều này khác với các hàm thông thường được định nghĩa bên trong lớp, vì chúng không thể truy cập các tên được định nghĩa trong phạm vi lớp.
+* Các biểu thức trong phạm vi chú thích không thể chứa các biểu thức :keyword:`yield`, ``yield from``,
+  :keyword:`await`, hoặc :token:`:= <python-grammar:assignment_expression>`. (Các biểu thức này được phép sử dụng trong những phạm vi khác nằm trong phạm vi chú thích.)
+* Các tên được định nghĩa trong phạm vi chú thích không thể được liên kết lại bằng các câu lệnh :keyword:`nonlocal` trong những phạm vi bên trong. Điều này chỉ bao gồm các tham số kiểu, vì không có phần tử cú pháp nào khác có thể xuất hiện trong phạm vi chú thích và tạo ra tên mới.
+* Mặc dù các phạm vi chú thích có một tên nội bộ, tên đó không được phản ánh trong
+  :term:`qualified name` của các đối tượng được định nghĩa trong phạm vi. Thay vào đó, :attr:`~definition.__qualname__` của những đối tượng đó giống như thể đối tượng được định nghĩa trong phạm vi bao quanh.
 
 .. versionadded:: 3.12
-   Annotation scopes were introduced in Python 3.12 as part of :pep:`695`.
+   Phạm vi chú thích được giới thiệu trong Python 3.12 như một phần của :pep:`695`.
 
 .. versionchanged:: 3.13
-   Annotation scopes are also used for type parameter defaults, as
-   introduced by :pep:`696`.
+   Phạm vi chú thích cũng được sử dụng cho các giá trị mặc định của tham số kiểu, được giới thiệu trong :pep:`696`.
 
 .. versionchanged:: 3.14
-   Annotation scopes are now also used for annotations, as specified in
-   :pep:`649` and :pep:`749`.
+   Phạm vi chú thích hiện cũng được sử dụng cho các chú thích, như được quy định trong
+   :pep:`649` và :pep:`749`.
 
 .. _lazy-evaluation:
 
-Lazy evaluation
----------------
+Đánh giá lười
+-------------
 
-Most annotation scopes are *lazily evaluated*. This includes annotations,
-the values of type aliases created through the :keyword:`type` statement, and
-the bounds, constraints, and default values of type
-variables created through the :ref:`type parameter syntax <type-params>`.
-This means that they are not evaluated when the type alias or type variable is
-created, or when the object carrying annotations is created. Instead, they
-are only evaluated when necessary, for example when the ``__value__``
-attribute on a type alias is accessed.
+Hầu hết các phạm vi chú thích đều *được đánh giá một cách trì hoãn*. Điều này bao gồm các chú thích, các giá trị của bí danh kiểu được tạo thông qua câu lệnh :keyword:`type`, cũng như các cận, ràng buộc và giá trị mặc định của các biến kiểu được tạo thông qua :ref:`cú pháp tham số kiểu <type-params>`. Điều này có nghĩa là chúng không được đánh giá khi bí danh kiểu hoặc biến kiểu được tạo, hoặc khi đối tượng chứa các chú thích được tạo. Thay vào đó, chúng chỉ được đánh giá khi cần thiết, chẳng hạn như khi thuộc tính ``__value__`` trên một bí danh kiểu được truy cập.
 
-Example:
+Ví dụ:
 
 .. doctest::
 
@@ -271,13 +182,9 @@ Example:
      ...
    ZeroDivisionError: division by zero
 
-Here the exception is raised only when the ``__value__`` attribute
-of the type alias or the ``__bound__`` attribute of the type variable
-is accessed.
+Trong trường hợp này, ngoại lệ chỉ được phát sinh khi thuộc tính ``__value__`` của bí danh kiểu hoặc thuộc tính ``__bound__`` của biến kiểu được truy cập.
 
-This behavior is primarily useful for references to types that have not
-yet been defined when the type alias or type variable is created. For example,
-lazy evaluation enables creation of mutually recursive type aliases::
+Hành vi này chủ yếu hữu ích cho các tham chiếu đến những kiểu chưa được định nghĩa khi bí danh kiểu hoặc biến kiểu được tạo. Ví dụ, đánh giá trì hoãn cho phép tạo các bí danh kiểu đệ quy lẫn nhau::
 
    from typing import Literal
 
@@ -285,42 +192,33 @@ lazy evaluation enables creation of mutually recursive type aliases::
    type Parenthesized = tuple[Literal["("], Expr, Literal[")"]]
    type Expr = SimpleExpr | tuple[SimpleExpr, Literal["+", "-"], Expr]
 
-Lazily evaluated values are evaluated in :ref:`annotation scope <annotation-scopes>`,
-which means that names that appear inside the lazily evaluated value are looked up
-as if they were used in the immediately enclosing scope.
+Các giá trị được đánh giá trì hoãn được đánh giá trong :ref:`phạm vi annotation <annotation-scopes>`, nghĩa là các tên xuất hiện bên trong giá trị được đánh giá trì hoãn sẽ được tra cứu như thể chúng được sử dụng trong phạm vi bao quanh trực tiếp.
 
 .. versionadded:: 3.12
 
 .. _restrict_exec:
 
-Builtins and restricted execution
----------------------------------
+Builtins và thực thi bị hạn chế
+-------------------------------
 
 .. index:: pair: restricted; execution
 
 .. impl-detail::
 
-   Users should not touch ``__builtins__``; it is strictly an implementation
-   detail.  Users wanting to override values in the builtins namespace should
-   :keyword:`import` the :mod:`builtins` module and modify its
-   attributes appropriately.
+   Người dùng không nên đụng đến ``__builtins__``; đây hoàn toàn là một chi tiết triển khai. Người dùng muốn ghi đè các giá trị trong namespace builtins nên
+   :keyword:`import` mô-đun :mod:`builtins` và sửa đổi các thuộc tính của mô-đun đó cho phù hợp.
 
-The builtins namespace associated with the execution of a code block
-is actually found by looking up the name ``__builtins__`` in its
-global namespace; this should be a dictionary or a module (in the
-latter case the module's dictionary is used).  By default, when in the
-:mod:`__main__` module, ``__builtins__`` is the built-in module
-:mod:`builtins`; when in any other module, ``__builtins__`` is an
-alias for the dictionary of the :mod:`builtins` module itself.
+Không gian tên builtins liên kết với việc thực thi một khối mã thực sự được tìm thấy bằng cách tra cứu tên ``__builtins__`` trong không gian tên toàn cục của khối đó; đây phải là một dictionary hoặc một module (trong trường hợp sau, dictionary của module được sử dụng). Theo mặc định, khi ở trong
+module :mod:`__main__`, ``__builtins__`` là module tích hợp sẵn
+:mod:`builtins`; khi ở trong bất kỳ module nào khác, ``__builtins__`` là bí danh cho dictionary của chính module :mod:`builtins`.
 
 
 .. _dynamic-features:
 
-Interaction with dynamic features
----------------------------------
+Tương tác với các tính năng động
+--------------------------------
 
-Name resolution of free variables occurs at runtime, not at compile time.
-This means that the following code will print 42::
+Việc phân giải tên của các biến tự do diễn ra tại runtime, không phải tại thời điểm biên dịch. Điều này có nghĩa là đoạn mã sau sẽ in ra 42::
 
    i = 10
    def f():
@@ -330,12 +228,8 @@ This means that the following code will print 42::
 
 .. XXX from * also invalid with relative imports (at least currently)
 
-The :func:`eval` and :func:`exec` functions do not have access to the full
-environment for resolving names.  Names may be resolved in the local and global
-namespaces of the caller.  Free variables are not resolved in the nearest
-enclosing namespace, but in the global namespace.  [#]_ The :func:`exec` and
-:func:`eval` functions have optional arguments to override the global and local
-namespace.  If only one namespace is specified, it is used for both.
+Các hàm :func:`eval` và :func:`exec` không có quyền truy cập vào toàn bộ môi trường để phân giải tên. Tên có thể được phân giải trong không gian tên cục bộ và toàn cục của bên gọi. Các biến tự do không được phân giải trong không gian tên bao quanh gần nhất mà trong không gian tên toàn cục. [#]_ Các hàm :func:`exec` và
+:func:`eval` có các đối số tùy chọn để ghi đè không gian tên toàn cục và cục bộ. Nếu chỉ định một không gian tên, nó sẽ được sử dụng cho cả hai.
 
 .. XXX(ncoghlan) above is only accurate for string execution. When executing code objects,
    closure cells may now be passed explicitly to resolve co_freevars references.
@@ -343,8 +237,8 @@ namespace.  If only one namespace is specified, it is used for both.
 
 .. _exceptions:
 
-Exceptions
-==========
+Ngoại lệ
+========
 
 .. index:: single: exception
 
@@ -355,236 +249,122 @@ Exceptions
    single: errors
    single: error handling
 
-Exceptions are a means of breaking out of the normal flow of control of a code
-block in order to handle errors or other exceptional conditions.  An exception
-is *raised* at the point where the error is detected; it may be *handled* by the
-surrounding code block or by any code block that directly or indirectly invoked
-the code block where the error occurred.
+Ngoại lệ là một cách thoát khỏi luồng điều khiển thông thường của một khối mã để xử lý lỗi hoặc các điều kiện bất thường khác. Một ngoại lệ được *phát sinh* tại thời điểm phát hiện lỗi; ngoại lệ đó có thể được *xử lý* bởi khối mã bao quanh hoặc bởi bất kỳ khối mã nào trực tiếp hay gián tiếp gọi khối mã nơi xảy ra lỗi.
 
-The Python interpreter raises an exception when it detects a run-time error
-(such as division by zero).  A Python program can also explicitly raise an
-exception with the :keyword:`raise` statement. Exception handlers are specified
-with the :keyword:`try` ... :keyword:`except` statement.  The :keyword:`finally`
-clause of such a statement can be used to specify cleanup code which does not
-handle the exception, but is executed whether an exception occurred or not in
-the preceding code.
+Trình thông dịch Python phát sinh một ngoại lệ khi phát hiện lỗi trong thời gian chạy (chẳng hạn như phép chia cho số không). Một chương trình Python cũng có thể phát sinh ngoại lệ một cách rõ ràng bằng câu lệnh :keyword:`raise`. Bộ xử lý ngoại lệ được chỉ định bằng câu lệnh :keyword:`try` ... :keyword:`except`. Mệnh đề :keyword:`finally` của câu lệnh như vậy có thể được dùng để chỉ định mã dọn dẹp không xử lý ngoại lệ, nhưng vẫn được thực thi bất kể trong đoạn mã trước đó có xảy ra ngoại lệ hay không.
 
 .. index:: single: termination model
 
-Python uses the "termination" model of error handling: an exception handler can
-find out what happened and continue execution at an outer level, but it cannot
-repair the cause of the error and retry the failing operation (except by
-re-entering the offending piece of code from the top).
+Python sử dụng mô hình "termination" để xử lý lỗi: một bộ xử lý ngoại lệ có thể xác định điều gì đã xảy ra và tiếp tục thực thi ở một cấp bên ngoài, nhưng không thể khắc phục nguyên nhân của lỗi rồi thử lại thao tác thất bại (ngoại trừ việc nhập lại đoạn mã gây lỗi từ đầu).
 
 .. index:: single: SystemExit (built-in exception)
 
-When an exception is not handled at all, the interpreter terminates execution of
-the program, or returns to its interactive main loop.  In either case, it prints
-a stack traceback, except when the exception is :exc:`SystemExit`.
+Khi một ngoại lệ hoàn toàn không được xử lý, trình thông dịch sẽ kết thúc việc thực thi chương trình hoặc quay lại vòng lặp chính tương tác. Trong cả hai trường hợp, trình thông dịch sẽ in ra stack traceback, ngoại trừ khi ngoại lệ là :exc:`SystemExit`.
 
-Exceptions are identified by class instances.  The :keyword:`except` clause is
-selected depending on the class of the instance: it must reference the class of
-the instance or a :term:`non-virtual base class <abstract base class>` thereof.
-The instance can be received by the handler and can carry additional information
-about the exceptional condition.
+Ngoại lệ được nhận diện bằng các instance của class. Mệnh đề :keyword:`except` được chọn tùy theo class của instance: mệnh đề này phải tham chiếu đến class của instance hoặc một :term:`lớp cơ sở không ảo <abstract base class>` của class đó. Handler có thể nhận instance và instance có thể mang thêm thông tin về điều kiện bất thường.
 
 .. note::
 
-   Exception messages are not part of the Python API.  Their contents may change
-   from one version of Python to the next without warning and should not be
-   relied on by code which will run under multiple versions of the interpreter.
+   Thông báo ngoại lệ không thuộc Python API. Nội dung của chúng có thể thay đổi từ phiên bản Python này sang phiên bản Python khác mà không có cảnh báo, và mã chạy trên nhiều phiên bản của trình thông dịch không nên phụ thuộc vào nội dung đó.
 
-See also the description of the :keyword:`try` statement in section :ref:`try`
-and :keyword:`raise` statement in section :ref:`raise`.
+Xem thêm phần mô tả về câu lệnh :keyword:`try` trong mục :ref:`try` và câu lệnh :keyword:`raise` trong mục :ref:`raise`.
 
 
 .. _execcomponents:
 
-Runtime Components
-==================
+Các thành phần runtime
+======================
 
-General Computing Model
------------------------
+Mô hình điện toán tổng quát
+---------------------------
 
-Python's execution model does not operate in a vacuum.  It runs on
-a host machine and through that host's runtime environment, including
-its operating system (OS), if there is one.  When a program runs,
-the conceptual layers of how it runs on the host look something
-like this:
+Mô hình thực thi của Python không hoạt động độc lập. Nó chạy trên một host machine và thông qua runtime environment của host đó, bao gồm hệ điều hành (OS), nếu có. Khi một chương trình chạy, các lớp khái niệm mô tả cách chương trình chạy trên host có thể được hình dung như sau:
 
-   | **host machine**
-   |   **process** (global resources)
-   |     **thread** (runs machine code)
+   | **máy host**
+   | **process** (tài nguyên toàn cục)
+   | **thread** (chạy mã máy)
 
-Each process represents a program running on the host.  Think of each
-process itself as the data part of its program.  Think of the process'
-threads as the execution part of the program.  This distinction will
-be important to understand the conceptual Python runtime.
+Mỗi process đại diện cho một chương trình đang chạy trên host. Hãy coi bản thân mỗi process là phần dữ liệu của chương trình đó. Hãy coi các thread của process là phần thực thi của chương trình. Sự phân biệt này sẽ rất quan trọng để hiểu runtime Python trên phương diện khái niệm.
 
-The process, as the data part, is the execution context in which the
-program runs.  It mostly consists of the set of resources assigned to
-the program by the host, including memory, signals, file handles,
-sockets, and environment variables.
+Process, với vai trò là phần dữ liệu, là ngữ cảnh thực thi trong đó chương trình chạy. Nó chủ yếu bao gồm tập hợp các tài nguyên được host cấp cho chương trình, gồm bộ nhớ, signal, file handle, socket và biến môi trường.
 
-Processes are isolated and independent from one another.  (The same
-is true for hosts.)  The host manages the process' access to its
-assigned resources, in addition to coordinating between processes.
+Các process được cô lập và độc lập với nhau. (Điều tương tự cũng đúng với các host.) Host quản lý quyền truy cập của process vào các tài nguyên được cấp cho nó, đồng thời điều phối giữa các process.
 
-Each thread represents the actual execution of the program's machine
-code, running relative to the resources assigned to the program's
-process.  It's strictly up to the host how and when that execution
-takes place.
+Mỗi thread đại diện cho việc thực thi thực tế mã máy của chương trình, chạy trong phạm vi các tài nguyên được cấp cho process của chương trình. Cách thức và thời điểm việc thực thi đó diễn ra hoàn toàn do host quyết định.
 
-From the point of view of Python, a program always starts with exactly
-one thread.  However, the program may grow to run in multiple
-simultaneous threads.  Not all hosts support multiple threads per
-process, but most do.  Unlike processes, threads in a process are not
-isolated and independent from one another.  Specifically, all threads
-in a process share all of the process' resources.
+Từ góc nhìn của Python, một chương trình luôn bắt đầu với chính xác một thread. Tuy nhiên, chương trình có thể phát triển để chạy trên nhiều thread đồng thời. Không phải host nào cũng hỗ trợ nhiều thread trên mỗi process, nhưng hầu hết đều hỗ trợ. Không giống các process, các thread trong một process không bị cô lập và không độc lập với nhau. Cụ thể, tất cả thread trong một process đều chia sẻ tất cả tài nguyên của process đó.
 
-The fundamental point of threads is that each one does *run*
-independently, at the same time as the others.  That may be only
-conceptually at the same time ("concurrently") or physically
-("in parallel").  Either way, the threads effectively run
-at a non-synchronized rate.
+Điểm cốt lõi của các thread là mỗi thread *chạy* độc lập, đồng thời với các thread khác. Điều đó có thể chỉ là đồng thời về mặt khái niệm ("concurrently") hoặc đồng thời về mặt vật lý ("in parallel"). Dù theo cách nào, các thread thực tế chạy với tốc độ không được đồng bộ hóa.
 
 .. note::
 
-   That non-synchronized rate means none of the process' memory is
-   guaranteed to stay consistent for the code running in any given
-   thread.  Thus multi-threaded programs must take care to coordinate
-   access to intentionally shared resources.  Likewise, they must take
-   care to be absolutely diligent about not accessing any *other*
-   resources in multiple threads; otherwise two threads running at the
-   same time might accidentally interfere with each other's use of some
-   shared data.  All this is true for both Python programs and the
-   Python runtime.
+   Tốc độ không được đồng bộ hóa đó có nghĩa là không có phần bộ nhớ nào của process được đảm bảo luôn nhất quán đối với mã đang chạy trong bất kỳ thread cụ thể nào. Vì vậy, các chương trình đa thread phải cẩn thận điều phối quyền truy cập vào những tài nguyên được chủ đích chia sẻ. Tương tự, chúng phải hết sức cẩn trọng không truy cập bất kỳ tài nguyên *khác* nào trong nhiều thread; nếu không, hai thread chạy cùng lúc có thể vô tình can thiệp vào việc sử dụng một số dữ liệu được chia sẻ của nhau. Tất cả những điều này đều đúng với cả các chương trình Python và runtime Python.
 
-   The cost of this broad, unstructured requirement is the tradeoff for
-   the kind of raw concurrency that threads provide.  The alternative
-   to the required discipline generally means dealing with
-   non-deterministic bugs and data corruption.
+   Cái giá của yêu cầu rộng và thiếu cấu trúc này là sự đánh đổi cho mức độ concurrency thô mà các thread cung cấp. Việc không tuân thủ kỷ luật bắt buộc này thường đồng nghĩa với việc phải xử lý các lỗi không xác định và tình trạng hỏng dữ liệu.
 
-Python Runtime Model
---------------------
+Mô hình runtime của Python
+--------------------------
 
-The same conceptual layers apply to each Python program, with some
-extra data layers specific to Python:
+Các lớp khái niệm giống nhau được áp dụng cho mỗi chương trình Python, cùng với một số lớp dữ liệu bổ sung dành riêng cho Python:
 
-   | **host machine**
-   |   **process** (global resources)
-   |     Python global runtime (*state*)
-   |       Python interpreter (*state*)
-   |         **thread** (runs Python bytecode and "C-API")
-   |           Python thread *state*
+   | **máy chủ**
+   | **process** (tài nguyên toàn cục)
+   | runtime toàn cục của Python (*state*)
+   | interpreter Python (*state*)
+   | **luồng** (chạy bytecode Python và "C-API")
+   | *Trạng thái luồng* Python
 
-At the conceptual level: when a Python program starts, it looks exactly
-like that diagram, with one of each.  The runtime may grow to include
-multiple interpreters, and each interpreter may grow to include
-multiple thread states.
+Ở cấp độ khái niệm: khi một chương trình Python khởi động, nó trông chính xác như sơ đồ đó, với mỗi thành phần một bản. Runtime có thể phát triển để bao gồm nhiều interpreter, và mỗi interpreter có thể phát triển để bao gồm nhiều trạng thái luồng.
 
 .. note::
 
-   A Python implementation won't necessarily implement the runtime
-   layers distinctly or even concretely.  The only exception is places
-   where distinct layers are directly specified or exposed to users,
-   like through the :mod:`threading` module.
+   Một triển khai Python không nhất thiết phải triển khai các lớp runtime một cách riêng biệt hoặc thậm chí một cách cụ thể. Ngoại lệ duy nhất là những nơi các lớp riêng biệt được chỉ định trực tiếp hoặc hiển thị cho người dùng, chẳng hạn như thông qua module :mod:`threading`.
 
 .. note::
 
-   The initial interpreter is typically called the "main" interpreter.
-   Some Python implementations, like CPython, assign special roles
-   to the main interpreter.
+   Interpreter ban đầu thường được gọi là interpreter "main". Một số triển khai Python, như CPython, gán các vai trò đặc biệt cho interpreter main.
 
-   Likewise, the host thread where the runtime was initialized is known
-   as the "main" thread.  It may be different from the process' initial
-   thread, though they are often the same.  In some cases "main thread"
-   may be even more specific and refer to the initial thread state.
-   A Python runtime might assign specific responsibilities
-   to the main thread, such as handling signals.
+   Tương tự, host thread nơi runtime được khởi tạo được gọi là thread "main". Nó có thể khác với thread ban đầu của process, mặc dù hai thread này thường là một. Trong một số trường hợp, "main thread" có thể mang nghĩa cụ thể hơn và chỉ trạng thái luồng ban đầu. Một Python runtime có thể gán các trách nhiệm cụ thể cho main thread, chẳng hạn như xử lý signal.
 
-As a whole, the Python runtime consists of the global runtime state,
-interpreters, and thread states.  The runtime ensures all that state
-stays consistent over its lifetime, particularly when used with
-multiple host threads.
+Xét tổng thể, Python runtime bao gồm trạng thái runtime toàn cục, các interpreter và các trạng thái luồng. Runtime đảm bảo tất cả trạng thái đó luôn nhất quán trong suốt vòng đời của nó, đặc biệt khi được sử dụng với nhiều host thread.
 
-The global runtime, at the conceptual level, is just a set of
-interpreters.  While those interpreters are otherwise isolated and
-independent from one another, they may share some data or other
-resources.  The runtime is responsible for managing these global
-resources safely.  The actual nature and management of these resources
-is implementation-specific.  Ultimately, the external utility of the
-global runtime is limited to managing interpreters.
+Ở cấp độ khái niệm, runtime toàn cục chỉ là một tập hợp các trình thông dịch. Mặc dù các trình thông dịch này độc lập và được cô lập với nhau, chúng vẫn có thể chia sẻ một số dữ liệu hoặc tài nguyên khác. Runtime chịu trách nhiệm quản lý các tài nguyên toàn cục này một cách an toàn. Bản chất và cách quản lý cụ thể của các tài nguyên này phụ thuộc vào implementation. Xét cho cùng, tiện ích bên ngoài của runtime toàn cục chỉ giới hạn ở việc quản lý các trình thông dịch.
 
-In contrast, an "interpreter" is conceptually what we would normally
-think of as the (full-featured) "Python runtime".  When machine code
-executing in a host thread interacts with the Python runtime, it calls
-into Python in the context of a specific interpreter.
+Ngược lại, về mặt khái niệm, "interpreter" chính là thứ mà chúng ta thường nghĩ đến khi nói về "Python runtime" (đầy đủ tính năng). Khi machine code đang thực thi trong một host thread tương tác với Python runtime, nó gọi vào Python trong ngữ cảnh của một interpreter cụ thể.
 
 .. note::
 
-   The term "interpreter" here is not the same as the "bytecode
-   interpreter", which is what regularly runs in threads, executing
-   compiled Python code.
+   Thuật ngữ "interpreter" ở đây không giống với "bytecode interpreter", vốn thường xuyên chạy trong các thread để thực thi mã Python đã được biên dịch.
 
-   In an ideal world, "Python runtime" would refer to what we currently
-   call "interpreter".  However, it's been called "interpreter" at least
-   since introduced in 1997 (`CPython:a027efa5b`_).
+   Trong một thế giới lý tưởng, "Python runtime" sẽ dùng để chỉ thứ mà hiện nay chúng ta gọi là "interpreter". Tuy nhiên, nó đã được gọi là "interpreter" ít nhất từ khi được giới thiệu vào năm 1997 (`CPython:a027efa5b`_).
 
    .. _CPython:a027efa5b: https://github.com/python/cpython/commit/a027efa5b
 
-Each interpreter completely encapsulates all of the non-process-global,
-non-thread-specific state needed for the Python runtime to work.
-Notably, the interpreter's state persists between uses.  It includes
-fundamental data like :data:`sys.modules`.  The runtime ensures
-multiple threads using the same interpreter will safely
-share it between them.
+Mỗi interpreter đóng gói hoàn toàn mọi trạng thái không thuộc phạm vi toàn process và không dành riêng cho thread mà Python runtime cần để hoạt động. Đáng chú ý là trạng thái của interpreter được duy trì giữa các lần sử dụng. Trạng thái này bao gồm những dữ liệu nền tảng như :data:`sys.modules`. Runtime đảm bảo nhiều thread sử dụng cùng một interpreter sẽ chia sẻ dữ liệu đó một cách an toàn.
 
-A Python implementation may support using multiple interpreters at the
-same time in the same process.  They are independent and isolated from
-one another.  For example, each interpreter has its own
+Một Python implementation có thể hỗ trợ sử dụng đồng thời nhiều interpreter trong cùng một process. Chúng độc lập và được cô lập với nhau. Ví dụ, mỗi interpreter có riêng
 :data:`sys.modules`.
 
-For thread-specific runtime state, each interpreter has a set of thread
-states, which it manages, in the same way the global runtime contains
-a set of interpreters.  It can have thread states for as many host
-threads as it needs.  It may even have multiple thread states for
-the same host thread, though that isn't as common.
+Đối với trạng thái runtime dành riêng cho thread, mỗi interpreter có một tập hợp các thread state do nó quản lý, tương tự như cách runtime toàn cục chứa một tập hợp các interpreter. Nó có thể có thread state cho số lượng host thread tùy theo nhu cầu. Thậm chí, nó có thể có nhiều thread state cho cùng một host thread, mặc dù trường hợp này không phổ biến.
 
-Each thread state, conceptually, has all the thread-specific runtime
-data an interpreter needs to operate in one host thread.  The thread
-state includes the current raised exception and the thread's Python
-call stack.  It may include other thread-specific resources.
+Về mặt khái niệm, mỗi trạng thái luồng chứa toàn bộ dữ liệu runtime dành riêng cho luồng mà một interpreter cần để hoạt động trong một luồng máy chủ. Trạng thái luồng bao gồm exception hiện đang được raised và call stack Python của luồng. Nó có thể bao gồm các tài nguyên khác dành riêng cho luồng.
 
 .. note::
 
-   The term "Python thread" can sometimes refer to a thread state, but
-   normally it means a thread created using the :mod:`threading` module.
+   Thuật ngữ "Python thread" đôi khi có thể dùng để chỉ một trạng thái luồng, nhưng thông thường nó có nghĩa là một luồng được tạo bằng module :mod:`threading`.
 
-Each thread state, over its lifetime, is always tied to exactly one
-interpreter and exactly one host thread.  It will only ever be used in
-that thread and with that interpreter.
+Trong suốt vòng đời của mình, mỗi trạng thái luồng luôn gắn với chính xác một interpreter và chính xác một luồng máy chủ. Trạng thái đó sẽ chỉ được sử dụng trong luồng đó và với interpreter đó.
 
-Multiple thread states may be tied to the same host thread, whether for
-different interpreters or even the same interpreter.  However, for any
-given host thread, only one of the thread states tied to it can be used
-by the thread at a time.
+Nhiều trạng thái luồng có thể được gắn với cùng một luồng máy chủ, dù là với các interpreter khác nhau hay thậm chí cùng một interpreter. Tuy nhiên, đối với bất kỳ luồng máy chủ nào, tại một thời điểm chỉ một trong các trạng thái luồng được gắn với nó có thể được luồng đó sử dụng.
 
-Thread states are isolated and independent from one another and don't
-share any data, except for possibly sharing an interpreter and objects
-or other resources belonging to that interpreter.
+Các trạng thái luồng được cô lập và độc lập với nhau, đồng thời không chia sẻ dữ liệu nào, ngoại trừ khả năng cùng chia sẻ một interpreter và các đối tượng hoặc tài nguyên khác thuộc về interpreter đó.
 
-Once a program is running, new Python threads can be created using the
-:mod:`threading` module (on platforms and Python implementations that
-support threads).  Additional processes can be created using the
-:mod:`os`, :mod:`subprocess`, and :mod:`multiprocessing` modules.
-Interpreters can be created and used with the
-:mod:`~concurrent.interpreters` module.  Coroutines (async) can
-be run using :mod:`asyncio` in each interpreter, typically only
-in a single thread (often the main thread).
+Sau khi chương trình đang chạy, có thể tạo các luồng Python mới bằng cách sử dụng
+module :mod:`threading` (trên các nền tảng và bản triển khai Python có hỗ trợ luồng). Có thể tạo thêm các tiến trình bằng cách sử dụng
+Các mô-đun :mod:`os`, :mod:`subprocess` và :mod:`multiprocessing`. Có thể tạo và sử dụng các interpreter bằng
+Mô-đun :mod:`~concurrent.interpreters`. Có thể chạy các coroutine (async) bằng :mod:`asyncio` trong mỗi interpreter, thường chỉ trong một thread (thường là thread chính).
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] This limitation occurs because the code that is executed by these operations
-       is not available at the time the module is compiled.
+.. [#] Hạn chế này xảy ra vì mã được thực thi bởi các thao tác này không có sẵn tại thời điểm mô-đun được biên dịch.

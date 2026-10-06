@@ -1,112 +1,62 @@
 
 .. _importsystem:
 
-*****************
-The import system
-*****************
+***************
+Hệ thống import
+***************
 
 .. index:: single: import machinery
 
-Python code in one :term:`module` gains access to the code in another module
-by the process of :term:`importing` it.  The :keyword:`import` statement is
-the most common way of invoking the import machinery, but it is not the only
-way.  Functions such as :func:`importlib.import_module` and built-in
-:func:`__import__` can also be used to invoke the import machinery.
+Mã Python trong một :term:`module` có quyền truy cập vào mã trong một module khác thông qua quá trình :term:`importing` nó. Câu lệnh :keyword:`import` là cách phổ biến nhất để gọi cơ chế import, nhưng không phải là cách duy nhất. Các hàm như :func:`importlib.import_module` và hàm tích hợp sẵn
+:func:`__import__` cũng có thể được sử dụng để gọi cơ chế import.
 
-The :keyword:`import` statement combines two operations; it searches for the
-named module, then it binds the results of that search to a name in the local
-scope.  The search operation of the :keyword:`!import` statement is defined as
-a call to the :func:`__import__` function, with the appropriate arguments.
-The return value of :func:`__import__` is used to perform the name
-binding operation of the :keyword:`!import` statement.  See the
-:keyword:`!import` statement for the exact details of that name binding
-operation.
+Câu lệnh :keyword:`import` kết hợp hai thao tác; nó tìm kiếm module được đặt tên, sau đó liên kết kết quả của việc tìm kiếm đó với một tên trong phạm vi cục bộ. Thao tác tìm kiếm của câu lệnh :keyword:`!import` được định nghĩa là một lệnh gọi đến hàm :func:`__import__`, với các đối số phù hợp. Giá trị trả về của :func:`__import__` được dùng để thực hiện thao tác liên kết tên của câu lệnh :keyword:`!import`. Xem
+câu lệnh :keyword:`!import` để biết chi tiết chính xác về thao tác liên kết tên đó.
 
-A direct call to :func:`__import__` performs only the module search and, if
-found, the module creation operation.  While certain side-effects may occur,
-such as the importing of parent packages, and the updating of various caches
-(including :data:`sys.modules`), only the :keyword:`import` statement performs
-a name binding operation.
+Một lệnh gọi trực tiếp đến :func:`__import__` chỉ thực hiện việc tìm kiếm module và, nếu tìm thấy, thao tác tạo module. Mặc dù có thể xảy ra một số tác dụng phụ, chẳng hạn như import các package cha và cập nhật nhiều bộ nhớ đệm khác nhau (bao gồm :data:`sys.modules`), chỉ câu lệnh :keyword:`import` mới thực hiện thao tác liên kết tên.
 
-When an :keyword:`import` statement is executed, the standard builtin
-:func:`__import__` function is called. Other mechanisms for invoking the
-import system (such as :func:`importlib.import_module`) may choose to bypass
-:func:`__import__` and use their own solutions to implement import semantics.
+Khi một câu lệnh :keyword:`import` được thực thi, hàm tích hợp sẵn tiêu chuẩn
+:func:`__import__` function được gọi. Các cơ chế khác để gọi import system (chẳng hạn như :func:`importlib.import_module`) có thể chọn bỏ qua
+:func:`__import__` và sử dụng các giải pháp riêng để triển khai ngữ nghĩa import.
 
-When a module is first imported, Python searches for the module and if found,
-it creates a module object [#fnmo]_, initializing it.  If the named module
-cannot be found, a :exc:`ModuleNotFoundError` is raised.  Python implements various
-strategies to search for the named module when the import machinery is
-invoked.  These strategies can be modified and extended by using various hooks
-described in the sections below.
+Khi một module được import lần đầu, Python tìm kiếm module đó và nếu tìm thấy, nó tạo một đối tượng module [#fnmo]_ rồi khởi tạo đối tượng đó. Nếu không tìm thấy module được chỉ định, một :exc:`ModuleNotFoundError` sẽ được phát sinh. Python triển khai nhiều chiến lược khác nhau để tìm kiếm module được chỉ định khi import machinery được gọi. Có thể sửa đổi và mở rộng các chiến lược này bằng cách sử dụng nhiều hook khác nhau được mô tả trong các phần bên dưới.
 
 .. versionchanged:: 3.3
-   The import system has been updated to fully implement the second phase
-   of :pep:`302`. There is no longer any implicit import machinery - the full
-   import system is exposed through :data:`sys.meta_path`. In addition,
-   native namespace package support has been implemented (see :pep:`420`).
+   Import system đã được cập nhật để triển khai đầy đủ giai đoạn thứ hai của :pep:`302`. Không còn import machinery ngầm nào nữa - toàn bộ import system được cung cấp thông qua :data:`sys.meta_path`. Ngoài ra, hỗ trợ native namespace package đã được triển khai (xem :pep:`420`).
 
 
 :mod:`importlib`
 ================
 
-The :mod:`importlib` module provides a rich API for interacting with the
-import system.  For example :func:`importlib.import_module` provides a
-recommended, simpler API than built-in :func:`__import__` for invoking the
-import machinery.  Refer to the :mod:`importlib` library documentation for
-additional detail.
+Module :mod:`importlib` cung cấp một API phong phú để tương tác với import system. Ví dụ, :func:`importlib.import_module` cung cấp một API đơn giản hơn và được khuyến nghị dùng thay cho :func:`__import__` tích hợp sẵn để gọi import machinery. Tham khảo tài liệu thư viện :mod:`importlib` để biết thêm chi tiết.
 
 
 
-Packages
-========
+Các package
+===========
 
 .. index::
     single: package
 
-Python has only one type of module object, and all modules are of this type,
-regardless of whether the module is implemented in Python, C, or something
-else.  To help organize modules and provide a naming hierarchy, Python has a
-concept of :term:`packages <package>`.
+Python chỉ có một loại đối tượng module, và tất cả module đều thuộc loại này, bất kể module được triển khai bằng Python, C hay một thứ gì khác. Để giúp tổ chức các module và cung cấp một hệ thống phân cấp tên, Python có khái niệm về :term:`package <package>`.
 
-You can think of packages as the directories on a file system and modules as
-files within directories, but don't take this analogy too literally since
-packages and modules need not originate from the file system.  For the
-purposes of this documentation, we'll use this convenient analogy of
-directories and files.  Like file system directories, packages are organized
-hierarchically, and packages may themselves contain subpackages, as well as
-regular modules.
+Bạn có thể hình dung packages là các thư mục trên hệ thống tệp và modules là các tệp bên trong thư mục, nhưng đừng hiểu phép tương tự này theo nghĩa quá sát vì packages và modules không nhất thiết phải bắt nguồn từ hệ thống tệp. Trong phạm vi tài liệu này, chúng ta sẽ sử dụng phép tương tự thuận tiện giữa thư mục và tệp. Giống như các thư mục trong hệ thống tệp, packages được tổ chức theo cấp bậc, và bản thân packages có thể chứa các subpackages cũng như các modules thông thường.
 
-It's important to keep in mind that all packages are modules, but not all
-modules are packages.  Or put another way, packages are just a special kind of
-module.  Specifically, any module that contains a ``__path__`` attribute is
-considered a package.
+Điều quan trọng cần ghi nhớ là mọi package đều là module, nhưng không phải mọi module đều là package. Nói cách khác, packages chỉ là một loại module đặc biệt. Cụ thể, mọi module chứa thuộc tính ``__path__`` đều được xem là package.
 
-All modules have a name.  Subpackage names are separated from their parent
-package name by a dot, akin to Python's standard attribute access syntax.  Thus
-you might have a package called :mod:`email`, which in turn has a subpackage
-called :mod:`email.mime` and a module within that subpackage called
+Mọi module đều có một tên. Tên của subpackage được phân tách với tên package cha bằng dấu chấm, tương tự cú pháp truy cập thuộc tính tiêu chuẩn của Python. Vì vậy, bạn có thể có một package tên là :mod:`email`, package này lại có một subpackage tên là :mod:`email.mime` và một module bên trong subpackage đó có tên là
 :mod:`email.mime.text`.
 
 
-Regular packages
-----------------
+Packages thông thường
+---------------------
 
 .. index::
     pair: package; regular
 
-Python defines two types of packages, :term:`regular packages <regular
-package>` and :term:`namespace packages <namespace package>`.  Regular
-packages are traditional packages as they existed in Python 3.2 and earlier.
-A regular package is typically implemented as a directory containing an
-``__init__.py`` file.  When a regular package is imported, this
-``__init__.py`` file is implicitly executed, and the objects it defines are
-bound to names in the package's namespace.  The ``__init__.py`` file can
-contain the same Python code that any other module can contain, and Python
-will add some additional attributes to the module when it is imported.
+Python định nghĩa hai loại package: :term:`packages thông thường <regular package>` và :term:`namespace packages <namespace package>`. Packages thông thường là các package truyền thống từng tồn tại trong Python 3.2 và các phiên bản trước đó. Một package thông thường thường được triển khai dưới dạng một thư mục chứa tệp ``__init__.py``. Khi một package thông thường được import, tệp ``__init__.py`` này sẽ được thực thi ngầm, và các đối tượng mà tệp định nghĩa được liên kết với các tên trong namespace của package. Tệp ``__init__.py`` có thể chứa cùng loại mã Python như bất kỳ module nào khác, và Python sẽ thêm một số thuộc tính bổ sung vào module khi module được import.
 
-For example, the following file system layout defines a top level ``parent``
-package with three subpackages::
+Ví dụ: bố cục hệ thống tệp sau đây định nghĩa một package ``parent`` cấp cao nhất với ba subpackage::
 
     parent/
         __init__.py
@@ -117,148 +67,83 @@ package with three subpackages::
         three/
             __init__.py
 
-Importing ``parent.one`` will implicitly execute ``parent/__init__.py`` and
-``parent/one/__init__.py``.  Subsequent imports of ``parent.two`` or
-``parent.three`` will execute ``parent/two/__init__.py`` and
-``parent/three/__init__.py`` respectively.
+Việc import ``parent.one`` sẽ ngầm thực thi ``parent/__init__.py`` và ``parent/one/__init__.py``. Các lần import tiếp theo đối với ``parent.two`` hoặc ``parent.three`` sẽ lần lượt thực thi ``parent/two/__init__.py`` và ``parent/three/__init__.py``.
 
-A subdirectory inside a regular package that does not contain an
-``__init__.py`` file is treated as an implicit
-:ref:`namespace package <reference-namespace-package>` (a "namespace
-subpackage") rooted in that parent.  See :pep:`420` for the underlying
-specification.
+Một thư mục con bên trong một package thông thường không chứa tệp ``__init__.py`` được coi là một
+:ref:`namespace package <reference-namespace-package>` (một “namespace subpackage”) nằm trong package cha đó.  Xem :pep:`420` để biết đặc tả cơ sở.
 
 
 .. _reference-namespace-package:
 
-Namespace packages
-------------------
+Namespace package
+-----------------
 
 .. index::
     pair: package; namespace
     pair: package; portion
 
-A namespace package is a composite of various :term:`portions <portion>`,
-where each portion contributes a subpackage to the parent package.  Portions
-may reside in different locations on the file system.  Portions may also be
-found in zip files, on the network, or anywhere else that Python searches
-during import.  Namespace packages may or may not correspond directly to
-objects on the file system; they may be virtual modules that have no concrete
-representation.
+Một namespace package là sự kết hợp của nhiều :term:`portion <portion>` khác nhau, trong đó mỗi portion đóng góp một subpackage cho package cha.  Các portion có thể nằm ở những vị trí khác nhau trên hệ thống tệp.  Các portion cũng có thể nằm trong tệp zip, trên mạng hoặc bất kỳ nơi nào khác mà Python tìm kiếm trong quá trình import.  Namespace package có thể tương ứng trực tiếp hoặc không với các đối tượng trên hệ thống tệp; chúng có thể là các module ảo không có biểu diễn cụ thể.
 
-Namespace packages do not use an ordinary list for their ``__path__``
-attribute. They instead use a custom iterable type which will automatically
-perform a new search for package portions on the next import attempt within
-that package if the path of their parent package (or :data:`sys.path` for a
-top level package) changes.
+Namespace package không sử dụng một danh sách thông thường cho thuộc tính ``__path__`` của chúng. Thay vào đó, chúng sử dụng một kiểu iterable tùy chỉnh, kiểu này sẽ tự động thực hiện một lần tìm kiếm mới các portion của package trong lần thử import tiếp theo bên trong package đó nếu đường dẫn của package cha (hoặc :data:`sys.path` đối với package cấp cao nhất) thay đổi.
 
-With namespace packages, there is no ``parent/__init__.py`` file.  In fact,
-there may be multiple ``parent`` directories found during import search, where
-each one is provided by a different portion.  Thus ``parent/one`` may not be
-physically located next to ``parent/two``.  In this case, Python will create a
-namespace package for the top-level ``parent`` package whenever it or one of
-its subpackages is imported.
+Với namespace package, không có tệp ``parent/__init__.py``.  Trên thực tế, có thể có nhiều thư mục ``parent`` được tìm thấy trong quá trình tìm kiếm import, trong đó mỗi thư mục được cung cấp bởi một portion khác nhau.  Vì vậy, ``parent/one`` có thể không nằm trên thực tế cạnh ``parent/two``.  Trong trường hợp này, Python sẽ tạo một namespace package cho package ``parent`` cấp cao nhất bất cứ khi nào package đó hoặc một trong các subpackage của nó được import.
 
-Namespace packages may also be nested inside a regular package.  When the
-import system searches a regular package's ``__path__`` and encounters a
-subdirectory that does not contain an ``__init__.py`` file, that
-subdirectory becomes a :term:`portion` contributing to a namespace
-subpackage of the enclosing regular package.
+Namespace package cũng có thể được lồng bên trong một package thông thường.  Khi hệ thống import tìm kiếm ``__path__`` của một package thông thường và gặp một thư mục con không chứa tệp ``__init__.py``, thư mục con đó trở thành một :term:`portion`, đóng góp vào một namespace subpackage của package thông thường bao quanh.
 
-See also :pep:`420` for the namespace package specification.
+Xem thêm :pep:`420` để biết đặc tả về namespace package.
 
 
-Searching
-=========
+Tìm kiếm
+========
 
-To begin the search, Python needs the :term:`fully qualified <qualified name>`
-name of the module (or package, but for the purposes of this discussion, the
-difference is immaterial) being imported.  This name may come from various
-arguments to the :keyword:`import` statement, or from the parameters to the
-:func:`importlib.import_module` or :func:`__import__` functions.
+Để bắt đầu quá trình tìm kiếm, Python cần tên :term:`đầy đủ <qualified name>` của module (hoặc package, nhưng trong phạm vi thảo luận này, sự khác biệt là không đáng kể) đang được import. Tên này có thể đến từ nhiều đối số khác nhau của câu lệnh :keyword:`import`, hoặc từ các tham số của
+hàm :func:`importlib.import_module` hoặc :func:`__import__`.
 
-This name will be used in various phases of the import search, and it may be
-the dotted path to a submodule, e.g. ``foo.bar.baz``.  In this case, Python
-first tries to import ``foo``, then ``foo.bar``, and finally ``foo.bar.baz``.
-If any of the intermediate imports fail, a :exc:`ModuleNotFoundError` is raised.
+Tên này sẽ được sử dụng trong nhiều giai đoạn khác nhau của quá trình tìm kiếm import và có thể là đường dẫn phân tách bằng dấu chấm đến một submodule, ví dụ ``foo.bar.baz``. Trong trường hợp này, Python trước tiên thử import ``foo``, sau đó ``foo.bar``, và cuối cùng là ``foo.bar.baz``. Nếu bất kỳ lần import trung gian nào thất bại, một :exc:`ModuleNotFoundError` sẽ được đưa ra.
 
 
-The module cache
-----------------
+Bộ nhớ đệm module
+-----------------
 
 .. index::
     single: sys.modules
 
-The first place checked during import search is :data:`sys.modules`.  This
-mapping serves as a cache of all modules that have been previously imported,
-including the intermediate paths.  So if ``foo.bar.baz`` was previously
-imported, :data:`sys.modules` will contain entries for ``foo``, ``foo.bar``,
-and ``foo.bar.baz``.  Each key will have as its value the corresponding module
-object.
+Nơi đầu tiên được kiểm tra trong quá trình tìm kiếm import là :data:`sys.modules`. Ánh xạ này đóng vai trò là bộ nhớ đệm của tất cả module đã được import trước đó, bao gồm cả các đường dẫn trung gian. Vì vậy, nếu ``foo.bar.baz`` đã được import trước đó, :data:`sys.modules` sẽ chứa các mục cho ``foo``, ``foo.bar`` và ``foo.bar.baz``. Mỗi khóa sẽ có giá trị là đối tượng module tương ứng.
 
-During import, the module name is looked up in :data:`sys.modules` and if
-present, the associated value is the module satisfying the import, and the
-process completes.  However, if the value is ``None``, then a
-:exc:`ModuleNotFoundError` is raised.  If the module name is missing, Python will
-continue searching for the module.
+Trong quá trình import, tên module được tra cứu trong :data:`sys.modules` và nếu có, giá trị tương ứng là module đáp ứng việc import, quá trình sẽ hoàn tất. Tuy nhiên, nếu giá trị là ``None``, thì một
+:exc:`ModuleNotFoundError` được phát sinh. Nếu không tìm thấy tên module, Python sẽ tiếp tục tìm kiếm module đó.
 
-:data:`sys.modules` is writable.  Deleting a key may not destroy the
-associated module (as other modules may hold references to it),
-but it will invalidate the cache entry for the named module, causing
-Python to search anew for the named module upon its next
-import. The key can also be assigned to ``None``, forcing the next import
-of the module to result in a :exc:`ModuleNotFoundError`.
+:data:`sys.modules` có thể ghi. Việc xóa một khóa có thể không hủy module tương ứng (vì các module khác có thể vẫn giữ tham chiếu đến module đó), nhưng sẽ làm mất hiệu lực mục nhập bộ nhớ đệm của module được đặt tên, khiến Python tìm lại module đó trong lần import tiếp theo. Khóa này cũng có thể được gán cho ``None``, buộc lần import module tiếp theo phải dẫn đến :exc:`ModuleNotFoundError`.
 
-Beware though, as if you keep a reference to the module object,
-invalidate its cache entry in :data:`sys.modules`, and then re-import the
-named module, the two module objects will *not* be the same. By contrast,
-:func:`importlib.reload` will reuse the *same* module object, and simply
-reinitialise the module contents by rerunning the module's code.
+Tuy nhiên, hãy cẩn thận: nếu bạn giữ một tham chiếu đến đối tượng module, làm mất hiệu lực mục nhập bộ nhớ đệm của nó trong :data:`sys.modules`, rồi import lại module được đặt tên, thì hai đối tượng module sẽ *không* giống nhau. Ngược lại,
+:func:`importlib.reload` sẽ sử dụng lại đối tượng module *giống*, và chỉ khởi tạo lại nội dung module bằng cách chạy lại mã của module.
 
 
 .. _finders-and-loaders:
 
-Finders and loaders
--------------------
+Finder và loader
+----------------
 
 .. index::
     single: finder
     single: loader
     single: module spec
 
-If the named module is not found in :data:`sys.modules`, then Python's import
-protocol is invoked to find and load the module.  This protocol consists of
-two conceptual objects, :term:`finders <finder>` and :term:`loaders <loader>`.
-A finder's job is to determine whether it can find the named module using
-whatever strategy it knows about. Objects that implement both of these
-interfaces are referred to as :term:`importers <importer>` - they return
-themselves when they find that they can load the requested module.
+Nếu không tìm thấy module được đặt tên trong :data:`sys.modules`, giao thức import của Python sẽ được gọi để tìm và tải module. Giao thức này bao gồm hai đối tượng mang tính khái niệm, :term:`finder <finder>` và :term:`loader <loader>`. Nhiệm vụ của finder là xác định xem nó có thể tìm thấy module được đặt tên bằng chiến lược mà nó biết hay không. Các đối tượng triển khai cả hai giao diện này được gọi là :term:`importer <importer>` - chúng trả về chính mình khi phát hiện rằng mình có thể tải module được yêu cầu.
 
-Python includes a number of default finders and importers.  The first one
-knows how to locate built-in modules, and the second knows how to locate
-frozen modules.  A third default finder searches an :term:`import path`
-for modules.  The :term:`import path` is a list of locations that may
-name file system paths or zip files.  It can also be extended to search
-for any locatable resource, such as those identified by URLs.
+Python bao gồm một số finder và importer mặc định. Finder đầu tiên biết cách định vị các module tích hợp sẵn, còn importer thứ hai biết cách định vị các module frozen. Một finder mặc định thứ ba tìm kiếm các module trong :term:`import path`. :term:`import path` là danh sách các vị trí có thể là đường dẫn hệ thống tệp hoặc tệp zip. Nó cũng có thể được mở rộng để tìm kiếm mọi tài nguyên có thể định vị, chẳng hạn như các tài nguyên được xác định bằng URL.
 
-The import machinery is extensible, so new finders can be added to extend the
-range and scope of module searching.
+Cơ chế import có thể mở rộng, vì vậy có thể thêm các finder mới để mở rộng phạm vi và quy mô tìm kiếm module.
 
-Finders do not actually load modules.  If they can find the named module, they
-return a :dfn:`module spec`, an encapsulation of the module's import-related
-information, which the import machinery then uses when loading the module.
+Finder không thực sự tải module. Nếu có thể tìm thấy module được chỉ định, chúng trả về một :dfn:`module spec`, là một đối tượng đóng gói thông tin liên quan đến việc import module, sau đó được cơ chế import sử dụng khi tải module.
 
-The following sections describe the protocol for finders and loaders in more
-detail, including how you can create and register new ones to extend the
-import machinery.
+Các phần sau mô tả chi tiết hơn về giao thức dành cho finder và loader, bao gồm cách bạn có thể tạo và đăng ký các thành phần mới để mở rộng cơ chế import.
 
 .. versionchanged:: 3.4
-   In previous versions of Python, finders returned :term:`loaders <loader>`
-   directly, whereas now they return module specs which *contain* loaders.
-   Loaders are still used during import but have fewer responsibilities.
+   Trong các phiên bản Python trước đây, finder trả về trực tiếp :term:`loaders <loader>`, trong khi hiện nay chúng trả về module spec, các module spec này *contain* loader. Loader vẫn được sử dụng trong quá trình import nhưng có ít trách nhiệm hơn.
 
-Import hooks
-------------
+Import hook
+-----------
 
 .. index::
    single: import hooks
@@ -268,111 +153,65 @@ Import hooks
    pair: hooks; meta
    pair: hooks; path
 
-The import machinery is designed to be extensible; the primary mechanism for
-this are the *import hooks*.  There are two types of import hooks: *meta
-hooks* and *import path hooks*.
+Cơ chế import được thiết kế để có thể mở rộng; cơ chế chính cho việc này là *import hooks*. Có hai loại import hook: *meta hooks* và *import path hooks*.
 
-Meta hooks are called at the start of import processing, before any other
-import processing has occurred, other than :data:`sys.modules` cache look up.
-This allows meta hooks to override :data:`sys.path` processing, frozen
-modules, or even built-in modules.  Meta hooks are registered by adding new
-finder objects to :data:`sys.meta_path`, as described below.
+Meta hook được gọi khi bắt đầu quá trình import, trước khi bất kỳ quá trình import nào khác diễn ra, ngoại trừ việc tra cứu cache :data:`sys.modules`. Điều này cho phép meta hook ghi đè quá trình xử lý :data:`sys.path`, các frozen module hoặc thậm chí các built-in module. Meta hook được đăng ký bằng cách thêm các đối tượng finder mới vào :data:`sys.meta_path`, như mô tả bên dưới.
 
-Import path hooks are called as part of :data:`sys.path` (or
-``package.__path__``) processing, at the point where their associated path
-item is encountered.  Import path hooks are registered by adding new callables
-to :data:`sys.path_hooks` as described below.
+Import path hook được gọi trong quá trình xử lý :data:`sys.path` (hoặc ``package.__path__``), tại thời điểm gặp path item liên kết với chúng. Import path hook được đăng ký bằng cách thêm các callable mới vào :data:`sys.path_hooks` như mô tả bên dưới.
 
 
-The meta path
--------------
+Meta path
+---------
 
 .. index::
     single: sys.meta_path
     pair: finder; find_spec
 
-When the named module is not found in :data:`sys.modules`, Python next
-searches :data:`sys.meta_path`, which contains a list of meta path finder
-objects.  These finders are queried in order to see if they know how to handle
-the named module.  Meta path finders must implement a method called
-:meth:`~importlib.abc.MetaPathFinder.find_spec` which takes three arguments:
-a name, an import path, and (optionally) a target module.  The meta path
-finder can use any strategy it wants to determine whether it can handle
-the named module or not.
+Khi không tìm thấy module có tên trong :data:`sys.modules`, Python tiếp tục tìm kiếm trong :data:`sys.meta_path`, nơi chứa danh sách các đối tượng meta path finder. Các finder này được truy vấn theo thứ tự để xem chúng có biết cách xử lý module có tên đó hay không. Meta path finder phải triển khai một phương thức có tên
+:meth:`~importlib.abc.MetaPathFinder.find_spec`, phương thức này nhận ba đối số: một tên, một import path và một target module (tùy chọn). Meta path finder có thể sử dụng bất kỳ chiến lược nào để xác định liệu nó có thể xử lý module có tên đó hay không.
 
-If the meta path finder knows how to handle the named module, it returns a
-spec object.  If it cannot handle the named module, it returns ``None``.  If
-:data:`sys.meta_path` processing reaches the end of its list without returning
-a spec, then a :exc:`ModuleNotFoundError` is raised.  Any other exceptions
-raised are simply propagated up, aborting the import process.
+Nếu meta path finder biết cách xử lý module có tên đó, nó trả về một spec object. Nếu không thể xử lý module có tên đó, nó trả về ``None``. Nếu
+Quá trình xử lý :data:`sys.meta_path` đi đến cuối danh sách mà không trả về spec, một :exc:`ModuleNotFoundError` sẽ được raised. Mọi exception khác được raised sẽ פשוט được truyền lên, khiến quá trình import bị hủy bỏ.
 
-The :meth:`~importlib.abc.MetaPathFinder.find_spec` method of meta path
-finders is called with two or three arguments.  The first is the fully
-qualified name of the module being imported, for example ``foo.bar.baz``.
-The second argument is the path entries to use for the module search.  For
-top-level modules, the second argument is ``None``, but for submodules or
-subpackages, the second argument is the value of the parent package's
-``__path__`` attribute. If the appropriate ``__path__`` attribute cannot
-be accessed, a :exc:`ModuleNotFoundError` is raised.  The third argument
-is an existing module object that will be the target of loading later.
-The import system passes in a target module only during reload.
+Phương thức :meth:`~importlib.abc.MetaPathFinder.find_spec` của các meta path finder được gọi với hai hoặc ba đối số. Đối số đầu tiên là tên đầy đủ của module đang được import, chẳng hạn như ``foo.bar.baz``. Đối số thứ hai là các mục đường dẫn được sử dụng để tìm kiếm module. Đối với các module cấp cao nhất, đối số thứ hai là ``None``, nhưng đối với các submodule hoặc subpackage, đối số thứ hai là giá trị của thuộc tính ``__path__`` của package cha. Nếu không thể truy cập thuộc tính ``__path__`` thích hợp, một :exc:`ModuleNotFoundError` sẽ được raise. Đối số thứ ba là một đối tượng module hiện có, sẽ là đối tượng đích để load sau đó. Hệ thống import chỉ truyền vào một module đích trong quá trình reload.
 
-The meta path may be traversed multiple times for a single import request.
-For example, assuming none of the modules involved has already been cached,
-importing ``foo.bar.baz`` will first perform a top level import, calling
-``mpf.find_spec("foo", None, None)`` on each meta path finder (``mpf``). After
-``foo`` has been imported, ``foo.bar`` will be imported by traversing the
-meta path a second time, calling
-``mpf.find_spec("foo.bar", foo.__path__, None)``. Once ``foo.bar`` has been
-imported, the final traversal will call
-``mpf.find_spec("foo.bar.baz", foo.bar.__path__, None)``.
+Meta path có thể được duyệt nhiều lần cho một yêu cầu import duy nhất. Ví dụ, giả sử chưa có module nào liên quan được cache, khi import ``foo.bar.baz``, trước tiên sẽ thực hiện một lần import cấp cao nhất, gọi ``mpf.find_spec("foo", None, None)`` trên từng meta path finder (``mpf``). Sau khi ``foo`` được import, ``foo.bar`` sẽ được import bằng cách duyệt meta path lần thứ hai và gọi ``mpf.find_spec("foo.bar", foo.__path__, None)``. Sau khi ``foo.bar`` được import, lần duyệt cuối cùng sẽ gọi ``mpf.find_spec("foo.bar.baz", foo.bar.__path__, None)``.
 
-Some meta path finders only support top level imports. These importers will
-always return ``None`` when anything other than ``None`` is passed as the
-second argument.
+Một số meta path finder chỉ hỗ trợ import cấp cao nhất. Các importer này sẽ luôn trả về ``None`` khi đối số thứ hai được truyền vào là bất kỳ giá trị nào khác ``None``.
 
-Python's default :data:`sys.meta_path` has three meta path finders, one that
-knows how to import built-in modules, one that knows how to import frozen
-modules, and one that knows how to import modules from an :term:`import path`
-(i.e. the :term:`path based finder`).
+:data:`sys.meta_path` mặc định của Python có ba meta path finder: một finder biết cách import các module tích hợp sẵn, một finder biết cách import các module frozen, và một finder biết cách import module từ một :term:`import path` (tức là :term:`path based finder`).
 
 .. versionchanged:: 3.4
-   The :meth:`~importlib.abc.MetaPathFinder.find_spec` method of meta path
-   finders replaced :meth:`!find_module`, which
-   is now deprecated.  While it will continue to work without change, the
-   import machinery will try it only if the finder does not implement
+   Phương thức :meth:`~importlib.abc.MetaPathFinder.find_spec` của các meta path finder đã thay thế :meth:`!find_module`, hiện đã deprecated. Mặc dù phương thức này vẫn sẽ tiếp tục hoạt động mà không cần thay đổi, cơ chế import sẽ chỉ thử phương thức này nếu finder không triển khai
    :meth:`~importlib.abc.MetaPathFinder.find_spec`.
 
 .. versionchanged:: 3.10
-   Use of :meth:`!find_module` by the import system
-   now raises :exc:`ImportWarning`.
+   Việc hệ thống import sử dụng :meth:`!find_module` hiện sẽ raise :exc:`ImportWarning`.
 
 .. versionchanged:: 3.12
    :meth:`!find_module` has been removed.
-   Use :meth:`~importlib.abc.MetaPathFinder.find_spec` instead.
+   Thay vào đó, hãy sử dụng :meth:`~importlib.abc.MetaPathFinder.find_spec`.
 
 
-Loading
-=======
+Đang tải
+========
 
-If and when a module spec is found, the import machinery will use it (and
-the loader it contains) when loading the module.  Here is an approximation
-of what happens during the loading portion of import::
+Nếu và khi tìm thấy module spec, cơ chế import sẽ sử dụng nó (cùng với loader mà nó chứa) khi tải module. Dưới đây là mô phỏng gần đúng những gì xảy ra trong phần tải của quá trình import::
 
     module = None
     if spec.loader is not None and hasattr(spec.loader, 'create_module'):
-        # It is assumed 'exec_module' will also be defined on the loader.
+        # Giả định rằng 'exec_module' cũng được định nghĩa trên loader.
         module = spec.loader.create_module(spec)
     if module is None:
         module = ModuleType(spec.name)
-    # The import-related module attributes get set here:
+    # Các thuộc tính liên quan đến import được thiết lập tại đây:
     _init_module_attrs(spec, module)
 
     if spec.loader is None:
-        # unsupported
+        # không được hỗ trợ
         raise ImportError
     if spec.origin is None and spec.submodule_search_locations is not None:
-        # namespace package
+        # gói namespace
         sys.modules[spec.name] = module
     elif not hasattr(spec.loader, 'exec_module'):
         module = spec.loader.load_module(spec.name)
@@ -388,132 +227,86 @@ of what happens during the loading portion of import::
             raise
     return sys.modules[spec.name]
 
-Note the following details:
+Lưu ý các chi tiết sau:
 
-* If there is an existing module object with the given name in
-  :data:`sys.modules`, import will have already returned it.
+* Nếu đã có một đối tượng module với tên đã cho trong
+  :data:`sys.modules`, thao tác import sẽ trả về đối tượng đó.
 
-* The module will exist in :data:`sys.modules` before the loader
-  executes the module code.  This is crucial because the module code may
-  (directly or indirectly) import itself; adding it to :data:`sys.modules`
-  beforehand prevents unbounded recursion in the worst case and multiple
-  loading in the best.
+* Module sẽ tồn tại trong :data:`sys.modules` trước khi loader thực thi mã của module. Điều này rất quan trọng vì mã của module có thể import chính nó (trực tiếp hoặc gián tiếp); việc thêm module vào :data:`sys.modules` trước đó sẽ ngăn đệ quy vô hạn trong trường hợp xấu nhất và ngăn việc tải nhiều lần trong trường hợp tốt nhất.
 
-* If loading fails, the failing module -- and only the failing module --
-  gets removed from :data:`sys.modules`.  Any module already in the
-  :data:`sys.modules` cache, and any module that was successfully loaded
-  as a side-effect, must remain in the cache.  This contrasts with
-  reloading where even the failing module is left in :data:`sys.modules`.
+* Nếu việc tải thất bại, module bị lỗi -- và chỉ module bị lỗi đó -- sẽ bị xóa khỏi :data:`sys.modules`. Bất kỳ module nào đã có trong
+  bộ nhớ đệm :data:`sys.modules`, cũng như bất kỳ module nào được tải thành công dưới dạng tác dụng phụ, đều phải vẫn nằm trong bộ nhớ đệm. Điều này khác với việc tải lại, khi ngay cả module bị lỗi cũng vẫn được giữ trong :data:`sys.modules`.
 
-* After the module is created but before execution, the import machinery
-  sets the import-related module attributes ("_init_module_attrs" in
-  the pseudo-code example above), as summarized in a
-  :ref:`later section <import-mod-attrs>`.
+* Sau khi module được tạo nhưng trước khi thực thi, cơ chế import sẽ thiết lập các thuộc tính của module liên quan đến import ("_init_module_attrs" trong ví dụ mã giả ở trên), như được tóm tắt trong
+  :ref:`phần sau <import-mod-attrs>`.
 
-* Module execution is the key moment of loading in which the module's
-  namespace gets populated.  Execution is entirely delegated to the
-  loader, which gets to decide what gets populated and how.
+* Thực thi module là thời điểm then chốt trong quá trình tải, khi namespace của module được điền dữ liệu. Việc thực thi hoàn toàn do loader đảm nhiệm; loader quyết định nội dung nào được điền và cách điền.
 
-* The module created during loading and passed to exec_module() may
-  not be the one returned at the end of import [#fnlo]_.
+* Module được tạo trong quá trình tải và được truyền vào exec_module() có thể không phải là module được trả về khi kết thúc import [#fnlo]_.
 
 .. versionchanged:: 3.4
-   The import system has taken over the boilerplate responsibilities of
-   loaders.  These were previously performed by the
-   :meth:`importlib.abc.Loader.load_module` method.
+   Hệ thống import đã tiếp quản các trách nhiệm mã mẫu (boilerplate) của loader. Trước đây, những trách nhiệm này được thực hiện bởi
+   phương thức :meth:`importlib.abc.Loader.load_module`.
 
 Loaders
 -------
 
-Module loaders provide the critical function of loading: module execution.
-The import machinery calls the :meth:`importlib.abc.Loader.exec_module`
-method with a single argument, the module object to execute.  Any value
-returned from :meth:`~importlib.abc.Loader.exec_module` is ignored.
+Loader của module cung cấp chức năng cốt lõi của việc tải: thực thi module. Bộ máy import gọi phương thức :meth:`importlib.abc.Loader.exec_module` với một đối số duy nhất là đối tượng module cần thực thi. Mọi giá trị được trả về từ :meth:`~importlib.abc.Loader.exec_module` đều bị bỏ qua.
 
-Loaders must satisfy the following requirements:
+Loader phải đáp ứng các yêu cầu sau:
 
-* If the module is a Python module (as opposed to a built-in module or a
-  dynamically loaded extension), the loader should execute the module's code
-  in the module's global name space (``module.__dict__``).
+* Nếu module là một Python module (không phải module tích hợp sẵn hoặc extension được tải động), loader phải thực thi mã của module trong không gian tên toàn cục của module (``module.__dict__``).
 
-* If the loader cannot execute the module, it should raise an
-  :exc:`ImportError`, although any other exception raised during
-  :meth:`~importlib.abc.Loader.exec_module` will be propagated.
+* Nếu loader không thể thực thi module, nó phải phát sinh một
+  :exc:`ImportError`, mặc dù mọi ngoại lệ khác phát sinh trong quá trình
+  :meth:`~importlib.abc.Loader.exec_module` sẽ được truyền tiếp.
 
-In many cases, the finder and loader can be the same object; in such cases the
-:meth:`~importlib.abc.MetaPathFinder.find_spec` method would just return a
-spec with the loader set to ``self``.
+Trong nhiều trường hợp, finder và loader có thể là cùng một đối tượng; trong những trường hợp đó, phương thức
+:meth:`~importlib.abc.MetaPathFinder.find_spec` chỉ cần trả về một spec với loader được đặt thành ``self``.
 
-Module loaders may opt in to creating the module object during loading
-by implementing a :meth:`~importlib.abc.Loader.create_module` method.
-It takes one argument, the module spec, and returns the new module object
-to use during loading.  ``create_module()`` does not need to set any attributes
-on the module object.  If the method returns ``None``, the
-import machinery will create the new module itself.
+Các module loader có thể chọn tạo đối tượng module trong quá trình loading bằng cách triển khai phương thức :meth:`~importlib.abc.Loader.create_module`. Phương thức này nhận một đối số, là module spec, và trả về đối tượng module mới để sử dụng trong quá trình loading. ``create_module()`` không cần thiết lập bất kỳ thuộc tính nào trên đối tượng module. Nếu phương thức trả về ``None``, cơ chế import sẽ tự tạo module mới.
 
 .. versionadded:: 3.4
-   The :meth:`~importlib.abc.Loader.create_module` method of loaders.
+   Phương thức :meth:`~importlib.abc.Loader.create_module` của các loader.
 
 .. versionchanged:: 3.4
-   The :meth:`~importlib.abc.Loader.load_module` method was replaced by
-   :meth:`~importlib.abc.Loader.exec_module` and the import
-   machinery assumed all the boilerplate responsibilities of loading.
+   Phương thức :meth:`~importlib.abc.Loader.load_module` đã được thay thế bởi
+   :meth:`~importlib.abc.Loader.exec_module` và cơ chế import đã đảm nhiệm mọi công việc khung cần thiết cho việc nạp.
 
-   For compatibility with existing loaders, the import machinery will use
-   the ``load_module()`` method of loaders if it exists and the loader does
-   not also implement ``exec_module()``.  However, ``load_module()`` has been
-   deprecated and loaders should implement ``exec_module()`` instead.
+   Để tương thích với các loader hiện có, cơ chế import sẽ sử dụng phương thức ``load_module()`` của loader nếu phương thức này tồn tại và loader không đồng thời triển khai ``exec_module()``. Tuy nhiên, ``load_module()`` đã không còn được khuyến nghị và loader nên triển khai ``exec_module()`` thay thế.
 
-   The ``load_module()`` method must implement all the boilerplate loading
-   functionality described above in addition to executing the module.  All
-   the same constraints apply, with some additional clarification:
+   Phương thức ``load_module()`` phải triển khai toàn bộ chức năng khung cần thiết cho việc nạp được mô tả ở trên, ngoài việc thực thi module. Mọi ràng buộc tương tự vẫn được áp dụng, cùng một số điểm làm rõ bổ sung:
 
-   * If there is an existing module object with the given name in
-     :data:`sys.modules`, the loader must use that existing module.
-     (Otherwise, :func:`importlib.reload` will not work correctly.)  If the
-     named module does not exist in :data:`sys.modules`, the loader
-     must create a new module object and add it to :data:`sys.modules`.
+   * Nếu đã có một đối tượng module với tên đã cho trong
+     :data:`sys.modules`, loader phải sử dụng module hiện có đó. (Nếu không, :func:`importlib.reload` sẽ không hoạt động chính xác.) Nếu module có tên không tồn tại trong :data:`sys.modules`, loader phải tạo một đối tượng module mới và thêm đối tượng đó vào :data:`sys.modules`.
 
-   * The module *must* exist in :data:`sys.modules` before the loader
-     executes the module code, to prevent unbounded recursion or multiple
-     loading.
+   * Mô-đun *must* tồn tại trong :data:`sys.modules` trước khi loader thực thi mã của mô-đun, nhằm ngăn đệ quy không bị giới hạn hoặc việc tải nhiều lần.
 
-   * If loading fails, the loader must remove any modules it has inserted
-     into :data:`sys.modules`, but it must remove **only** the failing
-     module(s), and only if the loader itself has loaded the module(s)
-     explicitly.
+   * Nếu việc tải thất bại, loader phải xóa mọi mô-đun mà nó đã chèn vào :data:`sys.modules`, nhưng chỉ được xóa **only** các mô-đun bị lỗi và chỉ khi chính loader đã tải các mô-đun đó một cách tường minh.
 
 .. versionchanged:: 3.5
-   A :exc:`DeprecationWarning` is raised when ``exec_module()`` is defined but
-   ``create_module()`` is not.
+   Một :exc:`DeprecationWarning` được phát sinh khi ``exec_module()`` được định nghĩa nhưng ``create_module()`` thì không.
 
 .. versionchanged:: 3.6
-   An :exc:`ImportError` is raised when ``exec_module()`` is defined but
-   ``create_module()`` is not.
+   Một :exc:`ImportError` được phát sinh khi ``exec_module()`` được định nghĩa nhưng ``create_module()`` thì không.
 
 .. versionchanged:: 3.10
-   Use of ``load_module()`` will raise :exc:`ImportWarning`.
+   Việc sử dụng ``load_module()`` sẽ phát sinh :exc:`ImportWarning`.
 
-Submodules
+Mô-đun con
 ----------
 
-When a submodule is loaded using any mechanism (e.g. ``importlib`` APIs, the
-``import`` or ``import-from`` statements, or built-in ``__import__()``) a
-binding is placed in the parent module's namespace to the submodule object.
-For example, if package ``spam`` has a submodule ``foo``, after importing
-``spam.foo``, ``spam`` will have an attribute ``foo`` which is bound to the
-submodule.  Let's say you have the following directory structure::
+Khi một mô-đun con được tải bằng bất kỳ cơ chế nào (ví dụ: các API ``importlib``, các câu lệnh ``import`` hoặc ``import-from``, hay ``__import__()`` tích hợp sẵn), một binding được đặt trong namespace của mô-đun cha để trỏ đến đối tượng mô-đun con. Ví dụ, nếu package ``spam`` có một mô-đun con ``foo``, sau khi import ``spam.foo``, ``spam`` sẽ có một thuộc tính ``foo`` được liên kết với mô-đun con. Giả sử bạn có cấu trúc thư mục sau đây::
 
     spam/
         __init__.py
         foo.py
 
-and ``spam/__init__.py`` has the following line in it::
+và ``spam/__init__.py`` có dòng sau trong đó::
 
     from .foo import Foo
 
-then executing the following puts name bindings for ``foo`` and ``Foo`` in the
-``spam`` module::
+sau đó thực thi nội dung sau sẽ đặt các liên kết tên cho ``foo`` và ``Foo`` trong module ``spam``::
 
     >>> import spam
     >>> spam.foo
@@ -521,180 +314,100 @@ then executing the following puts name bindings for ``foo`` and ``Foo`` in the
     >>> spam.Foo
     <class 'spam.foo.Foo'>
 
-Given Python's familiar name binding rules this might seem surprising, but
-it's actually a fundamental feature of the import system.  The invariant
-holding is that if you have ``sys.modules['spam']`` and
-``sys.modules['spam.foo']`` (as you would after the above import), the latter
-must appear as the ``foo`` attribute of the former.
+Với các quy tắc liên kết tên quen thuộc của Python, điều này có vẻ đáng ngạc nhiên, nhưng thực ra đây là một tính năng nền tảng của hệ thống import. Bất biến được duy trì là nếu bạn có ``sys.modules['spam']`` và ``sys.modules['spam.foo']`` (như sau thao tác import ở trên), thì ``sys.modules['spam.foo']`` phải xuất hiện dưới dạng thuộc tính ``foo`` của ``sys.modules['spam']``.
 
 .. _module-specs:
 
-Module specs
-------------
+Đặc tả module
+-------------
 
-The import machinery uses a variety of information about each module
-during import, especially before loading.  Most of the information is
-common to all modules.  The purpose of a module's spec is to encapsulate
-this import-related information on a per-module basis.
+Cơ chế import sử dụng nhiều loại thông tin về từng module trong quá trình import, đặc biệt là trước khi tải. Phần lớn thông tin là chung cho mọi module. Mục đích của đặc tả module là đóng gói thông tin liên quan đến import này theo từng module.
 
-Using a spec during import allows state to be transferred between import
-system components, e.g. between the finder that creates the module spec
-and the loader that executes it.  Most importantly, it allows the
-import machinery to perform the boilerplate operations of loading,
-whereas without a module spec the loader had that responsibility.
+Việc sử dụng đặc tả trong quá trình import cho phép truyền trạng thái giữa các thành phần của hệ thống import, chẳng hạn giữa finder tạo đặc tả module và loader thực thi đặc tả đó. Quan trọng nhất, nó cho phép cơ chế import thực hiện các thao tác soạn sẵn để tải, trong khi nếu không có đặc tả module thì loader phải chịu trách nhiệm đó.
 
-The module's spec is exposed as :attr:`module.__spec__`. Setting
-:attr:`!__spec__` appropriately applies equally to
-:ref:`modules initialized during interpreter startup <programs>`.
-The one exception is ``__main__``, where :attr:`!__spec__` is
-:ref:`set to None in some cases <main_spec>`.
+Đặc tả của module được cung cấp dưới dạng :attr:`module.__spec__`. Việc thiết lập
+:attr:`!__spec__` cũng áp dụng tương tự cho
+:ref:`các mô-đun được khởi tạo trong quá trình khởi động trình thông dịch <programs>`. Ngoại lệ duy nhất là ``__main__``, trong đó :attr:`!__spec__` là
+:ref:`được đặt thành None trong một số trường hợp <main_spec>`.
 
-See :class:`~importlib.machinery.ModuleSpec` for details on the contents of
-the module spec.
+Xem :class:`~importlib.machinery.ModuleSpec` để biết chi tiết về nội dung của module spec.
 
 .. versionadded:: 3.4
 
 .. _package-path-rules:
 
-__path__ attributes on modules
-------------------------------
+Các thuộc tính __path__ trên mô-đun
+-----------------------------------
 
-The :attr:`~module.__path__` attribute should be a (possibly empty)
-:term:`sequence` of strings enumerating the locations where the package's
-submodules will be found. By definition, if a module has a :attr:`!__path__`
-attribute, it is a :term:`package`.
+Thuộc tính :attr:`~module.__path__` phải là một (có thể rỗng)
+:term:`sequence` gồm các chuỗi liệt kê những vị trí chứa các submodule của package. Theo định nghĩa, nếu một mô-đun có thuộc tính :attr:`!__path__`, thì đó là một :term:`package`.
 
-A package's :attr:`~module.__path__` attribute is used during imports of its
-subpackages.
-Within the import machinery, it functions much the same as :data:`sys.path`,
-i.e. providing a list of locations to search for modules during import.
-However, :attr:`!__path__` is typically much more constrained than
+Thuộc tính :attr:`~module.__path__` của một package được sử dụng khi import các subpackage của package đó. Trong cơ chế import, thuộc tính này hoạt động gần như :data:`sys.path`, tức là cung cấp danh sách các vị trí cần tìm module trong quá trình import. Tuy nhiên, :attr:`!__path__` thường bị giới hạn hơn nhiều so với
 :data:`!sys.path`.
 
-The same rules used for :data:`sys.path` also apply to a package's
-:attr:`!__path__`. :data:`sys.path_hooks` (described below) are
-consulted when traversing a package's :attr:`!__path__`.
+Các quy tắc tương tự được áp dụng cho :data:`sys.path` cũng áp dụng cho
+:attr:`!__path__`. :data:`sys.path_hooks` (được mô tả bên dưới) được tham chiếu khi duyệt qua :attr:`!__path__` của một package.
 
-A package's ``__init__.py`` file may set or alter the package's
-:attr:`~module.__path__`
-attribute, and this was typically the way namespace packages were implemented
-prior to :pep:`420`.  With the adoption of :pep:`420`, namespace packages no
-longer need to supply ``__init__.py`` files containing only :attr:`!__path__`
-manipulation code; the import machinery automatically sets :attr:`!__path__`
-correctly for the namespace package.
+Tệp ``__init__.py`` của một package có thể thiết lập hoặc thay đổi thuộc tính
+:attr:`~module.__path__` của package, và trước :pep:`420`, đây thường là cách các namespace package được triển khai. Với việc áp dụng :pep:`420`, namespace package không còn cần cung cấp các tệp ``__init__.py`` chỉ chứa mã thao tác với :attr:`!__path__`; cơ chế import sẽ tự động thiết lập đúng :attr:`!__path__` cho namespace package.
 
-Module reprs
-------------
+repr của module
+---------------
 
-By default, all modules have a usable repr, however depending on the
-attributes set above, and in the module's spec, you can more explicitly
-control the repr of module objects.
+Theo mặc định, tất cả module đều có repr có thể sử dụng; tuy nhiên, tùy thuộc vào các thuộc tính được thiết lập ở trên và trong spec của module, bạn có thể kiểm soát rõ ràng hơn repr của các đối tượng module.
 
-If the module has a spec (``__spec__``), the import machinery will try
-to generate a repr from it.  If that fails or there is no spec, the import
-system will craft a default repr using whatever information is available
-on the module.  It will try to use the ``module.__name__``,
-``module.__file__``, and ``module.__loader__`` as input into the repr,
-with defaults for whatever information is missing.
+Nếu module có một spec (``__spec__``), cơ chế import sẽ cố gắng tạo repr từ spec đó. Nếu không thành công hoặc không có spec, hệ thống import sẽ tạo repr mặc định bằng bất kỳ thông tin nào có sẵn trên module. Hệ thống sẽ cố gắng sử dụng ``module.__name__``, ``module.__file__`` và ``module.__loader__`` làm đầu vào cho repr, đồng thời dùng giá trị mặc định cho mọi thông tin còn thiếu.
 
-Here are the exact rules used:
+Dưới đây là các quy tắc chính xác được sử dụng:
 
-* If the module has a ``__spec__`` attribute, the information in the spec
-  is used to generate the repr.  The "name", "loader", "origin", and
-  "has_location" attributes are consulted.
+* Nếu module có thuộc tính ``__spec__``, thông tin trong spec sẽ được sử dụng để tạo repr. Các thuộc tính "name", "loader", "origin" và "has_location" sẽ được kiểm tra.
 
-* If the module has a ``__file__`` attribute, this is used as part of the
-  module's repr.
+* Nếu module có thuộc tính ``__file__``, thuộc tính này sẽ được sử dụng như một phần của repr của module.
 
-* If the module has no ``__file__`` but does have a ``__loader__`` that is not
-  ``None``, then the loader's repr is used as part of the module's repr.
+* Nếu module không có ``__file__`` nhưng có ``__loader__`` khác ``None``, repr của loader sẽ được sử dụng như một phần của repr của module.
 
-* Otherwise, just use the module's ``__name__`` in the repr.
+* Nếu không, chỉ cần sử dụng ``__name__`` của module trong repr.
 
 .. versionchanged:: 3.12
-   Use of :meth:`!module_repr`, having been deprecated since Python 3.4, was
-   removed in Python 3.12 and is no longer called during the resolution of a
-   module's repr.
+   Việc sử dụng :meth:`!module_repr`, vốn đã bị deprecated từ Python 3.4, đã bị loại bỏ trong Python 3.12 và không còn được gọi trong quá trình xác định repr của module.
 
 .. _pyc-invalidation:
 
-Cached bytecode invalidation
-----------------------------
+Vô hiệu hóa bytecode đã lưu trong bộ nhớ đệm
+--------------------------------------------
 
-Before Python loads cached bytecode from a ``.pyc`` file, it checks whether the
-cache is up-to-date with the source ``.py`` file. By default, Python does this
-by storing the source's last-modified timestamp and size in the cache file when
-writing it. At runtime, the import system then validates the cache file by
-checking the stored metadata in the cache file against the source's
-metadata.
+Trước khi Python tải bytecode đã lưu trong bộ nhớ đệm từ tệp ``.pyc``, nó kiểm tra xem bộ nhớ đệm có được cập nhật theo tệp nguồn ``.py`` hay không. Theo mặc định, Python thực hiện việc này bằng cách lưu dấu thời gian sửa đổi lần cuối và kích thước của tệp nguồn vào tệp bộ nhớ đệm khi ghi tệp đó. Khi runtime chạy, hệ thống import sẽ xác thực tệp bộ nhớ đệm bằng cách đối chiếu siêu dữ liệu được lưu trong tệp bộ nhớ đệm với siêu dữ liệu của tệp nguồn.
 
-Python also supports "hash-based" cache files, which store a hash of the source
-file's contents rather than its metadata. There are two variants of hash-based
-``.pyc`` files: checked and unchecked. For checked hash-based ``.pyc`` files,
-Python validates the cache file by hashing the source file and comparing the
-resulting hash with the hash in the cache file. If a checked hash-based cache
-file is found to be invalid, Python regenerates it and writes a new checked
-hash-based cache file. For unchecked hash-based ``.pyc`` files, Python simply
-assumes the cache file is valid if it exists. Hash-based ``.pyc`` files
-validation behavior may be overridden with the :option:`--check-hash-based-pycs`
-flag.
+Python cũng hỗ trợ các tệp bộ nhớ đệm "dựa trên hash", lưu hash của nội dung tệp nguồn thay vì siêu dữ liệu của tệp. Có hai biến thể của tệp ``.pyc`` dựa trên hash: được kiểm tra và không được kiểm tra. Đối với các tệp ``.pyc`` dựa trên hash được kiểm tra, Python xác thực tệp bộ nhớ đệm bằng cách tính hash của tệp nguồn rồi so sánh hash thu được với hash trong tệp bộ nhớ đệm. Nếu một tệp bộ nhớ đệm dựa trên hash được kiểm tra được phát hiện là không hợp lệ, Python sẽ tạo lại tệp đó và ghi một tệp bộ nhớ đệm mới dựa trên hash được kiểm tra. Đối với các tệp ``.pyc`` dựa trên hash không được kiểm tra, Python chỉ cần giả định rằng tệp bộ nhớ đệm hợp lệ nếu tệp đó tồn tại. Hành vi xác thực các tệp ``.pyc`` dựa trên hash có thể được ghi đè bằng cờ :option:`--check-hash-based-pycs`.
 
 .. versionchanged:: 3.7
-   Added hash-based ``.pyc`` files. Previously, Python only supported
-   timestamp-based invalidation of bytecode caches.
+   Đã bổ sung các tệp ``.pyc`` dựa trên hash. Trước đây, Python chỉ hỗ trợ cơ chế vô hiệu hóa dựa trên dấu thời gian đối với các bộ nhớ đệm bytecode.
 
 
-The Path Based Finder
-=====================
+Trình tìm kiếm dựa trên đường dẫn
+=================================
 
 .. index::
     single: path based finder
 
-As mentioned previously, Python comes with several default meta path finders.
-One of these, called the :term:`path based finder`
-(:class:`~importlib.machinery.PathFinder`), searches an :term:`import path`,
-which contains a list of :term:`path entries <path entry>`.  Each path
-entry names a location to search for modules.
+Như đã đề cập trước đó, Python đi kèm với một số trình tìm kiếm meta path mặc định. Một trong số đó, được gọi là :term:`path based finder` (:class:`~importlib.machinery.PathFinder`), tìm kiếm trong một :term:`import path`, chứa danh sách các mục :term:`path entries <path entry>`. Mỗi mục đường dẫn chỉ định một vị trí để tìm kiếm các module.
 
-The path based finder itself doesn't know how to import anything. Instead, it
-traverses the individual path entries, associating each of them with a
-path entry finder that knows how to handle that particular kind of path.
+Bản thân trình tìm kiếm dựa trên đường dẫn không biết cách import bất cứ thứ gì. Thay vào đó, nó duyệt qua từng mục đường dẫn, liên kết mỗi mục với một trình tìm kiếm mục đường dẫn biết cách xử lý loại đường dẫn cụ thể đó.
 
-The default set of path entry finders implement all the semantics for finding
-modules on the file system, handling special file types such as Python source
-code (``.py`` files), Python byte code (``.pyc`` files) and
-shared libraries (e.g. ``.so`` files). When supported by the :mod:`zipimport`
-module in the standard library, the default path entry finders also handle
-loading all of these file types (other than shared libraries) from zipfiles.
+Tập hợp mặc định các trình tìm mục đường dẫn triển khai toàn bộ ngữ nghĩa để tìm module trên hệ thống tệp, xử lý các loại tệp đặc biệt như mã nguồn Python (các tệp ``.py``), byte code Python (các tệp ``.pyc``) và thư viện dùng chung (ví dụ: các tệp ``.so``). Khi được module :mod:`zipimport` trong thư viện chuẩn hỗ trợ, các trình tìm mục đường dẫn mặc định cũng xử lý việc tải tất cả các loại tệp này (ngoại trừ thư viện dùng chung) từ các tệp zip.
 
-Path entries need not be limited to file system locations.  They can refer to
-URLs, database queries, or any other location that can be specified as a
-string.
+Các mục đường dẫn không nhất thiết phải giới hạn ở những vị trí trên hệ thống tệp. Chúng có thể tham chiếu đến URL, truy vấn cơ sở dữ liệu hoặc bất kỳ vị trí nào khác có thể được chỉ định dưới dạng chuỗi.
 
-The path based finder provides additional hooks and protocols so that you
-can extend and customize the types of searchable path entries.  For example,
-if you wanted to support path entries as network URLs, you could write a hook
-that implements HTTP semantics to find modules on the web.  This hook (a
-callable) would return a :term:`path entry finder` supporting the protocol
-described below, which was then used to get a loader for the module from the
-web.
+Trình tìm dựa trên đường dẫn cung cấp các hook và protocol bổ sung để bạn có thể mở rộng và tùy chỉnh các loại mục đường dẫn có thể tìm kiếm. Ví dụ: nếu muốn hỗ trợ các mục đường dẫn dưới dạng URL mạng, bạn có thể viết một hook triển khai ngữ nghĩa HTTP để tìm module trên web. Hook này (một callable) sẽ trả về một :term:`path entry finder` hỗ trợ protocol được mô tả bên dưới, sau đó được dùng để lấy loader cho module từ web.
 
-A word of warning: this section and the previous both use the term *finder*,
-distinguishing between them by using the terms :term:`meta path finder` and
-:term:`path entry finder`.  These two types of finders are very similar,
-support similar protocols, and function in similar ways during the import
-process, but it's important to keep in mind that they are subtly different.
-In particular, meta path finders operate at the beginning of the import
-process, as keyed off the :data:`sys.meta_path` traversal.
+Xin lưu ý: phần này và phần trước đều sử dụng thuật ngữ *finder*, phân biệt chúng bằng cách sử dụng các thuật ngữ :term:`meta path finder` và
+:term:`path entry finder`. Hai loại finder này rất giống nhau, hỗ trợ các protocol tương tự và hoạt động theo những cách tương tự trong quá trình import, nhưng điều quan trọng là cần nhớ rằng chúng khác nhau một cách tinh tế. Cụ thể, meta path finder hoạt động ở đầu quá trình import, dựa trên quá trình duyệt :data:`sys.meta_path`.
 
-By contrast, path entry finders are in a sense an implementation detail
-of the path based finder, and in fact, if the path based finder were to be
-removed from :data:`sys.meta_path`, none of the path entry finder semantics
-would be invoked.
+Ngược lại, các trình tìm mục đường dẫn theo một nghĩa nào đó là chi tiết triển khai của trình tìm dựa trên đường dẫn; trên thực tế, nếu trình tìm dựa trên đường dẫn bị xóa khỏi :data:`sys.meta_path`, thì sẽ không có ngữ nghĩa nào của trình tìm mục đường dẫn được gọi.
 
 
-Path entry finders
-------------------
+Các trình tìm mục đường dẫn
+---------------------------
 
 .. index::
     single: sys.path
@@ -702,168 +415,84 @@ Path entry finders
     single: sys.path_importer_cache
     single: PYTHONPATH
 
-The :term:`path based finder` is responsible for finding and loading
-Python modules and packages whose location is specified with a string
-:term:`path entry`.  Most path entries name locations in the file system,
-but they need not be limited to this.
+:term:`path based finder` chịu trách nhiệm tìm và tải các module và package Python có vị trí được chỉ định bằng một chuỗi
+:term:`path entry`. Hầu hết các mục đường dẫn đều chỉ đến các vị trí trong hệ thống tệp, nhưng không nhất thiết phải giới hạn ở đó.
 
-As a meta path finder, the :term:`path based finder` implements the
-:meth:`~importlib.abc.MetaPathFinder.find_spec` protocol previously
-described, however it exposes additional hooks that can be used to
-customize how modules are found and loaded from the :term:`import path`.
+Với vai trò là một meta path finder, :term:`path based finder` triển khai
+giao thức :meth:`~importlib.abc.MetaPathFinder.find_spec` đã được mô tả trước đó, tuy nhiên nó cung cấp thêm các hook có thể được sử dụng để tùy chỉnh cách tìm và tải module từ :term:`import path`.
 
-Three variables are used by the :term:`path based finder`, :data:`sys.path`,
-:data:`sys.path_hooks` and :data:`sys.path_importer_cache`.  The ``__path__``
-attributes on package objects are also used.  These provide additional ways
-that the import machinery can be customized.
+Ba biến được :term:`path based finder`, :data:`sys.path` sử dụng,
+:data:`sys.path_hooks` và :data:`sys.path_importer_cache`. Các thuộc tính ``__path__`` trên các đối tượng package cũng được sử dụng. Những thành phần này cung cấp thêm các cách để tùy chỉnh cơ chế import.
 
-:data:`sys.path` contains a list of strings providing search locations for
-modules and packages.  It is initialized from the :envvar:`PYTHONPATH`
-environment variable and various other installation- and
-implementation-specific defaults.  Entries in :data:`sys.path` can name
-directories on the file system, zip files, and potentially other "locations"
-(see the :mod:`site` module) that should be searched for modules, such as
-URLs, or database queries.  Only strings should be present on
-:data:`sys.path`; all other data types are ignored.
+:data:`sys.path` chứa một danh sách các chuỗi cung cấp các vị trí tìm kiếm cho module và package. Nó được khởi tạo từ biến môi trường :envvar:`PYTHONPATH` và nhiều giá trị mặc định khác phụ thuộc vào quá trình cài đặt và implementation. Các mục trong :data:`sys.path` có thể chỉ đến các thư mục trong hệ thống tệp, các tệp zip và có khả năng là những “vị trí” khác (xem module :mod:`site`) cần được tìm kiếm để tìm module, chẳng hạn như URL hoặc truy vấn cơ sở dữ liệu. Chỉ các chuỗi mới nên xuất hiện trong
+:data:`sys.path`; tất cả các kiểu dữ liệu khác đều bị bỏ qua.
 
-The :term:`path based finder` is a :term:`meta path finder`, so the import
-machinery begins the :term:`import path` search by calling the path
-based finder's :meth:`~importlib.machinery.PathFinder.find_spec` method as
-described previously.  When the ``path`` argument to
-:meth:`~importlib.machinery.PathFinder.find_spec` is given, it will be a
-list of string paths to traverse - typically a package's ``__path__``
-attribute for an import within that package.  If the ``path`` argument is
-``None``, this indicates a top level import and :data:`sys.path` is used.
+:term:`path based finder` là một :term:`meta path finder`, vì vậy cơ chế import bắt đầu quá trình tìm kiếm :term:`import path` bằng cách gọi phương thức :meth:`~importlib.machinery.PathFinder.find_spec` của path-based finder như đã mô tả trước đó. Khi đối số ``path`` được truyền cho
+:meth:`~importlib.machinery.PathFinder.find_spec`, nó sẽ là một danh sách các path dạng chuỗi cần duyệt qua — thường là thuộc tính ``__path__`` của một package khi thực hiện import bên trong package đó. Nếu đối số ``path`` là ``None``, điều này cho biết đây là một import cấp cao nhất và :data:`sys.path` được sử dụng.
 
-The path based finder iterates over every entry in the search path, and
-for each of these, looks for an appropriate :term:`path entry finder`
-(:class:`~importlib.abc.PathEntryFinder`) for the
-path entry.  Because this can be an expensive operation (e.g. there may be
-``stat()`` call overheads for this search), the path based finder maintains
-a cache mapping path entries to path entry finders.  This cache is maintained
-in :data:`sys.path_importer_cache` (despite the name, this cache actually
-stores finder objects rather than being limited to :term:`importer` objects).
-In this way, the expensive search for a particular :term:`path entry`
-location's :term:`path entry finder` need only be done once.  User code is
-free to remove cache entries from :data:`sys.path_importer_cache` forcing
-the path based finder to perform the path entry search again.
+path-based finder lặp qua mọi entry trong search path và, với mỗi entry, tìm một :term:`path entry finder` (:class:`~importlib.abc.PathEntryFinder`) thích hợp cho path entry đó. Vì đây có thể là một thao tác tốn kém (ví dụ: việc tìm kiếm này có thể phát sinh chi phí gọi ``stat()``), path-based finder duy trì một cache ánh xạ các path entry với các path entry finder. Cache này được duy trì trong :data:`sys.path_importer_cache` (dù tên gọi như vậy, cache này thực tế lưu các finder object thay vì chỉ giới hạn ở các object :term:`importer`). Nhờ đó, việc tìm kiếm tốn kém để xác định :term:`path entry` của một vị trí cụ thể và :term:`path entry finder` của vị trí đó chỉ cần thực hiện một lần. Mã người dùng có thể tự do xóa các mục cache khỏi :data:`sys.path_importer_cache`, buộc path-based finder thực hiện lại việc tìm kiếm path entry.
 
-If the path entry is not present in the cache, the path based finder iterates
-over every callable in :data:`sys.path_hooks`.  Each of the :term:`path entry
-hooks <path entry hook>` in this list is called with a single argument, the
-path entry to be searched.  This callable may either return a :term:`path
-entry finder` that can handle the path entry, or it may raise
-:exc:`ImportError`.  An :exc:`ImportError` is used by the path based finder to
-signal that the hook cannot find a :term:`path entry finder`
-for that :term:`path entry`.  The
-exception is ignored and :term:`import path` iteration continues.  The hook
-should expect either a string or bytes object; the encoding of bytes objects
-is up to the hook (e.g. it may be a file system encoding, UTF-8, or something
-else), and if the hook cannot decode the argument, it should raise
+Nếu path entry không có trong cache, path-based finder lặp qua mọi callable trong :data:`sys.path_hooks`. Mỗi :term:`hook path entry <path entry hook>` trong danh sách này được gọi với một đối số duy nhất là path entry cần tìm kiếm. Callable này có thể trả về một :term:`path entry finder` có khả năng xử lý path entry, hoặc có thể phát sinh
+:exc:`ImportError`. Một :exc:`ImportError` được path-based finder sử dụng để báo hiệu rằng hook không thể tìm thấy :term:`path entry finder` cho :term:`path entry` đó. Exception bị bỏ qua và quá trình lặp :term:`import path` tiếp tục. Hook nên chờ một object dạng chuỗi hoặc bytes; encoding của các object bytes tùy thuộc vào hook (ví dụ: có thể là encoding của file system, UTF-8 hoặc một encoding khác), và nếu hook không thể decode đối số đó, nó nên phát sinh
 :exc:`ImportError`.
 
-If :data:`sys.path_hooks` iteration ends with no :term:`path entry finder`
-being returned, then the path based finder's
-:meth:`~importlib.machinery.PathFinder.find_spec` method will store ``None``
-in :data:`sys.path_importer_cache` (to indicate that there is no finder for
-this path entry) and return ``None``, indicating that this
-:term:`meta path finder` could not find the module.
+Nếu quá trình lặp :data:`sys.path_hooks` kết thúc mà không trả về :term:`path entry finder`, thì path-based finder sẽ
+Phương thức :meth:`~importlib.machinery.PathFinder.find_spec` sẽ lưu ``None`` vào :data:`sys.path_importer_cache` (để cho biết rằng không có finder nào cho mục nhập đường dẫn này) và trả về ``None``, cho biết rằng điều này
+:term:`meta path finder` không thể tìm thấy module.
 
-If a :term:`path entry finder` *is* returned by one of the :term:`path entry
-hook` callables on :data:`sys.path_hooks`, then the following protocol is used
-to ask the finder for a module spec, which is then used when loading the
-module.
+Nếu một :term:`path entry finder` *được* trả về bởi một trong các callable :term:`path entry hook` trên :data:`sys.path_hooks`, thì giao thức sau được sử dụng để yêu cầu finder cung cấp module spec, sau đó spec này được dùng khi tải module.
 
-The current working directory -- denoted by an empty string -- is handled
-slightly differently from other entries on :data:`sys.path`. First, if the
-current working directory cannot be determined or is found not to exist, no
-value is stored in :data:`sys.path_importer_cache`. Second, the value for the
-current working directory is looked up fresh for each module lookup. Third,
-the path used for :data:`sys.path_importer_cache` and returned by
-:meth:`importlib.machinery.PathFinder.find_spec` will be the actual current
-working directory and not the empty string.
+Thư mục làm việc hiện tại -- được biểu thị bằng một chuỗi rỗng -- được xử lý hơi khác so với các mục nhập khác trên :data:`sys.path`. Trước tiên, nếu không thể xác định thư mục làm việc hiện tại hoặc phát hiện thư mục này không tồn tại, không có giá trị nào được lưu trong :data:`sys.path_importer_cache`. Thứ hai, giá trị của thư mục làm việc hiện tại được tra cứu lại cho mỗi lần tra cứu module. Thứ ba, đường dẫn được dùng cho :data:`sys.path_importer_cache` và được trả về bởi
+:meth:`importlib.machinery.PathFinder.find_spec` sẽ là thư mục làm việc hiện tại thực tế, không phải chuỗi rỗng.
 
-Path entry finder protocol
---------------------------
+Giao thức finder của mục nhập đường dẫn
+---------------------------------------
 
-In order to support imports of modules and initialized packages and also to
-contribute portions to namespace packages, path entry finders must implement
-the :meth:`~importlib.abc.PathEntryFinder.find_spec` method.
+Để hỗ trợ việc import các module và package đã được khởi tạo, đồng thời đóng góp các phần cho namespace package, các path entry finder phải triển khai phương thức :meth:`~importlib.abc.PathEntryFinder.find_spec`.
 
-:meth:`~importlib.abc.PathEntryFinder.find_spec` takes two arguments: the
-fully qualified name of the module being imported, and the (optional) target
-module.  ``find_spec()`` returns a fully populated spec for the module.
-This spec will always have "loader" set (with one exception).
+:meth:`~importlib.abc.PathEntryFinder.find_spec` nhận hai đối số: tên đầy đủ của module đang được import và module đích (tùy chọn). ``find_spec()`` trả về spec được điền đầy đủ cho module. Spec này luôn có "loader" được thiết lập (ngoại trừ một trường hợp).
 
-To indicate to the import machinery that the spec represents a namespace
-:term:`portion`, the path entry finder sets ``submodule_search_locations`` to
-a list containing the portion.
+Để cho cơ chế import biết rằng spec đại diện cho một namespace
+:term:`portion`, path entry finder đặt ``submodule_search_locations`` thành một danh sách chứa phần đó.
 
 .. versionchanged:: 3.4
    :meth:`~importlib.abc.PathEntryFinder.find_spec` replaced
    :meth:`!find_loader` and
    :meth:`!find_module`, both of which
-   are now deprecated, but will be used if ``find_spec()`` is not defined.
+   hiện đã bị deprecated, nhưng sẽ được sử dụng nếu ``find_spec()`` chưa được định nghĩa.
 
-   Older path entry finders may implement one of these two deprecated methods
-   instead of ``find_spec()``.  The methods are still respected for the
-   sake of backward compatibility.  However, if ``find_spec()`` is
-   implemented on the path entry finder, the legacy methods are ignored.
+   Các path entry finder cũ có thể triển khai một trong hai phương thức đã bị deprecated này thay cho ``find_spec()``. Các phương thức này vẫn được tôn trọng để đảm bảo khả năng tương thích ngược. Tuy nhiên, nếu ``find_spec()`` được triển khai trên path entry finder, các phương thức cũ sẽ bị bỏ qua.
 
-   :meth:`!find_loader` takes one argument, the
-   fully qualified name of the module being imported.  ``find_loader()``
-   returns a 2-tuple where the first item is the loader and the second item
-   is a namespace :term:`portion`.
+   :meth:`!find_loader` nhận một đối số, là tên đầy đủ của module đang được import. ``find_loader()`` trả về một tuple 2 phần, trong đó phần tử đầu tiên là loader và phần tử thứ hai là một namespace :term:`portion`.
 
-   For backwards compatibility with other implementations of the import
-   protocol, many path entry finders also support the same,
-   traditional ``find_module()`` method that meta path finders support.
-   However path entry finder ``find_module()`` methods are never called
-   with a ``path`` argument (they are expected to record the appropriate
-   path information from the initial call to the path hook).
+   Để tương thích ngược với các triển khai khác của import protocol, nhiều path entry finder cũng hỗ trợ phương thức ``find_module()`` truyền thống, giống như meta path finder. Tuy nhiên, các phương thức ``find_module()`` của path entry finder không bao giờ được gọi với đối số ``path`` (chúng được kỳ vọng sẽ ghi nhận thông tin path thích hợp từ lần gọi ban đầu tới path hook).
 
-   The ``find_module()`` method on path entry finders is deprecated,
-   as it does not allow the path entry finder to contribute portions to
-   namespace packages.  If both ``find_loader()`` and ``find_module()``
-   exist on a path entry finder, the import system will always call
-   ``find_loader()`` in preference to ``find_module()``.
+   Phương thức ``find_module()`` trên các trình tìm mục đường dẫn đã lỗi thời vì không cho phép trình tìm mục đường dẫn đóng góp các phần vào các namespace package. Nếu cả ``find_loader()`` và ``find_module()`` đều tồn tại trên một trình tìm mục đường dẫn, hệ thống import sẽ luôn gọi ``find_loader()`` thay vì ``find_module()``.
 
 .. versionchanged:: 3.10
-    Calls to :meth:`!find_module` and
-    :meth:`!find_loader` by the import
-    system will raise :exc:`ImportWarning`.
+    Các lệnh gọi đến :meth:`!find_module` và
+    :meth:`!find_loader` của hệ thống import sẽ phát sinh :exc:`ImportWarning`.
 
 .. versionchanged:: 3.12
-    ``find_module()`` and ``find_loader()`` have been removed.
+    ``find_module()`` và ``find_loader()`` đã bị xóa.
 
 
-Replacing the standard import system
-====================================
+Thay thế hệ thống import tiêu chuẩn
+===================================
 
-The most reliable mechanism for replacing the entire import system is to
-delete the default contents of :data:`sys.meta_path`, replacing them
-entirely with a custom meta path hook.
+Cơ chế đáng tin cậy nhất để thay thế toàn bộ hệ thống import là xóa nội dung mặc định của :data:`sys.meta_path`, rồi thay thế hoàn toàn bằng một meta path hook tùy chỉnh.
 
-If it is acceptable to only alter the behaviour of import statements
-without affecting other APIs that access the import system, then replacing
-the builtin :func:`__import__` function may be sufficient.
+Nếu chỉ thay đổi hành vi của các câu lệnh import mà không ảnh hưởng đến các API khác truy cập hệ thống import là đủ, thì việc thay thế hàm builtin :func:`__import__` có thể đáp ứng yêu cầu.
 
-To selectively prevent the import of some modules from a hook early on the
-meta path (rather than disabling the standard import system entirely),
-it is sufficient to raise :exc:`ModuleNotFoundError` directly from
-:meth:`~importlib.abc.MetaPathFinder.find_spec` instead of returning
-``None``. The latter indicates that the meta path search should continue,
-while raising an exception terminates it immediately.
+Để ngăn có chọn lọc việc import một số module từ một hook ở đầu meta path (thay vì vô hiệu hóa hoàn toàn hệ thống import chuẩn), chỉ cần raise :exc:`ModuleNotFoundError` trực tiếp từ
+:meth:`~importlib.abc.MetaPathFinder.find_spec` thay vì trả về ``None``. Giá trị sau cho biết việc tìm kiếm trên meta path nên tiếp tục, còn việc raise một exception sẽ kết thúc ngay lập tức.
 
 .. _relativeimports:
 
-Package Relative Imports
-========================
+Import tương đối trong package
+==============================
 
-Relative imports use leading dots. A single leading dot indicates a relative
-import, starting with the current package. Two or more leading dots indicate a
-relative import to the parent(s) of the current package, one level per dot
-after the first. For example, given the following package layout::
+Import tương đối sử dụng các dấu chấm ở đầu. Một dấu chấm ở đầu biểu thị một import tương đối, bắt đầu từ package hiện tại. Hai hoặc nhiều dấu chấm ở đầu biểu thị một import tương đối đến package cha (hoặc các package cha) của package hiện tại, mỗi cấp tương ứng với một dấu chấm sau dấu đầu tiên. Ví dụ, với bố cục package sau đây::
 
     package/
         __init__.py
@@ -876,8 +505,7 @@ after the first. For example, given the following package layout::
             moduleZ.py
         moduleA.py
 
-In either ``subpackage1/moduleX.py`` or ``subpackage1/__init__.py``,
-the following are valid relative imports::
+Trong cả ``subpackage1/moduleX.py`` lẫn ``subpackage1/__init__.py``, các import tương đối sau đây đều hợp lệ::
 
     from .moduleY import spam
     from .moduleY import spam as ham
@@ -886,100 +514,64 @@ the following are valid relative imports::
     from ..subpackage2.moduleZ import eggs
     from ..moduleA import foo
 
-Absolute imports may use either the ``import <>`` or ``from <> import <>``
-syntax, but relative imports may only use the second form; the reason
-for this is that::
+Import tuyệt đối có thể sử dụng cú pháp ``import <>`` hoặc ``from <> import <>``, nhưng import tương đối chỉ có thể sử dụng dạng thứ hai; lý do là::
 
     import XXX.YYY.ZZZ
 
-should expose ``XXX.YYY.ZZZ`` as a usable expression, but .moduleY is
-not a valid expression.
+phải cung cấp ``XXX.YYY.ZZZ`` dưới dạng một biểu thức có thể sử dụng, nhưng .moduleY không phải là một biểu thức hợp lệ.
 
 
 .. _import-dunder-main:
 
-Special considerations for __main__
+Các lưu ý đặc biệt đối với __main__
 ===================================
 
-The :mod:`__main__` module is a special case relative to Python's import
-system.  As noted :ref:`elsewhere <programs>`, the ``__main__`` module
-is directly initialized at interpreter startup, much like :mod:`sys` and
-:mod:`builtins`.  However, unlike those two, it doesn't strictly
-qualify as a built-in module.  This is because the manner in which
-``__main__`` is initialized depends on the flags and other options with
-which the interpreter is invoked.
+Mô-đun :mod:`__main__` là một trường hợp đặc biệt trong hệ thống import của Python. Như đã lưu ý :ref:`ở nơi khác <programs>`, mô-đun ``__main__`` được khởi tạo trực tiếp khi trình thông dịch khởi động, tương tự như :mod:`sys` và
+:mod:`builtins`. Tuy nhiên, không giống hai mô-đun đó, nó không hoàn toàn đáp ứng tiêu chí của một mô-đun tích hợp sẵn. Điều này là do cách ``__main__`` được khởi tạo phụ thuộc vào các cờ và tùy chọn khác được sử dụng khi gọi trình thông dịch.
 
 .. _main_spec:
 
 __main__.__spec__
 -----------------
 
-Depending on how :mod:`__main__` is initialized, ``__main__.__spec__``
-gets set appropriately or to ``None``.
+Tùy thuộc vào cách :mod:`__main__` được khởi tạo, ``__main__.__spec__`` được thiết lập phù hợp hoặc thành ``None``.
 
-When Python is started with the :option:`-m` option, ``__spec__`` is set
-to the module spec of the corresponding module or package. ``__spec__`` is
-also populated when the ``__main__`` module is loaded as part of executing a
-directory, zipfile or other :data:`sys.path` entry.
+Khi Python được khởi động với tùy chọn :option:`-m`, ``__spec__`` được thiết lập thành module spec của mô-đun hoặc package tương ứng. ``__spec__`` cũng được điền khi mô-đun ``__main__`` được tải trong quá trình thực thi một thư mục, zipfile hoặc mục nhập :data:`sys.path` khác.
 
-In :ref:`the remaining cases <using-on-interface-options>`
-``__main__.__spec__`` is set to ``None``, as the code used to populate the
-:mod:`__main__` does not correspond directly with an importable module:
+Trong :ref:`các trường hợp còn lại <using-on-interface-options>`, ``__main__.__spec__`` được thiết lập thành ``None``, vì mã được sử dụng để điền
+:mod:`__main__` không tương ứng trực tiếp với một module có thể import:
 
-- interactive prompt
-- :option:`-c` option
-- running from stdin
-- running directly from a source or bytecode file
+- dấu nhắc tương tác
+- tùy chọn :option:`-c`
+- chạy từ stdin
+- chạy trực tiếp từ tệp mã nguồn hoặc bytecode
 
-Note that ``__main__.__spec__`` is always ``None`` in the last case,
-*even if* the file could technically be imported directly as a module
-instead. Use the :option:`-m` switch if valid module metadata is desired
-in :mod:`__main__`.
+Lưu ý rằng ``__main__.__spec__`` luôn là ``None`` trong trường hợp cuối cùng, *ngay cả khi* về mặt kỹ thuật, tệp này có thể được import trực tiếp như một module. Sử dụng tùy chọn :option:`-m` nếu muốn có metadata module hợp lệ trong :mod:`__main__`.
 
-Note also that even when ``__main__`` corresponds with an importable module
-and ``__main__.__spec__`` is set accordingly, they're still considered
-*distinct* modules. This is due to the fact that blocks guarded by
-``if __name__ == "__main__":`` checks only execute when the module is used
-to populate the ``__main__`` namespace, and not during normal import.
+Cũng lưu ý rằng ngay cả khi ``__main__`` tương ứng với một module có thể import và ``__main__.__spec__`` được thiết lập tương ứng, chúng vẫn được xem là các module *riêng biệt*. Nguyên nhân là các khối được bảo vệ bởi các kiểm tra ``if __name__ == "__main__":`` chỉ được thực thi khi module được dùng để điền vào namespace ``__main__``, chứ không được thực thi trong quá trình import thông thường.
 
 
-References
-==========
+Tài liệu tham khảo
+==================
 
-The import machinery has evolved considerably since Python's early days.  The
-original `specification for packages
-<https://www.python.org/doc/essays/packages/>`_ is still available to read,
-although some details have changed since the writing of that document.
+Cơ chế import đã phát triển đáng kể kể từ những ngày đầu của Python. Bản `đặc tả về các package <https://www.python.org/doc/essays/packages/>`_ ban đầu vẫn có thể đọc được, mặc dù một số chi tiết đã thay đổi kể từ khi tài liệu đó được soạn thảo.
 
-The original specification for :data:`sys.meta_path` was :pep:`302`, with
-subsequent extension in :pep:`420`.
+Đặc tả ban đầu cho :data:`sys.meta_path` là :pep:`302`, sau đó được mở rộng trong :pep:`420`.
 
-:pep:`420` introduced :term:`namespace packages <namespace package>` for
-Python 3.3.  :pep:`420` also introduced the :meth:`!find_loader` protocol as an
-alternative to :meth:`!find_module`.
+:pep:`420` đã giới thiệu :term:`namespace packages <namespace package>` cho Python 3.3. :pep:`420` cũng giới thiệu giao thức :meth:`!find_loader` như một lựa chọn thay thế cho :meth:`!find_module`.
 
-:pep:`366` describes the addition of the ``__package__`` attribute for
-explicit relative imports in main modules.
+:pep:`366` mô tả việc bổ sung thuộc tính ``__package__`` cho các import tương đối tường minh trong các module chính.
 
-:pep:`328` introduced absolute and explicit relative imports and initially
-proposed ``__name__`` for semantics :pep:`366` would eventually specify for
-``__package__``.
+:pep:`328` đã giới thiệu các import tuyệt đối và tương đối tường minh, đồng thời ban đầu đề xuất ``__name__`` cho ngữ nghĩa mà :pep:`366` sau này sẽ đặc tả cho ``__package__``.
 
-:pep:`338` defines executing modules as scripts.
+:pep:`338` định nghĩa việc thực thi các module dưới dạng script.
 
-:pep:`451` adds the encapsulation of per-module import state in spec
-objects.  It also off-loads most of the boilerplate responsibilities of
-loaders back onto the import machinery.  These changes allow the
-deprecation of several APIs in the import system and also addition of new
-methods to finders and loaders.
+:pep:`451` bổ sung việc đóng gói trạng thái import theo từng module trong các đối tượng spec. Đồng thời, phần lớn trách nhiệm xử lý mã dựng sẵn của loader được chuyển trở lại cho cơ chế import. Những thay đổi này cho phép loại bỏ dần một số API trong hệ thống import, đồng thời bổ sung các phương thức mới cho finder và loader.
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#fnmo] See :class:`types.ModuleType`.
+.. [#fnmo] Xem :class:`types.ModuleType`.
 
-.. [#fnlo] The importlib implementation avoids using the return value
-   directly. Instead, it gets the module object by looking the module name up
-   in :data:`sys.modules`.  The indirect effect of this is that an imported
-   module may replace itself in :data:`sys.modules`.  This is
-   implementation-specific behavior that is not guaranteed to work in other
-   Python implementations.
+.. [#fnlo] Cài đặt importlib không sử dụng trực tiếp giá trị trả về. Thay vào đó, nó lấy đối tượng module bằng cách tra cứu tên module trong :data:`sys.modules`. Hệ quả gián tiếp của việc này là một module đã import có thể tự thay thế nó trong :data:`sys.modules`. Đây là hành vi phụ thuộc vào cách triển khai và không được đảm bảo sẽ hoạt động trong các bản triển khai Python khác.
+
+.. _`specification for packages`: https://www.python.org/doc/essays/packages/
