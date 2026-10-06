@@ -159,14 +159,14 @@ Ví dụ về ThreadPoolExecutor
            'http://www.bbc.co.uk/',
            'http://nonexistent-subdomain.python.org/']
 
-   # Retrieve a single page and report the URL and contents
+   # Lấy một trang và trả về URL cùng nội dung của trang
    def load_url(url, timeout):
        with urllib.request.urlopen(url, timeout=timeout) as conn:
            return conn.read()
 
-   # We can use a with statement to ensure threads are cleaned up promptly
+   # Có thể dùng câu lệnh with để bảo đảm các luồng được dọn dẹp kịp thời
    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-       # Start the load operations and mark each future with its URL
+       # Bắt đầu các tác vụ tải và gắn URL tương ứng cho từng future
        future_to_url = {executor.submit(load_url, url, 60): url for url in URLS}
        for future in concurrent.futures.as_completed(future_to_url):
            url = future_to_url[future]

@@ -266,10 +266,10 @@ Sử dụng :func:`compress` và :func:`decompress` để minh họa việc nén
     ... felis. Pellentesque semper nunc sit amet nibh ullamcorper, ac elementum
     ... dolor luctus. Curabitur lacinia mi ornare consectetur vestibulum."""
     >>> c = bz2.compress(data)
-    >>> len(data) / len(c)  # Data compression ratio
+    >>> len(data) / len(c)  # Tỷ lệ nén dữ liệu
     1.513595166163142
     >>> d = bz2.decompress(c)
-    >>> data == d  # Check equality to original object after round-trip
+    >>> data == d  # Kiểm tra có bằng đối tượng gốc sau khi nén rồi giải nén hay không
     True
 
 Sử dụng :class:`BZ2Compressor` để nén tăng dần:
@@ -283,11 +283,11 @@ Sử dụng :class:`BZ2Compressor` để nén tăng dần:
     >>> comp = bz2.BZ2Compressor()
     >>> out = b""
     >>> for chunk in gen_data():
-    ...     # Provide data to the compressor object
+    ...     # Cung cấp dữ liệu cho đối tượng nén
     ...     out = out + comp.compress(chunk)
     ...
-    >>> # Finish the compression process.  Call this once you have
-    >>> # finished providing data to the compressor.
+    >>> # Hoàn tất quá trình nén. Gọi hàm này sau khi đã
+    >>> # cung cấp xong dữ liệu cho đối tượng nén.
     >>> out = out + comp.flush()
 
 Ví dụ trên sử dụng một luồng dữ liệu "không ngẫu nhiên" điển hình (một luồng gồm các khối ``b"z"``). Dữ liệu ngẫu nhiên thường khó nén, trong khi dữ liệu có thứ tự và lặp lại thường cho tỷ lệ nén cao.
@@ -304,14 +304,14 @@ Ghi và đọc tệp được nén bằng bzip2 ở chế độ nhị phân:
     ... felis. Pellentesque semper nunc sit amet nibh ullamcorper, ac elementum
     ... dolor luctus. Curabitur lacinia mi ornare consectetur vestibulum."""
     >>> with bz2.open("myfile.bz2", "wb") as f:
-    ...     # Write compressed data to file
+    ...     # Ghi dữ liệu đã nén vào tệp
     ...     unused = f.write(data)
     ...
     >>> with bz2.open("myfile.bz2", "rb") as f:
-    ...     # Decompress data from file
+    ...     # Giải nén dữ liệu từ tệp
     ...     content = f.read()
     ...
-    >>> content == data  # Check equality to original object after round-trip
+    >>> content == data  # Kiểm tra có bằng đối tượng gốc sau khi nén rồi giải nén hay không
     True
 
 .. testcleanup::

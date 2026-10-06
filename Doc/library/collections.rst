@@ -211,21 +211,21 @@ Một công cụ đếm được cung cấp để hỗ trợ việc thống kê 
 
     Các phần tử được đếm từ một *iterable* hoặc được khởi tạo từ một *mapping* khác (hoặc counter):
 
-        >>> c = Counter()                           # a new, empty counter
-        >>> c = Counter('gallahad')                 # a new counter from an iterable
-        >>> c = Counter({'red': 4, 'blue': 2})      # a new counter from a mapping
-        >>> c = Counter(cats=4, dogs=8)             # a new counter from keyword args
+        >>> c = Counter()                           # Một Counter mới, rỗng
+        >>> c = Counter('gallahad')                 # Một Counter mới từ một iterable
+        >>> c = Counter({'red': 4, 'blue': 2})      # Một Counter mới từ một mapping
+        >>> c = Counter(cats=4, dogs=8)             # Một Counter mới từ các đối số từ khóa
 
     Các đối tượng Counter có giao diện từ điển, ngoại trừ việc chúng trả về số lần đếm bằng không cho các mục bị thiếu thay vì phát sinh :exc:`KeyError`:
 
         >>> c = Counter(['eggs', 'ham'])
-        >>> c['bacon']                              # count of a missing element is zero
+        >>> c['bacon']                              # Số lần xuất hiện của phần tử không tồn tại là 0
         0
 
     Đặt count về zero không xóa một phần tử khỏi counter. Sử dụng ``del`` để xóa hoàn toàn phần tử đó:
 
-        >>> c['sausage'] = 0                        # counter entry with a zero count
-        >>> del c['sausage']                        # del actually removes the entry
+        >>> c['sausage'] = 0                        # Mục Counter có số đếm bằng 0
+        >>> del c['sausage']                        # del thực sự xóa mục này
 
     .. versionadded:: 3.1
 
