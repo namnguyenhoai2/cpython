@@ -1,62 +1,57 @@
-:mod:`!curses.panel` --- A panel stack extension for curses
-===========================================================
+:mod:`!curses.panel` --- Phần mở rộng ngăn xếp panel cho curses
+===============================================================
 
 .. module:: curses.panel
-   :synopsis: A panel stack extension that adds depth to  curses windows.
+   :synopsis: Phần mở rộng ngăn xếp panel bổ sung độ sâu cho các cửa sổ curses.
 
 .. sectionauthor:: A.M. Kuchling <amk@amk.ca>
 
 --------------
 
-Panels are windows with the added feature of depth, so they can be stacked on
-top of each other, and only the visible portions of each window will be
-displayed.  Panels can be added, moved up or down in the stack, and removed.
+Panel là các cửa sổ có thêm tính năng độ sâu, nhờ đó chúng có thể được xếp chồng lên nhau và chỉ những phần hiển thị của mỗi cửa sổ mới được hiển thị. Panel có thể được thêm vào, di chuyển lên hoặc xuống trong ngăn xếp và xóa bỏ.
 
 
 .. _cursespanel-functions:
 
-Functions
----------
+Các hàm
+-------
 
-The module :mod:`!curses.panel` defines the following exception:
+Module :mod:`!curses.panel` định nghĩa ngoại lệ sau:
 
 
 .. exception:: error
 
-   Exception raised when a curses panel library function returns an error.
+   Ngoại lệ được phát sinh khi một hàm của thư viện panel curses trả về lỗi.
 
 
-The module :mod:`!curses.panel` defines the following functions:
+Module :mod:`!curses.panel` định nghĩa các hàm sau:
 
 
 .. function:: bottom_panel()
 
-   Returns the bottom panel in the panel stack.
+   Trả về panel ở dưới cùng trong ngăn xếp panel.
 
 
 .. function:: new_panel(win)
 
-   Returns a panel object, associating it with the given window *win* and
-   placing the new panel on top of the panel stack.  Be aware
-   that you need to keep the returned panel object referenced explicitly.  If you
-   don't, the panel object is garbage collected and removed from the panel stack.
+   Trả về một đối tượng panel, liên kết đối tượng đó với cửa sổ đã cho *win* và đặt panel mới lên trên cùng của ngăn xếp panel. Hãy lưu ý rằng bạn cần giữ tham chiếu rõ ràng đến đối tượng panel được trả về. Nếu không, đối tượng panel sẽ bị garbage collection và bị xóa khỏi ngăn xếp panel.
 
 
 .. function:: top_panel()
 
-   Returns the top panel in the panel stack.
+   Trả về panel ở trên cùng trong ngăn xếp panel.
 
 
 .. function:: update_panels()
 
-   Updates the virtual screen after changes in the panel stack. This does not call
-   :func:`curses.doupdate`, so you'll have to do this yourself.
+   Cập nhật màn hình ảo sau khi có thay đổi trong ngăn xếp panel. Thao tác này không gọi
+   :func:`curses.doupdate`, vì vậy bạn sẽ phải tự thực hiện việc này.
 
 
 .. _curses-panel-objects:
 
-Panel objects
--------------
+Các đối tượng panel
+-------------------
 
 .. raw:: html
 
@@ -76,73 +71,67 @@ Panel objects
 
 .. class:: panel
 
-   Panel objects, as returned by :func:`new_panel` above, are windows with a
-   stacking order.  There's always a window associated with a panel which
-   determines the content, while the panel methods are responsible for the
-   window's depth in the panel stack.
+   Các đối tượng panel, như được :func:`new_panel` trả về ở trên, là các cửa sổ có thứ tự xếp chồng. Luôn có một cửa sổ được liên kết với một panel để xác định nội dung, trong khi các phương thức của panel chịu trách nhiệm về độ sâu của cửa sổ trong ngăn xếp panel.
 
-   Panel objects have the following methods:
+   Các đối tượng Panel có các phương thức sau:
 
 
 .. method:: panel.above()
 
-   Returns the panel above the current panel.
+   Trả về panel nằm trên panel hiện tại.
 
 
 .. method:: panel.below()
 
-   Returns the panel below the current panel.
+   Trả về panel nằm dưới panel hiện tại.
 
 
 .. method:: panel.bottom()
 
-   Push the panel to the bottom of the stack.
+   Đưa panel xuống cuối stack.
 
 
 .. method:: panel.hidden()
 
-   Returns ``True`` if the panel is hidden (not visible), ``False`` otherwise.
+   Trả về ``True`` nếu panel bị ẩn (không hiển thị), nếu không thì trả về ``False``.
 
 
 .. method:: panel.hide()
 
-   Hide the panel. This does not delete the object, it just makes the window on
-   screen invisible.
+   Ẩn panel. Thao tác này không xóa đối tượng mà chỉ làm cho cửa sổ trên màn hình trở nên vô hình.
 
 
 .. method:: panel.move(y, x)
 
-   Move the panel to the screen coordinates ``(y, x)``.
+   Di chuyển panel đến tọa độ màn hình ``(y, x)``.
 
 
 .. method:: panel.replace(win)
 
-   Change the window associated with the panel to the window *win*.
+   Thay đổi window được liên kết với panel thành window *win*.
 
 
 .. method:: panel.set_userptr(obj)
 
-   Set the panel's user pointer to *obj*. This is used to associate an arbitrary
-   piece of data with the panel, and can be any Python object.
+   Đặt con trỏ user của panel thành *obj*. Con trỏ này được dùng để liên kết một phần dữ liệu bất kỳ với panel và có thể là bất kỳ đối tượng Python nào.
 
 
 .. method:: panel.show()
 
-   Display the panel (which might have been hidden), placing it on top of
-   the panel stack.
+   Hiển thị panel (có thể trước đó đã bị ẩn), đưa panel lên đầu ngăn xếp panel.
 
 
 .. method:: panel.top()
 
-   Push panel to the top of the stack.
+   Đưa panel lên đầu ngăn xếp.
 
 
 .. method:: panel.userptr()
 
-   Returns the user pointer for the panel.  This might be any Python object.
+   Trả về con trỏ user của panel. Con trỏ này có thể là bất kỳ đối tượng Python nào.
 
 
 .. method:: panel.window()
 
-   Returns the window object associated with the panel.
+   Trả về đối tượng window được liên kết với panel.
 

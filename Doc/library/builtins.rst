@@ -1,19 +1,15 @@
-:mod:`!builtins` --- Built-in objects
-=====================================
+:mod:`!builtins` --- Đối tượng tích hợp sẵn
+===========================================
 
 .. module:: builtins
-   :synopsis: The module that provides the built-in namespace.
+   :synopsis: Mô-đun cung cấp namespace tích hợp sẵn.
 
 --------------
 
-This module provides direct access to all 'built-in' identifiers of Python; for
-example, ``builtins.open`` is the full name for the built-in function :func:`open`.
+Mô-đun này cung cấp quyền truy cập trực tiếp vào tất cả các định danh 'tích hợp sẵn' của Python; chẳng hạn, ``builtins.open`` là tên đầy đủ của hàm tích hợp sẵn :func:`open`.
 
-This module is not normally accessed explicitly by most applications, but can be
-useful in modules that provide objects with the same name as a built-in value,
-but in which the built-in of that name is also needed.  For example, in a module
-that wants to implement an :func:`open` function that wraps the built-in
-:func:`open`, this module can be used directly::
+Mô-đun này thường không được hầu hết các ứng dụng truy cập một cách tường minh, nhưng có thể hữu ích trong các mô-đun cung cấp các đối tượng có cùng tên với một giá trị tích hợp sẵn, đồng thời cũng cần đến giá trị tích hợp sẵn có tên đó. Ví dụ: trong một mô-đun muốn triển khai hàm :func:`open` bao bọc hàm tích hợp sẵn
+:func:`open`, mô-đun này có thể được sử dụng trực tiếp::
 
    import builtins
 
@@ -32,11 +28,7 @@ that wants to implement an :func:`open` function that wraps the built-in
 
        # ...
 
-As an implementation detail, most modules have the name ``__builtins__`` made
-available as part of their globals.  The value of ``__builtins__`` is normally
-either this module or the value of this module's :attr:`~object.__dict__` attribute.
-Since this is an implementation detail, it may not be used by alternate
-implementations of Python.
+Về chi tiết triển khai, hầu hết các mô-đun đều có tên ``__builtins__`` được cung cấp như một phần của các biến global. Giá trị của ``__builtins__`` thường là mô-đun này hoặc giá trị của thuộc tính :attr:`~object.__dict__` của mô-đun này. Vì đây là chi tiết triển khai, các bản triển khai khác của Python có thể không sử dụng nó.
 
 .. seealso::
 

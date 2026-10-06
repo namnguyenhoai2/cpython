@@ -1,197 +1,128 @@
-:mod:`!code` --- Interpreter base classes
-=========================================
+:mod:`!code` --- Các lớp cơ sở của trình thông dịch
+===================================================
 
 .. module:: code
-   :synopsis: Facilities to implement read-eval-print loops.
+   :synopsis: Các tiện ích để triển khai các vòng lặp read-eval-print.
 
-**Source code:** :source:`Lib/code.py`
+**Mã nguồn:** :source:`Lib/code.py`
 
 --------------
 
-The ``code`` module provides facilities to implement read-eval-print loops in
-Python.  Two classes and convenience functions are included which can be used to
-build applications which provide an interactive interpreter prompt.
+Module ``code`` cung cấp các tiện ích để triển khai các vòng lặp read-eval-print trong Python. Module này bao gồm hai lớp và các hàm tiện ích, có thể được dùng để xây dựng các ứng dụng cung cấp lời nhắc của trình thông dịch tương tác.
 
 
 .. class:: InteractiveInterpreter(locals=None)
 
-   This class deals with parsing and interpreter state (the user's namespace); it
-   does not deal with input buffering or prompting or input file naming (the
-   filename is always passed in explicitly). The optional *locals* argument
-   specifies a mapping to use as the namespace in which code will be executed;
-   it defaults to a newly created dictionary with key ``'__name__'`` set to
-   ``'__console__'`` and key ``'__doc__'`` set to ``None``.
+   Lớp này xử lý việc phân tích cú pháp và trạng thái của trình thông dịch (namespace của người dùng); lớp này không xử lý việc đệm đầu vào, hiển thị lời nhắc hoặc đặt tên tệp đầu vào (tên tệp luôn được truyền vào một cách rõ ràng). Đối số *locals* tùy chọn chỉ định một mapping được dùng làm namespace nơi mã sẽ được thực thi; theo mặc định, đó là một dictionary mới được tạo, với khóa ``'__name__'`` được đặt thành ``'__console__'`` và khóa ``'__doc__'`` được đặt thành ``None``.
 
-   Note that functions and classes objects created under an
-   :class:`!InteractiveInterpreter` instance will belong to the namespace
-   specified by *locals*.
-   They are only pickleable if *locals* is the namespace of an existing
-   module.
+   Lưu ý rằng các đối tượng hàm và lớp được tạo trong một
+   :class:`!InteractiveInterpreter` instance sẽ thuộc về namespace được chỉ định bởi *locals*. Chúng chỉ có thể được pickle nếu *locals* là namespace của một module hiện có.
 
 
 .. class:: InteractiveConsole(locals=None, filename="<console>", local_exit=False)
 
-   Closely emulate the behavior of the interactive Python interpreter. This class
-   builds on :class:`InteractiveInterpreter` and adds prompting using the familiar
-   ``sys.ps1`` and ``sys.ps2``, and input buffering. If *local_exit* is true,
-   ``exit()`` and ``quit()`` in the console will not raise :exc:`SystemExit`, but
-   instead return to the calling code.
+   Mô phỏng sát hành vi của trình thông dịch Python tương tác. Lớp này xây dựng trên :class:`InteractiveInterpreter` và bổ sung lời nhắc bằng ``sys.ps1`` và ``sys.ps2`` quen thuộc, cùng với bộ đệm đầu vào. Nếu *local_exit* là true, ``exit()`` và ``quit()`` trong console sẽ không phát sinh :exc:`SystemExit`, mà thay vào đó quay lại mã gọi.
 
    .. versionchanged:: 3.13
-      Added *local_exit* parameter.
+      Đã thêm tham số *local_exit*.
 
 .. function:: interact(banner=None, readfunc=None, local=None, exitmsg=None, local_exit=False)
 
-   Convenience function to run a read-eval-print loop.  This creates a new
-   instance of :class:`InteractiveConsole` and sets *readfunc* to be used as
-   the :meth:`InteractiveConsole.raw_input` method, if provided.  If *local* is
-   provided, it is passed to the :class:`InteractiveConsole` constructor for
-   use as the default namespace for the interpreter loop.  If *local_exit* is provided,
-   it is passed to the :class:`InteractiveConsole` constructor.  The :meth:`~InteractiveConsole.interact`
-   method of the instance is then run with *banner* and *exitmsg* passed as the
-   banner and exit message to use, if provided.  The console object is discarded
-   after use.
+   Hàm tiện ích để chạy vòng lặp read-eval-print. Hàm này tạo một thể hiện mới của :class:`InteractiveConsole` và đặt *readfunc* để dùng làm phương thức :meth:`InteractiveConsole.raw_input`, nếu được cung cấp. Nếu *local* được cung cấp, giá trị này sẽ được truyền cho hàm khởi tạo :class:`InteractiveConsole` để dùng làm namespace mặc định cho vòng lặp trình thông dịch. Nếu *local_exit* được cung cấp, giá trị này sẽ được truyền cho hàm khởi tạo :class:`InteractiveConsole`. Sau đó, phương thức :meth:`~InteractiveConsole.interact` của thể hiện sẽ được chạy với *banner* và *exitmsg* được truyền làm banner và thông báo thoát cần sử dụng, nếu được cung cấp. Đối tượng console sẽ bị loại bỏ sau khi sử dụng.
 
    .. versionchanged:: 3.6
-      Added *exitmsg* parameter.
+      Đã thêm tham số *exitmsg*.
 
    .. versionchanged:: 3.13
-      Added *local_exit* parameter.
+      Đã thêm tham số *local_exit*.
 
 .. function:: compile_command(source, filename="<input>", symbol="single")
 
-   This function is useful for programs that want to emulate Python's interpreter
-   main loop (a.k.a. the read-eval-print loop).  The tricky part is to determine
-   when the user has entered an incomplete command that can be completed by
-   entering more text (as opposed to a complete command or a syntax error).  This
-   function *almost* always makes the same decision as the real interpreter main
-   loop.
+   Hàm này hữu ích cho các chương trình muốn mô phỏng vòng lặp chính của trình thông dịch Python (còn gọi là vòng lặp read-eval-print). Phần khó là xác định khi nào người dùng đã nhập một lệnh chưa hoàn chỉnh có thể được hoàn tất bằng cách nhập thêm văn bản (thay vì một lệnh hoàn chỉnh hoặc lỗi cú pháp). Hàm này *almost* luôn đưa ra quyết định giống như vòng lặp chính của trình thông dịch thực.
 
-   *source* is the source string; *filename* is the optional filename from which
-   source was read, defaulting to ``'<input>'``; and *symbol* is the optional
-   grammar start symbol, which should be ``'single'`` (the default), ``'eval'``
-   or ``'exec'``.
+   *source* là chuỗi nguồn; *filename* là tên tệp tùy chọn mà từ đó mã nguồn được đọc, mặc định là ``'<input>'``; còn *symbol* là ký hiệu bắt đầu ngữ pháp tùy chọn, phải là ``'single'`` (mặc định), ``'eval'`` hoặc ``'exec'``.
 
-   Returns a code object (the same as ``compile(source, filename, symbol)``) if the
-   command is complete and valid; ``None`` if the command is incomplete; raises
-   :exc:`SyntaxError` if the command is complete and contains a syntax error, or
-   raises :exc:`OverflowError` or :exc:`ValueError` if the command contains an
-   invalid literal.
+   Trả về một đối tượng code (giống như ``compile(source, filename, symbol)``) nếu lệnh hoàn chỉnh và hợp lệ; ``None`` nếu lệnh chưa hoàn chỉnh; raises
+   :exc:`SyntaxError` nếu lệnh hoàn chỉnh nhưng chứa lỗi cú pháp, hoặc raises :exc:`OverflowError` hoặc :exc:`ValueError` nếu lệnh chứa một literal không hợp lệ.
 
 
 .. _interpreter-objects:
 
-Interactive Interpreter Objects
--------------------------------
+Các đối tượng Interactive Interpreter
+-------------------------------------
 
 
 .. method:: InteractiveInterpreter.runsource(source, filename="<input>", symbol="single")
 
-   Compile and run some source in the interpreter. Arguments are the same as for
-   :func:`compile_command`; the default for *filename* is ``'<input>'``, and for
-   *symbol* is ``'single'``.  One of several things can happen:
+   Biên dịch và chạy một phần source trong interpreter. Các đối số giống như đối số của
+   :func:`compile_command`; giá trị mặc định của *filename* là ``'<input>'``, còn của *symbol* là ``'single'``. Có thể xảy ra một trong các trường hợp sau:
 
-   * The input is incorrect; :func:`compile_command` raised an exception
-     (usually :exc:`SyntaxError`).  A syntax traceback will be
-     printed by calling the :meth:`showsyntaxerror` method.  :meth:`runsource`
-     returns ``False``.
+   * Đầu vào không chính xác; :func:`compile_command` đã phát sinh một exception (thường là :exc:`SyntaxError`). Một syntax traceback sẽ được in bằng cách gọi phương thức :meth:`showsyntaxerror`. :meth:`runsource` trả về ``False``.
 
-   * The input is incomplete, and more input is required; :func:`compile_command`
-     returned ``None``. :meth:`runsource` returns ``True``.
+   * Đầu vào chưa hoàn chỉnh và cần thêm dữ liệu; :func:`compile_command` đã trả về ``None``. :meth:`runsource` trả về ``True``.
 
-   * The input is complete; :func:`compile_command` returned a code object.  The
-     code is executed by calling the :meth:`runcode` (which also handles run-time
-     exceptions, except for :exc:`SystemExit`). :meth:`runsource` returns ``False``.
+   * Đầu vào đã hoàn tất; :func:`compile_command` đã trả về một đối tượng mã. Mã được thực thi bằng cách gọi :meth:`runcode` (phương thức này cũng xử lý các ngoại lệ trong thời gian chạy, ngoại trừ :exc:`SystemExit`). :meth:`runsource` trả về ``False``.
 
-   The return value can be used to decide whether to use ``sys.ps1`` or ``sys.ps2``
-   to prompt the next line.
+   Giá trị trả về có thể được dùng để quyết định sử dụng ``sys.ps1`` hay ``sys.ps2`` để nhắc nhập dòng tiếp theo.
 
 
 .. method:: InteractiveInterpreter.runcode(code)
 
-   Execute a code object. When an exception occurs, :meth:`showtraceback` is called
-   to display a traceback.  All exceptions are caught except :exc:`SystemExit`,
-   which is allowed to propagate.
+   Thực thi một đối tượng mã. Khi xảy ra ngoại lệ, :meth:`showtraceback` được gọi để hiển thị traceback. Tất cả các ngoại lệ đều được bắt, ngoại trừ :exc:`SystemExit`, ngoại lệ này được phép lan truyền.
 
-   A note about :exc:`KeyboardInterrupt`: this exception may occur elsewhere in
-   this code, and may not always be caught.  The caller should be prepared to deal
-   with it.
+   Lưu ý về :exc:`KeyboardInterrupt`: ngoại lệ này có thể xảy ra ở nơi khác trong mã và không phải lúc nào cũng được bắt. Bên gọi phải sẵn sàng xử lý ngoại lệ này.
 
 
 .. method:: InteractiveInterpreter.showsyntaxerror(filename=None)
 
-   Display the syntax error that just occurred.  This does not display a stack
-   trace because there isn't one for syntax errors. If *filename* is given, it is
-   stuffed into the exception instead of the default filename provided by Python's
-   parser, because it always uses ``'<string>'`` when reading from a string. The
-   output is written by the :meth:`write` method.
+   Hiển thị lỗi cú pháp vừa xảy ra. Thao tác này không hiển thị stack trace vì lỗi cú pháp không có stack trace. Nếu cung cấp *filename*, giá trị này sẽ được chèn vào ngoại lệ thay cho tên tệp mặc định do trình phân tích cú pháp của Python cung cấp, vì trình phân tích này luôn sử dụng ``'<string>'`` khi đọc từ một chuỗi. Đầu ra được ghi bởi phương thức :meth:`write`.
 
 
 .. method:: InteractiveInterpreter.showtraceback()
 
-   Display the exception that just occurred.  We remove the first stack item
-   because it is within the interpreter object implementation. The output is
-   written by the :meth:`write` method.
+   Hiển thị ngoại lệ vừa xảy ra. Chúng tôi loại bỏ mục đầu tiên trong stack vì mục đó nằm bên trong phần triển khai của đối tượng trình thông dịch. Đầu ra được ghi bởi phương thức :meth:`write`.
 
-   .. versionchanged:: 3.5 The full chained traceback is displayed instead
-      of just the primary traceback.
+   .. versionchanged:: 3.5 Thay vào đó, toàn bộ traceback được liên kết sẽ được hiển thị
+      chỉ của traceback chính.
 
 
 .. method:: InteractiveInterpreter.write(data)
 
-   Write a string to the standard error stream (``sys.stderr``). Derived classes
-   should override this to provide the appropriate output handling as needed.
+   Ghi một chuỗi vào luồng lỗi chuẩn (``sys.stderr``). Các lớp dẫn xuất nên ghi đè phương thức này để cung cấp cách xử lý đầu ra phù hợp khi cần.
 
 
 .. _console-objects:
 
-Interactive Console Objects
+Đối tượng Console tương tác
 ---------------------------
 
-The :class:`InteractiveConsole` class is a subclass of
-:class:`InteractiveInterpreter`, and so offers all the methods of the
-interpreter objects as well as the following additions.
+Lớp :class:`InteractiveConsole` là lớp con của
+:class:`InteractiveInterpreter`, do đó cung cấp tất cả các phương thức của các đối tượng trình thông dịch cũng như những bổ sung sau.
 
 
 .. method:: InteractiveConsole.interact(banner=None, exitmsg=None)
 
-   Closely emulate the interactive Python console. The optional *banner* argument
-   specify the banner to print before the first interaction; by default it prints a
-   banner similar to the one printed by the standard Python interpreter, followed
-   by the class name of the console object in parentheses (so as not to confuse
-   this with the real interpreter -- since it's so close!).
+   Mô phỏng rất sát console Python tương tác. Đối số tùy chọn *banner* chỉ định banner sẽ in trước lần tương tác đầu tiên; theo mặc định, đối số này in một banner tương tự banner do trình thông dịch Python chuẩn in, theo sau là tên lớp của đối tượng console trong dấu ngoặc đơn (để không nhầm với trình thông dịch thực -- vì nó gần như giống hệt!).
 
-   The optional *exitmsg* argument specifies an exit message printed when exiting.
-   Pass the empty string to suppress the exit message. If *exitmsg* is not given or
-   ``None``, a default message is printed.
+   Đối số tùy chọn *exitmsg* chỉ định thông báo thoát được in khi thoát. Truyền một chuỗi rỗng để bỏ qua thông báo thoát. Nếu *exitmsg* không được cung cấp hoặc ``None``, một thông báo mặc định sẽ được in.
 
    .. versionchanged:: 3.4
-      To suppress printing any banner, pass an empty string.
+      Để không in bất kỳ banner nào, hãy truyền vào một chuỗi rỗng.
 
    .. versionchanged:: 3.6
-      Print an exit message when exiting.
+      In thông báo thoát khi thoát.
 
 
 .. method:: InteractiveConsole.push(line)
 
-   Push a line of source text to the interpreter. The line should not have a
-   trailing newline; it may have internal newlines.  The line is appended to a
-   buffer and the interpreter's :meth:`~InteractiveInterpreter.runsource` method is called with the
-   concatenated contents of the buffer as source.  If this indicates that the
-   command was executed or invalid, the buffer is reset; otherwise, the command is
-   incomplete, and the buffer is left as it was after the line was appended.  The
-   return value is ``True`` if more input is required, ``False`` if the line was
-   dealt with in some way (this is the same as :meth:`!runsource`).
+   Đẩy một dòng văn bản mã nguồn vào interpreter. Dòng này không được có ký tự xuống dòng ở cuối; nhưng có thể chứa các ký tự xuống dòng bên trong. Dòng này được nối vào bộ đệm, sau đó phương thức :meth:`~InteractiveInterpreter.runsource` của interpreter được gọi với toàn bộ nội dung đã nối của bộ đệm làm mã nguồn. Nếu điều này cho biết lệnh đã được thực thi hoặc không hợp lệ, bộ đệm sẽ được đặt lại; nếu không, lệnh chưa hoàn chỉnh và bộ đệm được giữ nguyên như sau khi dòng này được nối vào. Giá trị trả về là ``True`` nếu cần thêm dữ liệu đầu vào, ``False`` nếu dòng đã được xử lý theo một cách nào đó (điều này giống với :meth:`!runsource`).
 
 
 .. method:: InteractiveConsole.resetbuffer()
 
-   Remove any unhandled source text from the input buffer.
+   Xóa mọi văn bản mã nguồn chưa được xử lý khỏi bộ đệm đầu vào.
 
 
 .. method:: InteractiveConsole.raw_input(prompt="")
 
-   Write a prompt and read a line.  The returned line does not include the trailing
-   newline.  When the user enters the EOF key sequence, :exc:`EOFError` is raised.
-   The base implementation reads from ``sys.stdin``; a subclass may replace this
-   with a different implementation.
+   Viết lời nhắc và đọc một dòng. Dòng được trả về không bao gồm ký tự xuống dòng ở cuối. Khi người dùng nhập chuỗi phím EOF, :exc:`EOFError` được phát sinh. Phần triển khai cơ sở đọc từ ``sys.stdin``; lớp con có thể thay thế phần này bằng một cách triển khai khác.

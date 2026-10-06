@@ -1,24 +1,19 @@
-:mod:`!curses` --- Terminal handling for character-cell displays
-================================================================
+:mod:`!curses` --- Xử lý terminal cho màn hình ô ký tự
+======================================================
 
 .. module:: curses
-   :synopsis: An interface to the curses library, providing portable
-              terminal handling.
+   :synopsis: Giao diện cho thư viện curses, cung cấp khả năng xử lý terminal di động.
 
 .. sectionauthor:: Moshe Zadka <moshez@zadka.site.co.il>
 .. sectionauthor:: Eric Raymond <esr@thyrsus.com>
 
-**Source code:** :source:`Lib/curses`
+**Mã nguồn:** :source:`Lib/curses`
 
 --------------
 
-The :mod:`!curses` module provides an interface to the curses library, the
-de-facto standard for portable advanced terminal handling.
+Mô-đun :mod:`!curses` cung cấp giao diện cho thư viện curses, tiêu chuẩn thực tế để xử lý terminal nâng cao và di động.
 
-While curses is most widely used in the Unix environment, versions are available
-for Windows, DOS, and possibly other systems as well.  This extension module is
-designed to match the API of ncurses, an open-source curses library hosted on
-Linux and the BSD variants of Unix.
+Mặc dù curses được sử dụng phổ biến nhất trong môi trường Unix, các phiên bản cũng có sẵn cho Windows, DOS và có thể cả các hệ thống khác. Mô-đun mở rộng này được thiết kế để tương thích với API của ncurses, một thư viện curses mã nguồn mở được lưu trữ trên Linux và các biến thể BSD của Unix.
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
@@ -28,1761 +23,1335 @@ Linux and the BSD variants of Unix.
 
 .. note::
 
-   Whenever the documentation mentions a *character* it can be specified
-   as an integer, a one-character Unicode string or a one-byte byte string.
-   An integer is the code of a single encoded byte, optionally combined with
-   attributes and a color pair, as returned by :meth:`window.inch`.
+   Bất cứ khi nào tài liệu đề cập đến *ký tự*, ký tự đó có thể được chỉ định dưới dạng số nguyên, chuỗi Unicode gồm một ký tự hoặc chuỗi byte gồm một byte. Số nguyên là mã của một byte được mã hóa đơn, có thể kết hợp với các thuộc tính và một cặp màu, như được trả về bởi :meth:`window.inch`.
 
-   Whenever the documentation mentions a *character string* it can be specified
-   as a Unicode string or a byte string.
+   Bất cứ khi nào tài liệu đề cập đến *chuỗi ký tự*, chuỗi đó có thể được chỉ định dưới dạng chuỗi Unicode hoặc chuỗi byte.
 
 .. note::
 
-   Whether curses may be used from several threads
-   depends on the underlying library and how it was built.
-   In many implementations, including the default build of ncurses,
-   the screen state is shared and not thread-safe;
-   since the blocking and refresh methods
-   (such as :meth:`~window.getch` and :meth:`~window.refresh`)
-   release the :term:`GIL`,
-   unsynchronized use from several threads can then crash the interpreter.
-   Serialize the calls.
+   Việc có thể sử dụng curses từ nhiều thread hay không phụ thuộc vào thư viện nền tảng và cách thư viện đó được xây dựng. Trong nhiều bản triển khai, bao gồm cả bản build mặc định của ncurses, trạng thái màn hình được dùng chung và không an toàn với thread; vì các phương thức chặn và làm mới (chẳng hạn như :meth:`~window.getch` và :meth:`~window.refresh`) giải phóng :term:`GIL`, việc sử dụng không đồng bộ từ nhiều thread có thể khiến trình thông dịch bị lỗi. Hãy tuần tự hóa các lệnh gọi.
 
 .. seealso::
 
-   Module :mod:`curses.ascii`
-      Utilities for working with ASCII characters, regardless of your locale settings.
+   Mô-đun :mod:`curses.ascii`
+      Các tiện ích để làm việc với các ký tự ASCII, bất kể cài đặt locale của bạn.
 
-   Module :mod:`curses.panel`
-      A panel stack extension that adds depth to  curses windows.
+   Mô-đun :mod:`curses.panel`
+      Một phần mở rộng ngăn xếp panel bổ sung chiều sâu cho các cửa sổ curses.
 
-   Module :mod:`curses.textpad`
-      Editable text widget for curses supporting  :program:`Emacs`\ -like bindings.
+   Mô-đun :mod:`curses.textpad`
+      Widget văn bản có thể chỉnh sửa cho curses, hỗ trợ các liên kết phím kiểu :program:`Emacs`\ .
 
    :ref:`curses-howto`
-      Tutorial material on using curses with Python, by Andrew Kuchling and Eric
-      Raymond.
+      Tài liệu hướng dẫn sử dụng curses với Python, do Andrew Kuchling và Eric Raymond biên soạn.
 
 
 .. _curses-functions:
 
-Functions
----------
+Các hàm
+-------
 
-The module :mod:`!curses` defines the following exception:
+Mô-đun :mod:`!curses` định nghĩa ngoại lệ sau:
 
 
 .. exception:: error
 
-   Exception raised when a curses library function returns an error.
+   Ngoại lệ được đưa ra khi một hàm của thư viện curses trả về lỗi.
 
 .. note::
 
-   Whenever *x* or *y* arguments to a function or a method are optional, they
-   default to the current cursor location. Whenever *attr* is optional, it defaults
-   to :const:`A_NORMAL`.
+   Bất cứ khi nào đối số *x* hoặc *y* của một hàm hoặc phương thức là tùy chọn, chúng sẽ mặc định là vị trí con trỏ hiện tại. Khi *attr* là tùy chọn, nó sẽ mặc định là :const:`A_NORMAL`.
 
-The module :mod:`!curses` defines the following functions:
+Mô-đun :mod:`!curses` định nghĩa các hàm sau:
 
 
 .. function:: assume_default_colors(fg, bg, /)
 
-   Allow use of default values for colors on terminals supporting this feature.
-   Use this to support transparency in your application.
+   Cho phép sử dụng các giá trị mặc định cho màu sắc trên những terminal hỗ trợ tính năng này. Sử dụng tùy chọn này để hỗ trợ độ trong suốt trong ứng dụng của bạn.
 
-   * Assign terminal default foreground/background colors to color number ``-1``.
-     So ``init_pair(x, COLOR_RED, -1)`` will initialize pair *x* as red
-     on default background and ``init_pair(x, -1, COLOR_BLUE)`` will
-     initialize pair *x* as default foreground on blue.
+   * Gán màu tiền cảnh/hậu cảnh mặc định của terminal cho số màu ``-1``. Vì vậy, ``init_pair(x, COLOR_RED, -1)`` sẽ khởi tạo cặp *x* với tiền cảnh màu đỏ trên nền mặc định, còn ``init_pair(x, -1, COLOR_BLUE)`` sẽ khởi tạo cặp *x* với tiền cảnh mặc định trên nền màu xanh dương.
 
-   * Change the definition of the color-pair ``0`` to ``(fg, bg)``.
+   * Thay đổi định nghĩa của cặp màu ``0`` thành ``(fg, bg)``.
 
-   This is an ncurses extension.
+   Đây là một phần mở rộng của ncurses.
 
    .. versionadded:: 3.14
 
 
 .. function:: baudrate()
 
-   Return the output speed of the terminal in bits per second.  On software
-   terminal emulators it will have a fixed high value. Included for historical
-   reasons; in former times, it was used to  write output loops for time delays and
-   occasionally to change interfaces depending on the line speed.
+   Trả về tốc độ đầu ra của terminal tính bằng bit trên giây. Trên các trình mô phỏng terminal bằng phần mềm, giá trị này sẽ cố định ở mức cao. Tùy chọn này được giữ lại vì lý do lịch sử; trước đây, nó được dùng để viết các vòng lặp xuất dữ liệu nhằm tạo độ trễ và đôi khi thay đổi giao diện tùy theo tốc độ đường truyền.
 
 
 .. function:: beep()
 
-   Emit a short attention sound.
+   Phát ra âm thanh chú ý ngắn.
 
 
 .. function:: can_change_color()
 
-   Return ``True`` or ``False``, depending on whether the programmer can change the colors
-   displayed by the terminal.
+   Trả về ``True`` hoặc ``False``, tùy thuộc vào việc lập trình viên có thể thay đổi màu hiển thị của terminal hay không.
 
 
 .. function:: cbreak()
 
-   Enter cbreak mode.  In cbreak mode (sometimes called "rare" mode) normal tty
-   line buffering is turned off and characters are available to be read one by one.
-   However, unlike raw mode, special characters (interrupt, quit, suspend, and flow
-   control) retain their effects on the tty driver and calling program.  Calling
-   first :func:`raw` then :func:`cbreak` leaves the terminal in cbreak mode.
+   Chuyển sang chế độ cbreak. Trong chế độ cbreak (đôi khi được gọi là chế độ "rare"), cơ chế đệm dòng bình thường của tty bị tắt và các ký tự có thể được đọc từng ký tự một. Tuy nhiên, không giống chế độ raw, các ký tự đặc biệt (ngắt, thoát, tạm dừng và điều khiển luồng) vẫn giữ nguyên tác động lên trình điều khiển tty và chương trình gọi. Gọi :func:`raw` trước, sau đó gọi :func:`cbreak` sẽ để terminal ở chế độ cbreak.
 
 
 .. function:: color_content(color_number)
 
-   Return the intensity of the red, green, and blue (RGB) components in the color
-   *color_number*, which must be between ``0`` and ``COLORS - 1``.  Return a 3-tuple,
-   containing the R,G,B values for the given color, which will be between
-   ``0`` (no component) and ``1000`` (maximum amount of component).  Raise an
-   exception if the color is not supported.
+   Trả về cường độ của các thành phần đỏ, xanh lá và xanh dương (RGB) trong màu *color_number*, giá trị này phải nằm giữa ``0`` và ``COLORS - 1``. Trả về một bộ 3 giá trị, chứa các giá trị R,G,B của màu đã cho, nằm trong khoảng từ ``0`` (không có thành phần) đến ``1000`` (lượng thành phần tối đa). Phát sinh ngoại lệ nếu màu không được hỗ trợ.
 
 
 .. function:: color_pair(pair_number)
 
-   Return the attribute value for displaying text in the specified color pair.
-   Only the first 256 color pairs are supported. This
-   attribute value can be combined with :const:`A_STANDOUT`, :const:`A_REVERSE`,
-   and the other :const:`!A_\*` attributes.  :func:`pair_number` is the counterpart
-   to this function.
+   Trả về giá trị thuộc tính để hiển thị văn bản trong cặp màu được chỉ định. Chỉ 256 cặp màu đầu tiên được hỗ trợ. Giá trị thuộc tính này có thể được kết hợp với :const:`A_STANDOUT`, :const:`A_REVERSE` và các thuộc tính :const:`!A_\*` khác. :func:`pair_number` là hàm đối ứng với hàm này.
 
 
 .. function:: curs_set(visibility)
 
-   Set the cursor state.  *visibility* can be set to ``0``, ``1``, or ``2``, for invisible,
-   normal, or very visible.  If the terminal supports the visibility requested, return the
-   previous cursor state; otherwise raise an exception.  On many
-   terminals, the "visible" mode is an underline cursor and the "very visible" mode
-   is a block cursor.
+   Đặt trạng thái con trỏ. *visibility* có thể được đặt thành ``0``, ``1`` hoặc ``2``, tương ứng với vô hình, bình thường hoặc rất dễ nhìn thấy. Nếu terminal hỗ trợ trạng thái hiển thị được yêu cầu, hãy trả về trạng thái con trỏ trước đó; nếu không, phát sinh ngoại lệ. Trên nhiều terminal, chế độ "visible" là con trỏ gạch chân, còn chế độ "very visible" là con trỏ khối.
 
 
 .. function:: def_prog_mode()
 
-   Save the current terminal mode as the "program" mode, the mode when the running
-   program is using curses.  (Its counterpart is the "shell" mode, for when the
-   program is not in curses.)  Subsequent calls to :func:`reset_prog_mode` will
-   restore this mode.
+   Lưu chế độ terminal hiện tại làm chế độ "program", tức chế độ khi chương trình đang chạy sử dụng curses. (Chế độ đối ứng là chế độ "shell", khi chương trình không sử dụng curses.) Các lần gọi :func:`reset_prog_mode` tiếp theo sẽ khôi phục chế độ này.
 
 
 .. function:: def_shell_mode()
 
-   Save the current terminal mode as the "shell" mode, the mode when the running
-   program is not using curses.  (Its counterpart is the "program" mode, when the
-   program is using curses capabilities.) Subsequent calls to
-   :func:`reset_shell_mode` will restore this mode.
+   Lưu chế độ terminal hiện tại làm chế độ "shell", tức chế độ khi chương trình đang chạy không sử dụng curses. (Chế độ đối ứng là chế độ "program", khi chương trình sử dụng các khả năng của curses.) Các lần gọi tiếp theo
+   :func:`reset_shell_mode` sẽ khôi phục chế độ này.
 
 
 .. function:: delay_output(ms)
 
-   Insert an *ms* millisecond pause in output.
+   Chèn khoảng dừng *ms* mili giây vào đầu ra.
 
 
 .. function:: doupdate()
 
-   Update the physical screen.  The curses library keeps two data structures, one
-   representing the current physical screen contents and a virtual screen
-   representing the desired next state.  The :func:`doupdate` function updates the
-   physical screen to match the virtual screen.
+   Cập nhật màn hình vật lý. Thư viện curses duy trì hai cấu trúc dữ liệu: một cấu trúc biểu diễn nội dung hiện tại của màn hình vật lý và một màn hình ảo biểu diễn trạng thái mong muốn tiếp theo. Hàm :func:`doupdate` cập nhật màn hình vật lý để khớp với màn hình ảo.
 
-   The virtual screen may be updated by a :meth:`~window.noutrefresh` call after write
-   operations such as :meth:`~window.addstr` have been performed on a window.  The normal
-   :meth:`~window.refresh` call is simply :meth:`!noutrefresh` followed by :func:`!doupdate`;
-   if you have to update multiple windows, you can speed performance and perhaps
-   reduce screen flicker by issuing :meth:`!noutrefresh` calls on all windows,
-   followed by a single :func:`!doupdate`.
+   Màn hình ảo có thể được cập nhật bằng một lệnh gọi :meth:`~window.noutrefresh` sau khi thực hiện các thao tác ghi như :meth:`~window.addstr` trên một cửa sổ. Thông thường
+   lệnh gọi :meth:`~window.refresh` chỉ đơn giản là :meth:`!noutrefresh` theo sau bởi :func:`!doupdate`; nếu phải cập nhật nhiều cửa sổ, bạn có thể tăng hiệu năng và có thể giảm hiện tượng nhấp nháy màn hình bằng cách thực hiện các lệnh gọi :meth:`!noutrefresh` trên tất cả cửa sổ, sau đó thực hiện một lệnh gọi :func:`!doupdate` duy nhất.
 
 
 .. function:: echo()
 
-   Enter echo mode.  In echo mode, each character input is echoed to the screen as
-   it is entered.
+   Bật chế độ echo. Trong chế độ echo, mỗi ký tự nhập vào được hiển thị trên màn hình ngay khi được nhập.
 
 
 .. function:: endwin()
 
-   De-initialize the library, and return terminal to normal status.
+   Hủy khởi tạo thư viện và đưa terminal về trạng thái bình thường.
 
 
 .. function:: erasechar()
 
-   Return the user's current erase character as a one-byte bytes object.  Under Unix operating systems this
-   is a property of the controlling tty of the curses program, and is not set by
-   the curses library itself.
+   Trả về ký tự xóa hiện tại của người dùng dưới dạng đối tượng bytes một byte. Trên các hệ điều hành Unix, đây là thuộc tính của tty điều khiển chương trình curses và không do chính thư viện curses thiết lập.
 
 
 .. function:: filter()
 
-   The :func:`.filter` routine, if used, must be called before :func:`initscr` is
-   called.  The effect is that, during the initialization, :envvar:`LINES` is set to ``1``; the
-   capabilities ``clear``, ``cup``, ``cud``, ``cud1``, ``cuu1``, ``cuu``, ``vpa`` are disabled; and the ``home``
-   string is set to the value of ``cr``. The effect is that the cursor is confined to
-   the current line, and so are screen updates.  This may be used for enabling
-   character-at-a-time  line editing without touching the rest of the screen.
+   Nếu được sử dụng, thủ tục :func:`.filter` phải được gọi trước khi gọi :func:`initscr`. Khi đó, trong quá trình khởi tạo, :envvar:`LINES` được đặt thành ``1``; các khả năng ``clear``, ``cup``, ``cud``, ``cud1``, ``cuu1``, ``cuu``, ``vpa`` bị vô hiệu hóa; và chuỗi ``home`` được đặt thành giá trị của ``cr``. Kết quả là con trỏ bị giới hạn trong dòng hiện tại, và các cập nhật màn hình cũng vậy. Điều này có thể được dùng để bật tính năng chỉnh sửa từng dòng theo từng ký tự mà không chạm đến phần còn lại của màn hình.
 
 
 .. function:: flash()
 
-   Flash the screen.  That is, change it to reverse-video and then change it back
-   in a short interval.  Some people prefer such as 'visible bell' to the audible
-   attention signal produced by :func:`beep`.
+   Làm màn hình nhấp nháy. Nghĩa là chuyển màn hình sang chế độ video đảo ngược rồi chuyển lại trong một khoảng thời gian ngắn. Một số người thích một 'chuông hiển thị' như vậy hơn tín hiệu chú ý bằng âm thanh do :func:`beep` tạo ra.
 
 
 .. function:: flushinp()
 
-   Flush all input buffers.  This throws away any  typeahead  that  has been typed
-   by the user and has not yet been processed by the program.
+   Xóa tất cả các bộ đệm đầu vào. Thao tác này loại bỏ mọi dữ liệu typeahead mà người dùng đã nhập nhưng chương trình chưa xử lý.
 
 
 .. function:: getmouse()
 
-   After :meth:`~window.getch` returns :const:`KEY_MOUSE` to signal a mouse event, this
-   method should be called to retrieve the queued mouse event, represented as a
-   5-tuple ``(id, x, y, z, bstate)``. *id* is an ID value used to distinguish
-   multiple devices, and *x*, *y*, *z* are the event's coordinates.  (*z* is
-   currently unused.)  *bstate* is an integer value whose bits will be set to
-   indicate the type of event, and will be the bitwise OR of one or more of the
-   following constants, where *n* is the button number from 1 to 5:
+   Sau khi :meth:`~window.getch` trả về :const:`KEY_MOUSE` để báo hiệu một sự kiện chuột, cần gọi phương thức này để lấy sự kiện chuột đang chờ trong hàng đợi, được biểu diễn dưới dạng tuple 5 phần tử ``(id, x, y, z, bstate)``. *id* là một giá trị ID dùng để phân biệt nhiều thiết bị, còn *x*, *y*, *z* là các tọa độ của sự kiện. (*z* hiện chưa được sử dụng.) *bstate* là một giá trị số nguyên, trong đó các bit sẽ được thiết lập để cho biết loại sự kiện, và sẽ là phép OR theo bit của một hoặc nhiều hằng số sau đây, trong đó *n* là số nút từ 1 đến 5:
    :const:`BUTTONn_PRESSED`, :const:`BUTTONn_RELEASED`, :const:`BUTTONn_CLICKED`,
    :const:`BUTTONn_DOUBLE_CLICKED`, :const:`BUTTONn_TRIPLE_CLICKED`,
    :const:`BUTTON_SHIFT`, :const:`BUTTON_CTRL`, :const:`BUTTON_ALT`.
 
    .. versionchanged:: 3.10
-      The ``BUTTON5_*`` constants are now exposed if they are provided by the
-      underlying curses library.
+      Các hằng số ``BUTTON5_*`` hiện được cung cấp nếu thư viện curses bên dưới cung cấp chúng.
 
 
 .. function:: getsyx()
 
-   Return the current coordinates of the virtual screen cursor as a tuple
-   ``(y, x)``.  If :meth:`leaveok <window.leaveok>` is currently ``True``, then return ``(-1, -1)``.
+   Trả về tọa độ hiện tại của con trỏ màn hình ảo dưới dạng tuple ``(y, x)``. Nếu :meth:`leaveok <window.leaveok>` hiện là ``True``, thì trả về ``(-1, -1)``.
 
 
 .. function:: getwin(file)
 
-   Read window-related data stored in the file by an earlier :meth:`window.putwin` call.
-   The routine then creates and initializes a new window using that data, returning
-   the new window object.  The *file* argument must be a file object opened for
-   reading in binary mode.
+   Đọc dữ liệu liên quan đến cửa sổ được lưu trong tệp bởi một lần gọi :meth:`window.putwin` trước đó. Sau đó, thủ tục này tạo và khởi tạo một cửa sổ mới bằng dữ liệu đó, rồi trả về đối tượng cửa sổ mới. Đối số *file* phải là một đối tượng tệp được mở để đọc ở chế độ nhị phân.
 
 
 .. function:: has_colors()
 
-   Return ``True`` if the terminal can display colors; otherwise, return ``False``.
+   Trả về ``True`` nếu terminal có thể hiển thị màu; nếu không, trả về ``False``.
 
 .. function:: has_extended_color_support()
 
-   Return ``True`` if the module supports extended colors; otherwise, return
-   ``False``. Extended color support allows more than 256 color pairs for
-   terminals that support more than 16 colors (for example, xterm-256color).
+   Trả về ``True`` nếu module hỗ trợ extended colors; nếu không, trả về ``False``. Hỗ trợ extended colors cho phép sử dụng hơn 256 cặp màu trên các terminal hỗ trợ hơn 16 màu (ví dụ: xterm-256color).
 
-   Extended color support requires ncurses version 6.1 or later.
+   Hỗ trợ extended colors yêu cầu ncurses phiên bản 6.1 trở lên.
 
    .. versionadded:: 3.10
 
 .. function:: has_ic()
 
-   Return ``True`` if the terminal has insert- and delete-character capabilities.
-   This function is included for historical reasons only, as all modern software
-   terminal emulators have such capabilities.
+   Trả về ``True`` nếu terminal có các khả năng chèn và xóa ký tự. Hàm này chỉ được giữ lại vì lý do lịch sử, vì mọi trình terminal emulator hiện đại đều có các khả năng này.
 
 
 .. function:: has_il()
 
-   Return ``True`` if the terminal has insert- and delete-line capabilities, or can
-   simulate  them  using scrolling regions. This function is included for
-   historical reasons only, as all modern software terminal emulators have such
-   capabilities.
+   Trả về ``True`` nếu terminal có các khả năng chèn và xóa dòng, hoặc có thể mô phỏng chúng bằng các vùng cuộn. Hàm này chỉ được giữ lại vì lý do lịch sử, vì mọi trình terminal emulator hiện đại đều có các khả năng này.
 
 
 .. function:: has_key(ch)
 
-   Take a key value *ch*, and return ``True`` if the current terminal type recognizes
-   a key with that value.
+   Nhận một giá trị phím *ch*, rồi trả về ``True`` nếu loại terminal hiện tại nhận diện một phím có giá trị đó.
 
 
 .. function:: halfdelay(tenths)
 
-   Used for half-delay mode, which is similar to cbreak mode in that characters
-   typed by the user are immediately available to the program. However, after
-   blocking for *tenths* tenths of seconds, raise an exception if nothing has
-   been typed.  The value of *tenths* must be a number between ``1`` and ``255``.  Use
-   :func:`nocbreak` to leave half-delay mode.
+   Được dùng cho chế độ half-delay, tương tự chế độ cbreak ở chỗ các ký tự do người dùng nhập sẽ ngay lập tức được cung cấp cho chương trình. Tuy nhiên, sau khi chờ *tenths* phần mười giây, hãy nêu một ngoại lệ nếu chưa có gì được nhập. Giá trị của *tenths* phải là một số nằm giữa ``1`` và ``255``. Sử dụng
+   :func:`nocbreak` để thoát khỏi chế độ half-delay.
 
 
 .. function:: init_color(color_number, r, g, b)
 
-   Change the definition of a color, taking the number of the color to be changed
-   followed by three RGB values (for the amounts of red, green, and blue
-   components).  The value of *color_number* must be between ``0`` and
-   ``COLORS - 1``.  Each of *r*, *g*, *b*, must be a value between ``0`` and
-   ``1000``.  When :func:`init_color` is used, all occurrences of that color on the
-   screen immediately change to the new definition.  This function is a no-op on
-   most terminals; it is active only if :func:`can_change_color` returns ``True``.
+   Thay đổi định nghĩa của một màu, bằng cách cung cấp số của màu cần thay đổi, theo sau là ba giá trị RGB (cho mức độ của các thành phần đỏ, lục và lam). Giá trị của *color_number* phải nằm giữa ``0`` và ``COLORS - 1``. Mỗi giá trị *r*, *g*, *b* phải nằm giữa ``0`` và ``1000``. Khi sử dụng :func:`init_color`, mọi lần xuất hiện của màu đó trên màn hình sẽ ngay lập tức chuyển sang định nghĩa mới. Hàm này không thực hiện thao tác nào trên hầu hết các terminal; nó chỉ hoạt động nếu :func:`can_change_color` trả về ``True``.
 
 
 .. function:: init_pair(pair_number, fg, bg)
 
-   Change the definition of a color-pair.  It takes three arguments: the number of
-   the color-pair to be changed, the foreground color number, and the background
-   color number.  The value of *pair_number* must be between ``1`` and
-   ``COLOR_PAIRS - 1`` (the ``0`` color pair can only be changed by
-   :func:`use_default_colors` and :func:`assume_default_colors`).
-   The value of *fg* and *bg* arguments must be between ``0`` and
-   ``COLORS - 1``, or, after calling :func:`!use_default_colors` or
-   :func:`!assume_default_colors`, ``-1``.
-   If the color-pair was previously initialized, the screen is
-   refreshed and all occurrences of that color-pair are changed to the new
-   definition.
+   Thay đổi định nghĩa của một color-pair. Hàm này nhận ba đối số: số của color-pair cần thay đổi, số của màu foreground và số của màu background. Giá trị của *pair_number* phải nằm giữa ``1`` và ``COLOR_PAIRS - 1`` (color pair ``0`` chỉ có thể được thay đổi bằng
+   :func:`use_default_colors` và :func:`assume_default_colors`). Giá trị của các đối số *fg* và *bg* phải nằm giữa ``0`` và ``COLORS - 1``, hoặc sau khi gọi :func:`!use_default_colors` hoặc
+   :func:`!assume_default_colors`, ``-1``. Nếu color-pair đã được khởi tạo trước đó, màn hình sẽ được làm mới và mọi lần xuất hiện của color-pair đó sẽ được thay đổi theo định nghĩa mới.
 
 
 .. function:: initscr()
 
-   Initialize the library. Return a :ref:`window <curses-window-objects>` object
-   which represents the whole screen.
+   Khởi tạo thư viện. Trả về một đối tượng :ref:`window <curses-window-objects>` đại diện cho toàn bộ màn hình.
 
-   See :func:`setupterm` for a caveat about calling it before this function.
+   Xem :func:`setupterm` để biết lưu ý về việc gọi nó trước hàm này.
 
    .. note::
 
-      If there is an error opening the terminal, the underlying curses library may
-      cause the interpreter to exit.
+      Nếu xảy ra lỗi khi mở terminal, thư viện curses bên dưới có thể khiến trình thông dịch thoát.
 
 
 .. function:: intrflush(flag)
 
-   If *flag* is ``True``, pressing an interrupt key (interrupt, break, or quit)
-   will flush all output in the terminal driver queue.  If *flag* is ``False``,
-   no flushing is done.
+   Nếu *flag* là ``True``, việc nhấn phím ngắt (interrupt, break hoặc quit) sẽ xóa toàn bộ đầu ra trong hàng đợi của terminal driver. Nếu *flag* là ``False``, sẽ không thực hiện việc xóa nào.
 
 
 .. function:: is_term_resized(nlines, ncols)
 
-   Return ``True`` if :func:`resize_term` would modify the window structure,
-   ``False`` otherwise.
+   Trả về ``True`` nếu :func:`resize_term` sẽ sửa đổi cấu trúc cửa sổ, nếu không thì trả về ``False``.
 
 
 .. function:: isendwin()
 
-   Return ``True`` if :func:`endwin` has been called (that is, the  curses library has
-   been deinitialized).
+   Trả về ``True`` nếu :func:`endwin` đã được gọi (nghĩa là thư viện curses đã được deinitialize).
 
 
 .. function:: keyname(k)
 
-   Return the name of the key numbered *k* as a bytes object.  The name of a key generating printable
-   ASCII character is the key's character.  The name of a control-key combination
-   is a two-byte bytes object consisting of a caret (``b'^'``) followed by the corresponding
-   printable ASCII character.  The name of an alt-key combination (128--255) is a
-   bytes object consisting of the prefix ``b'M-'`` followed by the name of the corresponding
-   ASCII character.
+   Trả về tên của phím có số *k* dưới dạng đối tượng bytes. Tên của phím tạo ra ký tự ASCII có thể in được chính là ký tự của phím đó. Tên của tổ hợp phím điều khiển là một đối tượng bytes gồm hai byte, bao gồm dấu mũ (``b'^'``) theo sau là ký tự ASCII có thể in được tương ứng. Tên của tổ hợp phím Alt (128--255) là một đối tượng bytes gồm tiền tố ``b'M-'`` theo sau là tên của ký tự ASCII tương ứng.
 
-   Raise a :exc:`ValueError` if *k* is negative.
+   Ném :exc:`ValueError` nếu *k* là số âm.
 
 
 .. function:: killchar()
 
-   Return the user's current line kill character as a one-byte bytes object. Under Unix operating systems
-   this is a property of the controlling tty of the curses program, and is not set
-   by the curses library itself.
+   Trả về một đối tượng bytes chứa ký tự xóa dòng hiện tại của người dùng dưới dạng đối tượng bytes một byte. Trên các hệ điều hành Unix, đây là thuộc tính của tty điều khiển chương trình curses và không được chính thư viện curses thiết lập.
 
 
 .. function:: longname()
 
-   Return a bytes object containing the terminfo long name field describing the current
-   terminal.  The maximum length of a verbose description is 128 characters.  It is
-   defined only after the call to :func:`initscr`.
+   Trả về một đối tượng bytes chứa trường tên dài của terminfo mô tả terminal hiện tại. Độ dài tối đa của phần mô tả chi tiết là 128 ký tự. Phần này chỉ được định nghĩa sau khi gọi :func:`initscr`.
 
 
 .. function:: meta(flag)
 
-   If *flag* is ``True``, allow 8-bit characters to be input.  If
-   *flag* is ``False``,  allow only 7-bit chars.
+   Nếu *flag* là ``True``, cho phép nhập các ký tự 8-bit. Nếu *flag* là ``False``, chỉ cho phép các ký tự 7-bit.
 
 
 .. function:: mouseinterval(interval)
 
-   Set the maximum time in milliseconds that can elapse between press and release
-   events in order for them to be recognized as a click, and return the previous
-   interval value.  The default value is 166 milliseconds, or one sixth of a second.
-   Use a negative *interval* to obtain the interval value without changing it.
+   Đặt thời gian tối đa tính bằng mili giây có thể trôi qua giữa các sự kiện nhấn và nhả để chúng được nhận dạng là một lần nhấp, rồi trả về giá trị khoảng thời gian trước đó. Giá trị mặc định là 166 mili giây, tức một phần sáu giây. Sử dụng *interval* âm để lấy giá trị khoảng thời gian mà không thay đổi nó.
 
 
 .. function:: mousemask(mousemask)
 
-   Set the mouse events to be reported, and return a tuple ``(availmask,
-   oldmask)``.   *availmask* indicates which of the specified mouse events can be
-   reported; on complete failure it returns ``0``.  *oldmask* is the previous value of
-   the mouse event mask.  If this function is never called, no mouse
-   events are ever reported.
+   Đặt các sự kiện chuột sẽ được báo cáo và trả về một tuple ``(availmask, oldmask)``. *availmask* cho biết những sự kiện chuột được chỉ định nào có thể được báo cáo; nếu hoàn toàn thất bại, hàm trả về ``0``. *oldmask* là giá trị trước đó của mặt nạ sự kiện chuột. Nếu hàm này chưa bao giờ được gọi, sẽ không có sự kiện chuột nào được báo cáo.
 
 
 .. function:: napms(ms)
 
-   Sleep for *ms* milliseconds.
+   Tạm dừng trong *ms* mili giây.
 
 
 .. function:: newpad(nlines, ncols)
 
-   Create and return a pointer to a new pad data structure with the given number
-   of lines and columns.  Return a pad as a window object.
+   Tạo và trả về một con trỏ đến cấu trúc dữ liệu pad mới với số dòng và cột đã cho. Trả về một pad dưới dạng đối tượng cửa sổ.
 
-   A pad is like a window, except that it is not restricted by the screen size, and
-   is not necessarily associated with a particular part of the screen.  Pads can be
-   used when a large window is needed, and only a part of the window will be on the
-   screen at one time.  Automatic refreshes of pads (such as from scrolling or
-   echoing of input) do not occur.  The :meth:`~window.refresh` and :meth:`~window.noutrefresh`
-   methods of a pad require 6 arguments to specify the part of the pad to be
-   displayed and the location on the screen to be used for the display. The
-   arguments are *pminrow*, *pmincol*, *sminrow*, *smincol*, *smaxrow*, *smaxcol*; the *p*
-   arguments refer to the upper-left corner of the pad region to be displayed and
-   the *s* arguments define a clipping box on the screen within which the pad region
-   is to be displayed.
+   Pad tương tự như cửa sổ, ngoại trừ việc nó không bị giới hạn bởi kích thước màn hình và không nhất thiết được liên kết với một phần cụ thể của màn hình. Có thể sử dụng pad khi cần một cửa sổ lớn nhưng mỗi lần chỉ hiển thị một phần cửa sổ trên màn hình. Pad không tự động làm mới, chẳng hạn do cuộn hoặc hiển thị dữ liệu nhập. Các phương thức :meth:`~window.refresh` và :meth:`~window.noutrefresh` của pad yêu cầu 6 đối số để xác định phần pad cần hiển thị và vị trí trên màn hình được dùng để hiển thị. Các đối số là *pminrow*, *pmincol*, *sminrow*, *smincol*, *smaxrow*, *smaxcol*; các đối số *p* tham chiếu đến góc trên bên trái của vùng pad cần hiển thị, còn các đối số *s* xác định một vùng cắt trên màn hình, trong đó vùng pad sẽ được hiển thị.
 
 
 .. function:: newwin(nlines, ncols)
               newwin(nlines, ncols, begin_y, begin_x)
 
-   Return a new :ref:`window <curses-window-objects>`, whose left-upper corner
-   is at  ``(begin_y, begin_x)``, and whose height/width is  *nlines*/*ncols*.
+   Trả về một :ref:`window <curses-window-objects>` mới, có góc trên bên trái tại ``(begin_y, begin_x)``, và có chiều cao/chiều rộng là *nlines*/*ncols*.
 
-   By default, the window will extend from the  specified position to the lower
-   right corner of the screen.
+   Theo mặc định, cửa sổ sẽ mở rộng từ vị trí đã chỉ định đến góc dưới bên phải của màn hình.
 
 
 .. function:: nl(flag=True)
 
-   Enter newline mode.  This mode translates the return key into newline on input,
-   and translates newline into return and line-feed on output. Newline mode is
-   initially on.
+   Bật chế độ newline. Chế độ này chuyển phím return thành newline khi nhập, và chuyển newline thành return cùng line-feed khi xuất. Chế độ newline ban đầu được bật.
 
-   If *flag* is ``False``, the effect is the same as calling :func:`nonl`.
+   Nếu *flag* là ``False``, hiệu ứng sẽ giống như khi gọi :func:`nonl`.
 
 
 .. function:: nocbreak()
 
-   Leave cbreak mode.  Return to normal "cooked" mode with line buffering.
+   Thoát khỏi chế độ cbreak. Trở về chế độ "cooked" thông thường với bộ đệm theo dòng.
 
 
 .. function:: noecho()
 
-   Leave echo mode.  Echoing of input characters is turned off.
+   Thoát khỏi chế độ echo. Tắt việc lặp lại các ký tự nhập vào.
 
 
 .. function:: nonl()
 
-   Leave newline mode.  Disable translation of return into newline on input, and
-   disable low-level translation of newline into newline/return on output (but this
-   does not change the behavior of ``addch('\n')``, which always does the
-   equivalent of return and line feed on the virtual screen).  With translation
-   off, curses can sometimes speed up vertical motion a little; also, it will be
-   able to detect the return key on input.
+   Thoát khỏi chế độ newline. Tắt việc chuyển return thành newline khi nhập, đồng thời tắt việc chuyển newline ở cấp thấp thành newline/return khi xuất (nhưng điều này không thay đổi hành vi của ``addch('\n')``, vốn luôn thực hiện tương đương return và line feed trên màn hình ảo). Khi tắt chuyển đổi, đôi khi curses có thể tăng tốc một chút thao tác di chuyển theo chiều dọc; đồng thời, nó sẽ có thể phát hiện phím return khi nhập.
 
 
 .. function:: noqiflush()
 
-   When the :func:`!noqiflush` routine is used, normal flush of input and output queues
-   associated with the ``INTR``, ``QUIT`` and ``SUSP`` characters will not be done.  You may
-   want to call :func:`!noqiflush` in a signal handler if you want output to
-   continue as though the interrupt had not occurred, after the handler exits.
+   Khi sử dụng routine :func:`!noqiflush`, việc flush thông thường các hàng đợi đầu vào và đầu ra liên kết với các ký tự ``INTR``, ``QUIT`` và ``SUSP`` sẽ không được thực hiện. Bạn có thể muốn gọi :func:`!noqiflush` trong signal handler nếu muốn đầu ra tiếp tục như thể interrupt chưa xảy ra sau khi handler kết thúc.
 
 
 .. function:: noraw()
 
-   Leave raw mode. Return to normal "cooked" mode with line buffering.
+   Thoát khỏi chế độ raw. Trở về chế độ "cooked" bình thường với bộ đệm theo dòng.
 
 
 .. function:: pair_content(pair_number)
 
-   Return a tuple ``(fg, bg)`` containing the colors for the requested color pair.
-   The value of *pair_number* must be between ``0`` and ``COLOR_PAIRS - 1``.
+   Trả về một tuple ``(fg, bg)`` chứa các màu của cặp màu được yêu cầu. Giá trị của *pair_number* phải nằm trong khoảng từ ``0`` đến ``COLOR_PAIRS - 1``.
 
 
 .. function:: pair_number(attr)
 
-   Return the number of the color-pair set by the attribute value *attr*.
-   :func:`color_pair` is the counterpart to this function.
+   Trả về số của cặp màu được đặt bởi giá trị thuộc tính *attr*.
+   :func:`color_pair` là hàm tương ứng với hàm này.
 
 
 .. function:: putp(str)
 
-   Equivalent to ``tputs(str, 1, putchar)``; emit the value of a specified
-   terminfo capability, a bytes object, for the current terminal.
-   Note that the output of :func:`putp` always goes to standard output.
+   Tương đương với ``tputs(str, 1, putchar)``; phát ra giá trị của một capability terminfo được chỉ định, dưới dạng đối tượng bytes, cho terminal hiện tại. Lưu ý rằng đầu ra của :func:`putp` luôn được gửi đến standard output.
 
-   :func:`setupterm` (or :func:`initscr`) must be called first.
+   Phải gọi :func:`setupterm` (hoặc :func:`initscr`) trước.
 
 
 .. function:: qiflush([flag])
 
-   If *flag* is ``False``, the effect is the same as calling :func:`noqiflush`. If
-   *flag* is ``True``, or no argument is provided, the queues will be flushed when
-   these control characters are read.
+   Nếu *flag* là ``False``, hiệu ứng sẽ giống như gọi :func:`noqiflush`. Nếu *flag* là ``True``, hoặc không cung cấp đối số, các queue sẽ được flush khi đọc các ký tự điều khiển này.
 
 
 .. function:: raw()
 
-   Enter raw mode.  In raw mode, normal line buffering and  processing of
-   interrupt, quit, suspend, and flow control keys are turned off; characters are
-   presented to curses input functions one by one.
+   Bật raw mode. Trong raw mode, tính năng buffering dòng thông thường và việc xử lý các phím interrupt, quit, suspend và flow control bị tắt; các ký tự được cung cấp cho các hàm nhập của curses từng ký tự một.
 
 
 .. function:: reset_prog_mode()
 
-   Restore the  terminal  to "program" mode, as previously saved  by
+   Khôi phục terminal về chế độ "program", như đã được lưu trước đó bởi
    :func:`def_prog_mode`.
 
 
 .. function:: reset_shell_mode()
 
-   Restore the  terminal  to "shell" mode, as previously saved  by
+   Khôi phục terminal về chế độ "shell", như đã được lưu trước đó bởi
    :func:`def_shell_mode`.
 
 
 .. function:: resetty()
 
-   Restore the state of the terminal modes to what it was at the last call to
+   Khôi phục trạng thái của các chế độ terminal về trạng thái tại lần gọi gần nhất đến
    :func:`savetty`.
 
 
 .. function:: resize_term(nlines, ncols)
 
-   Backend function used by :func:`resizeterm`, performing most of the work;
-   when resizing the windows, :func:`resize_term` blank-fills the areas that are
-   extended.  The calling application should fill in these areas with
-   appropriate data.  The :func:`!resize_term` function attempts to resize all
-   windows.  However, due to the calling convention of pads, it is not possible
-   to resize these without additional interaction with the application.
+   Hàm backend được :func:`resizeterm` sử dụng, thực hiện phần lớn công việc; khi thay đổi kích thước các cửa sổ, :func:`resize_term` sẽ điền các vùng được mở rộng bằng khoảng trống. Ứng dụng gọi hàm này nên điền các vùng đó bằng dữ liệu phù hợp. Hàm :func:`!resize_term` cố gắng thay đổi kích thước tất cả các cửa sổ. Tuy nhiên, do calling convention của pads, không thể thay đổi kích thước các pad này nếu không có thêm tương tác với ứng dụng.
 
 
 .. function:: resizeterm(nlines, ncols)
 
-   Resize the standard and current windows to the specified dimensions, and
-   adjusts other bookkeeping data used by the curses library that record the
-   window dimensions (in particular the SIGWINCH handler).
+   Thay đổi kích thước các cửa sổ chuẩn và hiện tại theo các kích thước được chỉ định, đồng thời điều chỉnh các dữ liệu bookkeeping khác được thư viện curses sử dụng để ghi lại kích thước cửa sổ (đặc biệt là trình xử lý SIGWINCH).
 
 
 .. function:: savetty()
 
-   Save the current state of the terminal modes in a buffer, usable by
+   Lưu trạng thái hiện tại của các chế độ terminal vào một bộ đệm, có thể được sử dụng bởi
    :func:`resetty`.
 
 .. function:: get_escdelay()
 
-   Retrieves the value set by :func:`set_escdelay`.
+   Truy xuất giá trị được đặt bởi :func:`set_escdelay`.
 
    .. versionadded:: 3.9
 
 .. function:: set_escdelay(ms)
 
-   Sets the number of milliseconds to wait after reading an escape character,
-   to distinguish between an individual escape character entered on the
-   keyboard from escape sequences sent by cursor and function keys.
+   Đặt số mili giây cần chờ sau khi đọc một ký tự escape để phân biệt giữa một ký tự escape riêng lẻ được nhập bằng bàn phím và các chuỗi escape được gửi bởi các phím con trỏ và phím chức năng.
 
    .. versionadded:: 3.9
 
 .. function:: get_tabsize()
 
-   Retrieves the value set by :func:`set_tabsize`.
+   Truy xuất giá trị được đặt bởi :func:`set_tabsize`.
 
    .. versionadded:: 3.9
 
 .. function:: set_tabsize(size)
 
-   Sets the number of columns used by the curses library when converting a tab
-   character to spaces as it adds the tab to a window.
+   Đặt số cột mà thư viện curses sử dụng khi chuyển đổi một ký tự tab thành các dấu cách trong lúc thêm tab vào một cửa sổ.
 
    .. versionadded:: 3.9
 
 .. function:: setsyx(y, x)
 
-   Set the virtual screen cursor to *y*, *x*. If *y* and *x* are both ``-1``, then
-   :meth:`leaveok <window.leaveok>` is set ``True``.
+   Đặt con trỏ màn hình ảo thành *y*, *x*. Nếu *y* và *x* đều là ``-1``, thì
+   :meth:`leaveok <window.leaveok>` được đặt ``True``.
 
 
 .. function:: setupterm(term=None, fd=-1)
 
-   Initialize the terminal.  *term* is a string giving
-   the terminal name, or ``None``; if omitted or ``None``, the value of the
-   :envvar:`TERM` environment variable will be used.  *fd* is the
-   file descriptor to which any initialization sequences will be sent; if not
-   supplied or ``-1``, the file descriptor for ``sys.stdout`` will be used.
+   Khởi tạo terminal. *term* là một chuỗi cung cấp tên terminal hoặc ``None``; nếu bị bỏ qua hoặc là ``None``, giá trị của
+   :envvar:`TERM` biến môi trường sẽ được sử dụng. *fd* là file descriptor mà mọi chuỗi khởi tạo sẽ được gửi đến; nếu không được cung cấp hoặc là ``-1``, file descriptor của ``sys.stdout`` sẽ được sử dụng.
 
-   Raise a :exc:`curses.error` if the terminal could not be found or its
-   terminfo database entry could not be read.  If the terminal has already
-   been initialized, this function has no effect.
+   Phát sinh :exc:`curses.error` nếu không tìm thấy terminal hoặc không thể đọc mục nhập terminfo của terminal đó. Nếu terminal đã được khởi tạo, hàm này không có tác dụng.
 
    .. note::
 
-      Calling :func:`initscr` after :func:`setupterm`
-      leaks the terminal that :func:`setupterm` allocated:
-      the curses library keeps only a single current terminal
-      and does not free the previously allocated one.
+      Việc gọi :func:`initscr` sau :func:`setupterm` sẽ làm rò rỉ terminal mà :func:`setupterm` đã cấp phát: thư viện curses chỉ duy trì một terminal hiện tại và không giải phóng terminal đã được cấp phát trước đó.
 
 
 .. function:: start_color()
 
-   Must be called if the programmer wants to use colors, and before any other color
-   manipulation routine is called.  It is good practice to call this routine right
-   after :func:`initscr`.
+   Phải gọi hàm này nếu lập trình viên muốn sử dụng màu sắc, và phải gọi trước mọi routine thao tác màu khác. Một cách làm tốt là gọi routine này ngay sau :func:`initscr`.
 
-   :func:`start_color` initializes eight basic colors (black, red,  green, yellow,
-   blue, magenta, cyan, and white), and two global variables in the :mod:`!curses`
-   module, :const:`COLORS` and :const:`COLOR_PAIRS`, containing the maximum number
-   of colors and color-pairs the terminal can support.  It also restores the colors
-   on the terminal to the values they had when the terminal was just turned on.
+   :func:`start_color` khởi tạo tám màu cơ bản (đen, đỏ, xanh lá, vàng, xanh dương, tím magenta, xanh cyan và trắng), cùng hai biến toàn cục trong module :mod:`!curses`, là :const:`COLORS` và :const:`COLOR_PAIRS`, chứa số lượng màu và cặp màu tối đa mà terminal có thể hỗ trợ. Hàm này cũng khôi phục màu trên terminal về các giá trị khi terminal vừa được bật.
 
 
 .. function:: termattrs()
 
-   Return a logical OR of all video attributes supported by the terminal.  This
-   information is useful when a curses program needs complete control over the
-   appearance of the screen.
+   Trả về phép OR logic của tất cả thuộc tính hiển thị mà terminal hỗ trợ. Thông tin này hữu ích khi chương trình curses cần kiểm soát hoàn toàn giao diện của màn hình.
 
 
 .. function:: termname()
 
-   Return the value of the environment variable :envvar:`TERM`, as a bytes object,
-   truncated to 14 characters.
+   Trả về giá trị của biến môi trường :envvar:`TERM` dưới dạng đối tượng bytes, được cắt ngắn còn 14 ký tự.
 
 
 .. function:: tigetflag(capname)
 
-   Return the value of the Boolean capability corresponding to the terminfo
-   capability name *capname* as an integer.  Return the value ``-1`` if *capname* is not a
-   Boolean capability, or ``0`` if it is canceled or absent from the terminal
-   description.
+   Trả về giá trị của capability Boolean tương ứng với tên capability terminfo *capname* dưới dạng số nguyên. Trả về giá trị ``-1`` nếu *capname* không phải là capability Boolean, hoặc ``0`` nếu capability này bị hủy hoặc không có trong mô tả terminal.
 
-   :func:`setupterm` (or :func:`initscr`) must be called first.
+   Phải gọi :func:`setupterm` (hoặc :func:`initscr`) trước.
 
 
 .. function:: tigetnum(capname)
 
-   Return the value of the numeric capability corresponding to the terminfo
-   capability name *capname* as an integer.  Return the value ``-2`` if *capname* is not a
-   numeric capability, or ``-1`` if it is canceled or absent from the terminal
-   description.
+   Trả về giá trị của capability số tương ứng với tên capability terminfo *capname* dưới dạng số nguyên. Trả về giá trị ``-2`` nếu *capname* không phải là capability số, hoặc ``-1`` nếu capability này bị hủy hoặc không có trong mô tả terminal.
 
-   :func:`setupterm` (or :func:`initscr`) must be called first.
+   Phải gọi :func:`setupterm` (hoặc :func:`initscr`) trước.
 
 
 .. function:: tigetstr(capname)
 
-   Return the value of the string capability corresponding to the terminfo
-   capability name *capname* as a bytes object.  Return ``None`` if *capname*
-   is not a terminfo "string capability", or is canceled or absent from the
-   terminal description.
+   Trả về giá trị của capability chuỗi tương ứng với tên capability terminfo *capname* dưới dạng đối tượng bytes. Trả về ``None`` nếu *capname* không phải là "string capability" của terminfo, hoặc bị hủy hay không có trong mô tả terminal.
 
-   :func:`setupterm` (or :func:`initscr`) must be called first.
+   Phải gọi :func:`setupterm` (hoặc :func:`initscr`) trước.
 
 
 .. function:: tparm(str[, ...])
 
-   Instantiate the bytes object *str* with the supplied parameters, where *str* should
-   be a parameterized byte string obtained from the terminfo database.  For example,
-   ``tparm(tigetstr("cup"), 5, 3)`` could result in ``b'\033[6;4H'``, the exact
-   result depending on terminal type.  Up to nine integer parameters may be supplied.
+   Khởi tạo đối tượng bytes *str* với các tham số được cung cấp, trong đó *str* phải là một chuỗi byte có tham số thu được từ cơ sở dữ liệu terminfo. Ví dụ: ``tparm(tigetstr("cup"), 5, 3)`` có thể cho kết quả là ``b'\033[6;4H'``, kết quả chính xác tùy thuộc vào loại terminal. Có thể cung cấp tối đa chín tham số số nguyên.
 
-   :func:`setupterm` (or :func:`initscr`) must be called first.
+   Phải gọi :func:`setupterm` (hoặc :func:`initscr`) trước.
 
 
 .. function:: typeahead(fd)
 
-   Specify that the file descriptor *fd* be used for typeahead checking.  If *fd*
-   is ``-1``, then no typeahead checking is done.
+   Chỉ định rằng file descriptor *fd* được sử dụng để kiểm tra typeahead. Nếu *fd* là ``-1``, thì không thực hiện kiểm tra typeahead.
 
-   The curses library does "line-breakout optimization" by looking for typeahead
-   periodically while updating the screen.  If input is found, and it is coming
-   from a tty, the current update is postponed until refresh or doupdate is called
-   again, allowing faster response to commands typed in advance. This function
-   allows specifying a different file descriptor for typeahead checking.
+   Thư viện curses thực hiện “tối ưu hóa line-breakout” bằng cách định kỳ tìm typeahead trong khi cập nhật màn hình. Nếu tìm thấy dữ liệu đầu vào và dữ liệu đó đến từ một tty, lần cập nhật hiện tại sẽ được trì hoãn cho đến khi refresh hoặc doupdate được gọi lại, giúp phản hồi nhanh hơn với các lệnh đã được nhập trước. Hàm này cho phép chỉ định một file descriptor khác để kiểm tra typeahead.
 
 
 .. function:: unctrl(ch)
 
-   Return a bytes object which is a printable representation of the character *ch*;
-   any attributes and color pair are ignored.
-   Control characters are represented as a caret followed by the character, for
-   example as ``b'^C'``. Printing characters are left as they are.
+   Trả về một đối tượng bytes là biểu diễn có thể in được của ký tự *ch*; mọi thuộc tính và color pair đều bị bỏ qua. Các ký tự điều khiển được biểu diễn bằng dấu mũ theo sau là ký tự đó, chẳng hạn như ``b'^C'``. Các ký tự có thể in được giữ nguyên.
 
 
 .. function:: ungetch(ch)
 
-   Push *ch* so the next :meth:`~window.getch` will return it.
+   Đưa *ch* vào để lần gọi :meth:`~window.getch` tiếp theo trả về nó.
 
-   *ch* may be an integer (a key code or the code of an encoded byte), a byte,
-   or a string of length 1 which encodes to a single byte.
+   *ch* có thể là một số nguyên (mã phím hoặc mã của một byte đã mã hóa), một byte hoặc một chuỗi có độ dài 1 được mã hóa thành một byte duy nhất.
 
    .. note::
 
-      Only one *ch* can be pushed before :meth:`!getch` is called.
+      Chỉ có thể đẩy một *ch* trước khi gọi :meth:`!getch`.
 
 
 .. function:: update_lines_cols()
 
-   Update the :const:`LINES` and :const:`COLS` module variables.
-   Useful for detecting manual screen resize.
+   Cập nhật các biến mô-đun :const:`LINES` và :const:`COLS`. Hữu ích để phát hiện việc thay đổi kích thước màn hình theo cách thủ công.
 
    .. versionadded:: 3.5
 
 
 .. function:: unget_wch(ch)
 
-   Push *ch* so the next :meth:`~window.get_wch` will return it.
+   Đẩy *ch* để lần gọi :meth:`~window.get_wch` tiếp theo sẽ trả về giá trị đó.
 
-   *ch* may be an integer (a character code, not a key code) or a string of
-   length 1.
+   *ch* có thể là một số nguyên (mã ký tự, không phải mã phím) hoặc một chuỗi có độ dài bằng 1.
 
    .. note::
 
-      Only one *ch* can be pushed before :meth:`!get_wch` is called.
+      Chỉ có thể đẩy một *ch* trước khi gọi :meth:`!get_wch`.
 
    .. versionadded:: 3.3
 
 
 .. function:: ungetmouse(id, x, y, z, bstate)
 
-   Push a :const:`KEY_MOUSE` event onto the input queue, associating the given
-   state data with it.
+   Đẩy một sự kiện :const:`KEY_MOUSE` vào hàng đợi đầu vào, liên kết dữ liệu trạng thái đã cho với sự kiện đó.
 
 
 .. function:: use_env(flag)
 
-   If used, this function should be called before :func:`initscr` or newterm are
-   called.  When *flag* is ``False``, the values of lines and columns specified in the
-   terminfo database will be used, even if environment variables :envvar:`LINES`
-   and :envvar:`COLUMNS` (used by default) are set, or if curses is running in a
-   window (in which case default behavior would be to use the window size if
-   :envvar:`LINES` and :envvar:`COLUMNS` are not set).
+   Nếu sử dụng, hàm này phải được gọi trước khi gọi :func:`initscr` hoặc newterm. Khi *flag* là ``False``, các giá trị về số dòng và số cột được chỉ định trong cơ sở dữ liệu terminfo sẽ được sử dụng, ngay cả khi các biến môi trường :envvar:`LINES` và :envvar:`COLUMNS` (được sử dụng theo mặc định) được thiết lập, hoặc nếu curses đang chạy trong một cửa sổ (trong trường hợp đó, hành vi mặc định sẽ là sử dụng kích thước cửa sổ nếu
+   :envvar:`LINES` và :envvar:`COLUMNS` chưa được thiết lập).
 
 
 .. function:: use_default_colors()
 
-   Equivalent to ``assume_default_colors(-1, -1)``.
+   Tương đương với ``assume_default_colors(-1, -1)``.
 
 
 .. function:: wrapper(func, /, *args, **kwargs)
 
-   Initialize curses and call another callable object, *func*, which should be the
-   rest of your curses-using application.  If the application raises an exception,
-   this function will restore the terminal to a sane state before re-raising the
-   exception and generating a traceback.  The callable object *func* is then passed
-   the main window 'stdscr' as its first argument, followed by any other arguments
-   passed to :func:`!wrapper`.  Before calling *func*, :func:`!wrapper` turns on
-   cbreak mode, turns off echo, enables the terminal keypad, and initializes colors
-   if the terminal has color support.  On exit (whether normally or by exception)
-   it restores cooked mode, turns on echo, and disables the terminal keypad.
+   Khởi tạo curses và gọi một đối tượng có thể gọi, *func*, đối tượng này sẽ là phần còn lại của ứng dụng sử dụng curses của bạn. Nếu ứng dụng phát sinh ngoại lệ, hàm này sẽ khôi phục terminal về trạng thái bình thường trước khi phát sinh lại ngoại lệ và tạo traceback. Sau đó, đối tượng có thể gọi *func* được truyền cửa sổ chính 'stdscr' làm đối số đầu tiên, tiếp theo là mọi đối số khác được truyền cho :func:`!wrapper`. Trước khi gọi *func*, :func:`!wrapper` bật chế độ cbreak, tắt echo, bật keypad của terminal và khởi tạo màu nếu terminal hỗ trợ màu. Khi thoát (dù bình thường hay do ngoại lệ), hàm này khôi phục chế độ cooked, bật echo và tắt keypad của terminal.
 
 
 .. _curses-window-objects:
 
-Window objects
---------------
+Đối tượng cửa sổ
+----------------
 
 .. class:: window
 
-   Window objects, as returned by :func:`initscr` and :func:`newwin` above, have
-   the following methods and attributes:
+   Các đối tượng cửa sổ, được trả về bởi :func:`initscr` và :func:`newwin` ở trên, có các phương thức và thuộc tính sau:
 
 
 .. method:: window.addch(ch[, attr])
             window.addch(y, x, ch[, attr])
 
-   Paint character *ch* at ``(y, x)`` with attributes *attr*, overwriting any
-   character previously painted at that location.  By default, the character
-   position and attributes are the current settings for the window object.
+   Vẽ ký tự *ch* tại ``(y, x)`` với các thuộc tính *attr*, ghi đè mọi ký tự đã được vẽ trước đó tại vị trí đó. Theo mặc định, vị trí ký tự và các thuộc tính là các thiết lập hiện tại của đối tượng cửa sổ.
 
    .. note::
 
-      Writing outside the window, subwindow, or pad raises a :exc:`curses.error`.
-      Attempting to write to the lower-right corner of a window, subwindow,
-      or pad will cause an exception to be raised after the character is printed.
+      Ghi bên ngoài cửa sổ, cửa sổ con hoặc pad sẽ phát sinh :exc:`curses.error`. Việc cố gắng ghi vào góc dưới bên phải của cửa sổ, cửa sổ con hoặc pad sẽ khiến một ngoại lệ được phát sinh sau khi ký tự được in.
 
 
 .. method:: window.addnstr(str, n[, attr])
             window.addnstr(y, x, str, n[, attr])
 
-   Paint at most *n* characters of the character string *str* at
-   ``(y, x)`` with attributes
-   *attr*, overwriting anything previously on the display.
+   Vẽ nhiều nhất *n* ký tự của chuỗi ký tự *str* tại ``(y, x)`` với các thuộc tính *attr*, ghi đè mọi nội dung trước đó trên màn hình.
 
 
 .. method:: window.addstr(str[, attr])
             window.addstr(y, x, str[, attr])
 
-   Paint the character string *str* at ``(y, x)`` with attributes
-   *attr*, overwriting anything previously on the display.
+   Vẽ chuỗi ký tự *str* tại ``(y, x)`` với các thuộc tính *attr*, ghi đè mọi nội dung trước đó trên màn hình.
 
    .. note::
 
-      * Writing outside the window, subwindow, or pad raises :exc:`curses.error`.
-        Attempting to write to the lower-right corner of a window, subwindow,
-        or pad will cause an exception to be raised after the string is printed.
+      * Ghi bên ngoài cửa sổ, cửa sổ con hoặc pad sẽ phát sinh :exc:`curses.error`. Việc cố gắng ghi vào góc dưới bên phải của cửa sổ, cửa sổ con hoặc pad sẽ khiến một ngoại lệ được phát sinh sau khi chuỗi được in.
 
-      * A bug in ncurses, the backend for this Python module, could cause
-        segfaults when resizing windows.  This was fixed in ncurses-6.1-20190511.
-        If you are stuck with an earlier ncurses, you can avoid triggering it by
-        not calling :meth:`!addstr` with a *str* that has embedded newlines;
-        instead, call :meth:`!addstr` separately for each line.
+      * Một lỗi trong ncurses, backend của module Python này, có thể gây ra lỗi phân đoạn khi thay đổi kích thước cửa sổ. Lỗi này đã được khắc phục trong ncurses-6.1-20190511. Nếu bạn buộc phải sử dụng phiên bản ncurses cũ hơn, có thể tránh kích hoạt lỗi này bằng cách không gọi :meth:`!addstr` với một *str* chứa ký tự xuống dòng; thay vào đó, hãy gọi :meth:`!addstr` riêng cho từng dòng.
 
 
 .. method:: window.attroff(attr)
 
-   Remove attribute *attr* from the "background" set applied to all writes to the
-   current window.
+   Xóa thuộc tính *attr* khỏi tập "background" được áp dụng cho mọi thao tác ghi vào cửa sổ hiện tại.
 
 
 .. method:: window.attron(attr)
 
-   Add attribute *attr* to the "background" set applied to all writes to the
-   current window.
+   Thêm thuộc tính *attr* vào tập "background" được áp dụng cho mọi thao tác ghi vào cửa sổ hiện tại.
 
 
 .. method:: window.attrset(attr)
 
-   Set the "background" set of attributes to *attr*.  This set is initially
-   ``0`` (no attributes).
+   Đặt tập thuộc tính "background" thành *attr*. Tập này ban đầu là ``0`` (không có thuộc tính).
 
 
 .. method:: window.bkgd(ch[, attr])
 
-   Set the background property of the window to the character *ch*, with
-   attributes *attr*.  The change is then applied to every character position in
-   that window:
+   Đặt thuộc tính background của cửa sổ thành ký tự *ch*, với các thuộc tính *attr*. Sau đó, thay đổi này được áp dụng cho mọi vị trí ký tự trong cửa sổ:
 
-   * The attribute of every character in the window  is changed to the new
-     background attribute.
+   * Thuộc tính của mọi ký tự trong cửa sổ được thay đổi thành thuộc tính background mới.
 
-   * Wherever  the  former background character appears, it is changed to the new
-     background character.
+   * Ở mọi vị trí xuất hiện ký tự background trước đây, ký tự đó được thay đổi thành ký tự background mới.
 
 
 .. method:: window.bkgdset(ch[, attr])
 
-   Set the window's background.  A window's background consists of a character and
-   any combination of attributes.  The attribute part of the background is combined
-   (OR'ed) with all non-blank characters that are written into the window.  Both
-   the character and attribute parts of the background are combined with the blank
-   characters.  The background becomes a property of the character and moves with
-   the character through any scrolling and insert/delete line/character operations.
+   Đặt background của cửa sổ. Background của một cửa sổ bao gồm một ký tự và bất kỳ tổ hợp thuộc tính nào. Phần thuộc tính của background được kết hợp (theo phép OR) với mọi ký tự không trống được ghi vào cửa sổ. Cả phần ký tự và phần thuộc tính của background đều được kết hợp với các ký tự trống. Background trở thành một thuộc tính của ký tự và di chuyển cùng ký tự qua mọi thao tác cuộn và chèn/xóa dòng/ký tự.
 
 
 .. method:: window.border([ls[, rs[, ts[, bs[, tl[, tr[, bl[, br]]]]]]]])
 
-   Draw a border around the edges of the window. Each parameter specifies  the
-   character to use for a specific part of the border; see the table below for more
-   details.
+   Vẽ đường viền quanh các cạnh của cửa sổ. Mỗi tham số chỉ định ký tự sẽ được sử dụng cho một phần cụ thể của đường viền; xem bảng dưới đây để biết thêm chi tiết.
 
    .. note::
 
-      A ``0`` value for any parameter will cause the default character to be used for
-      that parameter.  Keyword parameters can *not* be used.  The defaults are listed
-      in this table:
+      Một giá trị ``0`` cho bất kỳ tham số nào sẽ khiến ký tự mặc định được sử dụng cho tham số đó. Các tham số từ khóa *không* thể được sử dụng. Các giá trị mặc định được liệt kê trong bảng này:
 
-   +-----------+---------------------+-----------------------+
-   | Parameter | Description         | Default value         |
-   +===========+=====================+=======================+
-   | *ls*      | Left side           | :const:`ACS_VLINE`    |
-   +-----------+---------------------+-----------------------+
-   | *rs*      | Right side          | :const:`ACS_VLINE`    |
-   +-----------+---------------------+-----------------------+
-   | *ts*      | Top                 | :const:`ACS_HLINE`    |
-   +-----------+---------------------+-----------------------+
-   | *bs*      | Bottom              | :const:`ACS_HLINE`    |
-   +-----------+---------------------+-----------------------+
-   | *tl*      | Upper-left corner   | :const:`ACS_ULCORNER` |
-   +-----------+---------------------+-----------------------+
-   | *tr*      | Upper-right corner  | :const:`ACS_URCORNER` |
-   +-----------+---------------------+-----------------------+
-   | *bl*      | Bottom-left corner  | :const:`ACS_LLCORNER` |
-   +-----------+---------------------+-----------------------+
-   | *br*      | Bottom-right corner | :const:`ACS_LRCORNER` |
-   +-----------+---------------------+-----------------------+
+   +---------+-------------------+-----------------------+
+   | Tham số | Mô tả             | Giá trị mặc định      |
+   +=========+===================+=======================+
+   | *ls*    | Bên trái          | :const:`ACS_VLINE`    |
+   +---------+-------------------+-----------------------+
+   | *rs*    | Bên phải          | :const:`ACS_VLINE`    |
+   +---------+-------------------+-----------------------+
+   | *ts*    | Trên              | :const:`ACS_HLINE`    |
+   +---------+-------------------+-----------------------+
+   | *bs*    | Dưới              | :const:`ACS_HLINE`    |
+   +---------+-------------------+-----------------------+
+   | *tl*    | Góc trên bên trái | :const:`ACS_ULCORNER` |
+   +---------+-------------------+-----------------------+
+   | *tr*    | Góc trên bên phải | :const:`ACS_URCORNER` |
+   +---------+-------------------+-----------------------+
+   | *bl*    | Góc dưới bên trái | :const:`ACS_LLCORNER` |
+   +---------+-------------------+-----------------------+
+   | *br*    | Góc dưới bên phải | :const:`ACS_LRCORNER` |
+   +---------+-------------------+-----------------------+
 
 
 .. method:: window.box([vertch, horch])
 
-   Similar to :meth:`border`, but both *ls* and *rs* are *vertch* and both *ts* and
-   *bs* are *horch*.  The default corner characters are always used by this function.
+   Tương tự :meth:`border`, nhưng cả *ls* và *rs* đều là *vertch*, đồng thời cả *ts* và *bs* đều là *horch*. Hàm này luôn sử dụng các ký tự góc mặc định.
 
 
 .. method:: window.chgat(attr)
-            window.chgat(num, attr)
-            window.chgat(y, x, attr)
-            window.chgat(y, x, num, attr)
+            window.chgat(num, attr) window.chgat(y, x, attr) window.chgat(y, x, num, attr)
 
-   Set the attributes of *num* characters at the current cursor position, or at
-   position ``(y, x)`` if supplied. If *num* is not given or is ``-1``,
-   the attribute will be set on all the characters to the end of the line.  This
-   function moves cursor to position ``(y, x)`` if supplied. The changed line
-   will be touched using the :meth:`touchline` method so that the contents will
-   be redisplayed by the next window refresh.
+   Đặt thuộc tính cho *num* ký tự tại vị trí con trỏ hiện tại hoặc tại vị trí ``(y, x)`` nếu được cung cấp. Nếu *num* không được cung cấp hoặc là ``-1``, thuộc tính sẽ được đặt cho tất cả ký tự từ vị trí đó đến cuối dòng. Hàm này di chuyển con trỏ đến vị trí ``(y, x)`` nếu được cung cấp. Dòng đã thay đổi sẽ được đánh dấu bằng phương thức :meth:`touchline`, để nội dung được hiển thị lại trong lần làm mới cửa sổ tiếp theo.
 
 
 .. method:: window.clear()
 
-   Like :meth:`erase`, but also cause the whole window to be repainted upon next
-   call to :meth:`refresh`.
+   Giống :meth:`erase`, nhưng cũng khiến toàn bộ cửa sổ được vẽ lại trong lần gọi :meth:`refresh` tiếp theo.
 
 
 .. method:: window.clearok(flag)
 
-   If *flag* is ``True``, the next call to :meth:`refresh` will clear the window
-   completely.
+   Nếu *flag* là ``True``, lần gọi :meth:`refresh` tiếp theo sẽ xóa hoàn toàn cửa sổ.
 
 
 .. method:: window.clrtobot()
 
-   Erase from cursor to the end of the window: all lines below the cursor are
-   deleted, and then the equivalent of :meth:`clrtoeol` is performed.
+   Xóa từ vị trí con trỏ đến cuối cửa sổ: tất cả các dòng bên dưới con trỏ sẽ bị xóa, sau đó thực hiện thao tác tương đương với :meth:`clrtoeol`.
 
 
 .. method:: window.clrtoeol()
 
-   Erase from cursor to the end of the line.
+   Xóa từ vị trí con trỏ đến cuối dòng.
 
 
 .. method:: window.cursyncup()
 
-   Update the current cursor position of all the ancestors of the window to
-   reflect the current cursor position of the window.
+   Cập nhật vị trí con trỏ hiện tại của tất cả các cửa sổ cha của cửa sổ để phản ánh vị trí con trỏ hiện tại của cửa sổ.
 
 
 .. method:: window.delch([y, x])
 
-   Delete the character under the cursor, or at ``(y, x)`` if specified.  All
-   characters to the right on the same line are shifted one position left.
+   Xóa ký tự nằm dưới con trỏ hoặc tại ``(y, x)`` nếu được chỉ định. Tất cả các ký tự bên phải trên cùng dòng được dịch sang trái một vị trí.
 
 
 .. method:: window.deleteln()
 
-   Delete the line under the cursor. All following lines are moved up by one line.
+   Xóa dòng nằm dưới con trỏ. Tất cả các dòng tiếp theo được dịch lên một dòng.
 
 
 .. method:: window.derwin(begin_y, begin_x)
             window.derwin(nlines, ncols, begin_y, begin_x)
 
-   An abbreviation for "derive window", :meth:`derwin` is the same as calling
-   :meth:`subwin`, except that *begin_y* and *begin_x* are relative to the origin
-   of the window, rather than relative to the entire screen.  Return a window
-   object for the derived window.
+   Là cách viết tắt của "derive window", :meth:`derwin` tương đương với việc gọi
+   :meth:`subwin`, ngoại trừ *begin_y* và *begin_x* là các giá trị tương đối so với gốc của cửa sổ, thay vì tương đối so với toàn bộ màn hình. Trả về một đối tượng cửa sổ cho cửa sổ được tạo.
 
 
 .. method:: window.echochar(ch[, attr])
 
-   Add character *ch* with attribute *attr*, and immediately  call :meth:`refresh`
-   on the window.
+   Thêm ký tự *ch* với thuộc tính *attr*, rồi ngay lập tức gọi :meth:`refresh` trên cửa sổ.
 
 
 .. method:: window.enclose(y, x)
 
-   Test whether the given pair of screen-relative character-cell coordinates are
-   enclosed by the given window, returning ``True`` or ``False``.  It is useful for
-   determining what subset of the screen windows enclose the location of a mouse
-   event.
+   Kiểm tra xem cặp tọa độ ô ký tự tương đối với màn hình đã cho có nằm trong cửa sổ đã cho hay không, trả về ``True`` hoặc ``False``. Điều này hữu ích để xác định tập con nào của các cửa sổ màn hình bao quanh vị trí của một sự kiện chuột.
 
    .. versionchanged:: 3.10
-      Previously it returned ``1`` or ``0`` instead of ``True`` or ``False``.
+      Trước đây, hàm trả về ``1`` hoặc ``0`` thay vì ``True`` hoặc ``False``.
 
 
 .. attribute:: window.encoding
 
-   Encoding used to encode the string arguments of the methods and to decode
-   their results on a build without wide-character support.
-   The encoding attribute is inherited from the parent window when a subwindow
-   is created, for example with :meth:`window.subwin`.
-   By default, current locale encoding is used (see :func:`locale.getencoding`).
+   Encoding được dùng để mã hóa các đối số chuỗi của các phương thức và giải mã kết quả của chúng trong bản build không hỗ trợ wide-character. Thuộc tính encoding được kế thừa từ cửa sổ cha khi một subwindow được tạo, chẳng hạn bằng :meth:`window.subwin`. Theo mặc định, encoding của locale hiện tại được sử dụng (xem :func:`locale.getencoding`).
 
    .. versionadded:: 3.3
 
 
 .. method:: window.erase()
 
-   Clear the window.
+   Xóa cửa sổ.
 
 
 .. method:: window.getbegyx()
 
-   Return a tuple ``(y, x)`` of coordinates of upper-left corner.
+   Trả về một tuple ``(y, x)`` chứa tọa độ của góc trên bên trái.
 
 
 .. method:: window.getbkgd()
 
-   Return the given window's current background character/attribute pair.
-   Its components can be extracted like those of :meth:`inch`.
+   Trả về cặp ký tự/thuộc tính nền hiện tại của cửa sổ đã cho. Có thể trích xuất các thành phần của nó như các thành phần của :meth:`inch`.
 
 
 .. method:: window.getch([y, x])
 
-   Read a key press, after moving the cursor to *y*, *x* if specified,
-   and return it as an integer.
-   The window is refreshed first if it is not a pad and was modified since
-   the last refresh.
-   Wait until a key is pressed, or return ``-1`` if the read is non-blocking
-   or times out (see :meth:`nodelay` and :meth:`timeout`).
+   Đọc một phím được nhấn, sau khi di chuyển con trỏ đến *y*, *x* nếu được chỉ định, rồi trả về phím đó dưới dạng số nguyên. Cửa sổ được refresh trước nếu đó không phải là pad và đã được sửa đổi kể từ lần refresh trước. Chờ cho đến khi một phím được nhấn, hoặc trả về ``-1`` nếu thao tác đọc không blocking hoặc hết thời gian chờ (xem :meth:`nodelay` và :meth:`timeout`).
 
-   An ordinary key is returned as the code of a single byte of its encoding
-   in the current locale,
-   so a character encoded with several bytes takes several calls.
-   For example, in a UTF-8 locale ``'é'`` is read as ``195``, then ``169``.
-   Use :meth:`get_wch` to read it as a single character.
+   Một phím thông thường được trả về dưới dạng mã của một byte trong encoding của locale hiện tại, vì vậy một ký tự được mã hóa bằng nhiều byte sẽ cần nhiều lần gọi. Ví dụ, trong locale UTF-8, ``'é'`` được đọc thành ``195``, rồi ``169``. Hãy sử dụng :meth:`get_wch` để đọc nó dưới dạng một ký tự duy nhất.
 
-   In keypad mode (see :meth:`keypad`) function keys and other special keys
-   are returned as one of the :ref:`KEY_* constants <curses-key-constants>`,
-   which cannot be mistaken for an ordinary key.
-   Otherwise, or if their escape sequence does not arrive in time
-   (see :meth:`notimeout` and :func:`set_escdelay`),
-   their bytes are returned one at a time.
+   Ở chế độ keypad (xem :meth:`keypad`), các phím chức năng và những phím đặc biệt khác được trả về dưới dạng một trong các hằng số :ref:`KEY_* constants <curses-key-constants>`, không thể nhầm với phím thông thường. Nếu không, hoặc nếu escape sequence của chúng không đến kịp thời (xem :meth:`notimeout` và :func:`set_escdelay`), các byte của chúng sẽ được trả về từng byte một.
 
-   In echo mode (see :func:`echo`) the key is added to the window as by
-   :meth:`addch`; special keys are not echoed.
+   Ở chế độ echo (xem :func:`echo`), phím được thêm vào cửa sổ như khi gọi
+   :meth:`addch`; các phím đặc biệt không được echo.
 
 
 .. method:: window.get_wch([y, x])
 
-   Read a key press, after moving the cursor to *y*, *x* if specified,
-   and return it as a one-character :class:`str`.
-   The window is refreshed first if it is not a pad and was modified since
-   the last refresh.
-   Wait until a key is pressed, or raise :exc:`error` if the read is
-   non-blocking or times out (see :meth:`nodelay` and :meth:`timeout`).
+   Đọc một lần nhấn phím sau khi di chuyển con trỏ đến *y*, *x* nếu được chỉ định, rồi trả về phím đó dưới dạng :class:`str` một ký tự. Trước tiên, cửa sổ sẽ được refresh nếu đó không phải là pad và đã bị sửa đổi kể từ lần refresh gần nhất. Chờ cho đến khi một phím được nhấn, hoặc phát sinh :exc:`error` nếu thao tác đọc không blocking hoặc hết thời gian chờ (xem :meth:`nodelay` và :meth:`timeout`).
 
-   In keypad mode (see :meth:`keypad`) function keys and other special keys
-   are returned as one of the :ref:`KEY_* constants <curses-key-constants>`,
-   an integer.
-   Otherwise, or if their escape sequence does not arrive in time
-   (see :meth:`notimeout` and :func:`set_escdelay`),
-   their characters are returned one at a time.
+   Ở chế độ keypad (xem :meth:`keypad`), các phím chức năng và những phím đặc biệt khác được trả về dưới dạng một trong các hằng số :ref:`KEY_* constants <curses-key-constants>`, là một số nguyên. Nếu không, hoặc nếu escape sequence của chúng không đến kịp thời (xem :meth:`notimeout` và :func:`set_escdelay`), các ký tự của chúng sẽ được trả về từng ký tự một.
 
-   In echo mode (see :func:`echo`) the key is added to the window as by
-   :meth:`addch`; special keys are not echoed.
+   Ở chế độ echo (xem :func:`echo`), phím được thêm vào cửa sổ như khi gọi
+   :meth:`addch`; các phím đặc biệt không được echo.
 
    .. versionadded:: 3.3
 
 
 .. method:: window.getkey([y, x])
 
-   Read a key press as :meth:`getch` does, but return it as a :class:`str`:
-   an ordinary key as a one-character string, the byte decoded as Latin-1,
-   and a special key as its name, such as ``'KEY_UP'`` (see :func:`keyname`).
-   Raise :exc:`error` instead of returning ``-1`` if there is no input.
+   Đọc một lần nhấn phím như :meth:`getch`, nhưng trả về dưới dạng :class:`str`: một phím thông thường dưới dạng chuỗi một ký tự, byte được giải mã theo Latin-1, và một phím đặc biệt dưới dạng tên của phím đó, chẳng hạn như ``'KEY_UP'`` (xem :func:`keyname`). Phát sinh :exc:`error` thay vì trả về ``-1`` nếu không có dữ liệu đầu vào.
 
 
 .. method:: window.getmaxyx()
 
-   Return a tuple ``(y, x)`` of the height and width of the window.
+   Trả về một tuple ``(y, x)`` gồm chiều cao và chiều rộng của cửa sổ.
 
 
 .. method:: window.getparyx()
 
-   Return the beginning coordinates of this window relative to its parent window
-   as a tuple ``(y, x)``.  Return ``(-1, -1)`` if this window has no
-   parent.
+   Trả về tọa độ bắt đầu của cửa sổ này tương đối so với cửa sổ cha dưới dạng một tuple ``(y, x)``. Trả về ``(-1, -1)`` nếu cửa sổ này không có cửa sổ cha.
 
 
 .. method:: window.getstr()
-            window.getstr(n)
-            window.getstr(y, x)
-            window.getstr(y, x, n)
+            window.getstr(n) window.getstr(y, x) window.getstr(y, x, n)
 
-   Read a line of input from the user, with primitive line editing capacity,
-   after moving the cursor to *y*, *x* if specified.
-   Return it as a bytes object, in the encoding of the current locale
-   and without the terminating newline.
-   At most *n* bytes are read;
-   *n* defaults to and cannot exceed 2047.
+   Đọc một dòng dữ liệu đầu vào từ người dùng, với khả năng chỉnh sửa dòng cơ bản, sau khi di chuyển con trỏ đến *y*, *x* nếu được chỉ định. Trả về dòng đó dưới dạng đối tượng bytes, theo encoding của locale hiện tại và không bao gồm ký tự xuống dòng kết thúc. Đọc tối đa *n* byte; *n* mặc định là 2047 và không thể vượt quá giá trị này.
 
    .. versionchanged:: 3.14
-      The maximum value for *n* was increased from 1023 to 2047.
+      Giá trị tối đa của *n* đã được tăng từ 1023 lên 2047.
 
 
 .. method:: window.getyx()
 
-   Return a tuple ``(y, x)`` of current cursor position  relative to the window's
-   upper-left corner.
+   Trả về một tuple ``(y, x)`` biểu thị vị trí con trỏ hiện tại tương đối so với góc trên bên trái của cửa sổ.
 
 
 .. method:: window.hline(ch, n[, attr])
             window.hline(y, x, ch, n[, attr])
 
-   Display a horizontal line starting at ``(y, x)`` with length *n* consisting of
-   the character *ch* with attributes *attr*.  The line stops at the right edge
-   of the window if fewer than *n* cells are available.
+   Hiển thị một đường ngang bắt đầu tại ``(y, x)`` với độ dài *n*, gồm ký tự *ch* với các thuộc tính *attr*. Đường này dừng ở cạnh phải của cửa sổ nếu còn ít hơn *n* ô khả dụng.
 
 
 .. method:: window.idcok(flag)
 
-   If *flag* is ``False``, curses no longer considers using the hardware insert/delete
-   character feature of the terminal; if *flag* is ``True``, use of character insertion
-   and deletion is enabled.  When curses is first initialized, use of character
-   insert/delete is enabled by default.
+   Nếu *flag* là ``False``, curses không còn xem xét việc sử dụng tính năng chèn/xóa ký tự bằng phần cứng của terminal; nếu *flag* là ``True``, việc chèn và xóa ký tự sẽ được bật. Khi curses được khởi tạo lần đầu, việc chèn/xóa ký tự được bật theo mặc định.
 
 
 .. method:: window.idlok(flag)
 
-   If *flag* is ``True``, :mod:`!curses` will try to use hardware line
-   editing facilities.  Otherwise, curses will not use them.
+   Nếu *flag* là ``True``, :mod:`!curses` sẽ cố gắng sử dụng các khả năng chỉnh sửa dòng bằng phần cứng. Nếu không, curses sẽ không sử dụng chúng.
 
 
 .. method:: window.immedok(flag)
 
-   If *flag* is ``True``, any change in the window image automatically causes the
-   window to be refreshed; you no longer have to call :meth:`refresh` yourself.
-   However, it may degrade performance considerably, due to repeated calls to
-   wrefresh.  This option is disabled by default.
+   Nếu *flag* là ``True``, mọi thay đổi trong ảnh cửa sổ sẽ tự động khiến cửa sổ được làm mới; bạn không còn phải tự gọi :meth:`refresh`. Tuy nhiên, điều này có thể làm giảm đáng kể hiệu suất do các lần gọi wrefresh lặp lại. Tùy chọn này bị tắt theo mặc định.
 
 
 .. method:: window.inch([y, x])
 
-   Return the character at the given position in the window.
-   The bottom 8 bits are the character proper and the upper bits are the attributes;
-   extract them with the :data:`A_CHARTEXT` and :data:`A_ATTRIBUTES` bit-masks,
-   and the color pair with :func:`pair_number`.
-   The character byte is the locale-encoded byte of the cell's character,
-   consistent with :meth:`instr`.
-   On a wide-character build, a character that does not fit in a single byte
-   in the current locale has a character byte of ``0``;
-   use :meth:`instr` to read such characters.
+   Trả về ký tự tại vị trí đã cho trong cửa sổ. 8 bit thấp nhất là ký tự thực tế, còn các bit cao hơn là thuộc tính; hãy trích xuất chúng bằng các mặt nạ bit :data:`A_CHARTEXT` và :data:`A_ATTRIBUTES`, còn cặp màu bằng :func:`pair_number`. Byte ký tự là byte được mã hóa theo locale của ký tự trong ô, nhất quán với :meth:`instr`. Trên bản dựng wide-character, một ký tự không vừa trong một byte theo locale hiện tại sẽ có byte ký tự là ``0``; hãy dùng :meth:`instr` để đọc các ký tự đó.
 
 
 .. method:: window.insch(ch[, attr])
             window.insch(y, x, ch[, attr])
 
-   Insert character *ch* with attributes *attr* before the character under the
-   cursor, or at ``(y, x)`` if specified.  All characters to the right of the
-   cursor are shifted one position right, with the rightmost character on the
-   line being lost.  The cursor position does not change.
+   Chèn ký tự *ch* với thuộc tính *attr* trước ký tự bên dưới con trỏ, hoặc tại ``(y, x)`` nếu được chỉ định. Tất cả ký tự bên phải con trỏ được dịch sang phải một vị trí, khiến ký tự ngoài cùng bên phải trên dòng bị mất. Vị trí con trỏ không thay đổi.
 
 
 .. method:: window.insdelln(nlines)
 
-   Insert *nlines* lines into the specified window above the current line.  The
-   *nlines* bottom lines are lost.  For negative *nlines*, delete *nlines* lines
-   starting with the one under the cursor, and move the remaining lines up.  The
-   bottom *nlines* lines are cleared.  The current cursor position remains the
-   same.
+   Chèn *nlines* dòng vào cửa sổ được chỉ định, phía trên dòng hiện tại. *nlines* dòng dưới cùng sẽ bị mất. Với *nlines* âm, xóa *nlines* dòng bắt đầu từ dòng bên dưới con trỏ, rồi dịch các dòng còn lại lên trên. *nlines* dòng dưới cùng được xóa. Vị trí con trỏ hiện tại vẫn giữ nguyên.
 
 
 .. method:: window.insertln()
 
-   Insert a blank line under the cursor. All following lines are moved down by one
-   line.
+   Chèn một dòng trống bên dưới con trỏ. Tất cả các dòng tiếp theo được dịch xuống một dòng.
 
 
 .. method:: window.insnstr(str, n[, attr])
             window.insnstr(y, x, str, n[, attr])
 
-   Insert a character string (as many characters as will fit on the line) before
-   the character under the cursor, up to *n* characters.   If *n* is zero or
-   negative, the entire string is inserted. All characters to the right of the
-   cursor are shifted right, with the rightmost characters on the line being lost.
-   The cursor position does not change (after moving to *y*, *x*, if specified).
+   Chèn một chuỗi ký tự (nhiều ký tự nhất có thể vừa trên dòng) trước ký tự bên dưới con trỏ, tối đa *n* ký tự. Nếu *n* bằng không hoặc âm, toàn bộ chuỗi sẽ được chèn. Tất cả ký tự bên phải con trỏ được dịch sang phải, khiến các ký tự ngoài cùng bên phải trên dòng bị mất. Vị trí con trỏ không thay đổi (sau khi di chuyển đến *y*, *x*, nếu được chỉ định).
 
 
 .. method:: window.insstr(str[, attr])
             window.insstr(y, x, str[, attr])
 
-   Insert a character string (as many characters as will fit on the line) before
-   the character under the cursor.  All characters to the right of the cursor are
-   shifted right, with the rightmost characters on the line being lost.  The cursor
-   position does not change (after moving to *y*, *x*, if specified).
+   Chèn một chuỗi ký tự (nhiều ký tự nhất có thể vừa trên dòng) trước ký tự dưới con trỏ. Tất cả ký tự bên phải con trỏ được dịch sang phải, trong đó các ký tự ngoài cùng bên phải trên dòng sẽ bị mất. Vị trí con trỏ không thay đổi (sau khi di chuyển đến *y*, *x*, nếu được chỉ định).
 
 
 .. method:: window.instr([n])
             window.instr(y, x[, n])
 
-   Read the text of the window from the current cursor position,
-   or from *y*, *x* if specified, to the end of the line,
-   and return it as a bytes object, in the encoding of the current locale.
-   Attributes and color pairs are stripped.
-   At most *n* bytes are read; *n* defaults to and cannot exceed 2047.
+   Đọc văn bản của cửa sổ từ vị trí con trỏ hiện tại, hoặc từ *y*, *x* nếu được chỉ định, đến cuối dòng, rồi trả về văn bản dưới dạng đối tượng bytes, với encoding của locale hiện tại. Các thuộc tính và cặp màu sẽ bị loại bỏ. Đọc nhiều nhất *n* byte; *n* mặc định là và không thể vượt quá 2047.
 
    .. versionchanged:: 3.14
-      The maximum value for *n* was increased from 1023 to 2047.
+      Giá trị tối đa của *n* đã được tăng từ 1023 lên 2047.
 
 
 .. method:: window.is_linetouched(line)
 
-   Return ``True`` if the specified line was modified since the last call to
-   :meth:`refresh`; otherwise return ``False``.  Raise a :exc:`curses.error`
-   exception if *line* is not valid for the given window.
+   Trả về ``True`` nếu dòng được chỉ định đã được sửa đổi kể từ lần gọi gần nhất đến
+   :meth:`refresh`; nếu không thì trả về ``False``. Phát sinh ngoại lệ :exc:`curses.error` nếu *line* không hợp lệ đối với cửa sổ đã cho.
 
 
 .. method:: window.is_wintouched()
 
-   Return ``True`` if the specified window was modified since the last call to
-   :meth:`refresh`; otherwise return ``False``.
+   Trả về ``True`` nếu cửa sổ được chỉ định đã được sửa đổi kể từ lần gọi gần nhất đến
+   :meth:`refresh`; nếu không thì trả về ``False``.
 
 
 .. method:: window.keypad(flag)
 
-   If *flag* is ``True``, escape sequences generated by some keys (keypad,  function keys)
-   will be interpreted by :mod:`!curses`. If *flag* is ``False``, escape sequences will be
-   left as is in the input stream.
-   Keypad mode is disabled by default, but :func:`wrapper` enables it for the
-   main window.
+   Nếu *flag* là ``True``, các escape sequence do một số phím tạo ra (bàn phím số, phím chức năng) sẽ được :mod:`!curses` diễn giải. Nếu *flag* là ``False``, các escape sequence sẽ được giữ nguyên trong input stream. Chế độ bàn phím số bị tắt theo mặc định, nhưng :func:`wrapper` bật chế độ này cho cửa sổ chính.
 
 
 .. method:: window.leaveok(flag)
 
-   If *flag* is ``True``, cursor is left where it is on update, instead of being at "cursor
-   position."  This reduces cursor movement where possible.
+   Nếu *flag* là ``True``, con trỏ sẽ được giữ nguyên tại vị trí hiện tại khi cập nhật, thay vì ở "cursor position". Điều này giảm việc di chuyển con trỏ khi có thể.
 
-   If *flag* is ``False``, cursor will always be at "cursor position" after an update.
+   Nếu *flag* là ``False``, con trỏ sẽ luôn ở "cursor position" sau khi cập nhật.
 
 
 .. method:: window.move(new_y, new_x)
 
-   Move cursor to ``(new_y, new_x)``.
+   Di chuyển con trỏ đến ``(new_y, new_x)``.
 
 
 .. method:: window.mvderwin(y, x)
 
-   Move the window inside its parent window.  The screen-relative parameters of
-   the window are not changed.  This routine is used to display different parts of
-   the parent window at the same physical position on the screen.
+   Di chuyển cửa sổ bên trong cửa sổ cha. Các tham số tương đối với màn hình của cửa sổ không thay đổi. Routine này được dùng để hiển thị các phần khác nhau của cửa sổ cha tại cùng một vị trí vật lý trên màn hình.
 
 
 .. method:: window.mvwin(new_y, new_x)
 
-   Move the window so its upper-left corner is at ``(new_y, new_x)``.
+   Di chuyển cửa sổ sao cho góc trên bên trái của nó ở tại ``(new_y, new_x)``.
 
-   Moving the window so that any part of it would be off the screen is an error:
-   the window is not moved and :exc:`curses.error` is raised.
+   Di chuyển cửa sổ sao cho bất kỳ phần nào của nó nằm ngoài màn hình sẽ gây ra lỗi: cửa sổ không được di chuyển và :exc:`curses.error` được ném ra.
 
 
 .. method:: window.nodelay(flag)
 
-   If *flag* is ``True``, :meth:`getch` will be non-blocking.
+   Nếu *flag* là ``True``, :meth:`getch` sẽ ở chế độ non-blocking.
 
 
 .. method:: window.notimeout(flag)
 
-   If *flag* is ``True``, escape sequences will not be timed out.
+   Nếu *flag* là ``True``, các escape sequence sẽ không bị timeout.
 
-   If *flag* is ``False``, after a few milliseconds, an escape sequence will not be
-   interpreted, and will be left in the input stream as is.
+   Nếu *flag* là ``False``, sau vài mili giây, một escape sequence sẽ không được diễn giải mà sẽ được giữ nguyên trong input stream.
 
 
 .. method:: window.noutrefresh()
             window.noutrefresh(pminrow, pmincol, sminrow, smincol, smaxrow, smaxcol)
 
-   Mark for refresh but wait.  This function updates the data structure
-   representing the desired state of the window, but does not force an update of
-   the physical screen.  To accomplish that, call  :func:`doupdate`.
+   Đánh dấu để refresh nhưng chờ. Hàm này cập nhật cấu trúc dữ liệu biểu diễn trạng thái mong muốn của cửa sổ, nhưng không buộc cập nhật màn hình vật lý. Để thực hiện việc đó, hãy gọi  :func:`doupdate`.
 
-   The 6 arguments can only be specified, and are then required, when the window
-   is a pad created with :func:`newpad`; they have the same meaning as for
+   6 đối số chỉ có thể được chỉ định, và khi đó là bắt buộc, khi cửa sổ là một pad được tạo bằng :func:`newpad`; chúng có cùng ý nghĩa như đối với
    :meth:`refresh`.
 
 
 .. method:: window.overlay(destwin[, sminrow, smincol, dminrow, dmincol, dmaxrow, dmaxcol])
 
-   Overlay the window on top of *destwin*. The windows need not be the same size,
-   only the overlapping region is copied. This copy is non-destructive, which means
-   that the current background character does not overwrite the old contents of
-   *destwin*.
+   Chồng cửa sổ lên trên *destwin*. Các cửa sổ không cần có cùng kích thước; chỉ vùng chồng lấn được sao chép. Việc sao chép này không phá hủy dữ liệu, nghĩa là ký tự nền hiện tại không ghi đè nội dung cũ của *destwin*.
 
-   To get fine-grained control over the copied region, the second form of
-   :meth:`overlay` can be used. *sminrow* and *smincol* are the upper-left
-   coordinates of the source window, and the other variables mark a rectangle in
-   the destination window.
+   Để kiểm soát chi tiết vùng được sao chép, có thể sử dụng dạng thứ hai của
+   :meth:`overlay`. *sminrow* và *smincol* là tọa độ góc trên bên trái của cửa sổ nguồn, còn các biến khác xác định một hình chữ nhật trong cửa sổ đích.
 
 
 .. method:: window.overwrite(destwin[, sminrow, smincol, dminrow, dmincol, dmaxrow, dmaxcol])
 
-   Overwrite the window on top of *destwin*. The windows need not be the same size,
-   in which case only the overlapping region is copied. This copy is destructive,
-   which means that the current background character overwrites the old contents of
-   *destwin*.
+   Ghi đè cửa sổ lên trên *destwin*. Các cửa sổ không cần có cùng kích thước; nếu không, chỉ vùng chồng lấn được sao chép. Việc sao chép này có tính phá hủy, nghĩa là ký tự nền hiện tại ghi đè nội dung cũ của *destwin*.
 
-   To get fine-grained control over the copied region, the second form of
-   :meth:`overwrite` can be used. *sminrow* and *smincol* are the upper-left
-   coordinates of the source window, the other variables mark a rectangle in the
-   destination window.
+   Để kiểm soát chi tiết vùng được sao chép, có thể sử dụng dạng thứ hai của
+   :meth:`overwrite`. *sminrow* và *smincol* là tọa độ góc trên bên trái của cửa sổ nguồn, còn các biến khác xác định một hình chữ nhật trong cửa sổ đích.
 
 
 .. method:: window.putwin(file)
 
-   Write all data associated with the window into the provided file object.  This
-   information can be later retrieved using the :func:`getwin` function.
+   Ghi tất cả dữ liệu liên kết với cửa sổ vào đối tượng tệp được cung cấp. Sau đó có thể truy xuất thông tin này bằng hàm :func:`getwin`.
 
 
 .. method:: window.redrawln(beg, num)
 
-   Indicate that the *num* screen lines, starting at line *beg*, are corrupted and
-   should be completely redrawn on the next :meth:`refresh` call.
+   Cho biết rằng các dòng màn hình *num*, bắt đầu từ dòng *beg*, đã bị hỏng và phải được vẽ lại hoàn toàn trong lần gọi :meth:`refresh` tiếp theo.
 
 
 .. method:: window.redrawwin()
 
-   Touch the entire window, causing it to be completely redrawn on the next
-   :meth:`refresh` call.
+   Đánh dấu toàn bộ cửa sổ, khiến cửa sổ được vẽ lại hoàn toàn trong lần gọi tiếp theo
+   :meth:`refresh`.
 
 
 .. method:: window.refresh([pminrow, pmincol, sminrow, smincol, smaxrow, smaxcol])
 
-   Update the display immediately (sync actual screen with previous
-   drawing/deleting methods).
+   Cập nhật màn hình ngay lập tức (đồng bộ màn hình thực với các phương thức vẽ/xóa trước đó).
 
-   The 6 arguments can only be specified, and are then required, when the window
-   is a pad created with :func:`newpad`.  The additional parameters are needed to indicate what part
-   of the pad and screen are involved. *pminrow* and *pmincol* specify the
-   upper-left corner of the rectangle to be displayed in the pad.  *sminrow*,
-   *smincol*, *smaxrow*, and *smaxcol* specify the edges of the rectangle to be
-   displayed on the screen.  The lower-right corner of the rectangle to be
-   displayed in the pad is calculated from the screen coordinates, since the
-   rectangles must be the same size.  Both rectangles must be entirely contained
-   within their respective structures.  Negative values of *pminrow*, *pmincol*,
-   *sminrow*, or *smincol* are treated as if they were zero.
+   Chỉ có thể chỉ định 6 đối số này, và khi đó chúng là bắt buộc, nếu cửa sổ là một pad được tạo bằng :func:`newpad`. Các tham số bổ sung là cần thiết để chỉ ra phần nào của pad và màn hình được sử dụng. *pminrow* và *pmincol* xác định góc trên bên trái của hình chữ nhật sẽ được hiển thị trong pad. *sminrow*, *smincol*, *smaxrow*, và *smaxcol* xác định các cạnh của hình chữ nhật sẽ được hiển thị trên màn hình. Góc dưới bên phải của hình chữ nhật sẽ được hiển thị trong pad được tính từ các tọa độ màn hình, vì hai hình chữ nhật phải có cùng kích thước. Cả hai hình chữ nhật phải nằm hoàn toàn בתוך cấu trúc tương ứng của chúng. Các giá trị âm của *pminrow*, *pmincol*, *sminrow*, hoặc *smincol* được xử lý như thể chúng bằng không.
 
 
 .. method:: window.resize(nlines, ncols)
 
-   Reallocate storage for a curses window to adjust its dimensions to the
-   specified values.  If either dimension is larger than the current values, the
-   window's data is filled with blanks that have the current background
-   rendition (as set by :meth:`bkgdset`) merged into them.
+   Cấp phát lại vùng lưu trữ cho một cửa sổ để điều chỉnh kích thước của cửa sổ theo các giá trị được chỉ định. Nếu một trong hai chiều lớn hơn giá trị hiện tại, dữ liệu của cửa sổ sẽ được điền bằng các khoảng trắng có cách hiển thị nền hiện tại (được thiết lập bằng :meth:`bkgdset`) đã được hợp nhất vào chúng.
 
 
 .. method:: window.scroll([lines=1])
 
-   Scroll the screen or scrolling region.  Scroll upward by *lines* lines if
-   *lines* is positive, or downward if it is negative.  Scrolling has no effect
-   unless it has been enabled for the window with :meth:`scrollok`.
+   Cuộn màn hình hoặc vùng cuộn. Cuộn lên *lines* dòng nếu *lines* dương, hoặc cuộn xuống nếu giá trị này âm. Việc cuộn không có tác dụng trừ khi đã được bật cho cửa sổ bằng :meth:`scrollok`.
 
 
 .. method:: window.scrollok(flag)
 
-   Control what happens when the cursor of a window is moved off the edge of the
-   window or scrolling region, either as a result of a newline action on the bottom
-   line, or typing the last character of the last line.  If *flag* is ``False``, the
-   cursor is left on the bottom line.  If *flag* is ``True``, the window is scrolled up
-   one line.  Note that in order to get the physical scrolling effect on the
-   terminal, it is also necessary to call :meth:`idlok`.
+   Kiểm soát điều xảy ra khi con trỏ của một cửa sổ được di chuyển ra ngoài cạnh của cửa sổ hoặc vùng cuộn, do thao tác xuống dòng trên dòng cuối hoặc do nhập ký tự cuối cùng của dòng cuối. Nếu *flag* là ``False``, con trỏ sẽ được giữ lại trên dòng cuối. Nếu *flag* là ``True``, cửa sổ sẽ được cuộn lên một dòng. Lưu ý rằng để có hiệu ứng cuộn vật lý trên terminal, cũng cần gọi :meth:`idlok`.
 
 
 .. method:: window.setscrreg(top, bottom)
 
-   Set the scrolling region from line *top* to line *bottom*. All scrolling actions
-   will take place in this region.
+   Đặt vùng cuộn từ dòng *top* đến dòng *bottom*. Mọi thao tác cuộn sẽ diễn ra trong vùng này.
 
 
 .. method:: window.standend()
 
-   Turn off the standout attribute.  On some terminals this has the side effect of
-   turning off all attributes.
+   Tắt thuộc tính standout. Trên một số terminal, thao tác này cũng tắt tất cả các thuộc tính.
 
 
 .. method:: window.standout()
 
-   Turn on attribute *A_STANDOUT*.
+   Bật thuộc tính *A_STANDOUT*.
 
 
 .. method:: window.subpad(begin_y, begin_x)
             window.subpad(nlines, ncols, begin_y, begin_x)
 
-   Return a sub-pad, whose upper-left corner is at ``(begin_y, begin_x)``, and
-   whose width/height is *ncols*/*nlines*.  The coordinates are relative to the
-   parent pad (unlike :meth:`subwin`, which uses screen coordinates).  This
-   method is only available for pads created with :func:`newpad`.
+   Trả về một sub-pad có góc trên bên trái tại ``(begin_y, begin_x)``, với chiều rộng/chiều cao lần lượt là *ncols*/*nlines*. Tọa độ được tính tương đối so với pad cha, không giống :meth:`subwin`, vốn sử dụng tọa độ màn hình. Phương thức này chỉ khả dụng với các pad được tạo bằng :func:`newpad`.
 
 
 .. method:: window.subwin(begin_y, begin_x)
             window.subwin(nlines, ncols, begin_y, begin_x)
 
-   Return a sub-window, whose upper-left corner is at the screen-relative
-   coordinates ``(begin_y, begin_x)``, and whose width/height is *ncols*/*nlines*.
+   Trả về một cửa sổ con, có góc trên bên trái nằm tại các tọa độ tương đối so với màn hình ``(begin_y, begin_x)``, và có chiều rộng/chiều cao là *ncols*/*nlines*.
 
-   By default, the sub-window will extend from the specified position to the lower
-   right corner of the window.
+   Theo mặc định, cửa sổ con sẽ kéo dài từ vị trí được chỉ định đến góc dưới bên phải của cửa sổ.
 
 
 .. method:: window.syncdown()
 
-   Touch each location in the window that has been touched in any of its ancestor
-   windows.  This routine is called by :meth:`refresh`, so it should almost never
-   be necessary to call it manually.
+   Đánh dấu tất cả các vị trí trong cửa sổ đã được đánh dấu trong bất kỳ cửa sổ tổ tiên nào của nó. Quy trình này được :meth:`refresh` gọi, vì vậy hầu như không bao giờ cần gọi thủ công.
 
 
 .. method:: window.syncok(flag)
 
-   If *flag* is ``True``, then :meth:`syncup` is called automatically
-   whenever there is a change in the window.
+   Nếu *flag* là ``True``, thì :meth:`syncup` sẽ được tự động gọi mỗi khi cửa sổ có thay đổi.
 
 
 .. method:: window.syncup()
 
-   Touch all locations in ancestors of the window that have been changed in  the
-   window.
+   Đánh dấu tất cả các vị trí trong các cửa sổ tổ tiên của cửa sổ đã bị thay đổi trong cửa sổ.
 
 
 .. method:: window.timeout(delay)
 
-   Set blocking or non-blocking read behavior for the window.  If *delay* is
-   negative, blocking read is used (which will wait indefinitely for input).  If
-   *delay* is zero, then non-blocking read is used, and :meth:`getch` will
-   return ``-1`` if no input is waiting.  If *delay* is positive, then
-   :meth:`getch` will block for *delay* milliseconds, and return ``-1`` if there is
-   still no input at the end of that time.
+   Thiết lập hành vi đọc blocking hoặc non-blocking cho cửa sổ. Nếu *delay* là số âm, thao tác đọc blocking được sử dụng (sẽ chờ vô thời hạn để nhận đầu vào). Nếu *delay* bằng không, thao tác đọc non-blocking được sử dụng, và :meth:`getch` sẽ trả về ``-1`` nếu không có đầu vào nào đang chờ. Nếu *delay* là số dương, thì
+   :meth:`getch` sẽ chặn trong *delay* mili giây và trả về ``-1`` nếu vẫn không có đầu vào nào vào cuối khoảng thời gian đó.
 
 
 .. method:: window.touchline(start, count[, changed])
 
-   Pretend *count* lines have been changed, starting with line *start*.  If
-   *changed* is supplied, it specifies whether the affected lines are marked as
-   having been changed (*changed*\ ``=True``) or unchanged (*changed*\ ``=False``).
+   Giả sử đã thay đổi *count* dòng, bắt đầu từ dòng *start*. Nếu cung cấp *changed*, tham số này xác định liệu các dòng bị ảnh hưởng được đánh dấu là đã thay đổi (*changed*\ ``=True``) hay chưa thay đổi (*changed*\ ``=False``).
 
 
 .. method:: window.touchwin()
 
-   Pretend the whole window has been changed, for purposes of drawing
-   optimizations.
+   Giả sử toàn bộ cửa sổ đã được thay đổi nhằm phục vụ việc tối ưu hóa hiển thị.
 
 
 .. method:: window.untouchwin()
 
-   Mark all lines in  the  window  as unchanged since the last call to
+   Đánh dấu tất cả các dòng trong cửa sổ là chưa thay đổi kể từ lần gọi gần nhất đến
    :meth:`refresh`.
 
 
 .. method:: window.vline(ch, n[, attr])
             window.vline(y, x, ch, n[, attr])
 
-   Display a vertical line starting at ``(y, x)`` with length *n* consisting of the
-   character *ch* with attributes *attr*.
+   Hiển thị một dòng dọc bắt đầu từ ``(y, x)`` và có độ dài *n*, gồm ký tự *ch* với các thuộc tính *attr*.
 
 
-Constants
----------
+Hằng số
+-------
 
-The :mod:`!curses` module defines the following data members:
+Module :mod:`!curses` định nghĩa các thành viên dữ liệu sau:
 
 
 .. data:: ERR
 
-   Some curses routines  that  return  an integer, such as :meth:`~window.getch`, return
-   :const:`ERR` upon failure.
+   Một số routine curses trả về một số nguyên, chẳng hạn như :meth:`~window.getch`, sẽ trả về
+   :const:`ERR` khi thất bại.
 
 
 .. data:: OK
 
-   Some curses routines  that  return  an integer, such as  :func:`napms`, return
-   :const:`OK` upon success.
+   Một số routine curses trả về một số nguyên, chẳng hạn như :func:`napms`, sẽ trả về
+   :const:`OK` khi thành công.
 
 
 .. data:: version
 
-   A bytes object representing the current version of the module.
+   Một đối tượng bytes biểu thị phiên bản hiện tại của module.
 
 
 .. data:: ncurses_version
 
-   A named tuple containing the three components of the ncurses library
-   version: *major*, *minor*, and *patch*.  All values are integers.  The
-   components can also be accessed by name,  so ``curses.ncurses_version[0]``
-   is equivalent to ``curses.ncurses_version.major`` and so on.
+   Một named tuple chứa ba thành phần của phiên bản thư viện ncurses: *major*, *minor* và *patch*. Tất cả các giá trị đều là số nguyên. Các thành phần cũng có thể được truy cập theo tên, vì vậy ``curses.ncurses_version[0]`` tương đương với ``curses.ncurses_version.major`` và tương tự.
 
-   Availability: if the ncurses library is used.
+   Khả dụng: nếu sử dụng thư viện ncurses.
 
    .. versionadded:: 3.8
 
 .. data:: COLORS
 
-   The maximum number of colors the terminal can support.
-   It is defined only after the call to :func:`start_color`.
+   Số lượng màu tối đa mà terminal có thể hỗ trợ. Chỉ được xác định sau khi gọi :func:`start_color`.
 
 .. data:: COLOR_PAIRS
 
-   The maximum number of color pairs the terminal can support.
-   It is defined only after the call to :func:`start_color`.
+   Số lượng cặp màu tối đa mà terminal có thể hỗ trợ. Chỉ được xác định sau khi gọi :func:`start_color`.
 
 .. data:: COLS
 
-   The width of the screen, that is, the number of columns.
-   It is defined only after the call to :func:`initscr`.
-   Updated by :func:`update_lines_cols`, :func:`resizeterm` and
+   Chiều rộng của màn hình, tức là số cột. Chỉ được xác định sau khi gọi :func:`initscr`. Được cập nhật bởi :func:`update_lines_cols`, :func:`resizeterm` và
    :func:`resize_term`.
 
 .. data:: LINES
 
-   The height of the screen, that is, the number of lines.
-   It is defined only after the call to :func:`initscr`.
-   Updated by :func:`update_lines_cols`, :func:`resizeterm` and
+   Chiều cao của màn hình, tức là số dòng. Chỉ được xác định sau khi gọi :func:`initscr`. Được cập nhật bởi :func:`update_lines_cols`, :func:`resizeterm` và
    :func:`resize_term`.
 
 
-Some constants are available to specify character cell attributes.
-The exact constants available are system dependent.
+Một số hằng số có sẵn để chỉ định các thuộc tính của ô ký tự. Các hằng số cụ thể có sẵn phụ thuộc vào hệ thống.
 
-+------------------------+-------------------------------+
-| Attribute              | Meaning                       |
-+========================+===============================+
-| .. data:: A_ALTCHARSET | Alternate character set mode  |
-+------------------------+-------------------------------+
-| .. data:: A_BLINK      | Blink mode                    |
-+------------------------+-------------------------------+
-| .. data:: A_BOLD       | Bold mode                     |
-+------------------------+-------------------------------+
-| .. data:: A_DIM        | Dim mode                      |
-+------------------------+-------------------------------+
-| .. data:: A_INVIS      | Invisible or blank mode       |
-+------------------------+-------------------------------+
-| .. data:: A_ITALIC     | Italic mode                   |
-+------------------------+-------------------------------+
-| .. data:: A_NORMAL     | Normal attribute              |
-+------------------------+-------------------------------+
-| .. data:: A_PROTECT    | Protected mode                |
-+------------------------+-------------------------------+
-| .. data:: A_REVERSE    | Reverse background and        |
-|                        | foreground colors             |
-+------------------------+-------------------------------+
-| .. data:: A_STANDOUT   | Standout mode                 |
-+------------------------+-------------------------------+
-| .. data:: A_UNDERLINE  | Underline mode                |
-+------------------------+-------------------------------+
-| .. data:: A_HORIZONTAL | Horizontal highlight          |
-+------------------------+-------------------------------+
-| .. data:: A_LEFT       | Left highlight                |
-+------------------------+-------------------------------+
-| .. data:: A_LOW        | Low highlight                 |
-+------------------------+-------------------------------+
-| .. data:: A_RIGHT      | Right highlight               |
-+------------------------+-------------------------------+
-| .. data:: A_TOP        | Top highlight                 |
-+------------------------+-------------------------------+
-| .. data:: A_VERTICAL   | Vertical highlight            |
-+------------------------+-------------------------------+
++------------------------+------------------------------+
+| Thuộc tính             | Ý nghĩa                      |
++========================+==============================+
+| .. data:: A_ALTCHARSET | Chế độ bộ ký tự thay thế     |
++------------------------+------------------------------+
+| .. data:: A_BLINK      | Chế độ nhấp nháy             |
++------------------------+------------------------------+
+| .. data:: A_BOLD       | Chế độ in đậm                |
++------------------------+------------------------------+
+| .. data:: A_DIM        | Chế độ mờ                    |
++------------------------+------------------------------+
+| .. data:: A_INVIS      | Chế độ ẩn hoặc trống         |
++------------------------+------------------------------+
+| .. data:: A_ITALIC     | Chế độ in nghiêng            |
++------------------------+------------------------------+
+| .. data:: A_NORMAL     | Thuộc tính bình thường       |
++------------------------+------------------------------+
+| .. data:: A_PROTECT    | Chế độ bảo vệ                |
++------------------------+------------------------------+
+| .. data:: A_REVERSE    | Đảo ngược màu nền và màu chữ |
++------------------------+------------------------------+
+| .. data:: A_STANDOUT   | Chế độ nổi bật               |
++------------------------+------------------------------+
+| .. data:: A_UNDERLINE  | Chế độ gạch chân             |
++------------------------+------------------------------+
+| .. data:: A_HORIZONTAL | Làm nổi bật theo chiều ngang |
++------------------------+------------------------------+
+| .. data:: A_LEFT       | Làm nổi bật bên trái         |
++------------------------+------------------------------+
+| .. data:: A_LOW        | Làm nổi bật ở mức thấp       |
++------------------------+------------------------------+
+| .. data:: A_RIGHT      | Tô sáng bên phải             |
++------------------------+------------------------------+
+| .. data:: A_TOP        | Tô sáng phía trên            |
++------------------------+------------------------------+
+| .. data:: A_VERTICAL   | Tô sáng theo chiều dọc       |
++------------------------+------------------------------+
 
 .. versionadded:: 3.7
-   ``A_ITALIC`` was added.
+   ``A_ITALIC`` đã được thêm.
 
-Several constants are available to extract corresponding attributes returned
-by some methods.
+Có sẵn một số hằng số để trích xuất các thuộc tính tương ứng được một số phương thức trả về.
 
-+-------------------------+-------------------------------+
-| Bit-mask                | Meaning                       |
-+=========================+===============================+
-|  .. data:: A_ATTRIBUTES | Bit-mask to extract           |
-|                         | attributes                    |
-+-------------------------+-------------------------------+
-|  .. data:: A_CHARTEXT   | Bit-mask to extract a         |
-|                         | character                     |
-+-------------------------+-------------------------------+
-|  .. data:: A_COLOR      | Bit-mask to extract           |
-|                         | color-pair field information  |
-+-------------------------+-------------------------------+
++------------------------+---------------------------------------------------+
+| Mặt nạ bit             | Ý nghĩa                                           |
++========================+===================================================+
+| .. data:: A_ATTRIBUTES | Mặt nạ bit để trích xuất các thuộc tính           |
++------------------------+---------------------------------------------------+
+| .. data:: A_CHARTEXT   | Mặt nạ bit để trích xuất một ký tự                |
++------------------------+---------------------------------------------------+
+| .. data:: A_COLOR      | Mặt nạ bit để trích xuất thông tin trường cặp màu |
++------------------------+---------------------------------------------------+
 
 .. _curses-key-constants:
 
-Keys are referred to by integer constants with names starting with  ``KEY_``.
-The exact keycaps available are system dependent.
+Các phím được tham chiếu bằng các hằng số nguyên có tên bắt đầu bằng ``KEY_``. Các keycap chính xác hiện có phụ thuộc vào hệ thống.
 
 .. XXX this table is far too large! should it be alphabetized?
 
-+-------------------------+--------------------------------------------+
-| Key constant            | Key                                        |
-+=========================+============================================+
-| .. data:: KEY_MIN       | Minimum key value                          |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_BREAK     | Break key (unreliable)                     |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_DOWN      | Down-arrow                                 |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_UP        | Up-arrow                                   |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_LEFT      | Left-arrow                                 |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_RIGHT     | Right-arrow                                |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_HOME      | Home key (upward+left arrow)               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_BACKSPACE | Backspace (unreliable)                     |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_F0        | Function keys.  Up to 64 function keys are |
-|                         | supported.                                 |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_Fn        | Value of function key *n*                  |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_DL        | Delete line                                |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_IL        | Insert line                                |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_DC        | Delete character                           |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_IC        | Insert char or enter insert mode           |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_EIC       | Exit insert char mode                      |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_CLEAR     | Clear screen                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_EOS       | Clear to end of screen                     |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_EOL       | Clear to end of line                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SF        | Scroll 1 line forward                      |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SR        | Scroll 1 line backward (reverse)           |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_NPAGE     | Next page                                  |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_PPAGE     | Previous page                              |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_STAB      | Set tab                                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_CTAB      | Clear tab                                  |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_CATAB     | Clear all tabs                             |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_ENTER     | Enter or send (unreliable)                 |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SRESET    | Soft (partial) reset (unreliable)          |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_RESET     | Reset or hard reset (unreliable)           |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_PRINT     | Print                                      |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_LL        | Home down or bottom (lower left)           |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_A1        | Upper left of keypad                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_A3        | Upper right of keypad                      |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_B2        | Center of keypad                           |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_C1        | Lower left of keypad                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_C3        | Lower right of keypad                      |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_BTAB      | Back tab                                   |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_BEG       | Beg (beginning)                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_CANCEL    | Cancel                                     |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_CLOSE     | Close                                      |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_COMMAND   | Cmd (command)                              |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_COPY      | Copy                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_CREATE    | Create                                     |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_END       | End                                        |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_EXIT      | Exit                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_FIND      | Find                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_HELP      | Help                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_MARK      | Mark                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_MESSAGE   | Message                                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_MOVE      | Move                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_NEXT      | Next                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_OPEN      | Open                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_OPTIONS   | Options                                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_PREVIOUS  | Prev (previous)                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_REDO      | Redo                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_REFERENCE | Ref (reference)                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_REFRESH   | Refresh                                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_REPLACE   | Replace                                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_RESTART   | Restart                                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_RESUME    | Resume                                     |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SAVE      | Save                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SBEG      | Shifted Beg (beginning)                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SCANCEL   | Shifted Cancel                             |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SCOMMAND  | Shifted Command                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SCOPY     | Shifted Copy                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SCREATE   | Shifted Create                             |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SDC       | Shifted Delete char                        |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SDL       | Shifted Delete line                        |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SELECT    | Select                                     |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SEND      | Shifted End                                |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SEOL      | Shifted Clear line                         |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SEXIT     | Shifted Exit                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SFIND     | Shifted Find                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SHELP     | Shifted Help                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SHOME     | Shifted Home                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SIC       | Shifted Input                              |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SLEFT     | Shifted Left arrow                         |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SMESSAGE  | Shifted Message                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SMOVE     | Shifted Move                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SNEXT     | Shifted Next                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SOPTIONS  | Shifted Options                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SPREVIOUS | Shifted Prev                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SPRINT    | Shifted Print                              |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SREDO     | Shifted Redo                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SREPLACE  | Shifted Replace                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SRIGHT    | Shifted Right arrow                        |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SRSUME    | Shifted Resume                             |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SSAVE     | Shifted Save                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SSUSPEND  | Shifted Suspend                            |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SUNDO     | Shifted Undo                               |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_SUSPEND   | Suspend                                    |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_UNDO      | Undo                                       |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_MOUSE     | Mouse event has occurred                   |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_RESIZE    | Terminal resize event                      |
-+-------------------------+--------------------------------------------+
-| .. data:: KEY_MAX       | Maximum key value                          |
-+-------------------------+--------------------------------------------+
++-------------------------+--------------------------------------------------+
+| Hằng số phím            | Phím                                             |
++=========================+==================================================+
+| .. data:: KEY_MIN       | Giá trị phím tối thiểu                           |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_BREAK     | Phím Break (không đáng tin cậy)                  |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_DOWN      | Mũi tên xuống                                    |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_UP        | Mũi tên lên                                      |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_LEFT      | Mũi tên trái                                     |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_RIGHT     | Mũi tên phải                                     |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_HOME      | Phím Home (mũi tên lên + trái)                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_BACKSPACE | Backspace (không đáng tin cậy)                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_F0        | Phím chức năng. Hỗ trợ tối đa 64 phím chức năng. |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_Fn        | Giá trị của phím chức năng *n*                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_DL        | Xóa dòng                                         |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_IL        | Chèn dòng                                        |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_DC        | Xóa ký tự                                        |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_IC        | Chèn ký tự hoặc vào chế độ chèn                  |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_EIC       | Thoát chế độ chèn ký tự                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_CLEAR     | Xóa màn hình                                     |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_EOS       | Xóa đến cuối màn hình                            |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_EOL       | Xóa đến cuối dòng                                |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SF        | Cuộn tiến 1 dòng                                 |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SR        | Cuộn lùi 1 dòng (ngược)                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_NPAGE     | Trang tiếp theo                                  |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_PPAGE     | Trang trước                                      |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_STAB      | Đặt tab                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_CTAB      | Xóa tab                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_CATAB     | Xóa tất cả tab                                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_ENTER     | Enter hoặc gửi (không đáng tin cậy)              |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SRESET    | Đặt lại mềm (một phần) (không đáng tin cậy)      |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_RESET     | Đặt lại hoặc đặt lại cứng (không đáng tin cậy)   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_PRINT     | In                                               |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_LL        | Home xuống hoặc dưới cùng (góc dưới bên trái)    |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_A1        | Góc trên bên trái của bàn phím số                |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_A3        | Góc trên bên phải của bàn phím số                |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_B2        | Trung tâm của bàn phím số                        |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_C1        | Góc dưới bên trái của bàn phím số                |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_C3        | Góc dưới bên phải của bàn phím số                |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_BTAB      | Tab lùi                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_BEG       | Beg (beginning)                                  |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_CANCEL    | Cancel                                           |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_CLOSE     | Close                                            |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_COMMAND   | Cmd (command)                                    |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_COPY      | Copy                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_CREATE    | Create                                           |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_END       | End                                              |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_EXIT      | Exit                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_FIND      | Find                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_HELP      | Help                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_MARK      | Mark                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_MESSAGE   | Message                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_MOVE      | Move                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_NEXT      | Next                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_OPEN      | Open                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_OPTIONS   | Options                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_PREVIOUS  | Prev (previous)                                  |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_REDO      | Redo                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_REFERENCE | Ref (reference)                                  |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_REFRESH   | Refresh                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_REPLACE   | Replace                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_RESTART   | Restart                                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_RESUME    | Resume                                           |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SAVE      | Save                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SBEG      | Shifted Beg (beginning)                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SCANCEL   | Shifted Cancel                                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SCOMMAND  | Shifted Command                                  |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SCOPY     | Shifted Copy                                     |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SCREATE   | Tạo bằng Shift                                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SDC       | Xóa ký tự bằng Shift                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SDL       | Xóa dòng bằng Shift                              |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SELECT    | Chọn                                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SEND      | End bằng Shift                                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SEOL      | Xóa dòng bằng Shift                              |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SEXIT     | Thoát bằng Shift                                 |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SFIND     | Tìm kiếm có Shift                                |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SHELP     | Trợ giúp có Shift                                |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SHOME     | Home có Shift                                    |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SIC       | Input có Shift                                   |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SLEFT     | Mũi tên trái có Shift                            |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SMESSAGE  | Message có Shift                                 |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SMOVE     | Move có Shift                                    |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SNEXT     | Next khi nhấn Shift                              |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SOPTIONS  | Options khi nhấn Shift                           |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SPREVIOUS | Prev khi nhấn Shift                              |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SPRINT    | Print khi nhấn Shift                             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SREDO     | Redo khi nhấn Shift                              |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SREPLACE  | Replace khi nhấn Shift                           |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SRIGHT    | Mũi tên phải khi nhấn Shift                      |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SRSUME    | Tiếp tục với phím Shift                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SSAVE     | Lưu với phím Shift                               |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SSUSPEND  | Tạm dừng với phím Shift                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SUNDO     | Hoàn tác với phím Shift                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_SUSPEND   | Tạm dừng                                         |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_UNDO      | Hoàn tác                                         |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_MOUSE     | Đã xảy ra sự kiện chuột                          |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_RESIZE    | Sự kiện thay đổi kích thước terminal             |
++-------------------------+--------------------------------------------------+
+| .. data:: KEY_MAX       | Giá trị phím tối đa                              |
++-------------------------+--------------------------------------------------+
 
-On VT100s and their software emulations, such as X terminal emulators, there are
-normally at least four function keys (:const:`KEY_F1 <KEY_Fn>`, :const:`KEY_F2 <KEY_Fn>`,
-:const:`KEY_F3 <KEY_Fn>`, :const:`KEY_F4 <KEY_Fn>`) available, and the arrow keys mapped to
-:const:`KEY_UP`, :const:`KEY_DOWN`, :const:`KEY_LEFT` and :const:`KEY_RIGHT` in
-the obvious way.  If your machine has a PC keyboard, it is safe to expect arrow
-keys and twelve function keys (older PC keyboards may have only ten function
-keys); also, the following keypad mappings are standard:
+Trên VT100 và các trình mô phỏng phần mềm của chúng, chẳng hạn như các trình mô phỏng terminal X, thường có ít nhất bốn phím chức năng (:const:`KEY_F1 <KEY_Fn>`, :const:`KEY_F2 <KEY_Fn>`,
+:const:`KEY_F3 <KEY_Fn>`, :const:`KEY_F4 <KEY_Fn>`) khả dụng, và các phím mũi tên được ánh xạ tới
+:const:`KEY_UP`, :const:`KEY_DOWN`, :const:`KEY_LEFT` và :const:`KEY_RIGHT` theo cách hiển nhiên. Nếu máy của bạn có bàn phím PC, bạn có thể yên tâm mong đợi các phím mũi tên và mười hai phím chức năng (các bàn phím PC cũ có thể chỉ có mười phím chức năng); ngoài ra, các ánh xạ bàn phím số sau đây là tiêu chuẩn:
 
 +------------------+-----------+
-| Keycap           | Constant  |
+| Phím             | Hằng số   |
 +==================+===========+
 | :kbd:`Insert`    | KEY_IC    |
 +------------------+-----------+
@@ -1799,264 +1368,229 @@ keys); also, the following keypad mappings are standard:
 
 .. _curses-acs-codes:
 
-The following table lists characters from the alternate character set. These are
-inherited from the VT100 terminal, and will generally be  available on software
-emulations such as X terminals.  When there is no graphic available, curses
-falls back on a crude printable ASCII approximation.
+Bảng sau liệt kê các ký tự từ bộ ký tự thay thế. Các ký tự này được kế thừa từ thiết bị đầu cuối VT100 và thường có sẵn trong các trình mô phỏng phần mềm như thiết bị đầu cuối X. Khi không có ký tự đồ họa tương ứng, curses sẽ chuyển sang dùng một dạng biểu diễn ASCII có thể in được nhưng khá thô sơ.
 
 .. note::
 
-   These are available only after :func:`initscr` has  been called.
+   Các hằng số này chỉ khả dụng sau khi :func:`initscr` đã được gọi.
 
-+------------------------+------------------------------------------+
-| ACS code               | Meaning                                  |
-+========================+==========================================+
-| .. data:: ACS_BBSS     | alternate name for upper-right corner    |
-+------------------------+------------------------------------------+
-| .. data:: ACS_BLOCK    | solid square block                       |
-+------------------------+------------------------------------------+
-| .. data:: ACS_BOARD    | board of squares                         |
-+------------------------+------------------------------------------+
-| .. data:: ACS_BSBS     | alternate name for horizontal line       |
-+------------------------+------------------------------------------+
-| .. data:: ACS_BSSB     | alternate name for upper-left corner     |
-+------------------------+------------------------------------------+
-| .. data:: ACS_BSSS     | alternate name for top tee               |
-+------------------------+------------------------------------------+
-| .. data:: ACS_BTEE     | bottom tee                               |
-+------------------------+------------------------------------------+
-| .. data:: ACS_BULLET   | bullet                                   |
-+------------------------+------------------------------------------+
-| .. data:: ACS_CKBOARD  | checker board (stipple)                  |
-+------------------------+------------------------------------------+
-| .. data:: ACS_DARROW   | arrow pointing down                      |
-+------------------------+------------------------------------------+
-| .. data:: ACS_DEGREE   | degree symbol                            |
-+------------------------+------------------------------------------+
-| .. data:: ACS_DIAMOND  | diamond                                  |
-+------------------------+------------------------------------------+
-| .. data:: ACS_GEQUAL   | greater-than-or-equal-to                 |
-+------------------------+------------------------------------------+
-| .. data:: ACS_HLINE    | horizontal line                          |
-+------------------------+------------------------------------------+
-| .. data:: ACS_LANTERN  | lantern symbol                           |
-+------------------------+------------------------------------------+
-| .. data:: ACS_LARROW   | left arrow                               |
-+------------------------+------------------------------------------+
-| .. data:: ACS_LEQUAL   | less-than-or-equal-to                    |
-+------------------------+------------------------------------------+
-| .. data:: ACS_LLCORNER | lower-left corner                        |
-+------------------------+------------------------------------------+
-| .. data:: ACS_LRCORNER | lower-right corner                       |
-+------------------------+------------------------------------------+
-| .. data:: ACS_LTEE     | left tee                                 |
-+------------------------+------------------------------------------+
-| .. data:: ACS_NEQUAL   | not-equal sign                           |
-+------------------------+------------------------------------------+
-| .. data:: ACS_PI       | letter pi                                |
-+------------------------+------------------------------------------+
-| .. data:: ACS_PLMINUS  | plus-or-minus sign                       |
-+------------------------+------------------------------------------+
-| .. data:: ACS_PLUS     | big plus sign                            |
-+------------------------+------------------------------------------+
-| .. data:: ACS_RARROW   | right arrow                              |
-+------------------------+------------------------------------------+
-| .. data:: ACS_RTEE     | right tee                                |
-+------------------------+------------------------------------------+
-| .. data:: ACS_S1       | scan line 1                              |
-+------------------------+------------------------------------------+
-| .. data:: ACS_S3       | scan line 3                              |
-+------------------------+------------------------------------------+
-| .. data:: ACS_S7       | scan line 7                              |
-+------------------------+------------------------------------------+
-| .. data:: ACS_S9       | scan line 9                              |
-+------------------------+------------------------------------------+
-| .. data:: ACS_SBBS     | alternate name for lower-right corner    |
-+------------------------+------------------------------------------+
-| .. data:: ACS_SBSB     | alternate name for vertical line         |
-+------------------------+------------------------------------------+
-| .. data:: ACS_SBSS     | alternate name for right tee             |
-+------------------------+------------------------------------------+
-| .. data:: ACS_SSBB     | alternate name for lower-left corner     |
-+------------------------+------------------------------------------+
-| .. data:: ACS_SSBS     | alternate name for bottom tee            |
-+------------------------+------------------------------------------+
-| .. data:: ACS_SSSB     | alternate name for left tee              |
-+------------------------+------------------------------------------+
-| .. data:: ACS_SSSS     | alternate name for crossover or big plus |
-+------------------------+------------------------------------------+
-| .. data:: ACS_STERLING | pound sterling                           |
-+------------------------+------------------------------------------+
-| .. data:: ACS_TTEE     | top tee                                  |
-+------------------------+------------------------------------------+
-| .. data:: ACS_UARROW   | up arrow                                 |
-+------------------------+------------------------------------------+
-| .. data:: ACS_ULCORNER | upper-left corner                        |
-+------------------------+------------------------------------------+
-| .. data:: ACS_URCORNER | upper-right corner                       |
-+------------------------+------------------------------------------+
-| .. data:: ACS_VLINE    | vertical line                            |
-+------------------------+------------------------------------------+
++------------------------+----------------------------------------------+
+| ACS code               | Ý nghĩa                                      |
++========================+==============================================+
+| .. data:: ACS_BBSS     | tên thay thế cho góc trên bên phải           |
++------------------------+----------------------------------------------+
+| .. data:: ACS_BLOCK    | khối hình vuông đặc                          |
++------------------------+----------------------------------------------+
+| .. data:: ACS_BOARD    | bảng gồm các ô vuông                         |
++------------------------+----------------------------------------------+
+| .. data:: ACS_BSBS     | tên thay thế cho đường ngang                 |
++------------------------+----------------------------------------------+
+| .. data:: ACS_BSSB     | tên thay thế cho góc trên bên trái           |
++------------------------+----------------------------------------------+
+| .. data:: ACS_BSSS     | tên thay thế cho nhánh chữ T phía trên       |
++------------------------+----------------------------------------------+
+| .. data:: ACS_BTEE     | nhánh chữ T phía dưới                        |
++------------------------+----------------------------------------------+
+| .. data:: ACS_BULLET   | dấu đầu dòng                                 |
++------------------------+----------------------------------------------+
+| .. data:: ACS_CKBOARD  | bàn cờ (chấm li ti)                          |
++------------------------+----------------------------------------------+
+| .. data:: ACS_DARROW   | mũi tên chỉ xuống                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_DEGREE   | ký hiệu độ                                   |
++------------------------+----------------------------------------------+
+| .. data:: ACS_DIAMOND  | hình thoi                                    |
++------------------------+----------------------------------------------+
+| .. data:: ACS_GEQUAL   | lớn hơn hoặc bằng                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_HLINE    | đường ngang                                  |
++------------------------+----------------------------------------------+
+| .. data:: ACS_LANTERN  | biểu tượng đèn lồng                          |
++------------------------+----------------------------------------------+
+| .. data:: ACS_LARROW   | mũi tên trái                                 |
++------------------------+----------------------------------------------+
+| .. data:: ACS_LEQUAL   | nhỏ hơn hoặc bằng                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_LLCORNER | góc dưới bên trái                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_LRCORNER | góc dưới bên phải                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_LTEE     | chữ T bên trái                               |
++------------------------+----------------------------------------------+
+| .. data:: ACS_NEQUAL   | dấu không bằng                               |
++------------------------+----------------------------------------------+
+| .. data:: ACS_PI       | chữ cái pi                                   |
++------------------------+----------------------------------------------+
+| .. data:: ACS_PLMINUS  | dấu cộng-trừ                                 |
++------------------------+----------------------------------------------+
+| .. data:: ACS_PLUS     | dấu cộng lớn                                 |
++------------------------+----------------------------------------------+
+| .. data:: ACS_RARROW   | mũi tên sang phải                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_RTEE     | đầu nối bên phải                             |
++------------------------+----------------------------------------------+
+| .. data:: ACS_S1       | dòng quét 1                                  |
++------------------------+----------------------------------------------+
+| .. data:: ACS_S3       | dòng quét 3                                  |
++------------------------+----------------------------------------------+
+| .. data:: ACS_S7       | dòng quét 7                                  |
++------------------------+----------------------------------------------+
+| .. data:: ACS_S9       | dòng quét 9                                  |
++------------------------+----------------------------------------------+
+| .. data:: ACS_SBBS     | tên thay thế cho góc dưới bên phải           |
++------------------------+----------------------------------------------+
+| .. data:: ACS_SBSB     | tên thay thế cho đường dọc                   |
++------------------------+----------------------------------------------+
+| .. data:: ACS_SBSS     | tên gọi khác của chữ T bên phải              |
++------------------------+----------------------------------------------+
+| .. data:: ACS_SSBB     | tên gọi khác của góc dưới bên trái           |
++------------------------+----------------------------------------------+
+| .. data:: ACS_SSBS     | tên gọi khác của chữ T phía dưới             |
++------------------------+----------------------------------------------+
+| .. data:: ACS_SSSB     | tên gọi khác của chữ T bên trái              |
++------------------------+----------------------------------------------+
+| .. data:: ACS_SSSS     | tên gọi khác của giao điểm hoặc dấu cộng lớn |
++------------------------+----------------------------------------------+
+| .. data:: ACS_STERLING | bảng Anh                                     |
++------------------------+----------------------------------------------+
+| .. data:: ACS_TTEE     | chữ T phía trên                              |
++------------------------+----------------------------------------------+
+| .. data:: ACS_UARROW   | mũi tên lên                                  |
++------------------------+----------------------------------------------+
+| .. data:: ACS_ULCORNER | góc trên bên trái                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_URCORNER | góc trên bên phải                            |
++------------------------+----------------------------------------------+
+| .. data:: ACS_VLINE    | đường dọc                                    |
++------------------------+----------------------------------------------+
 
-The following table lists mouse button constants used by :meth:`getmouse`:
+Bảng sau liệt kê các hằng số nút chuột được :meth:`getmouse` sử dụng:
 
-+----------------------------------+---------------------------------------------+
-| Mouse button constant            | Meaning                                     |
-+==================================+=============================================+
-| .. data:: BUTTONn_PRESSED        | Mouse button *n* pressed                    |
-+----------------------------------+---------------------------------------------+
-| .. data:: BUTTONn_RELEASED       | Mouse button *n* released                   |
-+----------------------------------+---------------------------------------------+
-| .. data:: BUTTONn_CLICKED        | Mouse button *n* clicked                    |
-+----------------------------------+---------------------------------------------+
-| .. data:: BUTTONn_DOUBLE_CLICKED | Mouse button *n* double clicked             |
-+----------------------------------+---------------------------------------------+
-| .. data:: BUTTONn_TRIPLE_CLICKED | Mouse button *n* triple clicked             |
-+----------------------------------+---------------------------------------------+
-| .. data:: BUTTON_SHIFT           | Shift was down during button state change   |
-+----------------------------------+---------------------------------------------+
-| .. data:: BUTTON_CTRL            | Control was down during button state change |
-+----------------------------------+---------------------------------------------+
-| .. data:: BUTTON_ALT             | Alt was down during button state change     |
-+----------------------------------+---------------------------------------------+
++----------------------------------+---------------------------------------------------+
+| Hằng số nút chuột                | Ý nghĩa                                           |
++==================================+===================================================+
+| .. data:: BUTTONn_PRESSED        | Nút chuột *n* được nhấn                           |
++----------------------------------+---------------------------------------------------+
+| .. data:: BUTTONn_RELEASED       | Nút chuột *n* được nhả                            |
++----------------------------------+---------------------------------------------------+
+| .. data:: BUTTONn_CLICKED        | Nút chuột *n* được nhấp                           |
++----------------------------------+---------------------------------------------------+
+| .. data:: BUTTONn_DOUBLE_CLICKED | Nút chuột *n* được nhấp đúp                       |
++----------------------------------+---------------------------------------------------+
+| .. data:: BUTTONn_TRIPLE_CLICKED | Nút chuột *n* được nhấp ba lần                    |
++----------------------------------+---------------------------------------------------+
+| .. data:: BUTTON_SHIFT           | Shift đang được giữ khi trạng thái nút thay đổi   |
++----------------------------------+---------------------------------------------------+
+| .. data:: BUTTON_CTRL            | Control đang được giữ khi trạng thái nút thay đổi |
++----------------------------------+---------------------------------------------------+
+| .. data:: BUTTON_ALT             | Alt được nhấn khi trạng thái nút thay đổi         |
++----------------------------------+---------------------------------------------------+
 
 .. versionchanged:: 3.10
-   The ``BUTTON5_*`` constants are now exposed if they are provided by the
-   underlying curses library.
+   Các hằng số ``BUTTON5_*`` hiện được hiển thị nếu chúng được thư viện curses bên dưới cung cấp.
 
-The following table lists the predefined colors:
+Bảng sau liệt kê các màu được định nghĩa sẵn:
 
-+-------------------------+----------------------------+
-| Constant                | Color                      |
-+=========================+============================+
-| .. data:: COLOR_BLACK   | Black                      |
-+-------------------------+----------------------------+
-| .. data:: COLOR_BLUE    | Blue                       |
-+-------------------------+----------------------------+
-| .. data:: COLOR_CYAN    | Cyan (light greenish blue) |
-+-------------------------+----------------------------+
-| .. data:: COLOR_GREEN   | Green                      |
-+-------------------------+----------------------------+
-| .. data:: COLOR_MAGENTA | Magenta (purplish red)     |
-+-------------------------+----------------------------+
-| .. data:: COLOR_RED     | Red                        |
-+-------------------------+----------------------------+
-| .. data:: COLOR_WHITE   | White                      |
-+-------------------------+----------------------------+
-| .. data:: COLOR_YELLOW  | Yellow                     |
-+-------------------------+----------------------------+
++-------------------------+---------------------------------+
+| Hằng số                 | Màu sắc                         |
++=========================+=================================+
+| .. data:: COLOR_BLACK   | Đen                             |
++-------------------------+---------------------------------+
+| .. data:: COLOR_BLUE    | Xanh lam                        |
++-------------------------+---------------------------------+
+| .. data:: COLOR_CYAN    | Xanh lơ (xanh lam nhạt pha lục) |
++-------------------------+---------------------------------+
+| .. data:: COLOR_GREEN   | Xanh lá                         |
++-------------------------+---------------------------------+
+| .. data:: COLOR_MAGENTA | Đỏ tía (đỏ pha tím)             |
++-------------------------+---------------------------------+
+| .. data:: COLOR_RED     | Đỏ                              |
++-------------------------+---------------------------------+
+| .. data:: COLOR_WHITE   | Trắng                           |
++-------------------------+---------------------------------+
+| .. data:: COLOR_YELLOW  | Vàng                            |
++-------------------------+---------------------------------+
 
 
-:mod:`!curses.textpad` --- Text input widget for curses programs
-================================================================
+:mod:`!curses.textpad` --- Widget nhập văn bản cho các chương trình curses
+==========================================================================
 
 .. module:: curses.textpad
-   :synopsis: Emacs-like input editing in a curses window.
+   :synopsis: Chỉnh sửa đầu vào kiểu Emacs trong cửa sổ curses.
 .. moduleauthor:: Eric Raymond <esr@thyrsus.com>
 .. sectionauthor:: Eric Raymond <esr@thyrsus.com>
 
 
-The :mod:`!curses.textpad` module provides a :class:`Textbox` class that handles
-elementary text editing in a curses window, supporting a set of keybindings
-resembling those of Emacs (thus, also of Netscape Navigator, BBedit 6.x,
-FrameMaker, and many other programs).  The module also provides a
-rectangle-drawing function useful for framing text boxes or for other purposes.
+Mô-đun :mod:`!curses.textpad` cung cấp một lớp :class:`Textbox` xử lý việc chỉnh sửa văn bản cơ bản trong cửa sổ curses, hỗ trợ một tập hợp các liên kết phím tương tự như của Emacs (và do đó cũng tương tự như của Netscape Navigator, BBedit 6.x, FrameMaker và nhiều chương trình khác). Mô-đun này cũng cung cấp một hàm vẽ hình chữ nhật hữu ích để tạo khung cho các hộp văn bản hoặc phục vụ các mục đích khác.
 
-The module :mod:`!curses.textpad` defines the following function:
+Mô-đun :mod:`!curses.textpad` định nghĩa hàm sau:
 
 
 .. function:: rectangle(win, uly, ulx, lry, lrx)
 
-   Draw a rectangle.  The first argument must be a window object; the remaining
-   arguments are coordinates relative to that window.  The second and third
-   arguments are the y and x coordinates of the upper-left corner of the
-   rectangle to be drawn; the fourth and fifth arguments are the y and x
-   coordinates of the lower-right corner. The rectangle will be drawn using
-   VT100/IBM PC forms characters on terminals that make this possible (including
-   xterm and most other software terminal emulators).  Otherwise it will be drawn
-   with ASCII  dashes, vertical bars, and plus signs.
+   Vẽ một hình chữ nhật. Đối số đầu tiên phải là một đối tượng cửa sổ; các đối số còn lại là tọa độ tương đối so với cửa sổ đó. Đối số thứ hai và thứ ba lần lượt là tọa độ y và x của góc trên bên trái của hình chữ nhật cần vẽ; đối số thứ tư và thứ năm lần lượt là tọa độ y và x của góc dưới bên phải. Hình chữ nhật sẽ được vẽ bằng các ký tự tạo hình VT100/IBM PC trên những terminal hỗ trợ điều này (bao gồm xterm và hầu hết các trình mô phỏng terminal bằng phần mềm khác). Nếu không, hình chữ nhật sẽ được vẽ bằng các dấu gạch ngang, thanh dọc và dấu cộng ASCII.
 
 
 .. _curses-textpad-objects:
 
-Textbox objects
----------------
+Các đối tượng Textbox
+---------------------
 
-You can instantiate a :class:`Textbox` object as follows:
+Bạn có thể khởi tạo một đối tượng :class:`Textbox` như sau:
 
 
 .. class:: Textbox(win, insert_mode=False)
 
-   Return a textbox widget object.  The *win* argument should be a curses
-   :ref:`window <curses-window-objects>` object in which the textbox is to
-   be contained.  If *insert_mode* is true, the textbox inserts typed
-   characters, shifting existing text to the right, rather than overwriting it.
-   The edit cursor of the textbox is initially located at the
-   upper-left corner of the containing window, with coordinates ``(0, 0)``.
-   The instance's :attr:`stripspaces` flag is initially on.
+   Trả về một đối tượng widget textbox. Đối số *win* phải là một curses
+   Đối tượng :ref:`window <curses-window-objects>` mà textbox sẽ được chứa trong đó. Nếu *insert_mode* là true, textbox sẽ chèn các ký tự được nhập, đẩy phần văn bản hiện có sang phải, thay vì ghi đè lên đó. Con trỏ chỉnh sửa của textbox ban đầu nằm ở góc trên bên trái của window chứa nó, với tọa độ ``(0, 0)``. Cờ :attr:`stripspaces` của instance ban đầu được bật.
 
-   :class:`Textbox` objects have the following methods:
+   Các đối tượng :class:`Textbox` có những phương thức sau:
 
 
    .. method:: edit(validate=None)
 
-      This is the entry point you will normally use.  It accepts editing
-      keystrokes until one of the termination keystrokes is entered.  If
-      *validate* is supplied, it must be a function.  It will be called for
-      each keystroke entered with the keystroke as a parameter; command dispatch
-      is done on the result.  If it returns a false value, the keystroke is
-      ignored.  This method returns the window contents as a
-      string; whether blanks in the window are included is affected by the
-      :attr:`stripspaces` attribute.
+      Đây là entry point mà bạn thường sử dụng. Phương thức này nhận các phím bấm chỉnh sửa cho đến khi một trong các phím bấm kết thúc được nhập. Nếu cung cấp *validate*, giá trị này phải là một hàm. Hàm sẽ được gọi cho mỗi phím bấm được nhập, với phím bấm đó làm tham số; việc dispatch lệnh được thực hiện dựa trên kết quả. Nếu hàm trả về giá trị false, phím bấm sẽ bị bỏ qua. Phương thức này trả về nội dung của window dưới dạng chuỗi; việc các khoảng trắng trong window có được đưa vào hay không bị ảnh hưởng bởi
+      thuộc tính :attr:`stripspaces`.
 
 
    .. method:: do_command(ch)
 
-      Process a single command keystroke.  Returns ``1`` to continue editing,
-      or ``0`` if a termination keystroke was processed.  Here are the supported
-      special keystrokes:
+      Xử lý một phím bấm lệnh duy nhất. Trả về ``1`` để tiếp tục chỉnh sửa hoặc ``0`` nếu đã xử lý một phím bấm kết thúc. Sau đây là các phím bấm đặc biệt được hỗ trợ:
 
-      +------------------+-------------------------------------------+
-      | Keystroke        | Action                                    |
-      +==================+===========================================+
-      | :kbd:`Control-A` | Go to left edge of window.                |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-B` | Cursor left, wrapping to previous line if |
-      |                  | appropriate.                              |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-D` | Delete character under cursor.            |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-E` | Go to right edge (stripspaces off) or end |
-      |                  | of line (stripspaces on).                 |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-F` | Cursor right, wrapping to next line when  |
-      |                  | appropriate.                              |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-G` | Terminate, returning the window contents. |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-H` | Delete character backward.                |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-J` | Terminate if the window is 1 line,        |
-      |                  | otherwise move to the start of the next   |
-      |                  | line.                                     |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-K` | If line is blank, delete it, otherwise    |
-      |                  | clear to end of line.                     |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-L` | Refresh screen.                           |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-N` | Cursor down; move down one line.          |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-O` | Insert a blank line at cursor location.   |
-      +------------------+-------------------------------------------+
-      | :kbd:`Control-P` | Cursor up; move up one line.              |
-      +------------------+-------------------------------------------+
+      +------------------+------------------------------------------------------------------------------------+
+      | Phím bấm         | Thao tác                                                                           |
+      +==================+====================================================================================+
+      | :kbd:`Control-A` | Đi đến mép trái của cửa sổ.                                                        |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-B` | Di chuyển con trỏ sang trái, chuyển sang dòng trước nếu thích hợp.                 |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-D` | Xóa ký tự bên dưới con trỏ.                                                        |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-E` | Đi đến mép phải (khi stripspaces tắt) hoặc cuối dòng (khi stripspaces bật).        |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-F` | Di chuyển con trỏ sang phải, chuyển sang dòng tiếp theo khi thích hợp.             |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-G` | Kết thúc, trả về nội dung cửa sổ.                                                  |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-H` | Xóa ký tự về phía sau.                                                             |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-J` | Kết thúc nếu cửa sổ chỉ có 1 dòng, nếu không thì di chuyển đến đầu dòng tiếp theo. |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-K` | Nếu dòng trống, hãy xóa dòng đó; nếu không, hãy xóa đến cuối dòng.                 |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-L` | Làm mới màn hình.                                                                  |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-N` | Di chuyển con trỏ xuống; di chuyển xuống một dòng.                                 |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-O` | Chèn một dòng trống tại vị trí con trỏ.                                            |
+      +------------------+------------------------------------------------------------------------------------+
+      | :kbd:`Control-P` | Di chuyển con trỏ lên; di chuyển lên một dòng.                                     |
+      +------------------+------------------------------------------------------------------------------------+
 
-      Move operations do nothing if the cursor is at an edge where the movement
-      is not possible.  The following synonyms are supported where possible:
+      Các thao tác di chuyển không làm gì nếu con trỏ ở cạnh mà tại đó không thể di chuyển. Các từ đồng nghĩa sau được hỗ trợ khi có thể:
 
       +--------------------------------+------------------+
-      | Constant                       | Keystroke        |
+      | Hằng số                        | Phím gõ          |
       +================================+==================+
       | :const:`~curses.KEY_LEFT`      | :kbd:`Control-B` |
       +--------------------------------+------------------+
@@ -2069,20 +1603,14 @@ You can instantiate a :class:`Textbox` object as follows:
       | :const:`~curses.KEY_BACKSPACE` | :kbd:`Control-h` |
       +--------------------------------+------------------+
 
-      All other keystrokes are treated as a command to insert the given
-      character and move right (with line wrapping).
+      Tất cả các phím gõ khác được xử lý như một lệnh để chèn ký tự đã cho và di chuyển sang phải (có ngắt dòng).
 
 
    .. method:: gather()
 
-      Return the window contents as a string; whether blanks in the
-      window are included is affected by the :attr:`stripspaces` member.
+      Trả về nội dung của cửa sổ dưới dạng chuỗi; việc các khoảng trống trong cửa sổ có được bao gồm hay không phụ thuộc vào thành viên :attr:`stripspaces`.
 
 
    .. attribute:: stripspaces
 
-      This attribute is a flag which controls the interpretation of blanks in
-      the window.  When it is on, trailing blanks on each line are ignored; any
-      cursor motion that would land the cursor on a trailing blank goes to the
-      end of that line instead, and trailing blanks are stripped when the window
-      contents are gathered.
+      Thuộc tính này là một cờ điều khiển cách diễn giải các khoảng trống trong cửa sổ. Khi được bật, các khoảng trống ở cuối mỗi dòng sẽ bị bỏ qua; mọi thao tác di chuyển con trỏ khiến con trỏ dừng ở khoảng trống cuối dòng sẽ đưa con trỏ đến cuối dòng đó, đồng thời các khoảng trống ở cuối dòng sẽ bị loại bỏ khi thu thập nội dung cửa sổ.

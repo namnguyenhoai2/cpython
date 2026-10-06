@@ -1,20 +1,16 @@
-The :mod:`!compression` package
-===============================
+Gói :mod:`!compression`
+=======================
 
 .. module:: compression
 
 .. versionadded:: 3.14
 
-The :mod:`!compression` package contains the canonical compression modules
-containing interfaces to several different compression algorithms. Some of
-these modules have historically been available as separate modules; those will
-continue to be available under their original names for compatibility reasons,
-and will not be removed without a deprecation cycle. The use of modules in
-:mod:`!compression` is encouraged where practical.
+Gói :mod:`!compression` chứa các mô-đun nén chính thức, cung cấp các interface cho một số thuật toán nén khác nhau. Một số mô-đun trong số này trước đây từng được cung cấp dưới dạng các mô-đun riêng biệt; vì lý do tương thích, chúng sẽ tiếp tục khả dụng dưới tên ban đầu và sẽ không bị xóa nếu chưa trải qua một chu kỳ ngừng hỗ trợ. Việc sử dụng các mô-đun trong
+:mod:`!compression` được khuyến khích khi phù hợp.
 
-* :mod:`!compression.bz2` -- Re-exports :mod:`bz2`
-* :mod:`!compression.gzip` -- Re-exports :mod:`gzip`
-* :mod:`!compression.lzma` -- Re-exports :mod:`lzma`
-* :mod:`!compression.zlib` -- Re-exports :mod:`zlib`
-* :mod:`compression.zstd` -- Wrapper for the Zstandard compression library
+* :mod:`!compression.bz2` -- Tái xuất :mod:`bz2`
+* :mod:`!compression.gzip` -- Tái xuất :mod:`gzip`
+* :mod:`!compression.lzma` -- Tái xuất :mod:`lzma`
+* :mod:`!compression.zlib` -- Tái xuất :mod:`zlib`
+* :mod:`compression.zstd` -- Bộ bao bọc cho thư viện nén Zstandard
 

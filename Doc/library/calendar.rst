@@ -1,336 +1,266 @@
-:mod:`!calendar` --- General calendar-related functions
-=======================================================
+:mod:`!calendar` --- Các hàm chung liên quan đến lịch
+=====================================================
 
 .. module:: calendar
-   :synopsis: Functions for working with calendars, including some emulation
-              of the Unix cal program.
+   :synopsis: Các hàm dùng để làm việc với lịch, bao gồm một số chức năng mô phỏng chương trình cal của Unix.
 
 .. sectionauthor:: Drew Csillag <drew_csillag@geocities.com>
 
-**Source code:** :source:`Lib/calendar.py`
+**Mã nguồn:** :source:`Lib/calendar.py`
 
 --------------
 
-This module allows you to output calendars like the Unix :program:`cal` program,
-and provides additional useful functions related to the calendar. By default,
-these calendars have Monday as the first day of the week, and Sunday as the last
-(the European convention). Use :func:`setfirstweekday` to set the first day of
-the week to Sunday (6) or to any other weekday.  Parameters that specify dates
-are given as integers. For related
-functionality, see also the :mod:`datetime` and :mod:`time` modules.
+Mô-đun này cho phép bạn xuất lịch giống như chương trình :program:`cal` của Unix và cung cấp thêm các hàm hữu ích liên quan đến lịch. Theo mặc định, các lịch này có thứ Hai là ngày đầu tuần và Chủ nhật là ngày cuối tuần (theo quy ước châu Âu). Sử dụng :func:`setfirstweekday` để đặt ngày đầu tuần là Chủ nhật (6) hoặc bất kỳ ngày nào khác trong tuần. Các tham số chỉ định ngày tháng được cung cấp dưới dạng số nguyên. Để biết các chức năng liên quan, hãy xem thêm các mô-đun :mod:`datetime` và :mod:`time`.
 
-The functions and classes defined in this module
-use an idealized calendar, the current Gregorian calendar extended indefinitely
-in both directions.  This matches the definition of the "proleptic Gregorian"
-calendar in Dershowitz and Reingold's book "Calendrical Calculations", where
-it's the base calendar for all computations.  Zero and negative years are
-interpreted as prescribed by the ISO 8601 standard.  Year 0 is 1 BC, year -1 is
-2 BC, and so on.
+Các hàm và lớp được định nghĩa trong mô-đun này sử dụng một lịch lý tưởng hóa, tức lịch Gregory hiện tại được mở rộng vô hạn theo cả hai hướng. Điều này phù hợp với định nghĩa về lịch "Gregory suy diễn" (proleptic Gregorian) trong cuốn sách "Calendrical Calculations" của Dershowitz và Reingold, trong đó đây là lịch cơ sở cho mọi phép tính. Các năm bằng không và âm được diễn giải theo quy định của tiêu chuẩn ISO 8601. Năm 0 là năm 1 trước Công nguyên, năm -1 là năm 2 trước Công nguyên, v.v.
 
 
 .. class:: Calendar(firstweekday=0)
 
-   Creates a :class:`Calendar` object. *firstweekday* is an integer specifying the
-   first day of the week. :const:`MONDAY` is ``0`` (the default), :const:`SUNDAY` is ``6``.
+   Tạo một đối tượng :class:`Calendar`. *firstweekday* là một số nguyên chỉ định ngày đầu tuần. :const:`MONDAY` là ``0`` (mặc định), :const:`SUNDAY` là ``6``.
 
-   A :class:`Calendar` object provides several methods that can be used for
-   preparing the calendar data for formatting. This class doesn't do any formatting
-   itself. This is the job of subclasses.
+   Một đối tượng :class:`Calendar` cung cấp một số phương thức có thể được sử dụng để chuẩn bị dữ liệu lịch cho việc định dạng. Bản thân lớp này không thực hiện bất kỳ việc định dạng nào. Đây là nhiệm vụ của các lớp con.
 
 
-   :class:`Calendar` instances have the following methods and attributes:
+   Các instance của :class:`Calendar` có các phương thức và thuộc tính sau:
 
    .. attribute:: firstweekday
 
-      The first weekday as an integer (0--6).
+      Ngày đầu tiên trong tuần dưới dạng số nguyên (0--6).
 
-      This property can also be set and read using
-      :meth:`~Calendar.setfirstweekday` and
-      :meth:`~Calendar.getfirstweekday` respectively.
+      Bạn cũng có thể đặt và đọc thuộc tính này bằng cách sử dụng
+      :meth:`~Calendar.setfirstweekday` và
+      :meth:`~Calendar.getfirstweekday` tương ứng.
 
    .. method:: getfirstweekday()
 
-      Return an :class:`int` for the current first weekday (0--6).
+      Trả về một :class:`int` cho ngày đầu tiên trong tuần hiện tại (0--6).
 
-      Identical to reading the :attr:`~Calendar.firstweekday` property.
+      Tương đương với việc đọc thuộc tính :attr:`~Calendar.firstweekday`.
 
    .. method:: setfirstweekday(firstweekday)
 
-      Set the first weekday to *firstweekday*, passed as an :class:`int` (0--6).
+      Đặt ngày đầu tiên trong tuần thành *firstweekday*, được truyền dưới dạng :class:`int` (0--6).
 
-      Identical to setting the :attr:`~Calendar.firstweekday` property.
+      Tương đương với việc thiết lập thuộc tính :attr:`~Calendar.firstweekday`.
 
    .. method:: iterweekdays()
 
-      Return an iterator for the weekday numbers that will be used for one
-      week.  The first value from the iterator will be the same as the value of
-      the :attr:`~Calendar.firstweekday` property.
+      Trả về một iterator cho các số thứ trong tuần sẽ được sử dụng trong một tuần. Giá trị đầu tiên từ iterator sẽ giống với giá trị của thuộc tính :attr:`~Calendar.firstweekday`.
 
 
    .. method:: itermonthdates(year, month)
 
-      Return an iterator for the month *month* (1--12) in the year *year*. This
-      iterator will return all days (as :class:`datetime.date` objects) for the
-      month and all days before the start of the month or after the end of the
-      month that are required to get a complete week.
+      Trả về một iterator cho tháng *month* (1--12) trong năm *year*. Iterator này sẽ trả về tất cả các ngày (dưới dạng đối tượng :class:`datetime.date`) trong tháng, cùng với tất cả các ngày trước khi tháng bắt đầu hoặc sau khi tháng kết thúc cần thiết để tạo thành một tuần đầy đủ.
 
 
    .. method:: itermonthdays(year, month)
 
-      Return an iterator for the month *month* in the year *year* similar to
-      :meth:`itermonthdates`, but not restricted by the :class:`datetime.date`
-      range. Days returned will simply be day of the month numbers.  For the
-      days outside of the specified month, the day number is ``0``.
+      Trả về một iterator cho tháng *month* trong năm *year* tương tự như
+      :meth:`itermonthdates`, nhưng không bị giới hạn bởi phạm vi :class:`datetime.date`. Các ngày được trả về chỉ đơn giản là số ngày trong tháng. Đối với những ngày nằm ngoài tháng được chỉ định, số ngày là ``0``.
 
 
    .. method:: itermonthdays2(year, month)
 
-      Return an iterator for the month *month* in the year *year* similar to
-      :meth:`itermonthdates`, but not restricted by the :class:`datetime.date`
-      range. Days returned will be tuples consisting of a day of the month
-      number and a weekday number.
+      Trả về một iterator cho tháng *month* trong năm *year* tương tự như
+      :meth:`itermonthdates`, nhưng không bị giới hạn bởi phạm vi :class:`datetime.date`. Các ngày được trả về sẽ là các tuple gồm số ngày trong tháng và số thứ trong tuần.
 
 
    .. method:: itermonthdays3(year, month)
 
-      Return an iterator for the month *month* in the year *year* similar to
-      :meth:`itermonthdates`, but not restricted by the :class:`datetime.date`
-      range. Days returned will be tuples consisting of a year, a month and a day
-      of the month numbers.
+      Trả về một iterator cho tháng *month* trong năm *year* tương tự như
+      :meth:`itermonthdates`, nhưng không bị giới hạn bởi phạm vi :class:`datetime.date`. Các ngày được trả về sẽ là các tuple gồm số năm, số tháng và số ngày trong tháng.
 
       .. versionadded:: 3.7
 
 
    .. method:: itermonthdays4(year, month)
 
-      Return an iterator for the month *month* in the year *year* similar to
-      :meth:`itermonthdates`, but not restricted by the :class:`datetime.date`
-      range. Days returned will be tuples consisting of a year, a month, a day
-      of the month, and a day of the week numbers.
+      Trả về một iterator cho tháng *month* trong năm *year* tương tự như
+      :meth:`itermonthdates`, nhưng không bị giới hạn bởi phạm vi :class:`datetime.date`. Các ngày được trả về sẽ là các tuple gồm số năm, số tháng, số ngày trong tháng và số thứ trong tuần.
 
       .. versionadded:: 3.7
 
 
    .. method:: monthdatescalendar(year, month)
 
-      Return a list of the weeks in the month *month* of the *year* as full
-      weeks.  Weeks are lists of seven :class:`datetime.date` objects.
+      Trả về danh sách các tuần trong tháng *month* của *year* dưới dạng các tuần đầy đủ. Mỗi tuần là một danh sách gồm bảy đối tượng :class:`datetime.date`.
 
 
    .. method:: monthdays2calendar(year, month)
 
-      Return a list of the weeks in the month *month* of the *year* as full
-      weeks.  Weeks are lists of seven tuples of day numbers and weekday
-      numbers.
+      Trả về danh sách các tuần trong tháng *month* của *year* dưới dạng các tuần đầy đủ. Mỗi tuần là một danh sách gồm bảy tuple chứa số ngày và số thứ trong tuần.
 
 
    .. method:: monthdayscalendar(year, month)
 
-      Return a list of the weeks in the month *month* of the *year* as full
-      weeks.  Weeks are lists of seven day numbers.
+      Trả về danh sách các tuần trong *tháng* của *năm* dưới dạng các tuần đầy đủ. Các tuần là danh sách gồm bảy số ngày.
 
 
    .. method:: yeardatescalendar(year, width=3)
 
-      Return the data for the specified year ready for formatting. The return
-      value is a list of month rows. Each month row contains up to *width*
-      months (defaulting to 3). Each month contains between 4 and 6 weeks and
-      each week contains 1--7 days. Days are :class:`datetime.date` objects.
+      Trả về dữ liệu của năm được chỉ định, sẵn sàng để định dạng. Giá trị trả về là danh sách các hàng tháng. Mỗi hàng tháng chứa tối đa *width* tháng (mặc định là 3). Mỗi tháng chứa từ 4 đến 6 tuần và mỗi tuần chứa từ 1--7 ngày. Các ngày là các đối tượng :class:`datetime.date`.
 
 
    .. method:: yeardays2calendar(year, width=3)
 
-      Return the data for the specified year ready for formatting (similar to
-      :meth:`yeardatescalendar`). Entries in the week lists are tuples of day
-      numbers and weekday numbers. Day numbers outside this month are zero.
+      Trả về dữ liệu của năm được chỉ định, sẵn sàng để định dạng (tương tự như
+      :meth:`yeardatescalendar`). Các phần tử trong danh sách tuần là các tuple gồm số ngày và số thứ trong tuần. Các số ngày nằm ngoài tháng này có giá trị bằng không.
 
 
    .. method:: yeardayscalendar(year, width=3)
 
-      Return the data for the specified year ready for formatting (similar to
-      :meth:`yeardatescalendar`). Entries in the week lists are day numbers. Day
-      numbers outside this month are zero.
+      Trả về dữ liệu của năm được chỉ định, sẵn sàng để định dạng (tương tự như
+      :meth:`yeardatescalendar`). Các phần tử trong danh sách tuần là các số ngày. Các số ngày nằm ngoài tháng này có giá trị bằng không.
 
 
 .. class:: TextCalendar(firstweekday=0)
 
-   This class can be used to generate plain text calendars.
+   Có thể sử dụng lớp này để tạo lịch dạng văn bản thuần túy.
 
-   :class:`TextCalendar` instances have the following methods:
+   Các instance của :class:`TextCalendar` có các phương thức sau:
 
 
    .. method:: formatday(theday, weekday, width)
 
-      Return a string representing a single day formatted with the given *width*.
-      If *theday* is ``0``, return a string of spaces of
-      the specified width, representing an empty day. The *weekday* parameter
-      is unused.
+      Trả về một chuỗi biểu diễn một ngày đơn lẻ được định dạng với *width* đã cho. Nếu *theday* là ``0``, trả về một chuỗi gồm các khoảng trắng với độ rộng được chỉ định, biểu thị một ngày trống. Tham số *weekday* không được sử dụng.
 
    .. method:: formatweek(theweek, w=0)
 
-      Return a single week in a string with no newline. If *w* is provided, it
-      specifies the width of the date columns, which are centered. Depends
-      on the first weekday as specified in the constructor or set by the
-      :meth:`setfirstweekday` method.
+      Trả về một tuần dưới dạng chuỗi không có ký tự xuống dòng. Nếu cung cấp *w*, tham số này chỉ định độ rộng của các cột ngày, được căn giữa. Phụ thuộc vào ngày đầu tuần được chỉ định trong hàm khởi tạo hoặc được đặt bởi
+      :meth:`setfirstweekday` phương thức.
 
 
    .. method:: formatweekday(weekday, width)
 
-      Return a string representing the name of a single weekday formatted to
-      the specified *width*. The *weekday* parameter is an integer representing
-      the day of the week, where ``0`` is Monday and ``6`` is Sunday.
+      Trả về một chuỗi biểu diễn tên của một ngày trong tuần được định dạng theo *width* đã chỉ định. Tham số *weekday* là một số nguyên biểu diễn ngày trong tuần, trong đó ``0`` là thứ Hai và ``6`` là Chủ nhật.
 
 
    .. method:: formatweekheader(width)
 
-      Return a string containing the header row of weekday names, formatted
-      with the given *width* for each column. The names depend on the locale
-      settings and are padded to the specified width.
+      Trả về một chuỗi chứa hàng tiêu đề gồm tên các ngày trong tuần, được định dạng với *width* đã cho cho mỗi cột. Tên phụ thuộc vào cài đặt locale và được đệm đến độ rộng đã chỉ định.
 
 
    .. method:: formatmonth(theyear, themonth, w=0, l=0)
 
-      Return a month's calendar in a multi-line string. If *w* is provided, it
-      specifies the width of the date columns, which are centered. If *l* is
-      given, it specifies the number of lines that each week will use. Depends
-      on the first weekday as specified in the constructor or set by the
-      :meth:`setfirstweekday` method.
+      Trả về lịch của một tháng dưới dạng chuỗi nhiều dòng. Nếu cung cấp *w*, tham số này chỉ định độ rộng của các cột ngày, được căn giữa. Nếu chỉ định *l*, tham số này chỉ định số dòng mà mỗi tuần sẽ sử dụng. Phụ thuộc vào ngày đầu tuần được chỉ định trong hàm khởi tạo hoặc được đặt bởi
+      :meth:`setfirstweekday` phương thức.
 
 
    .. method:: formatmonthname(theyear, themonth, width=0, withyear=True)
 
-      Return a string representing the month's name centered within the
-      specified *width*. If *withyear* is ``True``, include the year in the
-      output. The *theyear* and *themonth* parameters specify the year
-      and month for the name to be formatted respectively.
+      Trả về một chuỗi biểu diễn tên tháng được căn giữa trong *width* đã chỉ định. Nếu *withyear* là ``True``, hãy đưa năm vào kết quả. Các tham số *theyear* và *themonth* lần lượt chỉ định năm và tháng dùng để định dạng tên.
 
 
    .. method:: prmonth(theyear, themonth, w=0, l=0)
 
-      Print a month's calendar as returned by :meth:`formatmonth`.
+      In lịch của một tháng như được trả về bởi :meth:`formatmonth`.
 
 
    .. method:: formatyear(theyear, w=2, l=1, c=6, m=3)
 
-      Return a *m*-column calendar for an entire year as a multi-line string.
-      Optional parameters *w*, *l*, and *c* are for date column width, lines per
-      week, and number of spaces between month columns, respectively. Depends on
-      the first weekday as specified in the constructor or set by the
-      :meth:`setfirstweekday` method.  The earliest year for which a calendar
-      can be generated is platform-dependent.
+      Trả về lịch *m* cột cho cả năm dưới dạng chuỗi nhiều dòng. Các tham số tùy chọn *w*, *l* và *c* lần lượt dùng để chỉ định độ rộng cột ngày, số dòng mỗi tuần và số khoảng trắng giữa các cột tháng. Phụ thuộc vào ngày đầu tiên trong tuần được chỉ định trong hàm khởi tạo hoặc được thiết lập bởi
+      :meth:`setfirstweekday` phương thức. Năm sớm nhất mà lịch có thể được tạo phụ thuộc vào nền tảng.
 
 
    .. method:: pryear(theyear, w=2, l=1, c=6, m=3)
 
-      Print the calendar for an entire year as returned by :meth:`formatyear`.
+      In lịch của cả năm như được trả về bởi :meth:`formatyear`.
 
 
 .. class:: HTMLCalendar(firstweekday=0)
 
-   This class can be used to generate HTML calendars.
+   Có thể sử dụng lớp này để tạo lịch HTML.
 
 
-   :class:`!HTMLCalendar` instances have the following methods:
+   Các instance của :class:`!HTMLCalendar` có những phương thức sau:
 
    .. method:: formatmonth(theyear, themonth, withyear=True)
 
-      Return a month's calendar as an HTML table. If *withyear* is true the year
-      will be included in the header, otherwise just the month name will be
-      used.
+      Trả về lịch của một tháng dưới dạng bảng HTML. Nếu *withyear* là true, năm sẽ được đưa vào tiêu đề; nếu không, chỉ tên tháng được sử dụng.
 
 
    .. method:: formatyear(theyear, width=3)
 
-      Return a year's calendar as an HTML table. *width* (defaulting to 3)
-      specifies the number of months per row.
+      Trả về lịch của một năm dưới dạng bảng HTML. *width* (mặc định là 3) chỉ định số tháng trên mỗi hàng.
 
 
    .. method:: formatyearpage(theyear, width=3, css='calendar.css', encoding=None)
 
-      Return a year's calendar as a complete HTML page. *width* (defaulting to
-      3) specifies the number of months per row. *css* is the name for the
-      cascading style sheet to be used. :const:`None` can be passed if no style
-      sheet should be used. *encoding* specifies the encoding to be used for the
-      output (defaulting to the system default encoding).
+      Trả về lịch của một năm dưới dạng một trang HTML hoàn chỉnh. *width* (mặc định là
+      3) chỉ định số tháng trên mỗi hàng. *css* là tên của bảng định kiểu xếp tầng sẽ được sử dụng.
+      :const:`None` có thể được truyền vào nếu không muốn sử dụng bảng định kiểu nào. *encoding* chỉ định encoding sẽ được sử dụng cho đầu ra (mặc định là encoding mặc định của hệ thống).
 
 
    .. method:: formatmonthname(theyear, themonth, withyear=True)
 
-      Return a month name as an HTML table row. If *withyear* is true the year
-      will be included in the row, otherwise just the month name will be
-      used.
+      Trả về tên một tháng dưới dạng một hàng trong bảng HTML. Nếu *withyear* là true, năm sẽ được đưa vào hàng; nếu không, chỉ tên tháng được sử dụng.
 
 
-   :class:`!HTMLCalendar` has the following attributes you can override to
-   customize the CSS classes used by the calendar:
+   :class:`!HTMLCalendar` có các thuộc tính sau mà bạn có thể ghi đè để tùy chỉnh các lớp CSS được sử dụng bởi lịch:
 
    .. attribute:: cssclasses
 
-      A list of CSS classes used for each weekday. The default class list is::
+      Danh sách các lớp CSS được sử dụng cho từng ngày trong tuần. Danh sách lớp mặc định là::
 
          cssclasses = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
-      more styles can be added for each day::
+      có thể thêm các kiểu khác cho từng ngày::
 
          cssclasses = ["mon text-bold", "tue", "wed", "thu", "fri", "sat", "sun red"]
 
-      Note that the length of this list must be seven items.
+      Lưu ý rằng danh sách này phải có bảy phần tử.
 
 
    .. attribute:: cssclass_noday
 
-      The CSS class for a weekday occurring in the previous or coming month.
+      Lớp CSS cho một ngày trong tuần thuộc tháng trước hoặc tháng kế tiếp.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: cssclasses_weekday_head
 
-      A list of CSS classes used for weekday names in the header row.
-      The default is the same as :attr:`cssclasses`.
+      Danh sách các lớp CSS được sử dụng cho tên các ngày trong tuần ở hàng tiêu đề. Mặc định giống với :attr:`cssclasses`.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: cssclass_month_head
 
-      The month's head CSS class (used by :meth:`formatmonthname`).
-      The default value is ``"month"``.
+      Lớp CSS tiêu đề tháng (được :meth:`formatmonthname` sử dụng). Giá trị mặc định là ``"month"``.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: cssclass_month
 
-      The CSS class for the whole month's table (used by :meth:`formatmonth`).
-      The default value is ``"month"``.
+      Lớp CSS cho toàn bộ bảng của tháng (được :meth:`formatmonth` sử dụng). Giá trị mặc định là ``"month"``.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: cssclass_year
 
-      The CSS class for the whole year's table of tables (used by
-      :meth:`formatyear`). The default value is ``"year"``.
+      Lớp CSS cho toàn bộ bảng gồm các bảng của năm (được sử dụng bởi
+      :meth:`formatyear`). Giá trị mặc định là ``"year"``.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: cssclass_year_head
 
-      The CSS class for the table head for the whole year (used by
-      :meth:`formatyear`). The default value is ``"year"``.
+      Lớp CSS cho phần đầu bảng của toàn bộ năm (được sử dụng bởi
+      :meth:`formatyear`). Giá trị mặc định là ``"year"``.
 
       .. versionadded:: 3.7
 
 
-   Note that although the naming for the above described class attributes is
-   singular (e.g. ``cssclass_month`` ``cssclass_noday``), one can replace the
-   single CSS class with a space separated list of CSS classes, for example::
+   Lưu ý rằng mặc dù cách đặt tên cho các thuộc tính lớp được mô tả ở trên là dạng số ít (ví dụ: ``cssclass_month`` ``cssclass_noday``), bạn có thể thay thế một lớp CSS duy nhất bằng danh sách các lớp CSS được phân tách bằng dấu cách, chẳng hạn như::
 
          "text-bold text-red"
 
-   Here is an example how :class:`!HTMLCalendar` can be customized::
+   Sau đây là ví dụ về cách tùy chỉnh :class:`!HTMLCalendar`::
 
        class CustomHTMLCal(calendar.HTMLCalendar):
            cssclasses = [style + " text-nowrap" for style in
@@ -342,32 +272,24 @@ interpreted as prescribed by the ISO 8601 standard.  Year 0 is 1 BC, year -1 is
 
 .. class:: LocaleTextCalendar(firstweekday=0, locale=None)
 
-   This subclass of :class:`TextCalendar` can be passed a locale name in the
-   constructor and will return month and weekday names in the specified locale.
+   Lớp con này của :class:`TextCalendar` có thể nhận tên locale trong hàm khởi tạo và sẽ trả về tên các tháng và ngày trong tuần theo locale được chỉ định.
 
 
 .. class:: LocaleHTMLCalendar(firstweekday=0, locale=None)
 
-   This subclass of :class:`HTMLCalendar` can be passed a locale name in the
-   constructor and will return month and weekday names in the specified
-   locale.
+   Lớp con này của :class:`HTMLCalendar` có thể nhận tên locale trong hàm khởi tạo và sẽ trả về tên các tháng và ngày trong tuần theo locale được chỉ định.
 
 .. note::
 
-   The constructor, :meth:`!formatweekday` and :meth:`!formatmonthname` methods
-   of these two classes temporarily change the ``LC_TIME`` locale to the given
-   *locale*. Because the current locale is a process-wide setting, they are
-   not thread-safe.
+   Hàm khởi tạo cùng các phương thức :meth:`!formatweekday` và :meth:`!formatmonthname` của hai lớp này tạm thời thay đổi locale ``LC_TIME`` thành *locale*. Vì locale hiện tại là một thiết lập áp dụng trên toàn bộ process, chúng không an toàn khi sử dụng trong thread.
 
 
-For simple text calendars this module provides the following functions.
+Đối với các lịch dạng văn bản đơn giản, module này cung cấp các hàm sau.
 
 .. function:: setfirstweekday(firstweekday)
 
-   Sets the weekday (``0`` is Monday, ``6`` is Sunday) to start each week. The
-   values :const:`MONDAY`, :const:`TUESDAY`, :const:`WEDNESDAY`, :const:`THURSDAY`,
-   :const:`FRIDAY`, :const:`SATURDAY`, and :const:`SUNDAY` are provided for
-   convenience. For example, to set the first weekday to Sunday::
+   Đặt ngày trong tuần (``0`` là thứ Hai, ``6`` là Chủ nhật) làm ngày bắt đầu mỗi tuần. Các giá trị :const:`MONDAY`, :const:`TUESDAY`, :const:`WEDNESDAY`, :const:`THURSDAY`,
+   :const:`FRIDAY`, :const:`SATURDAY` và :const:`SUNDAY` được cung cấp để thuận tiện. Ví dụ, để đặt Chủ nhật là ngày đầu tiên trong tuần::
 
       import calendar
       calendar.setfirstweekday(calendar.SUNDAY)
@@ -375,84 +297,71 @@ For simple text calendars this module provides the following functions.
 
 .. function:: firstweekday()
 
-   Returns the current setting for the weekday to start each week.
+   Trả về thiết lập hiện tại cho ngày bắt đầu mỗi tuần.
 
 
 .. function:: isleap(year)
 
-   Returns :const:`True` if *year* is a leap year, otherwise :const:`False`.
+   Trả về :const:`True` nếu *year* là năm nhuận, nếu không thì trả về :const:`False`.
 
 
 .. function:: leapdays(y1, y2)
 
-   Returns the number of leap years in the range from *y1* to *y2* (exclusive),
-   where *y1* and *y2* are years.
+   Trả về số năm nhuận trong phạm vi từ *y1* đến *y2* (không bao gồm), trong đó *y1* và *y2* là các năm.
 
-   This function works for ranges spanning a century change.
+   Hàm này hoạt động với các phạm vi bao gồm thời điểm chuyển sang thế kỷ mới.
 
 
 .. function:: weekday(year, month, day)
 
-   Returns the day of the week (``0`` is Monday) for *year* (``1970``--...),
-   *month* (``1``--``12``), *day* (``1``--``31``).
+   Trả về ngày trong tuần (``0`` là thứ Hai) của *year* (``1970``--...), *month* (``1``--``12``), *day* (``1``--``31``).
 
 
 .. function:: weekheader(width)
 
-   Return a header containing abbreviated weekday names. *width* specifies the width in
-   characters for one weekday.
+   Trả về phần tiêu đề chứa tên viết tắt của các ngày trong tuần. *width* chỉ định độ rộng tính bằng ký tự của một ngày trong tuần.
 
 
 .. function:: monthrange(year, month)
 
-   Returns weekday of first day of the month and number of days in month, for the
-   specified *year* and *month*.
+   Trả về ngày trong tuần của ngày đầu tiên trong tháng và số ngày trong tháng, cho *year* và *month* đã chỉ định.
 
 
 .. function:: monthcalendar(year, month)
 
-   Returns a matrix representing a month's calendar.  Each row represents a week;
-   days outside of the month are represented by zeros. Each week begins with Monday
-   unless set by :func:`setfirstweekday`.
+   Trả về một ma trận biểu diễn lịch của một tháng. Mỗi hàng biểu diễn một tuần; các ngày nằm ngoài tháng được biểu diễn bằng số 0. Mỗi tuần bắt đầu từ thứ Hai, trừ khi được thiết lập bởi :func:`setfirstweekday`.
 
 
 .. function:: prmonth(theyear, themonth, w=0, l=0)
 
-   Prints a month's calendar as returned by :func:`month`.
+   In lịch của một tháng như được trả về bởi :func:`month`.
 
 
 .. function:: month(theyear, themonth, w=0, l=0)
 
-   Returns a month's calendar in a multi-line string using the :meth:`~TextCalendar.formatmonth`
-   of the :class:`TextCalendar` class.
+   Trả về lịch của một tháng dưới dạng chuỗi nhiều dòng bằng :meth:`~TextCalendar.formatmonth` của lớp :class:`TextCalendar`.
 
 
 .. function:: prcal(theyear, w=0, l=0, c=6, m=3)
 
-   Prints the calendar for an entire year as returned by  :func:`calendar`.
+   In lịch của cả một năm như được trả về bởi :func:`calendar`.
 
 
 .. function:: calendar(theyear, w=2, l=1, c=6, m=3)
 
-   Returns a 3-column calendar for an entire year as a multi-line string using
-   the :meth:`~TextCalendar.formatyear` of the :class:`TextCalendar` class.
+   Trả về lịch 3 cột của cả một năm dưới dạng chuỗi nhiều dòng bằng :meth:`~TextCalendar.formatyear` của lớp :class:`TextCalendar`.
 
 
 .. function:: timegm(tuple)
 
-   An unrelated but handy function that takes a time tuple such as returned by
-   the :func:`~time.gmtime` function in the :mod:`time` module, and returns the
-   corresponding Unix timestamp value, assuming an epoch of 1970, and the POSIX
-   encoding.  In fact, :func:`time.gmtime` and :func:`timegm` are each other's
-   inverse.
+   Đây là một hàm tiện dụng nhưng không liên quan, nhận một tuple thời gian như tuple được trả về bởi hàm :func:`~time.gmtime` trong module :mod:`time`, rồi trả về giá trị Unix timestamp tương ứng, với giả định epoch là năm 1970 và sử dụng mã hóa POSIX. Trên thực tế, :func:`time.gmtime` và :func:`timegm` là hàm nghịch đảo của nhau.
 
 
-The :mod:`!calendar` module exports the following data attributes:
+Module :mod:`!calendar` xuất các thuộc tính dữ liệu sau:
 
 .. data:: day_name
 
-   A sequence that represents the days of the week in the current locale,
-   where Monday is day number 0.
+   Một dãy biểu diễn các ngày trong tuần theo locale hiện tại, trong đó thứ Hai là ngày số 0.
 
        >>> import calendar
        >>> list(calendar.day_name)
@@ -461,41 +370,31 @@ The :mod:`!calendar` module exports the following data attributes:
 
 .. data:: day_abbr
 
-   A sequence that represents the abbreviated days of the week in the current locale,
-   where Mon is day number 0.
+   Một chuỗi biểu diễn các ngày trong tuần được viết tắt theo locale hiện tại, trong đó Mon là ngày số 0.
 
        >>> import calendar
        >>> list(calendar.day_abbr)
        ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 .. data:: MONDAY
-          TUESDAY
-          WEDNESDAY
-          THURSDAY
-          FRIDAY
-          SATURDAY
-          SUNDAY
+          TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY SUNDAY
 
-   Aliases for the days of the week,
-   where ``MONDAY`` is ``0`` and ``SUNDAY`` is ``6``.
+   Các bí danh cho các ngày trong tuần, trong đó ``MONDAY`` là ``0`` và ``SUNDAY`` là ``6``.
 
    .. versionadded:: 3.12
 
 
 .. class:: Day
 
-   Enumeration defining days of the week as integer constants.
-   The members of this enumeration are exported to the module scope as
-   :data:`MONDAY` through :data:`SUNDAY`.
+   Kiểu liệt kê xác định các ngày trong tuần dưới dạng các hằng số số nguyên. Các thành viên của kiểu liệt kê này được xuất vào phạm vi module dưới dạng
+   :data:`MONDAY` đến :data:`SUNDAY`.
 
    .. versionadded:: 3.12
 
 
 .. data:: month_name
 
-   A sequence that represents the months of the year in the current locale.  This
-   follows normal convention of January being month number 1, so it has a length of
-   13 and ``month_name[0]`` is the empty string.
+   Một chuỗi biểu diễn các tháng trong năm theo locale hiện tại. Chuỗi này tuân theo quy ước thông thường, trong đó January là tháng số 1, vì vậy có độ dài là 13 và ``month_name[0]`` là chuỗi rỗng.
 
        >>> import calendar
        >>> list(calendar.month_name)
@@ -504,48 +403,33 @@ The :mod:`!calendar` module exports the following data attributes:
 
 .. data:: month_abbr
 
-   A sequence that represents the abbreviated months of the year in the current
-   locale.  This follows normal convention of January being month number 1, so it
-   has a length of 13 and  ``month_abbr[0]`` is the empty string.
+   Một chuỗi biểu diễn các tháng trong năm được viết tắt theo locale hiện tại. Chuỗi này tuân theo quy ước thông thường, trong đó January là tháng số 1, vì vậy có độ dài là 13 và ``month_abbr[0]`` là chuỗi rỗng.
 
        >>> import calendar
        >>> list(calendar.month_abbr)
        ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 .. data:: JANUARY
-          FEBRUARY
-          MARCH
-          APRIL
-          MAY
-          JUNE
-          JULY
-          AUGUST
-          SEPTEMBER
-          OCTOBER
-          NOVEMBER
-          DECEMBER
+          THÁNG HAI THÁNG BA THÁNG TƯ THÁNG NĂM THÁNG SÁU THÁNG BẢY THÁNG TÁM THÁNG CHÍN THÁNG MƯỜI THÁNG MƯỜI MỘT THÁNG MƯỜI HAI
 
-   Aliases for the months of the year,
-   where ``JANUARY`` is ``1`` and ``DECEMBER`` is ``12``.
+   Các bí danh cho các tháng trong năm, trong đó ``JANUARY`` là ``1`` và ``DECEMBER`` là ``12``.
 
    .. versionadded:: 3.12
 
 
 .. class:: Month
 
-   Enumeration defining months of the year as integer constants.
-   The members of this enumeration are exported to the module scope as
-   :data:`JANUARY` through :data:`DECEMBER`.
+   Enumeration định nghĩa các tháng trong năm dưới dạng các hằng số số nguyên. Các thành viên của enumeration này được xuất vào phạm vi module dưới dạng
+   :data:`JANUARY` đến :data:`DECEMBER`.
 
    .. versionadded:: 3.12
 
 
-The :mod:`!calendar` module defines the following exceptions:
+Module :mod:`!calendar` định nghĩa các ngoại lệ sau:
 
 .. exception:: IllegalMonthError(month)
 
-   A subclass of :exc:`ValueError` and :exc:`IndexError`,
-   raised when the given month number is outside of the range 1-12 (inclusive).
+   Một lớp con của :exc:`ValueError` và :exc:`IndexError`, được phát sinh khi số tháng đã cho nằm ngoài phạm vi 1-12 (bao gồm cả hai đầu mút).
 
    .. versionchanged:: 3.12
       :exc:`IllegalMonthError` is now also a subclass of
@@ -554,38 +438,36 @@ The :mod:`!calendar` module defines the following exceptions:
 
    .. attribute:: month
 
-      The invalid month number.
+      Số tháng không hợp lệ.
 
 
 .. exception:: IllegalWeekdayError(weekday)
 
-   A subclass of :exc:`ValueError`,
-   raised when the given weekday number is outside of the range 0-6 (inclusive).
+   Một lớp con của :exc:`ValueError`, được phát sinh khi số thứ tự ngày trong tuần đã cho nằm ngoài phạm vi từ 0 đến 6 (bao gồm cả hai đầu).
 
    .. attribute:: weekday
 
-      The invalid weekday number.
+      Số thứ tự ngày trong tuần không hợp lệ.
 
 
 .. seealso::
 
-   Module :mod:`datetime`
-      Object-oriented interface to dates and times with similar functionality to the
-      :mod:`time` module.
+   Mô-đun :mod:`datetime`
+      Giao diện hướng đối tượng dành cho ngày và giờ với chức năng tương tự như
+      mô-đun :mod:`time`.
 
-   Module :mod:`time`
-      Low-level time related functions.
+   Mô-đun :mod:`time`
+      Các hàm cấp thấp liên quan đến thời gian.
 
 
 .. _calendar-cli:
 
-Command-line usage
-------------------
+Cách sử dụng trên dòng lệnh
+---------------------------
 
 .. versionadded:: 2.5
 
-The :mod:`!calendar` module can be executed as a script from the command line
-to interactively print a calendar.
+Có thể chạy module :mod:`!calendar` dưới dạng script từ dòng lệnh để in lịch theo cách tương tác.
 
 .. code-block:: shell
 
@@ -594,7 +476,7 @@ to interactively print a calendar.
                       [-f FIRST_WEEKDAY] [year] [month]
 
 
-For example, to print a calendar for the year 2000:
+Ví dụ, để in lịch cho năm 2000:
 
 .. code-block:: console
 
@@ -637,94 +519,75 @@ For example, to print a calendar for the year 2000:
    30 31
 
 
-The following options are accepted:
+Các tùy chọn sau được chấp nhận:
 
 .. program:: calendar
 
 
 .. option:: --help, -h
 
-   Show the help message and exit.
+   Hiển thị thông báo trợ giúp rồi thoát.
 
 
 .. option:: --locale LOCALE, -L LOCALE
 
-   The locale to use for month and weekday names.
-   Defaults to English.
+   Locale được sử dụng cho tên tháng và ngày trong tuần. Mặc định là English.
 
 
 .. option:: --encoding ENCODING, -e ENCODING
 
-   The encoding to use for output.
-   :option:`--encoding` is required if :option:`--locale` is set.
+   Encoding được sử dụng cho đầu ra.
+   :option:`--encoding` là bắt buộc nếu :option:`--locale` được thiết lập.
 
 
 .. option:: --type {text,html}, -t {text,html}
 
-   Print the calendar to the terminal as text,
-   or as an HTML document.
+   In lịch ra terminal dưới dạng văn bản hoặc dưới dạng tài liệu HTML.
 
 
 .. option:: --first-weekday FIRST_WEEKDAY, -f FIRST_WEEKDAY
 
-   The weekday to start each week.
-   Must be a number between 0 (Monday) and 6 (Sunday).
-   Defaults to 0.
+   Ngày trong tuần bắt đầu mỗi tuần. Phải là một số từ 0 (Thứ Hai) đến 6 (Chủ Nhật). Mặc định là 0.
 
    .. versionadded:: 3.13
 
 .. option:: year
 
-   The year to print the calendar for.
-   Defaults to the current year.
+   Năm cần in lịch. Mặc định là năm hiện tại.
 
 
 .. option:: month
 
-   The month of the specified :option:`year` to print the calendar for.
-   Must be a number between 1 and 12,
-   and may only be used in text mode.
-   Defaults to printing a calendar for the full year.
+   Tháng của :option:`year` đã chỉ định cần in lịch. Phải là một số từ 1 đến 12 và chỉ có thể được sử dụng ở chế độ văn bản. Mặc định là in lịch cho cả năm.
 
 
-*Text-mode options:*
+*Tùy chọn chế độ văn bản:*
 
 .. option:: --width WIDTH, -w WIDTH
 
-   The width of the date column in terminal columns.
-   The date is printed centred in the column.
-   Any value lower than 2 is ignored.
-   Defaults to 2.
+   Độ rộng của cột ngày theo số cột trong terminal. Ngày được in ở giữa cột. Mọi giá trị nhỏ hơn 2 đều bị bỏ qua. Mặc định là 2.
 
 
 .. option:: --lines LINES, -l LINES
 
-   The number of lines for each week in terminal rows.
-   The date is printed top-aligned.
-   Any value lower than 1 is ignored.
-   Defaults to 1.
+   Số dòng cho mỗi tuần trong các hàng của terminal. Ngày được in căn theo phía trên. Mọi giá trị nhỏ hơn 1 đều bị bỏ qua. Mặc định là 1.
 
 
 .. option:: --spacing SPACING, -s SPACING
 
-   The space between months in columns.
-   Any value lower than 2 is ignored.
-   Defaults to 6.
+   Khoảng cách giữa các tháng theo cột. Mọi giá trị nhỏ hơn 2 đều bị bỏ qua. Mặc định là 6.
 
 
 .. option:: --months MONTHS, -m MONTHS
 
-   The number of months printed per row.
-   Defaults to 3.
+   Số tháng được in trên mỗi hàng. Mặc định là 3.
 
 .. versionchanged:: 3.14
-   By default, today's date is highlighted in color and can be
-   :ref:`controlled using environment variables <using-on-controlling-color>`.
+   Theo mặc định, ngày hôm nay được đánh dấu bằng màu và có thể được
+   :ref:`điều khiển bằng các biến môi trường <using-on-controlling-color>`.
 
-*HTML-mode options:*
+*Các tùy chọn của chế độ HTML:*
 
 .. option:: --css CSS, -c CSS
 
-   The path of a CSS stylesheet to use for the calendar.
-   This must either be relative to the generated HTML,
-   or an absolute HTTP or ``file:///`` URL.
+   Đường dẫn đến stylesheet CSS được sử dụng cho lịch. Đường dẫn này phải là đường dẫn tương đối so với HTML được tạo hoặc là URL HTTP tuyệt đối hoặc ``file:///``.

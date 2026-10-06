@@ -1,38 +1,24 @@
-:mod:`!cmath` --- Mathematical functions for complex numbers
-============================================================
+:mod:`!cmath` --- Các hàm toán học cho số phức
+==============================================
 
 .. module:: cmath
-   :synopsis: Mathematical functions for complex numbers.
+   :synopsis: Các hàm toán học cho số phức.
 
 --------------
 
-This module provides access to mathematical functions for complex numbers.  The
-functions in this module accept integers, floating-point numbers or complex
-numbers as arguments. They will also accept any Python object that has either a
-:meth:`~object.__complex__` or a :meth:`~object.__float__` method: these methods are used to
-convert the object to a complex or floating-point number, respectively, and
-the function is then applied to the result of the conversion.
+Mô-đun này cung cấp quyền truy cập vào các hàm toán học cho số phức. Các hàm trong mô-đun này chấp nhận số nguyên, số thực dấu phẩy động hoặc số phức làm đối số. Chúng cũng chấp nhận bất kỳ đối tượng Python nào có một
+:meth:`~object.__complex__` hoặc phương thức :meth:`~object.__float__`: các phương thức này được dùng để chuyển đổi đối tượng tương ứng thành số phức hoặc số thực dấu phẩy động, sau đó hàm được áp dụng cho kết quả của phép chuyển đổi.
 
 .. note::
 
-   For functions involving branch cuts, we have the problem of deciding how to
-   define those functions on the cut itself. Following Kahan's "Branch cuts for
-   complex elementary functions" paper, as well as Annex G of C99 and later C
-   standards, we use the sign of zero to distinguish one side of the branch cut
-   from the other: for a branch cut along (a portion of) the real axis we look
-   at the sign of the imaginary part, while for a branch cut along the
-   imaginary axis we look at the sign of the real part.
+   Đối với các hàm liên quan đến branch cut, chúng ta phải quyết định cách định nghĩa các hàm đó ngay trên branch cut. Theo bài viết "Branch cuts for complex elementary functions" của Kahan, cũng như Phụ lục G của C99 và các tiêu chuẩn C mới hơn, chúng ta sử dụng dấu của số 0 để phân biệt một phía của branch cut với phía còn lại: đối với branch cut nằm dọc theo (một phần của) trục thực, chúng ta xét dấu của phần ảo, còn đối với branch cut nằm dọc theo trục ảo, chúng ta xét dấu của phần thực.
 
-   For example, the :func:`cmath.sqrt` function has a branch cut along the
-   negative real axis. An argument of ``-2-0j`` is treated as
-   though it lies *below* the branch cut, and so gives a result on the negative
-   imaginary axis::
+   Ví dụ, hàm :func:`cmath.sqrt` có branch cut dọc theo trục thực âm. Đối số ``-2-0j`` được xem như nằm *bên dưới* branch cut, và do đó cho kết quả trên trục ảo âm::
 
       >>> cmath.sqrt(-2-0j)
       -1.4142135623730951j
 
-   But an argument of ``-2+0j`` is treated as though it lies above
-   the branch cut::
+   Nhưng đối số ``-2+0j`` được xem như nằm phía trên branch cut::
 
       >>> cmath.sqrt(-2+0j)
       1.4142135623730951j
@@ -89,30 +75,18 @@ the function is then applied to the result of the conversion.
 ====================================================  ============================================
 
 
-Conversions to and from polar coordinates
------------------------------------------
+Chuyển đổi sang và từ tọa độ cực
+--------------------------------
 
-A Python complex number ``z`` is stored internally using *rectangular*
-or *Cartesian* coordinates.  It is completely determined by its *real
-part* ``z.real`` and its *imaginary part* ``z.imag``.
+Một số phức Python ``z`` được lưu trữ nội bộ bằng tọa độ *rectangular* hoặc *Cartesian*. Nó được xác định hoàn toàn bởi *real part* ``z.real`` và *imaginary part* ``z.imag``.
 
-*Polar coordinates* give an alternative way to represent a complex
-number.  In polar coordinates, a complex number *z* is defined by the
-modulus *r* and the phase angle *phi*. The modulus *r* is the distance
-from *z* to the origin, while the phase *phi* is the counterclockwise
-angle, measured in radians, from the positive x-axis to the line
-segment that joins the origin to *z*.
+*Polar coordinates* cung cấp một cách khác để biểu diễn số phức. Trong tọa độ cực, số phức *z* được xác định bởi mô-đun *r* và góc pha *phi*. Mô-đun *r* là khoảng cách từ *z* đến gốc tọa độ, còn pha *phi* là góc ngược chiều kim đồng hồ, được đo bằng radian, từ trục x dương đến đoạn thẳng nối gốc tọa độ với *z*.
 
-The following functions can be used to convert from the native
-rectangular coordinates to polar coordinates and back.
+Có thể sử dụng các hàm sau để chuyển đổi từ tọa độ chữ nhật gốc sang tọa độ cực và ngược lại.
 
 .. function:: phase(z)
 
-   Return the phase of *z* (also known as the *argument* of *z*), as a float.
-   ``phase(z)`` is equivalent to ``math.atan2(z.imag, z.real)``.  The result
-   lies in the range [-\ *π*, *π*], and the branch cut for this operation lies
-   along the negative real axis.  The sign of the result is the same as the
-   sign of ``z.imag``, even when ``z.imag`` is zero::
+   Trả về pha của *z* (còn được gọi là *argument* của *z*), dưới dạng số thực. ``phase(z)`` tương đương với ``math.atan2(z.imag, z.real)``. Kết quả nằm trong khoảng [-\ *π*, *π*], và branch cut của phép toán này nằm dọc theo trục thực âm. Dấu của kết quả giống với dấu của ``z.imag``, ngay cả khi ``z.imag`` bằng không::
 
       >>> phase(-1+0j)
       3.141592653589793
@@ -122,255 +96,203 @@ rectangular coordinates to polar coordinates and back.
 
 .. note::
 
-   The modulus (absolute value) of a complex number *z* can be
-   computed using the built-in :func:`abs` function.  There is no
-   separate :mod:`!cmath` module function for this operation.
+   Mô-đun (giá trị tuyệt đối) của một số phức *z* có thể được tính bằng hàm :func:`abs` tích hợp sẵn. Không có hàm riêng trong mô-đun :mod:`!cmath` cho phép toán này.
 
 
 .. function:: polar(z)
 
-   Return the representation of *z* in polar coordinates.  Returns a
-   pair ``(r, phi)`` where *r* is the modulus of *z* and *phi* is the
-   phase of *z*.  ``polar(z)`` is equivalent to ``(abs(z),
-   phase(z))``.
+   Trả về biểu diễn của *z* trong tọa độ cực. Trả về một cặp ``(r, phi)`` trong đó *r* là mô-đun của *z* và *phi* là pha của *z*. ``polar(z)`` tương đương với ``(abs(z), phase(z))``.
 
 
 .. function:: rect(r, phi)
 
-   Return the complex number *z* with polar coordinates *r* and *phi*.
-   Equivalent to ``complex(r * math.cos(phi), r * math.sin(phi))``.
+   Trả về số phức *z* có tọa độ cực *r* và *phi*. Tương đương với ``complex(r * math.cos(phi), r * math.sin(phi))``.
 
 
-Power and logarithmic functions
--------------------------------
+Các hàm lũy thừa và logarithm
+-----------------------------
 
 .. function:: exp(z)
 
-   Return *e* raised to the power *z*, where *e* is the base of natural
-   logarithms.
+   Trả về *e* lũy thừa *z*, trong đó *e* là cơ số của logarithm tự nhiên.
 
 
 .. function:: log(z[, base])
 
-   Return the logarithm of *z* to the given *base*. If the *base* is not
-   specified, returns the natural logarithm of *z*. There is one branch cut,
-   from 0 along the negative real axis to -∞.
+   Trả về logarithm của *z* theo *cơ số* đã cho. Nếu không chỉ định *cơ số*, hàm trả về logarithm tự nhiên của *z*. Có một đường cắt nhánh từ 0 dọc theo trục thực âm đến -∞.
 
 
 .. function:: log10(z)
 
-   Return the base-10 logarithm of *z*. This has the same branch cut as
+   Trả về logarithm cơ số 10 của *z*. Hàm này có cùng đường cắt nhánh với
    :func:`log`.
 
 
 .. function:: sqrt(z)
 
-   Return the square root of *z*. This has the same branch cut as :func:`log`.
+   Trả về căn bậc hai của *z*. Hàm này có cùng đường cắt nhánh với :func:`log`.
 
 
-Trigonometric functions
------------------------
+Các hàm lượng giác
+------------------
 
 .. function:: acos(z)
 
-   Return the arc cosine of *z*. There are two branch cuts: One extends right
-   from 1 along the real axis to ∞. The other extends left from -1 along the
-   real axis to -∞.
+   Trả về arc cosine của *z*. Có hai nhánh cắt: Một nhánh kéo dài sang phải từ 1 dọc theo trục thực đến ∞. Nhánh còn lại kéo dài sang trái từ -1 dọc theo trục thực đến -∞.
 
 
 .. function:: asin(z)
 
-   Return the arc sine of *z*. This has the same branch cuts as :func:`acos`.
+   Trả về arc sine của *z*. Hàm này có các nhánh cắt giống như :func:`acos`.
 
 
 .. function:: atan(z)
 
-   Return the arc tangent of *z*. There are two branch cuts: One extends from
-   ``1j`` along the imaginary axis to ``∞j``. The other extends from ``-1j``
-   along the imaginary axis to ``-∞j``.
+   Trả về arc tangent của *z*. Có hai nhánh cắt: Một nhánh kéo dài từ ``1j`` dọc theo trục ảo đến ``∞j``. Nhánh còn lại kéo dài từ ``-1j`` dọc theo trục ảo đến ``-∞j``.
 
 
 .. function:: cos(z)
 
-   Return the cosine of *z*.
+   Trả về cosine của *z*.
 
 
 .. function:: sin(z)
 
-   Return the sine of *z*.
+   Trả về sine của *z*.
 
 
 .. function:: tan(z)
 
-   Return the tangent of *z*.
+   Trả về tangent của *z*.
 
 
-Hyperbolic functions
---------------------
+Các hàm hyperbolic
+------------------
 
 .. function:: acosh(z)
 
-   Return the inverse hyperbolic cosine of *z*. There is one branch cut,
-   extending left from 1 along the real axis to -∞.
+   Trả về cosin hyperbolic nghịch đảo của *z*. Có một nhánh cắt, kéo dài từ 1 về phía bên trái dọc theo trục thực đến -∞.
 
 
 .. function:: asinh(z)
 
-   Return the inverse hyperbolic sine of *z*. There are two branch cuts:
-   One extends from ``1j`` along the imaginary axis to ``∞j``.  The other
-   extends from ``-1j`` along the imaginary axis to ``-∞j``.
+   Trả về sin hyperbolic nghịch đảo của *z*. Có hai nhánh cắt: Một nhánh kéo dài từ ``1j`` dọc theo trục ảo đến ``∞j``. Nhánh còn lại kéo dài từ ``-1j`` dọc theo trục ảo đến ``-∞j``.
 
 
 .. function:: atanh(z)
 
-   Return the inverse hyperbolic tangent of *z*. There are two branch cuts: One
-   extends from ``1`` along the real axis to ``∞``. The other extends from
-   ``-1`` along the real axis to ``-∞``.
+   Trả về tan hyperbolic nghịch đảo của *z*. Có hai nhánh cắt: Một nhánh kéo dài từ ``1`` dọc theo trục thực đến ``∞``. Nhánh còn lại kéo dài từ ``-1`` dọc theo trục thực đến ``-∞``.
 
 
 .. function:: cosh(z)
 
-   Return the hyperbolic cosine of *z*.
+   Trả về cosin hyperbolic của *z*.
 
 
 .. function:: sinh(z)
 
-   Return the hyperbolic sine of *z*.
+   Trả về sin hyperbolic của *z*.
 
 
 .. function:: tanh(z)
 
-   Return the hyperbolic tangent of *z*.
+   Trả về tan hyperbolic của *z*.
 
 
-Classification functions
-------------------------
+Các hàm phân loại
+-----------------
 
 .. function:: isfinite(z)
 
-   Return ``True`` if both the real and imaginary parts of *z* are finite, and
-   ``False`` otherwise.
+   Trả về ``True`` nếu cả phần thực và phần ảo của *z* đều hữu hạn, và ``False`` nếu không.
 
    .. versionadded:: 3.2
 
 
 .. function:: isinf(z)
 
-   Return ``True`` if either the real or the imaginary part of *z* is an
-   infinity, and ``False`` otherwise.
+   Trả về ``True`` nếu phần thực hoặc phần ảo của *z* là vô cực, và ``False`` nếu không.
 
 
 .. function:: isnan(z)
 
-   Return ``True`` if either the real or the imaginary part of *z* is a NaN,
-   and ``False`` otherwise.
+   Trả về ``True`` nếu phần thực hoặc phần ảo của *z* là NaN, và ``False`` nếu không.
 
 
 .. function:: isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0)
 
-   Return ``True`` if the values *a* and *b* are close to each other and
-   ``False`` otherwise.
+   Trả về ``True`` nếu các giá trị *a* và *b* gần bằng nhau, và ``False`` nếu không.
 
-   Whether or not two values are considered close is determined according to
-   given absolute and relative tolerances.  If no errors occur, the result will
-   be: ``abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)``.
+   Việc hai giá trị có được xem là gần bằng nhau hay không được xác định theo các dung sai tuyệt đối và tương đối đã cho. Nếu không xảy ra lỗi, kết quả sẽ là: ``abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)``.
 
-   *rel_tol* is the relative tolerance -- it is the maximum allowed difference
-   between *a* and *b*, relative to the larger absolute value of *a* or *b*.
-   For example, to set a tolerance of 5%, pass ``rel_tol=0.05``.  The default
-   tolerance is ``1e-09``, which assures that the two values are the same
-   within about 9 decimal digits.  *rel_tol* must be nonnegative and less
-   than ``1.0``.
+   *rel_tol* là dung sai tương đối -- đây là độ chênh lệch tối đa được phép giữa *a* và *b*, so với giá trị tuyệt đối lớn hơn của *a* hoặc *b*. Ví dụ, để đặt dung sai 5%, hãy truyền ``rel_tol=0.05``. Dung sai mặc định là ``1e-09``, đảm bảo rằng hai giá trị giống nhau trong khoảng 9 chữ số thập phân. *rel_tol* phải không âm và nhỏ hơn ``1.0``.
 
-   *abs_tol* is the absolute tolerance; it defaults to ``0.0`` and it must be
-   nonnegative.  When comparing ``x`` to ``0.0``, ``isclose(x, 0)`` is computed
-   as ``abs(x) <= rel_tol  * abs(x)``, which is ``False`` for any ``x`` and
-   rel_tol less than ``1.0``.  So add an appropriate positive abs_tol argument
-   to the call.
+   *abs_tol* là dung sai tuyệt đối; giá trị mặc định là ``0.0`` và nó phải không âm. Khi so sánh ``x`` với ``0.0``, ``isclose(x, 0)`` được tính là ``abs(x) <= rel_tol  * abs(x)``, giá trị này bằng ``False`` với mọi ``x`` và rel_tol nhỏ hơn ``1.0``. Vì vậy, hãy thêm đối số abs_tol dương thích hợp vào lời gọi.
 
-   The IEEE 754 special values of ``NaN``, ``inf``, and ``-inf`` will be
-   handled according to IEEE rules.  Specifically, ``NaN`` is not considered
-   close to any other value, including ``NaN``.  ``inf`` and ``-inf`` are only
-   considered close to themselves.
+   Các giá trị đặc biệt của IEEE 754 là ``NaN``, ``inf`` và ``-inf`` sẽ được xử lý theo các quy tắc của IEEE. Cụ thể, ``NaN`` không được xem là gần với bất kỳ giá trị nào khác, kể cả ``NaN``. ``inf`` và ``-inf`` chỉ được xem là gần với chính chúng.
 
    .. versionadded:: 3.5
 
    .. seealso::
 
-      :pep:`485` -- A function for testing approximate equality
+      :pep:`485` -- Một hàm dùng để kiểm tra tính bằng nhau xấp xỉ
 
 
-Constants
----------
+Hằng số
+-------
 
 .. data:: pi
 
-   The mathematical constant *π*, as a float.
+   Hằng số toán học *π*, dưới dạng số thực dấu phẩy động.
 
 
 .. data:: e
 
-   The mathematical constant *e*, as a float.
+   Hằng số toán học *e*, dưới dạng số thực dấu phẩy động.
 
 
 .. data:: tau
 
-   The mathematical constant *τ*, as a float.
+   Hằng số toán học *τ*, dưới dạng số thực dấu phẩy động.
 
    .. versionadded:: 3.6
 
 
 .. data:: inf
 
-   Floating-point positive infinity. Equivalent to ``float('inf')``.
+   Vô cực dương dấu phẩy động. Tương đương với ``float('inf')``.
 
    .. versionadded:: 3.6
 
 
 .. data:: infj
 
-   Complex number with zero real part and positive infinity imaginary
-   part. Equivalent to ``complex(0.0, float('inf'))``.
+   Số phức có phần thực bằng không và phần ảo là dương vô cực. Tương đương với ``complex(0.0, float('inf'))``.
 
    .. versionadded:: 3.6
 
 
 .. data:: nan
 
-   A floating-point "not a number" (NaN) value.  Equivalent to
-   ``float('nan')``. See also :data:`math.nan`.
+   Giá trị dấu phẩy động "không phải là một số" (NaN). Tương đương với ``float('nan')``. Xem thêm :data:`math.nan`.
 
    .. versionadded:: 3.6
 
 
 .. data:: nanj
 
-   Complex number with zero real part and NaN imaginary part. Equivalent to
-   ``complex(0.0, float('nan'))``.
+   Số phức có phần thực bằng không và phần ảo là NaN. Tương đương với ``complex(0.0, float('nan'))``.
 
    .. versionadded:: 3.6
 
 
 .. index:: pair: module; math
 
-Note that the selection of functions is similar, but not identical, to that in
-module :mod:`math`.  The reason for having two modules is that some users aren't
-interested in complex numbers, and perhaps don't even know what they are.  They
-would rather have ``math.sqrt(-1)`` raise an exception than return a complex
-number. Also note that the functions defined in :mod:`!cmath` always return a
-complex number, even if the answer can be expressed as a real number (in which
-case the complex number has an imaginary part of zero).
+Lưu ý rằng tập hợp các hàm tương tự, nhưng không hoàn toàn giống, tập hợp trong module :mod:`math`. Lý do có hai module là vì một số người dùng không quan tâm đến số phức, và có thể thậm chí không biết chúng là gì. Họ muốn ``math.sqrt(-1)`` phát sinh một ngoại lệ thay vì trả về một số phức. Cũng lưu ý rằng các hàm được định nghĩa trong :mod:`!cmath` luôn trả về một số phức, ngay cả khi kết quả có thể được biểu diễn dưới dạng số thực (trong trường hợp đó, số phức có phần ảo bằng không).
 
-A note on branch cuts: They are curves along which the given function fails to
-be continuous.  They are a necessary feature of many complex functions.  It is
-assumed that if you need to compute with complex functions, you will understand
-about branch cuts.  Consult almost any (not too elementary) book on complex
-variables for enlightenment.  For information of the proper choice of branch
-cuts for numerical purposes, a good reference should be the following:
+Lưu ý về các nhánh cắt: Đó là những đường cong mà trên đó hàm đã cho không liên tục. Chúng là một đặc điểm cần thiết của nhiều hàm phức. Giả định rằng nếu cần tính toán với các hàm phức, bạn sẽ hiểu về các nhánh cắt. Hãy tham khảo hầu như bất kỳ cuốn sách nào về biến phức (không quá nhập môn) để hiểu rõ hơn. Để biết thông tin về lựa chọn nhánh cắt phù hợp cho mục đích tính toán số, tài liệu tham khảo tốt là bài viết sau:
 
 
 .. seealso::
 
-   Kahan, W:  Branch cuts for complex elementary functions; or, Much ado about
-   nothing's sign bit.  In Iserles, A., and Powell, M. (eds.), The state of the art
-   in numerical analysis. Clarendon Press (1987) pp165--211.
+   Kahan, W: Các nhánh cắt cho các hàm sơ cấp phức; hay, Chuyện bé xé ra to về bit dấu của số không. Trong Iserles, A. và Powell, M. (biên tập), Tình hình hiện tại trong phân tích số. Clarendon Press (1987), trang 165--211.

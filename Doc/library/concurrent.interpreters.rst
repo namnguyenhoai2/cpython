@@ -1,40 +1,34 @@
-:mod:`!concurrent.interpreters` --- Multiple interpreters in the same process
-=============================================================================
+:mod:`!concurrent.interpreters` --- Nhiều trình thông dịch trong cùng một tiến trình
+====================================================================================
 
 .. module:: concurrent.interpreters
-   :synopsis: Multiple interpreters in the same process
+   :synopsis: Nhiều trình thông dịch trong cùng một tiến trình
 
 .. moduleauthor:: Eric Snow <ericsnowcurrently@gmail.com>
 .. sectionauthor:: Eric Snow <ericsnowcurrently@gmail.com>
 
 .. versionadded:: 3.14
 
-**Source code:** :source:`Lib/concurrent/interpreters`
+**Mã nguồn:** :source:`Lib/concurrent/interpreters`
 
 --------------
 
-The :mod:`!concurrent.interpreters` module constructs higher-level
-interfaces on top of the lower level :mod:`!_interpreters` module.
+Module :mod:`!concurrent.interpreters` xây dựng các giao diện cấp cao hơn dựa trên module cấp thấp hơn :mod:`!_interpreters`.
 
-The module is primarily meant to provide a basic API for managing
-interpreters (AKA "subinterpreters") and running things in them.
-Running mostly involves switching to an interpreter (in the current
-thread) and calling a function in that execution context.
+Module này chủ yếu cung cấp một API cơ bản để quản lý các interpreter (còn gọi là "subinterpreter") và chạy các tác vụ trong đó. Việc chạy chủ yếu bao gồm chuyển sang một interpreter (trong thread hiện tại) và gọi một hàm trong ngữ cảnh thực thi đó.
 
-For concurrency, interpreters themselves (and this module) don't
-provide much more than isolation, which on its own isn't useful.
-Actual concurrency is available separately through
-:mod:`threads <threading>` -- see `below <interp-concurrency_>`_.
+Đối với tính đồng thời, bản thân các interpreter (và module này) không cung cấp nhiều hơn khả năng cô lập, mà riêng khả năng này thì không hữu ích. Tính đồng thời thực sự có sẵn riêng thông qua
+:mod:`threads <threading>` -- xem `bên dưới <interp-concurrency_>`_.
 
 .. seealso::
 
    :class:`~concurrent.futures.InterpreterPoolExecutor`
-      Combines threads with interpreters in a familiar interface.
+      Kết hợp thread với interpreter trong một giao diện quen thuộc.
 
    .. XXX Add references to the upcoming HOWTO docs in the seealso block.
 
    :ref:`isolating-extensions-howto`
-      How to update an extension module to support multiple interpreters.
+      Cách cập nhật một extension module để hỗ trợ nhiều interpreter.
 
    :pep:`554`
 
@@ -47,317 +41,238 @@ Actual concurrency is available separately through
 .. include:: ../includes/wasm-notavail.rst
 
 
-Key details
------------
+Thông tin chi tiết chính
+------------------------
 
-Before we dive in further, there are a small number of details
-to keep in mind about using multiple interpreters:
+Trước khi tìm hiểu sâu hơn, có một số ít chi tiết cần lưu ý khi sử dụng nhiều interpreter:
 
-* `isolated <interp-isolation_>`_, by default
-* no implicit threads
-* not all PyPI packages support use in multiple interpreters yet
+* `cô lập <interp-isolation_>`_, theo mặc định
+* không có thread ngầm định
+* chưa phải mọi package trên PyPI đều hỗ trợ sử dụng trong nhiều interpreter
 
 .. XXX Are there other relevant details to list?
 
 
 .. _interpreters-intro:
 
-Introduction
-------------
+Giới thiệu
+----------
 
-An "interpreter" is effectively the execution context of the Python
-runtime.  It contains all of the state the runtime needs to execute
-a program.  This includes things like the import state and builtins.
-(Each thread, even if there's only the main thread, has some extra
-runtime state, in addition to the current interpreter, related to
-the current exception and the bytecode eval loop.)
+"Trình thông dịch" về cơ bản là context thực thi của Python runtime. Nó chứa mọi trạng thái mà runtime cần để thực thi một chương trình. Những trạng thái này bao gồm import state và builtins. (Mỗi thread, ngay cả khi chỉ có main thread, đều có một số trạng thái runtime bổ sung, bên cạnh interpreter hiện tại, liên quan đến exception hiện tại và vòng lặp đánh giá bytecode.)
 
-The concept and functionality of the interpreter have been a part of
-Python since version 2.2, but the feature was only available through
-the C-API and not well known, and the `isolation <interp-isolation_>`_
-was relatively incomplete until version 3.12.
+Khái niệm và chức năng của interpreter đã là một phần của Python kể từ phiên bản 2.2, nhưng tính năng này chỉ khả dụng thông qua C-API và không được nhiều người biết đến; `tính cô lập <interp-isolation_>`_ cũng tương đối chưa hoàn thiện cho đến phiên bản 3.12.
 
 .. _interp-isolation:
 
-Multiple Interpreters and Isolation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Nhiều Interpreter và Tính cô lập
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A Python implementation may support using multiple interpreters in the
-same process.  CPython has this support.  Each interpreter is
-effectively isolated from the others (with a limited number of
-carefully managed process-global exceptions to the rule).
+Một triển khai Python có thể hỗ trợ sử dụng nhiều interpreter trong cùng một process. CPython có hỗ trợ này. Mỗi interpreter về cơ bản được cô lập khỏi các interpreter khác (với một số ít ngoại lệ ở cấp process được quản lý cẩn thận đối với quy tắc này).
 
-That isolation is primarily useful as a strong separation between
-distinct logical components of a program, where you want to have
-careful control of how those components interact.
+Tính cô lập đó chủ yếu hữu ích như một sự phân tách chặt chẽ giữa các thành phần logic riêng biệt của một chương trình, khi bạn muốn kiểm soát cẩn thận cách các thành phần đó tương tác với nhau.
 
 .. note::
 
-   Interpreters in the same process can technically never be strictly
-   isolated from one another since there are few restrictions on memory
-   access within the same process.  The Python runtime makes a best
-   effort at isolation but extension modules may easily violate that.
-   Therefore, do not use multiple interpreters in security-sensitive
-   situations, where they shouldn't have access to each other's data.
+   Về mặt kỹ thuật, các interpreter trong cùng một process không bao giờ có thể được cô lập hoàn toàn khỏi nhau, vì có rất ít hạn chế đối với việc truy cập bộ nhớ trong cùng process. Python runtime cố gắng hết sức để duy trì tính cô lập, nhưng các extension module có thể dễ dàng vi phạm điều đó. Vì vậy, không sử dụng nhiều interpreter trong các tình huống nhạy cảm về bảo mật, khi chúng không nên có quyền truy cập vào dữ liệu của nhau.
 
-Running in an Interpreter
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Chạy trong một Interpreter
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Running in a different interpreter involves switching to it in the
-current thread and then calling some function.  The runtime will
-execute the function using the current interpreter's state.  The
-:mod:`!concurrent.interpreters` module provides a basic API for
-creating and managing interpreters, as well as the switch-and-call
-operation.
+Việc chạy trong một interpreter khác bao gồm chuyển sang interpreter đó trong thread hiện tại, sau đó gọi một hàm. Runtime sẽ thực thi hàm bằng trạng thái của interpreter hiện tại.
+:mod:`!concurrent.interpreters` module cung cấp API cơ bản để tạo và quản lý các interpreter, cũng như thực hiện thao tác chuyển đổi và gọi.
 
-No other threads are automatically started for the operation.
-There is `a helper <interp-call-in-thread_>`_ for that though.
-There is another dedicated helper for calling the builtin
-:func:`exec` in an interpreter.
+Không có thread nào khác được tự động khởi động cho thao tác này. Tuy nhiên, có `một hàm trợ giúp <interp-call-in-thread_>`_ cho việc đó. Ngoài ra còn có một hàm trợ giúp chuyên dụng khác để gọi hàm builtin
+:func:`exec` trong một interpreter.
 
-When :func:`exec` (or :func:`eval`) are called in an interpreter,
-they run using the interpreter's :mod:`!__main__` module as the
-"globals" namespace.  The same is true for functions that aren't
-associated with any module.  This is the same as how scripts invoked
-from the command-line run in the :mod:`!__main__` module.
+Khi :func:`exec` (hoặc :func:`eval`) được gọi trong một interpreter, chúng chạy bằng module :mod:`!__main__` của interpreter đó làm namespace "globals". Điều tương tự cũng đúng với các hàm không liên kết với module nào. Đây cũng là cách các script được gọi từ dòng lệnh chạy trong module :mod:`!__main__`.
 
 
 .. _interp-concurrency:
 
-Concurrency and Parallelism
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tính đồng thời và tính song song
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As noted earlier, interpreters do not provide any concurrency
-on their own.  They strictly represent the isolated execution
-context the runtime will use *in the current thread*.  That isolation
-makes them similar to processes, but they still enjoy in-process
-efficiency, like threads.
+Như đã lưu ý trước đó, các interpreter không tự cung cấp bất kỳ khả năng concurrency nào. Chúng chỉ đơn thuần biểu diễn context thực thi bị cô lập mà runtime sẽ sử dụng *trong thread hiện tại*. Sự cô lập đó khiến chúng tương tự như các process, nhưng chúng vẫn có được hiệu quả trong process, giống như các thread.
 
-All that said, interpreters do naturally support certain flavors of
-concurrency.
-There's a powerful side effect of that isolation.  It enables a
-different approach to concurrency than you can take with async or
-threads.  It's a similar concurrency model to CSP or the actor model,
-a model which is relatively easy to reason about.
+Dù vậy, các interpreter vẫn tự nhiên hỗ trợ một số dạng concurrency nhất định. Sự cô lập đó mang lại một tác động phụ mạnh mẽ. Nó cho phép một cách tiếp cận concurrency khác với cách bạn có thể thực hiện bằng async hoặc thread. Đây là một mô hình concurrency tương tự CSP hoặc mô hình actor, một mô hình tương đối dễ suy luận.
 
-You can take advantage of that concurrency model in a single thread,
-switching back and forth between interpreters, Stackless-style.
-However, this model is more useful when you combine interpreters
-with multiple threads.  This mostly involves starting a new thread,
-where you switch to another interpreter and run what you want there.
+Bạn có thể tận dụng mô hình concurrency đó trong một thread duy nhất bằng cách chuyển đổi qua lại giữa các interpreter, theo phong cách Stackless. Tuy nhiên, mô hình này hữu ích hơn khi bạn kết hợp các interpreter với nhiều thread. Điều này chủ yếu bao gồm việc khởi động một thread mới, chuyển sang một interpreter khác rồi chạy nội dung bạn muốn ở đó.
 
-Each actual thread in Python, even if you're only running in the main
-thread, has its own *current* execution context.  Multiple threads can
-use the same interpreter or different ones.
+Mỗi thread thực tế trong Python, ngay cả khi bạn chỉ chạy trong thread chính, đều có context thực thi *hiện tại* riêng. Nhiều thread có thể sử dụng cùng một interpreter hoặc các interpreter khác nhau.
 
-At a high level, you can think of the combination of threads and
-interpreters as threads with opt-in sharing.
+Ở cấp độ khái quát, bạn có thể hình dung sự kết hợp giữa các thread và interpreter là các thread có cơ chế chia sẻ tùy chọn.
 
-As a significant bonus, interpreters are sufficiently isolated that
-they do not share the :term:`GIL`, which means combining threads with
-multiple interpreters enables full multi-core parallelism.
-(This has been the case since Python 3.12.)
+Một lợi ích đáng kể là các interpreter được cô lập đủ tốt để không chia sẻ :term:`GIL`, điều này có nghĩa là việc kết hợp các thread với nhiều interpreter cho phép đạt được khả năng parallelism đa lõi hoàn toàn. (Điều này đã đúng kể từ Python 3.12.)
 
-Communication Between Interpreters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Giao tiếp giữa các Interpreter
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In practice, multiple interpreters are useful only if we have a way
-to communicate between them.  This usually involves some form of
-message passing, but can even mean sharing data in some carefully
-managed way.
+Trong thực tế, nhiều interpreter chỉ hữu ích khi chúng ta có cách giao tiếp giữa chúng. Điều này thường liên quan đến một dạng truyền thông điệp nào đó, nhưng thậm chí có thể là việc chia sẻ dữ liệu theo một cách được quản lý cẩn thận.
 
-With this in mind, the :mod:`!concurrent.interpreters` module provides
-a :class:`queue.Queue` implementation, available through
+Với suy nghĩ đó, module :mod:`!concurrent.interpreters` cung cấp một implementation :class:`queue.Queue`, có thể truy cập thông qua
 :func:`create_queue`.
 
 .. _interp-object-sharing:
 
-"Sharing" Objects
-^^^^^^^^^^^^^^^^^
+Các đối tượng "chia sẻ"
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Any data actually shared between interpreters loses the thread-safety
-provided by the :term:`GIL`.  There are various options for dealing with
-this in extension modules.  However, from Python code the lack of
-thread-safety means objects can't actually be shared, with a few
-exceptions.  Instead, a copy must be created, which means mutable
-objects won't stay in sync.
+Mọi dữ liệu thực sự được chia sẻ giữa các interpreter đều mất đi tính an toàn luồng do :term:`GIL` cung cấp. Có nhiều lựa chọn khác nhau để xử lý việc này trong các extension module. Tuy nhiên, từ mã Python, việc thiếu tính an toàn luồng có nghĩa là các đối tượng thực sự không thể được chia sẻ, ngoại trừ một vài trường hợp. Thay vào đó, phải tạo một bản sao, nghĩa là các đối tượng mutable sẽ không còn được đồng bộ.
 
-By default, most objects are copied with :mod:`pickle` when they are
-passed to another interpreter.  Nearly all of the immutable builtin
-objects are either directly shared or copied efficiently.  For example:
+Theo mặc định, hầu hết các đối tượng được sao chép bằng :mod:`pickle` khi được truyền sang một interpreter khác. Gần như tất cả các đối tượng builtin immutable đều được chia sẻ trực tiếp hoặc sao chép hiệu quả. Ví dụ:
 
 * :const:`None`
-* :class:`bool` (:const:`True` and :const:`False`)
+* :class:`bool` (:const:`True` và :const:`False`)
 * :class:`bytes`
 * :class:`str`
 * :class:`int`
 * :class:`float`
-* :class:`tuple` (of similarly supported objects)
+* :class:`tuple` (các đối tượng được hỗ trợ tương tự)
 
-There are a small number of Python types that actually share mutable
-data between interpreters:
+Có một số ít kiểu Python thực sự chia sẻ dữ liệu có thể thay đổi giữa các trình thông dịch:
 
 * :class:`memoryview`
 * :class:`Queue`
 
 
-Reference
----------
+Tham chiếu
+----------
 
-This module defines the following functions:
+Mô-đun này định nghĩa các hàm sau:
 
 .. function:: list_all()
 
-   Return a :class:`list` of :class:`Interpreter` objects,
-   one for each existing interpreter.
+   Trả về một :class:`list` gồm các đối tượng :class:`Interpreter`, mỗi đối tượng tương ứng với một trình thông dịch hiện có.
 
 .. function:: get_current()
 
-   Return an :class:`Interpreter` object for the currently running
-   interpreter.
+   Trả về một đối tượng :class:`Interpreter` cho trình thông dịch hiện đang chạy.
 
 .. function:: get_main()
 
-   Return an :class:`Interpreter` object for the main interpreter.
-   This is the interpreter the runtime created to run the :term:`REPL`
-   or the script given at the command-line.  It is usually the only one.
+   Trả về một đối tượng :class:`Interpreter` cho trình thông dịch chính. Đây là trình thông dịch mà runtime tạo ra để chạy :term:`REPL` hoặc tập lệnh được cung cấp trên dòng lệnh. Thông thường, đây là trình thông dịch duy nhất.
 
 .. function:: create()
 
-   Initialize a new (idle) Python interpreter
-   and return a :class:`Interpreter` object for it.
+   Khởi tạo một trình thông dịch Python mới (đang rảnh) và trả về một đối tượng :class:`Interpreter` cho trình thông dịch đó.
 
 .. function:: create_queue()
 
-   Initialize a new cross-interpreter queue and return a :class:`Queue`
-   object for it.
+   Khởi tạo một hàng đợi liên interpreter mới và trả về một đối tượng :class:`Queue` cho hàng đợi đó.
 
 
-Interpreter objects
-^^^^^^^^^^^^^^^^^^^
+Các đối tượng interpreter
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: Interpreter(id)
 
-   A single interpreter in the current process.
+   Một interpreter duy nhất trong process hiện tại.
 
-   Generally, :class:`Interpreter` shouldn't be called directly.
-   Instead, use :func:`create` or one of the other module functions.
+   Thông thường, không nên gọi :class:`Interpreter` trực tiếp. Thay vào đó, hãy sử dụng :func:`create` hoặc một trong các hàm khác của module.
 
    .. attribute:: id
 
-      (read-only)
+      (chỉ đọc)
 
-      The underlying interpreter's ID.
+      ID của interpreter bên dưới.
 
    .. attribute:: whence
 
-      (read-only)
+      (chỉ đọc)
 
-      A string describing where the interpreter came from.
+      Một chuỗi mô tả nguồn gốc của trình thông dịch.
 
    .. method:: is_running()
 
-      Return ``True`` if the interpreter is currently executing code
-      in its :mod:`!__main__` module and ``False`` otherwise.
+      Trả về ``True`` nếu trình thông dịch hiện đang thực thi mã trong mô-đun :mod:`!__main__` của nó và ``False`` trong trường hợp ngược lại.
 
    .. method:: close()
 
-      Finalize and destroy the interpreter.
+      Hoàn tất và hủy trình thông dịch.
 
    .. method:: prepare_main(ns=None, **kwargs)
 
-      Bind objects in the interpreter's :mod:`!__main__` module.
+      Liên kết các đối tượng trong mô-đun :mod:`!__main__` của trình thông dịch.
 
-      Some objects are actually shared and some are copied efficiently,
-      but most are copied via :mod:`pickle`.  See :ref:`interp-object-sharing`.
+      Một số đối tượng thực sự được dùng chung và một số được sao chép một cách hiệu quả, nhưng hầu hết được sao chép thông qua :mod:`pickle`. Xem :ref:`interp-object-sharing`.
 
    .. method:: exec(code, /, dedent=True)
 
-      Run the given source code in the interpreter (in the current thread).
+      Chạy mã nguồn đã cho trong trình thông dịch (trong luồng hiện tại).
 
    .. method:: call(callable, /, *args, **kwargs)
 
-      Return the result of running the given function in the
-      interpreter (in the current thread).
+      Trả về kết quả của việc chạy hàm đã cho trong trình thông dịch (trong luồng hiện tại).
 
    .. _interp-call-in-thread:
 
    .. method:: call_in_thread(callable, /, *args, **kwargs)
 
-      Run the given function in the interpreter (in a new thread).
+      Chạy hàm đã cho trong interpreter (trong một thread mới).
 
-Exceptions
-^^^^^^^^^^
+Ngoại lệ
+^^^^^^^^
 
 .. exception:: InterpreterError
 
-   This exception, a subclass of :exc:`Exception`, is raised when
-   an interpreter-related error happens.
+   Ngoại lệ này, là một lớp con của :exc:`Exception`, được phát sinh khi xảy ra lỗi liên quan đến interpreter.
 
 .. exception:: InterpreterNotFoundError
 
-   This exception, a subclass of :exc:`InterpreterError`, is raised when
-   the targeted interpreter no longer exists.
+   Ngoại lệ này, là một lớp con của :exc:`InterpreterError`, được phát sinh khi interpreter đích không còn tồn tại.
 
 .. exception:: ExecutionFailed
 
-   This exception, a subclass of :exc:`InterpreterError`, is raised when
-   the running code raised an uncaught exception.
+   Ngoại lệ này, là một lớp con của :exc:`InterpreterError`, được phát sinh khi code đang chạy phát sinh một ngoại lệ chưa được bắt.
 
    .. attribute:: excinfo
 
-      A basic snapshot of the exception raised in the other interpreter.
+      Ảnh chụp cơ bản của ngoại lệ được phát sinh trong interpreter khác.
 
 .. XXX Document the excinfoattrs?
 
 .. exception:: NotShareableError
 
-   This exception, a subclass of :exc:`TypeError`, is raised when
-   an object cannot be sent to another interpreter.
+   Ngoại lệ này, là một lớp con của :exc:`TypeError`, được phát sinh khi không thể gửi một đối tượng đến interpreter khác.
 
 
-Communicating Between Interpreters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Giao tiếp giữa các trình thông dịch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: Queue(id)
 
-   A wrapper around a low-level, cross-interpreter queue, which
-   implements the :class:`queue.Queue` interface.  The underlying queue
-   can only be created through :func:`create_queue`.
+   Một wrapper cho hàng đợi cấp thấp, liên trình thông dịch, triển khai giao diện :class:`queue.Queue`. Hàng đợi nền tảng chỉ có thể được tạo thông qua :func:`create_queue`.
 
-   Some objects are actually shared and some are copied efficiently,
-   but most are copied via :mod:`pickle`.  See :ref:`interp-object-sharing`.
+   Một số đối tượng thực sự được dùng chung và một số được sao chép một cách hiệu quả, nhưng hầu hết được sao chép thông qua :mod:`pickle`. Xem :ref:`interp-object-sharing`.
 
    .. attribute:: id
 
-      (read-only)
+      (chỉ đọc)
 
-      The queue's ID.
+      ID của hàng đợi.
 
 
 .. exception:: QueueEmptyError
 
-   This exception, a subclass of :exc:`queue.Empty`, is raised from
-   :meth:`!Queue.get` and :meth:`!Queue.get_nowait` when the queue
-   is empty.
+   Ngoại lệ này, là một lớp con của :exc:`queue.Empty`, được phát sinh từ
+   :meth:`!Queue.get` và :meth:`!Queue.get_nowait` khi hàng đợi trống.
 
 .. exception:: QueueFullError
 
-   This exception, a subclass of :exc:`queue.Full`, is raised from
-   :meth:`!Queue.put` and :meth:`!Queue.put_nowait` when the queue
-   is full.
+   Ngoại lệ này, một lớp con của :exc:`queue.Full`, được phát sinh từ
+   :meth:`!Queue.put` và :meth:`!Queue.put_nowait` khi hàng đợi đầy.
 
 
-Basic usage
------------
+Cách sử dụng cơ bản
+-------------------
 
-Creating an interpreter and running code in it::
+Tạo một interpreter và chạy mã trong đó::
 
     from concurrent import interpreters
 
     interp = interpreters.create()
 
-    # Run in the current OS thread.
+    # Chạy trong luồng hệ điều hành hiện tại.
 
     interp.exec('print("spam!")')
 
@@ -381,7 +296,12 @@ Creating an interpreter and running code in it::
 
     interp.call(run)
 
-    # Run in new OS thread.
+    # Chạy trong luồng hệ điều hành mới.
 
     t = interp.call_in_thread(run)
     t.join()
+
+.. _`below`: interp-concurrency_
+.. _`isolated`: interp-isolation_
+.. _`isolation`: interp-isolation_
+.. _`a helper`: interp-call-in-thread_

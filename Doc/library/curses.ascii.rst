@@ -1,213 +1,196 @@
-:mod:`!curses.ascii` --- Utilities for ASCII characters
-=======================================================
+:mod:`!curses.ascii` --- Các tiện ích cho ký tự ASCII
+=====================================================
 
 .. module:: curses.ascii
-   :synopsis: Constants and set-membership functions for ASCII characters.
+   :synopsis: Các hằng số và hàm kiểm tra tư cách thành viên cho ký tự ASCII.
 
 .. moduleauthor:: Eric S. Raymond <esr@thyrsus.com>
 .. sectionauthor:: Eric S. Raymond <esr@thyrsus.com>
 
-**Source code:** :source:`Lib/curses/ascii.py`
+**Mã nguồn:** :source:`Lib/curses/ascii.py`
 
 --------------
 
-The :mod:`!curses.ascii` module supplies name constants for ASCII characters and
-functions to test membership in various ASCII character classes.  The constants
-supplied are names for control characters as follows:
+Mô-đun :mod:`!curses.ascii` cung cấp các hằng số tên cho ký tự ASCII và các hàm để kiểm tra tư cách thành viên trong nhiều lớp ký tự ASCII khác nhau. Các hằng số được cung cấp là tên của các ký tự điều khiển như sau:
 
-+---------------+----------------------------------------------+
-| Name          | Meaning                                      |
-+===============+==============================================+
-| .. data:: NUL |                                              |
-+---------------+----------------------------------------------+
-| .. data:: SOH | Start of heading, console interrupt          |
-+---------------+----------------------------------------------+
-| .. data:: STX | Start of text                                |
-+---------------+----------------------------------------------+
-| .. data:: ETX | End of text                                  |
-+---------------+----------------------------------------------+
-| .. data:: EOT | End of transmission                          |
-+---------------+----------------------------------------------+
-| .. data:: ENQ | Enquiry, goes with :const:`ACK` flow control |
-+---------------+----------------------------------------------+
-| .. data:: ACK | Acknowledgement                              |
-+---------------+----------------------------------------------+
-| .. data:: BEL | Bell                                         |
-+---------------+----------------------------------------------+
-| .. data:: BS  | Backspace                                    |
-+---------------+----------------------------------------------+
-| .. data:: TAB | Tab                                          |
-+---------------+----------------------------------------------+
-| .. data:: HT  | Alias for :const:`TAB`: "Horizontal tab"     |
-+---------------+----------------------------------------------+
-| .. data:: LF  | Line feed                                    |
-+---------------+----------------------------------------------+
-| .. data:: NL  | Alias for :const:`LF`: "New line"            |
-+---------------+----------------------------------------------+
-| .. data:: VT  | Vertical tab                                 |
-+---------------+----------------------------------------------+
-| .. data:: FF  | Form feed                                    |
-+---------------+----------------------------------------------+
-| .. data:: CR  | Carriage return                              |
-+---------------+----------------------------------------------+
-| .. data:: SO  | Shift-out, begin alternate character set     |
-+---------------+----------------------------------------------+
-| .. data:: SI  | Shift-in, resume default character set       |
-+---------------+----------------------------------------------+
-| .. data:: DLE | Data-link escape                             |
-+---------------+----------------------------------------------+
-| .. data:: DC1 | XON, for flow control                        |
-+---------------+----------------------------------------------+
-| .. data:: DC2 | Device control 2, block-mode flow control    |
-+---------------+----------------------------------------------+
-| .. data:: DC3 | XOFF, for flow control                       |
-+---------------+----------------------------------------------+
-| .. data:: DC4 | Device control 4                             |
-+---------------+----------------------------------------------+
-| .. data:: NAK | Negative acknowledgement                     |
-+---------------+----------------------------------------------+
-| .. data:: SYN | Synchronous idle                             |
-+---------------+----------------------------------------------+
-| .. data:: ETB | End transmission block                       |
-+---------------+----------------------------------------------+
-| .. data:: CAN | Cancel                                       |
-+---------------+----------------------------------------------+
-| .. data:: EM  | End of medium                                |
-+---------------+----------------------------------------------+
-| .. data:: SUB | Substitute                                   |
-+---------------+----------------------------------------------+
-| .. data:: ESC | Escape                                       |
-+---------------+----------------------------------------------+
-| .. data:: FS  | File separator                               |
-+---------------+----------------------------------------------+
-| .. data:: GS  | Group separator                              |
-+---------------+----------------------------------------------+
-| .. data:: RS  | Record separator, block-mode terminator      |
-+---------------+----------------------------------------------+
-| .. data:: US  | Unit separator                               |
-+---------------+----------------------------------------------+
-| .. data:: SP  | Space                                        |
-+---------------+----------------------------------------------+
-| .. data:: DEL | Delete                                       |
-+---------------+----------------------------------------------+
++---------------+-------------------------------------------------------+
+| Tên           | Ý nghĩa                                               |
++===============+=======================================================+
+| .. data:: NUL |                                                       |
++---------------+-------------------------------------------------------+
+| .. data:: SOH | Bắt đầu tiêu đề, ngắt console                         |
++---------------+-------------------------------------------------------+
+| .. data:: STX | Bắt đầu văn bản                                       |
++---------------+-------------------------------------------------------+
+| .. data:: ETX | Kết thúc văn bản                                      |
++---------------+-------------------------------------------------------+
+| .. data:: EOT | Kết thúc truyền tin                                   |
++---------------+-------------------------------------------------------+
+| .. data:: ENQ | Yêu cầu, đi kèm với điều khiển luồng :const:`ACK`     |
++---------------+-------------------------------------------------------+
+| .. data:: ACK | Xác nhận                                              |
++---------------+-------------------------------------------------------+
+| .. data:: BEL | Chuông                                                |
++---------------+-------------------------------------------------------+
+| .. data:: BS  | Xóa lùi                                               |
++---------------+-------------------------------------------------------+
+| .. data:: TAB | Tab                                                   |
++---------------+-------------------------------------------------------+
+| .. data:: HT  | Bí danh của :const:`TAB`: "Tab ngang"                 |
++---------------+-------------------------------------------------------+
+| .. data:: LF  | Xuống dòng                                            |
++---------------+-------------------------------------------------------+
+| .. data:: NL  | Bí danh của :const:`LF`: "Dòng mới"                   |
++---------------+-------------------------------------------------------+
+| .. data:: VT  | Tab dọc                                               |
++---------------+-------------------------------------------------------+
+| .. data:: FF  | Nạp biểu mẫu                                          |
++---------------+-------------------------------------------------------+
+| .. data:: CR  | Về đầu dòng                                           |
++---------------+-------------------------------------------------------+
+| .. data:: SO  | Shift-out, bắt đầu bộ ký tự thay thế                  |
++---------------+-------------------------------------------------------+
+| .. data:: SI  | Shift-in, tiếp tục sử dụng bộ ký tự mặc định          |
++---------------+-------------------------------------------------------+
+| .. data:: DLE | Ký tự thoát liên kết dữ liệu                          |
++---------------+-------------------------------------------------------+
+| .. data:: DC1 | XON, dùng để điều khiển luồng                         |
++---------------+-------------------------------------------------------+
+| .. data:: DC2 | Điều khiển thiết bị 2, điều khiển luồng ở chế độ khối |
++---------------+-------------------------------------------------------+
+| .. data:: DC3 | XOFF, dùng để điều khiển luồng                        |
++---------------+-------------------------------------------------------+
+| .. data:: DC4 | Điều khiển thiết bị 4                                 |
++---------------+-------------------------------------------------------+
+| .. data:: NAK | Xác nhận phủ định                                     |
++---------------+-------------------------------------------------------+
+| .. data:: SYN | Trạng thái chờ đồng bộ                                |
++---------------+-------------------------------------------------------+
+| .. data:: ETB | Kết thúc khối truyền                                  |
++---------------+-------------------------------------------------------+
+| .. data:: CAN | Hủy                                                   |
++---------------+-------------------------------------------------------+
+| .. data:: EM  | Kết thúc phương tiện                                  |
++---------------+-------------------------------------------------------+
+| .. data:: SUB | Thay thế                                              |
++---------------+-------------------------------------------------------+
+| .. data:: ESC | Thoát                                                 |
++---------------+-------------------------------------------------------+
+| .. data:: FS  | Dấu phân cách tệp                                     |
++---------------+-------------------------------------------------------+
+| .. data:: GS  | Dấu phân cách nhóm                                    |
++---------------+-------------------------------------------------------+
+| .. data:: RS  | Dấu phân cách bản ghi, ký tự kết thúc chế độ khối     |
++---------------+-------------------------------------------------------+
+| .. data:: US  | Dấu phân cách đơn vị                                  |
++---------------+-------------------------------------------------------+
+| .. data:: SP  | Khoảng trắng                                          |
++---------------+-------------------------------------------------------+
+| .. data:: DEL | Xóa                                                   |
++---------------+-------------------------------------------------------+
 
-Note that many of these have little practical significance in modern usage.  The
-mnemonics derive from teleprinter conventions that predate digital computers.
+Lưu ý rằng nhiều ký tự trong số này ít có ý nghĩa thực tiễn trong cách sử dụng hiện đại. Các từ viết tắt gợi nhớ bắt nguồn từ những quy ước của máy điện báo, có trước máy tính kỹ thuật số.
 
-The module supplies the following functions, patterned on those in the standard
-C library:
+Mô-đun cung cấp các hàm sau, được xây dựng theo các hàm trong thư viện C tiêu chuẩn:
 
 
 .. function:: isalnum(c)
 
-   Checks for an ASCII alphanumeric character; it is equivalent to ``isalpha(c) or
-   isdigit(c)``.
+   Kiểm tra ký tự chữ-số ASCII; tương đương với ``isalpha(c) or isdigit(c)``.
 
 
 .. function:: isalpha(c)
 
-   Checks for an ASCII alphabetic character; it is equivalent to ``isupper(c) or
-   islower(c)``.
+   Kiểm tra ký tự chữ cái ASCII; tương đương với ``isupper(c) or islower(c)``.
 
 
 .. function:: isascii(c)
 
-   Checks for a character value that fits in the 7-bit ASCII set.
+   Kiểm tra giá trị ký tự nằm trong bộ ký tự ASCII 7 bit.
 
 
 .. function:: isblank(c)
 
-   Checks for an ASCII blank character; space or horizontal tab.
+   Kiểm tra ký tự khoảng trắng ASCII; dấu cách hoặc tab ngang.
 
 
 .. function:: iscntrl(c)
 
-   Checks for an ASCII control character (in the range 0x00 to 0x1f or 0x7f).
+   Kiểm tra ký tự điều khiển ASCII (trong phạm vi từ 0x00 đến 0x1f hoặc 0x7f).
 
 
 .. function:: isdigit(c)
 
-   Checks for an ASCII decimal digit, ``'0'`` through ``'9'``.  This is equivalent
-   to ``c in string.digits``.
+   Kiểm tra chữ số thập phân ASCII, từ ``'0'`` đến ``'9'``.  Tương đương với ``c in string.digits``.
 
 
 .. function:: isgraph(c)
 
-   Checks for any ASCII printable character except space.
+   Kiểm tra xem có ký tự ASCII có thể in được nào ngoại trừ dấu cách hay không.
 
 
 .. function:: islower(c)
 
-   Checks for an ASCII lower-case character.
+   Kiểm tra xem có ký tự ASCII viết thường hay không.
 
 
 .. function:: isprint(c)
 
-   Checks for any ASCII printable character including space.
+   Kiểm tra xem có ký tự ASCII có thể in được nào, bao gồm cả dấu cách, hay không.
 
 
 .. function:: ispunct(c)
 
-   Checks for any ASCII printable character which is not a space or an alphanumeric
-   character.
+   Kiểm tra xem có ký tự ASCII có thể in được nào không phải là dấu cách hoặc ký tự chữ và số hay không.
 
 
 .. function:: isspace(c)
 
-   Checks for ASCII white-space characters; space, line feed, carriage return, form
-   feed, horizontal tab, vertical tab.
+   Kiểm tra các ký tự khoảng trắng ASCII; dấu cách, xuống dòng, xuống dòng về đầu dòng, ngắt trang, tab ngang, tab dọc.
 
 
 .. function:: isupper(c)
 
-   Checks for an ASCII uppercase letter.
+   Kiểm tra xem có chữ cái ASCII viết hoa hay không.
 
 
 .. function:: isxdigit(c)
 
-   Checks for an ASCII hexadecimal digit.  This is equivalent to ``c in
-   string.hexdigits``.
+   Kiểm tra xem có chữ số thập lục phân ASCII hay không. Tương đương với ``c in string.hexdigits``.
 
 
 .. function:: isctrl(c)
 
-   Checks for an ASCII control character (ordinal values 0 to 31).  Unlike
-   :func:`iscntrl`, this does not include the delete character (0x7f).
+   Kiểm tra ký tự điều khiển ASCII (giá trị thứ tự từ 0 đến 31). Không giống
+   :func:`iscntrl`, hàm này không bao gồm ký tự xóa (0x7f).
 
 
 .. function:: ismeta(c)
 
-   Checks for a non-ASCII character (ordinal values 0x80 and above).
+   Kiểm tra ký tự không phải ASCII (giá trị thứ tự từ 0x80 trở lên).
 
-These functions accept either integers or single-character strings; when the argument is a
-string, it is first converted using the built-in function :func:`ord`.
+Các hàm này chấp nhận số nguyên hoặc chuỗi một ký tự; khi đối số là một chuỗi, trước tiên chuỗi đó được chuyển đổi bằng hàm dựng sẵn :func:`ord`.
 
-Note that all these functions check ordinal bit values derived from the
-character of the string you pass in; they do not actually know anything about
-the host machine's character encoding.
+Lưu ý rằng tất cả các hàm này đều kiểm tra các giá trị bit thứ tự được suy ra từ ký tự của chuỗi bạn truyền vào; chúng thực sự không biết gì về bảng mã ký tự của máy chủ.
 
-The following two functions take either a single-character string or integer
-byte value; they return a value of the same type.
+Hai hàm sau đây nhận chuỗi một ký tự hoặc giá trị byte dạng số nguyên; chúng trả về giá trị cùng kiểu.
 
 
 .. function:: ascii(c)
 
-   Return the ASCII value corresponding to the low 7 bits of *c*.
+   Trả về giá trị ASCII tương ứng với 7 bit thấp của *c*.
 
 
 .. function:: ctrl(c)
 
-   Return the control character corresponding to the given character (the character
-   bit value is bitwise-anded with 0x1f).
+   Trả về ký tự điều khiển tương ứng với ký tự đã cho (giá trị bit của ký tự được thực hiện phép AND theo bit với 0x1f).
 
 
 .. function:: alt(c)
 
-   Return the 8-bit character corresponding to the given ASCII character (the
-   character bit value is bitwise-ored with 0x80).
+   Trả về ký tự 8 bit tương ứng với ký tự ASCII đã cho (giá trị bit của ký tự được thực hiện phép OR theo bit với 0x80).
 
-The following function takes either a single-character string or integer value;
-it returns a string.
+Hàm sau đây nhận một chuỗi gồm một ký tự hoặc một giá trị số nguyên; hàm trả về một chuỗi.
 
 
 .. index::
@@ -216,17 +199,10 @@ it returns a string.
 
 .. function:: unctrl(c)
 
-   Return a string representation of the ASCII character *c*.  If *c* is printable,
-   this string is the character itself.  If the character is a control character
-   (0x00--0x1f) the string consists of a caret (``'^'``) followed by the
-   corresponding uppercase letter. If the character is an ASCII delete (0x7f) the
-   string is ``'^?'``.  If the character has its meta bit (0x80) set, the meta bit
-   is stripped, the preceding rules applied, and ``'!'`` prepended to the result.
+   Trả về biểu diễn chuỗi của ký tự ASCII *c*. Nếu *c* có thể in được, chuỗi này chính là ký tự đó. Nếu ký tự là ký tự điều khiển (0x00--0x1f), chuỗi gồm một dấu mũ (``'^'``) theo sau là chữ cái viết hoa tương ứng. Nếu ký tự là ký tự xóa ASCII (0x7f), chuỗi là ``'^?'``. Nếu ký tự có bit meta (0x80) được thiết lập, bit meta sẽ bị loại bỏ, các quy tắc trước đó được áp dụng, rồi ``'!'`` được thêm vào trước kết quả.
 
 
 .. data:: controlnames
 
-   A 33-element string array that contains the ASCII mnemonics for the thirty-two
-   ASCII control characters from 0 (NUL) to 0x1f (US), in order, plus the mnemonic
-   ``SP`` for the space character.
+   Một mảng chuỗi gồm 33 phần tử, chứa các mnemonic ASCII cho 32 ký tự điều khiển ASCII từ 0 (NUL) đến 0x1f (US), theo thứ tự, cùng với mnemonic ``SP`` cho ký tự khoảng trắng.
 

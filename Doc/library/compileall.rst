@@ -1,348 +1,248 @@
-:mod:`!compileall` --- Byte-compile Python libraries
-====================================================
+:mod:`!compileall` --- Biên dịch byte các thư viện Python
+=========================================================
 
 .. module:: compileall
-   :synopsis: Tools for byte-compiling all Python source files in a directory tree.
+   :synopsis: Các công cụ để biên dịch byte tất cả tệp nguồn Python trong một cây thư mục.
 
-**Source code:** :source:`Lib/compileall.py`
+**Mã nguồn:** :source:`Lib/compileall.py`
 
 --------------
 
-This module provides some utility functions to support installing Python
-libraries.  These functions compile Python source files in a directory tree.
-This module can be used to create the cached byte-code files at library
-installation time, which makes them available for use even by users who don't
-have write permission to the library directories.
+Mô-đun này cung cấp một số hàm tiện ích để hỗ trợ cài đặt các thư viện Python. Các hàm này biên dịch các tệp nguồn Python trong một cây thư mục. Mô-đun này có thể được dùng để tạo các tệp bytecode được lưu vào bộ nhớ đệm tại thời điểm cài đặt thư viện, nhờ đó chúng vẫn có thể được sử dụng ngay cả bởi những người dùng không có quyền ghi vào các thư mục thư viện.
 
 .. include:: ../includes/wasm-notavail.rst
 
 .. _compileall-cli:
 
-Command-line use
-----------------
+Sử dụng từ dòng lệnh
+--------------------
 
-This module can work as a script (using :program:`python -m compileall`) to
-compile Python sources.
+Mô-đun này có thể hoạt động như một script (sử dụng :program:`python -m compileall`) để biên dịch mã nguồn Python.
 
 .. program:: compileall
 
 .. option:: directory ...
             file ...
 
-   Positional arguments are files to compile or directories that contain
-   source files, traversed recursively.  If no argument is given, behave as if
-   the command line was :samp:`-l {<directories from sys.path>}`.
+   Các đối số vị trí là các tệp cần biên dịch hoặc các thư mục chứa tệp mã nguồn, được duyệt đệ quy. Nếu không cung cấp đối số nào, hoạt động như thể dòng lệnh là :samp:`-l {<directories from sys.path>}`.
 
 .. option:: -l
 
-   Do not recurse into subdirectories, only compile source code files directly
-   contained in the named or implied directories.
+   Không đệ quy vào các thư mục con, chỉ biên dịch các tệp mã nguồn nằm trực tiếp trong những thư mục được chỉ định hoặc được ngầm định.
 
 .. option:: -f
 
-   Force rebuild even if timestamps are up-to-date.
+   Buộc xây dựng lại ngay cả khi các dấu thời gian đã được cập nhật.
 
 .. option:: -q
 
-   Do not print the list of files compiled. If passed once, error messages will
-   still be printed. If passed twice (``-qq``), all output is suppressed.
+   Không in danh sách các tệp đã biên dịch. Nếu được truyền một lần, các thông báo lỗi vẫn được in. Nếu được truyền hai lần (``-qq``), mọi đầu ra sẽ bị loại bỏ.
 
 .. option:: -d destdir
 
-   Directory prepended to the path to each file being compiled.  This will
-   appear in compilation time tracebacks, and is also compiled in to the
-   byte-code file, where it will be used in tracebacks and other messages in
-   cases where the source file does not exist at the time the byte-code file is
-   executed.
+   Thư mục được thêm vào trước đường dẫn của mỗi tệp đang được biên dịch. Thư mục này sẽ xuất hiện trong các traceback tại thời điểm biên dịch, đồng thời cũng được biên dịch vào tệp bytecode, nơi nó sẽ được sử dụng trong traceback và các thông báo khác khi tệp mã nguồn không tồn tại tại thời điểm tệp bytecode được thực thi.
 
 .. option:: -s strip_prefix
 
-   Remove the given prefix from paths recorded in the ``.pyc`` files.
-   Paths are made relative to the prefix.
+   Xóa tiền tố đã cho khỏi các đường dẫn được ghi trong các tệp ``.pyc``. Các đường dẫn được chuyển thành tương đối so với tiền tố.
 
-   This option can be used with ``-p`` but not with ``-d``.
+   Tùy chọn này có thể được sử dụng với ``-p`` nhưng không thể sử dụng với ``-d``.
 
 .. option:: -p prepend_prefix
 
-   Prepend the given prefix to paths recorded in the ``.pyc`` files.
-   Use ``-p /`` to make the paths absolute.
+   Thêm tiền tố đã cho vào trước các đường dẫn được ghi trong các tệp ``.pyc``. Sử dụng ``-p /`` để chuyển các đường dẫn thành đường dẫn tuyệt đối.
 
-   This option can be used with ``-s`` but not with ``-d``.
+   Tùy chọn này có thể được sử dụng với ``-s`` nhưng không thể sử dụng với ``-d``.
 
 .. option:: -x regex
 
-   regex is used to search the full path to each file considered for
-   compilation, and if the regex produces a match, the file is skipped.
+   regex được dùng để tìm kiếm đường dẫn đầy đủ đến từng tệp được xem xét để biên dịch, và nếu regex tạo ra kết quả khớp, tệp đó sẽ bị bỏ qua.
 
 .. option:: -i list
 
-   Read the file ``list`` and add each line that it contains to the list of
-   files and directories to compile.  If ``list`` is ``-``, read lines from
-   ``stdin``.
+   Đọc tệp ``list`` và thêm từng dòng trong tệp đó vào danh sách các tệp và thư mục cần biên dịch. Nếu ``list`` là ``-``, hãy đọc các dòng từ ``stdin``.
 
 .. option:: -b
 
-   Write the byte-code files to their legacy locations and names, which may
-   overwrite byte-code files created by another version of Python.  The default
-   is to write files to their :pep:`3147` locations and names, which allows
-   byte-code files from multiple versions of Python to coexist.
+   Ghi các tệp byte-code vào vị trí và tên cũ của chúng; thao tác này có thể ghi đè các tệp byte-code được tạo bởi một phiên bản Python khác. Mặc định là ghi các tệp vào vị trí và tên :pep:`3147` của chúng, cho phép các tệp byte-code từ nhiều phiên bản Python cùng tồn tại.
 
 .. option:: -r
 
-   Control the maximum recursion level for subdirectories.
-   If this is given, then ``-l`` option will not be taken into account.
-   :program:`python -m compileall <directory> -r 0` is equivalent to
+   Kiểm soát mức đệ quy tối đa cho các thư mục con. Nếu được chỉ định, tùy chọn ``-l`` sẽ không được tính đến.
+   :program:`python -m compileall <directory> -r 0` tương đương với
    :program:`python -m compileall <directory> -l`.
 
 .. option:: -j N
 
-   Use *N* workers to compile the files within the given directory.
-   If ``0`` is used, then the result of :func:`os.process_cpu_count`
-   will be used.
+   Sử dụng *N* worker để biên dịch các tệp trong thư mục đã cho. Nếu sử dụng ``0``, kết quả của :func:`os.process_cpu_count` sẽ được sử dụng.
 
 .. option:: --invalidation-mode [timestamp|checked-hash|unchecked-hash]
 
-   Control how the generated byte-code files are invalidated at runtime.
-   The ``timestamp`` value, means that ``.pyc`` files with the source timestamp
-   and size embedded will be generated. The ``checked-hash`` and
-   ``unchecked-hash`` values cause hash-based pycs to be generated. Hash-based
-   pycs embed a hash of the source file contents rather than a timestamp. See
-   :ref:`pyc-invalidation` for more information on how Python validates
-   bytecode cache files at runtime.
-   The default is ``timestamp`` if the :envvar:`SOURCE_DATE_EPOCH` environment
-   variable is not set, and ``checked-hash`` if the ``SOURCE_DATE_EPOCH``
-   environment variable is set.
+   Kiểm soát cách các tệp bytecode được tạo ra bị vô hiệu hóa trong runtime. Giá trị ``timestamp`` có nghĩa là sẽ tạo các tệp ``.pyc`` có nhúng dấu thời gian và kích thước của mã nguồn. Các giá trị ``checked-hash`` và ``unchecked-hash`` khiến các pyc dựa trên hash được tạo ra. Các pyc dựa trên hash nhúng hash của nội dung tệp mã nguồn thay vì dấu thời gian. Xem
+   :ref:`pyc-invalidation` để biết thêm thông tin về cách Python xác thực các tệp bộ nhớ đệm bytecode trong runtime. Giá trị mặc định là ``timestamp`` nếu biến môi trường :envvar:`SOURCE_DATE_EPOCH` chưa được đặt, và là ``checked-hash`` nếu biến môi trường ``SOURCE_DATE_EPOCH`` đã được đặt.
 
 .. option:: -o level
 
-   Compile with the given optimization level. May be used multiple times
-   to compile for multiple levels at a time (for example,
-   ``compileall -o 1 -o 2``).
+   Biên dịch với mức tối ưu hóa đã cho. Có thể sử dụng nhiều lần để biên dịch đồng thời cho nhiều mức (ví dụ: ``compileall -o 1 -o 2``).
 
 .. option:: -e dir
 
-   Ignore symlinks pointing outside the given directory.
+   Bỏ qua các symlink trỏ ra ngoài thư mục đã cho.
 
 .. option:: --hardlink-dupes
 
-   If two ``.pyc`` files with different optimization level have
-   the same content, use hard links to consolidate duplicate files.
+   Nếu hai tệp ``.pyc`` có mức tối ưu hóa khác nhau nhưng cùng nội dung, hãy sử dụng hard link để hợp nhất các tệp trùng lặp.
 
 .. versionchanged:: 3.2
-   Added the ``-i``, ``-b`` and ``-h`` options.
+   Đã thêm các tùy chọn ``-i``, ``-b`` và ``-h``.
 
 .. versionchanged:: 3.5
-   Added the  ``-j``, ``-r``, and ``-qq`` options.  ``-q`` option
-   was changed to a multilevel value.  ``-b`` will always produce a
-   byte-code file ending in ``.pyc``, never ``.pyo``.
+   Đã thêm các tùy chọn ``-j``, ``-r`` và ``-qq``. Tùy chọn ``-q`` đã được thay đổi thành một giá trị nhiều cấp. ``-b`` sẽ luôn tạo ra một tệp byte-code kết thúc bằng ``.pyc``, không bao giờ bằng ``.pyo``.
 
 .. versionchanged:: 3.7
-   Added the ``--invalidation-mode`` option.
+   Đã thêm tùy chọn ``--invalidation-mode``.
 
 .. versionchanged:: 3.9
-   Added the ``-s``, ``-p``, ``-e`` and ``--hardlink-dupes`` options.
-   Raised the default recursion limit from 10 to
-   :py:func:`sys.getrecursionlimit()`.
-   Added the possibility to specify the ``-o`` option multiple times.
+   Đã thêm các tùy chọn ``-s``, ``-p``, ``-e`` và ``--hardlink-dupes``. Đã tăng giới hạn đệ quy mặc định từ 10 lên
+   :py:func:`sys.getrecursionlimit()`. Đã thêm khả năng chỉ định tùy chọn ``-o`` nhiều lần.
 
 
-There is no command-line option to control the optimization level used by the
-:func:`compile` function, because the Python interpreter itself already
-provides the option: :program:`python -O -m compileall`.
+Không có tùy chọn dòng lệnh nào để kiểm soát cấp độ tối ưu hóa được sử dụng bởi
+hàm :func:`compile`, vì bản thân trình thông dịch Python đã cung cấp tùy chọn này: :program:`python -O -m compileall`.
 
-Similarly, the :func:`compile` function respects the :data:`sys.pycache_prefix`
-setting. The generated bytecode cache will only be useful if :func:`compile` is
-run with the same :data:`sys.pycache_prefix` (if any) that will be used at
-runtime.
+Tương tự, hàm :func:`compile` tuân theo thiết lập :data:`sys.pycache_prefix`. Bộ nhớ đệm bytecode được tạo ra sẽ chỉ hữu ích nếu :func:`compile` được chạy với cùng :data:`sys.pycache_prefix` (nếu có) sẽ được sử dụng khi chạy.
 
-Public functions
-----------------
+Các hàm công khai
+-----------------
 
 .. function:: compile_dir(dir, maxlevels=sys.getrecursionlimit(), ddir=None, force=False, rx=None, quiet=0, legacy=False, optimize=-1, workers=1, invalidation_mode=None, *, stripdir=None, prependdir=None, limit_sl_dest=None, hardlink_dupes=False)
 
-   Recursively descend the directory tree named by *dir*, compiling all :file:`.py`
-   files along the way. Return a true value if all the files compiled successfully,
-   and a false value otherwise.
+   Đệ quy duyệt cây thư mục có tên là *dir*, biên dịch tất cả các tệp :file:`.py` trên đường duyệt. Trả về giá trị true nếu tất cả các tệp được biên dịch thành công, và giá trị false nếu không.
 
-   The *maxlevels* parameter is used to limit the depth of the recursion; it
-   defaults to ``sys.getrecursionlimit()``.
+   Tham số *maxlevels* được dùng để giới hạn độ sâu của quá trình đệ quy; giá trị mặc định là ``sys.getrecursionlimit()``.
 
-   If *ddir* is given, it is prepended to the path to each file being compiled
-   for use in compilation time tracebacks, and is also compiled in to the
-   byte-code file, where it will be used in tracebacks and other messages in
-   cases where the source file does not exist at the time the byte-code file is
-   executed.
+   Nếu được cung cấp *ddir*, giá trị này được thêm vào đầu đường dẫn đến từng tệp đang được biên dịch để dùng trong các traceback tại thời điểm biên dịch, đồng thời cũng được biên dịch vào tệp byte-code, nơi nó sẽ được dùng trong các traceback và thông báo khác khi tệp nguồn không tồn tại tại thời điểm tệp byte-code được thực thi.
 
-   If *force* is true, modules are re-compiled even if the timestamps are up to
-   date.
+   Nếu *force* là true, các module sẽ được biên dịch lại ngay cả khi dấu thời gian đã được cập nhật.
 
-   If *rx* is given, its ``search`` method is called on the complete path to each
-   file considered for compilation, and if it returns a true value, the file
-   is skipped. This can be used to exclude files matching a regular expression,
-   given as a :ref:`re.Pattern <re-objects>` object.
+   Nếu được cung cấp *rx*, phương thức ``search`` của nó sẽ được gọi trên đường dẫn đầy đủ đến từng tệp được xem xét để biên dịch; nếu phương thức này trả về giá trị true, tệp sẽ bị bỏ qua. Có thể dùng tùy chọn này để loại trừ các tệp khớp với một biểu thức chính quy, được cung cấp dưới dạng đối tượng :ref:`re.Pattern <re-objects>`.
 
-   If *quiet* is ``False`` or ``0`` (the default), the filenames and other
-   information are printed to standard out. Set to ``1``, only errors are
-   printed. Set to ``2``, all output is suppressed.
+   Nếu *quiet* là ``False`` hoặc ``0`` (mặc định), tên tệp và các thông tin khác sẽ được in ra đầu ra chuẩn. Đặt thành ``1``, chỉ các lỗi được in ra. Đặt thành ``2``, mọi đầu ra đều bị ẩn.
 
-   If *legacy* is true, byte-code files are written to their legacy locations
-   and names, which may overwrite byte-code files created by another version of
-   Python.  The default is to write files to their :pep:`3147` locations and
-   names, which allows byte-code files from multiple versions of Python to
-   coexist.
+   Nếu *legacy* là true, các tệp byte-code sẽ được ghi vào các vị trí và tên cũ, điều này có thể ghi đè các tệp byte-code được tạo bởi một phiên bản Python khác. Mặc định là ghi tệp vào các vị trí và tên :pep:`3147` của chúng, cho phép các tệp byte-code từ nhiều phiên bản Python cùng tồn tại.
 
-   *optimize* specifies the optimization level for the compiler.  It is passed to
-   the built-in :func:`compile` function. Accepts also a sequence of optimization
-   levels which lead to multiple compilations of one :file:`.py` file in one call.
+   *optimize* chỉ định mức tối ưu hóa cho compiler. Giá trị này được truyền cho hàm tích hợp sẵn :func:`compile`. Cũng chấp nhận một chuỗi các mức tối ưu hóa, dẫn đến việc biên dịch một tệp :file:`.py` nhiều lần trong một lần gọi.
 
-   The argument *workers* specifies how many workers are used to
-   compile files in parallel. The default is to not use multiple workers.
-   If the platform can't use multiple workers and *workers* argument is given,
-   then sequential compilation will be used as a fallback.  If *workers*
-   is 0, the number of cores in the system is used.  If *workers* is
-   lower than ``0``, a :exc:`ValueError` will be raised.
+   Đối số *workers* chỉ định số worker được dùng để biên dịch các tệp song song. Mặc định là không dùng nhiều worker. Nếu nền tảng không thể sử dụng nhiều worker và đối số *workers* được cung cấp, việc biên dịch tuần tự sẽ được dùng làm phương án dự phòng. Nếu *workers* là 0, số lõi trong hệ thống sẽ được sử dụng. Nếu *workers* nhỏ hơn ``0``, một :exc:`ValueError` sẽ được raised.
 
-   *invalidation_mode* should be a member of the
-   :class:`py_compile.PycInvalidationMode` enum and controls how the generated
-   pycs are invalidated at runtime.
+   *invalidation_mode* nên là một thành viên của
+   :class:`py_compile.PycInvalidationMode` enum và kiểm soát cách các pyc được tạo sẽ bị vô hiệu hóa tại runtime.
 
-   The *stripdir*, *prependdir* and *limit_sl_dest* arguments correspond to
-   the ``-s``, ``-p`` and ``-e`` options described above.
-   They may be specified as ``str`` or :py:class:`os.PathLike`.
+   Các đối số *stripdir*, *prependdir* và *limit_sl_dest* tương ứng với các tùy chọn ``-s``, ``-p`` và ``-e`` được mô tả ở trên. Chúng có thể được chỉ định dưới dạng ``str`` hoặc :py:class:`os.PathLike`.
 
-   If *hardlink_dupes* is true and two ``.pyc`` files with different optimization
-   level have the same content, use hard links to consolidate duplicate files.
+   Nếu *hardlink_dupes* là true và hai tệp ``.pyc`` có các mức tối ưu hóa khác nhau nhưng cùng nội dung, hãy sử dụng hard link để hợp nhất các tệp trùng lặp.
 
    .. versionchanged:: 3.2
-      Added the *legacy* and *optimize* parameter.
+      Đã thêm tham số *legacy* và *optimize*.
 
    .. versionchanged:: 3.5
-      Added the *workers* parameter.
+      Đã thêm tham số *workers*.
 
    .. versionchanged:: 3.5
-      *quiet* parameter was changed to a multilevel value.
+      Tham số *quiet* đã được thay đổi thành giá trị nhiều cấp.
 
    .. versionchanged:: 3.5
-      The *legacy* parameter only writes out ``.pyc`` files, not ``.pyo`` files
-      no matter what the value of *optimize* is.
+      Tham số *legacy* chỉ ghi các tệp ``.pyc``, không ghi các tệp ``.pyo`` bất kể giá trị của *optimize* là gì.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.7
-      The *invalidation_mode* parameter was added.
+      Đã thêm tham số *invalidation_mode*.
 
    .. versionchanged:: 3.7.2
-      The *invalidation_mode* parameter's default value is updated to ``None``.
+      Giá trị mặc định của tham số *invalidation_mode* đã được cập nhật thành ``None``.
 
    .. versionchanged:: 3.8
-      Setting *workers* to 0 now chooses the optimal number of cores.
+      Việc đặt *workers* thành 0 sẽ chọn số lõi tối ưu.
 
    .. versionchanged:: 3.9
-      Added *stripdir*, *prependdir*, *limit_sl_dest* and *hardlink_dupes* arguments.
-      Default value of *maxlevels* was changed from ``10`` to ``sys.getrecursionlimit()``
+      Đã thêm các đối số *stripdir*, *prependdir*, *limit_sl_dest* và *hardlink_dupes*. Giá trị mặc định của *maxlevels* đã được thay đổi từ ``10`` thành ``sys.getrecursionlimit()``
 
 .. function:: compile_file(fullname, ddir=None, force=False, rx=None, quiet=0, legacy=False, optimize=-1, invalidation_mode=None, *, stripdir=None, prependdir=None, limit_sl_dest=None, hardlink_dupes=False)
 
-   Compile the file with path *fullname*. Return a true value if the file
-   compiled successfully, and a false value otherwise.
+   Biên dịch tệp có đường dẫn *fullname*. Trả về giá trị true nếu tệp được biên dịch thành công và giá trị false nếu không.
 
-   If *ddir* is given, it is prepended to the path to the file being compiled
-   for use in compilation time tracebacks, and is also compiled in to the
-   byte-code file, where it will be used in tracebacks and other messages in
-   cases where the source file does not exist at the time the byte-code file is
-   executed.
+   Nếu được cung cấp *ddir*, giá trị này được thêm vào đầu đường dẫn đến tệp đang được biên dịch để sử dụng trong các traceback tại thời điểm biên dịch, đồng thời cũng được biên dịch vào tệp byte-code, nơi nó sẽ được sử dụng trong traceback và các thông báo khác khi tệp nguồn không tồn tại tại thời điểm tệp byte-code được thực thi.
 
-   If *rx* is given, its ``search`` method is passed the full path name to the
-   file being compiled, and if it returns a true value, the file is not
-   compiled and ``True`` is returned. This can be used to exclude files matching
-   a regular expression, given as a :ref:`re.Pattern <re-objects>` object.
+   Nếu được cung cấp *rx*, phương thức ``search`` của nó sẽ nhận đường dẫn đầy đủ đến tệp đang được biên dịch; nếu phương thức này trả về giá trị true, tệp sẽ không được biên dịch và ``True`` sẽ được trả về. Có thể dùng tùy chọn này để loại trừ các tệp khớp với một biểu thức chính quy, được cung cấp dưới dạng đối tượng :ref:`re.Pattern <re-objects>`.
 
-   If *quiet* is ``False`` or ``0`` (the default), the filenames and other
-   information are printed to standard out. Set to ``1``, only errors are
-   printed. Set to ``2``, all output is suppressed.
+   Nếu *quiet* là ``False`` hoặc ``0`` (mặc định), tên tệp và các thông tin khác sẽ được in ra đầu ra chuẩn. Đặt thành ``1``, chỉ các lỗi được in ra. Đặt thành ``2``, mọi đầu ra đều bị ẩn.
 
-   If *legacy* is true, byte-code files are written to their legacy locations
-   and names, which may overwrite byte-code files created by another version of
-   Python.  The default is to write files to their :pep:`3147` locations and
-   names, which allows byte-code files from multiple versions of Python to
-   coexist.
+   Nếu *legacy* là true, các tệp byte-code sẽ được ghi vào các vị trí và tên cũ, điều này có thể ghi đè các tệp byte-code được tạo bởi một phiên bản Python khác. Mặc định là ghi tệp vào các vị trí và tên :pep:`3147` của chúng, cho phép các tệp byte-code từ nhiều phiên bản Python cùng tồn tại.
 
-   *optimize* specifies the optimization level for the compiler.  It is passed to
-   the built-in :func:`compile` function. Accepts also a sequence of optimization
-   levels which lead to multiple compilations of one :file:`.py` file in one call.
+   *optimize* chỉ định mức tối ưu hóa cho compiler. Giá trị này được truyền cho hàm tích hợp sẵn :func:`compile`. Cũng chấp nhận một chuỗi các mức tối ưu hóa, dẫn đến việc biên dịch một tệp :file:`.py` nhiều lần trong một lần gọi.
 
-   *invalidation_mode* should be a member of the
-   :class:`py_compile.PycInvalidationMode` enum and controls how the generated
-   pycs are invalidated at runtime.
+   *invalidation_mode* nên là một thành viên của
+   :class:`py_compile.PycInvalidationMode` enum và kiểm soát cách các pyc được tạo sẽ bị vô hiệu hóa tại runtime.
 
-   The *stripdir*, *prependdir* and *limit_sl_dest* arguments correspond to
-   the ``-s``, ``-p`` and ``-e`` options described above.
-   They may be specified as ``str`` or :py:class:`os.PathLike`.
+   Các đối số *stripdir*, *prependdir* và *limit_sl_dest* tương ứng với các tùy chọn ``-s``, ``-p`` và ``-e`` được mô tả ở trên. Chúng có thể được chỉ định dưới dạng ``str`` hoặc :py:class:`os.PathLike`.
 
-   If *hardlink_dupes* is true and two ``.pyc`` files with different optimization
-   level have the same content, use hard links to consolidate duplicate files.
+   Nếu *hardlink_dupes* là true và hai tệp ``.pyc`` có các mức tối ưu hóa khác nhau nhưng cùng nội dung, hãy sử dụng hard link để hợp nhất các tệp trùng lặp.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.5
-      *quiet* parameter was changed to a multilevel value.
+      Tham số *quiet* đã được thay đổi thành giá trị nhiều cấp.
 
    .. versionchanged:: 3.5
-      The *legacy* parameter only writes out ``.pyc`` files, not ``.pyo`` files
-      no matter what the value of *optimize* is.
+      Tham số *legacy* chỉ ghi các tệp ``.pyc``, không ghi các tệp ``.pyo`` bất kể giá trị của *optimize* là gì.
 
    .. versionchanged:: 3.7
-      The *invalidation_mode* parameter was added.
+      Đã thêm tham số *invalidation_mode*.
 
    .. versionchanged:: 3.7.2
-      The *invalidation_mode* parameter's default value is updated to ``None``.
+      Giá trị mặc định của tham số *invalidation_mode* đã được cập nhật thành ``None``.
 
    .. versionchanged:: 3.9
-      Added *stripdir*, *prependdir*, *limit_sl_dest* and *hardlink_dupes* arguments.
+      Đã thêm các đối số *stripdir*, *prependdir*, *limit_sl_dest* và *hardlink_dupes*.
 
 .. function:: compile_path(skip_curdir=True, maxlevels=0, force=False, quiet=0, legacy=False, optimize=-1, invalidation_mode=None)
 
-   Byte-compile all the :file:`.py` files found along ``sys.path``. Return a
-   true value if all the files compiled successfully, and a false value otherwise.
+   Biên dịch bytecode tất cả các tệp :file:`.py` được tìm thấy dọc theo ``sys.path``. Trả về giá trị true nếu tất cả các tệp được biên dịch thành công, và giá trị false nếu không.
 
-   If *skip_curdir* is true (the default), the current directory is not included
-   in the search.  All other parameters are passed to the :func:`compile_dir`
-   function.  Note that unlike the other compile functions, ``maxlevels``
-   defaults to ``0``.
+   Nếu *skip_curdir* là true (mặc định), thư mục hiện tại sẽ không được đưa vào quá trình tìm kiếm. Tất cả các tham số khác được truyền cho hàm :func:`compile_dir`. Lưu ý rằng không giống các hàm biên dịch khác, ``maxlevels`` mặc định là ``0``.
 
    .. versionchanged:: 3.2
-      Added the *legacy* and *optimize* parameter.
+      Đã thêm tham số *legacy* và *optimize*.
 
    .. versionchanged:: 3.5
-      *quiet* parameter was changed to a multilevel value.
+      Tham số *quiet* đã được thay đổi thành giá trị nhiều cấp.
 
    .. versionchanged:: 3.5
-      The *legacy* parameter only writes out ``.pyc`` files, not ``.pyo`` files
-      no matter what the value of *optimize* is.
+      Tham số *legacy* chỉ ghi các tệp ``.pyc``, không ghi các tệp ``.pyo`` bất kể giá trị của *optimize* là gì.
 
    .. versionchanged:: 3.7
-      The *invalidation_mode* parameter was added.
+      Đã thêm tham số *invalidation_mode*.
 
    .. versionchanged:: 3.7.2
-      The *invalidation_mode* parameter's default value is updated to ``None``.
+      Giá trị mặc định của tham số *invalidation_mode* đã được cập nhật thành ``None``.
 
-To force a recompile of all the :file:`.py` files in the :file:`Lib/`
-subdirectory and all its subdirectories::
+Để buộc biên dịch lại tất cả các tệp :file:`.py` trong thư mục con :file:`Lib/` và mọi thư mục con của nó::
 
    import compileall
 
    compileall.compile_dir('Lib/', force=True)
 
-   # Perform same compilation, excluding files in .svn directories.
+   # Thực hiện cùng quá trình biên dịch, không bao gồm các tệp trong thư mục .svn.
    import re
    compileall.compile_dir('Lib/', rx=re.compile(r'[/\\][.]svn'), force=True)
 
-   # pathlib.Path objects can also be used.
+   # Các đối tượng pathlib.Path cũng có thể được sử dụng.
    import pathlib
    compileall.compile_dir(pathlib.Path('Lib/'), force=True)
 
 .. seealso::
 
-   Module :mod:`py_compile`
-      Byte-compile a single source file.
+   Mô-đun :mod:`py_compile`
+      Biên dịch byte một tệp nguồn duy nhất.

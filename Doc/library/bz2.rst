@@ -1,325 +1,260 @@
-:mod:`!bz2` --- Support for :program:`bzip2` compression
-========================================================
+:mod:`!bz2` --- Hỗ trợ nén bằng :program:`bzip2`
+================================================
 
 .. module:: bz2
-   :synopsis: Interfaces for bzip2 compression and decompression.
+   :synopsis: Giao diện cho việc nén và giải nén bằng bzip2.
 
 .. moduleauthor:: Gustavo Niemeyer <niemeyer@conectiva.com>
 .. moduleauthor:: Nadeem Vawda <nadeem.vawda@gmail.com>
 .. sectionauthor:: Gustavo Niemeyer <niemeyer@conectiva.com>
 .. sectionauthor:: Nadeem Vawda <nadeem.vawda@gmail.com>
 
-**Source code:** :source:`Lib/bz2.py`
+**Mã nguồn:** :source:`Lib/bz2.py`
 
 --------------
 
-This module provides a comprehensive interface for compressing and
-decompressing data using the bzip2 compression algorithm.
+Mô-đun này cung cấp giao diện toàn diện để nén và giải nén dữ liệu bằng thuật toán nén bzip2.
 
-The :mod:`!bz2` module contains:
+Mô-đun :mod:`!bz2` bao gồm:
 
-* The :func:`.open` function and :class:`BZ2File` class for reading and
-  writing compressed files.
-* The :class:`BZ2Compressor` and :class:`BZ2Decompressor` classes for
-  incremental (de)compression.
-* The :func:`compress` and :func:`decompress` functions for one-shot
-  (de)compression.
+* Hàm :func:`.open` và lớp :class:`BZ2File` để đọc và ghi các tệp đã nén.
+* Các lớp :class:`BZ2Compressor` và :class:`BZ2Decompressor` để nén và giải nén tăng dần.
+* Các hàm :func:`compress` và :func:`decompress` để (giải) nén một lần.
 
 .. include:: ../includes/optional-module.rst
 
 
-(De)compression of files
-------------------------
+(Giải) nén tệp
+--------------
 
 .. function:: open(filename, mode='rb', compresslevel=9, encoding=None, errors=None, newline=None)
 
-   Open a bzip2-compressed file in binary or text mode, returning a :term:`file
-   object`.
+   Mở tệp được nén bằng bzip2 ở chế độ nhị phân hoặc văn bản, trả về một :term:`file object`.
 
-   As with the constructor for :class:`BZ2File`, the *filename* argument can be
-   an actual filename (a :class:`str` or :class:`bytes` object), or an existing
-   file object to read from or write to.
+   Giống như hàm khởi tạo của :class:`BZ2File`, đối số *filename* có thể là tên tệp thực tế (một đối tượng :class:`str` hoặc :class:`bytes`), hoặc một đối tượng tệp hiện có để đọc hoặc ghi.
 
-   The *mode* argument can be any of ``'r'``, ``'rb'``, ``'w'``, ``'wb'``,
-   ``'x'``, ``'xb'``, ``'a'`` or ``'ab'`` for binary mode, or ``'rt'``,
-   ``'wt'``, ``'xt'``, or ``'at'`` for text mode. The default is ``'rb'``.
+   Đối số *mode* có thể là bất kỳ giá trị nào trong số ``'r'``, ``'rb'``, ``'w'``, ``'wb'``, ``'x'``, ``'xb'``, ``'a'`` hoặc ``'ab'`` cho chế độ nhị phân, hoặc ``'rt'``, ``'wt'``, ``'xt'`` hoặc ``'at'`` cho chế độ văn bản. Giá trị mặc định là ``'rb'``.
 
-   The *compresslevel* argument is an integer from 1 to 9, as for the
-   :class:`BZ2File` constructor.
+   Đối số *compresslevel* là một số nguyên từ 1 đến 9, giống như đối với
+   :class:`BZ2File` hàm khởi tạo.
 
-   For binary mode, this function is equivalent to the :class:`BZ2File`
-   constructor: ``BZ2File(filename, mode, compresslevel=compresslevel)``. In
-   this case, the *encoding*, *errors* and *newline* arguments must not be
-   provided.
+   Ở chế độ nhị phân, hàm này tương đương với constructor :class:`BZ2File`: ``BZ2File(filename, mode, compresslevel=compresslevel)``. Trong trường hợp này, không được cung cấp các đối số *encoding*, *errors* và *newline*.
 
-   For text mode, a :class:`BZ2File` object is created, and wrapped in an
-   :class:`io.TextIOWrapper` instance with the specified encoding, error
-   handling behavior, and line ending(s).
+   Ở chế độ văn bản, một đối tượng :class:`BZ2File` được tạo và bọc trong một
+   instance :class:`io.TextIOWrapper` với encoding, hành vi xử lý lỗi và (các) ký tự kết thúc dòng được chỉ định.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.4
-      The ``'x'`` (exclusive creation) mode was added.
+      Chế độ ``'x'`` (tạo độc quyền) đã được bổ sung.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. class:: BZ2File(filename, mode='r', *, compresslevel=9)
 
-   Open a bzip2-compressed file in binary mode.
+   Mở một tệp được nén bằng bzip2 ở chế độ nhị phân.
 
-   If *filename* is a :class:`str` or :class:`bytes` object, open the named file
-   directly. Otherwise, *filename* should be a :term:`file object`, which will
-   be used to read or write the compressed data.
+   Nếu *filename* là một đối tượng :class:`str` hoặc :class:`bytes`, hãy mở trực tiếp tệp có tên đó. Nếu không, *filename* phải là một :term:`file object`, được dùng để đọc hoặc ghi dữ liệu đã nén.
 
-   The *mode* argument can be either ``'r'`` for reading (default), ``'w'`` for
-   overwriting, ``'x'`` for exclusive creation, or ``'a'`` for appending. These
-   can equivalently be given as ``'rb'``, ``'wb'``, ``'xb'`` and ``'ab'``
-   respectively.
+   Đối số *mode* có thể là ``'r'`` để đọc (mặc định), ``'w'`` để ghi đè, ``'x'`` để tạo độc quyền hoặc ``'a'`` để nối thêm. Tương ứng, có thể cung cấp các giá trị này dưới dạng ``'rb'``, ``'wb'``, ``'xb'`` và ``'ab'``.
 
-   If *filename* is a file object (rather than an actual file name), a mode of
-   ``'w'`` does not truncate the file, and is instead equivalent to ``'a'``.
+   Nếu *filename* là một đối tượng tệp (thay vì tên tệp thực tế), chế độ ``'w'`` sẽ không cắt ngắn tệp mà tương đương với ``'a'``.
 
-   If *mode* is ``'w'`` or ``'a'``, *compresslevel* can be an integer between
-   ``1`` and ``9`` specifying the level of compression: ``1`` produces the
-   least compression, and ``9`` (default) produces the most compression.
+   Nếu *mode* là ``'w'`` hoặc ``'a'``, *compresslevel* có thể là một số nguyên từ ``1`` đến ``9``, chỉ định mức độ nén: ``1`` tạo ra mức nén thấp nhất, còn ``9`` (mặc định) tạo ra mức nén cao nhất.
 
-   If *mode* is ``'r'``, the input file may be the concatenation of multiple
-   compressed streams.
+   Nếu *mode* là ``'r'``, tệp đầu vào có thể là phần nối của nhiều luồng đã nén.
 
-   :class:`BZ2File` provides all of the members specified by the
-   :class:`io.BufferedIOBase`, except for :meth:`~io.BufferedIOBase.detach`
-   and :meth:`~io.IOBase.truncate`.
-   Iteration and the :keyword:`with` statement are supported.
+   :class:`BZ2File` cung cấp tất cả các thành phần được chỉ định bởi
+   :class:`io.BufferedIOBase`, ngoại trừ :meth:`~io.BufferedIOBase.detach` và :meth:`~io.IOBase.truncate`. Việc lặp và câu lệnh :keyword:`with` được hỗ trợ.
 
-   :class:`BZ2File` also provides the following methods and attributes:
+   :class:`BZ2File` cũng cung cấp các phương thức và thuộc tính sau:
 
    .. method:: peek([n])
 
-      Return buffered data without advancing the file position. At least one
-      byte of data will be returned (unless at EOF). The exact number of bytes
-      returned is unspecified.
+      Trả về dữ liệu đã được đệm mà không thay đổi vị trí tệp. Sẽ trả về ít nhất một byte dữ liệu (trừ khi đã đến EOF). Số byte chính xác được trả về không được quy định.
 
-      .. note:: While calling :meth:`peek` does not change the file position of
-         the :class:`BZ2File`, it may change the position of the underlying file
-         object (e.g. if the :class:`BZ2File` was constructed by passing a file
-         object for *filename*).
+      .. note:: Mặc dù việc gọi :meth:`peek` không làm thay đổi vị trí tệp của :class:`BZ2File`, thao tác này có thể làm thay đổi vị trí của đối tượng tệp bên dưới (ví dụ: nếu :class:`BZ2File` được tạo bằng cách truyền một đối tượng tệp cho *filename*).
 
       .. versionadded:: 3.3
 
    .. method:: fileno()
 
-      Return the file descriptor for the underlying file.
+      Trả về file descriptor của tệp bên dưới.
 
       .. versionadded:: 3.3
 
    .. method:: readable()
 
-      Return whether the file was opened for reading.
+      Trả về liệu tệp có được mở để đọc hay không.
 
       .. versionadded:: 3.3
 
    .. method:: seekable()
 
-      Return whether the file supports seeking.
+      Trả về liệu tệp có hỗ trợ thao tác tìm vị trí hay không.
 
       .. versionadded:: 3.3
 
    .. method:: writable()
 
-      Return whether the file was opened for writing.
+      Trả về liệu tệp có được mở để ghi hay không.
 
       .. versionadded:: 3.3
 
    .. method:: read1(size=-1)
 
-      Read up to *size* uncompressed bytes, while trying to avoid
-      making multiple reads from the underlying stream. Reads up to a
-      buffer's worth of data if size is negative.
+      Đọc tối đa *size* byte chưa giải nén, đồng thời cố gắng tránh thực hiện nhiều lần đọc từ stream bên dưới. Đọc tối đa lượng dữ liệu bằng kích thước của bộ đệm nếu size là số âm.
 
-      Returns ``b''`` if the file is at EOF.
+      Trả về ``b''`` nếu tệp ở cuối tệp (EOF).
 
       .. versionadded:: 3.3
 
    .. method:: readinto(b)
 
-      Read bytes into *b*.
+      Đọc các byte vào *b*.
 
-      Returns the number of bytes read (0 for EOF).
+      Trả về số byte đã đọc (0 khi gặp EOF).
 
       .. versionadded:: 3.3
 
    .. attribute:: mode
 
-      ``'rb'`` for reading and ``'wb'`` for writing.
+      ``'rb'`` để đọc và ``'wb'`` để ghi.
 
       .. versionadded:: 3.13
 
    .. attribute:: name
 
-      The bzip2 file name.  Equivalent to the :attr:`~io.FileIO.name`
-      attribute of the underlying :term:`file object`.
+      Tên tệp bzip2. Tương đương với thuộc tính :attr:`~io.FileIO.name` của :term:`file object` bên dưới.
 
       .. versionadded:: 3.13
 
 
    .. versionchanged:: 3.1
-      Support for the :keyword:`with` statement was added.
+      Đã bổ sung hỗ trợ cho câu lệnh :keyword:`with`.
 
    .. versionchanged:: 3.3
-      Support was added for *filename* being a :term:`file object` instead of an
-      actual filename.
+      Đã bổ sung hỗ trợ để *filename* là một :term:`file object` thay vì tên tệp thực tế.
 
-      The ``'a'`` (append) mode was added, along with support for reading
-      multi-stream files.
+      Chế độ ``'a'`` (append) đã được thêm vào, cùng với khả năng đọc các tệp đa luồng.
 
    .. versionchanged:: 3.4
-      The ``'x'`` (exclusive creation) mode was added.
+      Chế độ ``'x'`` (tạo độc quyền) đã được bổ sung.
 
    .. versionchanged:: 3.5
-      The :meth:`~io.BufferedIOBase.read` method now accepts an argument of
-      ``None``.
+      Phương thức :meth:`~io.BufferedIOBase.read` hiện chấp nhận một đối số có giá trị là ``None``.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.9
-      The *buffering* parameter has been removed. It was ignored and deprecated
-      since Python 3.0. Pass an open file object to control how the file is
-      opened.
+      Tham số *buffering* đã bị xóa. Tham số này đã bị bỏ qua và không được khuyến nghị kể từ Python 3.0. Hãy truyền một đối tượng tệp đã mở để kiểm soát cách tệp được mở.
 
-      The *compresslevel* parameter became keyword-only.
+      Tham số *compresslevel* chỉ có thể được truyền dưới dạng keyword.
 
    .. versionchanged:: 3.10
-      This class is thread unsafe in the face of multiple simultaneous
-      readers or writers, just like its equivalent classes in :mod:`gzip` and
-      :mod:`lzma` have always been.
+      Lớp này không an toàn với thread khi có nhiều reader hoặc writer hoạt động đồng thời, giống như các lớp tương đương trong :mod:`gzip` và
+      :mod:`lzma` đã luôn như vậy.
 
 
-Incremental (de)compression
----------------------------
+Nén và giải nén tăng dần
+------------------------
 
 .. class:: BZ2Compressor(compresslevel=9)
 
-   Create a new compressor object. This object may be used to compress data
-   incrementally. For one-shot compression, use the :func:`compress` function
-   instead.
+   Tạo một đối tượng compressor mới. Bạn có thể dùng đối tượng này để nén dữ liệu tăng dần. Để nén một lần, hãy dùng hàm :func:`compress` thay thế.
 
-   *compresslevel*, if given, must be an integer between ``1`` and ``9``. The
-   default is ``9``.
+   *compresslevel*, nếu được cung cấp, phải là một số nguyên nằm giữa ``1`` và ``9``. Giá trị mặc định là ``9``.
 
    .. method:: compress(data)
 
-      Provide data to the compressor object. Returns a chunk of compressed data
-      if possible, or an empty byte string otherwise.
+      Cung cấp dữ liệu cho đối tượng compressor. Trả về một đoạn dữ liệu đã nén nếu có thể, hoặc một chuỗi byte rỗng nếu không.
 
-      When you have finished providing data to the compressor, call the
-      :meth:`flush` method to finish the compression process.
+      Khi đã cung cấp xong dữ liệu cho compressor, hãy gọi
+      phương thức :meth:`flush` để hoàn tất quá trình nén.
 
 
    .. method:: flush()
 
-      Finish the compression process. Returns the compressed data left in
-      internal buffers.
+      Hoàn tất quá trình nén. Trả về dữ liệu đã nén còn lại trong các bộ đệm nội bộ.
 
-      The compressor object may not be used after this method has been called.
+      Không được sử dụng đối tượng compressor sau khi gọi phương thức này.
 
 
 .. class:: BZ2Decompressor()
 
-   Create a new decompressor object. This object may be used to decompress data
-   incrementally. For one-shot compression, use the :func:`decompress` function
-   instead.
+   Tạo một đối tượng decompressor mới. Có thể sử dụng đối tượng này để giải nén dữ liệu theo từng phần. Để nén một lần, hãy sử dụng hàm :func:`decompress` thay thế.
 
    .. note::
-      This class does not transparently handle inputs containing multiple
-      compressed streams, unlike :func:`decompress` and :class:`BZ2File`. If
-      you need to decompress a multi-stream input with :class:`BZ2Decompressor`,
-      you must use a new decompressor for each stream.
+      Lớp này không tự động xử lý các đầu vào chứa nhiều luồng dữ liệu đã nén, không giống như :func:`decompress` và :class:`BZ2File`. Nếu cần giải nén đầu vào nhiều luồng bằng :class:`BZ2Decompressor`, bạn phải sử dụng một decompressor mới cho mỗi luồng.
 
    .. method:: decompress(data, max_length=-1)
 
-      Decompress *data* (a :term:`bytes-like object`), returning
-      uncompressed data as bytes. Some of *data* may be buffered
-      internally, for use in later calls to :meth:`decompress`. The
-      returned data should be concatenated with the output of any
-      previous calls to :meth:`decompress`.
+      Giải nén *data* (một :term:`bytes-like object`), trả về dữ liệu chưa nén dưới dạng byte. Một phần *data* có thể được đệm nội bộ để sử dụng trong các lần gọi :meth:`decompress` sau. Dữ liệu được trả về nên được nối với đầu ra của mọi lần gọi :meth:`decompress` trước đó.
 
-      If *max_length* is nonnegative, returns at most *max_length*
-      bytes of decompressed data. If this limit is reached and further
-      output can be produced, the :attr:`~.needs_input` attribute will
-      be set to ``False``. In this case, the next call to
-      :meth:`~.decompress` may provide *data* as ``b''`` to obtain
-      more of the output.
+      Nếu *max_length* không âm, trả về nhiều nhất *max_length* byte dữ liệu đã giải nén. Nếu đạt đến giới hạn này và vẫn có thể tạo thêm đầu ra, thuộc tính :attr:`~.needs_input` sẽ được đặt thành ``False``. Trong trường hợp này, lần gọi tiếp theo đến
+      :meth:`~.decompress` có thể cung cấp *data* dưới dạng ``b''`` để nhận thêm phần đầu ra.
 
-      If all of the input data was decompressed and returned (either
-      because this was less than *max_length* bytes, or because
-      *max_length* was negative), the :attr:`~.needs_input` attribute
-      will be set to ``True``.
+      Nếu tất cả dữ liệu đầu vào đã được giải nén và trả về (do dữ liệu này có ít hơn *max_length* byte hoặc do *max_length* là số âm), thuộc tính :attr:`~.needs_input` sẽ được đặt thành ``True``.
 
-      Attempting to decompress data after the end of stream is reached
-      raises an :exc:`EOFError`.  Any data found after the end of the
-      stream is ignored and saved in the :attr:`~.unused_data` attribute.
+      Việc cố gắng giải nén dữ liệu sau khi đã đến cuối luồng sẽ gây ra :exc:`EOFError`. Mọi dữ liệu được tìm thấy sau cuối luồng sẽ bị bỏ qua và được lưu trong thuộc tính :attr:`~.unused_data`.
 
       .. versionchanged:: 3.5
-         Added the *max_length* parameter.
+         Đã thêm tham số *max_length*.
 
    .. attribute:: eof
 
-      ``True`` if the end-of-stream marker has been reached.
+      ``True`` nếu đã đến dấu hiệu kết thúc luồng.
 
       .. versionadded:: 3.3
 
 
    .. attribute:: unused_data
 
-      Data found after the end of the compressed stream.
+      Dữ liệu được tìm thấy sau cuối luồng đã nén.
 
-      If this attribute is accessed before the end of the stream has been
-      reached, its value will be ``b''``.
+      Nếu truy cập thuộc tính này trước khi đến cuối luồng, giá trị của nó sẽ là ``b''``.
 
    .. attribute:: needs_input
 
-      ``False`` if the :meth:`.decompress` method can provide more
-      decompressed data before requiring new uncompressed input.
+      ``False`` nếu phương thức :meth:`.decompress` có thể cung cấp thêm dữ liệu đã giải nén trước khi cần dữ liệu đầu vào chưa giải nén mới.
 
       .. versionadded:: 3.5
 
 
-One-shot (de)compression
-------------------------
+Nén (giải nén) một lần
+----------------------
 
 .. function:: compress(data, compresslevel=9)
 
-   Compress *data*, a :term:`bytes-like object <bytes-like object>`.
+   Nén *data*, một :term:`bytes-like object <bytes-like object>`.
 
-   *compresslevel*, if given, must be an integer between ``1`` and ``9``. The
-   default is ``9``.
+   *compresslevel*, nếu được cung cấp, phải là một số nguyên nằm giữa ``1`` và ``9``. Giá trị mặc định là ``9``.
 
-   For incremental compression, use a :class:`BZ2Compressor` instead.
+   Để nén tăng dần, hãy sử dụng một :class:`BZ2Compressor` thay vào đó.
 
 
 .. function:: decompress(data)
 
-   Decompress *data*, a :term:`bytes-like object <bytes-like object>`.
+   Giải nén *data*, một :term:`bytes-like object <bytes-like object>`.
 
-   If *data* is the concatenation of multiple compressed streams, decompress
-   all of the streams.
+   Nếu *data* là phần nối của nhiều luồng đã nén, hãy giải nén tất cả các luồng.
 
-   For incremental decompression, use a :class:`BZ2Decompressor` instead.
+   Để giải nén tăng dần, hãy sử dụng một :class:`BZ2Decompressor` thay vào đó.
 
    .. versionchanged:: 3.3
-      Support for multi-stream inputs was added.
+      Đã bổ sung hỗ trợ cho đầu vào đa luồng.
 
 .. _bz2-usage-examples:
 
-Examples of usage
------------------
+Ví dụ sử dụng
+-------------
 
-Below are some examples of typical usage of the :mod:`!bz2` module.
+Dưới đây là một số ví dụ về cách sử dụng điển hình của mô-đun :mod:`!bz2`.
 
-Using :func:`compress` and :func:`decompress` to demonstrate round-trip compression:
+Sử dụng :func:`compress` và :func:`decompress` để minh họa việc nén và giải nén theo vòng khứ hồi:
 
     >>> import bz2
     >>> data = b"""\
@@ -337,7 +272,7 @@ Using :func:`compress` and :func:`decompress` to demonstrate round-trip compress
     >>> data == d  # Check equality to original object after round-trip
     True
 
-Using :class:`BZ2Compressor` for incremental compression:
+Sử dụng :class:`BZ2Compressor` để nén tăng dần:
 
     >>> import bz2
     >>> def gen_data(chunks=10, chunksize=1000):
@@ -355,11 +290,9 @@ Using :class:`BZ2Compressor` for incremental compression:
     >>> # finished providing data to the compressor.
     >>> out = out + comp.flush()
 
-The example above uses a very "nonrandom" stream of data
-(a stream of ``b"z"`` chunks).  Random data tends to compress poorly,
-while ordered, repetitive data usually yields a high compression ratio.
+Ví dụ trên sử dụng một luồng dữ liệu "không ngẫu nhiên" điển hình (một luồng gồm các khối ``b"z"``). Dữ liệu ngẫu nhiên thường khó nén, trong khi dữ liệu có thứ tự và lặp lại thường cho tỷ lệ nén cao.
 
-Writing and reading a bzip2-compressed file in binary mode:
+Ghi và đọc tệp được nén bằng bzip2 ở chế độ nhị phân:
 
     >>> import bz2
     >>> data = b"""\

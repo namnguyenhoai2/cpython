@@ -1,13 +1,12 @@
 .. _cmdlinelibs:
 
-********************************
-Command-line interface libraries
-********************************
+****************************
+Thư viện giao diện dòng lệnh
+****************************
 
-The modules described in this chapter assist with implementing
-command line and terminal interfaces for applications.
+Các module được mô tả trong chương này hỗ trợ triển khai giao diện dòng lệnh và giao diện terminal cho các ứng dụng.
 
-Here's an overview:
+Dưới đây là phần tổng quan:
 
 .. toctree::
    :maxdepth: 1

@@ -1,8 +1,8 @@
-:mod:`!configparser` --- Configuration file parser
-==================================================
+:mod:`!configparser` --- Trình phân tích cú pháp tệp cấu hình
+=============================================================
 
 .. module:: configparser
-   :synopsis: Configuration file parser.
+   :synopsis: Trình phân tích cú pháp tệp cấu hình.
 
 .. moduleauthor:: Ken Manheimer <klm@zope.com>
 .. moduleauthor:: Barry Warsaw <bwarsaw@python.org>
@@ -11,7 +11,7 @@
 .. sectionauthor:: Christopher G. Petrilli <petrilli@amber.org>
 .. sectionauthor:: Łukasz Langa <lukasz@langa.pl>
 
-**Source code:** :source:`Lib/configparser.py`
+**Mã nguồn:** :source:`Lib/configparser.py`
 
 .. index::
    pair: .ini; file
@@ -21,29 +21,22 @@
 
 --------------
 
-This module provides the :class:`ConfigParser` class which implements a basic
-configuration language which provides a structure similar to what's found in
-Microsoft Windows INI files.  You can use this to write Python programs which
-can be customized by end users easily.
+Mô-đun này cung cấp lớp :class:`ConfigParser`, triển khai một ngôn ngữ cấu hình cơ bản có cấu trúc tương tự như cấu trúc trong các tệp INI của Microsoft Windows. Bạn có thể sử dụng lớp này để viết các chương trình Python mà người dùng cuối có thể dễ dàng tùy chỉnh.
 
 .. note::
 
-   This library does *not* interpret or write the value-type prefixes used in
-   the Windows Registry extended version of INI syntax.
+   Thư viện này *không* diễn giải hoặc ghi các tiền tố kiểu giá trị được sử dụng trong phiên bản mở rộng của cú pháp INI trong Windows Registry.
 
 .. seealso::
 
-   Module :mod:`tomllib`
-      TOML is a well-specified format for application configuration files.
-      It is specifically designed to be an improved version of INI.
+   Mô-đun :mod:`tomllib`
+      TOML là một định dạng được đặc tả rõ ràng dành cho các tệp cấu hình ứng dụng. Định dạng này được thiết kế chuyên biệt để trở thành một phiên bản cải tiến của INI.
 
-   Module :mod:`shlex`
-      Support for creating Unix shell-like mini-languages which can also
-      be used for application configuration files.
+   Mô-đun :mod:`shlex`
+      Hỗ trợ tạo các mini-language giống shell Unix, cũng có thể được dùng cho các tệp cấu hình ứng dụng.
 
-   Module :mod:`json`
-      The ``json`` module implements a subset of JavaScript syntax which is
-      sometimes used for configuration, but does not support comments.
+   Mô-đun :mod:`json`
+      Mô-đun ``json`` triển khai một tập hợp con cú pháp JavaScript đôi khi được dùng cho cấu hình, nhưng không hỗ trợ chú thích.
 
 
 .. testsetup::
@@ -57,10 +50,10 @@ can be customized by end users easily.
    os.remove("override.ini")
 
 
-Quick Start
------------
+Bắt đầu nhanh
+-------------
 
-Let's take a very basic configuration file that looks like this:
+Hãy xem xét một tệp cấu hình rất cơ bản có dạng như sau:
 
 .. code-block:: ini
 
@@ -77,11 +70,8 @@ Let's take a very basic configuration file that looks like this:
    Port = 50022
    ForwardX11 = no
 
-The structure of INI files is described `in the following section
-<#supported-ini-file-structure>`_.  Essentially, the file
-consists of sections, each of which contains keys with values.
-:mod:`!configparser` classes can read and write such files.  Let's start by
-creating the above configuration file programmatically.
+Cấu trúc của các tệp INI được mô tả `trong phần sau <#supported-ini-file-structure>`_. Về cơ bản, tệp bao gồm các section, mỗi section chứa các key cùng với value.
+:mod:`!configparser` các lớp có thể đọc và ghi những tệp như vậy. Hãy bắt đầu bằng cách tạo tệp cấu hình ở trên theo phương thức lập trình.
 
 .. doctest::
 
@@ -94,19 +84,16 @@ creating the above configuration file programmatically.
    >>> config['forge.example']['User'] = 'hg'
    >>> config['topsecret.server.example'] = {}
    >>> topsecret = config['topsecret.server.example']
-   >>> topsecret['Port'] = '50022'     # mutates the parser
-   >>> topsecret['ForwardX11'] = 'no'  # same here
+   >>> topsecret['Port'] = '50022'     # thay đổi parser
+   >>> topsecret['ForwardX11'] = 'no'  # ở đây cũng vậy
    >>> config['DEFAULT']['ForwardX11'] = 'yes'
    >>> with open('example.ini', 'w') as configfile:
    ...   config.write(configfile)
    ...
 
-As you can see, we can treat a config parser much like a dictionary.
-There are differences, `outlined later <#mapping-protocol-access>`_, but
-the behavior is very close to what you would expect from a dictionary.
+Như bạn có thể thấy, chúng ta có thể sử dụng config parser gần giống như một dictionary. Có một số điểm khác biệt, `được trình bày ở phần sau <#mapping-protocol-access>`_, nhưng hành vi của nó rất gần với những gì bạn mong đợi từ một dictionary.
 
-Now that we have created and saved a configuration file, let's read it
-back and explore the data it holds.
+Bây giờ chúng ta đã tạo và lưu tệp cấu hình, hãy đọc lại tệp đó và khám phá dữ liệu mà nó chứa.
 
 .. doctest::
 
@@ -140,17 +127,10 @@ back and explore the data it holds.
    >>> config['forge.example']['ForwardX11']
    'yes'
 
-As we can see above, the API is pretty straightforward.  The only bit of magic
-involves the ``DEFAULT`` section which provides default values for all other
-sections [1]_.  Note also that keys in sections are
-case-insensitive and stored in lowercase [1]_.
+Như có thể thấy ở trên, API khá dễ sử dụng. Phần duy nhất có chút đặc biệt liên quan đến ``DEFAULT`` section, cung cấp các giá trị mặc định cho tất cả các section khác [1]_. Cũng lưu ý rằng các key trong section không phân biệt chữ hoa chữ thường và được lưu ở dạng chữ thường [1]_.
 
-It is possible to read several configurations into a single
-:class:`ConfigParser`, where the most recently added configuration has the
-highest priority. Any conflicting keys are taken from the more recent
-configuration while the previously existing keys are retained. The example
-below reads in an ``override.ini`` file, which will override any conflicting
-keys from the ``example.ini`` file.
+Có thể đọc nhiều cấu hình vào một
+:class:`ConfigParser`, trong đó cấu hình được thêm gần đây nhất có độ ưu tiên cao nhất. Mọi khóa xung đột sẽ được lấy từ cấu hình mới hơn, còn các khóa đã tồn tại trước đó vẫn được giữ lại. Ví dụ dưới đây đọc một tệp ``override.ini``, tệp này sẽ ghi đè mọi khóa xung đột từ tệp ``example.ini``.
 
 .. code-block:: ini
 
@@ -171,16 +151,13 @@ keys from the ``example.ini`` file.
    -1
 
 
-This behaviour is equivalent to a :meth:`ConfigParser.read` call with several
-files passed to the *filenames* parameter.
+Hành vi này tương đương với một lời gọi :meth:`ConfigParser.read` có nhiều tệp được truyền vào tham số *filenames*.
 
 
-Supported Datatypes
--------------------
+Các kiểu dữ liệu được hỗ trợ
+----------------------------
 
-Config parsers do not guess datatypes of values in configuration files, always
-storing them internally as strings.  This means that if you need other
-datatypes, you should convert on your own:
+Các trình phân tích cấu hình không tự đoán kiểu dữ liệu của các giá trị trong tệp cấu hình mà luôn lưu trữ chúng nội bộ dưới dạng chuỗi. Điều này có nghĩa là nếu cần các kiểu dữ liệu khác, bạn nên tự chuyển đổi:
 
 .. doctest::
 
@@ -189,13 +166,7 @@ datatypes, you should convert on your own:
    >>> float(topsecret['CompressionLevel'])
    9.0
 
-Since this task is so common, config parsers provide a range of handy getter
-methods to handle integers, floats and booleans.  The last one is the most
-interesting because simply passing the value to ``bool()`` would do no good
-since ``bool('False')`` is still ``True``.  This is why config parsers also
-provide :meth:`~ConfigParser.getboolean`.  This method is case-insensitive and
-recognizes Boolean values from ``'yes'``/``'no'``, ``'on'``/``'off'``,
-``'true'``/``'false'`` and ``'1'``/``'0'`` [1]_.  For example:
+Vì tác vụ này rất phổ biến, các trình phân tích cấu hình cung cấp nhiều phương thức getter tiện dụng để xử lý số nguyên, số thực và giá trị Boolean. Loại cuối cùng thú vị nhất vì việc chỉ truyền giá trị vào ``bool()`` sẽ không có tác dụng, bởi ``bool('False')`` vẫn là ``True``. Vì vậy, các trình phân tích cấu hình cũng cung cấp :meth:`~ConfigParser.getboolean`. Phương thức này không phân biệt chữ hoa chữ thường và nhận diện các giá trị Boolean từ ``'yes'``/``'no'``, ``'on'``/``'off'``, ``'true'``/``'false'`` và ``'1'``/``'0'`` [1]_. Ví dụ:
 
 .. doctest::
 
@@ -206,16 +177,13 @@ recognizes Boolean values from ``'yes'``/``'no'``, ``'on'``/``'off'``,
    >>> config.getboolean('forge.example', 'Compression')
    True
 
-Apart from :meth:`~ConfigParser.getboolean`, config parsers also
-provide equivalent :meth:`~ConfigParser.getint` and
-:meth:`~ConfigParser.getfloat` methods.  You can register your own
-converters and customize the provided ones. [1]_
+Ngoài :meth:`~ConfigParser.getboolean`, các trình phân tích cấu hình cũng cung cấp :meth:`~ConfigParser.getint` tương đương và
+:meth:`~ConfigParser.getfloat` phương thức. Bạn có thể đăng ký các converter của riêng mình và tùy chỉnh những converter được cung cấp. [1]_
 
-Fallback Values
----------------
+Giá trị dự phòng
+----------------
 
-As with a dictionary, you can use a section's :meth:`~ConfigParser.get` method to
-provide fallback values:
+Tương tự như với dictionary, bạn có thể sử dụng phương thức :meth:`~ConfigParser.get` của một section để cung cấp các giá trị dự phòng:
 
 .. doctest::
 
@@ -227,21 +195,14 @@ provide fallback values:
    >>> topsecret.get('Cipher', '3des-cbc')
    '3des-cbc'
 
-Please note that default values have precedence over fallback values.
-For instance, in our example the ``'CompressionLevel'`` key was
-specified only in the ``'DEFAULT'`` section.  If we try to get it from
-the section ``'topsecret.server.example'``, we will always get the default,
-even if we specify a fallback:
+Lưu ý rằng các giá trị mặc định được ưu tiên hơn các giá trị dự phòng. Chẳng hạn, trong ví dụ của chúng ta, key ``'CompressionLevel'`` chỉ được chỉ định trong section ``'DEFAULT'``. Nếu thử lấy key này từ section ``'topsecret.server.example'``, chúng ta sẽ luôn nhận được giá trị mặc định, ngay cả khi chỉ định một giá trị dự phòng:
 
 .. doctest::
 
    >>> topsecret.get('CompressionLevel', '3')
    '9'
 
-One more thing to be aware of is that the parser-level :meth:`~ConfigParser.get` method
-provides a custom, more complex interface, maintained for backwards
-compatibility.  When using this method, a fallback value can be provided via
-the ``fallback`` keyword-only argument:
+Một điều nữa cần lưu ý là phương thức :meth:`~ConfigParser.get` ở cấp parser cung cấp một interface tùy chỉnh, phức tạp hơn, được duy trì để đảm bảo khả năng tương thích ngược. Khi sử dụng phương thức này, bạn có thể cung cấp giá trị dự phòng thông qua đối số chỉ dành cho keyword ``fallback``:
 
 .. doctest::
 
@@ -249,9 +210,9 @@ the ``fallback`` keyword-only argument:
    ...            fallback='No such things as monsters')
    'No such things as monsters'
 
-The same ``fallback`` argument can be used with the
-:meth:`~ConfigParser.getint`, :meth:`~ConfigParser.getfloat` and
-:meth:`~ConfigParser.getboolean` methods, for example:
+Có thể sử dụng cùng đối số ``fallback`` với
+:meth:`~ConfigParser.getint`, :meth:`~ConfigParser.getfloat` và
+:meth:`~ConfigParser.getboolean` phương thức, ví dụ:
 
 .. doctest::
 
@@ -264,32 +225,18 @@ The same ``fallback`` argument can be used with the
    False
 
 
-Supported INI File Structure
+Cấu trúc tệp INI được hỗ trợ
 ----------------------------
 
-A configuration file consists of sections, each led by a ``[section]`` header,
-followed by key/value entries separated by a specific string (``=`` or ``:`` by
-default [1]_).  By default, section names are case sensitive but keys are not
-[1]_.  Leading and trailing whitespace is removed from keys and values.
-Values can be omitted if the parser is configured to allow it [1]_,
-in which case the key/value delimiter may also be left
-out.  Values can also span multiple lines, as long as they are indented deeper
-than the first line of the value.  Depending on the parser's mode, blank lines
-may be treated as parts of multiline values or ignored.
+Một tệp cấu hình bao gồm các phần, mỗi phần bắt đầu bằng tiêu đề ``[section]``, theo sau là các mục khóa/giá trị được phân tách bằng một chuỗi cụ thể (``=`` hoặc ``:`` theo mặc định [1]_). Theo mặc định, tên phần phân biệt chữ hoa chữ thường nhưng khóa thì không [1]_. Khoảng trắng ở đầu và cuối được loại bỏ khỏi khóa và giá trị. Có thể bỏ qua giá trị nếu parser được cấu hình cho phép điều đó [1]_, trong trường hợp đó dấu phân cách khóa/giá trị cũng có thể được bỏ qua. Giá trị cũng có thể trải dài trên nhiều dòng, miễn là chúng được thụt lề sâu hơn dòng đầu tiên của giá trị. Tùy thuộc vào chế độ của parser, các dòng trống có thể được coi là một phần của giá trị nhiều dòng hoặc bị bỏ qua.
 
-By default, a valid section name can be any string that does not contain '\\n'.
-To change this, see :attr:`ConfigParser.SECTCRE`.
+Theo mặc định, tên phần hợp lệ có thể là bất kỳ chuỗi nào không chứa '\\n'. Để thay đổi điều này, hãy xem :attr:`ConfigParser.SECTCRE`.
 
-The first section name may be omitted if the parser is configured to allow an
-unnamed top level section with ``allow_unnamed_section=True``. In this case,
-the keys/values may be retrieved by :const:`UNNAMED_SECTION` as in
-``config[UNNAMED_SECTION]``.
+Có thể bỏ qua tên phần đầu tiên nếu parser được cấu hình cho phép một phần cấp cao nhất không có tên bằng ``allow_unnamed_section=True``. Trong trường hợp này, có thể truy xuất các khóa/giá trị bằng :const:`UNNAMED_SECTION` như trong ``config[UNNAMED_SECTION]``.
 
-Configuration files may include comments, prefixed by specific
-characters (``#`` and ``;`` by default [1]_).  Comments may appear on
-their own on an otherwise empty line, possibly indented. [1]_
+Tệp cấu hình có thể chứa chú thích, được bắt đầu bằng các ký tự cụ thể (``#`` và ``;`` theo mặc định [1]_). Chú thích có thể xuất hiện riêng trên một dòng vốn trống, và có thể được thụt lề. [1]_
 
-For example:
+Ví dụ:
 
 .. code-block:: ini
 
@@ -316,13 +263,13 @@ For example:
    empty string value here =
 
    [You can use comments]
-   # like this
+   # như thế này
    ; or this
 
-   # By default only in an empty line.
-   # Inline comments can be harmful because they prevent users
-   # from using the delimiting characters as parts of values.
-   # That being said, this can be customized.
+   # Theo mặc định, chỉ trên một dòng trống.
+   # Chú thích cùng dòng có thể gây hại vì chúng ngăn người dùng
+   # sử dụng các ký tự phân cách làm một phần của giá trị.
+   # Tuy vậy, bạn có thể tùy chỉnh điều này.
 
        [Sections Can Be Indented]
            can_values_be_as_well = True
@@ -333,16 +280,15 @@ For example:
                long as they are indented
                deeper than the first line
                of a value
-           # Did I mention we can indent comments, too?
+           # Tôi đã đề cập rằng chúng ta cũng có thể thụt lề chú thích chưa?
 
 
 .. _unnamed-sections:
 
-Unnamed Sections
-----------------
+Các phần không tên
+------------------
 
-The name of the first section (or unique) may be omitted and values
-retrieved by the :const:`UNNAMED_SECTION` attribute.
+Có thể bỏ qua tên của section đầu tiên (hoặc section duy nhất) và truy xuất các giá trị bằng thuộc tính :const:`UNNAMED_SECTION`.
 
 .. doctest::
 
@@ -357,23 +303,18 @@ retrieved by the :const:`UNNAMED_SECTION` attribute.
    >>> unnamed.get(configparser.UNNAMED_SECTION, 'option')
    'value'
 
-Interpolation of values
------------------------
+Nội suy giá trị
+---------------
 
-On top of the core functionality, :class:`ConfigParser` supports
-interpolation.  This means values can be preprocessed before returning them
-from ``get()`` calls.
+Ngoài chức năng cốt lõi, :class:`ConfigParser` hỗ trợ nội suy. Điều này có nghĩa là các giá trị có thể được tiền xử lý trước khi trả về từ các lần gọi ``get()``.
 
 .. index:: single: % (percent); interpolation in configuration files
 
 .. class:: BasicInterpolation()
 
-   The default implementation used by :class:`ConfigParser`.  It enables
-   values to contain format strings which refer to other values in the same
-   section, or values in the special default section [1]_.  Additional default
-   values can be provided on initialization.
+   Triển khai mặc định được :class:`ConfigParser` sử dụng. Triển khai này cho phép các giá trị chứa các chuỗi định dạng tham chiếu đến các giá trị khác trong cùng section hoặc các giá trị trong section mặc định đặc biệt [1]_. Có thể cung cấp thêm các giá trị mặc định khi khởi tạo.
 
-   For example:
+   Ví dụ:
 
    .. code-block:: ini
 
@@ -383,33 +324,20 @@ from ``get()`` calls.
       my_pictures: %(my_dir)s/Pictures
 
       [Escape]
-      # use a %% to escape the % sign (% is the only character that needs to be escaped):
+      # dùng %% để escape dấu % (% là ký tự duy nhất cần được escape):
       gain: 80%%
 
-   In the example above, :class:`ConfigParser` with *interpolation* set to
-   ``BasicInterpolation()`` would resolve ``%(home_dir)s`` to the value of
-   ``home_dir`` (``/Users`` in this case).  ``%(my_dir)s`` in effect would
-   resolve to ``/Users/lumberjack``.  All interpolations are done on demand so
-   keys used in the chain of references do not have to be specified in any
-   specific order in the configuration file.
+   Trong ví dụ trên, :class:`ConfigParser` với *interpolation* được đặt thành ``BasicInterpolation()`` sẽ phân giải ``%(home_dir)s`` thành giá trị của ``home_dir`` (``/Users`` trong trường hợp này). ``%(my_dir)s`` thực tế sẽ được phân giải thành ``/Users/lumberjack``. Tất cả nội suy đều được thực hiện theo yêu cầu, vì vậy các khóa được sử dụng trong chuỗi tham chiếu không cần phải được chỉ định theo bất kỳ thứ tự cụ thể nào trong tệp cấu hình.
 
-   With ``interpolation`` set to ``None``, the parser would simply return
-   ``%(my_dir)s/Pictures`` as the value of ``my_pictures`` and
-   ``%(home_dir)s/lumberjack`` as the value of ``my_dir``.
+   Khi ``interpolation`` được đặt thành ``None``, parser sẽ chỉ trả về ``%(my_dir)s/Pictures`` làm giá trị của ``my_pictures`` và ``%(home_dir)s/lumberjack`` làm giá trị của ``my_dir``.
 
 .. index:: single: $ (dollar); interpolation in configuration files
 
 .. class:: ExtendedInterpolation()
 
-   An alternative handler for interpolation which implements a more advanced
-   syntax, used for instance in ``zc.buildout``.  Extended interpolation is
-   using ``${section:option}`` to denote a value from a foreign section.
-   Interpolation can span multiple levels.  For convenience, if the
-   ``section:`` part is omitted, interpolation defaults to the current section
-   (and possibly the default values from the special section).
+   Một handler thay thế cho interpolation, triển khai cú pháp nâng cao hơn và được sử dụng chẳng hạn trong ``zc.buildout``. Extended interpolation sử dụng ``${section:option}`` để biểu thị một giá trị từ một section khác. Interpolation có thể trải qua nhiều cấp. Để thuận tiện, nếu bỏ qua phần ``section:``, interpolation sẽ mặc định sử dụng section hiện tại (và có thể cả các giá trị mặc định từ section đặc biệt).
 
-   For example, the configuration specified above with basic interpolation,
-   would look like this with extended interpolation:
+   Ví dụ: cấu hình được chỉ định ở trên với basic interpolation sẽ có dạng như sau khi sử dụng extended interpolation:
 
    .. code-block:: ini
 
@@ -419,10 +347,10 @@ from ``get()`` calls.
       my_pictures: ${my_dir}/Pictures
 
       [Escape]
-      # use a $$ to escape the $ sign ($ is the only character that needs to be escaped):
+      # dùng $$ để escape dấu $ ($ là ký tự duy nhất cần được escape):
       cost: $$80
 
-   Values from other sections can be fetched as well:
+   Bạn cũng có thể lấy các giá trị từ những section khác:
 
    .. code-block:: ini
 
@@ -443,101 +371,64 @@ from ``get()`` calls.
       my_pictures: ${my_dir}/Pictures
       python_dir: ${Frameworks:path}/Python/Versions/${Frameworks:Python}
 
-Mapping Protocol Access
------------------------
+Truy cập theo giao thức ánh xạ
+------------------------------
 
 .. versionadded:: 3.2
 
-Mapping protocol access is a generic name for functionality that enables using
-custom objects as if they were dictionaries.  In case of :mod:`!configparser`,
-the mapping interface implementation is using the
-``parser['section']['option']`` notation.
+Truy cập theo giao thức ánh xạ là tên gọi chung cho chức năng cho phép sử dụng các đối tượng tùy chỉnh như thể chúng là dictionary. Trong trường hợp :mod:`!configparser`, việc triển khai mapping interface sử dụng ký hiệu ``parser['section']['option']``.
 
-``parser['section']`` in particular returns a proxy for the section's data in
-the parser.  This means that the values are not copied but they are taken from
-the original parser on demand.  What's even more important is that when values
-are changed on a section proxy, they are actually mutated in the original
-parser.
+``parser['section']`` cụ thể trả về một proxy cho dữ liệu của section trong parser. Điều này có nghĩa là các giá trị không được sao chép mà được lấy từ parser gốc khi cần. Quan trọng hơn nữa, khi các giá trị được thay đổi trên proxy của section, chúng thực sự được thay đổi trong parser gốc.
 
-:mod:`!configparser` objects behave as close to actual dictionaries as possible.
-The mapping interface is complete and adheres to the
-:class:`~collections.abc.MutableMapping` ABC.
-However, there are a few differences that should be taken into account:
+Các đối tượng :mod:`!configparser` hoạt động gần giống các dictionary thực tế nhất có thể. Giao diện mapping được hoàn thiện và tuân theo
+ABC :class:`~collections.abc.MutableMapping`. Tuy nhiên, có một vài điểm khác biệt cần lưu ý:
 
-* By default, all keys in sections are accessible in a case-insensitive manner
-  [1]_.  E.g. ``for option in parser["section"]`` yields only ``optionxform``'ed
-  option key names.  This means lowercased keys by default.  At the same time,
-  for a section that holds the key ``'a'``, both expressions return ``True``::
+* Theo mặc định, tất cả các khóa trong section đều có thể được truy cập theo cách không phân biệt chữ hoa chữ thường [1]_. Ví dụ: ``for option in parser["section"]`` chỉ trả về các tên khóa tùy chọn đã được ``optionxform``'ed. Điều này có nghĩa là các khóa được chuyển thành chữ thường theo mặc định. Đồng thời, đối với một section chứa khóa ``'a'``, cả hai biểu thức đều trả về ``True``::
 
      "a" in parser["section"]
      "A" in parser["section"]
 
-* All sections include ``DEFAULTSECT`` values as well which means that
-  ``.clear()`` on a section may not leave the section visibly empty.  This is
-  because default values cannot be deleted from the section (because technically
-  they are not there).  If they are overridden in the section, deleting causes
-  the default value to be visible again.  Trying to delete a default value
-  causes a :exc:`KeyError`.
+* Tất cả các section cũng bao gồm các giá trị ``DEFAULTSECT``, nghĩa là ``.clear()`` trên một section có thể không khiến section đó trống theo cách nhìn thấy được. Điều này là vì không thể xóa các giá trị mặc định khỏi section (vì về mặt kỹ thuật, chúng không nằm trong đó). Nếu chúng bị ghi đè trong section, thao tác xóa sẽ khiến giá trị mặc định hiển thị lại. Cố gắng xóa một giá trị mặc định sẽ gây ra :exc:`KeyError`.
 
-* ``DEFAULTSECT`` cannot be removed from the parser:
+* Không thể xóa ``DEFAULTSECT`` khỏi parser:
 
-  * trying to delete it raises :exc:`ValueError`,
+  * cố gắng xóa nó sẽ gây ra :exc:`ValueError`,
 
-  * ``parser.clear()`` leaves it intact,
+  * ``parser.clear()`` giữ nguyên nó,
 
-  * ``parser.popitem()`` never returns it.
+  * ``parser.popitem()`` không bao giờ trả về nó.
 
-* ``parser.get(section, option, **kwargs)`` - the second argument is **not**
-  a fallback value.  Note however that the section-level ``get()`` methods are
-  compatible both with the mapping protocol and the classic configparser API.
+* ``parser.get(section, option, **kwargs)`` - đối số thứ hai là **not** một giá trị dự phòng. Tuy nhiên, lưu ý rằng các phương thức ``get()`` cấp section tương thích cả với mapping protocol và API configparser cổ điển.
 
-* ``parser.items()`` is compatible with the mapping protocol (returns a list of
-  *section_name*, *section_proxy* pairs including the DEFAULTSECT).  However,
-  this method can also be invoked with arguments: ``parser.items(section, raw,
-  vars)``.  The latter call returns a list of *option*, *value* pairs for
-  a specified ``section``, with all interpolations expanded (unless
-  ``raw=True`` is provided).
+* ``parser.items()`` tương thích với mapping protocol (trả về danh sách các cặp *section_name*, *section_proxy* bao gồm cả DEFAULTSECT). Tuy nhiên, phương thức này cũng có thể được gọi với các đối số: ``parser.items(section, raw, vars)``. Lệnh gọi sau trả về danh sách các cặp *option*, *value* cho một ``section`` được chỉ định, với tất cả các phép nội suy được mở rộng (trừ khi ``raw=True`` được cung cấp).
 
-The mapping protocol is implemented on top of the existing legacy API so that
-subclasses overriding the original interface still should have mappings working
-as expected.
+mapping protocol được triển khai trên API legacy hiện có, vì vậy các subclass ghi đè interface ban đầu vẫn sẽ có mapping hoạt động như mong đợi.
 
 
-Customizing Parser Behaviour
+.. _`Customizing Parser Behaviour`:
+
+Tùy chỉnh hành vi của Parser
 ----------------------------
 
-There are nearly as many INI format variants as there are applications using it.
-:mod:`!configparser` goes a long way to provide support for the largest sensible
-set of INI styles available.  The default functionality is mainly dictated by
-historical background and it's very likely that you will want to customize some
-of the features.
+Số lượng biến thể của định dạng INI gần tương đương với số lượng ứng dụng sử dụng nó.
+:mod:`!configparser` hỗ trợ rất nhiều kiểu INI hợp lý nhất có thể. Chức năng mặc định chủ yếu được quyết định bởi bối cảnh lịch sử, và rất có thể bạn sẽ muốn tùy chỉnh một số tính năng.
 
-The most common way to change the way a specific config parser works is to use
-the :meth:`!__init__` options:
+Cách phổ biến nhất để thay đổi cách một config parser cụ thể hoạt động là sử dụng các tùy chọn :meth:`!__init__`:
 
-* *defaults*, default value: ``None``
+* *defaults*, giá trị mặc định: ``None``
 
-  This option accepts a dictionary of key-value pairs which will be initially
-  put in the ``DEFAULT`` section.  This makes for an elegant way to support
-  concise configuration files that don't specify values which are the same as
-  the documented default.
+  Tùy chọn này chấp nhận một dictionary gồm các cặp key-value, ban đầu sẽ được đưa vào section ``DEFAULT``. Đây là một cách hiệu quả để hỗ trợ các tệp cấu hình ngắn gọn, trong đó không cần chỉ định những giá trị trùng với giá trị mặc định đã được ghi trong tài liệu.
 
-  Hint: if you want to specify default values for a specific section, use
-  :meth:`~ConfigParser.read_dict` before you read the actual file.
+  Gợi ý: nếu bạn muốn chỉ định các giá trị mặc định cho một section cụ thể, hãy sử dụng
+  :meth:`~ConfigParser.read_dict` trước khi đọc tệp thực tế.
 
-* *dict_type*, default value: :class:`dict`
+* *dict_type*, giá trị mặc định: :class:`dict`
 
-  This option has a major impact on how the mapping protocol will behave and how
-  the written configuration files look.  With the standard dictionary, every
-  section is stored in the order they were added to the parser.  Same goes for
-  options within sections.
+  Tùy chọn này có ảnh hưởng lớn đến cách mapping protocol hoạt động và hình thức của các tệp cấu hình được ghi. Với dictionary tiêu chuẩn, mỗi section được lưu theo thứ tự chúng được thêm vào parser. Điều tương tự cũng áp dụng cho các option trong section.
 
-  An alternative dictionary type can be used for example to sort sections and
-  options on write-back.
+  Có thể sử dụng một kiểu dictionary thay thế, chẳng hạn để sắp xếp các section và option khi ghi lại.
 
-  Please note: there are ways to add a set of key-value pairs in a single
-  operation.  When you use a regular dictionary in those operations, the order
-  of the keys will be ordered.  For example:
+  Lưu ý: có những cách để thêm một tập hợp các cặp key-value trong một thao tác duy nhất. Khi sử dụng dictionary thông thường trong các thao tác đó, thứ tự các key sẽ được sắp xếp. Ví dụ:
 
   .. doctest::
 
@@ -557,12 +448,9 @@ the :meth:`!__init__` options:
      >>> [option for option in parser['section3']]
      ['foo', 'bar', 'baz']
 
-* *allow_no_value*, default value: ``False``
+* *allow_no_value*, giá trị mặc định: ``False``
 
-  Some configuration files are known to include settings without values, but
-  which otherwise conform to the syntax supported by :mod:`!configparser`.  The
-  *allow_no_value* parameter to the constructor can be used to
-  indicate that such values should be accepted:
+  Một số tệp cấu hình được biết là có các thiết lập không có giá trị, nhưng vẫn tuân theo cú pháp được :mod:`!configparser` hỗ trợ. Có thể sử dụng tham số *allow_no_value* của constructor để cho biết rằng các giá trị như vậy được chấp nhận:
 
   .. doctest::
 
@@ -575,59 +463,46 @@ the :meth:`!__init__` options:
      ...   skip-external-locking
      ...   old_passwords = 1
      ...   skip-bdb
-     ...   # we don't need ACID today
+     ...   # hôm nay chúng ta không cần ACID
      ...   skip-innodb
      ... """
      >>> config = configparser.ConfigParser(allow_no_value=True)
      >>> config.read_string(sample_config)
 
-     >>> # Settings with values are treated as before:
+     >>> # Các thiết lập có giá trị được xử lý như trước:
      >>> config["mysqld"]["user"]
      'mysql'
 
-     >>> # Settings without values provide None:
+     >>> # Các thiết lập không có giá trị sẽ cung cấp None:
      >>> config["mysqld"]["skip-bdb"]
 
-     >>> # Settings which aren't specified still raise an error:
+     >>> # Các thiết lập không được chỉ định vẫn gây ra lỗi:
      >>> config["mysqld"]["does-not-exist"]
      Traceback (most recent call last):
        ...
      KeyError: 'does-not-exist'
 
-* *delimiters*, default value: ``('=', ':')``
+* *delimiters*, giá trị mặc định: ``('=', ':')``
 
-  Delimiters are substrings that delimit keys from values within a section.
-  The first occurrence of a delimiting substring on a line is considered
-  a delimiter.  This means values (but not keys) can contain the delimiters.
+  Delimiters là các chuỗi con dùng để phân tách khóa khỏi giá trị trong một section. Lần xuất hiện đầu tiên của chuỗi con phân tách trên một dòng được xem là delimiter. Điều này có nghĩa là các giá trị (nhưng không phải khóa) có thể chứa delimiters.
 
-  See also the *space_around_delimiters* argument to
+  Xem thêm đối số *space_around_delimiters*
   :meth:`ConfigParser.write`.
 
-* *comment_prefixes*, default value: ``('#', ';')``
+* *comment_prefixes*, giá trị mặc định: ``('#', ';')``
 
-* *inline_comment_prefixes*, default value: ``None``
+* *inline_comment_prefixes*, giá trị mặc định: ``None``
 
-  Comment prefixes are strings that indicate the start of a valid comment within
-  a config file. *comment_prefixes* are used only on otherwise empty lines
-  (optionally indented) whereas *inline_comment_prefixes* can be used after
-  every valid value (e.g. section names, options and empty lines as well).  By
-  default inline comments are disabled and ``'#'`` and ``';'`` are used as
-  prefixes for whole line comments.
+  Tiền tố comment là các chuỗi cho biết vị trí bắt đầu của một comment hợp lệ trong tệp cấu hình. *comment_prefixes* chỉ được sử dụng trên các dòng vốn trống (có thể được thụt lề), trong khi *inline_comment_prefixes* có thể được sử dụng sau mọi giá trị hợp lệ (chẳng hạn như tên section, option và cả các dòng trống). Theo mặc định, comment inline bị vô hiệu hóa, còn ``'#'`` và ``';'`` được dùng làm tiền tố cho comment trên toàn dòng.
 
   .. versionchanged:: 3.2
-     In previous versions of :mod:`!configparser` behaviour matched
-     ``comment_prefixes=('#',';')`` and ``inline_comment_prefixes=(';',)``.
+     Trong các phiên bản trước, hành vi của :mod:`!configparser` khớp với ``comment_prefixes=('#',';')`` và ``inline_comment_prefixes=(';',)``.
 
-  Please note that config parsers don't support escaping of comment prefixes so
-  using *inline_comment_prefixes* may prevent users from specifying option
-  values with characters used as comment prefixes.  When in doubt, avoid
-  setting *inline_comment_prefixes*.  In any circumstances, the only way of
-  storing comment prefix characters at the beginning of a line in multiline
-  values is to interpolate the prefix, for example::
+  Lưu ý rằng các config parser không hỗ trợ việc escape tiền tố comment, vì vậy việc sử dụng *inline_comment_prefixes* có thể ngăn người dùng chỉ định các giá trị option chứa những ký tự được dùng làm tiền tố comment. Khi không chắc chắn, hãy tránh thiết lập *inline_comment_prefixes*. Trong mọi trường hợp, cách duy nhất để lưu các ký tự tiền tố comment ở đầu một dòng trong các giá trị nhiều dòng là nội suy tiền tố, chẳng hạn như::
 
     >>> from configparser import ConfigParser, ExtendedInterpolation
     >>> parser = ConfigParser(interpolation=ExtendedInterpolation())
-    >>> # the default BasicInterpolation could be used as well
+    >>> # cũng có thể sử dụng BasicInterpolation mặc định
     >>> parser.read_string("""
     ... [DEFAULT]
     ... hash = #
@@ -643,7 +518,7 @@ the :meth:`!__init__` options:
     ...   #disabled_by_comment
     ...   yet_another_extension
     ...
-    ... interpolation not necessary = if # is not at line start
+    ... interpolation not necessary = if # không ở đầu dòng
     ... even in multiline values = line #1
     ...   line #2
     ...   line #3
@@ -658,31 +533,23 @@ the :meth:`!__init__` options:
     another_extension
     yet_another_extension
     >>> print(parser['hashes']['interpolation not necessary'])
-    if # is not at line start
+    if # không ở đầu dòng
     >>> print(parser['hashes']['even in multiline values'])
     line #1
     line #2
     line #3
 
-* *strict*, default value: ``True``
+* *strict*, giá trị mặc định: ``True``
 
-  When set to ``True``, the parser will not allow for any section or option
-  duplicates while reading from a single source (using :meth:`~ConfigParser.read_file`,
-  :meth:`~ConfigParser.read_string` or :meth:`~ConfigParser.read_dict`).  It is recommended to use strict
-  parsers in new applications.
+  Khi được đặt thành ``True``, parser sẽ không cho phép bất kỳ section hoặc option nào bị trùng lặp trong khi đọc từ một nguồn duy nhất (sử dụng :meth:`~ConfigParser.read_file`,
+  :meth:`~ConfigParser.read_string` hoặc :meth:`~ConfigParser.read_dict`). Bạn nên sử dụng strict parser trong các ứng dụng mới.
 
   .. versionchanged:: 3.2
-     In previous versions of :mod:`!configparser` behaviour matched
-     ``strict=False``.
+     Trong các phiên bản trước, hành vi của :mod:`!configparser` khớp với ``strict=False``.
 
-* *empty_lines_in_values*, default value: ``True``
+* *empty_lines_in_values*, giá trị mặc định: ``True``
 
-  In config parsers, values can span multiple lines as long as they are
-  indented more than the key that holds them.  By default parsers also let
-  empty lines to be parts of values.  At the same time, keys can be arbitrarily
-  indented themselves to improve readability.  In consequence, when
-  configuration files get big and complex, it is easy for the user to lose
-  track of the file structure.  Take for instance:
+  Trong các config parser, giá trị có thể trải dài trên nhiều dòng miễn là chúng được thụt lề nhiều hơn key chứa chúng. Theo mặc định, parser cũng cho phép các dòng trống là một phần của giá trị. Đồng thời, bản thân các key có thể được thụt lề tùy ý để cải thiện khả năng đọc. Do đó, khi các file cấu hình trở nên lớn và phức tạp, người dùng rất dễ mất dấu cấu trúc của file. Ví dụ:
 
   .. code-block:: ini
 
@@ -692,64 +559,30 @@ the :meth:`!__init__` options:
 
       this = is still a part of the multiline value of 'key'
 
-  This can be especially problematic for the user to see if she's using a
-  proportional font to edit the file.  That is why when your application does
-  not need values with empty lines, you should consider disallowing them.  This
-  will make empty lines split keys every time.  In the example above, it would
-  produce two keys, ``key`` and ``this``.
+  Điều này có thể đặc biệt gây khó khăn cho người dùng khi xem nếu cô ấy đang sử dụng phông chữ tỷ lệ để chỉnh sửa tệp. Đó là lý do vì sao khi ứng dụng của bạn không cần các giá trị có dòng trống, bạn nên cân nhắc không cho phép chúng. Khi đó, các dòng trống sẽ luôn phân tách các khóa. Trong ví dụ trên, kết quả sẽ là hai khóa, ``key`` và ``this``.
 
-* *default_section*, default value: ``configparser.DEFAULTSECT`` (that is:
-  ``"DEFAULT"``)
+* *default_section*, giá trị mặc định: ``configparser.DEFAULTSECT`` (tức là: ``"DEFAULT"``)
 
-  The convention of allowing a special section of default values for other
-  sections or interpolation purposes is a powerful concept of this library,
-  letting users create complex declarative configurations.  This section is
-  normally called ``"DEFAULT"`` but this can be customized to point to any
-  other valid section name.  Some typical values include: ``"general"`` or
-  ``"common"``.  The name provided is used for recognizing default sections
-  when reading from any source and is used when writing configuration back to
-  a file.  Its current value can be retrieved using the
-  ``parser_instance.default_section`` attribute and may be modified at runtime
-  (i.e. to convert files from one format to another).
+  Quy ước cho phép một section đặc biệt chứa các giá trị mặc định cho những section khác hoặc phục vụ mục đích interpolation là một khái niệm mạnh mẽ của thư viện này, cho phép người dùng tạo các cấu hình khai báo phức tạp. Section này thường được gọi là ``"DEFAULT"``, nhưng có thể tùy chỉnh để trỏ đến bất kỳ tên section hợp lệ nào khác. Một số giá trị thường dùng gồm: ``"general"`` hoặc ``"common"``. Tên được cung cấp sẽ được dùng để nhận diện các section mặc định khi đọc từ bất kỳ nguồn nào và được dùng khi ghi cấu hình trở lại tệp. Có thể lấy giá trị hiện tại của tên này bằng thuộc tính ``parser_instance.default_section`` và có thể thay đổi nó trong runtime (tức là để chuyển đổi tệp từ định dạng này sang định dạng khác).
 
-* *interpolation*, default value: ``configparser.BasicInterpolation``
+* *interpolation*, giá trị mặc định: ``configparser.BasicInterpolation``
 
-  Interpolation behaviour may be customized by providing a custom handler
-  through the *interpolation* argument. ``None`` can be used to turn off
-  interpolation completely, ``ExtendedInterpolation()`` provides a more
-  advanced variant inspired by ``zc.buildout``.  More on the subject in the
-  `dedicated documentation section <#interpolation-of-values>`_.
-  :class:`RawConfigParser` has a default value of ``None``.
+  Có thể tùy chỉnh hành vi interpolation bằng cách cung cấp một handler tùy chỉnh thông qua đối số *interpolation*. Có thể dùng ``None`` để tắt hoàn toàn interpolation; ``ExtendedInterpolation()`` cung cấp một biến thể nâng cao hơn, lấy cảm hứng từ ``zc.buildout``. Xem thêm về chủ đề này trong `phần tài liệu chuyên biệt <#interpolation-of-values>`_.
+  :class:`RawConfigParser` có giá trị mặc định là ``None``.
 
-* *converters*, default value: not set
+* *converters*, giá trị mặc định: chưa thiết lập
 
-  Config parsers provide option value getters that perform type conversion.  By
-  default :meth:`~ConfigParser.getint`, :meth:`~ConfigParser.getfloat`, and
-  :meth:`~ConfigParser.getboolean` are implemented.  Should other getters be
-  desirable, users may define them in a subclass or pass a dictionary where each
-  key is a name of the converter and each value is a callable implementing said
-  conversion.  For instance, passing ``{'decimal': decimal.Decimal}`` would add
-  :meth:`!getdecimal` on both the parser object and all section proxies.  In
-  other words, it will be possible to write both
-  ``parser_instance.getdecimal('section', 'key', fallback=0)`` and
-  ``parser_instance['section'].getdecimal('key', 0)``.
+  Bộ phân tích cấu hình cung cấp các getter giá trị tùy chọn thực hiện chuyển đổi kiểu. Theo mặc định :meth:`~ConfigParser.getint`, :meth:`~ConfigParser.getfloat`, và
+  :meth:`~ConfigParser.getboolean` được triển khai. Nếu cần các getter khác, người dùng có thể định nghĩa chúng trong một lớp con hoặc truyền vào một dictionary, trong đó mỗi khóa là tên của bộ chuyển đổi và mỗi giá trị là một callable thực hiện việc chuyển đổi đó. Ví dụ, việc truyền ``{'decimal': decimal.Decimal}`` sẽ thêm
+  :meth:`!getdecimal` vào cả đối tượng parser và tất cả section proxy. Nói cách khác, có thể viết cả ``parser_instance.getdecimal('section', 'key', fallback=0)`` và ``parser_instance['section'].getdecimal('key', 0)``.
 
-  If the converter needs to access the state of the parser, it can be
-  implemented as a method on a config parser subclass.  If the name of this
-  method starts with ``get``, it will be available on all section proxies, in
-  the dict-compatible form (see the ``getdecimal()`` example above).
+  Nếu bộ chuyển đổi cần truy cập trạng thái của parser, bạn có thể triển khai nó dưới dạng một method trên lớp con của config parser. Nếu tên của method này bắt đầu bằng ``get``, nó sẽ khả dụng trên tất cả section proxy, dưới dạng tương thích với dict (xem ví dụ ``getdecimal()`` ở trên).
 
-More advanced customization may be achieved by overriding default values of
-these parser attributes.  The defaults are defined on the classes, so they may
-be overridden by subclasses or by attribute assignment.
+Có thể thực hiện việc tùy chỉnh nâng cao hơn bằng cách ghi đè các giá trị mặc định của những thuộc tính parser này. Các giá trị mặc định được định nghĩa trên các lớp, vì vậy có thể ghi đè chúng trong các lớp con hoặc bằng phép gán thuộc tính.
 
 .. attribute:: ConfigParser.BOOLEAN_STATES
 
-   By default when using :meth:`~ConfigParser.getboolean`, config parsers
-   consider the following values ``True``: ``'1'``, ``'yes'``, ``'true'``,
-   ``'on'`` and the following values ``False``: ``'0'``, ``'no'``, ``'false'``,
-   ``'off'``.  You can override this by specifying a custom dictionary of strings
-   and their Boolean outcomes. For example:
+   Theo mặc định khi sử dụng :meth:`~ConfigParser.getboolean`, config parser coi các giá trị sau là ``True``: ``'1'``, ``'yes'``, ``'true'``, ``'on'`` và các giá trị sau là ``False``: ``'0'``, ``'no'``, ``'false'``, ``'off'``. Bạn có thể ghi đè hành vi này bằng cách chỉ định một dictionary tùy chỉnh gồm các chuỗi và kết quả Boolean tương ứng. Ví dụ:
 
    .. doctest::
 
@@ -763,17 +596,12 @@ be overridden by subclasses or by attribute assignment.
       >>> custom['section1'].getboolean('funky')
       False
 
-   Other typical Boolean pairs include ``accept``/``reject`` or
-   ``enabled``/``disabled``.
+   Các cặp Boolean điển hình khác bao gồm ``accept``/``reject`` hoặc ``enabled``/``disabled``.
 
 .. method:: ConfigParser.optionxform(option)
    :noindex:
 
-   This method transforms option names on every read, get, or set
-   operation.  The default converts the name to lowercase.  This also
-   means that when a configuration file gets written, all keys will be
-   lowercase.  Override this method if that's unsuitable.
-   For example:
+   Phương thức này chuyển đổi tên tùy chọn trong mọi thao tác đọc, get hoặc set. Theo mặc định, tên được chuyển thành chữ thường. Điều này cũng có nghĩa là khi tệp cấu hình được ghi, tất cả các khóa sẽ ở dạng chữ thường. Hãy ghi đè phương thức này nếu cách xử lý đó không phù hợp. Ví dụ:
 
    .. doctest::
 
@@ -799,18 +627,12 @@ be overridden by subclasses or by attribute assignment.
       ['AnotherKey']
 
    .. note::
-      The optionxform function transforms option names to a canonical form.
-      This should be an idempotent function: if the name is already in
-      canonical form, it should be returned unchanged.
+      Hàm optionxform chuyển đổi tên tùy chọn thành dạng chuẩn. Đây nên là một hàm lũy đẳng (idempotent): nếu tên đã ở dạng chuẩn thì phải trả về tên đó mà không thay đổi.
 
 
 .. attribute:: ConfigParser.SECTCRE
 
-   A compiled regular expression used to parse section headers.  The default
-   matches ``[section]`` to the name ``"section"``.  Whitespace is considered
-   part of the section name, thus ``[  larch  ]`` will be read as a section of
-   name ``"  larch  "``.  Override this attribute if that's unsuitable.  For
-   example:
+   Một biểu thức chính quy đã biên dịch được dùng để phân tích cú pháp tiêu đề section. Theo mặc định, biểu thức này khớp với ``[section]`` để lấy tên ``"section"``. Khoảng trắng được xem là một phần của tên section, vì vậy ``[  larch  ]`` sẽ được đọc là section có tên ``"  larch  "``. Hãy ghi đè thuộc tính này nếu cách xử lý đó không phù hợp. Ví dụ:
 
    .. doctest::
 
@@ -834,31 +656,25 @@ be overridden by subclasses or by attribute assignment.
 
    .. note::
 
-      While ConfigParser objects also use an ``OPTCRE`` attribute for recognizing
-      option lines, it's not recommended to override it because that would
-      interfere with constructor options *allow_no_value* and *delimiters*.
+      Mặc dù các đối tượng ConfigParser cũng sử dụng thuộc tính ``OPTCRE`` để nhận diện các dòng tùy chọn, bạn không nên ghi đè thuộc tính này vì điều đó sẽ ảnh hưởng đến các tùy chọn constructor *allow_no_value* và *delimiters*.
 
 
-Legacy API Examples
+Các ví dụ về API cũ
 -------------------
 
-Mainly because of backwards compatibility concerns, :mod:`!configparser`
-provides also a legacy API with explicit ``get``/``set`` methods.  While there
-are valid use cases for the methods outlined below, mapping protocol access is
-preferred for new projects.  The legacy API is at times more advanced,
-low-level and downright counterintuitive.
+Chủ yếu do các mối lo ngại về khả năng tương thích ngược, :mod:`!configparser` cũng cung cấp một API cũ với các phương thức ``get``/``set`` tường minh. Mặc dù các phương thức được trình bày dưới đây có những trường hợp sử dụng hợp lệ, việc truy cập theo mapping protocol được ưu tiên cho các dự án mới. API cũ đôi khi nâng cao hơn, ở mức thấp hơn và hoàn toàn không trực quan.
 
-An example of writing to a configuration file::
+Ví dụ về cách ghi vào tệp cấu hình::
 
    import configparser
 
    config = configparser.RawConfigParser()
 
-   # Please note that using RawConfigParser's set functions, you can assign
-   # non-string values to keys internally, but will receive an error when
-   # attempting to write to a file or when you get it in non-raw mode. Setting
-   # values using the mapping protocol or ConfigParser's set() does not allow
-   # such assignments to take place.
+   # Lưu ý rằng khi sử dụng các hàm set của RawConfigParser, bạn có thể gán
+   # các giá trị không phải chuỗi cho các khóa ở bên trong, nhưng sẽ nhận được lỗi khi
+   # cố ghi vào tệp hoặc khi lấy giá trị ở chế độ không raw. Việc thiết lập
+   # giá trị bằng mapping protocol hoặc set() của ConfigParser không cho phép
+   # thực hiện các phép gán như vậy.
    config.add_section('Section1')
    config.set('Section1', 'an_int', '15')
    config.set('Section1', 'a_bool', 'true')
@@ -867,46 +683,46 @@ An example of writing to a configuration file::
    config.set('Section1', 'bar', 'Python')
    config.set('Section1', 'foo', '%(bar)s is %(baz)s!')
 
-   # Writing our configuration file to 'example.cfg'
+   # Ghi tệp cấu hình của chúng ta vào 'example.cfg'
    with open('example.cfg', 'w') as configfile:
        config.write(configfile)
 
-An example of reading the configuration file again::
+Ví dụ về việc đọc lại tệp cấu hình::
 
    import configparser
 
    config = configparser.RawConfigParser()
    config.read('example.cfg')
 
-   # getfloat() raises an exception if the value is not a float
-   # getint() and getboolean() also do this for their respective types
+   # getfloat() sẽ phát sinh ngoại lệ nếu giá trị không phải là số thực
+   # getint() và getboolean() cũng thực hiện điều tương tự với các kiểu tương ứng
    a_float = config.getfloat('Section1', 'a_float')
    an_int = config.getint('Section1', 'an_int')
    print(a_float + an_int)
 
-   # Notice that the next output does not interpolate '%(bar)s' or '%(baz)s'.
-   # This is because we are using a RawConfigParser().
+   # Lưu ý rằng kết quả tiếp theo không nội suy '%(bar)s' hoặc '%(baz)s'.
+   # Điều này là do chúng ta đang sử dụng RawConfigParser().
    if config.getboolean('Section1', 'a_bool'):
        print(config.get('Section1', 'foo'))
 
-To get interpolation, use :class:`ConfigParser`::
+Để thực hiện nội suy, hãy sử dụng :class:`ConfigParser`::
 
    import configparser
 
    cfg = configparser.ConfigParser()
    cfg.read('example.cfg')
 
-   # Set the optional *raw* argument of get() to True if you wish to disable
-   # interpolation in a single get operation.
+   # Đặt đối số tùy chọn *raw* của get() thành True nếu bạn muốn tắt
+   # tính nội suy trong một thao tác get đơn lẻ.
    print(cfg.get('Section1', 'foo', raw=False))  # -> "Python is fun!"
    print(cfg.get('Section1', 'foo', raw=True))   # -> "%(bar)s is %(baz)s!"
 
-   # The optional *vars* argument is a dict with members that will take
-   # precedence in interpolation.
+   # Đối số tùy chọn *vars* là một dict chứa các thành viên sẽ được ưu tiên
+   # khi nội suy.
    print(cfg.get('Section1', 'foo', vars={'bar': 'Documentation',
                                           'baz': 'evil'}))
 
-   # The optional *fallback* argument can be used to provide a fallback value
+   # Đối số tùy chọn *fallback* có thể được dùng để cung cấp một giá trị dự phòng
    print(cfg.get('Section1', 'foo'))
          # -> "Python is fun!"
 
@@ -914,98 +730,56 @@ To get interpolation, use :class:`ConfigParser`::
          # -> "Python is fun!"
 
    print(cfg.get('Section1', 'monster', fallback='No such things as monsters.'))
-         # -> "No such things as monsters."
+         # -> "Không có quái vật nào cả."
 
-   # A bare print(cfg.get('Section1', 'monster')) would raise NoOptionError
-   # but we can also use:
+   # Lệnh gọi print(cfg.get('Section1', 'monster')) đơn thuần sẽ raise NoOptionError
+   # nhưng chúng ta cũng có thể sử dụng:
 
    print(cfg.get('Section1', 'monster', fallback=None))
          # -> None
 
-Default values are available in both types of ConfigParsers.  They are used in
-interpolation if an option used is not defined elsewhere. ::
+Giá trị mặc định có sẵn trong cả hai loại ConfigParsers. Chúng được sử dụng trong quá trình interpolation nếu một option được sử dụng nhưng chưa được định nghĩa ở nơi khác.::
 
    import configparser
 
-   # New instance with 'bar' and 'baz' defaulting to 'Life' and 'hard' each
+   # Instance mới với 'bar' và 'baz' lần lượt có giá trị mặc định là 'Life' và 'hard'
    config = configparser.ConfigParser({'bar': 'Life', 'baz': 'hard'})
    config.read('example.cfg')
 
    print(config.get('Section1', 'foo'))     # -> "Python is fun!"
    config.remove_option('Section1', 'bar')
    config.remove_option('Section1', 'baz')
-   print(config.get('Section1', 'foo'))     # -> "Life is hard!"
+   print(config.get('Section1', 'foo'))     # -> "Cuộc sống thật khó khăn!"
 
 
 .. _configparser-objects:
 
-ConfigParser Objects
---------------------
+Đối tượng ConfigParser
+----------------------
 
 .. class:: ConfigParser(defaults=None, dict_type=dict, allow_no_value=False, *, \
-                        delimiters=('=', ':'), comment_prefixes=('#', ';'), \
-                        inline_comment_prefixes=None, strict=True, \
-                        empty_lines_in_values=True, \
-                        default_section=configparser.DEFAULTSECT, \
-                        interpolation=BasicInterpolation(), converters={}, \
-                        allow_unnamed_section=False)
+                        delimiters=('=', ':'), comment_prefixes=('#', ';'), \ inline_comment_prefixes=None, strict=True, \ empty_lines_in_values=True, \ default_section=configparser.DEFAULTSECT, \ interpolation=BasicInterpolation(), converters={}, \ allow_unnamed_section=False)
 
-   The main configuration parser.  When *defaults* is given, it is initialized
-   into the dictionary of intrinsic defaults.  When *dict_type* is given, it
-   will be used to create the dictionary objects for the list of sections, for
-   the options within a section, and for the default values.
+   Trình phân tích cú pháp cấu hình chính. Khi *defaults* được cung cấp, nó sẽ được khởi tạo vào dictionary của các giá trị mặc định tích hợp sẵn. Khi *dict_type* được cung cấp, nó sẽ được dùng để tạo các đối tượng dictionary cho danh sách section, các tùy chọn trong một section và các giá trị mặc định.
 
-   When *delimiters* is given, it is used as the set of substrings that
-   divide keys from values.  When *comment_prefixes* is given, it will be used
-   as the set of substrings that prefix comments in otherwise empty lines.
-   Comments can be indented.  When *inline_comment_prefixes* is given, it will
-   be used as the set of substrings that prefix comments in non-empty lines.
+   Khi *delimiters* được cung cấp, nó được dùng làm tập hợp các chuỗi con phân tách khóa khỏi giá trị. Khi *comment_prefixes* được cung cấp, nó sẽ được dùng làm tập hợp các chuỗi con đứng trước comment trong các dòng vốn trống. Comment có thể được thụt lề. Khi *inline_comment_prefixes* được cung cấp, nó sẽ được dùng làm tập hợp các chuỗi con đứng trước comment trong các dòng không trống.
 
-   When *strict* is ``True`` (the default), the parser won't allow for
-   any section or option duplicates while reading from a single source (file,
-   string or dictionary), raising :exc:`DuplicateSectionError` or
-   :exc:`DuplicateOptionError`.  When *empty_lines_in_values* is ``False``
-   (default: ``True``), each empty line marks the end of an option.  Otherwise,
-   internal empty lines of a multiline option are kept as part of the value.
-   When *allow_no_value* is ``True`` (default: ``False``), options without
-   values are accepted; the value held for these is ``None`` and they are
-   serialized without the trailing delimiter.
+   Khi *strict* là ``True`` (mặc định), trình phân tích cú pháp sẽ không cho phép bất kỳ section hoặc tùy chọn trùng lặp nào khi đọc từ một nguồn duy nhất (tệp, chuỗi hoặc dictionary), và sẽ phát sinh :exc:`DuplicateSectionError` hoặc
+   :exc:`DuplicateOptionError`. Khi *empty_lines_in_values* là ``False`` (mặc định: ``True``), mỗi dòng trống đánh dấu kết thúc của một tùy chọn. Nếu không, các dòng trống bên trong của một tùy chọn nhiều dòng sẽ được giữ lại như một phần của giá trị. Khi *allow_no_value* là ``True`` (mặc định: ``False``), các tùy chọn không có giá trị được chấp nhận; giá trị được lưu cho các tùy chọn này là ``None`` và chúng được tuần tự hóa mà không có dấu phân tách ở cuối.
 
-   When *default_section* is given, it specifies the name for the special
-   section holding default values for other sections and interpolation purposes
-   (normally named ``"DEFAULT"``).  This value can be retrieved and changed at
-   runtime using the ``default_section`` instance attribute. This won't
-   re-evaluate an already parsed config file, but will be used when writing
-   parsed settings to a new config file.
+   Khi *default_section* được cung cấp, nó chỉ định tên cho section đặc biệt chứa các giá trị mặc định của những section khác và phục vụ mục đích nội suy (thông thường có tên là ``"DEFAULT"``). Có thể truy xuất và thay đổi giá trị này trong runtime bằng thuộc tính instance ``default_section``. Việc này sẽ không đánh giá lại tệp cấu hình đã được phân tích cú pháp, nhưng sẽ được sử dụng khi ghi các thiết lập đã phân tích cú pháp vào một tệp cấu hình mới.
 
-   Interpolation behaviour may be customized by providing a custom handler
-   through the *interpolation* argument. ``None`` can be used to turn off
-   interpolation completely, ``ExtendedInterpolation()`` provides a more
-   advanced variant inspired by ``zc.buildout``.  More on the subject in the
-   `dedicated documentation section <#interpolation-of-values>`_.
+   Có thể tùy chỉnh hành vi nội suy bằng cách cung cấp một handler tùy chỉnh thông qua đối số *interpolation*. Có thể sử dụng ``None`` để tắt hoàn toàn nội suy; ``ExtendedInterpolation()`` cung cấp một biến thể nâng cao hơn lấy cảm hứng từ ``zc.buildout``. Tìm hiểu thêm về chủ đề này trong `phần tài liệu chuyên biệt <#interpolation-of-values>`_.
 
-   All option names used in interpolation will be passed through the
-   :meth:`optionxform` method just like any other option name reference.  For
-   example, using the default implementation of :meth:`optionxform` (which
-   converts option names to lower case), the values ``foo %(bar)s`` and ``foo
-   %(BAR)s`` are equivalent.
+   Tất cả tên option được sử dụng trong nội suy sẽ được truyền qua
+   :meth:`optionxform` method giống như mọi tham chiếu tên option khác. Ví dụ, khi sử dụng triển khai mặc định của :meth:`optionxform` (chuyển tên option thành chữ thường), các giá trị ``foo %(bar)s`` và ``foo %(BAR)s`` là tương đương.
 
-   When *converters* is given, it should be a dictionary where each key
-   represents the name of a type converter and each value is a callable
-   implementing the conversion from string to the desired datatype.  Every
-   converter gets its own corresponding :meth:`!get*` method on the parser
-   object and section proxies.
+   Khi *converters* được cung cấp, nó phải là một dictionary trong đó mỗi key đại diện cho tên của một type converter, còn mỗi value là một callable thực hiện việc chuyển đổi từ string sang datatype mong muốn. Mỗi converter sẽ có method :meth:`!get*` tương ứng riêng trên parser object và các section proxy.
 
-   When *allow_unnamed_section* is ``True`` (default: ``False``),
-   the first section name can be omitted. See the
-   `"Unnamed Sections" section <#unnamed-sections>`_.
+   Khi *allow_unnamed_section* là ``True`` (mặc định: ``False``), có thể bỏ qua tên section đầu tiên. Xem phần `"Unnamed Sections" <#unnamed-sections>`_.
 
-   It is possible to read several configurations into a single
-   :class:`ConfigParser`, where the most recently added configuration has the
-   highest priority. Any conflicting keys are taken from the more recent
-   configuration while the previously existing keys are retained. The example
-   below reads in an ``override.ini`` file, which will override any conflicting
-   keys from the ``example.ini`` file.
+   Có thể đọc nhiều cấu hình vào một
+   :class:`ConfigParser`, trong đó cấu hình được thêm gần đây nhất có mức ưu tiên cao nhất. Mọi khóa xung đột sẽ được lấy từ cấu hình mới hơn, còn các khóa đã tồn tại trước đó vẫn được giữ lại. Ví dụ dưới đây đọc một tệp ``override.ini``, tệp này sẽ ghi đè mọi khóa xung đột từ tệp ``example.ini``.
 
    .. code-block:: ini
 
@@ -1026,91 +800,68 @@ ConfigParser Objects
       -1
 
    .. versionchanged:: 3.1
-      The default *dict_type* is :class:`collections.OrderedDict`.
+      *dict_type* mặc định là :class:`collections.OrderedDict`.
 
    .. versionchanged:: 3.2
-      *allow_no_value*, *delimiters*, *comment_prefixes*, *strict*,
-      *empty_lines_in_values*, *default_section* and *interpolation* were
-      added.
+      *allow_no_value*, *delimiters*, *comment_prefixes*, *strict*, *empty_lines_in_values*, *default_section* và *interpolation* đã được thêm vào.
 
    .. versionchanged:: 3.5
-      The *converters* argument was added.
+      Đối số *converters* đã được thêm vào.
 
    .. versionchanged:: 3.7
-      The *defaults* argument is read with :meth:`read_dict`,
-      providing consistent behavior across the parser: non-string
-      keys and values are implicitly converted to strings.
+      Đối số *defaults* được đọc bằng :meth:`read_dict`, mang lại hành vi nhất quán trên toàn bộ parser: các khóa và giá trị không phải chuỗi sẽ được chuyển đổi ngầm thành chuỗi.
 
    .. versionchanged:: 3.8
-      The default *dict_type* is :class:`dict`, since it now preserves
-      insertion order.
+      *dict_type* mặc định là :class:`dict`, vì hiện tại nó bảo toàn thứ tự chèn.
 
    .. versionchanged:: 3.13
-      Raise a :exc:`MultilineContinuationError` when *allow_no_value* is
-      ``True``, and a key without a value is continued with an indented line.
+      Ném một :exc:`MultilineContinuationError` khi *allow_no_value* là ``True``, và một khóa không có giá trị được tiếp tục bằng một dòng thụt lề.
 
    .. versionchanged:: 3.13
-      The *allow_unnamed_section* argument was added.
+      Đối số *allow_unnamed_section* đã được thêm vào.
 
    .. method:: defaults()
 
-      Return a dictionary containing the instance-wide defaults.
+      Trả về một dictionary chứa các giá trị mặc định áp dụng trên toàn instance.
 
 
    .. method:: sections()
 
-      Return a list of the sections available; the *default section* is not
-      included in the list.
+      Trả về danh sách các section hiện có; *default section* không được đưa vào danh sách.
 
 
    .. method:: add_section(section)
 
-      Add a section named *section* to the instance.  If a section by the given
-      name already exists, :exc:`DuplicateSectionError` is raised.  If the
-      *default section* name is passed, :exc:`ValueError` is raised.  The name
-      of the section must be a string; if not, :exc:`TypeError` is raised.
+      Thêm một section có tên *section* vào instance. Nếu section có tên đã cho đã tồn tại, :exc:`DuplicateSectionError` sẽ được raise. Nếu truyền tên *default section*, :exc:`ValueError` sẽ được raise. Tên của section phải là một chuỗi; nếu không, :exc:`TypeError` sẽ được raise.
 
       .. versionchanged:: 3.2
-         Non-string section names raise :exc:`TypeError`.
+         Tên section không phải chuỗi sẽ raise :exc:`TypeError`.
 
 
    .. method:: has_section(section)
 
-      Indicates whether the named *section* is present in the configuration.
-      The *default section* is not acknowledged.
+      Cho biết *section* đã chỉ định có tồn tại trong cấu hình hay không. *default section* không được tính đến.
 
 
    .. method:: options(section)
 
-      Return a list of options available in the specified *section*.
+      Trả về danh sách các option có sẵn trong *section* được chỉ định.
 
 
    .. method:: has_option(section, option)
 
-      If the given *section* exists, and contains the given *option*, return
-      :const:`True`; otherwise return :const:`False`.  If the specified
-      *section* is :const:`None` or an empty string, DEFAULT is assumed.
+      Nếu *section* đã cho tồn tại và chứa *option* đã cho, trả về
+      :const:`True`; nếu không, trả về :const:`False`. Nếu *section* được chỉ định là :const:`None` hoặc chuỗi rỗng, DEFAULT sẽ được giả định.
 
 
    .. method:: read(filenames, encoding=None)
 
-      Attempt to read and parse an iterable of filenames, returning a list of
-      filenames which were successfully parsed.
+      Thử đọc và phân tích cú pháp một iterable gồm các tên tệp, rồi trả về danh sách các tên tệp đã được phân tích cú pháp thành công.
 
-      If *filenames* is a string, a :class:`bytes` object or a
-      :term:`path-like object`, it is treated as
-      a single filename.  If a file named in *filenames* cannot be opened, that
-      file will be ignored.  This is designed so that you can specify an
-      iterable of potential configuration file locations (for example, the
-      current directory, the user's home directory, and some system-wide
-      directory), and all existing configuration files in the iterable will be
-      read.
+      Nếu *filenames* là một chuỗi, một đối tượng :class:`bytes` hoặc một
+      :term:`path-like object`, nó được xem là một tên tệp duy nhất. Nếu không thể mở tệp được nêu trong *filenames*, tệp đó sẽ bị bỏ qua. Cách này cho phép bạn chỉ định một iterable gồm các vị trí tệp cấu hình có thể có (ví dụ: thư mục hiện tại, thư mục home của người dùng và một thư mục toàn hệ thống), đồng thời tất cả các tệp cấu hình hiện có trong iterable sẽ được đọc.
 
-      If none of the named files exist, the :class:`ConfigParser`
-      instance will contain an empty dataset.  An application which requires
-      initial values to be loaded from a file should load the required file or
-      files using :meth:`read_file` before calling :meth:`read` for any
-      optional files::
+      Nếu không có tệp nào được nêu tồn tại, thực thể :class:`ConfigParser` sẽ chứa một dataset trống. Ứng dụng yêu cầu tải các giá trị ban đầu từ tệp nên tải tệp hoặc các tệp cần thiết bằng :meth:`read_file` trước khi gọi :meth:`read` cho bất kỳ tệp tùy chọn nào::
 
          import configparser, os
 
@@ -1120,362 +871,269 @@ ConfigParser Objects
                      encoding='cp1250')
 
       .. versionchanged:: 3.2
-         Added the *encoding* parameter.
-         Previously, all files were read using the default encoding for :func:`open`.
+         Đã thêm tham số *encoding*. Trước đây, tất cả các tệp đều được đọc bằng encoding mặc định của :func:`open`.
 
       .. versionchanged:: 3.6.1
-         The *filenames* parameter accepts a :term:`path-like object`.
+         Tham số *filenames* chấp nhận một :term:`path-like object`.
 
       .. versionchanged:: 3.7
-         The *filenames* parameter accepts a :class:`bytes` object.
+         Tham số *filenames* chấp nhận một đối tượng :class:`bytes`.
 
 
    .. method:: read_file(f, source=None)
 
-      Read and parse configuration data from *f* which must be an iterable
-      yielding Unicode strings (for example files opened in text mode).
+      Đọc và phân tích dữ liệu cấu hình từ *f*, đối tượng này phải là một iterable trả về các chuỗi Unicode (ví dụ: các tệp được mở ở chế độ văn bản).
 
-      Optional argument *source* specifies the name of the file being read.  If
-      not given and *f* has a :attr:`!name` attribute, that is used for
-      *source*; the default is ``'<???>'``.
+      Đối số tùy chọn *source* chỉ định tên của tệp đang được đọc. Nếu không được cung cấp và *f* có một :attr:`!name` thuộc tính, thuộc tính đó được dùng cho *source*; giá trị mặc định là ``'<???>'``.
 
       .. versionadded:: 3.2
-         Replaces :meth:`!readfp`.
+         Thay thế :meth:`!readfp`.
 
    .. method:: read_string(string, source='<string>')
 
-      Parse configuration data from a string.
+      Phân tích cú pháp dữ liệu cấu hình từ một chuỗi.
 
-      Optional argument *source* specifies a context-specific name of the
-      string passed.  If not given, ``'<string>'`` is used.  This should
-      commonly be a filesystem path or a URL.
+      Đối số tùy chọn *source* chỉ định tên theo ngữ cảnh của chuỗi được truyền vào. Nếu không được cung cấp, ``'<string>'`` được sử dụng. Giá trị này thường nên là một đường dẫn hệ thống tệp hoặc một URL.
 
       .. versionadded:: 3.2
 
 
    .. method:: read_dict(dictionary, source='<dict>')
 
-      Load configuration from any object that provides a dict-like ``items()``
-      method.  Keys are section names, values are dictionaries with keys and
-      values that should be present in the section.  If the used dictionary
-      type preserves order, sections and their keys will be added in order.
-      Values are automatically converted to strings.
+      Tải cấu hình từ bất kỳ đối tượng nào cung cấp phương thức ``items()`` giống dict. Các khóa là tên phần, còn các giá trị là những từ điển chứa các khóa và giá trị cần có trong phần đó. Nếu kiểu từ điển được sử dụng có bảo toàn thứ tự, các phần và khóa của chúng sẽ được thêm theo thứ tự. Các giá trị sẽ được tự động chuyển thành chuỗi.
 
-      Optional argument *source* specifies a context-specific name of the
-      dictionary passed.  If not given, ``<dict>`` is used.
+      Đối số tùy chọn *source* chỉ định tên dành riêng cho ngữ cảnh của từ điển được truyền vào. Nếu không được cung cấp, ``<dict>`` sẽ được sử dụng.
 
-      This method can be used to copy state between parsers.
+      Có thể sử dụng phương thức này để sao chép trạng thái giữa các parser.
 
       .. versionadded:: 3.2
 
 
    .. method:: get(section, option, *, raw=False, vars=None[, fallback])
 
-      Get an *option* value for the named *section*.  If *vars* is provided, it
-      must be a dictionary.  The *option* is looked up in *vars* (if provided),
-      *section*, and in *DEFAULTSECT* in that order.  If the key is not found
-      and *fallback* is provided, it is used as a fallback value.  ``None`` can
-      be provided as a *fallback* value.
+      Lấy giá trị *option* cho *section* có tên. Nếu cung cấp *vars*, đối số này phải là một từ điển. *option* được tra cứu lần lượt trong *vars* (nếu được cung cấp), *section* và *DEFAULTSECT*. Nếu không tìm thấy khóa và cung cấp *fallback*, giá trị này sẽ được sử dụng làm giá trị dự phòng. Có thể cung cấp ``None`` làm giá trị *fallback*.
 
-      All the ``'%'`` interpolations are expanded in the return values, unless
-      the *raw* argument is true.  Values for interpolation keys are looked up
-      in the same manner as the option.
+      Tất cả các phép nội suy ``'%'`` được mở rộng trong các giá trị trả về, trừ khi đối số *raw* là true. Các giá trị của khóa nội suy được tra cứu theo cùng cách như tùy chọn.
 
       .. versionchanged:: 3.2
-         Arguments *raw*, *vars* and *fallback* are keyword only to protect
-         users from trying to use the third argument as the *fallback* fallback
-         (especially when using the mapping protocol).
+         Các đối số *raw*, *vars* và *fallback* chỉ được truyền dưới dạng từ khóa để ngăn người dùng cố sử dụng đối số thứ ba làm giá trị dự phòng *fallback* (đặc biệt khi sử dụng mapping protocol).
 
 
    .. method:: getint(section, option, *, raw=False, vars=None[, fallback])
 
-      A convenience method which coerces the *option* in the specified *section*
-      to an integer.  See :meth:`get` for explanation of *raw*, *vars* and
-      *fallback*.
+      Một phương thức tiện ích chuyển *option* trong *section* được chỉ định thành số nguyên. Xem :meth:`get` để biết giải thích về *raw*, *vars* và *fallback*.
 
 
    .. method:: getfloat(section, option, *, raw=False, vars=None[, fallback])
 
-      A convenience method which coerces the *option* in the specified *section*
-      to a floating-point number.  See :meth:`get` for explanation of *raw*,
-      *vars* and *fallback*.
+      Một phương thức tiện ích chuyển đổi *option* trong *section* được chỉ định thành một số dấu phẩy động. Xem :meth:`get` để biết giải thích về *raw*, *vars* và *fallback*.
 
 
    .. method:: getboolean(section, option, *, raw=False, vars=None[, fallback])
 
-      A convenience method which coerces the *option* in the specified *section*
-      to a Boolean value.  Note that the accepted values for the option are
-      ``'1'``, ``'yes'``, ``'true'``, and ``'on'``, which cause this method to
-      return ``True``, and ``'0'``, ``'no'``, ``'false'``, and ``'off'``, which
-      cause it to return ``False``.  These string values are checked in a
-      case-insensitive manner.  Any other value will cause it to raise
-      :exc:`ValueError`.  See :meth:`get` for explanation of *raw*, *vars* and
-      *fallback*.
+      Một phương thức tiện ích chuyển đổi *option* trong *section* được chỉ định thành một giá trị Boolean. Lưu ý rằng các giá trị được chấp nhận cho tùy chọn này là ``'1'``, ``'yes'``, ``'true'`` và ``'on'``, khiến phương thức này trả về ``True``; còn ``'0'``, ``'no'``, ``'false'`` và ``'off'`` khiến phương thức trả về ``False``. Các giá trị chuỗi này được kiểm tra không phân biệt chữ hoa chữ thường. Bất kỳ giá trị nào khác sẽ khiến phương thức này raise
+      :exc:`ValueError`. Xem :meth:`get` để biết giải thích về *raw*, *vars* và *fallback*.
 
 
    .. method:: items(raw=False, vars=None)
                items(section, raw=False, vars=None)
 
-      When *section* is not given, return a list of *section_name*,
-      *section_proxy* pairs, including DEFAULTSECT.
+      Khi không cung cấp *section*, trả về một danh sách các cặp *section_name*, *section_proxy*, bao gồm DEFAULTSECT.
 
-      Otherwise, return a list of *name*, *value* pairs for the options in the
-      given *section*.  Optional arguments have the same meaning as for the
-      :meth:`get` method.
+      Nếu không, trả về một danh sách các cặp *name*, *value* cho các tùy chọn trong *section* đã cho. Các đối số tùy chọn có ý nghĩa giống như đối với
+      :meth:`get` phương thức.
 
       .. versionchanged:: 3.8
-         Items present in *vars* no longer appear in the result.  The previous
-         behaviour mixed actual parser options with variables provided for
-         interpolation.
+         Các mục có trong *vars* sẽ không còn xuất hiện trong kết quả. Hành vi trước đây đã trộn lẫn các tùy chọn parser thực tế với các biến được cung cấp để nội suy.
 
 
    .. method:: set(section, option, value)
 
-      If the given section exists, set the given option to the specified value;
-      otherwise raise :exc:`NoSectionError`.  *option* and *value* must be
-      strings; if not, :exc:`TypeError` is raised.
+      Nếu section đã cho tồn tại, đặt option đã cho thành giá trị được chỉ định; nếu không, phát sinh :exc:`NoSectionError`. *option* và *value* phải là các chuỗi; nếu không, :exc:`TypeError` sẽ được phát sinh.
 
 
    .. method:: write(fileobject, space_around_delimiters=True)
 
-      Write a representation of the configuration to the specified :term:`file
-      object`, which must be opened in text mode (accepting strings).  This
-      representation can be parsed by a future :meth:`read` call.  If
-      *space_around_delimiters* is true, delimiters between
-      keys and values are surrounded by spaces.
+      Ghi biểu diễn của cấu hình vào :term:`file object` đã chỉ định, đối tượng này phải được mở ở chế độ văn bản (chấp nhận các chuỗi). Biểu diễn này có thể được phân tích cú pháp bằng một lệnh gọi :meth:`read` trong tương lai. Nếu *space_around_delimiters* là true, các dấu phân cách giữa khóa và giá trị sẽ được bao quanh bởi khoảng trắng.
 
       .. versionchanged:: 3.14
-         Raises InvalidWriteError if this would write a representation which cannot
-         be accurately parsed by a future :meth:`read` call from this parser.
+         Phát sinh InvalidWriteError nếu thao tác này sẽ ghi một biểu diễn không thể được phân tích cú pháp chính xác bằng một lệnh gọi :meth:`read` trong tương lai từ parser này.
 
    .. note::
 
-      Comments in the original configuration file are not preserved when
-      writing the configuration back.
-      What is considered a comment, depends on the given values for
-      *comment_prefix* and *inline_comment_prefix*.
+      Các chú thích trong tệp cấu hình ban đầu không được giữ lại khi ghi cấu hình trở lại. Nội dung nào được xem là chú thích phụ thuộc vào các giá trị đã cho của *comment_prefix* và *inline_comment_prefix*.
 
 
    .. method:: remove_option(section, option)
 
-      Remove the specified *option* from the specified *section*.  If the
-      section does not exist, raise :exc:`NoSectionError`.  If the option
-      existed to be removed, return :const:`True`; otherwise return
+      Xóa *option* đã chỉ định khỏi *section* đã chỉ định. Nếu section không tồn tại, phát sinh :exc:`NoSectionError`. Nếu option cần xóa tồn tại, trả về :const:`True`; nếu không, trả về
       :const:`False`.
 
 
    .. method:: remove_section(section)
 
-      Remove the specified *section* from the configuration.  If the section in
-      fact existed, return ``True``.  Otherwise return ``False``.
+      Xóa *section* đã chỉ định khỏi cấu hình. Nếu section thực sự tồn tại, trả về ``True``. Nếu không, trả về ``False``.
 
 
    .. method:: optionxform(option)
 
-      Transforms the option name *option* as found in an input file or as passed
-      in by client code to the form that should be used in the internal
-      structures.  The default implementation returns a lower-case version of
-      *option*; subclasses may override this or client code can set an attribute
-      of this name on instances to affect this behavior.
+      Chuyển đổi tên tùy chọn *option* được tìm thấy trong tệp đầu vào hoặc được mã client truyền vào thành dạng nên được sử dụng trong các cấu trúc nội bộ. Cách triển khai mặc định trả về phiên bản viết thường của *option*; các lớp con có thể ghi đè cách này hoặc mã client có thể đặt một thuộc tính có tên này trên các instance để thay đổi hành vi.
 
-      You don't need to subclass the parser to use this method, you can also
-      set it on an instance, to a function that takes a string argument and
-      returns a string.  Setting it to ``str``, for example, would make option
-      names case sensitive::
+      Bạn không cần tạo lớp con của parser để sử dụng phương thức này; bạn cũng có thể đặt nó trên một instance thành một hàm nhận một đối số chuỗi và trả về một chuỗi. Ví dụ, đặt nó thành ``str`` sẽ khiến tên tùy chọn phân biệt chữ hoa chữ thường::
 
          cfgparser = ConfigParser()
          cfgparser.optionxform = str
 
-      Note that when reading configuration files, whitespace around the option
-      names is stripped before :meth:`optionxform` is called.
+      Lưu ý rằng khi đọc các tệp cấu hình, khoảng trắng xung quanh tên tùy chọn sẽ bị loại bỏ trước khi gọi :meth:`optionxform`.
 
 
 .. data:: UNNAMED_SECTION
 
-   A special object representing a section name used to reference the unnamed section (see :ref:`unnamed-sections`).
+   Một đối tượng đặc biệt biểu diễn tên section dùng để tham chiếu đến section không có tên (xem :ref:`unnamed-sections`).
 
 
 .. data:: MAX_INTERPOLATION_DEPTH
 
-   The maximum depth for recursive interpolation for :meth:`~configparser.ConfigParser.get` when the *raw*
-   parameter is false.  This is relevant only when the default *interpolation*
-   is used.
+   Độ sâu tối đa cho phép nội suy đệ quy đối với :meth:`~configparser.ConfigParser.get` khi tham số *raw* là false. Điều này chỉ liên quan khi sử dụng *interpolation* mặc định.
 
 
 .. _rawconfigparser-objects:
 
-RawConfigParser Objects
------------------------
+Đối tượng RawConfigParser
+-------------------------
 
 .. class:: RawConfigParser(defaults=None, dict_type=dict, \
-                           allow_no_value=False, *, delimiters=('=', ':'), \
-                           comment_prefixes=('#', ';'), \
-                           inline_comment_prefixes=None, strict=True, \
-                           empty_lines_in_values=True, \
-                           default_section=configparser.DEFAULTSECT, \
-                           interpolation=BasicInterpolation(), converters={}, \
-                           allow_unnamed_section=False)
+                           allow_no_value=False, *, delimiters=('=', ':'), \ comment_prefixes=('#', ';'), \ inline_comment_prefixes=None, strict=True, \ empty_lines_in_values=True, \ default_section=configparser.DEFAULTSECT, \ interpolation=BasicInterpolation(), converters={}, \ allow_unnamed_section=False
 
-   Legacy variant of the :class:`ConfigParser`.  It has interpolation
-   disabled by default and allows for non-string section names, option
-   names, and values via its unsafe ``add_section`` and ``set`` methods,
-   as well as the legacy ``defaults=`` keyword argument handling.
+   Biến thể cũ của :class:`ConfigParser`. Theo mặc định, tính năng interpolation bị vô hiệu hóa và cho phép tên section, tên tùy chọn và giá trị không phải chuỗi thông qua các phương thức không an toàn ``add_section`` và ``set``, cũng như cách xử lý đối số từ khóa ``defaults=`` kiểu cũ.
 
    .. versionchanged:: 3.2
-      *allow_no_value*, *delimiters*, *comment_prefixes*, *strict*,
-      *empty_lines_in_values*, *default_section* and *interpolation* were
-      added.
+      *allow_no_value*, *delimiters*, *comment_prefixes*, *strict*, *empty_lines_in_values*, *default_section* và *interpolation* đã được thêm vào.
 
    .. versionchanged:: 3.5
-      The *converters* argument was added.
+      Đối số *converters* đã được thêm vào.
 
    .. versionchanged:: 3.8
-      The default *dict_type* is :class:`dict`, since it now preserves
-      insertion order.
+      *dict_type* mặc định là :class:`dict`, vì hiện tại nó bảo toàn thứ tự chèn.
 
    .. versionchanged:: 3.13
-      The *allow_unnamed_section* argument was added.
+      Đối số *allow_unnamed_section* đã được thêm vào.
 
    .. note::
-      Consider using :class:`ConfigParser` instead which checks types of
-      the values to be stored internally.  If you don't want interpolation, you
-      can use ``ConfigParser(interpolation=None)``.
+      Hãy cân nhắc sử dụng :class:`ConfigParser` thay vào đó, vì nó kiểm tra kiểu của các giá trị được lưu trữ nội bộ. Nếu không muốn sử dụng interpolation, bạn có thể dùng ``ConfigParser(interpolation=None)``.
 
 
    .. method:: add_section(section)
 
-      Add a section named *section* or :const:`UNNAMED_SECTION` to the instance.
+      Thêm section có tên *section* hoặc :const:`UNNAMED_SECTION` vào instance.
 
-      If the given section already exists, :exc:`DuplicateSectionError` is
-      raised. If the *default section* name is passed, :exc:`ValueError` is
-      raised. If :const:`UNNAMED_SECTION` is passed and support is disabled,
-      :exc:`UnnamedSectionDisabledError` is raised.
+      Nếu section đã cho đã tồn tại, :exc:`DuplicateSectionError` sẽ được ném ra. Nếu truyền tên *default section*, :exc:`ValueError` sẽ được ném ra. Nếu truyền :const:`UNNAMED_SECTION` và hỗ trợ bị tắt,
+      :exc:`UnnamedSectionDisabledError` sẽ được ném ra.
 
-      Type of *section* is not checked which lets users create non-string named
-      sections.  This behaviour is unsupported and may cause internal errors.
+      Kiểu của *section* không được kiểm tra, cho phép người dùng tạo các section có tên không phải chuỗi. Hành vi này không được hỗ trợ và có thể gây ra lỗi nội bộ.
 
    .. versionchanged:: 3.14
-      Added support for :const:`UNNAMED_SECTION`.
+      Đã bổ sung hỗ trợ cho :const:`UNNAMED_SECTION`.
 
 
    .. method:: set(section, option, value)
 
-      If the given section exists, set the given option to the specified value;
-      otherwise raise :exc:`NoSectionError`.  While it is possible to use
-      :class:`RawConfigParser` (or :class:`ConfigParser` with *raw* parameters
-      set to true) for *internal* storage of non-string values, full
-      functionality (including interpolation and output to files) can only be
-      achieved using string values.
+      Nếu section đã cho tồn tại, đặt option đã cho thành giá trị được chỉ định; nếu không thì ném ra :exc:`NoSectionError`. Mặc dù có thể sử dụng
+      :class:`RawConfigParser` (hoặc :class:`ConfigParser` với các tham số *raw* được đặt thành true) để *lưu trữ* nội bộ các giá trị không phải chuỗi, chỉ có thể đạt được đầy đủ chức năng (bao gồm interpolation và xuất ra tệp) bằng cách sử dụng các giá trị chuỗi.
 
-      This method lets users assign non-string values to keys internally.  This
-      behaviour is unsupported and will cause errors when attempting to write
-      to a file or get it in non-raw mode.  **Use the mapping protocol API**
-      which does not allow such assignments to take place.
+      Phương thức này cho phép người dùng gán các giá trị không phải chuỗi cho các key ở bên trong. Hành vi này không được hỗ trợ và sẽ gây ra lỗi khi cố gắng ghi vào tệp hoặc lấy dữ liệu ở chế độ không raw. **Sử dụng API mapping protocol**, API này không cho phép thực hiện các phép gán như vậy.
 
 
-Exceptions
-----------
+Ngoại lệ
+--------
 
 .. exception:: Error
 
-   Base class for all other :mod:`!configparser` exceptions.
+   Lớp cơ sở cho tất cả các ngoại lệ :mod:`!configparser` khác.
 
 
 .. exception:: NoSectionError
 
-   Exception raised when a specified section is not found.
+   Ngoại lệ được phát sinh khi không tìm thấy phần được chỉ định.
 
 
 .. exception:: DuplicateSectionError
 
-   Exception raised if :meth:`~ConfigParser.add_section` is called with the name of a section
-   that is already present or in strict parsers when a section if found more
-   than once in a single input file, string or dictionary.
+   Ngoại lệ được phát sinh nếu :meth:`~ConfigParser.add_section` được gọi với tên của một phần đã tồn tại hoặc trong các parser strict khi một phần được tìm thấy nhiều hơn một lần trong cùng một tệp, chuỗi hoặc dictionary đầu vào.
 
    .. versionchanged:: 3.2
-      Added the optional *source* and *lineno* attributes and parameters to
+      Đã thêm các thuộc tính và tham số tùy chọn *source* và *lineno* vào
       :meth:`!__init__`.
 
 
 .. exception:: DuplicateOptionError
 
-   Exception raised by strict parsers if a single option appears twice during
-   reading from a single file, string or dictionary. This catches misspellings
-   and case sensitivity-related errors, e.g. a dictionary may have two keys
-   representing the same case-insensitive configuration key.
+   Ngoại lệ được các parser strict phát sinh nếu một tùy chọn xuất hiện hai lần trong quá trình đọc từ cùng một tệp, chuỗi hoặc dictionary. Điều này phát hiện các lỗi chính tả và lỗi liên quan đến phân biệt chữ hoa chữ thường; ví dụ, một dictionary có thể có hai khóa đại diện cho cùng một khóa cấu hình không phân biệt chữ hoa chữ thường.
 
 
 .. exception:: NoOptionError
 
-   Exception raised when a specified option is not found in the specified
-   section.
+   Ngoại lệ được phát sinh khi không tìm thấy tùy chọn được chỉ định trong phần được chỉ định.
 
 
 .. exception:: InterpolationError
 
-   Base class for exceptions raised when problems occur performing string
-   interpolation.
+   Lớp cơ sở cho các ngoại lệ phát sinh khi xảy ra sự cố trong quá trình nội suy chuỗi.
 
 
 .. exception:: InterpolationDepthError
 
-   Exception raised when string interpolation cannot be completed because the
-   number of iterations exceeds :const:`MAX_INTERPOLATION_DEPTH`.  Subclass of
+   Ngoại lệ phát sinh khi không thể hoàn tất quá trình nội suy chuỗi vì số lần lặp vượt quá :const:`MAX_INTERPOLATION_DEPTH`.  Lớp con của
    :exc:`InterpolationError`.
 
 
 .. exception:: InterpolationMissingOptionError
 
-   Exception raised when an option referenced from a value does not exist.
-   Subclass of :exc:`InterpolationError`.
+   Ngoại lệ phát sinh khi một tùy chọn được tham chiếu từ một giá trị không tồn tại. Lớp con của :exc:`InterpolationError`.
 
 
 .. exception:: InterpolationSyntaxError
 
-   Exception raised when the source text into which substitutions are made does
-   not conform to the required syntax.  Subclass of :exc:`InterpolationError`.
+   Ngoại lệ phát sinh khi văn bản nguồn được dùng để thực hiện các phép thay thế không tuân theo cú pháp bắt buộc.  Lớp con của :exc:`InterpolationError`.
 
 
 .. exception:: MissingSectionHeaderError
 
-   Exception raised when attempting to parse a file which has no section
-   headers.
+   Ngoại lệ phát sinh khi cố gắng phân tích cú pháp một tệp không có tiêu đề phần.
 
 .. exception:: ParsingError
 
-   Exception raised when errors occur attempting to parse a file.
+   Ngoại lệ phát sinh khi xảy ra lỗi trong quá trình cố gắng phân tích cú pháp một tệp.
 
    .. versionchanged:: 3.12
-      The ``filename`` attribute and :meth:`!__init__` constructor argument were
-      removed.  They have been available using the name ``source`` since 3.2.
+      Thuộc tính ``filename`` và đối số hàm khởi tạo :meth:`!__init__` đã bị xóa.  Chúng đã có thể được sử dụng với tên ``source`` kể từ phiên bản 3.2.
 
 .. exception:: MultilineContinuationError
 
-   Exception raised when a key without a corresponding value is continued with
-   an indented line.
+   Ngoại lệ được đưa ra khi một khóa không có giá trị tương ứng được tiếp nối bằng một dòng thụt lề.
 
    .. versionadded:: 3.13
 
 .. exception:: UnnamedSectionDisabledError
 
-   Exception raised when attempting to use the
-   :const:`UNNAMED_SECTION` without enabling it.
+   Ngoại lệ được đưa ra khi cố gắng sử dụng
+   :const:`UNNAMED_SECTION` mà không bật nó.
 
     .. versionadded:: 3.14
 
 .. exception:: InvalidWriteError
 
-   Exception raised when an attempted :meth:`ConfigParser.write` would not be parsed
-   accurately with a future :meth:`ConfigParser.read` call.
+   Ngoại lệ được đưa ra khi một :meth:`ConfigParser.write` được cố gắng thực hiện sẽ không được phân tích chính xác bằng một lệnh gọi :meth:`ConfigParser.read` trong tương lai.
 
-   Ex: Writing a key beginning with the :attr:`ConfigParser.SECTCRE` pattern
-   would parse as a section header when read. Attempting to write this will raise
-   this exception.
+   Ví dụ: Việc ghi một khóa bắt đầu bằng mẫu :attr:`ConfigParser.SECTCRE` sẽ được phân tích thành tiêu đề phần khi đọc. Cố gắng ghi khóa này sẽ đưa ra ngoại lệ này.
 
    .. versionadded:: 3.14
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích
 
-.. [1] Config parsers allow for heavy customization.  If you are interested in
-       changing the behaviour outlined by the footnote reference, consult the
-       `Customizing Parser Behaviour`_ section.
+.. [1] Trình phân tích cú pháp cấu hình cho phép tùy chỉnh sâu. Nếu bạn muốn thay đổi hành vi được nêu trong tham chiếu chú thích, hãy tham khảo phần `Customizing Parser Behaviour <Customizing Parser Behaviour_>`_.
+
+.. _`in the following section`: #supported-ini-file-structure
+.. _`outlined later`: #mapping-protocol-access
+.. _`dedicated documentation section`: #interpolation-of-values
+.. _`"Unnamed Sections" section`: #unnamed-sections

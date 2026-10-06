@@ -1,11 +1,10 @@
-:mod:`!base64` --- Base16, Base32, Base64, Base85 Data Encodings
+:mod:`!base64` --- Mã hóa dữ liệu Base16, Base32, Base64, Base85
 ================================================================
 
 .. module:: base64
-   :synopsis: RFC 4648: Base16, Base32, Base64 Data Encodings;
-              Base85 and Ascii85
+   :synopsis: RFC 4648: Mã hóa dữ liệu Base16, Base32, Base64; Base85 và Ascii85
 
-**Source code:** :source:`Lib/base64.py`
+**Mã nguồn:** :source:`Lib/base64.py`
 
 .. index::
    pair: base64; encoding
@@ -13,142 +12,95 @@
 
 --------------
 
-This module provides functions for encoding binary data to printable
-ASCII characters and decoding such encodings back to binary data.
-This includes the :ref:`encodings specified in <base64-rfc-4648>`
-:rfc:`4648` (Base64, Base32 and Base16), the :ref:`Base85 encoding
-<base64-base-85>` specified in `PDF 2.0
-<https://pdfa.org/resource/iso-32000-2/>`_, and non-standard variants
-of Base85 used elsewhere.
+Mô-đun này cung cấp các hàm để mã hóa dữ liệu nhị phân thành các ký tự ASCII có thể in được và giải mã các kiểu mã hóa đó trở lại thành dữ liệu nhị phân. Các kiểu mã hóa này bao gồm :ref:`được chỉ định trong <base64-rfc-4648>`
+:rfc:`4648` (Base64, Base32 và Base16), :ref:`kiểu mã hóa Base85 <base64-base-85>` được chỉ định trong `PDF 2.0 <https://pdfa.org/resource/iso-32000-2/>`_, cùng các biến thể Base85 không theo tiêu chuẩn được sử dụng ở những nơi khác.
 
-There are two interfaces provided by this module.  The modern interface
-supports encoding :term:`bytes-like objects <bytes-like object>` to ASCII
-:class:`bytes`, and decoding :term:`bytes-like objects <bytes-like object>` or
-strings containing ASCII to :class:`bytes`.  Both base-64 alphabets
-defined in :rfc:`4648` (normal, and URL- and filesystem-safe) are supported.
+Mô-đun này cung cấp hai giao diện. Giao diện hiện đại hỗ trợ mã hóa :term:`các đối tượng bytes-like <bytes-like object>` thành ASCII
+:class:`bytes`, và giải mã :term:`các đối tượng bytes-like <bytes-like object>` hoặc chuỗi chứa ASCII thành :class:`bytes`. Cả hai bảng chữ cái base-64 được định nghĩa trong :rfc:`4648` (thông thường và an toàn cho URL cũng như hệ thống tệp) đều được hỗ trợ.
 
-The :ref:`legacy interface <base64-legacy>` does not support decoding from strings, but it does
-provide functions for encoding and decoding to and from :term:`file objects
-<file object>`.  It only supports the Base64 standard alphabet, and it adds
-newlines every 76 characters as per :rfc:`2045`.  Note that if you are looking
-for :rfc:`2045` support you probably want to be looking at the :mod:`email`
-package instead.
+:ref:`Giao diện cũ <base64-legacy>` không hỗ trợ giải mã từ chuỗi, nhưng cung cấp các hàm để mã hóa và giải mã đến và đi từ :term:`đối tượng tệp <file object>`. Giao diện này chỉ hỗ trợ bảng chữ cái Base64 tiêu chuẩn và thêm dòng mới sau mỗi 76 ký tự theo :rfc:`2045`. Lưu ý rằng nếu bạn đang tìm kiếm hỗ trợ :rfc:`2045`, có lẽ bạn nên xem xét package :mod:`email`.
 
 
 .. versionchanged:: 3.3
-   ASCII-only Unicode strings are now accepted by the decoding functions of
-   the modern interface.
+   Các chuỗi Unicode chỉ chứa ASCII hiện được các hàm giải mã của giao diện hiện đại chấp nhận.
 
 .. versionchanged:: 3.4
-   Any :term:`bytes-like objects <bytes-like object>` are now accepted by all
-   encoding and decoding functions in this module.  Ascii85/Base85 support added.
+   Mọi :term:`đối tượng tương tự bytes <bytes-like object>` hiện được tất cả các hàm mã hóa và giải mã trong module này chấp nhận. Đã bổ sung hỗ trợ Ascii85/Base85.
 
 
 .. _base64-rfc-4648:
 
-RFC 4648 Encodings
-------------------
+Mã hóa RFC 4648
+---------------
 
-The :rfc:`4648` encodings are suitable for encoding binary data so that it can be
-safely sent by email, used as parts of URLs, or included as part of an HTTP
-POST request.
+Các phương thức mã hóa :rfc:`4648` phù hợp để mã hóa dữ liệu nhị phân, ताकि dữ liệu có thể được gửi an toàn qua email, được sử dụng làm một phần của URL hoặc được đưa vào một phần của yêu cầu HTTP POST.
 
 .. function:: b64encode(s, altchars=None)
 
-   Encode the :term:`bytes-like object` *s* using Base64 and return the encoded
+   Mã hóa :term:`bytes-like object` *s* bằng Base64 và trả về phần đã mã hóa
    :class:`bytes`.
 
-   Optional *altchars* must be a :term:`bytes-like object` of length 2 which
-   specifies an alternative alphabet for the ``+`` and ``/`` characters.
-   This allows an application to e.g. generate URL or filesystem safe Base64
-   strings.  The default is ``None``, for which the standard Base64 alphabet is used.
+   *altchars* tùy chọn phải là một :term:`bytes-like object` có độ dài 2, chỉ định một bảng chữ cái thay thế cho các ký tự ``+`` và ``/``. Điều này cho phép ứng dụng, chẳng hạn, tạo ra các chuỗi Base64 an toàn cho URL hoặc hệ thống tệp. Giá trị mặc định là ``None``, trong đó bảng chữ cái Base64 tiêu chuẩn được sử dụng.
 
-   May assert or raise a :exc:`ValueError` if the length of *altchars* is not 2.  Raises a
-   :exc:`TypeError` if *altchars* is not a :term:`bytes-like object`.
+   Có thể assert hoặc raise một :exc:`ValueError` nếu độ dài của *altchars* không phải là 2. Raises a
+   :exc:`TypeError` nếu *altchars* không phải là một :term:`bytes-like object`.
 
 
 .. function:: b64decode(s, altchars=None, validate=False)
 
-   Decode the Base64 encoded :term:`bytes-like object` or ASCII string
-   *s* and return the decoded :class:`bytes`.
+   Giải mã :term:`bytes-like object` được mã hóa Base64 hoặc chuỗi ASCII *s* và trả về :class:`bytes` đã được giải mã.
 
-   Optional *altchars* must be a :term:`bytes-like object` or ASCII string
-   of length 2 which specifies the alternative alphabet used instead of the
-   ``+`` and ``/`` characters.
+   *altchars* tùy chọn phải là một :term:`bytes-like object` hoặc chuỗi ASCII có độ dài 2, chỉ định bảng chữ cái thay thế được sử dụng thay cho các ký tự ``+`` và ``/``.
 
-   A :exc:`binascii.Error` exception is raised
-   if *s* is incorrectly padded.
+   Một ngoại lệ :exc:`binascii.Error` được raise nếu *s* có padding không đúng.
 
-   If *validate* is ``False`` (the default), characters that are neither
-   in the normal base-64 alphabet nor the alternative alphabet are
-   discarded prior to the padding check.  If *validate* is ``True``,
-   these non-alphabet characters in the input result in a
+   Nếu *validate* là ``False`` (giá trị mặc định), các ký tự không thuộc bảng chữ cái base-64 thông thường hoặc bảng chữ cái thay thế sẽ bị loại bỏ trước khi kiểm tra padding. Nếu *validate* là ``True``, các ký tự không thuộc bảng chữ cái này trong đầu vào sẽ dẫn đến một
    :exc:`binascii.Error`.
 
-   For more information about the strict base64 check, see :func:`binascii.a2b_base64`
+   Để biết thêm thông tin về kiểm tra base64 nghiêm ngặt, hãy xem :func:`binascii.a2b_base64`
 
-   May assert or raise a :exc:`ValueError` if the length of *altchars* is not 2.
+   Có thể assert hoặc raise một :exc:`ValueError` nếu độ dài của *altchars* không phải là 2.
 
 .. function:: standard_b64encode(s)
 
-   Encode :term:`bytes-like object` *s* using the standard Base64 alphabet
-   and return the encoded :class:`bytes`.
+   Mã hóa :term:`bytes-like object` *s* bằng bảng chữ cái Base64 tiêu chuẩn và trả về :class:`bytes` đã được mã hóa.
 
 
 .. function:: standard_b64decode(s)
 
-   Decode :term:`bytes-like object` or ASCII string *s* using the standard
-   Base64 alphabet and return the decoded :class:`bytes`.
+   Giải mã :term:`bytes-like object` hoặc chuỗi ASCII *s* bằng bảng chữ cái Base64 tiêu chuẩn và trả về :class:`bytes` đã được giải mã.
 
 
 .. function:: urlsafe_b64encode(s)
 
-   Encode :term:`bytes-like object` *s* using the
-   URL- and filesystem-safe alphabet, which
-   substitutes ``-`` instead of ``+`` and ``_`` instead of ``/`` in the
-   standard Base64 alphabet, and return the encoded :class:`bytes`.  The result
-   can still contain ``=``.
+   Mã hóa :term:`bytes-like object` *s* bằng bảng chữ cái an toàn cho URL và hệ thống tệp, trong đó ``-`` được thay cho ``+`` và ``_`` được thay cho ``/`` trong bảng chữ cái Base64 tiêu chuẩn, rồi trả về :class:`bytes` đã được mã hóa. Kết quả vẫn có thể chứa ``=``.
 
 
 .. function:: urlsafe_b64decode(s)
 
-   Decode :term:`bytes-like object` or ASCII string *s*
-   using the URL- and filesystem-safe
-   alphabet, which substitutes ``-`` instead of ``+`` and ``_`` instead of
-   ``/`` in the standard Base64 alphabet, and return the decoded
+   Giải mã :term:`bytes-like object` hoặc chuỗi ASCII *s* bằng bảng chữ cái an toàn cho URL và hệ thống tệp, trong đó ``-`` được dùng thay cho ``+`` và ``_`` được dùng thay cho ``/`` trong bảng chữ cái Base64 tiêu chuẩn, rồi trả về chuỗi đã giải mã
    :class:`bytes`.
 
 
 .. function:: b32encode(s)
 
-   Encode the :term:`bytes-like object` *s* using Base32 and return the
-   encoded :class:`bytes`.
+   Mã hóa :term:`bytes-like object` *s* bằng Base32 và trả về :class:`bytes` đã được mã hóa.
 
 
 .. function:: b32decode(s, casefold=False, map01=None)
 
-   Decode the Base32 encoded :term:`bytes-like object` or ASCII string *s* and
-   return the decoded :class:`bytes`.
+   Giải mã :term:`bytes-like object` được mã hóa bằng Base32 hoặc chuỗi ASCII *s* rồi trả về :class:`bytes` đã được giải mã.
 
-   Optional *casefold* is a flag specifying
-   whether a lowercase alphabet is acceptable as input.  For security purposes,
-   the default is ``False``.
+   *casefold* tùy chọn là một cờ chỉ định liệu bảng chữ cái viết thường có được chấp nhận làm đầu vào hay không. Vì mục đích bảo mật, giá trị mặc định là ``False``.
 
-   :rfc:`4648` allows for optional mapping of the digit 0 (zero) to the letter O
-   (oh), and for optional mapping of the digit 1 (one) to either the letter I (eye)
-   or letter L (el).  The optional argument *map01* when not ``None``, specifies
-   which letter the digit 1 should be mapped to (when *map01* is not ``None``, the
-   digit 0 is always mapped to the letter O).  For security purposes the default is
-   ``None``, so that 0 and 1 are not allowed in the input.
+   :rfc:`4648` cho phép ánh xạ tùy chọn chữ số 0 (zero) thành chữ O (oh), và ánh xạ tùy chọn chữ số 1 (one) thành chữ I (eye) hoặc chữ L (el). Đối số tùy chọn *map01* khi không phải là ``None``, chỉ định chữ cái mà chữ số 1 sẽ được ánh xạ thành (khi *map01* không phải là ``None``, chữ số 0 luôn được ánh xạ thành chữ O). Vì mục đích bảo mật, giá trị mặc định là ``None``, để 0 và 1 không được phép xuất hiện trong đầu vào.
 
-   A :exc:`binascii.Error` is raised if *s* is
-   incorrectly padded or if there are non-alphabet characters present in the
-   input.
+   Một :exc:`binascii.Error` được phát sinh nếu *s* có phần đệm không đúng hoặc nếu đầu vào chứa các ký tự không thuộc bảng chữ cái.
 
 
 .. function:: b32hexencode(s)
 
-   Similar to :func:`b32encode` but uses the Extended Hex Alphabet, as defined in
+   Tương tự như :func:`b32encode` nhưng sử dụng Extended Hex Alphabet, như được định nghĩa trong
    :rfc:`4648`.
 
    .. versionadded:: 3.10
@@ -156,199 +108,139 @@ POST request.
 
 .. function:: b32hexdecode(s, casefold=False)
 
-   Similar to :func:`b32decode` but uses the Extended Hex Alphabet, as defined in
+   Tương tự như :func:`b32decode` nhưng sử dụng Extended Hex Alphabet, như được định nghĩa trong
    :rfc:`4648`.
 
-   This version does not allow the digit 0 (zero) to the letter O (oh) and digit
-   1 (one) to either the letter I (eye) or letter L (el) mappings, all these
-   characters are included in the Extended Hex Alphabet and are not
-   interchangeable.
+   Phiên bản này không cho phép ánh xạ chữ số 0 (zero) thành chữ O (oh) và chữ số 1 (one) thành chữ I (eye) hoặc chữ L (el); tất cả các ký tự này đều nằm trong Extended Hex Alphabet và không thể thay thế cho nhau.
 
    .. versionadded:: 3.10
 
 
 .. function:: b16encode(s)
 
-   Encode the :term:`bytes-like object` *s* using Base16 and return the
-   encoded :class:`bytes`.
+   Mã hóa :term:`bytes-like object` *s* bằng Base16 và trả về :class:`bytes` đã được mã hóa.
 
 
 .. function:: b16decode(s, casefold=False)
 
-   Decode the Base16 encoded :term:`bytes-like object` or ASCII string *s* and
-   return the decoded :class:`bytes`.
+   Giải mã :term:`bytes-like object` được mã hóa Base16 hoặc chuỗi ASCII *s* và trả về :class:`bytes` đã giải mã.
 
-   Optional *casefold* is a flag specifying whether a
-   lowercase alphabet is acceptable as input.  For security purposes, the default
-   is ``False``.
+   *casefold* tùy chọn là một cờ chỉ định liệu bảng chữ cái viết thường có được chấp nhận làm đầu vào hay không. Vì mục đích bảo mật, giá trị mặc định là ``False``.
 
-   A :exc:`binascii.Error` is raised if *s* is
-   incorrectly padded or if there are non-alphabet characters present in the
-   input.
+   Một :exc:`binascii.Error` được phát sinh nếu *s* có phần đệm không đúng hoặc nếu đầu vào chứa các ký tự không thuộc bảng chữ cái.
 
 .. _base64-base-85:
 
-Base85 Encodings
------------------
+Mã hóa Base85
+-------------
 
-Base85 encoding is a family of algorithms which represent four bytes
-using five ASCII characters.  Originally implemented in the Unix
-``btoa(1)`` utility, a version of it was later adopted by Adobe in the
-PostScript language and is standardized in PDF 2.0 (ISO 32000-2).
-This version, in both its ``btoa`` and PDF variants, is implemented by
+Mã hóa Base85 là một họ thuật toán biểu diễn bốn byte bằng năm ký tự ASCII. Ban đầu được triển khai trong tiện ích Unix ``btoa(1)``, một phiên bản của nó sau đó được Adobe áp dụng trong ngôn ngữ PostScript và được chuẩn hóa trong PDF 2.0 (ISO 32000-2). Phiên bản này, ở cả biến thể ``btoa`` và PDF, được triển khai bởi
 :func:`a85encode`.
 
-A separate version, using a different output character set, was
-defined as an April Fool's joke in :rfc:`1924` but is now used by Git
-and other software.  This version is implemented by :func:`b85encode`.
+Một phiên bản riêng biệt sử dụng bộ ký tự đầu ra khác được định nghĩa như một trò đùa Cá tháng Tư trong :rfc:`1924`, nhưng hiện được Git và các phần mềm khác sử dụng. Phiên bản này được triển khai bởi :func:`b85encode`.
 
-Finally, a third version, using yet another output character set
-designed for safe inclusion in programming language strings, is
-defined by ZeroMQ and implemented here by :func:`z85encode`.
+Cuối cùng, một phiên bản thứ ba sử dụng một bộ ký tự đầu ra khác nữa, được thiết kế để an toàn khi đưa vào các chuỗi trong ngôn ngữ lập trình, được ZeroMQ định nghĩa và triển khai tại đây bởi :func:`z85encode`.
 
-The functions present in this module differ in how they handle the following:
+Các hàm có trong mô-đun này khác nhau về cách xử lý những điều sau:
 
-* Whether to include and expect enclosing ``<~`` and ``~>`` markers.
-* Whether to fold the input into multiple lines.
-* The set of ASCII characters used for encoding.
-* Compact encodings of sequences of spaces and null bytes.
-* The encoding of zero-padding bytes applied to the input.
+* Có bao gồm và yêu cầu các dấu ``<~`` và ``~>`` bao quanh hay không.
+* Có chia đầu vào thành nhiều dòng hay không.
+* Tập hợp các ký tự ASCII được sử dụng để mã hóa.
+* Cách mã hóa rút gọn các chuỗi dấu cách và byte rỗng.
+* Cách mã hóa các byte đệm bằng 0 được thêm vào đầu vào.
 
-Refer to the documentation of the individual functions for more information.
+Hãy tham khảo tài liệu của từng hàm để biết thêm thông tin.
 
 .. function:: a85encode(b, *, foldspaces=False, wrapcol=0, pad=False, adobe=False)
 
-   Encode the :term:`bytes-like object` *b* using Ascii85 and return the
-   encoded :class:`bytes`.
+   Mã hóa :term:`bytes-like object` *b* bằng Ascii85 và trả về :class:`bytes` đã mã hóa.
 
-   *foldspaces* is an optional flag that uses the special short sequence 'y'
-   instead of 4 consecutive spaces (ASCII 0x20) as supported by 'btoa'. This
-   feature is not supported by the standard encoding used in PDF.
+   *foldspaces* là một cờ tùy chọn sử dụng chuỗi ngắn đặc biệt 'y' thay cho 4 dấu cách liên tiếp (ASCII 0x20), như được 'btoa' hỗ trợ. Tính năng này không được hỗ trợ bởi encoding chuẩn được sử dụng trong PDF.
 
-   *wrapcol* controls whether the output should have newline (``b'\n'``)
-   characters added to it. If this is non-zero, each output line will be
-   at most this many characters long, excluding the trailing newline.
+   *wrapcol* kiểm soát việc có thêm các ký tự newline (``b'\n'``) vào output hay không. Nếu giá trị này khác 0, mỗi dòng output sẽ có nhiều nhất số ký tự tương ứng với giá trị này, không tính newline ở cuối.
 
-   *pad* controls whether zero-padding applied to the end of the input
-   is fully retained in the output encoding, as done by ``btoa``,
-   producing an exact multiple of 5 bytes of output. This is not part
-   of the standard encoding used in PDF, as it does not preserve the
-   length of the data.
+   *pad* kiểm soát việc phần đệm bằng số 0 được áp dụng vào cuối input có được giữ lại hoàn toàn trong encoding output hay không, như được thực hiện bởi ``btoa``, tạo ra output có số byte là bội số chính xác của 5. Đây không phải là một phần của encoding chuẩn được sử dụng trong PDF, vì nó không bảo toàn độ dài của dữ liệu.
 
-   *adobe* controls whether the encoded byte sequence is framed with
-   ``<~`` and ``~>``, as in a PostScript base-85 string literal.  Note
-   that while ASCII85Decode streams in PDF documents *must* be
-   terminated with ``~>``, they *must not* use a leading ``<~``.
+   *adobe* kiểm soát việc chuỗi byte đã mã hóa có được bao quanh bởi ``<~`` và ``~>`` hay không, như trong một string literal base-85 của PostScript. Lưu ý rằng mặc dù các stream ASCII85Decode trong tài liệu PDF *phải* được kết thúc bằng ``~>``, chúng *không được* sử dụng ``<~`` ở đầu.
 
    .. versionadded:: 3.4
 
 
 .. function:: a85decode(b, *, foldspaces=False, adobe=False, ignorechars=b' \t\n\r\v')
 
-   Decode the Ascii85 encoded :term:`bytes-like object` or ASCII string *b* and
-   return the decoded :class:`bytes`.
+   Giải mã :term:`bytes-like object` được mã hóa bằng Ascii85 hoặc chuỗi ASCII *b* và trả về :class:`bytes` đã giải mã.
 
-   *foldspaces* is a flag that specifies whether the 'y' short sequence
-   should be accepted as shorthand for 4 consecutive spaces (ASCII 0x20).
-   This feature is not supported by the standard Ascii85 encoding used in
-   PDF and PostScript.
+   *foldspaces* là một cờ chỉ định liệu chuỗi ngắn 'y' có được chấp nhận như cách viết tắt cho 4 dấu cách liên tiếp (ASCII 0x20) hay không. Tính năng này không được hỗ trợ bởi encoding Ascii85 chuẩn được sử dụng trong PDF và PostScript.
 
-   *adobe* controls whether the ``<~`` and ``~>`` markers are
-   present. While the leading ``<~`` is not required, the input must
-   end with ``~>``, or a :exc:`ValueError` is raised.
+   *adobe* kiểm soát việc các dấu ``<~`` và ``~>`` có xuất hiện hay không. Mặc dù ``<~`` ở đầu không bắt buộc, dữ liệu đầu vào phải kết thúc bằng ``~>``, nếu không sẽ phát sinh :exc:`ValueError`.
 
-   *ignorechars* should be a byte string containing characters to ignore
-   from the input. This should only contain whitespace characters, and by
-   default contains all whitespace characters in ASCII.
+   *ignorechars* phải là một chuỗi byte chứa các ký tự cần bỏ qua trong dữ liệu đầu vào. Chuỗi này chỉ nên chứa các ký tự khoảng trắng và theo mặc định chứa tất cả ký tự khoảng trắng trong ASCII.
 
    .. versionadded:: 3.4
 
 
 .. function:: b85encode(b, pad=False)
 
-   Encode the :term:`bytes-like object` *b* using base85 (as used in e.g.
-   git-style binary diffs) and return the encoded :class:`bytes`.
+   Mã hóa :term:`bytes-like object` *b* bằng base85 (được sử dụng chẳng hạn trong các binary diff kiểu git) và trả về :class:`bytes` đã mã hóa.
 
-   The input is padded with ``b'\0'`` so its length is a multiple of 4
-   bytes before encoding.  If *pad* is true, all the resulting
-   characters are retained in the output, which will always be a
-   multiple of 5 bytes, and thus the length of the data may not be
-   preserved on decoding.
+   Dữ liệu đầu vào được đệm bằng ``b'\0'`` để độ dài của nó là bội số của 4 byte trước khi mã hóa. Nếu *pad* là true, tất cả các ký tự tạo ra đều được giữ lại trong đầu ra, đầu ra này luôn có độ dài là bội số của 5 byte, vì vậy độ dài dữ liệu có thể không được giữ nguyên khi giải mã.
 
    .. versionadded:: 3.4
 
 
 .. function:: b85decode(b)
 
-   Decode the base85-encoded :term:`bytes-like object` or ASCII string *b* and
-   return the decoded :class:`bytes`.
+   Giải mã :term:`bytes-like object` được mã hóa bằng base85 hoặc chuỗi ASCII *b* và trả về :class:`bytes` đã giải mã.
 
    .. versionadded:: 3.4
 
 
 .. function:: z85encode(s)
 
-   Encode the :term:`bytes-like object` *s* using Z85 (as used in ZeroMQ)
-   and return the encoded :class:`bytes`.
+   Mã hóa :term:`bytes-like object` *s* bằng Z85 (được sử dụng trong ZeroMQ) và trả về :class:`bytes` đã mã hóa.
 
-   The `ZeroMQ specification <https://rfc.zeromq.org/spec/32/>`_
-   requires the length of Z85-encoded data to be a multiple of 5
-   bytes. To produce compliant data frames, you must pad the input
-   data to this function to a multiple of 4 bytes.
+   `ZeroMQ specification <https://rfc.zeromq.org/spec/32/>`_ yêu cầu độ dài của dữ liệu được mã hóa bằng Z85 phải là bội số của 5 byte. Để tạo các khung dữ liệu tuân thủ đặc tả, bạn phải đệm dữ liệu đầu vào của hàm này thành bội số của 4 byte.
 
    .. versionadded:: 3.13
 
 
 .. function:: z85decode(s)
 
-   Decode the Z85-encoded :term:`bytes-like object` or ASCII string *s* and
-   return the decoded :class:`bytes`.
+   Giải mã chuỗi Z85-encoded :term:`bytes-like object` hoặc ASCII *s* và trả về :class:`bytes` đã được giải mã.
 
    .. versionadded:: 3.13
 
 
 .. _base64-legacy:
 
-Legacy Interface
-----------------
+Giao diện cũ
+------------
 
 .. function:: decode(input, output)
 
-   Decode the contents of the binary *input* file and write the resulting binary
-   data to the *output* file. *input* and *output* must be :term:`file objects
-   <file object>`. *input* will be read until ``input.readline()`` returns an
-   empty bytes object.
+   Giải mã nội dung của tệp *input* nhị phân và ghi dữ liệu nhị phân thu được vào tệp *output*. *input* và *output* phải là :term:`các đối tượng tệp <file object>`. *input* sẽ được đọc cho đến khi ``input.readline()`` trả về một đối tượng bytes rỗng.
 
 
 .. function:: decodebytes(s)
 
-   Decode the :term:`bytes-like object` *s*, which must contain one or more
-   lines of base64 encoded data, and return the decoded :class:`bytes`.
+   Giải mã :term:`bytes-like object` *s*, trong đó phải chứa một hoặc nhiều dòng dữ liệu được mã hóa base64, và trả về :class:`bytes` đã được giải mã.
 
    .. versionadded:: 3.1
 
 
 .. function:: encode(input, output)
 
-   Encode the contents of the binary *input* file and write the resulting base64
-   encoded data to the *output* file. *input* and *output* must be :term:`file
-   objects <file object>`. *input* will be read until ``input.read()`` returns
-   an empty bytes object. :func:`encode` inserts a newline character (``b'\n'``)
-   after every 76 bytes of the output, as well as ensuring that the output
-   always ends with a newline, as per :rfc:`2045` (MIME).
+   Mã hóa nội dung của tệp *input* nhị phân và ghi dữ liệu được mã hóa base64 thu được vào tệp *output*. *input* và *output* phải là :term:`các đối tượng tệp <file object>`. *input* sẽ được đọc cho đến khi ``input.read()`` trả về một đối tượng bytes rỗng. :func:`encode` chèn một ký tự xuống dòng (``b'\n'``) sau mỗi 76 byte của đầu ra, đồng thời đảm bảo rằng đầu ra luôn kết thúc bằng một ký tự xuống dòng, theo :rfc:`2045` (MIME).
 
 
 .. function:: encodebytes(s)
 
-   Encode the :term:`bytes-like object` *s*, which can contain arbitrary binary
-   data, and return :class:`bytes` containing the base64-encoded data, with newlines
-   (``b'\n'``) inserted after every 76 bytes of output, and ensuring that
-   there is a trailing newline, as per :rfc:`2045` (MIME).
+   Mã hóa :term:`bytes-like object` *s*, có thể chứa dữ liệu nhị phân tùy ý, và trả về :class:`bytes` chứa dữ liệu được mã hóa base64, với các ký tự xuống dòng (``b'\n'``) được chèn sau mỗi 76 byte của đầu ra, đồng thời đảm bảo có một ký tự xuống dòng ở cuối, theo :rfc:`2045` (MIME).
 
    .. versionadded:: 3.1
 
 
-An example usage of the module:
+Ví dụ về cách sử dụng module:
 
    >>> import base64
    >>> encoded = base64.b64encode(b'data to be encoded')
@@ -360,26 +252,26 @@ An example usage of the module:
 
 .. _base64-security:
 
-Security Considerations
+Các cân nhắc về bảo mật
 -----------------------
 
-A new security considerations section was added to :rfc:`4648` (section 12); it's
-recommended to review the security section for any code deployed to production.
+Một phần về các cân nhắc bảo mật mới đã được thêm vào :rfc:`4648` (mục 12); bạn nên xem lại phần bảo mật đối với mọi mã được deploy lên môi trường production.
 
 .. seealso::
 
    Module :mod:`binascii`
-      Support module containing ASCII-to-binary and binary-to-ASCII conversions.
+      Module hỗ trợ chuyển đổi ASCII sang binary và binary sang ASCII.
 
-   :rfc:`1521` - MIME (Multipurpose Internet Mail Extensions) Part One: Mechanisms for Specifying and Describing the Format of Internet Message Bodies
-      Section 5.2, "Base64 Content-Transfer-Encoding," provides the definition of the
-      base64 encoding.
+   :rfc:`1521` - MIME (Multipurpose Internet Mail Extensions) Phần một: Cơ chế chỉ định và mô tả định dạng của nội dung thư Internet
+      Mục 5.2, "Base64 Content-Transfer-Encoding," cung cấp định nghĩa về mã hóa base64.
 
-   `ISO 32000-2 Portable document format - Part 2: PDF 2.0 <https://pdfa.org/resource/iso-32000-2/>`_
-      Section 7.4.3, "ASCII85Decode Filter," provides the definition
-      of the Ascii85 encoding used in PDF and PostScript, including
-      the output character set and the details of data length preservation
-      using zero-padding and partial output groups.
+   `Định dạng tài liệu portable ISO 32000-2 - Phần 2: PDF 2.0 <https://pdfa.org/resource/iso-32000-2/>`_
+      Mục 7.4.3, "ASCII85Decode Filter," cung cấp định nghĩa về encoding Ascii85 được sử dụng trong PDF và PostScript, bao gồm tập ký tự đầu ra và chi tiết về việc bảo toàn độ dài dữ liệu bằng cách đệm bằng số không và các nhóm đầu ra một phần.
 
    `ZeroMQ RFC 32/Z85 <https://rfc.zeromq.org/spec/32/>`_
-      The "Formal Specification" section provides the character set used in Z85.
+      Phần "Formal Specification" cung cấp tập ký tự được sử dụng trong Z85.
+
+.. _`PDF 2.0`: https://pdfa.org/resource/iso-32000-2/
+.. _`ZeroMQ specification`: https://rfc.zeromq.org/spec/32/
+.. _`ISO 32000-2 Portable document format - Part 2: PDF 2.0`: https://pdfa.org/resource/iso-32000-2/
+.. _`ZeroMQ RFC 32/Z85`: https://rfc.zeromq.org/spec/32/

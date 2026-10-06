@@ -1,62 +1,54 @@
-:mod:`!colorsys` --- Conversions between color systems
-======================================================
+:mod:`!colorsys` --- Chuyển đổi giữa các hệ màu
+===============================================
 
 .. module:: colorsys
-   :synopsis: Conversion functions between RGB and other color systems.
+   :synopsis: Các hàm chuyển đổi giữa RGB và các hệ màu khác.
 
 .. sectionauthor:: David Ascher <da@python.net>
 
-**Source code:** :source:`Lib/colorsys.py`
+**Mã nguồn:** :source:`Lib/colorsys.py`
 
 --------------
 
-The :mod:`!colorsys` module defines bidirectional conversions of color values
-between colors expressed in the RGB (Red Green Blue) color space used in
-computer monitors and three other coordinate systems: YIQ, HLS (Hue Lightness
-Saturation) and HSV (Hue Saturation Value).  Coordinates in all of these color
-spaces are floating-point values.  In the YIQ space, the Y coordinate is between
-0 and 1, but the I and Q coordinates can be positive or negative.  In all other
-spaces, the coordinates are all between 0 and 1.
+Mô-đun :mod:`!colorsys` xác định các phép chuyển đổi hai chiều của các giá trị màu giữa màu được biểu diễn trong không gian màu RGB (Đỏ Lục Lam) được màn hình máy tính sử dụng và ba hệ tọa độ khác: YIQ, HLS (Sắc độ Độ sáng Độ bão hòa) và HSV (Sắc độ Độ bão hòa Giá trị). Tọa độ trong tất cả các không gian màu này đều là các giá trị dấu phẩy động. Trong không gian YIQ, tọa độ Y nằm trong khoảng từ 0 đến 1, nhưng các tọa độ I và Q có thể dương hoặc âm. Trong tất cả các không gian khác, mọi tọa độ đều nằm trong khoảng từ 0 đến 1.
 
 .. seealso::
 
-   More information about color spaces can be found at
-   https://www.poynton.ca/pdf/ColourFAQ.pdf and
-   https://www.cambridgeincolour.com/tutorials/color-spaces.htm.
+   Có thể tìm thêm thông tin về các không gian màu tại https://www.poynton.ca/pdf/ColourFAQ.pdf và https://www.cambridgeincolour.com/tutorials/color-spaces.htm.
 
-The :mod:`!colorsys` module defines the following functions:
+Mô-đun :mod:`!colorsys` xác định các hàm sau:
 
 
 .. function:: rgb_to_yiq(r, g, b)
 
-   Convert the color from RGB coordinates to YIQ coordinates.
+   Chuyển đổi màu từ tọa độ RGB sang tọa độ YIQ.
 
 
 .. function:: yiq_to_rgb(y, i, q)
 
-   Convert the color from YIQ coordinates to RGB coordinates.
+   Chuyển đổi màu từ tọa độ YIQ sang tọa độ RGB.
 
 
 .. function:: rgb_to_hls(r, g, b)
 
-   Convert the color from RGB coordinates to HLS coordinates.
+   Chuyển đổi màu từ tọa độ RGB sang tọa độ HLS.
 
 
 .. function:: hls_to_rgb(h, l, s)
 
-   Convert the color from HLS coordinates to RGB coordinates.
+   Chuyển đổi màu từ tọa độ HLS sang tọa độ RGB.
 
 
 .. function:: rgb_to_hsv(r, g, b)
 
-   Convert the color from RGB coordinates to HSV coordinates.
+   Chuyển đổi màu từ tọa độ RGB sang tọa độ HSV.
 
 
 .. function:: hsv_to_rgb(h, s, v)
 
-   Convert the color from HSV coordinates to RGB coordinates.
+   Chuyển đổi màu từ tọa độ HSV sang tọa độ RGB.
 
-Example::
+Ví dụ::
 
    >>> import colorsys
    >>> colorsys.rgb_to_hsv(0.2, 0.4, 0.4)

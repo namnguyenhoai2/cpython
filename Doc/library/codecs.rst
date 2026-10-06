@@ -1,14 +1,14 @@
-:mod:`!codecs` --- Codec registry and base classes
-==================================================
+:mod:`!codecs` --- Đăng ký codec và các lớp cơ sở
+=================================================
 
 .. module:: codecs
-   :synopsis: Encode and decode data and streams.
+   :synopsis: Mã hóa và giải mã dữ liệu cũng như các stream.
 
 .. moduleauthor:: Marc-André Lemburg <mal@lemburg.com>
 .. sectionauthor:: Marc-André Lemburg <mal@lemburg.com>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/codecs.py`
+**Mã nguồn:** :source:`Lib/codecs.py`
 
 .. index::
    single: Unicode
@@ -20,258 +20,188 @@
 
 --------------
 
-This module defines base classes for standard Python codecs (encoders and
-decoders) and provides access to the internal Python codec registry, which
-manages the codec and error handling lookup process. Most standard codecs
-are :term:`text encodings <text encoding>`, which encode text to bytes (and
-decode bytes to text), but there are also codecs provided that encode text to
-text, and bytes to bytes. Custom codecs may encode and decode between arbitrary
-types, but some module features are restricted to be used specifically with
-:term:`text encodings <text encoding>` or with codecs that encode to
+Mô-đun này định nghĩa các lớp cơ sở cho các codec Python tiêu chuẩn (encoder và decoder), đồng thời cung cấp quyền truy cập vào registry codec nội bộ của Python, nơi quản lý quá trình tra cứu codec và xử lý lỗi. Hầu hết codec tiêu chuẩn là :term:`mã hóa văn bản <text encoding>`, dùng để mã hóa văn bản thành bytes (và giải mã bytes thành văn bản), nhưng cũng có các codec mã hóa văn bản thành văn bản và bytes thành bytes. Codec tùy chỉnh có thể mã hóa và giải mã giữa các kiểu tùy ý, nhưng một số tính năng của mô-đun bị giới hạn và chỉ được sử dụng cụ thể với
+:term:`mã hóa văn bản <text encoding>` hoặc với các codec mã hóa thành
 :class:`bytes`.
 
-The module defines the following functions for encoding and decoding with
-any codec:
+Mô-đun định nghĩa các hàm sau để mã hóa và giải mã bằng bất kỳ codec nào:
 
 .. function:: encode(obj, encoding='utf-8', errors='strict')
 
-   Encodes *obj* using the codec registered for *encoding*.
+   Mã hóa *obj* bằng codec được đăng ký cho *encoding*.
 
-   *Errors* may be given to set the desired error handling scheme. The
-   default error handler is ``'strict'`` meaning that encoding errors raise
-   :exc:`ValueError` (or a more codec specific subclass, such as
-   :exc:`UnicodeEncodeError`). Refer to :ref:`codec-base-classes` for more
-   information on codec error handling.
+   *Errors* có thể được cung cấp để thiết lập cơ chế xử lý lỗi mong muốn. Trình xử lý lỗi mặc định là ``'strict'``, nghĩa là các lỗi mã hóa sẽ phát sinh
+   :exc:`ValueError` (hoặc một lớp con cụ thể hơn của codec, chẳng hạn như
+   :exc:`UnicodeEncodeError`). Tham khảo :ref:`codec-base-classes` để biết thêm thông tin về việc xử lý lỗi của codec.
 
 .. function:: decode(obj, encoding='utf-8', errors='strict')
 
-   Decodes *obj* using the codec registered for *encoding*.
+   Giải mã *obj* bằng codec được đăng ký cho *encoding*.
 
-   *Errors* may be given to set the desired error handling scheme. The
-   default error handler is ``'strict'`` meaning that decoding errors raise
-   :exc:`ValueError` (or a more codec specific subclass, such as
-   :exc:`UnicodeDecodeError`). Refer to :ref:`codec-base-classes` for more
-   information on codec error handling.
+   *Errors* có thể được cung cấp để thiết lập cơ chế xử lý lỗi mong muốn. Trình xử lý lỗi mặc định là ``'strict'``, nghĩa là các lỗi giải mã sẽ phát sinh
+   :exc:`ValueError` (hoặc một lớp con cụ thể hơn của codec, chẳng hạn như
+   :exc:`UnicodeDecodeError`). Tham khảo :ref:`codec-base-classes` để biết thêm thông tin về việc xử lý lỗi của codec.
 
 .. function:: charmap_build(string)
 
-   Return a mapping suitable for encoding with a custom single-byte encoding.
-   Given a :class:`str` *string* of up to 256 characters representing a
-   decoding table, returns either a compact internal mapping object
-   ``EncodingMap`` or a :class:`dictionary <dict>` mapping character ordinals
-   to byte values. Raises a :exc:`TypeError` on invalid input.
+   Trả về một ánh xạ phù hợp để mã hóa bằng một encoding một byte tùy chỉnh. Với một :class:`str` *chuỗi* có tối đa 256 ký tự, biểu diễn một bảng giải mã, hàm này trả về một đối tượng ánh xạ nội bộ gọn ``EncodingMap`` hoặc một ánh xạ :class:`dictionary <dict>` ánh xạ các ordinal của ký tự đến các giá trị byte. Phát sinh :exc:`TypeError` nếu đầu vào không hợp lệ.
 
-The full details for each codec can also be looked up directly:
+Bạn cũng có thể tra cứu trực tiếp thông tin đầy đủ cho từng codec:
 
 .. function:: lookup(encoding, /)
 
-   Looks up the codec info in the Python codec registry and returns a
-   :class:`CodecInfo` object as defined below.
+   Tra cứu thông tin codec trong registry codec của Python và trả về một
+   :class:`CodecInfo` đối tượng như được định nghĩa dưới đây.
 
-   Encodings are first looked up in the registry's cache. If not found, the list of
-   registered search functions is scanned. If no :class:`CodecInfo` object is
-   found, a :exc:`LookupError` is raised. Otherwise, the :class:`CodecInfo` object
-   is stored in the cache and returned to the caller.
+   Trước tiên, các encoding được tra cứu trong bộ nhớ đệm của registry. Nếu không tìm thấy, danh sách các hàm tìm kiếm đã đăng ký sẽ được quét. Nếu không tìm thấy đối tượng :class:`CodecInfo` nào, một :exc:`LookupError` sẽ được phát sinh. Nếu tìm thấy, đối tượng :class:`CodecInfo` sẽ được lưu vào bộ nhớ đệm và trả về cho bên gọi.
 
 .. class:: CodecInfo(encode, decode, streamreader=None, streamwriter=None, incrementalencoder=None, incrementaldecoder=None, name=None)
 
-   Codec details when looking up the codec registry. The constructor
-   arguments are stored in attributes of the same name:
+   Thông tin chi tiết về codec khi tra cứu registry codec. Các đối số của hàm khởi tạo được lưu trong các thuộc tính có cùng tên:
 
 
    .. attribute:: name
 
-      The name of the encoding.
+      Tên của encoding.
 
 
    .. attribute:: encode
                   decode
 
-      The stateless encoding and decoding functions. These must be
-      functions or methods which have the same interface as
-      the :meth:`~Codec.encode` and :meth:`~Codec.decode` methods of Codec
-      instances (see :ref:`Codec Interface <codec-objects>`).
-      The functions or methods are expected to work in a stateless mode.
+      Các hàm encoding và decoding không lưu trạng thái. Đây phải là các hàm hoặc phương thức có cùng interface với các phương thức :meth:`~Codec.encode` và :meth:`~Codec.decode` của các instance Codec (xem :ref:`Giao diện Codec <codec-objects>`). Các hàm hoặc phương thức này được kỳ vọng hoạt động ở chế độ không lưu trạng thái.
 
 
    .. attribute:: incrementalencoder
                   incrementaldecoder
 
-      Incremental encoder and decoder classes or factory functions.
-      These have to provide the interface defined by the base classes
-      :class:`IncrementalEncoder` and :class:`IncrementalDecoder`,
-      respectively. Incremental codecs can maintain state.
+      Các lớp encoder và decoder tăng dần hoặc các hàm factory. Chúng phải cung cấp interface được định nghĩa bởi các lớp cơ sở
+      :class:`IncrementalEncoder` và :class:`IncrementalDecoder`, tương ứng. Các codec tăng dần có thể duy trì trạng thái.
 
 
    .. attribute:: streamwriter
                   streamreader
 
-      Stream writer and reader classes or factory functions. These have to
-      provide the interface defined by the base classes
-      :class:`StreamWriter` and :class:`StreamReader`, respectively.
-      Stream codecs can maintain state.
+      Các lớp stream writer và reader hoặc các hàm factory. Chúng phải cung cấp interface được định nghĩa bởi các lớp cơ sở
+      :class:`StreamWriter` và :class:`StreamReader`, tương ứng. Stream codec có thể duy trì trạng thái.
 
-To simplify access to the various codec components, the module provides
-these additional functions which use :func:`lookup` for the codec lookup:
+Để đơn giản hóa việc truy cập vào các thành phần codec khác nhau, module cung cấp các hàm bổ sung sau đây, sử dụng :func:`lookup` để tra cứu codec:
 
 .. function:: getencoder(encoding)
 
-   Look up the codec for the given encoding and return its encoder function.
+   Tra cứu codec cho encoding đã cho và trả về hàm encoder của codec đó.
 
-   Raises a :exc:`LookupError` in case the encoding cannot be found.
+   Phát sinh :exc:`LookupError` nếu không tìm thấy encoding.
 
 
 .. function:: getdecoder(encoding)
 
-   Look up the codec for the given encoding and return its decoder function.
+   Tra cứu codec cho encoding đã cho và trả về hàm decoder của codec đó.
 
-   Raises a :exc:`LookupError` in case the encoding cannot be found.
+   Phát sinh :exc:`LookupError` nếu không tìm thấy encoding.
 
 
 .. function:: getincrementalencoder(encoding)
 
-   Look up the codec for the given encoding and return its incremental encoder
-   class or factory function.
+   Tra cứu codec cho encoding đã cho và trả về class encoder tăng dần hoặc hàm factory của codec đó.
 
-   Raises a :exc:`LookupError` in case the encoding cannot be found or the codec
-   doesn't support an incremental encoder.
+   Phát sinh :exc:`LookupError` trong trường hợp không tìm thấy encoding hoặc codec không hỗ trợ incremental encoder.
 
 
 .. function:: getincrementaldecoder(encoding)
 
-   Look up the codec for the given encoding and return its incremental decoder
-   class or factory function.
+   Tra cứu codec cho encoding đã cho và trả về class incremental decoder hoặc hàm factory của codec đó.
 
-   Raises a :exc:`LookupError` in case the encoding cannot be found or the codec
-   doesn't support an incremental decoder.
+   Phát sinh :exc:`LookupError` trong trường hợp không tìm thấy encoding hoặc codec không hỗ trợ incremental decoder.
 
 
 .. function:: getreader(encoding)
 
-   Look up the codec for the given encoding and return its :class:`StreamReader`
-   class or factory function.
+   Tra cứu codec cho encoding đã cho và trả về class :class:`StreamReader` hoặc hàm factory của codec đó.
 
-   Raises a :exc:`LookupError` in case the encoding cannot be found.
+   Phát sinh :exc:`LookupError` nếu không tìm thấy encoding.
 
 
 .. function:: getwriter(encoding)
 
-   Look up the codec for the given encoding and return its :class:`StreamWriter`
-   class or factory function.
+   Tra cứu codec cho encoding đã cho và trả về class :class:`StreamWriter` hoặc hàm factory của codec đó.
 
-   Raises a :exc:`LookupError` in case the encoding cannot be found.
+   Phát sinh :exc:`LookupError` nếu không tìm thấy encoding.
 
-Custom codecs are made available by registering a suitable codec search
-function:
+Các codec tùy chỉnh được cung cấp bằng cách đăng ký một hàm tìm kiếm codec phù hợp:
 
 .. function:: register(search_function, /)
 
-   Register a codec search function. Search functions are expected to take one
-   argument, being the encoding name in all lower case letters with hyphens
-   and spaces converted to underscores, and return a :class:`CodecInfo` object.
-   In case a search function cannot find a given encoding, it should return
-   ``None``.
+   Đăng ký một hàm tìm kiếm codec. Các hàm tìm kiếm được yêu cầu nhận một đối số là tên encoding được viết bằng chữ thường, trong đó dấu gạch nối và dấu cách được chuyển thành dấu gạch dưới, và trả về một đối tượng :class:`CodecInfo`. Nếu một hàm tìm kiếm không thể tìm thấy encoding đã cho, hàm đó nên trả về ``None``.
 
    .. versionchanged:: 3.9
-      Hyphens and spaces are converted to underscore.
+      Dấu gạch nối và dấu cách được chuyển thành dấu gạch dưới.
 
 
 .. function:: unregister(search_function, /)
 
-   Unregister a codec search function and clear the registry's cache.
-   If the search function is not registered, do nothing.
+   Hủy đăng ký một hàm tìm kiếm codec và xóa bộ nhớ đệm của registry. Nếu hàm tìm kiếm chưa được đăng ký thì không làm gì cả.
 
    .. versionadded:: 3.10
 
 
-While the builtin :func:`open` and the associated :mod:`io` module are the
-recommended approach for working with encoded text files, this module
-provides additional utility functions and classes that allow the use of a
-wider range of codecs when working with binary files:
+Mặc dù :func:`open` tích hợp sẵn và module :mod:`io` đi kèm là cách tiếp cận được khuyến nghị để làm việc với các tệp văn bản được mã hóa, module này cung cấp thêm các hàm tiện ích và lớp cho phép sử dụng nhiều codec hơn khi làm việc với các tệp nhị phân:
 
 .. function:: open(filename, mode='r', encoding=None, errors='strict', buffering=-1)
 
-   Open an encoded file using the given *mode* and return an instance of
-   :class:`StreamReaderWriter`, providing transparent encoding/decoding.
-   The default file mode is ``'r'``, meaning to open the file in read mode.
+   Mở một tệp được mã hóa bằng *mode* đã cho và trả về một thể hiện của
+   :class:`StreamReaderWriter`, cung cấp encoding/decoding trong suốt. Chế độ tệp mặc định là ``'r'``, nghĩa là mở tệp ở chế độ đọc.
 
    .. note::
 
-      If *encoding* is not ``None``, then the
-      underlying encoded files are always opened in binary mode.
-      No automatic conversion of ``'\n'`` is done on reading and writing.
-      The *mode* argument may be any binary mode acceptable to the built-in
-      :func:`open` function; the ``'b'`` is automatically added.
+      Nếu *encoding* không phải là ``None``, thì các tệp được mã hóa bên dưới luôn được mở ở chế độ nhị phân. Không tự động chuyển đổi ``'\n'`` khi đọc và ghi. Đối số *mode* có thể là bất kỳ chế độ nhị phân nào được hàm tích hợp sẵn chấp nhận
+      hàm :func:`open`; ``'b'`` được tự động thêm vào.
 
-   *encoding* specifies the encoding which is to be used for the file.
-   Any encoding that encodes to and decodes from bytes is allowed, and
-   the data types supported by the file methods depend on the codec used.
+   *encoding* chỉ định encoding sẽ được sử dụng cho tệp. Mọi encoding có thể mã hóa thành byte và giải mã từ byte đều được cho phép, còn các kiểu dữ liệu được các phương thức của tệp hỗ trợ phụ thuộc vào codec được sử dụng.
 
-   *errors* may be given to define the error handling. It defaults to ``'strict'``
-   which causes a :exc:`ValueError` to be raised in case an encoding error occurs.
+   Có thể cung cấp *errors* để xác định cách xử lý lỗi. Giá trị mặc định là ``'strict'``, khiến :exc:`ValueError` được phát sinh khi xảy ra lỗi encoding.
 
-   *buffering* has the same meaning as for the built-in :func:`open` function.
-   It defaults to -1 which means that the default buffer size will be used.
+   *buffering* có cùng ý nghĩa như trong hàm :func:`open` tích hợp sẵn. Giá trị mặc định là -1, nghĩa là kích thước bộ đệm mặc định sẽ được sử dụng.
 
    .. versionchanged:: 3.11
-      The ``'U'`` mode has been removed.
+      Chế độ ``'U'`` đã bị loại bỏ.
 
    .. deprecated:: 3.14
 
-      :func:`codecs.open` has been superseded by :func:`open`.
+      :func:`codecs.open` đã được thay thế bằng :func:`open`.
 
 
 .. function:: EncodedFile(file, data_encoding, file_encoding=None, errors='strict')
 
-   Return a :class:`StreamRecoder` instance, a wrapped version of *file*
-   which provides transparent transcoding. The original file is closed
-   when the wrapped version is closed.
+   Trả về một instance :class:`StreamRecoder`, là phiên bản bọc của *file* cung cấp khả năng chuyển mã trong suốt. Tệp gốc được đóng khi phiên bản bọc được đóng.
 
-   Data written to the wrapped file is decoded according to the given
-   *data_encoding* and then written to the original file as bytes using
-   *file_encoding*. Bytes read from the original file are decoded
-   according to *file_encoding*, and the result is encoded
-   using *data_encoding*.
+   Dữ liệu được ghi vào tệp bọc sẽ được giải mã theo *data_encoding*, sau đó được ghi vào tệp gốc dưới dạng byte bằng *file_encoding*. Các byte được đọc từ tệp gốc sẽ được giải mã theo *file_encoding*, rồi kết quả được mã hóa bằng *data_encoding*.
 
-   If *file_encoding* is not given, it defaults to *data_encoding*.
+   Nếu không cung cấp *file_encoding*, giá trị mặc định sẽ là *data_encoding*.
 
-   *errors* may be given to define the error handling. It defaults to
-   ``'strict'``, which causes :exc:`ValueError` to be raised in case an encoding
-   error occurs.
+   Có thể cung cấp *errors* để xác định cách xử lý lỗi. Giá trị mặc định là ``'strict'``, khiến :exc:`ValueError` được phát sinh khi xảy ra lỗi mã hóa.
 
 
 .. function:: iterencode(iterator, encoding, errors='strict', **kwargs)
 
-   Uses an incremental encoder to iteratively encode the input provided by
-   *iterator*. *iterator* must yield :class:`str` objects.
-   This function is a :term:`generator`. The *errors* argument (as well as any
-   other keyword argument) is passed through to the incremental encoder.
+   Sử dụng incremental encoder để mã hóa lặp dữ liệu đầu vào do *iterator* cung cấp. *iterator* phải sinh ra các đối tượng :class:`str`. Hàm này là một :term:`generator`. Đối số *errors* (cũng như mọi đối số từ khóa khác) được truyền cho incremental encoder.
 
-   This function requires that the codec accept text :class:`str` objects
-   to encode. Therefore it does not support bytes-to-bytes encoders such as
-   ``base64_codec``.
+   Hàm này yêu cầu codec chấp nhận các đối tượng văn bản :class:`str` để mã hóa. Do đó, hàm không hỗ trợ các encoder chuyển đổi từ byte sang byte, chẳng hạn như ``base64_codec``.
 
 
 .. function:: iterdecode(iterator, encoding, errors='strict', **kwargs)
 
-   Uses an incremental decoder to iteratively decode the input provided by
-   *iterator*. *iterator* must yield :class:`bytes` objects.
-   This function is a :term:`generator`. The *errors* argument (as well as any
-   other keyword argument) is passed through to the incremental decoder.
+   Sử dụng incremental decoder để giải mã lặp dữ liệu đầu vào do *iterator* cung cấp. *iterator* phải sinh ra các đối tượng :class:`bytes`. Hàm này là một :term:`generator`. Đối số *errors* (cũng như mọi đối số từ khóa khác) được truyền cho incremental decoder.
 
-   This function requires that the codec accept :class:`bytes` objects
-   to decode. Therefore it does not support text-to-text encoders such as
-   ``rot_13``, although ``rot_13`` may be used equivalently with
+   Hàm này yêu cầu codec chấp nhận các đối tượng :class:`bytes` để giải mã. Do đó, hàm không hỗ trợ các encoder chuyển văn bản thành văn bản như ``rot_13``, mặc dù ``rot_13`` có thể được sử dụng tương đương với
    :func:`iterencode`.
 
 
 .. function:: readbuffer_encode(buffer, errors=None, /)
 
-   Return a :class:`tuple` containing the raw bytes of *buffer*, a
-   :ref:`buffer-compatible object <bufferobjects>` or :class:`str`
-   (encoded to UTF-8 before processing), and their length in bytes.
+   Trả về một :class:`tuple` chứa các byte thô của *buffer*, một
+   :ref:`đối tượng tương thích với buffer <bufferobjects>` hoặc :class:`str` (được mã hóa thành UTF-8 trước khi xử lý), cùng với độ dài của chúng tính theo byte.
 
-   The *errors* argument is ignored.
+   Đối số *errors* bị bỏ qua.
 
    .. code-block:: pycon
 
@@ -279,56 +209,35 @@ wider range of codecs when working with binary files:
       (b'Zito', 4)
 
 
-The module also provides the following constants which are useful for reading
-and writing to platform dependent files:
+Mô-đun này cũng cung cấp các hằng số sau đây, hữu ích khi đọc và ghi vào các tệp phụ thuộc vào nền tảng:
 
 
 .. data:: BOM
-          BOM_BE
-          BOM_LE
-          BOM_UTF8
-          BOM_UTF16
-          BOM_UTF16_BE
-          BOM_UTF16_LE
-          BOM_UTF32
-          BOM_UTF32_BE
-          BOM_UTF32_LE
+          BOM_BE BOM_LE BOM_UTF8 BOM_UTF16 BOM_UTF16_BE BOM_UTF16_LE BOM_UTF32 BOM_UTF32_BE BOM_UTF32_LE
 
-   These constants define various byte sequences,
-   being Unicode byte order marks (BOMs) for several encodings. They are
-   used in UTF-16 and UTF-32 data streams to indicate the byte order used,
-   and in UTF-8 as a Unicode signature. :const:`BOM_UTF16` is either
-   :const:`BOM_UTF16_BE` or :const:`BOM_UTF16_LE` depending on the platform's
-   native byte order, :const:`BOM` is an alias for :const:`BOM_UTF16`,
-   :const:`BOM_LE` for :const:`BOM_UTF16_LE` and :const:`BOM_BE` for
-   :const:`BOM_UTF16_BE`. The others represent the BOM in UTF-8 and UTF-32
-   encodings.
+   Các hằng số này xác định nhiều chuỗi byte khác nhau, là các dấu thứ tự byte Unicode (BOM) cho một số encoding. Chúng được sử dụng trong các luồng dữ liệu UTF-16 và UTF-32 để cho biết thứ tự byte được sử dụng, và trong UTF-8 dưới dạng chữ ký Unicode. :const:`BOM_UTF16` là một trong hai
+   :const:`BOM_UTF16_BE` hoặc :const:`BOM_UTF16_LE` tùy thuộc vào thứ tự byte gốc của nền tảng, :const:`BOM` là bí danh của :const:`BOM_UTF16`,
+   :const:`BOM_LE` cho :const:`BOM_UTF16_LE` và :const:`BOM_BE` cho
+   :const:`BOM_UTF16_BE`. Các giá trị còn lại đại diện cho BOM trong các encoding UTF-8 và UTF-32.
 
 
 .. _codec-base-classes:
 
-Codec Base Classes
-------------------
+Các lớp cơ sở của Codec
+-----------------------
 
-The :mod:`!codecs` module defines a set of base classes which define the
-interfaces for working with codec objects, and can also be used as the basis
-for custom codec implementations.
+Module :mod:`!codecs` định nghĩa một tập hợp các lớp cơ sở, trong đó xác định các interface để làm việc với các đối tượng codec, đồng thời có thể dùng làm nền tảng để triển khai codec tùy chỉnh.
 
-Each codec has to define four interfaces to make it usable as codec in Python:
-stateless encoder, stateless decoder, stream reader and stream writer. The
-stream reader and writers typically reuse the stateless encoder/decoder to
-implement the file protocols. Codec authors also need to define how the
-codec will handle encoding and decoding errors.
+Mỗi codec phải định nghĩa bốn interface để có thể được sử dụng như một codec trong Python: encoder không trạng thái, decoder không trạng thái, stream reader và stream writer. Stream reader và stream writer thường tái sử dụng encoder/decoder không trạng thái để triển khai các giao thức tệp. Tác giả codec cũng cần xác định cách codec xử lý các lỗi encoding và decoding.
 
 
 .. _surrogateescape:
 .. _error-handlers:
 
-Error Handlers
-^^^^^^^^^^^^^^
+Trình xử lý lỗi
+^^^^^^^^^^^^^^^
 
-To simplify and standardize error handling, codecs may implement different
-error handling schemes by accepting the *errors* string argument:
+Để đơn giản hóa và chuẩn hóa việc xử lý lỗi, các codec có thể triển khai những cơ chế xử lý lỗi khác nhau bằng cách chấp nhận đối số chuỗi *errors*:
 
       >>> 'German ß, ♬'.encode(encoding='ascii', errors='backslashreplace')
       b'German \\xdf, \\u266c'
@@ -347,1377 +256,976 @@ error handling schemes by accepting the *errors* string argument:
    single: \u; escape sequence
    single: \U; escape sequence
 
-The following error handlers can be used with all Python
-:ref:`standard-encodings` codecs:
+Có thể sử dụng các trình xử lý lỗi sau đây với mọi Python
+:ref:`standard-encodings` codec:
 
 .. tabularcolumns:: |l|L|
 
-+-------------------------+-----------------------------------------------+
-| Value                   | Meaning                                       |
-+=========================+===============================================+
-| ``'strict'``            | Raise :exc:`UnicodeError` (or a subclass),    |
-|                         | this is the default. Implemented in           |
-|                         | :func:`strict_errors`.                        |
-+-------------------------+-----------------------------------------------+
-| ``'ignore'``            | Ignore the malformed data and continue without|
-|                         | further notice. Implemented in                |
-|                         | :func:`ignore_errors`.                        |
-+-------------------------+-----------------------------------------------+
-| ``'replace'``           | Replace with a replacement marker. On         |
-|                         | encoding, use ``?`` (ASCII character). On     |
-|                         | decoding, use ``�`` (U+FFFD, the official     |
-|                         | REPLACEMENT CHARACTER). Implemented in        |
-|                         | :func:`replace_errors`.                       |
-+-------------------------+-----------------------------------------------+
-| ``'backslashreplace'``  | Replace with backslashed escape sequences.    |
-|                         | On encoding, use hexadecimal form of Unicode  |
-|                         | code point with formats :samp:`\\x{hh}`       |
-|                         | :samp:`\\u{xxxx}` :samp:`\\U{xxxxxxxx}`.      |
-|                         | On decoding, use hexadecimal form of byte     |
-|                         | value with format :samp:`\\x{hh}`.            |
-|                         | Implemented in                                |
-|                         | :func:`backslashreplace_errors`.              |
-+-------------------------+-----------------------------------------------+
-| ``'surrogateescape'``   | On decoding, replace byte with individual     |
-|                         | surrogate code ranging from ``U+DC80`` to     |
-|                         | ``U+DCFF``. This code will then be turned     |
-|                         | back into the same byte when the              |
-|                         | ``'surrogateescape'`` error handler is used   |
-|                         | when encoding the data. (See :pep:`383` for   |
-|                         | more.)                                        |
-+-------------------------+-----------------------------------------------+
++------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Giá trị                | Ý nghĩa                                                                                                                                                                                                                                                           |
++========================+===================================================================================================================================================================================================================================================================+
+| ``'strict'``           | Ném :exc:`UnicodeError` (hoặc một lớp con); đây là giá trị mặc định. Được triển khai trong                                                                                                                                                                        |
+|                        | :func:`strict_errors`.                                                                                                                                                                                                                                            |
++------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``'ignore'``           | Bỏ qua dữ liệu không đúng định dạng và tiếp tục mà không có thêm thông báo nào. Được triển khai trong                                                                                                                                                             |
+|                        | :func:`ignore_errors`.                                                                                                                                                                                                                                            |
++------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``'replace'``          | Thay thế bằng một marker thay thế. Khi mã hóa, sử dụng ``?`` (ký tự ASCII). Khi giải mã, sử dụng ``�`` (U+FFFD, ký tự REPLACEMENT CHARACTER chính thức). Được triển khai trong                                                                                    |
+|                        | :func:`replace_errors`.                                                                                                                                                                                                                                           |
++------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``'backslashreplace'`` | Thay thế bằng các chuỗi escape có dấu gạch chéo ngược. Khi mã hóa, sử dụng dạng thập lục phân của mã điểm Unicode với các định dạng :samp:`\\x{hh}`                                                                                                               |
+|                        | :samp:`\\u{xxxx}` :samp:`\\U{xxxxxxxx}`. Khi giải mã, sử dụng dạng thập lục phân của giá trị byte với định dạng :samp:`\\x{hh}`. Được triển khai trong                                                                                                            |
+|                        | :func:`backslashreplace_errors`.                                                                                                                                                                                                                                  |
++------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``'surrogateescape'``  | Khi giải mã, thay thế byte bằng mã surrogate riêng lẻ trong khoảng từ ``U+DC80`` đến ``U+DCFF``. Mã này sau đó sẽ được chuyển đổi lại thành cùng byte đó khi sử dụng error handler ``'surrogateescape'`` trong lúc mã hóa dữ liệu. (Xem :pep:`383` để biết thêm.) |
++------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. index::
    pair: xmlcharrefreplace; error handler's name
    pair: namereplace; error handler's name
    single: \N; escape sequence
 
-The following error handlers are only applicable to encoding (within
+Các error handler sau chỉ áp dụng cho việc mã hóa (trong
 :term:`text encodings <text encoding>`):
 
-+-------------------------+-----------------------------------------------+
-| Value                   | Meaning                                       |
-+=========================+===============================================+
-| ``'xmlcharrefreplace'`` | Replace with XML/HTML numeric character       |
-|                         | reference, which is a decimal form of Unicode |
-|                         | code point with format :samp:`&#{num};`.      |
-|                         | Implemented in                                |
-|                         | :func:`xmlcharrefreplace_errors`.             |
-+-------------------------+-----------------------------------------------+
-| ``'namereplace'``       | Replace with ``\N{...}`` escape sequences,    |
-|                         | what appears in the braces is the Name        |
-|                         | property from Unicode Character Database.     |
-|                         | Implemented in :func:`namereplace_errors`.    |
-+-------------------------+-----------------------------------------------+
++-------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Giá trị                 | Ý nghĩa                                                                                                                                                                             |
++=========================+=====================================================================================================================================================================================+
+| ``'xmlcharrefreplace'`` | Thay thế bằng tham chiếu ký tự số XML/HTML, là dạng thập phân của điểm mã Unicode với định dạng :samp:`&#{num};`. Được triển khai trong                                             |
+|                         | :func:`xmlcharrefreplace_errors`.                                                                                                                                                   |
++-------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``'namereplace'``       | Thay thế bằng các chuỗi escape ``\N{...}``, phần xuất hiện trong dấu ngoặc nhọn là thuộc tính Name từ Unicode Character Database. Được triển khai trong :func:`namereplace_errors`. |
++-------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. index::
    pair: surrogatepass; error handler's name
 
-In addition, the following error handler is specific to the given codecs:
+Ngoài ra, trình xử lý lỗi sau đây dành riêng cho các codec tương ứng:
 
-+-------------------+------------------------+-------------------------------------------+
-| Value             | Codecs                 | Meaning                                   |
-+===================+========================+===========================================+
-|``'surrogatepass'``| utf-8, utf-16, utf-32, | Allow encoding and decoding surrogate code|
-|                   | utf-16-be, utf-16-le,  | point (``U+D800`` - ``U+DFFF``) as normal |
-|                   | utf-32-be, utf-32-le   | code point. Otherwise these codecs treat  |
-|                   |                        | the presence of surrogate code point in   |
-|                   |                        | :class:`str` as an error.                 |
-+-------------------+------------------------+-------------------------------------------+
++---------------------+-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Giá trị             | Codec                                                             | Ý nghĩa                                                                                                                                                                                |
++=====================+===================================================================+========================================================================================================================================================================================+
+| ``'surrogatepass'`` | utf-8, utf-16, utf-32, utf-16-be, utf-16-le, utf-32-be, utf-32-le | Cho phép mã hóa và giải mã surrogate code point (``U+D800`` - ``U+DFFF``) như một code point thông thường. Nếu không, các codec này sẽ coi sự hiện diện của surrogate code point trong |
+|                     |                                                                   | :class:`str` là một lỗi.                                                                                                                                                               |
++---------------------+-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. versionadded:: 3.1
-   The ``'surrogateescape'`` and ``'surrogatepass'`` error handlers.
+   Các error handler ``'surrogateescape'`` và ``'surrogatepass'``.
 
 .. versionchanged:: 3.4
-   The ``'surrogatepass'`` error handler now works with utf-16\* and utf-32\*
-   codecs.
+   Error handler ``'surrogatepass'`` hiện hoạt động với các codec utf-16\* và utf-32\* khi giải mã.
 
 .. versionadded:: 3.5
-   The ``'namereplace'`` error handler.
+   Error handler ``'namereplace'``.
 
 .. versionchanged:: 3.5
-   The ``'backslashreplace'`` error handler now works with decoding and
-   translating.
+   Error handler ``'backslashreplace'`` hiện hoạt động với việc giải mã và chuyển đổi.
 
-The set of allowed values can be extended by registering a new named error
-handler:
+Có thể mở rộng tập hợp các giá trị được phép bằng cách đăng ký một trình xử lý lỗi có tên mới:
 
 .. function:: register_error(name, error_handler, /)
 
-   Register the error handling function *error_handler* under the name *name*.
-   The *error_handler* argument will be called during encoding and decoding
-   in case of an error, when *name* is specified as the errors parameter.
+   Đăng ký hàm xử lý lỗi *error_handler* dưới tên *name*. Đối số *error_handler* sẽ được gọi trong quá trình mã hóa và giải mã khi xảy ra lỗi, nếu *name* được chỉ định làm tham số errors.
 
-   For encoding, *error_handler* will be called with a :exc:`UnicodeEncodeError`
-   instance, which contains information about the location of the error. The
-   error handler must either raise this or a different exception, or return a
-   tuple with a replacement for the unencodable part of the input and a position
-   where encoding should continue. The replacement may be either :class:`str` or
-   :class:`bytes`. If the replacement is bytes, the encoder will simply copy
-   them into the output buffer. If the replacement is a string, the encoder will
-   encode the replacement. Encoding continues on original input at the
-   specified position. Negative position values will be treated as being
-   relative to the end of the input string. If the resulting position is out of
-   bound an :exc:`IndexError` will be raised.
+   Đối với quá trình mã hóa, *error_handler* sẽ được gọi với một thực thể :exc:`UnicodeEncodeError`, chứa thông tin về vị trí xảy ra lỗi. Trình xử lý lỗi phải либо raise ngoại lệ này hoặc một ngoại lệ khác, hoặc trả về một tuple chứa phần thay thế cho phần đầu vào không thể mã hóa và vị trí mà tại đó quá trình mã hóa sẽ tiếp tục. Phần thay thế có thể là :class:`str` hoặc
+   :class:`bytes`. Nếu phần thay thế là bytes, encoder sẽ פשוט sao chép chúng vào bộ đệm đầu ra. Nếu phần thay thế là một chuỗi, encoder sẽ mã hóa phần thay thế đó. Quá trình mã hóa tiếp tục trên đầu vào ban đầu tại vị trí được chỉ định. Các giá trị vị trí âm sẽ được coi là tương đối so với cuối chuỗi đầu vào. Nếu vị trí kết quả nằm ngoài phạm vi, một :exc:`IndexError` sẽ được raise.
 
-   Decoding and translating works similarly, except :exc:`UnicodeDecodeError` or
-   :exc:`UnicodeTranslateError` will be passed to the handler and that the
-   replacement from the error handler will be put into the output directly.
+   Giải mã và chuyển đổi hoạt động tương tự, ngoại trừ :exc:`UnicodeDecodeError` hoặc
+   :exc:`UnicodeTranslateError` sẽ được truyền cho trình xử lý và phần thay thế từ trình xử lý lỗi sẽ được đưa trực tiếp vào đầu ra.
 
 
-Previously registered error handlers (including the standard error handlers)
-can be looked up by name:
+Có thể tra cứu các trình xử lý lỗi đã đăng ký trước đó (bao gồm cả các trình xử lý lỗi tiêu chuẩn) theo tên:
 
 .. function:: lookup_error(name, /)
 
-   Return the error handler previously registered under the name *name*.
+   Trả về trình xử lý lỗi đã được đăng ký trước đó với tên *name*.
 
-   Raises a :exc:`LookupError` in case the handler cannot be found.
+   Ném một :exc:`LookupError` nếu không tìm thấy trình xử lý.
 
-The following standard error handlers are also made available as module level
-functions:
+Các trình xử lý lỗi tiêu chuẩn sau đây cũng được cung cấp dưới dạng các hàm cấp mô-đun:
 
 .. function:: strict_errors(exception)
 
-   Implements the ``'strict'`` error handling.
+   Triển khai cơ chế xử lý lỗi ``'strict'``.
 
-   Each encoding or decoding error raises a :exc:`UnicodeError`.
+   Mỗi lỗi mã hóa hoặc giải mã đều ném một :exc:`UnicodeError`.
 
 
 .. function:: ignore_errors(exception)
 
-   Implements the ``'ignore'`` error handling.
+   Triển khai cơ chế xử lý lỗi ``'ignore'``.
 
-   Malformed data is ignored; encoding or decoding is continued without
-   further notice.
+   Dữ liệu không đúng định dạng sẽ bị bỏ qua; quá trình mã hóa hoặc giải mã vẫn tiếp tục mà không có thêm thông báo nào.
 
 
 .. function:: replace_errors(exception)
 
-   Implements the ``'replace'`` error handling.
+   Triển khai cơ chế xử lý lỗi ``'replace'``.
 
-   Substitutes ``?`` (ASCII character) for encoding errors or ``�`` (U+FFFD,
-   the official REPLACEMENT CHARACTER) for decoding errors.
+   Thay thế ``?`` (ký tự ASCII) cho các lỗi mã hóa hoặc ``�`` (U+FFFD, KÝ TỰ THAY THẾ chính thức) cho các lỗi giải mã.
 
 
 .. function:: backslashreplace_errors(exception)
 
-   Implements the ``'backslashreplace'`` error handling.
+   Triển khai cơ chế xử lý lỗi ``'backslashreplace'``.
 
-   Malformed data is replaced by a backslashed escape sequence.
-   On encoding, use the hexadecimal form of Unicode code point with formats
-   :samp:`\\x{hh}` :samp:`\\u{xxxx}` :samp:`\\U{xxxxxxxx}`.
-   On decoding, use the hexadecimal form of
-   byte value with format :samp:`\\x{hh}`.
+   Dữ liệu không đúng định dạng được thay thế bằng một escape sequence có dấu gạch chéo ngược. Khi mã hóa, hãy sử dụng dạng thập lục phân của điểm mã Unicode với các định dạng
+   :samp:`\\x{hh}` :samp:`\\u{xxxx}` :samp:`\\U{xxxxxxxx}`. Khi giải mã, hãy sử dụng dạng thập lục phân của giá trị byte với định dạng :samp:`\\x{hh}`.
 
    .. versionchanged:: 3.5
-      Works with decoding and translating.
+      Hoạt động với việc giải mã và chuyển đổi.
 
 
 .. function:: xmlcharrefreplace_errors(exception)
 
-   Implements the ``'xmlcharrefreplace'`` error handling (for encoding within
-   :term:`text encoding` only).
+   Triển khai cơ chế xử lý lỗi ``'xmlcharrefreplace'`` (để mã hóa trong
+   :term:`text encoding` chỉ).
 
-   The unencodable character is replaced by an appropriate XML/HTML numeric
-   character reference, which is a decimal form of Unicode code point with
-   format :samp:`&#{num};` .
+   Ký tự không thể mã hóa được thay thế bằng một tham chiếu ký tự số XML/HTML thích hợp, là dạng thập phân của điểm mã Unicode với định dạng :samp:`&#{num};` .
 
 
 .. function:: namereplace_errors(exception)
 
-   Implements the ``'namereplace'`` error handling (for encoding within
-   :term:`text encoding` only).
+   Triển khai cơ chế xử lý lỗi ``'namereplace'`` (để mã hóa trong
+   :term:`text encoding` chỉ).
 
-   The unencodable character is replaced by a ``\N{...}`` escape sequence. The
-   set of characters that appear in the braces is the Name property from
-   Unicode Character Database. For example, the German lowercase letter ``'ß'``
-   will be converted to byte sequence ``\N{LATIN SMALL LETTER SHARP S}`` .
+   Ký tự không thể mã hóa được thay thế bằng một chuỗi escape ``\N{...}``. Tập hợp các ký tự xuất hiện trong dấu ngoặc nhọn là thuộc tính Name từ Unicode Character Database. Ví dụ, chữ cái thường tiếng Đức ``'ß'`` sẽ được chuyển đổi thành chuỗi byte ``\N{LATIN SMALL LETTER SHARP S}`` .
 
    .. versionadded:: 3.5
 
 
 .. _codec-objects:
 
-Stateless Encoding and Decoding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mã hóa và Giải mã Không trạng thái
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The base :class:`Codec` class defines these methods which also define the
-function interfaces of the stateless encoder and decoder:
+Lớp cơ sở :class:`Codec` định nghĩa các phương thức này, đồng thời cũng định nghĩa các giao diện hàm của encoder và decoder không trạng thái:
 
 
 .. class:: Codec
 
    .. method:: encode(input, errors='strict')
 
-      Encodes the object *input* and returns a tuple (output object, length consumed).
-      For instance, :term:`text encoding` converts
-      a string object to a bytes object using a particular
-      character set encoding (e.g., ``cp1252`` or ``iso-8859-1``).
+      Mã hóa đối tượng *input* và trả về một tuple (đối tượng đầu ra, độ dài đã xử lý). Ví dụ, :term:`text encoding` chuyển đổi một đối tượng chuỗi thành một đối tượng bytes bằng cách sử dụng một encoding bộ ký tự cụ thể (ví dụ: ``cp1252`` hoặc ``iso-8859-1``).
 
-      The *errors* argument defines the error handling to apply.
-      It defaults to ``'strict'`` handling.
+      Đối số *errors* xác định cách xử lý lỗi cần áp dụng. Theo mặc định, đối số này sử dụng cách xử lý ``'strict'``.
 
-      The method may not store state in the :class:`Codec` instance. Use
-      :class:`StreamWriter` for codecs which have to keep state in order to make
-      encoding efficient.
+      Phương thức này không được lưu trạng thái trong instance :class:`Codec`. Hãy sử dụng
+      :class:`StreamWriter` cho các codec cần duy trì trạng thái để việc mã hóa đạt hiệu quả.
 
-      The encoder must be able to handle zero length input and return an empty object
-      of the output object type in this situation.
+      Encoder phải có khả năng xử lý dữ liệu đầu vào có độ dài bằng 0 và trong trường hợp này trả về một đối tượng rỗng thuộc kiểu đối tượng đầu ra.
 
 
    .. method:: decode(input, errors='strict')
 
-      Decodes the object *input* and returns a tuple (output object, length
-      consumed). For instance, for a :term:`text encoding`, decoding converts
-      a bytes object encoded using a particular
-      character set encoding to a string object.
+      Giải mã đối tượng *input* và trả về một tuple (đối tượng đầu ra, độ dài đã xử lý). Ví dụ, đối với :term:`text encoding`, quá trình giải mã chuyển đổi một đối tượng bytes được mã hóa bằng một encoding bộ ký tự cụ thể thành một đối tượng chuỗi.
 
-      For text encodings and bytes-to-bytes codecs,
-      *input* must be a bytes object or one which provides the read-only
-      buffer interface -- for example, buffer objects and memory mapped files.
+      Đối với các encoding văn bản và codec bytes-to-bytes, *input* phải là một đối tượng bytes hoặc một đối tượng cung cấp read-only buffer interface -- ví dụ: các đối tượng buffer và các tệp được ánh xạ vào bộ nhớ.
 
-      The *errors* argument defines the error handling to apply.
-      It defaults to ``'strict'`` handling.
+      Đối số *errors* xác định cách xử lý lỗi cần áp dụng. Theo mặc định, đối số này sử dụng cách xử lý ``'strict'``.
 
-      The method may not store state in the :class:`Codec` instance. Use
-      :class:`StreamReader` for codecs which have to keep state in order to make
-      decoding efficient.
+      Phương thức này không được lưu trạng thái trong instance :class:`Codec`. Hãy sử dụng
+      :class:`StreamReader` đối với các codec phải duy trì trạng thái để việc giải mã đạt hiệu quả.
 
-      The decoder must be able to handle zero length input and return an empty object
-      of the output object type in this situation.
+      Bộ giải mã phải có khả năng xử lý đầu vào có độ dài bằng 0 và trong trường hợp này trả về một đối tượng rỗng thuộc kiểu đối tượng đầu ra.
 
 
-Incremental Encoding and Decoding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mã hóa và giải mã tăng dần
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The :class:`IncrementalEncoder` and :class:`IncrementalDecoder` classes provide
-the basic interface for incremental encoding and decoding. Encoding/decoding the
-input isn't done with one call to the stateless encoder/decoder function, but
-with multiple calls to the
-:meth:`~IncrementalEncoder.encode`/:meth:`~IncrementalDecoder.decode` method of
-the incremental encoder/decoder. The incremental encoder/decoder keeps track of
-the encoding/decoding process during method calls.
+Các lớp :class:`IncrementalEncoder` và :class:`IncrementalDecoder` cung cấp giao diện cơ bản cho việc mã hóa và giải mã tăng dần. Việc mã hóa/giải mã đầu vào không được thực hiện bằng một lần gọi đến hàm encoder/decoder stateless, mà bằng nhiều lần gọi đến
+phương thức :meth:`~IncrementalEncoder.encode`/:meth:`~IncrementalDecoder.decode` của encoder/decoder tăng dần. Encoder/decoder tăng dần theo dõi tiến trình mã hóa/giải mã trong các lần gọi phương thức.
 
-The joined output of calls to the
-:meth:`~IncrementalEncoder.encode`/:meth:`~IncrementalDecoder.decode` method is
-the same as if all the single inputs were joined into one, and this input was
-encoded/decoded with the stateless encoder/decoder.
+Đầu ra được nối lại từ các lần gọi đến
+:meth:`~IncrementalEncoder.encode`/:meth:`~IncrementalDecoder.decode` phương thức giống với trường hợp tất cả các đầu vào đơn lẻ được nối lại thành một đầu vào duy nhất, rồi đầu vào này được mã hóa/giải mã bằng encoder/decoder không trạng thái.
 
 
 .. _incremental-encoder-objects:
 
-IncrementalEncoder Objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Đối tượng IncrementalEncoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`IncrementalEncoder` class is used for encoding an input in multiple
-steps. It defines the following methods which every incremental encoder must
-define in order to be compatible with the Python codec registry.
+Lớp :class:`IncrementalEncoder` được dùng để mã hóa một đầu vào qua nhiều bước. Lớp này định nghĩa các phương thức sau mà mọi incremental encoder phải định nghĩa để tương thích với Python codec registry.
 
 
 .. class:: IncrementalEncoder(errors='strict')
 
-   Constructor for an :class:`IncrementalEncoder` instance.
+   Hàm khởi tạo cho một thực thể :class:`IncrementalEncoder`.
 
-   All incremental encoders must provide this constructor interface. They are free
-   to add additional keyword arguments, but only the ones defined here are used by
-   the Python codec registry.
+   Mọi incremental encoder phải cung cấp giao diện hàm khởi tạo này. Chúng có thể tự do bổ sung các đối số keyword, nhưng Python codec registry chỉ sử dụng những đối số được định nghĩa ở đây.
 
-   The :class:`IncrementalEncoder` may implement different error handling schemes
-   by providing the *errors* keyword argument. See :ref:`error-handlers` for
-   possible values.
+   :class:`IncrementalEncoder` có thể triển khai các cơ chế xử lý lỗi khác nhau bằng cách cung cấp đối số keyword *errors*. Xem :ref:`error-handlers` để biết các giá trị có thể dùng.
 
-   The *errors* argument will be assigned to an attribute of the same name.
-   Assigning to this attribute makes it possible to switch between different error
-   handling strategies during the lifetime of the :class:`IncrementalEncoder`
-   object.
+   Đối số *errors* sẽ được gán cho một thuộc tính có cùng tên. Việc gán cho thuộc tính này cho phép chuyển đổi giữa các chiến lược xử lý lỗi khác nhau trong suốt vòng đời của đối tượng :class:`IncrementalEncoder`.
 
 
    .. method:: encode(object, final=False)
 
-      Encodes *object* (taking the current state of the encoder into account)
-      and returns the resulting encoded object. If this is the last call to
-      :meth:`encode` *final* must be true (the default is false).
+      Mã hóa *object* (có xét đến trạng thái hiện tại của encoder) và trả về đối tượng đã mã hóa tương ứng. Nếu đây là lần gọi cuối cùng đến
+      :meth:`encode` *final* phải là true (mặc định là false).
 
 
    .. method:: reset()
 
-      Reset the encoder to the initial state. The output is discarded: call
-      ``.encode(object, final=True)``, passing an empty byte or text string
-      if necessary, to reset the encoder and to get the output.
+      Đặt encoder về trạng thái ban đầu. Kết quả sẽ bị loại bỏ: gọi ``.encode(object, final=True)``, truyền vào một chuỗi byte hoặc chuỗi văn bản rỗng nếu cần, để đặt lại encoder và nhận kết quả.
 
 
    .. method:: getstate()
 
-      Return the current state of the encoder which must be an integer. The
-      implementation should make sure that ``0`` is the most common
-      state. (States that are more complicated than integers can be converted
-      into an integer by marshaling/pickling the state and encoding the bytes
-      of the resulting string into an integer.)
+      Trả về trạng thái hiện tại của encoder; trạng thái này phải là một số nguyên. Phần triển khai nên đảm bảo rằng ``0`` là trạng thái phổ biến nhất. (Các trạng thái phức tạp hơn số nguyên có thể được chuyển đổi thành một số nguyên bằng cách marshal/pickle trạng thái rồi mã hóa các byte của chuỗi kết quả thành một số nguyên.)
 
 
    .. method:: setstate(state)
 
-      Set the state of the encoder to *state*. *state* must be an encoder state
-      returned by :meth:`getstate`.
+      Đặt trạng thái của encoder thành *state*. *state* phải là một trạng thái encoder được trả về bởi :meth:`getstate`.
 
 
 .. _incremental-decoder-objects:
 
-IncrementalDecoder Objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Đối tượng IncrementalDecoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`IncrementalDecoder` class is used for decoding an input in multiple
-steps. It defines the following methods which every incremental decoder must
-define in order to be compatible with the Python codec registry.
+Lớp :class:`IncrementalDecoder` được dùng để giải mã một đầu vào qua nhiều bước. Lớp này định nghĩa các phương thức sau đây mà mọi incremental decoder đều phải định nghĩa để tương thích với Python codec registry.
 
 
 .. class:: IncrementalDecoder(errors='strict')
 
-   Constructor for an :class:`IncrementalDecoder` instance.
+   Hàm khởi tạo cho một instance :class:`IncrementalDecoder`.
 
-   All incremental decoders must provide this constructor interface. They are free
-   to add additional keyword arguments, but only the ones defined here are used by
-   the Python codec registry.
+   Mọi incremental decoder đều phải cung cấp interface hàm khởi tạo này. Chúng có thể tự do thêm các đối số keyword khác, nhưng Python codec registry chỉ sử dụng những đối số được định nghĩa ở đây.
 
-   The :class:`IncrementalDecoder` may implement different error handling schemes
-   by providing the *errors* keyword argument. See :ref:`error-handlers` for
-   possible values.
+   :class:`IncrementalDecoder` có thể triển khai các scheme xử lý lỗi khác nhau bằng cách cung cấp đối số keyword *errors*. Xem :ref:`error-handlers` để biết các giá trị có thể dùng.
 
-   The *errors* argument will be assigned to an attribute of the same name.
-   Assigning to this attribute makes it possible to switch between different error
-   handling strategies during the lifetime of the :class:`IncrementalDecoder`
-   object.
+   Đối số *errors* sẽ được gán cho một attribute có cùng tên. Việc gán cho attribute này cho phép chuyển đổi giữa các chiến lược xử lý lỗi khác nhau trong suốt vòng đời của đối tượng :class:`IncrementalDecoder`.
 
 
    .. method:: decode(object, final=False)
 
-      Decodes *object* (taking the current state of the decoder into account)
-      and returns the resulting decoded object. If this is the last call to
-      :meth:`decode` *final* must be true (the default is false). If *final* is
-      true the decoder must decode the input completely and must flush all
-      buffers. If this isn't possible (e.g. because of incomplete byte sequences
-      at the end of the input) it must initiate error handling just like in the
-      stateless case (which might raise an exception).
+      Giải mã *object* (có tính đến trạng thái hiện tại của decoder) và trả về object đã giải mã tương ứng. Nếu đây là lần gọi cuối cùng đến
+      :meth:`decode` *final* phải là true (mặc định là false). Nếu *final* là true, decoder phải giải mã hoàn toàn đầu vào và phải flush tất cả buffer. Nếu không thể thực hiện việc này (ví dụ: do các byte sequence chưa hoàn chỉnh ở cuối đầu vào), decoder phải bắt đầu xử lý lỗi giống như trong trường hợp stateless (có thể sẽ phát sinh exception).
 
 
    .. method:: reset()
 
-      Reset the decoder to the initial state.
+      Đặt lại bộ giải mã về trạng thái ban đầu.
 
 
    .. method:: getstate()
 
-      Return the current state of the decoder. This must be a tuple with two
-      items, the first must be the buffer containing the still undecoded
-      input. The second must be an integer and can be additional state
-      info. (The implementation should make sure that ``0`` is the most common
-      additional state info.) If this additional state info is ``0`` it must be
-      possible to set the decoder to the state which has no input buffered and
-      ``0`` as the additional state info, so that feeding the previously
-      buffered input to the decoder returns it to the previous state without
-      producing any output. (Additional state info that is more complicated than
-      integers can be converted into an integer by marshaling/pickling the info
-      and encoding the bytes of the resulting string into an integer.)
+      Trả về trạng thái hiện tại của bộ giải mã. Giá trị này phải là một tuple gồm hai phần tử; phần tử đầu tiên phải là bộ đệm chứa dữ liệu đầu vào chưa được giải mã. Phần tử thứ hai phải là một số nguyên và có thể chứa thông tin trạng thái bổ sung. (Việc triển khai phải đảm bảo rằng ``0`` là thông tin trạng thái bổ sung phổ biến nhất.) Nếu thông tin trạng thái bổ sung này là ``0``, phải có thể đặt bộ giải mã về trạng thái không có dữ liệu đầu vào nào trong bộ đệm và ``0`` làm thông tin trạng thái bổ sung, để việc cung cấp dữ liệu đầu vào đã được lưu trong bộ đệm trước đó cho bộ giải mã sẽ đưa nó trở lại trạng thái trước đó mà không tạo ra bất kỳ đầu ra nào. (Thông tin trạng thái bổ sung phức tạp hơn số nguyên có thể được chuyển đổi thành một số nguyên bằng cách marshal/pickle thông tin đó và mã hóa các byte của chuỗi kết quả thành một số nguyên.)
 
 
    .. method:: setstate(state)
 
-      Set the state of the decoder to *state*. *state* must be a decoder state
-      returned by :meth:`getstate`.
+      Đặt trạng thái của bộ giải mã thành *trạng thái*. *trạng thái* phải là trạng thái bộ giải mã được trả về bởi :meth:`getstate`.
 
 
-Stream Encoding and Decoding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mã hóa và giải mã luồng
+^^^^^^^^^^^^^^^^^^^^^^^
 
 
-The :class:`StreamWriter` and :class:`StreamReader` classes provide generic
-working interfaces which can be used to implement new encoding submodules very
-easily. See :mod:`!encodings.utf_8` for an example of how this is done.
+Các lớp :class:`StreamWriter` và :class:`StreamReader` cung cấp các giao diện hoạt động chung, có thể được dùng để triển khai các submodule mã hóa mới một cách rất dễ dàng. Xem :mod:`!encodings.utf_8` để biết ví dụ về cách thực hiện việc này.
 
 
 .. _stream-writer-objects:
 
-StreamWriter Objects
-~~~~~~~~~~~~~~~~~~~~
+Đối tượng StreamWriter
+~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`StreamWriter` class is a subclass of :class:`Codec` and defines the
-following methods which every stream writer must define in order to be
-compatible with the Python codec registry.
+Lớp :class:`StreamWriter` là một lớp con của :class:`Codec` và định nghĩa các phương thức sau mà mọi stream writer phải định nghĩa để tương thích với Python codec registry.
 
 
 .. class:: StreamWriter(stream, errors='strict')
 
-   Constructor for a :class:`StreamWriter` instance.
+   Hàm khởi tạo cho một thực thể :class:`StreamWriter`.
 
-   All stream writers must provide this constructor interface. They are free to add
-   additional keyword arguments, but only the ones defined here are used by the
-   Python codec registry.
+   Tất cả stream writer phải cung cấp giao diện hàm khởi tạo này. Chúng có thể tự do thêm các đối số từ khóa khác, nhưng Python codec registry chỉ sử dụng những đối số được định nghĩa ở đây.
 
-   The *stream* argument must be a file-like object open for writing
-   text or binary data, as appropriate for the specific codec.
+   Đối số *stream* phải là một đối tượng tương tự tệp được mở để ghi dữ liệu văn bản hoặc dữ liệu nhị phân, tùy theo codec cụ thể.
 
-   The :class:`StreamWriter` may implement different error handling schemes by
-   providing the *errors* keyword argument. See :ref:`error-handlers` for
-   the standard error handlers the underlying stream codec may support.
+   :class:`StreamWriter` có thể triển khai các cơ chế xử lý lỗi khác nhau bằng cách cung cấp đối số từ khóa *errors*. Xem :ref:`error-handlers` để biết các trình xử lý lỗi tiêu chuẩn mà codec của stream bên dưới có thể hỗ trợ.
 
-   The *errors* argument will be assigned to an attribute of the same name.
-   Assigning to this attribute makes it possible to switch between different error
-   handling strategies during the lifetime of the :class:`StreamWriter` object.
+   Đối số *errors* sẽ được gán cho một thuộc tính cùng tên. Việc gán cho thuộc tính này cho phép chuyển đổi giữa các chiến lược xử lý lỗi khác nhau trong suốt vòng đời của đối tượng :class:`StreamWriter`.
 
    .. method:: write(object)
 
-      Writes the object's contents encoded to the stream.
+      Ghi nội dung của đối tượng vào stream sau khi mã hóa.
 
 
    .. method:: writelines(list)
 
-      Writes the concatenated iterable of strings to the stream (possibly by reusing
-      the :meth:`write` method). Infinite or
-      very large iterables are not supported. The standard bytes-to-bytes codecs
-      do not support this method.
+      Ghi iterable các chuỗi đã nối vào stream (có thể bằng cách sử dụng lại phương thức :meth:`write`). Không hỗ trợ iterable vô hạn hoặc rất lớn. Các codec bytes-to-bytes tiêu chuẩn không hỗ trợ phương thức này.
 
 
    .. method:: reset()
 
-      Resets the codec buffers used for keeping internal state.
+      Đặt lại các bộ đệm codec được dùng để duy trì trạng thái nội bộ.
 
-      Calling this method should ensure that the data on the output is put into
-      a clean state that allows appending of new fresh data without having to
-      rescan the whole stream to recover state.
+      Việc gọi phương thức này phải bảo đảm dữ liệu trên đầu ra được đưa về trạng thái sạch, cho phép nối thêm dữ liệu mới mà không cần quét lại toàn bộ stream để khôi phục trạng thái.
 
 
-In addition to the above methods, the :class:`StreamWriter` must also inherit
-all other methods and attributes from the underlying stream.
+Ngoài các phương thức nêu trên, :class:`StreamWriter` cũng phải kế thừa tất cả các phương thức và thuộc tính khác từ stream nền.
 
 
 .. _stream-reader-objects:
 
-StreamReader Objects
-~~~~~~~~~~~~~~~~~~~~
+Đối tượng StreamReader
+~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`StreamReader` class is a subclass of :class:`Codec` and defines the
-following methods which every stream reader must define in order to be
-compatible with the Python codec registry.
+Lớp :class:`StreamReader` là lớp con của :class:`Codec` và định nghĩa các phương thức sau đây mà mọi stream reader phải định nghĩa để tương thích với Python codec registry.
 
 
 .. class:: StreamReader(stream, errors='strict')
 
-   Constructor for a :class:`StreamReader` instance.
+   Hàm khởi tạo cho một thực thể :class:`StreamReader`.
 
-   All stream readers must provide this constructor interface. They are free to add
-   additional keyword arguments, but only the ones defined here are used by the
-   Python codec registry.
+   Mọi stream reader phải cung cấp giao diện hàm khởi tạo này. Chúng được phép bổ sung các đối số từ khóa, nhưng Python codec registry chỉ sử dụng những đối số được định nghĩa ở đây.
 
-   The *stream* argument must be a file-like object open for reading
-   text or binary data, as appropriate for the specific codec.
+   Đối số *stream* phải là một đối tượng giống tệp được mở để đọc dữ liệu văn bản hoặc nhị phân, tùy theo codec cụ thể.
 
-   The :class:`StreamReader` may implement different error handling schemes by
-   providing the *errors* keyword argument. See :ref:`error-handlers` for
-   the standard error handlers the underlying stream codec may support.
+   :class:`StreamReader` có thể triển khai các cơ chế xử lý lỗi khác nhau bằng cách cung cấp đối số từ khóa *errors*. Xem :ref:`error-handlers` để biết các trình xử lý lỗi tiêu chuẩn mà codec stream bên dưới có thể hỗ trợ.
 
-   The *errors* argument will be assigned to an attribute of the same name.
-   Assigning to this attribute makes it possible to switch between different error
-   handling strategies during the lifetime of the :class:`StreamReader` object.
+   Đối số *errors* sẽ được gán cho một thuộc tính có cùng tên. Việc gán cho thuộc tính này cho phép chuyển đổi giữa các chiến lược xử lý lỗi khác nhau trong suốt vòng đời của đối tượng :class:`StreamReader`.
 
-   The set of allowed values for the *errors* argument can be extended with
+   Tập hợp các giá trị được phép cho đối số *errors* có thể được mở rộng bằng
    :func:`register_error`.
 
 
    .. method:: read(size=-1, chars=-1, firstline=False)
 
-      Decodes data from the stream and returns the resulting object.
+      Giải mã dữ liệu từ stream và trả về đối tượng kết quả.
 
-      The *chars* argument indicates the number of decoded
-      code points or bytes to return. The :func:`read` method will
-      never return more data than requested, but it might return less,
-      if there is not enough available.
+      Đối số *chars* cho biết số lượng code point hoặc byte đã giải mã cần trả về. Phương thức :func:`read` sẽ không bao giờ trả về nhiều dữ liệu hơn mức được yêu cầu, nhưng có thể trả về ít hơn nếu không có đủ dữ liệu.
 
-      The *size* argument indicates the approximate maximum
-      number of encoded bytes or code points to read
-      for decoding. The decoder can modify this setting as
-      appropriate. The default value -1 indicates to read and decode as much as
-      possible. This parameter is intended to
-      prevent having to decode huge files in one step.
+      Đối số *size* cho biết số byte hoặc code point đã mã hóa tối đa ước lượng cần đọc để giải mã. Decoder có thể điều chỉnh thiết lập này cho phù hợp. Giá trị mặc định -1 cho biết cần đọc và giải mã nhiều nhất có thể. Tham số này nhằm tránh phải giải mã các tệp rất lớn trong một bước.
 
-      The *firstline* flag indicates that
-      it would be sufficient to only return the first
-      line, if there are decoding errors on later lines.
+      Cờ *firstline* cho biết rằng chỉ cần trả về dòng đầu tiên nếu xảy ra lỗi giải mã ở các dòng sau.
 
-      The method should use a greedy read strategy meaning that it should read
-      as much data as is allowed within the definition of the encoding and the
-      given size, e.g.  if optional encoding endings or state markers are
-      available on the stream, these should be read too.
+      Phương thức này nên sử dụng chiến lược đọc tham lam, nghĩa là đọc nhiều dữ liệu nhất có thể trong phạm vi cho phép của định nghĩa encoding và kích thước đã cho; ví dụ: nếu có các phần kết thúc encoding tùy chọn hoặc các dấu trạng thái trên stream, thì cũng nên đọc chúng.
 
 
    .. method:: readline(size=None, keepends=True)
 
-      Read one line from the input stream and return the decoded data.
+      Đọc một dòng từ input stream và trả về dữ liệu đã được giải mã.
 
-      *size*, if given, is passed as size argument to the stream's
-      :meth:`read` method.
+      *size*, nếu được cung cấp, sẽ được truyền làm đối số size cho
+      phương thức :meth:`read`.
 
-      If *keepends* is false line-endings will be stripped from the lines
-      returned.
+      Nếu *keepends* là false, các ký tự kết thúc dòng sẽ bị loại bỏ khỏi những dòng được trả về.
 
 
    .. method:: readlines(sizehint=None, keepends=True)
 
-      Read all lines available on the input stream and return them as a list of
-      lines.
+      Đọc tất cả các dòng hiện có trên input stream và trả về chúng dưới dạng danh sách các dòng.
 
-      Line-endings are implemented using the codec's :meth:`decode` method and
-      are included in the list entries if *keepends* is true.
+      Các ký tự kết thúc dòng được triển khai bằng phương thức :meth:`decode` của codec và được đưa vào các mục danh sách nếu *keepends* là true.
 
-      *sizehint*, if given, is passed as the *size* argument to the stream's
-      :meth:`read` method.
+      *sizehint*, nếu được cung cấp, sẽ được truyền dưới dạng đối số *size* cho stream
+      phương thức :meth:`read`.
 
 
    .. method:: reset()
 
-      Resets the codec buffers used for keeping internal state.
+      Đặt lại các bộ đệm của codec được dùng để duy trì trạng thái nội bộ.
 
-      Note that no stream repositioning should take place. This method is
-      primarily intended to be able to recover from decoding errors.
+      Lưu ý rằng không được thực hiện việc định vị lại stream. Phương thức này chủ yếu nhằm khôi phục sau các lỗi giải mã.
 
 
-In addition to the above methods, the :class:`StreamReader` must also inherit
-all other methods and attributes from the underlying stream.
+Ngoài các phương thức nêu trên, :class:`StreamReader` cũng phải kế thừa tất cả các phương thức và thuộc tính khác từ stream bên dưới.
 
 .. _stream-reader-writer:
 
-StreamReaderWriter Objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các đối tượng StreamReaderWriter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`StreamReaderWriter` is a convenience class that allows wrapping
-streams which work in both read and write modes.
+:class:`StreamReaderWriter` là một lớp tiện ích cho phép bọc các stream hoạt động ở cả chế độ đọc và ghi.
 
-The design is such that one can use the factory functions returned by the
-:func:`lookup` function to construct the instance.
+Thiết kế này cho phép sử dụng các hàm factory được trả về bởi
+hàm :func:`lookup` để tạo instance.
 
 
 .. class:: StreamReaderWriter(stream, Reader, Writer, errors='strict')
 
-   Creates a :class:`StreamReaderWriter` instance. *stream* must be a file-like
-   object. *Reader* and *Writer* must be factory functions or classes providing the
-   :class:`StreamReader` and :class:`StreamWriter` interface resp. Error handling
-   is done in the same way as defined for the stream readers and writers.
+   Tạo một instance :class:`StreamReaderWriter`. *stream* phải là một đối tượng giống tệp. *Reader* và *Writer* phải là các hàm factory hoặc lớp cung cấp
+   :class:`StreamReader` và interface :class:`StreamWriter` tương ứng. Việc xử lý lỗi được thực hiện theo cùng cách như đã định nghĩa cho các stream reader và writer.
 
-:class:`StreamReaderWriter` instances define the combined interfaces of
-:class:`StreamReader` and :class:`StreamWriter` classes. They inherit all other
-methods and attributes from the underlying stream.
+Các instance :class:`StreamReaderWriter` định nghĩa các interface kết hợp của
+các lớp :class:`StreamReader` và :class:`StreamWriter`. Chúng kế thừa tất cả các phương thức và thuộc tính khác từ stream bên dưới.
 
 
 .. _stream-recoder-objects:
 
-StreamRecoder Objects
-~~~~~~~~~~~~~~~~~~~~~
+Đối tượng StreamRecoder
+~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`StreamRecoder` translates data from one encoding to another,
-which is sometimes useful when dealing with different encoding environments.
+:class:`StreamRecoder` chuyển đổi dữ liệu từ một encoding này sang encoding khác, đôi khi hữu ích khi làm việc với các môi trường encoding khác nhau.
 
-The design is such that one can use the factory functions returned by the
-:func:`lookup` function to construct the instance.
+Thiết kế này cho phép sử dụng các hàm factory được trả về bởi
+hàm :func:`lookup` để tạo instance.
 
 
 .. class:: StreamRecoder(stream, encode, decode, Reader, Writer, errors='strict')
 
-   Creates a :class:`StreamRecoder` instance which implements a two-way conversion:
-   *encode* and *decode* work on the frontend — the data visible to
-   code calling :meth:`~StreamReader.read` and :meth:`~StreamWriter.write`,
-   while *Reader* and *Writer*
-   work on the backend — the data in *stream*.
+   Tạo một instance :class:`StreamRecoder` thực hiện chuyển đổi hai chiều: *encode* và *decode* hoạt động ở frontend — dữ liệu mà code gọi :meth:`~StreamReader.read` và :meth:`~StreamWriter.write` có thể nhìn thấy, còn *Reader* và *Writer* hoạt động ở backend — dữ liệu trong *stream*.
 
-   You can use these objects to do transparent transcodings, e.g., from Latin-1
-   to UTF-8 and back.
+   Bạn có thể sử dụng các đối tượng này để thực hiện chuyển mã (transcoding) trong suốt, chẳng hạn từ Latin-1 sang UTF-8 và ngược lại.
 
-   The *stream* argument must be a file-like object.
+   Đối số *stream* phải là một đối tượng giống tệp.
 
-   The *encode* and *decode* arguments must
-   adhere to the :class:`Codec` interface. *Reader* and
-   *Writer* must be factory functions or classes providing objects of the
-   :class:`StreamReader` and :class:`StreamWriter` interface respectively.
+   Các đối số *encode* và *decode* phải tuân theo giao diện :class:`Codec`. *Reader* và *Writer* phải là các hàm factory hoặc lớp cung cấp các đối tượng thuộc
+   giao diện :class:`StreamReader` và :class:`StreamWriter` tương ứng.
 
-   Error handling is done in the same way as defined for the stream readers and
-   writers.
+   Việc xử lý lỗi được thực hiện theo cách tương tự như đã định nghĩa cho các stream reader và writer.
 
 
-:class:`StreamRecoder` instances define the combined interfaces of
-:class:`StreamReader` and :class:`StreamWriter` classes. They inherit all other
-methods and attributes from the underlying stream.
+Các instance :class:`StreamRecoder` định nghĩa các giao diện kết hợp của
+các lớp :class:`StreamReader` và :class:`StreamWriter`. Chúng kế thừa mọi phương thức và thuộc tính khác từ stream bên dưới.
 
 
 .. _encodings-overview:
 
-Encodings and Unicode
----------------------
+Encoding và Unicode
+-------------------
 
-Strings are stored internally as sequences of code points in
-range ``U+0000``--``U+10FFFF``. (See :pep:`393` for
-more details about the implementation.)
-Once a string object is used outside of CPU and memory, endianness
-and how these arrays are stored as bytes become an issue. As with other
-codecs, serialising a string into a sequence of bytes is known as *encoding*,
-and recreating the string from the sequence of bytes is known as *decoding*.
-There are a variety of different text serialisation codecs, which are
-collectivity referred to as :term:`text encodings <text encoding>`.
+Các chuỗi được lưu trữ nội bộ dưới dạng các dãy code point trong phạm vi ``U+0000``--``U+10FFFF``. (Xem :pep:`393` để biết thêm chi tiết về cách triển khai.) Khi một đối tượng chuỗi được sử dụng bên ngoài CPU và bộ nhớ, thứ tự byte và cách các mảng này được lưu trữ dưới dạng byte trở thành vấn đề. Cũng như với các codec khác, việc tuần tự hóa một chuỗi thành một dãy byte được gọi là *encoding*, còn việc tái tạo chuỗi từ dãy byte được gọi là *decoding*. Có nhiều codec tuần tự hóa văn bản khác nhau, được gọi chung là :term:`mã hóa văn bản <text encoding>`.
 
-The simplest text encoding (called ``'latin-1'`` or ``'iso-8859-1'``) maps
-the code points 0--255 to the bytes ``0x0``--``0xff``, which means that a string
-object that contains code points above ``U+00FF`` can't be encoded with this
-codec. Doing so will raise a :exc:`UnicodeEncodeError` that looks
-like the following (although the details of the error message may differ):
-``UnicodeEncodeError: 'latin-1' codec can't encode character '\u1234' in
-position 3: ordinal not in range(256)``.
+Kiểu mã hóa văn bản đơn giản nhất (được gọi là ``'latin-1'`` hoặc ``'iso-8859-1'``) ánh xạ các code point từ 0--255 tới các byte ``0x0``--``0xff``, nghĩa là một đối tượng chuỗi chứa các code point lớn hơn ``U+00FF`` không thể được mã hóa bằng codec này. Thực hiện việc đó sẽ gây ra :exc:`UnicodeEncodeError` có dạng như sau (mặc dù chi tiết của thông báo lỗi có thể khác): ``UnicodeEncodeError: 'latin-1' codec can't encode character '\u1234' in position 3: ordinal not in range(256)``.
 
-There's another group of encodings (the so called charmap encodings) that choose
-a different subset of all Unicode code points and how these code points are
-mapped to the bytes ``0x0``--``0xff``. To see how this is done simply open
-e.g. :file:`encodings/cp1252.py` (which is an encoding that is used primarily on
-Windows). There's a string constant with 256 characters that shows you which
-character is mapped to which byte value.
+Có một nhóm kiểu mã hóa khác (được gọi là các kiểu mã hóa charmap) chọn một tập con khác của toàn bộ các code point Unicode và cách ánh xạ các code point này tới các byte ``0x0``--``0xff``. Để xem cách thực hiện, chỉ cần mở chẳng hạn :file:`encodings/cp1252.py` (một kiểu mã hóa được sử dụng chủ yếu trên Windows). Có một hằng chuỗi gồm 256 ký tự cho biết ký tự nào được ánh xạ tới giá trị byte nào.
 
-All of these encodings can only encode 256 of the 1114112 code points
-defined in Unicode. A simple and straightforward way that can store each Unicode
-code point, is to store each code point as four consecutive bytes. There are two
-possibilities: store the bytes in big endian or in little endian order. These
-two encodings are called ``UTF-32-BE`` and ``UTF-32-LE`` respectively. Their
-disadvantage is that if, for example, you use ``UTF-32-BE`` on a little endian
-machine you will always have to swap bytes on encoding and decoding.
-Python's ``UTF-16`` and ``UTF-32`` codecs avoid this problem by using the
-platform's native byte order when no BOM is present.
-Python follows prevailing platform
-practice, so native-endian data round-trips without redundant byte swapping,
-even though the Unicode Standard defaults to big-endian when the byte order is
-unspecified. When these bytes are read by a CPU with a different endianness,
-the bytes have to be swapped. To be able to detect the endianness of a
-``UTF-16`` or ``UTF-32`` byte sequence, a BOM ("Byte Order Mark") is used.
-This is the Unicode character ``U+FEFF``. This character can be prepended to every
-``UTF-16`` or ``UTF-32`` byte sequence. The byte swapped version of this character
-(``0xFFFE``) is an illegal character that may not appear in a Unicode text.
-When the first character of a ``UTF-16`` or ``UTF-32`` byte sequence is
-``U+FFFE``, the bytes have to be swapped on decoding.
+Tất cả các kiểu mã hóa này chỉ có thể mã hóa 256 trong số 1114112 code point được định nghĩa trong Unicode. Một cách đơn giản và trực tiếp có thể lưu trữ mỗi code point Unicode là lưu mỗi code point dưới dạng bốn byte liên tiếp. Có hai khả năng: lưu các byte theo thứ tự big endian hoặc little endian. Hai kiểu mã hóa này lần lượt được gọi là ``UTF-32-BE`` và ``UTF-32-LE``. Nhược điểm của chúng là, chẳng hạn, nếu bạn sử dụng ``UTF-32-BE`` trên một máy little endian, bạn sẽ luôn phải hoán đổi các byte khi mã hóa và giải mã. Các codec ``UTF-16`` và ``UTF-32`` của Python tránh được vấn đề này bằng cách sử dụng thứ tự byte gốc của nền tảng khi không có BOM. Python tuân theo cách thực hành phổ biến của nền tảng, vì vậy dữ liệu native-endian có thể round-trip mà không cần hoán đổi byte dư thừa, mặc dù Unicode Standard mặc định sử dụng big endian khi thứ tự byte không được chỉ định. Khi các byte này được CPU có endianness khác đọc, chúng phải được hoán đổi. Để phát hiện endianness của một chuỗi byte ``UTF-16`` hoặc ``UTF-32``, người ta sử dụng BOM ("Byte Order Mark"). Đây là ký tự Unicode ``U+FEFF``. Ký tự này có thể được thêm vào đầu mọi chuỗi byte ``UTF-16`` hoặc ``UTF-32``. Phiên bản đã hoán đổi byte của ký tự này (``0xFFFE``) là một ký tự không hợp lệ, không được xuất hiện trong văn bản Unicode. Khi ký tự đầu tiên của chuỗi byte ``UTF-16`` hoặc ``UTF-32`` là ``U+FFFE``, các byte phải được hoán đổi khi giải mã.
 
-Unfortunately the character ``U+FEFF`` had a second purpose as
-a ``ZERO WIDTH NO-BREAK SPACE``: a character that has no width and doesn't allow
-a word to be split. It can e.g. be used to give hints to a ligature algorithm.
-With Unicode 4.0 using ``U+FEFF`` as a ``ZERO WIDTH NO-BREAK SPACE`` has been
-deprecated (with ``U+2060`` (``WORD JOINER``) assuming this role). Nevertheless
-Unicode software still must be able to handle ``U+FEFF`` in both roles: as a BOM
-it's a device to determine the storage layout of the encoded bytes, and vanishes
-once the byte sequence has been decoded into a string; as a ``ZERO WIDTH
-NO-BREAK SPACE`` it's a normal character that will be decoded like any other.
+Đáng tiếc là ký tự ``U+FEFF`` còn có một mục đích thứ hai, đó là một ``ZERO WIDTH NO-BREAK SPACE``: một ký tự không có độ rộng và không cho phép tách một từ. Ví dụ, nó có thể được dùng để cung cấp gợi ý cho thuật toán ligature. Kể từ Unicode 4.0, việc sử dụng ``U+FEFF`` làm ``ZERO WIDTH NO-BREAK SPACE`` đã bị phản đối (với ``U+2060`` (``WORD JOINER``) đảm nhiệm vai trò này). Tuy vậy, phần mềm Unicode vẫn phải có khả năng xử lý ``U+FEFF`` trong cả hai vai trò: với tư cách BOM, nó là công cụ xác định bố cục lưu trữ của các byte đã mã hóa và biến mất sau khi chuỗi byte được giải mã thành một chuỗi; với tư cách ``ZERO WIDTH NO-BREAK SPACE``, nó là một ký tự bình thường được giải mã như mọi ký tự khác.
 
-There's another encoding that is able to encode the full range of Unicode
-characters: UTF-8. UTF-8 is an 8-bit encoding, which means there are no issues
-with byte order in UTF-8. Each byte in a UTF-8 byte sequence consists of two
-parts: marker bits (the most significant bits) and payload bits. The marker bits
-are a sequence of zero to four ``1`` bits followed by a ``0`` bit. Unicode characters are
-encoded like this (with x being payload bits, which when concatenated give the
-Unicode character):
+Có một kiểu mã hóa khác có thể mã hóa toàn bộ phạm vi ký tự Unicode: UTF-8. UTF-8 là kiểu mã hóa 8 bit, nghĩa là UTF-8 không gặp vấn đề về thứ tự byte. Mỗi byte trong một chuỗi byte UTF-8 gồm hai phần: các bit đánh dấu (các bit có ý nghĩa cao nhất) và các bit dữ liệu. Các bit đánh dấu là một chuỗi gồm từ không đến bốn bit ``1`` liên tiếp, theo sau là một bit ``0``. Các ký tự Unicode được mã hóa như sau (với x là các bit dữ liệu, khi nối lại sẽ tạo thành ký tự Unicode):
 
-+-----------------------------------+----------------------------------------------+
-| Range                             | Encoding                                     |
-+===================================+==============================================+
-| ``U-00000000`` ... ``U-0000007F`` | 0xxxxxxx                                     |
-+-----------------------------------+----------------------------------------------+
-| ``U-00000080`` ... ``U-000007FF`` | 110xxxxx 10xxxxxx                            |
-+-----------------------------------+----------------------------------------------+
-| ``U-00000800`` ... ``U-0000FFFF`` | 1110xxxx 10xxxxxx 10xxxxxx                   |
-+-----------------------------------+----------------------------------------------+
-| ``U-00010000`` ... ``U-0010FFFF`` | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx          |
-+-----------------------------------+----------------------------------------------+
++-----------------------------------+-------------------------------------+
+| Phạm vi                           | Mã hóa                              |
++===================================+=====================================+
+| ``U-00000000`` ... ``U-0000007F`` | 0xxxxxxx                            |
++-----------------------------------+-------------------------------------+
+| ``U-00000080`` ... ``U-000007FF`` | 110xxxxx 10xxxxxx                   |
++-----------------------------------+-------------------------------------+
+| ``U-00000800`` ... ``U-0000FFFF`` | 1110xxxx 10xxxxxx 10xxxxxx          |
++-----------------------------------+-------------------------------------+
+| ``U-00010000`` ... ``U-0010FFFF`` | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx |
++-----------------------------------+-------------------------------------+
 
-The least significant bit of the Unicode character is the rightmost x bit.
+Bit có trọng số thấp nhất của ký tự Unicode là bit x ngoài cùng bên phải.
 
-As UTF-8 is an 8-bit encoding no BOM is required and any ``U+FEFF`` character in
-the decoded string (even if it's the first character) is treated as a ``ZERO
-WIDTH NO-BREAK SPACE``.
+Vì UTF-8 là một encoding 8 bit nên không cần BOM, và mọi ký tự ``U+FEFF`` trong chuỗi đã giải mã (ngay cả khi đó là ký tự đầu tiên) đều được coi là một ``ZERO WIDTH NO-BREAK SPACE``.
 
-Without external information it's impossible to reliably determine which
-encoding was used for encoding a string. Each charmap encoding can
-decode any random byte sequence. However that's not possible with UTF-8, as
-UTF-8 byte sequences have a structure that doesn't allow arbitrary byte
-sequences. To increase the reliability with which a UTF-8 encoding can be
-detected, Microsoft invented a variant of UTF-8 (that Python calls
-``"utf-8-sig"``) for its Notepad program: Before any of the Unicode characters
-is written to the file, a UTF-8 encoded BOM (which looks like this as a byte
-sequence: ``0xef``, ``0xbb``, ``0xbf``) is written. As it's rather improbable
-that any charmap encoded file starts with these byte values (which would e.g.
-map to
+Nếu không có thông tin bên ngoài thì không thể xác định một cách đáng tin cậy encoding nào đã được dùng để encoding một chuỗi. Mỗi encoding charmap đều có thể giải mã bất kỳ chuỗi byte ngẫu nhiên nào. Tuy nhiên, điều đó không thể thực hiện với UTF-8, vì các chuỗi byte UTF-8 có một cấu trúc không cho phép các chuỗi byte tùy ý. Để tăng độ tin cậy khi phát hiện encoding UTF-8, Microsoft đã phát minh một biến thể của UTF-8 (mà Python gọi là ``"utf-8-sig"``) cho chương trình Notepad của mình: Trước khi bất kỳ ký tự Unicode nào được ghi vào tệp, một BOM được encoding theo UTF-8 (có dạng chuỗi byte như sau: ``0xef``, ``0xbb``, ``0xbf``) sẽ được ghi vào. Vì khá khó có khả năng một tệp được encoding bằng charmap bất kỳ lại bắt đầu bằng các giá trị byte này (những giá trị này, chẳng hạn, sẽ ánh xạ thành
 
-   | LATIN SMALL LETTER I WITH DIAERESIS
-   | RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-   | INVERTED QUESTION MARK
+   | CHỮ CÁI I THƯỜNG LATIN CÓ DẤU HAI CHẤM
+   | DẤU NGOẶC KÉP GÓC ĐÔI HƯỚNG SANG PHẢI
+   | DẤU CHẤM HỎI ĐẢO NGƯỢC
 
-in iso-8859-1), this increases the probability that a ``utf-8-sig`` encoding can be
-correctly guessed from the byte sequence. So here the BOM is not used to be able
-to determine the byte order used for generating the byte sequence, but as a
-signature that helps in guessing the encoding. On encoding the utf-8-sig codec
-will write ``0xef``, ``0xbb``, ``0xbf`` as the first three bytes to the file. On
-decoding ``utf-8-sig`` will skip those three bytes if they appear as the first
-three bytes in the file. In UTF-8, the use of the BOM is discouraged and
-should generally be avoided.
+trong iso-8859-1), điều này làm tăng khả năng có thể đoán chính xác encoding ``utf-8-sig`` từ chuỗi byte. Vì vậy, ở đây BOM không được dùng để xác định thứ tự byte được sử dụng khi tạo chuỗi byte, mà được dùng như một chữ ký giúp đoán encoding. Khi encoding, codec utf-8-sig sẽ ghi ``0xef``, ``0xbb``, ``0xbf`` dưới dạng ba byte đầu tiên vào tệp. Khi giải mã, ``utf-8-sig`` sẽ bỏ qua ba byte đó nếu chúng xuất hiện ở vị trí ba byte đầu tiên trong tệp. Trong UTF-8, không khuyến khích sử dụng BOM và nhìn chung nên tránh sử dụng BOM.
 
 
 .. _standard-encodings:
 
-Standard Encodings
-------------------
+Các Encoding Tiêu Chuẩn
+-----------------------
 
-Python comes with a number of codecs built-in, either implemented as C functions
-or with dictionaries as mapping tables. The following table lists the codecs by
-name, together with a few common aliases, and the languages for which the
-encoding is likely used. Neither the list of aliases nor the list of languages
-is meant to be exhaustive. Notice that spelling alternatives that only differ in
-case or use a hyphen instead of an underscore are also valid aliases
-because they are equivalent when normalized by
-:func:`~encodings.normalize_encoding`. For example, ``'utf-8'`` is a valid
-alias for the ``'utf_8'`` codec.
+Python được tích hợp sẵn một số codec, được triển khai dưới dạng hàm C hoặc bằng các dictionary làm bảng ánh xạ. Bảng sau liệt kê các codec theo tên, cùng với một số bí danh phổ biến và những ngôn ngữ mà encoding có khả năng được sử dụng. Danh sách bí danh và danh sách ngôn ngữ đều không nhằm mục đích đầy đủ. Lưu ý rằng các cách viết chỉ khác nhau về chữ hoa chữ thường hoặc sử dụng dấu gạch ngang thay cho dấu gạch dưới cũng là bí danh hợp lệ, vì chúng tương đương khi được chuẩn hóa bởi
+:func:`~encodings.normalize_encoding`. Ví dụ: ``'utf-8'`` là bí danh hợp lệ của codec ``'utf_8'``.
 
 .. note::
 
-   The below table lists the most common aliases, for a complete list
-   refer to the source :source:`aliases.py <Lib/encodings/aliases.py>` file.
+   Bảng dưới đây liệt kê các bí danh phổ biến nhất; để xem danh sách đầy đủ, hãy tham khảo tệp :source:`aliases.py <Lib/encodings/aliases.py>` nguồn.
 
-On Windows, ``cpXXX`` codecs are available for all code pages.
-But only codecs listed in the following table are guarantead to exist on
-other platforms.
+Trên Windows, các codec ``cpXXX`` có sẵn cho tất cả các code page. Tuy nhiên, chỉ những codec được liệt kê trong bảng sau mới được đảm bảo tồn tại trên các nền tảng khác.
 
 .. impl-detail::
 
-   Some common encodings can bypass the codecs lookup machinery to
-   improve performance. These optimization opportunities are only
-   recognized by CPython for a limited set of (case insensitive)
-   aliases: utf-8, utf8, latin-1, latin1, iso-8859-1, iso8859-1, mbcs
-   (Windows only), ascii, us-ascii, utf-16, utf16, utf-32, utf32, and
-   the same using underscores instead of dashes. Using alternative
-   aliases for these encodings may result in slower execution.
+   Một số encoding phổ biến có thể bỏ qua cơ chế tra cứu codec để cải thiện hiệu năng. CPython chỉ nhận diện các cơ hội tối ưu hóa này đối với một tập hợp giới hạn các bí danh (không phân biệt chữ hoa chữ thường): utf-8, utf8, latin-1, latin1, iso-8859-1, iso8859-1, mbcs (chỉ trên Windows), ascii, us-ascii, utf-16, utf16, utf-32, utf32 và các bí danh tương tự sử dụng dấu gạch dưới thay cho dấu gạch ngang. Việc sử dụng bí danh thay thế cho các encoding này có thể khiến quá trình thực thi chậm hơn.
 
    .. versionchanged:: 3.6
-      Optimization opportunity recognized for us-ascii.
+      Đã nhận diện cơ hội tối ưu hóa cho us-ascii.
 
-Many of the character sets support the same languages. They vary in individual
-characters (e.g. whether the EURO SIGN is supported or not), and in the
-assignment of characters to code positions. For the European languages in
-particular, the following variants typically exist:
+Nhiều bộ ký tự hỗ trợ cùng một ngôn ngữ. Chúng khác nhau ở từng ký tự (ví dụ: có hỗ trợ EURO SIGN hay không) và ở cách gán ký tự vào các vị trí mã. Đặc biệt đối với các ngôn ngữ châu Âu, thường tồn tại các biến thể sau:
 
-* an ISO 8859 codeset
+* một codeset ISO 8859
 
-* a Microsoft Windows code page, which is typically derived from an 8859 codeset,
-  but replaces control characters with additional graphic characters
+* một code page Microsoft Windows, thường được phát triển từ một codeset 8859 nhưng thay thế các ký tự điều khiển bằng các ký tự đồ họa bổ sung
 
-* an IBM EBCDIC code page
+* một code page IBM EBCDIC
 
-* an IBM PC code page, which is ASCII compatible
+* một code page IBM PC, tương thích với ASCII
 
 .. tabularcolumns:: |l|p{0.3\linewidth}|p{0.3\linewidth}|
 
-+-----------------+--------------------------------+--------------------------------+
-| Codec           | Aliases                        | Languages                      |
-+=================+================================+================================+
-| ascii           | 646, us-ascii                  | English                        |
-+-----------------+--------------------------------+--------------------------------+
-| big5            | big5-tw, csbig5                | Traditional Chinese            |
-+-----------------+--------------------------------+--------------------------------+
-| big5hkscs       | big5-hkscs, hkscs              | Traditional Chinese            |
-+-----------------+--------------------------------+--------------------------------+
-| cp037           | IBM037, IBM039                 | English                        |
-+-----------------+--------------------------------+--------------------------------+
-| cp273           | 273, IBM273, csIBM273          | German                         |
-|                 |                                |                                |
-|                 |                                | .. versionadded:: 3.4          |
-+-----------------+--------------------------------+--------------------------------+
-| cp424           | EBCDIC-CP-HE, IBM424           | Hebrew                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp437           | 437, IBM437                    | English                        |
-+-----------------+--------------------------------+--------------------------------+
-| cp500           | EBCDIC-CP-BE, EBCDIC-CP-CH,    | Western Europe                 |
-|                 | IBM500                         |                                |
-+-----------------+--------------------------------+--------------------------------+
-| cp720           |                                | Arabic                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp737           |                                | Greek                          |
-+-----------------+--------------------------------+--------------------------------+
-| cp775           | IBM775                         | Baltic languages               |
-+-----------------+--------------------------------+--------------------------------+
-| cp850           | 850, IBM850                    | Western Europe                 |
-+-----------------+--------------------------------+--------------------------------+
-| cp852           | 852, IBM852                    | Central and Eastern Europe     |
-+-----------------+--------------------------------+--------------------------------+
-| cp855           | 855, IBM855                    | Belarusian, Bulgarian,         |
-|                 |                                | Macedonian, Russian, Serbian   |
-+-----------------+--------------------------------+--------------------------------+
-| cp856           |                                | Hebrew                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp857           | 857, IBM857                    | Turkish                        |
-+-----------------+--------------------------------+--------------------------------+
-| cp858           | 858, IBM00858                  | Western Europe                 |
-+-----------------+--------------------------------+--------------------------------+
-| cp860           | 860, IBM860                    | Portuguese                     |
-+-----------------+--------------------------------+--------------------------------+
-| cp861           | 861, CP-IS, IBM861             | Icelandic                      |
-+-----------------+--------------------------------+--------------------------------+
-| cp862           | 862, IBM862                    | Hebrew                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp863           | 863, IBM863                    | Canadian                       |
-+-----------------+--------------------------------+--------------------------------+
-| cp864           | IBM864                         | Arabic                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp865           | 865, IBM865                    | Danish, Norwegian              |
-+-----------------+--------------------------------+--------------------------------+
-| cp866           | 866, IBM866                    | Russian                        |
-+-----------------+--------------------------------+--------------------------------+
-| cp869           | 869, CP-GR, IBM869             | Greek                          |
-+-----------------+--------------------------------+--------------------------------+
-| cp874           |                                | Thai                           |
-+-----------------+--------------------------------+--------------------------------+
-| cp875           |                                | Greek                          |
-+-----------------+--------------------------------+--------------------------------+
-| cp932           | 932, ms932, mskanji, ms-kanji, | Japanese                       |
-|                 | windows-31j                    |                                |
-+-----------------+--------------------------------+--------------------------------+
-| cp949           | 949, ms949, uhc                | Korean                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp950           | 950, ms950                     | Traditional Chinese            |
-+-----------------+--------------------------------+--------------------------------+
-| cp1006          |                                | Urdu                           |
-+-----------------+--------------------------------+--------------------------------+
-| cp1026          | ibm1026                        | Turkish                        |
-+-----------------+--------------------------------+--------------------------------+
-| cp1125          | 1125, ibm1125, cp866u, ruscii  | Ukrainian                      |
-|                 |                                |                                |
-|                 |                                | .. versionadded:: 3.4          |
-+-----------------+--------------------------------+--------------------------------+
-| cp1140          | IBM01140                       | Western Europe                 |
-+-----------------+--------------------------------+--------------------------------+
-| cp1250          | windows-1250                   | Central and Eastern Europe     |
-+-----------------+--------------------------------+--------------------------------+
-| cp1251          | windows-1251                   | Belarusian, Bulgarian,         |
-|                 |                                | Macedonian, Russian, Serbian   |
-+-----------------+--------------------------------+--------------------------------+
-| cp1252          | windows-1252                   | Western Europe                 |
-+-----------------+--------------------------------+--------------------------------+
-| cp1253          | windows-1253                   | Greek                          |
-+-----------------+--------------------------------+--------------------------------+
-| cp1254          | windows-1254                   | Turkish                        |
-+-----------------+--------------------------------+--------------------------------+
-| cp1255          | windows-1255                   | Hebrew                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp1256          | windows-1256                   | Arabic                         |
-+-----------------+--------------------------------+--------------------------------+
-| cp1257          | windows-1257                   | Baltic languages               |
-+-----------------+--------------------------------+--------------------------------+
-| cp1258          | windows-1258                   | Vietnamese                     |
-+-----------------+--------------------------------+--------------------------------+
-| euc_jp          | eucjp, ujis, u-jis             | Japanese                       |
-+-----------------+--------------------------------+--------------------------------+
-| euc_jis_2004    | jisx0213, eucjis2004           | Japanese                       |
-+-----------------+--------------------------------+--------------------------------+
-| euc_jisx0213    | eucjisx0213                    | Japanese                       |
-+-----------------+--------------------------------+--------------------------------+
-| euc_kr          | euckr, korean, ksc5601,        | Korean                         |
-|                 | ks_c-5601, ks_c-5601-1987,     |                                |
-|                 | ksx1001, ks_x-1001             |                                |
-+-----------------+--------------------------------+--------------------------------+
-| gb2312          | chinese, csiso58gb231280,      | Simplified Chinese             |
-|                 | euc-cn, euccn, eucgb2312-cn,   |                                |
-|                 | gb2312-1980, gb2312-80,        |                                |
-|                 | iso-ir-58                      |                                |
-+-----------------+--------------------------------+--------------------------------+
-| gbk             | 936, cp936, ms936              | Unified Chinese                |
-+-----------------+--------------------------------+--------------------------------+
-| gb18030         | gb18030-2000                   | Unified Chinese                |
-+-----------------+--------------------------------+--------------------------------+
-| hz              | hzgb, hz-gb, hz-gb-2312        | Simplified Chinese             |
-+-----------------+--------------------------------+--------------------------------+
-| iso2022_jp      | csiso2022jp, iso2022jp,        | Japanese                       |
-|                 | iso-2022-jp                    |                                |
-+-----------------+--------------------------------+--------------------------------+
-| iso2022_jp_1    | iso2022jp-1, iso-2022-jp-1     | Japanese                       |
-+-----------------+--------------------------------+--------------------------------+
-| iso2022_jp_2    | iso2022jp-2, iso-2022-jp-2     | Japanese, Korean, Simplified   |
-|                 |                                | Chinese, Western Europe, Greek |
-+-----------------+--------------------------------+--------------------------------+
-| iso2022_jp_2004 | iso2022jp-2004,                | Japanese                       |
-|                 | iso-2022-jp-2004               |                                |
-+-----------------+--------------------------------+--------------------------------+
-| iso2022_jp_3    | iso2022jp-3, iso-2022-jp-3     | Japanese                       |
-+-----------------+--------------------------------+--------------------------------+
-| iso2022_jp_ext  | iso2022jp-ext, iso-2022-jp-ext | Japanese                       |
-+-----------------+--------------------------------+--------------------------------+
-| iso2022_kr      | csiso2022kr, iso2022kr,        | Korean                         |
-|                 | iso-2022-kr                    |                                |
-+-----------------+--------------------------------+--------------------------------+
-| latin_1         | iso-8859-1, iso8859-1, 8859,   | Western Europe                 |
-|                 | cp819, latin, latin1, L1       |                                |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_2       | iso-8859-2, latin2, L2         | Central and Eastern Europe     |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_3       | iso-8859-3, latin3, L3         | Esperanto, Maltese             |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_4       | iso-8859-4, latin4, L4         | Northern Europe                |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_5       | iso-8859-5, cyrillic           | Belarusian, Bulgarian,         |
-|                 |                                | Macedonian, Russian, Serbian   |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_6       | iso-8859-6, arabic             | Arabic                         |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_7       | iso-8859-7, greek, greek8      | Greek                          |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_8       | iso-8859-8, hebrew             | Hebrew                         |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_9       | iso-8859-9, latin5, L5         | Turkish                        |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_10      | iso-8859-10, latin6, L6        | Nordic languages               |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_11      | iso-8859-11, thai              | Thai languages                 |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_13      | iso-8859-13, latin7, L7        | Baltic languages               |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_14      | iso-8859-14, latin8, L8        | Celtic languages               |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_15      | iso-8859-15, latin9, L9        | Western Europe                 |
-+-----------------+--------------------------------+--------------------------------+
-| iso8859_16      | iso-8859-16, latin10, L10      | South-Eastern Europe           |
-+-----------------+--------------------------------+--------------------------------+
-| johab           | cp1361, ms1361                 | Korean                         |
-+-----------------+--------------------------------+--------------------------------+
-| koi8_r          |                                | Russian                        |
-+-----------------+--------------------------------+--------------------------------+
-| koi8_t          |                                | Tajik                          |
-|                 |                                |                                |
-|                 |                                | .. versionadded:: 3.5          |
-+-----------------+--------------------------------+--------------------------------+
-| koi8_u          |                                | Ukrainian                      |
-+-----------------+--------------------------------+--------------------------------+
-| kz1048          | kz_1048, strk1048_2002, rk1048 | Kazakh                         |
-|                 |                                |                                |
-|                 |                                | .. versionadded:: 3.5          |
-+-----------------+--------------------------------+--------------------------------+
-| mac_cyrillic    | maccyrillic                    | Belarusian, Bulgarian,         |
-|                 |                                | Macedonian, Russian, Serbian   |
-+-----------------+--------------------------------+--------------------------------+
-| mac_greek       | macgreek                       | Greek                          |
-+-----------------+--------------------------------+--------------------------------+
-| mac_iceland     | maciceland                     | Icelandic                      |
-+-----------------+--------------------------------+--------------------------------+
-| mac_latin2      | maclatin2, maccentraleurope,   | Central and Eastern Europe     |
-|                 | mac_centeuro                   |                                |
-+-----------------+--------------------------------+--------------------------------+
-| mac_roman       | macroman, macintosh            | Western Europe                 |
-+-----------------+--------------------------------+--------------------------------+
-| mac_turkish     | macturkish                     | Turkish                        |
-+-----------------+--------------------------------+--------------------------------+
-| ptcp154         | csptcp154, pt154, cp154,       | Kazakh                         |
-|                 | cyrillic-asian                 |                                |
-+-----------------+--------------------------------+--------------------------------+
-| shift_jis       | csshiftjis, shiftjis, sjis,    | Japanese                       |
-|                 | s_jis                          |                                |
-+-----------------+--------------------------------+--------------------------------+
-| shift_jis_2004  | shiftjis2004, sjis_2004,       | Japanese                       |
-|                 | sjis2004                       |                                |
-+-----------------+--------------------------------+--------------------------------+
-| shift_jisx0213  | shiftjisx0213, sjisx0213,      | Japanese                       |
-|                 | s_jisx0213                     |                                |
-+-----------------+--------------------------------+--------------------------------+
-| utf_32          | U32, utf32                     | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_32_be       | UTF-32BE                       | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_32_le       | UTF-32LE                       | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_16          | U16, utf16                     | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_16_be       | UTF-16BE                       | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_16_le       | UTF-16LE                       | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_7           | U7, unicode-1-1-utf-7          | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_8           | U8, UTF, utf8, cp65001         | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
-| utf_8_sig       |                                | all languages                  |
-+-----------------+--------------------------------+--------------------------------+
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| Codec           | Aliases                                                                                  | Languages                                                         |
++=================+==========================================================================================+===================================================================+
+| ascii           | 646, us-ascii                                                                            | Tiếng Anh                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| big5            | big5-tw, csbig5                                                                          | Tiếng Trung phồn thể                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| big5hkscs       | big5-hkscs, hkscs                                                                        | Tiếng Trung phồn thể                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp037           | IBM037, IBM039                                                                           | Tiếng Anh                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp273           | 273, IBM273, csIBM273                                                                    | Tiếng Đức                                                         |
+|                 |                                                                                          |                                                                   |
+|                 |                                                                                          | .. versionadded:: 3.4                                             |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp424           | EBCDIC-CP-HE, IBM424                                                                     | Tiếng Hebrew                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp437           | 437, IBM437                                                                              | Tiếng Anh                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp500           | EBCDIC-CP-BE, EBCDIC-CP-CH, IBM500                                                       | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp720           |                                                                                          | Tiếng Ả Rập                                                       |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp737           |                                                                                          | Tiếng Hy Lạp                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp775           | IBM775                                                                                   | Các ngôn ngữ Baltic                                               |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp850           | 850, IBM850                                                                              | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp852           | 852, IBM852                                                                              | Trung và Đông Âu                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp855           | 855, IBM855                                                                              | Belarus, Bulgaria, Bắc Macedonia, Nga, Serbia                     |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp856           |                                                                                          | Hebrew                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp857           | 857, IBM857                                                                              | Tiếng Thổ Nhĩ Kỳ                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp858           | 858, IBM00858                                                                            | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp860           | 860, IBM860                                                                              | Tiếng Bồ Đào Nha                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp861           | 861, CP-IS, IBM861                                                                       | Tiếng Iceland                                                     |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp862           | 862, IBM862                                                                              | Tiếng Hebrew                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp863           | 863, IBM863                                                                              | Canada                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp864           | IBM864                                                                                   | Ả Rập                                                             |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp865           | 865, IBM865                                                                              | Đan Mạch, Na Uy                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp866           | 866, IBM866                                                                              | Nga                                                               |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp869           | 869, CP-GR, IBM869                                                                       | Hy Lạp                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp874           |                                                                                          | Thái                                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp875           |                                                                                          | Hy Lạp                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp932           | 932, ms932, mskanji, ms-kanji, windows-31j                                               | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp949           | 949, ms949, uhc                                                                          | Tiếng Hàn                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp950           | 950, ms950                                                                               | Tiếng Trung phồn thể                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1006          |                                                                                          | Urdu                                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1026          | ibm1026                                                                                  | Tiếng Thổ Nhĩ Kỳ                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1125          | 1125, ibm1125, cp866u, ruscii                                                            | Tiếng Ukraina                                                     |
+|                 |                                                                                          |                                                                   |
+|                 |                                                                                          | .. versionadded:: 3.4                                             |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1140          | IBM01140                                                                                 | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1250          | windows-1250                                                                             | Trung và Đông Âu                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1251          | windows-1251                                                                             | Belarus, Bulgaria, Bắc Macedonia, Nga, Serbia                     |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1252          | windows-1252                                                                             | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1253          | windows-1253                                                                             | Tiếng Hy Lạp                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1254          | windows-1254                                                                             | Tiếng Thổ Nhĩ Kỳ                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1255          | windows-1255                                                                             | Tiếng Hebrew                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1256          | windows-1256                                                                             | Tiếng Ả Rập                                                       |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1257          | windows-1257                                                                             | Các ngôn ngữ Baltic                                               |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| cp1258          | windows-1258                                                                             | Tiếng Việt                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| euc_jp          | eucjp, ujis, u-jis                                                                       | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| euc_jis_2004    | jisx0213, eucjis2004                                                                     | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| euc_jisx0213    | eucjisx0213                                                                              | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| euc_kr          | euckr, korean, ksc5601, ks_c-5601, ks_c-5601-1987, ksx1001, ks_x-1001                    | Tiếng Hàn                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| gb2312          | chinese, csiso58gb231280, euc-cn, euccn, eucgb2312-cn, gb2312-1980, gb2312-80, iso-ir-58 | Tiếng Trung giản thể                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| gbk             | 936, cp936, ms936                                                                        | Tiếng Trung hợp nhất                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| gb18030         | gb18030-2000                                                                             | Tiếng Trung hợp nhất                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| hz              | hzgb, hz-gb, hz-gb-2312                                                                  | Tiếng Trung giản thể                                              |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso2022_jp      | csiso2022jp, iso2022jp, iso-2022-jp                                                      | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso2022_jp_1    | iso2022jp-1, iso-2022-jp-1                                                               | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso2022_jp_2    | iso2022jp-2, iso-2022-jp-2                                                               | Tiếng Nhật, Tiếng Hàn, Tiếng Trung giản thể, Tây Âu, Tiếng Hy Lạp |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso2022_jp_2004 | iso2022jp-2004, iso-2022-jp-2004                                                         | tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso2022_jp_3    | iso2022jp-3, iso-2022-jp-3                                                               | tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso2022_jp_ext  | iso2022jp-ext, iso-2022-jp-ext                                                           | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso2022_kr      | csiso2022kr, iso2022kr, iso-2022-kr                                                      | Tiếng Hàn                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| latin_1         | iso-8859-1, iso8859-1, 8859, cp819, latin, latin1, L1                                    | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_2       | iso-8859-2, latin2, L2                                                                   | Trung và Đông Âu                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_3       | iso-8859-3, latin3, L3                                                                   | Esperanto, tiếng Malta                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_4       | iso-8859-4, latin4, L4                                                                   | Bắc Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_5       | iso-8859-5, cyrillic                                                                     | Belarus, Bulgaria, Bắc Macedonia, Nga, Serbia                     |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_6       | iso-8859-6, arabic                                                                       | Tiếng Ả Rập                                                       |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_7       | iso-8859-7, greek, greek8                                                                | Tiếng Hy Lạp                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_8       | iso-8859-8, hebrew                                                                       | Tiếng Hebrew                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_9       | iso-8859-9, latin5, L5                                                                   | Tiếng Thổ Nhĩ Kỳ                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_10      | iso-8859-10, latin6, L6                                                                  | Các ngôn ngữ Bắc Âu                                               |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_11      | iso-8859-11, thai                                                                        | Các ngôn ngữ Thái                                                 |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_13      | iso-8859-13, latin7, L7                                                                  | Các ngôn ngữ Baltic                                               |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_14      | iso-8859-14, latin8, L8                                                                  | Các ngôn ngữ Celt                                                 |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_15      | iso-8859-15, latin9, L9                                                                  | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| iso8859_16      | iso-8859-16, latin10, L10                                                                | Đông Nam Âu                                                       |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| johab           | cp1361, ms1361                                                                           | Tiếng Hàn                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| koi8_r          |                                                                                          | Tiếng Nga                                                         |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| koi8_t          |                                                                                          | Tiếng Tajik                                                       |
+|                 |                                                                                          |                                                                   |
+|                 |                                                                                          | .. versionadded:: 3.5                                             |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| koi8_u          |                                                                                          | Tiếng Ukraina                                                     |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| kz1048          | kz_1048, strk1048_2002, rk1048                                                           | Tiếng Kazakh                                                      |
+|                 |                                                                                          |                                                                   |
+|                 |                                                                                          | .. versionadded:: 3.5                                             |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| mac_cyrillic    | maccyrillic                                                                              | Belarus, Bulgaria, Bắc Macedonia, Nga, Serbia                     |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| mac_greek       | macgreek                                                                                 | Tiếng Hy Lạp                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| mac_iceland     | maciceland                                                                               | Tiếng Iceland                                                     |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| mac_latin2      | maclatin2, maccentraleurope, mac_centeuro                                                | Trung và Đông Âu                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| mac_roman       | macroman, macintosh                                                                      | Tây Âu                                                            |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| mac_turkish     | macturkish                                                                               | Tiếng Thổ Nhĩ Kỳ                                                  |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| ptcp154         | csptcp154, pt154, cp154, cyrillic-asian                                                  | Tiếng Kazakh                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| shift_jis       | csshiftjis, shiftjis, sjis, s_jis                                                        | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| shift_jis_2004  | shiftjis2004, sjis_2004, sjis2004                                                        | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| shift_jisx0213  | shiftjisx0213, sjisx0213, s_jisx0213                                                     | Tiếng Nhật                                                        |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_32          | U32, utf32                                                                               | mọi ngôn ngữ                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_32_be       | UTF-32BE                                                                                 | mọi ngôn ngữ                                                      |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_32_le       | UTF-32LE                                                                                 | tất cả ngôn ngữ                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_16          | U16, utf16                                                                               | tất cả ngôn ngữ                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_16_be       | UTF-16BE                                                                                 | tất cả ngôn ngữ                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_16_le       | UTF-16LE                                                                                 | tất cả ngôn ngữ                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_7           | U7, unicode-1-1-utf-7                                                                    | tất cả ngôn ngữ                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_8           | U8, UTF, utf8, cp65001                                                                   | tất cả ngôn ngữ                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
+| utf_8_sig       |                                                                                          | tất cả ngôn ngữ                                                   |
++-----------------+------------------------------------------------------------------------------------------+-------------------------------------------------------------------+
 
 .. versionchanged:: 3.4
-   The utf-16\* and utf-32\* encoders no longer allow surrogate code points
-   (``U+D800``--``U+DFFF``) to be encoded.
-   The utf-32\* decoders no longer decode
-   byte sequences that correspond to surrogate code points.
+   Các bộ mã hóa utf-16\* và utf-32\* không còn cho phép mã hóa các code point surrogate (``U+D800``--``U+DFFF``). Các bộ giải mã utf-32\* không còn giải mã các chuỗi byte tương ứng với code point surrogate.
 
 .. versionchanged:: 3.8
-   ``cp65001`` is now an alias to ``utf_8``.
+   ``cp65001`` hiện là bí danh của ``utf_8``.
 
 .. versionchanged:: 3.14
-   On Windows, ``cpXXX`` codecs are now available for all code pages.
+   Trên Windows, các codec ``cpXXX`` hiện có sẵn cho tất cả các code page.
 
 
-Python Specific Encodings
--------------------------
+Các Encodings riêng của Python
+------------------------------
 
-A number of predefined codecs are specific to Python, so their codec names have
-no meaning outside Python. These are listed in the tables below based on the
-expected input and output types (note that while text encodings are the most
-common use case for codecs, the underlying codec infrastructure supports
-arbitrary data transforms rather than just text encodings). For asymmetric
-codecs, the stated meaning describes the encoding direction.
+Một số codec được định nghĩa sẵn chỉ dành riêng cho Python, vì vậy tên codec của chúng không có ý nghĩa bên ngoài Python. Các codec này được liệt kê trong những bảng dưới đây dựa trên kiểu dữ liệu đầu vào và đầu ra dự kiến (lưu ý rằng mặc dù encoding văn bản là trường hợp sử dụng phổ biến nhất của codec, cơ sở hạ tầng codec bên dưới hỗ trợ các phép biến đổi dữ liệu tùy ý thay vì chỉ encoding văn bản). Đối với các codec bất đối xứng, ý nghĩa được nêu mô tả hướng encoding.
 
-Text Encodings
-^^^^^^^^^^^^^^
+Encoding văn bản
+^^^^^^^^^^^^^^^^
 
-The following codecs provide :class:`str` to :class:`bytes` encoding and
-:term:`bytes-like object` to :class:`str` decoding, similar to the Unicode text
-encodings.
+Các codec sau đây cung cấp khả năng encoding từ :class:`str` sang :class:`bytes` và
+giải mã từ :term:`bytes-like object` sang :class:`str`, tương tự như các encoding văn bản Unicode.
 
 .. tabularcolumns:: |l|p{0.3\linewidth}|p{0.3\linewidth}|
 
-+--------------------+---------+---------------------------+
-| Codec              | Aliases | Meaning                   |
-+====================+=========+===========================+
-| idna               |         | Implement :rfc:`3490`,    |
-|                    |         | see also                  |
-|                    |         | :mod:`encodings.idna`.    |
-|                    |         | Only ``errors='strict'``  |
-|                    |         | is supported.             |
-|                    |         |                           |
-|                    |         | .. warning::              |
-|                    |         |                           |
-|                    |         |    This codec builds on   |
-|                    |         |    ``punycode``, whose    |
-|                    |         |    algorithms scale       |
-|                    |         |    poorly, so limit the   |
-|                    |         |    length of untrusted    |
-|                    |         |    input.                 |
-+--------------------+---------+---------------------------+
-| mbcs               | ansi,   | Windows only: Encode the  |
-|                    | dbcs    | operand according to the  |
-|                    |         | ANSI codepage (CP_ACP).   |
-+--------------------+---------+---------------------------+
-| oem                |         | Windows only: Encode the  |
-|                    |         | operand according to the  |
-|                    |         | OEM codepage (CP_OEMCP).  |
-|                    |         |                           |
-|                    |         | .. versionadded:: 3.6     |
-+--------------------+---------+---------------------------+
-| palmos             |         | Encoding of PalmOS 3.5.   |
-+--------------------+---------+---------------------------+
-| punycode           |         | Implement :rfc:`3492`.    |
-|                    |         | Stateful codecs are not   |
-|                    |         | supported.                |
-|                    |         |                           |
-|                    |         | .. warning::              |
-|                    |         |                           |
-|                    |         |    The decoding and       |
-|                    |         |    encoding algorithms    |
-|                    |         |    scale poorly, so       |
-|                    |         |    limit the length of    |
-|                    |         |    untrusted input.       |
-+--------------------+---------+---------------------------+
-| raw_unicode_escape |         | Latin-1 encoding with     |
-|                    |         | :samp:`\\u{XXXX}` and     |
-|                    |         | :samp:`\\U{XXXXXXXX}`     |
-|                    |         | for other code points.    |
-|                    |         | Existing                  |
-|                    |         | backslashes are not       |
-|                    |         | escaped in any way.       |
-|                    |         | It is used in the Python  |
-|                    |         | pickle protocol.          |
-+--------------------+---------+---------------------------+
-| undefined          |         | This Codec should only    |
-|                    |         | be used for testing       |
-|                    |         | purposes.                 |
-|                    |         |                           |
-|                    |         | Raise an exception for    |
-|                    |         | all conversions, even     |
-|                    |         | empty strings. The error  |
-|                    |         | handler is ignored.       |
-+--------------------+---------+---------------------------+
-| unicode_escape     |         | Encoding suitable as the  |
-|                    |         | contents of a Unicode     |
-|                    |         | literal in ASCII-encoded  |
-|                    |         | Python source code,       |
-|                    |         | except that quotes are    |
-|                    |         | not escaped. Decode       |
-|                    |         | from Latin-1 source code. |
-|                    |         | Beware that Python source |
-|                    |         | code actually uses UTF-8  |
-|                    |         | by default.               |
-+--------------------+---------+---------------------------+
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Bộ mã              | Bí danh    | Ý nghĩa                                                                                                                                                                                                                                                |
++====================+============+========================================================================================================================================================================================================================================================+
+| idna               |            | Triển khai :rfc:`3490`, xem thêm                                                                                                                                                                                                                       |
+|                    |            | :mod:`encodings.idna`. Chỉ ``errors='strict'`` được hỗ trợ.                                                                                                                                                                                            |
+|                    |            |                                                                                                                                                                                                                                                        |
+|                    |            | .. warning::                                                                                                                                                                                                                                           |
+|                    |            |                                                                                                                                                                                                                                                        |
+|                    |            |    Bộ mã này dựa trên ``punycode``, các thuật toán của bộ mã này có khả năng mở rộng kém, vì vậy hãy giới hạn độ dài của dữ liệu đầu vào không đáng tin cậy.                                                                                           |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| mbcs               | ansi, dbcs | Chỉ dành cho Windows: Mã hóa toán hạng theo trang mã ANSI (CP_ACP).                                                                                                                                                                                    |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| oem                |            | Chỉ dành cho Windows: Mã hóa toán hạng theo trang mã OEM (CP_OEMCP).                                                                                                                                                                                   |
+|                    |            |                                                                                                                                                                                                                                                        |
+|                    |            | .. versionadded:: 3.6                                                                                                                                                                                                                                  |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| palmos             |            | Mã hóa của PalmOS 3.5.                                                                                                                                                                                                                                 |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| punycode           |            | Triển khai :rfc:`3492`. Không hỗ trợ các codec có trạng thái.                                                                                                                                                                                          |
+|                    |            |                                                                                                                                                                                                                                                        |
+|                    |            | .. warning::                                                                                                                                                                                                                                           |
+|                    |            |                                                                                                                                                                                                                                                        |
+|                    |            |    Các thuật toán giải mã và mã hóa có hiệu năng kém khi mở rộng, vì vậy hãy giới hạn độ dài của dữ liệu đầu vào không đáng tin cậy.                                                                                                                   |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| raw_unicode_escape |            | Mã hóa Latin-1 với                                                                                                                                                                                                                                     |
+|                    |            | :samp:`\\u{XXXX}` và                                                                                                                                                                                                                                   |
+|                    |            | :samp:`\\U{XXXXXXXX}` cho các code point khác. Các dấu gạch chéo ngược hiện có không được escape theo bất kỳ cách nào. Nó được sử dụng trong giao thức Python pickle.                                                                                  |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| undefined          |            | Codec này chỉ nên được sử dụng cho mục đích kiểm thử.                                                                                                                                                                                                  |
+|                    |            |                                                                                                                                                                                                                                                        |
+|                    |            | Phát sinh ngoại lệ cho mọi chuyển đổi, kể cả chuỗi rỗng. Trình xử lý lỗi sẽ bị bỏ qua.                                                                                                                                                                 |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| unicode_escape     |            | Mã hóa phù hợp để dùng làm nội dung của một literal Unicode trong mã nguồn Python được mã hóa bằng ASCII, ngoại trừ việc dấu ngoặc kép không được escape. Giải mã từ mã nguồn Latin-1. Lưu ý rằng mã nguồn Python thực tế sử dụng UTF-8 theo mặc định. |
++--------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. versionchanged:: 3.8
-   "unicode_internal" codec is removed.
+   Codec "unicode_internal" đã bị loại bỏ.
 
 
 .. _binary-transforms:
 
-Binary Transforms
+Biến đổi nhị phân
 ^^^^^^^^^^^^^^^^^
 
-The following codecs provide binary transforms: :term:`bytes-like object`
-to :class:`bytes` mappings. They are not supported by :meth:`bytes.decode`
-(which only produces :class:`str` output).
+Các codec sau đây cung cấp phép biến đổi nhị phân: ánh xạ từ :term:`bytes-like object` đến :class:`bytes`. Chúng không được :meth:`bytes.decode` hỗ trợ (chỉ tạo đầu ra :class:`str`).
 
 
 .. tabularcolumns:: |l|L|L|L|
 
-+----------------------+------------------+------------------------------+------------------------------+
-| Codec                | Aliases          | Meaning                      | Encoder / decoder            |
-+======================+==================+==============================+==============================+
-| base64_codec [#b64]_ | base64, base_64  | Convert the operand to       | :meth:`base64.encodebytes` / |
-|                      |                  | multiline MIME base64 (the   | :meth:`base64.decodebytes`   |
-|                      |                  | result always includes a     |                              |
-|                      |                  | trailing ``'\n'``).          |                              |
-|                      |                  |                              |                              |
-|                      |                  | .. versionchanged:: 3.4      |                              |
-|                      |                  |    accepts any               |                              |
-|                      |                  |    :term:`bytes-like object` |                              |
-|                      |                  |    as input for encoding and |                              |
-|                      |                  |    decoding                  |                              |
-+----------------------+------------------+------------------------------+------------------------------+
-| bz2_codec            | bz2              | Compress the operand using   | :meth:`bz2.compress` /       |
-|                      |                  | bz2.                         | :meth:`bz2.decompress`       |
-+----------------------+------------------+------------------------------+------------------------------+
-| hex_codec            | hex              | Convert the operand to       | :meth:`binascii.b2a_hex` /   |
-|                      |                  | hexadecimal                  | :meth:`binascii.a2b_hex`     |
-|                      |                  | representation, with two     |                              |
-|                      |                  | digits per byte.             |                              |
-+----------------------+------------------+------------------------------+------------------------------+
-| quopri_codec         | quopri,          | Convert the operand to MIME  | :meth:`quopri.encode` with   |
-|                      | quotedprintable, | quoted printable.            | ``quotetabs=True`` /         |
-|                      | quoted_printable |                              | :meth:`quopri.decode`        |
-+----------------------+------------------+------------------------------+------------------------------+
-| uu_codec             | uu               | Convert the operand using    |                              |
-|                      |                  | uuencode.                    |                              |
-+----------------------+------------------+------------------------------+------------------------------+
-| zlib_codec           | zip, zlib        | Compress the operand using   | :meth:`zlib.compress` /      |
-|                      |                  | gzip.                        | :meth:`zlib.decompress`      |
-+----------------------+------------------+------------------------------+------------------------------+
++----------------------+-------------------------------------------+---------------------------------------------------------------------------------------+------------------------------------------------+
+| Codec                | Bí danh                                   | Ý nghĩa                                                                               | Bộ mã hóa / bộ giải mã                         |
++======================+===========================================+=======================================================================================+================================================+
+| base64_codec [#b64]_ | base64, base_64                           | Chuyển toán hạng thành MIME base64 nhiều dòng (kết quả luôn bao gồm ``'\n'`` ở cuối). | :meth:`base64.encodebytes` /                   |
+|                      |                                           |                                                                                       | :meth:`base64.decodebytes`                     |
+|                      |                                           | .. versionchanged:: 3.4                                                               |                                                |
+|                      |                                           |    chấp nhận mọi                                                                      |                                                |
+|                      |                                           |    :term:`bytes-like object` làm đầu vào để mã hóa và giải mã                         |                                                |
++----------------------+-------------------------------------------+---------------------------------------------------------------------------------------+------------------------------------------------+
+| bz2_codec            | bz2                                       | Nén toán hạng bằng bz2.                                                               | :meth:`bz2.compress` /                         |
+|                      |                                           |                                                                                       | :meth:`bz2.decompress`                         |
++----------------------+-------------------------------------------+---------------------------------------------------------------------------------------+------------------------------------------------+
+| hex_codec            | hex                                       | Chuyển toán hạng sang dạng biểu diễn thập lục phân, với hai chữ số cho mỗi byte.      | :meth:`binascii.b2a_hex` /                     |
+|                      |                                           |                                                                                       | :meth:`binascii.a2b_hex`                       |
++----------------------+-------------------------------------------+---------------------------------------------------------------------------------------+------------------------------------------------+
+| quopri_codec         | quopri, quotedprintable, quoted_printable | Chuyển toán hạng sang dạng quoted-printable của MIME.                                 | :meth:`quopri.encode` với ``quotetabs=True`` / |
+|                      |                                           |                                                                                       | :meth:`quopri.decode`                          |
++----------------------+-------------------------------------------+---------------------------------------------------------------------------------------+------------------------------------------------+
+| uu_codec             | uu                                        | Chuyển đổi toán hạng bằng uuencode.                                                   |                                                |
++----------------------+-------------------------------------------+---------------------------------------------------------------------------------------+------------------------------------------------+
+| zlib_codec           | zip, zlib                                 | Nén toán hạng bằng gzip.                                                              | :meth:`zlib.compress` /                        |
+|                      |                                           |                                                                                       | :meth:`zlib.decompress`                        |
++----------------------+-------------------------------------------+---------------------------------------------------------------------------------------+------------------------------------------------+
 
-.. [#b64] In addition to :term:`bytes-like objects <bytes-like object>`,
-   ``'base64_codec'`` also accepts ASCII-only instances of :class:`str` for
-   decoding
+.. [#b64] Ngoài :term:`các đối tượng dạng bytes <bytes-like object>`, ``'base64_codec'`` cũng chấp nhận các instance chỉ chứa ASCII của :class:`str` để giải mã
 
 .. versionadded:: 3.2
-   Restoration of the binary transforms.
+   Khôi phục các phép biến đổi nhị phân.
 
 .. versionchanged:: 3.4
-   Restoration of the aliases for the binary transforms.
+   Khôi phục các bí danh cho các phép biến đổi nhị phân.
 
 
 .. _standalone-codec-functions:
 
-Standalone Codec Functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các hàm Codec độc lập
+^^^^^^^^^^^^^^^^^^^^^
 
-The following functions provide encoding and decoding functionality similar to codecs,
-but are not available as named codecs through :func:`codecs.encode` or :func:`codecs.decode`.
-They are used internally (for example, by :mod:`pickle`) and behave similarly to the
-``string_escape`` codec that was removed in Python 3.
+Các hàm sau đây cung cấp chức năng mã hóa và giải mã tương tự như codec, nhưng không khả dụng dưới dạng codec có tên thông qua :func:`codecs.encode` hoặc :func:`codecs.decode`. Chúng được sử dụng nội bộ (ví dụ: bởi :mod:`pickle`) và hoạt động tương tự codec ``string_escape`` đã bị loại bỏ trong Python 3.
 
 .. function:: codecs.escape_encode(input, errors=None)
 
-   Encode *input* using escape sequences. Similar to how :func:`repr` on bytes
-   produces escaped byte values.
+   Mã hóa *input* bằng các escape sequence. Tương tự như cách :func:`repr` trên bytes tạo ra các giá trị byte đã escape.
 
-   *input* must be a :class:`bytes` object.
+   *input* phải là một đối tượng :class:`bytes`.
 
-   Returns a tuple ``(output, length)`` where *output* is a :class:`bytes`
-   object and *length* is the number of bytes consumed.
+   Trả về một tuple ``(output, length)``, trong đó *output* là một đối tượng :class:`bytes` và *length* là số byte đã được sử dụng.
 
 .. function:: codecs.escape_decode(input, errors=None)
 
-   Decode *input* from escape sequences back to the original bytes.
+   Giải mã *input* từ các escape sequence trở lại thành các byte ban đầu.
 
-   *input* must be a :term:`bytes-like object`.
+   *input* phải là một :term:`bytes-like object`.
 
-   Returns a tuple ``(output, length)`` where *output* is a :class:`bytes`
-   object and *length* is the number of bytes consumed.
+   Trả về một tuple ``(output, length)``, trong đó *output* là một đối tượng :class:`bytes` và *length* là số byte đã được sử dụng.
 
 
 .. _text-transforms:
 
-Text Transforms
-^^^^^^^^^^^^^^^
+Biến đổi văn bản
+^^^^^^^^^^^^^^^^
 
-The following codec provides a text transform: a :class:`str` to :class:`str`
-mapping. It is not supported by :meth:`str.encode` (which only produces
-:class:`bytes` output).
+Codec sau đây cung cấp một phép biến đổi văn bản: ánh xạ từ :class:`str` sang :class:`str`. Codec này không được :meth:`str.encode` hỗ trợ (chỉ tạo ra
+đầu ra :class:`bytes`).
 
 .. tabularcolumns:: |l|l|L|
 
-+--------------------+---------+---------------------------+
-| Codec              | Aliases | Meaning                   |
-+====================+=========+===========================+
-| rot_13             | rot13   | Return the Caesar-cypher  |
-|                    |         | encryption of the         |
-|                    |         | operand.                  |
-+--------------------+---------+---------------------------+
++--------+---------+-----------------------------------------+
+| Codec  | Aliases | Ý nghĩa                                 |
++========+=========+=========================================+
+| rot_13 | rot13   | Trả về bản mã hóa Caesar của toán hạng. |
++--------+---------+-----------------------------------------+
 
 .. versionadded:: 3.2
-   Restoration of the ``rot_13`` text transform.
+   Giải mã phép biến đổi văn bản ``rot_13``.
 
 .. versionchanged:: 3.4
-   Restoration of the ``rot13`` alias.
+   Giải mã bí danh ``rot13``.
 
 
-:mod:`!encodings` --- Encodings package
----------------------------------------
+:mod:`!encodings` --- Gói mã hóa
+--------------------------------
 
 .. module:: encodings
-   :synopsis: Encodings package
+   :synopsis: Gói Encodings
 
-This module implements the following functions:
+Mô-đun này triển khai các hàm sau:
 
 .. function:: normalize_encoding(encoding)
 
-   Normalize encoding name *encoding*.
+   Chuẩn hóa tên encoding *encoding*.
 
-   Normalization works as follows: all non-alphanumeric characters except the
-   dot used for Python package names are collapsed and replaced with a single
-   underscore, leading and trailing underscores are removed.
-   For example, ``'  -;#'`` becomes ``'_'``.
+   Việc chuẩn hóa được thực hiện như sau: tất cả các ký tự không phải chữ và số, ngoại trừ dấu chấm được dùng cho tên package Python, sẽ được gộp lại và thay thế bằng một dấu gạch dưới duy nhất; các dấu gạch dưới ở đầu và cuối sẽ bị loại bỏ. Ví dụ, ``'  -;#'`` trở thành ``'_'``.
 
-   Note that *encoding* should be ASCII only.
+   Lưu ý rằng *encoding* chỉ nên chứa ASCII.
 
 
 .. note::
-   The following functions should not be used directly, except for testing
-   purposes; :func:`codecs.lookup` should be used instead.
+   Không nên sử dụng trực tiếp các hàm sau đây, ngoại trừ cho mục đích kiểm thử; thay vào đó, nên sử dụng :func:`codecs.lookup`.
 
 
 .. function:: search_function(encoding)
 
-   Search for the codec module corresponding to the given encoding name
-   *encoding*.
+   Tìm mô-đun codec tương ứng với tên encoding đã cho *encoding*.
 
-   This function first normalizes the *encoding* using
-   :func:`normalize_encoding`, then looks for a corresponding alias.
-   It attempts to import a codec module from the encodings package using either
-   the alias or the normalized name. If the module is found and defines a valid
-   ``getregentry()`` function that returns a :class:`codecs.CodecInfo` object,
-   the codec is cached and returned.
+   Hàm này trước tiên chuẩn hóa *encoding* bằng
+   :func:`normalize_encoding`, sau đó tìm alias tương ứng. Hàm cố gắng import một codec module từ package encodings bằng alias hoặc tên đã được chuẩn hóa. Nếu tìm thấy module và module định nghĩa một hàm ``getregentry()`` hợp lệ trả về một đối tượng :class:`codecs.CodecInfo`, codec sẽ được lưu vào bộ nhớ đệm và trả về.
 
-   If the codec module defines a ``getaliases()`` function any returned aliases
-   are registered for future use.
+   Nếu codec module định nghĩa một hàm ``getaliases()``, mọi alias được trả về sẽ được đăng ký để sử dụng về sau.
 
 
 .. function:: win32_code_page_search_function(encoding)
 
-   Search for a Windows code page encoding *encoding* of the form ``cpXXXX``.
+   Tìm encoding trang mã Windows *encoding* có dạng ``cpXXXX``.
 
-   If the code page is valid and supported, return a :class:`codecs.CodecInfo`
-   object for it.
+   Nếu trang mã hợp lệ và được hỗ trợ, trả về một đối tượng :class:`codecs.CodecInfo` cho trang mã đó.
 
    .. availability:: Windows.
 
    .. versionadded:: 3.14
 
 
-This module implements the following exception:
+Module này triển khai ngoại lệ sau:
 
 .. exception:: CodecRegistryError
 
-   Raised when a codec is invalid or incompatible.
+   Được phát sinh khi codec không hợp lệ hoặc không tương thích.
 
 
-:mod:`!encodings.idna` --- Internationalized Domain Names in Applications
--------------------------------------------------------------------------
+:mod:`!encodings.idna` --- Tên miền quốc tế hóa trong ứng dụng
+--------------------------------------------------------------
 
 .. module:: encodings.idna
-   :synopsis: Internationalized Domain Names implementation
+   :synopsis: Triển khai Tên miền quốc tế hóa
 .. moduleauthor:: Martin v. Löwis
 
-This module implements :rfc:`3490` (Internationalized Domain Names in
-Applications) and :rfc:`3492` (Nameprep: A Stringprep Profile for
-Internationalized Domain Names (IDN)). It builds upon the ``punycode`` encoding
-and :mod:`stringprep`.
+Mô-đun này triển khai :rfc:`3490` (Tên miền quốc tế hóa trong ứng dụng) và :rfc:`3492` (Nameprep: Hồ sơ Stringprep cho Tên miền quốc tế hóa (IDN)). Mô-đun này dựa trên mã hóa ``punycode`` và :mod:`stringprep`.
 
 .. warning::
 
-   This module builds on ``punycode``, whose algorithms scale poorly, so limit
-   the length of untrusted input.
+   Mô-đun này dựa trên ``punycode``, trong đó các thuật toán có hiệu năng kém khi mở rộng, vì vậy hãy giới hạn độ dài của dữ liệu đầu vào không đáng tin cậy.
 
-If you need the IDNA 2008 standard from :rfc:`5891` and :rfc:`5895`, use the
-third-party :pypi:`idna` module.
+Nếu cần tiêu chuẩn IDNA 2008 từ :rfc:`5891` và :rfc:`5895`, hãy sử dụng mô-đun bên thứ ba :pypi:`idna`.
 
-These RFCs together define a protocol to support non-ASCII characters in domain
-names. A domain name containing non-ASCII characters (such as
-``www.Alliancefrançaise.nu``) is converted into an ASCII-compatible encoding
-(ACE, such as ``www.xn--alliancefranaise-npb.nu``). The ACE form of the domain
-name is then used in all places where arbitrary characters are not allowed by
-the protocol, such as DNS queries, HTTP :mailheader:`Host` fields, and so
-on. This conversion is carried out in the application; if possible invisible to
-the user: The application should transparently convert Unicode domain labels to
-IDNA on the wire, and convert back ACE labels to Unicode before presenting them
-to the user.
+Các RFC này cùng định nghĩa một giao thức hỗ trợ các ký tự không phải ASCII trong tên miền. Tên miền chứa các ký tự không phải ASCII (chẳng hạn như ``www.Alliancefrançaise.nu``) được chuyển đổi thành dạng mã hóa tương thích ASCII (ACE, chẳng hạn như ``www.xn--alliancefranaise-npb.nu``). Sau đó, dạng ACE của tên miền được sử dụng ở mọi nơi mà giao thức không cho phép các ký tự tùy ý, chẳng hạn như trong các truy vấn DNS, các trường HTTP :mailheader:`Host`, v.v. Việc chuyển đổi này được thực hiện trong ứng dụng; nếu có thể thì người dùng không nhận thấy: Ứng dụng phải tự động chuyển đổi các nhãn miền Unicode thành IDNA khi truyền qua mạng, rồi chuyển các nhãn ACE trở lại Unicode trước khi hiển thị cho người dùng.
 
-Python supports this conversion in several ways:  the ``idna`` codec performs
-conversion between Unicode and ACE, separating an input string into labels
-based on the separator characters defined in :rfc:`section 3.1 of RFC 3490 <3490#section-3.1>`
-and converting each label to ACE as required, and conversely separating an input
-byte string into labels based on the ``.`` separator and converting any ACE
-labels found into unicode. Furthermore, the :mod:`socket` module
-transparently converts Unicode host names to ACE, so that applications need not
-be concerned about converting host names themselves when they pass them to the
-socket module. On top of that, modules that have host names as function
-parameters, such as :mod:`http.client` and :mod:`ftplib`, accept Unicode host
-names (:mod:`http.client` then also transparently sends an IDNA hostname in the
-:mailheader:`Host` field if it sends that field at all).
+Python hỗ trợ việc chuyển đổi này theo nhiều cách: codec ``idna`` thực hiện chuyển đổi giữa Unicode và ACE, tách một chuỗi đầu vào thành các nhãn dựa trên các ký tự phân tách được định nghĩa trong :rfc:`section 3.1 of RFC 3490 <3490#section-3.1>` và chuyển đổi từng nhãn thành ACE khi cần, đồng thời tách một chuỗi byte đầu vào thành các nhãn dựa trên dấu phân tách ``.`` và chuyển mọi nhãn ACE tìm thấy thành unicode. Ngoài ra, mô-đun :mod:`socket` tự động chuyển đổi tên máy chủ Unicode thành ACE, để ứng dụng không cần tự xử lý việc chuyển đổi tên máy chủ khi truyền chúng cho mô-đun socket. Hơn nữa, các mô-đun có tên máy chủ làm tham số hàm, chẳng hạn như :mod:`http.client` và :mod:`ftplib`, chấp nhận tên máy chủ Unicode (:mod:`http.client` khi đó cũng tự động gửi một tên máy chủ IDNA trong
+:mailheader:`Host` trường nếu nó gửi trường đó).
 
-When receiving host names from the wire (such as in reverse name lookup), no
-automatic conversion to Unicode is performed: applications wishing to present
-such host names to the user should decode them to Unicode.
+Khi nhận tên máy chủ từ wire (chẳng hạn như trong quá trình tra cứu tên ngược), không có việc tự động chuyển đổi sang Unicode: các ứng dụng muốn hiển thị những tên máy chủ đó cho người dùng nên giải mã chúng thành Unicode.
 
-The module :mod:`!encodings.idna` also implements the nameprep procedure, which
-performs certain normalizations on host names, to achieve case-insensitivity of
-international domain names, and to unify similar characters. The nameprep
-functions can be used directly if desired.
+Mô-đun :mod:`!encodings.idna` cũng triển khai quy trình nameprep, thực hiện một số bước chuẩn hóa trên tên máy chủ để đạt được tính không phân biệt chữ hoa chữ thường của các tên miền quốc tế hóa và hợp nhất các ký tự tương tự. Nếu muốn, bạn có thể sử dụng trực tiếp các hàm nameprep.
 
 
 .. function:: nameprep(label)
 
-   Return the nameprepped version of *label*. The implementation currently assumes
-   query strings, so ``AllowUnassigned`` is true.
+   Trả về phiên bản đã qua nameprep của *label*. Hiện tại, phần triển khai giả định các chuỗi truy vấn, vì vậy ``AllowUnassigned`` là true.
 
 
 .. function:: ToASCII(label)
 
-   Convert a label to ASCII, as specified in :rfc:`3490`. ``UseSTD3ASCIIRules`` is
-   assumed to be false.
+   Chuyển đổi một label sang ASCII, như được quy định trong :rfc:`3490`. Giả định rằng ``UseSTD3ASCIIRules`` là false.
 
 
 .. function:: ToUnicode(label)
 
-   Convert a label to Unicode, as specified in :rfc:`3490`.
+   Chuyển đổi một label sang Unicode, như được quy định trong :rfc:`3490`.
 
 
-:mod:`!encodings.mbcs` --- Windows ANSI codepage
-------------------------------------------------
+:mod:`!encodings.mbcs` --- Bảng mã ANSI của Windows
+---------------------------------------------------
 
 .. module:: encodings.mbcs
-   :synopsis: Windows ANSI codepage
+   :synopsis: bảng mã ANSI của Windows
 
-This module implements the ANSI codepage (CP_ACP).
+Mô-đun này triển khai bảng mã ANSI (CP_ACP).
 
 .. availability:: Windows.
 
 .. versionchanged:: 3.2
-   Before 3.2, the *errors* argument was ignored; ``'replace'`` was always used
-   to encode, and ``'ignore'`` to decode.
+   Trước phiên bản 3.2, đối số *errors* bị bỏ qua; ``'replace'`` luôn được dùng để mã hóa, còn ``'ignore'`` được dùng để giải mã.
 
 .. versionchanged:: 3.3
-   Support any error handler.
+   Hỗ trợ mọi error handler.
 
 
-:mod:`!encodings.utf_8_sig` --- UTF-8 codec with BOM signature
---------------------------------------------------------------
+:mod:`!encodings.utf_8_sig` --- codec UTF-8 có chữ ký BOM
+---------------------------------------------------------
 
 .. module:: encodings.utf_8_sig
-   :synopsis: UTF-8 codec with BOM signature
+   :synopsis: codec UTF-8 có chữ ký BOM
 .. moduleauthor:: Walter Dörwald
 
-This module implements a variant of the UTF-8 codec. On encoding, a UTF-8 encoded
-BOM will be prepended to the UTF-8 encoded bytes. For the stateful encoder this
-is only done once (on the first write to the byte stream). On decoding, an
-optional UTF-8 encoded BOM at the start of the data will be skipped.
+Mô-đun này triển khai một biến thể của codec UTF-8. Khi mã hóa, một BOM được mã hóa theo UTF-8 sẽ được thêm vào trước các byte đã mã hóa theo UTF-8. Đối với encoder có trạng thái, thao tác này chỉ được thực hiện một lần (khi ghi lần đầu tiên vào byte stream). Khi giải mã, BOM được mã hóa theo UTF-8 ở đầu dữ liệu, nếu có, sẽ bị bỏ qua.

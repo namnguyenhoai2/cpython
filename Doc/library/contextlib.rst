@@ -1,41 +1,34 @@
-:mod:`!contextlib` --- Utilities for :keyword:`!with`\ -statement contexts
-==========================================================================
+:mod:`!contextlib` --- Tiện ích cho các ngữ cảnh của câu lệnh :keyword:`!with`\ -statement
+==========================================================================================
 
 .. module:: contextlib
-   :synopsis: Utilities for with-statement contexts.
+   :synopsis: Các tiện ích cho ngữ cảnh câu lệnh with.
 
-**Source code:** :source:`Lib/contextlib.py`
+**Mã nguồn:** :source:`Lib/contextlib.py`
 
 --------------
 
-This module provides utilities for common tasks involving the :keyword:`with`
-statement. For more information see also :ref:`typecontextmanager` and
+Mô-đun này cung cấp các tiện ích cho những tác vụ phổ biến liên quan đến câu lệnh :keyword:`with`. Để biết thêm thông tin, hãy xem cả :ref:`typecontextmanager` và
 :ref:`context-managers`.
 
 
-Utilities
----------
+Các tiện ích
+------------
 
-Functions and classes provided:
+Các hàm và lớp được cung cấp:
 
 .. class:: AbstractContextManager
 
-   An :term:`abstract base class` for classes that implement
-   :meth:`~object.__enter__` and :meth:`~object.__exit__`. A default
-   implementation for :meth:`~object.__enter__` is provided which returns
-   ``self`` while :meth:`~object.__exit__` is an abstract method which by default
-   returns ``None``. See also the definition of :ref:`typecontextmanager`.
+   Một :term:`abstract base class` dành cho các lớp triển khai
+   :meth:`~object.__enter__` và :meth:`~object.__exit__`. Một triển khai mặc định cho :meth:`~object.__enter__` được cung cấp và trả về ``self``, trong khi :meth:`~object.__exit__` là một phương thức abstract, theo mặc định trả về ``None``. Xem thêm định nghĩa của :ref:`typecontextmanager`.
 
    .. versionadded:: 3.6
 
 
 .. class:: AbstractAsyncContextManager
 
-   An :term:`abstract base class` for classes that implement
-   :meth:`~object.__aenter__` and :meth:`~object.__aexit__`. A default
-   implementation for :meth:`~object.__aenter__` is provided which returns
-   ``self`` while :meth:`~object.__aexit__` is an abstract method which by default
-   returns ``None``. See also the definition of
+   Một :term:`abstract base class` dành cho các lớp triển khai
+   :meth:`~object.__aenter__` và :meth:`~object.__aexit__`. Một triển khai mặc định cho :meth:`~object.__aenter__` được cung cấp và trả về ``self``, trong khi :meth:`~object.__aexit__` là một phương thức abstract, theo mặc định trả về ``None``. Xem thêm định nghĩa của
    :ref:`async-context-managers`.
 
    .. versionadded:: 3.7
@@ -43,74 +36,50 @@ Functions and classes provided:
 
 .. decorator:: contextmanager
 
-   This function is a :term:`decorator` that can be used to define a factory
-   function for :keyword:`with` statement context managers, without needing to
-   create a class or separate :meth:`~object.__enter__` and :meth:`~object.__exit__` methods.
+   Hàm này là một :term:`decorator` có thể được dùng để định nghĩa một factory function cho các context manager của câu lệnh :keyword:`with`, mà không cần tạo một class hoặc các phương thức :meth:`~object.__enter__` và :meth:`~object.__exit__` riêng biệt.
 
-   While many objects natively support use in with statements, sometimes a
-   resource needs to be managed that isn't a context manager in its own right,
-   and doesn't implement a ``close()`` method for use with ``contextlib.closing``.
+   Mặc dù nhiều đối tượng vốn hỗ trợ việc sử dụng trong các câu lệnh with, đôi khi cần quản lý một tài nguyên không phải là context manager và không triển khai phương thức ``close()`` để sử dụng với ``contextlib.closing``.
 
-   An abstract example would be the following to ensure correct resource
-   management::
+   Một ví dụ abstract có thể là đoạn sau để đảm bảo việc quản lý tài nguyên đúng cách::
 
       from contextlib import contextmanager
 
       @contextmanager
       def managed_resource(*args, **kwds):
-          # Code to acquire resource, e.g.:
+          # Mã để lấy tài nguyên, ví dụ:
           resource = acquire_resource(*args, **kwds)
           try:
               yield resource
           finally:
-              # Code to release resource, e.g.:
+              # Mã giải phóng tài nguyên, ví dụ:
               release_resource(resource)
 
-   The function can then be used like this::
+   Sau đó có thể sử dụng hàm như sau::
 
       >>> with managed_resource(timeout=3600) as resource:
-      ...     # Resource is released at the end of this block,
-      ...     # even if code in the block raises an exception
+      ...     # Tài nguyên được giải phóng ở cuối khối này,
+      ...     # ngay cả khi mã trong khối phát sinh ngoại lệ
 
-   The function being decorated must return a :term:`generator`-iterator when
-   called. This iterator must yield exactly one value, which will be bound to
-   the targets in the :keyword:`with` statement's :keyword:`!as` clause, if any.
+   Hàm được trang trí phải trả về một :term:`generator`-iterator khi được gọi. Iterator này phải yield chính xác một giá trị, giá trị này sẽ được liên kết với các đích trong mệnh đề :keyword:`with` :keyword:`!as`, nếu có.
 
-   At the point where the generator yields, the block nested in the :keyword:`with`
-   statement is executed.  The generator is then resumed after the block is exited.
-   If an unhandled exception occurs in the block, it is reraised inside the
-   generator at the point where the yield occurred.  Thus, you can use a
-   :keyword:`try`...\ :keyword:`except`...\ :keyword:`finally` statement to trap
-   the error (if any), or ensure that some cleanup takes place. If an exception is
-   trapped merely in order to log it or to perform some action (rather than to
-   suppress it entirely), the generator must reraise that exception. Otherwise the
-   generator context manager will indicate to the :keyword:`!with` statement that
-   the exception has been handled, and execution will resume with the statement
-   immediately following the :keyword:`!with` statement.
+   Tại thời điểm generator thực hiện yield, khối được lồng trong câu lệnh :keyword:`with` sẽ được thực thi. Sau đó generator được tiếp tục sau khi thoát khỏi khối. Nếu một ngoại lệ chưa được xử lý xảy ra trong khối, ngoại lệ đó sẽ được phát sinh lại bên trong generator tại vị trí đã thực hiện yield. Do đó, bạn có thể sử dụng một
+   :keyword:`try`...\ :keyword:`except`...\ :keyword:`finally` statement để bắt lỗi (nếu có), hoặc bảo đảm rằng một số thao tác dọn dẹp được thực hiện. Nếu một ngoại lệ chỉ được bắt để ghi log hoặc thực hiện một hành động nào đó (thay vì hoàn toàn bỏ qua ngoại lệ), generator phải phát sinh lại ngoại lệ đó. Nếu không, generator context manager sẽ cho câu lệnh :keyword:`!with` biết rằng ngoại lệ đã được xử lý, và quá trình thực thi sẽ tiếp tục với câu lệnh ngay sau câu lệnh :keyword:`!with`.
 
-   :deco:`contextmanager` uses :class:`ContextDecorator` so the context managers
-   it creates can be used as decorators as well as in :keyword:`with` statements.
-   When used as a decorator, a new generator instance is implicitly created on
-   each function call (this allows the otherwise "one-shot" context managers
-   created by :deco:`contextmanager` to meet the requirement that context
-   managers support multiple invocations in order to be used as decorators).
+   :deco:`contextmanager` sử dụng :class:`ContextDecorator` để các context manager mà nó tạo ra có thể được dùng làm decorator cũng như trong các câu lệnh :keyword:`with`. Khi được dùng làm decorator, một instance generator mới được tạo ngầm trong mỗi lần gọi hàm (điều này cho phép các context manager “chỉ dùng một lần” vốn được tạo bởi :deco:`contextmanager` đáp ứng yêu cầu rằng context manager phải hỗ trợ nhiều lần gọi để có thể được dùng làm decorator).
 
    .. versionchanged:: 3.2
-      Use of :class:`ContextDecorator`.
+      Cách sử dụng :class:`ContextDecorator`.
 
 
 .. decorator:: asynccontextmanager
 
-   Similar to :deco:`~contextlib.contextmanager`, but creates an
-   :ref:`asynchronous context manager <async-context-managers>`.
+   Tương tự như :deco:`~contextlib.contextmanager`, nhưng tạo ra một
+   :ref:`context manager bất đồng bộ <async-context-managers>`.
 
-   This function is a :term:`decorator` that can be used to define a factory
-   function for :keyword:`async with` statement asynchronous context managers,
-   without needing to create a class or separate :meth:`~object.__aenter__` and
-   :meth:`~object.__aexit__` methods. It must be applied to an :term:`asynchronous
-   generator` function.
+   Hàm này là một :term:`decorator` có thể được dùng để định nghĩa một hàm factory cho các context manager bất đồng bộ dùng trong câu lệnh :keyword:`async with`, mà không cần tạo một class hoặc :meth:`~object.__aenter__` riêng biệt và
+   :meth:`~object.__aexit__` các phương thức. Phải được áp dụng cho một hàm :term:`asynchronous generator`.
 
-   A simple example::
+   Một ví dụ đơn giản::
 
       from contextlib import asynccontextmanager
 
@@ -128,8 +97,7 @@ Functions and classes provided:
 
    .. versionadded:: 3.7
 
-   Context managers defined with :deco:`asynccontextmanager` can be used
-   either as decorators or with :keyword:`async with` statements::
+   Các context manager được định nghĩa bằng :deco:`asynccontextmanager` có thể được sử dụng dưới dạng decorator hoặc với các câu lệnh :keyword:`async with`::
 
      import time
      from contextlib import asynccontextmanager
@@ -144,22 +112,17 @@ Functions and classes provided:
 
      @timeit()
      async def main():
-         # ... async code ...
+         # ... mã async ...
 
-   When used as a decorator, a new generator instance is implicitly created on
-   each function call. This allows the otherwise "one-shot" context managers
-   created by :deco:`asynccontextmanager` to meet the requirement that context
-   managers support multiple invocations in order to be used as decorators.
+   Khi được sử dụng dưới dạng decorator, một instance generator mới sẽ được tạo ngầm trong mỗi lần gọi hàm. Điều này cho phép các context manager "one-shot" được tạo bởi :deco:`asynccontextmanager` đáp ứng yêu cầu rằng context manager phải hỗ trợ nhiều lần gọi để có thể được sử dụng dưới dạng decorator.
 
    .. versionchanged:: 3.10
-      Async context managers created with :deco:`asynccontextmanager` can
-      be used as decorators.
+      Các async context manager được tạo bằng :deco:`asynccontextmanager` có thể được sử dụng dưới dạng decorator.
 
 
 .. function:: closing(thing)
 
-   Return a context manager that closes *thing* upon completion of the block.  This
-   is basically equivalent to::
+   Trả về một context manager đóng *thing* khi khối lệnh hoàn tất. Về cơ bản, điều này tương đương với::
 
       from contextlib import contextmanager
 
@@ -170,7 +133,7 @@ Functions and classes provided:
           finally:
               thing.close()
 
-   And lets you write code like this::
+   Và cho phép bạn viết mã như sau::
 
       from contextlib import closing
       from urllib.request import urlopen
@@ -179,22 +142,15 @@ Functions and classes provided:
           for line in page:
               print(line)
 
-   without needing to explicitly close ``page``.  Even if an error occurs,
-   ``page.close()`` will be called when the :keyword:`with` block is exited.
+   mà không cần đóng ``page`` một cách rõ ràng. Ngay cả khi xảy ra lỗi, ``page.close()`` sẽ được gọi khi thoát khỏi khối :keyword:`with`.
 
    .. note::
 
-      Most types managing resources support the :term:`context manager` protocol,
-      which closes *thing* on leaving the :keyword:`with` statement.
-      As such, :func:`!closing` is most useful for third party types that don't
-      support context managers.
-      This example is purely for illustration purposes,
-      as :func:`~urllib.request.urlopen` would normally be used in a context manager.
+      Hầu hết các kiểu quản lý tài nguyên đều hỗ trợ giao thức :term:`context manager`, giao thức này sẽ đóng *thing* khi thoát khỏi câu lệnh :keyword:`with`. Vì vậy, :func:`!closing` hữu ích nhất đối với các kiểu của bên thứ ba không hỗ trợ context manager. Ví dụ này chỉ nhằm mục đích minh họa, vì thông thường :func:`~urllib.request.urlopen` sẽ được sử dụng trong một context manager.
 
 .. function:: aclosing(thing)
 
-   Return an async context manager that calls the ``aclose()`` method of *thing*
-   upon completion of the block.  This is basically equivalent to::
+   Trả về một async context manager gọi phương thức ``aclose()`` của *thing* khi khối lệnh hoàn tất. Về cơ bản, điều này tương đương với::
 
       from contextlib import asynccontextmanager
 
@@ -205,9 +161,7 @@ Functions and classes provided:
           finally:
               await thing.aclose()
 
-   Significantly, ``aclosing()`` supports deterministic cleanup of async
-   generators when they happen to exit early by :keyword:`break` or an
-   exception.  For example::
+   Đáng chú ý, ``aclosing()`` hỗ trợ việc dọn dẹp xác định các async generator khi chúng vô tình thoát sớm do :keyword:`break` hoặc một ngoại lệ. Ví dụ:::
 
       from contextlib import aclosing
 
@@ -216,10 +170,7 @@ Functions and classes provided:
               if value == 42:
                   break
 
-   This pattern ensures that the generator's async exit code is executed in
-   the same context as its iterations (so that exceptions and context
-   variables work as expected, and the exit code isn't run after the
-   lifetime of some task it depends on).
+   Mẫu này đảm bảo mã thoát bất đồng bộ của generator được thực thi trong cùng context với các lần lặp của nó (để các ngoại lệ và biến context hoạt động như mong đợi, đồng thời mã thoát không chạy sau khi vòng đời của một task mà nó phụ thuộc vào đã kết thúc).
 
    .. versionadded:: 3.10
 
@@ -228,46 +179,44 @@ Functions and classes provided:
 
 .. function:: nullcontext(enter_result=None)
 
-   Return a context manager that returns *enter_result* from :meth:`~object.__enter__`, but
-   otherwise does nothing. It is intended to be used as a stand-in for an
-   optional context manager, for example::
+   Trả về một context manager trả về *enter_result* từ :meth:`~object.__enter__`, nhưng không thực hiện thao tác nào khác. Nó được dùng làm đối tượng thay thế cho một context manager tùy chọn, ví dụ:::
 
       def myfunction(arg, ignore_exceptions=False):
           if ignore_exceptions:
-              # Use suppress to ignore all exceptions.
+              # Dùng suppress để bỏ qua mọi ngoại lệ.
               cm = contextlib.suppress(Exception)
           else:
-              # Do not ignore any exceptions, cm has no effect.
+              # Không bỏ qua bất kỳ ngoại lệ nào, cm không có tác dụng.
               cm = contextlib.nullcontext()
           with cm:
-              # Do something
+              # Thực hiện thao tác nào đó
 
-   An example using *enter_result*::
+   Một ví dụ sử dụng *enter_result*::
 
       def process_file(file_or_path):
           if isinstance(file_or_path, str):
-              # If string, open file
+              # Nếu là chuỗi, mở tệp
               cm = open(file_or_path)
           else:
-              # Caller is responsible for closing file
+              # Người gọi chịu trách nhiệm đóng tệp
               cm = nullcontext(file_or_path)
 
           with cm as file:
-              # Perform processing on the file
+              # Thực hiện xử lý trên tệp
 
-   It can also be used as a stand-in for
+   Nó cũng có thể được dùng thay cho
    :ref:`asynchronous context managers <async-context-managers>`::
 
        async def send_http(session=None):
            if not session:
-               # If no http session, create it with aiohttp
+               # Nếu không có http session, tạo session bằng aiohttp
                cm = aiohttp.ClientSession()
            else:
-               # Caller is responsible for closing the session
+               # Người gọi chịu trách nhiệm đóng session
                cm = nullcontext(session)
 
            async with cm as session:
-               # Send http requests with session
+               # Gửi các yêu cầu http bằng session
 
    .. versionadded:: 3.7
 
@@ -278,17 +227,12 @@ Functions and classes provided:
 
 .. function:: suppress(*exceptions)
 
-   Return a context manager that suppresses any of the specified exceptions
-   if they occur in the body of a :keyword:`!with` statement and then
-   resumes execution with the first statement following the end of the
-   :keyword:`!with` statement.
+   Trả về một context manager để bỏ qua mọi exception được chỉ định nếu chúng xảy ra trong phần thân của câu lệnh :keyword:`!with` và sau đó tiếp tục thực thi với câu lệnh đầu tiên sau phần kết thúc của
+   câu lệnh :keyword:`!with`.
 
-   As with any other mechanism that completely suppresses exceptions, this
-   context manager should be used only to cover very specific errors where
-   silently continuing with program execution is known to be the right
-   thing to do.
+   Cũng như mọi cơ chế khác hoàn toàn bỏ qua exception, context manager này chỉ nên được dùng để bao quát những lỗi rất cụ thể mà trong đó việc âm thầm tiếp tục thực thi chương trình được xác định là cách xử lý đúng đắn.
 
-   For example::
+   Ví dụ::
 
        from contextlib import suppress
 
@@ -298,7 +242,7 @@ Functions and classes provided:
        with suppress(FileNotFoundError):
            os.remove('someotherfile.tmp')
 
-   This code is equivalent to::
+   Đoạn mã này tương đương với::
 
        try:
            os.remove('somefile.tmp')
@@ -310,100 +254,80 @@ Functions and classes provided:
        except FileNotFoundError:
            pass
 
-   This context manager is :ref:`reentrant <reentrant-cms>`.
+   Context manager này có thể tái nhập :ref:`reentrant <reentrant-cms>`.
 
-   If the code within the :keyword:`!with` block raises a
-   :exc:`BaseExceptionGroup`, suppressed exceptions are removed from the
-   group.  Any exceptions of the group which are not suppressed are re-raised in
-   a new group which is created using the original group's :meth:`~BaseExceptionGroup.derive`
-   method.
+   Nếu mã bên trong :keyword:`!with` block phát sinh một
+   :exc:`BaseExceptionGroup`, các ngoại lệ bị loại bỏ sẽ được xóa khỏi nhóm. Bất kỳ ngoại lệ nào trong nhóm không bị loại bỏ sẽ được phát sinh lại trong một nhóm mới được tạo bằng phương thức :meth:`~BaseExceptionGroup.derive` của nhóm ban đầu.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.12
-      ``suppress`` now supports suppressing exceptions raised as
-      part of a :exc:`BaseExceptionGroup`.
+      ``suppress`` hiện hỗ trợ loại bỏ các ngoại lệ phát sinh trong một :exc:`BaseExceptionGroup`.
 
 .. function:: redirect_stdout(new_target)
 
-   Context manager for temporarily redirecting :data:`sys.stdout` to
-   another file or file-like object.
+   Context manager để tạm thời chuyển hướng :data:`sys.stdout` đến một tệp khác hoặc một đối tượng giống tệp.
 
-   This tool adds flexibility to existing functions or classes whose output
-   is hardwired to stdout.
+   Công cụ này bổ sung tính linh hoạt cho các hàm hoặc lớp hiện có mà đầu ra được gắn cố định với stdout.
 
-   For example, the output of :func:`help` normally is sent to *sys.stdout*.
-   You can capture that output in a string by redirecting the output to an
-   :class:`io.StringIO` object. The replacement stream is returned from the
-   :meth:`~object.__enter__` method and so is available as the target of the
-   :keyword:`with` statement::
+   Ví dụ: đầu ra của :func:`help` thường được gửi đến *sys.stdout*. Bạn có thể thu đầu ra đó vào một chuỗi bằng cách chuyển hướng đầu ra đến một
+   đối tượng :class:`io.StringIO`. Stream thay thế được trả về từ phương thức :class:`io.StringIO` và do đó có thể được dùng làm đích của
+   phương thức :meth:`~object.__enter__`, vì vậy nó có thể được dùng làm đích của câu lệnh
+   :keyword:`with`::
 
         with redirect_stdout(io.StringIO()) as f:
             help(pow)
         s = f.getvalue()
 
-   To send the output of :func:`help` to a file on disk, redirect the output
-   to a regular file::
+   Để gửi đầu ra của :func:`help` đến một tệp trên ổ đĩa, hãy chuyển hướng đầu ra đến một tệp thông thường::
 
         with open('help.txt', 'w') as f:
             with redirect_stdout(f):
                 help(pow)
 
-   To send the output of :func:`help` to *sys.stderr*::
+   Để gửi đầu ra của :func:`help` đến *sys.stderr*::
 
         with redirect_stdout(sys.stderr):
             help(pow)
 
-   Note that the global side effect on :data:`sys.stdout` means that this
-   context manager is not suitable for use in library code and most threaded
-   applications. It also has no effect on the output of subprocesses.
-   However, it is still a useful approach for many utility scripts.
+   Lưu ý rằng tác dụng phụ toàn cục lên :data:`sys.stdout` có nghĩa là context manager này không phù hợp để sử dụng trong mã thư viện và hầu hết các ứng dụng đa luồng. Nó cũng không ảnh hưởng đến đầu ra của các subprocess. Tuy nhiên, đây vẫn là một cách hữu ích cho nhiều utility script.
 
-   This context manager is :ref:`reentrant <reentrant-cms>`.
+   Context manager này có thể tái nhập :ref:`reentrant <reentrant-cms>`.
 
    .. versionadded:: 3.4
 
 
 .. function:: redirect_stderr(new_target)
 
-   Similar to :func:`~contextlib.redirect_stdout` but redirecting
-   :data:`sys.stderr` to another file or file-like object.
+   Tương tự :func:`~contextlib.redirect_stdout` nhưng chuyển hướng
+   :data:`sys.stderr` sang một tệp khác hoặc đối tượng tương tự tệp.
 
-   This context manager is :ref:`reentrant <reentrant-cms>`.
+   Context manager này có thể tái nhập :ref:`reentrant <reentrant-cms>`.
 
    .. versionadded:: 3.5
 
 
 .. function:: chdir(path)
 
-   Non parallel-safe context manager to change the current working directory.
-   As this changes a global state, the working directory, it is not suitable
-   for use in most threaded or async contexts. It is also not suitable for most
-   non-linear code execution, like generators, where the program execution is
-   temporarily relinquished -- unless explicitly desired, you should not yield
-   when this context manager is active.
+   Trình quản lý ngữ cảnh không an toàn khi chạy song song để thay đổi thư mục làm việc hiện tại. Vì thao tác này thay đổi một trạng thái toàn cục là thư mục làm việc, nên nó không phù hợp để sử dụng trong hầu hết các ngữ cảnh có luồng hoặc async. Nó cũng không phù hợp với hầu hết các quá trình thực thi mã phi tuyến tính, chẳng hạn như generator, trong đó quá trình thực thi của chương trình tạm thời được nhường lại -- trừ khi bạn thực sự mong muốn điều đó, không nên yield khi trình quản lý ngữ cảnh này đang hoạt động.
 
-   This is a simple wrapper around :func:`~os.chdir`, it changes the current
-   working directory upon entering and restores the old one on exit.
+   Đây là một wrapper đơn giản quanh :func:`~os.chdir`, thay đổi thư mục làm việc hiện tại khi bắt đầu và khôi phục thư mục cũ khi kết thúc.
 
-   This context manager is :ref:`reentrant <reentrant-cms>`.
+   Context manager này có thể tái nhập :ref:`reentrant <reentrant-cms>`.
 
    .. versionadded:: 3.11
 
 
 .. class:: ContextDecorator()
 
-   A base class that enables a context manager to also be used as a decorator.
+   Một lớp cơ sở cho phép sử dụng context manager dưới dạng decorator.
 
-   Context managers inheriting from ``ContextDecorator`` have to implement
-   :meth:`~object.__enter__` and :meth:`~object.__exit__` as normal.
-   ``__exit__`` retains its optional
-   exception handling even when used as a decorator.
+   Các context manager kế thừa từ ``ContextDecorator`` phải triển khai
+   :meth:`~object.__enter__` và :meth:`~object.__exit__` như bình thường. ``__exit__`` vẫn giữ cơ chế xử lý ngoại lệ tùy chọn ngay cả khi được sử dụng dưới dạng decorator.
 
-   ``ContextDecorator`` is used by :deco:`contextmanager`, so you get this
-   functionality automatically.
+   ``ContextDecorator`` được :deco:`contextmanager` sử dụng, vì vậy bạn tự động có được chức năng này.
 
-   Example of ``ContextDecorator``::
+   Ví dụ về ``ContextDecorator``::
 
       from contextlib import ContextDecorator
 
@@ -416,7 +340,7 @@ Functions and classes provided:
               print('Finishing')
               return False
 
-   The class can then be used like this::
+   Sau đó, có thể sử dụng lớp như sau::
 
       >>> @mycontext()
       ... def function():
@@ -434,23 +358,21 @@ Functions and classes provided:
       The bit in the middle
       Finishing
 
-   This change is just syntactic sugar for any construct of the following form::
+   Thay đổi này chỉ là cú pháp rút gọn cho bất kỳ cấu trúc nào có dạng sau::
 
       def f():
           with cm():
-              # Do stuff
+              # Thực hiện công việc
 
-   ``ContextDecorator`` lets you instead write::
+   ``ContextDecorator`` cho phép bạn viết theo cách khác::
 
       @cm()
       def f():
-          # Do stuff
+          # Thực hiện công việc
 
-   It makes it clear that the ``cm`` applies to the whole function, rather than
-   just a piece of it (and saving an indentation level is nice, too).
+   Điều này làm rõ rằng ``cm`` áp dụng cho toàn bộ hàm, thay vì chỉ một phần của hàm (và việc tiết kiệm một cấp độ thụt lề cũng rất tiện).
 
-   Existing context managers that already have a base class can be extended by
-   using ``ContextDecorator`` as a mixin class::
+   Các context manager hiện có vốn đã có lớp cơ sở có thể được mở rộng bằng cách sử dụng ``ContextDecorator`` làm lớp mixin::
 
       from contextlib import ContextDecorator
 
@@ -462,19 +384,16 @@ Functions and classes provided:
               return False
 
    .. note::
-      As the decorated function must be able to be called multiple times, the
-      underlying context manager must support use in multiple :keyword:`with`
-      statements. If this is not the case, then the original construct with the
-      explicit :keyword:`!with` statement inside the function should be used.
+      Vì hàm được trang trí phải có khả năng được gọi nhiều lần, context manager bên dưới phải hỗ trợ việc sử dụng trong nhiều câu lệnh :keyword:`with`. Nếu không, nên sử dụng cấu trúc ban đầu với câu lệnh :keyword:`!with` tường minh bên trong hàm.
 
    .. versionadded:: 3.2
 
 
 .. class:: AsyncContextDecorator
 
-   Similar to :class:`ContextDecorator` but only for asynchronous functions.
+   Tương tự như :class:`ContextDecorator` nhưng chỉ dành cho các hàm bất đồng bộ.
 
-   Example of ``AsyncContextDecorator``::
+   Ví dụ về ``AsyncContextDecorator``::
 
       from asyncio import run
       from contextlib import AsyncContextDecorator
@@ -488,7 +407,7 @@ Functions and classes provided:
               print('Finishing')
               return False
 
-   The class can then be used like this::
+   Sau đó, có thể sử dụng lớp như sau::
 
       >>> @mycontext()
       ... async def function():
@@ -513,174 +432,126 @@ Functions and classes provided:
 
 .. class:: ExitStack()
 
-   A context manager that is designed to make it easy to programmatically
-   combine other context managers and cleanup functions, especially those
-   that are optional or otherwise driven by input data.
+   Một context manager được thiết kế để giúp dễ dàng kết hợp các context manager và hàm dọn dẹp khác bằng chương trình, đặc biệt là những thành phần tùy chọn hoặc được điều khiển bởi dữ liệu đầu vào.
 
-   For example, a set of files may easily be handled in a single with
-   statement as follows::
+   Ví dụ: có thể dễ dàng xử lý một tập hợp tệp trong một câu lệnh with duy nhất như sau::
 
       with ExitStack() as stack:
           files = [stack.enter_context(open(fname)) for fname in filenames]
-          # All opened files will automatically be closed at the end of
-          # the with statement, even if attempts to open files later
-          # in the list raise an exception
+          # Tất cả các tệp đã mở sẽ tự động được đóng ở cuối
+          # câu lệnh with, ngay cả khi các nỗ lực mở tệp sau đó
+          # trong danh sách phát sinh ngoại lệ
 
-   The :meth:`~object.__enter__` method returns the :class:`ExitStack` instance, and
-   performs no additional operations.
+   Phương thức :meth:`~object.__enter__` trả về thực thể :class:`ExitStack` và không thực hiện thêm thao tác nào.
 
-   Each instance maintains a stack of registered callbacks that are called in
-   reverse order when the instance is closed (either explicitly or implicitly
-   at the end of a :keyword:`with` statement). Note that callbacks are *not*
-   invoked implicitly when the context stack instance is garbage collected.
+   Mỗi thực thể duy trì một ngăn xếp các callback đã đăng ký. Các callback này được gọi theo thứ tự ngược lại khi thực thể được đóng (dù là tường minh hay ngầm định ở cuối câu lệnh :keyword:`with`). Lưu ý rằng các callback *không* được gọi ngầm định khi thực thể ngăn xếp ngữ cảnh được garbage collection.
 
-   This stack model is used so that context managers that acquire their
-   resources in their ``__init__`` method (such as file objects) can be
-   handled correctly.
+   Mô hình ngăn xếp này được sử dụng để các context manager nhận tài nguyên trong phương thức ``__init__`` của chúng (chẳng hạn như đối tượng tệp) có thể được xử lý chính xác.
 
-   Since registered callbacks are invoked in the reverse order of
-   registration, this ends up behaving as if multiple nested :keyword:`with`
-   statements had been used with the registered set of callbacks. This even
-   extends to exception handling - if an inner callback suppresses or replaces
-   an exception, then outer callbacks will be passed arguments based on that
-   updated state.
+   Vì các callback đã đăng ký được gọi theo thứ tự ngược lại với thứ tự đăng ký, cách này hoạt động như thể đã sử dụng nhiều câu lệnh :keyword:`with` lồng nhau với tập callback đã đăng ký. Điều này cũng áp dụng cho việc xử lý ngoại lệ - nếu một callback bên trong suppress hoặc thay thế một ngoại lệ, các callback bên ngoài sẽ nhận được các đối số dựa trên trạng thái đã cập nhật đó.
 
-   This is a relatively low level API that takes care of the details of
-   correctly unwinding the stack of exit callbacks. It provides a suitable
-   foundation for higher level context managers that manipulate the exit
-   stack in application specific ways.
+   Đây là một API tương đối cấp thấp, đảm nhiệm các chi tiết để unwind chính xác ngăn xếp các callback thoát. API này cung cấp nền tảng phù hợp cho các context manager cấp cao hơn, vốn thao tác với ngăn xếp thoát theo những cách riêng cho từng ứng dụng.
 
    .. versionadded:: 3.3
 
    .. method:: enter_context(cm)
 
-      Enters a new context manager and adds its :meth:`~object.__exit__` method to
-      the callback stack. The return value is the result of the context
-      manager's own :meth:`~object.__enter__` method.
+      Đi vào một context manager mới và thêm phương thức :meth:`~object.__exit__` của nó vào ngăn xếp callback. Giá trị trả về là kết quả của phương thức :meth:`~object.__enter__` của chính context manager đó.
 
-      These context managers may suppress exceptions just as they normally
-      would if used directly as part of a :keyword:`with` statement.
+      Các context manager này có thể suppress ngoại lệ, giống như cách chúng vẫn làm khi được sử dụng trực tiếp như một phần của câu lệnh :keyword:`with`.
 
       .. versionchanged:: 3.11
-         Raises :exc:`TypeError` instead of :exc:`AttributeError` if *cm*
-         is not a context manager.
+         Nêu :exc:`TypeError` thay vì :exc:`AttributeError` nếu *cm* không phải là một trình quản lý ngữ cảnh.
 
    .. method:: push(exit)
 
-      Adds a context manager's :meth:`~object.__exit__` method to the callback stack.
+      Thêm phương thức :meth:`~object.__exit__` của trình quản lý ngữ cảnh vào ngăn xếp callback.
 
-      As ``__enter__`` is *not* invoked, this method can be used to cover
-      part of an :meth:`~object.__enter__` implementation with a context manager's own
-      :meth:`~object.__exit__` method.
+      Vì ``__enter__`` *không* được gọi, phương thức này có thể được dùng để bao phủ một phần triển khai :meth:`~object.__enter__` bằng phương thức riêng của trình quản lý ngữ cảnh
+      :meth:`~object.__exit__`.
 
-      If passed an object that is not a context manager, this method assumes
-      it is a callback with the same signature as a context manager's
-      :meth:`~object.__exit__` method and adds it directly to the callback stack.
+      Nếu được truyền một đối tượng không phải là trình quản lý ngữ cảnh, phương thức này giả định đó là một callback có cùng chữ ký với phương thức
+      :meth:`~object.__exit__` của trình quản lý ngữ cảnh và thêm trực tiếp callback đó vào ngăn xếp callback.
 
-      By returning true values, these callbacks can suppress exceptions the
-      same way context manager :meth:`~object.__exit__` methods can.
+      Bằng cách trả về các giá trị true, những callback này có thể ngăn chặn ngoại lệ giống như các phương thức :meth:`~object.__exit__` của trình quản lý ngữ cảnh.
 
-      The passed in object is returned from the function, allowing this
-      method to be used as a function decorator.
+      Đối tượng được truyền vào sẽ được trả về từ hàm, cho phép sử dụng phương thức này làm function decorator.
 
    .. method:: callback(callback, /, *args, **kwds)
 
-      Accepts an arbitrary callback function and arguments and adds it to
-      the callback stack.
+      Chấp nhận một callback function tùy ý cùng các đối số và thêm chúng vào callback stack.
 
-      Unlike the other methods, callbacks added this way cannot suppress
-      exceptions (as they are never passed the exception details).
+      Không giống các phương thức khác, các callback được thêm theo cách này không thể ngăn chặn exception (vì chúng không bao giờ được truyền thông tin chi tiết về exception).
 
-      The passed in callback is returned from the function, allowing this
-      method to be used as a function decorator.
+      Callback được truyền vào sẽ được trả về từ hàm, cho phép sử dụng phương thức này làm function decorator.
 
    .. method:: pop_all()
 
-      Transfers the callback stack to a fresh :class:`ExitStack` instance
-      and returns it. No callbacks are invoked by this operation - instead,
-      they will now be invoked when the new stack is closed (either
-      explicitly or implicitly at the end of a :keyword:`with` statement).
+      Chuyển callback stack sang một instance :class:`ExitStack` mới và trả về instance đó. Thao tác này không gọi callback nào - thay vào đó, chúng sẽ được gọi khi stack mới được đóng (dù là tường minh hay ngầm định ở cuối câu lệnh :keyword:`with`).
 
-      For example, a group of files can be opened as an "all or nothing"
-      operation as follows::
+      Ví dụ: có thể mở một nhóm tệp dưới dạng thao tác "tất cả hoặc không gì cả" như sau::
 
          with ExitStack() as stack:
              files = [stack.enter_context(open(fname)) for fname in filenames]
-             # Hold onto the close method, but don't call it yet.
+             # Giữ lại phương thức close nhưng chưa gọi nó.
              close_files = stack.pop_all().close
-             # If opening any file fails, all previously opened files will be
-             # closed automatically. If all files are opened successfully,
-             # they will remain open even after the with statement ends.
-             # close_files() can then be invoked explicitly to close them all.
+             # nếu việc mở bất kỳ tệp nào không thành công, tất cả các tệp đã mở trước đó sẽ được
+             # tự động đóng. Nếu tất cả các tệp đều được mở thành công,
+             # chúng sẽ vẫn mở ngay cả sau khi câu lệnh with kết thúc.
+             # Sau đó có thể gọi close_files() một cách rõ ràng để đóng tất cả chúng.
 
    .. method:: close()
 
-      Immediately unwinds the callback stack, invoking callbacks in the
-      reverse order of registration. For any context managers and exit
-      callbacks registered, the arguments passed in will indicate that no
-      exception occurred.
+      Giải phóng ngay lập tức ngăn xếp callback, gọi các callback theo thứ tự ngược với thứ tự đăng ký. Đối với mọi context manager và exit callback đã đăng ký, các đối số được truyền vào sẽ cho biết rằng không có ngoại lệ nào xảy ra.
 
 .. class:: AsyncExitStack()
 
-   An :ref:`asynchronous context manager <async-context-managers>`, similar
-   to :class:`ExitStack`, that supports combining both synchronous and
-   asynchronous context managers, as well as having coroutines for
-   cleanup logic.
+   Một :ref:`trình quản lý ngữ cảnh bất đồng bộ <async-context-managers>`, tương tự như :class:`ExitStack`, hỗ trợ kết hợp cả context manager đồng bộ và bất đồng bộ, đồng thời có các coroutine để xử lý logic dọn dẹp.
 
-   The :meth:`~ExitStack.close` method is not implemented; :meth:`aclose` must be used
-   instead.
+   Phương thức :meth:`~ExitStack.close` không được triển khai; phải sử dụng :meth:`aclose` thay thế.
 
    .. method:: enter_async_context(cm)
       :async:
 
-      Similar to :meth:`ExitStack.enter_context` but expects an asynchronous context
-      manager.
+      Tương tự :meth:`ExitStack.enter_context` nhưng yêu cầu một trình quản lý ngữ cảnh bất đồng bộ.
 
       .. versionchanged:: 3.11
-         Raises :exc:`TypeError` instead of :exc:`AttributeError` if *cm*
-         is not an asynchronous context manager.
+         Ném :exc:`TypeError` thay vì :exc:`AttributeError` nếu *cm* không phải là trình quản lý ngữ cảnh bất đồng bộ.
 
    .. method:: push_async_exit(exit)
 
-      Similar to :meth:`ExitStack.push` but expects either an asynchronous context manager
-      or a coroutine function.
+      Tương tự :meth:`ExitStack.push` nhưng yêu cầu một trình quản lý ngữ cảnh bất đồng bộ hoặc một hàm coroutine.
 
    .. method:: push_async_callback(callback, /, *args, **kwds)
 
-      Similar to :meth:`ExitStack.callback` but expects a coroutine function.
+      Tương tự :meth:`ExitStack.callback` nhưng yêu cầu một hàm coroutine.
 
    .. method:: aclose()
       :async:
 
-      Similar to :meth:`ExitStack.close` but properly handles awaitables.
+      Tương tự :meth:`ExitStack.close` nhưng xử lý đúng các awaitable.
 
-   Continuing the example for :deco:`asynccontextmanager`::
+   Tiếp tục ví dụ về :deco:`asynccontextmanager`::
 
       async with AsyncExitStack() as stack:
           connections = [await stack.enter_async_context(get_connection())
               for i in range(5)]
-          # All opened connections will automatically be released at the end of
-          # the async with statement, even if attempts to open a connection
-          # later in the list raise an exception.
+          # Tất cả các kết nối đã mở sẽ tự động được giải phóng vào cuối
+          # câu lệnh async with, ngay cả khi việc cố gắng mở một kết nối
+          # ở vị trí sau trong danh sách gây ra ngoại lệ.
 
    .. versionadded:: 3.7
 
-Examples and Recipes
---------------------
+Ví dụ và công thức
+------------------
 
-This section describes some examples and recipes for making effective use of
-the tools provided by :mod:`!contextlib`.
+Phần này mô tả một số ví dụ và công thức để sử dụng hiệu quả các công cụ do :mod:`!contextlib` cung cấp.
 
 
-Supporting a variable number of context managers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Hỗ trợ số lượng context manager biến đổi
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The primary use case for :class:`ExitStack` is the one given in the class
-documentation: supporting a variable number of context managers and other
-cleanup operations in a single :keyword:`with` statement. The variability
-may come from the number of context managers needed being driven by user
-input (such as opening a user specified collection of files), or from
-some of the context managers being optional::
+Trường hợp sử dụng chính của :class:`ExitStack` là trường hợp được nêu trong tài liệu của lớp: hỗ trợ một số lượng context manager (trình quản lý ngữ cảnh) và các thao tác dọn dẹp khác có thể biến đổi trong một câu lệnh :keyword:`with` duy nhất. Tính biến đổi này có thể bắt nguồn từ việc số lượng context manager cần dùng phụ thuộc vào đầu vào của người dùng (chẳng hạn như mở một tập hợp tệp do người dùng chỉ định), hoặc từ việc một số context manager là tùy chọn::
 
     with ExitStack() as stack:
         for resource in resources:
@@ -688,50 +559,36 @@ some of the context managers being optional::
         if need_special_resource():
             special = acquire_special_resource()
             stack.callback(release_special_resource, special)
-        # Perform operations that use the acquired resources
+        # Thực hiện các thao tác sử dụng tài nguyên đã nhận được
 
-As shown, :class:`ExitStack` also makes it quite easy to use :keyword:`with`
-statements to manage arbitrary resources that don't natively support the
-context management protocol.
+Như đã trình bày, :class:`ExitStack` cũng giúp việc sử dụng các câu lệnh :keyword:`with` để quản lý những tài nguyên tùy ý vốn không hỗ trợ sẵn giao thức quản lý ngữ cảnh trở nên khá dễ dàng.
 
 
-Catching exceptions from ``__enter__`` methods
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Bắt các ngoại lệ từ các phương thức ``__enter__``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is occasionally desirable to catch exceptions from an :meth:`~object.__enter__`
-method implementation, *without* inadvertently catching exceptions from
-the :keyword:`with` statement body or the context manager's :meth:`~object.__exit__`
-method. By using :class:`ExitStack` the steps in the context management
-protocol can be separated slightly in order to allow this::
+Đôi khi, việc bắt các ngoại lệ từ phần triển khai phương thức :meth:`~object.__enter__` là cần thiết, *mà không* vô tình bắt các ngoại lệ từ phần thân câu lệnh :keyword:`with` hoặc phương thức :meth:`~object.__exit__` của context manager. Bằng cách sử dụng :class:`ExitStack`, có thể tách các bước trong giao thức quản lý ngữ cảnh ở một mức độ nhất định để cho phép thực hiện điều này::
 
    stack = ExitStack()
    try:
        x = stack.enter_context(cm)
    except Exception:
-       # handle __enter__ exception
+       # xử lý ngoại lệ của __enter__
    else:
        with stack:
-           # Handle normal case
+           # Xử lý trường hợp bình thường
 
-Actually needing to do this is likely to indicate that the underlying API
-should be providing a direct resource management interface for use with
-:keyword:`try`/:keyword:`except`/:keyword:`finally` statements, but not
-all APIs are well designed in that regard. When a context manager is the
-only resource management API provided, then :class:`ExitStack` can make it
-easier to handle various situations that can't be handled directly in a
-:keyword:`with` statement.
+Việc thực sự cần làm điều này có thể cho thấy API nền tảng nên cung cấp một giao diện quản lý tài nguyên trực tiếp để sử dụng với
+:keyword:`try`/:keyword:`except`/:keyword:`finally` câu lệnh, nhưng không phải API nào cũng được thiết kế tốt về mặt này. Khi context manager là API quản lý tài nguyên duy nhất được cung cấp, thì :class:`ExitStack` có thể giúp xử lý dễ dàng hơn nhiều tình huống không thể xử lý trực tiếp trong một
+câu lệnh :keyword:`with`.
 
 
-Cleaning up in an ``__enter__`` implementation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Dọn dẹp trong phần triển khai ``__enter__``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As noted in the documentation of :meth:`ExitStack.push`, this
-method can be useful in cleaning up an already allocated resource if later
-steps in the :meth:`~object.__enter__` implementation fail.
+Như đã nêu trong tài liệu về :meth:`ExitStack.push`, phương thức này có thể hữu ích khi dọn dẹp một tài nguyên đã được cấp phát nếu các bước sau đó trong phần triển khai :meth:`~object.__enter__` thất bại.
 
-Here's an example of doing this for a context manager that accepts resource
-acquisition and release functions, along with an optional validation function,
-and maps them to the context management protocol::
+Dưới đây là ví dụ thực hiện việc này với một context manager chấp nhận các hàm thu nhận và giải phóng tài nguyên, cùng với một hàm xác thực tùy chọn, rồi ánh xạ chúng vào protocol quản lý context::
 
    from contextlib import contextmanager, AbstractContextManager, ExitStack
 
@@ -750,9 +607,9 @@ and maps them to the context management protocol::
            with ExitStack() as stack:
                stack.push(self)
                yield
-               # The validation check passed and didn't raise an exception
-               # Accordingly, we want to keep the resource, and pass it
-               # back to our caller
+               # Việc kiểm tra xác thực đã thành công và không phát sinh exception
+               # Vì vậy, chúng ta muốn giữ lại tài nguyên và truyền nó
+               # trở lại cho caller
                stack.pop_all()
 
        def __enter__(self):
@@ -764,17 +621,14 @@ and maps them to the context management protocol::
            return resource
 
        def __exit__(self, *exc_details):
-           # We don't need to duplicate any of our resource release logic
+           # Chúng ta không cần lặp lại bất kỳ logic giải phóng tài nguyên nào
            self.release_resource()
 
 
-Replacing any use of ``try-finally`` and flag variables
+Thay thế mọi chỗ sử dụng ``try-finally`` và các biến cờ
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A pattern you will sometimes see is a ``try-finally`` statement with a flag
-variable to indicate whether or not the body of the ``finally`` clause should
-be executed. In its simplest form (that can't already be handled just by
-using an ``except`` clause instead), it looks something like this::
+Một mẫu bạn sẽ thỉnh thoảng thấy là một câu lệnh ``try-finally`` cùng với một biến cờ để cho biết liệu phần thân của mệnh đề ``finally`` có nên được thực thi hay không. Ở dạng đơn giản nhất (không thể được xử lý chỉ bằng cách sử dụng mệnh đề ``except`` thay thế), nó trông như sau::
 
    cleanup_needed = True
    try:
@@ -785,13 +639,9 @@ using an ``except`` clause instead), it looks something like this::
        if cleanup_needed:
            cleanup_resources()
 
-As with any ``try`` statement based code, this can cause problems for
-development and review, because the setup code and the cleanup code can end
-up being separated by arbitrarily long sections of code.
+Cũng như với mọi mã dựa trên câu lệnh ``try``, điều này có thể gây ra vấn đề cho việc phát triển và review, vì mã thiết lập và mã dọn dẹp có thể bị ngăn cách bởi những đoạn mã dài tùy ý.
 
-:class:`ExitStack` makes it possible to instead register a callback for
-execution at the end of a ``with`` statement, and then later decide to skip
-executing that callback::
+:class:`ExitStack` cho phép thay vào đó đăng ký một callback để thực thi khi kết thúc câu lệnh ``with``, rồi sau đó quyết định bỏ qua việc thực thi callback đó::
 
    from contextlib import ExitStack
 
@@ -801,11 +651,9 @@ executing that callback::
        if result:
            stack.pop_all()
 
-This allows the intended cleanup behaviour to be made explicit up front,
-rather than requiring a separate flag variable.
+Điều này cho phép làm rõ ngay từ đầu hành vi dọn dẹp dự kiến, thay vì yêu cầu một biến cờ riêng.
 
-If a particular application uses this pattern a lot, it can be simplified
-even further by means of a small helper class::
+Nếu một ứng dụng cụ thể sử dụng mẫu này nhiều, có thể đơn giản hóa hơn nữa bằng một helper class nhỏ::
 
    from contextlib import ExitStack
 
@@ -822,10 +670,8 @@ even further by means of a small helper class::
        if result:
            cb.cancel()
 
-If the resource cleanup isn't already neatly bundled into a standalone
-function, then it is still possible to use the decorator form of
-:meth:`ExitStack.callback` to declare the resource cleanup in
-advance::
+Nếu việc dọn dẹp tài nguyên chưa được gói gọn một cách rõ ràng trong một hàm độc lập, bạn vẫn có thể sử dụng dạng decorator của
+:meth:`ExitStack.callback` để khai báo trước việc dọn dẹp tài nguyên::
 
    from contextlib import ExitStack
 
@@ -837,22 +683,15 @@ advance::
        if result:
            stack.pop_all()
 
-Due to the way the decorator protocol works, a callback function
-declared this way cannot take any parameters. Instead, any resources to
-be released must be accessed as closure variables.
+Do cách thức hoạt động của giao thức decorator, một hàm callback được khai báo theo cách này không thể nhận bất kỳ tham số nào. Thay vào đó, mọi tài nguyên cần được giải phóng phải được truy cập dưới dạng các biến closure.
 
 
-Using a context manager as a function decorator
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng context manager làm decorator cho hàm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:class:`ContextDecorator` makes it possible to use a context manager in
-both an ordinary ``with`` statement and also as a function decorator.
+:class:`ContextDecorator` cho phép sử dụng một context manager trong cả câu lệnh ``with`` thông thường lẫn dưới dạng decorator cho hàm.
 
-For example, it is sometimes useful to wrap functions or groups of statements
-with a logger that can track the time of entry and time of exit.  Rather than
-writing both a function decorator and a context manager for the task,
-inheriting from :class:`ContextDecorator` provides both capabilities in a
-single definition::
+Ví dụ, đôi khi việc bọc các hàm hoặc nhóm câu lệnh bằng một logger có thể theo dõi thời điểm bắt đầu và thời điểm kết thúc là hữu ích. Thay vì viết riêng cả decorator cho hàm và context manager cho tác vụ này, việc kế thừa từ :class:`ContextDecorator` cung cấp cả hai khả năng trong một định nghĩa duy nhất::
 
     from contextlib import ContextDecorator
     import logging
@@ -869,52 +708,39 @@ single definition::
         def __exit__(self, exc_type, exc, exc_tb):
             logging.info('Exiting: %s', self.name)
 
-Instances of this class can be used as both a context manager::
+Các instance của lớp này có thể được sử dụng vừa như một context manager::
 
     with track_entry_and_exit('widget loader'):
         print('Some time consuming activity goes here')
         load_widget()
 
-And also as a function decorator::
+Và cũng có thể dùng làm function decorator::
 
     @track_entry_and_exit('widget loader')
     def activity():
         print('Some time consuming activity goes here')
         load_widget()
 
-Note that there is one additional limitation when using context managers
-as function decorators: there's no way to access the return value of
-:meth:`~object.__enter__`. If that value is needed, then it is still necessary to use
-an explicit ``with`` statement.
+Lưu ý rằng có thêm một hạn chế khi sử dụng context manager làm function decorator: không có cách nào truy cập giá trị trả về của
+:meth:`~object.__enter__`. Nếu cần giá trị đó, bạn vẫn phải sử dụng một câu lệnh ``with`` rõ ràng.
 
 .. seealso::
 
-   :pep:`343` - The "with" statement
-      The specification, background, and examples for the Python :keyword:`with`
-      statement.
+   :pep:`343` - Câu lệnh "with"
+      Đặc tả, bối cảnh và các ví dụ cho câu lệnh :keyword:`with` của Python.
 
 .. _single-use-reusable-and-reentrant-cms:
 
-Single use, reusable and reentrant context managers
----------------------------------------------------
+Context manager dùng một lần, có thể tái sử dụng và có thể reentrant
+--------------------------------------------------------------------
 
-Most context managers are written in a way that means they can only be
-used effectively in a :keyword:`with` statement once. These single use
-context managers must be created afresh each time they're used -
-attempting to use them a second time will trigger an exception or
-otherwise not work correctly.
+Hầu hết context manager được viết theo cách khiến chúng chỉ có thể được sử dụng hiệu quả một lần trong câu lệnh :keyword:`with`. Các context manager dùng một lần này phải được tạo mới mỗi khi sử dụng; việc cố gắng sử dụng chúng lần thứ hai sẽ gây ra exception hoặc không hoạt động chính xác theo cách khác.
 
-This common limitation means that it is generally advisable to create
-context managers directly in the header of the :keyword:`with` statement
-where they are used (as shown in all of the usage examples above).
+Hạn chế phổ biến này có nghĩa là nhìn chung bạn nên tạo các context manager trực tiếp trong phần đầu của câu lệnh :keyword:`with` nơi chúng được sử dụng (như trong tất cả các ví dụ sử dụng ở trên).
 
-Files are an example of effectively single use context managers, since
-the first :keyword:`with` statement will close the file, preventing any
-further IO operations using that file object.
+Tệp là một ví dụ về context manager về cơ bản chỉ có thể sử dụng một lần, vì câu lệnh :keyword:`with` đầu tiên sẽ đóng tệp, ngăn mọi thao tác IO tiếp theo sử dụng đối tượng tệp đó.
 
-Context managers created using :deco:`contextmanager` are also single use
-context managers, and will complain about the underlying generator failing
-to yield if an attempt is made to use them a second time::
+Các context manager được tạo bằng :deco:`contextmanager` cũng là những context manager chỉ có thể sử dụng một lần và sẽ báo lỗi về việc generator bên dưới không thực hiện yield nếu cố gắng sử dụng chúng lần thứ hai::
 
     >>> from contextlib import contextmanager
     >>> @contextmanager
@@ -939,17 +765,13 @@ to yield if an attempt is made to use them a second time::
 
 .. _reentrant-cms:
 
-Reentrant context managers
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Context manager có thể tái nhập
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-More sophisticated context managers may be "reentrant". These context
-managers can not only be used in multiple :keyword:`with` statements,
-but may also be used *inside* a :keyword:`!with` statement that is already
-using the same context manager.
+Các context manager phức tạp hơn có thể là "reentrant". Những context manager này không chỉ có thể được sử dụng trong nhiều câu lệnh :keyword:`with`, mà còn có thể được sử dụng *bên trong* một câu lệnh :keyword:`!with` vốn đang sử dụng cùng context manager đó.
 
-:class:`threading.RLock` is an example of a reentrant context manager, as are
-:func:`suppress`, :func:`redirect_stdout`, and :func:`chdir`. Here's a very
-simple example of reentrant use::
+:class:`threading.RLock` là một ví dụ về context manager có thể tái nhập, cũng như
+:func:`suppress`, :func:`redirect_stdout`, và :func:`chdir`. Sau đây là một ví dụ rất đơn giản về việc sử dụng có thể tái nhập::
 
     >>> from contextlib import redirect_stdout
     >>> from io import StringIO
@@ -966,36 +788,24 @@ simple example of reentrant use::
     This is written to the stream rather than stdout
     This is also written to the stream
 
-Real world examples of reentrancy are more likely to involve multiple
-functions calling each other and hence be far more complicated than this
-example.
+Các ví dụ thực tế về tính tái nhập thường liên quan đến nhiều hàm gọi lẫn nhau, vì vậy phức tạp hơn rất nhiều so với ví dụ này.
 
-Note also that being reentrant is *not* the same thing as being thread safe.
-:func:`redirect_stdout`, for example, is definitely not thread safe, as it
-makes a global modification to the system state by binding :data:`sys.stdout`
-to a different stream.
+Cũng lưu ý rằng có thể tái nhập *không* đồng nghĩa với thread safe.
+:func:`redirect_stdout`, chẳng hạn, chắc chắn không thread safe, vì nó thực hiện một thay đổi toàn cục đối với trạng thái hệ thống bằng cách liên kết :data:`sys.stdout` với một stream khác.
 
 
 .. _reusable-cms:
 
-Reusable context managers
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Context manager có thể tái sử dụng
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Distinct from both single use and reentrant context managers are "reusable"
-context managers (or, to be completely explicit, "reusable, but not
-reentrant" context managers, since reentrant context managers are also
-reusable). These context managers support being used multiple times, but
-will fail (or otherwise not work correctly) if the specific context manager
-instance has already been used in a containing with statement.
+Khác với context manager dùng một lần và context manager có thể tái nhập, context manager "có thể tái sử dụng" (hoặc nói hoàn toàn rõ ràng là context manager "có thể tái sử dụng nhưng không thể tái nhập", vì context manager có thể tái nhập cũng có thể tái sử dụng). Các context manager này hỗ trợ việc được sử dụng nhiều lần, nhưng sẽ thất bại (hoặc nói cách khác là không hoạt động chính xác) nếu chính instance context manager đó đã được sử dụng trong một câu lệnh with bao quanh.
 
-:class:`threading.Lock` is an example of a reusable, but not reentrant,
-context manager (for a reentrant lock, it is necessary to use
-:class:`threading.RLock` instead).
+:class:`threading.Lock` là một ví dụ về context manager có thể tái sử dụng nhưng không thể tái nhập (đối với một reentrant lock, cần sử dụng
+:class:`threading.RLock` thay vào đó).
 
-Another example of a reusable, but not reentrant, context manager is
-:class:`ExitStack`, as it invokes *all* currently registered callbacks
-when leaving any with statement, regardless of where those callbacks
-were added::
+Một ví dụ khác về context manager có thể tái sử dụng nhưng không reentrant là
+:class:`ExitStack`, vì nó gọi *tất cả* callback hiện đã đăng ký khi rời khỏi bất kỳ câu lệnh with nào, bất kể các callback đó được thêm vào ở đâu::
 
     >>> from contextlib import ExitStack
     >>> stack = ExitStack()
@@ -1023,13 +833,9 @@ were added::
     Callback: from outer context
     Leaving outer context
 
-As the output from the example shows, reusing a single stack object across
-multiple with statements works correctly, but attempting to nest them
-will cause the stack to be cleared at the end of the innermost with
-statement, which is unlikely to be desirable behaviour.
+Như kết quả từ ví dụ cho thấy, việc tái sử dụng một đối tượng stack duy nhất trong nhiều câu lệnh with hoạt động chính xác, nhưng việc cố gắng lồng chúng sẽ khiến stack bị xóa vào cuối câu lệnh with bên trong cùng, đây khó có thể là hành vi mong muốn.
 
-Using separate :class:`ExitStack` instances instead of reusing a single
-instance avoids that problem::
+Sử dụng các instance :class:`ExitStack` riêng biệt thay vì tái sử dụng một instance duy nhất sẽ tránh được vấn đề đó::
 
     >>> from contextlib import ExitStack
     >>> with ExitStack() as outer_stack:

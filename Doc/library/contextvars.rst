@@ -1,87 +1,68 @@
-:mod:`!contextvars` --- Context Variables
-=========================================
+:mod:`!contextvars` --- Biến ngữ cảnh
+=====================================
 
 .. module:: contextvars
-   :synopsis: Context Variables
+   :synopsis: Biến ngữ cảnh
 
 .. sectionauthor:: Yury Selivanov <yury@magic.io>
 
 --------------
 
-This module provides APIs to manage, store, and access context-local
-state.  The :class:`~contextvars.ContextVar` class is used to declare
-and work with *Context Variables*.  The :func:`~contextvars.copy_context`
-function and the :class:`~contextvars.Context` class should be used to
-manage the current context in asynchronous frameworks.
+Mô-đun này cung cấp các API để quản lý, lưu trữ và truy cập trạng thái cục bộ theo ngữ cảnh. Lớp :class:`~contextvars.ContextVar` được dùng để khai báo và làm việc với *Biến ngữ cảnh*. Hàm :func:`~contextvars.copy_context` và lớp :class:`~contextvars.Context` nên được dùng để quản lý ngữ cảnh hiện tại trong các framework bất đồng bộ.
 
-Context managers that have state should use Context Variables
-instead of :func:`threading.local` to prevent their state from
-bleeding to other code unexpectedly, when used in concurrent code.
+Các context manager có trạng thái nên sử dụng Biến ngữ cảnh thay vì :func:`threading.local` để ngăn trạng thái của chúng vô tình lan sang mã khác khi được sử dụng trong mã chạy đồng thời.
 
-See also :pep:`567` for additional details.
+Xem thêm :pep:`567` để biết thêm chi tiết.
 
 .. versionadded:: 3.7
 
 
-Context Variables
------------------
+Biến ngữ cảnh
+-------------
 
 .. class:: ContextVar(name, [*, default])
 
-   This class is used to declare a new Context Variable, e.g.::
+   Lớp này được dùng để khai báo một Biến ngữ cảnh mới, chẳng hạn như::
 
        var: ContextVar[int] = ContextVar('var', default=42)
 
-   The required *name* parameter is used for introspection and debug
-   purposes.
+   Tham số bắt buộc *name* được sử dụng cho mục đích introspection và debug.
 
-   The optional keyword-only *default* parameter is returned by
-   :meth:`ContextVar.get` when no value for the variable is found
-   in the current context.
+   Tham số chỉ nhận từ khóa tùy chọn *default* được trả về bởi
+   :meth:`ContextVar.get` khi không tìm thấy giá trị nào cho biến trong context hiện tại.
 
-   **Important:** Context Variables should be created at the top module
-   level and never in closures.  :class:`Context` objects hold strong
-   references to context variables which prevents context variables
-   from being properly garbage collected.
+   **Lưu ý:** Context Variables nên được tạo ở cấp module cao nhất và không bao giờ nằm trong các closure. :class:`Context` object giữ các tham chiếu mạnh đến context variables, ngăn không cho context variables được garbage collection đúng cách.
 
-   :class:`!ContextVar`\s are :ref:`generic <generics>` over the type of
-   their contained value.
+   :class:`!ContextVar`\s là :ref:`generic <generics>` theo kiểu của giá trị mà chúng chứa.
 
    .. attribute:: ContextVar.name
 
-      The name of the variable.  This is a read-only property.
+      Tên của biến. Đây là thuộc tính chỉ đọc.
 
       .. versionadded:: 3.7.1
 
    .. method:: get([default])
 
-      Return a value for the context variable for the current context.
+      Trả về một giá trị cho context variable trong context hiện tại.
 
-      If there is no value for the variable in the current context,
-      the method will:
+      Nếu không có giá trị cho biến trong context hiện tại, phương thức sẽ:
 
-      * return the value of the *default* argument of the method,
-        if provided; or
+      * trả về giá trị của đối số *default* của phương thức, nếu được cung cấp; hoặc
 
-      * return the default value for the context variable,
-        if it was created with one; or
+      * trả về giá trị mặc định của biến context, nếu biến được tạo cùng một giá trị mặc định; hoặc
 
-      * raise a :exc:`LookupError`.
+      * phát sinh một :exc:`LookupError`.
 
    .. method:: set(value)
 
-      Call to set a new value for the context variable in the current
-      context.
+      Gọi phương thức này để đặt giá trị mới cho biến context trong context hiện tại.
 
-      The required *value* argument is the new value for the context
-      variable.
+      Đối số bắt buộc *value* là giá trị mới của biến context.
 
-      Returns a :class:`~contextvars.Token` object that can be used
-      to restore the variable to its previous value via the
-      :meth:`ContextVar.reset` method.
+      Trả về một đối tượng :class:`~contextvars.Token` có thể được sử dụng để khôi phục biến về giá trị trước đó thông qua
+      :meth:`ContextVar.reset` phương thức.
 
-      For convenience, the token object can be used as a context manager
-      to avoid calling :meth:`ContextVar.reset` manually::
+      Để thuận tiện, đối tượng token có thể được sử dụng như một context manager để tránh phải gọi :meth:`ContextVar.reset` theo cách thủ công::
 
           var = ContextVar('var', default='default value')
 
@@ -90,7 +71,7 @@ Context Variables
 
           assert var.get() == 'default value'
 
-      It is a shorthand for::
+      Đây là cách viết rút gọn cho::
 
           var = ContextVar('var', default='default value')
 
@@ -104,126 +85,97 @@ Context Variables
 
       .. versionadded:: 3.14
 
-         Added support for using tokens as context managers.
+         Đã thêm hỗ trợ sử dụng token làm context manager.
 
    .. method:: reset(token)
 
-      Reset the context variable to the value it had before the
-      :meth:`ContextVar.set` that created the *token* was used.
+      Đặt lại biến ngữ cảnh về giá trị mà nó có trước khi
+      Phương thức :meth:`ContextVar.set` đã tạo *token* đã được sử dụng.
 
-      For example::
+      Ví dụ::
 
           var = ContextVar('var')
 
           token = var.set('new value')
-          # code that uses 'var'; var.get() returns 'new value'.
+          # mã sử dụng 'var'; var.get() trả về 'new value'.
           var.reset(token)
 
-          # After the reset call the var has no value again, so
-          # var.get() would raise a LookupError.
+          # Sau lệnh gọi reset, var lại không có giá trị, vì vậy
+          # var.get() sẽ phát sinh LookupError.
 
-      The same *token* cannot be used twice.
+      Không thể sử dụng cùng một *token* hai lần.
 
 
 .. class:: Token
 
-   *Token* objects are returned by the :meth:`ContextVar.set` method.
-   They can be passed to the :meth:`ContextVar.reset` method to revert
-   the value of the variable to what it was before the corresponding
-   *set*. A single token cannot reset a context variable more than once.
+   Các đối tượng *Token* được trả về bởi phương thức :meth:`ContextVar.set` . Chúng có thể được truyền vào phương thức :meth:`ContextVar.reset` để khôi phục giá trị của biến về trạng thái trước thao tác *set* tương ứng. Một token không thể đặt lại một biến ngữ cảnh nhiều hơn một lần.
 
-   Tokens support the :ref:`context manager protocol <context-managers>`
-   to automatically reset context variables. See :meth:`ContextVar.set`.
+   Các token hỗ trợ :ref:`giao thức context manager <context-managers>` để tự động đặt lại các biến ngữ cảnh. Xem :meth:`ContextVar.set`.
 
-   Tokens are :ref:`generic <generics>` over the same type as the
-   :class:`ContextVar` which created them.
+   Các token là :ref:`generic <generics>` trên cùng kiểu với
+   :class:`ContextVar` đã tạo ra chúng.
 
    .. versionadded:: 3.14
 
-      Added support for usage as a context manager.
+      Đã bổ sung hỗ trợ sử dụng dưới dạng context manager.
 
    .. attribute:: Token.var
 
-      A read-only property.  Points to the :class:`ContextVar` object
-      that created the token.
+      Một thuộc tính chỉ đọc. Trỏ đến đối tượng :class:`ContextVar` đã tạo token.
 
    .. attribute:: Token.old_value
 
-      A read-only property.  Set to the value the variable had before
-      the :meth:`ContextVar.set` method call that created the token.
-      It points to :attr:`Token.MISSING` if the variable was not set
-      before the call.
+      Một thuộc tính chỉ đọc. Được đặt thành giá trị mà biến có trước lần gọi phương thức :meth:`ContextVar.set` đã tạo token. Trỏ đến :attr:`Token.MISSING` nếu biến chưa được đặt trước lần gọi đó.
 
    .. attribute:: Token.MISSING
 
-      A marker object used by :attr:`Token.old_value`.
+      Một đối tượng đánh dấu được :attr:`Token.old_value` sử dụng.
 
 
-Manual Context Management
--------------------------
+Quản lý Context thủ công
+------------------------
 
 .. function:: copy_context()
 
-   Returns a copy of the current :class:`~contextvars.Context` object.
+   Trả về một bản sao của đối tượng :class:`~contextvars.Context` hiện tại.
 
-   The following snippet gets a copy of the current context and prints
-   all variables and their values that are set in it::
+   Đoạn mã sau lấy một bản sao của context hiện tại và in tất cả các biến cùng giá trị của chúng đang được thiết lập trong đó::
 
       ctx: Context = copy_context()
       print(list(ctx.items()))
 
-   The function has an *O*\ (1) complexity, i.e. works equally fast for
-   contexts with a few context variables and for contexts that have
-   a lot of them.
+   Hàm này có độ phức tạp *O*\ (1), nghĩa là hoạt động nhanh như nhau đối với các context có ít biến context và các context có nhiều biến context.
 
 
 .. class:: Context()
 
-   A mapping of :class:`ContextVars <ContextVar>` to their values.
+   Một ánh xạ từ :class:`ContextVars <ContextVar>` đến các giá trị tương ứng của chúng.
 
-   ``Context()`` creates an empty context with no values in it.
-   To get a copy of the current context use the
-   :func:`~contextvars.copy_context` function.
+   ``Context()`` tạo một context trống không chứa giá trị nào. Để lấy một bản sao của context hiện tại, hãy sử dụng
+   hàm :func:`~contextvars.copy_context`.
 
-   Each thread has its own effective stack of :class:`!Context` objects.  The
-   :term:`current context` is the :class:`!Context` object at the top of the
-   current thread's stack.  All :class:`!Context` objects in the stacks are
-   considered to be *entered*.
+   Mỗi thread có một stack hiệu dụng riêng gồm các đối tượng :class:`!Context`.
+   :term:`current context` là đối tượng :class:`!Context` ở trên cùng của stack thuộc thread hiện tại.  Tất cả các đối tượng :class:`!Context` trong các stack đều được xem là đã *entered*.
 
-   *Entering* a context, which can be done by calling its :meth:`~Context.run`
-   method, makes the context the current context by pushing it onto the top of
-   the current thread's context stack.
+   *Việc đi vào* một context, có thể thực hiện bằng cách gọi phương thức :meth:`~Context.run` của context đó, khiến context trở thành context hiện tại bằng cách đẩy nó lên đầu ngăn xếp context của thread hiện tại.
 
-   *Exiting* from the current context, which can be done by returning from the
-   callback passed to the :meth:`~Context.run` method, restores the current
-   context to what it was before the context was entered by popping the context
-   off the top of the context stack.
+   *Việc thoát* khỏi context hiện tại, có thể thực hiện bằng cách trả về từ callback được truyền cho phương thức :meth:`~Context.run`, sẽ khôi phục context hiện tại về trạng thái trước khi đi vào context bằng cách lấy context ra khỏi đầu ngăn xếp context.
 
-   Since each thread has its own context stack, :class:`ContextVar` objects
-   behave in a similar fashion to :func:`threading.local` when values are
-   assigned in different threads.
+   Vì mỗi thread có ngăn xếp context riêng, các đối tượng :class:`ContextVar` hoạt động tương tự như :func:`threading.local` khi các giá trị được gán trong các thread khác nhau.
 
-   Attempting to enter an already entered context, including contexts entered in
-   other threads, raises a :exc:`RuntimeError`.
+   Việc cố gắng đi vào một context đã được đi vào, bao gồm cả các context được đi vào trong những thread khác, sẽ gây ra :exc:`RuntimeError`.
 
-   After exiting a context, it can later be re-entered (from any thread).
+   Sau khi thoát khỏi một context, bạn có thể đi vào lại context đó sau này (từ bất kỳ thread nào).
 
-   Any changes to :class:`ContextVar` values via the :meth:`ContextVar.set`
-   method are recorded in the current context.  The :meth:`ContextVar.get`
-   method returns the value associated with the current context.  Exiting a
-   context effectively reverts any changes made to context variables while the
-   context was entered (if needed, the values can be restored by re-entering the
-   context).
+   Mọi thay đổi đối với các giá trị :class:`ContextVar` thông qua phương thức :meth:`ContextVar.set` đều được ghi nhận trong context hiện tại. Phương thức :meth:`ContextVar.get` trả về giá trị được liên kết với context hiện tại. Việc thoát khỏi một context về cơ bản sẽ hoàn nguyên mọi thay đổi được thực hiện đối với các biến context trong khi context đang được đi vào (nếu cần, có thể khôi phục các giá trị bằng cách đi vào lại context).
 
-   Context implements the :class:`collections.abc.Mapping` interface.
+   Context triển khai interface :class:`collections.abc.Mapping`.
 
    .. method:: run(callable, *args, **kwargs)
 
-      Enters the Context, executes ``callable(*args, **kwargs)``, then exits the
-      Context.  Returns *callable*'s return value, or propagates an exception if
-      one occurred.
+      Đi vào Context, thực thi ``callable(*args, **kwargs)``, sau đó thoát khỏi Context. Trả về giá trị trả về của *callable*, hoặc truyền tiếp một exception nếu có xảy ra.
 
-      Example:
+      Ví dụ:
 
       .. testcode::
 
@@ -236,26 +188,26 @@ Manual Context Management
          ctx = contextvars.copy_context()
 
          def main():
-             # 'var' was set to 'spam' before
-             # calling 'copy_context()' and 'ctx.run(main)', so:
+             # 'var' được gán thành 'spam' trước khi
+             # gọi 'copy_context()' và 'ctx.run(main)', vì vậy:
              print(var.get())  # 'spam'
              print(ctx[var])  # 'spam'
 
              var.set('ham')
 
-             # Now, after setting 'var' to 'ham':
+             # Bây giờ, sau khi đặt 'var' thành 'ham':
              print(var.get())  # 'ham'
              print(ctx[var])  # 'ham'
 
-         # Any changes that the 'main' function makes to 'var'
-         # will be contained in 'ctx'.
+         # Mọi thay đổi mà hàm 'main' thực hiện đối với 'var'
+         # sẽ được chứa trong 'ctx'.
          ctx.run(main)
 
-         # The 'main()' function was run in the 'ctx' context,
-         # so changes to 'var' are contained in it:
+         # Hàm 'main()' đã được chạy trong ngữ cảnh 'ctx',
+         # vì vậy các thay đổi đối với 'var' được chứa trong đó:
          print(ctx[var])  # 'ham'
 
-         # However, outside of 'ctx', 'var' is still set to 'spam':
+         # Tuy nhiên, bên ngoài 'ctx', 'var' vẫn có giá trị là 'spam':
          print(var.get())  # 'spam'
 
       .. testoutput::
@@ -271,57 +223,47 @@ Manual Context Management
 
    .. method:: copy()
 
-      Return a shallow copy of the context object.
+      Trả về một bản sao nông của đối tượng context.
 
    .. describe:: var in context
 
-      Return ``True`` if the *context* has a value for *var* set;
-      return ``False`` otherwise.
+      Trả về ``True`` nếu *context* có giá trị được đặt cho *var*; nếu không, trả về ``False``.
 
    .. describe:: context[var]
 
-      Return the value of the *var* :class:`ContextVar` variable.
-      If the variable is not set in the context object, a
-      :exc:`KeyError` is raised.
+      Trả về giá trị của biến *var* :class:`ContextVar`. Nếu biến không được đặt trong đối tượng context, một
+      :exc:`KeyError` sẽ được phát sinh.
 
    .. method:: get(var, [default])
 
-      Return the value for *var* if *var* has the value in the context
-      object.  Return *default* otherwise.  If *default* is not given,
-      return ``None``.
+      Trả về giá trị của *var* nếu *var* có giá trị trong đối tượng context. Nếu không, trả về *default*. Nếu *default* không được cung cấp, trả về ``None``.
 
    .. describe:: iter(context)
 
-      Return an iterator over the variables stored in the context
-      object.
+      Trả về một iterator chứa các biến được lưu trữ trong đối tượng context.
 
    .. describe:: len(proxy)
 
-      Return the number of variables set in the context object.
+      Trả về số lượng biến được thiết lập trong đối tượng context.
 
    .. method:: keys()
 
-      Return a list of all variables in the context object.
+      Trả về danh sách tất cả các biến trong đối tượng context.
 
    .. method:: values()
 
-      Return a list of all variables' values in the context object.
+      Trả về danh sách giá trị của tất cả các biến trong đối tượng context.
 
 
    .. method:: items()
 
-      Return a list of 2-tuples containing all variables and their
-      values in the context object.
+      Trả về danh sách các tuple 2 phần tử chứa tất cả các biến và giá trị tương ứng của chúng trong đối tượng context.
 
 
-asyncio support
----------------
+Hỗ trợ asyncio
+--------------
 
-Context variables are natively supported in :mod:`asyncio` and are
-ready to be used without any extra configuration.  For example, here
-is a simple echo server, that uses a context variable to make the
-address of a remote client available in the Task that handles that
-client::
+Các biến ngữ cảnh được hỗ trợ nguyên bản trong :mod:`asyncio` và sẵn sàng được sử dụng mà không cần cấu hình thêm. Ví dụ, sau đây là một echo server đơn giản sử dụng biến ngữ cảnh để cung cấp địa chỉ của client từ xa cho Task xử lý client đó::
 
     import asyncio
     import contextvars
@@ -329,8 +271,8 @@ client::
     client_addr_var = contextvars.ContextVar('client_addr')
 
     def render_goodbye():
-        # The address of the currently handled client can be accessed
-        # without passing it explicitly to this function.
+        # Có thể truy cập địa chỉ của client hiện đang được xử lý
+        # mà không cần truyền địa chỉ đó một cách tường minh vào hàm này.
 
         client_addr = client_addr_var.get()
         return f'Good bye, client @ {client_addr}\r\n'.encode()
@@ -339,8 +281,8 @@ client::
         addr = writer.transport.get_extra_info('socket').getpeername()
         client_addr_var.set(addr)
 
-        # In any code that we call is now possible to get
-        # client's address by calling 'client_addr_var.get()'.
+        # Trong mọi code mà chúng ta gọi, giờ đây có thể lấy được
+        # địa chỉ của client bằng cách gọi 'client_addr_var.get()'.
 
         while True:
             line = await reader.readline()
@@ -348,9 +290,9 @@ client::
             if not line.strip():
                 break
 
-        writer.write(b'HTTP/1.1 200 OK\r\n')  # status line
+        writer.write(b'HTTP/1.1 200 OK\r\n')  # dòng trạng thái
         writer.write(b'\r\n')  # headers
-        writer.write(render_goodbye())  # body
+        writer.write(render_goodbye())  # nội dung
         writer.close()
 
     async def main():
@@ -362,6 +304,6 @@ client::
 
     asyncio.run(main())
 
-    # To test it you can use telnet or curl:
+    # Để kiểm tra, bạn có thể sử dụng telnet hoặc curl:
     #     telnet 127.0.0.1 8081
     #     curl 127.0.0.1:8081

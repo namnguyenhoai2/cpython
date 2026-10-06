@@ -1,19 +1,16 @@
-:mod:`!cgi` --- Common Gateway Interface support
-================================================
+:mod:`!cgi` --- hỗ trợ Common Gateway Interface
+===============================================
 
 .. module:: cgi
-   :synopsis: Removed in 3.13.
+   :synopsis: Đã bị loại bỏ trong phiên bản 3.13.
    :deprecated:
 
 .. deprecated-removed:: 3.11 3.13
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.13 <whatsnew313-pep594>` after
-being deprecated in Python 3.11.  The removal was decided in :pep:`594`.
+Mô-đun này không còn là một phần của thư viện chuẩn Python. Mô-đun đã được :ref:`loại bỏ trong Python 3.13 <whatsnew313-pep594>` sau khi không còn được khuyến nghị sử dụng trong Python 3.11. Việc loại bỏ đã được quyết định trong :pep:`594`.
 
-A fork of the module on PyPI can be used instead: :pypi:`legacy-cgi`.
-This is a copy of the cgi module, no longer maintained or supported by the core
-Python team.
+Thay vào đó, có thể sử dụng một fork của mô-đun trên PyPI: :pypi:`legacy-cgi`. Đây là bản sao của mô-đun cgi, không còn được nhóm phát triển Python cốt lõi duy trì hoặc hỗ trợ.
 
-The last version of Python that provided the :mod:`!cgi` module was
-`Python 3.12 <https://docs.python.org/3.12/library/cgi.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!cgi` là `Python 3.12 <https://docs.python.org/3.12/library/cgi.html>`_.
+
+.. _`Python 3.12`: https://docs.python.org/3.12/library/cgi.html

@@ -1,20 +1,17 @@
-:mod:`!crypt` --- Function to check Unix passwords
-==================================================
+:mod:`!crypt` --- Hàm kiểm tra mật khẩu Unix
+============================================
 
 .. module:: crypt
-   :synopsis: Removed in 3.13.
+   :synopsis: Đã bị xóa trong phiên bản 3.13.
    :deprecated:
 
 .. deprecated-removed:: 3.11 3.13
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.13 <whatsnew313-pep594>` after
-being deprecated in Python 3.11.  The removal was decided in :pep:`594`.
+Mô-đun này không còn là một phần của thư viện chuẩn Python. Mô-đun đã được :ref:`xóa trong Python 3.13 <whatsnew313-pep594>` sau khi bị đánh dấu không được khuyến nghị trong Python 3.11. Việc xóa mô-đun đã được quyết định trong :pep:`594`.
 
-Applications can use the :mod:`hashlib` module from the standard library.
-Other possible replacements are third-party libraries from PyPI:
-:pypi:`legacycrypt`, :pypi:`bcrypt`, or :pypi:`argon2-cffi`.
-These are not supported or maintained by the Python core team.
+Ứng dụng có thể sử dụng mô-đun :mod:`hashlib` từ thư viện chuẩn. Các lựa chọn thay thế khác có thể là những thư viện bên thứ ba từ PyPI:
+:pypi:`legacycrypt`, :pypi:`bcrypt` hoặc :pypi:`argon2-cffi`. Những thư viện này không được nhóm phát triển cốt lõi Python hỗ trợ hoặc duy trì.
 
-The last version of Python that provided the :mod:`!crypt` module was
-`Python 3.12 <https://docs.python.org/3.12/library/crypt.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!crypt` là `Python 3.12 <https://docs.python.org/3.12/library/crypt.html>`_.
+
+.. _`Python 3.12`: https://docs.python.org/3.12/library/crypt.html

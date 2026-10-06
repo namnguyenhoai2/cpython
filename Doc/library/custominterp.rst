@@ -1,16 +1,12 @@
 .. _custominterp:
 
-**************************
-Custom Python Interpreters
-**************************
+*********************************
+Trình thông dịch Python tùy chỉnh
+*********************************
 
-The modules described in this chapter allow writing interfaces similar to
-Python's interactive interpreter.  If you want a Python interpreter that
-supports some special feature in addition to the Python language, you should
-look at the :mod:`code` module.  (The :mod:`codeop` module is lower-level, used
-to support compiling a possibly incomplete chunk of Python code.)
+Các module được mô tả trong chương này cho phép viết các giao diện tương tự như trình thông dịch tương tác của Python. Nếu bạn muốn một trình thông dịch Python hỗ trợ một tính năng đặc biệt nào đó ngoài ngôn ngữ Python, bạn nên xem module :mod:`code`. (Module :mod:`codeop` ở cấp thấp hơn, được dùng để hỗ trợ biên dịch một đoạn mã Python có thể chưa hoàn chỉnh.)
 
-The full list of modules described in this chapter is:
+Danh sách đầy đủ các module được mô tả trong chương này là:
 
 
 .. toctree::

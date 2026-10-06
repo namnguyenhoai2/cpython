@@ -1,10 +1,10 @@
-:mod:`!copyreg` --- Register :mod:`!pickle` support functions
-=============================================================
+:mod:`!copyreg` --- Đăng ký các hàm hỗ trợ :mod:`!pickle`
+=========================================================
 
 .. module:: copyreg
-   :synopsis: Register pickle support functions.
+   :synopsis: Đăng ký các hàm hỗ trợ pickle.
 
-**Source code:** :source:`Lib/copyreg.py`
+**Mã nguồn:** :source:`Lib/copyreg.py`
 
 .. index::
    pair: module; pickle
@@ -12,38 +12,26 @@
 
 --------------
 
-The :mod:`!copyreg` module offers a way to define functions used while pickling
-specific objects.  The :mod:`pickle` and :mod:`copy` modules use those functions
-when pickling/copying those objects.  The module provides configuration
-information about object constructors which are not classes.
-Such constructors may be factory functions or class instances.
+Module :mod:`!copyreg` cung cấp cách định nghĩa các hàm được sử dụng khi pickling các đối tượng cụ thể. Các module :mod:`pickle` và :mod:`copy` sử dụng những hàm đó khi pickling/sao chép các đối tượng này. Module này cung cấp thông tin cấu hình về các hàm khởi tạo đối tượng không phải là class. Những hàm khởi tạo như vậy có thể là các hàm factory hoặc các thực thể của class.
 
 
 .. function:: constructor(object)
 
-   Declares *object* to be a valid constructor.  If *object* is not callable (and
-   hence not valid as a constructor), raises :exc:`TypeError`.
+   Khai báo *object* là một hàm khởi tạo hợp lệ. Nếu *object* không thể gọi được (và do đó không hợp lệ để làm hàm khởi tạo), sẽ phát sinh :exc:`TypeError`.
 
 
 .. function:: pickle(type, function, constructor_ob=None)
 
-   Declares that *function* should be used as a "reduction" function for objects
-   of type *type*.  *function* must return either a string or a tuple
-   containing between two and six elements. See the :attr:`~pickle.Pickler.dispatch_table`
-   for more details on the interface of *function*.
+   Khai báo rằng *function* nên được sử dụng làm hàm "reduction" cho các đối tượng thuộc kiểu *type*. *function* phải trả về một chuỗi hoặc một tuple chứa từ hai đến sáu phần tử. Xem :attr:`~pickle.Pickler.dispatch_table` để biết thêm chi tiết về giao diện của *function*.
 
-   The *constructor_ob* parameter is a legacy feature and is now ignored, but if
-   passed it must be a callable.
+   Tham số *constructor_ob* là một tính năng cũ và hiện bị bỏ qua, nhưng nếu được truyền vào thì phải là một đối tượng có thể gọi.
 
-   Note that the :attr:`~pickle.Pickler.dispatch_table` attribute of a pickler
-   object or subclass of :class:`pickle.Pickler` can also be used for
-   declaring reduction functions.
+   Lưu ý rằng thuộc tính :attr:`~pickle.Pickler.dispatch_table` của một đối tượng pickler hoặc lớp con của :class:`pickle.Pickler` cũng có thể được dùng để khai báo các hàm reduction.
 
-Example
--------
+Ví dụ
+-----
 
-The example below would like to show how to register a pickle function and how
-it will be used:
+Ví dụ dưới đây minh họa cách đăng ký một hàm pickle và cách hàm đó được sử dụng:
 
    >>> import copyreg, copy, pickle
    >>> class C:

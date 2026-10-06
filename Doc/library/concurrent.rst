@@ -1,7 +1,7 @@
-The :mod:`!concurrent` package
-==============================
+Gói :mod:`!concurrent`
+======================
 
-This package contains the following modules:
+Gói này chứa các mô-đun sau:
 
-* :mod:`concurrent.futures` -- Launching parallel tasks
-* :mod:`concurrent.interpreters` -- Multiple interpreters in the same process
+* :mod:`concurrent.futures` -- Khởi chạy các tác vụ song song
+* :mod:`concurrent.interpreters` -- Nhiều trình thông dịch trong cùng một tiến trình

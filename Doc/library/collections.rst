@@ -1,13 +1,13 @@
-:mod:`!collections` --- Container datatypes
-===========================================
+:mod:`!collections` --- Các kiểu dữ liệu container
+==================================================
 
 .. module:: collections
-    :synopsis: Container datatypes
+    :synopsis: Các kiểu dữ liệu container
 
 .. moduleauthor:: Raymond Hettinger <python@rcn.com>
 .. sectionauthor:: Raymond Hettinger <python@rcn.com>
 
-**Source code:** :source:`Lib/collections/__init__.py`
+**Mã nguồn:** :source:`Lib/collections/__init__.py`
 
 .. testsetup:: *
 
@@ -17,98 +17,79 @@
 
 --------------
 
-This module implements specialized container datatypes providing alternatives to
-Python's general purpose built-in containers, :class:`dict`, :class:`list`,
-:class:`set`, and :class:`tuple`.
+Mô-đun này triển khai các kiểu dữ liệu container chuyên biệt, cung cấp các lựa chọn thay thế cho các container tích hợp đa năng của Python, :class:`dict`, :class:`list`,
+:class:`set`, và :class:`tuple`.
 
-=====================   ====================================================================
-:func:`namedtuple`      factory function for creating tuple subclasses with named fields
-:class:`deque`          list-like container with fast appends and pops on either end
-:class:`ChainMap`       dict-like class for creating a single view of multiple mappings
-:class:`Counter`        dict subclass for counting :term:`hashable` objects
-:class:`OrderedDict`    dict subclass that remembers the order entries were added
-:class:`defaultdict`    dict subclass that calls a factory function to supply missing values
-:class:`UserDict`       wrapper around dictionary objects for easier dict subclassing
-:class:`UserList`       wrapper around list objects for easier list subclassing
-:class:`UserString`     wrapper around string objects for easier string subclassing
-=====================   ====================================================================
++----------------------+-------------------------------------------------------------------------------+
+| :func:`namedtuple`   | hàm factory để tạo các lớp con của tuple với các trường được đặt tên          |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`deque`       | container dạng list với thao tác thêm và lấy phần tử nhanh chóng ở cả hai đầu |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`ChainMap`    | lớp tương tự dict để tạo một chế độ xem duy nhất từ nhiều mapping             |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`Counter`     | lớp con của dict để đếm các đối tượng :term:`hashable`                        |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`OrderedDict` | lớp con của dict ghi nhớ thứ tự các mục được thêm vào                         |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`defaultdict` | lớp con của dict gọi một hàm factory để cung cấp các giá trị còn thiếu        |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`UserDict`    | lớp bọc quanh các đối tượng dictionary để dễ dàng tạo lớp con của dict        |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`UserList`    | lớp bọc quanh các đối tượng list để dễ dàng tạo lớp con của list              |
++----------------------+-------------------------------------------------------------------------------+
+| :class:`UserString`  | lớp bọc quanh các đối tượng string để dễ dàng tạo lớp con của string          |
++----------------------+-------------------------------------------------------------------------------+
 
 
-:class:`ChainMap` objects
--------------------------
+:class:`ChainMap` đối tượng
+---------------------------
 
 .. versionadded:: 3.3
 
-A :class:`ChainMap` class is provided for quickly linking a number of mappings
-so they can be treated as a single unit.  It is often much faster than creating
-a new dictionary and running multiple :meth:`~dict.update` calls.
+Một lớp :class:`ChainMap` được cung cấp để nhanh chóng liên kết một số mapping, cho phép xử lý chúng như một đơn vị duy nhất. Cách này thường nhanh hơn nhiều so với việc tạo một dictionary mới và thực hiện nhiều lần gọi :meth:`~dict.update`.
 
-The class can be used to simulate nested scopes and is useful in templating.
+Lớp này có thể được dùng để mô phỏng các phạm vi lồng nhau và hữu ích trong việc tạo template.
 
 .. class:: ChainMap(*maps)
 
-    A :class:`ChainMap` groups multiple dicts or other mappings together to
-    create a single, updateable view.  If no *maps* are specified, a single empty
-    dictionary is provided so that a new chain always has at least one mapping.
+    Một :class:`ChainMap` nhóm nhiều dict hoặc mapping khác lại với nhau để tạo một chế độ xem duy nhất có thể cập nhật. Nếu không chỉ định *maps*, một dictionary rỗng duy nhất sẽ được cung cấp để một chain mới luôn có ít nhất một mapping.
 
-    The underlying mappings are stored in a list.  That list is public and can
-    be accessed or updated using the *maps* attribute.  There is no other state.
+    Các mapping bên dưới được lưu trong một danh sách. Danh sách đó là công khai và có thể được truy cập hoặc cập nhật bằng thuộc tính *maps*. Không có trạng thái nào khác.
 
-    Lookups search the underlying mappings successively until a key is found.  In
-    contrast, writes, updates, and deletions only operate on the first mapping.
+    Các thao tác tra cứu lần lượt tìm trong các mapping bên dưới cho đến khi tìm thấy một khóa. Ngược lại, thao tác ghi, cập nhật và xóa chỉ hoạt động trên mapping đầu tiên.
 
-    A :class:`ChainMap` incorporates the underlying mappings by reference.  So, if
-    one of the underlying mappings gets updated, those changes will be reflected
-    in :class:`ChainMap`.
+    Một :class:`ChainMap` kết hợp các mapping bên dưới theo tham chiếu. Vì vậy, nếu một trong các mapping bên dưới được cập nhật, những thay đổi đó sẽ được phản ánh trong :class:`ChainMap`.
 
-    All of the usual dictionary methods are supported.  In addition, there is a
-    *maps* attribute, a method for creating new subcontexts, and a property for
-    accessing all but the first mapping:
+    Tất cả các phương thức từ điển thông thường đều được hỗ trợ. Ngoài ra, còn có thuộc tính *maps*, một phương thức để tạo các ngữ cảnh con mới và một thuộc tính để truy cập tất cả các ánh xạ trừ ánh xạ đầu tiên:
 
     .. attribute:: maps
 
-        A user updateable list of mappings.  The list is ordered from
-        first-searched to last-searched.  It is the only stored state and can
-        be modified to change which mappings are searched.  The list should
-        always contain at least one mapping.
+        Một danh sách các ánh xạ mà người dùng có thể cập nhật. Danh sách được sắp xếp từ ánh xạ được tìm kiếm đầu tiên đến ánh xạ được tìm kiếm cuối cùng. Đây là trạng thái duy nhất được lưu trữ và có thể được sửa đổi để thay đổi các ánh xạ được tìm kiếm. Danh sách luôn phải chứa ít nhất một ánh xạ.
 
     .. method:: new_child(m=None, **kwargs)
 
-        Returns a new :class:`ChainMap` containing a new map followed by
-        all of the maps in the current instance.  If ``m`` is specified,
-        it becomes the new map at the front of the list of mappings; if not
-        specified, an empty dict is used, so that a call to ``d.new_child()``
-        is equivalent to: ``ChainMap({}, *d.maps)``. If any keyword arguments
-        are specified, they update passed map or new empty dict. This method
-        is used for creating subcontexts that can be updated without altering
-        values in any of the parent mappings.
+        Trả về một :class:`ChainMap` mới, chứa một map mới theo sau bởi tất cả các map trong instance hiện tại. Nếu ``m`` được chỉ định, nó sẽ trở thành map mới ở đầu danh sách các ánh xạ; nếu không được chỉ định, một dict rỗng sẽ được sử dụng, vì vậy lệnh gọi ``d.new_child()`` tương đương với: ``ChainMap({}, *d.maps)``. Nếu có chỉ định bất kỳ đối số keyword nào, chúng sẽ cập nhật map được truyền vào hoặc dict rỗng mới. Phương thức này được dùng để tạo các ngữ cảnh con có thể được cập nhật mà không làm thay đổi các giá trị trong bất kỳ ánh xạ cha nào.
 
         .. versionchanged:: 3.4
-           The optional ``m`` parameter was added.
+           Tham số ``m`` tùy chọn đã được bổ sung.
 
         .. versionchanged:: 3.10
-           Keyword arguments support was added.
+           Đã bổ sung hỗ trợ cho các đối số keyword.
 
     .. attribute:: parents
 
-        Property returning a new :class:`ChainMap` containing all of the maps in
-        the current instance except the first one.  This is useful for skipping
-        the first map in the search.  Use cases are similar to those for the
-        :keyword:`nonlocal` keyword used in :term:`nested scopes <nested
-        scope>`.  The use cases also parallel those for the built-in
-        :func:`super` function.  A reference to ``d.parents`` is equivalent to:
-        ``ChainMap(*d.maps[1:])``.
+        Thuộc tính trả về một :class:`ChainMap` mới, chứa tất cả các map trong instance hiện tại ngoại trừ map đầu tiên. Điều này hữu ích khi muốn bỏ qua map đầu tiên trong quá trình tìm kiếm. Các trường hợp sử dụng tương tự như đối với
+        từ khóa :keyword:`nonlocal` trong :term:`nested scopes <nested scope>`. Các trường hợp sử dụng cũng tương tự như đối với thành phần tích hợp
+        hàm :func:`super`. Tham chiếu đến ``d.parents`` tương đương với: ``ChainMap(*d.maps[1:])``.
 
-    Note, the iteration order of a :class:`ChainMap` is determined by
-    scanning the mappings last to first::
+    Lưu ý rằng thứ tự lặp của :class:`ChainMap` được xác định bằng cách quét các mapping từ cuối lên đầu::
 
         >>> baseline = {'music': 'bach', 'art': 'rembrandt'}
         >>> adjustments = {'art': 'van gogh', 'opera': 'carmen'}
         >>> list(ChainMap(adjustments, baseline))
         ['music', 'art', 'opera']
 
-    This gives the same ordering as a series of :meth:`dict.update` calls
-    starting with the last mapping::
+    Điều này tạo ra thứ tự giống với một chuỗi các lệnh gọi :meth:`dict.update` bắt đầu từ mapping cuối cùng::
 
         >>> combined = baseline.copy()
         >>> combined.update(adjustments)
@@ -116,45 +97,33 @@ The class can be used to simulate nested scopes and is useful in templating.
         ['music', 'art', 'opera']
 
     .. versionchanged:: 3.9
-       Added support for ``|`` and ``|=`` operators, specified in :pep:`584`.
+       Đã bổ sung hỗ trợ cho các toán tử ``|`` và ``|=``, được chỉ định trong :pep:`584`.
 
 .. seealso::
 
-   * The `MultiContext class
-     <https://github.com/enthought/codetools/blob/4.0.0/codetools/contexts/multi_context.py>`_
-     in the Enthought `CodeTools package
-     <https://github.com/enthought/codetools>`_ has options to support
-     writing to any mapping in the chain.
+   * Lớp `MultiContext class <https://github.com/enthought/codetools/blob/4.0.0/codetools/contexts/multi_context.py>`_ trong gói `CodeTools package <https://github.com/enthought/codetools>`_ của Enthought có các tùy chọn hỗ trợ việc ghi vào bất kỳ mapping nào trong chuỗi.
 
-   * Django's `Context class
-     <https://github.com/django/django/blob/main/django/template/context.py>`_
-     for templating is a read-only chain of mappings.  It also features
-     pushing and popping of contexts similar to the
-     :meth:`~collections.ChainMap.new_child` method and the
-     :attr:`~collections.ChainMap.parents` property.
+   * `Context class <https://github.com/django/django/blob/main/django/template/context.py>`_ của Django dùng cho templating là một chuỗi mapping chỉ đọc. Nó cũng hỗ trợ việc đẩy và lấy các context tương tự như
+     phương thức :meth:`~collections.ChainMap.new_child` và
+     :attr:`~collections.ChainMap.parents` thuộc tính.
 
-   * The `Nested Contexts recipe
-     <https://code.activestate.com/recipes/577434-nested-contexts-a-chain-of-mapping-objects/>`_ has options to control
-     whether writes and other mutations apply only to the first mapping or to
-     any mapping in the chain.
+   * Công thức `Nested Contexts <https://code.activestate.com/recipes/577434-nested-contexts-a-chain-of-mapping-objects/>`_ có các tùy chọn để kiểm soát việc thao tác ghi và các thay đổi khác chỉ áp dụng cho mapping đầu tiên hay cho bất kỳ mapping nào trong chuỗi.
 
-   * A `greatly simplified read-only version of Chainmap
-     <https://code.activestate.com/recipes/305268/>`_.
+   * Một `phiên bản chỉ đọc được đơn giản hóa đáng kể của Chainmap <https://code.activestate.com/recipes/305268/>`_.
 
 
-:class:`ChainMap` Examples and Recipes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:class:`ChainMap` Ví dụ và công thức
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This section shows various approaches to working with chained maps.
+Phần này trình bày nhiều cách tiếp cận khác nhau khi làm việc với các mapping được liên kết.
 
 
-Example of simulating Python's internal lookup chain::
+Ví dụ mô phỏng chuỗi tra cứu nội bộ của Python::
 
         import builtins
         pylookup = ChainMap(locals(), globals(), vars(builtins))
 
-Example of letting user specified command-line arguments take precedence over
-environment variables which in turn take precedence over default values::
+Ví dụ cho phép các đối số dòng lệnh do người dùng chỉ định được ưu tiên hơn các biến môi trường, còn các biến môi trường lại được ưu tiên hơn các giá trị mặc định::
 
         import os, argparse
 
@@ -170,29 +139,25 @@ environment variables which in turn take precedence over default values::
         print(combined['color'])
         print(combined['user'])
 
-Example patterns for using the :class:`ChainMap` class to simulate nested
-contexts::
+Các mẫu sử dụng lớp :class:`ChainMap` để mô phỏng các context lồng nhau::
 
-        c = ChainMap()        # Create root context
-        d = c.new_child()     # Create nested child context
-        e = c.new_child()     # Child of c, independent from d
-        e.maps[0]             # Current context dictionary -- like Python's locals()
-        e.maps[-1]            # Root context -- like Python's globals()
-        e.parents             # Enclosing context chain -- like Python's nonlocals
+        c = ChainMap()        # Tạo context gốc
+        d = c.new_child()     # Tạo context con lồng nhau
+        e = c.new_child()     # Con của c, độc lập với d
+        e.maps[0]             # Dictionary của context hiện tại -- giống Python's locals()
+        e.maps[-1]            # Context gốc -- giống Python's globals()
+        e.parents             # Chuỗi context bao quanh -- giống Python's nonlocals
 
-        d['x'] = 1            # Set value in current context
-        d['x']                # Get first key in the chain of contexts
-        del d['x']            # Delete from current context
-        list(d)               # All nested values
-        k in d                # Check all nested values
-        len(d)                # Number of nested values
-        d.items()             # All nested items
-        dict(d)               # Flatten into a regular dictionary
+        d['x'] = 1            # Đặt giá trị trong context hiện tại
+        d['x']                # Lấy key đầu tiên trong chuỗi context
+        del d['x']            # Xóa khỏi context hiện tại
+        list(d)               # Tất cả giá trị lồng nhau
+        k in d                # Kiểm tra tất cả giá trị lồng nhau
+        len(d)                # Số lượng giá trị lồng nhau
+        d.items()             # Tất cả mục lồng nhau
+        dict(d)               # Làm phẳng thành một dictionary thông thường
 
-The :class:`ChainMap` class only makes updates (writes and deletions) to the
-first mapping in the chain while lookups will search the full chain.  However,
-if deep writes and deletions are desired, it is easy to make a subclass that
-updates keys found deeper in the chain::
+Lớp :class:`ChainMap` chỉ thực hiện cập nhật (ghi và xóa) trên mapping đầu tiên trong chuỗi, còn thao tác tra cứu sẽ tìm kiếm toàn bộ chuỗi. Tuy nhiên, nếu cần ghi và xóa sâu, bạn có thể dễ dàng tạo một lớp con để cập nhật các khóa được tìm thấy ở vị trí sâu hơn trong chuỗi::
 
     class DeepChainMap(ChainMap):
         'Variant of ChainMap that allows direct updates to inner scopes'
@@ -212,20 +177,19 @@ updates keys found deeper in the chain::
             raise KeyError(key)
 
     >>> d = DeepChainMap({'zebra': 'black'}, {'elephant': 'blue'}, {'lion': 'yellow'})
-    >>> d['lion'] = 'orange'         # update an existing key two levels down
-    >>> d['snake'] = 'red'           # new keys get added to the topmost dict
-    >>> del d['elephant']            # remove an existing key one level down
-    >>> d                            # display result
+    >>> d['lion'] = 'orange'         # cập nhật một khóa hiện có ở sâu hai cấp
+    >>> d['snake'] = 'red'           # các khóa mới được thêm vào dict trên cùng
+    >>> del d['elephant']            # xóa một khóa hiện có ở sâu một cấp
+    >>> d                            # hiển thị kết quả
     DeepChainMap({'zebra': 'black', 'snake': 'red'}, {}, {'lion': 'orange'})
 
 
-:class:`Counter` objects
-------------------------
+các đối tượng :class:`Counter`
+------------------------------
 
-A counter tool is provided to support convenient and rapid tallies.
-For example::
+Một công cụ đếm được cung cấp để hỗ trợ việc thống kê thuận tiện và nhanh chóng. Ví dụ:::
 
-    >>> # Tally occurrences of words in a list
+    >>> # Đếm số lần xuất hiện của các từ trong một danh sách
     >>> cnt = Counter()
     >>> for word in ['red', 'blue', 'red', 'green', 'blue', 'blue']:
     ...     cnt[word] += 1
@@ -233,7 +197,7 @@ For example::
     >>> cnt
     Counter({'blue': 3, 'red': 2, 'green': 1})
 
-    >>> # Find the ten most common words in Hamlet
+    >>> # Tìm mười từ phổ biến nhất trong Hamlet
     >>> import re
     >>> words = re.findall(r'\w+', open('hamlet.txt').read().lower())
     >>> Counter(words).most_common(10)
@@ -241,52 +205,38 @@ For example::
      ('you', 554),  ('a', 546), ('my', 514), ('hamlet', 471), ('in', 451)]
 
 .. class:: Counter(**kwargs)
-           Counter(iterable, /, **kwargs)
-           Counter(mapping, /, **kwargs)
+           Counter(iterable, /, ****kwargs) Counter(mapping, /, ****kwargs)
 
-    A :class:`Counter` is a :class:`dict` subclass for counting :term:`hashable` objects.
-    It is a collection where elements are stored as dictionary keys
-    and their counts are stored as dictionary values.  Counts are allowed to be
-    any integer value including zero or negative counts.  The :class:`Counter`
-    class is similar to bags or multisets in other languages.
+    :class:`Counter` là một lớp con của :class:`dict` dùng để đếm các đối tượng :term:`hashable`. Đây là một collection trong đó các phần tử được lưu dưới dạng khóa từ điển và số lần xuất hiện của chúng được lưu dưới dạng giá trị từ điển. Số lần đếm có thể là bất kỳ giá trị số nguyên nào, kể cả số lần đếm bằng không hoặc âm. Lớp :class:`Counter` tương tự như bag hoặc multiset trong các ngôn ngữ khác.
 
-    Elements are counted from an *iterable* or initialized from another
-    *mapping* (or counter):
+    Các phần tử được đếm từ một *iterable* hoặc được khởi tạo từ một *mapping* khác (hoặc counter):
 
         >>> c = Counter()                           # a new, empty counter
         >>> c = Counter('gallahad')                 # a new counter from an iterable
         >>> c = Counter({'red': 4, 'blue': 2})      # a new counter from a mapping
         >>> c = Counter(cats=4, dogs=8)             # a new counter from keyword args
 
-    Counter objects have a dictionary interface except that they return a zero
-    count for missing items instead of raising a :exc:`KeyError`:
+    Các đối tượng Counter có giao diện từ điển, ngoại trừ việc chúng trả về số lần đếm bằng không cho các mục bị thiếu thay vì phát sinh :exc:`KeyError`:
 
         >>> c = Counter(['eggs', 'ham'])
         >>> c['bacon']                              # count of a missing element is zero
         0
 
-    Setting a count to zero does not remove an element from a counter.
-    Use ``del`` to remove it entirely:
+    Đặt count về zero không xóa một phần tử khỏi counter. Sử dụng ``del`` để xóa hoàn toàn phần tử đó:
 
         >>> c['sausage'] = 0                        # counter entry with a zero count
         >>> del c['sausage']                        # del actually removes the entry
 
     .. versionadded:: 3.1
 
-    .. versionchanged:: 3.7 As a :class:`dict` subclass, :class:`Counter`
-       inherited the capability to remember insertion order.  Math operations
-       on *Counter* objects also preserve order.  Results are ordered
-       according to when an element is first encountered in the left operand
-       and then by the order encountered in the right operand.
+    .. versionchanged:: 3.7 Là một subclass của :class:`dict`, :class:`Counter`
+       được thừa hưởng khả năng ghi nhớ thứ tự chèn. Các phép toán số học trên các đối tượng *Counter* cũng giữ nguyên thứ tự. Kết quả được sắp xếp theo thời điểm một phần tử được gặp lần đầu trong toán hạng bên trái, sau đó theo thứ tự gặp trong toán hạng bên phải.
 
-    Counter objects support additional methods beyond those available for all
-    dictionaries:
+    Các đối tượng Counter hỗ trợ thêm các phương thức ngoài những phương thức có sẵn cho mọi dictionary:
 
     .. method:: elements()
 
-        Return an iterator over elements repeating each as many times as its
-        count.  Elements are returned in the order first encountered. If an
-        element's count is less than one, :meth:`elements` will ignore it.
+        Trả về một iterator trên các phần tử, lặp lại mỗi phần tử số lần tương ứng với count của nó. Các phần tử được trả về theo thứ tự gặp lần đầu. Nếu count của một phần tử nhỏ hơn một, :meth:`elements` sẽ bỏ qua phần tử đó.
 
             >>> c = Counter(a=4, b=2, c=0, d=-2)
             >>> sorted(c.elements())
@@ -294,21 +244,16 @@ For example::
 
     .. method:: most_common(n=None)
 
-        Return a list of the *n* most common elements and their counts from the
-        most common to the least.  If *n* is omitted or ``None``,
-        :meth:`most_common` returns *all* elements in the counter.
-        Elements with equal counts are ordered in the order first encountered:
+        Trả về danh sách *n* phần tử phổ biến nhất cùng count của chúng, từ phổ biến nhất đến ít phổ biến nhất. Nếu *n* bị bỏ qua hoặc ``None``,
+        :meth:`most_common` trả về *all* phần tử trong counter. Các phần tử có count bằng nhau được sắp xếp theo thứ tự gặp lần đầu:
 
             >>> Counter('abracadabra').most_common(3)
             [('a', 5), ('b', 2), ('r', 2)]
 
     .. method:: subtract(**kwargs)
-                subtract(iterable, /, **kwargs)
-                subtract(mapping, /, **kwargs)
+                subtract(iterable, /, ****kwargs) subtract(mapping, /, ****kwargs)
 
-        Elements are subtracted from an *iterable* or from another *mapping*
-        (or counter).  Like :meth:`dict.update` but subtracts counts instead
-        of replacing them.  Both inputs and outputs may be zero or negative.
+        Các phần tử được trừ khỏi một *iterable* hoặc từ một *mapping* khác (hoặc counter).  Tương tự :meth:`dict.update` nhưng trừ các count thay vì thay thế chúng.  Cả đầu vào và đầu ra đều có thể bằng không hoặc âm.
 
             >>> c = Counter(a=4, b=2, c=0, d=-2)
             >>> d = Counter(a=1, b=2, c=3, d=4)
@@ -320,7 +265,7 @@ For example::
 
     .. method:: total()
 
-        Compute the sum of the counts.
+        Tính tổng các count.
 
             >>> c = Counter(a=10, b=5, c=0)
             >>> c.total()
@@ -328,74 +273,57 @@ For example::
 
         .. versionadded:: 3.10
 
-    The usual dictionary methods are available for :class:`Counter` objects
-    except for two which work differently for counters.
+    Các phương thức dictionary thông thường đều khả dụng cho các đối tượng :class:`Counter`, ngoại trừ hai phương thức hoạt động khác đối với counter.
 
     .. method:: fromkeys(iterable)
 
-        This class method is not implemented for :class:`Counter` objects.
+        Phương thức lớp này không được triển khai cho các đối tượng :class:`Counter`.
 
     .. method:: update(**kwargs)
-                update(iterable, /, **kwargs)
-                update(mapping, /, **kwargs)
+                update(iterable, /, ****kwargs) update(mapping, /, ****kwargs)
 
-        Elements are counted from an *iterable* or added-in from another
-        *mapping* (or counter).  Like :meth:`dict.update` but adds counts
-        instead of replacing them.  Also, the *iterable* is expected to be a
-        sequence of elements, not a sequence of ``(key, value)`` pairs.
+        Các phần tử được đếm từ một *iterable* hoặc được cộng thêm từ một *mapping* khác (hoặc counter).  Tương tự :meth:`dict.update` nhưng cộng các count thay vì thay thế chúng.  Ngoài ra, *iterable* được kỳ vọng là một chuỗi các phần tử, không phải một chuỗi các cặp ``(key, value)``.
 
-Counters support rich comparison operators for equality, subset, and
-superset relationships: ``==``, ``!=``, ``<``, ``<=``, ``>``, ``>=``.
-All of those tests treat missing elements as having zero counts so that
-``Counter(a=1) == Counter(a=1, b=0)`` returns true.
+Counter hỗ trợ các toán tử so sánh phong phú cho quan hệ bằng nhau, tập con và tập cha: ``==``, ``!=``, ``<``, ``<=``, ``>``, ``>=``. Tất cả các phép kiểm tra đó đều xem các phần tử bị thiếu là có số đếm bằng 0, vì vậy ``Counter(a=1) == Counter(a=1, b=0)`` trả về true.
 
 .. versionchanged:: 3.10
-   Rich comparison operations were added.
+   Các phép toán so sánh phong phú đã được bổ sung.
 
 .. versionchanged:: 3.10
-   In equality tests, missing elements are treated as having zero counts.
-   Formerly, ``Counter(a=3)`` and ``Counter(a=3, b=0)`` were considered
-   distinct.
+   Trong các phép kiểm tra bằng nhau, các phần tử bị thiếu được xem là có số đếm bằng 0. Trước đây, ``Counter(a=3)`` và ``Counter(a=3, b=0)`` được xem là khác nhau.
 
-Common patterns for working with :class:`Counter` objects::
+Các mẫu thường dùng khi làm việc với các đối tượng :class:`Counter`::
 
-    c.total()                       # total of all counts
-    c.clear()                       # reset all counts
-    list(c)                         # list unique elements
-    set(c)                          # convert to a set
-    dict(c)                         # convert to a regular dictionary
-    c.items()                       # access the (elem, cnt) pairs
-    Counter(dict(list_of_pairs))    # convert from a list of (elem, cnt) pairs
-    c.most_common()[:-n-1:-1]       # n least common elements
-    +c                              # remove zero and negative counts
+    c.total()                       # tổng của tất cả số đếm
+    c.clear()                       # đặt lại tất cả số đếm
+    list(c)                         # liệt kê các phần tử duy nhất
+    set(c)                          # chuyển đổi thành một tập hợp
+    dict(c)                         # chuyển đổi thành một từ điển thông thường
+    c.items()                       # truy cập các cặp (elem, cnt)
+    Counter(dict(list_of_pairs))    # chuyển đổi từ danh sách các cặp (elem, cnt)
+    c.most_common()[:-n-1:-1]       # n phần tử ít phổ biến nhất
+    +c                              # loại bỏ các số đếm bằng 0 và âm
 
-Several mathematical operations are provided for combining :class:`Counter`
-objects to produce multisets (counters that have counts greater than zero).
-Addition and subtraction combine counters by adding or subtracting the counts
-of corresponding elements.  Intersection and union return the minimum and
-maximum of corresponding counts.  Equality and inclusion compare
-corresponding counts.  Each operation can accept inputs with signed
-counts, but the output will exclude results with counts of zero or less.
+Một số phép toán toán học được cung cấp để kết hợp các đối tượng :class:`Counter`, tạo ra các đa tập hợp (các bộ đếm có số đếm lớn hơn 0). Phép cộng và phép trừ kết hợp các bộ đếm bằng cách cộng hoặc trừ số đếm của các phần tử tương ứng. Phép giao và phép hợp trả về giá trị nhỏ nhất và lớn nhất của các số đếm tương ứng. Phép so sánh bằng và phép bao hàm so sánh các số đếm tương ứng. Mỗi phép toán có thể nhận đầu vào với các số đếm có dấu, nhưng kết quả sẽ loại bỏ các giá trị có số đếm bằng hoặc nhỏ hơn 0.
 
 .. doctest::
 
     >>> c = Counter(a=3, b=1)
     >>> d = Counter(a=1, b=2)
-    >>> c + d                       # add two counters together:  c[x] + d[x]
+    >>> c + d                       # cộng hai counter với nhau:  c[x] + d[x]
     Counter({'a': 4, 'b': 3})
-    >>> c - d                       # subtract (keeping only positive counts)
+    >>> c - d                       # phép trừ (chỉ giữ lại các số đếm dương)
     Counter({'a': 2})
-    >>> c & d                       # intersection:  min(c[x], d[x])
+    >>> c & d                       # phép giao:  min(c[x], d[x])
     Counter({'a': 1, 'b': 1})
-    >>> c | d                       # union:  max(c[x], d[x])
+    >>> c | d                       # phép hợp:  max(c[x], d[x])
     Counter({'a': 3, 'b': 2})
-    >>> c == d                      # equality:  c[x] == d[x]
+    >>> c == d                      # phép so sánh bằng:  c[x] == d[x]
     False
-    >>> c <= d                      # inclusion:  c[x] <= d[x]
+    >>> c <= d                      # phép bao hàm:  c[x] <= d[x]
     False
 
-Unary addition and subtraction are shortcuts for adding an empty counter
-or subtracting from an empty counter.
+Phép cộng và phép trừ một ngôi là cách viết tắt của việc cộng với một counter rỗng hoặc trừ từ một counter rỗng.
 
     >>> c = Counter(a=2, b=-4)
     >>> +c
@@ -404,272 +332,225 @@ or subtracting from an empty counter.
     Counter({'b': 4})
 
 .. versionadded:: 3.3
-    Added support for unary plus, unary minus, and in-place multiset operations.
+    Đã bổ sung hỗ trợ cho phép cộng một ngôi, phép trừ một ngôi và các phép toán multiset tại chỗ.
 
 .. note::
 
-    Counters were primarily designed to work with positive integers to represent
-    running counts; however, care was taken to not unnecessarily preclude use
-    cases needing other types or negative values.  To help with those use cases,
-    this section documents the minimum range and type restrictions.
+    Counter chủ yếu được thiết kế để làm việc với các số nguyên dương nhằm biểu thị số đếm đang được cập nhật; tuy nhiên, việc sử dụng cho các trường hợp cần kiểu dữ liệu khác hoặc giá trị âm cũng không bị ngăn cản một cách không cần thiết. Để hỗ trợ các trường hợp đó, phần này trình bày các giới hạn tối thiểu về phạm vi và kiểu dữ liệu.
 
-    * The :class:`Counter` class itself is a dictionary subclass with no
-      restrictions on its keys and values.  The values are intended to be numbers
-      representing counts, but you *could* store anything in the value field.
+    * Lớp :class:`Counter` bản thân nó là một lớp con của dictionary, không đặt ra giới hạn nào đối với khóa và giá trị. Các giá trị được dùng để biểu thị số đếm, nhưng bạn *có thể* lưu bất kỳ thứ gì vào trường giá trị.
 
-    * The :meth:`~Counter.most_common` method requires only that the values be orderable.
+    * Phương thức :meth:`~Counter.most_common` chỉ yêu cầu các giá trị có thể được sắp thứ tự.
 
-    * For in-place operations such as ``c[key] += 1``, the value type need only
-      support addition and subtraction.  So fractions, floats, and decimals would
-      work and negative values are supported.  The same is also true for
-      :meth:`~Counter.update` and :meth:`~Counter.subtract` which allow negative and zero values
-      for both inputs and outputs.
+    * Đối với các phép toán tại chỗ như ``c[key] += 1``, kiểu giá trị chỉ cần hỗ trợ phép cộng và phép trừ. Vì vậy, phân số, số thực dấu phẩy động và số thập phân đều có thể hoạt động, đồng thời các giá trị âm cũng được hỗ trợ. Điều tương tự cũng đúng với
+      :meth:`~Counter.update` và :meth:`~Counter.subtract`, cho phép các giá trị âm và bằng không ở cả đầu vào lẫn đầu ra.
 
-    * The multiset methods are designed only for use cases with positive values.
-      The inputs may be negative or zero, but only outputs with positive values
-      are created.  There are no type restrictions, but the value type needs to
-      support addition, subtraction, and comparison.
+    * Các phương thức multiset chỉ được thiết kế cho những trường hợp sử dụng với các giá trị dương. Đầu vào có thể là số âm hoặc bằng không, nhưng chỉ các đầu ra có giá trị dương mới được tạo ra. Không có giới hạn về kiểu dữ liệu, nhưng kiểu giá trị cần hỗ trợ phép cộng, phép trừ và phép so sánh.
 
-    * The :meth:`~Counter.elements` method requires integer counts.  It ignores zero and
-      negative counts.
+    * Phương thức :meth:`~Counter.elements` yêu cầu các số lượng nguyên. Phương thức này bỏ qua các số lượng bằng không và âm.
 
 .. seealso::
 
-   * `Bag class <https://www.gnu.org/software/smalltalk/manual-base/html_node/Bag.html>`_
-     in Smalltalk.
+   * `lớp Bag <https://www.gnu.org/software/smalltalk/manual-base/html_node/Bag.html>`_ trong Smalltalk.
 
-   * Wikipedia entry for `Multisets <https://en.wikipedia.org/wiki/Multiset>`_.
+   * Mục Wikipedia về `Multisets <https://en.wikipedia.org/wiki/Multiset>`_.
 
-   * `C++ multisets <http://www.java2s.com/Tutorial/Cpp/0380__set-multiset/Catalog0380__set-multiset.htm>`_
-     tutorial with examples.
+   * Hướng dẫn về `multisets trong C++ <http://www.java2s.com/Tutorial/Cpp/0380__set-multiset/Catalog0380__set-multiset.htm>`_ kèm các ví dụ.
 
-   * For mathematical operations on multisets and their use cases, see
-     *Knuth, Donald. The Art of Computer Programming Volume II,
-     Section 4.6.3, Exercise 19*.
+   * Để tìm hiểu về các phép toán toán học trên multisets và các trường hợp sử dụng chúng, hãy xem *Knuth, Donald. The Art of Computer Programming Volume II, Section 4.6.3, Exercise 19*.
 
-   * To enumerate all distinct multisets of a given size over a given set of
-     elements, see :func:`itertools.combinations_with_replacement`::
+   * Để liệt kê tất cả multisets khác nhau có kích thước cho trước trên một tập hợp phần tử cho trước, hãy xem :func:`itertools.combinations_with_replacement`::
 
         map(Counter, combinations_with_replacement('ABC', 2)) # --> AA AB AC BB BC CC
 
 
-:class:`deque` objects
-----------------------
+:class:`deque` đối tượng
+------------------------
 
 .. class:: deque([iterable, [maxlen]])
 
-    Returns a new deque object initialized left-to-right (using :meth:`append`) with
-    data from *iterable*.  If *iterable* is not specified, the new deque is empty.
+    Trả về một đối tượng deque mới được khởi tạo từ trái sang phải (bằng :meth:`append`) với dữ liệu từ *iterable*. Nếu *iterable* không được chỉ định, deque mới sẽ rỗng.
 
-    Deques are a generalization of stacks and queues (the name is pronounced "deck"
-    and is short for "double-ended queue").  Deques support thread-safe, memory
-    efficient appends and pops from either side of the deque with approximately the
-    same *O*\ (1) performance in either direction.
+    Deque là sự khái quát hóa của stack và queue (tên này được phát âm là "deck" và là dạng viết tắt của "double-ended queue"). Deque hỗ trợ các thao tác append và pop an toàn với thread, tiết kiệm bộ nhớ từ cả hai đầu của deque, với hiệu năng *O*\ (1) xấp xỉ như nhau theo cả hai hướng.
 
-    Though :class:`list` objects support similar operations, they are optimized for
-    fast fixed-length operations and incur *O*\ (*n*) memory movement costs for
-    ``pop(0)`` and ``insert(0, v)`` operations which change both the size and
-    position of the underlying data representation.
+    Mặc dù :class:`list` đối tượng hỗ trợ các thao tác tương tự, chúng được tối ưu hóa cho các thao tác có độ dài cố định nhanh và phải chịu chi phí di chuyển bộ nhớ *O*\ (*n*) đối với các thao tác ``pop(0)`` và ``insert(0, v)`` làm thay đổi cả kích thước lẫn vị trí của biểu diễn dữ liệu nền.
 
 
-    If *maxlen* is not specified or is ``None``, deques may grow to an
-    arbitrary length.  Otherwise, the deque is bounded to the specified maximum
-    length.  Once a bounded length deque is full, when new items are added, a
-    corresponding number of items are discarded from the opposite end.  Bounded
-    length deques provide functionality similar to the ``tail`` filter in
-    Unix. They are also useful for tracking transactions and other pools of data
-    where only the most recent activity is of interest.
+    Nếu *maxlen* không được chỉ định hoặc là ``None``, deque có thể tăng đến độ dài tùy ý. Nếu không, deque bị giới hạn ở độ dài tối đa đã chỉ định. Khi deque có độ dài giới hạn đã đầy, mỗi khi thêm các mục mới, một số lượng tương ứng các mục sẽ bị loại bỏ khỏi đầu đối diện. Deque có độ dài giới hạn cung cấp chức năng tương tự như ``tail`` bộ lọc trong Unix. Chúng cũng hữu ích để theo dõi các giao dịch và các tập dữ liệu khác mà chỉ hoạt động gần đây nhất mới đáng quan tâm.
 
-    Deques are :ref:`generic <generics>` over the type of their contents.
+    Các đối tượng Deque mang tính :ref:`generic <generics>` theo kiểu dữ liệu của nội dung bên trong.
 
 
-    Deque objects support the following methods:
+    Các đối tượng Deque hỗ trợ những phương thức sau:
 
     .. method:: append(item, /)
 
-        Add *item* to the right side of the deque.
+        Thêm *item* vào phía bên phải của deque.
 
 
     .. method:: appendleft(item, /)
 
-        Add *item* to the left side of the deque.
+        Thêm *item* vào phía bên trái của deque.
 
 
     .. method:: clear()
 
-        Remove all elements from the deque leaving it with length 0.
+        Xóa tất cả phần tử khỏi deque, khiến độ dài của nó bằng 0.
 
 
     .. method:: copy()
 
-        Create a shallow copy of the deque.
+        Tạo một bản sao nông của deque.
 
         .. versionadded:: 3.5
 
 
     .. method:: count(value, /)
 
-        Count the number of deque elements equal to *value*.
+        Đếm số phần tử trong deque bằng *value*.
 
         .. versionadded:: 3.2
 
 
     .. method:: extend(iterable, /)
 
-        Extend the right side of the deque by appending elements from the iterable
-        argument.
+        Mở rộng phía bên phải của deque bằng cách nối thêm các phần tử từ đối số iterable.
 
 
     .. method:: extendleft(iterable, /)
 
-        Extend the left side of the deque by appending elements from *iterable*.
-        Note, the series of left appends results in reversing the order of
-        elements in the iterable argument.
+        Mở rộng phía bên trái của deque bằng cách nối thêm các phần tử từ *iterable*. Lưu ý rằng chuỗi thao tác nối thêm vào bên trái sẽ đảo ngược thứ tự các phần tử trong đối số iterable.
 
 
     .. method:: index(value[, start[, stop]])
 
-        Return the position of *value* in the deque (at or after index *start*
-        and before index *stop*).  Returns the first match or raises
-        :exc:`ValueError` if not found.
+        Trả về vị trí của *value* trong deque (tại hoặc sau chỉ mục *start* và trước chỉ mục *stop*). Trả về kết quả khớp đầu tiên hoặc phát sinh
+        :exc:`ValueError` nếu không tìm thấy.
 
         .. versionadded:: 3.5
 
 
     .. method:: insert(index, value, /)
 
-        Insert *value* into the deque at position *index*.
+        Chèn *value* vào deque tại vị trí *index*.
 
-        If the insertion would cause a bounded deque to grow beyond *maxlen*,
-        an :exc:`IndexError` is raised.
+        Nếu thao tác chèn khiến deque bị giới hạn phát triển vượt quá *maxlen*, :exc:`IndexError` sẽ được phát sinh.
 
         .. versionadded:: 3.5
 
 
     .. method:: pop()
 
-        Remove and return an element from the right side of the deque. If no
-        elements are present, raises an :exc:`IndexError`.
+        Xóa và trả về một phần tử ở phía bên phải của deque. Nếu không có phần tử nào, phát sinh :exc:`IndexError`.
 
 
     .. method:: popleft()
 
-        Remove and return an element from the left side of the deque. If no
-        elements are present, raises an :exc:`IndexError`.
+        Xóa và trả về một phần tử ở phía bên trái của deque. Nếu không có phần tử nào, phát sinh :exc:`IndexError`.
 
 
     .. method:: remove(value, /)
 
-        Remove the first occurrence of *value*.  If not found, raises a
+        Xóa lần xuất hiện đầu tiên của *value*. Nếu không tìm thấy, phát sinh
         :exc:`ValueError`.
 
 
     .. method:: reverse()
 
-        Reverse the elements of the deque in-place and then return ``None``.
+        Đảo ngược các phần tử của deque tại chỗ rồi trả về ``None``.
 
         .. versionadded:: 3.2
 
 
     .. method:: rotate(n=1, /)
 
-        Rotate the deque *n* steps to the right.  If *n* is negative, rotate
-        to the left.
+        Xoay deque *n* bước sang phải. Nếu *n* là số âm, hãy xoay sang trái.
 
-        When the deque is not empty, rotating one step to the right is equivalent
-        to ``d.appendleft(d.pop())``, and rotating one step to the left is
-        equivalent to ``d.append(d.popleft())``.
+        Khi deque không rỗng, xoay một bước sang phải tương đương với ``d.appendleft(d.pop())``, còn xoay một bước sang trái tương đương với ``d.append(d.popleft())``.
 
 
-    Deque objects also provide one read-only attribute:
+    Các đối tượng deque cũng cung cấp một thuộc tính chỉ đọc:
 
     .. attribute:: maxlen
 
-        Maximum size of a deque or ``None`` if unbounded.
+        Kích thước tối đa của deque hoặc ``None`` nếu không giới hạn.
 
         .. versionadded:: 3.1
 
 
-In addition to the above, deques support iteration, pickling, ``len(d)``,
-``reversed(d)``, ``copy.copy(d)``, ``copy.deepcopy(d)``, membership testing with
-the :keyword:`in` operator, and subscript references such as ``d[0]`` to access
-the first element.  Indexed access is *O*\ (1) at both ends but slows to *O*\ (*n*) in
-the middle.  For fast random access, use lists instead.
+Ngoài các chức năng trên, deque còn hỗ trợ phép lặp, pickling, ``len(d)``, ``reversed(d)``, ``copy.copy(d)``, ``copy.deepcopy(d)``, kiểm tra phần tử với toán tử :keyword:`in`, và tham chiếu chỉ số con như ``d[0]`` để truy cập phần tử đầu tiên. Truy cập theo chỉ số có độ phức tạp *O*\ (1) ở cả hai đầu, nhưng chậm xuống *O*\ (*n*) ở giữa. Để truy cập ngẫu nhiên nhanh, hãy dùng list.
 
-Starting in version 3.5, deques support ``__add__()``, ``__mul__()``,
-and ``__imul__()``.
+Bắt đầu từ phiên bản 3.5, deque hỗ trợ ``__add__()``, ``__mul__()`` và ``__imul__()``.
 
-Example:
+Ví dụ:
 
 .. doctest::
 
     >>> from collections import deque
-    >>> d = deque('ghi')                 # make a new deque with three items
-    >>> for elem in d:                   # iterate over the deque's elements
+    >>> d = deque('ghi')                 # tạo một deque mới với ba phần tử
+    >>> for elem in d:                   # lặp qua các phần tử của deque
     ...     print(elem.upper())
     G
     H
     I
 
-    >>> d.append('j')                    # add a new entry to the right side
-    >>> d.appendleft('f')                # add a new entry to the left side
-    >>> d                                # show the representation of the deque
+    >>> d.append('j')                    # thêm một mục mới vào bên phải
+    >>> d.appendleft('f')                # thêm một mục mới vào bên trái
+    >>> d                                # hiển thị biểu diễn của deque
     deque(['f', 'g', 'h', 'i', 'j'])
 
-    >>> d.pop()                          # return and remove the rightmost item
+    >>> d.pop()                          # trả về và xóa mục ngoài cùng bên phải
     'j'
-    >>> d.popleft()                      # return and remove the leftmost item
+    >>> d.popleft()                      # trả về và xóa phần tử ngoài cùng bên trái
     'f'
-    >>> list(d)                          # list the contents of the deque
+    >>> list(d)                          # liệt kê nội dung của deque
     ['g', 'h', 'i']
-    >>> d[0]                             # peek at leftmost item
+    >>> d[0]                             # xem phần tử ngoài cùng bên trái
     'g'
-    >>> d[-1]                            # peek at rightmost item
+    >>> d[-1]                            # xem phần tử ngoài cùng bên phải
     'i'
 
-    >>> list(reversed(d))                # list the contents of a deque in reverse
+    >>> list(reversed(d))                # liệt kê nội dung của deque theo thứ tự ngược lại
     ['i', 'h', 'g']
-    >>> 'h' in d                         # search the deque
+    >>> 'h' in d                         # tìm kiếm trong deque
     True
-    >>> d.extend('jkl')                  # add multiple elements at once
+    >>> d.extend('jkl')                  # thêm nhiều phần tử cùng lúc
     >>> d
     deque(['g', 'h', 'i', 'j', 'k', 'l'])
-    >>> d.rotate(1)                      # right rotation
+    >>> d.rotate(1)                      # xoay phải
     >>> d
     deque(['l', 'g', 'h', 'i', 'j', 'k'])
-    >>> d.rotate(-1)                     # left rotation
+    >>> d.rotate(-1)                     # xoay trái
     >>> d
     deque(['g', 'h', 'i', 'j', 'k', 'l'])
 
-    >>> deque(reversed(d))               # make a new deque in reverse order
+    >>> deque(reversed(d))               # tạo deque mới theo thứ tự đảo ngược
     deque(['l', 'k', 'j', 'i', 'h', 'g'])
-    >>> d.clear()                        # empty the deque
-    >>> d.pop()                          # cannot pop from an empty deque
+    >>> d.clear()                        # làm rỗng deque
+    >>> d.pop()                          # không thể pop từ deque rỗng
     Traceback (most recent call last):
         File "<pyshell#6>", line 1, in -toplevel-
             d.pop()
     IndexError: pop from an empty deque
 
-    >>> d.extendleft('abc')              # extendleft() reverses the input order
+    >>> d.extendleft('abc')              # extendleft() đảo ngược thứ tự đầu vào
     >>> d
     deque(['c', 'b', 'a'])
 
 
-:class:`deque` Recipes
-^^^^^^^^^^^^^^^^^^^^^^
+:class:`deque` Công thức
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-This section shows various approaches to working with deques.
+Phần này trình bày nhiều cách tiếp cận khác nhau khi làm việc với deque.
 
-Bounded length deques provide functionality similar to the ``tail`` filter
-in Unix::
+Deque có độ dài giới hạn cung cấp chức năng tương tự bộ lọc ``tail`` trong Unix::
 
     def tail(filename, n=10):
         'Return the last n lines of a file'
         with open(filename) as f:
             return deque(f, n)
 
-Another approach to using deques is to maintain a sequence of recently
-added elements by appending to the right and popping to the left::
+Một cách tiếp cận khác khi sử dụng deque là duy trì một chuỗi các phần tử mới được thêm vào bằng cách thêm vào bên phải và lấy ra từ bên trái::
 
     def moving_average(iterable, n=3):
         # moving_average([40, 30, 50, 46, 39, 44]) --> 40.0 42.0 45.0 43.0
@@ -683,12 +564,7 @@ added elements by appending to the right and popping to the left::
             d.append(elem)
             yield s / n
 
-A `round-robin scheduler
-<https://en.wikipedia.org/wiki/Round-robin_scheduling>`_ can be implemented with
-input iterators stored in a :class:`deque`.  Values are yielded from the active
-iterator in position zero.  If that iterator is :term:`exhausted`, it can be removed
-with :meth:`~deque.popleft`; otherwise, it can be cycled back to the end with
-the :meth:`~deque.rotate` method::
+Có thể triển khai `bộ lập lịch round-robin <https://en.wikipedia.org/wiki/Round-robin_scheduling>`_ bằng các iterator đầu vào được lưu trong một :class:`deque`. Các giá trị được trả về từ iterator đang hoạt động ở vị trí số không. Nếu iterator đó :term:`exhausted`, có thể xóa nó bằng :meth:`~deque.popleft`; nếu không, có thể đưa nó trở lại cuối bằng phương thức :meth:`~deque.rotate`::
 
     def roundrobin(*iterables):
         "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
@@ -699,92 +575,69 @@ the :meth:`~deque.rotate` method::
                     yield next(iterators[0])
                     iterators.rotate(-1)
             except StopIteration:
-                # Remove an exhausted iterator.
+                # Xóa iterator đã dùng hết.
                 iterators.popleft()
 
-The :meth:`~deque.rotate` method provides a way to implement :class:`deque` slicing and
-deletion.  For example, a pure Python implementation of ``del d[n]`` relies on
-the ``rotate()`` method to position elements to be popped::
+Phương thức :meth:`~deque.rotate` cung cấp một cách để triển khai việc cắt lát và xóa :class:`deque`. Ví dụ: một triển khai thuần Python của ``del d[n]`` dựa vào phương thức ``rotate()`` để đưa các phần tử vào vị trí cần lấy ra::
 
     def delete_nth(d, n):
         d.rotate(-n)
         d.popleft()
         d.rotate(n)
 
-To implement :class:`deque` slicing, use a similar approach applying
-:meth:`~deque.rotate` to bring a target element to the left side of the deque. Remove
-old entries with :meth:`~deque.popleft`, add new entries with :meth:`~deque.extend`, and then
-reverse the rotation.
-With minor variations on that approach, it is easy to implement Forth style
-stack manipulations such as ``dup``, ``drop``, ``swap``, ``over``, ``pick``,
-``rot``, and ``roll``.
+Để triển khai việc cắt lát :class:`deque`, hãy sử dụng cách tiếp cận tương tự bằng cách áp dụng
+:meth:`~deque.rotate` để đưa phần tử đích về phía bên trái của deque. Xóa các mục cũ bằng :meth:`~deque.popleft`, thêm các mục mới bằng :meth:`~deque.extend`, rồi đảo ngược phép xoay. Với một vài biến thể nhỏ của cách tiếp cận này, bạn có thể dễ dàng triển khai các thao tác ngăn xếp theo phong cách Forth như ``dup``, ``drop``, ``swap``, ``over``, ``pick``, ``rot`` và ``roll``.
 
 
-:class:`defaultdict` objects
-----------------------------
+Các đối tượng :class:`defaultdict`
+----------------------------------
 
 .. class:: defaultdict(default_factory=None, /, **kwargs)
-           defaultdict(default_factory, mapping, /, **kwargs)
-           defaultdict(default_factory, iterable, /, **kwargs)
+           defaultdict(default_factory, mapping, /, ****kwargs) defaultdict(default_factory, iterable, /, ****kwargs)
 
-    Return a new dictionary-like object.  :class:`defaultdict` is a subclass of the
-    built-in :class:`dict` class.  It overrides one method and adds one writable
-    instance variable.  The remaining functionality is the same as for the
-    :class:`dict` class and is not documented here.
+    Trả về một đối tượng mới giống từ điển. :class:`defaultdict` là một lớp con của lớp :class:`dict` dựng sẵn. Lớp này ghi đè một phương thức và thêm một biến thực thể có thể ghi. Chức năng còn lại giống như chức năng của
+    lớp :class:`dict` và không được mô tả ở đây.
 
-    The first argument provides the initial value for the :attr:`default_factory`
-    attribute; it defaults to ``None``. All remaining arguments are treated the same
-    as if they were passed to the :class:`dict` constructor, including keyword
-    arguments.
+    Đối số đầu tiên cung cấp giá trị ban đầu cho thuộc tính :attr:`default_factory`; theo mặc định, thuộc tính này là ``None``. Tất cả các đối số còn lại được xử lý giống như khi chúng được truyền cho hàm khởi tạo :class:`dict`, bao gồm cả các đối số từ khóa.
 
-    :class:`!defaultdict`\s are :ref:`generic <generics>` over two types,
-    signifying (respectively) the types of the dictionary's keys and values.
+    :class:`!defaultdict`\s là :ref:`generic <generics>` trên hai kiểu, lần lượt biểu thị các kiểu của khóa và giá trị trong dictionary.
 
 
-    :class:`defaultdict` objects support the following method in addition to the
-    standard :class:`dict` operations:
+    Các đối tượng :class:`defaultdict` hỗ trợ phương thức sau, ngoài các thao tác :class:`dict` tiêu chuẩn:
 
     .. method:: __missing__(key, /)
 
-        If the :attr:`default_factory` attribute is ``None``, this raises a
-        :exc:`KeyError` exception with the *key* as argument.
+        Nếu thuộc tính :attr:`default_factory` là ``None``, thao tác này sẽ phát sinh một
+        ngoại lệ :exc:`KeyError` với *key* làm đối số.
 
-        If :attr:`default_factory` is not ``None``, it is called without arguments
-        to provide a default value for the given *key*, this value is inserted in
-        the dictionary for the *key*, and returned.
+        Nếu :attr:`default_factory` không phải là ``None``, nó được gọi không có đối số để cung cấp giá trị mặc định cho *key* đã cho; giá trị này được chèn vào dictionary cho *key*, rồi được trả về.
 
-        If calling :attr:`default_factory` raises an exception this exception is
-        propagated unchanged.
+        Nếu việc gọi :attr:`default_factory` phát sinh một ngoại lệ, ngoại lệ này được truyền nguyên trạng.
 
-        This method is called by the :meth:`~object.__getitem__` method of the
-        :class:`dict` class when the requested key is not found; whatever it
-        returns or raises is then returned or raised by :meth:`~object.__getitem__`.
+        Phương thức này được gọi bởi phương thức :meth:`~object.__getitem__` của
+        :class:`dict` lớp khi không tìm thấy khóa được yêu cầu; bất kỳ giá trị nào nó trả về hoặc ngoại lệ nào nó phát sinh sau đó cũng được :meth:`~object.__getitem__` trả về hoặc phát sinh.
 
-        Note that :meth:`__missing__` is *not* called for any operations besides
-        :meth:`~object.__getitem__`. This means that :meth:`~dict.get` will, like
-        normal dictionaries, return ``None`` as a default rather than using
+        Lưu ý rằng :meth:`__missing__` *not* được gọi cho bất kỳ thao tác nào ngoài
+        :meth:`~object.__getitem__`. Điều này có nghĩa là :meth:`~dict.get` sẽ, giống như các dictionary thông thường, trả về ``None`` theo mặc định thay vì sử dụng
         :attr:`default_factory`.
 
 
-    :class:`defaultdict` objects support the following instance variable:
+    Các đối tượng :class:`defaultdict` hỗ trợ biến instance sau:
 
 
     .. attribute:: default_factory
 
-        This attribute is used by the :meth:`~defaultdict.__missing__` method;
-        it is initialized from the first argument to the constructor, if present,
-        or to ``None``, if absent.
+        Thuộc tính này được phương thức :meth:`~defaultdict.__missing__` sử dụng; nó được khởi tạo từ đối số đầu tiên của hàm khởi tạo, nếu có, hoặc được đặt thành ``None`` nếu không có.
 
     .. versionchanged:: 3.9
-       Added merge (``|``) and update (``|=``) operators, specified in
+       Đã thêm các toán tử merge (``|``) và update (``|=``), được chỉ định trong
        :pep:`584`.
 
 
-:class:`defaultdict` Examples
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các ví dụ về :class:`defaultdict`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Using :class:`list` as the :attr:`~defaultdict.default_factory`, it is easy to group a
-sequence of key-value pairs into a dictionary of lists:
+Dùng :class:`list` làm :attr:`~defaultdict.default_factory`, bạn có thể dễ dàng nhóm một chuỗi các cặp khóa-giá trị thành một dictionary gồm các list:
 
     >>> s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
     >>> d = defaultdict(list)
@@ -794,13 +647,8 @@ sequence of key-value pairs into a dictionary of lists:
     >>> sorted(d.items())
     [('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
 
-When each key is encountered for the first time, it is not already in the
-mapping; so an entry is automatically created using the :attr:`~defaultdict.default_factory`
-function which returns an empty :class:`list`.  The :meth:`list.append`
-operation then attaches the value to the new list.  When keys are encountered
-again, the look-up proceeds normally (returning the list for that key) and the
-:meth:`list.append` operation adds another value to the list. This technique is
-simpler and faster than an equivalent technique using :meth:`dict.setdefault`:
+Khi mỗi khóa được gặp lần đầu, khóa đó chưa có trong mapping; vì vậy một mục nhập được tự động tạo bằng hàm :attr:`~defaultdict.default_factory`, hàm này trả về một :class:`list` trống. Sau đó, thao tác :meth:`list.append` sẽ gắn giá trị vào list mới. Khi các khóa được gặp lại, việc tra cứu diễn ra bình thường (trả về list tương ứng với khóa đó) và
+thao tác :meth:`list.append` thêm một giá trị khác vào list. Kỹ thuật này đơn giản và nhanh hơn kỹ thuật tương đương sử dụng :meth:`dict.setdefault`:
 
     >>> d = {}
     >>> for k, v in s:
@@ -809,9 +657,8 @@ simpler and faster than an equivalent technique using :meth:`dict.setdefault`:
     >>> sorted(d.items())
     [('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
 
-Setting the :attr:`~defaultdict.default_factory` to :class:`int` makes the
-:class:`defaultdict` useful for counting (like a bag or multiset in other
-languages):
+Đặt :attr:`~defaultdict.default_factory` thành :class:`int` khiến
+:class:`defaultdict` hữu ích cho việc đếm (tương tự bag hoặc multiset trong các ngôn ngữ khác):
 
     >>> s = 'mississippi'
     >>> d = defaultdict(int)
@@ -821,14 +668,10 @@ languages):
     >>> sorted(d.items())
     [('i', 4), ('m', 1), ('p', 2), ('s', 4)]
 
-When a letter is first encountered, it is missing from the mapping, so the
-:attr:`~defaultdict.default_factory` function calls :func:`int` to supply a default count of
-zero.  The increment operation then builds up the count for each letter.
+Khi một chữ cái được gặp lần đầu, chữ cái đó không có trong mapping, vì vậy
+hàm :attr:`~defaultdict.default_factory` gọi :func:`int` để cung cấp giá trị đếm mặc định bằng không. Sau đó, thao tác tăng dần sẽ xây dựng số đếm cho từng chữ cái.
 
-The function :func:`int` which always returns zero is just a special case of
-constant functions.  A faster and more flexible way to create constant functions
-is to use a lambda function which can supply any constant value (not just
-zero):
+Hàm :func:`int` luôn trả về số 0 chỉ là một trường hợp đặc biệt của các hàm hằng. Cách nhanh hơn và linh hoạt hơn để tạo các hàm hằng là sử dụng hàm lambda, có thể cung cấp bất kỳ giá trị hằng nào (không chỉ số 0):
 
     >>> def constant_factory(value):
     ...     return lambda: value
@@ -838,8 +681,8 @@ zero):
     >>> '%(name)s %(action)s to %(object)s' % d
     'John ran to <missing>'
 
-Setting the :attr:`~defaultdict.default_factory` to :class:`set` makes the
-:class:`defaultdict` useful for building a dictionary of sets:
+Đặt :attr:`~defaultdict.default_factory` thành :class:`set` khiến
+:class:`defaultdict` trở nên hữu ích khi xây dựng một từ điển các tập hợp:
 
     >>> s = [('red', 1), ('blue', 2), ('red', 3), ('blue', 4), ('red', 1), ('blue', 4)]
     >>> d = defaultdict(set)
@@ -850,88 +693,63 @@ Setting the :attr:`~defaultdict.default_factory` to :class:`set` makes the
     [('blue', {2, 4}), ('red', {1, 3})]
 
 
-:func:`namedtuple` Factory Function for Tuples with Named Fields
-----------------------------------------------------------------
+Hàm Factory :func:`namedtuple` cho các tuple có trường được đặt tên
+-------------------------------------------------------------------
 
-Named tuples assign meaning to each position in a tuple and allow for more readable,
-self-documenting code.  They can be used wherever regular tuples are used, and
-they add the ability to access fields by name instead of position index.
+Named tuple gán ý nghĩa cho từng vị trí trong một tuple và cho phép viết mã dễ đọc hơn, có khả năng tự mô tả. Chúng có thể được sử dụng ở bất cứ đâu có thể sử dụng tuple thông thường, đồng thời bổ sung khả năng truy cập các trường theo tên thay vì theo chỉ số vị trí.
 
 .. function:: namedtuple(typename, field_names, *, rename=False, defaults=None, module=None)
 
-    Returns a new tuple subclass named *typename*.  The new subclass is used to
-    create tuple-like objects that have fields accessible by attribute lookup as
-    well as being indexable and iterable.  Instances of the subclass also have a
-    helpful docstring (with *typename* and *field_names*) and a helpful
-    :meth:`~object.__repr__` method which lists the tuple contents in a ``name=value``
-    format.
+    Trả về một lớp con tuple mới có tên *typename*. Lớp con mới này được dùng để tạo các đối tượng giống tuple, có các trường có thể truy cập bằng tra cứu thuộc tính, đồng thời hỗ trợ lập chỉ mục và lặp. Các thực thể của lớp con cũng có một docstring hữu ích (với *typename* và *field_names*) cùng một phương thức hữu ích
+    :meth:`~object.__repr__`, liệt kê nội dung tuple theo định dạng ``name=value``.
 
-    The *field_names* are a sequence of strings such as ``['x', 'y']``.
-    Alternatively, *field_names* can be a single string with each fieldname
-    separated by whitespace and/or commas, for example ``'x y'`` or ``'x, y'``.
+    *field_names* là một chuỗi các chuỗi, chẳng hạn như ``['x', 'y']``. Ngoài ra, *field_names* có thể là một chuỗi duy nhất, trong đó mỗi tên trường được phân tách bằng khoảng trắng và/hoặc dấu phẩy, chẳng hạn như ``'x y'`` hoặc ``'x, y'``.
 
-    Any valid Python identifier may be used for a fieldname except for names
-    starting with an underscore.  Valid identifiers consist of letters, digits,
-    and underscores but do not start with a digit or underscore and cannot be
-    a :mod:`keyword` such as *class*, *for*, *return*, *global*, *pass*,
-    or *raise*.
+    Có thể sử dụng bất kỳ Python identifier hợp lệ nào làm tên trường, ngoại trừ các tên bắt đầu bằng dấu gạch dưới. Identifier hợp lệ gồm các chữ cái, chữ số và dấu gạch dưới, nhưng không bắt đầu bằng chữ số hoặc dấu gạch dưới và không thể là :mod:`keyword` như *class*, *for*, *return*, *global*, *pass* hoặc *raise*.
 
-    If *rename* is true, invalid fieldnames are automatically replaced
-    with positional names.  For example, ``['abc', 'def', 'ghi', 'abc']`` is
-    converted to ``['abc', '_1', 'ghi', '_3']``, eliminating the keyword
-    ``def`` and the duplicate fieldname ``abc``.
+    Nếu *rename* là true, các tên trường không hợp lệ sẽ tự động được thay thế bằng tên theo vị trí. Ví dụ, ``['abc', 'def', 'ghi', 'abc']`` được chuyển đổi thành ``['abc', '_1', 'ghi', '_3']``, loại bỏ từ khóa ``def`` và tên trường trùng lặp ``abc``.
 
-    *defaults* can be ``None`` or an :term:`iterable` of default values.
-    Since fields with a default value must come after any fields without a
-    default, the *defaults* are applied to the rightmost parameters.  For
-    example, if the fieldnames are ``['x', 'y', 'z']`` and the defaults are
-    ``(1, 2)``, then ``x`` will be a required argument, ``y`` will default to
-    ``1``, and ``z`` will default to ``2``.
+    *defaults* có thể là ``None`` hoặc một :term:`iterable` các giá trị mặc định. Vì các trường có giá trị mặc định phải đứng sau mọi trường không có giá trị mặc định, *defaults* được áp dụng cho các tham số ngoài cùng bên phải. Ví dụ, nếu các tên trường là ``['x', 'y', 'z']`` và các giá trị mặc định là ``(1, 2)``, thì ``x`` sẽ là đối số bắt buộc, ``y`` sẽ nhận mặc định là ``1``, còn ``z`` sẽ nhận mặc định là ``2``.
 
-    If *module* is defined, the :attr:`~type.__module__` attribute of the
-    named tuple is set to that value.
+    Nếu *module* được định nghĩa, thuộc tính :attr:`~type.__module__` của named tuple sẽ được đặt thành giá trị đó.
 
-    Named tuple instances do not have per-instance dictionaries, so they are
-    lightweight and require no more memory than regular tuples.
+    Các instance của named tuple không có dictionary riêng cho từng instance, vì vậy chúng nhẹ và không cần nhiều bộ nhớ hơn tuple thông thường.
 
-    To support pickling, the named tuple class should be assigned to a variable
-    that matches *typename*.
+    Để hỗ trợ pickling, class named tuple nên được gán cho một biến trùng với *typename*.
 
     .. versionchanged:: 3.1
-       Added support for *rename*.
+       Đã thêm hỗ trợ cho *rename*.
 
     .. versionchanged:: 3.6
-       The *verbose* and *rename* parameters became
-       :ref:`keyword-only arguments <keyword-only_parameter>`.
+       Các tham số *verbose* và *rename* trở thành
+       :ref:`đối số chỉ dùng từ khóa <keyword-only_parameter>`.
 
     .. versionchanged:: 3.6
-       Added the *module* parameter.
+       Đã thêm tham số *module*.
 
     .. versionchanged:: 3.7
-       Removed the *verbose* parameter and the :attr:`!_source` attribute.
+       Đã xóa tham số *verbose* và thuộc tính :attr:`!_source`.
 
     .. versionchanged:: 3.7
-       Added the *defaults* parameter and the :attr:`~somenamedtuple._field_defaults`
-       attribute.
+       Đã thêm tham số *defaults* và thuộc tính :attr:`~somenamedtuple._field_defaults`.
 
 .. doctest::
     :options: +NORMALIZE_WHITESPACE
 
-    >>> # Basic example
+    >>> # Ví dụ cơ bản
     >>> Point = namedtuple('Point', ['x', 'y'])
-    >>> p = Point(11, y=22)     # instantiate with positional or keyword arguments
-    >>> p[0] + p[1]             # indexable like the plain tuple (11, 22)
+    >>> p = Point(11, y=22)     # khởi tạo bằng đối số vị trí hoặc đối số từ khóa
+    >>> p[0] + p[1]             # có thể lập chỉ mục như tuple thông thường (11, 22)
     33
-    >>> x, y = p                # unpack like a regular tuple
+    >>> x, y = p                # giải nén như tuple thông thường
     >>> x, y
     (11, 22)
-    >>> p.x + p.y               # fields also accessible by name
+    >>> p.x + p.y               # các trường cũng có thể được truy cập theo tên
     33
-    >>> p                       # readable __repr__ with a name=value style
+    >>> p                       # __repr__ dễ đọc theo kiểu name=value
     Point(x=11, y=22)
 
-Named tuples are especially useful for assigning field names to result tuples returned
-by the :mod:`csv` or :mod:`sqlite3` modules::
+Named tuple đặc biệt hữu ích khi gán tên trường cho các tuple kết quả do các module :mod:`csv` hoặc :mod:`sqlite3` trả về::
 
     EmployeeRecord = namedtuple('EmployeeRecord', 'name, age, title, department, paygrade')
 
@@ -946,13 +764,11 @@ by the :mod:`csv` or :mod:`sqlite3` modules::
     for emp in map(EmployeeRecord._make, cursor.fetchall()):
         print(emp.name, emp.title)
 
-In addition to the methods inherited from tuples, named tuples support
-three additional methods and two attributes.  To prevent conflicts with
-field names, the method and attribute names start with an underscore.
+Ngoài các phương thức được kế thừa từ tuple, named tuple còn hỗ trợ ba phương thức bổ sung và hai thuộc tính. Để tránh xung đột với tên trường, tên của các phương thức và thuộc tính bắt đầu bằng dấu gạch dưới.
 
 .. classmethod:: somenamedtuple._make(iterable, /)
 
-    Class method that makes a new instance from an existing sequence or iterable.
+    Phương thức lớp tạo một instance mới từ một sequence hoặc iterable hiện có.
 
     .. doctest::
 
@@ -962,8 +778,7 @@ field names, the method and attribute names start with an underscore.
 
 .. method:: somenamedtuple._asdict()
 
-    Return a new :class:`dict` which maps field names to their corresponding
-    values:
+    Trả về một :class:`dict` mới ánh xạ tên trường tới các giá trị tương ứng:
 
     .. doctest::
 
@@ -972,19 +787,14 @@ field names, the method and attribute names start with an underscore.
         {'x': 11, 'y': 22}
 
     .. versionchanged:: 3.1
-        Returns an :class:`OrderedDict` instead of a regular :class:`dict`.
+        Trả về một :class:`OrderedDict` thay vì một :class:`dict` thông thường.
 
     .. versionchanged:: 3.8
-        Returns a regular :class:`dict` instead of an :class:`OrderedDict`.
-        As of Python 3.7, regular dicts are guaranteed to be ordered.  If the
-        extra features of :class:`OrderedDict` are required, the suggested
-        remediation is to cast the result to the desired type:
-        ``OrderedDict(nt._asdict())``.
+        Trả về một :class:`dict` thông thường thay vì một :class:`OrderedDict`. Kể từ Python 3.7, dict thông thường được đảm bảo giữ thứ tự. Nếu cần các tính năng bổ sung của :class:`OrderedDict`, cách khắc phục được đề xuất là ép kiểu kết quả sang kiểu mong muốn: ``OrderedDict(nt._asdict())``.
 
 .. method:: somenamedtuple._replace(**kwargs)
 
-    Return a new instance of the named tuple replacing specified fields with new
-    values::
+    Trả về một instance mới của named tuple, trong đó các trường được chỉ định được thay thế bằng các giá trị mới::
 
         >>> p = Point(x=11, y=22)
         >>> p._replace(x=33)
@@ -993,20 +803,18 @@ field names, the method and attribute names start with an underscore.
         >>> for partnum, record in inventory.items():
         ...     inventory[partnum] = record._replace(price=newprices[partnum], timestamp=time.now())
 
-    Named tuples are also supported by generic function :func:`copy.replace`.
+    Named tuple cũng được hỗ trợ bởi generic function :func:`copy.replace`.
 
     .. versionchanged:: 3.13
-       Raise :exc:`TypeError` instead of :exc:`ValueError` for invalid
-       keyword arguments.
+       Phát sinh :exc:`TypeError` thay vì :exc:`ValueError` đối với các đối số keyword không hợp lệ.
 
 .. attribute:: somenamedtuple._fields
 
-    Tuple of strings listing the field names.  Useful for introspection
-    and for creating new named tuple types from existing named tuples.
+    Tuple các chuỗi liệt kê tên trường. Hữu ích cho việc introspection và tạo các kiểu named tuple mới từ các named tuple hiện có.
 
     .. doctest::
 
-        >>> p._fields            # view the field names
+        >>> p._fields            # xem tên các trường
         ('x', 'y')
 
         >>> Color = namedtuple('Color', 'red green blue')
@@ -1016,7 +824,7 @@ field names, the method and attribute names start with an underscore.
 
 .. attribute:: somenamedtuple._field_defaults
 
-   Dictionary mapping field names to default values.
+   Dictionary ánh xạ tên trường với các giá trị mặc định.
 
    .. doctest::
 
@@ -1026,22 +834,18 @@ field names, the method and attribute names start with an underscore.
         >>> Account('premium')
         Account(type='premium', balance=0)
 
-To retrieve a field whose name is stored in a string, use the :func:`getattr`
-function:
+Để truy xuất một trường có tên được lưu trong một chuỗi, hãy sử dụng hàm :func:`getattr`:
 
     >>> getattr(p, 'x')
     11
 
-To convert a dictionary to a named tuple, use the double-star-operator
-(as described in :ref:`tut-unpacking-arguments`):
+Để chuyển đổi một dictionary thành named tuple, hãy sử dụng toán tử hai dấu sao (như được mô tả trong :ref:`tut-unpacking-arguments`):
 
     >>> d = {'x': 11, 'y': 22}
     >>> Point(**d)
     Point(x=11, y=22)
 
-Since a named tuple is a regular Python class, it is easy to add or change
-functionality with a subclass.  Here is how to add a calculated field and
-a fixed-width print format:
+Vì named tuple là một lớp Python thông thường, bạn có thể dễ dàng thêm hoặc thay đổi chức năng bằng một subclass. Sau đây là cách thêm một trường được tính toán và một định dạng in có độ rộng cố định:
 
 .. doctest::
 
@@ -1058,16 +862,13 @@ a fixed-width print format:
     Point: x= 3.000  y= 4.000  hypot= 5.000
     Point: x=14.000  y= 0.714  hypot=14.018
 
-The subclass shown above sets ``__slots__`` to an empty tuple.  This helps
-keep memory requirements low by preventing the creation of instance dictionaries.
+Subclass ở trên đặt ``__slots__`` thành một tuple rỗng. Điều này giúp giảm yêu cầu bộ nhớ bằng cách ngăn việc tạo các dictionary của instance.
 
-Subclassing is not useful for adding new, stored fields.  Instead, simply
-create a new named tuple type from the :attr:`~somenamedtuple._fields` attribute:
+Việc tạo lớp con không hữu ích khi thêm các trường được lưu trữ mới. Thay vào đó, chỉ cần tạo một kiểu tuple có tên mới từ thuộc tính :attr:`~somenamedtuple._fields`:
 
     >>> Point3D = namedtuple('Point3D', Point._fields + ('z',))
 
-Docstrings can be customized by making direct assignments to the ``__doc__``
-fields:
+Có thể tùy chỉnh docstring bằng cách gán trực tiếp cho các trường ``__doc__``:
 
    >>> Book = namedtuple('Book', ['id', 'title', 'authors'])
    >>> Book.__doc__ += ': Hardcover book in active collection'
@@ -1076,99 +877,69 @@ fields:
    >>> Book.authors.__doc__ = 'List of authors sorted by last name'
 
 .. versionchanged:: 3.5
-   Property docstrings became writeable.
+   Docstring của thuộc tính đã có thể ghi được.
 
 .. seealso::
 
-   * See :class:`typing.NamedTuple` for a way to add type hints for named
-     tuples.  It also provides an elegant notation using the :keyword:`class`
-     keyword::
+   * Xem :class:`typing.NamedTuple` để biết cách thêm type hints cho các tuple có tên. Nó cũng cung cấp ký hiệu tao nhã bằng từ khóa :keyword:`class`::
 
          class Component(NamedTuple):
              part_number: int
              weight: float
              description: Optional[str] = None
 
-   * See :meth:`types.SimpleNamespace` for a mutable namespace based on an
-     underlying dictionary instead of a tuple.
+   * Xem :meth:`types.SimpleNamespace` để biết một namespace có thể thay đổi dựa trên dictionary bên dưới thay vì tuple.
 
-   * The :mod:`dataclasses` module provides a decorator and functions for
-     automatically adding generated special methods to user-defined classes.
+   * Mô-đun :mod:`dataclasses` cung cấp một decorator và các hàm để tự động thêm những special method được tạo tự động vào các lớp do người dùng định nghĩa.
 
 
-:class:`OrderedDict` objects
-----------------------------
+Các đối tượng :class:`OrderedDict`
+----------------------------------
 
-Ordered dictionaries are just like regular dictionaries but have some extra
-capabilities relating to ordering operations.  They have become less
-important now that the built-in :class:`dict` class gained the ability
-to remember insertion order (this new behavior became guaranteed in
-Python 3.7).
+Ordered dictionaries cũng giống như các dictionary thông thường nhưng có thêm một số khả năng liên quan đến các thao tác sắp xếp. Chúng trở nên kém quan trọng hơn kể từ khi lớp :class:`dict` tích hợp sẵn có khả năng ghi nhớ thứ tự chèn (hành vi mới này được đảm bảo trong Python 3.7).
 
-Some differences from :class:`dict` still remain:
+Một số điểm khác biệt so với :class:`dict` vẫn còn tồn tại:
 
-* The regular :class:`dict` was designed to be very good at mapping
-  operations.  Tracking insertion order was secondary.
+* :class:`dict` thông thường được thiết kế để thực hiện rất tốt các thao tác ánh xạ. Việc theo dõi thứ tự chèn chỉ là ưu tiên thứ yếu.
 
-* The :class:`OrderedDict` was designed to be good at reordering operations.
-  Space efficiency, iteration speed, and the performance of update
-  operations were secondary.
+* :class:`OrderedDict` được thiết kế để thực hiện tốt các thao tác sắp xếp lại. Hiệu quả sử dụng bộ nhớ, tốc độ lặp và hiệu năng của các thao tác cập nhật là những ưu tiên thứ yếu.
 
-* The :class:`OrderedDict` algorithm can handle frequent reordering operations
-  better than :class:`dict`.  As shown in the recipes below, this makes it
-  suitable for implementing various kinds of LRU caches.
+* Thuật toán của :class:`OrderedDict` có thể xử lý các thao tác sắp xếp lại thường xuyên tốt hơn :class:`dict`. Như được minh họa trong các công thức bên dưới, điều này khiến nó phù hợp để triển khai nhiều loại bộ nhớ đệm LRU.
 
-* The equality operation for :class:`OrderedDict` checks for matching order.
+* Thao tác so sánh bằng của :class:`OrderedDict` kiểm tra xem thứ tự có trùng khớp hay không.
 
-  A regular :class:`dict` can emulate the order sensitive equality test with
-  ``p == q and all(k1 == k2 for k1, k2 in zip(p, q))``.
+  Một :class:`dict` thông thường có thể mô phỏng phép kiểm tra bằng nhạy với thứ tự bằng ``p == q and all(k1 == k2 for k1, k2 in zip(p, q))``.
 
-* The :meth:`~OrderedDict.popitem` method of :class:`OrderedDict` has a different
-  signature.  It accepts an optional argument to specify which item is popped.
+* Phương thức :meth:`~OrderedDict.popitem` của :class:`OrderedDict` có chữ ký khác. Phương thức này nhận một đối số tùy chọn để chỉ định mục được lấy ra.
 
-  A regular :class:`dict` can emulate OrderedDict's ``od.popitem(last=True)``
-  with ``d.popitem()`` which is guaranteed to pop the rightmost (last) item.
+  Một :class:`dict` thông thường có thể mô phỏng ``od.popitem(last=True)`` của OrderedDict bằng ``d.popitem()``, phương thức được đảm bảo sẽ lấy ra mục ngoài cùng bên phải (cuối cùng).
 
-  A regular :class:`dict` can emulate OrderedDict's ``od.popitem(last=False)``
-  with ``(k := next(iter(d)), d.pop(k))`` which will return and remove the
-  leftmost (first) item if it exists.
+  Một :class:`dict` thông thường có thể mô phỏng ``od.popitem(last=False)`` của OrderedDict bằng ``(k := next(iter(d)), d.pop(k))``, phương thức sẽ trả về và xóa mục ngoài cùng bên trái (đầu tiên) nếu mục đó tồn tại.
 
-* :class:`OrderedDict` has a :meth:`~OrderedDict.move_to_end` method to efficiently
-  reposition an element to an endpoint.
+* :class:`OrderedDict` có phương thức :meth:`~OrderedDict.move_to_end` để định vị lại một phần tử đến một đầu một cách hiệu quả.
 
-  A regular :class:`dict` can emulate OrderedDict's ``od.move_to_end(k,
-  last=True)`` with ``d[k] = d.pop(k)`` which will move the key and its
-  associated value to the rightmost (last) position.
+  Một :class:`dict` thông thường có thể mô phỏng ``od.move_to_end(k, last=True)`` của OrderedDict bằng ``d[k] = d.pop(k)``, phương thức sẽ di chuyển khóa và giá trị liên kết với khóa đó đến vị trí ngoài cùng bên phải (cuối cùng).
 
-  A regular :class:`dict` does not have an efficient equivalent for
-  OrderedDict's ``od.move_to_end(k, last=False)`` which moves the key
-  and its associated value to the leftmost (first) position.
+  Một :class:`dict` thông thường không có cách tương đương hiệu quả với ``od.move_to_end(k, last=False)`` của OrderedDict, phương thức di chuyển khóa và giá trị liên kết với khóa đó đến vị trí ngoài cùng bên trái (đầu tiên).
 
-* Until Python 3.8, :class:`dict` lacked a :meth:`~object.__reversed__` method.
+* Cho đến Python 3.8, :class:`dict` không có phương thức :meth:`~object.__reversed__`.
 
 
 .. class:: OrderedDict(**kwargs)
-           OrderedDict(mapping, /, **kwargs)
-           OrderedDict(iterable, /, **kwargs)
+           OrderedDict(mapping, /, ****kwargs) OrderedDict(iterable, /, ****kwargs)
 
-    Return an instance of a :class:`dict` subclass that has methods
-    specialized for rearranging dictionary order.
+    Trả về một thể hiện của lớp con :class:`dict` có các phương thức được chuyên biệt hóa để sắp xếp lại thứ tự từ điển.
 
     .. versionadded:: 3.1
 
     .. method:: popitem(last=True)
 
-        The :meth:`popitem` method for ordered dictionaries returns and removes a
-        (key, value) pair.  The pairs are returned in
-        :abbr:`LIFO (last-in, first-out)` order if *last* is true
-        or :abbr:`FIFO (first-in, first-out)` order if false.
+        Phương thức :meth:`popitem` của các từ điển có thứ tự trả về và loại bỏ một cặp (khóa, giá trị). Các cặp được trả về theo
+        thứ tự :abbr:`LIFO (vào sau, ra trước)` nếu *last* là true hoặc theo thứ tự :abbr:`FIFO (vào trước, ra trước)` nếu là false.
 
     .. method:: move_to_end(key, last=True)
 
-        Move an existing *key* to either end of an ordered dictionary.  The item
-        is moved to the right end if *last* is true (the default) or to the
-        beginning if *last* is false.  Raises :exc:`KeyError` if the *key* does
-        not exist:
+        Di chuyển một *khóa* hiện có đến một trong hai đầu của từ điển có thứ tự. Mục này được di chuyển đến cuối bên phải nếu *last* là true (mặc định) hoặc đến đầu nếu *last* là false. Phát sinh :exc:`KeyError` nếu *khóa* không tồn tại:
 
         .. doctest::
 
@@ -1182,39 +953,29 @@ Some differences from :class:`dict` still remain:
 
         .. versionadded:: 3.2
 
-In addition to the usual mapping methods, ordered dictionaries also support
-reverse iteration using :func:`reversed`.
+Ngoài các phương thức ánh xạ thông thường, các từ điển có thứ tự cũng hỗ trợ lặp ngược bằng cách sử dụng :func:`reversed`.
 
 .. _collections_OrderedDict__eq__:
 
-Equality tests between :class:`OrderedDict` objects are order-sensitive
-and are roughly equivalent to ``list(od1.items())==list(od2.items())``.
+Các phép kiểm tra tính bằng nhau giữa các đối tượng :class:`OrderedDict` có xét đến thứ tự và gần tương đương với ``list(od1.items())==list(od2.items())``.
 
-Equality tests between :class:`OrderedDict` objects and other
-:class:`~collections.abc.Mapping` objects are order-insensitive like regular
-dictionaries.  This allows :class:`OrderedDict` objects to be substituted
-anywhere a regular dictionary is used.
+Các phép kiểm tra tính bằng giữa các đối tượng :class:`OrderedDict` và các đối tượng khác
+Các đối tượng :class:`~collections.abc.Mapping` không phụ thuộc vào thứ tự, giống như các dictionary thông thường. Điều này cho phép thay thế các đối tượng :class:`OrderedDict` ở bất kỳ nơi nào sử dụng một dictionary thông thường.
 
 .. versionchanged:: 3.5
-   The items, keys, and values :term:`views <dictionary view>`
-   of :class:`OrderedDict` now support reverse iteration using :func:`reversed`.
+   Các :term:`view <dictionary view>` items, keys và values của :class:`OrderedDict` hiện hỗ trợ lặp ngược bằng :func:`reversed`.
 
 .. versionchanged:: 3.6
-   With the acceptance of :pep:`468`, order is retained for keyword arguments
-   passed to the :class:`OrderedDict` constructor and its :meth:`~dict.update`
-   method.
+   Với việc chấp nhận :pep:`468`, thứ tự được giữ nguyên đối với các keyword argument truyền vào constructor :class:`OrderedDict` và phương thức :meth:`~dict.update` của nó.
 
 .. versionchanged:: 3.9
-   Added merge (``|``) and update (``|=``) operators, specified in :pep:`584`.
+   Đã thêm các toán tử merge (``|``) và update (``|=``), được đặc tả trong :pep:`584`.
 
 
-:class:`OrderedDict` Examples and Recipes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:class:`OrderedDict` Ví dụ và công thức
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is straightforward to create an ordered dictionary variant
-that remembers the order the keys were *last* inserted.
-If a new entry overwrites an existing entry, the
-original insertion position is changed and moved to the end::
+Dễ dàng tạo một biến thể dictionary có thứ tự, ghi nhớ thứ tự các key được *chèn cuối cùng*. Nếu một entry mới ghi đè lên entry hiện có, vị trí chèn ban đầu sẽ được thay đổi và chuyển xuống cuối::
 
     class LastUpdatedOrderedDict(OrderedDict):
         'Store items in the order the keys were last added'
@@ -1223,8 +984,7 @@ original insertion position is changed and moved to the end::
             super().__setitem__(key, value)
             self.move_to_end(key)
 
-An :class:`OrderedDict` would also be useful for implementing
-variants of :deco:`functools.lru_cache`:
+Một :class:`OrderedDict` cũng sẽ hữu ích để triển khai các biến thể của :deco:`functools.lru_cache`:
 
 .. testcode::
 
@@ -1268,8 +1028,8 @@ variants of :deco:`functools.lru_cache`:
             self.requests = OrderedDict()   # { uncached_key : request_count }
             self.cache = OrderedDict()      # { cached_key : function_result }
             self.func = func
-            self.maxrequests = maxrequests  # max number of uncached requests
-            self.maxsize = maxsize          # max number of stored return values
+            self.maxrequests = maxrequests  # số request chưa được cache tối đa
+            self.maxsize = maxsize          # số giá trị trả về được lưu trữ tối đa
             self.cache_after = cache_after
 
         def __call__(self, *args):
@@ -1296,23 +1056,23 @@ variants of :deco:`functools.lru_cache`:
     ...     return x * x
     ...
     >>> f = MultiHitLRUCache(square, maxsize=4, maxrequests=6)
-    >>> list(map(f, range(10)))  # First requests, don't cache
+    >>> list(map(f, range(10)))  # Các request đầu tiên, không cache
     [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-    >>> f(4)  # Cache the second request
+    >>> f(4)  # Lưu yêu cầu thứ hai vào cache
     16
-    >>> f(6)  # Cache the second request
+    >>> f(6)  # Lưu yêu cầu thứ hai vào cache
     36
-    >>> f(2)  # The first request aged out, so don't cache
+    >>> f(2)  # Yêu cầu đầu tiên đã hết hạn, nên không lưu vào cache
     4
     >>> f(6)  # Cache hit
     36
-    >>> f(4)  # Cache hit and move to front
+    >>> f(4)  # Cache hit và chuyển lên đầu
     16
     >>> list(f.cache.values())
     [36, 16]
     >>> set(f.requests).isdisjoint(f.cache)
     True
-    >>> list(map(f, [9, 8, 7]))   # Cache these second requests
+    >>> list(map(f, [9, 8, 7]))   # Lưu các yêu cầu thứ hai này vào cache
     [81, 64, 49]
     >>> list(map(f, [7, 9]))  # Cache hits
     [49, 81]
@@ -1321,100 +1081,77 @@ variants of :deco:`functools.lru_cache`:
     >>> set(f.requests).isdisjoint(f.cache)
     True
 
-:class:`UserDict` objects
--------------------------
+Các đối tượng :class:`UserDict`
+-------------------------------
 
-The class, :class:`UserDict` acts as a wrapper around dictionary objects.
-The need for this class has been partially supplanted by the ability to
-subclass directly from :class:`dict`; however, this class can be easier
-to work with because the underlying dictionary is accessible as an
-attribute.
+Lớp :class:`UserDict` hoạt động như một lớp bọc quanh các đối tượng dictionary. Nhu cầu về lớp này phần nào đã được thay thế bằng khả năng trực tiếp tạo lớp con từ :class:`dict`; tuy nhiên, lớp này có thể dễ làm việc hơn vì dictionary bên dưới có thể được truy cập dưới dạng một thuộc tính.
 
 .. class:: UserDict(**kwargs)
-           UserDict(mapping, /, **kwargs)
-           UserDict(iterable, /, **kwargs)
+           UserDict(mapping, /, ****kwargs) UserDict(iterable, /, ****kwargs)
 
-    Class that simulates a dictionary.  The instance's contents are kept in a
-    regular dictionary, which is accessible via the :attr:`data` attribute of
-    :class:`!UserDict` instances.  If arguments are provided, they are used to
-    initialize :attr:`data`, like a regular dictionary.
+    Lớp mô phỏng một dictionary. Nội dung của instance được lưu trong một dictionary thông thường, có thể truy cập thông qua thuộc tính :attr:`data` của
+    :class:`!UserDict`. Nếu cung cấp đối số, chúng được dùng để khởi tạo :attr:`data`, giống như với một dictionary thông thường.
 
-    In addition to supporting the methods and operations of mappings,
-    :class:`!UserDict` instances provide the following attribute:
+    Ngoài việc hỗ trợ các phương thức và phép toán của mapping,
+    các instance :class:`!UserDict` cung cấp thuộc tính sau:
 
     .. attribute:: data
 
-        A real dictionary used to store the contents of the :class:`UserDict`
-        class.
+        Một dictionary thực được dùng để lưu trữ nội dung của lớp :class:`UserDict`.
 
 
 
-:class:`UserList` objects
--------------------------
+Các đối tượng :class:`UserList`
+-------------------------------
 
-This class acts as a wrapper around list objects.  It is a useful base class
-for your own list-like classes which can inherit from them and override
-existing methods or add new ones.  In this way, one can add new behaviors to
-lists.
+Lớp này hoạt động như một wrapper cho các đối tượng list. Đây là một lớp cơ sở hữu ích cho các lớp giống list của riêng bạn, cho phép chúng kế thừa từ lớp này rồi ghi đè các phương thức hiện có hoặc thêm phương thức mới. Theo cách này, bạn có thể thêm hành vi mới cho list.
 
-The need for this class has been partially supplanted by the ability to
-subclass directly from :class:`list`; however, this class can be easier
-to work with because the underlying list is accessible as an attribute.
+Nhu cầu sử dụng lớp này phần nào đã giảm do khả năng tạo lớp con trực tiếp từ :class:`list`; tuy nhiên, lớp này có thể dễ làm việc hơn vì list bên dưới có thể được truy cập dưới dạng một thuộc tính.
 
 .. class:: UserList([list])
 
-    Class that simulates a list.  The instance's contents are kept in a regular
-    list, which is accessible via the :attr:`data` attribute of :class:`UserList`
-    instances.  The instance's contents are initially set to a copy of *list*,
-    defaulting to the empty list ``[]``.  *list* can be any iterable, for
-    example a real Python list or a :class:`UserList` object.
+    Lớp mô phỏng một list. Nội dung của instance được lưu trong một list thông thường, có thể truy cập thông qua thuộc tính :attr:`data` của các instance :class:`UserList`. Nội dung của instance ban đầu được đặt thành một bản sao của *list*, mặc định là list rỗng ``[]``. *list* có thể là bất kỳ iterable nào, chẳng hạn như một list Python thực hoặc một đối tượng :class:`UserList`.
 
-    In addition to supporting the methods and operations of mutable sequences,
-    :class:`UserList` instances provide the following attribute:
+    Ngoài việc hỗ trợ các phương thức và phép toán của các sequence có thể thay đổi,
+    các instance :class:`UserList` cung cấp thuộc tính sau:
 
     .. attribute:: data
 
-        A real :class:`list` object used to store the contents of the
-        :class:`UserList` class.
+        Một đối tượng :class:`list` thực được dùng để lưu nội dung của
+        lớp :class:`UserList`.
 
-**Subclassing requirements:** Subclasses of :class:`UserList` are expected to
-offer a constructor which can be called with either no arguments or one
-argument.  List operations which return a new sequence attempt to create an
-instance of the actual implementation class.  To do so, it assumes that the
-constructor can be called with a single parameter, which is a sequence object
-used as a data source.
+**Yêu cầu khi phân lớp:** Các lớp con của :class:`UserList` được kỳ vọng cung cấp một hàm khởi tạo có thể được gọi mà không có đối số hoặc với một đối số. Các thao tác trên danh sách trả về một sequence mới sẽ cố gắng tạo một instance của lớp triển khai thực tế. Để thực hiện việc này, nó giả định rằng hàm khởi tạo có thể được gọi với một tham số duy nhất, là một đối tượng sequence được dùng làm nguồn dữ liệu.
 
-If a derived class does not wish to comply with this requirement, all of the
-special methods supported by this class will need to be overridden; please
-consult the sources for information about the methods which need to be provided
-in that case.
+Nếu một lớp dẫn xuất không muốn tuân thủ yêu cầu này, cần ghi đè tất cả các phương thức đặc biệt được lớp này hỗ trợ; hãy tham khảo mã nguồn để biết thông tin về các phương thức cần cung cấp trong trường hợp đó.
 
-:class:`UserString` objects
----------------------------
+Các đối tượng :class:`UserString`
+---------------------------------
 
-The class, :class:`UserString` acts as a wrapper around string objects.
-The need for this class has been partially supplanted by the ability to
-subclass directly from :class:`str`; however, this class can be easier
-to work with because the underlying string is accessible as an
-attribute.
+Lớp :class:`UserString` hoạt động như một wrapper quanh các đối tượng chuỗi. Nhu cầu về lớp này đã phần nào được thay thế bởi khả năng kế thừa trực tiếp từ :class:`str`; tuy nhiên, lớp này có thể dễ làm việc hơn vì chuỗi bên dưới có thể được truy cập dưới dạng một thuộc tính.
 
 .. class:: UserString(seq)
 
-    Class that simulates a string object.  The instance's
-    content is kept in a regular string object, which is accessible via the
-    :attr:`data` attribute of :class:`UserString` instances.  The instance's
-    contents are initially set to a copy of *seq*.  The *seq* argument can
-    be any object which can be converted into a string using the built-in
-    :func:`str` function.
+    Lớp mô phỏng một đối tượng chuỗi. Nội dung của instance được lưu trong một đối tượng chuỗi thông thường, có thể truy cập thông qua
+    :attr:`data` thuộc tính của các thực thể :class:`UserString`.  Nội dung của thực thể ban đầu được đặt thành một bản sao của *seq*.  Đối số *seq* có thể là bất kỳ đối tượng nào có thể được chuyển đổi thành một chuỗi bằng cách sử dụng hàm dựng sẵn
+    :func:`str`.
 
-    In addition to supporting the methods and operations of strings,
-    :class:`UserString` instances provide the following attribute:
+    Ngoài việc hỗ trợ các phương thức và phép toán của chuỗi,
+    các đối tượng :class:`UserString` cung cấp thuộc tính sau:
 
     .. attribute:: data
 
-        A real :class:`str` object used to store the contents of the
-        :class:`UserString` class.
+        Một đối tượng :class:`str` thực được dùng để lưu trữ nội dung của lớp
+        :class:`UserString`.
 
     .. versionchanged:: 3.5
-       New methods ``__getnewargs__``, ``__rmod__``, ``casefold``,
-       ``format_map``, ``isprintable``, and ``maketrans``.
+       Các phương thức mới ``__getnewargs__``, ``__rmod__``, ``casefold``, ``format_map``, ``isprintable`` và ``maketrans``.
+
+.. _`MultiContext class`: https://github.com/enthought/codetools/blob/4.0.0/codetools/contexts/multi_context.py
+.. _`CodeTools package`: https://github.com/enthought/codetools
+.. _`Context class`: https://github.com/django/django/blob/main/django/template/context.py
+.. _`Nested Contexts recipe`: https://code.activestate.com/recipes/577434-nested-contexts-a-chain-of-mapping-objects/
+.. _`greatly simplified read-only version of Chainmap`: https://code.activestate.com/recipes/305268/
+.. _`Bag class`: https://www.gnu.org/software/smalltalk/manual-base/html_node/Bag.html
+.. _`Multisets`: https://en.wikipedia.org/wiki/Multiset
+.. _`C++ multisets`: http://www.java2s.com/Tutorial/Cpp/0380__set-multiset/Catalog0380__set-multiset.htm
+.. _`round-robin scheduler`: https://en.wikipedia.org/wiki/Round-robin_scheduling

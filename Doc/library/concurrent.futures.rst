@@ -1,46 +1,36 @@
-:mod:`!concurrent.futures` --- Launching parallel tasks
-=======================================================
+:mod:`!concurrent.futures` --- Khởi chạy các tác vụ song song
+=============================================================
 
 .. module:: concurrent.futures
-   :synopsis: Execute computations concurrently using threads or processes.
+   :synopsis: Thực thi các phép tính đồng thời bằng thread hoặc process.
 
 .. versionadded:: 3.2
 
-**Source code:** :source:`Lib/concurrent/futures/thread.py`,
-:source:`Lib/concurrent/futures/process.py`,
-and :source:`Lib/concurrent/futures/interpreter.py`
+**Mã nguồn:** :source:`Lib/concurrent/futures/thread.py`,
+:source:`Lib/concurrent/futures/process.py`, và :source:`Lib/concurrent/futures/interpreter.py`
 
 --------------
 
-The :mod:`!concurrent.futures` module provides a high-level interface for
-asynchronously executing callables.
+Mô-đun :mod:`!concurrent.futures` cung cấp một giao diện cấp cao để thực thi các đối tượng callable một cách bất đồng bộ.
 
-The asynchronous execution can be performed with threads, using
-:class:`ThreadPoolExecutor` or :class:`InterpreterPoolExecutor`,
-or separate processes, using :class:`ProcessPoolExecutor`.
-Each implements the same interface, which is defined
-by the abstract :class:`Executor` class.
+Việc thực thi bất đồng bộ có thể được thực hiện bằng thread, sử dụng
+:class:`ThreadPoolExecutor` hoặc :class:`InterpreterPoolExecutor`, hoặc bằng các process riêng biệt, sử dụng :class:`ProcessPoolExecutor`. Mỗi lớp đều triển khai cùng một interface, được định nghĩa bởi lớp trừu tượng :class:`Executor`.
 
-:class:`concurrent.futures.Future` must not be confused with
-:class:`asyncio.Future`, which is designed for use with :mod:`asyncio`
-tasks and coroutines. See the :doc:`asyncio's Future <asyncio-future>`
-documentation for a detailed comparison of the two.
+:class:`concurrent.futures.Future` không được nhầm lẫn với
+:class:`asyncio.Future`, được thiết kế để sử dụng với các task và coroutine :mod:`asyncio`. Xem tài liệu :doc:`asyncio's Future <asyncio-future>` để so sánh chi tiết hai đối tượng này.
 
 .. include:: ../includes/wasm-notavail.rst
 
-Executor Objects
-----------------
+Các đối tượng Executor
+----------------------
 
 .. class:: Executor
 
-   An abstract class that provides methods to execute calls asynchronously.  It
-   should not be used directly, but through its concrete subclasses.
+   Một lớp trừu tượng cung cấp các phương thức để thực thi các lời gọi một cách bất đồng bộ. Không nên sử dụng trực tiếp lớp này mà nên sử dụng thông qua các lớp con cụ thể của nó.
 
    .. method:: submit(fn, /, *args, **kwargs)
 
-      Schedules the callable, *fn*, to be executed as ``fn(*args, **kwargs)``
-      and returns a :class:`Future` object representing the execution of the
-      callable. ::
+      Lên lịch cho callable, *fn*, để thực thi ``fn(*args, **kwargs)`` và trả về một :class:`Future` object đại diện cho việc thực thi callable.::
 
          with ThreadPoolExecutor(max_workers=1) as executor:
              future = executor.submit(pow, 323, 1235)
@@ -48,68 +38,37 @@ Executor Objects
 
    .. method:: map(fn, *iterables, timeout=None, chunksize=1, buffersize=None)
 
-      Similar to :func:`map(fn, *iterables) <map>` except:
+      Tương tự như :func:`map(fn, *iterables) <map>` ngoại trừ:
 
-      * The *iterables* are collected immediately rather than lazily, unless a
-        *buffersize* is specified to limit the number of submitted tasks whose
-        results have not yet been yielded. If the buffer is full, iteration over
-        the *iterables* pauses until a result is yielded from the buffer.
+      * Các *iterables* được thu thập ngay lập tức thay vì một cách lazy, trừ khi chỉ định *buffersize* để giới hạn số task đã gửi mà kết quả vẫn chưa được yield. Nếu bộ đệm đầy, việc lặp qua các *iterables* sẽ tạm dừng cho đến khi một kết quả được yield từ bộ đệm.
 
-      * *fn* is executed asynchronously and several calls to
-        *fn* may be made concurrently.
+      * *fn* được thực thi bất đồng bộ và có thể thực hiện đồng thời nhiều lệnh gọi đến *fn*.
 
-      The returned iterator raises a :exc:`TimeoutError`
-      if :meth:`~iterator.__next__` is called and the result isn't available
-      after *timeout* seconds from the original call to :meth:`Executor.map`.
-      *timeout* can be an int or a float.  If *timeout* is not specified or
-      ``None``, there is no limit to the wait time.
+      Iterator được trả về sẽ phát sinh :exc:`TimeoutError` nếu :meth:`~iterator.__next__` được gọi và kết quả chưa có sau *timeout* giây kể từ lệnh gọi ban đầu đến :meth:`Executor.map`. *timeout* có thể là số nguyên hoặc số thực. Nếu *timeout* không được chỉ định hoặc là ``None``, thời gian chờ là không giới hạn.
 
-      If a *fn* call raises an exception, then that exception will be
-      raised when its value is retrieved from the iterator.
+      Nếu lệnh gọi *fn* phát sinh ngoại lệ, ngoại lệ đó sẽ được phát sinh khi giá trị của lệnh gọi được lấy từ iterator.
 
-      When using :class:`ProcessPoolExecutor`, this method chops *iterables*
-      into a number of chunks which it submits to the pool as separate
-      tasks.  The (approximate) size of these chunks can be specified by
-      setting *chunksize* to a positive integer.  For very long iterables,
-      using a large value for *chunksize* can significantly improve
-      performance compared to the default size of 1.  With
-      :class:`ThreadPoolExecutor` and :class:`InterpreterPoolExecutor`,
-      *chunksize* has no effect.
+      Khi sử dụng :class:`ProcessPoolExecutor`, phương thức này chia *iterables* thành một số chunk rồi gửi chúng đến pool dưới dạng các task riêng biệt. Có thể chỉ định kích thước (xấp xỉ) của các chunk này bằng cách đặt *chunksize* thành một số nguyên dương. Đối với các iterable rất dài, việc sử dụng giá trị lớn cho *chunksize* có thể cải thiện đáng kể hiệu suất so với kích thước mặc định là 1. Với
+      :class:`ThreadPoolExecutor` và :class:`InterpreterPoolExecutor`, *chunksize* không có tác dụng.
 
       .. versionchanged:: 3.5
-         Added the *chunksize* parameter.
+         Đã thêm tham số *chunksize*.
 
       .. versionchanged:: 3.14
-         Added the *buffersize* parameter.
+         Đã thêm tham số *buffersize*.
 
    .. method:: shutdown(wait=True, *, cancel_futures=False)
 
-      Signal the executor that it should free any resources that it is using
-      when the currently pending futures are done executing.  Calls to
-      :meth:`Executor.submit` and :meth:`Executor.map` made after shutdown will
-      raise :exc:`RuntimeError`.
+      Báo cho executor rằng nó nên giải phóng mọi tài nguyên đang sử dụng khi các future đang chờ hiện tại hoàn tất việc thực thi. Các lệnh gọi đến
+      :meth:`Executor.submit` và :meth:`Executor.map` được thực hiện sau khi shutdown sẽ gây ra :exc:`RuntimeError`.
 
-      If *wait* is ``True`` then this method will not return until all the
-      pending futures are done executing and the resources associated with the
-      executor have been freed.  If *wait* is ``False`` then this method will
-      return immediately and the resources associated with the executor will be
-      freed when all pending futures are done executing.  Regardless of the
-      value of *wait*, the entire Python program will not exit until all
-      pending futures are done executing.
+      Nếu *wait* là ``True`` thì phương thức này sẽ không trả về cho đến khi tất cả future đang chờ hoàn tất việc thực thi và các tài nguyên liên kết với executor được giải phóng. Nếu *wait* là ``False`` thì phương thức này sẽ trả về ngay lập tức và các tài nguyên liên kết với executor sẽ được giải phóng khi tất cả future đang chờ hoàn tất việc thực thi. Bất kể giá trị của *wait* là gì, toàn bộ chương trình Python sẽ không thoát cho đến khi tất cả future đang chờ hoàn tất việc thực thi.
 
-      If *cancel_futures* is ``True``, this method will cancel all pending
-      futures that the executor has not started running. Any futures that
-      are completed or running won't be cancelled, regardless of the value
-      of *cancel_futures*.
+      Nếu *cancel_futures* là ``True``, phương thức này sẽ hủy tất cả future đang chờ mà executor chưa bắt đầu chạy. Mọi future đã hoàn tất hoặc đang chạy sẽ không bị hủy, bất kể giá trị của *cancel_futures* là gì.
 
-      If both *cancel_futures* and *wait* are ``True``, all futures that the
-      executor has started running will be completed prior to this method
-      returning. The remaining futures are cancelled.
+      Nếu cả *cancel_futures* và *wait* đều là ``True``, tất cả future mà executor đã bắt đầu chạy sẽ hoàn tất trước khi phương thức này trả về. Các future còn lại sẽ bị hủy.
 
-      You can avoid having to call this method explicitly if you use the executor
-      as a :term:`context manager` via the  :keyword:`with` statement, which
-      will shutdown the :class:`Executor` (waiting as if :meth:`Executor.shutdown`
-      were called with *wait* set to ``True``)::
+      Bạn có thể tránh phải gọi phương thức này một cách rõ ràng nếu sử dụng executor như một :term:`context manager` thông qua câu lệnh :keyword:`with`, câu lệnh này sẽ shutdown :class:`Executor` (chờ như thể :meth:`Executor.shutdown` được gọi với *wait* được đặt thành ``True``)::
 
          import shutil
          with ThreadPoolExecutor(max_workers=4) as e:
@@ -119,27 +78,25 @@ Executor Objects
              e.submit(shutil.copy, 'src4.txt', 'dest4.txt')
 
       .. versionchanged:: 3.9
-         Added *cancel_futures*.
+         Đã thêm *cancel_futures*.
 
 
 ThreadPoolExecutor
 ------------------
 
-:class:`ThreadPoolExecutor` is an :class:`Executor` subclass that uses a pool of
-threads to execute calls asynchronously.
+:class:`ThreadPoolExecutor` là một lớp con của :class:`Executor`, sử dụng một nhóm thread để thực thi các lệnh gọi một cách bất đồng bộ.
 
-Deadlocks can occur when the callable associated with a :class:`Future` waits on
-the results of another :class:`Future`.  For example::
+Có thể xảy ra deadlock khi callable liên kết với :class:`Future` chờ kết quả của một :class:`Future` khác. Ví dụ:::
 
    import time
    def wait_on_b():
        time.sleep(5)
-       print(b.result())  # b will never complete because it is waiting on a.
+       print(b.result())  # b sẽ không bao giờ hoàn tất vì đang chờ a.
        return 5
 
    def wait_on_a():
        time.sleep(5)
-       print(a.result())  # a will never complete because it is waiting on b.
+       print(a.result())  # a sẽ không bao giờ hoàn tất vì đang chờ b.
        return 6
 
 
@@ -147,72 +104,50 @@ the results of another :class:`Future`.  For example::
    a = executor.submit(wait_on_b)
    b = executor.submit(wait_on_a)
 
-And::
+Và::
 
    def wait_on_future():
        f = executor.submit(pow, 5, 2)
-       # This will never complete because there is only one worker thread and
-       # it is executing this function.
+       # Sẽ không bao giờ hoàn tất vì chỉ có một worker thread và
+       # nó đang thực thi hàm này.
        print(f.result())
 
    executor = ThreadPoolExecutor(max_workers=1)
    future = executor.submit(wait_on_future)
-   # Note: calling future.result() would also cause a deadlock because
-   # the single worker thread is already waiting for wait_on_future().
+   # Lưu ý: gọi future.result() cũng sẽ gây ra deadlock vì
+   # luồng worker duy nhất đã đang chờ wait_on_future().
 
 
 .. class:: ThreadPoolExecutor(max_workers=None, thread_name_prefix='', initializer=None, initargs=())
 
-   An :class:`Executor` subclass that uses a pool of at most *max_workers*
-   threads to execute calls asynchronously.
+   Một lớp con của :class:`Executor` sử dụng pool gồm tối đa *max_workers* luồng để thực thi các lời gọi một cách bất đồng bộ.
 
-   All threads enqueued to ``ThreadPoolExecutor`` will be joined before the
-   interpreter can exit. Note that the exit handler which does this is
-   executed *before* any exit handlers added using ``atexit``. This means
-   exceptions in the main thread must be caught and handled in order to
-   signal threads to exit gracefully. For this reason, it is recommended
-   that ``ThreadPoolExecutor`` not be used for long-running tasks.
+   Tất cả các luồng được đưa vào hàng đợi của ``ThreadPoolExecutor`` sẽ được join trước khi interpreter có thể thoát. Lưu ý rằng exit handler thực hiện việc này được thực thi *trước* bất kỳ exit handler nào được thêm bằng ``atexit``. Điều này có nghĩa là các exception trong luồng chính phải được bắt và xử lý để báo hiệu cho các luồng thoát một cách an toàn. Vì lý do này, bạn không nên sử dụng ``ThreadPoolExecutor`` cho các tác vụ chạy lâu.
 
-   *initializer* is an optional callable that is called at the start of
-   each worker thread; *initargs* is a tuple of arguments passed to the
-   initializer.  Should *initializer* raise an exception, all currently
-   pending jobs will raise a :exc:`~concurrent.futures.thread.BrokenThreadPool`,
-   as well as any attempt to submit more jobs to the pool.
+   *initializer* là một callable tùy chọn được gọi khi bắt đầu mỗi luồng worker; *initargs* là một tuple các đối số được truyền cho initializer. Nếu *initializer* gây ra exception, tất cả các job hiện đang chờ sẽ gây ra :exc:`~concurrent.futures.thread.BrokenThreadPool`, cũng như mọi nỗ lực submit thêm job vào pool.
 
    .. versionchanged:: 3.5
-      If *max_workers* is ``None`` or
-      not given, it will default to the number of processors on the machine,
-      multiplied by ``5``, assuming that :class:`ThreadPoolExecutor` is often
-      used to overlap I/O instead of CPU work and the number of workers
-      should be higher than the number of workers
-      for :class:`ProcessPoolExecutor`.
+      Nếu *max_workers* là ``None`` hoặc không được cung cấp, giá trị mặc định sẽ là số processor trên máy nhân với ``5``, với giả định rằng :class:`ThreadPoolExecutor` thường được dùng để chồng lấp các thao tác I/O thay vì công việc CPU và số worker nên lớn hơn số worker của :class:`ProcessPoolExecutor`.
 
    .. versionchanged:: 3.6
-      Added the *thread_name_prefix* parameter to allow users to
-      control the :class:`threading.Thread` names for worker threads created by
-      the pool for easier debugging.
+      Đã thêm tham số *thread_name_prefix* để cho phép người dùng kiểm soát :class:`threading.Thread` tên của các worker thread do pool tạo ra, giúp việc debug dễ dàng hơn.
 
    .. versionchanged:: 3.7
-      Added the *initializer* and *initargs* arguments.
+      Đã thêm các đối số *initializer* và *initargs*.
 
    .. versionchanged:: 3.8
-      Default value of *max_workers* is changed to ``min(32, os.cpu_count() + 4)``.
-      This default value preserves at least 5 workers for I/O bound tasks.
-      It utilizes at most 32 CPU cores for CPU bound tasks which release the GIL.
-      And it avoids using very large resources implicitly on many-core machines.
+      Giá trị mặc định của *max_workers* được thay đổi thành ``min(32, os.cpu_count() + 4)``. Giá trị mặc định này duy trì ít nhất 5 worker cho các tác vụ bị giới hạn bởi I/O. Giá trị này sử dụng nhiều nhất 32 lõi CPU cho các tác vụ bị giới hạn bởi CPU có giải phóng GIL. Đồng thời, nó tránh ngầm sử dụng lượng tài nguyên rất lớn trên các máy có nhiều lõi.
 
-      ThreadPoolExecutor now reuses idle worker threads before starting
-      *max_workers* worker threads too.
+      ThreadPoolExecutor giờ đây cũng tái sử dụng các worker thread đang rảnh trước khi khởi chạy *max_workers* worker thread.
 
    .. versionchanged:: 3.13
-      Default value of *max_workers* is changed to
-      ``min(32, (os.process_cpu_count() or 1) + 4)``.
+      Giá trị mặc định của *max_workers* được thay đổi thành ``min(32, (os.process_cpu_count() or 1) + 4)``.
 
 
 .. _threadpoolexecutor-example:
 
-ThreadPoolExecutor Example
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ví dụ về ThreadPoolExecutor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
    import concurrent.futures
@@ -248,212 +183,110 @@ InterpreterPoolExecutor
 
 .. versionadded:: 3.14
 
-The :class:`InterpreterPoolExecutor` class uses a pool of interpreters
-to execute calls asynchronously.  It is a :class:`ThreadPoolExecutor`
-subclass, which means each worker is running in its own thread.
-The difference here is that each worker has its own interpreter,
-and runs each task using that interpreter.
+Lớp :class:`InterpreterPoolExecutor` sử dụng một pool các interpreter để thực thi các lệnh gọi một cách bất đồng bộ. Đây là một subclass của :class:`ThreadPoolExecutor`, nghĩa là mỗi worker chạy trong thread riêng. Điểm khác biệt ở đây là mỗi worker có interpreter riêng và thực thi từng task bằng interpreter đó.
 
-The biggest benefit to using interpreters instead of only threads
-is true multi-core parallelism.  Each interpreter has its own
-:term:`Global Interpreter Lock <global interpreter lock>`, so code
-running in one interpreter can run on one CPU core, while code in
-another interpreter runs unblocked on a different core.
+Lợi ích lớn nhất của việc sử dụng interpreter thay vì chỉ dùng thread là khả năng parallelism thực sự trên nhiều core CPU. Mỗi interpreter có riêng
+:term:`Global Interpreter Lock <global interpreter lock>`, vì vậy mã chạy trong một trình thông dịch có thể chạy trên một lõi CPU, trong khi mã trong một trình thông dịch khác chạy không bị chặn trên một lõi khác.
 
-The tradeoff is that writing concurrent code for use with multiple
-interpreters can take extra effort.  However, this is because it
-forces you to be deliberate about how and when interpreters interact,
-and to be explicit about what data is shared between interpreters.
-This results in several benefits that help balance the extra effort,
-including true multi-core parallelism,  For example, code written
-this way can make it easier to reason about concurrency.  Another
-major benefit is that you don't have to deal with several of the
-big pain points of using threads, like race conditions.
+Đánh đổi là việc viết code concurrent để sử dụng với nhiều interpreter có thể đòi hỏi thêm công sức. Tuy nhiên, đó là vì cách này buộc bạn phải cân nhắc kỹ cách thức và thời điểm các interpreter tương tác với nhau, đồng thời phải nêu rõ dữ liệu nào được chia sẻ giữa các interpreter. Điều này mang lại một số lợi ích giúp cân bằng công sức bỏ ra, trong đó có parallelism thực sự trên nhiều core CPU. Ví dụ, code được viết theo cách này có thể giúp bạn dễ suy luận hơn về concurrency. Một lợi ích lớn khác là bạn không phải xử lý một số vấn đề khó chịu lớn khi sử dụng thread, chẳng hạn như race condition.
 
-Each worker's interpreter is isolated from all the other interpreters.
-"Isolated" means each interpreter has its own runtime state and
-operates completely independently.  For example, if you redirect
-:data:`sys.stdout` in one interpreter, it will not be automatically
-redirected to any other interpreter.  If you import a module in one
-interpreter, it is not automatically imported in any other.  You
-would need to import the module separately in interpreter where
-you need it.  In fact, each module imported in an interpreter is
-a completely separate object from the same module in a different
-interpreter, including :mod:`sys`, :mod:`builtins`,
-and even ``__main__``.
+Interpreter của mỗi worker được cô lập khỏi tất cả interpreter khác. "Cô lập" có nghĩa là mỗi interpreter có runtime state riêng và hoạt động hoàn toàn độc lập. Ví dụ, nếu bạn chuyển hướng
+:data:`sys.stdout` trong một interpreter, nó sẽ không tự động được chuyển hướng sang bất kỳ interpreter nào khác. Nếu bạn import một module trong một interpreter, module đó sẽ không tự động được import trong bất kỳ interpreter nào khác. Bạn sẽ cần import module riêng trong interpreter nơi bạn cần sử dụng nó. Trên thực tế, mỗi module được import trong một interpreter là một object hoàn toàn riêng biệt với cùng module đó trong một interpreter khác, bao gồm cả :mod:`sys`, :mod:`builtins` và thậm chí ``__main__``.
 
-Isolation means a mutable object, or other data, cannot be used
-by more than one interpreter at the same time.  That effectively means
-interpreters cannot actually share such objects or data.  Instead,
-each interpreter must have its own copy, and you will have to
-synchronize any changes between the copies manually.  Immutable
-objects and data, like the builtin singletons, strings, and tuples
-of immutable objects, don't have these limitations.
+Việc cô lập có nghĩa là một mutable object hoặc dữ liệu khác không thể được nhiều interpreter sử dụng cùng lúc. Điều đó đồng nghĩa với việc các interpreter thực sự không thể chia sẻ những object hoặc dữ liệu như vậy. Thay vào đó, mỗi interpreter phải có bản sao riêng và bạn sẽ phải đồng bộ thủ công mọi thay đổi giữa các bản sao. Các object và dữ liệu immutable, chẳng hạn như các singleton dựng sẵn, string và tuple chứa các immutable object, không bị những hạn chế này.
 
-Communicating and synchronizing between interpreters is most effectively
-done using dedicated tools, like those proposed in :pep:`734`.  One less
-efficient alternative is to serialize with :mod:`pickle` and then send
-the bytes over a shared :mod:`socket <socket>` or
+Việc giao tiếp và đồng bộ hóa giữa các interpreter được thực hiện hiệu quả nhất bằng các công cụ chuyên dụng, chẳng hạn như những công cụ được đề xuất trong :pep:`734`. Một phương án kém hiệu quả hơn là serialize bằng :mod:`pickle` rồi gửi các byte qua một :mod:`socket <socket>` dùng chung hoặc
 :func:`pipe <os.pipe>`.
 
 .. class:: InterpreterPoolExecutor(max_workers=None, thread_name_prefix='', initializer=None, initargs=())
 
-   A :class:`ThreadPoolExecutor` subclass that executes calls asynchronously
-   using a pool of at most *max_workers* threads.  Each thread runs
-   tasks in its own interpreter.  The worker interpreters are isolated
-   from each other, which means each has its own runtime state and that
-   they can't share any mutable objects or other data.  Each interpreter
-   has its own :term:`Global Interpreter Lock <global interpreter lock>`,
-   which means code run with this executor has true multi-core parallelism.
+   Một lớp con của :class:`ThreadPoolExecutor` thực thi các lệnh gọi một cách bất đồng bộ bằng cách sử dụng một pool gồm nhiều nhất *max_workers* thread. Mỗi thread chạy các tác vụ trong interpreter riêng của nó. Các interpreter worker được cô lập với nhau, nghĩa là mỗi interpreter có trạng thái runtime riêng và chúng không thể chia sẻ bất kỳ đối tượng mutable hoặc dữ liệu nào khác. Mỗi interpreter có :term:`Global Interpreter Lock <global interpreter lock>` riêng, nghĩa là code chạy với executor này có khả năng song song thực sự trên nhiều core.
 
-   The optional *initializer* and *initargs* arguments have the same
-   meaning as for :class:`!ThreadPoolExecutor`: the initializer is run
-   when each worker is created, though in this case it is run in
-   the worker's interpreter.  The executor serializes the *initializer*
-   and *initargs* using :mod:`pickle` when sending them to the worker's
-   interpreter.
+   Các đối số tùy chọn *initializer* và *initargs* có cùng ý nghĩa như trong :class:`!ThreadPoolExecutor`: initializer được chạy khi mỗi worker được tạo, nhưng trong trường hợp này, nó được chạy trong interpreter của worker. Executor serialize *initializer* và *initargs* bằng :mod:`pickle` khi gửi chúng đến interpreter của worker.
 
    .. note::
-      The executor may replace uncaught exceptions from *initializer*
-      with :class:`~concurrent.interpreters.ExecutionFailed`.
+      Executor có thể thay thế các exception không được bắt từ *initializer* bằng :class:`~concurrent.interpreters.ExecutionFailed`.
 
-   Other caveats from parent :class:`ThreadPoolExecutor` apply here.
+   Các lưu ý khác từ lớp cha :class:`ThreadPoolExecutor` cũng áp dụng ở đây.
 
-:meth:`~Executor.submit` and :meth:`~Executor.map` work like normal,
-except the worker serializes the callable and arguments using
-:mod:`pickle` when sending them to its interpreter.  The worker
-likewise serializes the return value when sending it back.
+:meth:`~Executor.submit` và :meth:`~Executor.map` hoạt động như bình thường, ngoại trừ việc worker serialize callable và các đối số bằng
+:mod:`pickle` khi gửi chúng đến interpreter của nó. Worker cũng serialize giá trị trả về khi gửi giá trị đó trở lại.
 
-When a worker's current task raises an uncaught exception, the worker
-always tries to preserve the exception as-is.  If that is successful
-then it also sets the ``__cause__`` to a corresponding
-:class:`~concurrent.interpreters.ExecutionFailed`
-instance, which contains a summary of the original exception.
-In the uncommon case that the worker is not able to preserve the
-original as-is then it directly preserves the corresponding
-:class:`~concurrent.interpreters.ExecutionFailed`
-instance instead.
+Khi tác vụ hiện tại của một worker phát sinh ngoại lệ không được bắt, worker luôn cố gắng giữ nguyên ngoại lệ đó. Nếu thành công thì worker cũng đặt ``__cause__`` thành một
+instance :class:`~concurrent.interpreters.ExecutionFailed` tương ứng, chứa phần tóm tắt về ngoại lệ ban đầu. Trong trường hợp hiếm gặp khi worker không thể giữ nguyên ngoại lệ ban đầu thì worker sẽ trực tiếp giữ lại
+instance :class:`~concurrent.interpreters.ExecutionFailed` tương ứng.
 
 
 ProcessPoolExecutor
 -------------------
 
-The :class:`ProcessPoolExecutor` class is an :class:`Executor` subclass that
-uses a pool of processes to execute calls asynchronously.
-:class:`ProcessPoolExecutor` uses the :mod:`multiprocessing` module, which
-allows it to side-step the :term:`Global Interpreter Lock
-<global interpreter lock>` but also means that
-only picklable objects can be executed and returned.
+Lớp :class:`ProcessPoolExecutor` là một lớp con của :class:`Executor`, sử dụng một pool các process để thực thi các lời gọi một cách bất đồng bộ.
+:class:`ProcessPoolExecutor` sử dụng module :mod:`multiprocessing`, cho phép nó tránh :term:`Global Interpreter Lock <global interpreter lock>`, nhưng cũng có nghĩa là chỉ những object có thể pickle mới có thể được thực thi và trả về.
 
-The ``__main__`` module must be importable by worker subprocesses. This means
-that :class:`ProcessPoolExecutor` will not work in the interactive interpreter.
+Module ``__main__`` phải có thể được các subprocess của worker import. Điều này có nghĩa là :class:`ProcessPoolExecutor` sẽ không hoạt động trong trình thông dịch tương tác.
 
-Calling :class:`Executor` or :class:`Future` methods from a callable submitted
-to a :class:`ProcessPoolExecutor` will result in deadlock.
+Việc gọi các phương thức :class:`Executor` hoặc :class:`Future` từ một callable được gửi đến :class:`ProcessPoolExecutor` sẽ dẫn đến deadlock.
 
-Note that the restrictions on functions and arguments needing to picklable as
-per :class:`multiprocessing.Process` apply when using :meth:`~Executor.submit`
-and :meth:`~Executor.map` on a :class:`ProcessPoolExecutor`. A function defined
-in a REPL or a lambda should not be expected to work.
+Lưu ý rằng các hạn chế đối với những hàm và đối số cần có khả năng picklable theo :class:`multiprocessing.Process` cũng được áp dụng khi sử dụng :meth:`~Executor.submit` và :meth:`~Executor.map` trên một :class:`ProcessPoolExecutor`. Không nên kỳ vọng một hàm được định nghĩa trong REPL hoặc một lambda sẽ hoạt động.
 
 .. class:: ProcessPoolExecutor(max_workers=None, mp_context=None, initializer=None, initargs=(), max_tasks_per_child=None)
 
-   An :class:`Executor` subclass that executes calls asynchronously using a pool
-   of at most *max_workers* processes.  If *max_workers* is ``None`` or not
-   given, it will default to :func:`os.process_cpu_count`.
-   If *max_workers* is less than or equal to ``0``, then a :exc:`ValueError`
-   will be raised.
-   On Windows, *max_workers* must be less than or equal to ``61``. If it is not
-   then :exc:`ValueError` will be raised. If *max_workers* is ``None``, then
-   the default chosen will be at most ``61``, even if more processors are
-   available.
-   *mp_context* can be a :mod:`multiprocessing` context or ``None``. It will be
-   used to launch the workers. If *mp_context* is ``None`` or not given, the
-   default :mod:`multiprocessing` context is used.
-   See :ref:`multiprocessing-start-methods`.
+   Một lớp con của :class:`Executor` thực thi các lệnh gọi một cách bất đồng bộ bằng cách sử dụng một pool gồm tối đa *max_workers* process. Nếu *max_workers* là ``None`` hoặc không được cung cấp, giá trị mặc định sẽ là :func:`os.process_cpu_count`. Nếu *max_workers* nhỏ hơn hoặc bằng ``0``, một :exc:`ValueError` sẽ được raise. Trên Windows, *max_workers* phải nhỏ hơn hoặc bằng ``61``. Nếu không, :exc:`ValueError` sẽ được raise. Nếu *max_workers* là ``None``, giá trị mặc định được chọn sẽ nhiều nhất là ``61``, ngay cả khi có nhiều processor hơn. *mp_context* có thể là một context :mod:`multiprocessing` hoặc ``None``. Context này sẽ được dùng để khởi chạy các worker. Nếu *mp_context* là ``None`` hoặc không được cung cấp, context :mod:`multiprocessing` mặc định sẽ được sử dụng. Xem :ref:`multiprocessing-start-methods`.
 
-   *initializer* is an optional callable that is called at the start of
-   each worker process; *initargs* is a tuple of arguments passed to the
-   initializer.  Should *initializer* raise an exception, all currently
-   pending jobs will raise a :exc:`~concurrent.futures.process.BrokenProcessPool`,
-   as well as any attempt to submit more jobs to the pool.
+   *initializer* là một callable tùy chọn được gọi khi bắt đầu mỗi worker process; *initargs* là một tuple các đối số được truyền cho initializer. Nếu *initializer* raise một exception, tất cả các job đang chờ sẽ raise một :exc:`~concurrent.futures.process.BrokenProcessPool`, cũng như mọi nỗ lực gửi thêm job đến pool.
 
-   *max_tasks_per_child* is an optional argument that specifies the maximum
-   number of tasks a single process can execute before it will exit and be
-   replaced with a fresh worker process. By default *max_tasks_per_child* is
-   ``None`` which means worker processes will live as long as the pool. When
-   a max is specified, the "spawn" multiprocessing start method will be used by
-   default in absence of a *mp_context* parameter. This feature is incompatible
-   with the "fork" start method.
+   *max_tasks_per_child* là một đối số tùy chọn chỉ định số task tối đa mà một process có thể thực thi trước khi thoát và được thay thế bằng một worker process mới. Theo mặc định, *max_tasks_per_child* là ``None``, nghĩa là các worker process sẽ tồn tại trong suốt vòng đời của pool. Khi chỉ định một giá trị tối đa, phương thức khởi động multiprocessing "spawn" sẽ được sử dụng theo mặc định nếu không có tham số *mp_context*. Tính năng này không tương thích với phương thức khởi động "fork".
 
    .. versionchanged:: 3.3
-      When one of the worker processes terminates abruptly, a
-      :exc:`~concurrent.futures.process.BrokenProcessPool` error is now raised.
-      Previously, behaviour
-      was undefined but operations on the executor or its futures would often
-      freeze or deadlock.
+      Khi một trong các worker process kết thúc đột ngột, một
+      :exc:`~concurrent.futures.process.BrokenProcessPool` error hiện được raise. Trước đây, hành vi không được xác định, nhưng các thao tác trên executor hoặc các future của nó thường bị treo hoặc rơi vào deadlock.
 
    .. versionchanged:: 3.7
-      The *mp_context* argument was added to allow users to control the
-      start_method for worker processes created by the pool.
+      Đối số *mp_context* được thêm vào để cho phép người dùng kiểm soát start_method cho các worker process được pool tạo ra.
 
-      Added the *initializer* and *initargs* arguments.
+      Đã thêm các đối số *initializer* và *initargs*.
 
    .. versionchanged:: 3.11
-      The *max_tasks_per_child* argument was added to allow users to
-      control the lifetime of workers in the pool.
+      Đối số *max_tasks_per_child* được thêm vào để cho phép người dùng kiểm soát vòng đời của các worker trong pool.
 
    .. versionchanged:: 3.12
-      On POSIX systems, if your application has multiple threads and the
-      :mod:`multiprocessing` context uses the ``"fork"`` start method:
-      The :func:`os.fork` function called internally to spawn workers may raise a
-      :exc:`DeprecationWarning`. Pass a *mp_context* configured to use a
-      different start method. See the :func:`os.fork` documentation for
-      further explanation.
+      Trên các hệ thống POSIX, nếu ứng dụng của bạn có nhiều thread và
+      :mod:`multiprocessing` context sử dụng ``"fork"`` start method: Hàm :func:`os.fork` được gọi nội bộ để tạo worker có thể phát sinh một
+      :exc:`DeprecationWarning`. Truyền một *mp_context* được cấu hình để sử dụng một start method khác. Xem tài liệu :func:`os.fork` để biết thêm giải thích.
 
    .. versionchanged:: 3.13
-      *max_workers* uses :func:`os.process_cpu_count` by default, instead of
+      *max_workers* sử dụng :func:`os.process_cpu_count` theo mặc định, thay vì
       :func:`os.cpu_count`.
 
    .. versionchanged:: 3.14
-      The default process start method (see
-      :ref:`multiprocessing-start-methods`) changed away from *fork*. If you
-      require the *fork* start method for :class:`ProcessPoolExecutor` you must
-      explicitly pass ``mp_context=multiprocessing.get_context("fork")``.
+      Phương thức khởi động tiến trình mặc định (xem
+      :ref:`multiprocessing-start-methods`) đã được thay đổi, không còn là *fork*. Nếu bạn yêu cầu phương thức khởi động *fork* cho :class:`ProcessPoolExecutor`, bạn phải truyền rõ ràng ``mp_context=multiprocessing.get_context("fork")``.
 
    .. versionchanged:: 3.14.7
-      Fixed a deadlock (:gh:`115634`) where the executor could hang after
-      a worker process exited upon reaching its *max_tasks_per_child*
-      limit while tasks remained queued.
+      Đã khắc phục tình trạng deadlock (:gh:`115634`) khiến executor có thể bị treo sau khi một worker process thoát khi đạt đến giới hạn *max_tasks_per_child* trong lúc vẫn còn các tác vụ đang chờ trong hàng đợi.
 
    .. method:: terminate_workers()
 
-      Attempt to terminate all living worker processes immediately by calling
-      :meth:`Process.terminate <multiprocessing.Process.terminate>` on each of them.
-      Internally, it will also call :meth:`Executor.shutdown` to ensure that all
-      other resources associated with the executor are freed.
+      Cố gắng chấm dứt ngay lập tức tất cả worker process đang hoạt động bằng cách gọi
+      :meth:`Process.terminate <multiprocessing.Process.terminate>` trên mỗi process. Trong nội bộ, phương thức này cũng sẽ gọi :meth:`Executor.shutdown` để đảm bảo tất cả tài nguyên khác liên kết với executor được giải phóng.
 
-      After calling this method the caller should no longer submit tasks to the
-      executor.
+      Sau khi gọi phương thức này, caller không nên gửi thêm tác vụ đến executor.
 
       .. versionadded:: 3.14
 
    .. method:: kill_workers()
 
-      Attempt to kill all living worker processes immediately by calling
-      :meth:`Process.kill <multiprocessing.Process.kill>` on each of them.
-      Internally, it will also call :meth:`Executor.shutdown` to ensure that all
-      other resources associated with the executor are freed.
+      Cố gắng hủy ngay lập tức tất cả worker process đang hoạt động bằng cách gọi
+      :meth:`Process.kill <multiprocessing.Process.kill>` trên từng đối tượng đó. Về nội bộ, nó cũng sẽ gọi :meth:`Executor.shutdown` để đảm bảo rằng tất cả các tài nguyên khác liên kết với executor đều được giải phóng.
 
-      After calling this method the caller should no longer submit tasks to the
-      executor.
+      Sau khi gọi phương thức này, caller không nên gửi thêm tác vụ đến executor.
 
       .. versionadded:: 3.14
 
 .. _processpoolexecutor-example:
 
-ProcessPoolExecutor Example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ví dụ về ProcessPoolExecutor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
    import concurrent.futures
@@ -490,218 +323,161 @@ ProcessPoolExecutor Example
        main()
 
 
-Future Objects
---------------
+Đối tượng Future
+----------------
 
-The :class:`Future` class encapsulates the asynchronous execution of a callable.
-:class:`Future` instances are created by :meth:`Executor.submit`.
+Lớp :class:`Future` đóng gói việc thực thi bất đồng bộ của một callable.
+Các instance :class:`Future` được tạo bởi :meth:`Executor.submit`.
 
 .. class:: Future
 
-   Encapsulates the asynchronous execution of a callable.  :class:`Future`
-   instances are created by :meth:`Executor.submit` and should not be created
-   directly except for testing.
+   Đóng gói việc thực thi bất đồng bộ của một callable. Các instance :class:`Future` được tạo bởi :meth:`Executor.submit` và không nên được tạo trực tiếp, ngoại trừ mục đích kiểm thử.
 
    .. method:: cancel()
 
-      Attempt to cancel the call.  If the call is currently being executed or
-      finished running and cannot be cancelled then the method will return
-      ``False``, otherwise the call will be cancelled and the method will
-      return ``True``.
+      Cố gắng hủy lệnh gọi. Nếu lệnh gọi hiện đang được thực thi hoặc đã chạy xong và không thể bị hủy, phương thức sẽ trả về ``False``; nếu không, lệnh gọi sẽ bị hủy và phương thức sẽ trả về ``True``.
 
    .. method:: cancelled()
 
-      Return ``True`` if the call was successfully cancelled.
+      Trả về ``True`` nếu lệnh gọi đã được hủy thành công.
 
    .. method:: running()
 
-      Return ``True`` if the call is currently being executed and cannot be
-      cancelled.
+      Trả về ``True`` nếu lệnh gọi hiện đang được thực thi và không thể bị hủy.
 
    .. method:: done()
 
-      Return ``True`` if the call was successfully cancelled or finished
-      running.
+      Trả về ``True`` nếu lệnh gọi đã được hủy thành công hoặc đã chạy xong.
 
    .. method:: result(timeout=None)
 
-      Return the value returned by the call. If the call hasn't yet completed
-      then this method will wait up to *timeout* seconds.  If the call hasn't
-      completed in *timeout* seconds, then a
-      :exc:`TimeoutError` will be raised. *timeout* can be
-      an int or float.  If *timeout* is not specified or ``None``, there is no
-      limit to the wait time.
+      Trả về giá trị do lệnh gọi trả về. Nếu lệnh gọi chưa hoàn tất, phương thức này sẽ chờ tối đa *timeout* giây. Nếu lệnh gọi chưa hoàn tất trong *timeout* giây thì một
+      :exc:`TimeoutError` sẽ được phát sinh. *timeout* có thể là int hoặc float. Nếu *timeout* không được chỉ định hoặc là ``None``, thì thời gian chờ là không giới hạn.
 
-      If the future is cancelled before completing then :exc:`.CancelledError`
-      will be raised.
+      Nếu future bị hủy trước khi hoàn tất thì :exc:`.CancelledError` sẽ được phát sinh.
 
-      If the call raised an exception, this method will raise the same exception.
+      Nếu lời gọi phát sinh một ngoại lệ, phương thức này sẽ phát sinh chính ngoại lệ đó.
 
    .. method:: exception(timeout=None)
 
-      Return the exception raised by the call.  If the call hasn't yet
-      completed then this method will wait up to *timeout* seconds.  If the
-      call hasn't completed in *timeout* seconds, then a
-      :exc:`TimeoutError` will be raised.  *timeout* can be
-      an int or float.  If *timeout* is not specified or ``None``, there is no
-      limit to the wait time.
+      Trả về ngoại lệ do lời gọi phát sinh. Nếu lời gọi chưa hoàn tất, phương thức này sẽ chờ tối đa *timeout* giây. Nếu lời gọi chưa hoàn tất trong *timeout* giây, thì một
+      :exc:`TimeoutError` sẽ được phát sinh. *timeout* có thể là một số nguyên hoặc số thực. Nếu *timeout* không được chỉ định hoặc là ``None``, thời gian chờ là không giới hạn.
 
-      If the future is cancelled before completing then :exc:`.CancelledError`
-      will be raised.
+      Nếu future bị hủy trước khi hoàn tất thì :exc:`.CancelledError` sẽ được phát sinh.
 
-      If the call completed without raising, ``None`` is returned.
+      Nếu lời gọi hoàn tất mà không phát sinh ngoại lệ, ``None`` sẽ được trả về.
 
    .. method:: add_done_callback(fn)
 
-      Attaches the callable *fn* to the future.  *fn* will be called, with the
-      future as its only argument, when the future is cancelled or finishes
-      running.
+      Gắn callable *fn* vào future. *fn* sẽ được gọi với future là đối số duy nhất khi future bị hủy hoặc hoàn tất chạy.
 
-      Added callables are called in the order that they were added and are
-      always called in a thread belonging to the process that added them.  If
-      the callable raises an :exc:`Exception` subclass, it will be logged and
-      ignored.  If the callable raises a :exc:`BaseException` subclass, the
-      behavior is undefined.
+      Các callable được thêm vào sẽ được gọi theo thứ tự thêm vào và luôn được gọi trong một thread thuộc về process đã thêm chúng. Nếu callable phát sinh một lớp con của :exc:`Exception`, lỗi đó sẽ được ghi vào log và bỏ qua. Nếu callable phát sinh một lớp con của :exc:`BaseException`, hành vi sẽ không được xác định.
 
-      If the future has already completed or been cancelled, *fn* will be
-      called immediately.
+      Nếu future đã hoàn tất hoặc bị hủy, *fn* sẽ được gọi ngay lập tức.
 
-   The following :class:`Future` methods are meant for use in unit tests and
-   :class:`Executor` implementations.
+   Các :class:`Future` phương thức sau đây предназначены cho việc sử dụng trong unit test và
+   các :class:`Executor` triển khai.
 
    .. method:: set_running_or_notify_cancel()
 
-      This method should only be called by :class:`Executor` implementations
-      before executing the work associated with the :class:`Future` and by unit
-      tests.
+      Phương thức này chỉ nên được gọi bởi các :class:`Executor` triển khai trước khi thực thi công việc liên kết với :class:`Future` và bởi các unit test.
 
-      If the method returns ``False`` then the :class:`Future` was cancelled,
-      i.e. :meth:`Future.cancel` was called and returned ``True``.  Any threads
-      waiting on the :class:`Future` completing (i.e. through
-      :func:`as_completed` or :func:`wait`) will be woken up.
+      Nếu phương thức trả về ``False`` thì :class:`Future` đã bị hủy, tức là :meth:`Future.cancel` đã được gọi và trả về ``True``. Mọi thread đang chờ :class:`Future` hoàn tất (tức là thông qua
+      :func:`as_completed` hoặc :func:`wait`) sẽ được đánh thức.
 
-      If the method returns ``True`` then the :class:`Future` was not cancelled
-      and has been put in the running state, i.e. calls to
-      :meth:`Future.running` will return ``True``.
+      Nếu phương thức trả về ``True`` thì :class:`Future` chưa bị hủy và đã được chuyển sang trạng thái đang chạy, tức là các lệnh gọi đến
+      :meth:`Future.running` sẽ trả về ``True``.
 
-      This method can only be called once and cannot be called after
-      :meth:`Future.set_result` or :meth:`Future.set_exception` have been
-      called.
+      Phương thức này chỉ có thể được gọi một lần và không thể được gọi sau
+      khi :meth:`Future.set_result` hoặc :meth:`Future.set_exception` đã được gọi.
 
    .. method:: set_result(result)
 
-      Sets the result of the work associated with the :class:`Future` to
-      *result*.
+      Đặt kết quả của công việc liên kết với :class:`Future` thành *result*.
 
-      This method should only be used by :class:`Executor` implementations and
-      unit tests.
+      Phương thức này chỉ nên được sử dụng bởi các triển khai :class:`Executor` và các bài kiểm thử đơn vị.
 
       .. versionchanged:: 3.8
-         This method raises
-         :exc:`concurrent.futures.InvalidStateError` if the :class:`Future` is
-         already done.
+         Phương thức này phát sinh
+         :exc:`concurrent.futures.InvalidStateError` nếu :class:`Future` đã hoàn tất.
 
    .. method:: set_exception(exception)
 
-      Sets the result of the work associated with the :class:`Future` to the
-      :class:`Exception` *exception*.
+      Đặt kết quả của công việc liên kết với :class:`Future` thành
+      :class:`Exception` *ngoại lệ*.
 
-      This method should only be used by :class:`Executor` implementations and
-      unit tests.
+      Phương thức này chỉ nên được sử dụng bởi các triển khai :class:`Executor` và các bài kiểm thử đơn vị.
 
       .. versionchanged:: 3.8
-         This method raises
-         :exc:`concurrent.futures.InvalidStateError` if the :class:`Future` is
-         already done.
+         Phương thức này phát sinh
+         :exc:`concurrent.futures.InvalidStateError` nếu :class:`Future` đã hoàn tất.
 
-Module Functions
-----------------
+Các hàm của mô-đun
+------------------
 
 .. function:: wait(fs, timeout=None, return_when=ALL_COMPLETED)
 
-   Wait for the :class:`Future` instances (possibly created by different
-   :class:`Executor` instances) given by *fs* to complete. Duplicate futures
-   given to *fs* are removed and will be returned only once. Returns a named
-   2-tuple of sets.  The first set, named ``done``, contains the futures that
-   completed (finished or cancelled futures) before the wait completed.  The
-   second set, named ``not_done``, contains the futures that did not complete
-   (pending or running futures).
+   Chờ các instance :class:`Future` (có thể được tạo bởi các
+   các instance :class:`Executor` được cung cấp cho *fs* để hoàn tất. Các future trùng lặp được cung cấp cho *fs* sẽ bị loại bỏ và chỉ được trả về một lần. Trả về một named 2-tuple gồm các tập hợp. Tập hợp đầu tiên, có tên là ``done``, chứa các future đã hoàn tất (future đã kết thúc hoặc bị hủy) trước khi quá trình chờ hoàn tất. Tập hợp thứ hai, có tên là ``not_done``, chứa các future chưa hoàn tất (future đang chờ hoặc đang chạy).
 
-   *timeout* can be used to control the maximum number of seconds to wait before
-   returning.  *timeout* can be an int or float.  If *timeout* is not specified
-   or ``None``, there is no limit to the wait time.
+   *timeout* có thể được dùng để kiểm soát số giây tối đa cần chờ trước khi trả về. *timeout* có thể là int hoặc float. Nếu *timeout* không được chỉ định hoặc là ``None``, thời gian chờ sẽ không bị giới hạn.
 
-   *return_when* indicates when this function should return.  It must be one of
-   the following constants:
+   *return_when* cho biết khi nào hàm này sẽ trả về. Giá trị này phải là một trong các hằng số sau:
 
    .. list-table::
       :header-rows: 1
 
-      * - Constant
-        - Description
+      * - Hằng số
+        - Mô tả
 
       * - .. data:: FIRST_COMPLETED
-        - The function will return when any future finishes or is cancelled.
+        - Hàm sẽ trả về khi bất kỳ future nào hoàn tất hoặc bị hủy.
 
       * - .. data:: FIRST_EXCEPTION
-        - The function will return when any future finishes by raising an
-          exception. If no future raises an exception
-          then it is equivalent to :const:`ALL_COMPLETED`.
+        - Hàm sẽ trả về khi bất kỳ future nào hoàn tất bằng cách phát sinh một ngoại lệ. Nếu không có future nào phát sinh ngoại lệ thì tương đương với :const:`ALL_COMPLETED`.
 
       * - .. data:: ALL_COMPLETED
-        - The function will return when all futures finish or are cancelled.
+        - Hàm sẽ trả về khi tất cả future hoàn tất hoặc bị hủy.
 
 .. function:: as_completed(fs, timeout=None)
 
-   Returns an iterator over the :class:`Future` instances (possibly created by
-   different :class:`Executor` instances) given by *fs* that yields futures as
-   they complete (finished or cancelled futures). Any futures given by *fs* that
-   are duplicated will be returned once. Any futures that completed before
-   :func:`as_completed` is called will be yielded first.  The returned iterator
-   raises a :exc:`TimeoutError` if :meth:`~iterator.__next__`
-   is called and the result isn't available after *timeout* seconds from the
-   original call to :func:`as_completed`.  *timeout* can be an int or float. If
-   *timeout* is not specified or ``None``, there is no limit to the wait time.
+   Trả về một iterator trên các instance :class:`Future` (có thể được tạo bởi các instance :class:`Executor` khác nhau) được cung cấp bởi *fs*, iterator này trả về các future khi chúng hoàn tất (các future đã hoàn tất hoặc bị hủy). Mọi future trùng lặp được cung cấp bởi *fs* sẽ chỉ được trả về một lần. Mọi future đã hoàn tất trước
+   :func:`as_completed` được gọi sẽ được yield trước. Iterator được trả về sẽ phát sinh một :exc:`TimeoutError` nếu :meth:`~iterator.__next__` được gọi và kết quả chưa khả dụng sau *timeout* giây kể từ lần gọi :func:`as_completed` ban đầu. *timeout* có thể là int hoặc float. Nếu *timeout* không được chỉ định hoặc là ``None``, thời gian chờ là không giới hạn.
 
 
 .. seealso::
 
-   :pep:`3148` -- futures - execute computations asynchronously
-      The proposal which described this feature for inclusion in the Python
-      standard library.
+   :pep:`3148` -- futures - thực thi các phép tính không đồng bộ
+      Đề xuất mô tả tính năng này để đưa vào thư viện chuẩn Python.
 
 
-Exception classes
------------------
+Các lớp ngoại lệ
+----------------
 
 .. currentmodule:: concurrent.futures
 
 .. exception:: CancelledError
 
-   Raised when a future is cancelled.
+   Được phát sinh khi một future bị hủy.
 
 .. exception:: TimeoutError
 
-   A deprecated alias of :exc:`TimeoutError`,
-   raised when a future operation exceeds the given timeout.
+   Một bí danh đã lỗi thời của :exc:`TimeoutError`, được phát sinh khi một thao tác future vượt quá thời gian chờ đã cho.
 
    .. versionchanged:: 3.11
 
-      This class was made an alias of :exc:`TimeoutError`.
+      Lớp này đã trở thành bí danh của :exc:`TimeoutError`.
 
 
 .. exception:: BrokenExecutor
 
-   Derived from :exc:`RuntimeError`, this exception class is raised
-   when an executor is broken for some reason, and cannot be used
-   to submit or execute new tasks.
+   Được dẫn xuất từ :exc:`RuntimeError`, lớp ngoại lệ này được phát sinh khi một executor bị hỏng vì một lý do nào đó và không thể được sử dụng để gửi hoặc thực thi các tác vụ mới.
 
    .. versionadded:: 3.7
 
 .. exception:: InvalidStateError
 
-   Raised when an operation is performed on a future that is not allowed
-   in the current state.
+   Được phát sinh khi một thao tác được thực hiện trên một future không được phép ở trạng thái hiện tại.
 
    .. versionadded:: 3.8
 
@@ -709,10 +485,7 @@ Exception classes
 
 .. exception:: BrokenThreadPool
 
-   Derived from :exc:`~concurrent.futures.BrokenExecutor`, this exception
-   class is raised when one of the workers
-   of a :class:`~concurrent.futures.ThreadPoolExecutor`
-   has failed initializing.
+   Được dẫn xuất từ :exc:`~concurrent.futures.BrokenExecutor`, lớp ngoại lệ này được phát sinh khi một trong các worker của :class:`~concurrent.futures.ThreadPoolExecutor` không khởi tạo được.
 
    .. versionadded:: 3.7
 
@@ -720,10 +493,7 @@ Exception classes
 
 .. exception:: BrokenInterpreterPool
 
-   Derived from :exc:`~concurrent.futures.thread.BrokenThreadPool`,
-   this exception class is raised when one of the workers
-   of a :class:`~concurrent.futures.InterpreterPoolExecutor`
-   has failed initializing.
+   Được dẫn xuất từ :exc:`~concurrent.futures.thread.BrokenThreadPool`, lớp ngoại lệ này được phát sinh khi một trong các worker của :class:`~concurrent.futures.InterpreterPoolExecutor` không khởi tạo được.
 
    .. versionadded:: 3.14
 
@@ -731,10 +501,7 @@ Exception classes
 
 .. exception:: BrokenProcessPool
 
-   Derived from :exc:`~concurrent.futures.BrokenExecutor` (formerly
-   :exc:`RuntimeError`), this exception class is raised when one of the
-   workers of a :class:`~concurrent.futures.ProcessPoolExecutor`
-   has terminated in a non-clean
-   fashion (for example, if it was killed from the outside).
+   Được dẫn xuất từ :exc:`~concurrent.futures.BrokenExecutor` (trước đây
+   :exc:`RuntimeError`), lớp ngoại lệ này được phát sinh khi một trong các worker của :class:`~concurrent.futures.ProcessPoolExecutor` đã kết thúc theo cách không sạch sẽ (ví dụ: bị kill từ bên ngoài).
 
    .. versionadded:: 3.3

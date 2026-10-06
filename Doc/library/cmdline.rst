@@ -1,10 +1,10 @@
 .. _library-cmdline:
 
-++++++++++++++++++++++++++++++++++++
-Modules command-line interface (CLI)
-++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++
+Giao diện dòng lệnh (CLI) của các module
+++++++++++++++++++++++++++++++++++++++++
 
-The following modules have a command-line interface.
+Các module sau đây có giao diện dòng lệnh.
 
 * :ref:`ast <ast-cli>`
 * :ref:`asyncio <asyncio-cli>`
@@ -12,7 +12,7 @@ The following modules have a command-line interface.
 * :ref:`calendar <calendar-cli>`
 * :mod:`code`
 * :ref:`compileall <compileall-cli>`
-* :mod:`cProfile`: see :ref:`profile <profile-cli>`
+* :mod:`cProfile`: xem :ref:`profile <profile-cli>`
 * :ref:`dis <dis-cli>`
 * :ref:`doctest <doctest-cli>`
 * :mod:`!encodings.rot_13`
@@ -57,4 +57,4 @@ The following modules have a command-line interface.
 * :ref:`zipapp <zipapp-command-line-interface>`
 * :ref:`zipfile <zipfile-commandline>`
 
-See also the :ref:`Python command-line interface <using-on-general>`.
+Xem thêm :ref:`giao diện dòng lệnh Python <using-on-general>`.

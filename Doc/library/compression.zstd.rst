@@ -1,512 +1,334 @@
-:mod:`!compression.zstd` --- Compression compatible with the Zstandard format
-=============================================================================
+:mod:`!compression.zstd` --- Nén tương thích với định dạng Zstandard
+====================================================================
 
 .. module:: compression.zstd
-   :synopsis: Low-level interface to compression and decompression routines in
-              the zstd library.
+   :synopsis: Giao diện cấp thấp cho các routine nén và giải nén trong thư viện zstd.
 
 .. versionadded:: 3.14
 
-**Source code:** :source:`Lib/compression/zstd/__init__.py`
+**Mã nguồn:** :source:`Lib/compression/zstd/__init__.py`
 
 --------------
 
-This module provides classes and functions for compressing and decompressing
-data using the Zstandard (or *zstd*) compression algorithm. The
-`zstd manual <https://facebook.github.io/zstd/doc/api_manual_latest.html>`__
-describes Zstandard as "a fast lossless compression algorithm, targeting
-real-time compression scenarios at zlib-level and better compression ratios."
-Also included is a file interface that supports reading and writing the
-contents of ``.zst`` files created by the :program:`zstd` utility, as well as
-raw zstd compressed streams.
+Mô-đun này cung cấp các lớp và hàm để nén và giải nén dữ liệu bằng thuật toán nén Zstandard (hay *zstd*). `Sổ tay zstd <https://facebook.github.io/zstd/doc/api_manual_latest.html>`__ mô tả Zstandard là "một thuật toán nén không mất dữ liệu nhanh, hướng đến các kịch bản nén theo thời gian thực với tốc độ ở mức zlib và tỷ lệ nén tốt hơn." Ngoài ra còn có một giao diện tệp hỗ trợ đọc và ghi nội dung của các tệp ``.zst`` được tạo bởi tiện ích :program:`zstd`, cũng như các luồng nén zstd thô.
 
-The :mod:`!compression.zstd` module contains:
+Mô-đun :mod:`!compression.zstd` chứa:
 
-* The :func:`.open` function and :class:`ZstdFile` class for reading and
-  writing compressed files.
-* The :class:`ZstdCompressor` and :class:`ZstdDecompressor` classes for
-  incremental (de)compression.
-* The :func:`compress` and :func:`decompress` functions for one-shot
-  (de)compression.
-* The :func:`train_dict` and :func:`finalize_dict` functions and the
-  :class:`ZstdDict` class to train and manage Zstandard dictionaries.
-* The :class:`CompressionParameter`, :class:`DecompressionParameter`, and
-  :class:`Strategy` classes for setting advanced (de)compression parameters.
+* Hàm :func:`.open` và lớp :class:`ZstdFile` để đọc và ghi các tệp đã nén.
+* Các lớp :class:`ZstdCompressor` và :class:`ZstdDecompressor` để nén và giải nén tăng dần.
+* Các hàm :func:`compress` và :func:`decompress` để nén/giải nén một lần.
+* Các hàm :func:`train_dict` và :func:`finalize_dict` cùng
+  lớp :class:`ZstdDict` để huấn luyện và quản lý các từ điển Zstandard.
+* Các lớp :class:`CompressionParameter`, :class:`DecompressionParameter` và
+  :class:`Strategy` để thiết lập các tham số nén/giải nén nâng cao.
 
 .. include:: ../includes/optional-module.rst
 
 
-Exceptions
-----------
+Ngoại lệ
+--------
 
 .. exception:: ZstdError
 
-   This exception is raised when an error occurs during compression or
-   decompression, or while initializing the (de)compressor state.
+   Ngoại lệ này được nâng lên khi xảy ra lỗi trong quá trình nén hoặc giải nén, hoặc khi khởi tạo trạng thái của bộ nén/giải nén.
 
 
-Reading and writing compressed files
-------------------------------------
+Đọc và ghi tệp được nén
+-----------------------
 
 .. function:: open(file, /, mode='rb', *, level=None, options=None, \
                    zstd_dict=None, encoding=None, errors=None, newline=None)
 
-   Open a Zstandard-compressed file in binary or text mode, returning a
+   Mở tệp được nén bằng Zstandard ở chế độ nhị phân hoặc văn bản, trả về một
    :term:`file object`.
 
-   The *file* argument can be either a file name (given as a
-   :class:`str`, :class:`bytes` or :term:`path-like <path-like object>`
-   object), in which case the named file is opened, or it can be an existing
-   file object to read from or write to.
+   Đối số *file* có thể là tên tệp (được cung cấp dưới dạng
+   :class:`str`, :class:`bytes` hoặc :term:`path-like <path-like object>`), trong trường hợp đó tệp có tên tương ứng sẽ được mở; hoặc có thể là một đối tượng tệp hiện có để đọc từ đó hoặc ghi vào đó.
 
-   The mode argument can be either ``'rb'`` for reading (default), ``'wb'`` for
-   overwriting, ``'ab'`` for appending, or ``'xb'`` for exclusive creation.
-   These can equivalently be given as ``'r'``, ``'w'``, ``'a'``, and ``'x'``
-   respectively. You may also open in text mode with ``'rt'``, ``'wt'``,
-   ``'at'``, and ``'xt'`` respectively.
+   Đối số mode có thể là ``'rb'`` để đọc (mặc định), ``'wb'`` để ghi đè, ``'ab'`` để nối thêm hoặc ``'xb'`` để tạo độc quyền. Tương ứng, bạn cũng có thể cung cấp các giá trị này dưới dạng ``'r'``, ``'w'``, ``'a'`` và ``'x'``. Bạn cũng có thể mở ở chế độ văn bản bằng lần lượt các giá trị ``'rt'``, ``'wt'``, ``'at'`` và ``'xt'``.
 
-   When reading, the *options* argument can be a dictionary providing advanced
-   decompression parameters; see :class:`DecompressionParameter` for detailed
-   information about supported
-   parameters. The *zstd_dict* argument is a :class:`ZstdDict` instance to be
-   used during decompression. When reading, if the *level*
-   argument is not None, a :exc:`!TypeError` will be raised.
+   Khi đọc, đối số *options* có thể là một dictionary cung cấp các tham số giải nén nâng cao; xem :class:`DecompressionParameter` để biết thông tin chi tiết về các tham số được hỗ trợ. Đối số *zstd_dict* là một thực thể :class:`ZstdDict` được sử dụng trong quá trình giải nén. Khi đọc, nếu đối số *level* không phải là None, một :exc:`!TypeError` sẽ được raised.
 
-   When writing, the *options* argument can be a dictionary
-   providing advanced compression parameters; see
-   :class:`CompressionParameter` for detailed information about supported
-   parameters. The *level* argument is the compression level to use when
-   writing compressed data. Only one of *level* or *options* may be non-None.
-   The *zstd_dict* argument is a :class:`ZstdDict` instance to be used during
-   compression.
+   Khi ghi dữ liệu, đối số *options* có thể là một dictionary cung cấp các tham số compression nâng cao; xem
+   :class:`CompressionParameter` để biết thông tin chi tiết về các tham số được hỗ trợ. Đối số *level* là compression level được sử dụng khi ghi dữ liệu đã nén. Chỉ một trong hai đối số *level* hoặc *options* có thể khác None. Đối số *zstd_dict* là một instance :class:`ZstdDict` được sử dụng trong quá trình compression.
 
-   In binary mode, this function is equivalent to the :class:`ZstdFile`
-   constructor: ``ZstdFile(file, mode, ...)``. In this case, the
-   *encoding*, *errors*, and *newline* parameters must not be provided.
+   Ở chế độ nhị phân, hàm này tương đương với constructor :class:`ZstdFile`: ``ZstdFile(file, mode, ...)``. Trong trường hợp này, không được cung cấp các tham số *encoding*, *errors* và *newline*.
 
-   In text mode, a :class:`ZstdFile` object is created, and wrapped in an
-   :class:`io.TextIOWrapper` instance with the specified encoding, error
-   handling behavior, and line endings.
+   Ở chế độ văn bản, một đối tượng :class:`ZstdFile` được tạo và bọc trong một
+   instance :class:`io.TextIOWrapper` với encoding, behavior xử lý lỗi và line ending được chỉ định.
 
 
 .. class:: ZstdFile(file, /, mode='rb', *, level=None, options=None, \
                     zstd_dict=None)
 
-   Open a Zstandard-compressed file in binary mode.
+   Mở tệp được nén bằng Zstandard ở chế độ nhị phân.
 
-   A :class:`ZstdFile` can wrap an already-open :term:`file object`, or operate
-   directly on a named file. The *file* argument specifies either the file
-   object to wrap, or the name of the file to open (as a :class:`str`,
-   :class:`bytes` or :term:`path-like <path-like object>` object). If
-   wrapping an existing file object, the wrapped file will not be closed when
-   the :class:`ZstdFile` is closed.
+   Một :class:`ZstdFile` có thể bao bọc một :term:`file object` đã được mở sẵn hoặc hoạt động trực tiếp trên một tệp có tên. Đối số *file* chỉ định đối tượng tệp cần bao bọc hoặc tên tệp cần mở (dưới dạng :class:`str`,
+   :class:`bytes` hoặc đối tượng :term:`path-like <path-like object>`). Nếu bao bọc một đối tượng tệp hiện có, tệp được bao bọc sẽ không bị đóng khi :class:`ZstdFile` được đóng.
 
-   The *mode* argument can be either ``'rb'`` for reading (default), ``'wb'``
-   for overwriting, ``'xb'`` for exclusive creation, or ``'ab'`` for appending.
-   These can equivalently be given as ``'r'``, ``'w'``, ``'x'`` and ``'a'``
-   respectively.
+   Đối số *mode* có thể là ``'rb'`` để đọc (mặc định), ``'wb'`` để ghi đè, ``'xb'`` để tạo độc quyền hoặc ``'ab'`` để nối thêm. Các giá trị này tương đương với ``'r'``, ``'w'``, ``'x'`` và ``'a'`` tương ứng.
 
-   If *file* is a file object (rather than an actual file name), a mode of
-   ``'w'`` does not truncate the file, and is instead equivalent to ``'a'``.
+   Nếu *file* là một đối tượng tệp (thay vì tên tệp thực tế), chế độ ``'w'`` sẽ không cắt ngắn tệp mà thay vào đó tương đương với ``'a'``.
 
-   When reading, the *options* argument can be a dictionary
-   providing advanced decompression parameters; see
-   :class:`DecompressionParameter` for detailed information about supported
-   parameters. The *zstd_dict* argument is a :class:`ZstdDict` instance to be
-   used during decompression. When reading, if the *level*
-   argument is not None, a :exc:`!TypeError` will be raised.
+   Khi đọc, đối số *options* có thể là một dictionary cung cấp các tham số giải nén nâng cao; xem
+   :class:`DecompressionParameter` để biết thông tin chi tiết về các tham số được hỗ trợ. Đối số *zstd_dict* là một instance :class:`ZstdDict` được sử dụng trong quá trình giải nén. Khi đọc, nếu đối số *level* không phải là None, một :exc:`!TypeError` sẽ được đưa ra.
 
-   When writing, the *options* argument can be a dictionary
-   providing advanced compression parameters; see
-   :class:`CompressionParameter` for detailed information about supported
-   parameters. The *level* argument is the compression level to use when
-   writing compressed data. Only one of *level* or *options* may be passed. The
-   *zstd_dict* argument is a :class:`ZstdDict` instance to be used during
-   compression.
+   Khi ghi dữ liệu, đối số *options* có thể là một dictionary cung cấp các tham số compression nâng cao; xem
+   :class:`CompressionParameter` để biết thông tin chi tiết về các tham số được hỗ trợ. Đối số *level* là cấp độ nén được sử dụng khi ghi dữ liệu đã nén. Chỉ có thể truyền một trong *level* hoặc *options*. Đối số *zstd_dict* là một thể hiện :class:`ZstdDict` được sử dụng trong quá trình nén.
 
-   :class:`!ZstdFile` supports all the members specified by
-   :class:`io.BufferedIOBase`, except for :meth:`~io.BufferedIOBase.detach`
-   and :meth:`~io.IOBase.truncate`.
-   Iteration and the :keyword:`with` statement are supported.
+   :class:`!ZstdFile` hỗ trợ tất cả các thành viên được chỉ định bởi
+   :class:`io.BufferedIOBase`, ngoại trừ :meth:`~io.BufferedIOBase.detach` và :meth:`~io.IOBase.truncate`. Việc lặp và câu lệnh :keyword:`with` được hỗ trợ.
 
-   The following method and attributes are also provided:
+   Các phương thức và thuộc tính sau đây cũng được cung cấp:
 
    .. method:: peek(size=-1)
 
-      Return buffered data without advancing the file position. At least one
-      byte of data will be returned, unless EOF has been reached. The exact
-      number of bytes returned is unspecified (the *size* argument is ignored).
+      Trả về dữ liệu đã đệm mà không làm thay đổi vị trí tệp. Sẽ trả về ít nhất một byte dữ liệu, trừ khi đã đến EOF. Số byte chính xác được trả về không được xác định (đối số *size* bị bỏ qua).
 
-      .. note:: While calling :meth:`peek` does not change the file position of
-         the :class:`ZstdFile`, it may change the position of the underlying
-         file object (for example, if the :class:`ZstdFile` was constructed by
-         passing a file object for *file*).
+      .. note:: Mặc dù việc gọi :meth:`peek` không làm thay đổi vị trí tệp của :class:`ZstdFile`, thao tác này có thể làm thay đổi vị trí của đối tượng tệp bên dưới (ví dụ: nếu :class:`ZstdFile` được tạo bằng cách truyền một đối tượng tệp cho *file*).
 
    .. attribute:: mode
 
-      ``'rb'`` for reading and ``'wb'`` for writing.
+      ``'rb'`` để đọc và ``'wb'`` để ghi.
 
    .. attribute:: name
 
-      The name of the Zstandard file. Equivalent to the :attr:`~io.FileIO.name`
-      attribute of the underlying :term:`file object`.
+      Tên của tệp Zstandard. Tương đương với thuộc tính :attr:`~io.FileIO.name` của :term:`file object` bên dưới.
 
 
-Compressing and decompressing data in memory
---------------------------------------------
+Nén và giải nén dữ liệu trong bộ nhớ
+------------------------------------
 
 .. function:: compress(data, level=None, options=None, zstd_dict=None)
 
-   Compress *data* (a :term:`bytes-like object`), returning the compressed
-   data as a :class:`bytes` object.
+   Nén *data* (một :term:`bytes-like object`), trả về dữ liệu đã nén dưới dạng đối tượng :class:`bytes`.
 
-   The *level* argument is an integer controlling the level of
-   compression. *level* is an alternative to setting
-   :attr:`CompressionParameter.compression_level` in *options*. Use
-   :meth:`~CompressionParameter.bounds` on
-   :attr:`~CompressionParameter.compression_level` to get the values that can
-   be passed for *level*. If advanced compression options are needed, the
-   *level* argument must be omitted and in the *options* dictionary the
-   :attr:`!CompressionParameter.compression_level` parameter should be set.
+   Đối số *level* là một số nguyên dùng để kiểm soát mức độ nén. *level* là một lựa chọn thay thế cho việc thiết lập
+   :attr:`CompressionParameter.compression_level` trong *options*. Sử dụng
+   :meth:`~CompressionParameter.bounds` trên
+   :attr:`~CompressionParameter.compression_level` để nhận các giá trị có thể truyền cho *level*. Nếu cần các tùy chọn nén nâng cao, phải bỏ qua đối số *level* và trong từ điển *options*
+   Tham số :attr:`!CompressionParameter.compression_level` cần được đặt.
 
-   The *options* argument is a Python dictionary containing advanced
-   compression parameters. The valid keys and values for compression parameters
-   are documented as part of the :class:`CompressionParameter` documentation.
+   Đối số *options* là một dictionary Python chứa các tham số nén nâng cao. Các khóa và giá trị hợp lệ cho các tham số nén được ghi lại trong tài liệu :class:`CompressionParameter`.
 
-   The *zstd_dict* argument is an instance of :class:`ZstdDict`
-   containing trained data to improve compression efficiency. The
-   function :func:`train_dict` can be used to generate a Zstandard dictionary.
+   Đối số *zstd_dict* là một thực thể của :class:`ZstdDict` chứa dữ liệu đã được huấn luyện để cải thiện hiệu quả nén. Có thể sử dụng hàm :func:`train_dict` để tạo dictionary Zstandard.
 
 
 .. function:: decompress(data, zstd_dict=None, options=None)
 
-   Decompress *data* (a :term:`bytes-like object`), returning the uncompressed
-   data as a :class:`bytes` object.
+   Giải nén *data* (một :term:`bytes-like object`), trả về dữ liệu chưa nén dưới dạng đối tượng :class:`bytes`.
 
-   The *options* argument is a Python dictionary containing advanced
-   decompression parameters. The valid keys and values for compression
-   parameters are documented as part of the :class:`DecompressionParameter`
-   documentation.
+   Đối số *options* là một dictionary Python chứa các tham số giải nén nâng cao. Các khóa và giá trị hợp lệ cho các tham số nén được ghi lại trong tài liệu :class:`DecompressionParameter`.
 
-   The *zstd_dict* argument is an instance of :class:`ZstdDict`
-   containing trained data used during compression. This must be
-   the same Zstandard dictionary used during compression.
+   Đối số *zstd_dict* là một thực thể của :class:`ZstdDict` chứa dữ liệu đã được huấn luyện được sử dụng trong quá trình nén. Đây phải là dictionary Zstandard được sử dụng trong quá trình nén.
 
-   If *data* is the concatenation of multiple distinct compressed frames,
-   decompress all of these frames, and return the concatenation of the results.
+   Nếu *data* là phần nối của nhiều frame nén riêng biệt, hãy giải nén tất cả các frame này và trả về phần nối của các kết quả.
 
 
 .. class:: ZstdCompressor(level=None, options=None, zstd_dict=None)
 
-   Create a compressor object, which can be used to compress data
-   incrementally.
+   Tạo một đối tượng compressor, có thể được dùng để nén dữ liệu theo từng phần.
 
-   For a more convenient way of compressing a single chunk of data, see the
-   module-level function :func:`compress`.
+   Để có cách thuận tiện hơn nhằm nén một khối dữ liệu đơn lẻ, hãy xem hàm cấp mô-đun :func:`compress`.
 
-   The *level* argument is an integer controlling the level of
-   compression. *level* is an alternative to setting
-   :attr:`CompressionParameter.compression_level` in *options*. Use
-   :meth:`~CompressionParameter.bounds` on
-   :attr:`~CompressionParameter.compression_level` to get the values that can
-   be passed for *level*. If advanced compression options are needed, the
-   *level* argument must be omitted and in the *options* dictionary the
-   :attr:`!CompressionParameter.compression_level` parameter should be set.
+   Đối số *level* là một số nguyên dùng để kiểm soát mức độ nén. *level* là một lựa chọn thay thế cho việc thiết lập
+   :attr:`CompressionParameter.compression_level` trong *options*. Sử dụng
+   :meth:`~CompressionParameter.bounds` trên
+   :attr:`~CompressionParameter.compression_level` để nhận các giá trị có thể truyền cho *level*. Nếu cần các tùy chọn nén nâng cao, phải bỏ qua đối số *level* và trong từ điển *options*
+   Tham số :attr:`!CompressionParameter.compression_level` cần được đặt.
 
-   The *options* argument is a Python dictionary containing advanced
-   compression parameters. The valid keys and values for compression parameters
-   are documented as part of the :class:`CompressionParameter` documentation.
+   Đối số *options* là một dictionary Python chứa các tham số nén nâng cao. Các khóa và giá trị hợp lệ cho các tham số nén được ghi lại trong tài liệu :class:`CompressionParameter`.
 
-   The *zstd_dict* argument is an optional instance of :class:`ZstdDict`
-   containing trained data to improve compression efficiency. The
-   function :func:`train_dict` can be used to generate a Zstandard dictionary.
+   Đối số *zstd_dict* là một thể hiện tùy chọn của :class:`ZstdDict` chứa dữ liệu đã được huấn luyện để cải thiện hiệu quả nén. Có thể sử dụng hàm :func:`train_dict` để tạo một từ điển Zstandard.
 
 
    .. method:: compress(data, mode=ZstdCompressor.CONTINUE)
 
-      Compress *data* (a :term:`bytes-like object`), returning a :class:`bytes`
-      object with compressed data if possible, or otherwise an empty
-      :class:`!bytes` object. Some of *data* may be buffered internally, for
-      use in later calls to :meth:`!compress` and :meth:`~.flush`. The returned
-      data should be concatenated with the output of any previous calls to
+      Nén *data* (một :term:`bytes-like object`), trả về một đối tượng :class:`bytes` chứa dữ liệu đã nén nếu có thể, hoặc nếu không thì trả về một đối tượng rỗng
+      :class:`!bytes`. Một phần *data* có thể được lưu vào bộ đệm nội bộ để sử dụng trong các lần gọi sau đến :meth:`!compress` và :meth:`~.flush`. Dữ liệu trả về phải được nối với đầu ra của mọi lần gọi trước đó đến
       :meth:`~.compress`.
 
-      The *mode* argument is a :class:`ZstdCompressor` attribute, either
-      :attr:`~.CONTINUE`, :attr:`~.FLUSH_BLOCK`,
-      or :attr:`~.FLUSH_FRAME`.
+      Đối số *mode* là một thuộc tính :class:`ZstdCompressor`, có thể là
+      :attr:`~.CONTINUE`, :attr:`~.FLUSH_BLOCK` hoặc :attr:`~.FLUSH_FRAME`.
 
-      When all data has been provided to the compressor, call the
-      :meth:`~.flush` method to finish the compression process. If
-      :meth:`~.compress` is called with *mode* set to :attr:`~.FLUSH_FRAME`,
-      :meth:`~.flush` should not be called, as it would write out a new empty
-      frame.
+      Khi đã cung cấp toàn bộ dữ liệu cho compressor, hãy gọi
+      :meth:`~.flush` để hoàn tất quá trình nén. Nếu
+      :meth:`~.compress` được gọi với *mode* được đặt thành :attr:`~.FLUSH_FRAME`,
+      Không nên gọi :meth:`~.flush`, vì thao tác này sẽ ghi ra một frame trống mới.
 
    .. method:: flush(mode=ZstdCompressor.FLUSH_FRAME)
 
-      Finish the compression process, returning a :class:`bytes` object
-      containing any data stored in the compressor's internal buffers.
+      Hoàn tất quá trình nén và trả về một đối tượng :class:`bytes` chứa mọi dữ liệu được lưu trong các bộ đệm nội bộ của compressor.
 
-      The *mode* argument is a :class:`ZstdCompressor` attribute, either
-      :attr:`~.FLUSH_BLOCK`, or :attr:`~.FLUSH_FRAME`.
+      Đối số *mode* là một thuộc tính :class:`ZstdCompressor`, có thể là
+      :attr:`~.FLUSH_BLOCK`, hoặc :attr:`~.FLUSH_FRAME`.
 
    .. method:: set_pledged_input_size(size)
 
-      Specify the amount of uncompressed data *size* that will be provided for
-      the next frame. *size* will be written into the frame header of the next
-      frame unless :attr:`CompressionParameter.content_size_flag` is ``False``
-      or ``0``. A size of ``0`` means that the frame is empty. If *size* is
-      ``None``, the frame header will omit the frame size. Frames that include
-      the uncompressed data size require less memory to decompress, especially
-      at higher compression levels.
+      Chỉ định lượng dữ liệu chưa nén *size* sẽ được cung cấp cho frame tiếp theo. *size* sẽ được ghi vào phần header của frame tiếp theo, trừ khi :attr:`CompressionParameter.content_size_flag` là ``False`` hoặc ``0``. Kích thước ``0`` nghĩa là frame trống. Nếu *size* là ``None``, phần header của frame sẽ không bao gồm kích thước frame. Các frame có chứa kích thước dữ liệu chưa nén sẽ cần ít bộ nhớ hơn để giải nén, đặc biệt ở các mức nén cao hơn.
 
-      If :attr:`last_mode` is not :attr:`FLUSH_FRAME`, a
-      :exc:`ValueError` is raised as the compressor is not at the start of
-      a frame. If the pledged size does not match the actual size of data
-      provided to :meth:`.compress`, future calls to :meth:`!compress` or
-      :meth:`flush` may raise :exc:`ZstdError` and the last chunk of data may
-      be lost.
+      Nếu :attr:`last_mode` không phải là :attr:`FLUSH_FRAME`, một
+      :exc:`ValueError` sẽ được phát sinh vì compressor không ở đầu frame. Nếu kích thước đã cam kết không khớp với kích thước thực tế của dữ liệu được cung cấp cho :meth:`.compress`, các lần gọi :meth:`!compress` tiếp theo hoặc
+      :meth:`flush` có thể phát sinh :exc:`ZstdError` và phần dữ liệu cuối cùng có thể bị mất.
 
-      After :meth:`flush` or :meth:`.compress` are called with mode
-      :attr:`FLUSH_FRAME`, the next frame will not include the frame size into
-      the header unless :meth:`!set_pledged_input_size` is called again.
+      Sau khi :meth:`flush` hoặc :meth:`.compress` được gọi với mode
+      :attr:`FLUSH_FRAME`, frame tiếp theo sẽ không đưa kích thước frame vào header, trừ khi :meth:`!set_pledged_input_size` được gọi lại.
 
    .. attribute:: CONTINUE
 
-      Collect more data for compression, which may or may not generate output
-      immediately. This mode optimizes the compression ratio by maximizing the
-      amount of data per block and frame.
+      Thu thập thêm dữ liệu để nén; thao tác này có thể tạo hoặc không tạo output ngay lập tức. Mode này tối ưu hóa tỷ lệ nén bằng cách tối đa hóa lượng dữ liệu trong mỗi block và frame.
 
    .. attribute:: FLUSH_BLOCK
 
-      Complete and write a block to the data stream. The data returned so far
-      can be immediately decompressed. Past data can still be referenced in
-      future blocks generated by calls to :meth:`~.compress`,
-      improving compression.
+      Hoàn tất và ghi một block vào data stream. Dữ liệu được trả về cho đến thời điểm này có thể được giải nén ngay lập tức. Dữ liệu trước đó vẫn có thể được tham chiếu trong các block tiếp theo do các lệnh gọi đến :meth:`~.compress` tạo ra, giúp cải thiện khả năng nén.
 
    .. attribute:: FLUSH_FRAME
 
-      Complete and write out a frame. Future data provided to
-      :meth:`~.compress` will be written into a new frame and
-      *cannot* reference past data.
+      Hoàn tất và ghi ra một frame. Dữ liệu trong tương lai được cung cấp cho
+      :meth:`~.compress` sẽ được ghi vào một frame mới và *không thể* tham chiếu đến dữ liệu trước đó.
 
    .. attribute:: last_mode
 
-      The last mode passed to either :meth:`~.compress` or :meth:`~.flush`.
-      The value can be one of :attr:`~.CONTINUE`, :attr:`~.FLUSH_BLOCK`, or
-      :attr:`~.FLUSH_FRAME`. The initial value is :attr:`~.FLUSH_FRAME`,
-      signifying that the compressor is at the start of a new frame.
+      Chế độ gần đây nhất được truyền vào :meth:`~.compress` hoặc :meth:`~.flush`. Giá trị này có thể là một trong :attr:`~.CONTINUE`, :attr:`~.FLUSH_BLOCK` hoặc
+      :attr:`~.FLUSH_FRAME`. Giá trị ban đầu là :attr:`~.FLUSH_FRAME`, cho biết compressor đang ở đầu một frame mới.
 
 
 .. class:: ZstdDecompressor(zstd_dict=None, options=None)
 
-   Create a decompressor object, which can be used to decompress data
-   incrementally.
+   Tạo một đối tượng decompressor, có thể được dùng để giải nén dữ liệu theo từng phần.
 
-   For a more convenient way of decompressing an entire compressed stream at
-   once, see the module-level function :func:`decompress`.
+   Để có cách thuận tiện hơn khi giải nén toàn bộ compressed stream cùng lúc, hãy xem hàm cấp module :func:`decompress`.
 
-   The *options* argument is a Python dictionary containing advanced
-   decompression parameters. The valid keys and values for compression
-   parameters are documented as part of the :class:`DecompressionParameter`
-   documentation.
+   Đối số *options* là một dictionary Python chứa các tham số giải nén nâng cao. Các khóa và giá trị hợp lệ cho các tham số nén được ghi lại trong tài liệu :class:`DecompressionParameter`.
 
-   The *zstd_dict* argument is an instance of :class:`ZstdDict`
-   containing trained data used during compression. This must be
-   the same Zstandard dictionary used during compression.
+   Đối số *zstd_dict* là một thực thể của :class:`ZstdDict` chứa dữ liệu đã được huấn luyện được sử dụng trong quá trình nén. Đây phải là dictionary Zstandard được sử dụng trong quá trình nén.
 
    .. note::
-      This class does not transparently handle inputs containing multiple
-      compressed frames, unlike the :func:`decompress` function and
-      :class:`ZstdFile` class. To decompress a multi-frame input, you should
-      use :func:`decompress`, :class:`ZstdFile` if working with a
-      :term:`file object`, or multiple :class:`!ZstdDecompressor` instances.
+      Lớp này không tự động xử lý các đầu vào chứa nhiều frame đã nén, khác với hàm :func:`decompress` và
+      lớp :class:`ZstdFile`. Để giải nén đầu vào nhiều frame, bạn nên sử dụng :func:`decompress`, :class:`ZstdFile` nếu đang làm việc với một
+      :term:`file object`, hoặc nhiều instance :class:`!ZstdDecompressor`.
 
    .. method:: decompress(data, max_length=-1)
 
-      Decompress *data* (a :term:`bytes-like object`), returning
-      uncompressed data as bytes. Some of *data* may be buffered
-      internally, for use in later calls to :meth:`!decompress`.
-      The returned data should be concatenated with the output of any previous
-      calls to :meth:`!decompress`.
+      Giải nén *data* (một :term:`bytes-like object`), trả về dữ liệu chưa nén dưới dạng byte. Một phần *data* có thể được đệm nội bộ để sử dụng trong các lần gọi sau đến :meth:`!decompress`. Dữ liệu được trả về nên được nối với kết quả của mọi lần gọi trước đó đến :meth:`!decompress`.
 
-      If *max_length* is non-negative, the method returns at most *max_length*
-      bytes of decompressed data. If this limit is reached and further
-      output can be produced, the :attr:`~.needs_input` attribute will
-      be set to ``False``. In this case, the next call to
-      :meth:`~.decompress` may provide *data* as ``b''`` to obtain
-      more of the output.
+      Nếu *max_length* không âm, phương thức sẽ trả về nhiều nhất *max_length* byte dữ liệu đã giải nén. Nếu đạt đến giới hạn này và vẫn có thể tạo thêm đầu ra, thuộc tính :attr:`~.needs_input` sẽ được đặt thành ``False``. Trong trường hợp này, lần gọi tiếp theo đến
+      :meth:`~.decompress` có thể cung cấp *data* làm ``b''`` để lấy thêm phần đầu ra.
 
-      If all of the input data was decompressed and returned (either
-      because this was less than *max_length* bytes, or because
-      *max_length* was negative), the :attr:`~.needs_input` attribute
-      will be set to ``True``.
+      Nếu toàn bộ dữ liệu đầu vào đã được giải nén và trả về (either vì dữ liệu có kích thước nhỏ hơn *max_length* byte, hoặc vì *max_length* là số âm), thuộc tính :attr:`~.needs_input` sẽ được đặt thành ``True``.
 
-      Attempting to decompress data after the end of a frame will raise a
-      :exc:`EOFError`. Any data found after the end of the frame is ignored
-      and saved in the :attr:`~.unused_data` attribute.
+      Việc cố gắng giải nén dữ liệu sau phần cuối của một frame sẽ gây ra một
+      :exc:`EOFError`. Mọi dữ liệu được tìm thấy sau phần cuối của frame sẽ bị bỏ qua và được lưu trong thuộc tính :attr:`~.unused_data`.
 
    .. attribute:: eof
 
-      ``True`` if the end-of-stream marker has been reached.
+      ``True`` nếu đã đạt đến marker kết thúc luồng.
 
    .. attribute:: unused_data
 
-      Data found after the end of the compressed stream.
+      Dữ liệu được tìm thấy sau phần cuối của luồng đã nén.
 
-      Before the end of the stream is reached, this will be ``b''``.
+      Trước khi đạt đến phần cuối của luồng, giá trị này sẽ là ``b''``.
 
    .. attribute:: needs_input
 
-      ``False`` if the :meth:`.decompress` method can provide more
-      decompressed data before requiring new compressed input.
+      ``False`` nếu phương thức :meth:`.decompress` có thể cung cấp thêm dữ liệu đã giải nén trước khi cần dữ liệu đầu vào đã nén mới.
 
 
-Zstandard dictionaries
-----------------------
+Các dictionary của Zstandard
+----------------------------
 
 
 .. function:: train_dict(samples, dict_size)
 
-   Train a Zstandard dictionary, returning a :class:`ZstdDict` instance.
-   Zstandard dictionaries enable more efficient compression of smaller sizes
-   of data, which is traditionally difficult to compress due to less
-   repetition. If you are compressing multiple similar groups of data (such as
-   similar files), Zstandard dictionaries can improve compression ratios and
-   speed significantly.
+   Huấn luyện một dictionary của Zstandard và trả về một instance :class:`ZstdDict`. Các dictionary của Zstandard cho phép nén hiệu quả hơn các tập dữ liệu nhỏ, vốn thường khó nén do có ít sự lặp lại hơn. Nếu bạn đang nén nhiều nhóm dữ liệu tương tự nhau (chẳng hạn như các tệp tương tự nhau), các dictionary của Zstandard có thể cải thiện đáng kể tỷ lệ và tốc độ nén.
 
-   The *samples* argument (an iterable of :class:`bytes` objects), is the
-   population of samples used to train the Zstandard dictionary.
+   Đối số *samples* (một iterable gồm các đối tượng :class:`bytes`) là tập hợp các mẫu được dùng để huấn luyện dictionary của Zstandard.
 
-   The *dict_size* argument, an integer, is the maximum size (in bytes) the
-   Zstandard dictionary should be. The Zstandard documentation suggests an
-   absolute maximum of no more than 100 KB, but the maximum can often be smaller
-   depending on the data. Larger dictionaries generally slow down compression,
-   but improve compression ratios. Smaller dictionaries lead to faster
-   compression, but reduce the compression ratio.
+   Đối số *dict_size*, một số nguyên, là kích thước tối đa (tính bằng byte) mà dictionary của Zstandard nên có. Tài liệu Zstandard đề xuất giới hạn tuyệt đối không quá 100 KB, nhưng giới hạn tối đa thường có thể nhỏ hơn tùy thuộc vào dữ liệu. Dictionary lớn hơn thường làm chậm quá trình nén nhưng cải thiện tỷ lệ nén. Dictionary nhỏ hơn giúp nén nhanh hơn nhưng làm giảm tỷ lệ nén.
 
 
 .. function:: finalize_dict(zstd_dict, /, samples, dict_size, level)
 
-   An advanced function for converting a "raw content" Zstandard dictionary into
-   a regular Zstandard dictionary. "Raw content" dictionaries are a sequence of
-   bytes that do not need to follow the structure of a normal Zstandard
-   dictionary.
+   Một hàm nâng cao để chuyển đổi dictionary của Zstandard "raw content" thành dictionary Zstandard thông thường. Các dictionary "raw content" là một chuỗi byte không cần tuân theo cấu trúc của dictionary Zstandard thông thường.
 
-   The *zstd_dict* argument is a :class:`ZstdDict` instance with
-   the :attr:`~ZstdDict.dict_content` containing the raw dictionary contents.
+   Đối số *zstd_dict* là một instance :class:`ZstdDict` có :attr:`~ZstdDict.dict_content` chứa nội dung dictionary thô.
 
-   The *samples* argument (an iterable of :class:`bytes` objects), contains
-   sample data for generating the Zstandard dictionary.
+   Đối số *samples* (một iterable gồm các đối tượng :class:`bytes`) chứa dữ liệu mẫu để tạo dictionary của Zstandard.
 
-   The *dict_size* argument, an integer, is the maximum size (in bytes) the
-   Zstandard dictionary should be. See :func:`train_dict` for
-   suggestions on the maximum dictionary size.
+   Đối số *dict_size*, là một số nguyên, là kích thước tối đa (tính bằng byte) mà từ điển Zstandard nên có. Xem :func:`train_dict` để biết các đề xuất về kích thước từ điển tối đa.
 
-   The *level* argument (an integer) is the compression level expected to be
-   passed to the compressors using this dictionary. The dictionary information
-   varies for each compression level, so tuning for the proper compression
-   level can make compression more efficient.
+   Đối số *level* (một số nguyên) là mức nén dự kiến được truyền cho các compressor sử dụng từ điển này. Thông tin từ điển thay đổi theo từng mức nén, vì vậy việc tinh chỉnh để chọn đúng mức nén có thể giúp quá trình nén hiệu quả hơn.
 
 
 .. class:: ZstdDict(dict_content, /, *, is_raw=False)
 
-   A wrapper around Zstandard dictionaries. Dictionaries can be used to improve
-   the compression of many small chunks of data. Use :func:`train_dict` if you
-   need to train a new dictionary from sample data.
+   Một wrapper cho các từ điển Zstandard. Có thể sử dụng từ điển để cải thiện khả năng nén nhiều đoạn dữ liệu nhỏ. Hãy sử dụng :func:`train_dict` nếu bạn cần huấn luyện một từ điển mới từ dữ liệu mẫu.
 
-   The *dict_content* argument (a :term:`bytes-like object`), is the already
-   trained dictionary information.
+   Đối số *dict_content* (một :term:`bytes-like object`) là thông tin từ điển đã được huấn luyện.
 
-   The *is_raw* argument, a boolean, is an advanced parameter controlling the
-   meaning of *dict_content*. ``True`` means *dict_content* is a "raw content"
-   dictionary, without any format restrictions. ``False`` means *dict_content*
-   is an ordinary Zstandard dictionary, created from Zstandard functions,
-   for example, :func:`train_dict` or the external :program:`zstd` CLI.
+   Đối số *is_raw*, một giá trị boolean, là tham số nâng cao dùng để kiểm soát ý nghĩa của *dict_content*. ``True`` có nghĩa là *dict_content* là một từ điển "raw content", không có bất kỳ hạn chế định dạng nào. ``False`` có nghĩa là *dict_content* là một từ điển Zstandard thông thường, được tạo từ các hàm Zstandard, chẳng hạn như :func:`train_dict` hoặc CLI :program:`zstd` bên ngoài.
 
-   When passing a :class:`!ZstdDict` to a function, the
-   :attr:`!as_digested_dict` and :attr:`!as_undigested_dict` attributes can
-   control how the dictionary is loaded by passing them as the ``zstd_dict``
-   argument, for example, ``compress(data, zstd_dict=zd.as_digested_dict)``.
-   Digesting a dictionary is a costly operation that occurs when loading a
-   Zstandard dictionary. When making multiple calls to compression or
-   decompression, passing a digested dictionary will reduce the overhead of
-   loading the dictionary.
+   Khi truyền một :class:`!ZstdDict` cho một hàm,
+   Các thuộc tính :attr:`!as_digested_dict` và :attr:`!as_undigested_dict` có thể kiểm soát cách từ điển được tải bằng cách truyền chúng dưới dạng đối số ``zstd_dict``, chẳng hạn như ``compress(data, zstd_dict=zd.as_digested_dict)``. Việc digest một từ điển là thao tác tốn kém, xảy ra khi tải một từ điển Zstandard. Khi thực hiện nhiều lần gọi đến compression hoặc decompression, việc truyền một từ điển đã được digest sẽ giảm chi phí tải từ điển.
 
-    .. list-table:: Difference for compression
+    .. list-table:: Sự khác biệt khi nén
        :widths: 10 14 10
        :header-rows: 1
 
        * -
-         - Digested dictionary
-         - Undigested dictionary
-       * - Advanced parameters of the compressor which may be overridden by
-           the dictionary's parameters
-         - ``window_log``, ``hash_log``, ``chain_log``, ``search_log``,
-           ``min_match``, ``target_length``, ``strategy``,
-           ``enable_long_distance_matching``, ``ldm_hash_log``,
-           ``ldm_min_match``, ``ldm_bucket_size_log``, ``ldm_hash_rate_log``,
-           and some non-public parameters.
-         - None
-       * - :class:`!ZstdDict` internally caches the dictionary
-         - Yes. It's faster when loading a digested dictionary again with the
-           same compression level.
-         - No. If you wish to load an undigested dictionary multiple times,
-           consider reusing a compressor object.
+         - Dictionary đã được xử lý
+         - Dictionary chưa được xử lý
+       * - Các tham số nâng cao của compressor có thể được ghi đè bởi các tham số của dictionary
+         - ``window_log``, ``hash_log``, ``chain_log``, ``search_log``, ``min_match``, ``target_length``, ``strategy``, ``enable_long_distance_matching``, ``ldm_hash_log``, ``ldm_min_match``, ``ldm_bucket_size_log``, ``ldm_hash_rate_log``, và một số tham số không công khai.
+         - Không có
+       * - :class:`!ZstdDict` nội bộ lưu dictionary vào bộ nhớ đệm
+         - Đúng vậy. Việc tải lại một từ điển đã digest sẽ nhanh hơn khi sử dụng cùng một mức compression.
+         - Không. Nếu muốn tải một từ điển chưa digest nhiều lần, hãy cân nhắc việc sử dụng lại một đối tượng compressor.
 
-   If passing a :class:`!ZstdDict` without any attribute, an undigested
-   dictionary is passed by default when compressing and a digested dictionary
-   is generated if necessary and passed by default when decompressing.
+   Nếu truyền một :class:`!ZstdDict` mà không có thuộc tính nào, theo mặc định, một từ điển chưa digest sẽ được truyền khi nén, còn một từ điển đã digest sẽ được tạo nếu cần và được truyền theo mặc định khi giải nén.
 
     .. attribute:: dict_content
 
-        The content of the Zstandard dictionary, a ``bytes`` object. It's the
-        same as the *dict_content* argument in the ``__init__`` method. It can
-        be used with other programs, such as the ``zstd`` CLI program.
+        Nội dung của từ điển Zstandard, một đối tượng ``bytes``. Nội dung này giống với đối số *dict_content* trong phương thức ``__init__``. Nó có thể được sử dụng với các chương trình khác, chẳng hạn như chương trình CLI ``zstd``.
 
     .. attribute:: dict_id
 
-        Identifier of the Zstandard dictionary, a non-negative int value.
+        Mã định danh của từ điển Zstandard, một giá trị int không âm.
 
-        Non-zero means the dictionary is ordinary, created by Zstandard
-        functions and following the Zstandard format.
+        Giá trị khác không có nghĩa là từ điển thông thường, được tạo bởi các hàm Zstandard và tuân theo định dạng Zstandard.
 
-        ``0`` means a "raw content" dictionary, free of any format restriction,
-        used for advanced users.
+        ``0`` có nghĩa là từ điển “raw content”, không bị giới hạn bởi bất kỳ định dạng nào và dành cho người dùng nâng cao.
 
         .. note::
 
-            The meaning of ``0`` for :attr:`!ZstdDict.dict_id` is different
-            from the ``dictionary_id`` attribute to the :func:`get_frame_info`
-            function.
+            Ý nghĩa của ``0`` đối với :attr:`!ZstdDict.dict_id` khác với thuộc tính ``dictionary_id`` của hàm :func:`get_frame_info`.
 
     .. attribute:: as_digested_dict
 
-        Load as a digested dictionary.
+        Tải dưới dạng dictionary đã được digest.
 
     .. attribute:: as_undigested_dict
 
-        Load as an undigested dictionary.
+        Tải dưới dạng dictionary chưa được digest.
 
 
-Advanced parameter control
---------------------------
+Điều khiển tham số nâng cao
+---------------------------
 
 .. class:: CompressionParameter()
 
-   An :class:`~enum.IntEnum` containing the advanced compression parameter
-   keys that can be used when compressing data.
+   Một :class:`~enum.IntEnum` chứa các khóa tham số nén nâng cao có thể được sử dụng khi nén dữ liệu.
 
-   The :meth:`~.bounds` method can be used on any attribute to get the valid
-   values for that parameter.
+   Có thể sử dụng phương thức :meth:`~.bounds` trên bất kỳ thuộc tính nào để lấy các giá trị hợp lệ cho tham số đó.
 
-   Parameters are optional; any omitted parameter will have its value selected
-   automatically.
+   Các tham số là tùy chọn; mọi tham số bị bỏ qua sẽ được tự động chọn giá trị.
 
-   Example getting the lower and upper bound of :attr:`~.compression_level`::
+   Ví dụ lấy giới hạn dưới và giới hạn trên của :attr:`~.compression_level`::
 
       lower, upper = CompressionParameter.compression_level.bounds()
 
-   Example setting the :attr:`~.window_log` to the maximum size::
+   Ví dụ đặt :attr:`~.window_log` thành kích thước tối đa::
 
       _lower, upper = CompressionParameter.window_log.bounds()
       options = {CompressionParameter.window_log: upper}
@@ -514,226 +336,163 @@ Advanced parameter control
 
    .. method:: bounds()
 
-      Return the tuple of int bounds, ``(lower, upper)``, of a compression
-      parameter. This method should be called on the attribute you wish to
-      retrieve the bounds of. For example, to get the valid values for
-      :attr:`~.compression_level`, one may check the result of
-      ``CompressionParameter.compression_level.bounds()``.
+      Trả về tuple gồm các giới hạn int, ``(lower, upper)``, của một tham số nén. Phương thức này nên được gọi trên thuộc tính mà bạn muốn lấy các giới hạn. Ví dụ: để lấy các giá trị hợp lệ cho
+      :attr:`~.compression_level`, bạn có thể kiểm tra kết quả của ``CompressionParameter.compression_level.bounds()``.
 
-      Both the lower and upper bounds are inclusive.
+      Cả giới hạn dưới và giới hạn trên đều được tính.
 
    .. attribute:: compression_level
 
-      A high-level means of setting other compression parameters that affect
-      the speed and ratio of compressing data.
+      Một cách cấp cao để thiết lập các tham số nén khác ảnh hưởng đến tốc độ và tỷ lệ nén dữ liệu.
 
-      Regular compression levels are greater than ``0``. Values greater than
-      ``20`` are considered "ultra" compression and require more memory than
-      other levels. Negative values can be used to trade off faster compression
-      for worse compression ratios.
+      Các cấp độ nén thông thường lớn hơn ``0``. Các giá trị lớn hơn ``20`` được xem là mức nén "ultra" và cần nhiều bộ nhớ hơn các cấp độ khác. Có thể sử dụng các giá trị âm để đánh đổi tốc độ nén nhanh hơn lấy tỷ lệ nén kém hơn.
 
-      Setting the level to zero uses :attr:`COMPRESSION_LEVEL_DEFAULT`.
+      Đặt mức này bằng không sẽ sử dụng :attr:`COMPRESSION_LEVEL_DEFAULT`.
 
    .. attribute:: window_log
 
-      Maximum allowed back-reference distance the compressor can use when
-      compressing data, expressed as power of two, ``1 << window_log`` bytes.
-      This parameter greatly influences the memory usage of compression. Higher
-      values require more memory but gain better compression values.
+      Khoảng cách back-reference tối đa mà compressor có thể sử dụng khi nén dữ liệu, được biểu thị dưới dạng lũy thừa của 2, ``1 << window_log`` byte. Tham số này ảnh hưởng đáng kể đến mức sử dụng bộ nhớ khi nén. Giá trị cao hơn yêu cầu nhiều bộ nhớ hơn nhưng cho hiệu quả nén tốt hơn.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: hash_log
 
-      Size of the initial probe table, as a power of two. The resulting memory
-      usage is ``1 << (hash_log+2)`` bytes. Larger tables improve compression
-      ratio of strategies <= :attr:`~Strategy.dfast`, and improve compression
-      speed of strategies > :attr:`~Strategy.dfast`.
+      Kích thước của bảng thăm dò ban đầu, dưới dạng lũy thừa của 2. Mức sử dụng bộ nhớ tương ứng là ``1 << (hash_log+2)`` byte. Các bảng lớn hơn cải thiện tỷ lệ nén của các strategy <= :attr:`~Strategy.dfast`, đồng thời cải thiện tốc độ nén của các strategy > :attr:`~Strategy.dfast`.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: chain_log
 
-      Size of the multi-probe search table, as a power of two. The resulting
-      memory usage is ``1 << (chain_log+2)`` bytes. Larger tables result in
-      better and slower compression. This parameter has no effect for the
-      :attr:`~Strategy.fast` strategy. It's still useful when using
-      :attr:`~Strategy.dfast` strategy, in which case it defines a secondary
-      probe table.
+      Kích thước của bảng tìm kiếm multi-probe, dưới dạng lũy thừa của 2. Mức sử dụng bộ nhớ tương ứng là ``1 << (chain_log+2)`` byte. Các bảng lớn hơn cho khả năng nén tốt hơn nhưng chậm hơn. Tham số này không có tác dụng đối với
+      :attr:`~Strategy.fast` strategy. Tham số này vẫn hữu ích khi sử dụng
+      chiến lược :attr:`~Strategy.dfast`, trong trường hợp đó nó xác định một bảng probe phụ.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: search_log
 
-      Number of search attempts, as a power of two. More attempts result in
-      better and slower compression. This parameter is useless for
-      :attr:`~Strategy.fast` and :attr:`~Strategy.dfast` strategies.
+      Số lần thử tìm kiếm, dưới dạng lũy thừa của hai. Nhiều lần thử hơn cho khả năng nén tốt hơn nhưng chậm hơn. Tham số này vô dụng đối với
+      các chiến lược :attr:`~Strategy.fast` và :attr:`~Strategy.dfast`.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: min_match
 
-      Minimum size of searched matches. Larger values increase compression and
-      decompression speed, but decrease ratio. Note that Zstandard can still
-      find matches of smaller size, it just tweaks its search algorithm to look
-      for this size and larger. For all strategies < :attr:`~Strategy.btopt`,
-      the effective minimum is ``4``; for all strategies
-      > :attr:`~Strategy.fast`, the effective maximum is ``6``.
+      Kích thước tối thiểu của các đoạn khớp được tìm kiếm. Giá trị lớn hơn làm tăng tốc độ nén và giải nén, nhưng làm giảm tỷ lệ nén. Lưu ý rằng Zstandard vẫn có thể tìm thấy các đoạn khớp nhỏ hơn; nó chỉ điều chỉnh thuật toán tìm kiếm để tìm các đoạn có kích thước này trở lên. Đối với mọi chiến lược < :attr:`~Strategy.btopt`, giá trị tối thiểu thực tế là ``4``; đối với mọi chiến lược > :attr:`~Strategy.fast`, giá trị tối đa thực tế là ``6``.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: target_length
 
-      The impact of this field depends on the selected :class:`Strategy`.
+      Tác động của trường này phụ thuộc vào :class:`Strategy` đã chọn.
 
-      For strategies :attr:`~Strategy.btopt`, :attr:`~Strategy.btultra` and
-      :attr:`~Strategy.btultra2`, the value is the length of a match
-      considered "good enough" to stop searching. Larger values make
-      compression ratios better, but compresses slower.
+      Đối với các strategy :attr:`~Strategy.btopt`, :attr:`~Strategy.btultra` và
+      :attr:`~Strategy.btultra2`, giá trị là độ dài của một kết quả khớp được xem là "đủ tốt" để dừng tìm kiếm. Giá trị lớn hơn giúp cải thiện tỷ lệ nén, nhưng quá trình nén sẽ chậm hơn.
 
-      For strategy :attr:`~Strategy.fast`, it is the distance between match
-      sampling. Larger values make compression faster, but with a worse
-      compression ratio.
+      Đối với strategy :attr:`~Strategy.fast`, đây là khoảng cách giữa các lần lấy mẫu kết quả khớp. Giá trị lớn hơn giúp quá trình nén nhanh hơn, nhưng tỷ lệ nén sẽ kém hơn.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: strategy
 
-      The higher the value of selected strategy, the more complex the
-      compression technique used by zstd, resulting in higher compression
-      ratios but slower compression.
+      Giá trị của strategy được chọn càng cao thì kỹ thuật nén mà zstd sử dụng càng phức tạp, resulting in higher compression ratios but slower compression.
 
       .. seealso:: :class:`Strategy`
 
    .. attribute:: enable_long_distance_matching
 
-      Long distance matching can be used to improve compression for large
-      inputs by finding large matches at greater distances. It increases memory
-      usage and window size.
+      Tính năng tìm kết quả khớp ở khoảng cách xa có thể được sử dụng để cải thiện khả năng nén đối với dữ liệu đầu vào lớn bằng cách tìm các kết quả khớp lớn ở khoảng cách xa hơn. Tính năng này làm tăng mức sử dụng bộ nhớ và kích thước cửa sổ.
 
-      ``True`` or ``1`` enable long distance matching while ``False`` or ``0``
-      disable it.
+      ``True`` hoặc ``1`` bật tính năng ghép cặp khoảng cách xa, còn ``False`` hoặc ``0`` tắt tính năng này.
 
-      Enabling this parameter increases default
-      :attr:`~CompressionParameter.window_log` to 128 MiB except when expressly
-      set to a different value. This setting is enabled by default if
-      :attr:`!window_log` >= 128 MiB and the compression
-      strategy >= :attr:`~Strategy.btopt` (compression level 16+).
+      Việc bật tham số này làm tăng giá trị mặc định
+      :attr:`~CompressionParameter.window_log` lên 128 MiB, trừ khi được đặt rõ ràng thành một giá trị khác. Thiết lập này được bật theo mặc định nếu
+      :attr:`!window_log` >= 128 MiB và chiến lược nén >= :attr:`~Strategy.btopt` (mức nén 16+).
 
    .. attribute:: ldm_hash_log
 
-      Size of the table for long distance matching, as a power of two. Larger
-      values increase memory usage and compression ratio, but decrease
-      compression speed.
+      Kích thước của bảng dùng cho việc ghép cặp khoảng cách xa, tính theo lũy thừa của hai. Giá trị lớn hơn làm tăng mức sử dụng bộ nhớ và tỷ lệ nén, nhưng làm giảm tốc độ nén.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: ldm_min_match
 
-      Minimum match size for long distance matcher. Larger or too small values
-      can often decrease the compression ratio.
+      Kích thước khớp tối thiểu cho bộ ghép cặp khoảng cách xa. Các giá trị lớn hơn hoặc quá nhỏ thường có thể làm giảm tỷ lệ nén.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: ldm_bucket_size_log
 
-      Log size of each bucket in the long distance matcher hash table for
-      collision resolution. Larger values improve collision resolution but
-      decrease compression speed.
+      Ghi lại kích thước của từng bucket trong bảng băm của long distance matcher để xử lý xung đột. Giá trị lớn hơn giúp xử lý xung đột tốt hơn nhưng làm giảm tốc độ nén.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: ldm_hash_rate_log
 
-      Frequency of inserting/looking up entries into the long distance matcher
-      hash table. Larger values improve compression speed. Deviating far from
-      the default value will likely result in a compression ratio decrease.
+      Tần suất chèn/tra cứu các mục trong bảng băm của long distance matcher. Giá trị lớn hơn giúp tăng tốc độ nén. Việc đặt giá trị lệch quá xa so với giá trị mặc định có thể làm giảm tỷ lệ nén.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: content_size_flag
 
-      Write the size of the data to be compressed into the Zstandard frame
-      header when known prior to compressing.
+      Ghi kích thước dữ liệu cần nén vào phần header của frame Zstandard khi kích thước này đã được biết trước khi nén.
 
-      This flag only takes effect under the following scenarios:
+      Cờ này chỉ có hiệu lực trong các trường hợp sau:
 
-      * Calling :func:`compress` for one-shot compression
-      * Providing all of the data to be compressed in the frame in a single
-        :meth:`ZstdCompressor.compress` call, with the
-        :attr:`ZstdCompressor.FLUSH_FRAME` mode.
-      * Calling :meth:`ZstdCompressor.set_pledged_input_size` with the exact
-        amount of data that will be provided to the compressor prior to any
-        calls to :meth:`ZstdCompressor.compress` for the current frame.
-        :meth:`!ZstdCompressor.set_pledged_input_size` must be called for each
-        new frame.
+      * Gọi :func:`compress` để nén một lần
+      * Cung cấp toàn bộ dữ liệu cần nén trong frame bằng một lần
+        gọi :meth:`ZstdCompressor.compress`, với
+        chế độ :attr:`ZstdCompressor.FLUSH_FRAME`.
+      * Gọi :meth:`ZstdCompressor.set_pledged_input_size` với chính xác lượng dữ liệu sẽ được cung cấp cho compressor trước mọi lần gọi :meth:`ZstdCompressor.compress` cho frame hiện tại.
+        Phải gọi :meth:`!ZstdCompressor.set_pledged_input_size` cho mỗi frame mới.
 
-      All other compression calls may not write the size information into the
-      frame header.
+      Tất cả các lần gọi compression khác có thể không ghi thông tin kích thước vào phần header của frame.
 
-      ``True`` or ``1`` enable the content size flag while ``False`` or ``0``
-      disable it.
+      ``True`` hoặc ``1`` bật cờ kích thước nội dung, còn ``False`` hoặc ``0`` tắt cờ này.
 
    .. attribute:: checksum_flag
 
-      A four-byte checksum using XXHash64 of the uncompressed content is
-      written at the end of each frame. Zstandard's decompression code verifies
-      the checksum. If there is a mismatch a :class:`ZstdError` exception is
-      raised.
+      Một checksum bốn byte sử dụng XXHash64 của nội dung chưa nén được ghi ở cuối mỗi frame. Mã decompression của Zstandard sẽ xác minh checksum. Nếu có sự không khớp, một exception :class:`ZstdError` sẽ được phát sinh.
 
-      ``True`` or ``1`` enable checksum generation while ``False`` or ``0``
-      disable it.
+      ``True`` hoặc ``1`` bật tính năng tạo checksum, còn ``False`` hoặc ``0`` tắt tính năng này.
 
    .. attribute:: dict_id_flag
 
-      When compressing with a :class:`ZstdDict`, the dictionary's ID is written
-      into the frame header.
+      Khi nén bằng :class:`ZstdDict`, ID của dictionary được ghi vào frame header.
 
-      ``True`` or ``1`` enable storing the dictionary ID while ``False`` or
-      ``0`` disable it.
+      ``True`` hoặc ``1`` bật tính năng lưu ID của dictionary, còn ``False`` hoặc ``0`` tắt tính năng này.
 
    .. attribute:: nb_workers
 
-      Select how many threads will be spawned to compress in parallel. When
-      :attr:`!nb_workers` > 0, enables multi-threaded compression, a value of
-      ``1`` means "one-thread multi-threaded mode". More workers improve speed,
-      but also increase memory usage and slightly reduce compression ratio.
+      Chọn số lượng thread sẽ được tạo để thực hiện nén song song. Khi
+      :attr:`!nb_workers` > 0, bật tính năng nén đa thread; giá trị ``1`` có nghĩa là "chế độ đa thread một thread". Nhiều worker hơn sẽ cải thiện tốc độ, nhưng cũng làm tăng mức sử dụng bộ nhớ và giảm nhẹ tỉ lệ nén.
 
-      A value of zero disables multi-threading.
+      Giá trị bằng 0 sẽ vô hiệu hóa chế độ đa luồng.
 
    .. attribute:: job_size
 
-      Size of a compression job, in bytes. This value is enforced only when
-      :attr:`~CompressionParameter.nb_workers` >= 1. Each compression job is
-      completed in parallel, so this value can indirectly impact the number of
-      active threads.
+      Kích thước của một tác vụ nén, tính bằng byte. Giá trị này chỉ được áp dụng khi
+      :attr:`~CompressionParameter.nb_workers` >= 1. Mỗi tác vụ nén được hoàn tất song song, vì vậy giá trị này có thể gián tiếp ảnh hưởng đến số lượng thread đang hoạt động.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
    .. attribute:: overlap_log
 
-      Sets how much data is reloaded from previous jobs (threads) for new jobs
-      to be used by the look behind window during compression. This value is
-      only used when :attr:`~CompressionParameter.nb_workers` >= 1. Acceptable
-      values vary from 0 to 9.
+      Thiết lập lượng dữ liệu được tải lại từ các tác vụ trước đó (thread) để các tác vụ mới sử dụng trong cửa sổ look-behind khi nén. Giá trị này chỉ được sử dụng khi :attr:`~CompressionParameter.nb_workers` >= 1. Các giá trị hợp lệ nằm trong khoảng từ 0 đến 9.
 
-         * 0 means dynamically set the overlap amount
-         * 1 means no overlap
-         * 9 means use a full window size from the previous job
+         * 0 nghĩa là tự động thiết lập lượng dữ liệu chồng lấn
+         * 1 nghĩa là không chồng lấn
+         * 9 nghĩa là sử dụng kích thước cửa sổ đầy đủ từ job trước đó
 
-      Each increment halves/doubles the overlap size. "8" means an overlap of
-      ``window_size/2``, "7" means an overlap of ``window_size/4``, etc.
+      Mỗi lần tăng sẽ giảm một nửa hoặc tăng gấp đôi kích thước phần chồng lấp. "8" nghĩa là phần chồng lấp ``window_size/2``, "7" nghĩa là phần chồng lấp ``window_size/4``, v.v.
 
 .. class:: DecompressionParameter()
 
-   An :class:`~enum.IntEnum` containing the advanced decompression parameter
-   keys that can be used when decompressing data. Parameters are optional; any
-   omitted parameter will have its value selected automatically.
+   Một :class:`~enum.IntEnum` chứa các khóa tham số giải nén nâng cao có thể được sử dụng khi giải nén dữ liệu. Các tham số là tùy chọn; mọi tham số bị bỏ qua sẽ được tự động chọn giá trị.
 
-   The :meth:`~.bounds` method can be used on any attribute to get the valid
-   values for that parameter.
+   Có thể sử dụng phương thức :meth:`~.bounds` trên bất kỳ thuộc tính nào để lấy các giá trị hợp lệ cho tham số đó.
 
-   Example setting the :attr:`~.window_log_max` to the maximum size::
+   Ví dụ thiết lập :attr:`~.window_log_max` thành kích thước tối đa::
 
       data = compress(b'Some very long buffer of bytes...')
 
@@ -744,35 +503,26 @@ Advanced parameter control
 
    .. method:: bounds()
 
-      Return the tuple of int bounds, ``(lower, upper)``, of a decompression
-      parameter. This method should be called on the attribute you wish to
-      retrieve the bounds of.
+      Trả về tuple gồm các giới hạn kiểu int, ``(lower, upper)``, của một tham số giải nén. Nên gọi phương thức này trên thuộc tính mà bạn muốn lấy các giới hạn.
 
-      Both the lower and upper bounds are inclusive.
+      Cả giới hạn dưới và giới hạn trên đều được tính.
 
    .. attribute:: window_log_max
 
-      The base-two logarithm of the maximum size of the window used during
-      decompression. This can be useful to limit the amount of memory used when
-      decompressing data. A larger maximum window size leads to faster
-      decompression.
+      Logarit cơ số hai của kích thước tối đa của cửa sổ được sử dụng trong quá trình giải nén. Thông tin này có thể hữu ích để giới hạn lượng bộ nhớ được sử dụng khi giải nén dữ liệu. Kích thước cửa sổ tối đa càng lớn thì tốc độ giải nén càng nhanh.
 
-      A value of zero causes the value to be selected automatically.
+      Giá trị bằng không sẽ khiến giá trị được tự động chọn.
 
 
 .. class:: Strategy()
 
-   An :class:`~enum.IntEnum` containing strategies for compression.
-   Higher-numbered strategies correspond to more complex and slower
-   compression.
+   Một :class:`~enum.IntEnum` chứa các chiến lược nén. Các chiến lược có số thứ tự cao hơn tương ứng với việc nén phức tạp hơn và chậm hơn.
 
    .. note::
 
-      The values of attributes of :class:`!Strategy` are not necessarily stable
-      across zstd versions. Only the ordering of the attributes may be relied
-      upon. The attributes are listed below in order.
+      Các giá trị của các thuộc tính của :class:`!Strategy` không nhất thiết ổn định giữa các phiên bản zstd. Chỉ có thể dựa vào thứ tự của các thuộc tính. Các thuộc tính được liệt kê bên dưới theo thứ tự.
 
-   The following strategies are available:
+   Các chiến lược sau đây khả dụng:
 
    .. attribute:: fast
 
@@ -793,46 +543,41 @@ Advanced parameter control
    .. attribute:: btultra2
 
 
-Miscellaneous
--------------
+Thông tin khác
+--------------
 
 .. function:: get_frame_info(frame_buffer)
 
-   Retrieve a :class:`FrameInfo` object containing metadata about a Zstandard
-   frame. Frames contain metadata related to the compressed data they hold.
+   Truy xuất một đối tượng :class:`FrameInfo` chứa siêu dữ liệu về một khung Zstandard. Các khung chứa siêu dữ liệu liên quan đến dữ liệu đã nén mà chúng lưu giữ.
 
 
 .. class:: FrameInfo
 
-   Metadata related to a Zstandard frame.
+   Siêu dữ liệu liên quan đến một frame Zstandard.
 
    .. attribute:: decompressed_size
 
-      The size of the decompressed contents of the frame.
+      Kích thước nội dung đã được giải nén của frame.
 
    .. attribute:: dictionary_id
 
-      An integer representing the Zstandard dictionary ID needed for
-      decompressing the frame. ``0`` means the dictionary ID was not
-      recorded in the frame header. This may mean that a Zstandard dictionary
-      is not needed, or that the ID of a required dictionary was not recorded.
+      Một số nguyên biểu thị ID từ điển Zstandard cần thiết để giải nén frame. ``0`` có nghĩa là ID từ điển không được ghi trong header của frame. Điều này có thể có nghĩa là không cần từ điển Zstandard hoặc ID của từ điển bắt buộc không được ghi lại.
 
 
 .. attribute:: COMPRESSION_LEVEL_DEFAULT
 
-   The default compression level for Zstandard: ``3``.
+   Mức nén mặc định cho Zstandard: ``3``.
 
 
 .. attribute:: zstd_version_info
 
-   Version number of the runtime zstd library as a tuple of integers
-   (major, minor, release).
+   Số phiên bản của thư viện zstd runtime dưới dạng một tuple số nguyên (major, minor, release).
 
 
-Examples
---------
+Ví dụ
+-----
 
-Reading in a compressed file:
+Đọc một tệp đã nén:
 
 .. code-block:: python
 
@@ -841,7 +586,7 @@ Reading in a compressed file:
    with zstd.open("file.zst") as f:
        file_content = f.read()
 
-Creating a compressed file:
+Tạo tệp nén:
 
 .. code-block:: python
 
@@ -851,7 +596,7 @@ Creating a compressed file:
    with zstd.open("file.zst", "w") as f:
        f.write(data)
 
-Compressing data in memory:
+Nén dữ liệu trong bộ nhớ:
 
 .. code-block:: python
 
@@ -860,7 +605,7 @@ Compressing data in memory:
    data_in = b"Insert Data Here"
    data_out = zstd.compress(data_in)
 
-Incremental compression:
+Nén tăng dần:
 
 .. code-block:: python
 
@@ -871,10 +616,10 @@ Incremental compression:
    out2 = comp.compress(b"Another piece of data\n")
    out3 = comp.compress(b"Even more data\n")
    out4 = comp.flush()
-   # Concatenate all the partial results:
+   # Nối tất cả các kết quả từng phần:
    result = b"".join([out1, out2, out3, out4])
 
-Writing compressed data to an already-open file:
+Ghi dữ liệu nén vào tệp đã được mở:
 
 .. code-block:: python
 
@@ -886,7 +631,7 @@ Writing compressed data to an already-open file:
            zstf.write(b"This *will* be compressed\n")
        f.write(b"Not compressed\n")
 
-Creating a compressed file using compression parameters:
+Tạo tệp nén bằng các tham số nén:
 
 .. code-block:: python
 

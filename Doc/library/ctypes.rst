@@ -1,67 +1,49 @@
-:mod:`!ctypes` --- A foreign function library for Python
-========================================================
+:mod:`!ctypes` --- Thư viện hàm ngoại cho Python
+================================================
 
 .. module:: ctypes
-   :synopsis: A foreign function library for Python.
+   :synopsis: Thư viện hàm ngoại cho Python.
 
 .. moduleauthor:: Thomas Heller <theller@python.net>
 
-**Source code:** :source:`Lib/ctypes`
+**Mã nguồn:** :source:`Lib/ctypes`
 
 --------------
 
-:mod:`!ctypes` is a foreign function library for Python.  It provides C compatible
-data types, and allows calling functions in DLLs or shared libraries.  It can be
-used to wrap these libraries in pure Python.
+:mod:`!ctypes` là một thư viện hàm ngoại cho Python. Thư viện này cung cấp các kiểu dữ liệu tương thích với C và cho phép gọi các hàm trong DLL hoặc shared library. Bạn có thể dùng thư viện này để bọc các thư viện đó bằng Python thuần.
 
 .. include:: ../includes/optional-module.rst
 
 .. warning::
 
-   :mod:`!ctypes` provides low-level access to native libraries and the
-   process's memory, bypassing Python's safety mechanisms and allowing
-   execution of arbitrary native code.
-   Incorrect use can corrupt data and objects, reveal sensitive information,
-   cause crashes, or otherwise compromise the running process.
+   :mod:`!ctypes` cung cấp quyền truy cập cấp thấp vào các thư viện native và bộ nhớ của tiến trình, bỏ qua các cơ chế an toàn của Python và cho phép thực thi mã native tùy ý. Việc sử dụng không đúng cách có thể làm hỏng dữ liệu và đối tượng, làm lộ thông tin nhạy cảm, gây sự cố hoặc bằng cách khác xâm phạm tiến trình đang chạy.
 
 
 .. _ctypes-ctypes-tutorial:
 
-ctypes tutorial
----------------
+Hướng dẫn ctypes
+----------------
 
-Note: Some code samples reference the ctypes :class:`c_int` type.  On platforms
-where ``sizeof(long) == sizeof(int)`` it is an alias to :class:`c_long`.
-So, you should not be confused if :class:`c_long` is printed if you would expect
-:class:`c_int` --- they are actually the same type.
+Lưu ý: Một số mẫu mã tham chiếu đến kiểu :class:`c_int` của ctypes. Trên các nền tảng mà ``sizeof(long) == sizeof(int)`` thì nó là bí danh của :class:`c_long`. Vì vậy, bạn không nên bối rối nếu :class:`c_long` được in ra khi bạn mong đợi
+:class:`c_int` --- thực ra chúng là cùng một kiểu.
 
 .. _ctypes-loading-dynamic-link-libraries:
 
-Loading dynamic link libraries
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Nạp thư viện liên kết động
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:mod:`!ctypes` exports the :py:data:`~ctypes.cdll`, and on Windows
-:py:data:`~ctypes.windll` and :py:data:`~ctypes.oledll`
-objects, for loading dynamic link libraries.
+:mod:`!ctypes` xuất :py:data:`~ctypes.cdll`, và trên Windows
+các đối tượng :py:data:`~ctypes.windll` và :py:data:`~ctypes.oledll`, dùng để nạp thư viện liên kết động.
 
-You load libraries by accessing them as attributes of these objects.
-:py:data:`!cdll` loads libraries which export functions using the
-standard ``cdecl`` calling convention, while :py:data:`!windll`
-libraries call functions using the ``stdcall``
-calling convention.
-:py:data:`~oledll` also uses the ``stdcall`` calling convention, and
-assumes the functions return a Windows :c:type:`!HRESULT` error code. The error
-code is used to automatically raise an :class:`OSError` exception when the
-function call fails.
+Bạn nạp các thư viện bằng cách truy cập chúng dưới dạng thuộc tính của các đối tượng này.
+:py:data:`!cdll` nạp các thư viện xuất các hàm sử dụng quy ước gọi ``cdecl`` tiêu chuẩn, trong khi các thư viện :py:data:`!windll` gọi các hàm bằng quy ước gọi ``stdcall``.
+:py:data:`~oledll` cũng sử dụng quy ước gọi ``stdcall`` và giả định rằng các hàm trả về mã lỗi :c:type:`!HRESULT` của Windows. Mã lỗi này được dùng để tự động phát sinh ngoại lệ :class:`OSError` khi lệnh gọi hàm thất bại.
 
 .. versionchanged:: 3.3
-   Windows errors used to raise :exc:`WindowsError`, which is now an alias
-   of :exc:`OSError`.
+   Các lỗi của Windows trước đây thường phát sinh :exc:`WindowsError`, hiện là bí danh của :exc:`OSError`.
 
 
-Here are some examples for Windows. Note that ``msvcrt`` is the MS standard C
-library containing most standard C functions, and uses the ``cdecl`` calling
-convention::
+Dưới đây là một số ví dụ dành cho Windows. Lưu ý rằng ``msvcrt`` là thư viện C chuẩn của MS, chứa hầu hết các hàm C chuẩn và sử dụng quy ước gọi ``cdecl``.::
 
    >>> from ctypes import *
    >>> print(windll.kernel32)  # doctest: +WINDOWS
@@ -71,21 +53,15 @@ convention::
    >>> libc = cdll.msvcrt      # doctest: +WINDOWS
    >>>
 
-Windows appends the usual ``.dll`` file suffix automatically.
+Windows tự động thêm hậu tố tệp ``.dll`` thông thường.
 
 .. note::
-    Accessing the standard C library through ``cdll.msvcrt`` will use an
-    outdated version of the library that may be incompatible with the one
-    being used by Python. Where possible, use native Python functionality,
-    or else import and use the ``msvcrt`` module.
+    Việc truy cập thư viện C chuẩn thông qua ``cdll.msvcrt`` sẽ sử dụng một phiên bản thư viện đã lỗi thời, có thể không tương thích với phiên bản mà Python đang sử dụng. Khi có thể, hãy dùng chức năng gốc của Python; nếu không, hãy import và sử dụng module ``msvcrt``.
 
-Other systems require the filename *including* the extension to
-load a library, so attribute access can not be used to load libraries. Either the
-:meth:`~LibraryLoader.LoadLibrary` method of the dll loaders should be used,
-or you should load the library by creating an instance of :py:class:`CDLL`
-by calling the constructor.
+Các hệ thống khác yêu cầu tên tệp *bao gồm* phần mở rộng để tải một thư viện, vì vậy không thể sử dụng truy cập thuộc tính để tải thư viện. Bạn có thể dùng
+phương thức :meth:`~LibraryLoader.LoadLibrary` của các trình tải dll, hoặc tải thư viện bằng cách tạo một instance của :py:class:`CDLL` bằng cách gọi constructor.
 
-For example, on Linux::
+Ví dụ, trên Linux::
 
    >>> cdll.LoadLibrary("libc.so.6")  # doctest: +LINUX
    <CDLL 'libc.so.6', handle ... at ...>
@@ -94,7 +70,7 @@ For example, on Linux::
    <CDLL 'libc.so.6', handle ... at ...>
    >>>
 
-On macOS::
+Trên macOS::
 
    >>> cdll.LoadLibrary("libc.dylib")  # doctest: +MACOS
    <CDLL 'libc.dylib', handle ... at ...>
@@ -106,10 +82,10 @@ On macOS::
 
 .. _ctypes-accessing-functions-from-loaded-dlls:
 
-Accessing functions from loaded dlls
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Truy cập các hàm từ các DLL đã tải
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Functions are accessed as attributes of dll objects::
+Có thể truy cập các hàm dưới dạng thuộc tính của các đối tượng DLL::
 
    >>> libc.printf
    <_FuncPtr object at 0x...>
@@ -123,33 +99,23 @@ Functions are accessed as attributes of dll objects::
    AttributeError: function 'MyOwnFunction' not found
    >>>
 
-Note that win32 system dlls like ``kernel32`` and ``user32`` often export ANSI
-as well as UNICODE versions of a function. The UNICODE version is exported with
-a ``W`` appended to the name, while the ANSI version is exported with an ``A``
-appended to the name. The win32 ``GetModuleHandle`` function, which returns a
-*module handle* for a given module name, has the following C prototype, and a
-macro is used to expose one of them as ``GetModuleHandle`` depending on whether
-UNICODE is defined or not::
+Lưu ý rằng các system dll của win32 như ``kernel32`` và ``user32`` thường export cả phiên bản ANSI lẫn UNICODE của một hàm. Phiên bản UNICODE được export với ``W`` nối vào tên, còn phiên bản ANSI được export với ``A`` nối vào tên. Hàm win32 ``GetModuleHandle``, trả về *module handle* cho tên module đã cho, có prototype C sau đây, và một macro được dùng để expose một trong hai phiên bản dưới dạng ``GetModuleHandle``, tùy thuộc vào việc UNICODE có được định nghĩa hay không::
 
    /* ANSI version */
    HMODULE GetModuleHandleA(LPCSTR lpModuleName);
    /* UNICODE version */
    HMODULE GetModuleHandleW(LPCWSTR lpModuleName);
 
-*windll* does not try to select one of them by magic, you must access the
-version you need by specifying ``GetModuleHandleA`` or ``GetModuleHandleW``
-explicitly, and then call it with bytes or string objects respectively.
+*windll* không cố gắng tự động chọn một trong hai phiên bản; bạn phải truy cập phiên bản cần dùng bằng cách chỉ định rõ ràng ``GetModuleHandleA`` hoặc ``GetModuleHandleW``, sau đó gọi phiên bản đó lần lượt bằng các đối tượng bytes hoặc string.
 
-Sometimes, dlls export functions with names which aren't valid Python
-identifiers, like ``"??2@YAPAXI@Z"``. In this case you have to use
-:func:`getattr` to retrieve the function::
+Đôi khi, dll export các hàm có tên không phải là các Python identifier hợp lệ, chẳng hạn như ``"??2@YAPAXI@Z"``. Trong trường hợp này, bạn phải sử dụng
+:func:`getattr` để lấy hàm::
 
    >>> getattr(cdll.msvcrt, "??2@YAPAXI@Z")  # doctest: +WINDOWS
    <_FuncPtr object at 0x...>
    >>>
 
-On Windows, some dlls export functions not by name but by ordinal. These
-functions can be accessed by indexing the dll object with the ordinal number::
+Trên Windows, một số dll export các hàm không theo tên mà theo ordinal. Có thể truy cập các hàm này bằng cách lập chỉ mục đối tượng dll với số ordinal::
 
    >>> cdll.kernel32[1]  # doctest: +WINDOWS
    <_FuncPtr object at 0x...>
@@ -164,24 +130,21 @@ functions can be accessed by indexing the dll object with the ordinal number::
 
 .. _ctypes-calling-functions:
 
-Calling functions
-^^^^^^^^^^^^^^^^^
+Gọi hàm
+^^^^^^^
 
-You can call these functions like any other Python callable. This example uses
-the ``rand()`` function, which takes no arguments and returns a pseudo-random integer::
+Bạn có thể gọi các hàm này như mọi đối tượng có thể gọi khác trong Python. Ví dụ này sử dụng hàm ``rand()``, hàm không nhận đối số nào và trả về một số nguyên giả ngẫu nhiên::
 
    >>> print(libc.rand())  # doctest: +SKIP
    1804289383
 
-On Windows, you can call the ``GetModuleHandleA()`` function, which returns a win32 module
-handle (passing ``None`` as single argument to call it with a ``NULL`` pointer)::
+Trên Windows, bạn có thể gọi hàm ``GetModuleHandleA()``, hàm này trả về một handle của module win32 (truyền ``None`` làm đối số duy nhất để gọi hàm với một con trỏ ``NULL``)::
 
    >>> print(hex(windll.kernel32.GetModuleHandleA(None)))  # doctest: +WINDOWS
    0x1d000000
    >>>
 
-:exc:`ValueError` is raised when you call an ``stdcall`` function with the
-``cdecl`` calling convention, or vice versa::
+:exc:`ValueError` được phát sinh khi bạn gọi một hàm ``stdcall`` với quy ước gọi ``cdecl``, hoặc ngược lại::
 
    >>> cdll.kernel32.GetModuleHandleA(None)  # doctest: +WINDOWS
    Traceback (most recent call last):
@@ -195,12 +158,9 @@ handle (passing ``None`` as single argument to call it with a ``NULL`` pointer):
    ValueError: Procedure probably called with too many arguments (4 bytes in excess)
    >>>
 
-To find out the correct calling convention you have to look into the C header
-file or the documentation for the function you want to call.
+Để tìm ra quy ước gọi chính xác, bạn phải xem tệp header C hoặc tài liệu về hàm mà bạn muốn gọi.
 
-On Windows, :mod:`!ctypes` uses win32 structured exception handling to prevent
-crashes from general protection faults when functions are called with invalid
-argument values::
+Trên Windows, :mod:`!ctypes` sử dụng cơ chế xử lý ngoại lệ có cấu trúc của win32 để ngăn sự cố do lỗi bảo vệ chung khi các hàm được gọi với các giá trị đối số không hợp lệ::
 
    >>> windll.kernel32.GetModuleHandleA(32)  # doctest: +WINDOWS
    Traceback (most recent call last):
@@ -208,33 +168,28 @@ argument values::
    OSError: exception: access violation reading 0x00000020
    >>>
 
-The :mod:`faulthandler` module can help debug crashes,
-such as segmentation faults produced by erroneous C library calls.
+Mô-đun :mod:`faulthandler` có thể giúp gỡ lỗi các sự cố, chẳng hạn như lỗi phân đoạn do các lệnh gọi thư viện C sai gây ra.
 
-``None``, integers, bytes objects and (unicode) strings are the only native
-Python objects that can directly be used as parameters in these function calls.
-``None`` is passed as a C ``NULL`` pointer, bytes objects and strings are passed
-as pointer to the memory block that contains their data (:c:expr:`char *` or
-:c:expr:`wchar_t *`).  Python integers are passed as the platform's default C
-:c:expr:`int` type, their value is masked to fit into the C type.
+``None``, các số nguyên, đối tượng bytes và chuỗi (unicode) là những đối tượng Python native duy nhất có thể được sử dụng trực tiếp làm tham số trong các lệnh gọi hàm này. ``None`` được truyền dưới dạng con trỏ ``NULL`` C, các đối tượng bytes và chuỗi được truyền dưới dạng con trỏ đến khối bộ nhớ chứa dữ liệu của chúng (:c:expr:`char *` hoặc
+:c:expr:`wchar_t *`).  Các số nguyên Python được truyền dưới dạng kiểu C mặc định của nền tảng
+:c:expr:`int` kiểu, giá trị của chúng được che để vừa với kiểu C.
 
-Before we move on calling functions with other parameter types, we have to learn
-more about :mod:`!ctypes` data types.
+Trước khi chuyển sang việc gọi hàm với các kiểu tham số khác, chúng ta cần tìm hiểu thêm về :mod:`!ctypes` các kiểu dữ liệu.
 
 
 .. _ctypes-fundamental-data-types:
 
-Fundamental data types
-^^^^^^^^^^^^^^^^^^^^^^
+Các kiểu dữ liệu cơ bản
+^^^^^^^^^^^^^^^^^^^^^^^
 
-:mod:`!ctypes` defines a number of primitive C compatible data types:
+:mod:`!ctypes` định nghĩa một số kiểu dữ liệu C nguyên thủy tương thích:
 
 .. list-table::
    :header-rows: 1
 
-   * - ctypes type
-     - C type
-     - Python type
+   * - kiểu ctypes
+     - kiểu C
+     - Kiểu Python
      - :py:attr:`~_SimpleCData._type_`
    * - :class:`c_bool`
      - :c:expr:`_Bool`
@@ -242,11 +197,11 @@ Fundamental data types
      - ``'?'``
    * - :class:`c_char`
      - :c:expr:`char`
-     - 1-character :py:class:`bytes`
+     - :py:class:`bytes` 1 ký tự
      - ``'c'``
    * - :class:`c_wchar`
      - :c:type:`wchar_t`
-     - 1-character :py:class:`str`
+     - :py:class:`str` 1 ký tự
      - ``'u'``
    * - :class:`c_byte`
      - :c:expr:`char`
@@ -345,16 +300,16 @@ Fundamental data types
      - :py:class:`float`
      - ``'g'`` \*
    * - :class:`c_char_p`
-     - :c:expr:`char *` (NUL terminated)
-     - :py:class:`bytes` or ``None``
+     - :c:expr:`char *` (kết thúc bằng NUL)
+     - :py:class:`bytes` hoặc ``None``
      - ``'z'``
    * - :class:`c_wchar_p`
-     - :c:expr:`wchar_t *` (NUL terminated)
-     - :py:class:`str` or ``None``
+     - :c:expr:`wchar_t *` (kết thúc bằng NUL)
+     - :py:class:`str` hoặc ``None``
      - ``'Z'``
    * - :class:`c_void_p`
      - :c:expr:`void *`
-     - :py:class:`int` or ``None``
+     - :py:class:`int` hoặc ``None``
      - ``'P'``
    * - :class:`py_object`
      - :c:expr:`PyObject *`
@@ -365,15 +320,14 @@ Fundamental data types
      - :py:class:`bool`
      - ``'v'``
 
-Additionally, if IEC 60559 compatible complex arithmetic (Annex G) is supported
-in both C and ``libffi``, the following complex types are available:
+Ngoài ra, nếu phép tính số phức tương thích với IEC 60559 (Phụ lục G) được hỗ trợ ở cả C và ``libffi``, thì các kiểu số phức sau đây sẽ khả dụng:
 
 .. list-table::
    :header-rows: 1
 
-   * - ctypes type
-     - C type
-     - Python type
+   * - kiểu ctypes
+     - kiểu C
+     - Kiểu Python
      - :py:attr:`~_SimpleCData._type_`
    * - :class:`c_float_complex`
      - :c:expr:`float complex`
@@ -389,8 +343,7 @@ in both C and ``libffi``, the following complex types are available:
      - ``'G'``
 
 
-All these types can be created by calling them with an optional initializer of
-the correct type and value::
+Tất cả các kiểu này có thể được tạo bằng cách gọi chúng với một trình khởi tạo tùy chọn có đúng kiểu và giá trị::
 
    >>> c_int()
    c_long(0)
@@ -400,17 +353,16 @@ the correct type and value::
    c_ushort(65533)
    >>>
 
-The constructors for numeric types will convert input using
+Các hàm khởi tạo cho các kiểu số sẽ chuyển đổi dữ liệu đầu vào bằng
 :py:meth:`~object.__bool__`,
-:py:meth:`~object.__index__` (for ``int``),
-:py:meth:`~object.__float__` or :py:meth:`~object.__complex__`.
-This means :py:class:`~ctypes.c_bool` accepts any object with a truth value::
+:py:meth:`~object.__index__` (đối với ``int``),
+:py:meth:`~object.__float__` hoặc :py:meth:`~object.__complex__`. Điều này có nghĩa là :py:class:`~ctypes.c_bool` chấp nhận bất kỳ đối tượng nào có giá trị logic::
 
    >>> empty_list = []
    >>> c_bool(empty_list)
    c_bool(False)
 
-Since these types are mutable, their value can also be changed afterwards::
+Vì các kiểu này có thể thay đổi, nên giá trị của chúng cũng có thể được thay đổi sau đó::
 
    >>> i = c_int(42)
    >>> print(i)
@@ -422,10 +374,8 @@ Since these types are mutable, their value can also be changed afterwards::
    -99
    >>>
 
-Assigning a new value to instances of the pointer types :class:`c_char_p`,
-:class:`c_wchar_p`, and :class:`c_void_p` changes the *memory location* they
-point to, *not the contents* of the memory block (of course not, because Python
-string objects are immutable)::
+Việc gán một giá trị mới cho các thể hiện của các kiểu con trỏ :class:`c_char_p`,
+:class:`c_wchar_p`, và :class:`c_void_p` sẽ thay đổi *vị trí bộ nhớ* mà chúng trỏ tới, *chứ không phải nội dung* của khối bộ nhớ (dĩ nhiên là không, vì các đối tượng chuỗi Python là bất biến)::
 
    >>> s = "Hello, World"
    >>> c_s = c_wchar_p(s)
@@ -434,31 +384,27 @@ string objects are immutable)::
    >>> print(c_s.value)
    Hello World
    >>> c_s.value = "Hi, there"
-   >>> print(c_s)              # the memory location has changed
+   >>> print(c_s)              # vị trí bộ nhớ đã thay đổi
    c_wchar_p(139966783348904)
    >>> print(c_s.value)
    Hi, there
-   >>> print(s)                # first object is unchanged
+   >>> print(s)                # đối tượng đầu tiên không thay đổi
    Hello, World
    >>>
 
-You should be careful, however, not to pass them to functions expecting pointers
-to mutable memory. If you need mutable memory blocks, ctypes has a
-:func:`create_string_buffer` function which creates these in various ways.  The
-current memory block contents can be accessed (or changed) with the ``raw``
-property; if you want to access it as NUL terminated string, use the ``value``
-property::
+Tuy nhiên, bạn nên cẩn thận không truyền chúng cho các hàm mong đợi con trỏ đến vùng nhớ có thể thay đổi. Nếu cần các khối vùng nhớ có thể thay đổi, ctypes có một
+:func:`create_string_buffer` tạo các khối này theo nhiều cách khác nhau. Có thể truy cập (hoặc thay đổi) nội dung của khối vùng nhớ hiện tại bằng thuộc tính ``raw``; nếu muốn truy cập khối này dưới dạng chuỗi kết thúc bằng NUL, hãy sử dụng thuộc tính ``value``::
 
    >>> from ctypes import *
-   >>> p = create_string_buffer(3)            # create a 3 byte buffer, initialized to NUL bytes
+   >>> p = create_string_buffer(3)            # tạo bộ đệm 3 byte, được khởi tạo bằng các byte NUL
    >>> print(sizeof(p), repr(p.raw))
    3 b'\x00\x00\x00'
-   >>> p = create_string_buffer(b"Hello")     # create a buffer containing a NUL terminated string
+   >>> p = create_string_buffer(b"Hello")     # tạo bộ đệm chứa chuỗi kết thúc bằng NUL
    >>> print(sizeof(p), repr(p.raw))
    6 b'Hello\x00'
    >>> print(repr(p.value))
    b'Hello'
-   >>> p = create_string_buffer(b"Hello", 10) # create a 10 byte buffer
+   >>> p = create_string_buffer(b"Hello", 10) # tạo bộ đệm 10 byte
    >>> print(sizeof(p), repr(p.raw))
    10 b'Hello\x00\x00\x00\x00\x00'
    >>> p.value = b"Hi"
@@ -466,20 +412,17 @@ property::
    10 b'Hi\x00lo\x00\x00\x00\x00\x00'
    >>>
 
-The :func:`create_string_buffer` function replaces the old :func:`!c_buffer`
-function (which is still available as an alias).  To create a mutable memory
-block containing unicode characters of the C type :c:type:`wchar_t`, use the
-:func:`create_unicode_buffer` function.
+Hàm :func:`create_string_buffer` thay thế cho hàm :func:`!c_buffer` cũ (hàm này vẫn khả dụng dưới dạng bí danh). Để tạo một khối vùng nhớ có thể thay đổi chứa các ký tự unicode thuộc kiểu C :c:type:`wchar_t`, hãy sử dụng
+:func:`create_unicode_buffer` hàm.
 
 
 .. _ctypes-calling-functions-continued:
 
-Calling functions, continued
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tiếp tục gọi hàm
+^^^^^^^^^^^^^^^^
 
-Note that printf prints to the real standard output channel, *not* to
-:data:`sys.stdout`, so these examples will only work at the console prompt, not
-from within *IDLE* or *PythonWin*::
+Lưu ý rằng printf in ra kênh đầu ra tiêu chuẩn thực, *không* đến
+:data:`sys.stdout`, vì vậy các ví dụ này chỉ hoạt động tại lời nhắc của console, không phải bên trong *IDLE* hoặc *PythonWin*::
 
    >>> printf = libc.printf
    >>> printf(b"Hello, %s\n", b"World!")
@@ -497,9 +440,7 @@ from within *IDLE* or *PythonWin*::
    ctypes.ArgumentError: argument 2: TypeError: Don't know how to convert parameter 2
    >>>
 
-As has been mentioned before, all Python types except integers, strings, and
-bytes objects have to be wrapped in their corresponding :mod:`!ctypes` type, so
-that they can be converted to the required C data type::
+Như đã đề cập trước đây, tất cả các kiểu Python ngoại trừ số nguyên, chuỗi và đối tượng bytes đều phải được bọc trong kiểu :mod:`!ctypes` tương ứng của chúng để có thể được chuyển đổi thành kiểu dữ liệu C cần thiết::
 
    >>> printf(b"An int %d, a double %f\n", 1234, c_double(3.14))
    An int 1234, a double 3.140000
@@ -508,35 +449,27 @@ that they can be converted to the required C data type::
 
 .. _ctypes-calling-variadic-functions:
 
-Calling variadic functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Gọi các hàm variadic
+^^^^^^^^^^^^^^^^^^^^
 
-On a lot of platforms calling variadic functions through ctypes is exactly the same
-as calling functions with a fixed number of parameters. On some platforms, and in
-particular ARM64 for Apple Platforms, the calling convention for variadic functions
-is different than that for regular functions.
+Trên nhiều nền tảng, việc gọi các hàm variadic thông qua ctypes hoàn toàn giống với việc gọi các hàm có số lượng tham số cố định. Trên một số nền tảng, đặc biệt là ARM64 cho Apple Platforms, calling convention của các hàm variadic khác với các hàm thông thường.
 
-On those platforms it is required to specify the :attr:`~_CFuncPtr.argtypes`
-attribute for the regular, non-variadic, function arguments:
+Trên các nền tảng đó, bắt buộc phải chỉ định thuộc tính :attr:`~_CFuncPtr.argtypes` cho các đối số hàm thông thường, không biến thiên:
 
 .. code-block:: python3
 
    libc.printf.argtypes = [ctypes.c_char_p]
 
-Because specifying the attribute does not inhibit portability it is advised to always
-specify :attr:`~_CFuncPtr.argtypes` for all variadic functions.
+Vì việc chỉ định thuộc tính này không cản trở tính khả chuyển, nên khuyến nghị luôn chỉ định :attr:`~_CFuncPtr.argtypes` cho mọi hàm variadic.
 
 
 .. _ctypes-calling-functions-with-own-custom-data-types:
 
-Calling functions with your own custom data types
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Gọi các hàm bằng kiểu dữ liệu tùy chỉnh của riêng bạn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can also customize :mod:`!ctypes` argument conversion to allow instances of
-your own classes be used as function arguments. :mod:`!ctypes` looks for an
-:attr:`!_as_parameter_` attribute and uses this as the function argument. The
-attribute must be an integer, string, bytes, a :mod:`!ctypes` instance, or an
-object with an :attr:`!_as_parameter_` attribute::
+Bạn cũng có thể tùy chỉnh việc chuyển đổi đối số :mod:`!ctypes` để cho phép các instance của lớp riêng được sử dụng làm đối số hàm. :mod:`!ctypes` tìm kiếm một
+thuộc tính :attr:`!_as_parameter_` và sử dụng thuộc tính này làm đối số hàm. Thuộc tính phải là số nguyên, chuỗi, bytes, một instance :mod:`!ctypes`, hoặc một đối tượng có thuộc tính :attr:`!_as_parameter_`::
 
    >>> class Bottles:
    ...     def __init__(self, number):
@@ -548,23 +481,17 @@ object with an :attr:`!_as_parameter_` attribute::
    19
    >>>
 
-If you don't want to store the instance's data in the :attr:`!_as_parameter_`
-instance variable, you could define a :deco:`property` which makes the
-attribute available on request.
+Nếu không muốn lưu dữ liệu của instance trong biến instance :attr:`!_as_parameter_`, bạn có thể định nghĩa một :deco:`property` để cung cấp thuộc tính này khi được yêu cầu.
 
 
 .. _ctypes-specifying-required-argument-types:
 
-Specifying the required argument types (function prototypes)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Chỉ định các kiểu đối số bắt buộc (prototype hàm)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is possible to specify the required argument types of functions exported from
-DLLs by setting the :attr:`~_CFuncPtr.argtypes` attribute.
+Có thể chỉ định các kiểu đối số bắt buộc của những hàm được export từ DLL bằng cách thiết lập thuộc tính :attr:`~_CFuncPtr.argtypes`.
 
-:attr:`~_CFuncPtr.argtypes` must be a sequence of C data types (the :func:`!printf` function is
-probably not a good example here, because it takes a variable number and
-different types of parameters depending on the format string, on the other hand
-this is quite handy to experiment with this feature)::
+:attr:`~_CFuncPtr.argtypes` phải là một chuỗi các kiểu dữ liệu C (hàm :func:`!printf` có lẽ không phải là ví dụ phù hợp ở đây, vì nó nhận số lượng và kiểu tham số khác nhau tùy thuộc vào chuỗi định dạng; mặt khác, đây là cách khá tiện để thử nghiệm tính năng này)::
 
    >>> printf.argtypes = [c_char_p, c_char_p, c_int, c_double]
    >>> printf(b"String '%s', Int %d, Double %f\n", b"Hi", 10, 2.2)
@@ -572,8 +499,7 @@ this is quite handy to experiment with this feature)::
    37
    >>>
 
-Specifying a format protects against incompatible argument types (just as a
-prototype for a C function), and tries to convert the arguments to valid types::
+Việc chỉ định một format giúp bảo vệ khỏi các kiểu đối số không tương thích (giống như prototype của một hàm C) và cố gắng chuyển đổi các đối số sang những kiểu hợp lệ::
 
    >>> printf(b"%d %d %d", 1, 2, 3)
    Traceback (most recent call last):
@@ -584,21 +510,14 @@ prototype for a C function), and tries to convert the arguments to valid types::
    13
    >>>
 
-If you have defined your own classes which you pass to function calls, you have
-to implement a :meth:`~_CData.from_param` class method for them to be able to use them
-in the :attr:`~_CFuncPtr.argtypes` sequence. The :meth:`~_CData.from_param` class method receives
-the Python object passed to the function call, it should do a typecheck or
-whatever is needed to make sure this object is acceptable, and then return the
-object itself, its :attr:`!_as_parameter_` attribute, or whatever you want to
-pass as the C function argument in this case. Again, the result should be an
-integer, string, bytes, a :mod:`!ctypes` instance, or an object with an
-:attr:`!_as_parameter_` attribute.
+Nếu bạn đã định nghĩa các class của riêng mình và truyền chúng vào các lệnh gọi hàm, bạn phải triển khai một class method :meth:`~_CData.from_param` để có thể sử dụng chúng trong chuỗi :attr:`~_CFuncPtr.argtypes`. Class method :meth:`~_CData.from_param` nhận object Python được truyền vào lệnh gọi hàm; method này phải thực hiện kiểm tra kiểu hoặc bất kỳ thao tác cần thiết nào để bảo đảm object này có thể chấp nhận được, sau đó trả về chính object đó, thuộc tính :attr:`!_as_parameter_` của nó hoặc bất kỳ giá trị nào bạn muốn truyền làm đối số cho hàm C trong trường hợp này. Một lần nữa, kết quả phải là một số nguyên, chuỗi, bytes, một instance :mod:`!ctypes` hoặc một object có
+thuộc tính :attr:`!_as_parameter_`.
 
 
 .. _ctypes-return-types:
 
-Return types
-^^^^^^^^^^^^
+Kiểu giá trị trả về
+^^^^^^^^^^^^^^^^^^^
 
 .. testsetup::
 
@@ -608,41 +527,35 @@ Return types
    strchr = libc.strchr
 
 
-By default functions are assumed to return the C :c:expr:`int` type.  Other
-return types can be specified by setting the :attr:`~_CFuncPtr.restype` attribute of the
-function object.
+Theo mặc định, các hàm được giả định là trả về kiểu C :c:expr:`int`. Có thể chỉ định các kiểu giá trị trả về khác bằng cách thiết lập thuộc tính :attr:`~_CFuncPtr.restype` của function object.
 
-The C prototype of :c:func:`time` is ``time_t time(time_t *)``. Because :c:type:`time_t`
-might be of a different type than the default return type :c:expr:`int`, you should
-specify the :attr:`!restype` attribute::
+Nguyên mẫu C của :c:func:`time` là ``time_t time(time_t *)``. Vì :c:type:`time_t` có thể có kiểu khác với kiểu trả về mặc định :c:expr:`int`, bạn nên chỉ định thuộc tính :attr:`!restype`::
 
    >>> libc.time.restype = c_time_t
 
-The argument types can be specified using :attr:`~_CFuncPtr.argtypes`::
+Có thể chỉ định các kiểu đối số bằng :attr:`~_CFuncPtr.argtypes`::
 
    >>> libc.time.argtypes = (POINTER(c_time_t),)
 
-To call the function with a ``NULL`` pointer as first argument, use ``None``::
+Để gọi hàm với một con trỏ ``NULL`` làm đối số đầu tiên, hãy sử dụng ``None``::
 
    >>> print(libc.time(None))  # doctest: +SKIP
    1150640792
 
-Here is a more advanced example, it uses the :func:`!strchr` function, which expects
-a string pointer and a char, and returns a pointer to a string::
+Đây là một ví dụ nâng cao hơn, sử dụng hàm :func:`!strchr`, hàm này nhận một con trỏ chuỗi và một char, đồng thời trả về một con trỏ tới chuỗi::
 
    >>> strchr = libc.strchr
    >>> strchr(b"abcdef", ord("d"))  # doctest: +SKIP
    8059983
-   >>> strchr.restype = c_char_p    # c_char_p is a pointer to a string
+   >>> strchr.restype = c_char_p    # c_char_p là một con trỏ tới chuỗi
    >>> strchr(b"abcdef", ord("d"))
    b'def'
    >>> print(strchr(b"abcdef", ord("x")))
    None
    >>>
 
-If you want to avoid the :func:`ord("x") <ord>` calls above, you can set the
-:attr:`~_CFuncPtr.argtypes` attribute, and the second argument will be converted from a
-single character Python bytes object into a C char:
+Nếu bạn muốn tránh các lần gọi :func:`ord("x") <ord>` ở trên, bạn có thể đặt
+thuộc tính :attr:`~_CFuncPtr.argtypes`, và đối số thứ hai sẽ được chuyển đổi từ một đối tượng bytes Python một ký tự thành một char C:
 
 .. doctest::
 
@@ -659,11 +572,7 @@ single character Python bytes object into a C char:
    b'def'
    >>>
 
-You can also use a callable Python object (a function or a class for example) as
-the :attr:`~_CFuncPtr.restype` attribute, if the foreign function returns an integer.  The
-callable will be called with the *integer* the C function returns, and the
-result of this call will be used as the result of your function call. This is
-useful to check for error return values and automatically raise an exception::
+Bạn cũng có thể sử dụng một đối tượng Python có thể gọi (ví dụ như một hàm hoặc một lớp) làm thuộc tính :attr:`~_CFuncPtr.restype`, nếu hàm foreign trả về một số nguyên. Đối tượng có thể gọi sẽ được gọi với *số nguyên* mà hàm C trả về, và kết quả của lần gọi này sẽ được dùng làm kết quả của lần gọi hàm của bạn. Điều này hữu ích để kiểm tra các giá trị trả về biểu thị lỗi và tự động phát sinh một exception::
 
    >>> GetModuleHandle = windll.kernel32.GetModuleHandleA  # doctest: +WINDOWS
    >>> def ValidHandle(value):
@@ -682,30 +591,20 @@ useful to check for error return values and automatically raise an exception::
    OSError: [Errno 126] The specified module could not be found.
    >>>
 
-``WinError`` is a function which will call Windows ``FormatMessage()`` api to
-get the string representation of an error code, and *returns* an exception.
-``WinError`` takes an optional error code parameter, if no one is used, it calls
-:func:`GetLastError` to retrieve it.
+``WinError`` là một hàm sẽ gọi API Windows ``FormatMessage()`` để lấy biểu diễn chuỗi của một mã lỗi, và *returns* một exception. ``WinError`` nhận một tham số mã lỗi tùy chọn; nếu không sử dụng tham số này, nó sẽ gọi
+:func:`GetLastError` để truy xuất mã đó.
 
-Please note that a much more powerful error checking mechanism is available
-through the :attr:`~_CFuncPtr.errcheck` attribute;
-see the reference manual for details.
+Xin lưu ý rằng một cơ chế kiểm tra lỗi mạnh hơn nhiều có sẵn thông qua thuộc tính :attr:`~_CFuncPtr.errcheck`; hãy xem tài liệu tham khảo để biết chi tiết.
 
 
 .. _ctypes-passing-pointers:
 
-Passing pointers (or: passing parameters by reference)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Truyền con trỏ (hay: truyền tham số bằng tham chiếu)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes a C api function expects a *pointer* to a data type as parameter,
-probably to write into the corresponding location, or if the data is too large
-to be passed by value. This is also known as *passing parameters by reference*.
+Đôi khi một hàm API C yêu cầu một *pointer* đến một kiểu dữ liệu làm tham số, có thể để ghi vào vị trí tương ứng hoặc vì dữ liệu quá lớn để truyền theo giá trị. Cách này còn được gọi là *truyền tham số bằng tham chiếu*.
 
-:mod:`!ctypes` exports the :func:`byref` function which is used to pass parameters
-by reference.  The same effect can be achieved with the :func:`pointer` function,
-although :func:`pointer` does a lot more work since it constructs a real pointer
-object, so it is faster to use :func:`byref` if you don't need the pointer
-object in Python itself::
+:mod:`!ctypes` xuất :func:`byref` function, được dùng để truyền tham số bằng tham chiếu. Có thể đạt được hiệu ứng tương tự với hàm :func:`pointer`, mặc dù :func:`pointer` thực hiện nhiều công việc hơn vì nó tạo một đối tượng con trỏ thực, do đó sử dụng :func:`byref` sẽ nhanh hơn nếu bản thân Python không cần đối tượng con trỏ::
 
    >>> i = c_int()
    >>> f = c_float()
@@ -722,19 +621,14 @@ object in Python itself::
 
 .. _ctypes-structures-unions:
 
-Structures and unions
-^^^^^^^^^^^^^^^^^^^^^
+Structures và unions
+^^^^^^^^^^^^^^^^^^^^
 
-Structures and unions must derive from the :class:`Structure` and :class:`Union`
-base classes which are defined in the :mod:`!ctypes` module. Each subclass must
-define a :attr:`~Structure._fields_` attribute.  :attr:`!_fields_` must be a list of
-*2-tuples*, containing a *field name* and a *field type*.
+Structures và unions phải kế thừa từ các lớp cơ sở :class:`Structure` và :class:`Union`, được định nghĩa trong module :mod:`!ctypes`. Mỗi lớp con phải định nghĩa một thuộc tính :attr:`~Structure._fields_`. :attr:`!_fields_` phải là một danh sách gồm các *2-tuples*, chứa *tên trường* và *kiểu trường*.
 
-The field type must be a :mod:`!ctypes` type like :class:`c_int`, or any other
-derived :mod:`!ctypes` type: structure, union, array, pointer.
+Kiểu trường phải là một kiểu :mod:`!ctypes` như :class:`c_int`, hoặc bất kỳ kiểu :mod:`!ctypes` dẫn xuất nào khác: structure, union, array, pointer.
 
-Here is a simple example of a POINT structure, which contains two integers named
-*x* and *y*, and also shows how to initialize a structure in the constructor::
+Sau đây là một ví dụ đơn giản về structure POINT, chứa hai số nguyên có tên *x* và *y*, đồng thời cho thấy cách khởi tạo một structure trong constructor::
 
    >>> from ctypes import *
    >>> class POINT(Structure):
@@ -753,11 +647,9 @@ Here is a simple example of a POINT structure, which contains two integers named
    TypeError: too many initializers
    >>>
 
-You can, however, build much more complicated structures.  A structure can
-itself contain other structures by using a structure as a field type.
+Tuy nhiên, bạn có thể xây dựng các structure phức tạp hơn nhiều. Một structure có thể tự chứa các structure khác bằng cách sử dụng một structure làm kiểu trường.
 
-Here is a RECT structure which contains two POINTs named *upperleft* and
-*lowerright*::
+Sau đây là một structure RECT chứa hai POINT có tên *upperleft* và *lowerright*::
 
    >>> class RECT(Structure):
    ...     _fields_ = [("upperleft", POINT),
@@ -770,14 +662,12 @@ Here is a RECT structure which contains two POINTs named *upperleft* and
    0 0
    >>>
 
-Nested structures can also be initialized in the constructor in several ways::
+Các structure lồng nhau cũng có thể được khởi tạo trong constructor theo nhiều cách::
 
    >>> r = RECT(POINT(1, 2), POINT(3, 4))
    >>> r = RECT((1, 2), (3, 4))
 
-Field :term:`descriptor`\s can be retrieved from the *class*, they are useful
-for debugging because they can provide useful information.
-See :class:`CField`::
+Trường :term:`descriptor`\s có thể được lấy từ *class*, và chúng hữu ích cho việc gỡ lỗi vì có thể cung cấp thông tin hữu ích. Xem :class:`CField`::
 
    >>> POINT.x
    <ctypes.CField 'x' type=c_int, ofs=0, size=4>
@@ -790,39 +680,27 @@ See :class:`CField`::
 
 .. warning::
 
-   :mod:`!ctypes` does not support passing unions or structures with bit-fields
-   to functions by value.  While this may work on 32-bit x86, it's not
-   guaranteed by the library to work in the general case.  Unions and
-   structures with bit-fields should always be passed to functions by pointer.
+   :mod:`!ctypes` không hỗ trợ truyền các union hoặc structure có bit-field cho hàm theo giá trị. Mặc dù cách này có thể hoạt động trên x86 32-bit, thư viện không đảm bảo nó hoạt động trong trường hợp tổng quát. Các union và structure có bit-field luôn phải được truyền cho hàm bằng con trỏ.
 
-Structure/union layout, alignment and byte order
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Bố cục, căn chỉnh và thứ tự byte của structure/union
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, Structure and Union fields are laid out in the same way the C
-compiler does it.  It is possible to override this behavior entirely by specifying a
-:attr:`~Structure._layout_` class attribute in the subclass definition; see
-the attribute documentation for details.
+Theo mặc định, các trường của Structure và Union được bố trí theo cùng cách mà trình biên dịch C thực hiện. Có thể ghi đè hoàn toàn hành vi này bằng cách chỉ định một
+thuộc tính lớp :attr:`~Structure._layout_` trong định nghĩa lớp con; xem tài liệu về thuộc tính để biết chi tiết.
 
-It is possible to specify the maximum alignment for the fields and/or for the
-structure itself by setting the class attributes :attr:`~Structure._pack_`
-and/or :attr:`~Structure._align_`, respectively.
-See the attribute documentation for details.
+Có thể chỉ định căn chỉnh tối đa cho các trường và/hoặc cho chính structure bằng cách lần lượt thiết lập các thuộc tính lớp :attr:`~Structure._pack_` và/hoặc :attr:`~Structure._align_`. Xem tài liệu về thuộc tính để biết chi tiết.
 
-:mod:`!ctypes` uses the native byte order for Structures and Unions.  To build
-structures with non-native byte order, you can use one of the
+:mod:`!ctypes` sử dụng thứ tự byte gốc cho các Structure và Union. Để tạo các structure có thứ tự byte không phải gốc, bạn có thể sử dụng một trong các
 :class:`BigEndianStructure`, :class:`LittleEndianStructure`,
-:class:`BigEndianUnion`, and :class:`LittleEndianUnion` base classes.  These
-classes cannot contain pointer fields.
+lớp cơ sở :class:`BigEndianUnion` và :class:`LittleEndianUnion`. Các lớp này không thể chứa các trường con trỏ.
 
 
 .. _ctypes-bit-fields-in-structures-unions:
 
-Bit fields in structures and unions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các trường bit trong structure và union
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is possible to create structures and unions containing bit fields. Bit fields
-are only possible for integer fields, the bit width is specified as the third
-item in the :attr:`~Structure._fields_` tuples::
+Có thể tạo các structure và union chứa các trường bit. Các trường bit chỉ có thể áp dụng cho các trường số nguyên; độ rộng bit được chỉ định ở mục thứ ba trong các tuple :attr:`~Structure._fields_`::
 
    >>> class Int(Structure):
    ...     _fields_ = [("first_16", c_int, 16),
@@ -833,28 +711,21 @@ item in the :attr:`~Structure._fields_` tuples::
    >>> print(Int.second_16)
    <ctypes.CField 'second_16' type=c_int, ofs=0, bit_size=16, bit_offset=16>
 
-It is important to note that bit field allocation and layout in memory are not
-defined as a C standard; their implementation is compiler-specific.
-By default, Python will attempt to match the behavior of a "native" compiler
-for the current platform.
-See the :attr:`~Structure._layout_` attribute for details on the default
-behavior and how to change it.
+Điều quan trọng cần lưu ý là việc cấp phát và bố trí trường bit trong bộ nhớ không được quy định trong tiêu chuẩn C; cách triển khai phụ thuộc vào compiler. Theo mặc định, Python sẽ cố gắng khớp với hành vi của compiler "native" trên nền tảng hiện tại. Xem thuộc tính :attr:`~Structure._layout_` để biết chi tiết về hành vi mặc định và cách thay đổi hành vi đó.
 
 
 .. _ctypes-arrays:
 
-Arrays
-^^^^^^
+Mảng
+^^^^
 
-Arrays are sequences, containing a fixed number of instances of the same type.
+Mảng là các dãy chứa một số lượng cố định các instance cùng kiểu.
 
-The recommended way to create array types is by multiplying a data type with a
-positive integer::
+Cách được khuyến nghị để tạo các kiểu mảng là nhân một kiểu dữ liệu với một số nguyên dương::
 
    TenPointsArrayType = POINT * 10
 
-Here is an example of a somewhat artificial data type, a structure containing 4
-POINTs among other stuff::
+Sau đây là một ví dụ về kiểu dữ liệu hơi mang tính nhân tạo: một structure chứa 4 POINT cùng với một số thành phần khác::
 
    >>> from ctypes import *
    >>> class POINT(Structure):
@@ -869,16 +740,15 @@ POINTs among other stuff::
    4
    >>>
 
-Instances are created in the usual way, by calling the class::
+Các instance được tạo theo cách thông thường bằng cách gọi class::
 
    arr = TenPointsArrayType()
    for pt in arr:
        print(pt.x, pt.y)
 
-The above code print a series of ``0 0`` lines, because the array contents is
-initialized to zeros.
+Đoạn mã trên in ra một loạt dòng ``0 0``, vì nội dung của array được khởi tạo bằng các số 0.
 
-Initializers of the correct type can also be specified::
+Bạn cũng có thể chỉ định các initializer thuộc đúng type::
 
    >>> from ctypes import *
    >>> TenIntegers = c_int * 10
@@ -893,26 +763,24 @@ Initializers of the correct type can also be specified::
 
 .. _ctypes-pointers:
 
-Pointers
-^^^^^^^^
+Con trỏ
+^^^^^^^
 
-Pointer instances are created by calling the :func:`pointer` function on a
-:mod:`!ctypes` type::
+Các instance của con trỏ được tạo bằng cách gọi hàm :func:`pointer` trên một
+type :mod:`!ctypes`::
 
    >>> from ctypes import *
    >>> i = c_int(42)
    >>> pi = pointer(i)
    >>>
 
-Pointer instances have a :attr:`~_Pointer.contents` attribute which
-returns the object to which the pointer points, the ``i`` object above::
+Các instance của con trỏ có thuộc tính :attr:`~_Pointer.contents`, thuộc tính này trả về object mà con trỏ trỏ tới, tức object ``i`` ở trên::
 
    >>> pi.contents
    c_long(42)
    >>>
 
-Note that :mod:`!ctypes` does not have OOR (original object return), it constructs a
-new, equivalent object each time you retrieve an attribute::
+Lưu ý rằng :mod:`!ctypes` không có OOR (original object return); mỗi lần bạn truy xuất một attribute, nó sẽ tạo một đối tượng tương đương mới::
 
    >>> pi.contents is i
    False
@@ -920,8 +788,7 @@ new, equivalent object each time you retrieve an attribute::
    False
    >>>
 
-Assigning another :class:`c_int` instance to the pointer's contents attribute
-would cause the pointer to point to the memory location where this is stored::
+Việc gán một thể hiện :class:`c_int` khác vào attribute contents của con trỏ sẽ khiến con trỏ trỏ đến vị trí bộ nhớ nơi đối tượng này được lưu trữ::
 
    >>> i = c_int(99)
    >>> pi.contents = i
@@ -932,13 +799,13 @@ would cause the pointer to point to the memory location where this is stored::
 .. XXX Document dereferencing pointers, and that it is preferred over the
    .contents attribute.
 
-Pointer instances can also be indexed with integers::
+Các thể hiện con trỏ cũng có thể được lập chỉ mục bằng các số nguyên::
 
    >>> pi[0]
    99
    >>>
 
-Assigning to an integer index changes the pointed to value::
+Việc gán cho một chỉ mục số nguyên sẽ thay đổi giá trị được trỏ đến::
 
    >>> print(i)
    c_long(99)
@@ -947,25 +814,15 @@ Assigning to an integer index changes the pointed to value::
    c_long(22)
    >>>
 
-It is also possible to use indexes different from 0, but you must know what
-you're doing, just as in C: You can access or change arbitrary memory locations.
-Generally you only use this feature if you receive a pointer from a C function,
-and you *know* that the pointer actually points to an array instead of a single
-item.
+Bạn cũng có thể sử dụng các chỉ mục khác 0, nhưng phải biết mình đang làm gì, giống như trong C: Bạn có thể truy cập hoặc thay đổi các vị trí bộ nhớ tùy ý. Nhìn chung, bạn chỉ sử dụng tính năng này khi nhận được một con trỏ từ một hàm C và *biết* rằng con trỏ thực sự trỏ đến một mảng thay vì một mục đơn lẻ.
 
 .. warning::
 
-   Because pointer objects support subscription, they implicitly support
-   :term:`iteration <iterator>`. Unless doing this in a controlled manner,
-   such as by manually calling :func:`next` on a :func:`pointer` iterator, this
-   will typically lead to infinite loops or crashes, because ctypes has no way
-   of knowing when to stop iteration. In other words, a ``pointer`` iterator
-   will infinitely yield arbitrary memory.
+   Vì các đối tượng con trỏ hỗ trợ phép truy cập theo chỉ mục, chúng cũng ngầm hỗ trợ
+   :term:`phép lặp <iterator>`. Trừ khi thực hiện việc này theo cách có kiểm soát, chẳng hạn như gọi thủ công :func:`next` trên một iterator :func:`pointer`, thao tác này thường sẽ dẫn đến vòng lặp vô hạn hoặc sự cố, vì ctypes không có cách nào biết khi nào cần dừng phép lặp. Nói cách khác, một iterator ``pointer`` sẽ liên tục trả về các vùng nhớ tùy ý.
 
-Behind the scenes, the :func:`pointer` function does more than simply create
-pointer instances, it has to create pointer *types* first. This is done with the
-:func:`POINTER` function, which accepts any :mod:`!ctypes` type, and returns a
-new type::
+Đằng sau hậu trường, hàm :func:`pointer` không chỉ đơn giản là tạo các thực thể con trỏ; trước tiên, hàm này phải tạo các *kiểu* con trỏ. Việc này được thực hiện bằng
+hàm :func:`POINTER`, chấp nhận bất kỳ :mod:`!ctypes` kiểu nào và trả về một kiểu mới::
 
    >>> PI = POINTER(c_int)
    >>> PI
@@ -978,16 +835,14 @@ new type::
    <ctypes.LP_c_long object at 0x...>
    >>>
 
-Calling the pointer type without an argument creates a ``NULL`` pointer.
-``NULL`` pointers have a ``False`` boolean value::
+Gọi kiểu con trỏ mà không có đối số sẽ tạo một con trỏ ``NULL``. Các con trỏ ``NULL`` có giá trị boolean là ``False``::
 
    >>> null_ptr = POINTER(c_int)()
    >>> print(bool(null_ptr))
    False
    >>>
 
-:mod:`!ctypes` checks for ``NULL`` when dereferencing pointers (but dereferencing
-invalid non-\ ``NULL`` pointers would crash Python)::
+:mod:`!ctypes` kiểm tra ``NULL`` khi hủy tham chiếu các con trỏ (nhưng việc hủy tham chiếu các con trỏ không hợp lệ, không phải \ ``NULL``, sẽ làm Python bị crash)::
 
    >>> null_ptr[0]
    Traceback (most recent call last):
@@ -1003,11 +858,10 @@ invalid non-\ ``NULL`` pointers would crash Python)::
 
 .. _ctypes-thread-safety:
 
-Thread safety without the GIL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Đảm bảo an toàn luồng khi không có GIL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-From Python 3.13 onward, the :term:`GIL` can be disabled on the :term:`free-threaded build`.
-In ctypes, reads and writes to a single object concurrently is safe, but not across multiple objects:
+Kể từ Python 3.13, có thể vô hiệu hóa :term:`GIL` trên :term:`free-threaded build`. Trong ctypes, việc đồng thời đọc và ghi vào một đối tượng duy nhất là an toàn, nhưng không an toàn khi thực hiện trên nhiều đối tượng:
 
    .. code-block:: pycon
 
@@ -1015,34 +869,26 @@ In ctypes, reads and writes to a single object concurrently is safe, but not acr
       >>> pointer_a = pointer(number)
       >>> pointer_b = pointer(number)
 
-In the above, it's only safe for one object to read and write to the address at once if the GIL is disabled.
-So, ``pointer_a`` can be shared and written to across multiple threads, but only if ``pointer_b``
-is not also attempting to do the same. If this is an issue, consider using a :class:`threading.Lock`
-to synchronize access to memory:
+Trong ví dụ trên, nếu GIL bị vô hiệu hóa thì chỉ an toàn khi một đối tượng đọc và ghi vào địa chỉ tại một thời điểm. Vì vậy, ``pointer_a`` có thể được chia sẻ và ghi từ nhiều thread, nhưng chỉ khi ``pointer_b`` không đồng thời cố gắng thực hiện việc tương tự. Nếu đây là vấn đề, hãy cân nhắc sử dụng :class:`threading.Lock` để đồng bộ hóa quyền truy cập vào bộ nhớ:
 
    .. code-block:: pycon
 
       >>> import threading
       >>> lock = threading.Lock()
-      >>> # Thread 1
+      >>> # Luồng 1
       >>> with lock:
       ...    pointer_a.contents = 24
-      >>> # Thread 2
+      >>> # Luồng 2
       >>> with lock:
       ...    pointer_b.contents = 42
 
 
 .. _ctypes-type-conversions:
 
-Type conversions
-^^^^^^^^^^^^^^^^
+Chuyển đổi kiểu
+^^^^^^^^^^^^^^^
 
-Usually, ctypes does strict type checking.  This means, if you have
-``POINTER(c_int)`` in the :attr:`~_CFuncPtr.argtypes` list of a function or as the type of
-a member field in a structure definition, only instances of exactly the same
-type are accepted.  There are some exceptions to this rule, where ctypes accepts
-other objects.  For example, you can pass compatible array instances instead of
-pointer types.  So, for ``POINTER(c_int)``, ctypes accepts an array of c_int::
+Thông thường, ctypes kiểm tra kiểu nghiêm ngặt. Điều này có nghĩa là nếu bạn có ``POINTER(c_int)`` trong danh sách :attr:`~_CFuncPtr.argtypes` của một hàm hoặc làm kiểu của một trường thành viên trong định nghĩa cấu trúc, thì chỉ các instance có chính xác cùng kiểu mới được chấp nhận. Có một số ngoại lệ đối với quy tắc này, trong đó ctypes chấp nhận các đối tượng khác. Ví dụ: bạn có thể truyền các instance mảng tương thích thay cho các kiểu con trỏ. Vì vậy, đối với ``POINTER(c_int)``, ctypes chấp nhận một mảng c_int::
 
    >>> class Bar(Structure):
    ...     _fields_ = [("count", c_int), ("values", POINTER(c_int))]
@@ -1058,23 +904,16 @@ pointer types.  So, for ``POINTER(c_int)``, ctypes accepts an array of c_int::
    3
    >>>
 
-In addition, if a function argument is explicitly declared to be a pointer type
-(such as ``POINTER(c_int)``) in :attr:`~_CFuncPtr.argtypes`, an object of the pointed
-type (``c_int`` in this case) can be passed to the function.  ctypes will apply
-the required :func:`byref` conversion in this case automatically.
+Ngoài ra, nếu một đối số của hàm được khai báo rõ ràng là kiểu con trỏ (chẳng hạn như ``POINTER(c_int)``) trong :attr:`~_CFuncPtr.argtypes`, thì có thể truyền một đối tượng thuộc kiểu được con trỏ trỏ tới (``c_int`` trong trường hợp này) vào hàm. Trong trường hợp này, ctypes sẽ tự động áp dụng chuyển đổi :func:`byref` cần thiết.
 
-To set a POINTER type field to ``NULL``, you can assign ``None``::
+Để đặt một trường kiểu POINTER thành ``NULL``, bạn có thể gán ``None``::
 
    >>> bar.values = None
    >>>
 
 .. XXX list other conversions...
 
-Sometimes you have instances of incompatible types.  In C, you can cast one type
-into another type.  :mod:`!ctypes` provides a :func:`cast` function which can be
-used in the same way.  The ``Bar`` structure defined above accepts
-``POINTER(c_int)`` pointers or :class:`c_int` arrays for its ``values`` field,
-but not instances of other types::
+Đôi khi bạn có các instance thuộc những kiểu không tương thích. Trong C, bạn có thể ép một kiểu sang kiểu khác. :mod:`!ctypes` cung cấp một hàm :func:`cast` có thể được sử dụng theo cách tương tự. Cấu trúc ``Bar`` được định nghĩa ở trên chấp nhận các con trỏ ``POINTER(c_int)`` hoặc các mảng :class:`c_int` cho trường ``values``, nhưng không chấp nhận các instance thuộc kiểu khác::
 
    >>> bar.values = (c_byte * 4)()
    Traceback (most recent call last):
@@ -1082,21 +921,16 @@ but not instances of other types::
    TypeError: incompatible types, c_byte_Array_4 instance instead of LP_c_long instance
    >>>
 
-For these cases, the :func:`cast` function is handy.
+Trong những trường hợp này, hàm :func:`cast` rất hữu ích.
 
-The :func:`cast` function can be used to cast a ctypes instance into a pointer
-to a different ctypes data type.  :func:`cast` takes two parameters, a ctypes
-object that is or can be converted to a pointer of some kind, and a ctypes
-pointer type.  It returns an instance of the second argument, which references
-the same memory block as the first argument::
+Có thể dùng hàm :func:`cast` để ép một thực thể ctypes thành con trỏ tới một kiểu dữ liệu ctypes khác. :func:`cast` nhận hai tham số: một đối tượng ctypes vốn là, hoặc có thể được chuyển đổi thành, một con trỏ thuộc một kiểu nào đó; và một kiểu con trỏ ctypes. Hàm trả về một thực thể thuộc đối số thứ hai, tham chiếu đến cùng khối bộ nhớ với đối số thứ nhất::
 
    >>> a = (c_byte * 4)()
    >>> cast(a, POINTER(c_int))
    <ctypes.LP_c_long object at ...>
    >>>
 
-So, :func:`cast` can be used to assign to the ``values`` field of ``Bar`` the
-structure::
+Vì vậy, có thể dùng :func:`cast` để gán vào trường ``values`` của cấu trúc ``Bar``::
 
    >>> bar = Bar()
    >>> bar.values = cast((c_byte * 4)(), POINTER(c_int))
@@ -1107,12 +941,10 @@ structure::
 
 .. _ctypes-incomplete-types:
 
-Incomplete Types
-^^^^^^^^^^^^^^^^
+Các kiểu chưa hoàn thiện
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-*Incomplete Types* are structures, unions or arrays whose members are not yet
-specified. In C, they are specified by forward declarations, which are defined
-later::
+*Các kiểu chưa hoàn thiện* là các cấu trúc, union hoặc mảng mà các thành phần của chúng chưa được chỉ định. Trong C, chúng được chỉ định bằng các khai báo chuyển tiếp, được định nghĩa sau đó::
 
    struct cell; /* forward declaration */
 
@@ -1121,8 +953,7 @@ later::
        struct cell *next;
    };
 
-The straightforward translation into ctypes code would be this, but it does not
-work::
+Cách chuyển trực tiếp sang mã ctypes sẽ như sau, nhưng cách này không hoạt động::
 
    >>> class cell(Structure):
    ...     _fields_ = [("name", c_char_p),
@@ -1134,9 +965,8 @@ work::
    NameError: name 'cell' is not defined
    >>>
 
-because the new ``class cell`` is not available in the class statement itself.
-In :mod:`!ctypes`, we can define the ``cell`` class and set the
-:attr:`~Structure._fields_` attribute later, after the class statement::
+vì ``class cell`` mới không khả dụng ngay trong câu lệnh khai báo lớp. Trong :mod:`!ctypes`, chúng ta có thể định nghĩa lớp ``cell`` và đặt
+thuộc tính :attr:`~Structure._fields_` sau đó, sau câu lệnh khai báo lớp::
 
    >>> from ctypes import *
    >>> class cell(Structure):
@@ -1146,8 +976,7 @@ In :mod:`!ctypes`, we can define the ``cell`` class and set the
    ...                  ("next", POINTER(cell))]
    >>>
 
-Let's try it. We create two instances of ``cell``, and let them point to each
-other, and finally follow the pointer chain a few times::
+Hãy thử xem. Chúng ta tạo hai thực thể của ``cell``, cho chúng trỏ đến nhau, rồi cuối cùng lần theo chuỗi con trỏ vài lần::
 
    >>> c1 = cell()
    >>> c1.name = b"foo"
@@ -1166,28 +995,19 @@ other, and finally follow the pointer chain a few times::
 
 .. _ctypes-callback-functions:
 
-Callback functions
-^^^^^^^^^^^^^^^^^^
+Các hàm callback
+^^^^^^^^^^^^^^^^
 
-:mod:`!ctypes` allows creating C callable function pointers from Python callables.
-These are sometimes called *callback functions*.
+:mod:`!ctypes` cho phép tạo các con trỏ hàm có thể được gọi từ C từ các callable của Python. Đôi khi chúng được gọi là *các hàm callback*.
 
-First, you must create a class for the callback function. The class knows the
-calling convention, the return type, and the number and types of arguments this
-function will receive.
+Trước tiên, bạn phải tạo một lớp cho hàm callback. Lớp này xác định calling convention, kiểu giá trị trả về, cũng như số lượng và kiểu của các đối số mà hàm này sẽ nhận.
 
-The :func:`CFUNCTYPE` factory function creates types for callback functions
-using the ``cdecl`` calling convention. On Windows, the :func:`WINFUNCTYPE`
-factory function creates types for callback functions using the ``stdcall``
-calling convention.
+Hàm factory :func:`CFUNCTYPE` tạo các kiểu cho hàm callback bằng calling convention ``cdecl``. Trên Windows, hàm factory :func:`WINFUNCTYPE` tạo các kiểu cho hàm callback bằng calling convention ``stdcall``.
 
-Both of these factory functions are called with the result type as first
-argument, and the callback functions expected argument types as the remaining
-arguments.
+Cả hai hàm factory này đều được gọi với kiểu kết quả là đối số đầu tiên, còn các kiểu đối số mà hàm callback dự kiến nhận là những đối số còn lại.
 
-I will present an example here which uses the standard C library's
-:c:func:`!qsort` function, that is used to sort items with the help of a callback
-function.  :c:func:`!qsort` will be used to sort an array of integers::
+Ở đây, tôi sẽ trình bày một ví dụ sử dụng thư viện C chuẩn
+:c:func:`!qsort` function, được dùng để sắp xếp các phần tử nhờ một hàm callback. :c:func:`!qsort` sẽ được dùng để sắp xếp một mảng số nguyên::
 
    >>> IntArray5 = c_int * 5
    >>> ia = IntArray5(5, 1, 7, 33, 99)
@@ -1195,20 +1015,14 @@ function.  :c:func:`!qsort` will be used to sort an array of integers::
    >>> qsort.restype = None
    >>>
 
-:func:`!qsort` must be called with a pointer to the data to sort, the number of
-items in the data array, the size of one item, and a pointer to the comparison
-function, the callback. The callback will then be called with two pointers to
-items, and it must return a negative integer if the first item is smaller than
-the second, a zero if they are equal, and a positive integer otherwise.
+:func:`!qsort` phải được gọi với một con trỏ đến dữ liệu cần sắp xếp, số lượng phần tử trong mảng dữ liệu, kích thước của một phần tử và một con trỏ đến hàm so sánh, tức callback. Sau đó, callback sẽ được gọi với hai con trỏ đến các phần tử và phải trả về một số nguyên âm nếu phần tử thứ nhất nhỏ hơn phần tử thứ hai, 0 nếu chúng bằng nhau và một số nguyên dương trong các trường hợp còn lại.
 
-So our callback function receives pointers to integers, and must return an
-integer. First we create the ``type`` for the callback function::
+Vì vậy, hàm callback của chúng ta nhận các con trỏ đến số nguyên và phải trả về một số nguyên. Trước tiên, chúng ta tạo ``type`` cho hàm callback::
 
    >>> CMPFUNC = CFUNCTYPE(c_int, POINTER(c_int), POINTER(c_int))
    >>>
 
-To get started, here is a simple callback that shows the values it gets
-passed::
+Để bắt đầu, dưới đây là một callback đơn giản hiển thị các giá trị mà nó nhận được::
 
    >>> def py_cmp_func(a, b):
    ...     print("py_cmp_func", a[0], b[0])
@@ -1217,7 +1031,7 @@ passed::
    >>> cmp_func = CMPFUNC(py_cmp_func)
    >>>
 
-The result::
+Kết quả::
 
    >>> qsort(ia, len(ia), sizeof(c_int), cmp_func)  # doctest: +LINUX
    py_cmp_func 5 1
@@ -1227,7 +1041,7 @@ The result::
    py_cmp_func 1 7
    >>>
 
-Now we can actually compare the two items and return a useful result::
+Giờ đây, chúng ta thực sự có thể so sánh hai mục này và trả về một kết quả hữu ích::
 
    >>> def py_cmp_func(a, b):
    ...     print("py_cmp_func", a[0], b[0])
@@ -1242,15 +1056,14 @@ Now we can actually compare the two items and return a useful result::
    py_cmp_func 5 7
    >>>
 
-As we can easily check, our array is sorted now::
+Như có thể dễ dàng kiểm tra, mảng của chúng ta giờ đã được sắp xếp::
 
    >>> for i in ia: print(i, end=" ")
    ...
    1 5 7 33 99
    >>>
 
-The function factories can be used as decorator factories, so we may as well
-write::
+Các function factory có thể được dùng làm decorator factory, vì vậy chúng ta có thể viết luôn::
 
    >>> @CFUNCTYPE(c_int, POINTER(c_int), POINTER(c_int))
    ... def py_cmp_func(a, b):
@@ -1267,46 +1080,32 @@ write::
 
 .. note::
 
-   Make sure you keep references to :func:`CFUNCTYPE` objects as long as they
-   are used from C code. :mod:`!ctypes` doesn't, and if you don't, they may be
-   garbage collected, crashing your program when a callback is made.
+   Hãy đảm bảo bạn giữ tham chiếu đến các đối tượng :func:`CFUNCTYPE` chừng nào chúng còn được sử dụng từ mã C. :mod:`!ctypes` thì không làm vậy, và nếu bạn không giữ tham chiếu, chúng có thể bị garbage collection thu hồi, khiến chương trình của bạn bị crash khi một callback được tạo.
 
-   Also, note that if the callback function is called in a thread created
-   outside of Python's control (e.g. by the foreign code that calls the
-   callback), ctypes creates a new dummy Python thread on every invocation. This
-   behavior is correct for most purposes, but it means that values stored with
-   :class:`threading.local` will *not* survive across different callbacks, even when
-   those calls are made from the same C thread.
+   Ngoài ra, lưu ý rằng nếu callback function được gọi trong một thread được tạo bên ngoài quyền kiểm soát của Python (ví dụ: bởi mã bên ngoài gọi callback), ctypes sẽ tạo một dummy Python thread mới trong mỗi lần gọi. Hành vi này đúng trong hầu hết trường hợp, nhưng có nghĩa là các giá trị được lưu cùng
+   :class:`threading.local` sẽ *không* tồn tại qua các callback khác nhau, ngay cả khi những lần gọi đó được thực hiện từ cùng một C thread.
 
 .. _ctypes-accessing-values-exported-from-dlls:
 
-Accessing values exported from dlls
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Truy cập các giá trị được xuất từ dll
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Some shared libraries not only export functions, they also export variables. An
-example in the Python library itself is the :c:data:`Py_Version`, Python
-runtime version number encoded in a single constant integer.
+Một số thư viện dùng chung không chỉ xuất các hàm mà còn xuất cả các biến. Một ví dụ trong chính thư viện Python là :c:data:`Py_Version`, số phiên bản runtime của Python được mã hóa trong một hằng số nguyên duy nhất.
 
-:mod:`!ctypes` can access values like this with the :meth:`~_CData.in_dll` class methods of
-the type.  *pythonapi* is a predefined symbol giving access to the Python C
-api::
+:mod:`!ctypes` có thể truy cập các giá trị như thế này bằng các phương thức của lớp :meth:`~_CData.in_dll` thuộc kiểu đó. *pythonapi* là một ký hiệu được định nghĩa sẵn, cho phép truy cập Python C api::
 
    >>> version = ctypes.c_int.in_dll(ctypes.pythonapi, "Py_Version")
    >>> print(hex(version.value))
    0x30c00a0
 
-An extended example which also demonstrates the use of pointers accesses the
-:c:data:`PyImport_FrozenModules` pointer exported by Python.
+Ví dụ mở rộng sau đây cũng minh họa cách sử dụng con trỏ để truy cập
+con trỏ :c:data:`PyImport_FrozenModules` được Python xuất.
 
-Quoting the docs for that value:
+Trích dẫn tài liệu về giá trị đó:
 
-   This pointer is initialized to point to an array of :c:struct:`_frozen`
-   records, terminated by one whose members are all ``NULL`` or zero.  When a frozen
-   module is imported, it is searched in this table.  Third-party code could play
-   tricks with this to provide a dynamically created collection of frozen modules.
+   Con trỏ này được khởi tạo để trỏ đến một mảng gồm các bản ghi :c:struct:`_frozen`, kết thúc bằng một bản ghi có tất cả các thành viên đều là ``NULL`` hoặc bằng không. Khi một frozen module được import, bảng này sẽ được tìm kiếm. Mã của bên thứ ba có thể lợi dụng điều này để cung cấp một tập hợp frozen module được tạo động.
 
-So manipulating this pointer could even prove useful. To restrict the example
-size, we show only how this table can be read with :mod:`!ctypes`::
+Vì vậy, việc thao tác với con trỏ này thậm chí có thể hữu ích. Để giới hạn kích thước ví dụ, chúng tôi chỉ trình bày cách đọc bảng này bằng :mod:`!ctypes`::
 
    >>> from ctypes import *
    >>>
@@ -1314,23 +1113,18 @@ size, we show only how this table can be read with :mod:`!ctypes`::
    ...     _fields_ = [("name", c_char_p),
    ...                 ("code", POINTER(c_ubyte)),
    ...                 ("size", c_int),
-   ...                 ("get_code", POINTER(c_ubyte)),  # Function pointer
+   ...                 ("get_code", POINTER(c_ubyte)),  # Con trỏ hàm
    ...                ]
    ...
    >>>
 
-We have defined the :c:struct:`_frozen` data type, so we can get the pointer
-to the table::
+Chúng ta đã định nghĩa kiểu dữ liệu :c:struct:`_frozen`, vì vậy có thể lấy con trỏ đến bảng::
 
    >>> FrozenTable = POINTER(struct_frozen)
    >>> table = FrozenTable.in_dll(pythonapi, "_PyImport_FrozenBootstrap")
    >>>
 
-Since ``table`` is a ``pointer`` to the array of ``struct_frozen`` records, we
-can iterate over it, but we just have to make sure that our loop terminates,
-because pointers have no size. Sooner or later it would probably crash with an
-access violation or whatever, so it's better to break out of the loop when we
-hit the ``NULL`` entry::
+Vì ``table`` là ``pointer`` đến một mảng gồm các bản ghi ``struct_frozen``, chúng ta có thể lặp qua mảng này, nhưng phải đảm bảo vòng lặp kết thúc, vì con trỏ không có kích thước. Không sớm thì muộn, chương trình có thể sẽ gặp lỗi truy cập hoặc lỗi tương tự, vì vậy tốt hơn hết là thoát khỏi vòng lặp khi gặp mục ``NULL``::
 
    >>> for item in table:
    ...     if item.name is None:
@@ -1342,20 +1136,17 @@ hit the ``NULL`` entry::
    zipimport 12345
    >>>
 
-The fact that standard Python has a frozen module and a frozen package
-(indicated by the negative ``size`` member) is not well known, it is only used
-for testing. Try it out with ``import __hello__`` for example.
+Việc Python chuẩn có một frozen module và một frozen package (được biểu thị bằng thành viên ``size`` âm) không được nhiều người biết đến; chúng chỉ được dùng để kiểm thử. Hãy thử với ``import __hello__`` chẳng hạn.
 
 
 .. _ctypes-surprises:
 
-Surprises
-^^^^^^^^^
+Những điều bất ngờ
+^^^^^^^^^^^^^^^^^^
 
-There are some edges in :mod:`!ctypes` where you might expect something other
-than what actually happens.
+Có một số trường hợp đặc biệt trong :mod:`!ctypes` mà bạn có thể dự đoán kết quả khác với những gì thực sự xảy ra.
 
-Consider the following example::
+Hãy xem ví dụ sau::
 
    >>> from ctypes import *
    >>> class POINT(Structure):
@@ -1369,31 +1160,24 @@ Consider the following example::
    >>> rc = RECT(p1, p2)
    >>> print(rc.a.x, rc.a.y, rc.b.x, rc.b.y)
    1 2 3 4
-   >>> # now swap the two points
+   >>> # bây giờ hoán đổi hai điểm
    >>> rc.a, rc.b = rc.b, rc.a
    >>> print(rc.a.x, rc.a.y, rc.b.x, rc.b.y)
    3 4 3 4
    >>>
 
-Hm. We certainly expected the last statement to print ``3 4 1 2``. What
-happened? Here are the steps of the ``rc.a, rc.b = rc.b, rc.a`` line above::
+Ừm. Chắc chắn chúng ta đã mong đợi câu lệnh cuối cùng in ra ``3 4 1 2``. Chuyện gì đã xảy ra? Sau đây là các bước của dòng ``rc.a, rc.b = rc.b, rc.a`` ở trên::
 
    >>> temp0, temp1 = rc.b, rc.a
    >>> rc.a = temp0
    >>> rc.b = temp1
    >>>
 
-Note that ``temp0`` and ``temp1`` are objects still using the internal buffer of
-the ``rc`` object above. So executing ``rc.a = temp0`` copies the buffer
-contents of ``temp0`` into ``rc`` 's buffer.  This, in turn, changes the
-contents of ``temp1``. So, the last assignment ``rc.b = temp1``, doesn't have
-the expected effect.
+Lưu ý rằng ``temp0`` và ``temp1`` là các đối tượng vẫn sử dụng bộ đệm nội bộ của đối tượng ``rc`` ở trên. Vì vậy, việc thực thi ``rc.a = temp0`` sẽ sao chép nội dung bộ đệm của ``temp0`` vào bộ đệm của ``rc``. Điều này wiederum thay đổi nội dung của ``temp1``. Do đó, phép gán cuối cùng ``rc.b = temp1`` không mang lại hiệu quả như mong đợi.
 
-Keep in mind that retrieving sub-objects from Structure, Unions, and Arrays
-doesn't *copy* the sub-object, instead it retrieves a wrapper object accessing
-the root-object's underlying buffer.
+Hãy nhớ rằng việc lấy các đối tượng con từ Structure, Unions và Arrays không *sao chép* đối tượng con; thay vào đó, nó lấy một đối tượng wrapper truy cập vào bộ đệm bên dưới của đối tượng gốc.
 
-Another example that may behave differently from what one would expect is this::
+Một ví dụ khác có thể hoạt động khác với dự đoán là ví dụ sau::
 
    >>> s = c_char_p()
    >>> s.value = b"abc def ghi"
@@ -1405,28 +1189,20 @@ Another example that may behave differently from what one would expect is this::
 
 .. note::
 
-   Objects instantiated from :class:`c_char_p` can only have their value set to bytes
-   or integers.
+   Các đối tượng được khởi tạo từ :class:`c_char_p` chỉ có thể được đặt giá trị là byte hoặc số nguyên.
 
-Why is it printing ``False``?  ctypes instances are objects containing a memory
-block plus some :term:`descriptor`\s accessing the contents of the memory.
-Storing a Python object in the memory block does not store the object itself,
-instead the ``contents`` of the object is stored.  Accessing the contents again
-constructs a new Python object each time!
+Tại sao nó lại in ra ``False``? Các instance của ctypes là những đối tượng chứa một khối bộ nhớ cùng một số :term:`descriptor`\s để truy cập nội dung của khối bộ nhớ đó. Việc lưu một đối tượng Python vào khối bộ nhớ không lưu chính đối tượng đó; thay vào đó, ``contents`` của đối tượng được lưu lại. Mỗi lần truy cập lại nội dung, một đối tượng Python mới sẽ được tạo ra!
 
 
 .. _ctypes-variable-sized-data-types:
 
-Variable-sized data types
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Kiểu dữ liệu có kích thước biến đổi
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:mod:`!ctypes` provides some support for variable-sized arrays and structures.
+:mod:`!ctypes` cung cấp một số hỗ trợ cho các mảng và cấu trúc có kích thước biến đổi.
 
-The :func:`resize` function can be used to resize the memory buffer of an
-existing ctypes object.  The function takes the object as first argument, and
-the requested size in bytes as the second argument.  The memory block cannot be
-made smaller than the natural memory block specified by the objects type, a
-:exc:`ValueError` is raised if this is tried::
+Có thể sử dụng hàm :func:`resize` để thay đổi kích thước bộ đệm bộ nhớ của một đối tượng ctypes hiện có. Hàm này nhận đối tượng làm đối số đầu tiên và kích thước yêu cầu tính bằng byte làm đối số thứ hai. Không thể làm cho khối bộ nhớ nhỏ hơn khối bộ nhớ tự nhiên được chỉ định bởi kiểu của đối tượng, a
+:exc:`ValueError` được phát sinh nếu thử làm vậy::
 
    >>> short_array = (c_short * 4)()
    >>> print(sizeof(short_array))
@@ -1442,9 +1218,7 @@ made smaller than the natural memory block specified by the objects type, a
    8
    >>>
 
-This is nice and fine, but how would one access the additional elements
-contained in this array?  Since the type still only knows about 4 elements, we
-get errors accessing other elements::
+Điều này rất tốt, nhưng làm thế nào để truy cập các phần tử bổ sung có trong mảng này? Vì kiểu này vẫn chỉ biết về 4 phần tử, nên chúng ta sẽ gặp lỗi khi truy cập các phần tử khác::
 
    >>> short_array[:]
    [0, 0, 0, 0]
@@ -1454,58 +1228,43 @@ get errors accessing other elements::
    IndexError: invalid index
    >>>
 
-Another way to use variable-sized data types with :mod:`!ctypes` is to use the
-dynamic nature of Python, and (re-)define the data type after the required size
-is already known, on a case by case basis.
+Một cách khác để sử dụng các kiểu dữ liệu có kích thước biến đổi với :mod:`!ctypes` là tận dụng tính linh động của Python và định nghĩa lại kiểu dữ liệu sau khi đã biết kích thước cần thiết, tùy theo từng trường hợp.
 
 
 .. _ctypes-ctypes-reference:
 
-ctypes reference
-----------------
+tài liệu tham khảo ctypes
+-------------------------
 
 
 .. _ctypes-finding-shared-libraries:
 
-Finding shared libraries
-^^^^^^^^^^^^^^^^^^^^^^^^
+Tìm thư viện dùng chung
+^^^^^^^^^^^^^^^^^^^^^^^
 
-When programming in a compiled language, shared libraries are accessed when
-compiling/linking a program, and when the program is run.
+Khi lập trình bằng một ngôn ngữ biên dịch, các thư viện dùng chung được truy cập trong quá trình biên dịch/liên kết chương trình và khi chương trình chạy.
 
-The purpose of the :func:`~ctypes.util.find_library` function is to locate a library in a way
-similar to what the compiler or runtime loader does (on platforms with several
-versions of a shared library the most recent should be loaded), while the ctypes
-library loaders act like when a program is run, and call the runtime loader
-directly.
+Mục đích của hàm :func:`~ctypes.util.find_library` là định vị một thư viện theo cách tương tự như trình biên dịch hoặc trình nạp runtime thực hiện (trên các nền tảng có nhiều phiên bản của một thư viện dùng chung, phiên bản mới nhất sẽ được nạp), trong khi các trình nạp thư viện ctypes hoạt động giống như khi một chương trình chạy và gọi trực tiếp trình nạp runtime.
 
-The :mod:`!ctypes.util` module provides a function which can help to determine
-the library to load.
+Mô-đun :mod:`!ctypes.util` cung cấp một hàm có thể giúp xác định thư viện cần nạp.
 
 
 .. data:: find_library(name)
    :module: ctypes.util
    :noindex:
 
-   Try to find a library and return a pathname.  *name* is the library name without
-   any prefix like *lib*, suffix like ``.so``, ``.dylib`` or version number (this
-   is the form used for the posix linker option :option:`!-l`).  If no library can
-   be found, returns ``None``.
+   Thử tìm một thư viện và trả về một pathname. *name* là tên thư viện không có tiền tố như *lib*, hậu tố như ``.so``, ``.dylib`` hoặc số phiên bản (đây là dạng được dùng cho tùy chọn linker posix :option:`!-l`). Nếu không tìm thấy thư viện, trả về ``None``.
 
-The exact functionality is system dependent.
+Chức năng chính xác phụ thuộc vào hệ thống.
 
-On Linux, :func:`~ctypes.util.find_library` tries to run external programs
-(``/sbin/ldconfig``, ``gcc``, ``objdump`` and ``ld``) to find the library file.
-It returns the filename of the library file.
+Trên Linux, :func:`~ctypes.util.find_library` cố gắng chạy các chương trình bên ngoài (``/sbin/ldconfig``, ``gcc``, ``objdump`` và ``ld``) để tìm tệp thư viện. Nó trả về tên tệp của thư viện.
 
-Note that if the output of these programs does not correspond to the dynamic
-linker used by Python, the result of this function may be misleading.
+Lưu ý rằng nếu đầu ra của các chương trình này không tương ứng với dynamic linker được Python sử dụng, kết quả của hàm này có thể gây hiểu lầm.
 
 .. versionchanged:: 3.6
-   On Linux, the value of the environment variable ``LD_LIBRARY_PATH`` is used
-   when searching for libraries, if a library cannot be found by any other means.
+   Trên Linux, giá trị của biến môi trường ``LD_LIBRARY_PATH`` được sử dụng khi tìm kiếm thư viện nếu không thể tìm thấy thư viện bằng bất kỳ cách nào khác.
 
-Here are some examples::
+Dưới đây là một số ví dụ::
 
    >>> from ctypes.util import find_library
    >>> find_library("m")
@@ -1516,9 +1275,7 @@ Here are some examples::
    'libbz2.so.1.0'
    >>>
 
-On macOS and Android, :func:`~ctypes.util.find_library` uses the system's
-standard naming schemes and paths to locate the library, and returns a full
-pathname if successful::
+Trên macOS và Android, :func:`~ctypes.util.find_library` sử dụng các quy ước đặt tên và đường dẫn tiêu chuẩn của hệ thống để định vị thư viện, đồng thời trả về tên đường dẫn đầy đủ nếu thành công::
 
    >>> from ctypes.util import find_library
    >>> find_library("c")
@@ -1531,32 +1288,21 @@ pathname if successful::
    '/System/Library/Frameworks/AGL.framework/AGL'
    >>>
 
-On Windows, :func:`~ctypes.util.find_library` searches along the system search path, and
-returns the full pathname, but since there is no predefined naming scheme a call
-like ``find_library("c")`` will fail and return ``None``.
+Trên Windows, :func:`~ctypes.util.find_library` tìm kiếm trong system search path và trả về tên đường dẫn đầy đủ, nhưng vì không có quy ước đặt tên được định nghĩa sẵn nên một lệnh gọi như ``find_library("c")`` sẽ thất bại và trả về ``None``.
 
-If wrapping a shared library with :mod:`!ctypes`, it *may* be better to determine
-the shared library name at development time, and hardcode that into the wrapper
-module instead of using :func:`~ctypes.util.find_library` to locate the library at runtime.
+Nếu bọc một shared library bằng :mod:`!ctypes`, *có thể* sẽ tốt hơn nếu xác định tên shared library trong thời gian phát triển và hardcode tên đó vào wrapper module, thay vì sử dụng :func:`~ctypes.util.find_library` để định vị thư viện trong runtime.
 
 
 .. _ctypes-listing-loaded-shared-libraries:
 
-Listing loaded shared libraries
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Liệt kê các thư viện dùng chung đã được tải
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When writing code that relies on code loaded from shared libraries, it can be
-useful to know which shared libraries have already been loaded into the current
-process.
+Khi viết mã dựa vào mã được tải từ các thư viện dùng chung, việc biết những thư viện dùng chung nào đã được tải vào tiến trình hiện tại có thể rất hữu ích.
 
-The :mod:`!ctypes.util` module provides the :func:`~ctypes.util.dllist` function,
-which calls the different APIs provided by the various platforms to help determine
-which shared libraries have already been loaded into the current process.
+Mô-đun :mod:`!ctypes.util` cung cấp hàm :func:`~ctypes.util.dllist`, hàm này gọi các API khác nhau do từng nền tảng cung cấp để giúp xác định những thư viện dùng chung nào đã được tải vào tiến trình hiện tại.
 
-The exact output of this function will be system dependent. On most platforms,
-the first entry of this list represents the current process itself, which may
-be an empty string.
-For example, on glibc-based Linux, the return may look like::
+Đầu ra chính xác của hàm này sẽ phụ thuộc vào hệ thống. Trên hầu hết các nền tảng, mục đầu tiên trong danh sách này đại diện cho chính tiến trình hiện tại và có thể là một chuỗi rỗng. Ví dụ: trên Linux dựa trên glibc, giá trị trả về có thể có dạng::
 
    >>> from ctypes.util import dllist
    >>> dllist()
@@ -1564,48 +1310,32 @@ For example, on glibc-based Linux, the return may look like::
 
 .. _ctypes-loading-shared-libraries:
 
-Loading shared libraries
-^^^^^^^^^^^^^^^^^^^^^^^^
+Tải thư viện dùng chung
+^^^^^^^^^^^^^^^^^^^^^^^
 
-There are several ways to load shared libraries into the Python process.  One
-way is to instantiate :py:class:`CDLL` or one of its subclasses:
+Có một số cách để tải thư viện dùng chung vào tiến trình Python. Một cách là khởi tạo :py:class:`CDLL` hoặc một trong các lớp con của nó:
 
 
 .. class:: CDLL(name, mode=DEFAULT_MODE, handle=None, use_errno=False, use_last_error=False, winmode=None)
 
-   Represents a loaded shared library.
+   Đại diện cho một thư viện dùng chung đã được tải.
 
-   Functions in this library use the standard C calling convention, and are
-   assumed to return :c:expr:`int`.
-   The Python :term:`global interpreter lock` is released before calling any
-   function exported by these libraries, and reacquired afterwards.
-   For different function behavior, use a subclass: :py:class:`~ctypes.OleDLL`,
-   :py:class:`~ctypes.WinDLL`, or :py:class:`~ctypes.PyDLL`.
+   Các hàm trong thư viện này sử dụng quy ước gọi hàm C tiêu chuẩn và được giả định là trả về :c:expr:`int`. Python :term:`global interpreter lock` được giải phóng trước khi gọi bất kỳ hàm nào được xuất bởi các thư viện này, rồi được lấy lại sau đó. Để có hành vi hàm khác, hãy sử dụng một lớp con: :py:class:`~ctypes.OleDLL`,
+   :py:class:`~ctypes.WinDLL`, hoặc :py:class:`~ctypes.PyDLL`.
 
-   If you have an existing :py:attr:`handle <ctypes.CDLL._handle>` to an already
-   loaded shared library, it can be passed as the *handle* argument to wrap
-   the opened library in a new :py:class:`!CDLL` object.
-   In this case, *name* is only used to set the :py:attr:`~ctypes.CDLL._name`
-   attribute, but it may be adjusted and/or validated.
+   Nếu bạn đã có một :py:attr:`handle <ctypes.CDLL._handle>` trỏ đến một shared library đã được tải, bạn có thể truyền nó dưới dạng đối số *handle* để bọc thư viện đã mở trong một đối tượng :py:class:`!CDLL` mới. Trong trường hợp này, *name* chỉ được dùng để thiết lập thuộc tính :py:attr:`~ctypes.CDLL._name`, nhưng thuộc tính này có thể được điều chỉnh và/hoặc xác thực.
 
-   If *handle* is ``None``, the underlying platform's :manpage:`dlopen(3)` or
-   :c:func:`!LoadLibrary` function is used to load the library into
-   the process, and to get a handle to it.
+   Nếu *handle* là ``None``, :manpage:`dlopen(3)` của nền tảng bên dưới hoặc
+   hàm :c:func:`!LoadLibrary` được dùng để tải thư viện vào process và lấy handle của thư viện đó.
 
-   *name* is the pathname of the shared library to open.
-   If *name* does not contain a path separator, the library is found
-   in a platform-specific way.
+   *name* là pathname của shared library cần mở. Nếu *name* không chứa dấu phân cách đường dẫn, thư viện sẽ được tìm theo cách dành riêng cho từng nền tảng.
 
-   On non-Windows systems, *name* can  be ``None``. In this case,
-   :c:func:`!dlopen` is called with ``NULL``, which opens the main program
-   as a "library".
-   (Some systems do the same is *name* is empty; ``None``/``NULL`` is more
-   portable.)
+   Trên các hệ thống không phải Windows, *name* có thể là ``None``. Trong trường hợp này,
+   :c:func:`!dlopen` được gọi với ``NULL``, thao tác này mở chương trình chính dưới dạng một "library". (Một số hệ thống cũng làm tương tự khi *name* trống; ``None``/``NULL`` có tính khả chuyển cao hơn.)
 
-   .. admonition:: CPython implementation detail
+   .. admonition:: Chi tiết triển khai CPython
 
-      Since CPython is linked to ``libc``, a ``None`` *name* is often used
-      to access the C standard library::
+      Vì CPython được liên kết với ``libc``, một ``None`` *name* thường được dùng để truy cập thư viện chuẩn C::
 
          >>> printf = ctypes.CDLL(None).printf
          >>> printf.argtypes = [ctypes.c_char_p]
@@ -1613,230 +1343,173 @@ way is to instantiate :py:class:`CDLL` or one of its subclasses:
          hello
          6
 
-      To access the Python C API, prefer :py:data:`ctypes.pythonapi` which
-      works across platforms.
+      Để truy cập Python C API, hãy ưu tiên :py:data:`ctypes.pythonapi`, vốn hoạt động trên nhiều nền tảng.
 
-   The *mode* parameter can be used to specify how the library is loaded.  For
-   details, consult the :manpage:`dlopen(3)` manpage.  On Windows, *mode* is
-   ignored.  On posix systems, RTLD_NOW is always added, and is not
-   configurable.
+   Có thể sử dụng tham số *mode* để chỉ định cách thư viện được tải. Để biết chi tiết, hãy tham khảo manpage :manpage:`dlopen(3)`. Trên Windows, *mode* bị bỏ qua. Trên các hệ thống posix, RTLD_NOW luôn được thêm vào và không thể cấu hình.
 
-   The *use_errno* parameter, when set to true, enables a ctypes mechanism that
-   allows accessing the system :data:`errno` error number in a safe way.
-   :mod:`!ctypes` maintains a thread-local copy of the system's :data:`errno`
-   variable; if you call foreign functions created with ``use_errno=True`` then the
-   :data:`errno` value before the function call is swapped with the ctypes private
-   copy, the same happens immediately after the function call.
+   Khi được đặt thành true, tham số *use_errno* bật một cơ chế của ctypes cho phép truy cập số hiệu lỗi :data:`errno` của hệ thống theo cách an toàn.
+   :mod:`!ctypes` duy trì một bản sao của biến :data:`errno` của hệ thống cho từng thread; nếu bạn gọi các hàm foreign được tạo bằng ``use_errno=True`` thì
+   Giá trị :data:`errno` trước khi gọi hàm được hoán đổi với bản sao riêng của ctypes; điều tương tự cũng xảy ra ngay sau khi gọi hàm.
 
-   The function :func:`ctypes.get_errno` returns the value of the ctypes private
-   copy, and the function :func:`ctypes.set_errno` changes the ctypes private copy
-   to a new value and returns the former value.
+   Hàm :func:`ctypes.get_errno` trả về giá trị của bản sao riêng của ctypes, còn hàm :func:`ctypes.set_errno` thay đổi bản sao riêng của ctypes thành một giá trị mới và trả về giá trị trước đó.
 
-   The *use_last_error* parameter, when set to true, enables the same mechanism for
-   the Windows error code which is managed by the :func:`GetLastError` and
-   :func:`!SetLastError` Windows API functions; :func:`ctypes.get_last_error` and
-   :func:`ctypes.set_last_error` are used to request and change the ctypes private
-   copy of the windows error code.
+   Tham số *use_last_error*, khi được đặt thành true, bật cùng cơ chế cho mã lỗi Windows, vốn được quản lý bởi :func:`GetLastError` và
+   :func:`!SetLastError` các hàm Windows API; :func:`ctypes.get_last_error` và
+   :func:`ctypes.set_last_error` được dùng để yêu cầu và thay đổi bản sao riêng của ctypes về mã lỗi Windows.
 
-   The *winmode* parameter is used on Windows to specify how the library is loaded
-   (since *mode* is ignored). It takes any value that is valid for the Win32 API
-   ``LoadLibraryEx`` flags parameter. When omitted, the default is to use the
-   flags that result in the most secure DLL load, which avoids issues such as DLL
-   hijacking. Passing the full path to the DLL is the safest way to ensure the
-   correct library and dependencies are loaded.
+   Tham số *winmode* được dùng trên Windows để chỉ định cách thư viện được tải (vì *mode* bị bỏ qua). Tham số này nhận mọi giá trị hợp lệ đối với tham số cờ ``LoadLibraryEx`` của Win32 API. Khi bị bỏ qua, mặc định là sử dụng các cờ tạo ra cách tải DLL an toàn nhất, giúp tránh những vấn đề như DLL hijacking. Truyền đường dẫn đầy đủ đến DLL là cách an toàn nhất để đảm bảo thư viện và các phần phụ thuộc chính xác được tải.
 
-   On Windows creating a :class:`CDLL` instance may fail even if the DLL name
-   exists. When a dependent DLL of the loaded DLL is not found, a
-   :exc:`OSError` error is raised with the message *"[WinError 126] The
-   specified module could not be found".* This error message does not contain
-   the name of the missing DLL because the Windows API does not return this
-   information making this error hard to diagnose. To resolve this error and
-   determine which DLL is not found, you need to find the list of dependent
-   DLLs and determine which one is not found using Windows debugging and
-   tracing tools.
+   Trên Windows, việc tạo một thực thể :class:`CDLL` có thể thất bại ngay cả khi tên DLL tồn tại. Khi không tìm thấy một DLL phụ thuộc của DLL đã tải, một
+   :exc:`OSError` lỗi được phát sinh với thông báo *"[WinError 126] The specified module could not be found".* Thông báo lỗi này không chứa tên của DLL bị thiếu vì Windows API không trả về thông tin đó, khiến việc chẩn đoán lỗi trở nên khó khăn. Để khắc phục lỗi này và xác định DLL nào không được tìm thấy, bạn cần tìm danh sách các DLL phụ thuộc và xác định DLL nào không được tìm thấy bằng các công cụ gỡ lỗi và tracing của Windows.
 
    .. seealso::
 
-      `Microsoft DUMPBIN tool <https://learn.microsoft.com/en-us/cpp/build/reference/dumpbin-reference?view=msvc-170>`_
-      -- A tool to find DLL dependents.
+      `Microsoft DUMPBIN tool <https://learn.microsoft.com/en-us/cpp/build/reference/dumpbin-reference?view=msvc-170>`_ -- Công cụ tìm các DLL phụ thuộc.
 
    .. versionchanged:: 3.8
-      Added *winmode* parameter.
+      Đã thêm tham số *winmode*.
 
    .. versionchanged:: 3.12
 
-      The *name* parameter can now be a :term:`path-like object`.
+      Tham số *name* giờ đây có thể là một :term:`path-like object`.
 
-   Instances of this class have no public methods.  Functions exported by the
-   shared library can be accessed as attributes or by index.  Please note that
-   accessing the function through an attribute caches the result and therefore
-   accessing it repeatedly returns the same object each time.  On the other hand,
-   accessing it through an index returns a new object each time::
+   Các instance của lớp này không có phương thức public. Có thể truy cập các hàm được shared library export dưới dạng thuộc tính hoặc theo chỉ mục. Lưu ý rằng việc truy cập hàm thông qua thuộc tính sẽ lưu kết quả vào cache, do đó mỗi lần truy cập lặp lại đều trả về cùng một đối tượng. Ngược lại, việc truy cập thông qua chỉ mục sẽ trả về một đối tượng mới mỗi lần.::
 
       >>> from ctypes import CDLL
-      >>> libc = CDLL("libc.so.6")  # On Linux
+      >>> libc = CDLL("libc.so.6")  # Trên Linux
       >>> libc.time == libc.time
       True
       >>> libc['time'] == libc['time']
       False
 
-   The following public attributes are available. Their name starts with an
-   underscore to not clash with exported function names:
+   Có các thuộc tính public sau đây. Tên của chúng bắt đầu bằng dấu gạch dưới để không xung đột với tên các hàm được export:
 
    .. attribute:: _handle
 
-      The system handle used to access the library.
+      Handle hệ thống được dùng để truy cập thư viện.
 
    .. attribute:: _name
 
-      The name of the library passed in the constructor.
+      Tên của thư viện được truyền vào hàm khởi tạo.
 
 .. class:: OleDLL
 
-   See :py:class:`~ctypes.CDLL`, the superclass, for common information.
+   Xem :py:class:`~ctypes.CDLL`, lớp cha, để biết thông tin chung.
 
-   Functions in this library use the ``stdcall`` calling convention, and are
-   assumed to return the windows specific :class:`HRESULT` code.  :class:`HRESULT`
-   values contain information specifying whether the function call failed or
-   succeeded, together with additional error code.  If the return value signals a
-   failure, an :class:`OSError` is automatically raised.
+   Các hàm trong thư viện này sử dụng quy ước gọi ``stdcall`` và được giả định là trả về mã :class:`HRESULT` dành riêng cho Windows. Các giá trị :class:`HRESULT` chứa thông tin cho biết lệnh gọi hàm đã thất bại hay thành công, cùng với mã lỗi bổ sung. Nếu giá trị trả về báo hiệu lỗi, một :class:`OSError` sẽ được tự động phát sinh.
 
    .. availability:: Windows
 
    .. versionchanged:: 3.3
       :exc:`WindowsError` used to be raised,
-      which is now an alias of :exc:`OSError`.
+      hiện là bí danh của :exc:`OSError`.
 
 
 .. class:: WinDLL
 
-   See :py:class:`~ctypes.CDLL`, the superclass, for common information.
+   Xem :py:class:`~ctypes.CDLL`, lớp cha, để biết thông tin chung.
 
-   Functions in these libraries use the ``stdcall`` calling convention, and are
-   assumed to return :c:expr:`int` by default.
+   Các hàm trong những thư viện này sử dụng quy ước gọi ``stdcall`` và theo mặc định được giả định là trả về :c:expr:`int`.
 
    .. availability:: Windows
 
 .. class:: PyDLL
 
-   See :py:class:`~ctypes.CDLL`, the superclass, for common information.
+   Xem :py:class:`~ctypes.CDLL`, lớp cha, để biết thông tin chung.
 
-   When functions in this library are called, the
-   Python GIL is *not* released during the function call, and after the function
-   execution the Python error flag is checked. If the error flag is set, a Python
-   exception is raised.
+   Khi các hàm trong thư viện này được gọi, Python GIL *không* được giải phóng trong suốt lần gọi hàm, và sau khi hàm thực thi xong, cờ lỗi Python sẽ được kiểm tra. Nếu cờ lỗi được thiết lập, một ngoại lệ Python sẽ được phát sinh.
 
-   Thus, this is only useful to call Python C API functions directly.
+   Do đó, điều này chỉ hữu ích khi gọi trực tiếp các hàm Python C API.
 
 
 .. data:: RTLD_GLOBAL
 
-   Flag to use as *mode* parameter.  On platforms where this flag is not available,
-   it is defined as the integer zero.
+   Cờ được sử dụng làm tham số *mode*. Trên các nền tảng không có cờ này, cờ được định nghĩa là số nguyên bằng không.
 
 
 .. data:: RTLD_LOCAL
 
-   Flag to use as *mode* parameter.  On platforms where this is not available, it
-   is the same as *RTLD_GLOBAL*.
+   Cờ được sử dụng làm tham số *mode*. Trên các nền tảng không có cờ này, cờ này giống *RTLD_GLOBAL*.
 
 
 .. data:: DEFAULT_MODE
 
-   The default mode which is used to load shared libraries.  On OSX 10.3, this is
-   *RTLD_GLOBAL*, otherwise it is the same as *RTLD_LOCAL*.
+   Chế độ mặc định được sử dụng để tải các thư viện dùng chung. Trên OSX 10.3, đây là *RTLD_GLOBAL*, còn trong các trường hợp khác thì giống *RTLD_LOCAL*.
 
 
-Shared libraries can also be loaded by using one of the prefabricated objects,
-which are instances of the :class:`LibraryLoader` class, either by calling the
-:meth:`~LibraryLoader.LoadLibrary` method, or by retrieving the library as
-attribute of the loader instance.
+Các thư viện dùng chung cũng có thể được tải bằng cách sử dụng một trong các đối tượng được tạo sẵn, là các instance của :class:`LibraryLoader` lớp, bằng cách gọi
+phương thức :meth:`~LibraryLoader.LoadLibrary`, hoặc bằng cách truy xuất thư viện dưới dạng thuộc tính của thực thể loader.
 
 .. class:: LibraryLoader(dlltype)
 
-   Class which loads shared libraries.  *dlltype* should be one of the
-   :class:`CDLL`, :class:`PyDLL`, :class:`WinDLL`, or :class:`OleDLL` types.
+   Lớp dùng để tải các thư viện dùng chung. *dlltype* phải là một trong các
+   kiểu :class:`CDLL`, :class:`PyDLL`, :class:`WinDLL` hoặc :class:`OleDLL`.
 
-   :meth:`!__getattr__` has special behavior: It allows loading a shared library by
-   accessing it as attribute of a library loader instance.  The result is cached,
-   so repeated attribute accesses return the same library each time.
+   :meth:`!__getattr__` có hành vi đặc biệt: Cho phép tải một thư viện dùng chung bằng cách truy xuất thư viện đó dưới dạng thuộc tính của một thực thể library loader. Kết quả được lưu vào bộ nhớ đệm, vì vậy các lần truy xuất thuộc tính lặp lại sẽ trả về cùng một thư viện.
 
    .. method:: LoadLibrary(name)
 
-      Load a shared library into the process and return it.  This method always
-      returns a new instance of the library.
+      Tải một thư viện dùng chung vào process và trả về thư viện đó. Phương thức này luôn trả về một thực thể mới của thư viện.
 
 
-These prefabricated library loaders are available:
+Các library loader dựng sẵn sau đây khả dụng:
 
 .. data:: cdll
 
-   Creates :class:`CDLL` instances.
+   Tạo các thực thể :class:`CDLL`.
 
 
 .. data:: windll
 
-   Creates :class:`WinDLL` instances.
+   Tạo các instance :class:`WinDLL`.
 
    .. availability:: Windows
 
 
 .. data:: oledll
 
-   Creates :class:`OleDLL` instances.
+   Tạo các instance :class:`OleDLL`.
 
    .. availability:: Windows
 
 
 .. data:: pydll
 
-   Creates :class:`PyDLL` instances.
+   Tạo các instance :class:`PyDLL`.
 
 
-For accessing the C Python api directly, a ready-to-use Python shared library
-object is available:
+Để truy cập trực tiếp vào Python C API, có sẵn một đối tượng shared library Python sẵn sàng sử dụng:
 
 .. data:: pythonapi
 
-   An instance of :class:`PyDLL` that exposes Python C API functions as
-   attributes.  Note that all these functions are assumed to return C
-   :c:expr:`int`, which is of course not always the truth, so you have to assign
-   the correct :attr:`!restype` attribute to use these functions.
+   Một instance của :class:`PyDLL` cung cấp các hàm Python C API dưới dạng thuộc tính. Lưu ý rằng tất cả các hàm này được giả định là trả về C
+   :c:expr:`int`, điều này dĩ nhiên không phải lúc nào cũng đúng, vì vậy bạn phải gán thuộc tính :attr:`!restype` chính xác để sử dụng các hàm này.
 
       .. note::
 
-         If the Python interpreter is statically linked, this may be ``None``.
+         Nếu trình thông dịch Python được liên kết tĩnh, giá trị này có thể là ``None``.
 
 .. audit-event:: ctypes.dlopen name ctypes.LibraryLoader
 
-   Loading a library through any of these objects raises an
-   :ref:`auditing event <auditing>` ``ctypes.dlopen`` with string argument
-   ``name``, the name used to load the library.
+   Việc tải một thư viện thông qua bất kỳ đối tượng nào trong số này sẽ phát sinh một
+   :ref:`sự kiện auditing <auditing>` ``ctypes.dlopen`` với đối số chuỗi ``name``, là tên được dùng để tải thư viện.
 
 .. audit-event:: ctypes.dlsym library,name ctypes.LibraryLoader
 
-   Accessing a function on a loaded library raises an auditing event
-   ``ctypes.dlsym`` with arguments ``library`` (the library object) and ``name``
-   (the symbol's name as a string or integer).
+   Việc truy cập một hàm trong thư viện đã tải sẽ phát sinh một sự kiện auditing ``ctypes.dlsym`` với các đối số ``library`` (đối tượng thư viện) và ``name`` (tên của symbol dưới dạng chuỗi hoặc số nguyên).
 
 .. audit-event:: ctypes.dlsym/handle handle,name ctypes.LibraryLoader
 
-   In cases when only the library handle is available rather than the object,
-   accessing a function raises an auditing event ``ctypes.dlsym/handle`` with
-   arguments ``handle`` (the raw library handle) and ``name``.
+   Trong trường hợp chỉ có library handle thay vì đối tượng, việc truy cập một hàm sẽ phát sinh một sự kiện auditing ``ctypes.dlsym/handle`` với các đối số ``handle`` (library handle thô) và ``name``.
 
 .. _ctypes-foreign-functions:
 
-Foreign functions
+Các hàm ngoại lai
 ^^^^^^^^^^^^^^^^^
 
-As explained in the previous section, foreign functions can be accessed as
-attributes of loaded shared libraries.  The function objects created in this way
-by default accept any number of arguments, accept any ctypes data instances as
-arguments, and return the default result type specified by the library loader.
+Như đã giải thích trong phần trước, có thể truy cập các hàm ngoại lai dưới dạng thuộc tính của các thư viện dùng chung đã tải. Các đối tượng hàm được tạo theo cách này mặc định chấp nhận số lượng đối số bất kỳ, chấp nhận mọi thực thể dữ liệu ctypes làm đối số và trả về kiểu kết quả mặc định do trình tải thư viện chỉ định.
 
-They are instances of a private local class :class:`!_FuncPtr` (not exposed
-in :mod:`!ctypes`) which inherits from the private :class:`_CFuncPtr` class:
+Chúng là các thực thể của một lớp cục bộ riêng tư :class:`!_FuncPtr` (không được cung cấp trong :mod:`!ctypes`) kế thừa từ lớp riêng tư :class:`_CFuncPtr`:
 
 .. doctest::
 
@@ -1849,200 +1522,138 @@ in :mod:`!ctypes`) which inherits from the private :class:`_CFuncPtr` class:
 
 .. class:: _CFuncPtr
 
-   Base class for C callable foreign functions.
+   Lớp cơ sở cho các hàm foreign có thể gọi được bằng C.
 
-   Instances of foreign functions are also C compatible data types; they
-   represent C function pointers.
+   Các thể hiện của hàm foreign cũng là các kiểu dữ liệu tương thích với C; chúng đại diện cho các con trỏ hàm C.
 
-   This behavior can be customized by assigning to special attributes of the
-   foreign function object.
+   Có thể tùy chỉnh hành vi này bằng cách gán giá trị cho các thuộc tính đặc biệt của đối tượng hàm foreign.
 
    .. attribute:: restype
 
-      Assign a ctypes type to specify the result type of the foreign function.
-      Use ``None`` for :c:expr:`void`, a function not returning anything.
+      Gán một kiểu ctypes để chỉ định kiểu kết quả của hàm foreign. Sử dụng ``None`` cho :c:expr:`void`, một hàm không trả về gì.
 
-      It is possible to assign a callable Python object that is not a ctypes
-      type, in this case the function is assumed to return a C :c:expr:`int`, and
-      the callable will be called with this integer, allowing further
-      processing or error checking.  Using this is deprecated, for more flexible
-      post processing or error checking use a ctypes data type as
-      :attr:`!restype` and assign a callable to the :attr:`errcheck` attribute.
+      Có thể gán một đối tượng Python có thể gọi nhưng không phải là kiểu ctypes; trong trường hợp này, hàm được giả định là trả về một :c:expr:`int` C, và đối tượng có thể gọi sẽ được gọi với số nguyên này, cho phép xử lý thêm hoặc kiểm tra lỗi. Cách sử dụng này đã lỗi thời; để xử lý sau hoặc kiểm tra lỗi linh hoạt hơn, hãy sử dụng một kiểu dữ liệu ctypes làm
+      :attr:`!restype` và gán một đối tượng có thể gọi cho thuộc tính :attr:`errcheck`.
 
    .. attribute:: argtypes
 
-      Assign a tuple of ctypes types to specify the argument types that the
-      function accepts.  Functions using the ``stdcall`` calling convention can
-      only be called with the same number of arguments as the length of this
-      tuple; functions using the C calling convention accept additional,
-      unspecified arguments as well.
+      Gán một tuple gồm các kiểu ctypes để chỉ định những kiểu đối số mà hàm chấp nhận. Các hàm sử dụng quy ước gọi ``stdcall`` chỉ có thể được gọi với số lượng đối số bằng độ dài của tuple này; các hàm sử dụng quy ước gọi C cũng chấp nhận các đối số bổ sung chưa được chỉ định.
 
-      When a foreign function is called, each actual argument is passed to the
-      :meth:`~_CData.from_param` class method of the items in the :attr:`argtypes`
-      tuple, this method allows adapting the actual argument to an object that
-      the foreign function accepts.  For example, a :class:`c_char_p` item in
-      the :attr:`argtypes` tuple will convert a string passed as argument into
-      a bytes object using ctypes conversion rules.
+      Khi một foreign function được gọi, mỗi đối số thực tế được truyền đến
+      :meth:`~_CData.from_param` phương thức lớp của các item trong tuple :attr:`argtypes`, phương thức này cho phép chuyển đổi đối số thực tế thành một đối tượng mà foreign function chấp nhận. Ví dụ, một item :class:`c_char_p` trong tuple :attr:`argtypes` sẽ chuyển đổi chuỗi được truyền làm đối số thành một đối tượng bytes bằng các quy tắc chuyển đổi của ctypes.
 
-      New: It is now possible to put items in argtypes which are not ctypes
-      types, but each item must have a :meth:`~_CData.from_param` method which returns a
-      value usable as argument (integer, string, ctypes instance).  This allows
-      defining adapters that can adapt custom objects as function parameters.
+      Mới: Giờ đây có thể đặt các item không phải là kiểu ctypes vào argtypes, nhưng mỗi item phải có phương thức :meth:`~_CData.from_param` trả về một giá trị có thể dùng làm đối số (số nguyên, chuỗi, thực thể ctypes). Điều này cho phép định nghĩa các adapter có thể chuyển đổi các đối tượng tùy chỉnh thành tham số hàm.
 
    .. attribute:: errcheck
 
-      Assign a Python function or another callable to this attribute. The
-      callable will be called with three or more arguments:
+      Gán một hàm Python hoặc một callable khác cho thuộc tính này. Callable sẽ được gọi với ba hoặc nhiều đối số:
 
       .. function:: callable(result, func, arguments)
          :noindex:
          :module:
 
-         *result* is what the foreign function returns, as specified by the
-         :attr:`!restype` attribute.
+         *result* là giá trị mà foreign function trả về, như được chỉ định bởi
+         :attr:`!restype` thuộc tính.
 
-         *func* is the foreign function object itself, this allows reusing the
-         same callable object to check or post process the results of several
-         functions.
+         *func* là chính đối tượng foreign function; điều này cho phép sử dụng lại cùng một callable để kiểm tra hoặc hậu xử lý kết quả của nhiều hàm.
 
-         *arguments* is a tuple containing the parameters originally passed to
-         the function call, this allows specializing the behavior on the
-         arguments used.
+         *arguments* là một tuple chứa các tham số ban đầu được truyền vào lời gọi hàm; điều này cho phép chuyên biệt hóa hành vi dựa trên các đối số được sử dụng.
 
-      The object that this function returns will be returned from the
-      foreign function call, but it can also check the result value
-      and raise an exception if the foreign function call failed.
+      Đối tượng mà hàm này trả về sẽ được trả về từ lời gọi hàm ngoại, nhưng hàm này cũng có thể kiểm tra giá trị kết quả và phát sinh một exception nếu lời gọi hàm ngoại thất bại.
 
 
 .. audit-event:: ctypes.set_exception code foreign-functions
 
-   On Windows, when a foreign function call raises a system exception (for
-   example, due to an access violation), it will be captured and replaced with
-   a suitable Python exception. Further, an auditing event
-   ``ctypes.set_exception`` with argument ``code`` will be raised, allowing an
-   audit hook to replace the exception with its own.
+   Trên Windows, khi một lời gọi hàm ngoại phát sinh một system exception (ví dụ do lỗi vi phạm quyền truy cập), exception đó sẽ được bắt và thay thế bằng một Python exception phù hợp. Ngoài ra, một sự kiện audit ``ctypes.set_exception`` với đối số ``code`` sẽ được phát sinh, cho phép một audit hook thay thế exception đó bằng exception riêng của nó.
 
 .. audit-event:: ctypes.call_function func_pointer,arguments foreign-functions
 
-   Some ways to invoke foreign function calls as well as some of the
-   functions in this module may raise an auditing event
-   ``ctypes.call_function`` with arguments ``function pointer`` and ``arguments``.
+   Một số cách gọi hàm ngoại, cũng như một số hàm trong module này, có thể phát sinh một sự kiện audit ``ctypes.call_function`` với các đối số ``function pointer`` và ``arguments``.
 
 .. _ctypes-function-prototypes:
 
-Function prototypes
-^^^^^^^^^^^^^^^^^^^
+Các prototype của hàm
+^^^^^^^^^^^^^^^^^^^^^
 
-Foreign functions can also be created by instantiating function prototypes.
-Function prototypes are similar to function prototypes in C; they describe a
-function (return type, argument types, calling convention) without defining an
-implementation.  The factory functions must be called with the desired result
-type and the argument types of the function, and can be used as decorator
-factories, and as such, be applied to functions through the ``@wrapper`` syntax.
-See :ref:`ctypes-callback-functions` for examples.
+Hàm ngoại cũng có thể được tạo bằng cách khởi tạo các prototype của hàm. Các prototype của hàm tương tự như prototype của hàm trong C; chúng mô tả một hàm (kiểu trả về, kiểu đối số, calling convention) mà không định nghĩa phần triển khai. Các hàm factory phải được gọi với kiểu kết quả mong muốn và các kiểu đối số của hàm, đồng thời có thể được dùng làm factory của decorator và do đó được áp dụng cho các hàm thông qua cú pháp ``@wrapper``. Xem :ref:`ctypes-callback-functions` để biết các ví dụ.
 
 
 .. function:: CFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False)
 
-   The returned function prototype creates functions that use the standard C
-   calling convention.  The function will release the GIL during the call.  If
-   *use_errno* is set to true, the ctypes private copy of the system
-   :data:`errno` variable is exchanged with the real :data:`errno` value before
-   and after the call; *use_last_error* does the same for the Windows error
-   code.
+   Prototype của hàm được trả về sẽ tạo ra các hàm sử dụng calling convention C tiêu chuẩn. Hàm này sẽ giải phóng GIL trong khi gọi. Nếu *use_errno* được đặt thành true, bản sao riêng của ctypes về hệ thống
+   Biến :data:`errno` được thay thế bằng giá trị :data:`errno` thực trước và sau khi gọi; *use_last_error* thực hiện điều tương tự với mã lỗi Windows.
 
 
 .. function:: WINFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False)
 
-   The returned function prototype creates functions that use the
-   ``stdcall`` calling convention.  The function will
-   release the GIL during the call.  *use_errno* and *use_last_error* have the
-   same meaning as above.
+   Function prototype được trả về tạo ra các hàm sử dụng quy ước gọi hàm ``stdcall``. Hàm sẽ giải phóng GIL trong khi gọi. *use_errno* và *use_last_error* có cùng ý nghĩa như trên.
 
    .. availability:: Windows
 
 
 .. function:: PYFUNCTYPE(restype, *argtypes)
 
-   The returned function prototype creates functions that use the Python calling
-   convention.  The function will *not* release the GIL during the call.
+   Function prototype được trả về tạo ra các hàm sử dụng quy ước gọi hàm Python. Hàm sẽ *not* giải phóng GIL trong khi gọi.
 
-Function prototypes created by these factory functions can be instantiated in
-different ways, depending on the type and number of the parameters in the call:
+Các function prototype được tạo bởi những factory function này có thể được khởi tạo theo nhiều cách khác nhau, tùy thuộc vào kiểu và số lượng tham số trong lệnh gọi:
 
 .. function:: prototype(address)
    :noindex:
    :module:
 
-   Returns a foreign function at the specified address which must be an integer.
+   Trả về một hàm ngoại tại địa chỉ đã chỉ định, địa chỉ này phải là một số nguyên.
 
 
 .. function:: prototype(callable)
    :noindex:
    :module:
 
-   Create a C callable function (a callback function) from a Python *callable*.
+   Tạo một hàm có thể được C gọi (hàm callback) từ một *callable* Python.
 
 
 .. function:: prototype(func_spec[, paramflags])
    :noindex:
    :module:
 
-   Returns a foreign function exported by a shared library. *func_spec* must
-   be a 2-tuple ``(name_or_ordinal, library)``. The first item is the name of
-   the exported function as string, or the ordinal of the exported function
-   as small integer.  The second item is the shared library instance.
+   Trả về một hàm ngoại được export bởi một shared library. *func_spec* phải là một bộ 2 phần tử ``(name_or_ordinal, library)``. Phần tử đầu tiên là tên của hàm được export dưới dạng chuỗi hoặc ordinal của hàm được export dưới dạng số nguyên nhỏ. Phần tử thứ hai là instance của shared library.
 
 
 .. function:: prototype(vtbl_index, name[, paramflags[, iid]])
    :noindex:
    :module:
 
-   Returns a foreign function that will call a COM method. *vtbl_index* is
-   the index into the virtual function table, a small non-negative
-   integer. *name* is name of the COM method. *iid* is an optional pointer to
-   the interface identifier which is used in extended error reporting.
+   Trả về một foreign function sẽ gọi một phương thức COM. *vtbl_index* là chỉ mục trong bảng hàm ảo, một số nguyên không âm nhỏ. *name* là tên của phương thức COM. *iid* là một con trỏ tùy chọn đến mã định danh giao diện, được dùng trong việc báo cáo lỗi mở rộng.
 
-   If *iid* is not specified, an :exc:`OSError` is raised if the COM method
-   call fails. If *iid* is specified, a :exc:`~ctypes.COMError` is raised
-   instead.
+   Nếu không chỉ định *iid*, một :exc:`OSError` sẽ được phát sinh nếu lệnh gọi phương thức COM thất bại. Nếu chỉ định *iid*, một :exc:`~ctypes.COMError` sẽ được phát sinh thay thế.
 
-   COM methods use a special calling convention: They require a pointer to
-   the COM interface as first argument, in addition to those parameters that
-   are specified in the :attr:`!argtypes` tuple.
+   Các phương thức COM sử dụng một calling convention đặc biệt: Chúng yêu cầu một con trỏ đến giao diện COM làm đối số đầu tiên, ngoài các tham số được chỉ định trong tuple :attr:`!argtypes`.
 
    .. availability:: Windows
 
 
-The optional *paramflags* parameter creates foreign function wrappers with much
-more functionality than the features described above.
+Tham số *paramflags* tùy chọn tạo các wrapper foreign function có nhiều chức năng hơn đáng kể so với các tính năng được mô tả ở trên.
 
-*paramflags* must be a tuple of the same length as :attr:`~_CFuncPtr.argtypes`.
+*paramflags* phải là một tuple có cùng độ dài với :attr:`~_CFuncPtr.argtypes`.
 
-Each item in this tuple contains further information about a parameter, it must
-be a tuple containing one, two, or three items.
+Mỗi mục trong tuple này chứa thêm thông tin về một tham số; mục đó phải là một tuple chứa một, hai hoặc ba mục.
 
-The first item is an integer containing a combination of direction
-flags for the parameter:
+Mục đầu tiên là một số nguyên chứa tổ hợp các cờ hướng cho tham số:
 
    1
-      Specifies an input parameter to the function.
+      Chỉ định một tham số đầu vào cho hàm.
 
    2
-      Output parameter.  The foreign function fills in a value.
+      Tham số đầu ra. Hàm ngoại điền một giá trị vào đó.
 
    4
-      Input parameter which defaults to the integer zero.
+      Tham số đầu vào có giá trị mặc định là số nguyên không.
 
-The optional second item is the parameter name as string.  If this is specified,
-the foreign function can be called with named parameters.
+Mục thứ hai tùy chọn là tên tham số dưới dạng chuỗi. Nếu được chỉ định, hàm ngoại có thể được gọi bằng các tham số có tên.
 
-The optional third item is the default value for this parameter.
+Mục thứ ba tùy chọn là giá trị mặc định cho tham số này.
 
 
-The following example demonstrates how to wrap the Windows ``MessageBoxW`` function so
-that it supports default parameters and named arguments. The C declaration from
-the windows header file is this::
+Ví dụ sau minh họa cách bao bọc hàm Windows ``MessageBoxW`` để hàm hỗ trợ các tham số mặc định và đối số có tên. Khai báo C từ tệp header Windows là::
 
    WINUSERAPI int WINAPI
    MessageBoxW(
@@ -2051,7 +1662,7 @@ the windows header file is this::
        LPCWSTR lpCaption,
        UINT uType);
 
-Here is the wrapping with :mod:`!ctypes`::
+Sau đây là phần bao bọc với :mod:`!ctypes`::
 
    >>> from ctypes import c_int, WINFUNCTYPE, windll
    >>> from ctypes.wintypes import HWND, LPCWSTR, UINT
@@ -2059,22 +1670,20 @@ Here is the wrapping with :mod:`!ctypes`::
    >>> paramflags = (1, "hwnd", 0), (1, "text", "Hi"), (1, "caption", "Hello from ctypes"), (1, "flags", 0)
    >>> MessageBox = prototype(("MessageBoxW", windll.user32), paramflags)
 
-The ``MessageBox`` foreign function can now be called in these ways::
+Hàm foreign function ``MessageBox`` giờ đây có thể được gọi theo những cách sau::
 
    >>> MessageBox()
    >>> MessageBox(text="Spam, spam, spam")
    >>> MessageBox(flags=2, text="foo bar")
 
-A second example demonstrates output parameters.  The win32 ``GetWindowRect``
-function retrieves the dimensions of a specified window by copying them into
-``RECT`` structure that the caller has to supply.  Here is the C declaration::
+Ví dụ thứ hai minh họa các tham số đầu ra. Hàm win32 ``GetWindowRect`` lấy kích thước của một cửa sổ được chỉ định bằng cách sao chép chúng vào cấu trúc ``RECT`` mà bên gọi phải cung cấp. Dưới đây là khai báo C của hàm này::
 
    WINUSERAPI BOOL WINAPI
    GetWindowRect(
         HWND hWnd,
         LPRECT lpRect);
 
-Here is the wrapping with :mod:`!ctypes`::
+Sau đây là phần bao bọc với :mod:`!ctypes`::
 
    >>> from ctypes import POINTER, WINFUNCTYPE, windll, WinError
    >>> from ctypes.wintypes import BOOL, HWND, RECT
@@ -2083,15 +1692,9 @@ Here is the wrapping with :mod:`!ctypes`::
    >>> GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
    >>>
 
-Functions with output parameters will automatically return the output parameter
-value if there is a single one, or a tuple containing the output parameter
-values when there are more than one, so the GetWindowRect function now returns a
-RECT instance, when called.
+Các hàm có tham số đầu ra sẽ tự động trả về giá trị của tham số đầu ra nếu chỉ có một tham số, hoặc một tuple chứa các giá trị tham số đầu ra nếu có nhiều hơn một tham số, vì vậy hàm GetWindowRect giờ đây trả về một instance RECT khi được gọi.
 
-Output parameters can be combined with the :attr:`~_CFuncPtr.errcheck` protocol to do
-further output processing and error checking.  The win32 ``GetWindowRect`` api
-function returns a ``BOOL`` to signal success or failure, so this function could
-do the error checking, and raises an exception when the api call failed::
+Các tham số đầu ra có thể được kết hợp với protocol :attr:`~_CFuncPtr.errcheck` để thực hiện thêm việc xử lý đầu ra và kiểm tra lỗi. Hàm api win32 ``GetWindowRect`` trả về một ``BOOL`` để báo hiệu thành công hoặc thất bại, vì vậy hàm này có thể thực hiện việc kiểm tra lỗi và phát sinh một exception khi lệnh gọi api thất bại::
 
    >>> def errcheck(result, func, args):
    ...     if not result:
@@ -2101,11 +1704,7 @@ do the error checking, and raises an exception when the api call failed::
    >>> GetWindowRect.errcheck = errcheck
    >>>
 
-If the :attr:`~_CFuncPtr.errcheck` function returns the argument tuple it receives
-unchanged, :mod:`!ctypes` continues the normal processing it does on the output
-parameters.  If you want to return a tuple of window coordinates instead of a
-``RECT`` instance, you can retrieve the fields in the function and return them
-instead, the normal processing will no longer take place::
+Nếu hàm :attr:`~_CFuncPtr.errcheck` trả về tuple đối số mà nó nhận được mà không thay đổi, :mod:`!ctypes` sẽ tiếp tục quá trình xử lý thông thường đối với các tham số đầu ra. Nếu muốn trả về một tuple gồm các tọa độ cửa sổ thay vì một instance ``RECT``, bạn có thể lấy các trường trong hàm và trả về chúng; khi đó quá trình xử lý thông thường sẽ không còn diễn ra::
 
    >>> def errcheck(result, func, args):
    ...     if not result:
@@ -2119,49 +1718,40 @@ instead, the normal processing will no longer take place::
 
 .. _ctypes-utility-functions:
 
-Utility functions
-^^^^^^^^^^^^^^^^^
+Các hàm tiện ích
+^^^^^^^^^^^^^^^^
 
 .. function:: addressof(obj)
 
-   Returns the address of the memory buffer as integer.  *obj* must be an
-   instance of a ctypes type.
+   Trả về địa chỉ của bộ đệm bộ nhớ dưới dạng số nguyên. *obj* phải là một instance của kiểu ctypes.
 
    .. audit-event:: ctypes.addressof obj ctypes.addressof
 
 
 .. function:: alignment(obj_or_type)
 
-   Returns the alignment requirements of a ctypes type. *obj_or_type* must be a
-   ctypes type or instance.
+   Trả về các yêu cầu căn chỉnh của một kiểu ctypes. *obj_or_type* phải là một kiểu ctypes hoặc một instance.
 
 
 .. function:: byref(obj[, offset])
 
-   Returns a light-weight pointer to *obj*, which must be an instance of a
-   ctypes type.  *offset* defaults to zero, and must be an integer that will be
-   added to the internal pointer value.
+   Trả về một con trỏ nhẹ đến *obj*, đối tượng này phải là một instance của kiểu ctypes. *offset* mặc định là 0 và phải là một số nguyên được cộng vào giá trị con trỏ nội bộ.
 
-   ``byref(obj, offset)`` corresponds to this C code::
+   ``byref(obj, offset)`` tương ứng với mã C này::
 
       (((char *)&obj) + offset)
 
-   The returned object can only be used as a foreign function call parameter.
-   It behaves similar to ``pointer(obj)``, but the construction is a lot faster.
+   Đối tượng được trả về chỉ có thể được sử dụng làm tham số cho lời gọi hàm ngoại. Nó hoạt động tương tự ``pointer(obj)``, nhưng việc khởi tạo nhanh hơn nhiều.
 
 
 .. function:: CopyComPointer(src, dst)
 
-   Copies a COM pointer from *src* to *dst* and returns the Windows specific
-   :c:type:`!HRESULT` value.
+   Sao chép một con trỏ COM từ *src* sang *dst* và trả về giá trị dành riêng cho Windows
+   :c:type:`!HRESULT`.
 
-   If *src* is not ``NULL``, its ``AddRef`` method is called, incrementing the
-   reference count.
+   Nếu *src* không phải là ``NULL``, phương thức ``AddRef`` của nó sẽ được gọi, làm tăng số lượng tham chiếu.
 
-   In contrast, the reference count of *dst* will not be decremented before
-   assigning the new value. Unless *dst* is ``NULL``, the caller is responsible
-   for decrementing the reference count by calling its ``Release`` method when
-   necessary.
+   Ngược lại, số lượng tham chiếu của *dst* sẽ không bị giảm trước khi gán giá trị mới. Trừ khi *dst* là ``NULL``, caller chịu trách nhiệm giảm số lượng tham chiếu bằng cách gọi phương thức ``Release`` của nó khi cần.
 
    .. availability:: Windows
 
@@ -2170,36 +1760,27 @@ Utility functions
 
 .. function:: cast(obj, type)
 
-   This function is similar to the cast operator in C. It returns a new instance
-   of *type* which points to the same memory block as *obj*.  *type* must be a
-   pointer type, and *obj* must be an object that can be interpreted as a
-   pointer.
+   Hàm này tương tự như toán tử cast trong C. Hàm trả về một instance mới của *type*, trỏ đến cùng khối bộ nhớ với *obj*. *type* phải là một kiểu con trỏ, còn *obj* phải là một đối tượng có thể được diễn giải như một con trỏ.
 
 
 .. function:: create_string_buffer(init, size=None)
               create_string_buffer(size)
 
-   This function creates a mutable character buffer. The returned object is a
-   ctypes array of :class:`c_char`.
+   Hàm này tạo một buffer ký tự có thể thay đổi. Đối tượng được trả về là một mảng ctypes gồm :class:`c_char`.
 
-   If *size* is given (and not ``None``), it must be an :class:`int`.
-   It specifies the size of the returned array.
+   Nếu *size* được cung cấp (và không phải ``None``), nó phải là một :class:`int`. Giá trị này chỉ định kích thước của mảng được trả về.
 
-   If the *init* argument is given, it must be :class:`bytes`. It is used
-   to initialize the array items. Bytes not initialized this way are
-   set to zero (NUL).
+   Nếu đối số *init* được cung cấp, nó phải là :class:`bytes`. Đối số này được dùng để khởi tạo các phần tử của mảng. Các byte không được khởi tạo theo cách này sẽ được đặt thành 0 (NUL).
 
-   If *size* is not given (or if it is ``None``), the buffer is made one element
-   larger than *init*, effectively adding a NUL terminator.
+   Nếu không cung cấp *size* (hoặc nếu nó là ``None``), buffer sẽ được tạo lớn hơn *init* một phần tử, về cơ bản là thêm một bộ kết thúc NUL.
 
-   If both arguments are given, *size* must not be less than ``len(init)``.
+   Nếu cung cấp cả hai đối số, *size* không được nhỏ hơn ``len(init)``.
 
    .. warning::
 
-      If *size* is equal to ``len(init)``, a NUL terminator is
-      not added. Do not treat such a buffer as a C string.
+      Nếu *size* bằng ``len(init)``, bộ kết thúc NUL sẽ không được thêm vào. Không được coi buffer như vậy là một chuỗi C.
 
-   For example::
+   Ví dụ::
 
       >>> bytes(create_string_buffer(2))
       b'\x00\x00'
@@ -2220,29 +1801,23 @@ Utility functions
 .. function:: create_unicode_buffer(init, size=None)
               create_unicode_buffer(size)
 
-   This function creates a mutable unicode character buffer. The returned object is
-   a ctypes array of :class:`c_wchar`.
+   Hàm này tạo một buffer ký tự unicode có thể thay đổi. Đối tượng được trả về là một mảng ctypes của :class:`c_wchar`.
 
-   The function takes the same arguments as :func:`~create_string_buffer` except
-   *init* must be a string and *size* counts :class:`c_wchar`.
+   Hàm này nhận các đối số giống như :func:`~create_string_buffer`, ngoại trừ *init* phải là một chuỗi và *size* tính theo :class:`c_wchar`.
 
    .. audit-event:: ctypes.create_unicode_buffer init,size ctypes.create_unicode_buffer
 
 
 .. function:: DllCanUnloadNow()
 
-   This function is a hook which allows implementing in-process
-   COM servers with ctypes.  It is called from the DllCanUnloadNow function that
-   the _ctypes extension dll exports.
+   Hàm này là một hook cho phép triển khai các COM server trong tiến trình bằng ctypes. Hàm này được gọi từ hàm DllCanUnloadNow mà extension dll _ctypes xuất ra.
 
    .. availability:: Windows
 
 
 .. function:: DllGetClassObject()
 
-   This function is a hook which allows implementing in-process
-   COM servers with ctypes.  It is called from the DllGetClassObject function
-   that the ``_ctypes`` extension dll exports.
+   Hàm này là một hook cho phép triển khai các COM server trong tiến trình bằng ctypes. Hàm này được gọi từ hàm DllGetClassObject mà extension dll ``_ctypes`` xuất ra.
 
    .. availability:: Windows
 
@@ -2250,26 +1825,19 @@ Utility functions
 .. function:: find_library(name)
    :module: ctypes.util
 
-   Try to find a library and return a pathname.  *name* is the library name
-   without any prefix like ``lib``, suffix like ``.so``, ``.dylib`` or version
-   number (this is the form used for the posix linker option :option:`!-l`).  If
-   no library can be found, returns ``None``.
+   Cố gắng tìm một thư viện và trả về một pathname. *name* là tên thư viện không có tiền tố như ``lib``, hậu tố như ``.so``, ``.dylib`` hoặc số phiên bản (đây là dạng được dùng cho tùy chọn linker posix :option:`!-l`). Nếu không tìm thấy thư viện, trả về ``None``.
 
-   The exact functionality is system dependent.
+   Chức năng chính xác phụ thuộc vào hệ thống.
 
-   See :ref:`ctypes-finding-shared-libraries` for complete documentation.
+   Xem :ref:`ctypes-finding-shared-libraries` để biết tài liệu đầy đủ.
 
 
 .. function:: find_msvcrt()
    :module: ctypes.util
 
-   Returns the filename of the VC runtime library used by Python,
-   and by the extension modules.  If the name of the library cannot be
-   determined, ``None`` is returned.
+   Trả về tên tệp của thư viện runtime VC được Python và các extension module sử dụng. Nếu không thể xác định tên thư viện, ``None`` sẽ được trả về.
 
-   If you need to free memory, for example, allocated by an extension module
-   with a call to the ``free(void *)``, it is important that you use the
-   function in the same library that allocated the memory.
+   Nếu cần giải phóng bộ nhớ, chẳng hạn bộ nhớ được cấp phát bởi một extension module bằng lệnh gọi tới ``free(void *)``, điều quan trọng là bạn phải sử dụng hàm trong chính thư viện đã cấp phát bộ nhớ đó.
 
    .. availability:: Windows
 
@@ -2277,21 +1845,16 @@ Utility functions
 .. function:: dllist()
    :module: ctypes.util
 
-   Try to provide a list of paths of the shared libraries loaded into the current
-   process.  These paths are not normalized or processed in any way.  The function
-   can raise :exc:`OSError` if the underlying platform APIs fail.
-   The exact functionality is system dependent.
+   Cố gắng cung cấp danh sách các đường dẫn của những shared library được tải vào process hiện tại. Các đường dẫn này không được chuẩn hóa hoặc xử lý theo bất kỳ cách nào. Hàm có thể phát sinh :exc:`OSError` nếu các API của nền tảng bên dưới bị lỗi. Chức năng chính xác phụ thuộc vào hệ thống.
 
-   On most platforms, the first element of the list represents the current
-   executable file. It may be an empty string.
+   Trên hầu hết các nền tảng, phần tử đầu tiên của danh sách biểu thị tệp thực thi hiện tại. Phần tử này có thể là một chuỗi rỗng.
 
    .. availability:: Windows, macOS, iOS, glibc, BSD libc, musl
    .. versionadded:: 3.14
 
 .. function:: FormatError([code])
 
-   Returns a textual description of the error code *code*.  If no error code is
-   specified, the last error code is used by calling the Windows API function
+   Trả về mô tả dạng văn bản của mã lỗi *code*. Nếu không chỉ định mã lỗi, mã lỗi cuối cùng sẽ được sử dụng bằng cách gọi hàm API Windows
    :func:`GetLastError`.
 
    .. availability:: Windows
@@ -2299,24 +1862,22 @@ Utility functions
 
 .. function:: GetLastError()
 
-   Returns the last error code set by Windows in the calling thread.
-   This function calls the Windows ``GetLastError()`` function directly,
-   it does not return the ctypes-private copy of the error code.
+   Trả về mã lỗi cuối cùng được Windows thiết lập trong thread đang gọi. Hàm này gọi trực tiếp hàm Windows ``GetLastError()``, không trả về bản sao riêng của ctypes về mã lỗi.
 
    .. availability:: Windows
 
 
 .. function:: get_errno()
 
-   Returns the current value of the ctypes-private copy of the system
-   :data:`errno` variable in the calling thread.
+   Trả về giá trị hiện tại của bản sao riêng của ctypes về hệ thống
+   biến :data:`errno` trong thread đang gọi.
 
    .. audit-event:: ctypes.get_errno "" ctypes.get_errno
 
 .. function:: get_last_error()
 
-   Returns the current value of the ctypes-private copy of the system
-   :data:`!LastError` variable in the calling thread.
+   Trả về giá trị hiện tại của bản sao riêng của ctypes về hệ thống
+   biến :data:`!LastError` trong luồng gọi.
 
    .. availability:: Windows
 
@@ -2325,65 +1886,46 @@ Utility functions
 
 .. function:: memmove(dst, src, count)
 
-   Same as the standard C memmove library function: copies *count* bytes from
-   *src* to *dst*. *dst* and *src* must be integers or ctypes instances that can
-   be converted to pointers.
+   Tương tự hàm thư viện C chuẩn memmove: sao chép *count* byte từ *src* đến *dst*. *dst* và *src* phải là số nguyên hoặc các thực thể ctypes có thể được chuyển đổi thành con trỏ.
 
 
 .. function:: memset(dst, c, count)
 
-   Same as the standard C memset library function: fills the memory block at
-   address *dst* with *count* bytes of value *c*. *dst* must be an integer
-   specifying an address, or a ctypes instance.
+   Tương tự hàm thư viện C chuẩn memset: điền khối bộ nhớ tại địa chỉ *dst* bằng *count* byte có giá trị *c*. *dst* phải là một số nguyên chỉ định một địa chỉ hoặc một thực thể ctypes.
 
 
 .. function:: POINTER(type, /)
 
-   Create or return a ctypes pointer type. Pointer types are cached and
-   reused internally, so calling this function repeatedly is cheap.
-   *type* must be a ctypes type.
+   Tạo hoặc trả về một kiểu con trỏ ctypes. Các kiểu con trỏ được lưu vào bộ nhớ đệm và tái sử dụng nội bộ, vì vậy việc gọi hàm này nhiều lần không tốn nhiều chi phí. *type* phải là một kiểu ctypes.
 
    .. impl-detail::
 
-      The resulting pointer type is cached in the ``__pointer_type__``
-      attribute of *type*.
-      It is possible to set this attribute before the first call to
-      ``POINTER`` in order to set a custom pointer type.
-      However, doing this is discouraged: manually creating a suitable
-      pointer type is difficult without relying on implementation
-      details that may change in future Python versions.
+      Kiểu con trỏ kết quả được lưu vào bộ nhớ đệm trong thuộc tính ``__pointer_type__`` của *type*. Có thể thiết lập thuộc tính này trước lần gọi đầu tiên đến ``POINTER`` để đặt một kiểu con trỏ tùy chỉnh. Tuy nhiên, không nên làm vậy: việc tự tạo một kiểu con trỏ phù hợp rất khó nếu không dựa vào các chi tiết triển khai có thể thay đổi trong những phiên bản Python sau này.
 
 
 .. function:: pointer(obj, /)
 
-   Create a new pointer instance, pointing to *obj*.
-   The returned object is of the type ``POINTER(type(obj))``.
+   Tạo một thực thể con trỏ mới, trỏ đến *obj*. Đối tượng được trả về thuộc kiểu ``POINTER(type(obj))``.
 
-   Note: If you just want to pass a pointer to an object to a foreign function
-   call, you should use ``byref(obj)`` which is much faster.
+   Lưu ý: Nếu bạn chỉ muốn truyền một con trỏ đến một đối tượng trong lời gọi hàm foreign, bạn nên sử dụng ``byref(obj)``, cách này nhanh hơn nhiều.
 
 
 .. function:: resize(obj, size)
 
-   This function resizes the internal memory buffer of *obj*, which must be an
-   instance of a ctypes type.  It is not possible to make the buffer smaller
-   than the native size of the objects type, as given by ``sizeof(type(obj))``,
-   but it is possible to enlarge the buffer.
+   Hàm này thay đổi kích thước bộ đệm bộ nhớ nội bộ của *obj*, vốn phải là một instance của kiểu ctypes. Không thể làm bộ đệm nhỏ hơn kích thước gốc của kiểu đối tượng, như được xác định bởi ``sizeof(type(obj))``, nhưng có thể mở rộng bộ đệm.
 
 
 .. function:: set_errno(value)
 
-   Set the current value of the ctypes-private copy of the system :data:`errno`
-   variable in the calling thread to *value* and return the previous value.
+   Đặt giá trị hiện tại của bản sao riêng của ctypes đối với biến hệ thống :data:`errno` trong thread đang gọi thành *value* và trả về giá trị trước đó.
 
    .. audit-event:: ctypes.set_errno errno ctypes.set_errno
 
 
 .. function:: set_last_error(value)
 
-   Sets the current value of the ctypes-private copy of the system
-   :data:`!LastError` variable in the calling thread to *value* and return the
-   previous value.
+   Đặt giá trị hiện tại của bản sao riêng của ctypes đối với biến hệ thống
+   :data:`!LastError` trong thread đang gọi thành *value* và trả về giá trị trước đó.
 
    .. availability:: Windows
 
@@ -2392,59 +1934,41 @@ Utility functions
 
 .. function:: sizeof(obj_or_type)
 
-   Returns the size in bytes of a ctypes type or instance memory buffer.
-   Does the same as the C ``sizeof`` operator.
+   Trả về kích thước tính bằng byte của bộ đệm bộ nhớ của một kiểu hoặc instance ctypes. Thực hiện tương tự toán tử C ``sizeof``.
 
 
 .. function:: string_at(ptr, size=-1)
 
-   Return the byte string at *void \*ptr*.
-   If *size* is specified, it is used as size, otherwise the string is assumed
-   to be zero-terminated.
+   Trả về chuỗi byte tại *void \*ptr*. Nếu *size* được chỉ định, giá trị đó được dùng làm kích thước; nếu không, chuỗi được coi là kết thúc bằng số 0.
 
    .. audit-event:: ctypes.string_at ptr,size ctypes.string_at
 
 
 .. function:: WinError(code=None, descr=None)
 
-   Creates an instance of :exc:`OSError`.  If *code* is not specified,
-   :func:`GetLastError` is called to determine the error code. If *descr* is not
-   specified, :func:`FormatError` is called to get a textual description of the
-   error.
+   Tạo một instance của :exc:`OSError`. Nếu *code* không được chỉ định,
+   :func:`GetLastError` được gọi để xác định mã lỗi. Nếu *descr* không được chỉ định, :func:`FormatError` được gọi để lấy phần mô tả lỗi dạng văn bản.
 
    .. availability:: Windows
 
    .. versionchanged:: 3.3
-      An instance of :exc:`WindowsError` used to be created, which is now an
-      alias of :exc:`OSError`.
+      Trước đây, một thực thể của :exc:`WindowsError` được tạo, hiện là bí danh của :exc:`OSError`.
 
 
 .. function:: wstring_at(ptr, size=-1)
 
-   Return the wide-character string at *void \*ptr*.
-   If *size* is specified, it is used as the number of
-   characters of the string, otherwise the string is assumed to be
-   zero-terminated.
+   Trả về chuỗi ký tự rộng tại *void \*ptr*. Nếu *size* được chỉ định, giá trị này được dùng làm số ký tự của chuỗi; nếu không, chuỗi được giả định là kết thúc bằng ký tự null.
 
    .. audit-event:: ctypes.wstring_at ptr,size ctypes.wstring_at
 
 
 .. function:: memoryview_at(ptr, size, readonly=False)
 
-   Return a :class:`memoryview` object of length *size* that references memory
-   starting at *void \*ptr*.
+   Trả về một đối tượng :class:`memoryview` có độ dài *size*, tham chiếu đến vùng nhớ bắt đầu tại *void \*ptr*.
 
-   If *readonly* is true, the returned :class:`!memoryview` object can
-   not be used to modify the underlying memory.
-   (Changes made by other means will still be reflected in the returned
-   object.)
+   Nếu *readonly* là true, không thể dùng đối tượng :class:`!memoryview` được trả về để sửa đổi vùng nhớ bên dưới. (Các thay đổi được thực hiện bằng cách khác vẫn sẽ được phản ánh trong đối tượng được trả về.)
 
-   This function is similar to :func:`string_at` with the key
-   difference of not making a copy of the specified memory.
-   It is a semantically equivalent (but more efficient) alternative to
-   ``memoryview((c_byte * size).from_address(ptr))``.
-   (While :meth:`~_CData.from_address` only takes integers, *ptr* can also
-   be given as a :class:`ctypes.POINTER` or a :func:`~ctypes.byref` object.)
+   Hàm này tương tự :func:`string_at`, với điểm khác biệt chính là không tạo bản sao của vùng nhớ được chỉ định. Đây là một phương án tương đương về ngữ nghĩa (nhưng hiệu quả hơn) so với ``memoryview((c_byte * size).from_address(ptr))``. (Trong khi :meth:`~_CData.from_address` chỉ nhận các số nguyên, *ptr* cũng có thể được cung cấp dưới dạng :class:`ctypes.POINTER` hoặc đối tượng :func:`~ctypes.byref`.)
 
    .. audit-event:: ctypes.memoryview_at address,size,readonly
 
@@ -2453,480 +1977,370 @@ Utility functions
 
 .. _ctypes-data-types:
 
-Data types
-^^^^^^^^^^
+Các kiểu dữ liệu
+^^^^^^^^^^^^^^^^
 
 
 .. class:: _CData
 
-   This non-public class is the common base class of all ctypes data types.
-   Among other things, all ctypes type instances contain a memory block that
-   hold C compatible data; the address of the memory block is returned by the
+   Lớp không công khai này là lớp cơ sở chung của tất cả các kiểu dữ liệu ctypes. Ngoài những điều khác, mọi thực thể kiểu ctypes đều chứa một khối bộ nhớ lưu trữ dữ liệu tương thích với C; địa chỉ của khối bộ nhớ được hàm trả về
    :func:`addressof` helper function. Another instance variable is exposed as
-   :attr:`_objects`; this contains other Python objects that need to be kept
-   alive in case the memory block contains pointers.
+   :attr:`_objects`; biến này chứa các đối tượng Python khác cần được giữ tồn tại trong trường hợp khối bộ nhớ chứa các con trỏ.
 
-   Common methods of ctypes data types, these are all class methods (to be
-   exact, they are methods of the :term:`metaclass`):
+   Các phương thức phổ biến của kiểu dữ liệu ctypes đều là các phương thức lớp (chính xác hơn, chúng là các phương thức của :term:`metaclass`):
 
    .. method:: _CData.from_buffer(source[, offset])
 
-      This method returns a ctypes instance that shares the buffer of the
-      *source* object.  The *source* object must support the writeable buffer
-      interface.  The optional *offset* parameter specifies an offset into the
-      source buffer in bytes; the default is zero.  If the source buffer is not
-      large enough a :exc:`ValueError` is raised.
+      Phương thức này trả về một thực thể ctypes dùng chung bộ đệm của đối tượng *source*. Đối tượng *source* phải hỗ trợ giao diện bộ đệm có thể ghi. Tham số *offset* tùy chọn chỉ định độ lệch tính bằng byte trong bộ đệm nguồn; giá trị mặc định là 0. Nếu bộ đệm nguồn không đủ lớn, một :exc:`ValueError` sẽ được phát sinh.
 
       .. audit-event:: ctypes.cdata/buffer pointer,size,offset ctypes._CData.from_buffer
 
    .. method:: _CData.from_buffer_copy(source[, offset])
 
-      This method creates a ctypes instance, copying the buffer from the
-      *source* object buffer which must be readable.  The optional *offset*
-      parameter specifies an offset into the source buffer in bytes; the default
-      is zero.  If the source buffer is not large enough a :exc:`ValueError` is
-      raised.
+      Phương thức này tạo một thực thể ctypes bằng cách sao chép bộ đệm từ bộ đệm của đối tượng *source*, đối tượng này phải có thể đọc được. Tham số *offset* tùy chọn chỉ định độ lệch tính bằng byte trong bộ đệm nguồn; giá trị mặc định là 0. Nếu bộ đệm nguồn không đủ lớn, một :exc:`ValueError` sẽ được phát sinh.
 
       .. audit-event:: ctypes.cdata/buffer pointer,size,offset ctypes._CData.from_buffer_copy
 
    .. method:: from_address(address)
 
-      This method returns a ctypes type instance using the memory specified by
-      *address* which must be an integer.
+      Phương thức này trả về một thực thể kiểu ctypes sử dụng vùng bộ nhớ được chỉ định bởi *address*, giá trị này phải là một số nguyên.
 
       .. audit-event:: ctypes.cdata address ctypes._CData.from_address
 
-         This method, and others that indirectly call this method, raises an
-         :ref:`auditing event <auditing>` ``ctypes.cdata`` with argument
-         ``address``.
+         Phương thức này và các phương thức khác gián tiếp gọi phương thức này sẽ phát sinh một
+         :ref:`auditing event <auditing>` ``ctypes.cdata`` với đối số ``address``.
 
    .. method:: from_param(obj)
 
-      This method adapts *obj* to a ctypes type.  It is called with the actual
-      object used in a foreign function call when the type is present in the
-      foreign function's :attr:`~_CFuncPtr.argtypes` tuple;
-      it must return an object that can be used as a function call parameter.
+      Phương thức này chuyển đổi *obj* thành một kiểu ctypes. Phương thức được gọi với đối tượng thực tế được sử dụng trong một lời gọi hàm ngoại khi kiểu này có trong tuple :attr:`~_CFuncPtr.argtypes` của hàm ngoại; phương thức phải trả về một đối tượng có thể được sử dụng làm tham số lời gọi hàm.
 
-      All ctypes data types have a default implementation of this classmethod
-      that normally returns *obj* if that is an instance of the type.  Some
-      types accept other objects as well.
+      Tất cả các kiểu dữ liệu ctypes đều có một triển khai classmethod mặc định của lớp này, thường trả về *obj* nếu đó là một instance của kiểu. Một số kiểu cũng chấp nhận các đối tượng khác.
 
    .. method:: in_dll(library, name)
 
-      This method returns a ctypes type instance exported by a shared
-      library. *name* is the name of the symbol that exports the data, *library*
-      is the loaded shared library.
+      Phương thức này trả về một instance kiểu ctypes được xuất bởi một shared library. *name* là tên của symbol xuất dữ liệu, còn *library* là shared library đã được tải.
 
-   Common class variables of ctypes data types:
+   Các biến lớp phổ biến của các kiểu dữ liệu ctypes:
 
    .. attribute:: __pointer_type__
 
-      The pointer type that was created by calling
-      :func:`POINTER` for corresponding ctypes data type. If a pointer type
-      was not yet created, the attribute is missing.
+      Kiểu con trỏ được tạo bằng cách gọi
+      :func:`POINTER` cho kiểu dữ liệu ctypes tương ứng. Nếu một kiểu con trỏ chưa được tạo, thuộc tính này sẽ bị thiếu.
 
       .. versionadded:: 3.14
 
-   Common instance variables of ctypes data types:
+   Các biến instance phổ biến của kiểu dữ liệu ctypes:
 
    .. attribute:: _b_base_
 
-      Sometimes ctypes data instances do not own the memory block they contain,
-      instead they share part of the memory block of a base object.  The
-      :attr:`_b_base_` read-only member is the root ctypes object that owns the
-      memory block.
+      Đôi khi các thực thể dữ liệu ctypes không sở hữu khối bộ nhớ mà chúng chứa; thay vào đó, chúng chia sẻ một phần khối bộ nhớ của đối tượng cơ sở. Thành viên
+      :attr:`_b_base_` chỉ đọc là đối tượng ctypes gốc sở hữu khối bộ nhớ.
 
    .. attribute:: _b_needsfree_
 
-      This read-only variable is true when the ctypes data instance has
-      allocated the memory block itself, false otherwise.
+      Biến chỉ đọc này có giá trị true khi instance dữ liệu ctypes tự cấp phát khối bộ nhớ, và có giá trị false trong các trường hợp khác.
 
    .. attribute:: _objects
 
-      This member is either ``None`` or a dictionary containing Python objects
-      that need to be kept alive so that the memory block contents is kept
-      valid.  This object is only exposed for debugging; never modify the
-      contents of this dictionary.
+      Thành viên này có thể là ``None`` hoặc một dictionary chứa các đối tượng Python cần được giữ cho đến khi còn tồn tại, ताकि nội dung khối bộ nhớ vẫn hợp lệ. Đối tượng này chỉ được cung cấp để debug; không bao giờ được sửa đổi nội dung của dictionary này.
 
 
 .. _ctypes-fundamental-data-types-2:
 
-Fundamental data types
-^^^^^^^^^^^^^^^^^^^^^^
+Các kiểu dữ liệu cơ bản
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: _SimpleCData
 
-   This non-public class is the base class of all fundamental ctypes data
-   types. It is mentioned here because it contains the common attributes of the
-   fundamental ctypes data types.  :class:`_SimpleCData` is a subclass of
-   :class:`_CData`, so it inherits their methods and attributes. ctypes data
-   types that are not and do not contain pointers can now be pickled.
+   Lớp không công khai này là lớp cơ sở của tất cả các kiểu dữ liệu ctypes cơ bản. Lớp này được đề cập ở đây vì chứa các thuộc tính chung của những kiểu dữ liệu ctypes cơ bản. :class:`_SimpleCData` là một lớp con của
+   :class:`_CData`, vì vậy nó kế thừa các phương thức và thuộc tính của chúng. Các kiểu dữ liệu ctypes không phải là con trỏ và không chứa con trỏ giờ đây có thể được pickle.
 
-   Instances have a single attribute:
+   Các instance có một thuộc tính duy nhất:
 
    .. attribute:: value
 
-      This attribute contains the actual value of the instance. For integer and
-      pointer types, it is an integer, for character types, it is a single
-      character bytes object or string, for character pointer types it is a
-      Python bytes object or string.
+      Thuộc tính này chứa giá trị thực của instance. Đối với các kiểu số nguyên và con trỏ, đó là một số nguyên; đối với các kiểu ký tự, đó là một đối tượng bytes chứa một ký tự hoặc một chuỗi; đối với các kiểu con trỏ ký tự, đó là một đối tượng bytes hoặc một chuỗi Python.
 
-      When the ``value`` attribute is retrieved from a ctypes instance, usually
-      a new object is returned each time.  :mod:`!ctypes` does *not* implement
-      original object return, always a new object is constructed.  The same is
-      true for all other ctypes object instances.
+      Khi thuộc tính ``value`` được lấy từ một instance ctypes, thường thì mỗi lần sẽ trả về một object mới. :mod:`!ctypes` không *not* triển khai việc trả về object ban đầu; luôn có một object mới được tạo. Điều tương tự cũng đúng với tất cả các instance object ctypes khác.
 
-   Each subclass has a class attribute:
+   Mỗi lớp con có một thuộc tính lớp:
 
    .. attribute:: _type_
 
-      Class attribute that contains an internal type code, as a
-      single-character string.
-      See :ref:`ctypes-fundamental-data-types` for a summary.
+      Thuộc tính lớp chứa một mã kiểu nội bộ dưới dạng chuỗi một ký tự. Xem :ref:`ctypes-fundamental-data-types` để biết phần tóm tắt.
 
-      Types marked \* in the summary may be (or always are) aliases of a
-      different :class:`_SimpleCData` subclass, and will not necessarily
-      use the listed type code.
-      For example, if the platform's :c:expr:`long`, :c:expr:`long long`
-      and :c:expr:`time_t` C types are the same, then :class:`c_long`,
-      :class:`c_longlong` and :class:`c_time_t` all refer to a single class,
-      :class:`c_long`, whose :attr:`_type_` code is ``'l'``.
-      The ``'L'`` code will be unused.
+      Các kiểu được đánh dấu \* trong phần tóm tắt có thể là (hoặc luôn là) bí danh của một lớp con :class:`_SimpleCData` khác và không nhất thiết sử dụng mã kiểu được liệt kê. Ví dụ: nếu các kiểu C :c:expr:`long`, :c:expr:`long long` và :c:expr:`time_t` của nền tảng là như nhau, thì :class:`c_long`,
+      :class:`c_longlong` và :class:`c_time_t` đều tham chiếu đến cùng một lớp duy nhất,
+      :class:`c_long`, có mã :attr:`_type_` là ``'l'``. Mã ``'L'`` sẽ không được sử dụng.
 
       .. seealso::
 
-         The :mod:`array` and :ref:`struct <format-characters>` modules,
-         as well as third-party modules like `numpy <https://numpy.org/doc/stable/reference/arrays.interface.html#object.__array_interface__>`__,
-         use similar -- but slightly different -- type codes.
+         Các mô-đun :mod:`array` và :ref:`struct <format-characters>`, cũng như các mô-đun bên thứ ba như `numpy <https://numpy.org/doc/stable/reference/arrays.interface.html#object.__array_interface__>`__, sử dụng các mã kiểu tương tự -- nhưng hơi khác nhau --.
 
 
-Fundamental data types, when returned as foreign function call results, or, for
-example, by retrieving structure field members or array items, are transparently
-converted to native Python types.  In other words, if a foreign function has a
-:attr:`~_CFuncPtr.restype` of :class:`c_char_p`, you will always receive a Python bytes
-object, *not* a :class:`c_char_p` instance.
+Các kiểu dữ liệu cơ bản, khi được trả về dưới dạng kết quả của lệnh gọi hàm ngoại hoặc, chẳng hạn, khi truy xuất các thành viên trường của cấu trúc hay các phần tử mảng, sẽ được chuyển đổi trong suốt thành các kiểu Python gốc. Nói cách khác, nếu một hàm ngoại có
+:attr:`~_CFuncPtr.restype` kiểu :class:`c_char_p`, bạn sẽ luôn nhận được một đối tượng bytes của Python, *không* một thực thể :class:`c_char_p`.
 
 .. XXX above is false, it actually returns a Unicode string
 
-Subclasses of fundamental data types do *not* inherit this behavior. So, if a
-foreign functions :attr:`!restype` is a subclass of :class:`c_void_p`, you will
-receive an instance of this subclass from the function call. Of course, you can
-get the value of the pointer by accessing the ``value`` attribute.
+Các lớp con của kiểu dữ liệu cơ bản *không* kế thừa hành vi này. Vì vậy, nếu :attr:`!restype` của một hàm ngoại là một lớp con của :class:`c_void_p`, bạn sẽ nhận được một thực thể của lớp con này từ lệnh gọi hàm. Tất nhiên, bạn có thể lấy giá trị của con trỏ bằng cách truy cập thuộc tính ``value``.
 
-These are the fundamental ctypes data types:
+Đây là các kiểu dữ liệu ctypes cơ bản:
 
 .. class:: c_byte
 
-   Represents the C :c:expr:`signed char` datatype, and interprets the value as
-   small integer.  The constructor accepts an optional integer initializer; no
-   overflow checking is done.
+   Đại diện cho kiểu dữ liệu C :c:expr:`signed char` và diễn giải giá trị dưới dạng số nguyên nhỏ. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn số.
 
 
 .. class:: c_char
 
-   Represents the C :c:expr:`char` datatype, and interprets the value as a single
-   character.  The constructor accepts an optional string initializer, the
-   length of the string must be exactly one character.
+   Đại diện cho kiểu dữ liệu C :c:expr:`char` và diễn giải giá trị dưới dạng một ký tự đơn. Hàm khởi tạo chấp nhận một giá trị khởi tạo chuỗi tùy chọn; độ dài của chuỗi phải chính xác là một ký tự.
 
 
 .. class:: c_char_p
 
-   Represents the C :c:expr:`char *` datatype when it points to a zero-terminated
-   string.  For a general character pointer that may also point to binary data,
-   ``POINTER(c_char)`` must be used.  The constructor accepts an integer
-   address, or a bytes object.
+   Đại diện cho kiểu dữ liệu C :c:expr:`char *` khi nó trỏ đến một chuỗi kết thúc bằng ký tự null. Đối với một con trỏ ký tự tổng quát cũng có thể trỏ đến dữ liệu nhị phân, phải sử dụng ``POINTER(c_char)``. Hàm khởi tạo chấp nhận một địa chỉ số nguyên hoặc một đối tượng bytes.
 
 
 .. class:: c_double
 
-   Represents the C :c:expr:`double` datatype.  The constructor accepts an
-   optional float initializer.
+   Đại diện cho kiểu dữ liệu C :c:expr:`double`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số thực tùy chọn.
 
 
 .. class:: c_longdouble
 
-   Represents the C :c:expr:`long double` datatype.  The constructor accepts an
-   optional float initializer.  On platforms where ``sizeof(long double) ==
-   sizeof(double)`` it is an alias to :class:`c_double`.
+   Đại diện cho kiểu dữ liệu C :c:expr:`long double`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số thực tùy chọn. Trên các nền tảng mà ``sizeof(long double) == sizeof(double)``, nó là bí danh của :class:`c_double`.
 
 .. class:: c_float
 
-   Represents the C :c:expr:`float` datatype.  The constructor accepts an
-   optional float initializer.
+   Đại diện cho kiểu dữ liệu C :c:expr:`float`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số thực tùy chọn.
 
 
 .. class:: c_double_complex
 
-   Represents the C :c:expr:`double complex` datatype, if available.  The
-   constructor accepts an optional :class:`complex` initializer.
+   Biểu diễn kiểu dữ liệu C :c:expr:`double complex`, nếu có. Hàm khởi tạo chấp nhận một bộ khởi tạo :class:`complex` tùy chọn.
 
    .. versionadded:: 3.14
 
 
 .. class:: c_float_complex
 
-   Represents the C :c:expr:`float complex` datatype, if available.  The
-   constructor accepts an optional :class:`complex` initializer.
+   Biểu diễn kiểu dữ liệu C :c:expr:`float complex`, nếu có. Hàm khởi tạo chấp nhận một bộ khởi tạo :class:`complex` tùy chọn.
 
    .. versionadded:: 3.14
 
 
 .. class:: c_longdouble_complex
 
-   Represents the C :c:expr:`long double complex` datatype, if available.  The
-   constructor accepts an optional :class:`complex` initializer.
+   Biểu diễn kiểu dữ liệu C :c:expr:`long double complex`, nếu có. Hàm khởi tạo chấp nhận một bộ khởi tạo :class:`complex` tùy chọn.
 
    .. versionadded:: 3.14
 
 
 .. class:: c_int
 
-   Represents the C :c:expr:`signed int` datatype.  The constructor accepts an
-   optional integer initializer; no overflow checking is done.  On platforms
-   where ``sizeof(int) == sizeof(long)`` it is an alias to :class:`c_long`.
+   Biểu diễn kiểu dữ liệu C :c:expr:`signed int`. Hàm khởi tạo chấp nhận một bộ khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn số. Trên các nền tảng mà ``sizeof(int) == sizeof(long)``, nó là bí danh của :class:`c_long`.
 
 
 .. class:: c_int8
 
-   Represents the C 8-bit :c:expr:`signed int` datatype.  It is an alias for
+   Biểu diễn kiểu dữ liệu C :c:expr:`signed int` 8 bit. Đây là bí danh của
    :class:`c_byte`.
 
 
 .. class:: c_int16
 
-   Represents the C 16-bit :c:expr:`signed int` datatype.  Usually an alias for
+   Biểu diễn kiểu dữ liệu C :c:expr:`signed int` 16 bit. Thường là bí danh của
    :class:`c_short`.
 
 
 .. class:: c_int32
 
-   Represents the C 32-bit :c:expr:`signed int` datatype.  Usually an alias for
+   Biểu diễn kiểu dữ liệu C :c:expr:`signed int` 32 bit. Thường là bí danh của
    :class:`c_int`.
 
 
 .. class:: c_int64
 
-   Represents the C 64-bit :c:expr:`signed int` datatype.  Usually an alias for
+   Đại diện cho kiểu dữ liệu C 64-bit :c:expr:`signed int`. Thường là bí danh của
    :class:`c_longlong`.
 
 
 .. class:: c_long
 
-   Represents the C :c:expr:`signed long` datatype.  The constructor accepts an
-   optional integer initializer; no overflow checking is done.
+   Đại diện cho kiểu dữ liệu C :c:expr:`signed long`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn số.
 
 
 .. class:: c_longlong
 
-   Represents the C :c:expr:`signed long long` datatype.  The constructor accepts
-   an optional integer initializer; no overflow checking is done.
-   On platforms where ``sizeof(long long) == sizeof(long)`` it is an alias
-   to :class:`c_long`.
+   Đại diện cho kiểu dữ liệu C :c:expr:`signed long long`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn số. Trên các nền tảng mà ``sizeof(long long) == sizeof(long)``, nó là bí danh của :class:`c_long`.
 
 
 .. class:: c_short
 
-   Represents the C :c:expr:`signed short` datatype.  The constructor accepts an
-   optional integer initializer; no overflow checking is done.
+   Đại diện cho kiểu dữ liệu C :c:expr:`signed short`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn số.
 
 
 .. class:: c_size_t
 
-   Represents the C :c:type:`size_t` datatype.
-   Usually an alias for another unsigned integer type.
+   Đại diện cho kiểu dữ liệu C :c:type:`size_t`. Thường là bí danh của một kiểu số nguyên không dấu khác.
 
 
 .. class:: c_ssize_t
 
-   Represents the :c:type:`Py_ssize_t` datatype.
-   This is a signed version of :c:type:`size_t`;
-   that is, the POSIX :c:type:`ssize_t` type.
-   Usually an alias for another integer type.
+   Đại diện cho kiểu dữ liệu :c:type:`Py_ssize_t`. Đây là phiên bản có dấu của :c:type:`size_t`; tức là kiểu POSIX :c:type:`ssize_t`. Thường là bí danh của một kiểu số nguyên khác.
 
    .. versionadded:: 3.2
 
 
 .. class:: c_time_t
 
-   Represents the C :c:type:`time_t` datatype.
-   Usually an alias for another integer type.
+   Đại diện cho kiểu dữ liệu C :c:type:`time_t`. Thường là bí danh của một kiểu số nguyên khác.
 
    .. versionadded:: 3.12
 
 
 .. class:: c_ubyte
 
-   Represents the C :c:expr:`unsigned char` datatype, it interprets the value as
-   small integer.  The constructor accepts an optional integer initializer; no
-   overflow checking is done.
+   Biểu thị kiểu dữ liệu C :c:expr:`unsigned char`, diễn giải giá trị dưới dạng số nguyên nhỏ. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn.
 
 
 .. class:: c_uint
 
-   Represents the C :c:expr:`unsigned int` datatype.  The constructor accepts an
-   optional integer initializer; no overflow checking is done.  On platforms
-   where ``sizeof(int) == sizeof(long)`` it is an alias for :class:`c_ulong`.
+   Biểu thị kiểu dữ liệu C :c:expr:`unsigned int`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn. Trên các nền tảng mà ``sizeof(int) == sizeof(long)``, nó là bí danh của :class:`c_ulong`.
 
 
 .. class:: c_uint8
 
-   Represents the C 8-bit :c:expr:`unsigned int` datatype.  It is an alias for
+   Biểu thị kiểu dữ liệu C :c:expr:`unsigned int` 8 bit. Đây là bí danh của
    :class:`c_ubyte`.
 
 
 .. class:: c_uint16
 
-   Represents the C 16-bit :c:expr:`unsigned int` datatype.  Usually an alias for
+   Biểu thị kiểu dữ liệu C :c:expr:`unsigned int` 16 bit. Thường là bí danh của
    :class:`c_ushort`.
 
 
 .. class:: c_uint32
 
-   Represents the C 32-bit :c:expr:`unsigned int` datatype.  Usually an alias for
+   Biểu thị kiểu dữ liệu C :c:expr:`unsigned int` 32 bit. Thường là bí danh của
    :class:`c_uint`.
 
 
 .. class:: c_uint64
 
-   Represents the C 64-bit :c:expr:`unsigned int` datatype.  Usually an alias for
+   Biểu thị kiểu dữ liệu C :c:expr:`unsigned int` 64 bit. Thường là bí danh của
    :class:`c_ulonglong`.
 
 
 .. class:: c_ulong
 
-   Represents the C :c:expr:`unsigned long` datatype.  The constructor accepts an
-   optional integer initializer; no overflow checking is done.
+   Biểu thị kiểu dữ liệu C :c:expr:`unsigned long`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn.
 
 
 .. class:: c_ulonglong
 
-   Represents the C :c:expr:`unsigned long long` datatype.  The constructor
-   accepts an optional integer initializer; no overflow checking is done.
-   On platforms where ``sizeof(long long) == sizeof(long)`` it is an alias
-   to :class:`c_long`.
+   Đại diện cho kiểu dữ liệu C :c:expr:`unsigned long long`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn số. Trên các nền tảng mà ``sizeof(long long) == sizeof(long)``, nó là bí danh của :class:`c_long`.
 
 
 .. class:: c_ushort
 
-   Represents the C :c:expr:`unsigned short` datatype.  The constructor accepts
-   an optional integer initializer; no overflow checking is done.
+   Đại diện cho kiểu dữ liệu C :c:expr:`unsigned short`. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn; không thực hiện kiểm tra tràn số.
 
 
 .. class:: c_void_p
 
-   Represents the C :c:expr:`void *` type.  The value is represented as integer.
-   The constructor accepts an optional integer initializer.
+   Đại diện cho kiểu C :c:expr:`void *`. Giá trị được biểu diễn dưới dạng số nguyên. Hàm khởi tạo chấp nhận một giá trị khởi tạo số nguyên tùy chọn.
 
 
 .. class:: c_wchar
 
-   Represents the C :c:type:`wchar_t` datatype, and interprets the value as a
-   single character unicode string.  The constructor accepts an optional string
-   initializer, the length of the string must be exactly one character.
+   Đại diện cho kiểu dữ liệu C :c:type:`wchar_t` và diễn giải giá trị dưới dạng chuỗi unicode một ký tự. Hàm khởi tạo chấp nhận một giá trị khởi tạo chuỗi tùy chọn; độ dài của chuỗi phải chính xác là một ký tự.
 
 
 .. class:: c_wchar_p
 
-   Represents the C :c:expr:`wchar_t *` datatype, which must be a pointer to a
-   zero-terminated wide character string.  The constructor accepts an integer
-   address, or a string.
+   Đại diện cho kiểu dữ liệu C :c:expr:`wchar_t *`, kiểu này phải là một con trỏ tới chuỗi ký tự rộng kết thúc bằng số 0. Hàm khởi tạo chấp nhận một địa chỉ số nguyên hoặc một chuỗi.
 
 
 .. class:: c_bool
 
-   Represent the C :c:expr:`bool` datatype (more accurately, :c:expr:`_Bool` from
-   C99).  Its value can be ``True`` or ``False``, and the constructor accepts any object
-   that has a truth value.
+   Đại diện cho kiểu dữ liệu C :c:expr:`bool` (chính xác hơn là :c:expr:`_Bool` từ C99). Giá trị của nó có thể là ``True`` hoặc ``False``, và hàm khởi tạo chấp nhận bất kỳ đối tượng nào có giá trị logic.
 
 
 .. class:: HRESULT
 
-   Represents a :c:type:`!HRESULT` value, which contains success or
-   error information for a function or method call.
+   Đại diện cho một giá trị :c:type:`!HRESULT`, chứa thông tin thành công hoặc lỗi đối với một lệnh gọi hàm hoặc phương thức.
 
    .. availability:: Windows
 
 
 .. class:: py_object
 
-   Represents the C :c:expr:`PyObject *` datatype.  Calling this without an
-   argument creates a ``NULL`` :c:expr:`PyObject *` pointer.
+   Đại diện cho kiểu dữ liệu C :c:expr:`PyObject *`. Gọi hàm này mà không cung cấp đối số sẽ tạo một con trỏ ``NULL`` :c:expr:`PyObject *`.
 
    .. versionchanged:: 3.14
       :class:`!py_object` is now a :term:`generic type`.
 
 .. _ctypes-wintypes:
 
-The :mod:`!ctypes.wintypes` module provides quite some other Windows specific
-data types, for example :c:type:`!HWND`, :c:type:`!WPARAM`,
-:c:type:`!VARIANT_BOOL` or :c:type:`!DWORD`.
-Some useful structures like :c:type:`!MSG` or :c:type:`!RECT` are also defined.
+Mô-đun :mod:`!ctypes.wintypes` cung cấp khá nhiều kiểu dữ liệu dành riêng cho Windows khác, chẳng hạn như :c:type:`!HWND`, :c:type:`!WPARAM`,
+:c:type:`!VARIANT_BOOL` hoặc :c:type:`!DWORD`. Một số cấu trúc hữu ích như :c:type:`!MSG` hoặc :c:type:`!RECT` cũng được định nghĩa.
 
 
 .. _ctypes-structured-data-types:
 
-Structured data types
-^^^^^^^^^^^^^^^^^^^^^
+Kiểu dữ liệu có cấu trúc
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: Union(*args, **kw)
 
-   Abstract base class for unions in native byte order.
+   Lớp cơ sở trừu tượng cho các union theo thứ tự byte gốc.
 
-   Unions share common attributes and behavior with structures;
-   see :class:`Structure` documentation for details.
+   Các union dùng chung những thuộc tính và hành vi với các cấu trúc; xem tài liệu :class:`Structure` để biết chi tiết.
 
 .. class:: BigEndianUnion(*args, **kw)
 
-   Abstract base class for unions in *big endian* byte order.
+   Lớp cơ sở trừu tượng cho các union theo thứ tự byte *big endian*.
 
    .. versionadded:: 3.11
 
 .. class:: LittleEndianUnion(*args, **kw)
 
-   Abstract base class for unions in *little endian* byte order.
+   Lớp cơ sở trừu tượng cho các union có thứ tự byte *little endian*.
 
    .. versionadded:: 3.11
 
 .. class:: BigEndianStructure(*args, **kw)
 
-   Abstract base class for structures in *big endian* byte order.
+   Lớp cơ sở trừu tượng cho các structure có thứ tự byte *big endian*.
 
 
 .. class:: LittleEndianStructure(*args, **kw)
 
-   Abstract base class for structures in *little endian* byte order.
+   Lớp cơ sở trừu tượng cho các structure có thứ tự byte *little endian*.
 
-Structures and unions with non-native byte order cannot contain pointer type
-fields, or any other data types containing pointer type fields.
+Các structure và union có thứ tự byte không phải native không thể chứa các trường thuộc kiểu con trỏ hoặc bất kỳ kiểu dữ liệu nào khác chứa các trường thuộc kiểu con trỏ.
 
 
 .. class:: Structure(*args, **kw)
 
-   Abstract base class for structures in *native* byte order.
+   Lớp cơ sở trừu tượng cho các structure có thứ tự byte *native*.
 
-   Concrete structure and union types must be created by subclassing one of these
-   types, and at least define a :attr:`_fields_` class variable. :mod:`!ctypes` will
-   create :term:`descriptor`\s which allow reading and writing the fields by direct
-   attribute accesses.  These are the
+   Các kiểu structure và union cụ thể phải được tạo bằng cách kế thừa một trong các kiểu này và ít nhất phải định nghĩa một biến lớp :attr:`_fields_`. :mod:`!ctypes` sẽ tạo :term:`descriptor`\s cho phép đọc và ghi các trường bằng cách truy cập thuộc tính trực tiếp. Đây là
 
 
    .. attribute:: _fields_
 
-      A sequence defining the structure fields.  The items must be 2-tuples or
-      3-tuples.  The first item is the name of the field, the second item
-      specifies the type of the field; it can be any ctypes data type.
+      Một sequence định nghĩa các trường của structure. Các phần tử phải là tuple 2 phần tử hoặc 3 phần tử. Phần tử đầu tiên là tên của trường, phần tử thứ hai chỉ định kiểu của trường; kiểu này có thể là bất kỳ kiểu dữ liệu ctypes nào.
 
-      For integer type fields like :class:`c_int`, a third optional item can be
-      given.  It must be a small positive integer defining the bit width of the
-      field.
+      Đối với các trường kiểu số nguyên như :class:`c_int`, có thể cung cấp một mục tùy chọn thứ ba. Mục này phải là một số nguyên dương nhỏ xác định độ rộng bit của trường.
 
-      Field names must be unique within one structure or union.  This is not
-      checked, only one field can be accessed when names are repeated.
+      Tên trường phải là duy nhất trong một cấu trúc hoặc union. Điều này không được kiểm tra; nếu tên bị lặp, chỉ một trường có thể được truy cập.
 
-      It is possible to define the :attr:`_fields_` class variable *after* the
-      class statement that defines the Structure subclass, this allows creating
-      data types that directly or indirectly reference themselves::
+      Có thể định nghĩa biến lớp :attr:`_fields_` *sau* câu lệnh lớp định nghĩa lớp con Structure, cho phép tạo các kiểu dữ liệu tham chiếu trực tiếp hoặc gián tiếp đến chính chúng.::
 
          class List(Structure):
              pass
@@ -2934,107 +2348,69 @@ fields, or any other data types containing pointer type fields.
                           ...
                          ]
 
-      The :attr:`!_fields_` class variable can only be set once.
-      Later assignments will raise an :exc:`AttributeError`.
+      Biến lớp :attr:`!_fields_` chỉ có thể được thiết lập một lần. Các phép gán sau đó sẽ gây ra :exc:`AttributeError`.
 
-      Additionally, the :attr:`!_fields_` class variable must be defined before
-      the structure or union type is first used: an instance or subclass is
-      created, :func:`sizeof` is called on it, and so on.
-      Later assignments to :attr:`!_fields_` will raise an :exc:`AttributeError`.
-      If :attr:`!_fields_` has not been set before such use,
-      the structure or union will have no own fields, as if :attr:`!_fields_`
-      was empty.
+      Ngoài ra, biến lớp :attr:`!_fields_` phải được định nghĩa trước khi kiểu cấu trúc hoặc union được sử dụng lần đầu: một instance hoặc lớp con được tạo, :func:`sizeof` được gọi trên đó, v.v. Các phép gán sau đó cho :attr:`!_fields_` sẽ gây ra :exc:`AttributeError`. Nếu :attr:`!_fields_` chưa được thiết lập trước lần sử dụng đó, cấu trúc hoặc union sẽ không có trường riêng nào, như thể :attr:`!_fields_` trống.
 
-      Sub-subclasses of structure types inherit the fields of the base class
-      plus the :attr:`_fields_` defined in the sub-subclass, if any.
+      Các lớp con của lớp con của kiểu cấu trúc kế thừa các trường của lớp cơ sở cùng với :attr:`_fields_` được định nghĩa trong lớp con của lớp con, nếu có.
 
 
    .. attribute:: _pack_
 
-      An optional small integer that allows overriding the alignment of
-      structure fields in the instance.
+      Một số nguyên nhỏ tùy chọn cho phép ghi đè alignment của các trường cấu trúc trong instance.
 
-      This is only implemented for the MSVC-compatible memory layout
-      (see :attr:`_layout_`).
+      Điều này chỉ được triển khai cho bố cục bộ nhớ tương thích với MSVC (xem :attr:`_layout_`).
 
-      Setting :attr:`!_pack_` to 0 is the same as not setting it at all.
-      Otherwise, the value must be a positive power of two.
-      The effect is equivalent to ``#pragma pack(N)`` in C, except
-      :mod:`!ctypes` may allow larger *n* than what the compiler accepts.
+      Đặt :attr:`!_pack_` thành 0 cũng giống như hoàn toàn không đặt nó. Nếu không, giá trị phải là lũy thừa dương của hai. Hiệu ứng này tương đương với ``#pragma pack(N)`` trong C, ngoại trừ
+      :mod:`!ctypes` có thể cho phép các giá trị *n* lớn hơn mức trình biên dịch chấp nhận.
 
-      :attr:`!_pack_` must already be defined
-      when :attr:`_fields_` is assigned, otherwise it will have no effect.
+      :attr:`!_pack_` phải được định nghĩa trước khi :attr:`_fields_` được gán; nếu không, nó sẽ không có tác dụng.
 
       .. deprecated-removed:: 3.14 3.19
 
-         For historical reasons, if :attr:`!_pack_` is non-zero,
-         the MSVC-compatible layout will be used by default.
-         On non-Windows platforms, this default is deprecated and is slated to
-         become an error in Python 3.19.
-         If it is intended, set :attr:`~Structure._layout_` to ``'ms'``
-         explicitly.
+         Vì lý do lịch sử, nếu :attr:`!_pack_` khác 0, bố cục tương thích với MSVC sẽ được sử dụng theo mặc định. Trên các nền tảng không phải Windows, mặc định này đã không còn được khuyến nghị và dự kiến sẽ trở thành lỗi trong Python 3.19. Nếu đây là chủ đích, hãy đặt :attr:`~Structure._layout_` thành ``'ms'`` một cách rõ ràng.
 
    .. attribute:: _align_
 
-      An optional small integer that allows increasing the alignment of
-      the structure when being packed or unpacked to/from memory.
+      Một số nguyên nhỏ tùy chọn cho phép tăng alignment của cấu trúc khi đóng gói hoặc giải nén từ bộ nhớ.
 
-      The value must not be negative.
-      The effect is equivalent to ``__attribute__((aligned(N)))`` on GCC
-      or ``#pragma align(N)`` on MSVC, except :mod:`!ctypes` may allow
-      values that the compiler would reject.
+      Giá trị không được âm. Hiệu ứng này tương đương với ``__attribute__((aligned(N)))`` trên GCC hoặc ``#pragma align(N)`` trên MSVC, ngoại trừ việc :mod:`!ctypes` có thể cho phép các giá trị mà trình biên dịch sẽ từ chối.
 
-      :attr:`!_align_` can only *increase* a structure's alignment
-      requirements. Setting it to 0 or 1 has no effect.
+      :attr:`!_align_` chỉ có thể *tăng* các yêu cầu căn chỉnh của một cấu trúc. Đặt giá trị này thành 0 hoặc 1 sẽ không có tác dụng.
 
-      Using values that are not powers of two is discouraged and may lead to
-      surprising behavior.
+      Không khuyến khích sử dụng các giá trị không phải là lũy thừa của hai vì điều này có thể dẫn đến hành vi bất ngờ.
 
-      :attr:`!_align_` must already be defined
-      when :attr:`_fields_` is assigned, otherwise it will have no effect.
+      :attr:`!_align_` phải được định nghĩa trước khi :attr:`_fields_` được gán, nếu không thao tác này sẽ không có tác dụng.
 
       .. versionadded:: 3.13
 
    .. attribute:: _layout_
 
-      An optional string naming the struct/union layout. It can currently
-      be set to:
+      Một chuỗi tùy chọn đặt tên cho bố cục struct/union. Hiện tại, chuỗi này có thể được đặt thành:
 
-      - ``"ms"``: the layout used by the Microsoft compiler (MSVC).
-        On GCC and Clang, this layout can be selected with
-        ``__attribute__((ms_struct))``.
-      - ``"gcc-sysv"``: the layout used by GCC with the System V or “SysV-like”
-        data model, as used on Linux and macOS.
-        With this layout, :attr:`~Structure._pack_` must be unset or zero.
+      - ``"ms"``: bố cục được trình biên dịch Microsoft (MSVC) sử dụng. Trên GCC và Clang, có thể chọn bố cục này bằng ``__attribute__((ms_struct))``.
+      - ``"gcc-sysv"``: bố cục được GCC sử dụng với mô hình dữ liệu System V hoặc “tương tự SysV”, như trên Linux và macOS. Với bố cục này, :attr:`~Structure._pack_` phải không được đặt hoặc phải bằng 0.
 
-      If not set explicitly, ``ctypes`` will use a default that
-      matches the platform conventions. This default may change in future
-      Python releases (for example, when a new platform gains official support,
-      or when a difference between similar platforms is found).
-      Currently the default will be:
+      Nếu không được đặt rõ ràng, ``ctypes`` sẽ sử dụng giá trị mặc định phù hợp với quy ước của nền tảng. Giá trị mặc định này có thể thay đổi trong các bản phát hành Python tương lai (ví dụ: khi một nền tảng mới được hỗ trợ chính thức hoặc khi phát hiện sự khác biệt giữa các nền tảng tương tự). Hiện tại, giá trị mặc định sẽ là:
 
-      - On Windows: ``"ms"``
-      - When :attr:`~Structure._pack_` is specified: ``"ms"``.
-        (This is deprecated; see :attr:`~Structure._pack_` documentation.)
-      - Otherwise: ``"gcc-sysv"``
+      - Trên Windows: ``"ms"``
+      - Khi :attr:`~Structure._pack_` được chỉ định: ``"ms"``. (Tùy chọn này đã lỗi thời; xem tài liệu :attr:`~Structure._pack_`.)
+      - Nếu không: ``"gcc-sysv"``
 
-      :attr:`!_layout_` must already be defined when
-      :attr:`~Structure._fields_` is assigned, otherwise it will have no effect.
+      :attr:`!_layout_` phải được định nghĩa trước khi
+      :attr:`~Structure._fields_` được gán, nếu không thao tác này sẽ không có hiệu lực.
 
       .. versionadded:: 3.14
 
    .. attribute:: _anonymous_
 
-      An optional sequence that lists the names of unnamed (anonymous) fields.
-      :attr:`_anonymous_` must be already defined when :attr:`_fields_` is
-      assigned, otherwise it will have no effect.
+      Một chuỗi tùy chọn liệt kê tên của các trường không có tên (ẩn danh).
+      :attr:`_anonymous_` phải được định nghĩa trước khi :attr:`_fields_` được gán, nếu không thao tác này sẽ không có hiệu lực.
 
-      The fields listed in this variable must be structure or union type fields.
-      :mod:`!ctypes` will create descriptors in the structure type that allows
-      accessing the nested fields directly, without the need to create the
-      structure or union field.
+      Các trường được liệt kê trong biến này phải là các trường thuộc kiểu structure hoặc union.
+      :mod:`!ctypes` sẽ tạo các descriptor trong kiểu structure, cho phép truy cập trực tiếp vào các trường lồng nhau mà không cần tạo trường structure hoặc union.
 
-      Here is an example type (Windows)::
+      Sau đây là một kiểu ví dụ (Windows)::
 
          class _U(Union):
              _fields_ = [("lptdesc", POINTER(TYPEDESC)),
@@ -3047,35 +2423,23 @@ fields, or any other data types containing pointer type fields.
                          ("vt", VARTYPE)]
 
 
-      The ``TYPEDESC`` structure describes a COM data type, the ``vt`` field
-      specifies which one of the union fields is valid.  Since the ``u`` field
-      is defined as anonymous field, it is now possible to access the members
-      directly off the TYPEDESC instance. ``td.lptdesc`` and ``td.u.lptdesc``
-      are equivalent, but the former is faster since it does not need to create
-      a temporary union instance::
+      Structure ``TYPEDESC`` mô tả một kiểu dữ liệu COM, trường ``vt`` chỉ định trường union nào hợp lệ. Vì trường ``u`` được định nghĩa là trường anonymous, giờ đây có thể truy cập trực tiếp vào các member từ instance TYPEDESC. ``td.lptdesc`` và ``td.u.lptdesc`` là tương đương, nhưng cách đầu tiên nhanh hơn vì không cần tạo một instance union tạm thời.::
 
          td = TYPEDESC()
          td.vt = VT_PTR
          td.lptdesc = POINTER(some_type)
          td.u.lptdesc = POINTER(some_type)
 
-   It is possible to define sub-subclasses of structures, they inherit the
-   fields of the base class.  If the subclass definition has a separate
-   :attr:`_fields_` variable, the fields specified in this are appended to the
-   fields of the base class.
+   Có thể định nghĩa các subclass con của structure; chúng kế thừa các trường của base class. Nếu định nghĩa subclass có một
+   biến :attr:`_fields_` riêng, các trường được chỉ định trong biến này sẽ được nối thêm vào các trường của base class.
 
-   Structure and union constructors accept both positional and keyword
-   arguments.  Positional arguments are used to initialize member fields in the
-   same order as they are appear in :attr:`_fields_`.  Keyword arguments in the
-   constructor are interpreted as attribute assignments, so they will initialize
-   :attr:`_fields_` with the same name, or create new attributes for names not
-   present in :attr:`_fields_`.
+   Constructor của structure và union chấp nhận cả đối số positional và keyword. Các đối số positional được dùng để khởi tạo các trường member theo cùng thứ tự xuất hiện trong :attr:`_fields_`. Các đối số keyword trong constructor được diễn giải là các phép gán thuộc tính, vì vậy chúng sẽ khởi tạo
+   :attr:`_fields_` với cùng tên hoặc tạo các thuộc tính mới cho những tên không có trong :attr:`_fields_`.
 
 
 .. class:: CField(*args, **kw)
 
-   Descriptor for fields of a :class:`Structure` and :class:`Union`.
-   For example::
+   Mô tả các trường của một :class:`Structure` và :class:`Union`. Ví dụ::
 
       >>> class Color(Structure):
       ...     _fields_ = (
@@ -3097,176 +2461,148 @@ fields, or any other data types containing pointer type fields.
       >>> Color.blinking.bit_offset
       1
 
-   All attributes are read-only.
+   Tất cả các thuộc tính đều chỉ có thể đọc.
 
-   :class:`!CField` objects are created via :attr:`~Structure._fields_`;
-   do not instantiate the class directly.
+   Các đối tượng :class:`!CField` được tạo thông qua :attr:`~Structure._fields_`; không khởi tạo lớp này trực tiếp.
 
    .. versionadded:: 3.14
 
-      Previously, descriptors only had ``offset`` and ``size`` attributes
-      and a readable string representation; the :class:`!CField` class was not
-      available directly.
+      Trước đây, các descriptor chỉ có các thuộc tính ``offset`` và ``size`` cùng biểu diễn chuỗi có thể đọc; lớp :class:`!CField` không thể được sử dụng trực tiếp.
 
    .. attribute:: name
 
-      Name of the field, as a string.
+      Tên của trường, dưới dạng một chuỗi.
 
    .. attribute:: type
 
-      Type of the field, as a :ref:`ctypes class <ctypes-data-types>`.
+      Kiểu của trường, dưới dạng một :ref:`ctypes class <ctypes-data-types>`.
 
    .. attribute:: offset
                   byte_offset
 
-      Offset of the field, in bytes.
+      Độ lệch của trường, tính bằng byte.
 
-      For bitfields, this is the offset of the underlying byte-aligned
-      *storage unit*; see :attr:`~CField.bit_offset`.
+      Đối với các bitfield, đây là độ lệch của *storage unit* được căn chỉnh theo byte bên dưới; xem :attr:`~CField.bit_offset`.
 
    .. attribute:: byte_size
 
-      Size of the field, in bytes.
+      Kích thước của trường, tính bằng byte.
 
-      For bitfields, this is the size of the underlying *storage unit*.
-      Typically, it has the same size as the bitfield's type.
+      Đối với các bitfield, đây là kích thước của *storage unit* bên dưới. Thông thường, nó có cùng kích thước với kiểu của bitfield.
 
    .. attribute:: size
 
-      For non-bitfields, equivalent to :attr:`~CField.byte_size`.
+      Đối với các trường không phải bitfield, tương đương với :attr:`~CField.byte_size`.
 
-      For bitfields, this contains a backwards-compatible bit-packed
-      value that combines :attr:`~CField.bit_size` and
-      :attr:`~CField.bit_offset`.
-      Prefer using the explicit attributes instead.
+      Đối với các bitfield, trường này chứa một giá trị đóng gói theo bit tương thích ngược, kết hợp :attr:`~CField.bit_size` và
+      :attr:`~CField.bit_offset`. Nên sử dụng các thuộc tính tường minh thay thế.
 
    .. attribute:: is_bitfield
 
-      True if this is a bitfield.
+      True nếu đây là một bitfield.
 
    .. attribute:: bit_offset
                   bit_size
 
-      The location of a bitfield within its *storage unit*, that is, within
-      :attr:`~CField.byte_size` bytes of memory starting at
+      Vị trí của một bitfield trong *đơn vị lưu trữ* của nó, tức là trong
+      :attr:`~CField.byte_size` byte bộ nhớ bắt đầu tại
       :attr:`~CField.byte_offset`.
 
-      To get the field's value, read the storage unit as an integer,
-      :ref:`shift left <shifting>` by :attr:`!bit_offset` and
-      take the :attr:`!bit_size` least significant bits.
+      Để lấy giá trị của trường, hãy đọc đơn vị lưu trữ dưới dạng một số nguyên,
+      :ref:`dịch trái <shifting>` đi :attr:`!bit_offset` và lấy :attr:`!bit_size` bit có trọng số thấp nhất.
 
-      For non-bitfields, :attr:`!bit_offset` is zero
-      and :attr:`!bit_size` is equal to ``byte_size * 8``.
+      Đối với các trường không phải bitfield, :attr:`!bit_offset` bằng không và :attr:`!bit_size` bằng ``byte_size * 8``.
 
    .. attribute:: is_anonymous
 
-      True if this field is anonymous, that is, it contains nested sub-fields
-      that should be merged into a containing structure or union.
+      Bằng true nếu trường này là ẩn danh, nghĩa là trường chứa các trường con lồng nhau cần được hợp nhất vào một cấu trúc hoặc union bao quanh.
 
 
 .. _ctypes-arrays-pointers:
 
-Arrays and pointers
-^^^^^^^^^^^^^^^^^^^
+Mảng và con trỏ
+^^^^^^^^^^^^^^^
 
 .. class:: Array(*args)
 
-   Abstract base class for arrays.
+   Lớp cơ sở trừu tượng cho mảng.
 
-   The recommended way to create concrete array types is by multiplying any
-   :mod:`!ctypes` data type with a non-negative integer.  Alternatively, you can subclass
-   this type and define :attr:`_length_` and :attr:`_type_` class variables.
-   Array elements can be read and written using standard
-   subscript and slice accesses; for slice reads, the resulting object is
-   *not* itself an :class:`Array`.
+   Cách được khuyến nghị để tạo các kiểu mảng cụ thể là nhân bất kỳ
+   kiểu dữ liệu :mod:`!ctypes` nào với một số nguyên không âm. Ngoài ra, bạn có thể phân lớp kiểu này và định nghĩa các biến lớp :attr:`_length_` và :attr:`_type_`. Có thể đọc và ghi các phần tử mảng bằng cách sử dụng quyền truy cập chỉ mục và lát cắt tiêu chuẩn; đối với thao tác đọc lát cắt, đối tượng kết quả *không* phải là chính một :class:`Array`.
 
-   Arrays are :ref:`generic <generics>` over the type of their elements.
+   Mảng là :ref:`tổng quát <generics>` theo kiểu của các phần tử trong đó.
 
 
    .. attribute:: _length_
 
-        A positive integer specifying the number of elements in the array.
-        Out-of-range subscripts result in an :exc:`IndexError`. Will be
-        returned by :func:`len`.
+        Một số nguyên dương chỉ định số phần tử trong array. Các chỉ số nằm ngoài phạm vi sẽ dẫn đến :exc:`IndexError`. Sẽ được trả về bởi :func:`len`.
 
 
    .. attribute:: _type_
 
-        Specifies the type of each element in the array.
+        Chỉ định kiểu của từng phần tử trong array.
 
 
-   Array subclass constructors accept positional arguments, used to
-   initialize the elements in order.
+   Các constructor của lớp con array chấp nhận các đối số vị trí, được dùng để khởi tạo các phần tử theo thứ tự.
 
 .. function:: ARRAY(type, length)
 
-   Create an array.
-   Equivalent to ``type * length``, where *type* is a
-   :mod:`!ctypes` data type and *length* an integer.
+   Tạo một array. Tương đương với ``type * length``, trong đó *type* là một
+   :mod:`!ctypes` kiểu dữ liệu và *length* là một số nguyên.
 
    .. soft-deprecated:: 3.14
-      In favor of multiplication.
+      Ưu tiên phép nhân.
 
 
 .. class:: _Pointer
 
-   Private, abstract base class for pointers.
+   Lớp cơ sở trừu tượng private dành cho pointer.
 
-   Concrete pointer types are created by calling :func:`POINTER` with the
-   type that will be pointed to; this is done automatically by
+   Các kiểu con trỏ cụ thể được tạo bằng cách gọi :func:`POINTER` với kiểu mà con trỏ sẽ trỏ tới; việc này được tự động thực hiện bởi
    :func:`pointer`.
 
-   If a pointer points to an array, its elements can be read and
-   written using standard subscript and slice accesses.  Pointer objects
-   have no size, so :func:`len` will raise :exc:`TypeError`.  Negative
-   subscripts will read from the memory *before* the pointer (as in C), and
-   out-of-range subscripts will probably crash with an access violation (if
-   you're lucky).
+   Nếu một con trỏ trỏ tới một mảng, bạn có thể đọc và ghi các phần tử của mảng bằng cách sử dụng các phép truy cập chỉ số và lát cắt tiêu chuẩn. Các đối tượng con trỏ không có kích thước, vì vậy :func:`len` sẽ phát sinh :exc:`TypeError`. Các chỉ số âm sẽ đọc từ vùng bộ nhớ *trước* con trỏ (như trong C), còn các chỉ số nằm ngoài phạm vi có thể sẽ khiến chương trình bị lỗi với vi phạm quyền truy cập (nếu bạn may mắn).
 
 
    .. attribute:: _type_
 
-        Specifies the type pointed to.
+        Chỉ định kiểu mà con trỏ trỏ tới.
 
    .. attribute:: contents
 
-        Returns the object to which to pointer points.  Assigning to this
-        attribute changes the pointer to point to the assigned object.
+        Trả về đối tượng mà con trỏ trỏ tới. Việc gán cho thuộc tính này sẽ thay đổi con trỏ để trỏ tới đối tượng được gán.
 
 
 .. _ctypes-exceptions:
 
-Exceptions
-^^^^^^^^^^
+Ngoại lệ
+^^^^^^^^
 
 .. exception:: ArgumentError
 
-   This exception is raised when a foreign function call cannot convert one of the
-   passed arguments.
+   Ngoại lệ này được phát sinh khi một lời gọi hàm foreign không thể chuyển đổi một trong các đối số được truyền vào.
 
 
 .. exception:: COMError(hresult, text, details)
 
-   This exception is raised when a COM method call failed.
+   Ngoại lệ này được phát sinh khi một lời gọi phương thức COM không thành công.
 
    .. attribute:: hresult
 
-      The integer value representing the error code.
+      Giá trị số nguyên biểu thị mã lỗi.
 
    .. attribute:: text
 
-      The error message.
+      Thông báo lỗi.
 
    .. attribute:: details
 
-      The 5-tuple ``(descr, source, helpfile, helpcontext, progid)``.
+      Bộ 5 phần tử ``(descr, source, helpfile, helpcontext, progid)``.
 
-      *descr* is the textual description.  *source* is the language-dependent
-      ``ProgID`` for the class or application that raised the error.  *helpfile*
-      is the path of the help file.  *helpcontext* is the help context
-      identifier.  *progid* is the ``ProgID`` of the interface that defined the
-      error.
+      *descr* là phần mô tả dạng văn bản.  *source* là ``ProgID`` phụ thuộc vào ngôn ngữ của lớp hoặc ứng dụng đã phát sinh lỗi.  *helpfile* là đường dẫn đến tệp trợ giúp.  *helpcontext* là mã định danh ngữ cảnh trợ giúp.  *progid* là ``ProgID`` của giao diện đã định nghĩa lỗi.
 
    .. availability:: Windows
 
    .. versionadded:: 3.14
+
+.. _`Microsoft DUMPBIN tool`: https://learn.microsoft.com/en-us/cpp/build/reference/dumpbin-reference?view=msvc-170

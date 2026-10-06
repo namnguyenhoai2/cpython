@@ -1,161 +1,107 @@
-:mod:`!bisect` --- Array bisection algorithm
-============================================
+:mod:`!bisect` --- Thuật toán chia đôi mảng
+===========================================
 
 .. module:: bisect
-   :synopsis: Array bisection algorithms for binary searching.
+   :synopsis: Các thuật toán chia đôi mảng để tìm kiếm nhị phân.
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. sectionauthor:: Raymond Hettinger <python at rcn.com>
 .. example based on the PyModules FAQ entry by Aaron Watters <arw@pythonpros.com>
 
-**Source code:** :source:`Lib/bisect.py`
+**Mã nguồn:** :source:`Lib/bisect.py`
 
 --------------
 
-This module provides support for maintaining a list in sorted order without
-having to sort the list after each insertion.  For long lists of items with
-expensive comparison operations, this can be an improvement over
-linear searches or frequent resorting.
+Mô-đun này hỗ trợ duy trì một danh sách theo thứ tự đã sắp xếp mà không cần sắp xếp lại danh sách sau mỗi lần chèn. Đối với các danh sách dài chứa những phần tử có thao tác so sánh tốn kém, cách này có thể cải thiện hiệu năng so với việc tìm kiếm tuyến tính hoặc sắp xếp lại thường xuyên.
 
-The module is called :mod:`!bisect` because it uses a basic bisection
-algorithm to do its work.  Unlike other bisection tools that search for a
-specific value, the functions in this module are designed to locate an
-insertion point. Accordingly, the functions never call an :meth:`~object.__eq__`
-method to determine whether a value has been found.  Instead, the
-functions only call the :meth:`~object.__lt__` method and will return an insertion
-point between values in an array.
+Mô-đun này có tên là :mod:`!bisect` vì sử dụng một thuật toán chia đôi cơ bản để thực hiện công việc. Không giống các công cụ chia đôi khác dùng để tìm kiếm một giá trị cụ thể, các hàm trong mô-đun này được thiết kế để xác định vị trí chèn. Do đó, các hàm không bao giờ gọi phương thức :meth:`~object.__eq__` để xác định xem đã tìm thấy một giá trị hay chưa. Thay vào đó, các hàm chỉ gọi phương thức :meth:`~object.__lt__` và trả về một vị trí chèn giữa các giá trị trong một mảng.
 
 .. note::
 
-   The functions in this module are not thread-safe. If multiple threads
-   concurrently use :mod:`!bisect` functions on the same sequence, this
-   may result in undefined behaviour. Likewise, if the provided sequence
-   is mutated by a different thread while a :mod:`!bisect` function
-   is operating on it, the result is undefined. For example, using
-   :py:func:`~bisect.insort_left` on the same list from multiple threads
-   may result in the list becoming unsorted.
+   Các hàm trong mô-đun này không an toàn khi sử dụng trong môi trường đa luồng. Nếu nhiều thread đồng thời sử dụng các hàm :mod:`!bisect` trên cùng một sequence, điều này có thể dẫn đến hành vi không xác định. Tương tự, nếu sequence được cung cấp bị một thread khác thay đổi trong khi hàm :mod:`!bisect` đang hoạt động trên đó, kết quả sẽ không xác định. Ví dụ, việc sử dụng
+   :py:func:`~bisect.insort_left` trên cùng một danh sách từ nhiều thread có thể khiến danh sách không còn được sắp xếp.
 
 .. _bisect functions:
 
-The following functions are provided:
+Các hàm sau được cung cấp:
 
 
 .. function:: bisect_left(a, x, lo=0, hi=len(a), *, key=None)
 
-   Locate the insertion point for *x* in *a* to maintain sorted order.
-   The parameters *lo* and *hi* may be used to specify a subset of the list
-   which should be considered; by default the entire list is used.  If *x* is
-   already present in *a*, the insertion point will be before (to the left of)
-   any existing entries.  The return value is suitable for use as the first
-   parameter to ``list.insert()`` assuming that *a* is already sorted.
+   Xác định vị trí chèn *x* vào *a* để duy trì thứ tự đã sắp xếp. Có thể sử dụng các tham số *lo* và *hi* để chỉ định một phần của danh sách cần xem xét; theo mặc định, toàn bộ danh sách được sử dụng. Nếu *x* đã có trong *a*, vị trí chèn sẽ nằm trước (về bên trái) mọi phần tử hiện có. Giá trị trả về phù hợp để dùng làm tham số đầu tiên cho ``list.insert()``, với điều kiện *a* đã được sắp xếp.
 
-   The returned insertion point *ip* partitions the array *a* into two
-   slices such that ``all(elem < x for elem in a[lo : ip])`` is true for the
-   left slice and ``all(elem >= x for elem in a[ip : hi])`` is true for the
-   right slice.
+   Vị trí chèn được trả về *ip* phân chia mảng *a* thành hai lát cắt, sao cho ``all(elem < x for elem in a[lo : ip])`` là đúng đối với lát cắt bên trái và ``all(elem >= x for elem in a[ip : hi])`` là đúng đối với lát cắt bên phải.
 
-   *key* specifies a :term:`key function` of one argument that is used to
-   extract a comparison key from each element in the array.  To support
-   searching complex records, the key function is not applied to the *x* value.
+   *key* chỉ định một :term:`key function` nhận một đối số, được dùng để trích xuất khóa so sánh từ mỗi phần tử trong mảng. Để hỗ trợ tìm kiếm các bản ghi phức tạp, hàm key không được áp dụng cho giá trị *x*.
 
-   If *key* is ``None``, the elements are compared directly and
-   no key function is called.
+   Nếu *key* là ``None``, các phần tử sẽ được so sánh trực tiếp và không có hàm key nào được gọi.
 
    .. versionchanged:: 3.10
-      Added the *key* parameter.
+      Đã thêm tham số *key*.
 
 
 .. function:: bisect_right(a, x, lo=0, hi=len(a), *, key=None)
               bisect(a, x, lo=0, hi=len(a), *, key=None)
 
-   Similar to :py:func:`~bisect.bisect_left`, but returns an insertion point which comes
-   after (to the right of) any existing entries of *x* in *a*.
+   Tương tự như :py:func:`~bisect.bisect_left`, nhưng trả về một vị trí chèn nằm sau (về bên phải) mọi mục nhập hiện có của *x* trong *a*.
 
-   The returned insertion point *ip* partitions the array *a* into two slices
-   such that ``all(elem <= x for elem in a[lo : ip])`` is true for the left slice and
-   ``all(elem > x for elem in a[ip : hi])`` is true for the right slice.
+   Vị trí chèn được trả về *ip* phân chia mảng *a* thành hai lát cắt, sao cho ``all(elem <= x for elem in a[lo : ip])`` đúng với lát cắt bên trái và ``all(elem > x for elem in a[ip : hi])`` đúng với lát cắt bên phải.
 
    .. versionchanged:: 3.10
-      Added the *key* parameter.
+      Đã thêm tham số *key*.
 
 
 .. function:: insort_left(a, x, lo=0, hi=len(a), *, key=None)
 
-   Insert *x* in *a* in sorted order.
+   Chèn *x* vào *a* theo thứ tự đã sắp xếp.
 
-   This function first runs :py:func:`~bisect.bisect_left` to locate an insertion point.
-   Next, it runs the :meth:`~sequence.insert` method on *a* to insert *x* at the
-   appropriate position to maintain sort order.
+   Trước tiên, hàm này chạy :py:func:`~bisect.bisect_left` để xác định vị trí chèn. Tiếp theo, hàm chạy phương thức :meth:`~sequence.insert` trên *a* để chèn *x* vào vị trí thích hợp nhằm duy trì thứ tự sắp xếp.
 
-   To support inserting records in a table, the *key* function (if any) is
-   applied to *x* for the search step but not for the insertion step.
+   Để hỗ trợ chèn các bản ghi vào một bảng, hàm *key* (nếu có) được áp dụng cho *x* trong bước tìm kiếm nhưng không được áp dụng trong bước chèn.
 
-   Keep in mind that the *O*\ (log *n*) search is dominated by the slow *O*\ (*n*)
-   insertion step.
+   Hãy nhớ rằng phép tìm kiếm *O*\ (log *n*) bị chi phối bởi bước chèn chậm *O*\ (*n*).
 
    .. versionchanged:: 3.10
-      Added the *key* parameter.
+      Đã thêm tham số *key*.
 
 
 .. function:: insort_right(a, x, lo=0, hi=len(a), *, key=None)
               insort(a, x, lo=0, hi=len(a), *, key=None)
 
-   Similar to :py:func:`~bisect.insort_left`, but inserting *x* in *a* after any existing
-   entries of *x*.
+   Tương tự như :py:func:`~bisect.insort_left`, nhưng chèn *x* vào *a* sau mọi mục hiện có của *x*.
 
-   This function first runs :py:func:`~bisect.bisect_right` to locate an insertion point.
-   Next, it runs the :meth:`~sequence.insert` method on *a* to insert *x* at the
-   appropriate position to maintain sort order.
+   Trước tiên, hàm này chạy :py:func:`~bisect.bisect_right` để xác định vị trí chèn. Tiếp theo, hàm gọi phương thức :meth:`~sequence.insert` trên *a* để chèn *x* vào vị trí thích hợp nhằm duy trì thứ tự sắp xếp.
 
-   To support inserting records in a table, the *key* function (if any) is
-   applied to *x* for the search step but not for the insertion step.
+   Để hỗ trợ chèn các bản ghi vào một bảng, hàm *key* (nếu có) được áp dụng cho *x* trong bước tìm kiếm nhưng không được áp dụng trong bước chèn.
 
-   Keep in mind that the *O*\ (log *n*) search is dominated by the slow *O*\ (*n*)
-   insertion step.
+   Hãy nhớ rằng phép tìm kiếm *O*\ (log *n*) bị chi phối bởi bước chèn chậm *O*\ (*n*).
 
    .. versionchanged:: 3.10
-      Added the *key* parameter.
+      Đã thêm tham số *key*.
 
 
-Performance Notes
------------------
+Ghi chú về hiệu năng
+--------------------
 
-When writing time sensitive code using *bisect()* and *insort()*, keep these
-thoughts in mind:
+Khi viết mã nhạy cảm về thời gian bằng *bisect()* và *insort()*, hãy ghi nhớ những điều sau:
 
-* Bisection is effective for searching ranges of values.
-  For locating specific values, dictionaries are more performant.
+* Phép chia đôi hiệu quả khi tìm kiếm các phạm vi giá trị. Để định vị các giá trị cụ thể, dictionaries có hiệu năng tốt hơn.
 
-* The *insort()* functions are *O*\ (*n*) because the logarithmic search step
-  is dominated by the linear time insertion step.
+* Các hàm *insort()* có độ phức tạp *O*\ (*n*) vì bước tìm kiếm logarithmic bị chi phối bởi bước chèn có thời gian tuyến tính.
 
-* The search functions are stateless and discard key function results after
-  they are used.  Consequently, if the search functions are used in a loop,
-  the key function may be called again and again on the same array elements.
-  If the key function isn't fast, consider wrapping it with
-  :py:deco:`functools.cache` to avoid duplicate computations.  Alternatively,
-  consider searching an array of precomputed keys to locate the insertion
-  point (as shown in the examples section below).
+* Các hàm tìm kiếm không lưu trạng thái và loại bỏ kết quả của hàm key sau khi sử dụng. Do đó, nếu các hàm tìm kiếm được sử dụng trong một vòng lặp, hàm key có thể được gọi lặp đi lặp lại trên cùng các phần tử mảng. Nếu hàm key không nhanh, hãy cân nhắc bọc nó bằng
+  :py:deco:`functools.cache` để tránh các phép tính trùng lặp. Ngoài ra, hãy cân nhắc tìm kiếm trong một mảng các key đã được tính trước để định vị điểm chèn (như minh họa trong phần ví dụ bên dưới).
 
 .. seealso::
 
-   * `Sorted Collections
-     <https://grantjenks.com/docs/sortedcollections/>`_ is a high performance
-     module that uses *bisect* to managed sorted collections of data.
+   * `Sorted Collections <https://grantjenks.com/docs/sortedcollections/>`_ là một module hiệu năng cao sử dụng *bisect* để quản lý các tập hợp dữ liệu đã được sắp xếp.
 
-   * The `SortedCollection recipe
-     <https://code.activestate.com/recipes/577197-sortedcollection/>`_ uses
-     bisect to build a full-featured collection class with straight-forward search
-     methods and support for a key-function.  The keys are precomputed to save
-     unnecessary calls to the key function during searches.
+   * Công thức `SortedCollection recipe <https://code.activestate.com/recipes/577197-sortedcollection/>`_ sử dụng bisect để xây dựng một class collection đầy đủ tính năng, với các phương thức tìm kiếm đơn giản, dễ hiểu và hỗ trợ key-function. Các key được tính toán trước để tránh những lần gọi không cần thiết đến key function trong quá trình tìm kiếm.
 
 
-Searching Sorted Lists
-----------------------
+Tìm kiếm trong các danh sách đã sắp xếp
+---------------------------------------
 
-The above `bisect functions`_ are useful for finding insertion points but
-can be tricky or awkward to use for common searching tasks. The following five
-functions show how to transform them into the standard lookups for sorted
-lists::
+Các `hàm bisect <bisect functions_>`_ ở trên hữu ích để tìm vị trí chèn, nhưng có thể khó dùng hoặc bất tiện cho các tác vụ tìm kiếm thông thường. Năm hàm sau đây cho thấy cách chuyển đổi chúng thành các phép tra cứu tiêu chuẩn cho danh sách đã sắp xếp::
 
     def index(a, x):
         'Locate the leftmost value exactly equal to x'
@@ -193,15 +139,12 @@ lists::
         raise ValueError
 
 
-Examples
---------
+Ví dụ
+-----
 
 .. _bisect-example:
 
-The :py:func:`~bisect.bisect` function can be useful for numeric table lookups. This
-example uses :py:func:`~bisect.bisect` to look up a letter grade for an exam score (say)
-based on a set of ordered numeric breakpoints: 90 and up is an 'A', 80 to 89 is
-a 'B', and so on::
+Hàm :py:func:`~bisect.bisect` có thể hữu ích cho việc tra cứu bảng số. Ví dụ này sử dụng :py:func:`~bisect.bisect` để tra cứu điểm chữ cho điểm số của một bài thi (chẳng hạn) dựa trên một tập hợp các mốc số được sắp xếp: từ 90 trở lên là 'A', từ 80 đến 89 là 'B', v.v.::
 
    >>> def grade(score):
    ...     i = bisect([60, 70, 80, 90], score)
@@ -210,9 +153,7 @@ a 'B', and so on::
    >>> [grade(score) for score in [33, 99, 77, 70, 89, 90, 100]]
    ['F', 'A', 'C', 'C', 'B', 'A', 'A']
 
-The :py:func:`~bisect.bisect` and :py:func:`~bisect.insort` functions also work with
-lists of tuples.  The *key* argument can serve to extract the field used for ordering
-records in a table::
+Các hàm :py:func:`~bisect.bisect` và :py:func:`~bisect.insort` cũng hoạt động với các danh sách tuple. Đối số *key* có thể được dùng để trích xuất trường dùng cho việc sắp xếp các bản ghi trong một bảng::
 
     >>> from collections import namedtuple
     >>> from operator import attrgetter
@@ -228,13 +169,13 @@ records in a table::
     ...     Movie('Aliens', 1986, 'Cameron')
     ... ]
 
-    >>> # Find the first movie released after 1960
+    >>> # Tìm bộ phim đầu tiên được phát hành sau năm 1960
     >>> by_year = attrgetter('released')
     >>> movies.sort(key=by_year)
     >>> movies[bisect(movies, 1960, key=by_year)]
     Movie(name='The Birds', released=1963, director='Hitchcock')
 
-    >>> # Insert a movie while maintaining sort order
+    >>> # Chèn một bộ phim trong khi vẫn duy trì thứ tự sắp xếp
     >>> romance = Movie('Love Story', 1970, 'Hiller')
     >>> insort(movies, romance, key=by_year)
     >>> pprint(movies)
@@ -244,12 +185,11 @@ records in a table::
      Movie(name='Aliens', released=1986, director='Cameron'),
      Movie(name='Titanic', released=1997, director='Cameron')]
 
-If the key function is expensive, it is possible to avoid repeated function
-calls by searching a list of precomputed keys to find the index of a record::
+Nếu hàm key tốn nhiều chi phí, bạn có thể tránh việc gọi hàm lặp lại bằng cách tìm kiếm trong một danh sách các key đã được tính trước để xác định chỉ mục của một bản ghi::
 
     >>> data = [('red', 5), ('blue', 1), ('yellow', 8), ('black', 0)]
-    >>> data.sort(key=lambda r: r[1])       # Or use operator.itemgetter(1).
-    >>> keys = [r[1] for r in data]         # Precompute a list of keys.
+    >>> data.sort(key=lambda r: r[1])       # Hoặc sử dụng operator.itemgetter(1).
+    >>> keys = [r[1] for r in data]         # Tính trước một danh sách các key.
     >>> data[bisect_left(keys, 0)]
     ('black', 0)
     >>> data[bisect_left(keys, 1)]
@@ -258,3 +198,6 @@ calls by searching a list of precomputed keys to find the index of a record::
     ('red', 5)
     >>> data[bisect_left(keys, 8)]
     ('yellow', 8)
+
+.. _`Sorted Collections`: https://grantjenks.com/docs/sortedcollections/
+.. _`SortedCollection recipe`: https://code.activestate.com/recipes/577197-sortedcollection/

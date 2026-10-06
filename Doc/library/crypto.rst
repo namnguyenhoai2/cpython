@@ -1,14 +1,12 @@
 .. _crypto:
 
-**********************
-Cryptographic Services
-**********************
+******************
+Các dịch vụ mật mã
+******************
 
 .. index:: single: cryptography
 
-The modules described in this chapter implement various algorithms of a
-cryptographic nature.  They are available at the discretion of the installation.
-Here's an overview:
+Các mô-đun được mô tả trong chương này triển khai nhiều thuật toán mang tính chất mật mã. Chúng có sẵn tùy thuộc vào bản cài đặt. Dưới đây là tổng quan:
 
 
 .. toctree::
