@@ -1,20 +1,16 @@
 .. _datatypes:
 
-**********
-Data Types
-**********
+****************
+Các kiểu dữ liệu
+****************
 
-The modules described in this chapter provide a variety of specialized data
-types such as dates and times, fixed-type arrays, heap queues, double-ended
-queues, and enumerations.
+Các module được mô tả trong chương này cung cấp nhiều kiểu dữ liệu chuyên biệt, chẳng hạn như ngày và giờ, mảng có kiểu cố định, hàng đợi heap, hàng đợi hai đầu và kiểu liệt kê.
 
-Python also provides some built-in data types, in particular,
-:class:`dict`, :class:`list`, :class:`set` and :class:`frozenset`, and
-:class:`tuple`.  The :class:`str` class is used to hold
-Unicode strings, and the :class:`bytes` and :class:`bytearray` classes are used
-to hold binary data.
+Python cũng cung cấp một số kiểu dữ liệu tích hợp sẵn, cụ thể là
+:class:`dict`, :class:`list`, :class:`set` và :class:`frozenset`, và
+:class:`tuple`. Lớp :class:`str` được dùng để lưu trữ các chuỗi Unicode, còn các lớp :class:`bytes` và :class:`bytearray` được dùng để lưu trữ dữ liệu nhị phân.
 
-The following modules are documented in this chapter:
+Các module sau được trình bày trong chương này:
 
 
 .. toctree::

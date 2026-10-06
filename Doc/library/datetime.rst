@@ -1,238 +1,197 @@
-:mod:`!datetime` --- Basic date and time types
-==============================================
+:mod:`!datetime` --- Các kiểu ngày và giờ cơ bản
+================================================
 
 .. module:: datetime
-   :synopsis: Basic date and time types.
+   :synopsis: Các kiểu ngày và giờ cơ bản.
 
 .. moduleauthor:: Tim Peters <tim@zope.com>
 .. sectionauthor:: Tim Peters <tim@zope.com>
 .. sectionauthor:: A.M. Kuchling <amk@amk.ca>
 
-**Source code:** :source:`Lib/datetime.py`
+**Mã nguồn:** :source:`Lib/datetime.py`
 
 --------------
 
-The :mod:`!datetime` module supplies classes for manipulating dates and times.
+Mô-đun :mod:`!datetime` cung cấp các lớp để thao tác với ngày và giờ.
 
-While date and time arithmetic is supported, the focus of the implementation is
-on efficient attribute extraction for output formatting and manipulation.
+Mặc dù hỗ trợ phép tính số học trên ngày và giờ, trọng tâm của việc triển khai là trích xuất thuộc tính hiệu quả để định dạng và thao tác đầu ra.
 
 .. tip::
 
-    Skip to :ref:`the format codes <format-codes>`.
+    Chuyển đến :ref:`các mã định dạng <format-codes>`.
 
 .. seealso::
 
-   Module :mod:`calendar`
-      General calendar related functions.
+   Mô-đun :mod:`calendar`
+      Các hàm chung liên quan đến lịch.
 
-   Module :mod:`time`
-      Time access and conversions.
+   Mô-đun :mod:`time`
+      Truy cập và chuyển đổi thời gian.
 
-   Module :mod:`zoneinfo`
-      Concrete time zones representing the IANA time zone database.
+   Mô-đun :mod:`zoneinfo`
+      Các múi giờ cụ thể đại diện cho cơ sở dữ liệu múi giờ IANA.
 
-   Package `dateutil <https://dateutil.readthedocs.io/en/stable/>`_
-      Third-party library with expanded time zone and parsing support.
+   Gói `dateutil <https://dateutil.readthedocs.io/en/stable/>`_
+      Thư viện bên thứ ba với khả năng hỗ trợ mở rộng cho múi giờ và phân tích cú pháp.
 
-   Package :pypi:`DateType`
-      Third-party library that introduces distinct static types to for example,
-      allow :term:`static type checkers <static type checker>`
-      to differentiate between naive and aware datetimes.
+   Gói :pypi:`DateType`
+      Thư viện bên thứ ba giới thiệu các kiểu tĩnh riêng biệt để, chẳng hạn, cho phép :term:`các trình kiểm tra kiểu tĩnh <static type checker>` phân biệt giữa các datetime naive và aware.
 
 
 .. _datetime-naive-aware:
 
-Aware and naive objects
------------------------
+Các đối tượng aware và naive
+----------------------------
 
-Date and time objects may be categorized as "aware" or "naive" depending on
-whether or not they include time zone information.
+Các đối tượng ngày và giờ có thể được phân loại là "aware" hoặc "naive" tùy thuộc vào việc chúng có bao gồm thông tin múi giờ hay không.
 
-With sufficient knowledge of applicable algorithmic and political time
-adjustments, such as time zone and daylight saving time information,
-an **aware** object can locate itself relative to other aware objects.
-An aware object represents a specific moment in time that is not open to
-interpretation. [#]_
+Với đủ kiến thức về các điều chỉnh thuật toán và chính trị áp dụng, chẳng hạn như thông tin về múi giờ và giờ mùa hè, một đối tượng **aware** có thể xác định vị trí của nó tương quan với các đối tượng aware khác. Một đối tượng aware biểu diễn một thời điểm cụ thể không thể bị diễn giải theo nhiều cách. [#]_
 
-A **naive** object does not contain enough information to unambiguously locate
-itself relative to other date/time objects. Whether a naive object represents
-Coordinated Universal Time (UTC), local time, or time in some other time zone is
-purely up to the program, just like it is up to the program whether a
-particular number represents metres, miles, or mass. Naive objects are easy to
-understand and to work with, at the cost of ignoring some aspects of reality.
+Một đối tượng **naive** không chứa đủ thông tin để xác định rõ ràng vị trí của nó tương quan với các đối tượng ngày/giờ khác. Việc một đối tượng naive biểu diễn Giờ Phối hợp Quốc tế (UTC), giờ địa phương hay giờ ở một múi giờ khác hoàn toàn tùy thuộc vào chương trình, cũng giống như việc một số cụ thể biểu diễn mét, dặm hay khối lượng là tùy thuộc vào chương trình. Các đối tượng naive dễ hiểu và dễ làm việc, nhưng phải đánh đổi bằng việc bỏ qua một số khía cạnh của thực tế.
 
-For applications requiring aware objects, :class:`.datetime` and :class:`.time`
-objects have an optional time zone information attribute, :attr:`!tzinfo`, that
-can be set to an instance of a subclass of the abstract :class:`!tzinfo` class.
-These :class:`tzinfo` objects capture information about the offset from UTC
-time, the time zone name, and whether daylight saving time is in effect.
+Đối với các ứng dụng yêu cầu các đối tượng aware, các đối tượng :class:`.datetime` và :class:`.time` có một thuộc tính thông tin múi giờ tùy chọn, :attr:`!tzinfo`, có thể được đặt thành một instance của một lớp con của lớp trừu tượng :class:`!tzinfo`. Các đối tượng :class:`tzinfo` này lưu giữ thông tin về độ lệch so với giờ UTC, tên múi giờ và việc giờ mùa hè có đang được áp dụng hay không.
 
-Only one concrete :class:`tzinfo` class, the :class:`timezone` class, is
-supplied by the :mod:`!datetime` module. The :class:`!timezone` class can
-represent simple time zones with fixed offsets from UTC, such as UTC itself or
-North American EST and EDT time zones. Supporting time zones at deeper levels of
-detail is up to the application. The rules for time adjustment across the
-world are more political than rational, change frequently, and there is no
-standard suitable for every application aside from UTC.
+Chỉ có một lớp :class:`tzinfo` cụ thể, là lớp :class:`timezone`, được cung cấp bởi mô-đun :mod:`!datetime`. Lớp :class:`!timezone` có thể biểu diễn các múi giờ đơn giản với độ lệch cố định so với UTC, chẳng hạn như chính UTC hoặc các múi giờ EST và EDT của Bắc Mỹ. Việc hỗ trợ các múi giờ ở mức độ chi tiết hơn tùy thuộc vào ứng dụng. Các quy tắc điều chỉnh thời gian trên toàn thế giới mang tính chính trị nhiều hơn là hợp lý, thường xuyên thay đổi và không có tiêu chuẩn nào phù hợp với mọi ứng dụng ngoài UTC.
 
 
-Constants
----------
+Hằng số
+-------
 
-The :mod:`!datetime` module exports the following constants:
+Mô-đun :mod:`!datetime` xuất các hằng số sau:
 
 .. data:: MINYEAR
 
-   The smallest year number allowed in a :class:`date` or :class:`.datetime` object.
-   :const:`MINYEAR` is 1.
+   Số năm nhỏ nhất được phép trong đối tượng :class:`date` hoặc :class:`.datetime`.
+   :const:`MINYEAR` là 1.
 
 
 .. data:: MAXYEAR
 
-   The largest year number allowed in a :class:`date` or :class:`.datetime` object.
-   :const:`MAXYEAR` is 9999.
+   Số năm lớn nhất được phép trong đối tượng :class:`date` hoặc :class:`.datetime`.
+   :const:`MAXYEAR` là 9999.
 
 
 .. data:: UTC
 
-   Alias for the UTC time zone singleton :attr:`datetime.timezone.utc`.
+   Bí danh cho singleton múi giờ UTC :attr:`datetime.timezone.utc`.
 
    .. versionadded:: 3.11
 
 
-Available types
----------------
+Các kiểu khả dụng
+-----------------
 
 .. class:: date
    :noindex:
 
-   An idealized naive date, assuming the current Gregorian calendar always was, and
-   always will be, in effect. Attributes: :attr:`year`, :attr:`month`, and
+   Một date lý tưởng không có thông tin múi giờ (naive), giả định rằng lịch Gregorian hiện tại luôn đã và sẽ luôn được áp dụng. Các thuộc tính: :attr:`year`, :attr:`month`, và
    :attr:`day`.
 
 
 .. class:: time
    :noindex:
 
-   An idealized time, independent of any particular day, assuming that every day
-   has exactly 24\*60\*60 seconds.  (There is no notion of "leap seconds" here.)
-   Attributes: :attr:`hour`, :attr:`minute`, :attr:`second`, :attr:`microsecond`,
-   and :attr:`.tzinfo`.
+   Một time lý tưởng, không phụ thuộc vào bất kỳ ngày cụ thể nào, giả định rằng mỗi ngày luôn có chính xác 24\*60\*60 giây. (Ở đây không có khái niệm về "giây nhuận".) Các thuộc tính: :attr:`hour`, :attr:`minute`, :attr:`second`, :attr:`microsecond`, và :attr:`.tzinfo`.
 
 
 .. class:: datetime
    :noindex:
 
-   A combination of a date and a time. Attributes: :attr:`year`, :attr:`month`,
-   :attr:`day`, :attr:`hour`, :attr:`minute`, :attr:`second`, :attr:`microsecond`,
-   and :attr:`.tzinfo`.
+   Sự kết hợp giữa một date và một time. Các thuộc tính: :attr:`year`, :attr:`month`,
+   :attr:`day`, :attr:`hour`, :attr:`minute`, :attr:`second`, :attr:`microsecond`, và :attr:`.tzinfo`.
 
 
 .. class:: timedelta
    :noindex:
 
-   A duration expressing the difference between two :class:`.datetime`
-   or :class:`date` instances to microsecond resolution.
+   Một khoảng thời gian biểu thị sự chênh lệch giữa hai instance :class:`.datetime` hoặc :class:`date`, với độ phân giải đến microsecond.
 
 
 .. class:: tzinfo
    :noindex:
 
-   An abstract base class for time zone information objects. These are used by the
-   :class:`.datetime` and :class:`.time` classes to provide a customizable notion of
-   time adjustment (for example, to account for time zone and/or daylight saving
-   time).
+   Một lớp cơ sở trừu tượng dành cho các đối tượng chứa thông tin múi giờ. Các đối tượng này được sử dụng bởi
+   :class:`.datetime` và :class:`.time` để cung cấp khái niệm có thể tùy chỉnh về việc điều chỉnh thời gian (ví dụ: để tính đến múi giờ và/hoặc giờ mùa hè).
 
 
 .. class:: timezone
    :noindex:
 
-   A class that implements the :class:`tzinfo` abstract base class as a
-   fixed offset from the UTC.
+   Một lớp triển khai lớp cơ sở trừu tượng :class:`tzinfo` dưới dạng độ lệch cố định so với UTC.
 
    .. versionadded:: 3.2
 
 
-Objects of these types are immutable.
+Các đối tượng thuộc những kiểu này là bất biến.
 
-Subclass relationships:
+Quan hệ kế thừa:
 
 .. figure:: datetime-inheritance.svg
    :class: invert-in-dark-mode
    :align: center
-   :alt: timedelta, tzinfo, time, and date inherit from object; timezone inherits
-         from tzinfo; and datetime inherits from date.
+   :alt: timedelta, tzinfo, time và date kế thừa từ object; timezone kế thừa từ tzinfo; còn datetime kế thừa từ date.
 
 
-Common properties
-^^^^^^^^^^^^^^^^^
+Các thuộc tính chung
+^^^^^^^^^^^^^^^^^^^^
 
-The :class:`date`, :class:`.datetime`, :class:`.time`, and :class:`timezone` types
-share these common features:
+Các kiểu :class:`date`, :class:`.datetime`, :class:`.time` và :class:`timezone` có những đặc điểm chung sau:
 
-- Objects of these types are immutable.
-- Objects of these types are :term:`hashable`, meaning that they can be used as
-  dictionary keys.
-- Objects of these types support efficient pickling via the :mod:`pickle` module.
+- Các đối tượng thuộc những kiểu này là bất biến.
+- Các đối tượng thuộc những kiểu này là :term:`hashable`, nghĩa là chúng có thể được dùng làm khóa từ điển.
+- Các đối tượng thuộc những kiểu này hỗ trợ pickling hiệu quả thông qua mô-đun :mod:`pickle`.
 
 
-Determining if an object is aware or naive
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Xác định một đối tượng là aware hay naive
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Objects of the :class:`date` type are always naive.
+Các đối tượng thuộc kiểu :class:`date` luôn là naive.
 
-An object of type :class:`.time` or :class:`.datetime` may be aware or naive.
+Một đối tượng thuộc kiểu :class:`.time` hoặc :class:`.datetime` có thể là aware hoặc naive.
 
-A :class:`.datetime` object ``d`` is aware if both of the following hold:
+Một đối tượng :class:`.datetime` ``d`` là aware nếu cả hai điều kiện sau đều đúng:
 
-1. ``d.tzinfo`` is not ``None``
-2. ``d.tzinfo.utcoffset(d)`` does not return ``None``
+1. ``d.tzinfo`` không phải ``None``
+2. ``d.tzinfo.utcoffset(d)`` không trả về ``None``
 
-Otherwise, ``d`` is naive.
+Nếu không, ``d`` là naive.
 
-A :class:`.time` object ``t`` is aware if both of the following hold:
+Một đối tượng :class:`.time` ``t`` là aware nếu cả hai điều kiện sau đều đúng:
 
-1. ``t.tzinfo`` is not ``None``
-2. ``t.tzinfo.utcoffset(None)`` does not return ``None``.
+1. ``t.tzinfo`` không phải ``None``
+2. ``t.tzinfo.utcoffset(None)`` không trả về ``None``.
 
-Otherwise, ``t`` is naive.
+Nếu không, ``t`` là naive.
 
-The distinction between aware and naive doesn't apply to :class:`timedelta`
-objects.
+Sự phân biệt giữa aware và naive không áp dụng cho các đối tượng :class:`timedelta`.
 
 
 .. _datetime-timedelta:
 
-:class:`!timedelta` objects
----------------------------
+Các đối tượng :class:`!timedelta`
+---------------------------------
 
-A :class:`timedelta` object represents a duration, the difference between two
-:class:`.datetime` or :class:`date` instances.
+Một đối tượng :class:`timedelta` biểu diễn một khoảng thời gian, tức hiệu giữa hai
+đối tượng :class:`.datetime` hoặc :class:`date`.
 
 .. class:: timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
 
-   All arguments are optional and default to 0. Arguments may be integers
-   or floats, and may be positive or negative.
+   Tất cả đối số đều là tùy chọn và mặc định là 0. Đối số có thể là số nguyên hoặc số thực, đồng thời có thể dương hoặc âm.
 
-   Only *days*, *seconds* and *microseconds* are stored internally.
-   Arguments are converted to those units:
+   Chỉ *days*, *seconds* và *microseconds* được lưu trữ nội bộ. Các đối số được chuyển đổi sang những đơn vị đó:
 
-   * A millisecond is converted to 1000 microseconds.
-   * A minute is converted to 60 seconds.
-   * An hour is converted to 3600 seconds.
-   * A week is converted to 7 days.
+   * Một mili giây được chuyển đổi thành 1000 micro giây.
+   * Một phút được chuyển đổi thành 60 giây.
+   * Một giờ được chuyển đổi thành 3600 giây.
+   * Một tuần được chuyển đổi thành 7 ngày.
 
-   and days, seconds and microseconds are then normalized so that the
-   representation is unique, with
+   sau đó ngày, giây và micro giây được chuẩn hóa để biểu diễn là duy nhất, với
 
    * ``0 <= microseconds < 1000000``
-   * ``0 <= seconds < 3600*24`` (the number of seconds in one day)
+   * ``0 <= seconds < 3600*24`` (số giây trong một ngày)
    * ``-999999999 <= days <= 999999999``
 
-   The following example illustrates how any arguments besides
-   *days*, *seconds* and *microseconds* are "merged" and normalized into those
-   three resulting attributes::
+   Ví dụ sau minh họa cách mọi đối số ngoài *days*, *seconds* và *microseconds* được "gộp" và chuẩn hóa thành ba thuộc tính kết quả đó::
 
        >>> import datetime as dt
        >>> delta = dt.timedelta(
@@ -244,36 +203,26 @@ A :class:`timedelta` object represents a duration, the difference between two
        ...     hours=8,
        ...     weeks=2
        ... )
-       >>> # Only days, seconds, and microseconds remain
+       >>> # Chỉ còn ngày, giây và microsecond
        >>> delta
        datetime.timedelta(days=64, seconds=29156, microseconds=10)
 
    .. tip::
-      ``import datetime as dt`` instead of ``import datetime`` or
-      ``from datetime import datetime`` to avoid confusion between the module
-      and the class. See `How I Import Python’s datetime Module
-      <https://adamj.eu/tech/2019/09/12/how-i-import-pythons-datetime-module/>`__.
+      ``import datetime as dt`` thay vì ``import datetime`` hoặc ``from datetime import datetime`` để tránh nhầm lẫn giữa module và class. Xem `How I Import Python’s datetime Module <https://adamj.eu/tech/2019/09/12/how-i-import-pythons-datetime-module/>`__.
 
-   If any argument is a float and there are fractional microseconds,
-   the fractional microseconds left over from all arguments are
-   combined and their sum is rounded to the nearest microsecond using
-   round-half-to-even tiebreaker. If no argument is a float, the
-   conversion and normalization processes are exact (no information is
-   lost).
+   Nếu bất kỳ đối số nào là số thực và có microsecond lẻ, phần microsecond lẻ còn lại từ tất cả các đối số sẽ được gộp lại, rồi tổng của chúng được làm tròn đến microsecond gần nhất, sử dụng quy tắc phân định round-half-to-even. Nếu không có đối số nào là số thực, quá trình chuyển đổi và chuẩn hóa là chính xác (không mất thông tin).
 
-   If the normalized value of days lies outside the indicated range,
-   :exc:`OverflowError` is raised.
+   Nếu giá trị ngày đã chuẩn hóa nằm ngoài phạm vi được chỉ định,
+   :exc:`OverflowError` sẽ được raised.
 
-   Note that normalization of negative values may be surprising at first. For
-   example::
+   Lưu ý rằng việc chuẩn hóa các giá trị âm lúc đầu có thể gây bất ngờ. Ví dụ::
 
       >>> import datetime as dt
       >>> d = dt.timedelta(microseconds=-1)
       >>> (d.days, d.seconds, d.microseconds)
       (-1, 86399, 999999)
 
-   Since the string representation of :class:`!timedelta` objects can be confusing,
-   use the following recipe to produce a more readable format:
+   Vì biểu diễn chuỗi của các đối tượng :class:`!timedelta` có thể gây nhầm lẫn, hãy sử dụng công thức sau để tạo ra định dạng dễ đọc hơn:
 
    .. code-block:: pycon
 
@@ -283,51 +232,46 @@ A :class:`timedelta` object represents a duration, the difference between two
       ...     return f'-({-td!s})'
       ...
       >>> d = timedelta(hours=-1)
-      >>> str(d)  # not human-friendly
+      >>> str(d)  # không thân thiện với con người
       '-1 day, 23:00:00'
       >>> pretty_timedelta(d)
       '-(1:00:00)'
 
 
-Class attributes:
+Các thuộc tính của lớp:
 
 .. attribute:: timedelta.min
 
-   The most negative :class:`timedelta` object, ``timedelta(-999999999)``.
+   Đối tượng :class:`timedelta` âm nhất, ``timedelta(-999999999)``.
 
 
 .. attribute:: timedelta.max
 
-   The most positive :class:`timedelta` object, ``timedelta(days=999999999,
-   hours=23, minutes=59, seconds=59, microseconds=999999)``.
+   Đối tượng :class:`timedelta` dương nhất, ``timedelta(days=999999999, hours=23, minutes=59, seconds=59, microseconds=999999)``.
 
 
 .. attribute:: timedelta.resolution
 
-   The smallest possible difference between non-equal :class:`timedelta` objects,
-   ``timedelta(microseconds=1)``.
+   Hiệu nhỏ nhất có thể giữa các đối tượng :class:`timedelta` không bằng nhau, ``timedelta(microseconds=1)``.
 
 
-Note that, because of normalization, ``timedelta.max`` is greater than ``-timedelta.min``.
-``-timedelta.max`` is not representable as a :class:`timedelta` object.
+Lưu ý rằng, do quá trình chuẩn hóa, ``timedelta.max`` lớn hơn ``-timedelta.min``. ``-timedelta.max`` không thể biểu diễn dưới dạng đối tượng :class:`timedelta`.
 
 
-Instance attributes (read-only):
+Các thuộc tính của instance (chỉ đọc):
 
 .. attribute:: timedelta.days
 
-   Between -999,999,999 and 999,999,999 inclusive.
+   Trong khoảng từ -999.999.999 đến 999.999.999, bao gồm cả hai đầu mút.
 
 
 .. attribute:: timedelta.seconds
 
-   Between 0 and 86,399 inclusive.
+   Trong khoảng từ 0 đến 86.399, bao gồm cả hai đầu mút.
 
    .. caution::
 
-      It is a somewhat common bug for code to unintentionally use this attribute
-      when it is actually intended to get a :meth:`~timedelta.total_seconds`
-      value instead:
+      Một lỗi khá phổ biến là code vô tình sử dụng thuộc tính này trong khi thực tế lại nhằm lấy một giá trị :meth:`~timedelta.total_seconds`:
 
       .. doctest::
 
@@ -341,10 +285,10 @@ Instance attributes (read-only):
 
 .. attribute:: timedelta.microseconds
 
-   Between 0 and 999,999 inclusive.
+   Trong khoảng từ 0 đến 999.999, bao gồm cả hai đầu mút.
 
 
-Supported operations:
+Các phép toán được hỗ trợ:
 
 +--------------------------------+-----------------------------------------------+
 | Operation                      | Result                                        |
@@ -407,24 +351,22 @@ Supported operations:
 |                                | call with canonical attribute values.         |
 +--------------------------------+-----------------------------------------------+
 
-Notes:
+Lưu ý:
 
 (1)
-   This is exact but may overflow.
+   Giá trị này chính xác nhưng có thể gây tràn số.
 
 (2)
-   This is exact and cannot overflow.
+   Kết quả này chính xác và không thể bị tràn.
 
 (3)
-   Division by zero raises :exc:`ZeroDivisionError`.
+   Phép chia cho số không sẽ phát sinh :exc:`ZeroDivisionError`.
 
 (4)
-   ``-timedelta.max`` is not representable as a :class:`timedelta` object.
+   ``-timedelta.max`` không thể biểu diễn dưới dạng đối tượng :class:`timedelta`.
 
 (5)
-   String representations of :class:`timedelta` objects are normalized
-   similarly to their internal representation. This leads to somewhat
-   unusual results for negative timedeltas. For example::
+   Biểu diễn chuỗi của các đối tượng :class:`timedelta` được chuẩn hóa tương tự như biểu diễn nội bộ của chúng. Điều này dẫn đến một số kết quả khá bất thường đối với các timedelta âm. Ví dụ::
 
       >>> timedelta(hours=-5)
       datetime.timedelta(days=-1, seconds=68400)
@@ -432,45 +374,36 @@ Notes:
       -1 day, 19:00:00
 
 (6)
-   The expression ``t2 - t3`` will always be equal to the expression ``t2 + (-t3)`` except
-   when t3 is equal to ``timedelta.max``; in that case the former will produce a result
-   while the latter will overflow.
+   Biểu thức ``t2 - t3`` sẽ luôn bằng biểu thức ``t2 + (-t3)``, ngoại trừ khi t3 bằng ``timedelta.max``; trong trường hợp đó, biểu thức đầu tiên sẽ tạo ra một kết quả, còn biểu thức sau sẽ bị tràn.
 
-In addition to the operations listed above, :class:`timedelta` objects support
-certain additions and subtractions with :class:`date` and :class:`.datetime`
-objects (see below).
+Ngoài các phép toán được liệt kê ở trên, các đối tượng :class:`timedelta` còn hỗ trợ một số phép cộng và phép trừ với các đối tượng :class:`date` và :class:`.datetime` (xem bên dưới).
 
 .. versionchanged:: 3.2
-   Floor division and true division of a :class:`timedelta` object by another
-   :class:`!timedelta` object are now supported, as are remainder operations and
-   the :func:`divmod` function. True division and multiplication of a
-   :class:`!timedelta` object by a :class:`float` object are now supported.
+   Phép chia lấy phần nguyên và phép chia thực của một đối tượng :class:`timedelta` cho một đối tượng khác
+   Các phép toán với đối tượng :class:`!timedelta` hiện đã được hỗ trợ, cũng như các phép toán lấy phần dư và hàm :func:`divmod`. Phép chia thực và phép nhân một
+   đối tượng :class:`!timedelta` với một đối tượng :class:`float` hiện đã được hỗ trợ.
 
-:class:`timedelta` objects support equality and order comparisons.
+Các đối tượng :class:`timedelta` hỗ trợ so sánh bằng và so sánh thứ tự.
 
-In Boolean contexts, a :class:`timedelta` object is
-considered to be true if and only if it isn't equal to ``timedelta(0)``.
+Trong các ngữ cảnh Boolean, một đối tượng :class:`timedelta` được xem là đúng khi và chỉ khi nó không bằng ``timedelta(0)``.
 
-Instance methods:
+Các phương thức của instance:
 
 .. method:: timedelta.total_seconds()
 
-   Return the total number of seconds contained in the duration. Equivalent to
-   ``td / timedelta(seconds=1)``. For interval units other than seconds, use the
-   division form directly (for example, ``td / timedelta(microseconds=1)``).
+   Trả về tổng số giây có trong khoảng thời gian. Tương đương với ``td / timedelta(seconds=1)``. Đối với các đơn vị khoảng thời gian khác giây, hãy sử dụng trực tiếp dạng phép chia (ví dụ: ``td / timedelta(microseconds=1)``).
 
-   Note that for very large time intervals (greater than 270 years on
-   most platforms) this method will lose microsecond accuracy.
+   Lưu ý rằng đối với các khoảng thời gian rất lớn (lớn hơn 270 năm trên hầu hết các nền tảng), phương thức này sẽ mất độ chính xác đến microsecond.
 
    .. versionadded:: 3.2
 
 
-Examples of usage: :class:`!timedelta`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ sử dụng: :class:`!timedelta`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An additional example of normalization::
+Một ví dụ bổ sung về việc chuẩn hóa::
 
-    >>> # Components of another_year add up to exactly 365 days
+    >>> # Các thành phần của another_year cộng lại chính xác bằng 365 ngày
     >>> import datetime as dt
     >>> year = dt.timedelta(days=365)
     >>> another_year = dt.timedelta(weeks=40, days=84, hours=23,
@@ -480,7 +413,7 @@ An additional example of normalization::
     >>> year.total_seconds()
     31536000.0
 
-Examples of :class:`timedelta` arithmetic::
+Ví dụ về phép tính số học với :class:`timedelta`::
 
     >>> import datetime as dt
     >>> year = dt.timedelta(days=365)
@@ -499,78 +432,61 @@ Examples of :class:`timedelta` arithmetic::
 
 .. _datetime-date:
 
-:class:`!date` objects
-----------------------
+Các đối tượng :class:`!date`
+----------------------------
 
-A :class:`date` object represents a date (year, month and day) in an idealized
-calendar, the current Gregorian calendar indefinitely extended in both
-directions.
+Đối tượng :class:`date` biểu diễn một ngày (năm, tháng và ngày) trong một lịch lý tưởng hóa, tức lịch Gregory hiện tại được mở rộng vô hạn theo cả hai hướng.
 
-January 1 of year 1 is called day number 1, January 2 of year 1 is
-called day number 2, and so on. [#]_
+Ngày 1 tháng 1 của năm 1 được gọi là ngày số 1, ngày 2 tháng 1 của năm 1 được gọi là ngày số 2, và cứ tiếp tục như vậy. [#]_
 
 .. class:: date(year, month, day)
 
-   All arguments are required. Arguments must be integers, in the following
-   ranges:
+   Tất cả các đối số đều bắt buộc. Các đối số phải là số nguyên, trong các phạm vi sau:
 
    * ``MINYEAR <= year <= MAXYEAR``
    * ``1 <= month <= 12``
    * ``1 <= day <= number of days in the given month and year``
 
-   If an argument outside those ranges is given, :exc:`ValueError` is raised.
+   Nếu cung cấp một đối số nằm ngoài các phạm vi đó, :exc:`ValueError` sẽ được phát sinh.
 
 
-Other constructors, all class methods:
+Các hàm khởi tạo khác, tất cả các phương thức của lớp:
 
 .. classmethod:: date.today()
 
-   Return the current local date.
+   Trả về ngày hiện tại theo giờ địa phương.
 
-   This is equivalent to ``date.fromtimestamp(time.time())``.
+   Điều này tương đương với ``date.fromtimestamp(time.time())``.
 
 
 .. classmethod:: date.fromtimestamp(timestamp)
 
-   Return the local date corresponding to the POSIX *timestamp*, such as is
-   returned by :func:`time.time`.
+   Trả về ngày địa phương tương ứng với *timestamp* POSIX, chẳng hạn như giá trị được trả về bởi :func:`time.time`.
 
-   This may raise :exc:`OverflowError`, if the timestamp is out
-   of the range of values supported by the platform C :c:func:`localtime`
-   function, and :exc:`OSError` on :c:func:`localtime` failure.
-   It's common for this to be restricted to years from 1970 through 2038. Note
-   that on non-POSIX systems that include leap seconds in their notion of a
-   timestamp, leap seconds are ignored by :meth:`fromtimestamp`.
+   Lệnh này có thể phát sinh :exc:`OverflowError` nếu timestamp nằm ngoài phạm vi giá trị được hàm :c:func:`localtime` C của nền tảng hỗ trợ, và :exc:`OSError` khi :c:func:`localtime` không thành công. Thông thường, phạm vi này bị giới hạn trong các năm từ 1970 đến 2038. Lưu ý rằng trên các hệ thống không phải POSIX có tính giây nhuận vào timestamp, các giây nhuận sẽ bị :meth:`fromtimestamp` bỏ qua.
 
    .. versionchanged:: 3.3
-      Raise :exc:`OverflowError` instead of :exc:`ValueError` if the timestamp
-      is out of the range of values supported by the platform C
-      :c:func:`localtime` function. Raise :exc:`OSError` instead of
-      :exc:`ValueError` on :c:func:`localtime` failure.
+      Nêu :exc:`OverflowError` thay vì :exc:`ValueError` nếu timestamp nằm ngoài phạm vi giá trị được platform C hỗ trợ
+      Hàm :c:func:`localtime`. Nêu :exc:`OSError` thay vì
+      :exc:`ValueError` khi :c:func:`localtime` không thành công.
 
 
 .. classmethod:: date.fromordinal(ordinal)
 
-   Return the date corresponding to the proleptic Gregorian *ordinal*, where
-   January 1 of year 1 has ordinal 1.
+   Trả về ngày tương ứng với *ordinal* Gregorian mở rộng, trong đó ngày 1 tháng 1 của năm 1 có ordinal là 1.
 
-   :exc:`ValueError` is raised unless ``1 <= ordinal <=
-   date.max.toordinal()``. For any date ``d``,
-   ``date.fromordinal(d.toordinal()) == d``.
+   :exc:`ValueError` được nêu trừ khi ``1 <= ordinal <= date.max.toordinal()``. Với mọi ngày ``d``, ``date.fromordinal(d.toordinal()) == d``.
 
 
 .. classmethod:: date.fromisoformat(date_string)
 
-   Return a :class:`date` corresponding to a *date_string* given in any valid
-   ISO 8601 format, with the following exceptions:
+   Trả về một :class:`date` tương ứng với *date_string* được cung cấp ở bất kỳ định dạng ISO 8601 hợp lệ nào, với các ngoại lệ sau:
 
-   1. Reduced precision dates are not currently supported (``YYYY-MM``,
-      ``YYYY``).
-   2. Extended date representations are not currently supported
-      (``±YYYYYY-MM-DD``).
-   3. Ordinal dates are not currently supported (``YYYY-OOO``).
+   1. Hiện chưa hỗ trợ ngày có độ chính xác rút gọn (``YYYY-MM``, ``YYYY``).
+   2. Các biểu diễn ngày mở rộng hiện chưa được hỗ trợ (``±YYYYYY-MM-DD``).
+   3. Ngày thứ tự hiện chưa được hỗ trợ (``YYYY-OOO``).
 
-   Examples::
+   Ví dụ::
 
       >>> import datetime as dt
       >>> dt.date.fromisoformat('2019-12-04')
@@ -582,87 +498,76 @@ Other constructors, all class methods:
 
    .. versionadded:: 3.7
    .. versionchanged:: 3.11
-      Previously, this method only supported the format ``YYYY-MM-DD``.
+      Trước đây, phương thức này chỉ hỗ trợ định dạng ``YYYY-MM-DD``.
 
 
 .. classmethod:: date.fromisocalendar(year, week, day)
 
-   Return a :class:`date` corresponding to the ISO calendar date specified by
-   *year*, *week* and *day*. This is the inverse of the function :meth:`date.isocalendar`.
+   Trả về một :class:`date` tương ứng với ngày theo lịch ISO được chỉ định bởi *year*, *week* và *day*. Đây là hàm ngược của hàm :meth:`date.isocalendar`.
 
    .. versionadded:: 3.8
 
 
 .. classmethod:: date.strptime(date_string, format)
 
-   Return a :class:`.date` corresponding to *date_string*, parsed according to
-   *format*. This is equivalent to::
+   Trả về một :class:`.date` tương ứng với *date_string*, được phân tích theo *format*. Điều này tương đương với::
 
      date(*(time.strptime(date_string, format)[0:3]))
 
-   :exc:`ValueError` is raised if the date_string and format
-   can't be parsed by :func:`time.strptime` or if it returns a value which isn't a
-   time tuple.  See also :ref:`strftime-strptime-behavior` and
+   :exc:`ValueError` được phát sinh nếu không thể phân tích date_string và format bằng :func:`time.strptime` hoặc nếu hàm này trả về một giá trị không phải là time tuple. Xem thêm :ref:`strftime-strptime-behavior` và
    :meth:`date.fromisoformat`.
 
    .. note::
 
-      If *format* specifies a day of month without a year a
-      :exc:`DeprecationWarning` is emitted.  This is to avoid a quadrennial
-      leap year bug in code seeking to parse only a month and day as the
-      default year used in absence of one in the format is not a leap year.
-      Such *format* values may raise an error as of Python 3.15.  The
-      workaround is to always include a year in your *format*.  If parsing
-      *date_string* values that do not have a year, explicitly add a year that
-      is a leap year before parsing:
+      Nếu *format* chỉ định một ngày trong tháng mà không có năm thì một
+      :exc:`DeprecationWarning` được phát ra. Điều này nhằm tránh lỗi năm nhuận bốn năm một lần trong mã chỉ tìm cách phân tích tháng và ngày, vì năm mặc định được dùng khi không có năm trong định dạng không phải là năm nhuận. Các giá trị *format* như vậy có thể gây ra lỗi kể từ Python 3.15. Cách khắc phục là luôn bao gồm một năm trong *format*. Nếu phân tích các giá trị *date_string* không có năm, hãy thêm rõ ràng một năm nhuận trước khi phân tích:
 
       .. doctest::
 
          >>> import datetime as dt
          >>> date_string = "02/29"
-         >>> when = dt.date.strptime(f"{date_string};1984", "%m/%d;%Y")  # Avoids leap year bug.
+         >>> when = dt.date.strptime(f"{date_string};1984", "%m/%d;%Y")  # Tránh lỗi năm nhuận.
          >>> when.strftime("%B %d")  # doctest: +SKIP
          'February 29'
 
    .. versionadded:: 3.14
 
 
-Class attributes:
+Các thuộc tính của lớp:
 
 .. attribute:: date.min
 
-   The earliest representable date, ``date(MINYEAR, 1, 1)``.
+   Ngày sớm nhất có thể biểu diễn, ``date(MINYEAR, 1, 1)``.
 
 
 .. attribute:: date.max
 
-   The latest representable date, ``date(MAXYEAR, 12, 31)``.
+   Ngày muộn nhất có thể biểu diễn, ``date(MAXYEAR, 12, 31)``.
 
 
 .. attribute:: date.resolution
 
-   The smallest possible difference between non-equal date objects,
-   ``timedelta(days=1)``.
+   Khoảng chênh lệch nhỏ nhất có thể giữa các đối tượng date không bằng nhau, ``timedelta(days=1)``.
 
 
-Instance attributes (read-only):
+Các thuộc tính của thể hiện (chỉ đọc):
 
 .. attribute:: date.year
 
-   Between :const:`MINYEAR` and :const:`MAXYEAR` inclusive.
+   Nằm trong khoảng từ :const:`MINYEAR` đến :const:`MAXYEAR`, bao gồm cả hai giá trị.
 
 
 .. attribute:: date.month
 
-   Between 1 and 12 inclusive.
+   Nằm trong khoảng từ 1 đến 12, bao gồm cả hai giá trị.
 
 
 .. attribute:: date.day
 
-   Between 1 and the number of days in the given month of the given year.
+   Nằm trong khoảng từ 1 đến số ngày của tháng đã cho trong năm đã cho.
 
 
-Supported operations:
+Các thao tác được hỗ trợ:
 
 +-------------------------------+----------------------------------------------+
 | Operation                     | Result                                       |
@@ -684,115 +589,91 @@ Supported operations:
 | | ``date1 >= date2``          |                                              |
 +-------------------------------+----------------------------------------------+
 
-Notes:
+Lưu ý:
 
 (1)
-   *date2* is moved forward in time if ``timedelta.days > 0``, or backward if
-   ``timedelta.days < 0``. Afterward ``date2 - date1 == timedelta.days``.
-   ``timedelta.seconds`` and ``timedelta.microseconds`` are ignored.
-   :exc:`OverflowError` is raised if ``date2.year`` would be smaller than
-   :const:`MINYEAR` or larger than :const:`MAXYEAR`.
+   *date2* được dịch chuyển về phía trước theo thời gian nếu ``timedelta.days > 0``, hoặc lùi lại nếu ``timedelta.days < 0``. Sau đó ``date2 - date1 == timedelta.days``. ``timedelta.seconds`` và ``timedelta.microseconds`` bị bỏ qua.
+   :exc:`OverflowError` được phát sinh nếu ``date2.year`` nhỏ hơn
+   :const:`MINYEAR` hoặc lớn hơn :const:`MAXYEAR`.
 
 (2)
-   ``timedelta.seconds`` and ``timedelta.microseconds`` are ignored.
+   ``timedelta.seconds`` và ``timedelta.microseconds`` bị bỏ qua.
 
 (3)
-   This is exact, and cannot overflow. ``timedelta.seconds`` and
-   ``timedelta.microseconds`` are 0, and ``date2 + timedelta == date1`` after.
+   Điều này là chính xác và không thể xảy ra tràn. ``timedelta.seconds`` và ``timedelta.microseconds`` là 0, còn ``date2 + timedelta == date1`` sau đó.
 
 (4)
-   :class:`date` objects are equal if they represent the same date.
+   Các đối tượng :class:`date` bằng nhau nếu chúng biểu diễn cùng một ngày.
 
-   :class:`!date` objects that are not also :class:`.datetime` instances
-   are never equal to :class:`!datetime` objects, even if they represent
-   the same date.
+   Các đối tượng :class:`!date` không đồng thời là các thực thể :class:`.datetime` thì không bao giờ bằng các đối tượng :class:`!datetime`, ngay cả khi chúng biểu diễn cùng một ngày.
 
 (5)
-   *date1* is considered less than *date2* when *date1* precedes *date2* in time.
-   In other words, ``date1 < date2`` if and only if ``date1.toordinal() <
-   date2.toordinal()``.
+   *date1* được xem là nhỏ hơn *date2* khi *date1* đứng trước *date2* về thời gian. Nói cách khác, ``date1 < date2`` khi và chỉ khi ``date1.toordinal() < date2.toordinal()``.
 
-   Order comparison between a :class:`date` object that is not also a
-   :class:`.datetime` instance and a :class:`!datetime` object raises
+   Phép so sánh thứ tự giữa một đối tượng :class:`date` không đồng thời là một
+   instance :class:`.datetime` và một đối tượng :class:`!datetime` sẽ phát sinh lỗi
    :exc:`TypeError`.
 
 .. versionchanged:: 3.13
-   Comparison between :class:`.datetime` object and an instance of
-   the :class:`date` subclass that is not a :class:`!datetime` subclass
-   no longer converts the latter to :class:`!date`, ignoring the time part
-   and the time zone.
-   The default behavior can be changed by overriding the special comparison
-   methods in subclasses.
+   Phép so sánh giữa đối tượng :class:`.datetime` và một instance của lớp con :class:`date` không phải là lớp con :class:`!datetime` không còn chuyển đối tượng sau thành :class:`!date`, bỏ qua phần thời gian và múi giờ. Có thể thay đổi hành vi mặc định bằng cách ghi đè các phương thức so sánh đặc biệt trong các lớp con.
 
-In Boolean contexts, all :class:`date` objects are considered to be true.
+Trong các ngữ cảnh Boolean, mọi đối tượng :class:`date` đều được xem là true.
 
-Instance methods:
+Các phương thức instance:
 
 .. method:: date.replace(year=self.year, month=self.month, day=self.day)
 
-   Return a new :class:`date` object with the same values, but with specified
-   parameters updated.
+   Trả về một đối tượng :class:`date` mới với các giá trị giống nhau, nhưng các tham số được chỉ định đã được cập nhật.
 
-   Example::
+   Ví dụ::
 
        >>> import datetime as dt
        >>> d = dt.date(2002, 12, 31)
        >>> d.replace(day=26)
        datetime.date(2002, 12, 26)
 
-   The generic function :func:`copy.replace` also supports :class:`date`
-   objects.
+   Hàm generic :func:`copy.replace` cũng hỗ trợ các đối tượng :class:`date`.
 
 
 .. method:: date.timetuple()
 
-   Return a :class:`time.struct_time` such as returned by :func:`time.localtime`.
+   Trả về một :class:`time.struct_time` như giá trị được trả về bởi :func:`time.localtime`.
 
-   The hours, minutes and seconds are 0, and the DST flag is -1.
+   Giờ, phút và giây đều bằng 0, còn cờ DST là -1.
 
-   ``d.timetuple()`` is equivalent to::
+   ``d.timetuple()`` tương đương với::
 
      time.struct_time((d.year, d.month, d.day, 0, 0, 0, d.weekday(), yday, -1))
 
-   where ``yday = d.toordinal() - date(d.year, 1, 1).toordinal() + 1``
-   is the day number within the current year starting with 1 for January 1st.
+   trong đó ``yday = d.toordinal() - date(d.year, 1, 1).toordinal() + 1`` là số thứ tự của ngày trong năm hiện tại, bắt đầu từ 1 cho ngày 1 tháng 1.
 
 
 .. method:: date.toordinal()
 
-   Return the proleptic Gregorian ordinal of the date, where January 1 of year 1
-   has ordinal 1. For any :class:`date` object ``d``,
-   ``date.fromordinal(d.toordinal()) == d``.
+   Trả về số thứ tự Gregorian mở rộng của ngày, trong đó ngày 1 tháng 1 của năm 1 có số thứ tự là 1. Với mọi đối tượng :class:`date` ``d``, ``date.fromordinal(d.toordinal()) == d``.
 
 
 .. method:: date.weekday()
 
-   Return the day of the week as an integer, where Monday is 0 and Sunday is 6.
-   For example, ``date(2002, 12, 4).weekday() == 2``, a Wednesday. See also
+   Trả về ngày trong tuần dưới dạng số nguyên, trong đó thứ Hai là 0 và Chủ nhật là 6. Ví dụ: ``date(2002, 12, 4).weekday() == 2``, là thứ Tư. Xem thêm
    :meth:`isoweekday`.
 
 
 .. method:: date.isoweekday()
 
-   Return the day of the week as an integer, where Monday is 1 and Sunday is 7.
-   For example, ``date(2002, 12, 4).isoweekday() == 3``, a Wednesday. See also
+   Trả về ngày trong tuần dưới dạng số nguyên, trong đó thứ Hai là 1 và Chủ nhật là 7. Ví dụ: ``date(2002, 12, 4).isoweekday() == 3``, là thứ Tư. Xem thêm
    :meth:`weekday`, :meth:`isocalendar`.
 
 
 .. method:: date.isocalendar()
 
-   Return a :term:`named tuple` object with three components: ``year``,
-   ``week`` and ``weekday``.
+   Trả về một đối tượng :term:`named tuple` gồm ba thành phần: ``year``, ``week`` và ``weekday``.
 
-   The ISO calendar is a widely used variant of the Gregorian calendar. [#]_
+   Lịch ISO là một biến thể được sử dụng rộng rãi của lịch Gregory. [#]_
 
-   The ISO year consists of 52 or 53 full weeks, and where a week starts on a
-   Monday and ends on a Sunday. The first week of an ISO year is the first
-   (Gregorian) calendar week of a year containing a Thursday. This is called week
-   number 1, and the ISO year of that Thursday is the same as its Gregorian year.
+   Năm ISO gồm 52 hoặc 53 tuần trọn vẹn, trong đó một tuần bắt đầu vào thứ Hai và kết thúc vào Chủ nhật. Tuần đầu tiên của một năm ISO là tuần dương lịch (Gregory) đầu tiên của một năm có chứa thứ Năm. Tuần này được gọi là tuần số 1, và năm ISO của ngày thứ Năm đó trùng với năm Gregory của ngày đó.
 
-   For example, 2004 begins on a Thursday, so the first week of ISO year 2004
-   begins on Monday, 29 Dec 2003 and ends on Sunday, 4 Jan 2004::
+   Ví dụ: năm 2004 bắt đầu vào thứ Năm, vì vậy tuần đầu tiên của năm ISO 2004 bắt đầu vào thứ Hai, ngày 29 tháng 12 năm 2003 và kết thúc vào Chủ nhật, ngày 4 tháng 1 năm 2004::
 
         >>> import datetime as dt
         >>> dt.date(2003, 12, 29).isocalendar()
@@ -801,12 +682,12 @@ Instance methods:
         datetime.IsoCalendarDate(year=2004, week=1, weekday=7)
 
    .. versionchanged:: 3.9
-      Result changed from a tuple to a :term:`named tuple`.
+      Kết quả đã được thay đổi từ tuple thành :term:`named tuple`.
 
 
 .. method:: date.isoformat()
 
-   Return a string representing the date in ISO 8601 format, ``YYYY-MM-DD``::
+   Trả về một chuỗi biểu diễn ngày ở định dạng ISO 8601, ``YYYY-MM-DD``::
 
        >>> import datetime as dt
        >>> dt.date(2002, 12, 4).isoformat()
@@ -815,45 +696,40 @@ Instance methods:
 
 .. method:: date.__str__()
 
-   For a date ``d``, ``str(d)`` is equivalent to ``d.isoformat()``.
+   Đối với một ngày ``d``, ``str(d)`` tương đương với ``d.isoformat()``.
 
 
 .. method:: date.ctime()
 
-   Return a string representing the date::
+   Trả về một chuỗi biểu diễn ngày::
 
        >>> import datetime as dt
        >>> dt.date(2002, 12, 4).ctime()
        'Wed Dec  4 00:00:00 2002'
 
-   ``d.ctime()`` is equivalent to::
+   ``d.ctime()`` tương đương với::
 
      time.ctime(time.mktime(d.timetuple()))
 
-   on platforms where the native C
-   :c:func:`ctime` function (which :func:`time.ctime` invokes, but which
-   :meth:`date.ctime` does not invoke) conforms to the C standard.
+   trên các nền tảng mà C gốc
+   hàm :c:func:`ctime` (mà :func:`time.ctime` gọi, nhưng
+   :meth:`date.ctime` không gọi) tuân thủ tiêu chuẩn C.
 
 
 .. method:: date.strftime(format)
 
-   Return a string representing the date, controlled by an explicit format string.
-   Format codes referring to hours, minutes or seconds will see 0 values.
-   See also :ref:`strftime-strptime-behavior` and :meth:`date.isoformat`.
+   Trả về một chuỗi biểu diễn ngày tháng, được điều khiển bởi một chuỗi định dạng tường minh. Các mã định dạng chỉ giờ, phút hoặc giây sẽ nhận giá trị 0. Xem thêm :ref:`strftime-strptime-behavior` và :meth:`date.isoformat`.
 
 
 .. method:: date.__format__(format)
 
-   Same as :meth:`.date.strftime`. This makes it possible to specify a format
-   string for a :class:`.date` object in :ref:`formatted string
-   literals <f-strings>` and when using :meth:`str.format`.
-   See also :ref:`strftime-strptime-behavior` and :meth:`date.isoformat`.
+   Giống :meth:`.date.strftime`. Điều này cho phép chỉ định một chuỗi định dạng cho đối tượng :class:`.date` trong các chuỗi ký tự định dạng :ref:`formatted string literals <f-strings>` và khi sử dụng :meth:`str.format`. Xem thêm :ref:`strftime-strptime-behavior` và :meth:`date.isoformat`.
 
 
-Examples of usage: :class:`!date`
+Các ví dụ sử dụng: :class:`!date`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Example of counting days to an event::
+Ví dụ về cách đếm số ngày đến một sự kiện::
 
     >>> import time
     >>> import datetime as dt
@@ -872,16 +748,16 @@ Example of counting days to an event::
     >>> time_to_birthday.days
     202
 
-More examples of working with :class:`date`:
+Các ví dụ khác về cách làm việc với :class:`date`:
 
 .. doctest::
 
     >>> import datetime as dt
-    >>> d = dt.date.fromordinal(730920) # 730920th day after 1. 1. 0001
+    >>> d = dt.date.fromordinal(730920) # Ngày thứ 730920 kể từ 1. 1. 0001
     >>> d
     datetime.date(2002, 3, 11)
 
-    >>> # Methods related to formatting string output
+    >>> # Các phương thức liên quan đến việc định dạng đầu ra chuỗi
     >>> d.isoformat()
     '2002-03-11'
     >>> d.strftime("%d/%m/%y")
@@ -893,50 +769,46 @@ More examples of working with :class:`date`:
     >>> 'The {1} is {0:%d}, the {2} is {0:%B}.'.format(d, "day", "month")
     'The day is 11, the month is March.'
 
-    >>> # Methods for extracting 'components' under different calendars
+    >>> # Các phương thức trích xuất 'thành phần' theo các lịch khác nhau
     >>> t = d.timetuple()
     >>> for i in t:     # doctest: +SKIP
     ...     print(i)
-    2002                # year
-    3                   # month
-    11                  # day
+    2002                # năm
+    3                   # tháng
+    11                  # ngày
     0
     0
     0
-    0                   # weekday (0 = Monday)
-    70                  # 70th day in the year
+    0                   # thứ trong tuần (0 = Thứ Hai)
+    70                  # ngày thứ 70 trong năm
     -1
     >>> ic = d.isocalendar()
     >>> for i in ic:    # doctest: +SKIP
     ...     print(i)
-    2002                # ISO year
-    11                  # ISO week number
-    1                   # ISO day number ( 1 = Monday )
+    2002                # Năm ISO
+    11                  # Số tuần ISO
+    1                   # Số ngày ISO ( 1 = Thứ Hai )
 
-    >>> # A date object is immutable; all operations produce a new object
+    >>> # Đối tượng date là bất biến; mọi thao tác đều tạo ra một đối tượng mới
     >>> d.replace(year=2005)
     datetime.date(2005, 3, 11)
 
 
 .. _datetime-datetime:
 
-:class:`!datetime` objects
---------------------------
+Các đối tượng :class:`!datetime`
+--------------------------------
 
-A :class:`.datetime` object is a single object containing all the information
-from a :class:`date` object and a :class:`.time` object.
+Một đối tượng :class:`.datetime` là một đối tượng duy nhất chứa mọi thông tin từ một đối tượng :class:`date` và một đối tượng :class:`.time`.
 
-Like a :class:`date` object, :class:`.datetime` assumes the current Gregorian
-calendar extended in both directions; like a :class:`.time` object,
-:class:`!datetime` assumes there are exactly 3600\*24 seconds in every day.
+Giống như một đối tượng :class:`date`, :class:`.datetime` giả định lịch Gregory hiện tại được mở rộng theo cả hai hướng; giống như một đối tượng :class:`.time`,
+:class:`!datetime` giả định rằng mỗi ngày có chính xác 3600\*24 giây.
 
-Constructor:
+Hàm khởi tạo:
 
 .. class:: datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0)
 
-   The *year*, *month* and *day* arguments are required. *tzinfo* may be ``None``, or an
-   instance of a :class:`tzinfo` subclass. The remaining arguments must be integers
-   in the following ranges:
+   Các đối số *year*, *month* và *day* là bắt buộc. *tzinfo* có thể là ``None`` hoặc một instance của một lớp con :class:`tzinfo`. Các đối số còn lại phải là số nguyên trong các phạm vi sau:
 
    * ``MINYEAR <= year <= MAXYEAR``,
    * ``1 <= month <= 12``,
@@ -947,184 +819,139 @@ Constructor:
    * ``0 <= microsecond < 1000000``,
    * ``fold in [0, 1]``.
 
-   If an argument outside those ranges is given, :exc:`ValueError` is raised.
+   Nếu cung cấp một đối số nằm ngoài các phạm vi đó, :exc:`ValueError` sẽ được raise.
 
    .. versionchanged:: 3.6
-      Added the *fold* parameter.
+      Đã thêm tham số *fold*.
 
 
-Other constructors, all class methods:
+Các hàm khởi tạo khác, tất cả đều là class method:
 
 .. classmethod:: datetime.today()
 
-   Return the current local date and time, with :attr:`.tzinfo` ``None``.
+   Trả về ngày và giờ địa phương hiện tại, kèm theo :attr:`.tzinfo` ``None``.
 
-   Equivalent to::
+   Tương đương với::
 
      datetime.fromtimestamp(time.time())
 
-   See also :meth:`now`, :meth:`fromtimestamp`.
+   Xem thêm :meth:`now`, :meth:`fromtimestamp`.
 
-   This method is functionally equivalent to :meth:`now`, but without a
-   ``tz`` parameter.
+   Về mặt chức năng, phương thức này tương đương với :meth:`now`, nhưng không có tham số ``tz``.
 
 
 .. classmethod:: datetime.now(tz=None)
 
-   Return the current local date and time.
+   Trả về ngày và giờ địa phương hiện tại.
 
-   If optional argument *tz* is ``None``
-   or not specified, this is like :meth:`today`, but, if possible, supplies more
-   precision than can be gotten from going through a :func:`time.time` timestamp
-   (for example, this may be possible on platforms supplying the C
-   :c:func:`gettimeofday` function).
+   Nếu đối số tùy chọn *tz* là ``None`` hoặc không được chỉ định, giá trị này tương tự :meth:`today`, nhưng nếu có thể sẽ cung cấp độ chính xác cao hơn so với việc đi qua một timestamp :func:`time.time` (ví dụ: điều này có thể thực hiện được trên các nền tảng cung cấp hàm C
+   :c:func:`gettimeofday`).
 
-   If *tz* is not ``None``, it must be an instance of a :class:`tzinfo` subclass,
-   and the current date and time are converted to *tz*’s time zone.
+   Nếu *tz* không phải là ``None``, thì nó phải là một instance của một lớp con :class:`tzinfo`, và ngày giờ hiện tại được chuyển đổi sang múi giờ của *tz*.
 
-   This function is preferred over :meth:`today` and :meth:`utcnow`.
+   Hàm này được ưu tiên hơn :meth:`today` và :meth:`utcnow`.
 
    .. note::
 
-      Subsequent calls to :meth:`!datetime.now` may return the same
-      instant depending on the precision of the underlying clock.
+      Các lần gọi tiếp theo đến :meth:`!datetime.now` có thể trả về cùng một thời điểm, tùy thuộc vào độ chính xác của clock bên dưới.
 
 
 .. classmethod:: datetime.utcnow()
 
-   Return the current UTC date and time, with :attr:`.tzinfo` ``None``.
+   Trả về ngày và giờ UTC hiện tại, với :attr:`.tzinfo` là ``None``.
 
-   This is like :meth:`now`, but returns the current UTC date and time, as a naive
-   :class:`.datetime` object. An aware current UTC datetime can be obtained by
-   calling ``datetime.now(timezone.utc)``. See also :meth:`now`.
+   Tương tự như :meth:`now`, nhưng trả về ngày và giờ UTC hiện tại dưới dạng một
+   đối tượng :class:`.datetime`. Có thể lấy datetime UTC hiện tại có thông tin múi giờ bằng cách gọi ``datetime.now(timezone.utc)``. Xem thêm :meth:`now`.
 
    .. warning::
 
-      Because naive ``datetime`` objects are treated by many ``datetime`` methods
-      as local times, it is preferred to use aware datetimes to represent times
-      in UTC. As such, the recommended way to create an object representing the
-      current time in UTC is by calling ``datetime.now(timezone.utc)``.
+      Vì các đối tượng ``datetime`` không có thông tin múi giờ được nhiều phương thức ``datetime`` xem là giờ địa phương, nên nên sử dụng datetime có thông tin múi giờ để biểu diễn thời gian UTC. Do đó, cách được khuyến nghị để tạo một đối tượng biểu diễn thời gian UTC hiện tại là gọi ``datetime.now(timezone.utc)``.
 
    .. deprecated:: 3.12
 
-      Use :meth:`datetime.now` with :const:`UTC` instead.
+      Thay vào đó, hãy sử dụng :meth:`datetime.now` với :const:`UTC`.
 
 
 .. classmethod:: datetime.fromtimestamp(timestamp, tz=None)
 
-   Return the local date and time corresponding to the POSIX timestamp, such as is
-   returned by :func:`time.time`. If optional argument *tz* is ``None`` or not
-   specified, the timestamp is converted to the platform's local date and time, and
-   the returned :class:`.datetime` object is naive.
+   Trả về ngày và giờ cục bộ tương ứng với timestamp POSIX, chẳng hạn như giá trị do :func:`time.time` trả về. Nếu đối số tùy chọn *tz* là ``None`` hoặc không được chỉ định, timestamp sẽ được chuyển đổi thành ngày và giờ cục bộ của nền tảng, còn đối tượng :class:`.datetime` được trả về sẽ là naive.
 
-   If *tz* is not ``None``, it must be an instance of a :class:`tzinfo` subclass, and the
-   timestamp is converted to *tz*’s time zone.
+   Nếu *tz* không phải là ``None``, nó phải là một instance của một subclass của :class:`tzinfo`, và timestamp sẽ được chuyển đổi sang múi giờ của *tz*.
 
-   :meth:`fromtimestamp` may raise :exc:`OverflowError`, if the timestamp is out of
-   the range of values supported by the platform C :c:func:`localtime` or
-   :c:func:`gmtime` functions, and :exc:`OSError` on :c:func:`localtime` or
-   :c:func:`gmtime` failure.
-   It's common for this to be restricted to years in
-   1970 through 2038. Note that on non-POSIX systems that include leap seconds in
-   their notion of a timestamp, leap seconds are ignored by :meth:`fromtimestamp`,
-   and then it's possible to have two timestamps differing by a second that yield
-   identical :class:`.datetime` objects. This method is preferred over
+   :meth:`fromtimestamp` có thể phát sinh :exc:`OverflowError` nếu timestamp nằm ngoài phạm vi các giá trị được :c:func:`localtime` C của nền tảng hỗ trợ hoặc
+   các hàm :c:func:`gmtime`, và :exc:`OSError` khi :c:func:`localtime` hoặc
+   :c:func:`gmtime` gặp lỗi. Thông thường, phạm vi này chỉ giới hạn trong các năm từ 1970 đến 2038. Lưu ý rằng trên các hệ thống không phải POSIX có tính cả giây nhuận trong cách biểu diễn timestamp, các giây nhuận sẽ bị :meth:`fromtimestamp` bỏ qua, nên có thể xảy ra trường hợp hai timestamp chênh nhau một giây nhưng cho ra các đối tượng :class:`.datetime` giống hệt nhau. Phương thức này được ưu tiên hơn
    :meth:`utcfromtimestamp`.
 
    .. versionchanged:: 3.3
-      Raise :exc:`OverflowError` instead of :exc:`ValueError` if the timestamp
-      is out of the range of values supported by the platform C
-      :c:func:`localtime` or :c:func:`gmtime` functions. Raise :exc:`OSError`
-      instead of :exc:`ValueError` on :c:func:`localtime` or :c:func:`gmtime`
-      failure.
+      Phát sinh :exc:`OverflowError` thay vì :exc:`ValueError` nếu timestamp nằm ngoài phạm vi các giá trị được C của nền tảng hỗ trợ
+      các hàm :c:func:`localtime` hoặc :c:func:`gmtime`. Phát sinh :exc:`OSError` thay vì :exc:`ValueError` khi :c:func:`localtime` hoặc :c:func:`gmtime` bị lỗi.
 
    .. versionchanged:: 3.6
       :meth:`fromtimestamp` may return instances with :attr:`.fold` set to 1.
 
 .. classmethod:: datetime.utcfromtimestamp(timestamp)
 
-   Return the UTC :class:`.datetime` corresponding to the POSIX timestamp, with
-   :attr:`.tzinfo` ``None``.  (The resulting object is naive.)
+   Trả về :class:`.datetime` UTC tương ứng với dấu thời gian POSIX, với
+   :attr:`.tzinfo` ``None``.  (Đối tượng kết quả là naive.)
 
-   This may raise :exc:`OverflowError`, if the timestamp is
-   out of the range of values supported by the platform C :c:func:`gmtime` function,
-   and :exc:`OSError` on :c:func:`gmtime` failure.
-   It's common for this to be restricted to years in 1970 through 2038.
+   Thao tác này có thể phát sinh :exc:`OverflowError` nếu dấu thời gian nằm ngoài phạm vi giá trị được hàm :c:func:`gmtime` C của nền tảng hỗ trợ, và :exc:`OSError` khi :c:func:`gmtime` bị lỗi. Thông thường, phạm vi này bị giới hạn trong các năm từ 1970 đến 2038.
 
-   To get an aware :class:`.datetime` object, call :meth:`fromtimestamp`::
+   Để lấy một đối tượng :class:`.datetime` aware, hãy gọi :meth:`fromtimestamp`::
 
      datetime.fromtimestamp(timestamp, timezone.utc)
 
-   On the POSIX compliant platforms, it is equivalent to the following
-   expression::
+   Trên các nền tảng tuân thủ POSIX, thao tác này tương đương với biểu thức sau::
 
      datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(seconds=timestamp)
 
-   except the latter formula always supports the full years range: between
-   :const:`MINYEAR` and :const:`MAXYEAR` inclusive.
+   ngoại trừ việc công thức sau luôn hỗ trợ toàn bộ phạm vi năm: từ
+   Bao gồm cả :const:`MINYEAR` và :const:`MAXYEAR`.
 
    .. warning::
 
-      Because naive ``datetime`` objects are treated by many ``datetime`` methods
-      as local times, it is preferred to use aware datetimes to represent times
-      in UTC. As such, the recommended way to create an object representing a
-      specific timestamp in UTC is by calling
-      ``datetime.fromtimestamp(timestamp, tz=timezone.utc)``.
+      Vì các đối tượng ``datetime`` naive được nhiều phương thức ``datetime`` coi là giờ địa phương, nên ưu tiên sử dụng datetime aware để biểu diễn thời gian theo UTC. Do đó, cách được khuyến nghị để tạo một đối tượng biểu diễn một timestamp cụ thể theo UTC là gọi ``datetime.fromtimestamp(timestamp, tz=timezone.utc)``.
 
    .. versionchanged:: 3.3
-      Raise :exc:`OverflowError` instead of :exc:`ValueError` if the timestamp
-      is out of the range of values supported by the platform C
-      :c:func:`gmtime` function. Raise :exc:`OSError` instead of
-      :exc:`ValueError` on :c:func:`gmtime` failure.
+      Phát sinh :exc:`OverflowError` thay vì :exc:`ValueError` nếu timestamp nằm ngoài phạm vi các giá trị được C của nền tảng hỗ trợ
+      Hàm :c:func:`gmtime`. Gây ra :exc:`OSError` thay vì
+      :exc:`ValueError` khi :c:func:`gmtime` không thành công.
 
    .. versionchanged:: 3.15
-      Accepts any real number as *timestamp*, not only integer or float.
+      Chấp nhận mọi số thực làm *timestamp*, không chỉ số nguyên hoặc số thực dấu phẩy động.
 
    .. deprecated:: 3.12
 
-      Use :meth:`datetime.fromtimestamp` with :const:`UTC` instead.
+      Thay vào đó, hãy dùng :meth:`datetime.fromtimestamp` với :const:`UTC`.
 
 
 .. classmethod:: datetime.fromordinal(ordinal)
 
-   Return the :class:`.datetime` corresponding to the proleptic Gregorian ordinal,
-   where January 1 of year 1 has ordinal 1. :exc:`ValueError` is raised unless
-   ``1 <= ordinal <= datetime.max.toordinal()``. The hour, minute, second and
-   microsecond of the result are all 0, and :attr:`.tzinfo` is ``None``.
+   Trả về :class:`.datetime` tương ứng với ordinal theo lịch Gregory mở rộng, trong đó ngày 1 tháng 1 của năm 1 có ordinal là 1. :exc:`ValueError` được phát sinh trừ khi ``1 <= ordinal <= datetime.max.toordinal()``. Giờ, phút, giây và microsecond của kết quả đều bằng 0, và :attr:`.tzinfo` là ``None``.
 
 
 .. classmethod:: datetime.combine(date, time, tzinfo=time.tzinfo)
 
-   Return a new :class:`.datetime` object whose date components are equal to the
-   given :class:`date` object's, and whose time components
-   are equal to the given :class:`.time` object's. If the *tzinfo*
-   argument is provided, its value is used to set the :attr:`.tzinfo` attribute
-   of the result, otherwise the :attr:`~.time.tzinfo` attribute of the *time* argument
-   is used.  If the *date* argument is a :class:`!datetime` object, its time components
-   and :attr:`.tzinfo` attributes are ignored.
+   Trả về một đối tượng :class:`.datetime` mới có các thành phần ngày bằng với các thành phần của đối tượng :class:`date` đã cho, và các thành phần thời gian bằng với các thành phần của đối tượng :class:`.time` đã cho. Nếu cung cấp đối số *tzinfo*, giá trị của đối số này được dùng để thiết lập thuộc tính :attr:`.tzinfo` của kết quả; nếu không, thuộc tính :attr:`~.time.tzinfo` của đối số *time* được dùng. Nếu đối số *date* là một đối tượng :class:`!datetime`, các thành phần thời gian và thuộc tính :attr:`.tzinfo` của đối tượng đó sẽ bị bỏ qua.
 
-   For any :class:`.datetime` object ``d``,
-   ``d == datetime.combine(d.date(), d.time(), d.tzinfo)``.
+   Với mọi đối tượng :class:`.datetime` ``d``, ``d == datetime.combine(d.date(), d.time(), d.tzinfo)``.
 
    .. versionchanged:: 3.6
-      Added the *tzinfo* argument.
+      Đã thêm đối số *tzinfo*.
 
 
 .. classmethod:: datetime.fromisoformat(date_string)
 
-   Return a :class:`.datetime` corresponding to a *date_string* in any valid
-   ISO 8601 format, with the following exceptions:
+   Trả về một :class:`.datetime` tương ứng với một *date_string* ở bất kỳ định dạng ISO 8601 hợp lệ nào, với các ngoại lệ sau:
 
-   1. Time zone offsets may have fractional seconds.
-   2. The ``T`` separator may be replaced by any single unicode character.
-   3. Fractional hours and minutes are not supported.
-   4. Reduced precision dates are not currently supported (``YYYY-MM``,
-      ``YYYY``).
-   5. Extended date representations are not currently supported
-      (``±YYYYYY-MM-DD``).
-   6. Ordinal dates are not currently supported (``YYYY-OOO``).
+   1. Offset múi giờ có thể có phần giây lẻ.
+   2. Dấu phân cách ``T`` có thể được thay thế bằng bất kỳ ký tự Unicode đơn nào.
+   3. Không hỗ trợ giờ và phút dạng phân số.
+   4. Hiện chưa hỗ trợ ngày tháng với độ chính xác rút gọn (``YYYY-MM``, ``YYYY``).
+   5. Hiện chưa hỗ trợ các biểu diễn ngày tháng mở rộng (``±YYYYYY-MM-DD``).
+   6. Hiện chưa hỗ trợ ngày thứ tự (``YYYY-OOO``).
 
-   Examples::
+   Ví dụ::
 
        >>> import datetime as dt
        >>> dt.datetime.fromisoformat('2011-11-04')
@@ -1149,15 +976,13 @@ Other constructors, all class methods:
 
    .. versionadded:: 3.7
    .. versionchanged:: 3.11
-      Previously, this method only supported formats that could be emitted by
-      :meth:`date.isoformat` or :meth:`datetime.isoformat`.
+      Trước đây, phương thức này chỉ hỗ trợ các định dạng có thể được tạo ra bởi
+      :meth:`date.isoformat` hoặc :meth:`datetime.isoformat`.
 
 
 .. classmethod:: datetime.fromisocalendar(year, week, day)
 
-   Return a :class:`.datetime` corresponding to the ISO calendar date specified
-   by *year*, *week* and *day*. The non-date components of the datetime are populated
-   with their normal default values. This is the inverse of the function
+   Trả về một :class:`.datetime` tương ứng với ngày theo lịch ISO được chỉ định bởi *year*, *week* và *day*. Các thành phần không phải ngày của datetime được điền bằng các giá trị mặc định thông thường. Đây là hàm nghịch đảo của hàm
    :meth:`datetime.isocalendar`.
 
    .. versionadded:: 3.8
@@ -1165,113 +990,96 @@ Other constructors, all class methods:
 
 .. classmethod:: datetime.strptime(date_string, format)
 
-   Return a :class:`.datetime` corresponding to *date_string*, parsed according to
-   *format*.
+   Trả về một :class:`.datetime` tương ứng với *date_string*, được phân tích theo *format*.
 
-   If *format* does not contain microseconds or time zone information, this is equivalent to::
+   Nếu *format* không chứa thông tin microsecond hoặc múi giờ, thì điều này tương đương với::
 
      datetime(*(time.strptime(date_string, format)[0:6]))
 
-   :exc:`ValueError` is raised if the date_string and format
-   can't be parsed by :func:`time.strptime` or if it returns a value which isn't a
-   time tuple.  See also :ref:`strftime-strptime-behavior` and
+   :exc:`ValueError` được phát sinh nếu không thể phân tích date_string và format bằng :func:`time.strptime`, hoặc nếu hàm này trả về một giá trị không phải là một time tuple. Xem thêm :ref:`strftime-strptime-behavior` và
    :meth:`datetime.fromisoformat`.
 
    .. versionchanged:: 3.13
 
-      If *format* specifies a day of month without a year a
-      :exc:`DeprecationWarning` is now emitted.  This is to avoid a quadrennial
-      leap year bug in code seeking to parse only a month and day as the
-      default year used in absence of one in the format is not a leap year.
-      Such *format* values may raise an error as of Python 3.15.  The
-      workaround is to always include a year in your *format*.  If parsing
-      *date_string* values that do not have a year, explicitly add a year that
-      is a leap year before parsing:
+      Nếu *format* chỉ định ngày trong tháng mà không có năm thì một
+      :exc:`DeprecationWarning` hiện được phát ra. Điều này nhằm tránh lỗi năm nhuận bốn năm một lần trong mã chỉ tìm cách phân tích tháng và ngày, vì năm mặc định được sử dụng khi format không có năm không phải là năm nhuận. Các giá trị *format* như vậy có thể gây lỗi kể từ Python 3.15. Cách khắc phục là luôn включ năm trong *format*. Nếu phân tích các giá trị *date_string* không có năm, hãy thêm rõ ràng một năm nhuận trước khi phân tích:
 
       .. doctest::
 
          >>> import datetime as dt
          >>> date_string = "02/29"
-         >>> when = dt.datetime.strptime(f"{date_string};1984", "%m/%d;%Y")  # Avoids leap year bug.
+         >>> when = dt.datetime.strptime(f"{date_string};1984", "%m/%d;%Y")  # Tránh lỗi năm nhuận.
          >>> when.strftime("%B %d")  # doctest: +SKIP
          'February 29'
 
 
-Class attributes:
+Các thuộc tính lớp:
 
 .. attribute:: datetime.min
 
-   The earliest representable :class:`.datetime`, ``datetime(MINYEAR, 1, 1,
-   tzinfo=None)``.
+   :class:`.datetime` có thể biểu diễn sớm nhất là ``datetime(MINYEAR, 1, 1, tzinfo=None)``.
 
 
 .. attribute:: datetime.max
 
-   The latest representable :class:`.datetime`, ``datetime(MAXYEAR, 12, 31, 23, 59,
-   59, 999999, tzinfo=None)``.
+   :class:`.datetime` có thể biểu diễn muộn nhất là ``datetime(MAXYEAR, 12, 31, 23, 59, 59, 999999, tzinfo=None)``.
 
 
 .. attribute:: datetime.resolution
 
-   The smallest possible difference between non-equal :class:`.datetime` objects,
-   ``timedelta(microseconds=1)``.
+   Độ chênh lệch nhỏ nhất có thể có giữa các đối tượng :class:`.datetime` không bằng nhau là ``timedelta(microseconds=1)``.
 
 
-Instance attributes (read-only):
+Các thuộc tính thực thể (chỉ đọc):
 
 .. attribute:: datetime.year
 
-   Between :const:`MINYEAR` and :const:`MAXYEAR` inclusive.
+   Trong khoảng từ :const:`MINYEAR` đến :const:`MAXYEAR`, bao gồm cả hai đầu mút.
 
 
 .. attribute:: datetime.month
 
-   Between 1 and 12 inclusive.
+   Trong khoảng từ 1 đến 12, bao gồm cả hai đầu mút.
 
 
 .. attribute:: datetime.day
 
-   Between 1 and the number of days in the given month of the given year.
+   Trong khoảng từ 1 đến số ngày của tháng đã cho trong năm đã cho.
 
 
 .. attribute:: datetime.hour
 
-   In ``range(24)``.
+   Trong ``range(24)``.
 
 
 .. attribute:: datetime.minute
 
-   In ``range(60)``.
+   Trong ``range(60)``.
 
 
 .. attribute:: datetime.second
 
-   In ``range(60)``.
+   Trong ``range(60)``.
 
 
 .. attribute:: datetime.microsecond
 
-   In ``range(1000000)``.
+   Trong ``range(1000000)``.
 
 
 .. attribute:: datetime.tzinfo
 
-   The object passed as the *tzinfo* argument to the :class:`.datetime` constructor,
-   or ``None`` if none was passed.
+   Đối tượng được truyền làm đối số *tzinfo* cho hàm khởi tạo :class:`.datetime`, hoặc ``None`` nếu không truyền đối số nào.
 
 
 .. attribute:: datetime.fold
 
-   In ``[0, 1]``. Used to disambiguate wall times during a repeated interval. (A
-   repeated interval occurs when clocks are rolled back at the end of daylight saving
-   time or when the UTC offset for the current zone is decreased for political reasons.)
-   The values 0 and 1 represent, respectively, the earlier and later of the two
-   moments with the same wall time representation.
+   Trong ``[0, 1]``. Dùng để phân biệt các thời điểm theo giờ địa phương trong một khoảng thời gian lặp lại. (Khoảng thời gian lặp lại xảy ra khi đồng hồ được lùi lại vào cuối giờ mùa hè hoặc khi độ lệch UTC của múi giờ hiện tại bị giảm vì lý do chính trị.) Các giá trị 0 và 1 lần lượt biểu thị thời điểm sớm hơn và muộn hơn trong hai thời điểm có cùng biểu diễn theo giờ địa phương.
 
    .. versionadded:: 3.6
 
 
-Supported operations:
+Các thao tác được hỗ trợ:
 
 +---------------------------------------+--------------------------------+
 | Operation                             | Result                         |
@@ -1292,315 +1100,219 @@ Supported operations:
 +---------------------------------------+--------------------------------+
 
 (1)
-   ``datetime2`` is a duration of ``timedelta`` removed from ``datetime1``, moving forward in
-   time if ``timedelta.days > 0``, or backward if ``timedelta.days < 0``. The
-   result has the same :attr:`~.datetime.tzinfo` attribute as the input datetime, and
-   ``datetime2 - datetime1 == timedelta`` after. :exc:`OverflowError` is raised if
-   ``datetime2.year`` would be smaller than :const:`MINYEAR` or larger than
-   :const:`MAXYEAR`. Note that no time zone adjustments are done even if the
-   input is an aware object.
+   ``datetime2`` là khoảng thời lượng ``timedelta`` được trừ khỏi ``datetime1``, tiến về phía trước theo thời gian nếu ``timedelta.days > 0``, hoặc lùi lại nếu ``timedelta.days < 0``. Kết quả có cùng thuộc tính :attr:`~.datetime.tzinfo` như datetime đầu vào, và ``datetime2 - datetime1 == timedelta`` sau đó. :exc:`OverflowError` được phát sinh nếu ``datetime2.year`` nhỏ hơn :const:`MINYEAR` hoặc lớn hơn
+   :const:`MAXYEAR`. Lưu ý rằng không thực hiện điều chỉnh múi giờ nào, ngay cả khi đầu vào là một đối tượng aware.
 
 (2)
-   Computes the ``datetime2`` such that ``datetime2 + timedelta == datetime1``. As for
-   addition, the result has the same :attr:`~.datetime.tzinfo` attribute as the input
-   datetime, and no time zone adjustments are done even if the input is aware.
+   Tính ``datetime2`` sao cho ``datetime2 + timedelta == datetime1``. Tương tự phép cộng, kết quả có cùng thuộc tính :attr:`~.datetime.tzinfo` như datetime đầu vào và không thực hiện điều chỉnh múi giờ nào, ngay cả khi đầu vào là aware.
 
 (3)
-   Subtraction of a :class:`.datetime` from a :class:`!datetime` is defined only if
-   both operands are naive, or if both are aware. If one is aware and the other is
-   naive, :exc:`TypeError` is raised.
+   Phép trừ một :class:`.datetime` khỏi một :class:`!datetime` chỉ được định nghĩa khi cả hai toán hạng đều là naive hoặc cả hai đều là aware. Nếu một toán hạng là aware còn toán hạng kia là naive, :exc:`TypeError` được phát sinh.
 
-   If both are naive, or both are aware and have the same :attr:`~.datetime.tzinfo` attribute,
-   the :attr:`~.datetime.tzinfo` attributes are ignored, and the result is a :class:`timedelta`
-   object ``t`` such that ``datetime2 + t == datetime1``. No time zone adjustments
-   are done in this case.
+   Nếu cả hai đều naive, hoặc cả hai đều aware và có cùng thuộc tính :attr:`~.datetime.tzinfo`, thì các thuộc tính :attr:`~.datetime.tzinfo` được bỏ qua, và kết quả là một đối tượng :class:`timedelta` ``t`` sao cho ``datetime2 + t == datetime1``. Trong trường hợp này, không thực hiện điều chỉnh múi giờ.
 
-   If both are aware and have different :attr:`~.datetime.tzinfo` attributes, ``a-b`` acts
-   as if ``a`` and ``b`` were first converted to naive UTC datetimes. The
-   result is ``(a.replace(tzinfo=None) - a.utcoffset()) - (b.replace(tzinfo=None)
-   - b.utcoffset())`` except that the implementation never overflows.
+   Nếu cả hai đều aware và có các thuộc tính :attr:`~.datetime.tzinfo` khác nhau, ``a-b`` hoạt động như thể ``a`` và ``b`` trước tiên được chuyển đổi thành các đối tượng datetime UTC naive. Kết quả là ``(a.replace(tzinfo=None) - a.utcoffset()) - (b.replace(tzinfo=None)
+   - b.utcoffset())`` ngoại trừ việc quá trình triển khai không bao giờ bị tràn.
 
 (4)
-   :class:`.datetime` objects are equal if they represent the same date
-   and time, taking into account the time zone.
+   Các đối tượng :class:`.datetime` bằng nhau nếu chúng biểu diễn cùng ngày và giờ, có tính đến múi giờ.
 
-   Naive and aware :class:`.datetime` objects are never equal.
+   Các đối tượng :class:`.datetime` naive và aware không bao giờ bằng nhau.
 
-   If both comparands are aware, and have the same :attr:`!tzinfo` attribute,
-   the :attr:`!tzinfo` and :attr:`~.datetime.fold` attributes are ignored and
-   the base datetimes are compared.
-   If both comparands are aware and have different :attr:`~.datetime.tzinfo`
-   attributes, the comparison acts as comparands were first converted to UTC
-   datetimes except that the implementation never overflows.
-   :class:`.datetime` instances in a repeated interval are never equal to
-   :class:`!datetime` instances in other time zone.
+   Nếu cả hai toán hạng so sánh đều aware và có cùng thuộc tính :attr:`!tzinfo`, thì các thuộc tính :attr:`!tzinfo` và :attr:`~.datetime.fold` được bỏ qua và các datetime cơ sở được so sánh. Nếu cả hai toán hạng so sánh đều aware và có các thuộc tính :attr:`~.datetime.tzinfo` khác nhau, phép so sánh diễn ra như thể các toán hạng trước tiên được chuyển đổi thành các datetime UTC, ngoại trừ việc quá trình triển khai không bao giờ bị tràn.
+   Các thực thể :class:`.datetime` trong một khoảng lặp lại không bao giờ bằng
+   Các thực thể :class:`!datetime` trong múi giờ khác.
 
 (5)
-   *datetime1* is considered less than *datetime2* when *datetime1* precedes
-   *datetime2* in time, taking into account the time zone.
+   *datetime1* được xem là nhỏ hơn *datetime2* khi *datetime1* đứng trước *datetime2* về thời gian, có tính đến múi giờ.
 
-   Order comparison between naive and aware :class:`.datetime` objects
-   raises :exc:`TypeError`.
+   So sánh thứ tự giữa các đối tượng :class:`.datetime` naive và aware sẽ phát sinh :exc:`TypeError`.
 
-   If both comparands are aware, and have the same :attr:`!tzinfo` attribute,
-   the :attr:`!tzinfo` and :attr:`~.datetime.fold` attributes are ignored and
-   the base datetimes are compared.
-   If both comparands are aware and have different :attr:`~.datetime.tzinfo`
-   attributes, the comparison acts as comparands were first converted to UTC
-   datetimes except that the implementation never overflows.
+   Nếu cả hai toán hạng so sánh đều aware và có cùng thuộc tính :attr:`!tzinfo`, thì các thuộc tính :attr:`!tzinfo` và :attr:`~.datetime.fold` được bỏ qua và các datetime cơ sở được so sánh. Nếu cả hai toán hạng so sánh đều aware và có các thuộc tính :attr:`~.datetime.tzinfo` khác nhau, phép so sánh diễn ra như thể các toán hạng trước tiên được chuyển đổi thành các datetime UTC, ngoại trừ việc quá trình triển khai không bao giờ bị tràn.
 
 .. versionchanged:: 3.3
-   Equality comparisons between aware and naive :class:`.datetime`
-   instances don't raise :exc:`TypeError`.
+   So sánh bằng giữa các thực thể :class:`.datetime` aware và naive không phát sinh :exc:`TypeError`.
 
 .. versionchanged:: 3.13
-   Comparison between :class:`.datetime` object and an instance of
-   the :class:`date` subclass that is not a :class:`!datetime` subclass
-   no longer converts the latter to :class:`!date`, ignoring the time part
-   and the time zone.
-   The default behavior can be changed by overriding the special comparison
-   methods in subclasses.
+   Việc so sánh giữa đối tượng :class:`.datetime` và một thực thể của lớp con :class:`date` không phải là lớp con :class:`!datetime` không còn chuyển đổi thực thể sau thành :class:`!date`, bỏ qua phần thời gian và múi giờ. Có thể thay đổi hành vi mặc định bằng cách ghi đè các phương thức so sánh đặc biệt trong các lớp con.
 
 
-Instance methods:
+Các phương thức của thực thể:
 
 .. method:: datetime.date()
 
-   Return :class:`date` object with same year, month and day.
+   Trả về đối tượng :class:`date` có cùng năm, tháng và ngày.
 
 
 .. method:: datetime.time()
 
-   Return :class:`.time` object with same hour, minute, second, microsecond and fold.
-   :attr:`.tzinfo` is ``None``. See also method :meth:`timetz`.
+   Trả về đối tượng :class:`.time` có cùng giờ, phút, giây, microsecond và fold.
+   :attr:`.tzinfo` là ``None``. Xem thêm phương thức :meth:`timetz`.
 
    .. versionchanged:: 3.6
-      The fold value is copied to the returned :class:`.time` object.
+      Giá trị fold được sao chép vào đối tượng :class:`.time` được trả về.
 
 
 .. method:: datetime.timetz()
 
-   Return :class:`.time` object with same hour, minute, second, microsecond, fold, and
-   tzinfo attributes. See also method :meth:`time`.
+   Trả về đối tượng :class:`.time` có cùng các thuộc tính hour, minute, second, microsecond, fold và tzinfo. Xem thêm phương thức :meth:`time`.
 
    .. versionchanged:: 3.6
-      The fold value is copied to the returned :class:`.time` object.
+      Giá trị fold được sao chép vào đối tượng :class:`.time` được trả về.
 
 
 .. method:: datetime.replace(year=self.year, month=self.month, day=self.day, \
-   hour=self.hour, minute=self.minute, second=self.second, microsecond=self.microsecond, \
-   tzinfo=self.tzinfo, *, fold=0)
+   hour=self.hour, minute=self.minute, second=self.second, microsecond=self.microsecond, \ tzinfo=self.tzinfo, *, fold=0)
 
-   Return a new :class:`datetime` object with the same attributes, but with
-   specified parameters updated. Note that ``tzinfo=None`` can be specified to
-   create a naive datetime from an aware datetime with no conversion of date
-   and time data.
+   Trả về một đối tượng :class:`datetime` mới với các thuộc tính giống nhau, nhưng các tham số được chỉ định sẽ được cập nhật. Lưu ý rằng có thể chỉ định ``tzinfo=None`` để tạo một datetime naive từ một datetime aware mà không chuyển đổi dữ liệu ngày và giờ.
 
-   :class:`.datetime` objects are also supported by generic function
+   Các đối tượng :class:`.datetime` cũng được generic function hỗ trợ
    :func:`copy.replace`.
 
    .. versionchanged:: 3.6
-      Added the *fold* parameter.
+      Đã thêm tham số *fold*.
 
 
 .. method:: datetime.astimezone(tz=None)
 
-   Return a :class:`.datetime` object with new :attr:`.tzinfo` attribute *tz*,
-   adjusting the date and time data so the result is the same UTC time as
-   *self*, but in *tz*'s local time.
+   Trả về một :class:`.datetime` đối tượng với thuộc tính :attr:`.tzinfo` *tz*, điều chỉnh dữ liệu ngày và giờ để kết quả có cùng thời điểm UTC với *self*, nhưng theo giờ địa phương của *tz*.
 
-   If provided, *tz* must be an instance of a :class:`tzinfo` subclass, and its
-   :meth:`utcoffset` and :meth:`dst` methods must not return ``None``. If *self*
-   is naive, it is presumed to represent time in the system time zone.
+   Nếu được cung cấp, *tz* phải là một instance của một lớp con :class:`tzinfo`, và
+   Các phương thức :meth:`utcoffset` và :meth:`dst` không được trả về ``None``. Nếu *self* là naive, nó được giả định là biểu thị thời gian trong múi giờ hệ thống.
 
-   If called without arguments (or with ``tz=None``) the system local
-   time zone is assumed for the target time zone. The ``.tzinfo`` attribute of the converted
-   datetime instance will be set to an instance of :class:`timezone`
-   with the zone name and offset obtained from the OS.
+   Nếu được gọi mà không có đối số (hoặc với ``tz=None``), múi giờ cục bộ của hệ thống sẽ được giả định làm múi giờ đích. Thuộc tính ``.tzinfo`` của instance datetime đã chuyển đổi sẽ được đặt thành một instance của :class:`timezone` với tên múi giờ và độ lệch được lấy từ hệ điều hành.
 
-   If ``self.tzinfo`` is *tz*, ``self.astimezone(tz)`` is equal to *self*:  no
-   adjustment of date or time data is performed. Else the result is local
-   time in the time zone *tz*, representing the same UTC time as *self*:  after
-   ``astz = dt.astimezone(tz)``, ``astz - astz.utcoffset()`` will have
-   the same date and time data as ``dt - dt.utcoffset()``.
+   Nếu ``self.tzinfo`` là *tz*, thì ``self.astimezone(tz)`` bằng *self*: không thực hiện điều chỉnh dữ liệu ngày hoặc giờ. Nếu không, kết quả là giờ địa phương trong múi giờ *tz*, biểu diễn cùng thời điểm UTC với *self*: sau ``astz = dt.astimezone(tz)``, ``astz - astz.utcoffset()`` sẽ có dữ liệu ngày và giờ giống như ``dt - dt.utcoffset()``.
 
-   If you merely want to attach a :class:`timezone` object *tz* to a datetime *dt* without
-   adjustment of date and time data, use ``dt.replace(tzinfo=tz)``. If you
-   merely want to remove the :class:`!timezone` object from an aware datetime *dt* without
-   conversion of date and time data, use ``dt.replace(tzinfo=None)``.
+   Nếu bạn chỉ muốn gắn một đối tượng :class:`timezone` *tz* vào datetime *dt* mà không điều chỉnh dữ liệu ngày và giờ, hãy sử dụng ``dt.replace(tzinfo=tz)``. Nếu bạn chỉ muốn xóa đối tượng :class:`!timezone` khỏi một datetime có thông tin múi giờ *dt* mà không chuyển đổi dữ liệu ngày và giờ, hãy sử dụng ``dt.replace(tzinfo=None)``.
 
-   Note that the default :meth:`tzinfo.fromutc` method can be overridden in a
-   :class:`tzinfo` subclass to affect the result returned by :meth:`astimezone`.
-   Ignoring error cases, :meth:`astimezone` acts like::
+   Lưu ý rằng phương thức :meth:`tzinfo.fromutc` mặc định có thể được ghi đè trong một
+   lớp con :class:`tzinfo` để thay đổi kết quả do :meth:`astimezone` trả về. Bỏ qua các trường hợp lỗi, :meth:`astimezone` hoạt động giống như::
 
       def astimezone(self, tz):
           if self.tzinfo is tz:
               return self
-          # Convert self to UTC, and attach the new timezone object.
+          # Chuyển self sang UTC và gắn đối tượng múi giờ mới.
           utc = (self - self.utcoffset()).replace(tzinfo=tz)
-          # Convert from UTC to tz's local time.
+          # Chuyển từ UTC sang giờ địa phương của tz.
           return tz.fromutc(utc)
 
    .. versionchanged:: 3.3
-      *tz* now can be omitted.
+      *tz* giờ đây có thể được bỏ qua.
 
    .. versionchanged:: 3.6
-      The :meth:`astimezone` method can now be called on naive instances that
-      are presumed to represent system local time.
+      Giờ đây có thể gọi phương thức :meth:`astimezone` trên các instance naive được giả định là biểu diễn giờ địa phương của hệ thống.
 
 
 .. method:: datetime.utcoffset()
 
-   If :attr:`.tzinfo` is ``None``, returns ``None``, else returns
-   ``self.tzinfo.utcoffset(self)``, and raises an exception if the latter doesn't
-   return ``None`` or a :class:`timedelta` object with magnitude less than one day.
+   Nếu :attr:`.tzinfo` là ``None``, trả về ``None``, nếu không thì trả về ``self.tzinfo.utcoffset(self)`` và phát sinh ngoại lệ nếu giá trị sau không trả về ``None`` hoặc một đối tượng :class:`timedelta` có độ lớn nhỏ hơn một ngày.
 
    .. versionchanged:: 3.7
-      The UTC offset is not restricted to a whole number of minutes.
+      Độ lệch UTC không bị giới hạn ở một số phút nguyên.
 
 
 .. method:: datetime.dst()
 
-   If :attr:`.tzinfo` is ``None``, returns ``None``, else returns
-   ``self.tzinfo.dst(self)``, and raises an exception if the latter doesn't return
-   ``None`` or a :class:`timedelta` object with magnitude less than one day.
+   Nếu :attr:`.tzinfo` là ``None``, trả về ``None``, nếu không thì trả về ``self.tzinfo.dst(self)`` và phát sinh ngoại lệ nếu giá trị sau không trả về ``None`` hoặc một đối tượng :class:`timedelta` có độ lớn nhỏ hơn một ngày.
 
    .. versionchanged:: 3.7
-      The DST offset is not restricted to a whole number of minutes.
+      Độ lệch DST không bị giới hạn ở một số phút nguyên.
 
 
 .. method:: datetime.tzname()
 
-   If :attr:`.tzinfo` is ``None``, returns ``None``, else returns
-   ``self.tzinfo.tzname(self)``, raises an exception if the latter doesn't return
-   ``None`` or a string object,
+   Nếu :attr:`.tzinfo` là ``None``, trả về ``None``, nếu không thì trả về ``self.tzinfo.tzname(self)``, và phát sinh ngoại lệ nếu giá trị sau không trả về ``None`` hoặc một đối tượng chuỗi,
 
 
 .. method:: datetime.timetuple()
 
-   Return a :class:`time.struct_time` such as returned by :func:`time.localtime`.
+   Trả về một :class:`time.struct_time` như giá trị được :func:`time.localtime` trả về.
 
-   ``d.timetuple()`` is equivalent to::
+   ``d.timetuple()`` tương đương với::
 
      time.struct_time((d.year, d.month, d.day,
                        d.hour, d.minute, d.second,
                        d.weekday(), yday, dst))
 
-   where ``yday = d.toordinal() - date(d.year, 1, 1).toordinal() + 1``
-   is the day number within the current year starting with 1 for January
-   1st. The :attr:`~time.struct_time.tm_isdst` flag of the result is set according to the
-   :meth:`dst` method: :attr:`.tzinfo` is ``None`` or :meth:`dst` returns
-   ``None``, :attr:`!tm_isdst` is set to ``-1``; else if :meth:`dst` returns a
-   non-zero value, :attr:`!tm_isdst` is set to 1; else :attr:`!tm_isdst` is
-   set to 0.
+   trong đó ``yday = d.toordinal() - date(d.year, 1, 1).toordinal() + 1`` là số thứ tự của ngày trong năm hiện tại, bắt đầu từ 1 cho ngày 1 tháng 1. Cờ :attr:`~time.struct_time.tm_isdst` của kết quả được thiết lập theo
+   phương thức :meth:`dst`: nếu :attr:`.tzinfo` là ``None`` hoặc :meth:`dst` trả về ``None``, thì :attr:`!tm_isdst` được đặt thành ``-1``; nếu không, khi :meth:`dst` trả về một giá trị khác không, :attr:`!tm_isdst` được đặt thành 1; nếu không, :attr:`!tm_isdst` được đặt thành 0.
 
 
 .. method:: datetime.utctimetuple()
 
-   If :class:`.datetime` instance ``d`` is naive, this is the same as
-   ``d.timetuple()`` except that :attr:`~.time.struct_time.tm_isdst` is forced to 0 regardless of what
-   ``d.dst()`` returns. DST is never in effect for a UTC time.
+   Nếu :class:`.datetime` instance ``d`` là naive, điều này giống với ``d.timetuple()``, ngoại trừ việc :attr:`~.time.struct_time.tm_isdst` bị buộc đặt thành 0 bất kể ``d.dst()`` trả về gì. DST không bao giờ có hiệu lực đối với thời gian UTC.
 
-   If ``d`` is aware, ``d`` is normalized to UTC time, by subtracting
-   ``d.utcoffset()``, and a :class:`time.struct_time` for the
-   normalized time is returned. :attr:`!tm_isdst` is forced to 0. Note
-   that an :exc:`OverflowError` may be raised if ``d.year`` was
-   ``MINYEAR`` or ``MAXYEAR`` and UTC adjustment spills over a year
-   boundary.
+   Nếu ``d`` là aware, ``d`` được chuẩn hóa thành thời gian UTC bằng cách trừ ``d.utcoffset()``, rồi trả về một :class:`time.struct_time` cho thời gian đã chuẩn hóa. :attr:`!tm_isdst` bị buộc đặt thành 0. Lưu ý rằng có thể phát sinh :exc:`OverflowError` nếu ``d.year`` là ``MINYEAR`` hoặc ``MAXYEAR`` và việc điều chỉnh sang UTC vượt qua ranh giới năm.
 
    .. warning::
 
-      Because naive ``datetime`` objects are treated by many ``datetime`` methods
-      as local times, it is preferred to use aware datetimes to represent times
-      in UTC; as a result, using :meth:`datetime.utctimetuple` may give misleading
-      results. If you have a naive ``datetime`` representing UTC, use
-      ``datetime.replace(tzinfo=timezone.utc)`` to make it aware, at which point
-      you can use :meth:`.datetime.timetuple`.
+      Vì các đối tượng ``datetime`` naive được nhiều phương thức ``datetime`` xử lý như thời gian cục bộ, nên ưu tiên sử dụng datetime aware để biểu diễn thời gian UTC; do đó, việc sử dụng :meth:`datetime.utctimetuple` có thể cho kết quả gây hiểu lầm. Nếu bạn có một ``datetime`` naive biểu diễn thời gian UTC, hãy sử dụng ``datetime.replace(tzinfo=timezone.utc)`` để chuyển nó thành aware, sau đó bạn có thể sử dụng :meth:`.datetime.timetuple`.
 
 
 .. method:: datetime.toordinal()
 
-   Return the proleptic Gregorian ordinal of the date. The same as
-   ``self.date().toordinal()``.
+   Trả về số thứ tự theo lịch Gregorian ngoại suy của ngày. Tương tự như ``self.date().toordinal()``.
 
 
 .. method:: datetime.timestamp()
 
-   Return POSIX timestamp corresponding to the :class:`.datetime`
-   instance. The return value is a :class:`float` similar to that
-   returned by :func:`time.time`.
+   Trả về dấu thời gian POSIX tương ứng với instance :class:`.datetime`. Giá trị trả về là một :class:`float` tương tự như giá trị được trả về bởi :func:`time.time`.
 
-   Naive :class:`.datetime` instances are assumed to represent local
-   time and this method relies on platform C functions to perform
-   the conversion. Since :class:`!datetime` supports a wider range of
-   values than the platform C functions on many platforms, this
-   method may raise :exc:`OverflowError` or :exc:`OSError` for times
-   far in the past or far in the future.
+   Các instance :class:`.datetime` không có thông tin múi giờ được giả định là biểu diễn giờ địa phương và phương thức này dựa vào các hàm C của nền tảng để thực hiện việc chuyển đổi. Vì :class:`!datetime` hỗ trợ phạm vi giá trị rộng hơn các hàm C của nền tảng trên nhiều nền tảng, phương thức này có thể phát sinh :exc:`OverflowError` hoặc :exc:`OSError` đối với các thời điểm quá xa trong quá khứ hoặc tương lai.
 
-   For aware :class:`.datetime` instances, the return value is computed
-   as::
+   Đối với các instance :class:`.datetime` có thông tin múi giờ, giá trị trả về được tính như sau::
 
       (dt - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
 
    .. note::
 
-      There is no method to obtain the POSIX timestamp directly from a
-      naive :class:`.datetime` instance representing UTC time. If your
-      application uses this convention and your system time zone is not
-      set to UTC, you can obtain the POSIX timestamp by supplying
-      ``tzinfo=timezone.utc``::
+      Không có phương thức nào để lấy trực tiếp dấu thời gian POSIX từ một instance :class:`.datetime` không có thông tin múi giờ biểu diễn thời gian UTC. Nếu ứng dụng của bạn sử dụng quy ước này và múi giờ hệ thống không được đặt thành UTC, bạn có thể lấy dấu thời gian POSIX bằng cách cung cấp ``tzinfo=timezone.utc``::
 
          timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
 
-      or by calculating the timestamp directly::
+      hoặc bằng cách tính trực tiếp dấu thời gian::
 
          timestamp = (dt - datetime(1970, 1, 1)) / timedelta(seconds=1)
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.6
-      The :meth:`timestamp` method uses the :attr:`.fold` attribute to
-      disambiguate the times during a repeated interval.
+      Phương thức :meth:`timestamp` sử dụng thuộc tính :attr:`.fold` để phân biệt các thời điểm trong khoảng thời gian lặp lại.
 
    .. versionchanged:: 3.6
-      This method no longer relies on the platform C :c:func:`mktime`
-      function to perform conversions.
+      Phương thức này không còn dựa vào hàm C :c:func:`mktime` của nền tảng để thực hiện việc chuyển đổi.
 
 
 .. method:: datetime.weekday()
 
-   Return the day of the week as an integer, where Monday is 0 and Sunday is 6.
-   The same as ``self.date().weekday()``. See also :meth:`isoweekday`.
+   Trả về ngày trong tuần dưới dạng số nguyên, trong đó thứ Hai là 0 và Chủ nhật là 6. Giống với ``self.date().weekday()``. Xem thêm :meth:`isoweekday`.
 
 
 .. method:: datetime.isoweekday()
 
-   Return the day of the week as an integer, where Monday is 1 and Sunday is 7.
-   The same as ``self.date().isoweekday()``. See also :meth:`weekday`,
+   Trả về ngày trong tuần dưới dạng số nguyên, trong đó thứ Hai là 1 và Chủ nhật là 7. Giống với ``self.date().isoweekday()``. Xem thêm :meth:`weekday`,
    :meth:`isocalendar`.
 
 
 .. method:: datetime.isocalendar()
 
-   Return a :term:`named tuple` with three components: ``year``, ``week``
-   and ``weekday``. The same as ``self.date().isocalendar()``.
+   Trả về một :term:`named tuple` gồm ba thành phần: ``year``, ``week`` và ``weekday``. Giống với ``self.date().isocalendar()``.
 
 
 .. method:: datetime.isoformat(sep='T', timespec='auto')
 
-   Return a string representing the date and time in ISO 8601 format:
+   Trả về một chuỗi biểu thị ngày và giờ theo định dạng ISO 8601:
 
-   - ``YYYY-MM-DDTHH:MM:SS.ffffff``, if :attr:`microsecond` is not 0
-   - ``YYYY-MM-DDTHH:MM:SS``, if :attr:`microsecond` is 0
+   - ``YYYY-MM-DDTHH:MM:SS.ffffff``, nếu :attr:`microsecond` không phải là 0
+   - ``YYYY-MM-DDTHH:MM:SS``, nếu :attr:`microsecond` là 0
 
-   If :meth:`utcoffset` does not return ``None``, a string is
-   appended, giving the UTC offset:
+   Nếu :meth:`utcoffset` không trả về ``None``, một chuỗi sẽ được nối thêm để biểu thị độ lệch UTC:
 
-   - ``YYYY-MM-DDTHH:MM:SS.ffffff+HH:MM[:SS[.ffffff]]``, if :attr:`microsecond`
-     is not 0
-   - ``YYYY-MM-DDTHH:MM:SS+HH:MM[:SS[.ffffff]]``,  if :attr:`microsecond` is 0
+   - ``YYYY-MM-DDTHH:MM:SS.ffffff+HH:MM[:SS[.ffffff]]``, nếu :attr:`microsecond` không phải là 0
+   - ``YYYY-MM-DDTHH:MM:SS+HH:MM[:SS[.ffffff]]``, nếu :attr:`microsecond` là 0
 
-   Examples::
+   Ví dụ::
 
        >>> import datetime as dt
        >>> dt.datetime(2019, 5, 18, 15, 17, 8, 132263).isoformat()
@@ -1608,8 +1320,7 @@ Instance methods:
        >>> dt.datetime(2019, 5, 18, 15, 17, tzinfo=dt.timezone.utc).isoformat()
        '2019-05-18T15:17:00+00:00'
 
-   The optional argument *sep* (default ``'T'``) is a one-character separator,
-   placed between the date and time portions of the result. For example::
+   Đối số tùy chọn *sep* (mặc định là ``'T'``) là dấu phân cách gồm một ký tự, được đặt giữa phần ngày và phần giờ của kết quả. Ví dụ::
 
       >>> import datetime as dt
       >>> class TZ(dt.tzinfo):
@@ -1622,25 +1333,20 @@ Instance methods:
       >>> dt.datetime(2009, 11, 27, microsecond=100, tzinfo=TZ()).isoformat()
       '2009-11-27T00:00:00.000100-06:39'
 
-   The optional argument *timespec* specifies the number of additional
-   components of the time to include (the default is ``'auto'``).
-   It can be one of the following:
+   Đối số tùy chọn *timespec* chỉ định số thành phần bổ sung của thời gian cần đưa vào (mặc định là ``'auto'``). Có thể là một trong các giá trị sau:
 
-   - ``'auto'``: Same as ``'seconds'`` if :attr:`microsecond` is 0,
-     same as ``'microseconds'`` otherwise.
-   - ``'hours'``: Include the :attr:`hour` in the two-digit ``HH`` format.
-   - ``'minutes'``: Include :attr:`hour` and :attr:`minute` in ``HH:MM`` format.
-   - ``'seconds'``: Include :attr:`hour`, :attr:`minute`, and :attr:`second`
-     in ``HH:MM:SS`` format.
-   - ``'milliseconds'``: Include full time, but truncate fractional second
-     part to milliseconds. ``HH:MM:SS.sss`` format.
-   - ``'microseconds'``: Include full time in ``HH:MM:SS.ffffff`` format.
+   - ``'auto'``: Giống ``'seconds'`` nếu :attr:`microsecond` là 0, nếu không thì giống ``'microseconds'``.
+   - ``'hours'``: Đưa :attr:`hour` vào định dạng ``HH`` gồm hai chữ số.
+   - ``'minutes'``: Bao gồm :attr:`hour` và :attr:`minute` ở định dạng ``HH:MM``.
+   - ``'seconds'``: Bao gồm :attr:`hour`, :attr:`minute` và :attr:`second` ở định dạng ``HH:MM:SS``.
+   - ``'milliseconds'``: Bao gồm toàn bộ thời gian, nhưng cắt phần giây lẻ xuống còn mili giây. Định dạng ``HH:MM:SS.sss``.
+   - ``'microseconds'``: Bao gồm toàn bộ thời gian ở định dạng ``HH:MM:SS.ffffff``.
 
    .. note::
 
-      Excluded time components are truncated, not rounded.
+      Các thành phần thời gian bị loại trừ sẽ bị cắt bỏ, không được làm tròn.
 
-   :exc:`ValueError` will be raised on an invalid *timespec* argument::
+   :exc:`ValueError` sẽ được phát sinh khi đối số *timespec* không hợp lệ::
 
 
       >>> import datetime as dt
@@ -1651,146 +1357,136 @@ Instance methods:
       '2015-01-01T12:30:59.000000'
 
    .. versionchanged:: 3.6
-      Added the *timespec* parameter.
+      Đã thêm tham số *timespec*.
 
 
 .. method:: datetime.__str__()
 
-   For a :class:`.datetime` instance ``d``, ``str(d)`` is equivalent to
-   ``d.isoformat(' ')``.
+   Đối với một thực thể :class:`.datetime` ``d``, ``str(d)`` tương đương với ``d.isoformat(' ')``.
 
 
 .. method:: datetime.ctime()
 
-   Return a string representing the date and time::
+   Trả về một chuỗi biểu diễn ngày và giờ::
 
        >>> import datetime as dt
        >>> dt.datetime(2002, 12, 4, 20, 30, 40).ctime()
        'Wed Dec  4 20:30:40 2002'
 
-   The output string will *not* include time zone information, regardless
-   of whether the input is aware or naive.
+   Chuỗi đầu ra *không* bao gồm thông tin múi giờ, bất kể dữ liệu đầu vào là aware hay naive.
 
-   ``d.ctime()`` is equivalent to::
+   ``d.ctime()`` tương đương với::
 
      time.ctime(time.mktime(d.timetuple()))
 
-   on platforms where the native C :c:func:`ctime` function
-   (which :func:`time.ctime` invokes, but which
-   :meth:`datetime.ctime` does not invoke) conforms to the C standard.
+   trên các nền tảng mà hàm :c:func:`ctime` gốc của C (được :func:`time.ctime` gọi, nhưng
+   :meth:`datetime.ctime` không gọi) tuân thủ tiêu chuẩn C.
 
 
 .. method:: datetime.strftime(format)
 
-   Return a string representing the date and time,
-   controlled by an explicit format string.
-   See also :ref:`strftime-strptime-behavior` and :meth:`datetime.isoformat`.
+   Trả về một chuỗi biểu diễn ngày và giờ, được điều khiển bởi một chuỗi định dạng tường minh. Xem thêm :ref:`strftime-strptime-behavior` và :meth:`datetime.isoformat`.
 
 
 .. method:: datetime.__format__(format)
 
-   Same as :meth:`.datetime.strftime`. This makes it possible to specify a format
-   string for a :class:`.datetime` object in :ref:`formatted string
-   literals <f-strings>` and when using :meth:`str.format`.
-   See also :ref:`strftime-strptime-behavior` and :meth:`datetime.isoformat`.
+   Giống như :meth:`.datetime.strftime`. Điều này cho phép chỉ định một chuỗi định dạng cho đối tượng :class:`.datetime` trong :ref:`formatted string literals <f-strings>` và khi sử dụng :meth:`str.format`. Xem thêm :ref:`strftime-strptime-behavior` và :meth:`datetime.isoformat`.
 
 
-Examples of usage: :class:`!datetime`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ sử dụng: :class:`!datetime`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Examples of working with :class:`.datetime` objects:
+Ví dụ làm việc với các đối tượng :class:`.datetime`:
 
 .. doctest::
 
     >>> import datetime as dt
 
-    >>> # Using datetime.combine()
+    >>> # Sử dụng datetime.combine()
     >>> d = dt.date(2005, 7, 14)
     >>> t = dt.time(12, 30)
     >>> dt.datetime.combine(d, t)
     datetime.datetime(2005, 7, 14, 12, 30)
 
-    >>> # Using datetime.now()
+    >>> # Sử dụng datetime.now()
     >>> dt.datetime.now()   # doctest: +SKIP
     datetime.datetime(2007, 12, 6, 16, 29, 43, 79043)   # GMT +1
     >>> dt.datetime.now(dt.timezone.utc)   # doctest: +SKIP
     datetime.datetime(2007, 12, 6, 15, 29, 43, 79060, tzinfo=datetime.timezone.utc)
 
-    >>> # Using datetime.strptime()
+    >>> # Sử dụng datetime.strptime()
     >>> my_datetime = dt.datetime.strptime("21/11/06 16:30", "%d/%m/%y %H:%M")
     >>> my_datetime
     datetime.datetime(2006, 11, 21, 16, 30)
 
-    >>> # Using datetime.timetuple() to get tuple of all attributes
+    >>> # Sử dụng datetime.timetuple() để lấy tuple của tất cả thuộc tính
     >>> tt = my_datetime.timetuple()
     >>> for it in tt:   # doctest: +SKIP
     ...     print(it)
     ...
-    2006    # year
-    11      # month
-    21      # day
-    16      # hour
-    30      # minute
-    0       # second
-    1       # weekday (0 = Monday)
-    325     # number of days since 1st January
-    -1      # dst - method tzinfo.dst() returned None
+    2006    # năm
+    11      # tháng
+    21      # ngày
+    16      # giờ
+    30      # phút
+    0       # giây
+    1       # ngày trong tuần (0 = Thứ Hai)
+    325     # số ngày kể từ ngày 1 tháng 1
+    -1      # dst - phương thức tzinfo.dst() trả về None
 
-    >>> # Date in ISO format
+    >>> # Ngày ở định dạng ISO
     >>> ic = my_datetime.isocalendar()
     >>> for it in ic:   # doctest: +SKIP
     ...     print(it)
     ...
-    2006    # ISO year
-    47      # ISO week
-    2       # ISO weekday
+    2006    # Năm ISO
+    47      # Tuần ISO
+    2       # Ngày trong tuần ISO
 
-    >>> # Formatting a datetime
+    >>> # Định dạng datetime
     >>> my_datetime.strftime("%A, %d. %B %Y %I:%M%p")
     'Tuesday, 21. November 2006 04:30PM'
     >>> 'The {1} is {0:%d}, the {2} is {0:%B}, the {3} is {0:%I:%M%p}.'.format(my_datetime, "day", "month", "time")
     'The day is 21, the month is November, the time is 04:30PM.'
 
-The example below defines a :class:`tzinfo` subclass capturing time zone
-information for Kabul, Afghanistan, which used +4 UTC until 1945
-and then +4:30 UTC thereafter::
+Ví dụ dưới đây định nghĩa một lớp con :class:`tzinfo` ghi lại thông tin múi giờ của Kabul, Afghanistan, nơi đã sử dụng UTC+4 cho đến năm 1945 và sau đó là UTC+4:30::
 
    import datetime as dt
 
    class KabulTz(dt.tzinfo):
-       # Kabul used +4 until 1945, when they moved to +4:30
+       # Kabul dùng +4 cho đến năm 1945, khi chuyển sang +4:30
        UTC_MOVE_DATE = dt.datetime(1944, 12, 31, 20, tzinfo=dt.timezone.utc)
 
        def utcoffset(self, when):
            if when.year < 1945:
                return dt.timedelta(hours=4)
            elif (1945, 1, 1, 0, 0) <= when.timetuple()[:5] < (1945, 1, 1, 0, 30):
-               # An ambiguous ("imaginary") half-hour range representing
-               # a 'fold' in time due to the shift from +4 to +4:30.
-               # If when falls in the imaginary range, use fold to decide how
-               # to resolve. See PEP 495.
+               # Một khoảng nửa giờ mơ hồ ("tưởng tượng") biểu thị
+               # một 'fold' trong thời gian do chuyển từ +4 sang +4:30.
+               # Nếu when nằm trong khoảng tưởng tượng, dùng fold để quyết định cách
+               # phân giải. Xem PEP 495.
                return dt.timedelta(hours=4, minutes=(30 if when.fold else 0))
            else:
                return dt.timedelta(hours=4, minutes=30)
 
        def fromutc(self, when):
-           # Follow same validations as in datetime.tzinfo
+           # Áp dụng các bước kiểm tra tương tự như trong datetime.tzinfo
            if not isinstance(when, dt.datetime):
                raise TypeError("fromutc() requires a datetime argument")
            if when.tzinfo is not self:
                raise ValueError("when.tzinfo is not self")
 
-           # A custom implementation is required for fromutc as
-           # the input to this function is a datetime with utc values
-           # but with a tzinfo set to self.
-           # See datetime.astimezone or fromtimestamp.
+           # Cần có một triển khai tùy chỉnh cho fromutc vì
+           # đầu vào của hàm này là một datetime với các giá trị utc
+           # nhưng tzinfo được đặt thành self.
+           # Xem datetime.astimezone hoặc fromtimestamp.
            if when.replace(tzinfo=dt.timezone.utc) >= self.UTC_MOVE_DATE:
                return when + dt.timedelta(hours=4, minutes=30)
            else:
                return when + dt.timedelta(hours=4)
 
        def dst(self, when):
-           # Kabul does not observe daylight saving time.
+           # Kabul không áp dụng giờ mùa hè.
            return dt.timedelta(0)
 
        def tzname(self, when):
@@ -1798,21 +1494,21 @@ and then +4:30 UTC thereafter::
                return "+04:30"
            return "+04"
 
-Usage of ``KabulTz`` from above::
+Cách sử dụng ``KabulTz`` ở trên::
 
    >>> tz1 = KabulTz()
 
-   >>> # Datetime before the change
+   >>> # Datetime trước khi thay đổi
    >>> dt1 = dt.datetime(1900, 11, 21, 16, 30, tzinfo=tz1)
    >>> print(dt1.utcoffset())
    4:00:00
 
-   >>> # Datetime after the change
+   >>> # Datetime sau khi thay đổi
    >>> dt2 = dt.datetime(2006, 6, 14, 13, 0, tzinfo=tz1)
    >>> print(dt2.utcoffset())
    4:30:00
 
-   >>> # Convert datetime to another time zone
+   >>> # Chuyển datetime sang múi giờ khác
    >>> dt3 = dt2.astimezone(dt.timezone.utc)
    >>> dt3
    datetime.datetime(2006, 6, 14, 8, 30, tzinfo=datetime.timezone.utc)
@@ -1824,17 +1520,15 @@ Usage of ``KabulTz`` from above::
 
 .. _datetime-time:
 
-:class:`!time` objects
-----------------------
+:class:`!time` đối tượng
+------------------------
 
-A :class:`.time` object represents a (local) time of day, independent of any particular
-day, and subject to adjustment via a :class:`tzinfo` object.
+Một đối tượng :class:`.time` đại diện cho một thời điểm trong ngày (giờ địa phương), độc lập với bất kỳ ngày cụ thể nào và có thể được điều chỉnh thông qua một đối tượng :class:`tzinfo`.
 
 .. class:: time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0)
 
-   All arguments are optional. *tzinfo* may be ``None``, or an instance of a
-   :class:`tzinfo` subclass. The remaining arguments must be integers in the
-   following ranges:
+   Tất cả đối số đều là tùy chọn. *tzinfo* có thể là ``None``, hoặc là một thể hiện của một
+   :class:`tzinfo` lớp con. Các đối số còn lại phải là số nguyên trong các phạm vi sau:
 
    * ``0 <= hour < 24``,
    * ``0 <= minute < 60``,
@@ -1842,110 +1536,90 @@ day, and subject to adjustment via a :class:`tzinfo` object.
    * ``0 <= microsecond < 1000000``,
    * ``fold in [0, 1]``.
 
-   If an argument outside those ranges is given, :exc:`ValueError` is raised. All
-   default to 0 except *tzinfo*, which defaults to ``None``.
+   Nếu cung cấp một đối số nằm ngoài các phạm vi đó, :exc:`ValueError` sẽ được phát sinh. Tất cả đều mặc định là 0, ngoại trừ *tzinfo*, mặc định là ``None``.
 
 
-Class attributes:
+Các thuộc tính của lớp:
 
 
 .. attribute:: time.min
 
-   The earliest representable :class:`.time`, ``time(0, 0, 0, 0)``.
+   Thời điểm sớm nhất có thể biểu diễn, :class:`.time`, ``time(0, 0, 0, 0)``.
 
 
 .. attribute:: time.max
 
-   The latest representable :class:`.time`, ``time(23, 59, 59, 999999)``.
+   Thời điểm muộn nhất có thể biểu diễn, :class:`.time`, ``time(23, 59, 59, 999999)``.
 
 
 .. attribute:: time.resolution
 
-   The smallest possible difference between non-equal :class:`.time` objects,
-   ``timedelta(microseconds=1)``, although note that arithmetic on
-   :class:`.time` objects is not supported.
+   Khoảng chênh lệch nhỏ nhất có thể có giữa các đối tượng :class:`.time` không bằng nhau, ``timedelta(microseconds=1)``, tuy nhiên lưu ý rằng phép tính số học trên
+   các đối tượng :class:`.time` không được hỗ trợ.
 
 
-Instance attributes (read-only):
+Các thuộc tính của instance (chỉ đọc):
 
 .. attribute:: time.hour
 
-   In ``range(24)``.
+   Trong ``range(24)``.
 
 
 .. attribute:: time.minute
 
-   In ``range(60)``.
+   Trong ``range(60)``.
 
 
 .. attribute:: time.second
 
-   In ``range(60)``.
+   Trong ``range(60)``.
 
 
 .. attribute:: time.microsecond
 
-   In ``range(1000000)``.
+   Trong ``range(1000000)``.
 
 
 .. attribute:: time.tzinfo
 
-   The object passed as the tzinfo argument to the :class:`.time` constructor, or
-   ``None`` if none was passed.
+   Đối tượng được truyền làm đối số tzinfo cho hàm khởi tạo :class:`.time`, hoặc ``None`` nếu không truyền đối số này.
 
 
 .. attribute:: time.fold
 
-   In ``[0, 1]``. Used to disambiguate wall times during a repeated interval. (A
-   repeated interval occurs when clocks are rolled back at the end of daylight saving
-   time or when the UTC offset for the current zone is decreased for political reasons.)
-   The values 0 and 1 represent, respectively, the earlier and later of the two
-   moments with the same wall time representation.
+   Trong ``[0, 1]``. Được dùng để phân biệt các thời điểm theo giờ địa phương trong một khoảng thời gian lặp lại. (Khoảng thời gian lặp lại xảy ra khi đồng hồ được chỉnh lùi vào cuối giờ tiết kiệm ánh sáng ban ngày hoặc khi độ lệch UTC của múi giờ hiện tại bị giảm vì lý do chính trị.) Các giá trị 0 và 1 lần lượt biểu thị thời điểm sớm hơn và muộn hơn trong hai thời điểm có cùng biểu diễn giờ địa phương.
 
    .. versionadded:: 3.6
 
 
-:class:`.time` objects support equality and order comparisons,
-where ``a`` is considered less than ``b`` when ``a`` precedes ``b`` in time.
+Các đối tượng :class:`.time` hỗ trợ so sánh bằng và so sánh thứ tự, trong đó ``a`` được xem là nhỏ hơn ``b`` khi ``a`` xảy ra trước ``b`` theo thời gian.
 
-Naive and aware :class:`!time` objects are never equal.
-Order comparison between naive and aware :class:`!time` objects raises
+Các đối tượng :class:`!time` naive và aware không bao giờ bằng nhau. Việc so sánh thứ tự giữa các đối tượng :class:`!time` naive và aware sẽ phát sinh
 :exc:`TypeError`.
 
-If both comparands are aware, and have the same :attr:`~.time.tzinfo`
-attribute, the :attr:`!tzinfo` and :attr:`!fold` attributes are
-ignored and the base times are compared. If both comparands are aware and
-have different :attr:`!tzinfo` attributes, the comparands are first adjusted by
-subtracting their UTC offsets (obtained from ``self.utcoffset()``).
+Nếu cả hai đối tượng được so sánh đều aware và có cùng thuộc tính :attr:`~.time.tzinfo`, các thuộc tính :attr:`!tzinfo` và :attr:`!fold` sẽ bị bỏ qua và các thời điểm cơ sở được so sánh. Nếu cả hai đối tượng được so sánh đều aware và có các thuộc tính :attr:`!tzinfo` khác nhau, trước tiên các đối tượng được điều chỉnh bằng cách trừ đi độ lệch UTC của chúng (lấy từ ``self.utcoffset()``).
 
 .. versionchanged:: 3.3
-  Equality comparisons between aware and naive :class:`.time` instances
-  don't raise :exc:`TypeError`.
+  So sánh bằng giữa các thực thể :class:`.time` aware và naive không gây ra :exc:`TypeError`.
 
-In Boolean contexts, a :class:`.time` object is always considered to be true.
+Trong các ngữ cảnh Boolean, một đối tượng :class:`.time` luôn được xem là true.
 
 .. versionchanged:: 3.5
-   Before Python 3.5, a :class:`.time` object was considered to be false if it
-   represented midnight in UTC. This behavior was considered obscure and
-   error-prone and has been removed in Python 3.5. See :issue:`13936` for more
-   information.
+   Trước Python 3.5, một đối tượng :class:`.time` được xem là false nếu biểu diễn thời điểm nửa đêm theo UTC. Hành vi này được xem là khó hiểu và dễ gây lỗi, nên đã bị loại bỏ trong Python 3.5. Xem :issue:`13936` để biết thêm thông tin.
 
 
-Other constructors:
+Các hàm khởi tạo khác:
 
 .. classmethod:: time.fromisoformat(time_string)
 
-   Return a :class:`.time` corresponding to a *time_string* in any valid
-   ISO 8601 format, with the following exceptions:
+   Trả về một :class:`.time` tương ứng với *time_string* ở bất kỳ định dạng ISO 8601 hợp lệ nào, ngoại trừ các trường hợp sau:
 
-   1. Time zone offsets may have fractional seconds.
-   2. The leading ``T``, normally required in cases where there may be ambiguity between
-      a date and a time, is not required.
-   3. Fractional seconds may have any number of digits (anything beyond 6 will
-      be truncated).
-   4. Fractional hours and minutes are not supported.
+   1. Múi giờ có thể có độ lệch tính bằng số giây phân số.
+   2. Ký tự ``T`` ở đầu, thường bắt buộc trong các trường hợp có thể gây nhầm lẫn giữa ngày và giờ, là không bắt buộc.
+   3. Phần giây lẻ có thể có bất kỳ số chữ số nào (mọi chữ số vượt quá 6 sẽ bị cắt bỏ).
+   4. Không hỗ trợ phần giờ và phút lẻ.
 
-   Examples:
+   Ví dụ:
 
    .. doctest::
 
@@ -1970,74 +1644,63 @@ Other constructors:
 
    .. versionadded:: 3.7
    .. versionchanged:: 3.11
-      Previously, this method only supported formats that could be emitted by
+      Trước đây, phương thức này chỉ hỗ trợ các định dạng có thể được tạo ra bởi
       :meth:`time.isoformat`.
 
 
 .. classmethod:: time.strptime(date_string, format)
 
-   Return a :class:`.time` corresponding to *date_string*, parsed according to
-   *format*.
+   Trả về một :class:`.time` tương ứng với *date_string*, được phân tích theo *format*.
 
-   If *format* does not contain microseconds or timezone information, this is equivalent to::
+   Nếu *format* không chứa thông tin microsecond hoặc múi giờ, điều này tương đương với::
 
      time(*(time.strptime(date_string, format)[3:6]))
 
-   :exc:`ValueError` is raised if the *date_string* and *format*
-   cannot be parsed by :func:`time.strptime` or if it returns a value which is not a
-   time tuple.  See also :ref:`strftime-strptime-behavior` and
+   :exc:`ValueError` được phát sinh nếu không thể phân tích *date_string* và *format* bằng :func:`time.strptime`, hoặc nếu nó trả về một giá trị không phải là time tuple. Xem thêm :ref:`strftime-strptime-behavior` và
    :meth:`time.fromisoformat`.
 
    .. versionadded:: 3.14
 
 
-Instance methods:
+Các phương thức instance:
 
 .. method:: time.replace(hour=self.hour, minute=self.minute, second=self.second, \
    microsecond=self.microsecond, tzinfo=self.tzinfo, *, fold=0)
 
-   Return a new :class:`.time` with the same values, but with specified
-   parameters updated. Note that ``tzinfo=None`` can be specified to create a
-   naive :class:`!time` from an aware :class:`!time`, without conversion of the
-   time data.
+   Trả về một :class:`.time` mới với các giá trị giống nhau, nhưng các tham số được chỉ định sẽ được cập nhật. Lưu ý rằng có thể chỉ định ``tzinfo=None`` để tạo một :class:`!time` naive từ một :class:`!time` aware mà không chuyển đổi dữ liệu thời gian.
 
-   :class:`.time` objects are also supported by generic function
+   Các đối tượng :class:`.time` cũng được generic function hỗ trợ
    :func:`copy.replace`.
 
    .. versionchanged:: 3.6
-      Added the *fold* parameter.
+      Đã thêm tham số *fold*.
 
 
 .. method:: time.isoformat(timespec='auto')
 
-   Return a string representing the time in ISO 8601 format, one of:
+   Trả về một chuỗi biểu diễn thời gian theo định dạng ISO 8601, với một trong các dạng sau:
 
-   - ``HH:MM:SS.ffffff``, if :attr:`microsecond` is not 0
-   - ``HH:MM:SS``, if :attr:`microsecond` is 0
-   - ``HH:MM:SS.ffffff+HH:MM[:SS[.ffffff]]``, if :meth:`utcoffset` does not return ``None``
-   - ``HH:MM:SS+HH:MM[:SS[.ffffff]]``, if :attr:`microsecond` is 0 and :meth:`utcoffset` does not return ``None``
+   - ``HH:MM:SS.ffffff``, nếu :attr:`microsecond` khác 0
+   - ``HH:MM:SS``, nếu :attr:`microsecond` là 0
+   - ``HH:MM:SS.ffffff+HH:MM[:SS[.ffffff]]``, nếu :meth:`utcoffset` không trả về ``None``
+   - ``HH:MM:SS+HH:MM[:SS[.ffffff]]``, nếu :attr:`microsecond` là 0 và :meth:`utcoffset` không trả về ``None``
 
-   The optional argument *timespec* specifies the number of additional
-   components of the time to include (the default is ``'auto'``).
-   It can be one of the following:
+   Đối số tùy chọn *timespec* chỉ định số thành phần bổ sung của thời gian cần đưa vào (mặc định là ``'auto'``). Có thể là một trong các giá trị sau:
 
-   - ``'auto'``: Same as ``'seconds'`` if :attr:`microsecond` is 0,
-     same as ``'microseconds'`` otherwise.
-   - ``'hours'``: Include the :attr:`hour` in the two-digit ``HH`` format.
-   - ``'minutes'``: Include :attr:`hour` and :attr:`minute` in ``HH:MM`` format.
-   - ``'seconds'``: Include :attr:`hour`, :attr:`minute`, and :attr:`second`
-     in ``HH:MM:SS`` format.
-   - ``'milliseconds'``: Include full time, but truncate fractional second
-     part to milliseconds. ``HH:MM:SS.sss`` format.
-   - ``'microseconds'``: Include full time in ``HH:MM:SS.ffffff`` format.
+   - ``'auto'``: Giống như ``'seconds'`` nếu :attr:`microsecond` là 0, nếu không thì giống như ``'microseconds'``.
+   - ``'hours'``: Bao gồm :attr:`hour` ở định dạng ``HH`` gồm hai chữ số.
+   - ``'minutes'``: Bao gồm :attr:`hour` và :attr:`minute` ở định dạng ``HH:MM``.
+   - ``'seconds'``: Bao gồm :attr:`hour`, :attr:`minute` và :attr:`second` theo định dạng ``HH:MM:SS``.
+   - ``'milliseconds'``: Bao gồm thời gian đầy đủ, nhưng cắt phần giây lẻ đến mili giây. Định dạng ``HH:MM:SS.sss``.
+   - ``'microseconds'``: Bao gồm thời gian đầy đủ theo định dạng ``HH:MM:SS.ffffff``.
 
    .. note::
 
-      Excluded time components are truncated, not rounded.
+      Các thành phần thời gian bị loại trừ sẽ được cắt bỏ, không được làm tròn.
 
-   :exc:`ValueError` will be raised on an invalid *timespec* argument.
+   :exc:`ValueError` sẽ được phát sinh khi đối số *timespec* không hợp lệ.
 
-   Example::
+   Ví dụ::
 
       >>> import datetime as dt
       >>> dt.time(hour=12, minute=34, second=56, microsecond=123456).isoformat(timespec='minutes')
@@ -2049,59 +1712,49 @@ Instance methods:
       '12:34:56'
 
    .. versionchanged:: 3.6
-      Added the *timespec* parameter.
+      Đã thêm tham số *timespec*.
 
 
 .. method:: time.__str__()
 
-   For a time ``t``, ``str(t)`` is equivalent to ``t.isoformat()``.
+   Đối với một đối tượng time ``t``, ``str(t)`` tương đương với ``t.isoformat()``.
 
 
 .. method:: time.strftime(format)
 
-   Return a string representing the time, controlled by an explicit format
-   string.  See also :ref:`strftime-strptime-behavior` and :meth:`time.isoformat`.
+   Trả về một chuỗi biểu diễn thời gian, được điều khiển bằng một chuỗi định dạng tường minh. Xem thêm :ref:`strftime-strptime-behavior` và :meth:`time.isoformat`.
 
 
 .. method:: time.__format__(format)
 
-   Same as :meth:`.time.strftime`. This makes it possible to specify
-   a format string for a :class:`.time` object in :ref:`formatted string
-   literals <f-strings>` and when using :meth:`str.format`.
-   See also :ref:`strftime-strptime-behavior` and :meth:`time.isoformat`.
+   Tương tự như :meth:`.time.strftime`. Điều này cho phép chỉ định một chuỗi định dạng cho đối tượng :class:`.time` trong :ref:`formatted string literals <f-strings>` và khi sử dụng :meth:`str.format`. Xem thêm :ref:`strftime-strptime-behavior` và :meth:`time.isoformat`.
 
 
 .. method:: time.utcoffset()
 
-   If :attr:`.tzinfo` is ``None``, returns ``None``, else returns
-   ``self.tzinfo.utcoffset(None)``, and raises an exception if the latter doesn't
-   return ``None`` or a :class:`timedelta` object with magnitude less than one day.
+   Nếu :attr:`.tzinfo` là ``None``, trả về ``None``; nếu không, trả về ``self.tzinfo.utcoffset(None)`` và phát sinh ngoại lệ nếu giá trị sau không trả về ``None`` hoặc một đối tượng :class:`timedelta` có độ lớn nhỏ hơn một ngày.
 
    .. versionchanged:: 3.7
-      The UTC offset is not restricted to a whole number of minutes.
+      Độ lệch UTC không bị giới hạn ở một số phút nguyên.
 
 
 .. method:: time.dst()
 
-   If :attr:`.tzinfo` is ``None``, returns ``None``, else returns
-   ``self.tzinfo.dst(None)``, and raises an exception if the latter doesn't return
-   ``None``, or a :class:`timedelta` object with magnitude less than one day.
+   Nếu :attr:`.tzinfo` là ``None``, trả về ``None``; nếu không, trả về ``self.tzinfo.dst(None)`` và phát sinh ngoại lệ nếu giá trị sau không trả về ``None`` hoặc một đối tượng :class:`timedelta` có độ lớn nhỏ hơn một ngày.
 
    .. versionchanged:: 3.7
-      The DST offset is not restricted to a whole number of minutes.
+      Độ lệch DST không bị giới hạn ở một số phút nguyên.
 
 
 .. method:: time.tzname()
 
-   If :attr:`.tzinfo` is ``None``, returns ``None``, else returns
-   ``self.tzinfo.tzname(None)``, or raises an exception if the latter doesn't
-   return ``None`` or a string object.
+   Nếu :attr:`.tzinfo` là ``None``, trả về ``None``; nếu không thì trả về ``self.tzinfo.tzname(None)``, hoặc phát sinh một ngoại lệ nếu giá trị sau không trả về ``None`` hoặc một đối tượng chuỗi.
 
 
-Examples of usage: :class:`!time`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ sử dụng: :class:`!time`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Examples of working with a :class:`.time` object::
+Ví dụ làm việc với một đối tượng :class:`.time`::
 
     >>> import datetime as dt
     >>> class TZ1(dt.tzinfo):
@@ -2131,209 +1784,136 @@ Examples of working with a :class:`.time` object::
 
 .. _datetime-tzinfo:
 
-:class:`!tzinfo` objects
-------------------------
+Các đối tượng :class:`!tzinfo`
+------------------------------
 
 .. class:: tzinfo()
 
-   This is an :term:`abstract base class`, meaning that this class should not be
-   instantiated directly.  Define a subclass of :class:`tzinfo` to capture
-   information about a particular time zone.
+   Đây là một :term:`abstract base class`, nghĩa là không nên khởi tạo trực tiếp lớp này. Hãy định nghĩa một lớp con của :class:`tzinfo` để nắm bắt thông tin về một múi giờ cụ thể.
 
-   An instance of (a concrete subclass of) :class:`tzinfo` can be passed to the
-   constructors for :class:`.datetime` and :class:`.time` objects. The latter objects
-   view their attributes as being in local time, and the :class:`!tzinfo` object
-   supports methods revealing offset of local time from UTC, the name of the time
-   zone, and DST offset, all relative to a date or time object passed to them.
+   Một thực thể của (một lớp con cụ thể của) :class:`tzinfo` có thể được truyền cho các hàm khởi tạo của các đối tượng :class:`.datetime` và :class:`.time`. Các đối tượng sau xem các thuộc tính của chúng là theo giờ địa phương, còn đối tượng :class:`!tzinfo` hỗ trợ các phương thức cho biết độ lệch của giờ địa phương so với UTC, tên múi giờ và độ lệch DST, tất cả đều dựa trên một đối tượng ngày hoặc giờ được truyền cho chúng.
 
-   You need to derive a concrete subclass, and (at least)
-   supply implementations of the standard :class:`tzinfo` methods needed by the
-   :class:`.datetime` methods you use. The :mod:`!datetime` module provides
-   :class:`timezone`, a simple concrete subclass of :class:`!tzinfo` which can
-   represent time zones with fixed offset from UTC such as UTC itself or North
-   American EST and EDT.
+   Bạn cần tạo một lớp con cụ thể và (ít nhất) cung cấp các triển khai của những phương thức :class:`tzinfo` tiêu chuẩn cần thiết bởi
+   các phương thức :class:`.datetime` bạn sử dụng. Mô-đun :mod:`!datetime` cung cấp
+   :class:`timezone`, một lớp con cụ thể đơn giản của :class:`!tzinfo`, có thể biểu diễn các múi giờ có độ lệch cố định so với UTC, chẳng hạn như chính UTC hoặc EST và EDT của Bắc Mỹ.
 
-   Special requirement for pickling:  A :class:`tzinfo` subclass must have an
-   :meth:`~object.__init__` method that can be called with no arguments,
-   otherwise it can be
-   pickled but possibly not unpickled again. This is a technical requirement that
-   may be relaxed in the future.
+   Yêu cầu đặc biệt đối với việc pickle: Một lớp con :class:`tzinfo` phải có một
+   phương thức :meth:`~object.__init__` có thể được gọi mà không cần đối số; nếu không, đối tượng có thể được pickle nhưng có khả năng không thể unpickle lại. Đây là một yêu cầu kỹ thuật có thể được nới lỏng trong tương lai.
 
-   A concrete subclass of :class:`tzinfo` may need to implement the following
-   methods. Exactly which methods are needed depends on the uses made of aware
-   :mod:`!datetime` objects. If in doubt, simply implement all of them.
+   Một lớp con cụ thể của :class:`tzinfo` có thể cần cài đặt các phương thức sau. Chính xác cần những phương thức nào phụ thuộc vào cách sử dụng các đối tượng :class:`tzinfo`
+   :mod:`!datetime` các đối tượng. Nếu không chắc chắn, chỉ cần triển khai tất cả chúng.
 
 
 .. method:: tzinfo.utcoffset(dt)
 
-   Return offset of local time from UTC, as a :class:`timedelta` object that is
-   positive east of UTC. If local time is west of UTC, this should be negative.
+   Trả về độ lệch của giờ địa phương so với UTC dưới dạng một đối tượng :class:`timedelta` có giá trị dương ở phía đông UTC. Nếu giờ địa phương nằm ở phía tây UTC, giá trị này phải âm.
 
-   This represents the *total* offset from UTC; for example, if a
-   :class:`tzinfo` object represents both time zone and DST adjustments,
-   :meth:`utcoffset` should return their sum. If the UTC offset isn't known,
-   return ``None``. Else the value returned must be a :class:`timedelta` object
-   strictly between ``-timedelta(hours=24)`` and ``timedelta(hours=24)``
-   (the magnitude of the offset must be less than one day). Most implementations
-   of :meth:`utcoffset` will probably look like one of these two::
+   Điều này biểu thị độ lệch *tổng cộng* so với UTC; ví dụ: nếu một
+   :class:`tzinfo` đối tượng biểu thị cả múi giờ và các điều chỉnh DST,
+   :meth:`utcoffset` nên trả về tổng của chúng. Nếu không biết độ lệch UTC, hãy trả về ``None``. Nếu không, giá trị được trả về phải là một đối tượng :class:`timedelta` nằm строго giữa ``-timedelta(hours=24)`` và ``timedelta(hours=24)`` (độ lớn của độ lệch phải nhỏ hơn một ngày). Hầu hết các triển khai của :meth:`utcoffset` có thể sẽ giống như một trong hai dạng sau::
 
-      return CONSTANT                 # fixed-offset class
-      return CONSTANT + self.dst(dt)  # daylight-aware class
+      return CONSTANT                 # lớp có độ lệch cố định
+      return CONSTANT + self.dst(dt)  # lớp nhận biết giờ mùa hè
 
-   If :meth:`utcoffset` does not return ``None``, :meth:`dst` should not return
-   ``None`` either.
+   Nếu :meth:`utcoffset` không trả về ``None``, thì :meth:`dst` cũng không được trả về ``None``.
 
-   The default implementation of :meth:`utcoffset` raises
+   Cài đặt mặc định của :meth:`utcoffset` sẽ phát sinh
    :exc:`NotImplementedError`.
 
    .. versionchanged:: 3.7
-      The UTC offset is not restricted to a whole number of minutes.
+      Độ lệch UTC không bị giới hạn ở một số phút nguyên.
 
 
 .. method:: tzinfo.dst(dt)
 
-   Return the daylight saving time (DST) adjustment, as a :class:`timedelta`
-   object or
-   ``None`` if DST information isn't known.
+   Trả về điều chỉnh giờ mùa hè (DST) dưới dạng một đối tượng :class:`timedelta` hoặc ``None`` nếu không xác định được thông tin DST.
 
-   Return ``timedelta(0)`` if DST is not in effect.
-   If DST is in effect, return the offset as a :class:`timedelta` object
-   (see :meth:`utcoffset` for details). Note that DST offset, if applicable, has
-   already been added to the UTC offset returned by :meth:`utcoffset`, so there's
-   no need to consult :meth:`dst` unless you're interested in obtaining DST info
-   separately. For example, :meth:`datetime.timetuple` calls its :attr:`~.datetime.tzinfo`
-   attribute's :meth:`dst` method to determine how the :attr:`~time.struct_time.tm_isdst` flag
-   should be set, and :meth:`tzinfo.fromutc` calls :meth:`dst` to account for
-   DST changes when crossing time zones.
+   Trả về ``timedelta(0)`` nếu DST không có hiệu lực. Nếu DST có hiệu lực, trả về độ lệch dưới dạng một đối tượng :class:`timedelta` (xem :meth:`utcoffset` để biết chi tiết). Lưu ý rằng độ lệch DST, nếu có, đã được cộng vào độ lệch UTC do :meth:`utcoffset` trả về, vì vậy không cần tham khảo :meth:`dst` trừ khi bạn muốn lấy riêng thông tin DST. Ví dụ, :meth:`datetime.timetuple` gọi phương thức :meth:`dst` của thuộc tính :attr:`~.datetime.tzinfo` để xác định cách đặt cờ :attr:`~time.struct_time.tm_isdst`, còn :meth:`tzinfo.fromutc` gọi :meth:`dst` để tính đến các thay đổi DST khi chuyển múi giờ.
 
-   An instance *tz* of a :class:`tzinfo` subclass that models both standard and
-   daylight times must be consistent in this sense:
+   Một thực thể *tz* của một lớp con :class:`tzinfo` mô hình hóa cả giờ chuẩn và giờ mùa hè phải nhất quán theo nghĩa sau:
 
    ``tz.utcoffset(dt) - tz.dst(dt)``
 
-   must return the same result for every :class:`.datetime` *dt* with ``dt.tzinfo ==
-   tz``. For sane :class:`!tzinfo` subclasses, this expression yields the time
-   zone's "standard offset", which should not depend on the date or the time, but
-   only on geographic location. The implementation of :meth:`datetime.astimezone`
-   relies on this, but cannot detect violations; it's the programmer's
-   responsibility to ensure it. If a :class:`!tzinfo` subclass cannot guarantee
-   this, it may be able to override the default implementation of
-   :meth:`tzinfo.fromutc` to work correctly with :meth:`~.datetime.astimezone` regardless.
+   phải trả về cùng một kết quả cho mọi :class:`.datetime` *dt* có ``dt.tzinfo == tz``. Đối với các lớp con :class:`!tzinfo` hợp lý, biểu thức này cho ra "độ lệch chuẩn" của múi giờ, giá trị này không nên phụ thuộc vào ngày hoặc giờ, mà chỉ phụ thuộc vào vị trí địa lý. Việc triển khai :meth:`datetime.astimezone` dựa trên điều này nhưng không thể phát hiện các vi phạm; lập trình viên có trách nhiệm bảo đảm điều đó. Nếu một lớp con :class:`!tzinfo` không thể bảo đảm điều này, lớp đó có thể ghi đè cách triển khai mặc định của
+   :meth:`tzinfo.fromutc` để hoạt động chính xác với :meth:`~.datetime.astimezone` trong mọi trường hợp.
 
-   Most implementations of :meth:`dst` will probably look like one of these two::
+   Hầu hết các cách triển khai :meth:`dst` có lẽ sẽ trông giống như một trong hai cách sau::
 
       import datetime as dt
 
       def dst(self, when):
-          # a fixed-offset class:  doesn't account for DST
+          # lớp fixed-offset: không tính đến DST
           return dt.timedelta(0)
 
-   or::
+   hoặc::
 
       import datetime as dt
 
       def dst(self, when):
-          # Code to set dston and dstoff to the time zone's DST
-          # transition times based on the input when.year, and expressed
-          # in standard local time.
+          # Mã đặt dston và dstoff thành thời điểm chuyển đổi DST của múi giờ
+          # dựa trên when.year đầu vào và được biểu diễn
+          # theo giờ địa phương chuẩn.
 
           if dston <= when.replace(tzinfo=None) < dstoff:
               return dt.timedelta(hours=1)
           else:
               return dt.timedelta(0)
 
-   The default implementation of :meth:`dst` raises :exc:`NotImplementedError`.
+   Triển khai mặc định của :meth:`dst` sẽ phát sinh :exc:`NotImplementedError`.
 
    .. versionchanged:: 3.7
-      The DST offset is not restricted to a whole number of minutes.
+      Độ lệch DST không bị giới hạn ở số phút nguyên.
 
 
 .. method:: tzinfo.tzname(dt)
 
-   Return the time zone name corresponding to the :class:`.datetime` object *dt*, as
-   a string. Nothing about string names is defined by the :mod:`!datetime` module,
-   and there's no requirement that it mean anything in particular. For example,
-   ``"GMT"``, ``"UTC"``, ``"-500"``, ``"-5:00"``, ``"EDT"``, ``"US/Eastern"``, ``"America/New York"`` are all
-   valid replies. Return ``None`` if a string name isn't known. Note that this is
-   a method rather than a fixed string primarily because some :class:`tzinfo`
-   subclasses will wish to return different names depending on the specific value
-   of *dt* passed, especially if the :class:`!tzinfo` class is accounting for
-   daylight time.
+   Trả về tên múi giờ tương ứng với đối tượng :class:`.datetime` *dt*, dưới dạng một chuỗi. Mô-đun :mod:`!datetime` không quy định gì về tên chuỗi, và cũng không yêu cầu tên đó phải mang một ý nghĩa cụ thể nào. Ví dụ, ``"GMT"``, ``"UTC"``, ``"-500"``, ``"-5:00"``, ``"EDT"``, ``"US/Eastern"``, ``"America/New York"`` đều là các giá trị trả về hợp lệ. Trả về ``None`` nếu không biết tên chuỗi. Lưu ý rằng đây là một method thay vì một chuỗi cố định, chủ yếu vì một số lớp con của :class:`tzinfo` có thể muốn trả về các tên khác nhau tùy thuộc vào giá trị cụ thể của *dt* được truyền vào, đặc biệt nếu lớp :class:`!tzinfo` đang tính đến giờ mùa hè.
 
-   The default implementation of :meth:`tzname` raises :exc:`NotImplementedError`.
+   Cài đặt mặc định của :meth:`tzname` sẽ raise :exc:`NotImplementedError`.
 
 
-These methods are called by a :class:`.datetime` or :class:`.time` object, in
-response to their methods of the same names. A :class:`!datetime` object passes
-itself as the argument, and a :class:`!time` object passes ``None`` as the
-argument. A :class:`tzinfo` subclass's methods should therefore be prepared to
-accept a *dt* argument of ``None``, or of class :class:`!datetime`.
+Các method này được gọi bởi một đối tượng :class:`.datetime` hoặc :class:`.time`, để phản hồi cho các method cùng tên của chúng. Một đối tượng :class:`!datetime` truyền chính nó làm đối số, còn một đối tượng :class:`!time` truyền ``None`` làm đối số. Vì vậy, các method của lớp con :class:`tzinfo` phải sẵn sàng nhận một đối số *dt* có giá trị ``None``, hoặc thuộc lớp :class:`!datetime`.
 
-When ``None`` is passed, it's up to the class designer to decide the best
-response. For example, returning ``None`` is appropriate if the class wishes to
-say that time objects don't participate in the :class:`tzinfo` protocols. It
-may be more useful for ``utcoffset(None)`` to return the standard UTC offset, as
-there is no other convention for discovering the standard offset.
+Khi truyền ``None`` vào, việc quyết định cách phản hồi phù hợp nhất thuộc về người thiết kế lớp. Ví dụ, trả về ``None`` là phù hợp nếu lớp muốn cho biết rằng các đối tượng thời gian không tham gia vào các protocol :class:`tzinfo`. Có thể hữu ích hơn nếu ``utcoffset(None)`` trả về độ lệch UTC tiêu chuẩn, vì không có quy ước nào khác để xác định độ lệch tiêu chuẩn.
 
-When a :class:`.datetime` object is passed in response to a :class:`!datetime`
-method, ``dt.tzinfo`` is the same object as *self*. :class:`tzinfo` methods can
-rely on this, unless user code calls :class:`!tzinfo` methods directly. The
-intent is that the :class:`!tzinfo` methods interpret *dt* as being in local
-time, and not need worry about objects in other time zones.
+Khi một đối tượng :class:`.datetime` được truyền vào để phản hồi cho một method :class:`!datetime`, ``dt.tzinfo`` là cùng một đối tượng với *self*. Các method :class:`tzinfo` có thể dựa vào điều này, trừ khi mã người dùng gọi trực tiếp các method :class:`!tzinfo`. Mục đích là để các method :class:`!tzinfo` diễn giải *dt* là giờ địa phương, và không cần phải quan tâm đến các đối tượng thuộc múi giờ khác.
 
-There is one more :class:`tzinfo` method that a subclass may wish to override:
+Còn một method :class:`tzinfo` nữa mà lớp con có thể muốn ghi đè:
 
 
 .. method:: tzinfo.fromutc(dt)
 
-   This is called from the default :meth:`datetime.astimezone`
-   implementation. When called from that, ``dt.tzinfo`` is *self*, and *dt*'s
-   date and time data are to be viewed as expressing a UTC time. The purpose
-   of :meth:`fromutc` is to adjust the date and time data, returning an
-   equivalent datetime in *self*'s local time.
+   Method này được gọi từ cài đặt mặc định của :meth:`datetime.astimezone`. Khi được gọi từ đó, ``dt.tzinfo`` là *self*, và dữ liệu ngày tháng và thời gian của *dt* được xem là biểu thị một thời điểm UTC. Mục đích của :meth:`fromutc` là điều chỉnh dữ liệu ngày tháng và thời gian, rồi trả về một datetime tương đương theo giờ địa phương của *self*.
 
-   Most :class:`tzinfo` subclasses should be able to inherit the default
-   :meth:`fromutc` implementation without problems. It's strong enough to handle
-   fixed-offset time zones, and time zones accounting for both standard and
-   daylight time, and the latter even if the DST transition times differ in
-   different years. An example of a time zone the default :meth:`fromutc`
-   implementation may not handle correctly in all cases is one where the standard
-   offset (from UTC) depends on the specific date and time passed, which can happen
-   for political reasons. The default implementations of :meth:`~.datetime.astimezone` and
-   :meth:`fromutc` may not produce the result you want if the result is one of the
-   hours straddling the moment the standard offset changes.
+   Hầu hết các lớp con của :class:`tzinfo` sẽ có thể kế thừa phần triển khai mặc định
+   Việc triển khai :meth:`fromutc` có thể xử lý các múi giờ có độ lệch cố định, cũng như các múi giờ tính đến cả giờ chuẩn và giờ mùa hè, và thậm chí xử lý trường hợp thời điểm chuyển đổi DST của loại sau khác nhau giữa các năm. Một ví dụ về múi giờ mà phần triển khai :meth:`fromutc` mặc định có thể không xử lý đúng trong mọi trường hợp là múi giờ có độ lệch chuẩn (so với UTC) phụ thuộc vào ngày và giờ cụ thể được truyền vào; điều này có thể xảy ra vì lý do chính trị. Các phần triển khai mặc định của :meth:`~.datetime.astimezone` và
+   :meth:`fromutc` có thể không tạo ra kết quả bạn muốn nếu kết quả đó là một trong những giờ bao quanh thời điểm độ lệch chuẩn thay đổi.
 
-   Skipping code for error cases, the default :meth:`fromutc` implementation acts
-   like::
+   Bỏ qua mã xử lý các trường hợp lỗi, phần triển khai :meth:`fromutc` mặc định hoạt động như sau::
 
       import datetime as dt
 
       def fromutc(self, when):
-          # raise ValueError error if when.tzinfo is not self
+          # phát sinh lỗi ValueError nếu when.tzinfo không phải là self
           dtoff = when.utcoffset()
           dtdst = when.dst()
-          # raise ValueError if dtoff is None or dtdst is None
-          delta = dtoff - dtdst  # this is self's standard offset
+          # phát sinh lỗi ValueError nếu dtoff là None hoặc dtdst là None
+          delta = dtoff - dtdst  # đây là độ lệch chuẩn của self
           if delta:
-              when += delta   # convert to standard local time
+              when += delta   # chuyển đổi sang giờ địa phương tiêu chuẩn
               dtdst = when.dst()
-              # raise ValueError if dtdst is None
+              # tăng ValueError nếu dtdst là None
           if dtdst:
               return when + dtdst
           else:
               return when
 
-In the following :download:`tzinfo_examples.py
-<../includes/tzinfo_examples.py>` file there are some examples of
-:class:`tzinfo` classes:
+Trong tệp :download:`tzinfo_examples.py <../includes/tzinfo_examples.py>` sau đây có một số ví dụ về
+:class:`tzinfo` lớp:
 
 .. literalinclude:: ../includes/tzinfo_examples.py
 
-Note that there are unavoidable subtleties twice per year in a :class:`tzinfo`
-subclass accounting for both standard and daylight time, at the DST transition
-points. For concreteness, consider US Eastern (UTC -0500), where EDT begins the
-minute after 1:59 (EST) on the second Sunday in March, and ends the minute after
-1:59 (EDT) on the first Sunday in November::
+Lưu ý rằng mỗi năm có hai thời điểm phát sinh những điểm tinh tế không thể tránh khỏi trong một lớp con :class:`tzinfo` khi xử lý cả giờ tiêu chuẩn và giờ mùa hè, tại các thời điểm chuyển đổi DST. Cụ thể, hãy xét múi giờ miền Đông Hoa Kỳ (UTC -0500), trong đó EDT bắt đầu vào phút ngay sau 1:59 (EST) vào Chủ nhật thứ hai của tháng 3 và kết thúc vào phút ngay sau 1:59 (EDT) vào Chủ nhật đầu tiên của tháng 11::
 
      UTC   3:MM  4:MM  5:MM  6:MM  7:MM  8:MM
      EST  22:MM 23:MM  0:MM  1:MM  2:MM  3:MM
@@ -2343,10 +1923,7 @@ minute after 1:59 (EST) on the second Sunday in March, and ends the minute after
 
      end  23:MM  0:MM  1:MM  1:MM  2:MM  3:MM
 
-When DST starts (the "start" line), the local wall clock leaps from 1:59 to
-3:00. A wall time of the form 2:MM doesn't really make sense on that day, so
-``astimezone(Eastern)`` won't deliver a result with ``hour == 2`` on the day DST
-begins. For example, at the Spring forward transition of 2016, we get::
+Khi DST bắt đầu (dòng "start"), đồng hồ địa phương nhảy từ 1:59 đến 3:00. Thời gian địa phương có dạng 2:MM thực sự không có ý nghĩa vào ngày đó, vì vậy ``astimezone(Eastern)`` sẽ không trả về kết quả có ``hour == 2`` vào ngày DST bắt đầu. Ví dụ, tại thời điểm chuyển sang giờ mùa hè vào mùa xuân năm 2016, ta nhận được::
 
     >>> import datetime as dt
     >>> from tzinfo_examples import HOUR, Eastern
@@ -2362,16 +1939,8 @@ begins. For example, at the Spring forward transition of 2016, we get::
     08:00:00 UTC = 04:00:00 EDT
 
 
-When DST ends (the "end" line), there's a potentially worse problem: there's an
-hour that can't be spelled unambiguously in local wall time: the last hour of
-daylight time. In Eastern, that's times of the form 5:MM UTC on the day
-daylight time ends. The local wall clock leaps from 1:59 (daylight time) back
-to 1:00 (standard time) again. Local times of the form 1:MM are ambiguous.
-:meth:`~.datetime.astimezone` mimics the local clock's behavior by mapping two adjacent UTC
-hours into the same local hour then. In the Eastern example, UTC times of the
-form 5:MM and 6:MM both map to 1:MM when converted to Eastern, but earlier times
-have the :attr:`~.datetime.fold` attribute set to 0 and the later times have it set to 1.
-For example, at the Fall back transition of 2016, we get::
+Khi DST kết thúc (dòng "end"), có một vấn đề còn nghiêm trọng hơn: có một giờ không thể biểu diễn rõ ràng theo giờ địa phương: giờ cuối cùng của giờ mùa hè. Ở miền Đông, đó là các thời điểm có dạng 5:MM UTC vào ngày giờ mùa hè kết thúc. Đồng hồ địa phương nhảy ngược từ 1:59 (giờ mùa hè) về 1:00 (giờ tiêu chuẩn) một lần nữa. Các thời điểm địa phương có dạng 1:MM là không rõ ràng.
+:meth:`~.datetime.astimezone` mô phỏng cách hoạt động của đồng hồ địa phương bằng cách ánh xạ hai giờ UTC liền kề vào cùng một giờ địa phương tại thời điểm đó. Trong ví dụ về múi giờ Eastern, các thời điểm UTC có dạng 5:MM và 6:MM đều được ánh xạ thành 1:MM khi chuyển đổi sang Eastern, nhưng các thời điểm sớm hơn có thuộc tính :attr:`~.datetime.fold` được đặt là 0, còn các thời điểm muộn hơn có thuộc tính này được đặt là 1. Ví dụ, tại thời điểm chuyển tiếp lùi giờ vào mùa thu năm 2016, ta có::
 
     >>> import datetime as dt
     >>> from tzinfo_examples import HOUR, Eastern
@@ -2386,107 +1955,81 @@ For example, at the Fall back transition of 2016, we get::
     06:00:00 UTC = 01:00:00 EST 1
     07:00:00 UTC = 02:00:00 EST 0
 
-Note that the :class:`.datetime` instances that differ only by the value of the
-:attr:`~.datetime.fold` attribute are considered equal in comparisons.
+Lưu ý rằng các đối tượng :class:`.datetime` chỉ khác nhau ở giá trị của
+thuộc tính :attr:`~.datetime.fold` được xem là bằng nhau trong các phép so sánh.
 
-Applications that can't bear wall-time ambiguities should explicitly check the
-value of the :attr:`~.datetime.fold` attribute or avoid using hybrid
-:class:`tzinfo` subclasses; there are no ambiguities when using :class:`timezone`,
-or any other fixed-offset :class:`!tzinfo` subclass (such as a class representing
-only EST (fixed offset -5 hours), or only EDT (fixed offset -4 hours)).
+Các ứng dụng không thể chấp nhận những điểm không rõ ràng về thời gian theo đồng hồ treo tường nên kiểm tra rõ ràng giá trị của thuộc tính :attr:`~.datetime.fold` hoặc tránh sử dụng các đối tượng hybrid
+:class:`tzinfo` lớp con; không có điểm không rõ ràng nào khi sử dụng :class:`timezone`, hoặc bất kỳ lớp con :class:`!tzinfo` nào có độ lệch cố định khác (chẳng hạn như một lớp chỉ biểu diễn EST (độ lệch cố định -5 giờ), hoặc chỉ EDT (độ lệch cố định -4 giờ)).
 
 .. seealso::
 
     :mod:`zoneinfo`
-      The :mod:`!datetime` module has a basic :class:`timezone` class (for
-      handling arbitrary fixed offsets from UTC) and its :attr:`timezone.utc`
-      attribute (a UTC :class:`!timezone` instance).
+      Mô-đun :mod:`!datetime` có một lớp :class:`timezone` cơ bản (để xử lý các độ lệch tùy ý so với UTC) và thuộc tính :attr:`timezone.utc` của nó (một đối tượng :class:`!timezone` UTC).
 
-      ``zoneinfo`` brings the *IANA time zone database* (also known as the Olson
-      database) to Python, and its usage is recommended.
+      ``zoneinfo`` đưa *cơ sở dữ liệu múi giờ IANA* (còn được gọi là cơ sở dữ liệu Olson) vào Python, và bạn nên sử dụng nó.
 
-   `IANA time zone database <https://www.iana.org/time-zones>`_
-      The Time Zone Database (often called tz, tzdata or zoneinfo) contains code
-      and data that represent the history of local time for many representative
-      locations around the globe. It is updated periodically to reflect changes
-      made by political bodies to time zone boundaries, UTC offsets, and
-      daylight-saving rules.
+   `cơ sở dữ liệu múi giờ IANA <https://www.iana.org/time-zones>`_
+      Cơ sở dữ liệu múi giờ (thường được gọi là tz, tzdata hoặc zoneinfo) chứa mã và dữ liệu biểu diễn lịch sử giờ địa phương của nhiều địa điểm tiêu biểu trên toàn cầu. Cơ sở dữ liệu này được cập nhật định kỳ để phản ánh những thay đổi do các cơ quan chính trị thực hiện đối với ranh giới múi giờ, độ lệch UTC và các quy tắc giờ mùa hè.
 
 
 .. _datetime-timezone:
 
-:class:`!timezone` objects
---------------------------
+Các đối tượng :class:`!timezone`
+--------------------------------
 
-The :class:`timezone` class is a subclass of :class:`tzinfo`, each
-instance of which represents a time zone defined by a fixed offset from
-UTC.
+Lớp :class:`timezone` là một lớp con của :class:`tzinfo`, trong đó mỗi thực thể biểu diễn một múi giờ được xác định bằng độ lệch cố định so với UTC.
 
-Objects of this class cannot be used to represent time zone information in the
-locations where different offsets are used in different days of the year or
-where historical changes have been made to civil time.
+Không thể sử dụng các đối tượng của lớp này để biểu diễn thông tin múi giờ tại những địa điểm sử dụng các độ lệch khác nhau vào những ngày khác nhau trong năm hoặc nơi giờ dân sự đã có những thay đổi trong lịch sử.
 
 
 .. class:: timezone(offset, name=None)
 
-  The *offset* argument must be specified as a :class:`timedelta`
-  object representing the difference between the local time and UTC. It must
-  be strictly between ``-timedelta(hours=24)`` and
-  ``timedelta(hours=24)``, otherwise :exc:`ValueError` is raised.
+  Đối số *offset* phải được chỉ định dưới dạng một đối tượng :class:`timedelta` biểu diễn chênh lệch giữa giờ địa phương và UTC. Giá trị này phải lớn hơn nghiêm ngặt ``-timedelta(hours=24)`` và nhỏ hơn nghiêm ngặt ``timedelta(hours=24)``; nếu không, :exc:`ValueError` sẽ được phát sinh.
 
-  The *name* argument is optional. If specified it must be a string that
-  will be used as the value returned by the :meth:`datetime.tzname` method.
+  Đối số *name* là tùy chọn. Nếu được chỉ định, đối số này phải là một chuỗi được sử dụng làm giá trị mà phương thức :meth:`datetime.tzname` trả về.
 
   .. versionadded:: 3.2
 
   .. versionchanged:: 3.7
-     The UTC offset is not restricted to a whole number of minutes.
+     Độ lệch UTC không bị giới hạn ở một số nguyên phút.
 
 
 .. method:: timezone.utcoffset(dt)
 
-  Return the fixed value specified when the :class:`timezone` instance is
-  constructed.
+  Trả về giá trị cố định được chỉ định khi thực thể :class:`timezone` được tạo.
 
-  The *dt* argument is ignored. The return value is a :class:`timedelta`
-  instance equal to the difference between the local time and UTC.
+  Đối số *dt* bị bỏ qua. Giá trị trả về là một thực thể :class:`timedelta`, bằng với chênh lệch giữa giờ địa phương và UTC.
 
   .. versionchanged:: 3.7
-     The UTC offset is not restricted to a whole number of minutes.
+     Độ lệch UTC không bị giới hạn ở một số nguyên phút.
 
 
 .. method:: timezone.tzname(dt)
 
-  Return the fixed value specified when the :class:`timezone` instance
-  is constructed.
+  Trả về giá trị cố định được chỉ định khi thực thể :class:`timezone` được tạo.
 
-  If *name* is not provided in the constructor, the name returned by
-  ``tzname(dt)`` is generated from the value of the ``offset`` as follows. If
-  *offset* is ``timedelta(0)``, the name is "UTC", otherwise it is a string in
-  the format ``UTC±HH:MM``, where ± is the sign of ``offset``, HH and MM are
-  two digits of ``offset.hours`` and ``offset.minutes`` respectively.
+  Nếu *name* không được cung cấp trong hàm khởi tạo, tên được ``tzname(dt)`` trả về sẽ được tạo từ giá trị của ``offset`` như sau. Nếu *offset* là ``timedelta(0)``, tên là "UTC"; nếu không, đó là một chuỗi có định dạng ``UTC±HH:MM``, trong đó ± là dấu của ``offset``, còn HH và MM lần lượt là hai chữ số của ``offset.hours`` và ``offset.minutes``.
 
   .. versionchanged:: 3.6
-     Name generated from ``offset=timedelta(0)`` is now plain ``'UTC'``, not
-     ``'UTC+00:00'``.
+     Tên được tạo từ ``offset=timedelta(0)`` giờ đây là ``'UTC'`` thuần túy, không phải ``'UTC+00:00'``.
 
 
 .. method:: timezone.dst(dt)
 
-  Always returns ``None``.
+  Luôn trả về ``None``.
 
 
 .. method:: timezone.fromutc(dt)
 
-  Return ``dt + offset``. The *dt* argument must be an aware
-  :class:`.datetime` instance, with ``tzinfo`` set to ``self``.
+  Trả về ``dt + offset``. Đối số *dt* phải là một instance aware
+  :class:`.datetime`, với ``tzinfo`` được đặt thành ``self``.
 
 
-Class attributes:
+Các thuộc tính của class:
 
 .. attribute:: timezone.utc
 
-   The UTC time zone, ``timezone(timedelta(0))``.
+   Múi giờ UTC, ``timezone(timedelta(0))``.
 
 
 .. index::
@@ -2494,37 +2037,33 @@ Class attributes:
 
 .. _strftime-strptime-behavior:
 
-:meth:`!strftime` and :meth:`!strptime` behavior
-------------------------------------------------
+Hành vi của :meth:`!strftime` và :meth:`!strptime` hoạt động
+------------------------------------------------------------
 
-:class:`date`, :class:`.datetime`, and :class:`.time` objects all support a
-``strftime(format)`` method, to create a string representing the time under the
-control of an explicit format string.
+Các đối tượng :class:`date`, :class:`.datetime` và :class:`.time` đều hỗ trợ phương thức ``strftime(format)``, dùng để tạo một chuỗi biểu thị thời gian theo một chuỗi định dạng được chỉ định rõ ràng.
 
-Conversely, the :meth:`date.strptime`, :meth:`datetime.strptime` and
-:meth:`time.strptime` class methods create an object from a string
-representing the time and a corresponding format string.
+Ngược lại, :meth:`date.strptime`, :meth:`datetime.strptime` và
+Các phương thức lớp :meth:`time.strptime` tạo một đối tượng từ một chuỗi biểu diễn thời gian và một chuỗi định dạng tương ứng.
 
-The table below provides a high-level comparison of :meth:`~.datetime.strftime`
-versus :meth:`~.datetime.strptime`:
+Bảng dưới đây cung cấp sự so sánh khái quát giữa :meth:`~.datetime.strftime` và :meth:`~.datetime.strptime`:
 
-+----------------+--------------------------------------------------------+------------------------------------------------------------+
-|                | ``strftime``                                           | ``strptime``                                               |
-+================+========================================================+============================================================+
-| Usage          | Convert object to a string according to a given format | Parse a string into an object given a corresponding format |
-+----------------+--------------------------------------------------------+------------------------------------------------------------+
-| Type of method | Instance method                                        | Class method                                               |
-+----------------+--------------------------------------------------------+------------------------------------------------------------+
-| Signature      | ``strftime(format)``                                   | ``strptime(date_string, format)``                          |
-+----------------+--------------------------------------------------------+------------------------------------------------------------+
++------------------+---------------------------------------------------------------+--------------------------------------------------------------------------+
+|                  | ``strftime``                                                  | ``strptime``                                                             |
++==================+===============================================================+==========================================================================+
+| Cách sử dụng     | Chuyển đổi đối tượng thành chuỗi theo một định dạng nhất định | Phân tích cú pháp một chuỗi thành đối tượng dựa trên định dạng tương ứng |
++------------------+---------------------------------------------------------------+--------------------------------------------------------------------------+
+| Loại phương thức | Phương thức instance                                          | Phương thức lớp                                                          |
++------------------+---------------------------------------------------------------+--------------------------------------------------------------------------+
+| Chữ ký           | ``strftime(format)``                                          | ``strptime(date_string, format)``                                        |
++------------------+---------------------------------------------------------------+--------------------------------------------------------------------------+
 
 
    .. _format-codes:
 
-:meth:`!strftime` and :meth:`!strptime` format codes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mã định dạng của :meth:`!strftime` và :meth:`!strptime`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-These methods accept format codes that can be used to parse and format dates::
+Các phương thức này chấp nhận những mã định dạng có thể dùng để phân tích cú pháp và định dạng ngày tháng::
 
    >>> import datetime as dt
    >>> dt.datetime.strptime('31/01/22 23:59:59.999999',
@@ -2533,8 +2072,7 @@ These methods accept format codes that can be used to parse and format dates::
    >>> _.strftime('%a %d %b %Y, %I:%M%p')
    'Mon 31 Jan 2022, 11:59PM'
 
-The following is a list of all the format codes that the 1989 C standard
-requires, and these work on all platforms with a standard C implementation.
+Sau đây là danh sách tất cả mã định dạng mà tiêu chuẩn C năm 1989 yêu cầu; các mã này hoạt động trên mọi nền tảng có triển khai C tiêu chuẩn.
 
 +-----------+--------------------------------+------------------------+-------+
 | Directive | Meaning                        | Example                | Notes |
@@ -2636,72 +2174,46 @@ requires, and these work on all platforms with a standard C implementation.
 | ``%%``    | A literal ``'%'`` character.   | %                      |       |
 +-----------+--------------------------------+------------------------+-------+
 
-Several additional directives not required by the C89 standard are included for
-convenience. These parameters all correspond to ISO 8601 date values.
+Một số directive bổ sung không được tiêu chuẩn C89 yêu cầu cũng được đưa vào để thuận tiện. Tất cả các tham số này đều tương ứng với các giá trị ngày tháng theo ISO 8601.
 
-+-----------+--------------------------------+------------------------+-------+
-| Directive | Meaning                        | Example                | Notes |
-+===========+================================+========================+=======+
-| ``%G``    | ISO 8601 year with century     | 0001, 0002, ..., 2013, | \(8)  |
-|           | representing the year that     | 2014, ..., 9998, 9999  |       |
-|           | contains the greater part of   |                        |       |
-|           | the ISO week (``%V``).         |                        |       |
-+-----------+--------------------------------+------------------------+-------+
-| ``%u``    | ISO 8601 weekday as a decimal  | 1, 2, ..., 7           |       |
-|           | number where 1 is Monday.      |                        |       |
-+-----------+--------------------------------+------------------------+-------+
-| ``%V``    | ISO 8601 week as a decimal     | 01, 02, ..., 53        | \(8), |
-|           | number with Monday as          |                        | \(9)  |
-|           | the first day of the week.     |                        |       |
-|           | Week 01 is the week containing |                        |       |
-|           | Jan 4.                         |                        |       |
-+-----------+--------------------------------+------------------------+-------+
-| ``%:z``   | UTC offset in the form         | (empty), +00:00,       | \(6)  |
-|           | ``±HH:MM[:SS[.ffffff]]``       | -04:00, +10:30,        |       |
-|           | (empty string if the object is | +06:34:15,             |       |
-|           | naive).                        | -03:07:12.345216       |       |
-+-----------+--------------------------------+------------------------+-------+
++---------+--------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------+---------+
+| Chỉ thị | Ý nghĩa                                                                                                                  | Ví dụ                                                       | Ghi chú |
++=========+==========================================================================================================================+=============================================================+=========+
+| ``%G``  | Năm ISO 8601 có thế kỷ, biểu thị năm chứa phần lớn hơn của tuần ISO (``%V``).                                            | 0001, 0002, ..., 2013,                                      | \(8)    |
+|         |                                                                                                                          | 2014, ..., 9998, 9999                                       |         |
++---------+--------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------+---------+
+| ``%u``  | Ngày trong tuần theo ISO 8601 dưới dạng số thập phân, trong đó 1 là thứ Hai.                                             | 1, 2, ..., 7                                                |         |
++---------+--------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------+---------+
+| ``%V``  | Tuần theo ISO 8601 dưới dạng số thập phân, với thứ Hai là ngày đầu tiên trong tuần. Tuần 01 là tuần chứa ngày 4 tháng 1. | 01, 02, ..., 53                                             | \(8),   |
+|         |                                                                                                                          |                                                             | \(9)    |
++---------+--------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------+---------+
+| ``%:z`` | Độ lệch UTC dưới dạng ``±HH:MM[:SS[.ffffff]]`` (chuỗi rỗng nếu đối tượng là naive).                                      | (rỗng), +00:00, -04:00, +10:30, +06:34:15, -03:07:12.345216 | \(6)    |
++---------+--------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------+---------+
 
-These may not be available on all platforms when used with the :meth:`~.datetime.strftime`
-method. The ISO 8601 year and ISO 8601 week directives are not interchangeable
-with the year and week number directives above. Calling :meth:`~.datetime.strptime` with
-incomplete or ambiguous ISO 8601 directives will raise a :exc:`ValueError`.
+Các mã này có thể không khả dụng trên mọi nền tảng khi được sử dụng với phương thức :meth:`~.datetime.strftime`. Các chỉ thị về năm ISO 8601 và tuần ISO 8601 không thể thay thế cho các chỉ thị về năm và số tuần ở trên. Việc gọi :meth:`~.datetime.strptime` với các chỉ thị ISO 8601 chưa đầy đủ hoặc không rõ ràng sẽ gây ra :exc:`ValueError`.
 
-The full set of format codes supported varies across platforms, because Python
-calls the platform C library's :c:func:`strftime` function, and platform
-variations are common. To see the full set of format codes supported on your
-platform, consult the :manpage:`strftime(3)` documentation. There are also
-differences between platforms in handling of unsupported format specifiers.
+Bộ mã định dạng đầy đủ được hỗ trợ sẽ khác nhau tùy nền tảng, vì Python gọi hàm :c:func:`strftime` của thư viện C trên nền tảng đó, và các khác biệt giữa các nền tảng là phổ biến. Để xem toàn bộ mã định dạng được hỗ trợ trên nền tảng của bạn, hãy tham khảo tài liệu :manpage:`strftime(3)`. Cách xử lý các mã định dạng không được hỗ trợ cũng khác nhau giữa các nền tảng.
 
 .. versionadded:: 3.6
-   ``%G``, ``%u`` and ``%V`` were added.
+   Đã thêm ``%G``, ``%u`` và ``%V``.
 
 .. versionadded:: 3.12
-   ``%:z`` was added.
+   Đã thêm ``%:z``.
 
 
-Technical detail
-^^^^^^^^^^^^^^^^
+Chi tiết kỹ thuật
+^^^^^^^^^^^^^^^^^
 
-Broadly speaking, ``d.strftime(fmt)`` acts like the :mod:`time` module's
-``time.strftime(fmt, d.timetuple())`` although not all objects support a
-:meth:`~date.timetuple` method.
+Nói chung, ``d.strftime(fmt)`` hoạt động giống như ``time.strftime(fmt, d.timetuple())`` của mô-đun :mod:`time`, mặc dù không phải mọi đối tượng đều hỗ trợ một
+phương thức :meth:`~date.timetuple`.
 
-For the :meth:`.datetime.strptime` and :meth:`.date.strptime` class methods,
-the default value is ``1900-01-01T00:00:00.000``: any components not specified
-in the format string will be pulled from the default value.
+Đối với các phương thức lớp :meth:`.datetime.strptime` và :meth:`.date.strptime`, giá trị mặc định là ``1900-01-01T00:00:00.000``: mọi thành phần không được chỉ định trong chuỗi định dạng sẽ được lấy từ giá trị mặc định.
 
 .. note::
-   Format strings without separators can be ambiguous for parsing. For
-   example, with ``%Y%m%d``, the string ``2026111`` may be parsed either as
-   ``2026-11-01`` or as ``2026-01-11``.
-   Use separators to ensure the input is parsed as intended.
+   Các chuỗi định dạng không có dấu phân cách có thể gây mơ hồ khi phân tích cú pháp. Ví dụ, với ``%Y%m%d``, chuỗi ``2026111`` có thể được phân tích cú pháp thành ``2026-11-01`` hoặc ``2026-01-11``. Hãy sử dụng dấu phân cách để đảm bảo dữ liệu đầu vào được phân tích cú pháp theo đúng mục đích.
 
 .. note::
-   When used to parse partial dates lacking a year, :meth:`.datetime.strptime`
-   and :meth:`.date.strptime` will raise when encountering February 29 because
-   the default year of 1900 is *not* a leap year.  Always add a default leap
-   year to partial date strings before parsing.
+   Khi được dùng để phân tích cú pháp các ngày không đầy đủ, thiếu năm, :meth:`.datetime.strptime` và :meth:`.date.strptime` sẽ phát sinh ngoại lệ khi gặp ngày 29 tháng 2 vì năm mặc định 1900 *không phải* là năm nhuận. Luôn thêm một năm nhuận mặc định vào các chuỗi ngày không đầy đủ trước khi phân tích cú pháp.
 
 .. testsetup::
 
@@ -2729,159 +2241,105 @@ in the format string will be pulled from the default value.
     >>> dt.datetime.strptime(f"1904 {value}", "%Y %m/%d")
     datetime.datetime(1904, 2, 29, 0, 0)
 
-Using ``datetime.strptime(date_string, format)`` is equivalent to::
+Việc sử dụng ``datetime.strptime(date_string, format)`` tương đương với::
 
   datetime(*(time.strptime(date_string, format)[0:6]))
 
-except when the format includes sub-second components or time zone offset
-information, which are supported in ``datetime.strptime`` but are discarded by
-``time.strptime``.
+trừ khi định dạng bao gồm các thành phần nhỏ hơn một giây hoặc thông tin về độ lệch múi giờ; các thành phần này được hỗ trợ trong ``datetime.strptime`` nhưng bị ``time.strptime`` loại bỏ.
 
-For :class:`.time` objects, the format codes for year, month, and day should not
-be used, as :class:`!time` objects have no such values. If they're used anyway,
-1900 is substituted for the year, and 1 for the month and day.
+Đối với các đối tượng :class:`.time`, không nên sử dụng các mã định dạng cho năm, tháng và ngày, vì các đối tượng :class:`!time` không có những giá trị này. Nếu vẫn sử dụng, 1900 sẽ được thay thế cho năm, còn 1 được thay thế cho tháng và ngày.
 
-For :class:`date` objects, the format codes for hours, minutes, seconds, and
-microseconds should not be used, as :class:`date` objects have no such
-values. If they're used anyway, 0 is substituted for them.
+Đối với các đối tượng :class:`date`, không nên sử dụng các mã định dạng cho giờ, phút, giây và microgiây, vì các đối tượng :class:`date` không có những giá trị này. Nếu vẫn sử dụng, 0 sẽ được thay thế cho các giá trị đó.
 
-For the same reason, handling of format strings containing Unicode code points
-that can't be represented in the charset of the current locale is also
-platform-dependent. On some platforms such code points are preserved intact in
-the output, while on others ``strftime`` may raise :exc:`UnicodeError` or return
-an empty string instead.
+Vì cùng lý do, việc xử lý các chuỗi định dạng chứa các điểm mã Unicode không thể được biểu diễn trong charset của locale hiện tại cũng phụ thuộc vào nền tảng. Trên một số nền tảng, các điểm mã đó được giữ nguyên trong đầu ra, trong khi trên các nền tảng khác, ``strftime`` có thể phát sinh :exc:`UnicodeError` hoặc thay vào đó trả về một chuỗi rỗng.
 
-Notes:
+Lưu ý:
 
 (1)
-   Because the format depends on the current locale, care should be taken when
-   making assumptions about the output value. Field orderings will vary (for
-   example, "month/day/year" versus "day/month/year"), and the output may
-   contain non-ASCII characters.
+   Vì định dạng phụ thuộc vào locale hiện tại, cần thận trọng khi đưa ra giả định về giá trị đầu ra. Thứ tự các trường sẽ thay đổi (ví dụ: "month/day/year" so với "day/month/year"), và đầu ra có thể chứa các ký tự không phải ASCII.
 
 (2)
-   The :meth:`~.datetime.strptime` method can parse years in the full [1, 9999] range, but
-   years < 1000 must be zero-filled to 4-digit width.
+   Phương thức :meth:`~.datetime.strptime` có thể phân tích cú pháp các năm trong toàn bộ phạm vi [1, 9999], nhưng các năm < 1000 phải được điền số 0 để đạt độ rộng 4 chữ số.
 
    .. versionchanged:: 3.2
-      In previous versions, :meth:`~.datetime.strftime` method was restricted to
-      years >= 1900.
+      Trong các phiên bản trước, phương thức :meth:`~.datetime.strftime` bị giới hạn ở các năm >= 1900.
 
    .. versionchanged:: 3.3
-      In version 3.2, :meth:`~.datetime.strftime` method was restricted to
-      years >= 1000.
+      Trong phiên bản 3.2, phương thức :meth:`~.datetime.strftime` chỉ áp dụng cho các năm >= 1000.
 
 (3)
-   When used with the :meth:`~.datetime.strptime` method, the ``%p`` directive only affects
-   the output hour field if the ``%I`` directive is used to parse the hour.
+   Khi được sử dụng với phương thức :meth:`~.datetime.strptime`, directive ``%p`` chỉ ảnh hưởng đến trường giờ đầu ra nếu directive ``%I`` được sử dụng để phân tích giờ.
 
 (4)
-   Unlike the :mod:`time` module, the :mod:`!datetime` module does not support
-   leap seconds.
+   Không giống module :mod:`time`, module :mod:`!datetime` không hỗ trợ giây nhuận.
 
 (5)
-   When used with the :meth:`~.datetime.strptime` method, the ``%f`` directive
-   accepts from one to six digits and zero pads on the right. ``%f`` is
-   an extension to the set of format characters in the C standard (but
-   implemented separately in datetime objects, and therefore always
-   available).
+   Khi được sử dụng với phương thức :meth:`~.datetime.strptime`, directive ``%f`` chấp nhận từ một đến sáu chữ số và bổ sung số 0 ở bên phải. ``%f`` là phần mở rộng của tập ký tự định dạng trong tiêu chuẩn C (nhưng được triển khai riêng trong các đối tượng datetime, vì vậy luôn khả dụng).
 
 (6)
-   For a naive object, the ``%z``, ``%:z`` and ``%Z`` format codes are replaced
-   by empty strings.
+   Đối với một đối tượng naive, các mã định dạng ``%z``, ``%:z`` và ``%Z`` được thay thế bằng các chuỗi rỗng.
 
-   For an aware object:
+   Đối với một đối tượng aware:
 
    ``%z``
-      :meth:`~.datetime.utcoffset` is transformed into a string of the form
-      ``±HHMM[SS[.ffffff]]``, where ``HH`` is a 2-digit string giving the number
-      of UTC offset hours, ``MM`` is a 2-digit string giving the number of UTC
-      offset minutes, ``SS`` is a 2-digit string giving the number of UTC offset
-      seconds and ``ffffff`` is a 6-digit string giving the number of UTC
-      offset microseconds. The ``ffffff`` part is omitted when the offset is a
-      whole number of seconds and both the ``ffffff`` and the ``SS`` part is
-      omitted when the offset is a whole number of minutes. For example, if
-      :meth:`~.datetime.utcoffset` returns ``timedelta(hours=-3, minutes=-30)``, ``%z`` is
-      replaced with the string ``'-0330'``.
+      :meth:`~.datetime.utcoffset` được chuyển đổi thành một chuỗi có dạng ``±HHMM[SS[.ffffff]]``, trong đó ``HH`` là một chuỗi gồm 2 chữ số biểu thị số giờ của độ lệch UTC, ``MM`` là một chuỗi gồm 2 chữ số biểu thị số phút của độ lệch UTC, ``SS`` là một chuỗi gồm 2 chữ số biểu thị số giây của độ lệch UTC và ``ffffff`` là một chuỗi gồm 6 chữ số biểu thị số microgiây của độ lệch UTC. Phần ``ffffff`` được lược bỏ khi độ lệch là một số nguyên giây, và cả phần ``ffffff`` lẫn ``SS`` đều được lược bỏ khi độ lệch là một số nguyên phút. Ví dụ, nếu
+      :meth:`~.datetime.utcoffset` trả về ``timedelta(hours=-3, minutes=-30)``, ``%z`` được thay thế bằng chuỗi ``'-0330'``.
 
    .. versionchanged:: 3.7
-      The UTC offset is not restricted to a whole number of minutes.
+      Độ lệch UTC không bị giới hạn ở một số phút nguyên.
 
    .. versionchanged:: 3.7
-      When the ``%z`` directive is provided to the  :meth:`~.datetime.strptime` method,
-      the UTC offsets can have a colon as a separator between hours, minutes
-      and seconds.
-      For example, ``'+01:00:00'`` will be parsed as an offset of one hour.
-      In addition, providing ``'Z'`` is identical to ``'+00:00'``.
+      Khi chỉ thị ``%z`` được cung cấp cho phương thức :meth:`~.datetime.strptime`, độ lệch UTC có thể có dấu hai chấm làm dấu phân cách giữa giờ, phút và giây. Ví dụ: ``'+01:00:00'`` sẽ được phân tích cú pháp thành độ lệch một giờ. Ngoài ra, việc cung cấp ``'Z'`` tương đương với ``'+00:00'``.
 
    ``%:z``
-      Behaves exactly as ``%z``, but has a colon separator added between
-      hours, minutes and seconds.
+      Hoạt động hoàn toàn giống như ``%z``, nhưng có thêm dấu hai chấm làm dấu phân cách giữa giờ, phút và giây.
 
    ``%Z``
-      In :meth:`~.datetime.strftime`, ``%Z`` is replaced by an empty string if
-      :meth:`~.datetime.tzname` returns ``None``; otherwise ``%Z`` is replaced by the
-      returned value, which must be a string.
+      Trong :meth:`~.datetime.strftime`, ``%Z`` được thay thế bằng một chuỗi rỗng nếu
+      :meth:`~.datetime.tzname` trả về ``None``; nếu không, ``%Z`` được thay thế bằng giá trị trả về, giá trị này phải là một chuỗi.
 
-      :meth:`~.datetime.strptime` only accepts certain values for ``%Z``:
+      :meth:`~.datetime.strptime` chỉ chấp nhận một số giá trị nhất định cho ``%Z``:
 
-      1. any value in ``time.tzname`` for your machine's locale
-      2. the hard-coded values ``UTC`` and ``GMT``
+      1. bất kỳ giá trị nào trong ``time.tzname`` cho locale của máy bạn
+      2. các giá trị được hard-code ``UTC`` và ``GMT``
 
-      So someone living in Japan may have ``JST``, ``UTC``, and ``GMT`` as
-      valid values, but probably not ``EST``. It will raise ``ValueError`` for
-      invalid values.
+      Vì vậy, một người sống ở Nhật Bản có thể có ``JST``, ``UTC`` và ``GMT`` là các giá trị hợp lệ, nhưng có lẽ không phải ``EST``. Giá trị không hợp lệ sẽ gây ra ``ValueError``.
 
    .. versionchanged:: 3.2
-      When the ``%z`` directive is provided to the :meth:`~.datetime.strptime` method, an
-      aware :class:`.datetime` object will be produced. The ``tzinfo`` of the
-      result will be set to a :class:`timezone` instance.
+      Khi chỉ thị ``%z`` được cung cấp cho phương thức :meth:`~.datetime.strptime`, một đối tượng :class:`.datetime` aware sẽ được tạo ra. ``tzinfo`` của kết quả sẽ được đặt thành một instance :class:`timezone`.
 
 (7)
-   When used with the :meth:`~.datetime.strptime` method, ``%U`` and ``%W`` are only used
-   in calculations when the day of the week and the calendar year (``%Y``)
-   are specified.
+   Khi được sử dụng với phương thức :meth:`~.datetime.strptime`, ``%U`` và ``%W`` chỉ được dùng trong các phép tính khi ngày trong tuần và năm theo lịch (``%Y``) được chỉ định.
 
 (8)
-   Similar to ``%U`` and ``%W``, ``%V`` is only used in calculations when the
-   day of the week and the ISO year (``%G``) are specified in a
-   :meth:`~.datetime.strptime` format string. Also note that ``%G`` and ``%Y`` are not
-   interchangeable.
+   Tương tự như ``%U`` và ``%W``, ``%V`` chỉ được dùng trong các phép tính khi ngày trong tuần và năm ISO (``%G``) được chỉ định trong một
+   chuỗi định dạng :meth:`~.datetime.strptime`. Cũng lưu ý rằng ``%G`` và ``%Y`` không thể thay thế cho nhau.
 
 (9)
-   When used with the :meth:`~.datetime.strptime` method, the leading zero is optional
-   for  formats ``%d``, ``%m``, ``%H``, ``%I``, ``%M``, ``%S``, ``%j``, ``%U``,
-   ``%W``, and ``%V``. Format ``%y`` does require a leading zero.
+   Khi được sử dụng với phương thức :meth:`~.datetime.strptime`, số 0 ở đầu là tùy chọn đối với các định dạng ``%d``, ``%m``, ``%H``, ``%I``, ``%M``, ``%S``, ``%j``, ``%U``, ``%W`` và ``%V``. Định dạng ``%y`` yêu cầu phải có số 0 ở đầu.
 
 (10)
-   When parsing a month and day using :meth:`~.datetime.strptime`, always
-   include a year in the format.  If the value you need to parse lacks a year,
-   append an explicit dummy leap year.  Otherwise your code will raise an
-   exception when it encounters leap day because the default year used by the
-   parser (1900) is not a leap year.  Users run into that bug every leap year.
+   Khi phân tích tháng và ngày bằng :meth:`~.datetime.strptime`, luôn đưa năm vào định dạng. Nếu giá trị bạn cần phân tích không có năm, hãy thêm một năm nhuận giả rõ ràng. Nếu không, mã của bạn sẽ phát sinh ngoại lệ khi gặp ngày nhuận vì năm mặc định mà trình phân tích sử dụng (1900) không phải là năm nhuận. Người dùng gặp lỗi này vào mỗi năm nhuận.
 
    .. doctest::
 
       >>> month_day = "02/29"
-      >>> dt.datetime.strptime(f"{month_day};1984", "%m/%d;%Y")  # No leap year bug.
+      >>> dt.datetime.strptime(f"{month_day};1984", "%m/%d;%Y")  # Không có lỗi năm nhuận.
       datetime.datetime(1984, 2, 29, 0, 0)
 
    .. deprecated-removed:: 3.13 3.15
       :meth:`~.datetime.strptime` calls using a format string containing
-      a day of month without a year now emit a
-      :exc:`DeprecationWarning`. In 3.15 or later we may change this into
-      an error or change the default year to a leap year. See :gh:`70647`.
+      một ngày trong tháng không có năm giờ sẽ phát ra một
+      :exc:`DeprecationWarning`. Trong phiên bản 3.15 trở lên, chúng tôi có thể thay đổi điều này thành một lỗi hoặc thay đổi năm mặc định thành một năm nhuận. Xem :gh:`70647`.
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] If, that is, we ignore the effects of relativity.
+.. [#] Nói cách khác, nếu bỏ qua các tác động của thuyết tương đối.
 
-.. [#] This matches the definition of the "proleptic Gregorian" calendar in
-       Dershowitz and Reingold's book *Calendrical Calculations*,
-       where it's the base calendar for all computations. See the book for
-       algorithms for converting between proleptic Gregorian ordinals and
-       many other calendar systems.
+.. [#] Điều này phù hợp với định nghĩa về lịch "proleptic Gregorian" trong cuốn sách *Calendrical Calculations* của Dershowitz và Reingold, trong đó đây là lịch cơ sở cho mọi phép tính. Hãy xem cuốn sách để biết các thuật toán chuyển đổi giữa số thứ tự theo lịch proleptic Gregorian và nhiều hệ lịch khác.
 
-.. [#] See R. H. van Gent's `guide to the mathematics of the ISO 8601 calendar
-       <https://web.archive.org/web/20220531051136/https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm>`_
-       for a good explanation.
+.. [#] Hãy xem `hướng dẫn về toán học của lịch ISO 8601 <https://web.archive.org/web/20220531051136/https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm>`_ do R. H. van Gent biên soạn để có lời giải thích dễ hiểu.
+
+.. _`dateutil`: https://dateutil.readthedocs.io/en/stable/
+.. _`IANA time zone database`: https://www.iana.org/time-zones
+.. _`guide to the mathematics of the ISO 8601 calendar`: https://web.archive.org/web/20220531051136/https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm

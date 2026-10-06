@@ -1,23 +1,20 @@
-:mod:`!dataclasses` --- Data Classes
-====================================
+:mod:`!dataclasses` --- Các lớp dữ liệu
+=======================================
 
 .. module:: dataclasses
-    :synopsis: Generate special methods on user-defined classes.
+    :synopsis: Tạo các phương thức đặc biệt trên các lớp do người dùng định nghĩa.
 
 .. moduleauthor:: Eric V. Smith <eric@trueblade.com>
 .. sectionauthor:: Eric V. Smith <eric@trueblade.com>
 
-**Source code:** :source:`Lib/dataclasses.py`
+**Mã nguồn:** :source:`Lib/dataclasses.py`
 
 --------------
 
-This module provides a decorator and functions for automatically
-adding generated :term:`special methods <special method>` such as :meth:`~object.__init__` and
-:meth:`~object.__repr__` to user-defined classes.  It was originally described
-in :pep:`557`.
+Mô-đun này cung cấp một decorator và các hàm để tự động thêm các :term:`phương thức đặc biệt <special method>` được sinh tự động, chẳng hạn như :meth:`~object.__init__` và
+:meth:`~object.__repr__` vào các lớp do người dùng định nghĩa.  Mô-đun này ban đầu được mô tả trong :pep:`557`.
 
-The member variables to use in these generated methods are defined
-using :pep:`526` type annotations.  For example, this code::
+Các biến thành viên được sử dụng trong những phương thức được sinh tự động này được định nghĩa bằng :pep:`526` chú thích kiểu (type annotation).  Ví dụ: đoạn mã này::
 
   from dataclasses import dataclass
 
@@ -31,45 +28,33 @@ using :pep:`526` type annotations.  For example, this code::
       def total_cost(self) -> float:
           return self.unit_price * self.quantity_on_hand
 
-will add, among other things, a :meth:`!__init__` that looks like::
+sẽ thêm, cùng với nhiều thành phần khác, một :meth:`!__init__` có dạng như sau::
 
   def __init__(self, name: str, unit_price: float, quantity_on_hand: int = 0):
       self.name = name
       self.unit_price = unit_price
       self.quantity_on_hand = quantity_on_hand
 
-Note that this method is automatically added to the class: it is not
-directly specified in the :class:`!InventoryItem` definition shown above.
+Lưu ý rằng phương thức này được tự động thêm vào class: phương thức này không được chỉ định trực tiếp trong định nghĩa :class:`!InventoryItem` được trình bày ở trên.
 
 .. versionadded:: 3.7
 
-Module contents
+Nội dung module
 ---------------
 
 .. decorator:: dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
 
-   This function is a :term:`decorator` that is used to add generated
-   :term:`special methods <special method>` to classes, as described below.
+   Hàm này là một :term:`decorator` được dùng để thêm các
+   :term:`phương thức đặc biệt <special method>` được tạo tự động vào các class, như mô tả bên dưới.
 
-   The ``@dataclass`` decorator examines the class to find
-   ``field``\s.  A ``field`` is defined as a class variable that has a
-   :term:`type annotation <variable annotation>`.  With two
-   exceptions described below, nothing in ``@dataclass``
-   examines the type specified in the variable annotation.
+   Decorator ``@dataclass`` kiểm tra class để tìm ``field``\s.  Một ``field`` được định nghĩa là một biến class có một
+   :term:`chú thích kiểu <variable annotation>`.  Ngoại trừ hai trường hợp được mô tả bên dưới, không có thành phần nào trong ``@dataclass`` kiểm tra kiểu được chỉ định trong chú thích biến.
 
-   The order of the fields in all of the generated methods is the
-   order in which they appear in the class definition.
+   Thứ tự của các field trong tất cả các phương thức được tạo tự động là thứ tự mà chúng xuất hiện trong định nghĩa class.
 
-   The ``@dataclass`` decorator will add various "dunder" methods to
-   the class, described below.  If any of the added methods already
-   exist in the class, the behavior depends on the parameter, as documented
-   below. The decorator returns the same class that it is called on; no new
-   class is created.
+   Trình trang trí ``@dataclass`` sẽ thêm nhiều phương thức "dunder" khác nhau vào lớp, được mô tả bên dưới. Nếu bất kỳ phương thức nào được thêm đã tồn tại trong lớp, hành vi sẽ phụ thuộc vào tham số, như được ghi lại bên dưới. Trình trang trí trả về chính lớp mà nó được gọi trên đó; không tạo lớp mới.
 
-   If ``@dataclass`` is used just as a simple decorator with no parameters,
-   it acts as if it has the default values documented in this
-   signature.  That is, these three uses of ``@dataclass`` are
-   equivalent::
+   Nếu ``@dataclass`` được sử dụng chỉ như một trình trang trí đơn giản không có tham số, nó hoạt động như thể có các giá trị mặc định được ghi lại trong chữ ký này. Nghĩa là, ba cách sử dụng ``@dataclass`` sau đây là tương đương::
 
      @dataclass
      class C:
@@ -84,179 +69,106 @@ Module contents
      class C:
          ...
 
-   The parameters to ``@dataclass`` are:
+   Các tham số của ``@dataclass`` là:
 
-   - *init*: If true (the default), a :meth:`~object.__init__` method will be
-     generated.
+   - *init*: Nếu là true (mặc định), một phương thức :meth:`~object.__init__` sẽ được tạo.
 
-     If the class already defines :meth:`!__init__`, this parameter is
-     ignored.
+     Nếu lớp đã định nghĩa :meth:`!__init__`, tham số này sẽ bị bỏ qua.
 
-   - *repr*: If true (the default), a :meth:`~object.__repr__` method will be
-     generated.  The generated repr string will have the class name and
-     the name and repr of each field, in the order they are defined in
-     the class.  Fields that are marked as being excluded from the repr
-     are not included.  For example:
-     ``InventoryItem(name='widget', unit_price=3.0, quantity_on_hand=10)``.
+   - *repr*: Nếu là true (mặc định), một phương thức :meth:`~object.__repr__` sẽ được tạo. Chuỗi repr được tạo sẽ có tên lớp, cùng tên và repr của từng trường, theo thứ tự chúng được định nghĩa trong lớp. Các trường được đánh dấu là loại trừ khỏi repr sẽ không được đưa vào. Ví dụ: ``InventoryItem(name='widget', unit_price=3.0, quantity_on_hand=10)``.
 
-     If the class already defines :meth:`!__repr__`, this parameter is
-     ignored.
+     Nếu lớp đã định nghĩa :meth:`!__repr__`, tham số này sẽ bị bỏ qua.
 
-   - *eq*: If true (the default), an :meth:`~object.__eq__` method will be
-     generated.
+   - *eq*: Nếu là true (mặc định), một phương thức :meth:`~object.__eq__` sẽ được tạo.
 
-     This method compares the class by comparing each field in order. Both
-     instances in the comparison must be of the identical type.
+     Phương thức này so sánh lớp bằng cách lần lượt so sánh từng trường. Hai đối tượng trong phép so sánh phải có cùng kiểu.
 
-     If the class already defines :meth:`!__eq__`, this parameter is ignored.
+     Nếu lớp đã định nghĩa :meth:`!__eq__`, tham số này sẽ bị bỏ qua.
 
      .. versionchanged:: 3.13
-        The generated ``__eq__`` method now compares each field individually
-        (for example, ``self.a == other.a and self.b == other.b``), rather than
-        comparing tuples of fields as in previous versions.
+        Phương thức ``__eq__`` được tạo giờ đây sẽ so sánh từng trường riêng lẻ (ví dụ: ``self.a == other.a and self.b == other.b``), thay vì so sánh các tuple trường như trong những phiên bản trước.
 
-        This change makes the comparison faster but it may alter results in cases
-        where attributes compare equal by identity but not by value (such as
-        ``float('nan')``).
+        Thay đổi này giúp phép so sánh nhanh hơn, nhưng có thể làm thay đổi kết quả trong những trường hợp các thuộc tính so sánh bằng nhau theo identity nhưng không bằng nhau theo value (chẳng hạn như ``float('nan')``).
 
-        In Python 3.12 and earlier, the comparison was performed by creating
-        tuples of the fields and comparing them (for example,
-        ``(self.a, self.b) == (other.a, other.b)``).
+        Trong Python 3.12 và các phiên bản trước đó, phép so sánh được thực hiện bằng cách tạo các tuple từ các trường rồi so sánh chúng (ví dụ: ``(self.a, self.b) == (other.a, other.b)``).
 
-   - *order*: If true (the default is ``False``), :meth:`~object.__lt__`,
-     :meth:`~object.__le__`, :meth:`~object.__gt__`, and :meth:`~object.__ge__` methods will be
-     generated.  These compare the class as if it were a tuple of its
-     fields, in order.  Both instances in the comparison must be of the
-     identical type.  If *order* is true and *eq* is false, a
-     :exc:`ValueError` is raised.
+   - *order*: Nếu là true (mặc định là ``False``), :meth:`~object.__lt__`,
+     :meth:`~object.__le__`, :meth:`~object.__gt__`, và :meth:`~object.__ge__` sẽ được tạo. Các phương thức này so sánh lớp như thể đó là một tuple gồm các trường của lớp, theo thứ tự. Cả hai instance trong phép so sánh phải có cùng một kiểu hoàn toàn. Nếu *order* là true và *eq* là false, sẽ phát sinh một
+     :exc:`ValueError`.
 
-     If the class already defines any of :meth:`!__lt__`,
-     :meth:`!__le__`, :meth:`!__gt__`, or :meth:`!__ge__`, then
-     :exc:`TypeError` is raised.
+     Nếu lớp đã định nghĩa bất kỳ phương thức nào trong số :meth:`!__lt__`,
+     :meth:`!__le__`, :meth:`!__gt__`, hoặc :meth:`!__ge__`, thì
+     :exc:`TypeError` sẽ được phát sinh.
 
-   - *unsafe_hash*: If true, force ``dataclasses`` to create a
-     :meth:`~object.__hash__` method, even though it may not be safe to do so.
-     Otherwise, generate a :meth:`~object.__hash__` method according to how
-     *eq* and *frozen* are set.
-     The default value is ``False``.
+   - *unsafe_hash*: Nếu là true, buộc ``dataclasses`` tạo một
+     :meth:`~object.__hash__` method, ngay cả khi việc này có thể không an toàn. Nếu không, hãy tạo một phương thức :meth:`~object.__hash__` theo cách *eq* và *frozen* được thiết lập. Giá trị mặc định là ``False``.
 
-     :meth:`!__hash__` is used by built-in :meth:`hash`, and when objects are
-     added to hashed collections such as dictionaries and sets.  Having a
-     :meth:`!__hash__` implies that instances of the class are immutable.
-     Mutability is a complicated property that depends on the programmer's
-     intent, the existence and behavior of :meth:`!__eq__`, and the values of
-     the *eq* and *frozen* flags in the ``@dataclass`` decorator.
+     :meth:`!__hash__` được :meth:`hash` tích hợp sẵn sử dụng, cũng như khi các đối tượng được thêm vào những tập hợp băm như dictionary và set. Việc có một
+     :meth:`!__hash__` ngụ ý rằng các thực thể của lớp là bất biến. Tính khả biến là một thuộc tính phức tạp, phụ thuộc vào ý định của lập trình viên, sự tồn tại và hành vi của :meth:`!__eq__`, cũng như giá trị của các cờ *eq* và *frozen* trong decorator ``@dataclass``.
 
-     By default, ``@dataclass`` will not implicitly add a :meth:`~object.__hash__`
-     method unless it is safe to do so.  Neither will it add or change an
-     existing explicitly defined :meth:`!__hash__` method.  Setting the class
-     attribute ``__hash__ = None`` has a specific meaning to Python, as
-     described in the :meth:`!__hash__` documentation.
+     Theo mặc định, ``@dataclass`` sẽ không tự động thêm một phương thức :meth:`~object.__hash__` trừ khi việc đó an toàn. Nó cũng sẽ không thêm hoặc thay đổi một phương thức :meth:`!__hash__` hiện có được định nghĩa tường minh. Việc đặt thuộc tính lớp ``__hash__ = None`` mang một ý nghĩa cụ thể đối với Python, như được mô tả trong tài liệu :meth:`!__hash__`.
 
-     If :meth:`!__hash__` is not explicitly defined, or if it is set to ``None``,
-     then ``@dataclass`` *may* add an implicit :meth:`!__hash__` method.
-     Although not recommended, you can force ``@dataclass`` to create a
-     :meth:`!__hash__` method with ``unsafe_hash=True``. This might be the case
-     if your class is logically immutable but can still be mutated.
-     This is a specialized use case and should be considered carefully.
+     Nếu :meth:`!__hash__` không được định nghĩa tường minh, hoặc được đặt thành ``None``, thì ``@dataclass`` *có thể* thêm một phương thức :meth:`!__hash__` ngầm định. Mặc dù không được khuyến nghị, bạn có thể buộc ``@dataclass`` tạo một
+     phương thức :meth:`!__hash__` với ``unsafe_hash=True``. Trường hợp này có thể xảy ra nếu lớp của bạn về mặt logic là bất biến nhưng vẫn có thể bị thay đổi. Đây là một trường hợp sử dụng chuyên biệt và cần được cân nhắc cẩn thận.
 
-     Here are the rules governing implicit creation of a :meth:`!__hash__`
-     method.  Note that you cannot both have an explicit :meth:`!__hash__`
-     method in your dataclass and set ``unsafe_hash=True``; this will result
-     in a :exc:`TypeError`.
+     Sau đây là các quy tắc chi phối việc tạo ngầm định một phương thức :meth:`!__hash__`. Lưu ý rằng bạn không thể vừa có một phương thức :meth:`!__hash__` tường minh trong dataclass vừa đặt ``unsafe_hash=True``; điều này sẽ dẫn đến một :exc:`TypeError`.
 
-     If *eq* and *frozen* are both true, by default ``@dataclass`` will
-     generate a :meth:`!__hash__` method for you.  If *eq* is true and
-     *frozen* is false, :meth:`!__hash__` will be set to ``None``, marking it
-     unhashable (which it is, since it is mutable).  If *eq* is false,
-     :meth:`!__hash__` will be left untouched meaning the :meth:`!__hash__`
-     method of the superclass will be used (if the superclass is
-     :class:`object`, this means it will fall back to id-based hashing).
+     Nếu cả *eq* và *frozen* đều là true, theo mặc định ``@dataclass`` sẽ tạo một phương thức :meth:`!__hash__` cho bạn. Nếu *eq* là true và *frozen* là false, :meth:`!__hash__` sẽ được đặt thành ``None``, đánh dấu nó là không thể băm (đúng như vậy, vì nó có thể thay đổi). Nếu *eq* là false,
+     :meth:`!__hash__` sẽ được giữ nguyên, nghĩa là phương thức :meth:`!__hash__` của superclass sẽ được sử dụng (nếu superclass là
+     :class:`object`, điều này có nghĩa là sẽ chuyển sang băm dựa trên id).
 
-   - *frozen*: If true (the default is ``False``), assigning to fields will
-     generate an exception.  This emulates read-only frozen instances.
-     See the :ref:`discussion <dataclasses-frozen>` below.
+   - *frozen*: Nếu là true (mặc định là ``False``), việc gán cho các trường sẽ tạo ra một exception. Điều này mô phỏng các instance frozen chỉ đọc. Xem :ref:`phần thảo luận <dataclasses-frozen>` bên dưới.
 
-     If :meth:`~object.__setattr__` or :meth:`~object.__delattr__` is defined in the class
-     and *frozen* is true, then :exc:`TypeError` is raised.
+     Nếu :meth:`~object.__setattr__` hoặc :meth:`~object.__delattr__` được định nghĩa trong class và *frozen* là true, thì :exc:`TypeError` sẽ được tạo ra.
 
-   - *match_args*: If true (the default is ``True``), the
-     :attr:`~object.__match_args__` tuple will be created from the list of
-     non keyword-only parameters to the generated :meth:`~object.__init__` method (even if
-     :meth:`!__init__` is not generated, see above).  If false, or if
-     :attr:`!__match_args__` is already defined in the class, then
-     :attr:`!__match_args__` will not be generated.
+   - *match_args*: Nếu là true (mặc định là ``True``),
+     :attr:`~object.__match_args__` tuple sẽ được tạo từ danh sách các tham số không chỉ định bằng keyword-only của phương thức :meth:`~object.__init__` được tạo tự động (ngay cả khi
+     :meth:`!__init__` không được tạo, xem ở trên). Nếu là false, hoặc nếu
+     Nếu :attr:`!__match_args__` đã được định nghĩa trong class thì
+     :attr:`!__match_args__` sẽ không được tạo.
 
     .. versionadded:: 3.10
 
-   - *kw_only*: If true (the default value is ``False``), then all
-     fields will be marked as keyword-only.  If a field is marked as
-     keyword-only, then the only effect is that the :meth:`~object.__init__`
-     parameter generated from a keyword-only field must be specified
-     with a keyword when :meth:`!__init__` is called. See the :term:`parameter`
-     glossary entry for details.  Also see the
-     :const:`KW_ONLY` section.
+   - *kw_only*: Nếu là true (giá trị mặc định là ``False``), thì tất cả các field sẽ được đánh dấu là keyword-only. Nếu một field được đánh dấu là keyword-only, thì hiệu ứng duy nhất là tham số :meth:`~object.__init__` được tạo từ field keyword-only phải được chỉ định bằng một keyword khi gọi :meth:`!__init__`. Xem mục :term:`parameter` trong bảng thuật ngữ để biết chi tiết. Đồng thời xem phần
+     :const:`KW_ONLY`.
 
-     Keyword-only fields are not included in :attr:`!__match_args__`.
+     Các field keyword-only không được đưa vào :attr:`!__match_args__`.
 
     .. versionadded:: 3.10
 
-   - *slots*: If true (the default is ``False``), :attr:`~object.__slots__` attribute
-     will be generated and new class will be returned instead of the original one.
-     If :attr:`!__slots__` is already defined in the class, then :exc:`TypeError`
-     is raised.
+   - *slots*: Nếu là true (mặc định là ``False``), thuộc tính :attr:`~object.__slots__` sẽ được tạo và một class mới sẽ được trả về thay cho class ban đầu. Nếu :attr:`!__slots__` đã được định nghĩa trong class thì :exc:`TypeError` sẽ được phát sinh.
 
     .. warning::
-       Passing parameters to a base class :meth:`~object.__init_subclass__`
-       when using ``slots=True`` will result in a :exc:`TypeError`.
-       Either use ``__init_subclass__`` with no parameters
-       or use default values as a workaround.
-       See :gh:`91126` for full details.
+       Việc truyền các tham số cho :meth:`~object.__init_subclass__` của một base class khi sử dụng ``slots=True`` sẽ dẫn đến :exc:`TypeError`. Để khắc phục, hãy sử dụng ``__init_subclass__`` không có tham số hoặc sử dụng các giá trị mặc định. Xem :gh:`91126` để biết đầy đủ chi tiết.
 
     .. versionadded:: 3.10
 
     .. versionchanged:: 3.11
-       If a field name is already included in the :attr:`!__slots__`
-       of a base class, it will not be included in the generated :attr:`!__slots__`
-       to prevent :ref:`overriding them <datamodel-note-slots>`.
-       Therefore, do not use :attr:`!__slots__` to retrieve the field names of a
-       dataclass. Use :func:`fields` instead.
-       To be able to determine inherited slots,
-       base class :attr:`!__slots__` may be any iterable, but *not* an iterator.
+       Nếu tên trường đã được bao gồm trong :attr:`!__slots__` của một lớp cơ sở, tên đó sẽ không được bao gồm trong :attr:`!__slots__` được tạo ra để ngăn :ref:`ghi đè chúng <datamodel-note-slots>`. Do đó, không sử dụng :attr:`!__slots__` để lấy tên các trường của một dataclass. Thay vào đó, hãy sử dụng :func:`fields`. Để có thể xác định các slot được kế thừa, :attr:`!__slots__` của lớp cơ sở có thể là bất kỳ iterable nào, nhưng *không được là* một iterator.
 
 
-   - *weakref_slot*: If true (the default is ``False``), add a slot
-     named "__weakref__", which is required to make an instance
-     :func:`weakref-able <weakref.ref>`.
-     It is an error to specify ``weakref_slot=True``
-     without also specifying ``slots=True``.
+   - *weakref_slot*: Nếu là true (mặc định là ``False``), thêm một slot có tên "__weakref__", vốn cần thiết để làm cho một instance
+     :func:`weakref-able <weakref.ref>`. Việc chỉ định ``weakref_slot=True`` mà không đồng thời chỉ định ``slots=True`` là một lỗi.
 
     .. versionadded:: 3.11
 
-   ``field``\s may optionally specify a default value, using normal
-   Python syntax::
+   ``field``\s có thể tùy chọn chỉ định một giá trị mặc định bằng cú pháp Python thông thường::
 
      @dataclass
      class C:
-         a: int       # 'a' has no default value
-         b: int = 0   # assign a default value for 'b'
+         a: int       # 'a' không có giá trị mặc định
+         b: int = 0   # gán giá trị mặc định cho 'b'
 
-   In this example, both :attr:`!a` and :attr:`!b` will be included in the added
-   :meth:`~object.__init__` method, which will be defined as::
+   Trong ví dụ này, cả :attr:`!a` và :attr:`!b` đều sẽ được đưa vào phần được thêm vào
+   phương thức :meth:`~object.__init__`, được định nghĩa là::
 
      def __init__(self, a: int, b: int = 0):
 
-   :exc:`TypeError` will be raised if a field without a default value
-   follows a field with a default value.  This is true whether this
-   occurs in a single class, or as a result of class inheritance.
+   :exc:`TypeError` sẽ được phát sinh nếu một trường không có giá trị mặc định đứng sau một trường có giá trị mặc định. Điều này đúng cho dù xảy ra trong một lớp đơn lẻ hay do kế thừa lớp.
 
 .. function:: field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING, doc=None)
 
-   For common and simple use cases, no other functionality is
-   required.  There are, however, some dataclass features that
-   require additional per-field information.  To satisfy this need for
-   additional information, you can replace the default field value
-   with a call to the provided :func:`!field` function.  For example::
+   Đối với các trường hợp sử dụng phổ biến và đơn giản, không cần thêm chức năng nào khác. Tuy nhiên, có một số tính năng của dataclass yêu cầu thông tin bổ sung cho từng trường. Để đáp ứng nhu cầu về thông tin bổ sung này, bạn có thể thay thế giá trị mặc định của trường bằng một lệnh gọi đến hàm :func:`!field` được cung cấp. Ví dụ::
 
      @dataclass
      class C:
@@ -265,75 +177,40 @@ Module contents
      c = C()
      c.mylist += [1, 2, 3]
 
-   As shown above, the :const:`MISSING` value is a sentinel object used to
-   detect if some parameters are provided by the user. This sentinel is
-   used because ``None`` is a valid value for some parameters with
-   a distinct meaning.  No code should directly use the :const:`MISSING` value.
+   Như đã trình bày ở trên, giá trị :const:`MISSING` là một đối tượng sentinel được dùng để phát hiện xem người dùng có cung cấp một số tham số hay không. Sentinel này được sử dụng vì ``None`` là một giá trị hợp lệ đối với một số tham số và có ý nghĩa riêng. Không mã nào được sử dụng trực tiếp giá trị :const:`MISSING`.
 
-   The parameters to :func:`!field` are:
+   Các tham số của :func:`!field` là:
 
-   - *default*: If provided, this will be the default value for this
-     field.  This is needed because the :func:`!field` call itself
-     replaces the normal position of the default value.
+   - *default*: Nếu được cung cấp, đây sẽ là giá trị mặc định cho trường này. Điều này là cần thiết vì lệnh gọi :func:`!field` tự nó thay thế vị trí thông thường của giá trị mặc định.
 
-   - *default_factory*: If provided, it must be a zero-argument
-     callable that will be called when a default value is needed for
-     this field.  Among other purposes, this can be used to specify
-     fields with mutable default values, as discussed below.  It is an
-     error to specify both *default* and *default_factory*.
+   - *default_factory*: Nếu được cung cấp, đây phải là một callable không có đối số, sẽ được gọi khi cần một giá trị mặc định cho trường này. Ngoài các mục đích khác, nó có thể được dùng để chỉ định các trường có giá trị mặc định có thể thay đổi, như thảo luận bên dưới. Việc chỉ định đồng thời *default* và *default_factory* là một lỗi.
 
-   - *init*: If true (the default), this field is included as a
-     parameter to the generated :meth:`~object.__init__` method.
+   - *init*: Nếu là true (giá trị mặc định), trường này được đưa vào làm tham số cho phương thức :meth:`~object.__init__` được tạo tự động.
 
-   - *repr*: If true (the default), this field is included in the
-     string returned by the generated :meth:`~object.__repr__` method.
+   - *repr*: Nếu là true (giá trị mặc định), trường này được đưa vào chuỗi được phương thức :meth:`~object.__repr__` được tạo tự động trả về.
 
-   - *hash*: This can be a bool or ``None``.  If true, this field is
-     included in the generated :meth:`~object.__hash__` method.  If false,
-     this field is excluded from the generated :meth:`~object.__hash__`.
-     If ``None`` (the default), use the value of *compare*: this would
-     normally be the expected behavior, since a field should be included
-     in the hash if it's used for comparisons.  Setting this value to anything
-     other than ``None`` is discouraged.
+   - *hash*: Giá trị này có thể là bool hoặc ``None``. Nếu là true, trường này được đưa vào phương thức :meth:`~object.__hash__` được tạo tự động. Nếu là false, trường này bị loại khỏi :meth:`~object.__hash__` được tạo tự động. Nếu là ``None`` (giá trị mặc định), hãy sử dụng giá trị của *compare*: đây thường là hành vi được mong đợi, vì một trường nên được đưa vào hash nếu nó được dùng để so sánh. Không nên đặt giá trị này thành bất kỳ giá trị nào khác ngoài ``None``.
 
-     One possible reason to set ``hash=False`` but ``compare=True``
-     would be if a field is expensive to compute a hash value for,
-     that field is needed for equality testing, and there are other
-     fields that contribute to the type's hash value.  Even if a field
-     is excluded from the hash, it will still be used for comparisons.
+     Một lý do có thể để đặt ``hash=False`` nhưng ``compare=True`` là khi việc tính giá trị hash cho một trường tốn nhiều chi phí, trường đó cần thiết cho việc kiểm tra tính bằng nhau và có các trường khác góp phần vào giá trị hash của kiểu. Ngay cả khi một trường bị loại khỏi hash, trường đó vẫn được dùng để so sánh.
 
-   - *compare*: If true (the default), this field is included in the
-     generated equality and comparison methods (:meth:`~object.__eq__`,
-     :meth:`~object.__gt__`, et al.).
+   - *compare*: Nếu là true (giá trị mặc định), trường này được đưa vào các phương thức kiểm tra tính bằng nhau và so sánh được tạo tự động (:meth:`~object.__eq__`,
+     :meth:`~object.__gt__`, v.v.).
 
-   - *metadata*: This can be a mapping or ``None``. ``None`` is treated as
-     an empty dict.  This value is wrapped in
-     :func:`~types.MappingProxyType` to make it read-only, and exposed
-     on the :class:`Field` object. It is not used at all by Data
-     Classes, and is provided as a third-party extension mechanism.
-     Multiple third-parties can each have their own key, to use as a
-     namespace in the metadata.
+   - *metadata*: Giá trị này có thể là một mapping hoặc ``None``. ``None`` được xử lý như một dict rỗng. Giá trị này được bọc trong
+     :func:`~types.MappingProxyType` để biến nó thành chỉ đọc và được cung cấp trên đối tượng :class:`Field`. Data Classes hoàn toàn không sử dụng nó; nó được cung cấp như một cơ chế mở rộng của bên thứ ba. Nhiều bên thứ ba có thể có khóa riêng, dùng khóa đó làm namespace trong metadata.
 
-   - *kw_only*: If true, this field will be marked as keyword-only.
-     This is used when the generated :meth:`~object.__init__` method's
-     parameters are computed.
+   - *kw_only*: Nếu là true, trường này sẽ được đánh dấu là chỉ nhận đối số từ khóa. Điều này được sử dụng khi các tham số của phương thức :meth:`~object.__init__` được tạo được tính toán.
 
-     Keyword-only fields are also not included in :attr:`!__match_args__`.
+     Các trường chỉ nhận đối số từ khóa cũng không được đưa vào :attr:`!__match_args__`.
 
     .. versionadded:: 3.10
 
-   - *doc*: optional docstring for this field.
+   - *doc*: docstring tùy chọn cho trường này.
 
     .. versionadded:: 3.14
 
-   If the default value of a field is specified by a call to
-   :func:`!field`, then the class attribute for this field will be
-   replaced by the specified *default* value.  If *default* is not
-   provided, then the class attribute will be deleted.  The intent is
-   that after the :deco:`dataclass` decorator runs, the class
-   attributes will all contain the default values for the fields, just
-   as if the default value itself were specified.  For example,
-   after::
+   Nếu giá trị mặc định của một trường được chỉ định bằng một lệnh gọi đến
+   :func:`!field`, thì thuộc tính lớp của trường này sẽ được thay thế bằng giá trị *default* được chỉ định. Nếu *default* không được cung cấp, thuộc tính lớp sẽ bị xóa. Mục đích là sau khi decorator :deco:`dataclass` chạy, tất cả thuộc tính lớp sẽ chứa các giá trị mặc định cho những trường tương ứng, giống như khi tự chỉ định giá trị mặc định. Ví dụ, sau khi::
 
      @dataclass
      class C:
@@ -342,51 +219,38 @@ Module contents
          z: int = field(repr=False, default=10)
          t: int = 20
 
-   The class attribute :attr:`!C.z` will be ``10``, the class attribute
-   :attr:`!C.t` will be ``20``, and the class attributes :attr:`!C.x` and
-   :attr:`!C.y` will not be set.
+   Thuộc tính lớp :attr:`!C.z` sẽ là ``10``, còn thuộc tính lớp
+   :attr:`!C.t` sẽ là ``20``, và các thuộc tính lớp :attr:`!C.x` cùng
+   :attr:`!C.y` sẽ không được thiết lập.
 
 .. class:: Field
 
-   :class:`!Field` objects describe each defined field. These objects
-   are created internally, and are returned by the :func:`fields`
-   module-level method (see below).  Users should never instantiate a
-   :class:`!Field` object directly.  Its documented attributes are:
+   Các đối tượng :class:`!Field` mô tả từng trường được định nghĩa. Các đối tượng này được tạo nội bộ và được trả về bởi phương thức cấp mô-đun :func:`fields` (xem bên dưới). Người dùng không bao giờ nên khởi tạo một
+   đối tượng :class:`!Field` trực tiếp. Các thuộc tính được tài liệu hóa của nó là:
 
-   - :attr:`!name`: The name of the field.
-   - :attr:`!type`: The type of the field.
+   - :attr:`!name`: Tên của trường.
+   - :attr:`!type`: Kiểu của trường.
    - :attr:`!default`, :attr:`!default_factory`, :attr:`!init`, :attr:`!repr`, :attr:`!hash`,
-     :attr:`!compare`, :attr:`!metadata`, and :attr:`!kw_only` have the identical
-     meaning and values as they do in the :func:`field` function.
+     :attr:`!compare`, :attr:`!metadata` và :attr:`!kw_only` có ý nghĩa và giá trị giống hệt như trong hàm :func:`field`.
 
-   Other attributes may exist, but they are private and must not be
-   inspected or relied on.
+   Có thể tồn tại các thuộc tính khác, nhưng chúng là thuộc tính private và không được kiểm tra hoặc dựa vào.
 
 .. class:: InitVar
 
-   ``InitVar[T]`` type annotations describe variables that are :ref:`init-only
-   <dataclasses-init-only-variables>`. Fields annotated with :class:`!InitVar`
-   are considered pseudo-fields, and thus are neither returned by the
-   :func:`fields` function nor used in any way except adding them as
-   parameters to :meth:`~object.__init__` and an optional
+   ``InitVar[T]`` Các chú thích kiểu mô tả những biến là :ref:`init-only <dataclasses-init-only-variables>`. Các trường được chú thích bằng :class:`!InitVar` được xem là pseudo-field, vì vậy không được hàm
+   :func:`fields` trả về và không được sử dụng theo bất kỳ cách nào, ngoại trừ việc thêm chúng làm tham số cho :meth:`~object.__init__` và một tùy chọn
    :meth:`__post_init__`.
 
 .. function:: fields(class_or_instance)
 
-   Returns a tuple of :class:`Field` objects that define the fields for this
-   dataclass.  Accepts either a dataclass, or an instance of a dataclass.
-   Raises :exc:`TypeError` if not passed a dataclass or instance of one.
-   Does not return pseudo-fields which are ``ClassVar`` or ``InitVar``.
+   Trả về một tuple gồm các đối tượng :class:`Field` xác định những trường cho dataclass này. Chấp nhận một dataclass hoặc một instance của dataclass. Gây ra :exc:`TypeError` nếu đối số truyền vào không phải là dataclass hoặc instance của dataclass. Không trả về các pseudo-field là ``ClassVar`` hoặc ``InitVar``.
 
 .. function:: asdict(obj, *, dict_factory=dict)
 
-   Converts the dataclass *obj* to a dict (by using the
-   factory function *dict_factory*).  Each dataclass is converted
-   to a dict of its fields, as ``name: value`` pairs.  dataclasses, dicts,
-   lists, and tuples are recursed into.  Other objects are copied with
+   Chuyển dataclass *obj* thành một dict (bằng cách sử dụng factory function *dict_factory*). Mỗi dataclass được chuyển thành một dict gồm các trường của nó dưới dạng các cặp ``name: value``. Các dataclass, dict, list và tuple được đệ quy. Các object khác được sao chép bằng
    :func:`copy.deepcopy`.
 
-   Example of using :func:`!asdict` on nested dataclasses::
+   Ví dụ sử dụng :func:`!asdict` với các dataclass lồng nhau::
 
      @dataclass
      class Point:
@@ -403,59 +267,38 @@ Module contents
      c = C([Point(0, 0), Point(10, 4)])
      assert asdict(c) == {'mylist': [{'x': 0, 'y': 0}, {'x': 10, 'y': 4}]}
 
-   To create a shallow copy, the following workaround may be used::
+   Để tạo một bản sao nông, có thể sử dụng cách khắc phục sau::
 
      {field.name: getattr(obj, field.name) for field in fields(obj)}
 
-   :func:`!asdict` raises :exc:`TypeError` if *obj* is not a dataclass
-   instance.
+   :func:`!asdict` tăng :exc:`TypeError` nếu *obj* không phải là một instance của dataclass.
 
 .. function:: astuple(obj, *, tuple_factory=tuple)
 
-   Converts the dataclass *obj* to a tuple (by using the
-   factory function *tuple_factory*).  Each dataclass is converted
-   to a tuple of its field values.  dataclasses, dicts, lists, and
-   tuples are recursed into. Other objects are copied with
+   Chuyển dataclass *obj* thành một tuple (bằng cách sử dụng factory function *tuple_factory*). Mỗi dataclass được chuyển thành một tuple gồm các giá trị trường của nó. Các dataclass, dict, list và tuple được xử lý đệ quy. Các đối tượng khác được sao chép bằng
    :func:`copy.deepcopy`.
 
-   Continuing from the previous example::
+   Tiếp tục từ ví dụ trước::
 
      assert astuple(p) == (10, 20)
      assert astuple(c) == ([(0, 0), (10, 4)],)
 
-   To create a shallow copy, the following workaround may be used::
+   Để tạo một bản sao nông, có thể sử dụng cách khắc phục sau::
 
      tuple(getattr(obj, field.name) for field in dataclasses.fields(obj))
 
-   :func:`!astuple` raises :exc:`TypeError` if *obj* is not a dataclass
-   instance.
+   :func:`!astuple` tăng :exc:`TypeError` nếu *obj* không phải là một instance của dataclass.
 
 .. function:: make_dataclass(cls_name, fields, *, bases=(), namespace=None, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False, module=None, decorator=dataclass)
 
-   Creates a new dataclass with name *cls_name*, fields as defined
-   in *fields*, base classes as given in *bases*, and initialized
-   with a namespace as given in *namespace*.  *fields* is an
-   iterable whose elements are each either ``name``, ``(name, type)``,
-   or ``(name, type, Field)``.  If just ``name`` is supplied,
-   :data:`typing.Any` is used for ``type``.  The values of *init*,
-   *repr*, *eq*, *order*, *unsafe_hash*, *frozen*,
-   *match_args*, *kw_only*, *slots*, and *weakref_slot* have
-   the same meaning as they do in :deco:`dataclass`.
+   Tạo một dataclass mới với tên *cls_name*, các trường được định nghĩa trong *fields*, các lớp cơ sở được cung cấp trong *bases*, và được khởi tạo với namespace được cung cấp trong *namespace*. *fields* là một iterable mà mỗi phần tử đều là ``name``, ``(name, type)`` hoặc ``(name, type, Field)``. Nếu chỉ cung cấp ``name``,
+   :data:`typing.Any` được sử dụng cho ``type``. Các giá trị của *init*, *repr*, *eq*, *order*, *unsafe_hash*, *frozen*, *match_args*, *kw_only*, *slots* và *weakref_slot* có cùng ý nghĩa như trong :deco:`dataclass`.
 
-   If *module* is defined, the :attr:`!__module__` attribute
-   of the dataclass is set to that value.
-   By default, it is set to the module name of the caller.
+   Nếu *module* được định nghĩa, thuộc tính :attr:`!__module__` của dataclass sẽ được đặt thành giá trị đó. Theo mặc định, thuộc tính này được đặt thành tên module của caller.
 
-   The *decorator* parameter is a callable that will be used to create the dataclass.
-   It should take the class object as a first argument and the same keyword arguments
-   as :deco:`dataclass`. By default, the :deco:`dataclass`
-   function is used.
+   Tham số *decorator* là một callable được dùng để tạo dataclass. Callable này phải nhận đối tượng class làm đối số đầu tiên và các keyword argument giống như :deco:`dataclass`. Theo mặc định, hàm :deco:`dataclass` được sử dụng.
 
-   This function is not strictly required, because any Python
-   mechanism for creating a new class with :attr:`~object.__annotations__` can
-   then apply the :deco:`dataclass` function to convert that class to
-   a dataclass.  This function is provided as a convenience.  For
-   example::
+   Hàm này không hoàn toàn bắt buộc, vì bất kỳ cơ chế Python nào để tạo một class mới với :attr:`~object.__annotations__` đều có thể áp dụng hàm :deco:`dataclass` để chuyển class đó thành dataclass. Hàm này được cung cấp nhằm thuận tiện. Ví dụ::
 
      C = make_dataclass('C',
                         [('x', int),
@@ -463,7 +306,7 @@ Module contents
                          ('z', int, field(default=5))],
                         namespace={'add_one': lambda self: self.x + 1})
 
-   Is equivalent to::
+   Tương đương với::
 
      @dataclass
      class C:
@@ -475,67 +318,47 @@ Module contents
              return self.x + 1
 
    .. versionadded:: 3.14
-      Added the *decorator* parameter.
+      Đã thêm tham số *decorator*.
 
 .. function:: replace(obj, /, **changes)
 
-   Creates a new object of the same type as *obj*, replacing
-   fields with values from *changes*.  If *obj* is not a Data
-   Class, raises :exc:`TypeError`.  If keys in *changes* are not
-   field names of the given dataclass, raises :exc:`TypeError`.
+   Tạo một đối tượng mới cùng kiểu với *obj*, thay thế các field bằng các giá trị từ *changes*. Nếu *obj* không phải là Data Class, sẽ phát sinh :exc:`TypeError`. Nếu các key trong *changes* không phải là tên field của dataclass đã cho, sẽ phát sinh :exc:`TypeError`.
 
-   The newly returned object is created by calling the :meth:`~object.__init__`
-   method of the dataclass.  This ensures that
-   :meth:`__post_init__`, if present, is also called.
+   Đối tượng mới được trả về sẽ được tạo bằng cách gọi method :meth:`~object.__init__` của dataclass. Điều này đảm bảo rằng
+   :meth:`__post_init__`, nếu có, cũng được gọi là.
 
-   Init-only variables without default values, if any exist, must be
-   specified on the call to :func:`!replace` so that they can be passed to
-   :meth:`!__init__` and :meth:`__post_init__`.
+   Các biến chỉ khởi tạo không có giá trị mặc định, nếu có, phải được chỉ định trong lệnh gọi :func:`!replace` để có thể được truyền cho
+   :meth:`!__init__` và :meth:`__post_init__`.
 
-   It is an error for *changes* to contain any fields that are
-   defined as having ``init=False``.  A :exc:`ValueError` will be raised
-   in this case.
+   *changes* chứa bất kỳ trường nào được định nghĩa là có ``init=False`` là một lỗi. Trong trường hợp này, một :exc:`ValueError` sẽ được phát sinh.
 
-   Be forewarned about how ``init=False`` fields work during a call to
-   :func:`!replace`.  They are not copied from the source object, but
-   rather are initialized in :meth:`__post_init__`, if they're
-   initialized at all.  It is expected that ``init=False`` fields will
-   be rarely and judiciously used.  If they are used, it might be wise
-   to have alternate class constructors, or perhaps a custom
-   :func:`!replace` (or similarly named) method which handles instance
-   copying.
+   Hãy lưu ý về cách các trường ``init=False`` hoạt động trong một lệnh gọi đến
+   :func:`!replace`. Chúng không được sao chép từ đối tượng nguồn mà được khởi tạo trong :meth:`__post_init__`, nếu chúng được khởi tạo. Các trường ``init=False`` được cho là sẽ hiếm khi được sử dụng và cần được sử dụng thận trọng. Nếu sử dụng chúng, có thể nên có các hàm khởi tạo lớp thay thế hoặc có thể là một phương thức :func:`!replace` (hoặc có tên tương tự) tùy chỉnh để xử lý việc sao chép instance.
+   :func:`!replace` (hoặc có tên tương tự) để xử lý việc sao chép instance.
 
-   Dataclass instances are also supported by generic function :func:`copy.replace`.
+   Các instance của dataclass cũng được generic function :func:`copy.replace` hỗ trợ.
 
 .. function:: is_dataclass(obj)
 
-   Return ``True`` if its parameter is a dataclass (including subclasses of a
-   dataclass, but not including :ref:`generic aliases <types-genericalias>`)
-   or an instance of one, otherwise return ``False``.
+   Trả về ``True`` nếu tham số của nó là một dataclass (bao gồm các lớp con của một dataclass, nhưng không bao gồm :ref:`generic aliases <types-genericalias>`) hoặc một instance của dataclass, nếu không thì trả về ``False``.
 
-   If you need to know if a class is an instance of a dataclass (and
-   not a dataclass itself), then add a further check for ``not
-   isinstance(obj, type)``::
+   Nếu cần biết một class là một instance của dataclass (chứ không phải bản thân một dataclass), hãy thêm một kiểm tra nữa cho ``not isinstance(obj, type)``::
 
      def is_dataclass_instance(obj):
          return is_dataclass(obj) and not isinstance(obj, type)
 
 .. data:: MISSING
 
-   A sentinel value signifying a missing default or default_factory.
+   Một giá trị sentinel biểu thị default hoặc default_factory bị thiếu.
 
 .. data:: KW_ONLY
 
-   A sentinel value used as a type annotation.  Any fields after a
-   pseudo-field with the type of :const:`!KW_ONLY` are marked as
-   keyword-only fields.  Note that a pseudo-field of type
-   :const:`!KW_ONLY` is otherwise completely ignored.  This includes the
-   name of such a field.  By convention, a name of ``_`` is used for a
-   :const:`!KW_ONLY` field.  Keyword-only fields signify
-   :meth:`~object.__init__` parameters that must be specified as keywords when
-   the class is instantiated.
+   Một giá trị sentinel được dùng làm type annotation. Mọi field sau một pseudo-field có kiểu :const:`!KW_ONLY` đều được đánh dấu là keyword-only field. Lưu ý rằng một pseudo-field có kiểu
+   :const:`!KW_ONLY` về cơ bản sẽ bị bỏ qua hoàn toàn. Điều này bao gồm cả tên của field đó. Theo quy ước, tên ``_`` được dùng cho một
+   field :const:`!KW_ONLY`. Keyword-only field biểu thị
+   các tham số :meth:`~object.__init__` phải được chỉ định dưới dạng từ khóa khi lớp được khởi tạo.
 
-   In this example, the fields ``y`` and ``z`` will be marked as keyword-only fields::
+   Trong ví dụ này, các trường ``y`` và ``z`` sẽ được đánh dấu là các trường chỉ nhận từ khóa::
 
     @dataclass
     class Point:
@@ -546,33 +369,27 @@ Module contents
 
     p = Point(0, y=1.5, z=2.0)
 
-   In a single dataclass, it is an error to specify more than one
-   field whose type is :const:`!KW_ONLY`.
+   Trong một dataclass, việc chỉ định nhiều hơn một trường có kiểu :const:`!KW_ONLY` sẽ gây ra lỗi.
 
    .. versionadded:: 3.10
 
 .. exception:: FrozenInstanceError
 
-   Raised when an implicitly defined :meth:`~object.__setattr__` or
-   :meth:`~object.__delattr__` is called on a dataclass which was defined with
-   ``frozen=True``. It is a subclass of :exc:`AttributeError`.
+   Được phát sinh khi :meth:`~object.__setattr__` được định nghĩa ngầm hoặc
+   :meth:`~object.__delattr__` được gọi trên một dataclass được định nghĩa với ``frozen=True``. Đây là một lớp con của :exc:`AttributeError`.
 
 .. _post-init-processing:
 
-Post-init processing
---------------------
+Xử lý sau khởi tạo
+------------------
 
 .. function:: __post_init__()
 
-   When defined on the class, it will be called by the generated
-   :meth:`~object.__init__`, normally as :meth:`!self.__post_init__`.
-   However, if any ``InitVar`` fields are defined, they will also be
-   passed to :meth:`!__post_init__` in the order they were defined in the
-   class.  If no :meth:`!__init__` method is generated, then
-   :meth:`!__post_init__` will not automatically be called.
+   Khi được định nghĩa trên lớp, nó sẽ được gọi bởi phần mã được tạo tự động
+   :meth:`~object.__init__`, thường dưới dạng :meth:`!self.__post_init__`. Tuy nhiên, nếu có bất kỳ trường ``InitVar`` nào được định nghĩa, chúng cũng sẽ được truyền vào :meth:`!__post_init__` theo thứ tự được định nghĩa trong lớp.  Nếu không có phương thức :meth:`!__init__` nào được tạo, thì
+   :meth:`!__post_init__` sẽ không được tự động gọi.
 
-   Among other uses, this allows for initializing field values that
-   depend on one or more other fields.  For example::
+   Trong số các cách sử dụng khác, điều này cho phép khởi tạo các giá trị trường phụ thuộc vào một hoặc nhiều trường khác. Ví dụ::
 
      @dataclass
      class C:
@@ -583,10 +400,8 @@ Post-init processing
          def __post_init__(self):
              self.c = self.a + self.b
 
-The :meth:`~object.__init__` method generated by :deco:`dataclass` does not call base
-class :meth:`!__init__` methods. If the base class has an :meth:`!__init__` method
-that has to be called, it is common to call this method in a
-:meth:`__post_init__` method::
+Phương thức :meth:`~object.__init__` do :deco:`dataclass` tạo ra không gọi các phương thức :meth:`!__init__` của lớp cơ sở. Nếu lớp cơ sở có một phương thức :meth:`!__init__` cần được gọi, thông thường người ta sẽ gọi phương thức này trong một
+phương thức :meth:`__post_init__`::
 
     class Rectangle:
         def __init__(self, height, width):
@@ -600,44 +415,27 @@ that has to be called, it is common to call this method in a
         def __post_init__(self):
             super().__init__(self.side, self.side)
 
-Note, however, that in general the dataclass-generated :meth:`!__init__` methods
-don't need to be called, since the derived dataclass will take care of
-initializing all fields of any base class that is a dataclass itself.
+Tuy nhiên, lưu ý rằng nhìn chung không cần gọi các phương thức :meth:`!__init__` do dataclass tạo ra, vì dataclass dẫn xuất sẽ đảm nhiệm việc khởi tạo tất cả các trường của bất kỳ lớp cơ sở nào vốn cũng là dataclass.
 
-See the section below on init-only variables for ways to pass
-parameters to :meth:`!__post_init__`.  Also see the warning about how
-:func:`replace` handles ``init=False`` fields.
+Xem phần bên dưới về các biến chỉ dùng cho init để biết cách truyền tham số cho :meth:`!__post_init__`. Đồng thời xem cảnh báo về cách
+:func:`replace` xử lý các trường ``init=False``.
 
 .. _dataclasses-class-variables:
 
-Class variables
----------------
+Biến lớp
+--------
 
-One of the few places where :deco:`dataclass` actually inspects the type
-of a field is to determine if a field is a class variable as defined
-in :pep:`526`.  It does this by checking if the type of the field is
-:data:`typing.ClassVar`.  If a field is a ``ClassVar``, it is excluded
-from consideration as a field and is ignored by the dataclass
-mechanisms.  Such ``ClassVar`` pseudo-fields are not returned by the
-module-level :func:`fields` function.
+Một trong số ít nơi :deco:`dataclass` thực sự kiểm tra kiểu của một trường là để xác định xem trường đó có phải là biến lớp như được định nghĩa trong :pep:`526` hay không. Nó thực hiện việc này bằng cách kiểm tra xem kiểu của trường có phải là
+:data:`typing.ClassVar`. Nếu một trường là ``ClassVar``, trường đó sẽ bị loại khỏi việc xem xét như một trường và bị các cơ chế dataclass bỏ qua. Các trường giả ``ClassVar`` như vậy không được hàm cấp mô-đun :func:`fields` trả về.
 
 .. _dataclasses-init-only-variables:
 
-Init-only variables
--------------------
+Biến chỉ dùng khi khởi tạo
+--------------------------
 
-Another place where :deco:`dataclass` inspects a type annotation is to
-determine if a field is an init-only variable.  It does this by seeing
-if the type of a field is of type :class:`InitVar`.  If a field
-is an :class:`InitVar`, it is considered a pseudo-field called an init-only
-field.  As it is not a true field, it is not returned by the
-module-level :func:`fields` function.  Init-only fields are added as
-parameters to the generated :meth:`~object.__init__` method, and are passed to
-the optional :meth:`__post_init__` method.  They are not otherwise used
-by dataclasses.
+Một nơi khác mà :deco:`dataclass` kiểm tra chú thích kiểu là để xác định xem một trường có phải là biến chỉ dùng khi khởi tạo hay không. Nó thực hiện việc này bằng cách kiểm tra xem kiểu của một trường có thuộc kiểu :class:`InitVar` hay không. Nếu một trường là :class:`InitVar`, trường đó được xem là một trường giả có tên là trường chỉ dùng khi khởi tạo. Vì không phải là một trường thực sự, trường này không được hàm cấp mô-đun :func:`fields` trả về. Các trường chỉ dùng khi khởi tạo được thêm làm tham số vào phương thức :meth:`~object.__init__` được tạo ra và được truyền vào phương thức :meth:`__post_init__` tùy chọn. Ngoài ra, dataclass không sử dụng chúng.
 
-For example, suppose a field will be initialized from a database, if a
-value is not provided when creating the class::
+Ví dụ: giả sử một trường sẽ được khởi tạo từ cơ sở dữ liệu nếu không cung cấp giá trị khi tạo lớp::
 
   @dataclass
   class C:
@@ -651,40 +449,28 @@ value is not provided when creating the class::
 
   c = C(10, database=my_database)
 
-In this case, :func:`fields` will return :class:`Field` objects for :attr:`!i` and
-:attr:`!j`, but not for :attr:`!database`.
+Trong trường hợp này, :func:`fields` sẽ trả về các đối tượng :class:`Field` cho :attr:`!i` và
+:attr:`!j`, nhưng không trả về cho :attr:`!database`.
 
 .. _dataclasses-frozen:
 
-Frozen instances
-----------------
+Các instance bị đóng băng
+-------------------------
 
-It is not possible to create truly immutable Python objects.  However,
-by passing ``frozen=True`` to the :deco:`dataclass` decorator you can
-emulate immutability.  In that case, dataclasses will add
-:meth:`~object.__setattr__` and :meth:`~object.__delattr__` methods to the class.  These
-methods will raise a :exc:`FrozenInstanceError` when invoked.
+Không thể tạo các đối tượng Python thực sự bất biến. Tuy nhiên, bằng cách truyền ``frozen=True`` cho decorator :deco:`dataclass`, bạn có thể mô phỏng tính bất biến. Trong trường hợp đó, dataclasses sẽ thêm
+các phương thức :meth:`~object.__setattr__` và :meth:`~object.__delattr__` vào class. Các phương thức này sẽ raise một :exc:`FrozenInstanceError` khi được gọi.
 
-There is a tiny performance penalty when using ``frozen=True``:
-:meth:`~object.__init__` cannot use simple assignment to initialize fields, and
-must use :meth:`!object.__setattr__`.
+Khi sử dụng ``frozen=True``, hiệu năng sẽ giảm đôi chút:
+:meth:`~object.__init__` không thể sử dụng phép gán đơn giản để khởi tạo các field và phải sử dụng :meth:`!object.__setattr__`.
 
 .. Make sure to not remove "object" from "object.__setattr__" in the above markup!
 
 .. _dataclasses-inheritance:
 
-Inheritance
------------
+Tính kế thừa
+------------
 
-When the dataclass is being created by the :deco:`dataclass` decorator,
-it looks through all of the class's base classes in reverse MRO (that
-is, starting at :class:`object`) and, for each dataclass that it finds,
-adds the fields from that base class to an ordered mapping of fields.
-After all of the base class fields are added, it adds its own fields
-to the ordered mapping.  All of the generated methods will use this
-combined, calculated ordered mapping of fields.  Because the fields
-are in insertion order, derived classes override base classes.  An
-example::
+Khi dataclass được tạo bởi decorator :deco:`dataclass`, decorator này duyệt qua tất cả lớp cơ sở của lớp theo thứ tự MRO ngược (tức là bắt đầu từ :class:`object`) và với mỗi dataclass tìm thấy, thêm các field của lớp cơ sở đó vào một ánh xạ có thứ tự của các field. Sau khi thêm tất cả field của các lớp cơ sở, nó thêm các field của chính lớp đó vào ánh xạ có thứ tự. Tất cả phương thức được tạo sẽ sử dụng ánh xạ có thứ tự đã tính toán và kết hợp này của các field. Vì các field được sắp xếp theo thứ tự chèn, các lớp dẫn xuất sẽ ghi đè các lớp cơ sở. Một ví dụ::
 
   @dataclass
   class Base:
@@ -696,24 +482,18 @@ example::
       z: int = 10
       x: int = 15
 
-The final list of fields is, in order, :attr:`!x`, :attr:`!y`, :attr:`!z`.  The final
-type of :attr:`!x` is :class:`int`, as specified in class :class:`!C`.
+Danh sách field cuối cùng theo thứ tự là :attr:`!x`, :attr:`!y`, :attr:`!z`. Kiểu cuối cùng của :attr:`!x` là :class:`int`, như được chỉ định trong lớp :class:`!C`.
 
-The generated :meth:`~object.__init__` method for :class:`!C` will look like::
+Phương thức :meth:`~object.__init__` được tạo cho :class:`!C` sẽ có dạng::
 
   def __init__(self, x: int = 15, y: int = 0, z: int = 10):
 
-Re-ordering of keyword-only parameters in :meth:`!__init__`
------------------------------------------------------------
+Sắp xếp lại các tham số chỉ dùng từ khóa trong :meth:`!__init__`
+----------------------------------------------------------------
 
-After the parameters needed for :meth:`~object.__init__` are computed, any
-keyword-only parameters are moved to come after all regular
-(non-keyword-only) parameters.  This is a requirement of how
-keyword-only parameters are implemented in Python: they must come
-after non-keyword-only parameters.
+Sau khi tính toán các tham số cần thiết cho :meth:`~object.__init__`, mọi tham số chỉ dùng từ khóa sẽ được chuyển xuống sau tất cả tham số thông thường (không chỉ dùng từ khóa). Đây là yêu cầu trong cách Python triển khai các tham số chỉ dùng từ khóa: chúng phải đứng sau các tham số không chỉ dùng từ khóa.
 
-In this example, :attr:`!Base.y`, :attr:`!Base.w`, and :attr:`!D.t` are keyword-only
-fields, and :attr:`!Base.x` and :attr:`!D.z` are regular fields::
+Trong ví dụ này, :attr:`!Base.y`, :attr:`!Base.w` và :attr:`!D.t` là các field chỉ dùng từ khóa, còn :attr:`!Base.x` và :attr:`!D.z` là các field thông thường::
 
   @dataclass
   class Base:
@@ -727,38 +507,29 @@ fields, and :attr:`!Base.x` and :attr:`!D.z` are regular fields::
       z: int = 10
       t: int = field(kw_only=True, default=0)
 
-The generated :meth:`!__init__` method for :class:`!D` will look like::
+Phương thức :meth:`!__init__` được tạo cho :class:`!D` sẽ có dạng như sau::
 
   def __init__(self, x: Any = 15.0, z: int = 10, *, y: int = 0, w: int = 1, t: int = 0):
 
-Note that the parameters have been re-ordered from how they appear in
-the list of fields: parameters derived from regular fields are
-followed by parameters derived from keyword-only fields.
+Lưu ý rằng các tham số đã được sắp xếp lại so với thứ tự xuất hiện trong danh sách các trường: các tham số được tạo từ những trường thông thường đứng trước các tham số được tạo từ những trường chỉ nhận đối số từ khóa.
 
-The relative ordering of keyword-only parameters is maintained in the
-re-ordered :meth:`!__init__` parameter list.
+Thứ tự tương đối của các tham số chỉ nhận đối số từ khóa được duy trì trong danh sách tham số :meth:`!__init__` đã được sắp xếp lại.
 
 
-Default factory functions
--------------------------
+Các hàm factory mặc định
+------------------------
 
-If a :func:`field` specifies a *default_factory*, it is called with
-zero arguments when a default value for the field is needed.  For
-example, to create a new instance of a list, use::
+Nếu một :func:`field` chỉ định *default_factory*, hàm này sẽ được gọi không có đối số khi cần một giá trị mặc định cho trường. Ví dụ, để tạo một instance mới của list, hãy sử dụng::
 
   mylist: list = field(default_factory=list)
 
-If a field is excluded from :meth:`~object.__init__` (using ``init=False``)
-and the field also specifies *default_factory*, then the default
-factory function will always be called from the generated
-:meth:`!__init__` function.  This happens because there is no other
-way to give the field an initial value.
+Nếu một trường bị loại khỏi :meth:`~object.__init__` (bằng cách sử dụng ``init=False``) và trường đó cũng chỉ định *default_factory*, thì hàm factory mặc định sẽ luôn được gọi từ hàm được tạo
+:meth:`!__init__`. Điều này xảy ra vì không còn cách nào khác để cung cấp cho trường một giá trị ban đầu.
 
-Mutable default values
-----------------------
+Các giá trị mặc định có thể thay đổi
+------------------------------------
 
-Python stores default member variable values in class attributes.
-Consider this example, not using dataclasses::
+Python lưu trữ các giá trị mặc định của biến thành viên trong các thuộc tính của lớp. Hãy xem xét ví dụ này, không sử dụng dataclasses::
 
   class C:
       x = []
@@ -772,18 +543,17 @@ Consider this example, not using dataclasses::
   assert o1.x == [1, 2]
   assert o1.x is o2.x
 
-Note that the two instances of class :class:`!C` share the same class
-variable :attr:`!x`, as expected.
+Lưu ý rằng hai thực thể của lớp :class:`!C` dùng chung cùng một biến lớp :attr:`!x`, như mong đợi.
 
-Using dataclasses, *if* this code was valid::
+Khi sử dụng dataclasses, *nếu* đoạn mã này hợp lệ::
 
   @dataclass
   class D:
-      x: list = []      # This code raises ValueError
+      x: list = []      # Đoạn mã này gây ra ValueError
       def add(self, element):
           self.x.append(element)
 
-it would generate code similar to::
+nó sẽ tạo ra đoạn mã tương tự như sau::
 
   class D:
       x = []
@@ -794,19 +564,10 @@ it would generate code similar to::
 
   assert D().x is D().x
 
-This has the same issue as the original example using class :class:`!C`.
-That is, two instances of class :class:`!D` that do not specify a value
-for :attr:`!x` when creating a class instance will share the same copy
-of :attr:`!x`.  Because dataclasses just use normal Python class
-creation they also share this behavior.  There is no general way
-for Data Classes to detect this condition.  Instead, the
-:deco:`dataclass` decorator will raise a :exc:`ValueError` if it
-detects an unhashable default parameter.  The assumption is that if
-a value is unhashable, it is mutable.  This is a partial solution,
-but it does protect against many common errors.
+Điều này gặp phải vấn đề giống như ví dụ ban đầu sử dụng lớp :class:`!C`. Nghĩa là, hai thực thể của lớp :class:`!D` không chỉ định giá trị cho :attr:`!x` khi tạo một thực thể lớp sẽ dùng chung một bản sao của :attr:`!x`. Vì dataclasses chỉ sử dụng cách tạo lớp Python thông thường nên chúng cũng có hành vi này. Không có cách tổng quát nào để Data Classes phát hiện điều kiện này. Thay vào đó, các
+decorator :deco:`dataclass` sẽ raise một :exc:`ValueError` nếu phát hiện tham số mặc định không thể băm. Giả định là nếu một giá trị không thể băm thì giá trị đó có thể thay đổi. Đây là một giải pháp chưa hoàn chỉnh, nhưng giúp ngăn chặn nhiều lỗi phổ biến.
 
-Using default factory functions is a way to create new instances of
-mutable types as default values for fields::
+Việc sử dụng các hàm default factory là một cách để tạo các instance mới của những kiểu có thể thay đổi làm giá trị mặc định cho các trường::
 
   @dataclass
   class D:
@@ -815,32 +576,21 @@ mutable types as default values for fields::
   assert D().x is not D().x
 
 .. versionchanged:: 3.11
-   Instead of looking for and disallowing objects of type :class:`list`,
-   :class:`dict`, or :class:`set`, unhashable objects are now not allowed as
-   default values.  Unhashability is used to approximate
-   mutability.
+   Thay vì tìm và không cho phép các đối tượng thuộc kiểu :class:`list`,
+   :class:`dict`, hoặc :class:`set`, các đối tượng không thể băm hiện không được phép làm giá trị mặc định. Tính không thể băm được dùng để ước lượng khả năng thay đổi.
 
-Descriptor-typed fields
------------------------
+Các trường có kiểu descriptor
+-----------------------------
 
-Fields that are assigned :ref:`descriptor objects <descriptors>` as their
-default value have the following special behaviors:
+Các trường được gán :ref:`các đối tượng descriptor <descriptors>` làm giá trị mặc định sẽ có các hành vi đặc biệt sau:
 
-* The value for the field passed to the dataclass's :meth:`~object.__init__` method is
-  passed to the descriptor's :meth:`~object.__set__` method rather than overwriting the
-  descriptor object.
+* Giá trị của trường được truyền vào phương thức :meth:`~object.__init__` của dataclass sẽ được truyền vào phương thức :meth:`~object.__set__` của descriptor thay vì ghi đè đối tượng descriptor.
 
-* Similarly, when getting or setting the field, the descriptor's
-  :meth:`~object.__get__` or :meth:`!__set__` method is called rather than returning or
-  overwriting the descriptor object.
+* Tương tự, khi lấy hoặc thiết lập trường, phương thức của descriptor
+  :meth:`~object.__get__` hoặc phương thức :meth:`!__set__` được gọi thay vì trả về hoặc ghi đè đối tượng descriptor.
 
-* To determine whether a field contains a default value, :deco:`dataclass`
-  will call the descriptor's :meth:`!__get__` method using its class access
-  form: ``descriptor.__get__(obj=None, type=cls)``.  If the
-  descriptor returns a value in this case, it will be used as the
-  field's default. On the other hand, if the descriptor raises
-  :exc:`AttributeError` in this situation, no default value will be
-  provided for the field.
+* Để xác định liệu một trường có chứa giá trị mặc định hay không, :deco:`dataclass` sẽ gọi phương thức :meth:`!__get__` của descriptor bằng dạng truy cập lớp: ``descriptor.__get__(obj=None, type=cls)``. Nếu descriptor trả về một giá trị trong trường hợp này, giá trị đó sẽ được dùng làm giá trị mặc định của trường. Ngược lại, nếu descriptor phát sinh
+  :exc:`AttributeError` trong tình huống này thì trường sẽ không được cung cấp giá trị mặc định.
 
 ::
 
@@ -866,9 +616,7 @@ default value have the following special behaviors:
 
   i = InventoryItem()
   print(i.quantity_on_hand)   # 100
-  i.quantity_on_hand = 2.5    # calls __set__ with 2.5
+  i.quantity_on_hand = 2.5    # gọi __set__ với 2.5
   print(i.quantity_on_hand)   # 2
 
-Note that if a field is annotated with a descriptor type, but is not assigned
-a descriptor object as its default value, the field will act like a normal
-field.
+Lưu ý rằng nếu một trường được chú thích bằng kiểu descriptor nhưng không được gán đối tượng descriptor làm giá trị mặc định, trường đó sẽ hoạt động như một trường thông thường.
