@@ -1,186 +1,109 @@
-:mod:`!email.message`: Representing an email message
-----------------------------------------------------
+:mod:`!email.message`: Biểu diễn một thông điệp email
+-----------------------------------------------------
 
 .. module:: email.message
-   :synopsis: The base class representing email messages.
+   :synopsis: Lớp cơ sở biểu diễn các thông điệp email.
 .. moduleauthor:: R. David Murray <rdmurray@bitdance.com>
 .. sectionauthor:: R. David Murray <rdmurray@bitdance.com>,
                    Barry A. Warsaw <barry@python.org>
 
-**Source code:** :source:`Lib/email/message.py`
+**Mã nguồn:** :source:`Lib/email/message.py`
 
 --------------
 
 .. versionadded:: 3.6 [1]_
 
-The central class in the :mod:`email` package is the :class:`EmailMessage`
-class, imported from the :mod:`!email.message` module.  It is the base class for
-the :mod:`email` object model.  :class:`EmailMessage` provides the core
-functionality for setting and querying header fields, for accessing message
-bodies, and for creating or modifying structured messages.
+Lớp trung tâm trong gói :mod:`email` là lớp :class:`EmailMessage`, được nhập từ mô-đun :mod:`!email.message`. Đây là lớp cơ sở cho mô hình đối tượng :mod:`email`. :class:`EmailMessage` cung cấp chức năng cốt lõi để thiết lập và truy vấn các trường tiêu đề, truy cập phần nội dung thông điệp cũng như tạo hoặc sửa đổi các thông điệp có cấu trúc.
 
-An email message consists of *headers* and a *payload* (which is also referred
-to as the *content*).  Headers are :rfc:`5322` or :rfc:`6532` style field names
-and values, where the field name and value are separated by a colon.  The colon
-is not part of either the field name or the field value.  The payload may be a
-simple text message, or a binary object, or a structured sequence of
-sub-messages each with their own set of headers and their own payload.  The
-latter type of payload is indicated by the message having a MIME type such as
-:mimetype:`multipart/\*` or :mimetype:`message/rfc822`.
+Một thông điệp email gồm *tiêu đề* và một *payload* (còn được gọi là *nội dung*). Tiêu đề là các tên và giá trị trường theo kiểu :rfc:`5322` hoặc :rfc:`6532`, trong đó tên trường và giá trị được phân tách bằng dấu hai chấm. Dấu hai chấm không thuộc về tên trường cũng như giá trị trường. Payload có thể là một thông điệp văn bản đơn giản, một đối tượng nhị phân hoặc một chuỗi có cấu trúc gồm các thông điệp con, mỗi thông điệp có tập tiêu đề và payload riêng. Loại payload sau được biểu thị bằng việc thông điệp có kiểu MIME như
+:mimetype:`multipart/\*` hoặc :mimetype:`message/rfc822`.
 
-The conceptual model provided by an :class:`EmailMessage` object is that of an
-ordered dictionary of headers coupled with a *payload* that represents the
-:rfc:`5322` body of the message, which might be a list of sub-``EmailMessage``
-objects.  In addition to the normal dictionary methods for accessing the header
-names and values, there are methods for accessing specialized information from
-the headers (for example the MIME content type), for operating on the payload,
-for generating a serialized version of the message, and for recursively walking
-over the object tree.
+Mô hình khái niệm do một đối tượng :class:`EmailMessage` cung cấp là một từ điển có thứ tự gồm các tiêu đề kết hợp với *payload* đại diện cho
+:rfc:`5322` phần thân của thư, có thể là một danh sách các đối tượng con-``EmailMessage``. Ngoài các phương thức từ điển thông thường để truy cập tên và giá trị của các header, còn có các phương thức để truy cập thông tin chuyên biệt từ các header (ví dụ: kiểu nội dung MIME), thao tác trên payload, tạo phiên bản đã tuần tự hóa của thư và duyệt đệ quy qua cây đối tượng.
 
-The :class:`EmailMessage` dictionary-like interface is indexed by the header
-names, which must be ASCII values.  The values of the dictionary are strings
-with some extra methods.  Headers are stored and returned in case-preserving
-form, but field names are matched case-insensitively.  The keys are ordered,
-but unlike a real dict, there can be duplicates.  Additional methods are
-provided for working with headers that have duplicate keys.
+Giao diện giống từ điển :class:`EmailMessage` được lập chỉ mục theo tên các header, vốn phải là các giá trị ASCII. Các giá trị của từ điển là các chuỗi có thêm một số phương thức. Header được lưu trữ và trả về với kiểu chữ được giữ nguyên, nhưng tên trường được so khớp không phân biệt chữ hoa chữ thường. Các khóa được sắp xếp theo thứ tự, nhưng không giống một dict thực sự, chúng có thể bị trùng lặp. Có thêm các phương thức để làm việc với các header có khóa trùng lặp.
 
-The *payload* is either a string or bytes object, in the case of simple message
-objects, or a list of :class:`EmailMessage` objects, for MIME container
-documents such as :mimetype:`multipart/\*` and :mimetype:`message/rfc822`
-message objects.
+*payload* là một đối tượng chuỗi hoặc bytes trong trường hợp các đối tượng thư đơn giản, hoặc là một danh sách các đối tượng :class:`EmailMessage` đối với các tài liệu container MIME, chẳng hạn như các đối tượng thư :mimetype:`multipart/\*` và :mimetype:`message/rfc822`.
 
 
 .. class:: EmailMessage(policy=default)
 
-   If *policy* is specified use the rules it specifies to update and serialize
-   the representation of the message.  If *policy* is not set, use the
-   :class:`~email.policy.default` policy, which follows the rules of the email
-   RFCs except for line endings (instead of the RFC mandated ``\r\n``, it uses
-   the Python standard ``\n`` line endings).  For more information see the
-   :mod:`~email.policy` documentation. [2]_
+   Nếu *policy* được chỉ định, hãy sử dụng các quy tắc mà nó chỉ định để cập nhật và tuần tự hóa biểu diễn của thư. Nếu *policy* chưa được thiết lập, hãy sử dụng
+   :class:`~email.policy.default` policy, tuân theo các quy tắc của các RFC về email, ngoại trừ phần kết thúc dòng (thay vì ``\r\n`` bắt buộc theo RFC, nó sử dụng phần kết thúc dòng tiêu chuẩn ``\n`` của Python). Để biết thêm thông tin, hãy xem
+   tài liệu :mod:`~email.policy`. [2]_
 
    .. method:: as_string(unixfrom=False, maxheaderlen=None, policy=None)
 
-      Return the entire message flattened as a string.  When optional
-      *unixfrom* is true, the envelope header is included in the returned
-      string.  *unixfrom* defaults to ``False``.  For backward compatibility
-      with the base :class:`~email.message.Message` class *maxheaderlen* is
-      accepted, but defaults to ``None``, which means that by default the line
-      length is controlled by the
-      :attr:`~email.policy.Policy.max_line_length` of the policy.  The
-      *policy* argument may be used to override the default policy obtained
-      from the message instance.  This can be used to control some of the
-      formatting produced by the method, since the specified *policy* will be
-      passed to the :class:`~email.generator.Generator`.
+      Trả về toàn bộ thư đã được làm phẳng dưới dạng một chuỗi. Khi *unixfrom* tùy chọn là true, header phong bì được đưa vào chuỗi trả về. *unixfrom* mặc định là ``False``. Để tương thích ngược với lớp cơ sở :class:`~email.message.Message`, *maxheaderlen* được chấp nhận, nhưng mặc định là ``None``, nghĩa là theo mặc định, độ dài dòng được kiểm soát bởi
+      :attr:`~email.policy.Policy.max_line_length` của policy. Đối số *policy* có thể được sử dụng để ghi đè policy mặc định nhận được từ message instance. Điều này có thể được dùng để kiểm soát một số định dạng do method tạo ra, vì *policy* được chỉ định sẽ được truyền vào :class:`~email.generator.Generator`.
 
-      Flattening the message may trigger changes to the :class:`EmailMessage`
-      if defaults need to be filled in to complete the transformation to a
-      string (for example, MIME boundaries may be generated or modified).
+      Việc flatten message có thể kích hoạt các thay đổi đối với :class:`EmailMessage` nếu cần điền các giá trị mặc định để hoàn tất quá trình chuyển đổi thành một chuỗi (ví dụ: các MIME boundary có thể được tạo hoặc sửa đổi).
 
-      Note that this method is provided as a convenience and may not be the
-      most useful way to serialize messages in your application, especially if
-      you are dealing with multiple messages.  See
-      :class:`email.generator.Generator` for a more flexible API for
-      serializing messages.  Note also that this method is restricted to
-      producing messages serialized as "7 bit clean" when
-      :attr:`~email.policy.EmailPolicy.utf8` is ``False``, which is the default.
+      Lưu ý rằng method này được cung cấp như một tiện ích và có thể không phải là cách hữu ích nhất để serialize các message trong ứng dụng của bạn, đặc biệt nếu bạn đang xử lý nhiều message. Xem
+      :class:`email.generator.Generator` để sử dụng API linh hoạt hơn cho việc serialize các message. Cũng lưu ý rằng method này bị giới hạn ở việc tạo ra các message được serialize dưới dạng "7 bit clean" khi
+      :attr:`~email.policy.EmailPolicy.utf8` là ``False``, đây là giá trị mặc định.
 
-      .. versionchanged:: 3.6 the default behavior when *maxheaderlen*
-         is not specified was changed from defaulting to 0 to defaulting
-         to the value of *max_line_length* from the policy.
+      .. versionchanged:: 3.6 hành vi mặc định khi *maxheaderlen*
+         không được chỉ định đã được thay đổi từ giá trị mặc định là 0 thành giá trị của *max_line_length* trong policy.
 
 
    .. method:: __str__()
 
-      Equivalent to ``as_string(policy=self.policy.clone(utf8=True))``.  Allows
-      ``str(msg)`` to produce a string containing the serialized message in a
-      readable format.
+      Tương đương với ``as_string(policy=self.policy.clone(utf8=True))``. Cho phép ``str(msg)`` tạo ra một chuỗi chứa thông điệp đã được tuần tự hóa ở định dạng dễ đọc.
 
-      .. versionchanged:: 3.4 the method was changed to use ``utf8=True``,
-         thus producing an :rfc:`6531`-like message representation, instead of
-         being a direct alias for :meth:`as_string`.
+      .. versionchanged:: 3.4 phương thức này đã được thay đổi để sử dụng ``utf8=True``,
+         do đó tạo ra một biểu diễn thông điệp tương tự :rfc:`6531`, thay vì là bí danh trực tiếp của :meth:`as_string`.
 
 
    .. method:: as_bytes(unixfrom=False, policy=None)
 
-      Return the entire message flattened as a bytes object.  When optional
-      *unixfrom* is true, the envelope header is included in the returned
-      string.  *unixfrom* defaults to ``False``.  The *policy* argument may be
-      used to override the default policy obtained from the message instance.
-      This can be used to control some of the formatting produced by the
-      method, since the specified *policy* will be passed to the
+      Trả về toàn bộ thông điệp đã được chuyển phẳng dưới dạng đối tượng bytes. Khi *unixfrom* tùy chọn là true, header phong bì được đưa vào chuỗi trả về. *unixfrom* mặc định là ``False``. Có thể sử dụng đối số *policy* để ghi đè policy mặc định nhận được từ thực thể thông điệp. Điều này có thể được dùng để kiểm soát một số định dạng do phương thức tạo ra, vì *policy* được chỉ định sẽ được truyền cho
       :class:`~email.generator.BytesGenerator`.
 
-      Flattening the message may trigger changes to the :class:`EmailMessage`
-      if defaults need to be filled in to complete the transformation to a
-      string (for example, MIME boundaries may be generated or modified).
+      Việc flatten message có thể kích hoạt các thay đổi đối với :class:`EmailMessage` nếu cần điền các giá trị mặc định để hoàn tất quá trình chuyển đổi thành một chuỗi (ví dụ: các MIME boundary có thể được tạo hoặc sửa đổi).
 
-      Note that this method is provided as a convenience and may not be the
-      most useful way to serialize messages in your application, especially if
-      you are dealing with multiple messages.  See
-      :class:`email.generator.BytesGenerator` for a more flexible API for
-      serializing messages.
+      Lưu ý rằng method này được cung cấp như một tiện ích và có thể không phải là cách hữu ích nhất để serialize các message trong ứng dụng của bạn, đặc biệt nếu bạn đang xử lý nhiều message. Xem
+      :class:`email.generator.BytesGenerator` để có API linh hoạt hơn cho việc tuần tự hóa thông điệp.
 
 
    .. method:: __bytes__()
 
-      Equivalent to :meth:`.as_bytes`.  Allows ``bytes(msg)`` to produce a
-      bytes object containing the serialized message.
+      Tương đương với :meth:`.as_bytes`. Cho phép ``bytes(msg)`` tạo ra một đối tượng bytes chứa message đã được serialize.
 
 
    .. method:: is_multipart()
 
-      Return ``True`` if the message's payload is a list of
-      sub-\ :class:`EmailMessage` objects, otherwise return ``False``.  When
-      :meth:`is_multipart` returns ``False``, the payload should be a string
-      object (which might be a CTE encoded binary payload).  Note that
-      :meth:`is_multipart` returning ``True`` does not necessarily mean that
-      "msg.get_content_maintype() == 'multipart'" will return the ``True``.
-      For example, ``is_multipart`` will return ``True`` when the
-      :class:`EmailMessage` is of type ``message/rfc822``.
+      Trả về ``True`` nếu payload của message là một danh sách các đối tượng \ :class:`EmailMessage` con, nếu không thì trả về ``False``. Khi
+      :meth:`is_multipart` trả về ``False``, payload phải là một đối tượng chuỗi (có thể là payload nhị phân được mã hóa CTE). Lưu ý rằng
+      :meth:`is_multipart` trả về ``True`` không nhất thiết có nghĩa là "msg.get_content_maintype() == 'multipart'" sẽ trả về ``True``. Ví dụ: ``is_multipart`` sẽ trả về ``True`` khi
+      :class:`EmailMessage` có kiểu ``message/rfc822``.
 
 
    .. method:: set_unixfrom(unixfrom)
 
-      Set the message's envelope header to *unixfrom*, which should be a
-      string.  (See :class:`~mailbox.mboxMessage` for a brief description of
-      this header.)
+      Đặt envelope header của message thành *unixfrom*, giá trị này phải là một chuỗi. (Xem :class:`~mailbox.mboxMessage` để biết mô tả ngắn gọn về header này.)
 
 
    .. method:: get_unixfrom()
 
-      Return the message's envelope header.  Defaults to ``None`` if the
-      envelope header was never set.
+      Trả về envelope header của message. Mặc định là ``None`` nếu envelope header chưa bao giờ được đặt.
 
 
-   The following methods implement the mapping-like interface for accessing the
-   message's headers.  Note that there are some semantic differences
-   between these methods and a normal mapping (i.e. dictionary) interface.  For
-   example, in a dictionary there are no duplicate keys, but here there may be
-   duplicate message headers.  Also, in dictionaries there is no guaranteed
-   order to the keys returned by :meth:`keys`, but in an :class:`EmailMessage`
-   object, headers are always returned in the order they appeared in the
-   original message, or in which they were added to the message later.  Any
-   header deleted and then re-added is always appended to the end of the
-   header list.
+   Các phương thức sau đây triển khai interface giống mapping để truy cập các header của message. Lưu ý rằng có một số khác biệt về ngữ nghĩa giữa các phương thức này và interface mapping thông thường (tức dictionary). Ví dụ, trong dictionary không có các key trùng lặp, nhưng ở đây có thể có các header message trùng lặp. Ngoài ra, trong dictionary không có bảo đảm về thứ tự của các key được :meth:`keys`, nhưng trong một đối tượng :class:`EmailMessage`, các header luôn được trả về theo thứ tự chúng xuất hiện trong message ban đầu hoặc theo thứ tự chúng được thêm vào message sau đó. Bất kỳ header nào bị xóa rồi được thêm lại sẽ luôn được nối vào cuối danh sách header.
 
-   These semantic differences are intentional and are biased toward
-   convenience in the most common use cases.
+   Những khác biệt về ngữ nghĩa này là có chủ ý và được thiên về sự tiện lợi trong các trường hợp sử dụng phổ biến nhất.
 
-   Note that in all cases, any envelope header present in the message is not
-   included in the mapping interface.
+   Lưu ý rằng trong mọi trường hợp, bất kỳ envelope header nào có trong message cũng không được đưa vào interface mapping.
 
 
    .. method:: __len__()
 
-      Return the total number of headers, including duplicates.
+      Trả về tổng số header, bao gồm cả các header trùng lặp.
 
 
    .. method:: __contains__(name)
 
-      Return ``True`` if the message object has a field named *name*. Matching is
-      done without regard to case and *name* does not include the trailing
-      colon.  Used for the ``in`` operator.  For example::
+      Trả về ``True`` nếu đối tượng message có một trường có tên là *name*. Việc so khớp không phân biệt chữ hoa chữ thường và *name* không bao gồm dấu hai chấm ở cuối. Được sử dụng cho toán tử ``in``. Ví dụ::
 
            if 'message-id' in myMessage:
               print('Message-ID:', myMessage['message-id'])
@@ -188,111 +111,77 @@ message objects.
 
    .. method:: __getitem__(name)
 
-      Return the value of the named header field.  *name* does not include the
-      colon field separator.  If the header is missing, ``None`` is returned; a
-      :exc:`KeyError` is never raised.
+      Trả về giá trị của trường header có tên được chỉ định. *name* không bao gồm dấu phân cách trường là dấu hai chấm. Nếu không tìm thấy header, ``None`` được trả về; một
+      :exc:`KeyError` không bao giờ được ném ra.
 
-      Note that if the named field appears more than once in the message's
-      headers, exactly which of those field values will be returned is
-      undefined.  Use the :meth:`get_all` method to get the values of all the
-      extant headers named *name*.
+      Lưu ý rằng nếu trường có tên đã chỉ định xuất hiện nhiều hơn một lần trong phần header của thông điệp, thì không xác định được chính xác giá trị nào trong các giá trị của trường đó sẽ được trả về. Sử dụng phương thức :meth:`get_all` để lấy giá trị của tất cả các header hiện có có tên *name*.
 
-      Using the standard (non-``compat32``) policies, the returned value is an
-      instance of a subclass of :class:`email.headerregistry.BaseHeader`.
+      Khi sử dụng các policy tiêu chuẩn (không phải ``compat32``), giá trị được trả về là một thể hiện của một lớp con của :class:`email.headerregistry.BaseHeader`.
 
 
    .. method:: __setitem__(name, val)
 
-      Add a header to the message with field name *name* and value *val*.  The
-      field is appended to the end of the message's existing headers.
+      Thêm một header vào thông điệp với tên trường *name* và giá trị *val*. Trường này được nối vào cuối các header hiện có của thông điệp.
 
-      Note that this does *not* overwrite or delete any existing header with the same
-      name.  If you want to ensure that the new header is the only one present in the
-      message with field name *name*, delete the field first, e.g.::
+      Lưu ý rằng thao tác này *not* ghi đè hoặc xóa bất kỳ header hiện có nào có cùng tên. Nếu muốn đảm bảo header mới là header duy nhất trong thông điệp có tên trường *name*, trước tiên hãy xóa trường đó, chẳng hạn như:::
 
          del msg['subject']
          msg['subject'] = 'Python roolz!'
 
-      If the :mod:`policy <email.policy>` defines certain headers to be unique (as the standard
-      policies do), this method may raise a :exc:`ValueError` when an attempt
-      is made to assign a value to such a header when one already exists.  This
-      behavior is intentional for consistency's sake, but do not depend on it
-      as we may choose to make such assignments do an automatic deletion of the
-      existing header in the future.
+      Nếu :mod:`policy <email.policy>` xác định một số header là duy nhất (như các policy tiêu chuẩn), phương thức này có thể phát sinh :exc:`ValueError` khi cố gắng gán giá trị cho một header như vậy trong khi đã có một header cùng tên. Hành vi này là có chủ ý để đảm bảo tính nhất quán, nhưng đừng phụ thuộc vào nó vì trong tương lai, chúng tôi có thể chọn để những phép gán như vậy tự động xóa header hiện có.
 
 
    .. method:: __delitem__(name)
 
-      Delete all occurrences of the field with name *name* from the message's
-      headers.  No exception is raised if the named field isn't present in the
-      headers.
+      Xóa mọi trường có tên *name* khỏi các header của thông điệp. Không phát sinh ngoại lệ nếu trường có tên đã chỉ định không tồn tại trong các header.
 
 
    .. method:: keys()
 
-      Return a list of all the message's header field names.
+      Trả về danh sách tất cả tên trường header của thông điệp.
 
 
    .. method:: values()
 
-      Return a list of all the message's field values.
+      Trả về danh sách tất cả các giá trị trường của message.
 
 
    .. method:: items()
 
-      Return a list of 2-tuples containing all the message's field headers and
-      values.
+      Trả về danh sách các bộ 2-tuples chứa tất cả tiêu đề và giá trị trường của message.
 
 
    .. method:: get(name, failobj=None)
 
-      Return the value of the named header field.  This is identical to
-      :meth:`~object.__getitem__` except that optional *failobj* is returned if the
-      named header is missing (*failobj* defaults to ``None``).
+      Trả về giá trị của trường tiêu đề được đặt tên. Phương thức này giống hệt
+      :meth:`~object.__getitem__` ngoại trừ việc *failobj* tùy chọn được trả về nếu không tìm thấy tiêu đề được đặt tên (*failobj* mặc định là ``None``).
 
 
-   Here are some additional useful header related methods:
+   Dưới đây là một số phương thức hữu ích bổ sung liên quan đến tiêu đề:
 
 
    .. method:: get_all(name, failobj=None)
 
-      Return a list of all the values for the field named *name*. If there are
-      no such named headers in the message, *failobj* is returned (defaults to
-      ``None``).
+      Trả về danh sách tất cả các giá trị của trường có tên *name*. Nếu message không có tiêu đề nào mang tên đó, *failobj* sẽ được trả về (mặc định là ``None``).
 
 
    .. method:: add_header(_name, _value, **_params)
 
-      Extended header setting.  This method is similar to :meth:`__setitem__`
-      except that additional header parameters can be provided as keyword
-      arguments.  *_name* is the header field to add and *_value* is the
-      *primary* value for the header.
+      Thiết lập tiêu đề mở rộng. Phương thức này tương tự như :meth:`__setitem__`, nhưng có thể cung cấp thêm các tham số tiêu đề dưới dạng đối số từ khóa. *_name* là trường tiêu đề cần thêm và *_value* là giá trị *primary* của tiêu đề.
 
-      For each item in the keyword argument dictionary *_params*, the key is
-      taken as the parameter name, with underscores converted to dashes (since
-      dashes are illegal in Python identifiers).  Normally, the parameter will
-      be added as ``key="value"`` unless the value is ``None``, in which case
-      only the key will be added.
+      Với mỗi mục trong từ điển đối số từ khóa *_params*, khóa được lấy làm tên tham số, với dấu gạch dưới được chuyển thành dấu gạch ngang (vì dấu gạch ngang không hợp lệ trong các định danh Python). Thông thường, tham số sẽ được thêm dưới dạng ``key="value"``, trừ khi giá trị là ``None``, khi đó chỉ khóa được thêm vào.
 
-      If the value contains non-ASCII characters, the charset and language may
-      be explicitly controlled by specifying the value as a three tuple in the
-      format ``(CHARSET, LANGUAGE, VALUE)``, where ``CHARSET`` is a string
-      naming the charset to be used to encode the value, ``LANGUAGE`` can
-      usually be set to ``None`` or the empty string (see :rfc:`2231` for other
-      possibilities), and ``VALUE`` is the string value containing non-ASCII
-      code points.  If a three tuple is not passed and the value contains
-      non-ASCII characters, it is automatically encoded in :rfc:`2231` format
-      using a ``CHARSET`` of ``utf-8`` and a ``LANGUAGE`` of ``None``.
+      Nếu giá trị chứa các ký tự non-ASCII, bộ mã ký tự và ngôn ngữ có thể được điều khiển rõ ràng bằng cách chỉ định giá trị dưới dạng một tuple ba phần theo định dạng ``(CHARSET, LANGUAGE, VALUE)``, trong đó ``CHARSET`` là chuỗi chỉ định bộ mã ký tự được dùng để mã hóa giá trị, ``LANGUAGE`` thường có thể được đặt thành ``None`` hoặc chuỗi rỗng (xem :rfc:`2231` để biết các khả năng khác), còn ``VALUE`` là chuỗi giá trị chứa các code point non-ASCII. Nếu không truyền tuple ba phần và giá trị chứa các ký tự non-ASCII, giá trị sẽ tự động được mã hóa theo định dạng :rfc:`2231` bằng cách sử dụng ``CHARSET`` là ``utf-8`` và ``LANGUAGE`` là ``None``.
 
-      Here is an example::
+      Sau đây là một ví dụ::
 
          msg.add_header('Content-Disposition', 'attachment', filename='bud.gif')
 
-      This will add a header that looks like ::
+      Thao tác này sẽ thêm một header có dạng::
 
          Content-Disposition: attachment; filename="bud.gif"
 
-      An example of the extended interface with non-ASCII characters::
+      Ví dụ về interface mở rộng với các ký tự non-ASCII::
 
          msg.add_header('Content-Disposition', 'attachment',
                         filename=('iso-8859-1', '', 'Fußballer.ppt'))
@@ -300,187 +189,125 @@ message objects.
 
    .. method:: replace_header(_name, _value)
 
-      Replace a header.  Replace the first header found in the message that
-      matches *_name*, retaining header order and field name case of the
-      original header.  If no matching header is found, raise a
+      Thay thế một header. Thay thế header đầu tiên được tìm thấy trong message khớp với *_name*, đồng thời giữ nguyên thứ tự header và kiểu chữ của tên trường trong header ban đầu. Nếu không tìm thấy header phù hợp, hãy raise a
       :exc:`KeyError`.
 
 
    .. method:: get_content_type()
 
-      Return the message's content type, coerced to lower case of the form
-      :mimetype:`maintype/subtype`.  If there is no :mailheader:`Content-Type`
-      header in the message return the value returned by
-      :meth:`get_default_type`.  If the :mailheader:`Content-Type` header is
-      invalid, return ``text/plain``.
+      Trả về content type của message, được chuyển thành chữ thường theo dạng
+      :mimetype:`maintype/subtype`.  Nếu không có tiêu đề :mailheader:`Content-Type` trong thông điệp, hãy trả về giá trị do
+      :meth:`get_default_type`.  Nếu tiêu đề :mailheader:`Content-Type` không hợp lệ, hãy trả về ``text/plain``.
 
-      (According to :rfc:`2045`, messages always have a default type,
-      :meth:`get_content_type` will always return a value.  :rfc:`2045` defines
-      a message's default type to be :mimetype:`text/plain` unless it appears
-      inside a :mimetype:`multipart/digest` container, in which case it would
-      be :mimetype:`message/rfc822`.  If the :mailheader:`Content-Type` header
-      has an invalid type specification, :rfc:`2045` mandates that the default
-      type be :mimetype:`text/plain`.)
+      (Theo :rfc:`2045`, thông điệp luôn có một kiểu mặc định,
+      :meth:`get_content_type` sẽ luôn trả về một giá trị.  :rfc:`2045` xác định kiểu mặc định của thông điệp là :mimetype:`text/plain`, trừ khi thông điệp xuất hiện bên trong một vùng chứa :mimetype:`multipart/digest`, trong trường hợp đó kiểu mặc định sẽ là :mimetype:`message/rfc822`.  Nếu tiêu đề :mailheader:`Content-Type` có đặc tả kiểu không hợp lệ, :rfc:`2045` yêu cầu kiểu mặc định phải là :mimetype:`text/plain`.)
 
 
    .. method:: get_content_maintype()
 
-      Return the message's main content type.  This is the :mimetype:`maintype`
-      part of the string returned by :meth:`get_content_type`.
+      Trả về kiểu nội dung chính của thông điệp.  Đây là phần :mimetype:`maintype` của chuỗi được :meth:`get_content_type` trả về.
 
 
    .. method:: get_content_subtype()
 
-      Return the message's sub-content type.  This is the :mimetype:`subtype`
-      part of the string returned by :meth:`get_content_type`.
+      Trả về kiểu nội dung phụ của thông điệp.  Đây là phần :mimetype:`subtype` của chuỗi được :meth:`get_content_type` trả về.
 
 
    .. method:: get_default_type()
 
-      Return the default content type.  Most messages have a default content
-      type of :mimetype:`text/plain`, except for messages that are subparts of
-      :mimetype:`multipart/digest` containers.  Such subparts have a default
-      content type of :mimetype:`message/rfc822`.
+      Trả về kiểu nội dung mặc định.  Hầu hết thông điệp có kiểu nội dung mặc định là :mimetype:`text/plain`, ngoại trừ các thông điệp là phần con của
+      :mimetype:`multipart/digest` các vùng chứa. Những phần con như vậy có kiểu nội dung mặc định là :mimetype:`message/rfc822`.
 
 
    .. method:: set_default_type(ctype)
 
-      Set the default content type.  *ctype* should either be
-      :mimetype:`text/plain` or :mimetype:`message/rfc822`, although this is
-      not enforced.  The default content type is not stored in the
-      :mailheader:`Content-Type` header, so it only affects the return value of
-      the ``get_content_type`` methods when no :mailheader:`Content-Type`
-      header is present in the message.
+      Đặt kiểu nội dung mặc định. *ctype* phải là một trong các giá trị sau:
+      :mimetype:`text/plain` hoặc :mimetype:`message/rfc822`, mặc dù điều này không được thực thi. Kiểu nội dung mặc định không được lưu trong
+      :mailheader:`Content-Type` header, vì vậy nó chỉ ảnh hưởng đến giá trị trả về của các phương thức ``get_content_type`` khi không có header :mailheader:`Content-Type` trong message.
 
 
    .. method:: set_param(param, value, header='Content-Type', requote=True, \
                          charset=None, language='', replace=False)
 
-      Set a parameter in the :mailheader:`Content-Type` header.  If the
-      parameter already exists in the header, replace its value with *value*.
-      When *header* is ``Content-Type`` (the default) and the header does not
-      yet exist in the message, add it, set its value to
-      :mimetype:`text/plain`, and append the new parameter value.  Optional
-      *header* specifies an alternative header to :mailheader:`Content-Type`.
+      Đặt một tham số trong header :mailheader:`Content-Type`. Nếu tham số đó đã tồn tại trong header, thay thế giá trị của nó bằng *value*. Khi *header* là ``Content-Type`` (mặc định) và header chưa tồn tại trong message, hãy thêm header đó, đặt giá trị của nó thành
+      :mimetype:`text/plain`, rồi nối thêm giá trị tham số mới. *header* tùy chọn chỉ định một header thay thế cho :mailheader:`Content-Type`.
 
-      If the value contains non-ASCII characters, the charset and language may
-      be explicitly specified using the optional *charset* and *language*
-      parameters.  Optional *language* specifies the :rfc:`2231` language,
-      defaulting to the empty string.  Both *charset* and *language* should be
-      strings.  The default is to use the ``utf8`` *charset* and ``None`` for
-      the *language*.
+      Nếu giá trị chứa các ký tự non-ASCII, có thể chỉ định rõ charset và language bằng các tham số tùy chọn *charset* và *language*. Tham số *language* tùy chọn chỉ định :rfc:`2231` language, mặc định là chuỗi rỗng. Cả *charset* và *language* đều phải là chuỗi. Mặc định là sử dụng ``utf8`` *charset* và ``None`` cho *language*.
 
-      If *replace* is ``False`` (the default) the header is moved to the
-      end of the list of headers.  If *replace* is ``True``, the header
-      will be updated in place.
+      Nếu *replace* là ``False`` (mặc định), header sẽ được chuyển đến cuối danh sách các header. Nếu *replace* là ``True``, header sẽ được cập nhật tại chỗ.
 
-      Use of the *requote* parameter with :class:`EmailMessage` objects is
-      deprecated.
+      Việc sử dụng tham số *requote* với các đối tượng :class:`EmailMessage` không còn được khuyến nghị.
 
-      Note that existing parameter values of headers may be accessed through
-      the :attr:`~email.headerregistry.ParameterizedMIMEHeader.params` attribute of the
-      header value (for example, ``msg['Content-Type'].params['charset']``).
+      Lưu ý rằng có thể truy cập các giá trị tham số hiện có của header thông qua thuộc tính :attr:`~email.headerregistry.ParameterizedMIMEHeader.params` của giá trị header (ví dụ: ``msg['Content-Type'].params['charset']``).
 
-      .. versionchanged:: 3.4 ``replace`` keyword was added.
+      .. versionchanged:: 3.4 Từ khóa ``replace`` đã được thêm.
 
 
    .. method:: del_param(param, header='content-type', requote=True)
 
-      Remove the given parameter completely from the :mailheader:`Content-Type`
-      header.  The header will be re-written in place without the parameter or
-      its value.  Optional *header* specifies an alternative to
+      Xóa hoàn toàn tham số đã cho khỏi header :mailheader:`Content-Type`. Header sẽ được viết lại tại chỗ mà không có tham số hoặc giá trị của nó. *header* tùy chọn chỉ định một lựa chọn thay thế cho
       :mailheader:`Content-Type`.
 
-      Use of the *requote* parameter with :class:`EmailMessage` objects is
-      deprecated.
+      Việc sử dụng tham số *requote* với các đối tượng :class:`EmailMessage` không còn được khuyến nghị.
 
 
    .. method:: get_filename(failobj=None)
 
-      Return the value of the ``filename`` parameter of the
-      :mailheader:`Content-Disposition` header of the message.  If the header
-      does not have a ``filename`` parameter, this method falls back to looking
-      for the ``name`` parameter on the :mailheader:`Content-Type` header.  If
-      neither is found, or the header is missing, then *failobj* is returned.
-      The returned string will always be unquoted as per
+      Trả về giá trị của tham số ``filename`` của
+      header :mailheader:`Content-Disposition` của thư. Nếu header không có tham số ``filename``, phương thức này sẽ chuyển sang tìm tham số ``name`` trong header :mailheader:`Content-Type`. Nếu không tìm thấy cả hai tham số, hoặc header bị thiếu, thì *failobj* được trả về. Chuỗi được trả về luôn không có dấu ngoặc kép theo
       :func:`email.utils.unquote`.
 
 
    .. method:: get_boundary(failobj=None)
 
-      Return the value of the ``boundary`` parameter of the
-      :mailheader:`Content-Type` header of the message, or *failobj* if either
-      the header is missing, or has no ``boundary`` parameter.  The returned
-      string will always be unquoted as per :func:`email.utils.unquote`.
+      Trả về giá trị của tham số ``boundary`` của
+      header :mailheader:`Content-Type` của thư, hoặc *failobj* nếu header bị thiếu hoặc không có tham số ``boundary``. Chuỗi được trả về luôn không có dấu ngoặc kép theo :func:`email.utils.unquote`.
 
 
    .. method:: set_boundary(boundary)
 
-      Set the ``boundary`` parameter of the :mailheader:`Content-Type` header to
-      *boundary*.  :meth:`set_boundary` will always quote *boundary* if
-      necessary.  A :exc:`~email.errors.HeaderParseError` is raised if the
-      message object has no :mailheader:`Content-Type` header.
+      Đặt tham số ``boundary`` của header :mailheader:`Content-Type` thành *boundary*. :meth:`set_boundary` sẽ luôn đặt *boundary* trong dấu ngoặc kép nếu cần. Một :exc:`~email.errors.HeaderParseError` sẽ được phát sinh nếu đối tượng thư không có header :mailheader:`Content-Type`.
 
-      Note that using this method is subtly different from deleting the old
-      :mailheader:`Content-Type` header and adding a new one with the new
-      boundary via :meth:`add_header`, because :meth:`set_boundary` preserves
-      the order of the :mailheader:`Content-Type` header in the list of
-      headers.
+      Lưu ý rằng việc sử dụng phương thức này hơi khác so với việc xóa
+      header :mailheader:`Content-Type` cũ rồi thêm một header mới với boundary mới thông qua :meth:`add_header`, vì :meth:`set_boundary` giữ nguyên thứ tự của header :mailheader:`Content-Type` trong danh sách các header.
 
 
    .. method:: get_content_charset(failobj=None)
 
-      Return the ``charset`` parameter of the :mailheader:`Content-Type` header,
-      coerced to lower case.  If there is no :mailheader:`Content-Type` header, or if
-      that header has no ``charset`` parameter, *failobj* is returned.
+      Trả về tham số ``charset`` của tiêu đề :mailheader:`Content-Type`, được chuyển thành chữ thường. Nếu không có tiêu đề :mailheader:`Content-Type`, hoặc tiêu đề đó không có tham số ``charset``, *failobj* sẽ được trả về.
 
 
    .. method:: get_charsets(failobj=None)
 
-      Return a list containing the character set names in the message.  If the
-      message is a :mimetype:`multipart`, then the list will contain one element
-      for each subpart in the payload, otherwise, it will be a list of length 1.
+      Trả về một danh sách chứa tên các bộ ký tự trong message. Nếu message là một :mimetype:`multipart`, danh sách sẽ chứa một phần tử cho mỗi phân phần trong payload; nếu không, danh sách sẽ có độ dài 1.
 
-      Each item in the list will be a string which is the value of the
-      ``charset`` parameter in the :mailheader:`Content-Type` header for the
-      represented subpart.  If the subpart has no :mailheader:`Content-Type`
-      header, no ``charset`` parameter, or is not of the :mimetype:`text` main
-      MIME type, then that item in the returned list will be *failobj*.
+      Mỗi phần tử trong danh sách sẽ là một chuỗi, tương ứng với giá trị của tham số ``charset`` trong tiêu đề :mailheader:`Content-Type` của phân phần được biểu diễn. Nếu phân phần không có tiêu đề :mailheader:`Content-Type`, không có tham số ``charset``, hoặc không thuộc kiểu MIME chính :mimetype:`text`, thì phần tử tương ứng trong danh sách trả về sẽ là *failobj*.
 
 
    .. method:: is_attachment
 
-      Return ``True`` if there is a :mailheader:`Content-Disposition` header
-      and its (case insensitive) value is ``attachment``, ``False`` otherwise.
+      Trả về ``True`` nếu có tiêu đề :mailheader:`Content-Disposition` và giá trị của tiêu đề đó (không phân biệt chữ hoa chữ thường) là ``attachment``, nếu không thì trả về ``False``.
 
       .. versionchanged:: 3.4.2
-         is_attachment is now a method instead of a property, for consistency
-         with :meth:`~email.message.Message.is_multipart`.
+         is_attachment hiện là một method thay vì một property, để nhất quán với :meth:`~email.message.Message.is_multipart`.
 
 
    .. method:: get_content_disposition()
 
-      Return the lowercased value (without parameters) of the message's
-      :mailheader:`Content-Disposition` header if it has one, or ``None``.  The
-      possible values for this method are *inline*, *attachment* or ``None``
-      if the message follows :rfc:`2183`.
+      Trả về giá trị viết thường (không kèm tham số) của message's
+      tiêu đề :mailheader:`Content-Disposition` nếu có, hoặc ``None``. Các giá trị có thể có của method này là *inline*, *attachment* hoặc ``None`` nếu message tuân theo :rfc:`2183`.
 
       .. versionadded:: 3.5
 
 
-   The following methods relate to interrogating and manipulating the content
-   (payload) of the message.
+   Các phương thức sau đây liên quan đến việc truy vấn và thao tác với nội dung (payload) của message.
 
 
    .. method:: walk()
 
-      The :meth:`walk` method is an all-purpose generator which can be used to
-      iterate over all the parts and subparts of a message object tree, in
-      depth-first traversal order.  You will typically use :meth:`walk` as the
-      iterator in a ``for`` loop; each iteration returns the next subpart.
+      Phương thức :meth:`walk` là một generator đa dụng có thể được dùng để lặp qua tất cả các phần và phần con của cây đối tượng message theo thứ tự duyệt depth-first. Thông thường, bạn sẽ dùng :meth:`walk` làm iterator trong vòng lặp ``for``; mỗi lần lặp trả về phần con tiếp theo.
 
-      Here's an example that prints the MIME type of every part of a multipart
-      message structure:
+      Sau đây là một ví dụ in ra MIME type của mọi phần trong một cấu trúc message multipart:
 
       .. testsetup::
 
@@ -500,11 +327,8 @@ message objects.
          message/rfc822
          text/plain
 
-      ``walk`` iterates over the subparts of any part where
-      :meth:`is_multipart` returns ``True``, even though
-      ``msg.get_content_maintype() == 'multipart'`` may return ``False``.  We
-      can see this in our example by making use of the ``_structure`` debug
-      helper function:
+      ``walk`` lặp qua các phần con của bất kỳ phần nào mà
+      :meth:`is_multipart` trả về ``True``, mặc dù ``msg.get_content_maintype() == 'multipart'`` có thể trả về ``False``. Chúng ta có thể thấy điều này trong ví dụ bằng cách sử dụng hàm trợ giúp debug ``_structure``:
 
       .. doctest::
 
@@ -528,230 +352,128 @@ message objects.
              message/rfc822
                  text/plain
 
-      Here the ``message`` parts are not ``multiparts``, but they do contain
-      subparts. ``is_multipart()`` returns ``True`` and ``walk`` descends
-      into the subparts.
+      Ở đây, các phần ``message`` không phải là ``multiparts``, nhưng chúng có chứa các phần con. ``is_multipart()`` trả về ``True`` và ``walk`` đi sâu vào các phần con.
 
 
    .. method:: get_body(preferencelist=('related', 'html', 'plain'))
 
-      Return the MIME part that is the best candidate to be the "body" of the
-      message.
+      Trả về phần MIME có khả năng cao nhất là "body" của message.
 
-      *preferencelist* must be a sequence of strings from the set ``related``,
-      ``html``, and ``plain``, and indicates the order of preference for the
-      content type of the part returned.
+      *preferencelist* phải là một dãy các chuỗi thuộc tập hợp ``related``, ``html`` và ``plain``, đồng thời cho biết thứ tự ưu tiên của kiểu nội dung của phần được trả về.
 
-      Start looking for candidate matches with the object on which the
-      ``get_body`` method is called.
+      Bắt đầu tìm các kết quả khớp tiềm năng với đối tượng mà phương thức ``get_body`` được gọi trên đó.
 
-      If ``related`` is not included in *preferencelist*, consider the root
-      part (or subpart of the root part) of any related encountered as a
-      candidate if the (sub-)part matches a preference.
+      Nếu ``related`` không được đưa vào *preferencelist*, hãy xem phần gốc (hoặc phần con của phần gốc) của bất kỳ phần liên quan nào được gặp như một kết quả khớp tiềm năng nếu phần đó khớp với một tùy chọn ưu tiên.
 
-      When encountering a ``multipart/related``, check the ``start`` parameter
-      and if a part with a matching :mailheader:`Content-ID` is found, consider
-      only it when looking for candidate matches.  Otherwise consider only the
-      first (default root) part of the ``multipart/related``.
+      Khi gặp một ``multipart/related``, hãy kiểm tra tham số ``start`` và nếu tìm thấy một phần có :mailheader:`Content-ID` khớp, chỉ xem xét phần đó khi tìm các kết quả khớp tiềm năng. Nếu không, chỉ xem xét phần đầu tiên (phần gốc mặc định) của ``multipart/related``.
 
-      If a part has a :mailheader:`Content-Disposition` header, only consider
-      the part a candidate match if the value of the header is ``inline``.
+      Nếu một phần có tiêu đề :mailheader:`Content-Disposition`, chỉ xem phần đó là một kết quả khớp tiềm năng nếu giá trị của tiêu đề là ``inline``.
 
-      If none of the candidates matches any of the preferences in
-      *preferencelist*, return ``None``.
+      Nếu không có ứng viên nào khớp với bất kỳ tùy chọn ưu tiên nào trong *preferencelist*, hãy trả về ``None``.
 
-      Notes: (1) For most applications the only *preferencelist* combinations
-      that really make sense are ``('plain',)``, ``('html', 'plain')``, and the
-      default ``('related', 'html', 'plain')``.  (2) Because matching starts
-      with the object on which ``get_body`` is called, calling ``get_body`` on
-      a ``multipart/related`` will return the object itself unless
-      *preferencelist* has a non-default value. (3) Messages (or message parts)
-      that do not specify a :mailheader:`Content-Type` or whose
-      :mailheader:`Content-Type` header is invalid will be treated as if they
-      are of type ``text/plain``, which may occasionally cause ``get_body`` to
-      return unexpected results.
+      Lưu ý: (1) Đối với hầu hết các ứng dụng, các tổ hợp *preferencelist* duy nhất thực sự hợp lý là ``('plain',)``, ``('html', 'plain')`` và ``('related', 'html', 'plain')`` mặc định. (2) Vì việc khớp bắt đầu với đối tượng mà ``get_body`` được gọi trên đó, việc gọi ``get_body`` trên một ``multipart/related`` sẽ trả về chính đối tượng đó, trừ khi *preferencelist* có giá trị khác mặc định. (3) Các message (hoặc phần message) không chỉ định :mailheader:`Content-Type` hoặc có
+      Tiêu đề :mailheader:`Content-Type` không hợp lệ sẽ được xử lý như thể thuộc kiểu ``text/plain``, điều này đôi khi có thể khiến ``get_body`` trả về kết quả không như mong đợi.
 
 
    .. method:: iter_attachments()
 
-      Return an iterator over all of the immediate sub-parts of the message
-      that are not candidate "body" parts.  That is, skip the first occurrence
-      of each of ``text/plain``, ``text/html``, ``multipart/related``, or
-      ``multipart/alternative`` (unless they are explicitly marked as
-      attachments via :mailheader:`Content-Disposition: attachment`), and
-      return all remaining parts.  When applied directly to a
-      ``multipart/related``, return an iterator over the all the related parts
-      except the root part (ie: the part pointed to by the ``start`` parameter,
-      or the first part if there is no ``start`` parameter or the ``start``
-      parameter doesn't match the :mailheader:`Content-ID` of any of the
-      parts).  When applied directly to a ``multipart/alternative`` or a
-      non-``multipart``, return an empty iterator.
+      Trả về một iterator chứa tất cả các phần con trực tiếp của message không phải là các phần ứng viên cho "body". Nghĩa là, bỏ qua lần xuất hiện đầu tiên của mỗi ``text/plain``, ``text/html``, ``multipart/related`` hoặc ``multipart/alternative`` (trừ khi chúng được đánh dấu rõ ràng là tệp đính kèm thông qua :mailheader:`Content-Disposition: attachment`), rồi trả về tất cả các phần còn lại. Khi được áp dụng trực tiếp cho một ``multipart/related``, trả về một iterator chứa tất cả các phần liên quan ngoại trừ phần gốc (tức là phần được tham chiếu bởi tham số ``start``, hoặc phần đầu tiên nếu không có tham số ``start`` hoặc tham số ``start`` không khớp với :mailheader:`Content-ID` của bất kỳ phần nào). Khi được áp dụng trực tiếp cho một ``multipart/alternative`` hoặc một đối tượng không phải ``multipart``, trả về một iterator rỗng.
 
 
    .. method:: iter_parts()
 
-      Return an iterator over all of the immediate sub-parts of the message,
-      which will be empty for a non-``multipart``.  (See also
+      Trả về một iterator chứa tất cả các phần con trực tiếp của message; iterator này sẽ rỗng đối với một đối tượng không phải ``multipart``. (Xem thêm
       :meth:`~email.message.EmailMessage.walk`.)
 
 
    .. method:: get_content(*args, content_manager=None, **kw)
 
-      Call the :meth:`~email.contentmanager.ContentManager.get_content` method
-      of the *content_manager*, passing self as the message object, and passing
-      along any other arguments or keywords as additional arguments.  If
-      *content_manager* is not specified, use the ``content_manager`` specified
-      by the current :mod:`~email.policy`.
+      Gọi phương thức :meth:`~email.contentmanager.ContentManager.get_content` của *content_manager*, truyền self làm đối tượng message và truyền mọi đối số hoặc từ khóa khác dưới dạng các đối số bổ sung. Nếu *content_manager* không được chỉ định, hãy sử dụng ``content_manager`` được chỉ định bởi :mod:`~email.policy` hiện tại.
 
 
    .. method:: set_content(*args, content_manager=None, **kw)
 
-      Call the :meth:`~email.contentmanager.ContentManager.set_content` method
-      of the *content_manager*, passing self as the message object, and passing
-      along any other arguments or keywords as additional arguments.  If
-      *content_manager* is not specified, use the ``content_manager`` specified
-      by the current :mod:`~email.policy`.
+      Gọi phương thức :meth:`~email.contentmanager.ContentManager.set_content` của *content_manager*, truyền self làm đối tượng message và truyền mọi đối số hoặc từ khóa khác dưới dạng các đối số bổ sung. Nếu *content_manager* không được chỉ định, hãy sử dụng ``content_manager`` được chỉ định bởi :mod:`~email.policy` hiện tại.
 
 
    .. method:: make_related(boundary=None)
 
-      Convert a non-``multipart`` message into a ``multipart/related`` message,
-      moving any existing :mailheader:`Content-` headers and payload into a
-      (new) first part of the ``multipart``.  If *boundary* is specified, use
-      it as the boundary string in the multipart, otherwise leave the boundary
-      to be automatically created when it is needed (for example, when the
-      message is serialized).
+      Chuyển đổi một message không phải ``multipart`` thành một message ``multipart/related``, chuyển mọi header và payload :mailheader:`Content-` hiện có vào một phần đầu tiên (mới) của ``multipart``. Nếu *boundary* được chỉ định, hãy sử dụng nó làm chuỗi boundary trong multipart; nếu không, để boundary được tự động tạo khi cần (ví dụ: khi message được serialize).
 
 
    .. method:: make_alternative(boundary=None)
 
-      Convert a non-``multipart`` or a ``multipart/related`` into a
-      ``multipart/alternative``, moving any existing :mailheader:`Content-`
-      headers and payload into a (new) first part of the ``multipart``.  If
-      *boundary* is specified, use it as the boundary string in the multipart,
-      otherwise leave the boundary to be automatically created when it is
-      needed (for example, when the message is serialized).
+      Chuyển đổi một đối tượng không phải ``multipart`` hoặc một ``multipart/related`` thành một ``multipart/alternative``, chuyển mọi header và payload :mailheader:`Content-` hiện có vào một phần đầu tiên (mới) của ``multipart``. Nếu *boundary* được chỉ định, hãy sử dụng nó làm chuỗi boundary trong multipart; nếu không, để boundary được tự động tạo khi cần (ví dụ: khi message được serialize).
 
 
    .. method:: make_mixed(boundary=None)
 
-      Convert a non-``multipart``, a ``multipart/related``, or a
-      ``multipart-alternative`` into a ``multipart/mixed``, moving any existing
-      :mailheader:`Content-` headers and payload into a (new) first part of the
-      ``multipart``.  If *boundary* is specified, use it as the boundary string
-      in the multipart, otherwise leave the boundary to be automatically
-      created when it is needed (for example, when the message is serialized).
+      Chuyển đổi một ``multipart`` không phải loại ..., một ``multipart/related``, hoặc một ``multipart-alternative`` thành một ``multipart/mixed``, đồng thời chuyển mọi
+      header và payload :mailheader:`Content-` hiện có vào phần đầu tiên (mới) của ``multipart``. Nếu *boundary* được chỉ định, hãy sử dụng nó làm chuỗi boundary trong multipart; nếu không, để boundary được tự động tạo khi cần (ví dụ: khi message được serialize).
 
 
    .. method:: add_related(*args, content_manager=None, **kw)
 
-      If the message is a ``multipart/related``, create a new message
-      object, pass all of the arguments to its :meth:`set_content` method,
-      and :meth:`~email.message.Message.attach` it to the ``multipart``.  If
-      the message is a non-``multipart``, call :meth:`make_related` and then
-      proceed as above.  If the message is any other type of ``multipart``,
-      raise a :exc:`TypeError`. If *content_manager* is not specified, use
-      the ``content_manager`` specified by the current :mod:`~email.policy`.
-      If the added part has no :mailheader:`Content-Disposition` header,
-      add one with the value ``inline``.
+      Nếu message là một ``multipart/related``, hãy tạo một đối tượng message mới, truyền tất cả đối số vào phương thức :meth:`set_content` của nó, rồi :meth:`~email.message.Message.attach` nó vào ``multipart``. Nếu message không phải là một ``multipart``, hãy gọi :meth:`make_related`, rồi tiếp tục như trên. Nếu message thuộc bất kỳ kiểu ``multipart`` nào khác, hãy raise một :exc:`TypeError`. Nếu *content_manager* không được chỉ định, hãy sử dụng ``content_manager`` được chỉ định bởi :mod:`~email.policy` hiện tại. Nếu phần được thêm không có header :mailheader:`Content-Disposition`, hãy thêm một header với giá trị ``inline``.
 
 
    .. method:: add_alternative(*args, content_manager=None, **kw)
 
-      If the message is a ``multipart/alternative``, create a new message
-      object, pass all of the arguments to its :meth:`set_content` method, and
-      :meth:`~email.message.Message.attach` it to the ``multipart``.  If the
-      message is a non-``multipart`` or ``multipart/related``, call
-      :meth:`make_alternative` and then proceed as above.  If the message is
-      any other type of ``multipart``, raise a :exc:`TypeError`. If
-      *content_manager* is not specified, use the ``content_manager`` specified
-      by the current :mod:`~email.policy`.
+      Nếu message là một ``multipart/alternative``, hãy tạo một đối tượng message mới, truyền tất cả đối số vào phương thức :meth:`set_content` của nó, rồi
+      :meth:`~email.message.Message.attach` nó vào ``multipart``. Nếu message không phải là một ``multipart`` hoặc ``multipart/related``, hãy gọi
+      :meth:`make_alternative`, rồi tiếp tục như trên. Nếu message thuộc bất kỳ kiểu ``multipart`` nào khác, hãy raise một :exc:`TypeError`. Nếu *content_manager* không được chỉ định, hãy sử dụng ``content_manager`` được chỉ định bởi :mod:`~email.policy` hiện tại.
 
 
    .. method:: add_attachment(*args, content_manager=None, **kw)
 
-      If the message is a ``multipart/mixed``, create a new message object,
-      pass all of the arguments to its :meth:`set_content` method, and
-      :meth:`~email.message.Message.attach` it to the ``multipart``.  If the
-      message is a non-``multipart``, ``multipart/related``, or
-      ``multipart/alternative``, call :meth:`make_mixed` and then proceed as
-      above. If *content_manager* is not specified, use the ``content_manager``
-      specified by the current :mod:`~email.policy`.  If the added part
-      has no :mailheader:`Content-Disposition` header, add one with the value
-      ``attachment``.  This method can be used both for explicit attachments
-      (:mailheader:`Content-Disposition: attachment`) and ``inline`` attachments
-      (:mailheader:`Content-Disposition: inline`), by passing appropriate
-      options to the ``content_manager``.
+      Nếu message là một ``multipart/mixed``, hãy tạo một đối tượng message mới, truyền tất cả đối số vào phương thức :meth:`set_content` của nó, rồi
+      :meth:`~email.message.Message.attach` nó vào ``multipart``.  Nếu thông điệp không phải ``multipart``, ``multipart/related`` hoặc ``multipart/alternative``, hãy gọi :meth:`make_mixed` rồi tiếp tục như trên. Nếu *content_manager* không được chỉ định, hãy sử dụng ``content_manager`` được chỉ định bởi :mod:`~email.policy` hiện tại. Nếu phần được thêm không có header :mailheader:`Content-Disposition`, hãy thêm một header với giá trị ``attachment``. Phương thức này có thể được sử dụng cho cả tệp đính kèm tường minh (:mailheader:`Content-Disposition: attachment`) và tệp đính kèm ``inline`` (:mailheader:`Content-Disposition: inline`), bằng cách truyền các tùy chọn thích hợp cho ``content_manager``.
 
 
    .. method:: clear()
 
-      Remove the payload and all of the headers.
+      Xóa payload và tất cả các header.
 
 
    .. method:: clear_content()
 
-      Remove the payload and all of the :mailheader:`!Content-` headers, leaving
-      all other headers intact and in their original order.
+      Xóa payload và tất cả các header :mailheader:`!Content-`, giữ nguyên mọi header khác theo đúng thứ tự ban đầu.
 
 
-   :class:`EmailMessage` objects have the following instance attributes:
+   Các đối tượng :class:`EmailMessage` có những thuộc tính instance sau:
 
 
    .. attribute:: preamble
 
-      The format of a MIME document allows for some text between the blank line
-      following the headers, and the first multipart boundary string. Normally,
-      this text is never visible in a MIME-aware mail reader because it falls
-      outside the standard MIME armor.  However, when viewing the raw text of
-      the message, or when viewing the message in a non-MIME aware reader, this
-      text can become visible.
+      Định dạng của tài liệu MIME cho phép có một phần văn bản nằm giữa dòng trống sau các header và chuỗi boundary multipart đầu tiên. Thông thường, phần văn bản này không bao giờ hiển thị trong trình đọc thư có hỗ trợ MIME vì nó nằm ngoài phần bao bọc MIME tiêu chuẩn. Tuy nhiên, khi xem văn bản thô của thông điệp hoặc xem thông điệp trong trình đọc không hỗ trợ MIME, phần văn bản này có thể hiển thị.
 
-      The *preamble* attribute contains this leading extra-armor text for MIME
-      documents.  When the :class:`~email.parser.Parser` discovers some text
-      after the headers but before the first boundary string, it assigns this
-      text to the message's *preamble* attribute.  When the
-      :class:`~email.generator.Generator` is writing out the plain text
-      representation of a MIME message, and it finds the
-      message has a *preamble* attribute, it will write this text in the area
-      between the headers and the first boundary.  See :mod:`email.parser` and
-      :mod:`email.generator` for details.
+      Thuộc tính *preamble* chứa phần văn bản bổ sung nằm ở đầu, bên ngoài phần bao bọc, của các tài liệu MIME. Khi :class:`~email.parser.Parser` phát hiện một phần văn bản sau các header nhưng trước chuỗi boundary đầu tiên, nó gán phần văn bản này cho thuộc tính *preamble* của thông điệp. Khi
+      :class:`~email.generator.Generator` đang ghi biểu diễn văn bản thuần túy của một thông điệp MIME và phát hiện thông điệp có thuộc tính *preamble*, nó sẽ ghi phần văn bản này vào khu vực giữa các header và boundary đầu tiên. Xem :mod:`email.parser` và
+      :mod:`email.generator` để biết thêm chi tiết.
 
-      Note that if the message object has no preamble, the *preamble* attribute
-      will be ``None``.
+      Lưu ý rằng nếu đối tượng message không có phần mở đầu, thuộc tính *preamble* sẽ là ``None``.
 
 
    .. attribute:: epilogue
 
-      The *epilogue* attribute acts the same way as the *preamble* attribute,
-      except that it contains text that appears between the last boundary and
-      the end of the message.  As with the :attr:`~EmailMessage.preamble`,
-      if there is no epilog text this attribute will be ``None``.
+      Thuộc tính *epilogue* hoạt động giống như thuộc tính *preamble*, ngoại trừ việc nó chứa văn bản xuất hiện giữa boundary cuối cùng và phần cuối của message. Cũng như với :attr:`~EmailMessage.preamble`, nếu không có văn bản kết thúc thì thuộc tính này sẽ là ``None``.
 
 
    .. attribute:: defects
 
-      The *defects* attribute contains a list of all the problems found when
-      parsing this message.  See :mod:`email.errors` for a detailed description
-      of the possible parsing defects.
+      Thuộc tính *defects* chứa danh sách tất cả các vấn đề được phát hiện khi phân tích message này. Xem :mod:`email.errors` để biết mô tả chi tiết về các lỗi phân tích có thể xảy ra.
 
 
 .. class:: MIMEPart(policy=default)
 
-    This class represents a subpart of a MIME message.  It is identical to
-    :class:`EmailMessage`, except that no :mailheader:`MIME-Version` headers are
-    added when :meth:`~EmailMessage.set_content` is called, since sub-parts do
-    not need their own :mailheader:`MIME-Version` headers.
+    Lớp này biểu diễn một subpart của message MIME. Nó giống hệt
+    :class:`EmailMessage`, ngoại trừ việc không có header :mailheader:`MIME-Version` nào được thêm khi gọi :meth:`~EmailMessage.set_content`, vì các subpart không cần header :mailheader:`MIME-Version` riêng.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích
 
-.. [1] Originally added in 3.4 as a :term:`provisional module <provisional
-       package>`.  Docs for legacy message class moved to
+.. [1] Được bổ sung lần đầu trong 3.4 dưới dạng một :term:`mô-đun tạm thời <provisional package>`. Tài liệu về lớp message cũ đã được chuyển đến
        :ref:`compat32_message`.
 
-.. [2] The :class:`EmailMessage` class requires a policy that provides a
-       ``content_manager`` attribute for content management methods like
-       ``set_content()`` and ``get_content()`` to work. The legacy
-       :const:`~email.policy.compat32` policy does not support these methods
-       and should not be used with :class:`EmailMessage`.
+.. [2] Lớp :class:`EmailMessage` yêu cầu một policy cung cấp thuộc tính ``content_manager`` để các phương thức quản lý nội dung như ``set_content()`` và ``get_content()`` hoạt động. Lớp legacy
+       Policy :const:`~email.policy.compat32` không hỗ trợ các phương thức này và không nên được sử dụng với :class:`EmailMessage`.

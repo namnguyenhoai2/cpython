@@ -1,845 +1,835 @@
-:mod:`!errno` --- Standard errno system symbols
-===============================================
+:mod:`!errno` --- Ký hiệu hệ thống errno tiêu chuẩn
+===================================================
 
 .. module:: errno
-   :synopsis: Standard errno system symbols.
+   :synopsis: Ký hiệu hệ thống errno tiêu chuẩn.
 
 ----------------
 
-This module makes available standard ``errno`` system symbols. The value of each
-symbol is the corresponding integer value. The names and descriptions are
-borrowed from :file:`linux/include/errno.h`, which should be
-all-inclusive.
+Mô-đun này cung cấp các ký hiệu hệ thống ``errno`` tiêu chuẩn. Giá trị của mỗi ký hiệu là giá trị số nguyên tương ứng. Tên và mô tả được lấy từ :file:`linux/include/errno.h`, vốn được cho là bao quát đầy đủ.
 
 
 .. data:: errorcode
 
-   Dictionary providing a mapping from the errno value to the string name in the
-   underlying system.  For instance, ``errno.errorcode[errno.EPERM]`` maps to
-   ``'EPERM'``.
+   Từ điển cung cấp ánh xạ từ giá trị errno tới tên chuỗi trong hệ thống bên dưới. Ví dụ: ``errno.errorcode[errno.EPERM]`` ánh xạ tới ``'EPERM'``.
 
-To translate a numeric error code to an error message, use :func:`os.strerror`.
+Để chuyển mã lỗi dạng số thành thông báo lỗi, hãy sử dụng :func:`os.strerror`.
 
-Of the following list, symbols that are not used on the current platform are not
-defined by the module.  The specific list of defined symbols is available as
-``errno.errorcode.keys()``.  Symbols available can include:
+Trong danh sách sau, các ký hiệu không được sử dụng trên nền tảng hiện tại sẽ không được mô-đun định nghĩa. Danh sách cụ thể các ký hiệu được định nghĩa có tại ``errno.errorcode.keys()``. Các ký hiệu khả dụng có thể bao gồm:
 
 
 .. data:: EPERM
 
-   Operation not permitted. This error is mapped to the exception
+   Không được phép thực hiện thao tác. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`PermissionError`.
 
 
 .. data:: ENOENT
 
-   No such file or directory. This error is mapped to the exception
+   Không có tệp hoặc thư mục như vậy. Lỗi này được ánh xạ tới exception
    :exc:`FileNotFoundError`.
 
 
 .. data:: ESRCH
 
-   No such process. This error is mapped to the exception
+   Không có tiến trình như vậy. Lỗi này được ánh xạ tới exception
    :exc:`ProcessLookupError`.
 
 
 .. data:: EINTR
 
-   Interrupted system call. This error is mapped to the exception
+   Lời gọi hệ thống bị gián đoạn. Lỗi này được ánh xạ tới exception
    :exc:`InterruptedError`.
 
 
 .. data:: EIO
 
-   I/O error
+   Lỗi I/O
 
 
 .. data:: ENXIO
 
-   No such device or address
+   Không có thiết bị hoặc địa chỉ như vậy
 
 
 .. data:: E2BIG
 
-   Arg list too long
+   Danh sách đối số quá dài
 
 
 .. data:: ENOEXEC
 
-   Exec format error
+   Lỗi định dạng Exec
 
 
 .. data:: EBADF
 
-   Bad file number
+   Số hiệu tệp không hợp lệ
 
 
 .. data:: ECHILD
 
-   No child processes. This error is mapped to the exception
+   Không có tiến trình con. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`ChildProcessError`.
 
 
 .. data:: EAGAIN
 
-   Try again. This error is mapped to the exception :exc:`BlockingIOError`.
+   Hãy thử lại. Lỗi này được ánh xạ tới ngoại lệ :exc:`BlockingIOError`.
 
 
 .. data:: ENOMEM
 
-   Out of memory
+   Không đủ bộ nhớ
 
 
 .. data:: EACCES
 
-   Permission denied.  This error is mapped to the exception
+   Bị từ chối quyền truy cập. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`PermissionError`.
 
 
 .. data:: EFAULT
 
-   Bad address
+   Địa chỉ không hợp lệ
 
 
 .. data:: ENOTBLK
 
-   Block device required
+   Yêu cầu thiết bị khối
 
 
 .. data:: EBUSY
 
-   Device or resource busy
+   Thiết bị hoặc tài nguyên đang bận
 
 
 .. data:: EEXIST
 
-   File exists. This error is mapped to the exception
+   Tệp đã tồn tại. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`FileExistsError`.
 
 
 .. data:: EXDEV
 
-   Cross-device link
+   Liên kết giữa các thiết bị
 
 
 .. data:: ENODEV
 
-   No such device
+   Không có thiết bị như vậy
 
 
 .. data:: ENOTDIR
 
-   Not a directory. This error is mapped to the exception
+   Không phải là thư mục. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`NotADirectoryError`.
 
 
 .. data:: EISDIR
 
-   Is a directory. This error is mapped to the exception
+   Là một thư mục. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`IsADirectoryError`.
 
 
 .. data:: EINVAL
 
-   Invalid argument
+   Đối số không hợp lệ
 
 
 .. data:: ENFILE
 
-   File table overflow
+   Tràn bảng tệp
 
 
 .. data:: EMFILE
 
-   Too many open files
+   Quá nhiều tệp đang mở
 
 
 .. data:: ENOTTY
 
-   Not a typewriter
+   Không phải máy đánh chữ
 
 
 .. data:: ETXTBSY
 
-   Text file busy
+   Tệp văn bản đang bận
 
 
 .. data:: EFBIG
 
-   File too large
+   Tệp quá lớn
 
 
 .. data:: ENOSPC
 
-   No space left on device
+   Thiết bị không còn chỗ trống
 
 
 .. data:: ESPIPE
 
-   Illegal seek
+   Thao tác seek không hợp lệ
 
 
 .. data:: EROFS
 
-   Read-only file system
+   Hệ thống tệp chỉ đọc
 
 
 .. data:: EMLINK
 
-   Too many links
+   Quá nhiều liên kết
 
 
 .. data:: EPIPE
 
-   Broken pipe. This error is mapped to the exception
+   Đường ống bị hỏng. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`BrokenPipeError`.
 
 
 .. data:: EDOM
 
-   Math argument out of domain of func
+   Đối số toán học nằm ngoài miền của hàm
 
 
 .. data:: ERANGE
 
-   Math result not representable
+   Kết quả toán học không thể biểu diễn
 
 
 .. data:: EDEADLK
 
-   Resource deadlock would occur
+   Sẽ xảy ra deadlock tài nguyên
 
 
 .. data:: ENAMETOOLONG
 
-   File name too long
+   Tên tệp quá dài
 
 
 .. data:: ENOLCK
 
-   No record locks available
+   Không có khóa bản ghi nào khả dụng
 
 
 .. data:: ENOSYS
 
-   Function not implemented
+   Hàm chưa được triển khai
 
 
 .. data:: ENOTEMPTY
 
-   Directory not empty
+   Thư mục không trống
 
 
 .. data:: ELOOP
 
-   Too many symbolic links encountered
+   Đã gặp quá nhiều liên kết tượng trưng
 
 
 .. data:: EWOULDBLOCK
 
-   Operation would block. This error is mapped to the exception
+   Thao tác sẽ bị chặn. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`BlockingIOError`.
 
 
 .. data:: ENOMSG
 
-   No message of desired type
+   Không có thông báo thuộc loại mong muốn
 
 
 .. data:: EIDRM
 
-   Identifier removed
+   Mã định danh đã bị xóa
 
 
 .. data:: ECHRNG
 
-   Channel number out of range
+   Số kênh nằm ngoài phạm vi
 
 
 .. data:: EL2NSYNC
 
-   Level 2 not synchronized
+   Tầng 2 chưa được đồng bộ hóa
 
 
 .. data:: EL3HLT
 
-   Level 3 halted
+   Tầng 3 đã dừng
 
 
 .. data:: EL3RST
 
-   Level 3 reset
+   Tầng 3 đã được đặt lại
 
 
 .. data:: ELNRNG
 
-   Link number out of range
+   Số liên kết nằm ngoài phạm vi
 
 
 .. data:: EUNATCH
 
-   Protocol driver not attached
+   Trình điều khiển giao thức chưa được gắn kết
 
 
 .. data:: ENOCSI
 
-   No CSI structure available
+   Không có cấu trúc CSI khả dụng
 
 
 .. data:: EL2HLT
 
-   Level 2 halted
+   Cấp 2 đã dừng
 
 
 .. data:: EBADE
 
-   Invalid exchange
+   Trao đổi không hợp lệ
 
 
 .. data:: EBADR
 
-   Invalid request descriptor
+   Bộ mô tả yêu cầu không hợp lệ
 
 
 .. data:: EXFULL
 
-   Exchange full
+   Trao đổi đã đầy
 
 
 .. data:: ENOANO
 
-   No anode
+   Không có cực dương
 
 
 .. data:: EBADRQC
 
-   Invalid request code
+   Mã yêu cầu không hợp lệ
 
 
 .. data:: EBADSLT
 
-   Invalid slot
+   Slot không hợp lệ
 
 
 .. data:: EDEADLOCK
 
-   File locking deadlock error
+   Lỗi deadlock khi khóa tệp
 
 
 .. data:: EBFONT
 
-   Bad font file format
+   Định dạng tệp phông chữ không hợp lệ
 
 
 .. data:: ENOSTR
 
-   Device not a stream
+   Thiết bị không phải là stream
 
 
 .. data:: ENODATA
 
-   No data available
+   Không có dữ liệu
 
 
 .. data:: ETIME
 
-   Timer expired
+   Bộ hẹn giờ đã hết hạn
 
 
 .. data:: ENOSR
 
-   Out of streams resources
+   Hết tài nguyên stream
 
 
 .. data:: ENONET
 
-   Machine is not on the network
+   Máy không kết nối mạng
 
 
 .. data:: ENOPKG
 
-   Package not installed
+   Gói chưa được cài đặt
 
 
 .. data:: EREMOTE
 
-   Object is remote
+   Đối tượng ở xa
 
 
 .. data:: ENOLINK
 
-   Link has been severed
+   Liên kết đã bị ngắt
 
 
 .. data:: EADV
 
-   Advertise error
+   Lỗi quảng bá
 
 
 .. data:: ESRMNT
 
-   Srmount error
+   Lỗi Srmount
 
 
 .. data:: ECOMM
 
-   Communication error on send
+   Lỗi giao tiếp khi gửi
 
 
 .. data:: EPROTO
 
-   Protocol error
+   Lỗi giao thức
 
 
 .. data:: EMULTIHOP
 
-   Multihop attempted
+   Đã thử multihop
 
 
 .. data:: EDOTDOT
 
-   RFS specific error
+   Lỗi cụ thể của RFS
 
 
 .. data:: EBADMSG
 
-   Not a data message
+   Không phải thông báo dữ liệu
 
 
 .. data:: EOVERFLOW
 
-   Value too large for defined data type
+   Giá trị quá lớn đối với kiểu dữ liệu đã định nghĩa
 
 
 .. data:: ENOTUNIQ
 
-   Name not unique on network
+   Tên không duy nhất trên mạng
 
 
 .. data:: EBADFD
 
-   File descriptor in bad state
+   File descriptor ở trạng thái không hợp lệ
 
 
 .. data:: EREMCHG
 
-   Remote address changed
+   Địa chỉ từ xa đã thay đổi
 
 
 .. data:: ELIBACC
 
-   Can not access a needed shared library
+   Không thể truy cập thư viện dùng chung cần thiết
 
 
 .. data:: ELIBBAD
 
-   Accessing a corrupted shared library
+   Đang truy cập thư viện dùng chung bị hỏng
 
 
 .. data:: ELIBSCN
 
-   .lib section in a.out corrupted
+   Phần .lib trong a.out bị hỏng
 
 
 .. data:: ELIBMAX
 
-   Attempting to link in too many shared libraries
+   Đang cố gắng liên kết quá nhiều thư viện dùng chung
 
 
 .. data:: ELIBEXEC
 
-   Cannot exec a shared library directly
+   Không thể thực thi trực tiếp một thư viện dùng chung
 
 
 .. data:: EILSEQ
 
-   Illegal byte sequence
+   Chuỗi byte không hợp lệ
 
 
 .. data:: ERESTART
 
-   Interrupted system call should be restarted
+   Cuộc gọi hệ thống bị gián đoạn nên được khởi động lại
 
 
 .. data:: ESTRPIPE
 
-   Streams pipe error
+   Lỗi pipe của stream
 
 
 .. data:: EUSERS
 
-   Too many users
+   Quá nhiều người dùng
 
 
 .. data:: ENOTSOCK
 
-   Socket operation on non-socket
+   Thao tác socket trên đối tượng không phải socket
 
 
 .. data:: EDESTADDRREQ
 
-   Destination address required
+   Yêu cầu địa chỉ đích
 
 
 .. data:: EMSGSIZE
 
-   Message too long
+   Thông báo quá dài
 
 
 .. data:: EPROTOTYPE
 
-   Protocol wrong type for socket
+   Giao thức không đúng loại cho socket
 
 
 .. data:: ENOPROTOOPT
 
-   Protocol not available
+   Giao thức không khả dụng
 
 
 .. data:: EPROTONOSUPPORT
 
-   Protocol not supported
+   Giao thức không được hỗ trợ
 
 
 .. data:: ESOCKTNOSUPPORT
 
-   Socket type not supported
+   Kiểu socket không được hỗ trợ
 
 
 .. data:: EOPNOTSUPP
 
-   Operation not supported on transport endpoint
+   Thao tác không được hỗ trợ trên endpoint truyền tải
 
 
 .. data:: ENOTSUP
 
-   Operation not supported
+   Thao tác không được hỗ trợ
 
    .. versionadded:: 3.2
 
 
 .. data:: EPFNOSUPPORT
 
-   Protocol family not supported
+   Họ giao thức không được hỗ trợ
 
 
 .. data:: EAFNOSUPPORT
 
-   Address family not supported by protocol
+   Họ địa chỉ không được giao thức hỗ trợ
 
 
 .. data:: EADDRINUSE
 
-   Address already in use
+   Địa chỉ đã được sử dụng
 
 
 .. data:: EADDRNOTAVAIL
 
-   Cannot assign requested address
+   Không thể gán địa chỉ được yêu cầu
 
 
 .. data:: ENETDOWN
 
-   Network is down
+   Mạng không hoạt động
 
 
 .. data:: ENETUNREACH
 
-   Network is unreachable
+   Không thể truy cập mạng
 
 
 .. data:: ENETRESET
 
-   Network dropped connection because of reset
+   Mạng đã ngắt kết nối do bị đặt lại
 
 
 .. data:: ECONNABORTED
 
-   Software caused connection abort. This error is mapped to the
-   exception :exc:`ConnectionAbortedError`.
+   Phần mềm đã khiến kết nối bị hủy bỏ. Lỗi này được ánh xạ tới ngoại lệ :exc:`ConnectionAbortedError`.
 
 
 .. data:: ECONNRESET
 
-   Connection reset by peer. This error is mapped to the exception
+   Kết nối đã bị máy ngang hàng đặt lại. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`ConnectionResetError`.
 
 
 .. data:: ENOBUFS
 
-   No buffer space available
+   Không còn dung lượng bộ đệm
 
 
 .. data:: EISCONN
 
-   Transport endpoint is already connected
+   Điểm cuối truyền tải đã được kết nối
 
 
 .. data:: ENOTCONN
 
-   Transport endpoint is not connected
+   Điểm cuối truyền tải chưa được kết nối
 
 
 .. data:: ESHUTDOWN
 
-   Cannot send after transport endpoint shutdown. This error is mapped
-   to the exception :exc:`BrokenPipeError`.
+   Không thể gửi sau khi điểm cuối truyền tải bị tắt. Lỗi này được ánh xạ tới ngoại lệ :exc:`BrokenPipeError`.
 
 
 .. data:: ETOOMANYREFS
 
-   Too many references: cannot splice
+   Quá nhiều tham chiếu: không thể splice
 
 
 .. data:: ETIMEDOUT
 
-   Connection timed out. This error is mapped to the exception
+   Kết nối đã hết thời gian chờ. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`TimeoutError`.
 
 
 .. data:: ECONNREFUSED
 
-   Connection refused. This error is mapped to the exception
+   Kết nối bị từ chối. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`ConnectionRefusedError`.
 
 
 .. data:: EHOSTDOWN
 
-   Host is down
+   Máy chủ đang ngừng hoạt động
 
 
 .. data:: EHOSTUNREACH
 
-   No route to host
+   Không có đường dẫn đến máy chủ
 
 
 .. data:: EHWPOISON
 
-   Memory page has hardware error.
+   Trang bộ nhớ gặp lỗi phần cứng.
 
    .. versionadded:: 3.14
 
 
 .. data:: EALREADY
 
-   Operation already in progress. This error is mapped to the
-   exception :exc:`BlockingIOError`.
+   Thao tác đã được thực hiện. Lỗi này được ánh xạ tới ngoại lệ :exc:`BlockingIOError`.
 
 
 .. data:: EINPROGRESS
 
-   Operation now in progress. This error is mapped to the exception
+   Thao tác đang được thực hiện. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`BlockingIOError`.
 
 
 .. data:: ESTALE
 
-   Stale NFS file handle
+   Handle tệp NFS đã cũ
 
 
 .. data:: EUCLEAN
 
-   Structure needs cleaning
+   Cấu trúc cần được dọn dẹp
 
 
 .. data:: ENOTNAM
 
-   Not a XENIX named type file
+   Không phải là tệp kiểu được đặt tên XENIX
 
 
 .. data:: ENAVAIL
 
-   No XENIX semaphores available
+   Không có semaphore XENIX nào khả dụng
 
 
 .. data:: EISNAM
 
-   Is a named type file
+   Là tệp kiểu có tên
 
 
 .. data:: EREMOTEIO
 
-   Remote I/O error
+   Lỗi I/O từ xa
 
 
 .. data:: EDQUOT
 
-   Quota exceeded
+   Đã vượt quá hạn ngạch
 
 .. data:: EQFULL
 
-   Interface output queue is full
+   Hàng đợi đầu ra của interface đã đầy
 
    .. versionadded:: 3.11
 
 
 .. data:: ENOMEDIUM
 
-   No medium found
+   Không tìm thấy phương tiện
 
 
 .. data:: EMEDIUMTYPE
 
-   Wrong medium type
+   Sai loại phương tiện
 
 
 .. data:: ENOKEY
 
-   Required key not available
+   Không có khóa bắt buộc
 
 
 .. data:: EKEYEXPIRED
 
-   Key has expired
+   Khóa đã hết hạn
 
 
 .. data:: EKEYREVOKED
 
-   Key has been revoked
+   Khóa đã bị thu hồi
 
 
 .. data:: EKEYREJECTED
 
-   Key was rejected by service
+   Dịch vụ đã từ chối khóa
 
 
 .. data:: ERFKILL
 
-   Operation not possible due to RF-kill
+   Không thể thực hiện thao tác do RF-kill
 
 
 .. data:: ELOCKUNMAPPED
 
-   Locked lock was unmapped
+   Khóa bị khóa đã được bỏ ánh xạ
 
 
 .. data:: ENOTACTIVE
 
-   Facility is not active
+   Cơ chế không hoạt động
 
 
 .. data:: EAUTH
 
-   Authentication error
+   Lỗi xác thực
 
    .. versionadded:: 3.2
 
 
 .. data:: EBADARCH
 
-   Bad CPU type in executable
+   Loại CPU không hợp lệ trong tệp thực thi
 
    .. versionadded:: 3.2
 
 
 .. data:: EBADEXEC
 
-   Bad executable (or shared library)
+   Tệp thực thi (hoặc thư viện dùng chung) không hợp lệ
 
    .. versionadded:: 3.2
 
 
 .. data:: EBADMACHO
 
-   Malformed Mach-o file
+   Tệp Mach-O không đúng định dạng
 
    .. versionadded:: 3.2
 
 
 .. data:: EDEVERR
 
-   Device error
+   Lỗi thiết bị
 
    .. versionadded:: 3.2
 
 
 .. data:: EFTYPE
 
-   Inappropriate file type or format
+   Loại hoặc định dạng tệp không phù hợp
 
    .. versionadded:: 3.2
 
 
 .. data:: ENEEDAUTH
 
-   Need authenticator
+   Cần trình xác thực
 
    .. versionadded:: 3.2
 
 
 .. data:: ENOATTR
 
-   Attribute not found
+   Không tìm thấy thuộc tính
 
    .. versionadded:: 3.2
 
 
 .. data:: ENOPOLICY
 
-   Policy not found
+   Không tìm thấy chính sách
 
    .. versionadded:: 3.2
 
 
 .. data:: EPROCLIM
 
-   Too many processes
+   Quá nhiều tiến trình
 
    .. versionadded:: 3.2
 
 
 .. data:: EPROCUNAVAIL
 
-   Bad procedure for program
+   Thủ tục không hợp lệ cho chương trình
 
    .. versionadded:: 3.2
 
 
 .. data:: EPROGMISMATCH
 
-   Program version wrong
+   Phiên bản chương trình không đúng
 
    .. versionadded:: 3.2
 
 
 .. data:: EPROGUNAVAIL
 
-   RPC prog. not avail
+   Không có chương trình RPC
 
    .. versionadded:: 3.2
 
 
 .. data:: EPWROFF
 
-   Device power is off
+   Thiết bị đã tắt nguồn
 
    .. versionadded:: 3.2
 
 
 .. data:: EBADRPC
 
-   RPC struct is bad
+   Cấu trúc RPC không hợp lệ
 
    .. versionadded:: 3.2
 
 
 .. data:: ERPCMISMATCH
 
-   RPC version wrong
+   Phiên bản RPC không đúng
 
    .. versionadded:: 3.2
 
 
 .. data:: ESHLIBVERS
 
-   Shared library version mismatch
+   Phiên bản thư viện dùng chung không khớp
 
    .. versionadded:: 3.2
 
 
 .. data:: ENOTCAPABLE
 
-   Capabilities insufficient. This error is mapped to the exception
+   Không đủ capability. Lỗi này được ánh xạ tới ngoại lệ
    :exc:`PermissionError`.
 
    .. availability:: WASI, FreeBSD
@@ -849,20 +839,20 @@ defined by the module.  The specific list of defined symbols is available as
 
 .. data:: ECANCELED
 
-   Operation canceled
+   Thao tác đã bị hủy
 
    .. versionadded:: 3.2
 
 
 .. data:: EOWNERDEAD
 
-   Owner died
+   Chủ sở hữu đã chết
 
    .. versionadded:: 3.2
 
 
 .. data:: ENOTRECOVERABLE
 
-   State not recoverable
+   Trạng thái không thể khôi phục
 
    .. versionadded:: 3.2

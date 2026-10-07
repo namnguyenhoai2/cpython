@@ -1,108 +1,50 @@
-:mod:`!email` --- An email and MIME handling package
-====================================================
+:mod:`!email` --- Gói xử lý email và MIME
+=========================================
 
 .. module:: email
-   :synopsis: Package supporting the parsing, manipulating, and generating
-              email messages.
+   :synopsis: Gói hỗ trợ phân tích cú pháp, thao tác và tạo các thư email.
 .. moduleauthor:: Barry A. Warsaw <barry@python.org>,
                   R. David Murray <rdmurray@bitdance.com>
 .. sectionauthor:: R. David Murray <rdmurray@bitdance.com>
 
-**Source code:** :source:`Lib/email/__init__.py`
+**Mã nguồn:** :source:`Lib/email/__init__.py`
 
 --------------
 
-The :mod:`!email` package is a library for managing email messages.  It is
-specifically *not* designed to do any sending of email messages to SMTP
-(:rfc:`2821`), NNTP, or other servers; those are functions of modules such as
-:mod:`smtplib`.  The :mod:`!email` package attempts to be as
-RFC-compliant as possible, supporting :rfc:`5322` and :rfc:`6532`, as well as
-such MIME-related RFCs as :rfc:`2045`, :rfc:`2046`, :rfc:`2047`, :rfc:`2183`,
-and :rfc:`2231`.
+Gói :mod:`!email` là một thư viện dùng để quản lý các thư email. Gói này cụ thể *không* được thiết kế để thực hiện việc gửi thư email đến SMTP (:rfc:`2821`), NNTP hoặc các máy chủ khác; đó là chức năng của các mô-đun như
+:mod:`smtplib`. Gói :mod:`!email` cố gắng tuân thủ RFC ở mức cao nhất có thể, hỗ trợ :rfc:`5322` và :rfc:`6532`, cũng như các RFC liên quan đến MIME như :rfc:`2045`, :rfc:`2046`, :rfc:`2047`, :rfc:`2183` và :rfc:`2231`.
 
-The overall structure of the email package can be divided into three major
-components, plus a fourth component that controls the behavior of the other
-components.
+Cấu trúc tổng thể của gói email có thể được chia thành ba thành phần chính, cùng với một thành phần thứ tư dùng để kiểm soát hoạt động của các thành phần còn lại.
 
-The central component of the package is an "object model" that represents email
-messages.  An application interacts with the package primarily through the
-object model interface defined in the :mod:`~email.message` sub-module.  The
-application can use this API to ask questions about an existing email, to
-construct a new email, or to add or remove email subcomponents that themselves
-use the same object model interface.  That is, following the nature of email
-messages and their MIME subcomponents, the email object model is a tree
-structure of objects that all provide the :class:`~email.message.EmailMessage`
-API.
+Thành phần trung tâm của gói là một "mô hình đối tượng" đại diện cho các thư email. Ứng dụng chủ yếu tương tác với gói thông qua giao diện mô hình đối tượng được định nghĩa trong mô-đun con :mod:`~email.message`. Ứng dụng có thể sử dụng API này để truy vấn một email hiện có, tạo email mới hoặc thêm hay xóa các thành phần con của email vốn cũng sử dụng cùng giao diện mô hình đối tượng. Nói cách khác, theo đặc điểm của các thư email và các thành phần con MIME, mô hình đối tượng email là một cấu trúc cây gồm các đối tượng đều cung cấp API :class:`~email.message.EmailMessage`.
 
-The other two major components of the package are the :mod:`~email.parser` and
-the :mod:`~email.generator`.  The parser takes the serialized version of an
-email message (a stream of bytes) and converts it into a tree of
-:class:`~email.message.EmailMessage` objects.  The generator takes an
-:class:`~email.message.EmailMessage` and turns it back into a serialized byte
-stream.  (The parser and generator also handle streams of text characters, but
-this usage is discouraged as it is too easy to end up with messages that are
-not valid in one way or another.)
+Hai thành phần chính còn lại của package là :mod:`~email.parser` và :mod:`~email.generator`. Parser nhận phiên bản đã được tuần tự hóa của một email message (một luồng byte) và chuyển đổi nó thành một cây gồm
+các đối tượng :class:`~email.message.EmailMessage`. Generator nhận một
+:class:`~email.message.EmailMessage` và chuyển đổi nó trở lại thành một luồng byte đã được tuần tự hóa. (Parser và generator cũng xử lý các luồng ký tự văn bản, nhưng không khuyến khích cách sử dụng này vì rất dễ tạo ra các message không hợp lệ theo cách này hay cách khác.)
 
-The control component is the :mod:`~email.policy` module.  Every
-:class:`~email.message.EmailMessage`, every :mod:`~email.generator`, and every
-:mod:`~email.parser` has an associated :mod:`~email.policy` object that
-controls its behavior.  Usually an application only needs to specify the policy
-when an :class:`~email.message.EmailMessage` is created, either by directly
-instantiating an :class:`~email.message.EmailMessage`  to create a new email,
-or by parsing an input stream using a :mod:`~email.parser`.  But the policy can
-be changed when the message is serialized using a :mod:`~email.generator`.
-This allows, for example, a generic email message to be parsed from disk, but
-to serialize it using standard SMTP settings when sending it to an email
-server.
+Thành phần điều khiển là mô-đun :mod:`~email.policy`. Mỗi
+:class:`~email.message.EmailMessage`, mỗi :mod:`~email.generator`, và mỗi
+:mod:`~email.parser` đều có một đối tượng :mod:`~email.policy` liên kết để kiểm soát hành vi của nó. Thông thường, ứng dụng chỉ cần chỉ định policy khi tạo một :class:`~email.message.EmailMessage`, bằng cách trực tiếp khởi tạo một :class:`~email.message.EmailMessage` để tạo email mới, hoặc phân tích cú pháp một luồng đầu vào bằng :mod:`~email.parser`. Tuy nhiên, policy có thể được thay đổi khi message được tuần tự hóa bằng :mod:`~email.generator`. Điều này cho phép, chẳng hạn, phân tích cú pháp một email message tổng quát từ đĩa, nhưng tuần tự hóa nó bằng các thiết lập SMTP tiêu chuẩn khi gửi đến email server.
 
-The email package does its best to hide the details of the various governing
-RFCs from the application.  Conceptually the application should be able to
-treat the email message as a structured tree of Unicode text and binary
-attachments, without having to worry about how these are represented when
-serialized.  In practice, however, it is often necessary to be aware of at
-least some of the rules governing MIME messages and their structure,
-specifically the names and nature of the MIME "content types" and how they
-identify multipart documents.  For the most part this knowledge should only be
-required for more complex applications, and even then it should only be the
-high level structure in question, and not the details of how those structures
-are represented.  Since MIME content types are used widely in modern internet
-software (not just email), this will be a familiar concept to many programmers.
+Package email cố gắng hết sức để che giấu các chi tiết của nhiều RFC chi phối khác nhau khỏi ứng dụng. Về mặt khái niệm, ứng dụng có thể xử lý email message như một cây có cấu trúc gồm văn bản Unicode và các tệp đính kèm nhị phân, mà không cần lo lắng về cách chúng được biểu diễn khi tuần tự hóa. Tuy nhiên, trên thực tế, thường cần nắm được ít nhất một số quy tắc chi phối các message MIME và cấu trúc của chúng, cụ thể là tên và bản chất của các "content type" MIME cũng như cách chúng xác định các tài liệu multipart. Phần lớn thời gian, kiến thức này chỉ cần thiết đối với các ứng dụng phức tạp hơn; ngay cả khi đó, chỉ cần nắm cấu trúc cấp cao đang được đề cập, chứ không cần biết chi tiết về cách các cấu trúc đó được biểu diễn. Vì content type MIME được sử dụng rộng rãi trong phần mềm Internet hiện đại (không chỉ email), đây sẽ là một khái niệm quen thuộc với nhiều lập trình viên.
 
-The following sections describe the functionality of the :mod:`!email` package.
-We start with the :mod:`~email.message` object model, which is the primary
-interface an application will use, and follow that with the
-:mod:`~email.parser` and :mod:`~email.generator` components.  Then we cover the
-:mod:`~email.policy` controls, which completes the treatment of the main
-components of the library.
+Các phần sau đây mô tả chức năng của gói :mod:`!email`. Trước tiên, chúng ta tìm hiểu mô hình đối tượng :mod:`~email.message`, là giao diện chính mà một ứng dụng sẽ sử dụng, sau đó là
+các thành phần :mod:`~email.parser` và :mod:`~email.generator`. Tiếp theo, chúng ta tìm hiểu
+các cơ chế điều khiển :mod:`~email.policy`, qua đó hoàn tất phần trình bày về những thành phần chính của thư viện.
 
-The next three sections cover the exceptions the package may raise and the
-defects (non-compliance with the RFCs) that the :mod:`~email.parser` may
-detect.  Then we cover the :mod:`~email.headerregistry` and the
-:mod:`~email.contentmanager` sub-components, which provide tools for doing more
-detailed manipulation of headers and payloads, respectively.  Both of these
-components contain features relevant to consuming and producing non-trivial
-messages, but also document their extensibility APIs, which will be of interest
-to advanced applications.
+Ba phần tiếp theo trình bày các ngoại lệ mà gói có thể phát sinh và những khiếm khuyết (không tuân thủ các RFC) mà :mod:`~email.parser` có thể phát hiện. Sau đó, chúng ta tìm hiểu :mod:`~email.headerregistry` và
+các thành phần con :mod:`~email.contentmanager`, lần lượt cung cấp các công cụ để thao tác chi tiết hơn với các header và payload. Cả hai thành phần này đều chứa các tính năng hữu ích khi tiếp nhận và tạo các message phức tạp, đồng thời cũng ghi lại các API mở rộng của chúng, vốn sẽ được các ứng dụng nâng cao quan tâm.
 
-Following those is a set of examples of using the fundamental parts of the APIs
-covered in the preceding sections.
+Sau đó là một tập hợp các ví dụ về cách sử dụng những phần nền tảng của các API được trình bày trong các phần trước.
 
-The foregoing represent the modern (Unicode friendly) API of the email package.
-The remaining sections, starting with the :class:`~email.message.Message`
-class, cover the legacy :data:`~email.policy.compat32` API that deals much more
-directly with the details of how email messages are represented.  The
-:data:`~email.policy.compat32` API does *not* hide the details of the RFCs from
-the application, but for applications that need to operate at that level, they
-can be useful tools.  This documentation is also relevant for applications that
-are still using the :mod:`~email.policy.compat32` API for backward
-compatibility reasons.
+Những nội dung trên trình bày API hiện đại (thân thiện với Unicode) của gói email. Các phần còn lại, bắt đầu với lớp :class:`~email.message.Message`, trình bày API :data:`~email.policy.compat32` cũ, vốn làm việc trực tiếp hơn nhiều với các chi tiết về cách các email message được biểu diễn. Phần
+:data:`~email.policy.compat32` API *không* che giấu các chi tiết của RFC khỏi ứng dụng, nhưng đối với những ứng dụng cần hoạt động ở cấp độ đó, chúng có thể là những công cụ hữu ích. Tài liệu này cũng phù hợp với các ứng dụng vẫn đang sử dụng API :mod:`~email.policy.compat32` vì lý do tương thích ngược.
 
 .. versionchanged:: 3.6
-   Docs reorganized and rewritten to promote the new
-   :class:`~email.message.EmailMessage`/:class:`~email.policy.EmailPolicy`
-   API.
+   Tài liệu được sắp xếp lại và viết lại để quảng bá phiên bản mới của
+   :class:`~email.message.EmailMessage`/:class:`~email.policy.EmailPolicy` API.
 
-Contents of the :mod:`!email` package documentation:
+Nội dung tài liệu của package :mod:`!email`:
 
 .. toctree::
 
@@ -117,7 +59,7 @@ Contents of the :mod:`!email` package documentation:
 
    email.examples.rst
 
-Legacy API:
+API cũ:
 
 .. toctree::
 
@@ -132,15 +74,14 @@ Legacy API:
 
 .. seealso::
 
-   Module :mod:`smtplib`
-      SMTP (Simple Mail Transport Protocol) client
+   Mô-đun :mod:`smtplib`
+      client SMTP (Simple Mail Transport Protocol)
 
-   Module :mod:`poplib`
-      POP (Post Office Protocol) client
+   Mô-đun :mod:`poplib`
+      client POP (Post Office Protocol)
 
-   Module :mod:`imaplib`
-      IMAP (Internet Message Access Protocol) client
+   Mô-đun :mod:`imaplib`
+      client IMAP (Internet Message Access Protocol)
 
-   Module :mod:`mailbox`
-      Tools for creating, reading, and managing collections of messages on disk
-      using a variety standard formats.
+   Mô-đun :mod:`mailbox`
+      Các công cụ để tạo, đọc và quản lý các tập hợp thư trên đĩa bằng nhiều định dạng tiêu chuẩn.

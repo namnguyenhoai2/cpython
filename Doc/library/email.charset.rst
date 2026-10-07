@@ -1,214 +1,149 @@
-:mod:`!email.charset`: Representing character sets
---------------------------------------------------
+:mod:`!email.charset`: Biểu diễn các bộ ký tự
+---------------------------------------------
 
 .. module:: email.charset
-   :synopsis: Character Sets
+   :synopsis: Bộ ký tự
 
-**Source code:** :source:`Lib/email/charset.py`
+**Mã nguồn:** :source:`Lib/email/charset.py`
 
 --------------
 
-This module is part of the legacy (``Compat32``) email API.  In the new
-API only the aliases table is used.
+Mô-đun này là một phần của API email cũ (``Compat32``). Trong API mới, chỉ có bảng bí danh được sử dụng.
 
-The remaining text in this section is the original documentation of the module.
+Phần văn bản còn lại trong mục này là tài liệu gốc của mô-đun.
 
-This module provides a class :class:`Charset` for representing character sets
-and character set conversions in email messages, as well as a character set
-registry and several convenience methods for manipulating this registry.
-Instances of :class:`Charset` are used in several other modules within the
-:mod:`email` package.
+Mô-đun này cung cấp một lớp :class:`Charset` để biểu diễn các bộ ký tự và việc chuyển đổi bộ ký tự trong các thông điệp email, cùng với một registry bộ ký tự và một số phương thức tiện ích để thao tác với registry này. Các thực thể của :class:`Charset` được sử dụng trong một số mô-đun khác thuộc
+:mod:`email`.
 
-Import this class from the :mod:`!email.charset` module.
+Import lớp này từ mô-đun :mod:`!email.charset`.
 
 
 .. class:: Charset(input_charset=DEFAULT_CHARSET)
 
-   Map character sets to their email properties.
+   Ánh xạ các bộ ký tự với các thuộc tính email của chúng.
 
-   This class provides information about the requirements imposed on email for a
-   specific character set.  It also provides convenience routines for converting
-   between character sets, given the availability of the applicable codecs.  Given
-   a character set, it will do its best to provide information on how to use that
-   character set in an email message in an RFC-compliant way.
+   Lớp này cung cấp thông tin về các yêu cầu áp dụng cho email đối với một bộ ký tự cụ thể. Lớp cũng cung cấp các routine tiện ích để chuyển đổi giữa các bộ ký tự, khi có các codec thích hợp. Với một bộ ký tự cho trước, lớp sẽ cố gắng hết sức để cung cấp thông tin về cách sử dụng bộ ký tự đó trong thông điệp email theo cách tuân thủ RFC.
 
-   Certain character sets must be encoded with quoted-printable or base64 when used
-   in email headers or bodies.  Certain character sets must be converted outright,
-   and are not allowed in email.
+   Một số bộ ký tự phải được mã hóa bằng quoted-printable hoặc base64 khi được sử dụng trong tiêu đề hoặc nội dung email. Một số bộ ký tự phải được chuyển đổi hoàn toàn và không được phép sử dụng trong email.
 
-   Optional *input_charset* is as described below; it is always coerced to lower
-   case.  After being alias normalized it is also used as a lookup into the
-   registry of character sets to find out the header encoding, body encoding, and
-   output conversion codec to be used for the character set.  For example, if
-   *input_charset* is ``iso-8859-1``, then headers and bodies will be encoded using
-   quoted-printable and no output conversion codec is necessary.  If
-   *input_charset* is ``euc-jp``, then headers will be encoded with base64, bodies
-   will not be encoded, but output text will be converted from the ``euc-jp``
-   character set to the ``iso-2022-jp`` character set.
+   *input_charset* tùy chọn được mô tả bên dưới; giá trị này luôn được chuyển thành chữ thường. Sau khi được chuẩn hóa bí danh, giá trị này cũng được dùng để tra cứu trong registry của các bộ ký tự nhằm xác định encoding cho tiêu đề, encoding cho nội dung và codec chuyển đổi đầu ra cần dùng cho bộ ký tự đó. Ví dụ, nếu *input_charset* là ``iso-8859-1``, thì tiêu đề và nội dung sẽ được mã hóa bằng quoted-printable và không cần codec chuyển đổi đầu ra. Nếu *input_charset* là ``euc-jp``, thì tiêu đề sẽ được mã hóa bằng base64, nội dung sẽ không được mã hóa, nhưng văn bản đầu ra sẽ được chuyển đổi từ bộ ký tự ``euc-jp`` sang bộ ký tự ``iso-2022-jp``.
 
-   :class:`Charset` instances have the following data attributes:
+   Các instance :class:`Charset` có những thuộc tính dữ liệu sau:
 
    .. attribute:: input_charset
 
-      The initial character set specified.  Common aliases are converted to
-      their *official* email names (e.g. ``latin_1`` is converted to
-      ``iso-8859-1``).  Defaults to 7-bit ``us-ascii``.
+      Bộ ký tự được chỉ định ban đầu. Các bí danh phổ biến được chuyển đổi thành tên email *official* tương ứng (ví dụ: ``latin_1`` được chuyển đổi thành ``iso-8859-1``). Mặc định là ``us-ascii`` 7-bit.
 
 
    .. attribute:: header_encoding
 
-      If the character set must be encoded before it can be used in an email
-      header, this attribute will be set to ``charset.QP`` (for
-      quoted-printable), ``charset.BASE64`` (for base64 encoding), or
-      ``charset.SHORTEST`` for the shortest of QP or BASE64 encoding. Otherwise,
-      it will be ``None``.
+      Nếu bộ ký tự phải được mã hóa trước khi có thể sử dụng trong tiêu đề email, thuộc tính này sẽ được đặt thành ``charset.QP`` (đối với quoted-printable), ``charset.BASE64`` (đối với mã hóa base64) hoặc ``charset.SHORTEST`` cho kiểu mã hóa ngắn hơn giữa QP và BASE64. Nếu không, giá trị sẽ là ``None``.
 
 
    .. attribute:: body_encoding
 
-      Same as *header_encoding*, but describes the encoding for the mail
-      message's body, which indeed may be different than the header encoding.
-      ``charset.SHORTEST`` is not allowed for *body_encoding*.
+      Tương tự *header_encoding*, nhưng mô tả kiểu mã hóa cho phần thân của thông điệp thư, vốn có thể khác với kiểu mã hóa tiêu đề. ``charset.SHORTEST`` không được phép đối với *body_encoding*.
 
 
    .. attribute:: output_charset
 
-      Some character sets must be converted before they can be used in email
-      headers or bodies.  If the *input_charset* is one of them, this attribute
-      will contain the name of the character set output will be converted to.
-      Otherwise, it will be ``None``.
+      Một số bộ ký tự phải được chuyển đổi trước khi có thể sử dụng trong tiêu đề hoặc phần thân email. Nếu *input_charset* thuộc một trong số đó, thuộc tính này sẽ chứa tên của bộ ký tự mà đầu ra sẽ được chuyển đổi thành. Nếu không, giá trị sẽ là ``None``.
 
 
    .. attribute:: input_codec
 
-      The name of the Python codec used to convert the *input_charset* to
-      Unicode.  If no conversion codec is necessary, this attribute will be
-      ``None``.
+      Tên của Python codec được dùng để chuyển đổi *input_charset* thành Unicode. Nếu không cần codec chuyển đổi, thuộc tính này sẽ là ``None``.
 
 
    .. attribute:: output_codec
 
-      The name of the Python codec used to convert Unicode to the
-      *output_charset*.  If no conversion codec is necessary, this attribute
-      will have the same value as the *input_codec*.
+      Tên của Python codec được dùng để chuyển đổi Unicode thành *output_charset*. Nếu không cần codec chuyển đổi, thuộc tính này sẽ có cùng giá trị với *input_codec*.
 
 
-   :class:`Charset` instances also have the following methods:
+   Các instance :class:`Charset` cũng có các phương thức sau:
 
    .. method:: get_body_encoding()
 
-      Return the content transfer encoding used for body encoding.
+      Trả về kiểu mã hóa truyền nội dung được sử dụng để mã hóa phần thân.
 
-      This is either the string ``quoted-printable`` or ``base64`` depending on
-      the encoding used, or it is a function, in which case you should call the
-      function with a single argument, the Message object being encoded.  The
-      function should then set the :mailheader:`Content-Transfer-Encoding`
-      header itself to whatever is appropriate.
+      Đây có thể là chuỗi ``quoted-printable`` hoặc ``base64`` tùy thuộc vào encoding được sử dụng, hoặc có thể là một hàm; trong trường hợp đó, bạn nên gọi hàm với một đối số duy nhất là đối tượng Message đang được encoding. Sau đó, hàm sẽ tự đặt header :mailheader:`Content-Transfer-Encoding` thành giá trị phù hợp.
 
-      Returns the string ``quoted-printable`` if *body_encoding* is ``QP``,
-      returns the string ``base64`` if *body_encoding* is ``BASE64``, and
-      returns the string ``7bit`` otherwise.
+      Trả về chuỗi ``quoted-printable`` nếu *body_encoding* là ``QP``, trả về chuỗi ``base64`` nếu *body_encoding* là ``BASE64``, và trả về chuỗi ``7bit`` trong các trường hợp khác.
 
 
    .. method:: get_output_charset()
 
-      Return the output character set.
+      Trả về bộ ký tự đầu ra.
 
-      This is the *output_charset* attribute if that is not ``None``, otherwise
-      it is *input_charset*.
+      Đây là thuộc tính *output_charset* nếu thuộc tính đó không phải là ``None``, nếu không thì đây là *input_charset*.
 
 
    .. method:: header_encode(string)
 
-      Header-encode the string *string*.
+      Mã hóa header cho chuỗi *string*.
 
-      The type of encoding (base64 or quoted-printable) will be based on the
-      *header_encoding* attribute.
+      Loại encoding (base64 hoặc quoted-printable) sẽ dựa trên thuộc tính *header_encoding*.
 
 
    .. method:: header_encode_lines(string, maxlengths)
 
-      Header-encode a *string* by converting it first to bytes.
+      Mã hóa header cho một *string* bằng cách trước tiên chuyển đổi chuỗi đó thành các byte.
 
-      This is similar to :meth:`header_encode` except that the string is fit
-      into maximum line lengths as given by the argument *maxlengths*, which
-      must be an iterator: each element returned from this iterator will provide
-      the next maximum line length.
+      Điều này tương tự như :meth:`header_encode`, ngoại trừ việc chuỗi được định dạng theo độ dài dòng tối đa được cung cấp bởi đối số *maxlengths*, đối số này phải là một iterator: mỗi phần tử được trả về từ iterator này sẽ cung cấp độ dài dòng tối đa tiếp theo.
 
 
    .. method:: body_encode(string)
 
-      Body-encode the string *string*.
+      Mã hóa phần thân của chuỗi *string*.
 
-      The type of encoding (base64 or quoted-printable) will be based on the
-      *body_encoding* attribute.
+      Loại encoding (base64 hoặc quoted-printable) sẽ dựa trên thuộc tính *body_encoding*.
 
-   The :class:`Charset` class also provides a number of methods to support
-   standard operations and built-in functions.
+   Lớp :class:`Charset` cũng cung cấp một số phương thức để hỗ trợ các phép toán tiêu chuẩn và các hàm tích hợp sẵn.
 
 
    .. method:: __str__()
 
-      Returns *input_charset* as a string coerced to lower
-      case. :meth:`!__repr__` is an alias for :meth:`!__str__`.
+      Trả về *input_charset* dưới dạng chuỗi được chuyển thành chữ thường. :meth:`!__repr__` là bí danh của :meth:`!__str__`.
 
 
    .. method:: __eq__(other)
 
-      This method allows you to compare two :class:`Charset` instances for
-      equality.
+      Phương thức này cho phép bạn so sánh hai thực thể :class:`Charset` xem chúng có bằng nhau hay không.
 
 
    .. method:: __ne__(other)
 
-      This method allows you to compare two :class:`Charset` instances for
-      inequality.
+      Phương thức này cho phép bạn so sánh hai thực thể :class:`Charset` xem chúng có khác nhau hay không.
 
-The :mod:`!email.charset` module also provides the following functions for adding
-new entries to the global character set, alias, and codec registries:
+Mô-đun :mod:`!email.charset` cũng cung cấp các hàm sau để thêm các mục mới vào các registry toàn cục về character set, alias và codec:
 
 
 .. function:: add_charset(charset, header_enc=None, body_enc=None, output_charset=None)
 
-   Add character properties to the global registry.
+   Thêm các thuộc tính của character set vào registry toàn cục.
 
-   *charset* is the input character set, and must be the canonical name of a
-   character set.
+   *charset* là character set đầu vào và phải là tên chuẩn của một character set.
 
-   Optional *header_enc* and *body_enc* is either ``charset.QP`` for
-   quoted-printable, ``charset.BASE64`` for base64 encoding,
-   ``charset.SHORTEST`` for the shortest of quoted-printable or base64 encoding,
-   or ``None`` for no encoding.  ``SHORTEST`` is only valid for
-   *header_enc*. The default is ``None`` for no encoding.
+   *header_enc* và *body_enc* tùy chọn có thể là ``charset.QP`` để dùng quoted-printable, ``charset.BASE64`` để mã hóa bằng base64, ``charset.SHORTEST`` để dùng cách mã hóa ngắn hơn giữa quoted-printable và base64, hoặc ``None`` để không mã hóa. ``SHORTEST`` chỉ hợp lệ với *header_enc*. Mặc định là ``None`` để không mã hóa.
 
-   Optional *output_charset* is the character set that the output should be in.
-   Conversions will proceed from input charset, to Unicode, to the output charset
-   when the method :meth:`Charset.convert` is called.  The default is to output in
-   the same character set as the input.
+   *output_charset* tùy chọn là character set mà đầu ra sẽ sử dụng. Khi phương thức :meth:`Charset.convert` được gọi, quá trình chuyển đổi sẽ diễn ra từ character set đầu vào sang Unicode, rồi sang character set đầu ra. Mặc định, đầu ra sử dụng cùng character set với đầu vào.
 
-   Both *input_charset* and *output_charset* must have Unicode codec entries in the
-   module's character set-to-codec mapping; use :func:`add_codec` to add codecs the
-   module does not know about.  See the :mod:`codecs` module's documentation for
-   more information.
+   Cả *input_charset* và *output_charset* đều phải có các mục codec Unicode trong ánh xạ character set-to-codec của mô-đun; hãy dùng :func:`add_codec` để thêm các codec mà mô-đun chưa biết. Xem tài liệu của mô-đun :mod:`codecs` để biết thêm thông tin.
 
-   The global character set registry is kept in the module global dictionary
-   ``CHARSETS``.
+   Registry character set toàn cục được lưu trong dictionary toàn cục của mô-đun ``CHARSETS``.
 
 
 .. function:: add_alias(alias, canonical)
 
-   Add a character set alias.  *alias* is the alias name, e.g. ``latin-1``.
-   *canonical* is the character set's canonical name, e.g. ``iso-8859-1``.
+   Thêm một alias cho bộ ký tự. *alias* là tên alias, ví dụ: ``latin-1``. *canonical* là tên chuẩn của bộ ký tự, ví dụ: ``iso-8859-1``.
 
-   The global charset alias registry is kept in the module global dictionary
-   ``ALIASES``.
+   Registry alias charset toàn cục được lưu trong dictionary toàn cục của module ``ALIASES``.
 
 
 .. function:: add_codec(charset, codecname)
 
-   Add a codec that map characters in the given character set to and from Unicode.
+   Thêm một codec ánh xạ các ký tự trong bộ ký tự đã cho sang Unicode và ngược lại.
 
-   *charset* is the canonical name of a character set. *codecname* is the name of a
-   Python codec, as appropriate for the second argument to the :class:`str`'s
-   :meth:`~str.encode` method.
+   *charset* là tên chuẩn của một bộ ký tự. *codecname* là tên của một Python codec, phù hợp làm đối số thứ hai cho :class:`str`'s
+   :meth:`~str.encode` phương thức.
 

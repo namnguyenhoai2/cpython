@@ -1,75 +1,53 @@
-:mod:`!email.mime`: Creating email and MIME objects from scratch
-----------------------------------------------------------------
+:mod:`!email.mime`: Tạo các đối tượng email và MIME từ đầu
+----------------------------------------------------------
 
 .. module:: email.mime
-   :synopsis: Build MIME messages.
+   :synopsis: Xây dựng các message MIME.
 
-**Source code:** :source:`Lib/email/mime/`
+**Mã nguồn:** :source:`Lib/email/mime/`
 
 --------------
 
-This module is part of the legacy (``Compat32``) email API.  Its functionality
-is partially replaced by the :mod:`~email.contentmanager` in the new API, but
-in certain applications these classes may still be useful, even in non-legacy
-code.
+Mô-đun này thuộc API email cũ (``Compat32``). Chức năng của nó được thay thế một phần bởi :mod:`~email.contentmanager` trong API mới, nhưng trong một số ứng dụng, các lớp này vẫn có thể hữu ích, ngay cả trong mã không còn dùng API cũ.
 
-Ordinarily, you get a message object structure by passing a file or some text to
-a parser, which parses the text and returns the root message object.  However
-you can also build a complete message structure from scratch, or even individual
-:class:`~email.message.Message` objects by hand.  In fact, you can also take an
-existing structure and add new :class:`~email.message.Message` objects, move them
-around, etc.  This makes a very convenient interface for slicing-and-dicing MIME
-messages.
+Thông thường, bạn có được một cấu trúc đối tượng message bằng cách truyền một tệp hoặc một đoạn văn bản cho parser, trình này phân tích văn bản và trả về đối tượng message gốc. Tuy nhiên, bạn cũng có thể xây dựng toàn bộ cấu trúc message từ đầu, hoặc thậm chí từng
+:class:`~email.message.Message` các đối tượng bằng tay. Trên thực tế, bạn cũng có thể lấy một cấu trúc hiện có và thêm các :class:`~email.message.Message` đối tượng mới, di chuyển chúng, v.v. Điều này tạo ra một giao diện rất thuận tiện để cắt và phân tách các thông điệp MIME.
 
-You can create a new object structure by creating :class:`~email.message.Message`
-instances, adding attachments and all the appropriate headers manually.  For MIME
-messages though, the :mod:`email` package provides some convenient subclasses to
-make things easier.
+Bạn có thể tạo một cấu trúc đối tượng mới bằng cách tạo các instance :class:`~email.message.Message`, thêm tệp đính kèm và tự thêm tất cả các header thích hợp. Tuy nhiên, đối với message MIME, package :mod:`email` cung cấp một số lớp con thuận tiện để giúp mọi việc trở nên dễ dàng hơn.
 
-Here are the classes:
+Dưới đây là các lớp:
 
 .. module:: email.mime.base
 
 .. class:: MIMEBase(_maintype, _subtype, *, policy=compat32, **_params)
 
-   Module: :mod:`email.mime.base`
+   Mô-đun: :mod:`email.mime.base`
 
-   This is the base class for all the MIME-specific subclasses of
-   :class:`~email.message.Message`.  Ordinarily you won't create instances
-   specifically of :class:`MIMEBase`, although you could.  :class:`MIMEBase`
-   is provided primarily as a convenient base class for more specific
-   MIME-aware subclasses.
+   Đây là lớp cơ sở cho tất cả các lớp con dành riêng cho MIME của
+   :class:`~email.message.Message`.  Thông thường, bạn sẽ không tạo các thực thể cụ thể của :class:`MIMEBase`, mặc dù bạn có thể làm vậy.  :class:`MIMEBase` chủ yếu được cung cấp làm lớp cơ sở thuận tiện cho các lớp con cụ thể hơn có hỗ trợ MIME.
 
-   *_maintype* is the :mailheader:`Content-Type` major type (e.g. :mimetype:`text`
-   or :mimetype:`image`), and *_subtype* is the :mailheader:`Content-Type` minor
-   type  (e.g. :mimetype:`plain` or :mimetype:`gif`).  *_params* is a parameter
-   key/value dictionary and is passed directly to :meth:`Message.add_header
-   <email.message.Message.add_header>`.
+   *_maintype* là kiểu chính :mailheader:`Content-Type` (ví dụ: :mimetype:`text` hoặc :mimetype:`image`), còn *_subtype* là kiểu phụ :mailheader:`Content-Type` (ví dụ: :mimetype:`plain` hoặc :mimetype:`gif`).  *_params* là một từ điển khóa/giá trị tham số và được truyền trực tiếp cho :meth:`Message.add_header <email.message.Message.add_header>`.
 
-   If *policy* is specified, (defaults to the
-   :class:`compat32 <email.policy.Compat32>` policy) it will be passed to
+   Nếu *policy* được chỉ định (mặc định là policy
+   :class:`compat32 <email.policy.Compat32>`), nó sẽ được truyền cho
    :class:`~email.message.Message`.
 
-   The :class:`MIMEBase` class always adds a :mailheader:`Content-Type` header
-   (based on *_maintype*, *_subtype*, and *_params*), and a
-   :mailheader:`MIME-Version` header (always set to ``1.0``).
+   Lớp :class:`MIMEBase` luôn thêm một header :mailheader:`Content-Type` (dựa trên *_maintype*, *_subtype* và *_params*), và một
+   header :mailheader:`MIME-Version` (luôn được đặt thành ``1.0``).
 
    .. versionchanged:: 3.6
-      Added *policy* keyword-only parameter.
+      Đã thêm tham số chỉ dùng theo từ khóa *policy*.
 
 
 .. module:: email.mime.nonmultipart
 
 .. class:: MIMENonMultipart()
 
-   Module: :mod:`email.mime.nonmultipart`
+   Mô-đun: :mod:`email.mime.nonmultipart`
 
-   A subclass of :class:`~email.mime.base.MIMEBase`, this is an intermediate base
-   class for MIME messages that are not :mimetype:`multipart`.  The primary
-   purpose of this class is to prevent the use of the
-   :meth:`~email.message.Message.attach` method, which only makes sense for
-   :mimetype:`multipart` messages.  If :meth:`~email.message.Message.attach`
-   is called, a :exc:`~email.errors.MultipartConversionError` exception is raised.
+   Là một lớp con của :class:`~email.mime.base.MIMEBase`, đây là lớp cơ sở trung gian cho các message MIME không phải là :mimetype:`multipart`. Mục đích chính của lớp này là ngăn việc sử dụng
+   phương thức :meth:`~email.message.Message.attach`, vốn chỉ có ý nghĩa đối với
+   các message :mimetype:`multipart`. Nếu gọi :meth:`~email.message.Message.attach`, một ngoại lệ :exc:`~email.errors.MultipartConversionError` sẽ được đưa ra.
 
 
 .. module:: email.mime.multipart
@@ -77,97 +55,65 @@ Here are the classes:
 .. class:: MIMEMultipart(_subtype='mixed', boundary=None, _subparts=None, \
                          *, policy=compat32, **_params)
 
-   Module: :mod:`email.mime.multipart`
+   Mô-đun: :mod:`email.mime.multipart`
 
-   A subclass of :class:`~email.mime.base.MIMEBase`, this is an intermediate base
-   class for MIME messages that are :mimetype:`multipart`.  Optional *_subtype*
-   defaults to :mimetype:`mixed`, but can be used to specify the subtype of the
-   message.  A :mailheader:`Content-Type` header of :mimetype:`multipart/_subtype`
-   will be added to the message object.  A :mailheader:`MIME-Version` header will
-   also be added.
+   Là một lớp con của :class:`~email.mime.base.MIMEBase`, đây là lớp cơ sở trung gian cho các thông điệp MIME có :mimetype:`multipart`. *_subtype* tùy chọn mặc định là :mimetype:`mixed`, nhưng có thể được dùng để chỉ định subtype của thông điệp. Một header :mailheader:`Content-Type` có giá trị :mimetype:`multipart/_subtype` sẽ được thêm vào đối tượng thông điệp. Một header :mailheader:`MIME-Version` cũng sẽ được thêm vào.
 
-   Optional *boundary* is the multipart boundary string.  When ``None`` (the
-   default), the boundary is calculated when needed (for example, when the
-   message is serialized).
+   *boundary* tùy chọn là chuỗi boundary của multipart. Khi là ``None`` (mặc định), boundary được tính khi cần (chẳng hạn khi thông điệp được serialize).
 
-   *_subparts* is a sequence of initial subparts for the payload.  It must be
-   possible to convert this sequence to a list.  You can always attach new subparts
-   to the message by using the :meth:`Message.attach
-   <email.message.Message.attach>` method.
+   *_subparts* là một sequence gồm các subpart ban đầu cho payload. Phải có thể chuyển sequence này thành một list. Bạn luôn có thể đính kèm các subpart mới vào thông điệp bằng cách sử dụng phương thức :meth:`Message.attach <email.message.Message.attach>`.
 
-   Optional *policy* argument defaults to :class:`compat32 <email.policy.Compat32>`.
+   Đối số *policy* tùy chọn mặc định là :class:`compat32 <email.policy.Compat32>`.
 
-   Additional parameters for the :mailheader:`Content-Type` header are taken from
-   the keyword arguments, or passed into the *_params* argument, which is a keyword
-   dictionary.
+   Các tham số bổ sung cho header :mailheader:`Content-Type` được lấy từ các keyword argument hoặc được truyền vào đối số *_params*, vốn là một keyword dictionary.
 
    .. versionchanged:: 3.6
-      Added *policy* keyword-only parameter.
+      Đã thêm tham số chỉ dùng theo từ khóa *policy*.
 
 .. module:: email.mime.application
 
 .. class:: MIMEApplication(_data, _subtype='octet-stream', \
-                           _encoder=email.encoders.encode_base64, \
-                           *, policy=compat32, **_params)
+                           _encoder=email.encoders.encode_base64, \ *, policy=compat32, **_params)
 
-   Module: :mod:`email.mime.application`
+   Mô-đun: :mod:`email.mime.application`
 
-   A subclass of :class:`~email.mime.nonmultipart.MIMENonMultipart`, the
-   :class:`MIMEApplication` class is used to represent MIME message objects of
-   major type :mimetype:`application`.  *_data* contains the bytes for the raw
-   application data.  Optional *_subtype* specifies the MIME subtype and defaults
-   to :mimetype:`octet-stream`.
+   Là một lớp con của :class:`~email.mime.nonmultipart.MIMENonMultipart`, lớp này
+   Lớp :class:`MIMEApplication` được dùng để biểu diễn các đối tượng thông báo MIME có kiểu chính là :mimetype:`application`.  *_data* chứa các byte của dữ liệu ứng dụng thô.  *_subtype* tùy chọn chỉ định subtype MIME và mặc định là :mimetype:`octet-stream`.
 
-   Optional *_encoder* is a callable (i.e. function) which will perform the actual
-   encoding of the data for transport.  This callable takes one argument, which is
-   the :class:`MIMEApplication` instance. It should use
-   :meth:`~email.message.Message.get_payload` and
-   :meth:`~email.message.Message.set_payload` to change the payload to encoded
-   form.  It should also add
-   any :mailheader:`Content-Transfer-Encoding` or other headers to the message
-   object as necessary.  The default encoding is base64.  See the
-   :mod:`email.encoders` module for a list of the built-in encoders.
+   *_encoder* tùy chọn là một callable (tức là hàm) thực hiện việc mã hóa dữ liệu để truyền tải.  Callable này nhận một đối số, đó là đối tượng :class:`MIMEApplication`. Đối tượng này nên sử dụng
+   :meth:`~email.message.Message.get_payload` và
+   :meth:`~email.message.Message.set_payload` được gọi để thay đổi payload sang dạng đã mã hóa. Hàm này cũng sẽ thêm mọi :mailheader:`Content-Transfer-Encoding` hoặc header khác vào đối tượng message khi cần. Dạng mã hóa mặc định là base64. Xem
+   mô-đun :mod:`email.encoders` để biết danh sách các encoder tích hợp sẵn.
 
-   Optional *policy* argument defaults to :class:`compat32 <email.policy.Compat32>`.
+   Đối số *policy* tùy chọn mặc định là :class:`compat32 <email.policy.Compat32>`.
 
-   *_params* are passed straight through to the base class constructor.
+   *_params* được truyền trực tiếp đến hàm khởi tạo của lớp cơ sở.
 
    .. versionchanged:: 3.6
-      Added *policy* keyword-only parameter.
+      Đã thêm tham số chỉ dùng theo từ khóa *policy*.
 
 .. module:: email.mime.audio
 
 .. class:: MIMEAudio(_audiodata, _subtype=None, \
-                     _encoder=email.encoders.encode_base64, \
-                     *, policy=compat32, **_params)
+                     _encoder=email.encoders.encode_base64, \ *, policy=compat32, **_params)
 
-   Module: :mod:`email.mime.audio`
+   Mô-đun: :mod:`email.mime.audio`
 
-   A subclass of :class:`~email.mime.nonmultipart.MIMENonMultipart`, the
-   :class:`MIMEAudio` class is used to create MIME message objects of major type
-   :mimetype:`audio`. *_audiodata* contains the bytes for the raw audio data.  If
-   this data can be decoded as au, wav, aiff, or aifc, then the
-   subtype will be automatically included in the :mailheader:`Content-Type` header.
-   Otherwise you can explicitly specify the audio subtype via the *_subtype*
-   argument.  If the minor type could not be guessed and *_subtype* was not given,
-   then :exc:`TypeError` is raised.
+   Là một lớp con của :class:`~email.mime.nonmultipart.MIMENonMultipart`, lớp này
+   Lớp :class:`MIMEAudio` được dùng để tạo các đối tượng thông điệp MIME có kiểu chính
+   :mimetype:`audio`. *_audiodata* chứa các byte của dữ liệu âm thanh thô. Nếu dữ liệu này có thể được giải mã dưới dạng au, wav, aiff hoặc aifc, thì subtype sẽ tự động được đưa vào header :mailheader:`Content-Type`. Nếu không, bạn có thể chỉ định rõ subtype âm thanh thông qua đối số *_subtype*. Nếu không thể suy đoán minor type và không cung cấp *_subtype*, thì :exc:`TypeError` sẽ được đưa ra.
 
-   Optional *_encoder* is a callable (i.e. function) which will perform the actual
-   encoding of the audio data for transport.  This callable takes one argument,
-   which is the :class:`MIMEAudio` instance. It should use
-   :meth:`~email.message.Message.get_payload` and
-   :meth:`~email.message.Message.set_payload` to change the payload to encoded
-   form.  It should also add
-   any :mailheader:`Content-Transfer-Encoding` or other headers to the message
-   object as necessary.  The default encoding is base64.  See the
-   :mod:`email.encoders` module for a list of the built-in encoders.
+   *_encoder* tùy chọn là một callable (tức là một hàm) thực hiện việc encoding thực tế dữ liệu âm thanh để truyền tải. Callable này nhận một đối số là instance :class:`MIMEAudio`. Callable này nên sử dụng
+   :meth:`~email.message.Message.get_payload` và
+   :meth:`~email.message.Message.set_payload` được gọi để thay đổi payload sang dạng đã mã hóa. Hàm này cũng sẽ thêm mọi :mailheader:`Content-Transfer-Encoding` hoặc header khác vào đối tượng message khi cần. Dạng mã hóa mặc định là base64. Xem
+   mô-đun :mod:`email.encoders` để biết danh sách các encoder tích hợp sẵn.
 
-   Optional *policy* argument defaults to :class:`compat32 <email.policy.Compat32>`.
+   Đối số *policy* tùy chọn mặc định là :class:`compat32 <email.policy.Compat32>`.
 
-   *_params* are passed straight through to the base class constructor.
+   *_params* được truyền trực tiếp đến hàm khởi tạo của lớp cơ sở.
 
    .. versionchanged:: 3.6
-      Added *policy* keyword-only parameter.
+      Đã thêm tham số chỉ dùng theo từ khóa *policy*.
 
 .. module:: email.mime.image
 
@@ -175,86 +121,62 @@ Here are the classes:
                      _encoder=email.encoders.encode_base64, \
                     *, policy=compat32, **_params)
 
-   Module: :mod:`email.mime.image`
+   Mô-đun: :mod:`email.mime.image`
 
-   A subclass of :class:`~email.mime.nonmultipart.MIMENonMultipart`, the
-   :class:`MIMEImage` class is used to create MIME message objects of major type
-   :mimetype:`image`. *_imagedata* contains the bytes for the raw image data.  If
-   this data type can be detected (jpeg, png, gif, tiff, rgb, pbm, pgm, ppm,
-   rast, xbm, bmp, webp, and exr attempted), then the subtype will be
-   automatically included in the :mailheader:`Content-Type` header. Otherwise
-   you can explicitly specify the image subtype via the *_subtype* argument.
-   If the minor type could not be guessed and *_subtype* was not given, then
-   :exc:`TypeError` is raised.
+   Là một lớp con của :class:`~email.mime.nonmultipart.MIMENonMultipart`, lớp này
+   Lớp :class:`MIMEImage` được dùng để tạo các đối tượng thông báo MIME có kiểu chính là
+   :mimetype:`image`. *_imagedata* chứa các byte của dữ liệu hình ảnh thô. Nếu có thể xác định được kiểu dữ liệu này (đã thử jpeg, png, gif, tiff, rgb, pbm, pgm, ppm, rast, xbm, bmp, webp và exr), thì kiểu phụ sẽ tự động được đưa vào header :mailheader:`Content-Type`. Nếu không, bạn có thể chỉ định rõ kiểu phụ của hình ảnh thông qua đối số *_subtype*. Nếu không thể suy đoán kiểu phụ và *_subtype* không được cung cấp, thì
+   :exc:`TypeError` sẽ được phát sinh.
 
-   Optional *_encoder* is a callable (i.e. function) which will perform the actual
-   encoding of the image data for transport.  This callable takes one argument,
-   which is the :class:`MIMEImage` instance. It should use
-   :meth:`~email.message.Message.get_payload` and
-   :meth:`~email.message.Message.set_payload` to change the payload to encoded
-   form.  It should also add
-   any :mailheader:`Content-Transfer-Encoding` or other headers to the message
-   object as necessary.  The default encoding is base64.  See the
-   :mod:`email.encoders` module for a list of the built-in encoders.
+   *_encoder* tùy chọn là một callable (tức là một hàm) thực hiện việc mã hóa thực tế dữ liệu hình ảnh để truyền đi. Callable này nhận một đối số, là thể hiện :class:`MIMEImage`. Callable này nên sử dụng
+   :meth:`~email.message.Message.get_payload` và
+   :meth:`~email.message.Message.set_payload` được gọi để thay đổi payload sang dạng đã mã hóa. Hàm này cũng sẽ thêm mọi :mailheader:`Content-Transfer-Encoding` hoặc header khác vào đối tượng message khi cần. Dạng mã hóa mặc định là base64. Xem
+   mô-đun :mod:`email.encoders` để biết danh sách các encoder tích hợp sẵn.
 
-   Optional *policy* argument defaults to :class:`compat32 <email.policy.Compat32>`.
+   Đối số *policy* tùy chọn mặc định là :class:`compat32 <email.policy.Compat32>`.
 
-   *_params* are passed straight through to the :class:`~email.mime.base.MIMEBase`
-   constructor.
+   *_params* được truyền trực tiếp vào hàm khởi tạo :class:`~email.mime.base.MIMEBase`.
 
    .. versionchanged:: 3.6
-      Added *policy* keyword-only parameter.
+      Đã thêm tham số chỉ dùng theo từ khóa *policy*.
 
 .. module:: email.mime.message
 
 .. class:: MIMEMessage(_msg, _subtype='rfc822', *, policy=compat32)
 
-   Module: :mod:`email.mime.message`
+   Mô-đun: :mod:`email.mime.message`
 
-   A subclass of :class:`~email.mime.nonmultipart.MIMENonMultipart`, the
-   :class:`MIMEMessage` class is used to create MIME objects of main type
-   :mimetype:`message`. *_msg* is used as the payload, and must be an instance
-   of class :class:`~email.message.Message` (or a subclass thereof), otherwise
-   a :exc:`TypeError` is raised.
+   Là một lớp con của :class:`~email.mime.nonmultipart.MIMENonMultipart`, lớp này
+   Lớp :class:`MIMEMessage` được dùng để tạo các đối tượng MIME thuộc kiểu chính
+   :mimetype:`message`. *_msg* được dùng làm payload và phải là một thể hiện của lớp :class:`~email.message.Message` (hoặc một lớp con của lớp đó); nếu không, một :exc:`TypeError` sẽ được phát sinh.
 
-   Optional *_subtype* sets the subtype of the message; it defaults to
+   *_subtype* tùy chọn đặt subtype của message; mặc định là
    :mimetype:`rfc822`.
 
-   Optional *policy* argument defaults to :class:`compat32 <email.policy.Compat32>`.
+   Đối số *policy* tùy chọn mặc định là :class:`compat32 <email.policy.Compat32>`.
 
    .. versionchanged:: 3.6
-      Added *policy* keyword-only parameter.
+      Đã thêm tham số chỉ dùng theo từ khóa *policy*.
 
 .. module:: email.mime.text
 
 .. class:: MIMEText(_text, _subtype='plain', _charset=None, *, policy=compat32)
 
-   Module: :mod:`email.mime.text`
+   Mô-đun: :mod:`email.mime.text`
 
-   A subclass of :class:`~email.mime.nonmultipart.MIMENonMultipart`, the
-   :class:`MIMEText` class is used to create MIME objects of major type
-   :mimetype:`text`. *_text* is the string for the payload.  *_subtype* is the
-   minor type and defaults to :mimetype:`plain`.  *_charset* is the character
-   set of the text and is passed as an argument to the
-   :class:`~email.mime.nonmultipart.MIMENonMultipart` constructor; it defaults
-   to ``us-ascii`` if the string contains only ``ascii`` code points, and
-   ``utf-8`` otherwise.  The *_charset* parameter accepts either a string or a
-   :class:`~email.charset.Charset` instance.
+   Là một lớp con của :class:`~email.mime.nonmultipart.MIMENonMultipart`, lớp này
+   Lớp :class:`MIMEText` được dùng để tạo các MIME object có kiểu chính
+   :mimetype:`text`. *_text* là chuỗi cho payload.  *_subtype* là kiểu phụ và mặc định là :mimetype:`plain`.  *_charset* là bộ ký tự của văn bản và được truyền dưới dạng đối số cho
+   :class:`~email.mime.nonmultipart.MIMENonMultipart` hàm khởi tạo; mặc định là ``us-ascii`` nếu chuỗi chỉ chứa các code point ``ascii``, và ``utf-8`` nếu không. Tham số *_charset* chấp nhận một chuỗi hoặc một
+   đối tượng :class:`~email.charset.Charset`.
 
-   Unless the *_charset* argument is explicitly set to ``None``, the
-   MIMEText object created will have both a :mailheader:`Content-Type` header
-   with a ``charset`` parameter, and a :mailheader:`Content-Transfer-Encoding`
-   header.  This means that a subsequent ``set_payload`` call will not result
-   in an encoded payload, even if a charset is passed in the ``set_payload``
-   command.  You can "reset" this behavior by deleting the
-   ``Content-Transfer-Encoding`` header, after which a ``set_payload`` call
-   will automatically encode the new payload (and add a new
-   :mailheader:`Content-Transfer-Encoding` header).
+   Trừ khi đối số *_charset* được đặt rõ ràng thành ``None``, đối tượng MIMEText được tạo sẽ có cả một header :mailheader:`Content-Type` với tham số ``charset``, và một header :mailheader:`Content-Transfer-Encoding`. Điều này có nghĩa là một lệnh gọi ``set_payload`` tiếp theo sẽ không tạo payload được mã hóa, ngay cả khi một charset được truyền trong lệnh ``set_payload``. Bạn có thể "đặt lại" hành vi này bằng cách xóa header ``Content-Transfer-Encoding``; sau đó, một lệnh gọi ``set_payload`` sẽ tự động mã hóa payload mới (và thêm một header
+   :mailheader:`Content-Transfer-Encoding`).
 
-   Optional *policy* argument defaults to :class:`compat32 <email.policy.Compat32>`.
+   Đối số *policy* tùy chọn mặc định là :class:`compat32 <email.policy.Compat32>`.
 
    .. versionchanged:: 3.5
-      *_charset* also accepts :class:`~email.charset.Charset` instances.
+      *_charset* cũng chấp nhận các instance :class:`~email.charset.Charset`.
 
    .. versionchanged:: 3.6
-      Added *policy* keyword-only parameter.
+      Đã thêm tham số chỉ dùng theo từ khóa *policy*.

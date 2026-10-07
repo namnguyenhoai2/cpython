@@ -1,8 +1,8 @@
-:mod:`!enum` --- Support for enumerations
-=========================================
+:mod:`!enum` --- Hỗ trợ kiểu liệt kê
+====================================
 
 .. module:: enum
-   :synopsis: Implementation of an enumeration class.
+   :synopsis: Triển khai một lớp enumeration.
 
 .. moduleauthor:: Ethan Furman <ethan@stoneleaf.us>
 .. sectionauthor:: Barry Warsaw <barry@python.org>
@@ -11,153 +11,130 @@
 
 .. versionadded:: 3.4
 
-**Source code:** :source:`Lib/enum.py`
+**Mã nguồn:** :source:`Lib/enum.py`
 
-.. sidebar:: Important
+.. sidebar:: Quan trọng
 
-   This page contains the API reference information. For tutorial
-   information and discussion of more advanced topics, see
+   Trang này chứa thông tin tham chiếu API. Để xem thông tin hướng dẫn và thảo luận về các chủ đề nâng cao hơn, hãy xem
 
-   * :ref:`Basic Tutorial <enum-basic-tutorial>`
-   * :ref:`Advanced Tutorial <enum-advanced-tutorial>`
-   * :ref:`Enum Cookbook <enum-cookbook>`
+   * :ref:`Hướng dẫn cơ bản <enum-basic-tutorial>`
+   * :ref:`Hướng dẫn nâng cao <enum-advanced-tutorial>`
+   * :ref:`Cẩm nang Enum <enum-cookbook>`
 
 ---------------
 
-An enumeration:
+Một enumeration:
 
-* is a set of symbolic names (members) bound to unique values
-* can be iterated over to return its canonical (i.e. non-alias) members in
-  definition order
-* uses *call* syntax to return members by value
-* uses *index* syntax to return members by name
+* là một tập hợp các tên tượng trưng (thành viên) được liên kết với các giá trị duy nhất
+* có thể được lặp qua để trả về các thành viên chính tắc (tức là không phải bí danh) theo thứ tự định nghĩa
+* sử dụng cú pháp *call* để trả về các thành viên theo giá trị
+* sử dụng cú pháp *index* để trả về các thành viên theo tên
 
-Enumerations are created either by using :keyword:`class` syntax, or by
-using function-call syntax::
+Enumeration được tạo entweder bằng cách sử dụng cú pháp :keyword:`class`, hoặc bằng cú pháp gọi hàm::
 
    >>> from enum import Enum
 
-   >>> # class syntax
+   >>> # cú pháp lớp
    >>> class Color(Enum):
    ...     RED = 1
    ...     GREEN = 2
    ...     BLUE = 3
 
-   >>> # functional syntax
+   >>> # cú pháp hàm
    >>> Color = Enum('Color', [('RED', 1), ('GREEN', 2), ('BLUE', 3)])
 
-Even though we can use :keyword:`class` syntax to create Enums, Enums
-are not normal Python classes.  See
-:ref:`How are Enums different? <enum-class-differences>` for more details.
+Mặc dù chúng ta có thể sử dụng :keyword:`class` cú pháp để tạo Enum, Enum không phải là các lớp Python thông thường. Xem
+:ref:`Các Enum khác biệt như thế nào? <enum-class-differences>` để biết thêm chi tiết.
 
-.. note:: Nomenclature
+.. note:: Thuật ngữ
 
-   - The class :class:`!Color` is an *enumeration* (or *enum*)
-   - The attributes :attr:`!Color.RED`, :attr:`!Color.GREEN`, etc., are
-     *enumeration members* (or *members*) and are functionally constants.
-   - The enum members have *names* and *values* (the name of
-     :attr:`!Color.RED` is ``RED``, the value of :attr:`!Color.BLUE` is
-     ``3``, etc.)
+   - Lớp :class:`!Color` là một *enumeration* (hay *enum*)
+   - Các thuộc tính :attr:`!Color.RED`, :attr:`!Color.GREEN`, v.v. là *các thành viên enumeration* (hay *member*) và về chức năng là các hằng số.
+   - Các thành viên enum có *tên* và *giá trị* (tên của
+     :attr:`!Color.RED` là ``RED``, giá trị của :attr:`!Color.BLUE` là ``3``, v.v.)
 
 ---------------
 
-Module contents
+Nội dung mô-đun
 ---------------
 
    :class:`EnumType`
 
-      The ``type`` for Enum and its subclasses.
+      ``type`` của Enum và các lớp con của nó.
 
    :class:`Enum`
 
-      Base class for creating enumerated constants.
+      Lớp cơ sở để tạo các hằng số liệt kê.
 
    :class:`IntEnum`
 
-      Base class for creating enumerated constants that are also
-      subclasses of :class:`int`. (`Notes`_)
+      Lớp cơ sở để tạo các hằng số liệt kê đồng thời là các lớp con của :class:`int`. (`Notes`_)
 
    :class:`StrEnum`
 
-      Base class for creating enumerated constants that are also
-      subclasses of :class:`str`. (`Notes`_)
+      Lớp cơ sở để tạo các hằng số liệt kê đồng thời là các lớp con của :class:`str`. (`Notes`_)
 
    :class:`Flag`
 
-      Base class for creating enumerated constants that can be combined using
-      the bitwise operations without losing their :class:`Flag` membership.
+      Lớp cơ sở để tạo các hằng số liệt kê có thể được kết hợp bằng các phép toán bitwise mà không làm mất tính thành viên :class:`Flag` của chúng.
 
    :class:`IntFlag`
 
-      Base class for creating enumerated constants that can be combined using
-      the bitwise operators without losing their :class:`IntFlag` membership.
-      :class:`IntFlag` members are also subclasses of :class:`int`. (`Notes`_)
+      Lớp cơ sở để tạo các hằng số liệt kê có thể được kết hợp bằng các toán tử bitwise mà không làm mất tính thành viên :class:`IntFlag` của chúng.
+      Các thành viên :class:`IntFlag` cũng là các lớp con của :class:`int`. (`Notes`_)
 
    :class:`ReprEnum`
 
-      Used by :class:`IntEnum`, :class:`StrEnum`, and :class:`IntFlag`
-      to keep the :class:`str() <str>` of the mixed-in type.
+      Được :class:`IntEnum`, :class:`StrEnum` và :class:`IntFlag` sử dụng để giữ lại :class:`str() <str>` của kiểu được trộn vào.
 
    :class:`EnumCheck`
 
-      An enumeration with the values ``CONTINUOUS``, ``NAMED_FLAGS``, and
-      ``UNIQUE``, for use with :func:`verify` to ensure various constraints
-      are met by a given enumeration.
+      Một kiểu liệt kê có các giá trị ``CONTINUOUS``, ``NAMED_FLAGS`` và ``UNIQUE``, được dùng với :func:`verify` để đảm bảo một kiểu liệt kê nhất định đáp ứng nhiều ràng buộc khác nhau.
 
    :class:`FlagBoundary`
 
-      An enumeration with the values ``STRICT``, ``CONFORM``, ``EJECT``, and
-      ``KEEP`` which allows for more fine-grained control over how invalid values
-      are dealt with in an enumeration.
+      Một kiểu liệt kê có các giá trị ``STRICT``, ``CONFORM``, ``EJECT`` và ``KEEP``, cho phép kiểm soát chi tiết hơn cách xử lý các giá trị không hợp lệ trong một kiểu liệt kê.
 
    :class:`EnumDict`
 
-      A subclass of :class:`dict` for use when subclassing :class:`EnumType`.
+      Một lớp con của :class:`dict`, được dùng khi tạo lớp con của :class:`EnumType`.
 
    :class:`auto`
 
-      Instances are replaced with an appropriate value for Enum members.
-      :class:`StrEnum` defaults to the lower-cased version of the member name,
-      while other Enums default to 1 and increase from there.
+      Các instance được thay thế bằng một giá trị thích hợp cho các thành viên Enum.
+      :class:`StrEnum` mặc định là phiên bản viết thường của tên thành viên, trong khi các Enum khác mặc định là 1 và tăng dần từ đó.
 
    :deco:`~enum.property`
 
-      Allows :class:`Enum` members to have attributes without conflicting with
-      member names.  The ``value`` and ``name`` attributes are implemented this
-      way.
+      Cho phép các thành viên :class:`Enum` có các thuộc tính mà không xung đột với tên thành viên. Các thuộc tính ``value`` và ``name`` được triển khai theo cách này.
 
    :deco:`unique`
 
-      Enum class decorator that ensures only one name is bound to any one value.
+      Decorator lớp Enum đảm bảo chỉ một tên duy nhất được liên kết với mỗi giá trị.
 
    :deco:`verify`
 
-      Enum class decorator that checks user-selectable constraints on an
-      enumeration.
+      Decorator lớp Enum kiểm tra các ràng buộc do người dùng lựa chọn trên một enumeration.
 
    :deco:`member`
 
-      Make ``obj`` a member.  Can be used as a decorator.
+      Biến ``obj`` thành một thành viên. Có thể được sử dụng làm decorator.
 
    :deco:`nonmember`
 
-      Do not make ``obj`` a member.  Can be used as a decorator.
+      Không biến ``obj`` thành một thành viên. Có thể được sử dụng làm decorator.
 
    :deco:`global_enum`
 
-      Modify the :class:`str() <str>` and :func:`repr` of an enum
-      to show its members as belonging to the module instead of its class,
-      and export the enum members to the global namespace.
+      Sửa đổi :class:`str() <str>` và :func:`repr` của một enum để hiển thị các thành viên của nó là thuộc về module thay vì class của nó, đồng thời export các thành viên enum vào global namespace.
 
    :func:`show_flag_values`
 
-      Return a list of all power-of-two integers contained in a flag.
+      Trả về danh sách tất cả các số nguyên là lũy thừa của hai có trong một flag.
 
    :func:`enum.bin`
 
-      Like built-in :func:`bin`, except negative values are represented in
-      two's complement, and the leading bit always indicates sign
-      (``0`` implies positive, ``1`` implies negative).
+      Tương tự :func:`bin` tích hợp sẵn, ngoại trừ các giá trị âm được biểu diễn theo bù hai, và bit đầu tiên luôn biểu thị dấu (``0`` nghĩa là dương, ``1`` nghĩa là âm).
 
 
 .. versionadded:: 3.6  ``Flag``, ``IntFlag``, ``auto``
@@ -166,49 +143,44 @@ Module contents
 
 ---------------
 
-Data types
-----------
+Kiểu dữ liệu
+------------
 
 
 .. class:: EnumType
 
-   *EnumType* is the :term:`metaclass` for *enum* enumerations.  It is possible
-   to subclass *EnumType* -- see :ref:`Subclassing EnumType <enumtype-examples>`
-   for details.
+   *EnumType* là :term:`metaclass` cho các enumeration *enum*. Có thể tạo subclass của *EnumType* -- xem :ref:`Subclassing EnumType <enumtype-examples>` để biết chi tiết.
 
-   ``EnumType`` is responsible for setting the correct :meth:`!__repr__`,
-   :meth:`!__str__`, :meth:`!__format__`, and :meth:`!__reduce__` methods on the
-   final *enum*, as well as creating the enum members, properly handling
-   duplicates, providing iteration over the enum class, etc.
+   ``EnumType`` chịu trách nhiệm thiết lập đúng :meth:`!__repr__`,
+   các phương thức :meth:`!__str__`, :meth:`!__format__` và :meth:`!__reduce__` trên *enum* cuối cùng, cũng như tạo các thành viên enum, xử lý đúng các thành viên trùng lặp, cung cấp khả năng lặp qua enum class, v.v.
 
    .. versionadded:: 3.11
 
-      Before 3.11 ``EnumType`` was called ``EnumMeta``, which is still available as an alias.
+      Trước phiên bản 3.11, ``EnumType`` được gọi là ``EnumMeta``, tên này vẫn có thể được sử dụng như một bí danh.
 
    .. method:: EnumType.__call__(cls, value, names=None, *, module=None, qualname=None, type=None, start=1, boundary=None)
 
-      This method is called in two different ways:
+      Phương thức này được gọi theo hai cách khác nhau:
 
-      * to look up an existing member:
+      * để tra cứu một member hiện có:
 
-         :cls:   The enum class being called.
-         :value: The value to lookup.
+         :cls:   Lớp enum đang được gọi.
+         :value: Giá trị cần tra cứu.
 
-      * to use the ``cls`` enum to create a new enum (only if the existing enum
-        does not have any members):
+      * để sử dụng enum ``cls`` nhằm tạo một enum mới (chỉ khi enum hiện có không có member nào):
 
-         :cls:   The enum class being called.
-         :value: The name of the new Enum to create.
-         :names: The names/values of the members for the new Enum.
-         :module:    The name of the module the new Enum is created in.
-         :qualname:  The actual location in the module where this Enum can be found.
-         :type:  A mix-in type for the new Enum.
-         :start: The first integer value for the Enum (used by :class:`auto`).
-         :boundary:  How to handle out-of-range values from bit operations (:class:`Flag` only).
+         :cls:   Lớp enum đang được gọi.
+         :value: Tên của Enum mới cần tạo.
+         :names: Tên/giá trị của các thành viên cho Enum mới.
+         :module:    Tên của module mà Enum mới được tạo trong đó.
+         :qualname:  Vị trí thực tế trong module nơi có thể tìm thấy Enum này.
+         :type:  Một kiểu mix-in cho Enum mới.
+         :start: Giá trị số nguyên đầu tiên cho Enum (được :class:`auto` sử dụng).
+         :boundary:  Cách xử lý các giá trị nằm ngoài phạm vi từ các phép toán bit (chỉ :class:`Flag`).
 
    .. method:: EnumType.__contains__(cls, member)
 
-      Returns ``True`` if member belongs to the ``cls``::
+      Trả về ``True`` nếu thành viên thuộc ``cls``::
 
         >>> some_var = Color.RED
         >>> some_var in Color
@@ -218,45 +190,43 @@ Data types
 
       .. versionchanged:: 3.12
 
-         Before Python 3.12, a ``TypeError`` is raised if a
-         non-Enum-member is used in a containment check.
+         Trước Python 3.12, một ``TypeError`` được đưa ra nếu một đối tượng không phải thành viên Enum được sử dụng trong phép kiểm tra chứa.
 
    .. method:: EnumType.__dir__(cls)
 
-      Returns ``['__class__', '__doc__', '__members__', '__module__']`` and the
-      names of the members in *cls*::
+      Trả về ``['__class__', '__doc__', '__members__', '__module__']`` và tên của các thành viên trong *cls*::
 
         >>> dir(Color)
         ['BLUE', 'GREEN', 'RED', '__class__', '__contains__', '__doc__', '__getitem__', '__init_subclass__', '__iter__', '__len__', '__members__', '__module__', '__name__', '__qualname__']
 
    .. method:: EnumType.__getitem__(cls, name)
 
-      Returns the Enum member in *cls* matching *name*, or raises a :exc:`KeyError`::
+      Trả về thành viên Enum trong *cls* khớp với *name*, hoặc đưa ra một :exc:`KeyError`::
 
         >>> Color['BLUE']
         <Color.BLUE: 3>
 
    .. method:: EnumType.__iter__(cls)
 
-      Returns each member in *cls* in definition order::
+      Trả về từng thành viên trong *cls* theo thứ tự định nghĩa::
 
         >>> list(Color)
         [<Color.RED: 1>, <Color.GREEN: 2>, <Color.BLUE: 3>]
 
    .. method:: EnumType.__len__(cls)
 
-      Returns the number of members in *cls*::
+      Trả về số lượng thành viên trong *cls*::
 
         >>> len(Color)
         3
 
    .. attribute:: EnumType.__members__
 
-      Returns a mapping of every enum name to its member, including aliases
+      Trả về ánh xạ từ mọi tên enum đến thành viên tương ứng, bao gồm cả bí danh
 
    .. method:: EnumType.__reversed__(cls)
 
-      Returns each member in *cls* in reverse definition order::
+      Trả về từng thành viên trong *cls* theo thứ tự định nghĩa ngược::
 
         >>> list(reversed(Color))
         [<Color.BLUE: 3>, <Color.GREEN: 2>, <Color.RED: 1>]
@@ -264,51 +234,43 @@ Data types
 
 .. class:: Enum
 
-   *Enum* is the base class for all *enum* enumerations.
+   *Enum* là lớp cơ sở cho tất cả các enumeration *enum*.
 
    .. attribute:: Enum.name
 
-      The name used to define the ``Enum`` member::
+      Tên được dùng để định nghĩa thành viên ``Enum``::
 
         >>> Color.BLUE.name
         'BLUE'
 
    .. attribute:: Enum.value
 
-      The value given to the ``Enum`` member::
+      Giá trị được gán cho thành viên ``Enum``::
 
          >>> Color.RED.value
          1
 
-      Value of the member, can be set in :meth:`~Enum.__new__`.
+      Giá trị của thành viên, có thể được đặt trong :meth:`~Enum.__new__`.
 
-      .. note:: Enum member values
+      .. note:: Giá trị thành viên của Enum
 
-         Member values can be anything: :class:`int`, :class:`str`, etc.  If
-         the exact value is unimportant you may use :class:`auto` instances and an
-         appropriate value will be chosen for you.  See :class:`auto` for the
-         details.
+         Giá trị thành viên có thể là bất kỳ thứ gì: :class:`int`, :class:`str`, v.v. Nếu giá trị cụ thể không quan trọng, bạn có thể sử dụng các instance :class:`auto` và một giá trị phù hợp sẽ được tự động chọn cho bạn. Xem :class:`auto` để biết chi tiết.
 
-         While mutable/unhashable values, such as :class:`dict`, :class:`list` or
-         a mutable :class:`~dataclasses.dataclass`, can be used, they will have a
-         quadratic performance impact during creation relative to the
-         total number of mutable/unhashable values in the enum.
+         Mặc dù có thể sử dụng các giá trị có thể thay đổi/không thể băm (mutable/unhashable), chẳng hạn như :class:`dict`, :class:`list` hoặc một :class:`~dataclasses.dataclass` có thể thay đổi, nhưng chúng sẽ làm giảm hiệu năng theo cấp số nhân trong quá trình tạo, tương ứng với tổng số giá trị có thể thay đổi/không thể băm trong enum.
 
    .. attribute:: Enum._name_
 
-      Name of the member.
+      Tên của member.
 
    .. attribute:: Enum._value_
 
-      Value of the member, can be set in :meth:`~Enum.__new__`.
+      Giá trị của thành viên, có thể được đặt trong :meth:`~Enum.__new__`.
 
    .. attribute:: Enum._order_
 
-      No longer used, kept for backward compatibility.
-      (class attribute, removed during class creation).
+      Không còn được sử dụng, được giữ lại để tương thích ngược. (class attribute, bị xóa trong quá trình tạo class).
 
-      The :attr:`~Enum._order_` attribute can be provided to help keep Python 2 / Python 3 code in sync.
-      It will be checked against the actual order of the enumeration and raise an error if the two do not match::
+      Có thể cung cấp attribute :attr:`~Enum._order_` để giúp giữ cho code Python 2 / Python 3 đồng bộ. Attribute này sẽ được kiểm tra với thứ tự thực tế của enumeration và sẽ phát sinh lỗi nếu hai thứ không khớp::
 
          >>> class Color(Enum):
          ...     _order_ = 'RED GREEN BLUE'
@@ -324,26 +286,22 @@ Data types
 
       .. note::
 
-         In Python 2 code the :attr:`~Enum._order_` attribute is necessary as definition
-         order is lost before it can be recorded.
+         Trong code Python 2, attribute :attr:`~Enum._order_` là cần thiết vì thứ tự định nghĩa bị mất trước khi có thể được ghi lại.
 
       .. versionadded:: 3.6
 
    .. attribute:: Enum._ignore_
 
-      ``_ignore_`` is only used during creation and is removed from the
-      enumeration once creation is complete.
+      ``_ignore_`` chỉ được sử dụng trong quá trình tạo và bị xóa khỏi enumeration sau khi quá trình tạo hoàn tất.
 
-      ``_ignore_`` is a list of names that will not become members, and whose
-      names will also be removed from the completed enumeration.  See
-      :ref:`TimePeriod <enum-time-period>` for an example.
+      ``_ignore_`` là danh sách các tên sẽ không trở thành thành viên và tên của chúng cũng sẽ bị loại khỏi phép liệt kê hoàn chỉnh. Xem
+      :ref:`TimePeriod <enum-time-period>` để xem ví dụ.
 
       .. versionadded:: 3.7
 
    .. method:: Enum.__dir__(self)
 
-      Returns ``['__class__', '__doc__', '__module__', 'name', 'value']`` and
-      any public methods defined on *self.__class__*::
+      Trả về ``['__class__', '__doc__', '__module__', 'name', 'value']`` và mọi phương thức công khai được định nghĩa trên *self.__class__*::
 
          >>> from enum import Enum
          >>> import datetime as dt
@@ -364,22 +322,20 @@ Data types
 
    .. method:: Enum._generate_next_value_(name, start, count, last_values)
 
-         :name: The name of the member being defined (e.g. 'RED').
-         :start: The start value for the Enum; the default is 1.
-         :count: The number of members currently defined, not including this one.
-         :last_values: A list of the previous values.
+         :name: Tên của thành viên đang được định nghĩa (ví dụ: 'RED').
+         :start: Giá trị bắt đầu cho Enum; mặc định là 1.
+         :count: Số lượng thành viên hiện được định nghĩa, không bao gồm thành viên này.
+         :last_values: Danh sách các giá trị trước đó.
 
-      A *staticmethod* that is used to determine the next value returned by
+      Một *staticmethod* được sử dụng để xác định giá trị tiếp theo được trả về bởi
       :class:`auto`.
 
       .. note::
-         For standard :class:`Enum` classes the next value chosen is the highest
-         value seen incremented by one.
+         Đối với các lớp :class:`Enum` tiêu chuẩn, giá trị tiếp theo được chọn là giá trị cao nhất đã thấy cộng thêm một.
 
-         For :class:`Flag` classes the next value chosen will be the next highest
-         power-of-two.
+         Đối với các lớp :class:`Flag`, giá trị tiếp theo được chọn sẽ là lũy thừa của hai nhỏ nhất tiếp theo.
 
-      This method may be overridden, e.g.::
+      Có thể ghi đè phương thức này, ví dụ:::
 
          >>> from enum import auto, Enum
          >>> class PowersOfThree(Enum):
@@ -394,28 +350,25 @@ Data types
 
       .. versionadded:: 3.6
       .. versionchanged:: 3.13
-         Prior versions would use the last seen value instead of the highest value.
+         Các phiên bản trước đây sẽ sử dụng giá trị được thấy gần nhất thay vì giá trị cao nhất.
 
    .. method:: Enum.__init__(self, *args, **kwds)
 
-      By default, does nothing.  If multiple values are given in the member
-      assignment, those values become separate arguments to ``__init__``; e.g.
+      Theo mặc định, phương thức này không làm gì. Nếu phép gán thành viên cung cấp nhiều giá trị, các giá trị đó trở thành các đối số riêng biệt của ``__init__``; ví dụ:
 
          >>> from enum import Enum
          >>> class Weekday(Enum):
          ...     MONDAY = 1, 'Mon'
 
-      ``Weekday.__init__()`` would be called as ``Weekday.__init__(self, 1, 'Mon')``
+      ``Weekday.__init__()`` sẽ được gọi như sau: ``Weekday.__init__(self, 1, 'Mon')``
 
    .. method:: Enum.__init_subclass__(cls, **kwds)
 
-      A *classmethod* that is used to further configure subsequent subclasses.
-      By default, does nothing.
+      Một *classmethod* được dùng để cấu hình thêm cho các lớp con tiếp theo. Theo mặc định, không thực hiện gì.
 
    .. method:: Enum._missing_(cls, value)
 
-      A *classmethod* for looking up values not found in *cls*.  By default it
-      does nothing, but can be overridden to implement custom search behavior::
+      Một *classmethod* dùng để tra cứu các giá trị không tìm thấy trong *cls*. Theo mặc định, phương thức này không thực hiện gì, nhưng có thể được ghi đè để triển khai hành vi tìm kiếm tùy chỉnh::
 
          >>> from enum import auto, StrEnum
          >>> class Build(StrEnum):
@@ -438,25 +391,21 @@ Data types
 
    .. method:: Enum.__new__(cls, *args, **kwds)
 
-      By default, doesn't exist.  If specified, either in the enum class
-      definition or in a mixin class (such as ``int``), all values given
-      in the member assignment will be passed; e.g.
+      Theo mặc định, không tồn tại. Nếu được chỉ định trong định nghĩa lớp enum hoặc trong một lớp mixin (chẳng hạn như ``int``), tất cả các giá trị được cung cấp trong phép gán member sẽ được truyền vào; ví dụ:
 
          >>> from enum import Enum
          >>> class MyIntEnum(int, Enum):
          ...     TWENTYSIX = '1a', 16
 
-      results in the call ``int('1a', 16)`` and a value of ``26`` for the member.
+      dẫn đến lời gọi ``int('1a', 16)`` và giá trị ``26`` cho member.
 
       .. note::
 
-         When writing a custom ``__new__``, do not use ``super().__new__`` --
-         call the appropriate ``__new__`` instead.
+         Khi viết ``__new__`` tùy chỉnh, không sử dụng ``super().__new__`` -- hãy gọi ``__new__`` thích hợp thay thế.
 
    .. method:: Enum.__repr__(self)
 
-      Returns the string used for *repr()* calls.  By default, returns the
-      *Enum* name, member name, and value, but can be overridden::
+      Trả về chuỗi được dùng cho các lời gọi *repr()*. Theo mặc định, trả về tên *Enum*, tên member và giá trị, nhưng có thể được ghi đè::
 
          >>> from enum import auto, Enum
          >>> class OtherStyle(Enum):
@@ -472,8 +421,7 @@ Data types
 
    .. method:: Enum.__str__(self)
 
-      Returns the string used for *str()* calls.  By default, returns the
-      *Enum* name and member name, but can be overridden::
+      Trả về chuỗi được dùng cho các lời gọi *str()*. Theo mặc định, trả về tên *Enum* và tên member, nhưng có thể được ghi đè::
 
          >>> from enum import auto, Enum
          >>> class OtherStyle(Enum):
@@ -488,8 +436,7 @@ Data types
 
    .. method:: Enum.__format__(self)
 
-      Returns the string used for *format()* and *f-string* calls.  By default,
-      returns :meth:`__str__` return value, but can be overridden::
+      Trả về chuỗi được sử dụng cho các lệnh gọi *format()* và *f-string*. Theo mặc định, trả về giá trị :meth:`__str__`, nhưng có thể ghi đè::
 
          >>> from enum import auto, Enum
          >>> class OtherStyle(Enum):
@@ -504,42 +451,39 @@ Data types
 
    .. note::
 
-      Using :class:`auto` with :class:`Enum` results in integers of increasing value,
-      starting with ``1``.
+      Khi sử dụng :class:`auto` với :class:`Enum`, kết quả là các số nguyên có giá trị tăng dần, bắt đầu từ ``1``.
 
-   .. versionchanged:: 3.12 Added :ref:`enum-dataclass-support`
+   .. versionchanged:: 3.12 Đã thêm :ref:`enum-dataclass-support`
 
    .. method:: Enum._add_alias_
 
-      Adds a new name as an alias to an existing member::
+      Thêm một tên mới làm bí danh cho một thành viên hiện có::
 
          >>> Color.RED._add_alias_("ERROR")
          >>> Color.ERROR
          <Color.RED: 1>
 
-      Raises a :exc:`NameError` if the name is already assigned to a different member.
+      Nêu ra một :exc:`NameError` nếu tên đã được gán cho một thành viên khác.
 
       .. versionadded:: 3.13
 
    .. method:: Enum._add_value_alias_
 
-      Adds a new value as an alias to an existing member::
+      Thêm một giá trị mới làm bí danh cho một thành viên hiện có::
 
          >>> Color.RED._add_value_alias_(42)
          >>> Color(42)
          <Color.RED: 1>
 
-      | Raises a :exc:`ValueError` if the value is already linked with a different member.
-      | See :ref:`multi-value-enum` for an example.
+      | Nêu ra một :exc:`ValueError` nếu giá trị đã được liên kết với một thành viên khác.
+      | Xem :ref:`multi-value-enum` để biết ví dụ.
 
       .. versionadded:: 3.13
 
 
 .. class:: IntEnum
 
-   *IntEnum* is the same as :class:`Enum`, but its members are also integers and can be
-   used anywhere that an integer can be used.  If any integer operation is performed
-   with an *IntEnum* member, the resulting value loses its enumeration status.
+   *IntEnum* giống như :class:`Enum`, nhưng các thành viên của nó cũng là số nguyên và có thể được sử dụng ở bất kỳ nơi nào có thể sử dụng số nguyên. Nếu thực hiện bất kỳ phép toán số nguyên nào với một thành viên *IntEnum*, giá trị kết quả sẽ không còn thuộc enumeration.
 
       >>> from enum import IntEnum
       >>> class Number(IntEnum):
@@ -558,20 +502,16 @@ Data types
 
    .. note::
 
-      Using :class:`auto` with :class:`IntEnum` results in integers of increasing
-      value, starting with ``1``.
+      Sử dụng :class:`auto` với :class:`IntEnum` sẽ tạo ra các số nguyên có giá trị tăng dần, bắt đầu từ ``1``.
 
-   .. versionchanged:: 3.11 :meth:`~object.__str__` is now :meth:`!int.__str__` to
-      better support the *replacement of existing constants* use-case.
-      :meth:`~object.__format__` was already :meth:`!int.__format__` for that same reason.
+   .. versionchanged:: 3.11 :meth:`~object.__str__` hiện đã :meth:`!int.__str__` để
+      hỗ trợ tốt hơn trường hợp sử dụng *thay thế các hằng số hiện có*.
+      :meth:`~object.__format__` đã được :meth:`!int.__format__` vì cùng lý do đó.
 
 
 .. class:: StrEnum
 
-   *StrEnum* is the same as :class:`Enum`, but its members are also strings and
-   can be used in most of the same places that a string can be used. The result
-   of any string operation performed on or with a *StrEnum* member is not part
-   of the enumeration.
+   *StrEnum* giống như :class:`Enum`, nhưng các thành viên của nó cũng là chuỗi và có thể được sử dụng ở hầu hết những nơi có thể sử dụng chuỗi. Kết quả của bất kỳ thao tác chuỗi nào được thực hiện trên hoặc với một thành viên *StrEnum* đều không thuộc enumeration.
 
    >>> from enum import StrEnum, auto
    >>> class Color(StrEnum):
@@ -589,33 +529,26 @@ Data types
 
    .. note::
 
-      There are places in the stdlib that check for an exact :class:`str`
-      instead of a :class:`str` subclass (i.e. ``type(unknown) == str``
-      instead of ``isinstance(unknown, str)``), and in those locations you
-      will need to use ``str(MyStrEnum.MY_MEMBER)``.
+      Trong stdlib có những nơi kiểm tra một :class:`str` chính xác thay vì một lớp con của :class:`str` (tức là ``type(unknown) == str`` thay vì ``isinstance(unknown, str)``), và tại những nơi đó, bạn cần sử dụng ``str(MyStrEnum.MY_MEMBER)``.
 
    .. note::
 
-      Using :class:`auto` with :class:`StrEnum` results in the lower-cased member
-      name as the value.
+      Việc sử dụng :class:`auto` với :class:`StrEnum` sẽ cho ra tên thành viên viết thường làm giá trị.
 
    .. note::
 
-      :meth:`~object.__str__` is :meth:`!str.__str__` to better support the
-      *replacement of existing constants* use-case.  :meth:`~object.__format__` is likewise
-      :meth:`!str.__format__` for that same reason.
+      :meth:`~object.__str__` được :meth:`!str.__str__` để hỗ trợ tốt hơn trường hợp sử dụng *replacement of existing constants*. :meth:`~object.__format__` cũng vậy
+      :meth:`!str.__format__` vì cùng lý do đó.
 
    .. versionadded:: 3.11
 
 .. class:: Flag
 
-   ``Flag`` is the same as :class:`Enum`, but its members support the bitwise
-   operators ``&`` (*AND*), ``|`` (*OR*), ``^`` (*XOR*), and ``~`` (*INVERT*);
-   the results of those operations are (aliases of) members of the enumeration.
+   ``Flag`` giống với :class:`Enum`, nhưng các thành viên của nó hỗ trợ các toán tử bitwise ``&`` (*AND*), ``|`` (*OR*), ``^`` (*XOR*) và ``~`` (*INVERT*); kết quả của các phép toán đó là (bí danh của) các thành viên trong enumeration.
 
    .. method:: __contains__(self, value)
 
-      Returns *True* if value is in self::
+      Trả về *True* nếu value nằm trong self::
 
          >>> from enum import Flag, auto
          >>> class Color(Flag):
@@ -636,7 +569,7 @@ Data types
 
    .. method:: __iter__(self)
 
-      Returns all contained non-alias members::
+      Trả về tất cả các thành viên được chứa, không phải bí danh::
 
          >>> list(Color.RED)
          [<Color.RED: 1>]
@@ -647,7 +580,7 @@ Data types
 
    .. method:: __len__(self)
 
-      Returns number of members in flag::
+      Trả về số lượng thành viên trong cờ::
 
          >>> len(Color.GREEN)
          1
@@ -658,7 +591,7 @@ Data types
 
    .. method:: __bool__(self)
 
-      Returns *True* if any members in flag, *False* otherwise::
+      Trả về *True* nếu cờ có bất kỳ thành viên nào, nếu không thì trả về *False*::
 
          >>> bool(Color.GREEN)
          True
@@ -670,14 +603,14 @@ Data types
 
    .. method:: __or__(self, other)
 
-      Returns current flag binary or'ed with other::
+      Trả về kết quả OR nhị phân của cờ hiện tại với giá trị khác::
 
          >>> Color.RED | Color.GREEN
          <Color.RED|GREEN: 3>
 
    .. method:: __and__(self, other)
 
-      Returns current flag binary and'ed with other::
+      Trả về kết quả AND nhị phân của cờ hiện tại với giá trị khác::
 
          >>> purple & white
          <Color.RED|BLUE: 5>
@@ -686,7 +619,7 @@ Data types
 
    .. method:: __xor__(self, other)
 
-      Returns current flag binary xor'ed with other::
+      Trả về kết quả XOR nhị phân của cờ hiện tại với giá trị khác::
 
          >>> purple ^ white
          <Color.GREEN: 2>
@@ -695,7 +628,7 @@ Data types
 
    .. method:: __invert__(self)
 
-      Returns all the flags in *type(self)* that are not in *self*::
+      Trả về tất cả các cờ trong *type(self)* không có trong *self*::
 
          >>> ~white
          <Color: 0>
@@ -706,24 +639,21 @@ Data types
 
    .. method:: _numeric_repr_
 
-      Function used to format any remaining unnamed numeric values.  Default is
-      the value's repr; common choices are :func:`hex` and :func:`oct`.
+      Hàm được dùng để định dạng mọi giá trị số còn lại chưa được đặt tên. Mặc định là repr của giá trị; các lựa chọn phổ biến là :func:`hex` và :func:`oct`.
 
    .. note::
 
-      Using :class:`auto` with :class:`Flag` results in integers that are powers
-      of two, starting with ``1``.
+      Việc sử dụng :class:`auto` với :class:`Flag` tạo ra các số nguyên là lũy thừa của hai, bắt đầu từ ``1``.
 
-   .. versionchanged:: 3.11 The *repr()* of zero-valued flags has changed.  It
-      is now:
+   .. versionchanged:: 3.11 *repr()* của các flag có giá trị bằng không đã thay đổi. Nó
+      hiện là:
 
          >>> Color(0) # doctest: +SKIP
          <Color: 0>
 
 .. class:: IntFlag
 
-   ``IntFlag`` is the same as :class:`Flag`, but its members are also integers and can be
-   used anywhere that an integer can be used.
+   ``IntFlag`` giống với :class:`Flag`, nhưng các phần tử của nó cũng là số nguyên và có thể được sử dụng ở bất cứ nơi nào có thể sử dụng một số nguyên.
 
       >>> from enum import IntFlag, auto
       >>> class Color(IntFlag):
@@ -736,60 +666,51 @@ Data types
       >>> Color.RED | 2
       <Color.RED|GREEN: 3>
 
-   If any integer operation is performed with an *IntFlag* member, the result is
-   not an *IntFlag*::
+   Nếu thực hiện bất kỳ phép toán số nguyên nào với một phần tử *IntFlag*, kết quả không phải là một *IntFlag*::
 
         >>> Color.RED + 2
         3
 
-   If a :class:`Flag` operation is performed with an *IntFlag* member and:
+   Nếu thực hiện phép :class:`Flag` với một phần tử *IntFlag* và:
 
-   * the result is a valid *IntFlag*: an *IntFlag* is returned
-   * the result is not a valid *IntFlag*: the result depends on the :class:`FlagBoundary` setting
+   * kết quả là một *IntFlag* hợp lệ: một *IntFlag* được trả về
+   * kết quả không phải là một *IntFlag* hợp lệ: kết quả phụ thuộc vào thiết lập :class:`FlagBoundary`
 
-   The :func:`repr` of unnamed zero-valued flags has changed.  It is now::
+   :func:`repr` của các flag không có tên có giá trị bằng không đã thay đổi. Hiện tại nó là::
 
       >>> Color(0)
       <Color: 0>
 
    .. note::
 
-      Using :class:`auto` with :class:`IntFlag` results in integers that are powers
-      of two, starting with ``1``.
+      Việc sử dụng :class:`auto` với :class:`IntFlag` tạo ra các số nguyên là lũy thừa của hai, bắt đầu từ ``1``.
 
    .. versionchanged:: 3.11
 
-      :meth:`~object.__str__` is now :meth:`!int.__str__` to better support the
-      *replacement of existing constants* use-case.  :meth:`~object.__format__` was
-      already :meth:`!int.__format__` for that same reason.
+      :meth:`~object.__str__` hiện :meth:`!int.__str__` để hỗ trợ tốt hơn trường hợp sử dụng *thay thế các hằng số hiện có*. :meth:`~object.__format__` đã :meth:`!int.__format__` vì cùng lý do đó.
 
-      Inversion of an :class:`!IntFlag` now returns a positive value that is the
-      union of all flags not in the given flag, rather than a negative value.
-      This matches the existing :class:`Flag` behavior.
+      Phép đảo của một :class:`!IntFlag` hiện trả về một giá trị dương là hợp của tất cả các flag không có trong flag đã cho, thay vì một giá trị âm. Điều này phù hợp với hành vi :class:`Flag` hiện có.
 
 .. class:: ReprEnum
 
-   :class:`!ReprEnum` uses the :meth:`repr() <Enum.__repr__>` of :class:`Enum`,
-   but the :class:`str() <str>` of the mixed-in data type:
+   :class:`!ReprEnum` sử dụng :meth:`repr() <Enum.__repr__>` của :class:`Enum`, nhưng sử dụng :class:`str() <str>` của kiểu dữ liệu được trộn vào:
 
-   * :meth:`!int.__str__` for :class:`IntEnum` and :class:`IntFlag`
-   * :meth:`!str.__str__` for :class:`StrEnum`
+   * :meth:`!int.__str__` cho :class:`IntEnum` và :class:`IntFlag`
+   * :meth:`!str.__str__` cho :class:`StrEnum`
 
-   Inherit from :class:`!ReprEnum` to keep the :class:`str() <str>` / :func:`format`
-   of the mixed-in data type instead of using the
-   :class:`Enum`-default :meth:`str() <Enum.__str__>`.
+   Kế thừa từ :class:`!ReprEnum` để giữ lại :class:`str() <str>` / :func:`format` của kiểu dữ liệu được trộn vào thay vì sử dụng
+   :class:`Enum`-mặc định :meth:`str() <Enum.__str__>`.
 
 
    .. versionadded:: 3.11
 
 .. class:: EnumCheck
 
-   *EnumCheck* contains the options used by the :func:`verify` decorator to ensure
-   various constraints; failed constraints result in a :exc:`ValueError`.
+   *EnumCheck* chứa các tùy chọn được decorator :func:`verify` sử dụng để đảm bảo nhiều ràng buộc; các ràng buộc không đạt sẽ dẫn đến một :exc:`ValueError`.
 
    .. attribute:: UNIQUE
 
-      Ensure that each value has only one name::
+      Đảm bảo mỗi giá trị chỉ có một tên::
 
          >>> from enum import Enum, verify, UNIQUE
          >>> @verify(UNIQUE)
@@ -805,8 +726,7 @@ Data types
 
    .. attribute:: CONTINUOUS
 
-      Ensure that there are no missing values between the lowest-valued member
-      and the highest-valued member::
+      Đảm bảo không có giá trị nào bị thiếu giữa thành viên có giá trị thấp nhất và thành viên có giá trị cao nhất::
 
          >>> from enum import Enum, verify, CONTINUOUS
          >>> @verify(CONTINUOUS)
@@ -820,8 +740,7 @@ Data types
 
    .. attribute:: NAMED_FLAGS
 
-      Ensure that any flag groups/masks contain only named flags -- useful when
-      values are specified instead of being generated by :func:`auto`::
+      Đảm bảo rằng mọi nhóm/mask cờ chỉ chứa các cờ được đặt tên -- hữu ích khi các giá trị được chỉ định thay vì được tạo bởi :func:`auto`::
 
          >>> from enum import Flag, verify, NAMED_FLAGS
          >>> @verify(NAMED_FLAGS)
@@ -837,19 +756,17 @@ Data types
 
    .. note::
 
-      CONTINUOUS and NAMED_FLAGS are designed to work with integer-valued members.
+      CONTINUOUS và NAMED_FLAGS được thiết kế để hoạt động với các member có giá trị nguyên.
 
    .. versionadded:: 3.11
 
 .. class:: FlagBoundary
 
-   ``FlagBoundary`` controls how out-of-range values are handled in :class:`Flag` and its
-   subclasses.
+   ``FlagBoundary`` kiểm soát cách xử lý các giá trị nằm ngoài phạm vi trong :class:`Flag` và các lớp con của nó.
 
    .. attribute:: STRICT
 
-      Out-of-range values cause a :exc:`ValueError` to be raised. This is the
-      default for :class:`Flag`::
+      Các giá trị nằm ngoài phạm vi khiến :exc:`ValueError` được phát sinh. Đây là giá trị mặc định cho :class:`Flag`::
 
          >>> from enum import Flag, STRICT, auto
          >>> class StrictFlag(Flag, boundary=STRICT):
@@ -866,8 +783,7 @@ Data types
 
    .. attribute:: CONFORM
 
-      Out-of-range values have invalid values removed, leaving a valid :class:`Flag`
-      value::
+      Các giá trị nằm ngoài phạm vi bị loại bỏ các giá trị không hợp lệ, để lại một giá trị :class:`Flag` hợp lệ::
 
          >>> from enum import Flag, CONFORM, auto
          >>> class ConformFlag(Flag, boundary=CONFORM):
@@ -880,7 +796,7 @@ Data types
 
    .. attribute:: EJECT
 
-      Out-of-range values lose their :class:`Flag` membership and revert to :class:`int`.
+      Các giá trị nằm ngoài phạm vi mất tư cách thành viên :class:`Flag` và trở về :class:`int`.
 
          >>> from enum import Flag, EJECT, auto
          >>> class EjectFlag(Flag, boundary=EJECT):
@@ -893,8 +809,7 @@ Data types
 
    .. attribute:: KEEP
 
-      Out-of-range values are kept, and the :class:`Flag` membership is kept.
-      This is the default for :class:`IntFlag`::
+      Các giá trị nằm ngoài phạm vi được giữ lại, đồng thời tư cách thành viên :class:`Flag` cũng được giữ lại. Đây là giá trị mặc định cho :class:`IntFlag`::
 
          >>> from enum import Flag, KEEP, auto
          >>> class KeepFlag(Flag, boundary=KEEP):
@@ -909,21 +824,13 @@ Data types
 
 .. class:: EnumDict
 
-   *EnumDict* is a subclass of :class:`dict` that is used as the namespace
-   for defining enum classes (see :ref:`prepare`).
-   It is exposed to allow subclasses of :class:`EnumType` with advanced
-   behavior like having multiple values per member.
-   It should be called with the name of the enum class being created, otherwise
-   private names and internal classes will not be handled correctly.
+   *EnumDict* là một lớp con của :class:`dict` được dùng làm namespace để định nghĩa các lớp enum (xem :ref:`prepare`). Nó được cung cấp để cho phép tạo các lớp con của :class:`EnumType` với hành vi nâng cao, chẳng hạn như mỗi member có nhiều giá trị. Lớp này phải được gọi với tên của lớp enum đang được tạo; nếu không, các tên riêng tư và lớp nội bộ sẽ không được xử lý chính xác.
 
-   Note that only the :class:`~collections.abc.MutableMapping` interface
-   (:meth:`~object.__setitem__` and :meth:`~dict.update`) is overridden.
-   It may be possible to bypass the checks using other :class:`!dict`
-   operations like :meth:`|= <object.__ior__>`.
+   Lưu ý rằng chỉ có interface :class:`~collections.abc.MutableMapping` (:meth:`~object.__setitem__` và :meth:`~dict.update`) được ghi đè. Có thể vượt qua các bước kiểm tra bằng cách sử dụng những thao tác :class:`!dict` khác như :meth:`|= <object.__ior__>`.
 
    .. attribute:: EnumDict.member_names
 
-      A list of member names.
+      Danh sách tên member.
 
    .. versionadded:: 3.13
 
@@ -931,42 +838,32 @@ Data types
 
 .. _enum-dunder-sunder:
 
-Supported ``__dunder__`` names
-""""""""""""""""""""""""""""""
+Các tên ``__dunder__`` được hỗ trợ
+""""""""""""""""""""""""""""""""""
 
-:attr:`~EnumType.__members__` is a read-only ordered mapping of ``member_name``:``member``
-items.  It is only available on the class.
+:attr:`~EnumType.__members__` là một ánh xạ có thứ tự, chỉ đọc, gồm các mục ``member_name``:``member``. Nó chỉ khả dụng trên class.
 
-:meth:`~Enum.__new__`, if specified, must create and return the enum members;
-it is also a very good idea to set the member's :attr:`~Enum._value_` appropriately.
-Once all the members are created it is no longer used.
+:meth:`~Enum.__new__`, nếu được chỉ định, phải tạo và trả về các enum member; đồng thời, bạn cũng nên đặt :attr:`~Enum._value_` của member một cách phù hợp. Sau khi tất cả member được tạo, nó sẽ không còn được sử dụng.
 
 
-Supported ``_sunder_`` names
-""""""""""""""""""""""""""""
+Các tên ``_sunder_`` được hỗ trợ
+""""""""""""""""""""""""""""""""
 
-- :attr:`~Enum._name_` -- name of the member
-- :attr:`~Enum._value_` -- value of the member; can be set in ``__new__``
-- :meth:`~Enum._missing_` -- a lookup function used when a value is not found;
-  may be overridden
-- :attr:`~Enum._ignore_` -- a list of names, either as a :class:`list` or a
-  :class:`str`, that will not be transformed into members, and will be removed
-  from the final class
-- :attr:`~Enum._order_` -- no longer used, kept for backward
-  compatibility (class attribute, removed during class creation)
+- :attr:`~Enum._name_` -- tên của member
+- :attr:`~Enum._value_` -- giá trị của member; có thể được đặt trong ``__new__``
+- :meth:`~Enum._missing_` -- hàm tra cứu được dùng khi không tìm thấy giá trị; có thể được ghi đè
+- :attr:`~Enum._ignore_` -- danh sách tên, ở dạng :class:`list` hoặc một
+  :class:`str`, sẽ không được chuyển thành các member và sẽ bị xóa khỏi class cuối cùng
+- :attr:`~Enum._order_` -- không còn được sử dụng, được giữ lại để tương thích ngược (thuộc tính class, bị xóa trong quá trình tạo class)
 
-- :meth:`~Enum._generate_next_value_` -- used to get an appropriate value for
-  an enum member; may be overridden
+- :meth:`~Enum._generate_next_value_` -- được dùng để lấy giá trị phù hợp cho một enum member; có thể được ghi đè
 
-- :meth:`~Enum._add_alias_` -- adds a new name as an alias to an existing
-  member.
-- :meth:`~Enum._add_value_alias_` -- adds a new value as an alias to an
-  existing member.
+- :meth:`~Enum._add_alias_` -- thêm một tên mới làm bí danh cho một member hiện có.
+- :meth:`~Enum._add_value_alias_` -- thêm một giá trị mới làm bí danh cho một member hiện có.
 
-- While ``_sunder_`` names are generally reserved for the further development
-  of the :class:`Enum` class and can not be used, some are explicitly allowed:
+- Mặc dù các tên ``_sunder_`` thường được dành riêng cho việc phát triển tiếp theo của lớp :class:`Enum` và không thể sử dụng, một số tên được cho phép rõ ràng:
 
-  - ``_repr_*`` (e.g. ``_repr_html_``), as used in `IPython's rich display`_
+  - ``_repr_*`` (ví dụ: ``_repr_html_``), được sử dụng trong `IPython's rich display <IPython's rich display_>`_
 
 .. versionadded:: 3.6 ``_missing_``, ``_order_``, ``_generate_next_value_``
 .. versionadded:: 3.7 ``_ignore_``
@@ -975,58 +872,38 @@ Supported ``_sunder_`` names
 
 ---------------
 
-Utilities and decorators
-------------------------
+Các tiện ích và decorator
+-------------------------
 
 .. class:: auto
 
-   *auto* can be used in place of a value.  If used, the *Enum* machinery will
-   call an :class:`Enum`'s :meth:`~Enum._generate_next_value_` to get an appropriate value.
-   For :class:`Enum` and :class:`IntEnum` that appropriate value will be the last value plus
-   one; for :class:`Flag` and :class:`IntFlag` it will be the first power-of-two greater
-   than the highest value; for :class:`StrEnum` it will be the lower-cased version of
-   the member's name.  Care must be taken if mixing *auto()* with manually
-   specified values.
+   *auto* có thể được dùng thay cho một giá trị. Nếu được sử dụng, cơ chế *Enum* sẽ gọi :class:`Enum` của :meth:`~Enum._generate_next_value_` để lấy một giá trị phù hợp. Với :class:`Enum` và :class:`IntEnum`, giá trị phù hợp sẽ là giá trị cuối cùng cộng một; với :class:`Flag` và :class:`IntFlag`, đó sẽ là lũy thừa của hai nhỏ nhất lớn hơn giá trị cao nhất; với :class:`StrEnum`, đó sẽ là phiên bản viết thường của tên member. Cần thận trọng khi kết hợp *auto()* với các giá trị được chỉ định thủ công.
 
-   *auto* instances are only resolved when at the top level of an assignment, either by
-   itself or as part of a tuple:
+   Các instance *auto* chỉ được phân giải khi ở cấp cao nhất của một phép gán, либо tự nó hoặc là một phần của tuple:
 
-   * ``FIRST = auto()`` will work (auto() is replaced with ``1``);
-   * ``SECOND = auto(), -2`` will work (auto is replaced with ``2``, so ``2, -2`` is
-     used to create the ``SECOND`` enum member;
-   * ``THREE = [auto(), -3]`` will *not* work (``[<auto instance>, -3]`` is used to
-     create the ``THREE`` enum member)
+   * ``FIRST = auto()`` sẽ hoạt động (auto() được thay thế bằng ``1``);
+   * ``SECOND = auto(), -2`` sẽ hoạt động (auto được thay thế bằng ``2``, vì vậy ``2, -2`` được dùng để tạo member ``SECOND`` của enum;
+   * ``THREE = [auto(), -3]`` sẽ *không* hoạt động (``[<auto instance>, -3]`` được dùng để tạo member ``THREE`` của enum)
 
    .. versionchanged:: 3.11.1
 
-      In prior versions, ``auto()`` had to be the only thing
-      on the assignment line to work properly.
+      Trong các phiên bản trước, ``auto()`` phải là thành phần duy nhất trên dòng phép gán thì mới hoạt động đúng cách.
 
-   ``_generate_next_value_`` can be overridden to customize the values used by
-   *auto*.
+   ``_generate_next_value_`` có thể được ghi đè để tùy chỉnh các giá trị được *auto* sử dụng.
 
-   .. note:: in 3.13 the default ``_generate_next_value_`` will always return
-             the highest member value incremented by 1, and will fail if any
-             member is an incompatible type.
+   .. note:: trong 3.13, ``_generate_next_value_`` mặc định sẽ luôn trả về giá trị member cao nhất cộng thêm 1 và sẽ không thành công nếu bất kỳ member nào có kiểu không tương thích.
 
 .. decorator:: property
 
-   A decorator similar to the built-in :deco:`property`, but specifically for
-   enumerations.  It allows member attributes to have the same names as members
-   themselves.
+   Một decorator tương tự như :deco:`property` tích hợp sẵn, nhưng dành riêng cho các enumeration. Nó cho phép các thuộc tính của member có cùng tên với chính các member đó.
 
-   .. note:: the *property* and the member must be defined in separate classes;
-             for example, the *value* and *name* attributes are defined in the
-             *Enum* class, and *Enum* subclasses can define members with the
-             names ``value`` and ``name``.
+   .. note:: *property* và member phải được định nghĩa trong các class riêng biệt; ví dụ, các thuộc tính *value* và *name* được định nghĩa trong class *Enum*, còn các subclass *Enum* có thể định nghĩa các member có tên ``value`` và ``name``.
 
    .. versionadded:: 3.11
 
 .. decorator:: unique
 
-   A :keyword:`class` decorator specifically for enumerations.  It searches an
-   enumeration's :attr:`~EnumType.__members__`, gathering any aliases it finds; if any are
-   found :exc:`ValueError` is raised with the details::
+   Một decorator :keyword:`class` dành riêng cho enumeration. Nó tìm kiếm :attr:`~EnumType.__members__` của một enumeration và thu thập mọi alias tìm thấy; nếu tìm thấy alias nào, :exc:`ValueError` sẽ được raise kèm theo thông tin chi tiết::
 
       >>> from enum import Enum, unique
       >>> @unique
@@ -1042,77 +919,70 @@ Utilities and decorators
 
 .. decorator:: verify
 
-   A :keyword:`class` decorator specifically for enumerations.  Members from
-   :class:`EnumCheck` are used to specify which constraints should be checked
-   on the decorated enumeration.
+   Một decorator :keyword:`class` dành riêng cho enumeration. Các member từ
+   :class:`EnumCheck` được dùng để chỉ định những ràng buộc nào cần được kiểm tra trên enumeration được decorator áp dụng.
 
    .. versionadded:: 3.11
 
 .. decorator:: member
 
-   A decorator for use in enums: its target will become a member.
+   Một decorator dùng trong enum: đối tượng đích của nó sẽ trở thành một member.
 
    .. versionadded:: 3.11
 
 .. decorator:: nonmember
 
-   A decorator for use in enums: its target will not become a member.
+   Một decorator dùng trong enum: đối tượng đích của nó sẽ không trở thành một member.
 
    .. versionadded:: 3.11
 
 .. decorator:: global_enum
 
-   A decorator to change the :class:`str() <str>` and :func:`repr` of an enum
-   to show its members as belonging to the module instead of its class.
-   Should only be used when the enum members are exported
-   to the module global namespace (see :class:`re.RegexFlag` for an example).
+   Một decorator dùng để thay đổi :class:`str() <str>` và :func:`repr` của một enum, nhằm hiển thị các member của enum là thuộc về module thay vì class của nó. Chỉ nên sử dụng khi các member của enum được export vào global namespace của module (xem :class:`re.RegexFlag` để biết ví dụ).
 
 
    .. versionadded:: 3.11
 
 .. function:: show_flag_values(value)
 
-   Return a list of all power-of-two integers contained in a flag *value*.
+   Trả về danh sách tất cả các số nguyên là lũy thừa của hai được chứa trong một flag *value*.
 
    .. versionadded:: 3.11
 
 .. function:: bin(num, max_bits=None)
 
-   Like built-in :func:`bin`, except negative values are represented in
-   two's complement, and the leading bit always indicates sign
-   (``0`` implies positive, ``1`` implies negative).
+   Giống như :func:`bin` tích hợp sẵn, ngoại trừ việc các giá trị âm được biểu diễn bằng bù hai và bit đầu tiên luôn biểu thị dấu (``0`` là số dương, ``1`` là số âm).
 
       >>> import enum
       >>> enum.bin(10)
       '0b0 1010'
-      >>> enum.bin(~10)   # ~10 is -11
+      >>> enum.bin(~10)   # ~10 là -11
       '0b1 0101'
 
    .. versionadded:: 3.11
 
 ---------------
 
-Notes
------
+.. _`Notes`:
 
-:class:`IntEnum`, :class:`StrEnum`, and :class:`IntFlag`
+Ghi chú
+-------
 
-   These three enum types are designed to be drop-in replacements for existing
-   integer- and string-based values; as such, they have extra limitations:
+:class:`IntEnum`, :class:`StrEnum` và :class:`IntFlag`
 
-   - ``__str__`` uses the value and not the name of the enum member
+   Ba kiểu enum này được thiết kế để thay thế trực tiếp cho các giá trị hiện có dựa trên số nguyên và chuỗi; do đó, chúng có thêm một số hạn chế:
 
-   - ``__format__``, because it uses ``__str__``, will also use the value of
-     the enum member instead of its name
+   - ``__str__`` sử dụng giá trị chứ không sử dụng tên của thành viên enum
 
-   If you do not need/want those limitations, you can either create your own
-   base class by mixing in the ``int`` or ``str`` type yourself::
+   - ``__format__``, vì sử dụng ``__str__``, cũng sẽ sử dụng giá trị của thành viên enum thay vì tên của nó
+
+   Nếu bạn không cần hoặc không muốn những hạn chế đó, bạn có thể tự tạo lớp cơ sở của riêng mình bằng cách tự mix-in kiểu ``int`` hoặc ``str``::
 
        >>> from enum import Enum
        >>> class MyIntEnum(int, Enum):
        ...     pass
 
-   or you can reassign the appropriate :meth:`str`, etc., in your enum::
+   hoặc bạn có thể gán lại :meth:`str` tương ứng, v.v. trong enum của mình::
 
        >>> from enum import Enum, IntEnum
        >>> class MyIntEnum(IntEnum):

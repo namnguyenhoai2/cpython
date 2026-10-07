@@ -1,34 +1,27 @@
-:mod:`!doctest` --- Test interactive Python examples
-====================================================
+:mod:`!doctest` --- Kiểm thử các ví dụ Python tương tác
+=======================================================
 
 .. module:: doctest
-   :synopsis: Test pieces of code within docstrings.
+   :synopsis: Kiểm thử các đoạn mã trong docstring.
 
 .. moduleauthor:: Tim Peters <tim@python.org>
 .. sectionauthor:: Tim Peters <tim@python.org>
 .. sectionauthor:: Moshe Zadka <moshez@debian.org>
 .. sectionauthor:: Edward Loper <edloper@users.sourceforge.net>
 
-**Source code:** :source:`Lib/doctest.py`
+**Mã nguồn:** :source:`Lib/doctest.py`
 
 --------------
 
-The :mod:`!doctest` module searches for pieces of text that look like interactive
-Python sessions, and then executes those sessions to verify that they work
-exactly as shown.  There are several common ways to use doctest:
+Module :mod:`!doctest` tìm kiếm các đoạn văn bản trông giống như những phiên làm việc Python tương tác, sau đó thực thi các phiên đó để xác minh rằng chúng hoạt động chính xác như được hiển thị. Có một số cách phổ biến để sử dụng doctest:
 
-* To check that a module's docstrings are up-to-date by verifying that all
-  interactive examples still work as documented.
+* Kiểm tra xem docstring của một module có được cập nhật hay không bằng cách xác minh rằng tất cả các ví dụ tương tác vẫn hoạt động như được ghi lại.
 
-* To perform regression testing by verifying that interactive examples from a
-  test file or a test object work as expected.
+* Thực hiện kiểm thử hồi quy bằng cách xác minh rằng các ví dụ tương tác từ một tệp kiểm thử hoặc một đối tượng kiểm thử hoạt động như mong đợi.
 
-* To write tutorial documentation for a package, liberally illustrated with
-  input-output examples.  Depending on whether the examples or the expository text
-  are emphasized, this has the flavor of "literate testing" or "executable
-  documentation".
+* Viết tài liệu hướng dẫn cho một package, minh họa phong phú bằng các ví dụ đầu vào–đầu ra. Tùy thuộc vào việc nhấn mạnh các ví dụ hay phần văn bản thuyết minh, cách này mang màu sắc của “kiểm thử bằng văn bản” hoặc “tài liệu có thể thực thi”.
 
-Here's a complete but small example module::
+Đây là một module hoàn chỉnh nhưng nhỏ::
 
    """
    This is the "example" module.
@@ -71,7 +64,7 @@ Here's a complete but small example module::
            raise ValueError("n must be >= 0")
        if math.floor(n) != n:
            raise ValueError("n must be exact integer")
-       if n+1 == n:  # catch a value like 1e300
+       if n+1 == n:  # bắt một giá trị như 1e300
            raise OverflowError("n too large")
        result = 1
        factor = 2
@@ -85,17 +78,14 @@ Here's a complete but small example module::
        import doctest
        doctest.testmod()
 
-If you run :file:`example.py` directly from the command line, :mod:`!doctest`
-works its magic:
+Nếu bạn chạy :file:`example.py` trực tiếp từ dòng lệnh, :mod:`!doctest` sẽ phát huy tác dụng kỳ diệu của nó:
 
 .. code-block:: shell-session
 
    $ python example.py
    $
 
-There's no output!  That's normal, and it means all the examples worked.  Pass
-``-v`` to the script, and :mod:`!doctest` prints a detailed log of what
-it's trying, and prints a summary at the end:
+Không có đầu ra! Điều đó là bình thường và có nghĩa là tất cả các ví dụ đều hoạt động. Truyền ``-v`` cho script, :mod:`!doctest` sẽ in nhật ký chi tiết về những gì nó đang thử, rồi in bản tóm tắt ở cuối:
 
 .. code-block:: shell-session
 
@@ -111,7 +101,7 @@ it's trying, and prints a summary at the end:
        [1, 1, 2, 6, 24, 120]
    ok
 
-And so on, eventually ending with:
+Và cứ tiếp tục như vậy, cuối cùng kết thúc bằng:
 
 .. code-block:: none
 
@@ -130,74 +120,59 @@ And so on, eventually ending with:
    Test passed.
    $
 
-That's all you need to know to start making productive use of :mod:`!doctest`!
-Jump in.  The following sections provide full details.  Note that there are many
-examples of doctests in the standard Python test suite and libraries.
-Especially useful examples can be found in the standard test file
+Đó là tất cả những gì bạn cần biết để bắt đầu sử dụng :mod:`!doctest` hiệu quả! Hãy bắt tay vào làm. Các phần sau cung cấp đầy đủ chi tiết. Lưu ý rằng có rất nhiều ví dụ về doctest trong bộ kiểm thử và các thư viện Python chuẩn. Bạn có thể tìm thấy những ví dụ đặc biệt hữu ích trong tệp kiểm thử chuẩn
 :file:`Lib/test/test_doctest/test_doctest.py`.
 
 .. versionadded:: 3.13
-   Output is colorized by default and can be
-   :ref:`controlled using environment variables <using-on-controlling-color>`.
+   Theo mặc định, đầu ra được tô màu và có thể
+   :ref:`được điều khiển bằng các biến môi trường <using-on-controlling-color>`.
 
 
 .. _doctest-simple-testmod:
 
-Simple Usage: Checking Examples in Docstrings
----------------------------------------------
+Cách sử dụng đơn giản: Kiểm tra các ví dụ trong docstring
+---------------------------------------------------------
 
-The simplest way to start using doctest (but not necessarily the way you'll
-continue to do it) is to end each module :mod:`!M` with::
+Cách đơn giản nhất để bắt đầu sử dụng doctest (nhưng không nhất thiết là cách bạn sẽ tiếp tục sử dụng) là kết thúc mỗi module :mod:`!M` bằng::
 
    if __name__ == "__main__":
        import doctest
        doctest.testmod()
 
-:mod:`!doctest` then examines docstrings in module :mod:`!M`.
+:mod:`!doctest` sau đó kiểm tra các docstring trong module :mod:`!M`.
 
-Running the module as a script causes the examples in the docstrings to get
-executed and verified::
+Chạy module dưới dạng một script sẽ khiến các ví dụ trong docstring được thực thi và kiểm tra::
 
    python M.py
 
-This won't display anything unless an example fails, in which case the failing
-example(s) and the cause(s) of the failure(s) are printed to stdout, and the
-final line of output is ``***Test Failed*** N failures.``, where *N* is the
-number of examples that failed.
+Lệnh này sẽ không hiển thị gì trừ khi một ví dụ thất bại; khi đó, (các) ví dụ bị lỗi và (các) nguyên nhân gây ra (các) lỗi sẽ được in ra stdout, và dòng cuối cùng của kết quả là ``***Test Failed*** N failures.``, trong đó *N* là số ví dụ đã thất bại.
 
-Run it with the ``-v`` switch instead::
+Thay vào đó, hãy chạy lệnh này với tùy chọn ``-v``::
 
    python M.py -v
 
-and a detailed report of all examples tried is printed to standard output, along
-with assorted summaries at the end.
+và một báo cáo chi tiết về tất cả các ví dụ đã thử được in ra đầu ra tiêu chuẩn, cùng với nhiều bản tóm tắt khác nhau ở cuối.
 
-You can force verbose mode by passing ``verbose=True`` to :func:`testmod`, or
-prohibit it by passing ``verbose=False``.  In either of those cases,
-:data:`sys.argv` is not examined by :func:`testmod` (so passing ``-v`` or not
-has no effect).
+Bạn có thể buộc chế độ chi tiết bằng cách truyền ``verbose=True`` cho :func:`testmod`, hoặc tắt chế độ này bằng cách truyền ``verbose=False``.  Trong cả hai trường hợp đó,
+:data:`sys.argv` không được :func:`testmod` kiểm tra (vì vậy việc truyền ``-v`` hay không cũng không có tác dụng).
 
-There is also a command line shortcut for running :func:`testmod`, see section
+Ngoài ra còn có một lối tắt trên dòng lệnh để chạy :func:`testmod`, xem phần
 :ref:`doctest-cli`.
 
-For more information on :func:`testmod`, see section :ref:`doctest-basic-api`.
+Để biết thêm thông tin về :func:`testmod`, hãy xem phần :ref:`doctest-basic-api`.
 
 
 .. _doctest-simple-testfile:
 
-Simple Usage: Checking Examples in a Text File
-----------------------------------------------
+Cách sử dụng đơn giản: Kiểm tra các ví dụ trong tệp văn bản
+-----------------------------------------------------------
 
-Another simple application of doctest is testing interactive examples in a text
-file.  This can be done with the :func:`testfile` function::
+Một ứng dụng đơn giản khác của doctest là kiểm thử các ví dụ tương tác trong một tệp văn bản.  Việc này có thể được thực hiện bằng hàm :func:`testfile`::
 
    import doctest
    doctest.testfile("example.txt")
 
-That short script executes and verifies any interactive Python examples
-contained in the file :file:`example.txt`.  The file content is treated as if it
-were a single giant docstring; the file doesn't need to contain a Python
-program!   For example, perhaps :file:`example.txt` contains this:
+Script ngắn đó thực thi và xác minh mọi ví dụ Python tương tác có trong tệp :file:`example.txt`. Nội dung tệp được xử lý như thể đó là một docstring khổng lồ duy nhất; tệp không cần chứa một chương trình Python! Ví dụ: có thể :file:`example.txt` chứa nội dung sau:
 
 .. code-block:: none
 
@@ -217,8 +192,7 @@ program!   For example, perhaps :file:`example.txt` contains this:
        >>> factorial(6)
        120
 
-Running ``doctest.testfile("example.txt")`` then finds the error in this
-documentation::
+Chạy ``doctest.testfile("example.txt")`` sau đó sẽ phát hiện lỗi trong tài liệu này::
 
    File "./example.txt", line 14, in example.txt
    Failed example:
@@ -228,31 +202,25 @@ documentation::
    Got:
        720
 
-As with :func:`testmod`, :func:`testfile` won't display anything unless an
-example fails.  If an example does fail, then the failing example(s) and the
-cause(s) of the failure(s) are printed to stdout, using the same format as
+Tương tự như :func:`testmod`, :func:`testfile` sẽ không hiển thị gì trừ khi một ví dụ bị lỗi. Nếu một ví dụ thực sự bị lỗi, thì (các) ví dụ bị lỗi và (các) nguyên nhân gây lỗi sẽ được in ra stdout, sử dụng cùng định dạng như
 :func:`!testmod`.
 
-By default, :func:`testfile` looks for files in the calling module's directory.
-See section :ref:`doctest-basic-api` for a description of the optional arguments
-that can be used to tell it to look for files in other locations.
+Theo mặc định, :func:`testfile` tìm các tệp trong thư mục của module gọi nó. Xem phần :ref:`doctest-basic-api` để biết mô tả về các đối số tùy chọn có thể dùng để yêu cầu nó tìm tệp ở những vị trí khác.
 
-Like :func:`testmod`, :func:`testfile`'s verbosity can be set with the
-``-v`` command-line switch or with the optional keyword argument
-*verbose*.
+Giống như :func:`testmod`, mức độ chi tiết của :func:`testfile` có thể được đặt bằng switch dòng lệnh ``-v`` hoặc bằng đối số từ khóa tùy chọn *verbose*.
 
-There is also a command line shortcut for running :func:`testfile`, see section
+Ngoài ra còn có một phím tắt dòng lệnh để chạy :func:`testfile`; xem phần
 :ref:`doctest-cli`.
 
-For more information on :func:`testfile`, see section :ref:`doctest-basic-api`.
+Để biết thêm thông tin về :func:`testfile`, hãy xem phần :ref:`doctest-basic-api`.
 
 
 .. _doctest-cli:
 
-Command-line Usage
-------------------
+Cách sử dụng trên dòng lệnh
+---------------------------
 
-The :mod:`!doctest` module can be invoked as a script from the command line:
+Có thể gọi module :mod:`!doctest` dưới dạng một script từ dòng lệnh:
 
 .. code-block:: bash
 
@@ -262,54 +230,45 @@ The :mod:`!doctest` module can be invoked as a script from the command line:
 
 .. option:: -v, --verbose
 
-   Detailed report of all examples tried is printed to standard output,
-   along with assorted summaries at the end::
+   Báo cáo chi tiết về tất cả các ví dụ đã thử được in ra đầu ra tiêu chuẩn, cùng với nhiều bản tóm tắt khác nhau ở cuối::
 
       python -m doctest -v example.py
 
-   This will import :file:`example.py` as a standalone module and run
-   :func:`testmod` on it. Note that this may not work correctly if the
-   file is part of a package and imports other submodules from that package.
+   Thao tác này sẽ nhập :file:`example.py` dưới dạng một module độc lập và chạy
+   :func:`testmod` trên đó. Lưu ý rằng thao tác này có thể không hoạt động chính xác nếu tệp là một phần của package và nhập các submodule khác từ package đó.
 
-   If the file name does not end with :file:`.py`, :mod:`!doctest` infers
-   that it must be run with :func:`testfile` instead::
+   Nếu tên tệp không kết thúc bằng :file:`.py`, :mod:`!doctest` sẽ suy ra rằng tệp phải được chạy bằng :func:`testfile` thay thế::
 
       python -m doctest -v example.txt
 
 .. option:: -o, --option <option>
 
-   Option flags control various aspects of doctest's behavior, see section
+   Các cờ tùy chọn kiểm soát nhiều khía cạnh khác nhau trong hành vi của doctest; xem phần
    :ref:`doctest-options`.
 
    .. versionadded:: 3.4
 
 .. option:: -f, --fail-fast
 
-   This is shorthand for ``-o FAIL_FAST``.
+   Đây là cách viết tắt của ``-o FAIL_FAST``.
 
    .. versionadded:: 3.4
 
 
 .. _doctest-how-it-works:
 
-How It Works
-------------
+Cách thức hoạt động
+-------------------
 
-This section examines in detail how doctest works: which docstrings it looks at,
-how it finds interactive examples, what execution context it uses, how it
-handles exceptions, and how option flags can be used to control its behavior.
-This is the information that you need to know to write doctest examples; for
-information about actually running doctest on these examples, see the following
-sections.
+Phần này xem xét chi tiết cách doctest hoạt động: nó kiểm tra những docstring nào, tìm các ví dụ tương tác ra sao, sử dụng ngữ cảnh thực thi nào, xử lý ngoại lệ như thế nào và có thể dùng các cờ tùy chọn để kiểm soát hành vi của nó ra sao. Đây là những thông tin bạn cần biết để viết các ví dụ doctest; để biết thông tin về cách thực sự chạy doctest trên các ví dụ này, hãy xem các phần sau.
 
 
 .. _doctest-which-docstrings:
 
-Which Docstrings Are Examined?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Những Docstring Nào Được Kiểm Tra?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The module docstring, and all function, class and method docstrings are
-searched.  Objects imported into the module are not searched.
+Docstring của module cùng với tất cả docstring của function, class và method đều được tìm kiếm. Các object được import vào module không được tìm kiếm.
 
 .. currentmodule:: None
 
@@ -318,16 +277,9 @@ searched.  Objects imported into the module are not searched.
 
 .. currentmodule:: doctest
 
-In addition, there are cases when you want tests to be part of a module but not part
-of the help text, which requires that the tests not be included in the docstring.
-Doctest looks for a module-level variable called ``__test__`` and uses it to locate other
-tests. If ``M.__test__`` exists, it must be a dict, and each
-entry maps a (string) name to a function object, class object, or string.
-Function and class object docstrings found from ``M.__test__`` are searched, and
-strings are treated as if they were docstrings.  In output, a key ``K`` in
-``M.__test__`` appears with name ``M.__test__.K``.
+Ngoài ra, có những trường hợp bạn muốn các test thuộc về một module nhưng không xuất hiện trong phần văn bản trợ giúp, do đó các test không được bao gồm trong docstring. Doctest tìm một biến cấp module có tên ``__test__`` và dùng biến này để định vị các test khác. Nếu ``M.__test__`` tồn tại, nó phải là một dict và mỗi mục ánh xạ một tên (chuỗi) tới một function object, class object hoặc chuỗi. Các docstring của function object và class object được tìm thấy từ ``M.__test__`` sẽ được tìm kiếm, còn các chuỗi được xử lý như thể chúng là docstring. Trong đầu ra, một khóa ``K`` trong ``M.__test__`` sẽ xuất hiện với tên ``M.__test__.K``.
 
-For example, place this block of code at the top of :file:`example.py`:
+Ví dụ, đặt khối mã này ở đầu :file:`example.py`:
 
 .. code-block:: python
 
@@ -341,34 +293,26 @@ For example, place this block of code at the top of :file:`example.py`:
    """
    }
 
-The value of ``example.__test__["numbers"]`` will be treated as a
-docstring and all the tests inside it will be run. It is
-important to note that the value can be mapped to a function,
-class object, or module; if so, :mod:`!doctest`
-searches them recursively for docstrings, which are then scanned for tests.
+Giá trị của ``example.__test__["numbers"]`` sẽ được xem là một docstring và tất cả các test bên trong đó sẽ được chạy. Điều quan trọng cần lưu ý là giá trị này có thể trỏ tới một function, class object hoặc module; nếu vậy, :mod:`!doctest` sẽ tìm đệ quy trong chúng để lấy các docstring, sau đó quét các docstring này để tìm test.
 
-Any classes found are recursively searched similarly, to test docstrings in
-their contained methods and nested classes.
+Mọi class được tìm thấy cũng sẽ được tìm kiếm đệ quy tương tự để kiểm thử các docstring trong những method và class lồng nhau bên trong chúng.
 
 .. note::
 
-   ``doctest`` can only automatically discover classes and functions that are
-   defined at the module level or inside other classes.
+   ``doctest`` chỉ có thể tự động phát hiện các class và function được định nghĩa ở cấp module hoặc bên trong các class khác.
 
-   Since nested classes and functions only exist when an outer function
-   is called, they cannot be discovered. Define them outside to make them visible.
+   Vì các class và function lồng nhau chỉ tồn tại khi một function bên ngoài được gọi, nên không thể phát hiện chúng. Hãy định nghĩa chúng ở bên ngoài để chúng có thể được nhìn thấy.
 
 .. _doctest-finding-examples:
 
-How are Docstring Examples Recognized?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các ví dụ trong Docstring được nhận diện như thế nào?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In most cases a copy-and-paste of an interactive console session works fine,
-but doctest isn't trying to do an exact emulation of any specific Python shell.
+Trong hầu hết trường hợp, việc sao chép và dán một phiên làm việc trên interactive console sẽ hoạt động tốt, nhưng doctest không cố gắng mô phỏng chính xác bất kỳ Python shell cụ thể nào.
 
 ::
 
-   >>> # comments are ignored
+   >>> # bỏ qua các comment
    >>> x = 12
    >>> x
    12
@@ -388,35 +332,18 @@ but doctest isn't trying to do an exact emulation of any specific Python shell.
    single: >>>; interpreter prompt
    single: ...; interpreter prompt
 
-Any expected output must immediately follow the final ``'>>> '`` or ``'... '``
-line containing the code, and the expected output (if any) extends to the next
-``'>>> '`` or all-whitespace line.
+Mọi đầu ra dự kiến phải ngay lập tức theo sau dòng ``'>>> '`` hoặc ``'... '`` cuối cùng chứa mã, và đầu ra dự kiến (nếu có) kéo dài đến dòng ``'>>> '`` tiếp theo hoặc dòng chỉ chứa khoảng trắng.
 
-The fine print:
+Chi tiết cần lưu ý:
 
-* Expected output cannot contain an all-whitespace line, since such a line is
-  taken to signal the end of expected output.  If expected output does contain a
-  blank line, put ``<BLANKLINE>`` in your doctest example each place a blank line
-  is expected.
+* Đầu ra dự kiến không được chứa dòng chỉ gồm khoảng trắng, vì dòng như vậy được hiểu là báo hiệu kết thúc đầu ra dự kiến. Nếu đầu ra dự kiến có chứa dòng trống, hãy đặt ``<BLANKLINE>`` vào doctest example của bạn tại mỗi vị trí cần có dòng trống.
 
-* All hard tab characters are expanded to spaces, using 8-column tab stops.
-  Tabs in output generated by the tested code are not modified.  Because any
-  hard tabs in the sample output *are* expanded, this means that if the code
-  output includes hard tabs, the only way the doctest can pass is if the
-  :const:`NORMALIZE_WHITESPACE` option or :ref:`directive <doctest-directives>`
-  is in effect.
-  Alternatively, the test can be rewritten to capture the output and compare it
-  to an expected value as part of the test.  This handling of tabs in the
-  source was arrived at through trial and error, and has proven to be the least
-  error prone way of handling them.  It is possible to use a different
-  algorithm for handling tabs by writing a custom :class:`DocTestParser` class.
+* Mọi ký tự tab cứng đều được chuyển thành khoảng trắng, sử dụng các điểm dừng tab cách nhau 8 cột. Các tab trong đầu ra do mã được kiểm thử tạo ra không bị thay đổi. Vì mọi tab cứng trong đầu ra mẫu *đều được* mở rộng, điều này có nghĩa là nếu đầu ra của mã chứa các tab cứng thì cách duy nhất để doctest có thể vượt qua là
+  :const:`NORMALIZE_WHITESPACE` tùy chọn hoặc :ref:`chỉ thị <doctest-directives>` đang có hiệu lực. Ngoài ra, có thể viết lại bài kiểm thử để thu thập đầu ra và so sánh đầu ra đó với một giá trị dự kiến như một phần của bài kiểm thử. Cách xử lý tab trong mã nguồn này được đưa ra sau quá trình thử và sai, và đã chứng minh là cách ít dễ gây lỗi nhất để xử lý chúng. Có thể sử dụng một thuật toán khác để xử lý tab bằng cách viết một lớp :class:`DocTestParser` tùy chỉnh.
 
-* Output to stdout is captured, but not output to stderr (exception tracebacks
-  are captured via a different means).
+* Đầu ra tới stdout được capture, nhưng đầu ra tới stderr thì không (traceback của exception được capture bằng một cơ chế khác).
 
-* If you continue a line via backslashing in an interactive session, or for any
-  other reason use a backslash, you should use a raw docstring, which will
-  preserve your backslashes exactly as you type them::
+* Nếu bạn tiếp tục một dòng bằng dấu gạch chéo ngược trong một interactive session, hoặc vì bất kỳ lý do nào khác sử dụng dấu gạch chéo ngược, bạn nên dùng raw docstring, vốn sẽ giữ nguyên chính xác các dấu gạch chéo ngược như bạn nhập::
 
      >>> def f(x):
      ...     r'''Backslashes in a raw docstring: m\n'''
@@ -424,9 +351,7 @@ The fine print:
      >>> print(f.__doc__)
      Backslashes in a raw docstring: m\n
 
-  Otherwise, the backslash will be interpreted as part of the string. For example,
-  the ``\n`` above would be interpreted as a newline character.  Alternatively, you
-  can double each backslash in the doctest version (and not use a raw string)::
+  Nếu không, dấu gạch chéo ngược sẽ được diễn giải như một phần của chuỗi. Ví dụ: ``\n`` ở trên sẽ được diễn giải thành một ký tự xuống dòng. Ngoài ra, bạn có thể nhân đôi mỗi dấu gạch chéo ngược trong phiên bản doctest (và không sử dụng raw string)::
 
      >>> def f(x):
      ...     '''Backslashes in a raw docstring: m\\n'''
@@ -434,7 +359,7 @@ The fine print:
      >>> print(f.__doc__)
      Backslashes in a raw docstring: m\n
 
-* The starting column doesn't matter::
+* Cột bắt đầu không quan trọng::
 
      >>> assert "Easy!"
            >>> import math
@@ -447,57 +372,38 @@ The fine print:
 
 .. _doctest-execution-context:
 
-What's the Execution Context?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Bối cảnh thực thi là gì?
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, each time :mod:`!doctest` finds a docstring to test, it uses a
-*shallow copy* of :mod:`!M`'s globals, so that running tests doesn't change the
-module's real globals, and so that one test in :mod:`!M` can't leave behind
-crumbs that accidentally allow another test to work.  This means examples can
-freely use any names defined at top-level in :mod:`!M`, and names defined earlier
-in the docstring being run. Examples cannot see names defined in other
-docstrings.
+Theo mặc định, mỗi khi :mod:`!doctest` tìm thấy một docstring cần kiểm thử, nó sử dụng *bản sao nông* của các biến toàn cục trong :mod:`!M`, để việc chạy các bài kiểm thử không thay đổi các biến toàn cục thực của module, đồng thời một bài kiểm thử trong :mod:`!M` không thể để lại những dấu vết vô tình giúp một bài kiểm thử khác hoạt động. Điều này có nghĩa là các ví dụ có thể tự do sử dụng mọi tên được định nghĩa ở cấp cao nhất trong :mod:`!M` và các tên được định nghĩa trước đó trong docstring đang được chạy. Các ví dụ không thể thấy những tên được định nghĩa trong các docstring khác.
 
-You can force use of your own dict as the execution context by passing
-``globs=your_dict`` to :func:`testmod` or :func:`testfile` instead.
+Bạn có thể buộc sử dụng dict của riêng mình làm bối cảnh thực thi bằng cách truyền ``globs=your_dict`` cho :func:`testmod` hoặc :func:`testfile` thay vào đó.
 
 
 .. _doctest-exceptions:
 
-What About Exceptions?
-^^^^^^^^^^^^^^^^^^^^^^
+Còn ngoại lệ thì sao?
+^^^^^^^^^^^^^^^^^^^^^
 
-No problem, provided that the traceback is the only output produced by the
-example:  just paste in the traceback. [#]_ Since tracebacks contain details
-that are likely to change rapidly (for example, exact file paths and line
-numbers), this is one case where doctest works hard to be flexible in what it
-accepts.
+Không vấn đề gì, miễn là traceback là đầu ra duy nhất do ví dụ tạo ra: chỉ cần dán traceback vào. [#]_ Vì traceback chứa những chi tiết có khả năng thay đổi nhanh (chẳng hạn như đường dẫn tệp và số dòng chính xác), đây là một trường hợp mà doctest cố gắng linh hoạt trong những gì nó chấp nhận.
 
-Simple example::
+Ví dụ đơn giản::
 
    >>> [1, 2, 3].remove(42)
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
    ValueError: list.remove(x): x not in list
 
-That doctest succeeds if :exc:`ValueError` is raised, with the ``list.remove(x):
-x not in list`` detail as shown.
+Doctest đó thành công nếu :exc:`ValueError` được phát sinh, với chi tiết ``list.remove(x): x not in list`` như được minh họa.
 
-The expected output for an exception must start with a traceback header, which
-may be either of the following two lines, indented the same as the first line of
-the example::
+Đầu ra dự kiến cho một exception phải bắt đầu bằng tiêu đề traceback, có thể là một trong hai dòng sau, được thụt lề giống với dòng đầu tiên của ví dụ::
 
    Traceback (most recent call last):
    Traceback (innermost last):
 
-The traceback header is followed by an optional traceback stack, whose contents
-are ignored by doctest.  The traceback stack is typically omitted, or copied
-verbatim from an interactive session.
+Tiêu đề traceback được theo sau bởi một stack traceback tùy chọn, nội dung của stack này sẽ bị doctest bỏ qua. Stack traceback thường được lược bỏ hoặc sao chép nguyên văn từ một phiên tương tác.
 
-The traceback stack is followed by the most interesting part: the line(s)
-containing the exception type and detail.  This is usually the last line of a
-traceback, but can extend across multiple lines if the exception has a
-multi-line detail::
+Stack traceback được theo sau bởi phần đáng chú ý nhất: (các) dòng chứa kiểu exception và thông tin chi tiết. Đây thường là dòng cuối cùng của traceback, nhưng có thể trải dài trên nhiều dòng nếu exception có thông tin chi tiết trên nhiều dòng::
 
    >>> raise ValueError('multi\n    line\ndetail')
    Traceback (most recent call last):
@@ -506,11 +412,9 @@ multi-line detail::
        line
    detail
 
-The last three lines (starting with :exc:`ValueError`) are compared against the
-exception's type and detail, and the rest are ignored.
+Ba dòng cuối cùng (bắt đầu bằng :exc:`ValueError`) được so sánh với kiểu và thông tin chi tiết của exception, còn phần còn lại bị bỏ qua.
 
-Best practice is to omit the traceback stack, unless it adds significant
-documentation value to the example.  So the last example is probably better as::
+Cách làm tốt nhất là lược bỏ stack traceback, trừ khi nó bổ sung giá trị đáng kể về mặt tài liệu cho ví dụ. Vì vậy, ví dụ cuối có lẽ nên được viết như sau::
 
    >>> raise ValueError('multi\n    line\ndetail')
    Traceback (most recent call last):
@@ -519,41 +423,23 @@ documentation value to the example.  So the last example is probably better as::
        line
    detail
 
-Note that tracebacks are treated very specially.  In particular, in the
-rewritten example, the use of ``...`` is independent of doctest's
-:const:`ELLIPSIS` option.  The ellipsis in that example could be left out, or
-could just as well be three (or three hundred) commas or digits, or an indented
-transcript of a Monty Python skit.
+Lưu ý rằng traceback được xử lý theo cách rất đặc biệt. Cụ thể, trong ví dụ đã viết lại, việc sử dụng ``...`` không phụ thuộc vào tùy chọn doctest's
+:const:`ELLIPSIS`. Dấu ba chấm trong ví dụ đó có thể được bỏ đi, hoặc cũng có thể được thay bằng ba (hoặc ba trăm) dấu phẩy hay chữ số, hoặc một transcript được thụt lề của một tiểu phẩm Monty Python.
 
-Some details you should read once, but won't need to remember:
+Có một số chi tiết bạn nên đọc qua một lần nhưng không cần ghi nhớ:
 
-* Doctest can't guess whether your expected output came from an exception
-  traceback or from ordinary printing.  So, e.g., an example that expects
-  ``ValueError: 42 is prime`` will pass whether :exc:`ValueError` is actually
-  raised or if the example merely prints that traceback text.  In practice,
-  ordinary output rarely begins with a traceback header line, so this doesn't
-  create real problems.
+* Doctest không thể đoán liệu output mong đợi của bạn đến từ traceback của exception hay từ việc in thông thường. Vì vậy, chẳng hạn, một ví dụ mong đợi ``ValueError: 42 is prime`` sẽ đạt bất kể :exc:`ValueError` thực sự được raise hay ví dụ chỉ đơn thuần in ra phần văn bản traceback đó. Trên thực tế, output thông thường hiếm khi bắt đầu bằng một dòng tiêu đề traceback, nên điều này không gây ra vấn đề thực sự.
 
-* Each line of the traceback stack (if present) must be indented further than
-  the first line of the example, *or* start with a non-alphanumeric character.
-  The first line following the traceback header indented the same and starting
-  with an alphanumeric is taken to be the start of the exception detail.  Of
-  course this does the right thing for genuine tracebacks.
+* Mỗi dòng của stack traceback (nếu có) phải được thụt lề sâu hơn dòng đầu tiên của ví dụ, *hoặc* bắt đầu bằng một ký tự không phải chữ và số. Dòng đầu tiên sau tiêu đề traceback được thụt lề ở cùng mức và bắt đầu bằng một chữ hoặc số được coi là phần bắt đầu của chi tiết exception. Tất nhiên, điều này hoạt động đúng với các traceback thực sự.
 
-* When the :const:`IGNORE_EXCEPTION_DETAIL` doctest option is specified,
-  everything following the leftmost colon and any module information in the
-  exception name is ignored.
+* Khi tùy chọn doctest :const:`IGNORE_EXCEPTION_DETAIL` được chỉ định, mọi thứ sau dấu hai chấm ngoài cùng bên trái và mọi thông tin module trong tên exception đều bị bỏ qua.
 
-* The interactive shell omits the traceback header line for some
-  :exc:`SyntaxError`\ s.  But doctest uses the traceback header line to
-  distinguish exceptions from non-exceptions.  So in the rare case where you need
-  to test a :exc:`!SyntaxError` that omits the traceback header, you will need to
-  manually add the traceback header line to your test example.
+* Interactive shell bỏ qua dòng tiêu đề traceback đối với một số
+  :exc:`SyntaxError`\ s.  Nhưng doctest sử dụng dòng tiêu đề traceback để phân biệt ngoại lệ với trường hợp không phải ngoại lệ.  Vì vậy, trong trường hợp hiếm khi bạn cần kiểm thử một :exc:`!SyntaxError` không có dòng tiêu đề traceback, bạn sẽ cần tự thêm dòng tiêu đề traceback vào ví dụ kiểm thử.
 
 .. index:: single: ^ (caret); marker
 
-* For some exceptions, Python displays the position of the error using ``^``
-  markers and tildes::
+* Đối với một số ngoại lệ, Python hiển thị vị trí xảy ra lỗi bằng các dấu ``^`` và dấu ngã::
 
      >>> 1 + None
        File "<stdin>", line 1
@@ -561,9 +447,7 @@ Some details you should read once, but won't need to remember:
          ~~^~~~~~
      TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'
 
-  Since the lines showing the position of the error come before the exception type
-  and detail, they are not checked by doctest.  For example, the following test
-  would pass, even though it puts the ``^`` marker in the wrong location::
+  Vì các dòng hiển thị vị trí xảy ra lỗi xuất hiện trước loại và thông tin chi tiết của ngoại lệ, doctest không kiểm tra chúng.  Ví dụ, bài kiểm thử sau vẫn sẽ thành công, mặc dù đặt dấu ``^`` sai vị trí::
 
      >>> 1 + None
        File "<stdin>", line 1
@@ -575,73 +459,44 @@ Some details you should read once, but won't need to remember:
 .. _option-flags-and-directives:
 .. _doctest-options:
 
-Option Flags
-^^^^^^^^^^^^
+Cờ tùy chọn
+^^^^^^^^^^^
 
-A number of option flags control various aspects of doctest's behavior.
-Symbolic names for the flags are supplied as module constants, which can be
-:ref:`bitwise ORed <bitwise>` together and passed to various functions.
-The names can also be used in :ref:`doctest directives <doctest-directives>`,
-and may be passed to the doctest command line interface via the ``-o`` option.
+Một số cờ tùy chọn kiểm soát các khía cạnh khác nhau trong cách doctest hoạt động. Tên biểu tượng của các cờ được cung cấp dưới dạng hằng số của module, có thể được
+:ref:`kết hợp bằng phép OR theo bit <bitwise>` với nhau rồi truyền cho nhiều hàm khác nhau. Các tên này cũng có thể được sử dụng trong :ref:`chỉ thị doctest <doctest-directives>`, và có thể được truyền cho giao diện dòng lệnh doctest thông qua tùy chọn ``-o``.
 
-The first group of options define test semantics, controlling aspects of how
-doctest decides whether actual output matches an example's expected output:
+Nhóm tùy chọn đầu tiên xác định ngữ nghĩa của bài kiểm thử, kiểm soát các khía cạnh về cách doctest quyết định liệu đầu ra thực tế có khớp với đầu ra mong đợi của một ví dụ hay không:
 
 
 .. data:: DONT_ACCEPT_TRUE_FOR_1
 
-   By default, if an expected output block contains just ``1``, an actual output
-   block containing just ``1`` or just ``True`` is considered to be a match, and
-   similarly for ``0`` versus ``False``.  When :const:`DONT_ACCEPT_TRUE_FOR_1` is
-   specified, neither substitution is allowed.  The default behavior caters to that
-   Python changed the return type of many functions from integer to boolean;
-   doctests expecting "little integer" output still work in these cases.  This
-   option will probably go away, but not for several years.
+   Theo mặc định, nếu một khối đầu ra mong đợi chỉ chứa ``1``, thì một khối đầu ra thực tế chỉ chứa ``1`` hoặc chỉ chứa ``True`` được xem là khớp, và tương tự đối với ``0`` so với ``False``. Khi :const:`DONT_ACCEPT_TRUE_FOR_1` được chỉ định, không phép thay thế nào được cho phép. Hành vi mặc định này đáp ứng việc Python đã thay đổi kiểu trả về của nhiều hàm từ số nguyên sang boolean; các doctest mong đợi đầu ra là "số nguyên nhỏ" vẫn hoạt động trong những trường hợp này. Tùy chọn này có lẽ sẽ bị loại bỏ, nhưng không phải trong vài năm tới.
 
 
 .. index:: single: <BLANKLINE>
 .. data:: DONT_ACCEPT_BLANKLINE
 
-   By default, if an expected output block contains a line containing only the
-   string ``<BLANKLINE>``, then that line will match a blank line in the actual
-   output.  Because a genuinely blank line delimits the expected output, this is
-   the only way to communicate that a blank line is expected.  When
-   :const:`DONT_ACCEPT_BLANKLINE` is specified, this substitution is not allowed.
+   Theo mặc định, nếu một khối đầu ra mong đợi chứa một dòng chỉ có chuỗi ``<BLANKLINE>``, thì dòng đó sẽ khớp với một dòng trống trong đầu ra thực tế. Vì một dòng thực sự trống dùng để phân cách đầu ra mong đợi, đây là cách duy nhất để biểu thị rằng cần có một dòng trống. Khi
+   :const:`DONT_ACCEPT_BLANKLINE` được chỉ định, phép thay thế này không được cho phép.
 
 
 .. data:: NORMALIZE_WHITESPACE
 
-   When specified, all sequences of whitespace (blanks and newlines) are treated as
-   equal.  Any sequence of whitespace within the expected output will match any
-   sequence of whitespace within the actual output. By default, whitespace must
-   match exactly. :const:`NORMALIZE_WHITESPACE` is especially useful when a line of
-   expected output is very long, and you want to wrap it across multiple lines in
-   your source.
+   Khi được chỉ định, mọi chuỗi khoảng trắng (dấu cách và ký tự xuống dòng) được xem là tương đương. Bất kỳ chuỗi khoảng trắng nào trong đầu ra mong đợi sẽ khớp với bất kỳ chuỗi khoảng trắng nào trong đầu ra thực tế. Theo mặc định, khoảng trắng phải khớp chính xác. :const:`NORMALIZE_WHITESPACE` đặc biệt hữu ích khi một dòng đầu ra mong đợi rất dài và bạn muốn ngắt dòng đó thành nhiều dòng trong mã nguồn.
 
 
 .. index:: single: ...; in doctests
 .. data:: ELLIPSIS
 
-   When specified, an ellipsis marker (``...``) in the expected output can match
-   any substring in the actual output.  This includes substrings that span line
-   boundaries, and empty substrings, so it's best to keep usage of this simple.
-   Complicated uses can lead to the same kinds of "oops, it matched too much!"
-   surprises that ``.*`` is prone to in regular expressions.
+   Khi được chỉ định, một dấu đánh dấu ellipsis (``...``) trong đầu ra mong đợi có thể khớp với bất kỳ chuỗi con nào trong đầu ra thực tế. Điều này bao gồm cả các chuỗi con trải qua ranh giới dòng và các chuỗi con rỗng, vì vậy tốt nhất là nên sử dụng đơn giản. Những cách sử dụng phức tạp có thể dẫn đến cùng kiểu bất ngờ "ôi không, nó khớp quá nhiều!" mà ``.*`` thường gây ra trong regular expression.
 
 
 .. data:: IGNORE_EXCEPTION_DETAIL
 
-   When specified, doctests expecting exceptions pass so long as an exception
-   of the expected type is raised, even if the details
-   (message and fully qualified exception name) don't match.
+   Khi được chỉ định, các doctest mong đợi ngoại lệ sẽ đạt nếu một ngoại lệ thuộc kiểu mong đợi được phát sinh, ngay cả khi các chi tiết (thông báo và tên ngoại lệ đầy đủ) không khớp.
 
-   For example, an example expecting ``ValueError: 42`` will pass if the actual
-   exception raised is ``ValueError: 3*14``, but will fail if, say, a
-   :exc:`TypeError` is raised instead.
-   It will also ignore any fully qualified name included before the
-   exception class, which can vary between implementations and versions
-   of Python and the code/libraries in use.
-   Hence, all three of these variations will work with the flag specified:
+   Ví dụ, một ví dụ mong đợi ``ValueError: 42`` sẽ đạt nếu ngoại lệ thực tế được phát sinh là ``ValueError: 3*14``, nhưng sẽ thất bại nếu, chẳng hạn, một
+   :exc:`TypeError` sẽ được phát sinh thay thế. Nó cũng sẽ bỏ qua mọi tên đầy đủ được ghi trước lớp ngoại lệ, vì tên này có thể khác nhau giữa các bản triển khai và phiên bản Python, cũng như giữa các mã nguồn/thư viện đang được sử dụng. Do đó, cả ba biến thể này đều sẽ hoạt động với flag được chỉ định:
 
    .. code-block:: pycon
 
@@ -657,89 +512,67 @@ doctest decides whether actual output matches an example's expected output:
       Traceback (most recent call last):
       __main__.Exception: message
 
-   Note that :const:`ELLIPSIS` can also be used to ignore the
-   details of the exception message, but such a test may still fail based
-   on whether the module name is present or matches exactly.
+   Lưu ý rằng :const:`ELLIPSIS` cũng có thể được dùng để bỏ qua các chi tiết của thông báo ngoại lệ, nhưng một phép kiểm thử như vậy vẫn có thể thất bại tùy thuộc vào việc tên module có xuất hiện hay khớp chính xác hay không.
 
    .. versionchanged:: 3.2
       :const:`IGNORE_EXCEPTION_DETAIL` now also ignores any information relating
-      to the module containing the exception under test.
+      đến module chứa ngoại lệ đang được kiểm thử.
 
 
 .. data:: SKIP
 
-   When specified, do not run the example at all.  This can be useful in contexts
-   where doctest examples serve as both documentation and test cases, and an
-   example should be included for documentation purposes, but should not be
-   checked.  E.g., the example's output might be random; or the example might
-   depend on resources which would be unavailable to the test driver.
+   Khi được chỉ định, không chạy ví dụ này. Điều này hữu ích trong các ngữ cảnh mà các ví dụ doctest vừa là tài liệu vừa là trường hợp kiểm thử, và một ví dụ cần được đưa vào nhằm mục đích tài liệu nhưng không nên được kiểm tra. Ví dụ: đầu ra của ví dụ có thể là ngẫu nhiên; hoặc ví dụ có thể phụ thuộc vào những tài nguyên mà test driver không thể truy cập.
 
-   The SKIP flag can also be used for temporarily "commenting out" examples.
+   Flag SKIP cũng có thể được dùng để tạm thời "comment out" các ví dụ.
 
 
 .. data:: COMPARISON_FLAGS
 
-   A bitmask or'ing together all the comparison flags above.
+   Một bitmask kết hợp bằng phép OR tất cả các flag so sánh ở trên.
 
-The second group of options controls how test failures are reported:
+Nhóm tùy chọn thứ hai kiểm soát cách báo cáo các lỗi kiểm thử:
 
 
 .. data:: REPORT_UDIFF
 
-   When specified, failures that involve multi-line expected and actual outputs are
-   displayed using a unified diff.
+   Khi được chỉ định, các lỗi liên quan đến đầu ra mong đợi và đầu ra thực tế nhiều dòng sẽ được hiển thị bằng unified diff.
 
 
 .. data:: REPORT_CDIFF
 
-   When specified, failures that involve multi-line expected and actual outputs
-   will be displayed using a context diff.
+   Khi được chỉ định, các lỗi liên quan đến đầu ra mong đợi và đầu ra thực tế nhiều dòng sẽ được hiển thị bằng context diff.
 
 
 .. data:: REPORT_NDIFF
 
-   When specified, differences are computed by ``difflib.Differ``, using the same
-   algorithm as the popular :file:`ndiff.py` utility. This is the only method that
-   marks differences within lines as well as across lines.  For example, if a line
-   of expected output contains digit ``1`` where actual output contains letter
-   ``l``, a line is inserted with a caret marking the mismatching column positions.
+   Khi được chỉ định, các điểm khác biệt được tính toán bằng ``difflib.Differ``, sử dụng cùng thuật toán với tiện ích phổ biến :file:`ndiff.py`. Đây là phương pháp duy nhất đánh dấu các điểm khác biệt cả trong từng dòng lẫn giữa các dòng. Ví dụ: nếu một dòng đầu ra mong đợi chứa chữ số ``1`` trong khi đầu ra thực tế chứa chữ cái ``l``, một dòng sẽ được chèn vào với dấu mũ đánh dấu vị trí các cột không khớp.
 
 
 .. data:: REPORT_ONLY_FIRST_FAILURE
 
-   When specified, display the first failing example in each doctest, but suppress
-   output for all remaining examples.  This will prevent doctest from reporting
-   correct examples that break because of earlier failures; but it might also hide
-   incorrect examples that fail independently of the first failure.  When
-   :const:`REPORT_ONLY_FIRST_FAILURE` is specified, the remaining examples are
-   still run, and still count towards the total number of failures reported; only
-   the output is suppressed.
+   Khi được chỉ định, hiển thị ví dụ đầu tiên bị lỗi trong mỗi doctest, nhưng ẩn đầu ra của tất cả các ví dụ còn lại. Điều này sẽ ngăn doctest báo cáo các ví dụ đúng bị lỗi do các lỗi trước đó; nhưng cũng có thể ẩn các ví dụ không đúng bị lỗi độc lập với lỗi đầu tiên. Khi
+   :const:`REPORT_ONLY_FIRST_FAILURE` được chỉ định, các ví dụ còn lại vẫn được chạy và vẫn được tính vào tổng số lỗi được báo cáo; chỉ có đầu ra bị ẩn.
 
 
 .. data:: FAIL_FAST
 
-   When specified, exit after the first failing example and don't attempt to run
-   the remaining examples. Thus, the number of failures reported will be at most
-   1.  This flag may be useful during debugging, since examples after the first
-   failure won't even produce debugging output.
+   Khi được chỉ định, thoát sau ví dụ đầu tiên bị lỗi và không cố chạy các ví dụ còn lại. Vì vậy, số lỗi được báo cáo nhiều nhất sẽ là
+   1.  Cờ này có thể hữu ích trong quá trình debugging, vì các ví dụ sau ví dụ đầu tiên
+   lỗi thậm chí sẽ không tạo ra đầu ra gỡ lỗi.
 
 
 .. data:: REPORTING_FLAGS
 
-   A bitmask or'ing together all the reporting flags above.
+   Một bitmask kết hợp tất cả các cờ báo cáo ở trên bằng phép OR.
 
 
-There is also a way to register new option flag names, though this isn't
-useful unless you intend to extend :mod:`!doctest` internals via subclassing:
+Ngoài ra còn có cách đăng ký tên cờ tùy chọn mới, mặc dù cách này không hữu ích trừ khi bạn định mở rộng phần nội bộ của :mod:`!doctest` thông qua việc phân lớp:
 
 
 .. function:: register_optionflag(name)
 
-   Create a new option flag with a given name, and return the new flag's integer
-   value.  :func:`register_optionflag` can be used when subclassing
-   :class:`OutputChecker` or :class:`DocTestRunner` to create new options that are
-   supported by your subclasses.  :func:`register_optionflag` should always be
-   called using the following idiom::
+   Tạo một cờ tùy chọn mới với tên đã cho và trả về giá trị số nguyên của cờ mới đó. Có thể sử dụng :func:`register_optionflag` khi phân lớp
+   :class:`OutputChecker` hoặc :class:`DocTestRunner` để tạo các tùy chọn được các lớp con của bạn hỗ trợ. Luôn phải gọi :func:`register_optionflag` bằng thành ngữ sau đây::
 
       MY_FLAG = register_optionflag('MY_FLAG')
 
@@ -753,9 +586,7 @@ useful unless you intend to extend :mod:`!doctest` internals via subclassing:
 Directives
 ^^^^^^^^^^
 
-Doctest directives may be used to modify the :ref:`option flags
-<doctest-options>` for an individual example.  Doctest directives are
-special Python comments following an example's source code:
+Có thể sử dụng các directive của doctest để sửa đổi :ref:`option flags <doctest-options>` cho từng ví dụ. Directive của doctest là các chú thích Python đặc biệt nằm sau mã nguồn của một ví dụ:
 
 .. productionlist:: doctest
    directive: "#" "doctest:" `directive_options`
@@ -764,14 +595,11 @@ special Python comments following an example's source code:
    on_or_off: "+" | "-"
    directive_option_name: "DONT_ACCEPT_BLANKLINE" | "NORMALIZE_WHITESPACE" | ...
 
-Whitespace is not allowed between the ``+`` or ``-`` and the directive option
-name.  The directive option name can be any of the option flag names explained
-above.
+Không được phép có khoảng trắng giữa ``+`` hoặc ``-`` và tên tùy chọn của directive. Tên tùy chọn của directive có thể là bất kỳ tên cờ tùy chọn nào được giải thích ở trên.
 
-An example's doctest directives modify doctest's behavior for that single
-example.  Use ``+`` to enable the named behavior, or ``-`` to disable it.
+Các directive doctest của một ví dụ sẽ thay đổi hành vi của doctest cho riêng ví dụ đó. Sử dụng ``+`` để bật hành vi được đặt tên hoặc ``-`` để tắt hành vi đó.
 
-For example, this test passes:
+Ví dụ, kiểm thử này thành công:
 
 .. doctest::
    :no-trim-doctest-flags:
@@ -780,10 +608,7 @@ For example, this test passes:
    [0,   1,  2,  3,  4,  5,  6,  7,  8,  9,
    10,  11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-Without the directive it would fail, both because the actual output doesn't have
-two blanks before the single-digit list elements, and because the actual output
-is on a single line.  This test also passes, and also requires a directive to do
-so:
+Nếu không có directive này, kiểm thử sẽ thất bại vì cả hai lý do: đầu ra thực tế không có hai khoảng trắng trước các phần tử danh sách một chữ số, và đầu ra thực tế nằm trên một dòng duy nhất. Kiểm thử này cũng thành công và cũng cần một directive để làm được như vậy:
 
 .. doctest::
    :no-trim-doctest-flags:
@@ -791,8 +616,7 @@ so:
    >>> print(list(range(20)))  # doctest: +ELLIPSIS
    [0, 1, ..., 18, 19]
 
-Multiple directives can be used on a single physical line, separated by
-commas:
+Có thể sử dụng nhiều directive trên cùng một dòng vật lý, được phân tách bằng dấu phẩy:
 
 .. doctest::
    :no-trim-doctest-flags:
@@ -800,8 +624,7 @@ commas:
    >>> print(list(range(20)))  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
    [0,    1, ...,   18,    19]
 
-If multiple directive comments are used for a single example, then they are
-combined:
+Nếu sử dụng nhiều chú thích chỉ thị cho cùng một ví dụ, chúng sẽ được kết hợp:
 
 .. doctest::
    :no-trim-doctest-flags:
@@ -810,9 +633,7 @@ combined:
    ...                         # doctest: +NORMALIZE_WHITESPACE
    [0,    1, ...,   18,    19]
 
-As the previous example shows, you can add ``...`` lines to your example
-containing only directives.  This can be useful when an example is too long for
-a directive to comfortably fit on the same line:
+Như ví dụ trước cho thấy, bạn có thể thêm các dòng ``...`` chỉ chứa các chỉ thị vào ví dụ của mình. Điều này hữu ích khi ví dụ quá dài để đặt một chỉ thị trên cùng dòng một cách thoải mái:
 
 .. doctest::
    :no-trim-doctest-flags:
@@ -821,51 +642,43 @@ a directive to comfortably fit on the same line:
    ... # doctest: +ELLIPSIS
    [0, ..., 4, 10, ..., 19, 30, ..., 39]
 
-Note that since all options are disabled by default, and directives apply only
-to the example they appear in, enabling options (via ``+`` in a directive) is
-usually the only meaningful choice.  However, option flags can also be passed to
-functions that run doctests, establishing different defaults.  In such cases,
-disabling an option via ``-`` in a directive can be useful.
+Lưu ý rằng vì tất cả các tùy chọn đều bị tắt theo mặc định và các chỉ thị chỉ áp dụng cho ví dụ nơi chúng xuất hiện, việc bật tùy chọn (thông qua ``+`` trong một chỉ thị) thường là lựa chọn duy nhất có ý nghĩa. Tuy nhiên, các cờ tùy chọn cũng có thể được truyền vào những hàm chạy doctest, qua đó thiết lập các giá trị mặc định khác nhau. Trong những trường hợp như vậy, việc tắt một tùy chọn thông qua ``-`` trong một chỉ thị có thể hữu ích.
 
 
 .. _doctest-warnings:
 
-Warnings
+Cảnh báo
 ^^^^^^^^
 
-:mod:`!doctest` is serious about requiring exact matches in expected output.  If
-even a single character doesn't match, the test fails.  This will probably
-surprise you a few times, as you learn exactly what Python does and doesn't
-guarantee about output.  For example, when printing a set, Python doesn't
-guarantee that the element is printed in any particular order, so a test like ::
+:mod:`!doctest` rất nghiêm ngặt trong việc yêu cầu kết quả mong đợi phải khớp chính xác. Chỉ cần một ký tự không khớp là bài kiểm tra sẽ thất bại. Điều này có thể sẽ khiến bạn bất ngờ vài lần khi tìm hiểu chính xác Python đảm bảo và không đảm bảo điều gì về kết quả đầu ra. Ví dụ: khi in một set, Python không đảm bảo các phần tử được in theo thứ tự cụ thể nào, nên một bài kiểm tra như sau::
 
    >>> foo()
    {"spam", "eggs"}
 
-is vulnerable!  One workaround is to do ::
+sẽ dễ gặp lỗi! Một cách khắc phục là thực hiện::
 
    >>> foo() == {"spam", "eggs"}
    True
 
-instead.  Another is to do ::
+thay vào đó. Một cách khác là thực hiện::
 
    >>> d = sorted(foo())
    >>> d
    ['eggs', 'spam']
 
-There are others, but you get the idea.
+Còn những cách khác, nhưng bạn đã hiểu ý.
 
-Another bad idea is to print things that embed an object address, like
+Một ý tưởng tồi khác là in những thứ có chứa địa chỉ của một đối tượng, chẳng hạn như
 
 .. doctest::
 
-   >>> id(1.0)  # certain to fail some of the time  # doctest: +SKIP
+   >>> id(1.0)  # chắc chắn đôi khi sẽ thất bại  # doctest: +SKIP
    7948648
    >>> class C: pass
-   >>> C()  # the default repr() for instances embeds an address   # doctest: +SKIP
+   >>> C()  # repr() mặc định cho các instance chứa một địa chỉ   # doctest: +SKIP
    <C object at 0x00AC18F0>
 
-The :const:`ELLIPSIS` directive gives a nice approach for the last example:
+Chỉ thị :const:`ELLIPSIS` cung cấp một cách tiếp cận hữu ích cho ví dụ cuối cùng:
 
 .. doctest::
    :no-trim-doctest-flags:
@@ -873,160 +686,98 @@ The :const:`ELLIPSIS` directive gives a nice approach for the last example:
    >>> C()  # doctest: +ELLIPSIS
    <C object at 0x...>
 
-Floating-point numbers are also subject to small output variations across
-platforms, because Python defers to the platform C library for some
-floating-point calculations, and C libraries vary widely in quality here. ::
+Các số dấu phẩy động cũng có thể có những khác biệt nhỏ trong đầu ra giữa các nền tảng, vì Python ủy quyền một số phép tính dấu phẩy động cho thư viện C của nền tảng, mà chất lượng của các thư viện C khác nhau đáng kể trong trường hợp này.::
 
-   >>> 1000**0.1  # risky
+   >>> 1000**0.1  # rủi ro
    1.9952623149688797
-   >>> round(1000**0.1, 9) # safer
+   >>> round(1000**0.1, 9) # an toàn hơn
    1.995262315
-   >>> print(f'{1000**0.1:.4f}') # much safer
+   >>> print(f'{1000**0.1:.4f}') # an toàn hơn nhiều
    1.9953
 
-Numbers of the form ``I/2.**J`` are safe across all platforms, and I often
-contrive doctest examples to produce numbers of that form::
+Các số có dạng ``I/2.**J`` an toàn trên mọi nền tảng, và tôi thường cố ý tạo các ví dụ doctest để cho ra những số có dạng đó::
 
-   >>> 3./4  # utterly safe
+   >>> 3./4  # hoàn toàn an toàn
    0.75
 
-Simple fractions are also easier for people to understand, and that makes for
-better documentation.
+Các phân số đơn giản cũng dễ hiểu hơn đối với mọi người, nhờ đó tài liệu sẽ tốt hơn.
 
 
 .. _doctest-basic-api:
 
-Basic API
----------
+API cơ bản
+----------
 
-The functions :func:`testmod` and :func:`testfile` provide a simple interface to
-doctest that should be sufficient for most basic uses.  For a less formal
-introduction to these two functions, see sections :ref:`doctest-simple-testmod`
-and :ref:`doctest-simple-testfile`.
+Các hàm :func:`testmod` và :func:`testfile` cung cấp một giao diện đơn giản cho doctest, đáp ứng hầu hết các nhu cầu sử dụng cơ bản. Để có phần giới thiệu ít trang trọng hơn về hai hàm này, hãy xem các phần :ref:`doctest-simple-testmod` và :ref:`doctest-simple-testfile`.
 
 
 .. function:: testfile(filename, module_relative=True, name=None, package=None, globs=None, verbose=None, report=True, optionflags=0, extraglobs=None, raise_on_error=False, parser=DocTestParser(), encoding=None)
 
-   All arguments except *filename* are optional, and should be specified in keyword
-   form.
+   Tất cả đối số ngoại trừ *filename* đều là tùy chọn và nên được chỉ định theo dạng keyword.
 
-   Test examples in the file named *filename*.  Return ``(failure_count,
-   test_count)``.
+   Kiểm thử các ví dụ trong tệp có tên *filename*. Trả về ``(failure_count, test_count)``.
 
-   Optional argument *module_relative* specifies how the filename should be
-   interpreted:
+   Đối số tùy chọn *module_relative* chỉ định cách diễn giải tên tệp:
 
-   * If *module_relative* is ``True`` (the default), then *filename* specifies an
-     OS-independent module-relative path.  By default, this path is relative to the
-     calling module's directory; but if the *package* argument is specified, then it
-     is relative to that package.  To ensure OS-independence, *filename* should use
-     ``/`` characters to separate path segments, and may not be an absolute path
-     (i.e., it may not begin with ``/``).
+   * Nếu *module_relative* là ``True`` (giá trị mặc định), thì *filename* chỉ định một đường dẫn tương đối với module và không phụ thuộc hệ điều hành. Theo mặc định, đường dẫn này tương đối với thư mục của module gọi; nhưng nếu đối số *package* được chỉ định, thì nó tương đối với package đó. Để đảm bảo tính độc lập với hệ điều hành, *filename* phải sử dụng ký tự ``/`` để phân tách các thành phần đường dẫn và không được là đường dẫn tuyệt đối (tức là không được bắt đầu bằng ``/``).
 
-   * If *module_relative* is ``False``, then *filename* specifies an OS-specific
-     path.  The path may be absolute or relative; relative paths are resolved with
-     respect to the current working directory.
+   * Nếu *module_relative* là ``False``, thì *filename* chỉ định một đường dẫn đặc thù theo hệ điều hành. Đường dẫn này có thể là tuyệt đối hoặc tương đối; các đường dẫn tương đối được phân giải dựa trên thư mục làm việc hiện tại.
 
-   Optional argument *name* gives the name of the test; by default, or if ``None``,
-   ``os.path.basename(filename)`` is used.
+   Đối số tùy chọn *name* cung cấp tên của phép kiểm thử; theo mặc định, hoặc nếu ``None``, ``os.path.basename(filename)`` được sử dụng.
 
-   Optional argument *package* is a Python package or the name of a Python package
-   whose directory should be used as the base directory for a module-relative
-   filename.  If no package is specified, then the calling module's directory is
-   used as the base directory for module-relative filenames.  It is an error to
-   specify *package* if *module_relative* is ``False``.
+   Đối số tùy chọn *package* là một Python package hoặc tên của một Python package có thư mục được dùng làm thư mục cơ sở cho tên tệp tương đối với module. Nếu không chỉ định package, thư mục của module gọi sẽ được dùng làm thư mục cơ sở cho các tên tệp tương đối với module. Sẽ xảy ra lỗi nếu chỉ định *package* khi *module_relative* là ``False``.
 
-   Optional argument *globs* gives a dict to be used as the globals when executing
-   examples.  A new shallow copy of this dict is created for the doctest, so its
-   examples start with a clean slate. By default, or if ``None``, a new empty dict
-   is used.
+   Đối số tùy chọn *globs* cung cấp một dict được dùng làm globals khi thực thi các ví dụ. Một bản sao nông mới của dict này được tạo cho doctest, vì vậy các ví dụ của nó bắt đầu với trạng thái sạch. Theo mặc định, hoặc nếu ``None``, một dict trống mới được sử dụng.
 
-   Optional argument *extraglobs* gives a dict merged into the globals used to
-   execute examples.  This works like :meth:`dict.update`:  if *globs* and
-   *extraglobs* have a common key, the associated value in *extraglobs* appears in
-   the combined dict.  By default, or if ``None``, no extra globals are used.  This
-   is an advanced feature that allows parameterization of doctests.  For example, a
-   doctest can be written for a base class, using a generic name for the class,
-   then reused to test any number of subclasses by passing an *extraglobs* dict
-   mapping the generic name to the subclass to be tested.
+   Đối số tùy chọn *extraglobs* cung cấp một dict được hợp nhất vào globals dùng để thực thi các ví dụ. Cách này hoạt động tương tự như :meth:`dict.update`: nếu *globs* và *extraglobs* có một khóa chung, giá trị tương ứng trong *extraglobs* sẽ xuất hiện trong dict kết hợp. Theo mặc định, hoặc nếu ``None``, không sử dụng globals bổ sung. Đây là một tính năng nâng cao cho phép tham số hóa các doctest. Ví dụ, có thể viết một doctest cho một lớp cơ sở bằng cách sử dụng một tên chung cho lớp đó, sau đó dùng lại để kiểm thử bất kỳ số lượng lớp con nào bằng cách truyền một dict *extraglobs* ánh xạ tên chung đến lớp con cần kiểm thử.
 
-   Optional argument *verbose* prints lots of stuff if true, and prints only
-   failures if false; by default, or if ``None``, it's true if and only if ``'-v'``
-   is in :data:`sys.argv`.
+   Đối số tùy chọn *verbose* sẽ in ra rất nhiều thông tin nếu có giá trị true và chỉ in ra các lỗi nếu có giá trị false; theo mặc định, hoặc nếu ``None``, nó là true khi và chỉ khi ``'-v'`` nằm trong :data:`sys.argv`.
 
-   Optional argument *report* prints a summary at the end when true, else prints
-   nothing at the end.  In verbose mode, the summary is detailed, else the summary
-   is very brief (in fact, empty if all tests passed).
+   Đối số tùy chọn *report* sẽ in bản tóm tắt ở cuối khi có giá trị true, nếu không thì không in gì ở cuối.  Ở chế độ verbose, bản tóm tắt sẽ chi tiết; nếu không, bản tóm tắt sẽ rất ngắn (thực tế là trống nếu tất cả các bài kiểm tra đều đạt).
 
-   Optional argument *optionflags* (default value ``0``) takes the
-   :ref:`bitwise OR <bitwise>` of option flags.
-   See section :ref:`doctest-options`.
+   Đối số tùy chọn *optionflags* (giá trị mặc định là ``0``) nhận phép
+   :ref:`OR theo bit <bitwise>` của các cờ tùy chọn. Xem phần :ref:`doctest-options`.
 
-   Optional argument *raise_on_error* defaults to false.  If true, an exception is
-   raised upon the first failure or unexpected exception in an example.  This
-   allows failures to be post-mortem debugged. Default behavior is to continue
-   running examples.
+   Đối số tùy chọn *raise_on_error* mặc định là false.  Nếu là true, một exception sẽ được raised khi gặp failure đầu tiên hoặc exception không mong đợi trong một ví dụ.  Điều này cho phép debug các failure sau khi chúng xảy ra. Hành vi mặc định là tiếp tục chạy các ví dụ.
 
-   Optional argument *parser* specifies a :class:`DocTestParser` (or subclass) that
-   should be used to extract tests from the files.  It defaults to a normal parser
-   (i.e., ``DocTestParser()``).
+   Đối số tùy chọn *parser* chỉ định một :class:`DocTestParser` (hoặc lớp con) sẽ được dùng để trích xuất các bài kiểm tra từ các tệp.  Theo mặc định, đây là một parser thông thường (tức là ``DocTestParser()``).
 
-   Optional argument *encoding* specifies an encoding that should be used to
-   convert the file to unicode.
+   Đối số tùy chọn *encoding* chỉ định encoding được dùng để chuyển đổi tệp sang Unicode.
 
 
 .. function:: testmod(m=None, name=None, globs=None, verbose=None, report=True, optionflags=0, extraglobs=None, raise_on_error=False, exclude_empty=False)
 
-   All arguments are optional, and all except for *m* should be specified in
-   keyword form.
+   Tất cả đối số đều là tùy chọn, và tất cả ngoại trừ *m* phải được chỉ định dưới dạng keyword.
 
-   Test examples in docstrings in functions and classes reachable from module *m*
-   (or module :mod:`__main__` if *m* is not supplied or is ``None``), starting with
-   ``m.__doc__``.
+   Kiểm thử các ví dụ trong docstring của các function và class có thể truy cập từ module *m* (hoặc module :mod:`__main__` nếu *m* không được cung cấp hoặc là ``None``), bắt đầu từ ``m.__doc__``.
 
-   Also test examples reachable from dict ``m.__test__``, if it exists.
-   ``m.__test__`` maps names (strings) to functions, classes and
-   strings; function and class docstrings are searched for examples; strings are
-   searched directly, as if they were docstrings.
+   Ngoài ra, hãy kiểm thử các ví dụ có thể truy cập từ dict ``m.__test__``, nếu dict này tồn tại. ``m.__test__`` ánh xạ các tên (chuỗi) tới các function, class và chuỗi; docstring của function và class được tìm kiếm để tìm các ví dụ; các chuỗi được tìm kiếm trực tiếp, như thể chúng là docstring.
 
-   Only docstrings attached to objects belonging to module *m* are searched.
+   Chỉ các docstring gắn với những đối tượng thuộc module *m* mới được tìm kiếm.
 
-   Return ``(failure_count, test_count)``.
+   Trả về ``(failure_count, test_count)``.
 
-   Optional argument *name* gives the name of the module; by default, or if
-   ``None``, ``m.__name__`` is used.
+   Đối số tùy chọn *name* cung cấp tên của module; theo mặc định, hoặc nếu ``None``, thì ``m.__name__`` được sử dụng.
 
-   Optional argument *exclude_empty* defaults to false.  If true, objects for which
-   no doctests are found are excluded from consideration. The default is a backward
-   compatibility hack, so that code still using
-   :meth:`doctest.master.summarize <DocTestRunner.summarize>` in
-   conjunction with :func:`testmod` continues to get output for objects with no
-   tests. The *exclude_empty* argument to the newer :class:`DocTestFinder`
-   constructor defaults to true.
+   Đối số tùy chọn *exclude_empty* mặc định là false. Nếu là true, các đối tượng không tìm thấy doctest nào sẽ bị loại khỏi việc xem xét. Giá trị mặc định là một thủ thuật tương thích ngược, để mã vẫn đang sử dụng
+   :meth:`doctest.master.summarize <DocTestRunner.summarize>` kết hợp với :func:`testmod` vẫn tiếp tục tạo đầu ra cho các đối tượng không có kiểm thử. Đối số *exclude_empty* của hàm khởi tạo :class:`DocTestFinder` mới hơn mặc định là true.
 
-   Optional arguments *extraglobs*, *verbose*, *report*, *optionflags*,
-   *raise_on_error*, and *globs* are the same as for function :func:`testfile`
-   above, except that *globs* defaults to ``m.__dict__``.
+   Các đối số tùy chọn *extraglobs*, *verbose*, *report*, *optionflags*, *raise_on_error* và *globs* giống như đối với hàm :func:`testfile` ở trên, ngoại trừ việc *globs* mặc định là ``m.__dict__``.
 
 
 .. function:: run_docstring_examples(f, globs, verbose=False, name="NoName", compileflags=None, optionflags=0)
 
-   Test examples associated with object *f*; for example, *f* may be a string,
-   a module, a function, or a class object.
+   Kiểm thử các ví dụ được liên kết với đối tượng *f*; chẳng hạn, *f* có thể là một chuỗi, mô-đun, hàm hoặc đối tượng lớp.
 
-   A shallow copy of dictionary argument *globs* is used for the execution context.
+   Một bản sao nông của đối số từ điển *globs* được sử dụng cho ngữ cảnh thực thi.
 
-   Optional argument *name* is used in failure messages, and defaults to
-   ``"NoName"``.
+   Đối số tùy chọn *name* được sử dụng trong các thông báo lỗi và mặc định là ``"NoName"``.
 
-   If optional argument *verbose* is true, output is generated even if there are no
-   failures.  By default, output is generated only in case of an example failure.
+   Nếu đối số tùy chọn *verbose* là true, đầu ra sẽ được tạo ngay cả khi không có lỗi nào. Theo mặc định, đầu ra chỉ được tạo khi một ví dụ bị lỗi.
 
-   Optional argument *compileflags* gives the set of flags that should be used by
-   the Python compiler when running the examples.  By default, or if ``None``,
-   flags are deduced corresponding to the set of future features found in *globs*.
+   Đối số tùy chọn *compileflags* cung cấp tập cờ sẽ được trình biên dịch Python sử dụng khi chạy các ví dụ. Theo mặc định hoặc nếu ``None``, các cờ sẽ được suy ra tương ứng với tập tính năng future được tìm thấy trong *globs*.
 
-   Optional argument *optionflags* works as for function :func:`testfile` above.
+   Đối số tùy chọn *optionflags* hoạt động giống như đối với hàm :func:`testfile` ở trên.
 
 
 .. _doctest-unittest-api:
@@ -1034,11 +785,7 @@ and :ref:`doctest-simple-testfile`.
 Unittest API
 ------------
 
-As your collection of doctest'ed modules grows, you'll want a way to run all
-their doctests systematically.  :mod:`!doctest` provides two functions that can
-be used to create :mod:`unittest` test suites from modules and text files
-containing doctests.  To integrate with :mod:`unittest` test discovery, include
-a :ref:`load_tests <load_tests-protocol>` function in your test module::
+Khi tập hợp các mô-đun có doctest của bạn ngày càng lớn, bạn sẽ cần một cách để chạy tất cả doctest của chúng một cách có hệ thống. :mod:`!doctest` cung cấp hai hàm có thể được dùng để tạo các bộ kiểm thử :mod:`unittest` từ các mô-đun và tệp văn bản chứa doctest. Để tích hợp với tính năng phát hiện kiểm thử của :mod:`unittest`, hãy thêm một hàm :ref:`load_tests <load_tests-protocol>` vào mô-đun kiểm thử của bạn::
 
    import unittest
    import doctest
@@ -1048,197 +795,120 @@ a :ref:`load_tests <load_tests-protocol>` function in your test module::
        tests.addTests(doctest.DocTestSuite(my_module_with_doctests))
        return tests
 
-There are two main functions for creating :class:`unittest.TestSuite` instances
-from text files and modules with doctests:
+Có hai hàm chính để tạo các thực thể :class:`unittest.TestSuite` từ các tệp văn bản và mô-đun có doctest:
 
 
 .. function:: DocFileSuite(*paths, module_relative=True, package=None, setUp=None, tearDown=None, globs=None, optionflags=0, parser=DocTestParser(), encoding=None)
 
-   Convert doctest tests from one or more text files to a
+   Chuyển đổi các kiểm thử doctest từ một hoặc nhiều tệp văn bản thành một
    :class:`unittest.TestSuite`.
 
-   The returned :class:`unittest.TestSuite` is to be run by the unittest framework
-   and runs the interactive examples in each file.  If an example in any file
-   fails, then the synthesized unit test fails, and a :exc:`~unittest.TestCase.failureException`
-   exception is raised showing the name of the file containing the test and a
-   (sometimes approximate) line number.  If all the examples in a file are
-   skipped, then the synthesized unit test is also marked as skipped.
+   :class:`unittest.TestSuite` được trả về sẽ được chạy bởi framework unittest và chạy các ví dụ tương tác trong từng tệp. Nếu một ví dụ trong bất kỳ tệp nào không thành công, kiểm thử đơn vị được tổng hợp sẽ thất bại và một ngoại lệ :exc:`~unittest.TestCase.failureException` được đưa ra, cho biết tên của tệp chứa kiểm thử và số dòng (đôi khi chỉ gần đúng). Nếu tất cả ví dụ trong một tệp đều bị bỏ qua, kiểm thử đơn vị được tổng hợp cũng được đánh dấu là bị bỏ qua.
 
-   Pass one or more paths (as strings) to text files to be examined.
+   Truyền một hoặc nhiều đường dẫn (dưới dạng chuỗi) đến các tệp văn bản cần kiểm tra.
 
-   Options may be provided as keyword arguments:
+   Các tùy chọn có thể được cung cấp dưới dạng đối số từ khóa:
 
-   Optional argument *module_relative* specifies how the filenames in *paths*
-   should be interpreted:
+   Đối số tùy chọn *module_relative* chỉ định cách diễn giải các tên tệp trong *paths*:
 
-   * If *module_relative* is ``True`` (the default), then each filename in
-     *paths* specifies an OS-independent module-relative path.  By default, this
-     path is relative to the calling module's directory; but if the *package*
-     argument is specified, then it is relative to that package.  To ensure
-     OS-independence, each filename should use ``/`` characters to separate path
-     segments, and may not be an absolute path (i.e., it may not begin with
-     ``/``).
+   * Nếu *module_relative* là ``True`` (mặc định), thì mỗi tên tệp trong *paths* chỉ định một đường dẫn độc lập với hệ điều hành, tương đối với module. Theo mặc định, đường dẫn này tương đối với thư mục của module gọi; nhưng nếu đối số *package* được chỉ định, thì nó tương đối với package đó. Để đảm bảo tính độc lập với hệ điều hành, mỗi tên tệp phải sử dụng ký tự ``/`` để phân tách các phần của đường dẫn và không được là đường dẫn tuyệt đối (tức là không được bắt đầu bằng ``/``).
 
-   * If *module_relative* is ``False``, then each filename in *paths* specifies
-     an OS-specific path.  The path may be absolute or relative; relative paths
-     are resolved with respect to the current working directory.
+   * Nếu *module_relative* là ``False``, thì mỗi tên tệp trong *paths* chỉ định một đường dẫn dành riêng cho hệ điều hành. Đường dẫn này có thể là đường dẫn tuyệt đối hoặc tương đối; các đường dẫn tương đối được phân giải dựa trên thư mục làm việc hiện tại.
 
-   Optional argument *package* is a Python package or the name of a Python
-   package whose directory should be used as the base directory for
-   module-relative filenames in *paths*.  If no package is specified, then the
-   calling module's directory is used as the base directory for module-relative
-   filenames.  It is an error to specify *package* if *module_relative* is
-   ``False``.
+   Đối số tùy chọn *package* là một Python package hoặc tên của một Python package, có thư mục được dùng làm thư mục cơ sở cho các tên tệp tương đối với module trong *paths*. Nếu không chỉ định package, thư mục của module gọi sẽ được dùng làm thư mục cơ sở cho các tên tệp tương đối với module. Sẽ xảy ra lỗi nếu chỉ định *package* khi *module_relative* là ``False``.
 
-   Optional argument *setUp* specifies a set-up function for the test suite.
-   This is called before running the tests in each file.  The *setUp* function
-   will be passed a :class:`DocTest` object.  The *setUp* function can access the
-   test globals as the :attr:`~DocTest.globs` attribute of the test passed.
+   Đối số tùy chọn *setUp* chỉ định một hàm thiết lập cho test suite. Hàm này được gọi trước khi chạy các bài kiểm thử trong từng tệp. Hàm *setUp* sẽ được truyền một đối tượng :class:`DocTest`. Hàm *setUp* có thể truy cập các biến toàn cục của bài kiểm thử thông qua thuộc tính :attr:`~DocTest.globs` của bài kiểm thử được truyền vào.
 
-   Optional argument *tearDown* specifies a tear-down function for the test
-   suite.  This is called after running the tests in each file.  The *tearDown*
-   function will be passed a :class:`DocTest` object.  The *tearDown* function can
-   access the test globals as the :attr:`~DocTest.globs` attribute of the test
-   passed.
+   Đối số tùy chọn *tearDown* chỉ định một hàm dọn dẹp cho test suite. Hàm này được gọi sau khi chạy các bài kiểm thử trong từng tệp. Hàm *tearDown* sẽ được truyền một đối tượng :class:`DocTest`. Hàm *tearDown* có thể truy cập các biến toàn cục của bài kiểm thử thông qua thuộc tính :attr:`~DocTest.globs` của bài kiểm thử được truyền vào.
 
-   Optional argument *globs* is a dictionary containing the initial global
-   variables for the tests.  A new copy of this dictionary is created for each
-   test.  By default, *globs* is a new empty dictionary.
+   Đối số tùy chọn *globs* là một từ điển chứa các biến toàn cục ban đầu cho các kiểm thử. Một bản sao mới của từ điển này được tạo cho mỗi kiểm thử. Theo mặc định, *globs* là một từ điển mới, rỗng.
 
-   Optional argument *optionflags* specifies the default doctest options for the
-   tests, created by or-ing together individual option flags.  See section
-   :ref:`doctest-options`. See function :func:`set_unittest_reportflags` below
-   for a better way to set reporting options.
+   Đối số tùy chọn *optionflags* chỉ định các tùy chọn doctest mặc định cho các kiểm thử, được tạo bằng cách thực hiện phép OR trên từng cờ tùy chọn. Xem phần
+   :ref:`doctest-options`. Xem hàm :func:`set_unittest_reportflags` bên dưới để biết cách tốt hơn nhằm thiết lập các tùy chọn báo cáo.
 
-   Optional argument *parser* specifies a :class:`DocTestParser` (or subclass)
-   that should be used to extract tests from the files.  It defaults to a normal
-   parser (i.e., ``DocTestParser()``).
+   Đối số tùy chọn *parser* chỉ định một :class:`DocTestParser` (hoặc lớp con) được dùng để trích xuất các kiểm thử từ các tệp. Theo mặc định, đây là một parser thông thường (tức là ``DocTestParser()``).
 
-   Optional argument *encoding* specifies an encoding that should be used to
-   convert the file to unicode.
+   Đối số tùy chọn *encoding* chỉ định encoding được dùng để chuyển đổi tệp sang unicode.
 
-   The global ``__file__`` is added to the globals provided to doctests loaded
-   from a text file using :func:`DocFileSuite`.
+   Biến toàn cục ``__file__`` được thêm vào các biến toàn cục được cung cấp cho các doctest được tải từ một tệp văn bản bằng :func:`DocFileSuite`.
 
 
 .. function:: DocTestSuite(module=None, globs=None, extraglobs=None, test_finder=None, setUp=None, tearDown=None, optionflags=0, checker=None)
 
-   Convert doctest tests for a module to a :class:`unittest.TestSuite`.
+   Chuyển đổi các kiểm thử doctest của một module thành một :class:`unittest.TestSuite`.
 
-   The returned :class:`unittest.TestSuite` is to be run by the unittest framework
-   and runs each doctest in the module.
-   Each docstring is run as a separate unit test.
-   If any of the doctests fail, then the synthesized unit test fails,
-   and a :exc:`unittest.TestCase.failureException` exception is raised
-   showing the name of the file containing the test and a (sometimes approximate)
-   line number.  If all the examples in a docstring are skipped, then the
+   :class:`unittest.TestSuite` được trả về sẽ được framework unittest chạy và chạy từng doctest trong module. Mỗi docstring được chạy như một unit test riêng biệt. Nếu bất kỳ doctest nào không thành công, unit test được tổng hợp cũng không thành công và một ngoại lệ :exc:`unittest.TestCase.failureException` được đưa ra, hiển thị tên tệp chứa test cùng với số dòng (đôi khi chỉ là số dòng gần đúng). Nếu tất cả các ví dụ trong một docstring đều bị bỏ qua, thì
 
-   Optional argument *module* provides the module to be tested.  It can be a module
-   object or a (possibly dotted) module name.  If not specified, the module calling
-   this function is used.
+   Đối số tùy chọn *module* cung cấp module cần được kiểm thử. Đối số này có thể là một đối tượng module hoặc tên module (có thể chứa dấu chấm). Nếu không được chỉ định, module gọi hàm này sẽ được sử dụng.
 
-   Optional argument *globs* is a dictionary containing the initial global
-   variables for the tests.  A new copy of this dictionary is created for each
-   test.  By default, *globs* is the module's :attr:`~module.__dict__`.
+   Đối số tùy chọn *globs* là một từ điển chứa các biến global ban đầu cho các test. Một bản sao mới của từ điển này được tạo cho mỗi test. Theo mặc định, *globs* là :attr:`~module.__dict__` của module.
 
-   Optional argument *extraglobs* specifies an extra set of global variables, which
-   is merged into *globs*.  By default, no extra globals are used.
+   Đối số tùy chọn *extraglobs* chỉ định một tập hợp bổ sung các biến global, được hợp nhất vào *globs*. Theo mặc định, không sử dụng biến global bổ sung nào.
 
-   Optional argument *test_finder* is the :class:`DocTestFinder` object (or a
-   drop-in replacement) that is used to extract doctests from the module.
+   Đối số tùy chọn *test_finder* là đối tượng :class:`DocTestFinder` (hoặc một đối tượng thay thế tương thích) được dùng để trích xuất doctest từ module.
 
-   Optional arguments *setUp*, *tearDown*, and *optionflags* are the same as for
-   function :func:`DocFileSuite` above, but they are called for each docstring.
+   Các đối số tùy chọn *setUp*, *tearDown* và *optionflags* giống như đối với hàm :func:`DocFileSuite` ở trên, nhưng chúng được gọi cho mỗi docstring.
 
-   This function uses the same search technique as :func:`testmod`.
+   Hàm này sử dụng cùng kỹ thuật tìm kiếm như :func:`testmod`.
 
    .. versionchanged:: 3.5
       :func:`DocTestSuite` returns an empty :class:`unittest.TestSuite` if *module*
-      contains no docstrings instead of raising :exc:`ValueError`.
+      không chứa docstring thay vì phát sinh :exc:`ValueError`.
 
-Under the covers, :func:`DocTestSuite` creates a :class:`unittest.TestSuite` out
-of :class:`!doctest.DocTestCase` instances, and :class:`!DocTestCase` is a
-subclass of :class:`unittest.TestCase`. :class:`!DocTestCase` isn't documented
-here (it's an internal detail), but studying its code can answer questions about
-the exact details of :mod:`unittest` integration.
+Bên dưới lớp trừu tượng, :func:`DocTestSuite` tạo một :class:`unittest.TestSuite` từ các thực thể :class:`!doctest.DocTestCase`, và :class:`!DocTestCase` là một lớp con của :class:`unittest.TestCase`. :class:`!DocTestCase` không được tài liệu hóa ở đây (đây là chi tiết nội bộ), nhưng việc nghiên cứu mã nguồn của nó có thể giúp trả lời các câu hỏi về những chi tiết chính xác của việc tích hợp :mod:`unittest`.
 
-Similarly, :func:`DocFileSuite` creates a :class:`unittest.TestSuite` out of
-:class:`!doctest.DocFileCase` instances, and :class:`!DocFileCase` is a subclass
-of :class:`!DocTestCase`.
+Tương tự, :func:`DocFileSuite` tạo một :class:`unittest.TestSuite` từ
+các thực thể :class:`!doctest.DocFileCase`, và :class:`!DocFileCase` là một lớp con của :class:`!DocTestCase`.
 
-So both ways of creating a :class:`unittest.TestSuite` run instances of
-:class:`!DocTestCase`.  This is important for a subtle reason: when you run
-:mod:`!doctest` functions yourself, you can control the :mod:`!doctest` options in
-use directly, by passing option flags to :mod:`!doctest` functions.  However, if
-you're writing a :mod:`unittest` framework, :mod:`!unittest` ultimately controls
-when and how tests get run.  The framework author typically wants to control
-:mod:`!doctest` reporting options (perhaps, e.g., specified by command line
-options), but there's no way to pass options through :mod:`!unittest` to
-:mod:`!doctest` test runners.
+Vì vậy, cả hai cách tạo một :class:`unittest.TestSuite` đều chạy các thực thể của
+:class:`!DocTestCase`. Điều này quan trọng vì một lý do khá tinh tế: khi bạn tự chạy
+các hàm :mod:`!doctest`, bạn có thể trực tiếp kiểm soát các tùy chọn :mod:`!doctest` được sử dụng bằng cách truyền các cờ tùy chọn cho các hàm :mod:`!doctest`. Tuy nhiên, nếu bạn đang viết một framework :mod:`unittest`, thì :mod:`!unittest` cuối cùng sẽ kiểm soát thời điểm và cách các bài kiểm thử được chạy. Tác giả framework thường muốn kiểm soát
+các tùy chọn báo cáo của :mod:`!doctest` (chẳng hạn như được chỉ định bằng các tùy chọn dòng lệnh), nhưng không có cách nào truyền các tùy chọn qua :mod:`!unittest` đến
+các trình chạy kiểm thử :mod:`!doctest`.
 
-For this reason, :mod:`!doctest` also supports a notion of :mod:`!doctest`
-reporting flags specific to :mod:`unittest` support, via this function:
+Vì lý do này, :mod:`!doctest` cũng hỗ trợ khái niệm về các cờ báo cáo :mod:`!doctest` dành riêng cho việc hỗ trợ :mod:`unittest`, thông qua hàm sau:
 
 
 .. function:: set_unittest_reportflags(flags)
 
-   Set the :mod:`!doctest` reporting flags to use.
+   Đặt các cờ báo cáo :mod:`!doctest` cần sử dụng.
 
-   Argument *flags* takes the :ref:`bitwise OR <bitwise>` of option flags.  See
-   section :ref:`doctest-options`.  Only "reporting flags" can be used.
+   Đối số *flags* nhận :ref:`phép OR theo bit <bitwise>` của các cờ tùy chọn. Xem phần :ref:`doctest-options`. Chỉ có thể sử dụng "các cờ báo cáo".
 
-   This is a module-global setting, and affects all future doctests run by module
-   :mod:`unittest`:  the :meth:`!runTest` method of :class:`!DocTestCase` looks at
-   the option flags specified for the test case when the :class:`!DocTestCase`
-   instance was constructed.  If no reporting flags were specified (which is the
-   typical and expected case), :mod:`!doctest`'s :mod:`!unittest` reporting flags are
-   :ref:`bitwise ORed <bitwise>` into the option flags, and the option flags
-   so augmented are passed to the :class:`DocTestRunner` instance created to
-   run the doctest.  If any reporting flags were specified when the
-   :class:`!DocTestCase` instance was constructed, :mod:`!doctest`'s
-   :mod:`!unittest` reporting flags are ignored.
+   Đây là một thiết lập ở cấp module và ảnh hưởng đến tất cả các doctest trong tương lai được chạy bởi module
+   :mod:`unittest`: phương thức :meth:`!runTest` của :class:`!DocTestCase` xem xét các cờ tùy chọn được chỉ định cho test case khi instance :class:`!DocTestCase` được khởi tạo. Nếu không có cờ báo cáo nào được chỉ định (đây là trường hợp thường gặp và được mong đợi), các cờ báo cáo của :mod:`!doctest`'s :mod:`!unittest` là
+   :ref:`được OR theo bit <bitwise>` vào các cờ tùy chọn, và các cờ tùy chọn sau khi được bổ sung như vậy sẽ được truyền cho instance :class:`DocTestRunner` được tạo để chạy doctest. Nếu có cờ báo cáo nào được chỉ định khi
+   instance :class:`!DocTestCase` được khởi tạo, các cờ báo cáo của :mod:`!doctest`
+   :mod:`!unittest` Các cờ reporting bị bỏ qua.
 
-   The value of the :mod:`unittest` reporting flags in effect before the function
-   was called is returned by the function.
+   Hàm trả về giá trị của các cờ báo cáo :mod:`unittest` đang có hiệu lực trước khi hàm được gọi.
 
 
 .. _doctest-advanced-api:
 
-Advanced API
+API nâng cao
 ------------
 
-The basic API is a simple wrapper that's intended to make doctest easy to use.
-It is fairly flexible, and should meet most users' needs; however, if you
-require more fine-grained control over testing, or wish to extend doctest's
-capabilities, then you should use the advanced API.
+API cơ bản là một wrapper đơn giản, được thiết kế để giúp sử dụng doctest dễ dàng. API này khá linh hoạt và đáp ứng nhu cầu của hầu hết người dùng; tuy nhiên, nếu bạn cần kiểm soát việc kiểm thử chi tiết hơn hoặc muốn mở rộng khả năng của doctest, bạn nên sử dụng API nâng cao.
 
-The advanced API revolves around two container classes, which are used to store
-the interactive examples extracted from doctest cases:
+API nâng cao xoay quanh hai lớp container, được dùng để lưu trữ các ví dụ tương tác được trích xuất từ các trường hợp doctest:
 
-* :class:`Example`: A single Python :term:`statement`, paired with its expected
-  output.
+* :class:`Example`: Một :term:`statement` Python duy nhất, đi kèm với kết quả dự kiến.
 
-* :class:`DocTest`: A collection of :class:`Example`\ s, typically extracted
-  from a single docstring or text file.
+* :class:`DocTest`: Một tập hợp các :class:`Example`\ s, thường được trích xuất từ một docstring hoặc tệp văn bản duy nhất.
 
-Additional processing classes are defined to find, parse, and run, and check
-doctest examples:
+Các lớp xử lý bổ sung được định nghĩa để tìm, phân tích cú pháp, thực thi và kiểm tra các ví dụ doctest:
 
-* :class:`DocTestFinder`: Finds all docstrings in a given module, and uses a
-  :class:`DocTestParser` to create a :class:`DocTest` from every docstring that
-  contains interactive examples.
+* :class:`DocTestFinder`: Tìm tất cả docstring trong một module cho trước và sử dụng một
+  :class:`DocTestParser` để tạo một :class:`DocTest` từ mỗi docstring chứa các ví dụ tương tác.
 
-* :class:`DocTestParser`: Creates a :class:`DocTest` object from a string (such
-  as an object's docstring).
+* :class:`DocTestParser`: Tạo một đối tượng :class:`DocTest` từ một chuỗi (chẳng hạn như docstring của một đối tượng).
 
-* :class:`DocTestRunner`: Executes the examples in a :class:`DocTest`, and uses
-  an :class:`OutputChecker` to verify their output.
+* :class:`DocTestRunner`: Thực thi các ví dụ trong một :class:`DocTest` và sử dụng một :class:`OutputChecker` để xác minh kết quả của chúng.
 
-* :class:`OutputChecker`: Compares the actual output from a doctest example with
-  the expected output, and decides whether they match.
+* :class:`OutputChecker`: So sánh đầu ra thực tế từ một ví dụ doctest với đầu ra mong đợi và quyết định xem chúng có khớp nhau hay không.
 
-The relationships among these processing classes are summarized in the following
-diagram::
+Mối quan hệ giữa các lớp xử lý này được tóm tắt trong sơ đồ sau::
 
                                list of:
    +------+                   +---------+
@@ -1258,437 +928,325 @@ DocTest Objects
 
 .. class:: DocTest(examples, globs, name, filename, lineno, docstring)
 
-   A collection of doctest examples that should be run in a single namespace.  The
-   constructor arguments are used to initialize the attributes of the same names.
+   Một tập hợp các ví dụ doctest cần được chạy trong cùng một namespace. Các đối số của hàm khởi tạo được dùng để khởi tạo các thuộc tính có cùng tên.
 
 
-   :class:`DocTest` defines the following attributes.  They are initialized by
-   the constructor, and should not be modified directly.
+   :class:`DocTest` định nghĩa các thuộc tính sau. Chúng được khởi tạo bởi hàm khởi tạo và không nên được sửa đổi trực tiếp.
 
 
    .. attribute:: examples
 
-      A list of :class:`Example` objects encoding the individual interactive Python
-      examples that should be run by this test.
+      Một danh sách các đối tượng :class:`Example` mã hóa những ví dụ Python tương tác riêng lẻ cần được chạy bởi bài kiểm thử này.
 
 
    .. attribute:: globs
 
-      The namespace (aka globals) that the examples should be run in. This is a
-      dictionary mapping names to values.  Any changes to the namespace made by the
-      examples (such as binding new variables) will be reflected in :attr:`globs`
-      after the test is run.
+      Namespace (hay còn gọi là globals) nơi các ví dụ sẽ được chạy. Đây là một dictionary ánh xạ tên với giá trị. Mọi thay đổi đối với namespace do các ví dụ thực hiện (chẳng hạn như liên kết các biến mới) sẽ được phản ánh trong :attr:`globs` sau khi bài kiểm thử chạy xong.
 
 
    .. attribute:: name
 
-      A string name identifying the :class:`DocTest`.  Typically, this is the name
-      of the object or file that the test was extracted from.
+      Tên chuỗi xác định :class:`DocTest`. Thông thường, đây là tên của đối tượng hoặc tệp mà từ đó bài kiểm thử được trích xuất.
 
 
    .. attribute:: filename
 
-      The name of the file that this :class:`DocTest` was extracted from; or
-      ``None`` if the filename is unknown, or if the :class:`!DocTest` was not
-      extracted from a file.
+      Tên của tệp mà từ đó :class:`DocTest` được trích xuất; hoặc ``None`` nếu không xác định được tên tệp, hoặc nếu :class:`!DocTest` không được trích xuất từ một tệp.
 
 
    .. attribute:: lineno
 
-      The line number within :attr:`filename` where this :class:`DocTest` begins, or
-      ``None`` if the line number is unavailable.  This line number is zero-based
-      with respect to the beginning of the file.
+      Số dòng trong :attr:`filename` nơi :class:`DocTest` này bắt đầu, hoặc ``None`` nếu không xác định được số dòng. Số dòng này được đánh số bắt đầu từ 0 tính từ đầu tệp.
 
 
    .. attribute:: docstring
 
-      The string that the test was extracted from, or ``None`` if the string is
-      unavailable, or if the test was not extracted from a string.
+      Chuỗi mà từ đó bài kiểm thử được trích xuất, hoặc ``None`` nếu không có chuỗi, hoặc nếu bài kiểm thử không được trích xuất từ một chuỗi.
 
 
 .. _doctest-example:
 
-Example Objects
-^^^^^^^^^^^^^^^
+Các đối tượng ví dụ
+^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: Example(source, want, exc_msg=None, lineno=0, indent=0, options=None)
 
-   A single interactive example, consisting of a Python statement and its expected
-   output.  The constructor arguments are used to initialize the attributes of
-   the same names.
+   Một ví dụ tương tác đơn, gồm một câu lệnh Python và đầu ra dự kiến của câu lệnh đó. Các đối số của hàm khởi tạo được dùng để khởi tạo các thuộc tính có cùng tên.
 
 
-   :class:`Example` defines the following attributes.  They are initialized by
-   the constructor, and should not be modified directly.
+   :class:`Example` định nghĩa các thuộc tính sau. Các thuộc tính này được khởi tạo bởi hàm khởi tạo và không nên được sửa đổi trực tiếp.
 
 
    .. attribute:: source
 
-      A string containing the example's source code.  This source code consists of a
-      single Python statement, and always ends with a newline; the constructor adds
-      a newline when necessary.
+      Một chuỗi chứa mã nguồn của ví dụ. Mã nguồn này gồm một câu lệnh Python duy nhất và luôn kết thúc bằng ký tự xuống dòng; constructor sẽ thêm ký tự xuống dòng khi cần.
 
 
    .. attribute:: want
 
-      The expected output from running the example's source code (either from
-      stdout, or a traceback in case of exception).  :attr:`want` ends with a
-      newline unless no output is expected, in which case it's an empty string.  The
-      constructor adds a newline when necessary.
+      Đầu ra dự kiến khi chạy mã nguồn của ví dụ (từ stdout hoặc một traceback trong trường hợp có exception). :attr:`want` kết thúc bằng ký tự xuống dòng, trừ khi không dự kiến có đầu ra; khi đó, nó là một chuỗi rỗng. Constructor sẽ thêm ký tự xuống dòng khi cần.
 
 
    .. attribute:: exc_msg
 
-      The exception message generated by the example, if the example is expected to
-      generate an exception; or ``None`` if it is not expected to generate an
-      exception.  This exception message is compared against the return value of
-      :func:`traceback.format_exception_only`.  :attr:`exc_msg` ends with a newline
-      unless it's ``None``.  The constructor adds a newline if needed.
+      Thông báo exception do ví dụ tạo ra, nếu ví dụ được dự kiến sẽ tạo ra một exception; hoặc ``None`` nếu không dự kiến tạo ra một exception. Thông báo exception này được so sánh với giá trị trả về của
+      :func:`traceback.format_exception_only`. :attr:`exc_msg` kết thúc bằng ký tự xuống dòng, trừ khi nó là ``None``. Constructor sẽ thêm ký tự xuống dòng nếu cần.
 
 
    .. attribute:: lineno
 
-      The line number within the string containing this example where the example
-      begins.  This line number is zero-based with respect to the beginning of the
-      containing string.
+      Số dòng trong chuỗi chứa ví dụ, tại đó ví dụ bắt đầu. Số dòng này được đánh số từ 0 so với phần đầu của chuỗi chứa nó.
 
 
    .. attribute:: indent
 
-      The example's indentation in the containing string, i.e., the number of space
-      characters that precede the example's first prompt.
+      Mức thụt lề của ví dụ trong chuỗi chứa nó, tức là số ký tự dấu cách đứng trước prompt đầu tiên của ví dụ.
 
 
    .. attribute:: options
 
-      A dictionary mapping from option flags to ``True`` or ``False``, which is used
-      to override default options for this example.  Any option flags not contained
-      in this dictionary are left at their default value (as specified by the
-      :class:`DocTestRunner`'s :ref:`optionflags <doctest-options>`).
-      By default, no options are set.
+      Một dictionary ánh xạ các cờ tùy chọn tới ``True`` hoặc ``False``, được dùng để ghi đè các tùy chọn mặc định cho ví dụ này. Mọi cờ tùy chọn không có trong dictionary này sẽ giữ giá trị mặc định (như được chỉ định bởi
+      của :class:`DocTestRunner` :ref:`optionflags <doctest-options>`). Theo mặc định, không có tùy chọn nào được thiết lập.
 
 
 .. _doctest-doctestfinder:
 
-DocTestFinder objects
-^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng DocTestFinder
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: DocTestFinder(verbose=False, parser=DocTestParser(), recurse=True, exclude_empty=True)
 
-   A processing class used to extract the :class:`DocTest`\ s that are relevant to
-   a given object, from its docstring and the docstrings of its contained objects.
-   :class:`DocTest`\ s can be extracted from modules, classes, functions,
-   methods, staticmethods, classmethods, and properties.
+   Một lớp xử lý được dùng để trích xuất các :class:`DocTest`\ s có liên quan đến một đối tượng nhất định, từ docstring của đối tượng đó và docstring của các đối tượng chứa trong đó.
+   Có thể trích xuất :class:`DocTest`\ s từ các module, class, function, method, staticmethod, classmethod và property.
 
-   The optional argument *verbose* can be used to display the objects searched by
-   the finder.  It defaults to ``False`` (no output).
+   Có thể sử dụng đối số tùy chọn *verbose* để hiển thị các đối tượng được finder tìm kiếm. Theo mặc định, đối số này là ``False`` (không xuất gì).
 
-   The optional argument *parser* specifies the :class:`DocTestParser` object (or a
-   drop-in replacement) that is used to extract doctests from docstrings.
+   Đối số tùy chọn *parser* chỉ định đối tượng :class:`DocTestParser` (hoặc một đối tượng thay thế tương thích) được dùng để trích xuất doctest từ các docstring.
 
-   If the optional argument *recurse* is false, then :meth:`DocTestFinder.find`
-   will only examine the given object, and not any contained objects.
+   Nếu đối số tùy chọn *recurse* là false, thì :meth:`DocTestFinder.find` sẽ chỉ kiểm tra đối tượng được cung cấp, không kiểm tra bất kỳ đối tượng nào chứa trong đó.
 
-   If the optional argument *exclude_empty* is false, then
-   :meth:`DocTestFinder.find` will include tests for objects with empty docstrings.
+   Nếu đối số tùy chọn *exclude_empty* là false thì
+   :meth:`DocTestFinder.find` sẽ bao gồm các bài kiểm thử cho những đối tượng có docstring rỗng.
 
 
-   :class:`DocTestFinder` defines the following method:
+   :class:`DocTestFinder` định nghĩa phương thức sau:
 
 
    .. method:: find(obj[, name][, module][, globs][, extraglobs])
 
-      Return a list of the :class:`DocTest`\ s that are defined by *obj*'s
-      docstring, or by any of its contained objects' docstrings.
+      Trả về danh sách các :class:`DocTest`\ s được định nghĩa bởi docstring của *obj*, hoặc bởi docstring của bất kỳ đối tượng nào chứa trong đó.
 
-      The optional argument *name* specifies the object's name; this name will be
-      used to construct names for the returned :class:`DocTest`\ s.  If *name* is
-      not specified, then ``obj.__name__`` is used.
+      Đối số tùy chọn *name* chỉ định tên của đối tượng; tên này sẽ được dùng để tạo tên cho các :class:`DocTest`\ s được trả về. Nếu *name* không được chỉ định thì ``obj.__name__`` sẽ được sử dụng.
 
-      The optional parameter *module* is the module that contains the given object.
-      If the module is not specified or is ``None``, then the test finder will attempt
-      to automatically determine the correct module.  The object's module is used:
+      Tham số tùy chọn *module* là module chứa đối tượng đã cho. Nếu module không được chỉ định hoặc là ``None``, trình tìm kiếm kiểm thử sẽ cố gắng tự động xác định module chính xác. Module của đối tượng được sử dụng:
 
-      * As a default namespace, if *globs* is not specified.
+      * Làm namespace mặc định nếu *globs* không được chỉ định.
 
-      * To prevent the DocTestFinder from extracting DocTests from objects that are
-        imported from other modules.  (Contained objects with modules other than
-        *module* are ignored.)
+      * Để ngăn DocTestFinder trích xuất các DocTest từ những đối tượng được nhập từ các module khác. (Các đối tượng chứa có module khác với *module* sẽ bị bỏ qua.)
 
-      * To find the name of the file containing the object.
+      * Để tìm tên tệp chứa đối tượng.
 
-      * To help find the line number of the object within its file.
+      * Để hỗ trợ tìm số dòng của đối tượng trong tệp.
 
-      If *module* is ``False``, no attempt to find the module will be made.  This is
-      obscure, of use mostly in testing doctest itself: if *module* is ``False``, or
-      is ``None`` but cannot be found automatically, then all objects are considered
-      to belong to the (non-existent) module, so all contained objects will
-      (recursively) be searched for doctests.
+      Nếu *module* là ``False``, sẽ không cố gắng tìm module. Điều này khá khó hiểu và chủ yếu hữu ích khi kiểm thử chính doctest: nếu *module* là ``False``, hoặc là ``None`` nhưng không thể tự động tìm thấy, thì tất cả đối tượng được xem là thuộc về module (không tồn tại) đó, vì vậy tất cả đối tượng chứa sẽ được tìm kiếm doctest (theo đệ quy).
 
-      The globals for each :class:`DocTest` is formed by combining *globs* and
-      *extraglobs* (bindings in *extraglobs* override bindings in *globs*).  A new
-      shallow copy of the globals dictionary is created for each :class:`!DocTest`.
-      If *globs* is not specified, then it defaults to the module's
-      :attr:`~module.__dict__`, if specified, or ``{}`` otherwise.
-      If *extraglobs* is not specified, then it defaults to ``{}``.
+      Các biến toàn cục cho mỗi :class:`DocTest` được tạo bằng cách kết hợp *globs* và *extraglobs* (các liên kết trong *extraglobs* sẽ ghi đè các liên kết trong *globs*). Một bản sao nông mới của từ điển biến toàn cục được tạo cho mỗi :class:`!DocTest`. Nếu *globs* không được chỉ định, giá trị mặc định là biến toàn cục của module
+      :attr:`~module.__dict__`, nếu được chỉ định, hoặc ``{}`` nếu không. Nếu *extraglobs* không được chỉ định, giá trị mặc định là ``{}``.
 
 
 .. _doctest-doctestparser:
 
-DocTestParser objects
-^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng DocTestParser
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: DocTestParser()
 
-   A processing class used to extract interactive examples from a string, and use
-   them to create a :class:`DocTest` object.
+   Một processing class được sử dụng để trích xuất các ví dụ tương tác từ một chuỗi và dùng chúng để tạo một đối tượng :class:`DocTest`.
 
 
-   :class:`DocTestParser` defines the following methods:
+   :class:`DocTestParser` định nghĩa các phương thức sau:
 
 
    .. method:: get_doctest(string, globs, name, filename, lineno)
 
-      Extract all doctest examples from the given string, and collect them into a
-      :class:`DocTest` object.
+      Trích xuất tất cả các ví dụ doctest từ chuỗi đã cho và tập hợp chúng thành một
+      đối tượng :class:`DocTest`.
 
-      *globs*, *name*, *filename*, and *lineno* are attributes for the new
-      :class:`!DocTest` object.  See the documentation for :class:`DocTest` for more
-      information.
+      *globs*, *name*, *filename* và *lineno* là các thuộc tính của đối tượng mới
+      :class:`!DocTest`. Xem tài liệu về :class:`DocTest` để biết thêm thông tin.
 
 
    .. method:: get_examples(string, name='<string>')
 
-      Extract all doctest examples from the given string, and return them as a list
-      of :class:`Example` objects.  Line numbers are 0-based.  The optional argument
-      *name* is a name identifying this string, and is only used for error messages.
+      Trích xuất tất cả các ví dụ doctest từ chuỗi đã cho và trả về chúng dưới dạng một danh sách các đối tượng :class:`Example`. Số dòng được đánh chỉ mục từ 0. Đối số tùy chọn *name* là tên xác định chuỗi này và chỉ được sử dụng trong các thông báo lỗi.
 
 
    .. method:: parse(string, name='<string>')
 
-      Divide the given string into examples and intervening text, and return them as
-      a list of alternating :class:`Example`\ s and strings. Line numbers for the
-      :class:`!Example`\ s are 0-based.  The optional argument *name* is a name
-      identifying this string, and is only used for error messages.
+      Chia chuỗi đã cho thành các ví dụ và phần văn bản xen giữa, rồi trả về chúng dưới dạng danh sách xen kẽ các :class:`Example`\ s và các chuỗi. Số dòng của
+      :class:`!Example`\ s được đánh số từ 0. Đối số tùy chọn *name* là tên xác định chuỗi này và chỉ được sử dụng trong các thông báo lỗi.
 
 
-TestResults objects
-^^^^^^^^^^^^^^^^^^^
+Các đối tượng TestResults
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: TestResults(failed, attempted)
 
    .. attribute:: failed
 
-      Number of failed tests.
+      Số lượng bài kiểm thử không thành công.
 
    .. attribute:: attempted
 
-      Number of attempted tests.
+      Số lượng bài kiểm thử đã thực hiện.
 
    .. attribute:: skipped
 
-      Number of skipped tests.
+      Số lượng bài kiểm thử bị bỏ qua.
 
       .. versionadded:: 3.13
 
 
 .. _doctest-doctestrunner:
 
-DocTestRunner objects
-^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng DocTestRunner
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: DocTestRunner(checker=None, verbose=None, optionflags=0)
 
-   A processing class used to execute and verify the interactive examples in a
+   Một lớp xử lý được dùng để thực thi và xác minh các ví dụ tương tác trong một
    :class:`DocTest`.
 
-   The comparison between expected outputs and actual outputs is done by an
-   :class:`OutputChecker`.  This comparison may be customized with a number of
-   option flags; see section :ref:`doctest-options` for more information.  If the
-   option flags are insufficient, then the comparison may also be customized by
-   passing a subclass of :class:`!OutputChecker` to the constructor.
+   Việc so sánh giữa output dự kiến và output thực tế được thực hiện bằng một
+   :class:`OutputChecker`.  Có thể tùy chỉnh phép so sánh này bằng một số option flag; xem phần :ref:`doctest-options` để biết thêm thông tin.  Nếu các option flag không đủ, bạn cũng có thể tùy chỉnh phép so sánh bằng cách truyền một lớp con của :class:`!OutputChecker` vào constructor.
 
-   The test runner's display output can be controlled in two ways. First, an output
-   function can be passed to :meth:`run`; this function will be called
-   with strings that should be displayed.  It defaults to ``sys.stdout.write``.  If
-   capturing the output is not sufficient, then the display output can be also
-   customized by subclassing DocTestRunner, and overriding the methods
+   Output hiển thị của test runner có thể được kiểm soát theo hai cách. Trước tiên, có thể truyền một hàm output vào :meth:`run`; hàm này sẽ được gọi với các chuỗi cần hiển thị.  Giá trị mặc định là ``sys.stdout.write``.  Nếu việc capture output không đủ, bạn cũng có thể tùy chỉnh output hiển thị bằng cách tạo lớp con của DocTestRunner và ghi đè các phương thức
    :meth:`report_start`, :meth:`report_success`,
-   :meth:`report_unexpected_exception`, and :meth:`report_failure`.
+   :meth:`report_unexpected_exception` và :meth:`report_failure`.
 
-   The optional keyword argument *checker* specifies the :class:`OutputChecker`
-   object (or drop-in replacement) that should be used to compare the expected
-   outputs to the actual outputs of doctest examples.
+   Keyword argument tùy chọn *checker* chỉ định đối tượng :class:`OutputChecker` (hoặc đối tượng thay thế tương thích) sẽ được dùng để so sánh output dự kiến với output thực tế của các ví dụ doctest.
 
-   The optional keyword argument *verbose* controls the :class:`DocTestRunner`'s
-   verbosity.  If *verbose* is ``True``, then information is printed about each
-   example, as it is run.  If *verbose* is ``False``, then only failures are
-   printed.  If *verbose* is unspecified, or ``None``, then verbose output is used
-   iff the command-line switch ``-v`` is used.
+   Keyword argument tùy chọn *verbose* kiểm soát mức độ chi tiết của :class:`DocTestRunner`.  Nếu *verbose* là ``True``, thông tin về từng ví dụ sẽ được in ra khi ví dụ đó chạy.  Nếu *verbose* là ``False``, chỉ các trường hợp thất bại được in ra.  Nếu *verbose* không được chỉ định hoặc là ``None``, output chi tiết sẽ được sử dụng khi và chỉ khi switch dòng lệnh ``-v`` được dùng.
 
-   The optional keyword argument *optionflags* can be used to control how the test
-   runner compares expected output to actual output, and how it displays failures.
-   For more information, see section :ref:`doctest-options`.
+   Đối số từ khóa tùy chọn *optionflags* có thể được sử dụng để kiểm soát cách test runner so sánh đầu ra mong đợi với đầu ra thực tế và cách hiển thị các lỗi. Để biết thêm thông tin, hãy xem phần :ref:`doctest-options`.
 
-   The test runner accumulates statistics. The aggregated number of attempted,
-   failed and skipped examples is also available via the :attr:`tries`,
-   :attr:`failures` and :attr:`skips` attributes. The :meth:`run` and
-   :meth:`summarize` methods return a :class:`TestResults` instance.
+   Test runner tích lũy các thống kê. Tổng số các ví dụ đã thử, thất bại và bị bỏ qua cũng có thể được truy cập thông qua :attr:`tries`,
+   các thuộc tính :attr:`failures` và :attr:`skips`. Các phương thức :meth:`run` và
+   :meth:`summarize` trả về một thực thể :class:`TestResults`.
 
-   :class:`DocTestRunner` defines the following methods:
+   :class:`DocTestRunner` định nghĩa các phương thức sau:
 
 
    .. method:: report_start(out, test, example)
 
-      Report that the test runner is about to process the given example. This method
-      is provided to allow subclasses of :class:`DocTestRunner` to customize their
-      output; it should not be called directly.
+      Báo cáo rằng test runner sắp xử lý ví dụ đã cho. Phương thức này được cung cấp để cho phép các lớp con của :class:`DocTestRunner` tùy chỉnh đầu ra; không nên gọi phương thức này trực tiếp.
 
-      *example* is the example about to be processed.  *test* is the test
-      containing *example*.  *out* is the output function that was passed to
+      *example* là ví dụ sắp được xử lý. *test* là test chứa *example*. *out* là hàm đầu ra được truyền cho
       :meth:`DocTestRunner.run`.
 
 
    .. method:: report_success(out, test, example, got)
 
-      Report that the given example ran successfully.  This method is provided to
-      allow subclasses of :class:`DocTestRunner` to customize their output; it
-      should not be called directly.
+      Báo cáo rằng ví dụ đã cho chạy thành công. Phương thức này được cung cấp để cho phép các lớp con của :class:`DocTestRunner` tùy chỉnh đầu ra; không nên gọi trực tiếp phương thức này.
 
-      *example* is the example about to be processed.  *got* is the actual output
-      from the example.  *test* is the test containing *example*.  *out* is the
-      output function that was passed to :meth:`DocTestRunner.run`.
+      *example* là ví dụ sắp được xử lý. *got* là đầu ra thực tế từ ví dụ. *test* là bài kiểm thử chứa *example*. *out* là hàm đầu ra được truyền vào :meth:`DocTestRunner.run`.
 
 
    .. method:: report_failure(out, test, example, got)
 
-      Report that the given example failed.  This method is provided to allow
-      subclasses of :class:`DocTestRunner` to customize their output; it should not
-      be called directly.
+      Báo cáo rằng ví dụ đã cho không thành công. Phương thức này được cung cấp để cho phép các lớp con của :class:`DocTestRunner` tùy chỉnh đầu ra; không nên gọi trực tiếp phương thức này.
 
-      *example* is the example about to be processed.  *got* is the actual output
-      from the example.  *test* is the test containing *example*.  *out* is the
-      output function that was passed to :meth:`DocTestRunner.run`.
+      *example* là ví dụ sắp được xử lý. *got* là đầu ra thực tế từ ví dụ. *test* là bài kiểm thử chứa *example*. *out* là hàm đầu ra được truyền vào :meth:`DocTestRunner.run`.
 
 
    .. method:: report_unexpected_exception(out, test, example, exc_info)
 
-      Report that the given example raised an unexpected exception. This method is
-      provided to allow subclasses of :class:`DocTestRunner` to customize their
-      output; it should not be called directly.
+      Báo cáo rằng ví dụ đã cho phát sinh một ngoại lệ không mong đợi. Phương thức này được cung cấp để cho phép các lớp con của :class:`DocTestRunner` tùy chỉnh đầu ra; không nên gọi trực tiếp phương thức này.
 
-      *example* is the example about to be processed. *exc_info* is a tuple
-      containing information about the unexpected exception (as returned by
-      :func:`sys.exc_info`). *test* is the test containing *example*.  *out* is the
-      output function that was passed to :meth:`DocTestRunner.run`.
+      *example* là ví dụ sắp được xử lý. *exc_info* là một tuple chứa thông tin về ngoại lệ không mong đợi (như được trả về bởi
+      :func:`sys.exc_info`). *test* là bài kiểm thử chứa *example*. *out* là hàm đầu ra được truyền vào :meth:`DocTestRunner.run`.
 
 
    .. method:: run(test, compileflags=None, out=None, clear_globs=True)
 
-      Run the examples in *test* (a :class:`DocTest` object), and display the
-      results using the writer function *out*. Return a :class:`TestResults`
-      instance.
+      Chạy các ví dụ trong *test* (một đối tượng :class:`DocTest`) và hiển thị kết quả bằng hàm writer *out*. Trả về một thực thể :class:`TestResults`.
 
-      The examples are run in the namespace ``test.globs``.  If *clear_globs* is
-      true (the default), then this namespace will be cleared after the test runs,
-      to help with garbage collection. If you would like to examine the namespace
-      after the test completes, then use *clear_globs=False*.
+      Các ví dụ được chạy trong namespace ``test.globs``. Nếu *clear_globs* là true (mặc định), namespace này sẽ được xóa sau khi chạy kiểm thử để hỗ trợ việc thu gom rác. Nếu muốn kiểm tra namespace sau khi kiểm thử hoàn tất, hãy sử dụng *clear_globs=False*.
 
-      *compileflags* gives the set of flags that should be used by the Python
-      compiler when running the examples.  If not specified, then it will default to
-      the set of future-import flags that apply to *globs*.
+      *compileflags* cung cấp tập các cờ mà Python compiler sẽ sử dụng khi chạy các ví dụ. Nếu không được chỉ định, giá trị này mặc định là tập các cờ future-import áp dụng cho *globs*.
 
-      The output of each example is checked using the :class:`DocTestRunner`'s
-      output checker, and the results are formatted by the
-      :meth:`!DocTestRunner.report_\*` methods.
+      Đầu ra của mỗi ví dụ được kiểm tra bằng output checker của :class:`DocTestRunner`, và kết quả được định dạng bởi
+      các phương thức :meth:`!DocTestRunner.report_\*`.
 
 
    .. method:: summarize(verbose=None)
 
-      Print a summary of all the test cases that have been run by this DocTestRunner,
-      and return a :class:`TestResults` instance.
+      In bản tóm tắt của tất cả test case đã được DocTestRunner này chạy, rồi trả về một thực thể :class:`TestResults`.
 
-      The optional *verbose* argument controls how detailed the summary is.  If the
-      verbosity is not specified, then the :class:`DocTestRunner`'s verbosity is
-      used.
+      Đối số tùy chọn *verbose* kiểm soát mức độ chi tiết của bản tóm tắt. Nếu không chỉ định verbosity, thì verbosity của :class:`DocTestRunner` sẽ được sử dụng.
 
-   :class:`DocTestParser` has the following attributes:
+   :class:`DocTestParser` có các thuộc tính sau:
 
    .. attribute:: tries
 
-      Number of attempted examples.
+      Số lượng ví dụ đã thử.
 
    .. attribute:: failures
 
-      Number of failed examples.
+      Số lượng ví dụ không thành công.
 
    .. attribute:: skips
 
-      Number of skipped examples.
+      Số lượng ví dụ bị bỏ qua.
 
       .. versionadded:: 3.13
 
 
 .. _doctest-outputchecker:
 
-OutputChecker objects
-^^^^^^^^^^^^^^^^^^^^^
+Đối tượng OutputChecker
+^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: OutputChecker()
 
-   A class used to check the whether the actual output from a doctest example
-   matches the expected output.  :class:`OutputChecker` defines two methods:
-   :meth:`check_output`, which compares a given pair of outputs, and returns ``True``
-   if they match; and :meth:`output_difference`, which returns a string describing
-   the differences between two outputs.
+   Một lớp được dùng để kiểm tra xem đầu ra thực tế từ một ví dụ doctest có khớp với đầu ra mong đợi hay không. :class:`OutputChecker` định nghĩa hai phương thức:
+   :meth:`check_output`, dùng để so sánh một cặp đầu ra đã cho và trả về ``True`` nếu chúng khớp; và :meth:`output_difference`, trả về một chuỗi mô tả sự khác biệt giữa hai đầu ra.
 
 
-   :class:`OutputChecker` defines the following methods:
+   :class:`OutputChecker` định nghĩa các phương thức sau:
 
    .. method:: check_output(want, got, optionflags)
 
-      Return ``True`` iff the actual output from an example (*got*) matches the
-      expected output (*want*).  These strings are always considered to match if
-      they are identical; but depending on what option flags the test runner is
-      using, several non-exact match types are also possible.  See section
-      :ref:`doctest-options` for more information about option flags.
+      Trả về ``True`` khi và chỉ khi đầu ra thực tế từ một ví dụ (*got*) khớp với đầu ra mong đợi (*want*). Các chuỗi này luôn được xem là khớp nếu chúng giống hệt nhau; tuy nhiên, tùy thuộc vào các cờ tùy chọn mà test runner đang sử dụng, cũng có thể có một số kiểu khớp không chính xác. Xem phần
+      :ref:`doctest-options` để biết thêm thông tin về các cờ tùy chọn.
 
 
    .. method:: output_difference(example, got, optionflags)
 
-      Return a string describing the differences between the expected output for a
-      given example (*example*) and the actual output (*got*).  *optionflags* is the
-      set of option flags used to compare *want* and *got*.
+      Trả về một chuỗi mô tả sự khác biệt giữa đầu ra mong đợi của một ví dụ cụ thể (*example*) và đầu ra thực tế (*got*). *optionflags* là tập hợp các cờ tùy chọn được sử dụng để so sánh *want* và *got*.
 
 
 .. _doctest-debugging:
 
-Debugging
----------
+Gỡ lỗi
+------
 
-Doctest provides several mechanisms for debugging doctest examples:
+Doctest cung cấp một số cơ chế để gỡ lỗi các ví dụ doctest:
 
-* Several functions convert doctests to executable Python programs, which can be
-  run under the Python debugger, :mod:`pdb`.
+* Một số hàm chuyển đổi doctest thành các chương trình Python có thể thực thi, sau đó có thể chạy chúng dưới trình gỡ lỗi Python, :mod:`pdb`.
 
-* The :class:`DebugRunner` class is a subclass of :class:`DocTestRunner` that
-  raises an exception for the first failing example, containing information about
-  that example. This information can be used to perform post-mortem debugging on
-  the example.
+* Lớp :class:`DebugRunner` là lớp con của :class:`DocTestRunner`, lớp này sẽ phát sinh ngoại lệ đối với ví dụ đầu tiên không thành công và chứa thông tin về ví dụ đó. Thông tin này có thể được dùng để gỡ lỗi sau khi lỗi xảy ra (post-mortem debugging) cho ví dụ.
 
-* The :mod:`unittest` cases generated by :func:`DocTestSuite` support the
-  :meth:`debug` method defined by :class:`unittest.TestCase`.
+* Các trường hợp :mod:`unittest` được tạo bởi :func:`DocTestSuite` hỗ trợ
+  phương thức :meth:`debug` được định nghĩa bởi :class:`unittest.TestCase`.
 
-* You can add a call to :func:`pdb.set_trace` in a doctest example, and you'll
-  drop into the Python debugger when that line is executed.  Then you can inspect
-  current values of variables, and so on.  For example, suppose :file:`a.py`
-  contains just this module docstring::
+* Bạn có thể thêm lệnh gọi đến :func:`pdb.set_trace` trong một ví dụ doctest, và trình gỡ lỗi Python sẽ được mở khi dòng đó được thực thi. Sau đó, bạn có thể kiểm tra các giá trị hiện tại của biến, v.v. Ví dụ: giả sử :file:`a.py` chỉ chứa module docstring này::
 
      """
      >>> def f(x):
@@ -1700,7 +1258,7 @@ Doctest provides several mechanisms for debugging doctest examples:
      9
      """
 
-  Then an interactive Python session may look like this::
+  Khi đó, một phiên Python tương tác có thể trông như sau::
 
      >>> import a, doctest
      >>> doctest.testmod(a)
@@ -1733,18 +1291,14 @@ Doctest provides several mechanisms for debugging doctest examples:
      >>>
 
 
-Functions that convert doctests to Python code, and possibly run the synthesized
-code under the debugger:
+Các hàm chuyển đổi doctest thành mã Python và có thể chạy mã được tạo dưới trình gỡ lỗi:
 
 
 .. function:: script_from_examples(s)
 
-   Convert text with examples to a script.
+   Chuyển đổi văn bản có các ví dụ thành một tập lệnh.
 
-   Argument *s* is a string containing doctest examples.  The string is converted
-   to a Python script, where doctest examples in *s* are converted to regular code,
-   and everything else is converted to Python comments.  The generated script is
-   returned as a string. For example, ::
+   Đối số *s* là một chuỗi chứa các ví dụ doctest. Chuỗi này được chuyển đổi thành một Python script, trong đó các ví dụ doctest trong *s* được chuyển thành mã thông thường, còn mọi phần khác được chuyển thành chú thích Python. Python script được tạo sẽ được trả về dưới dạng một chuỗi. Ví dụ:::
 
       import doctest
       print(doctest.script_from_examples(r"""
@@ -1756,207 +1310,142 @@ code under the debugger:
           3
       """))
 
-   displays::
+   hiển thị::
 
-      # Set x and y to 1 and 2.
+      # Đặt x và y thành 1 và 2.
       x, y = 1, 2
       #
-      # Print their sum:
+      # In tổng của chúng:
       print(x+y)
-      # Expected:
+      # Dự kiến:
       ## 3
 
-   This function is used internally by other functions (see below), but can also be
-   useful when you want to transform an interactive Python session into a Python
-   script.
+   Hàm này được các hàm khác sử dụng internally (xem bên dưới), nhưng cũng có thể hữu ích khi bạn muốn chuyển một phiên Python tương tác thành một Python script.
 
 
 .. function:: testsource(module, name)
 
-   Convert the doctest for an object to a script.
+   Chuyển doctest của một đối tượng thành một script.
 
-   Argument *module* is a module object, or dotted name of a module, containing the
-   object whose doctests are of interest.  Argument *name* is the name (within the
-   module) of the object with the doctests of interest.  The result is a string,
-   containing the object's docstring converted to a Python script, as described for
-   :func:`script_from_examples` above.  For example, if module :file:`a.py`
-   contains a top-level function :func:`!f`, then ::
+   Đối số *module* là một đối tượng module hoặc tên có dấu chấm của một module, chứa đối tượng có các doctest cần quan tâm. Đối số *name* là tên (bên trong module) của đối tượng có các doctest cần quan tâm. Kết quả là một chuỗi chứa docstring của đối tượng được chuyển đổi thành một tập lệnh Python, như mô tả cho
+   :func:`script_from_examples` ở trên. Ví dụ: nếu module :file:`a.py` chứa một hàm cấp cao nhất :func:`!f`, thì::
 
       import a, doctest
       print(doctest.testsource(a, "a.f"))
 
-   prints a script version of function :func:`!f`'s docstring, with doctests
-   converted to code, and the rest placed in comments.
+   sẽ in ra phiên bản tập lệnh của docstring của hàm :func:`!f`, trong đó các doctest được chuyển đổi thành mã, còn phần còn lại được đặt trong các chú thích.
 
 
 .. function:: debug(module, name, pm=False)
 
-   Debug the doctests for an object.
+   Gỡ lỗi các doctest của một đối tượng.
 
-   The *module* and *name* arguments are the same as for function
-   :func:`testsource` above.  The synthesized Python script for the named object's
-   docstring is written to a temporary file, and then that file is run under the
-   control of the Python debugger, :mod:`pdb`.
+   Các đối số *module* và *name* giống như đối với hàm
+   :func:`testsource` ở trên. Tập lệnh Python được tạo từ docstring của đối tượng có tên sẽ được ghi vào một tệp tạm thời, sau đó tệp đó được chạy dưới sự điều khiển của trình gỡ lỗi Python, :mod:`pdb`.
 
-   A shallow copy of ``module.__dict__`` is used for both local and global
-   execution context.
+   Một bản sao nông của ``module.__dict__`` được sử dụng làm ngữ cảnh thực thi cục bộ và toàn cục.
 
-   Optional argument *pm* controls whether post-mortem debugging is used.  If *pm*
-   has a true value, the script file is run directly, and the debugger gets
-   involved only if the script terminates via raising an unhandled exception.  If
-   it does, then post-mortem debugging is invoked, via :func:`pdb.post_mortem`,
-   passing the traceback object from the unhandled exception.  If *pm* is not
-   specified, or is false, the script is run under the debugger from the start, via
-   passing an appropriate :func:`exec` call to :func:`pdb.run`.
+   Đối số tùy chọn *pm* kiểm soát việc có sử dụng gỡ lỗi sau sự cố (post-mortem) hay không. Nếu *pm* có giá trị true, tệp script được chạy trực tiếp và trình gỡ lỗi chỉ được kích hoạt nếu script kết thúc do phát sinh một ngoại lệ chưa được xử lý. Nếu xảy ra trường hợp đó, gỡ lỗi sau sự cố sẽ được gọi thông qua :func:`pdb.post_mortem`, với đối tượng traceback từ ngoại lệ chưa được xử lý. Nếu *pm* không được chỉ định hoặc có giá trị false, script sẽ được chạy dưới trình gỡ lỗi ngay từ đầu bằng cách truyền một lệnh gọi :func:`exec` thích hợp cho :func:`pdb.run`.
 
 
 .. function:: debug_src(src, pm=False, globs=None)
 
-   Debug the doctests in a string.
+   Gỡ lỗi các doctest trong một chuỗi.
 
-   This is like function :func:`debug` above, except that a string containing
-   doctest examples is specified directly, via the *src* argument.
+   Tương tự như function :func:`debug` ở trên, ngoại trừ việc một chuỗi chứa các ví dụ doctest được chỉ định trực tiếp thông qua đối số *src*.
 
-   Optional argument *pm* has the same meaning as in function :func:`debug` above.
+   Đối số tùy chọn *pm* có cùng ý nghĩa như trong function :func:`debug` ở trên.
 
-   Optional argument *globs* gives a dictionary to use as both local and global
-   execution context.  If not specified, or ``None``, an empty dictionary is used.
-   If specified, a shallow copy of the dictionary is used.
+   Đối số tùy chọn *globs* cung cấp một dictionary được dùng làm ngữ cảnh thực thi cục bộ và toàn cục. Nếu không được chỉ định hoặc là ``None``, một dictionary rỗng sẽ được sử dụng. Nếu được chỉ định, một bản sao nông của dictionary sẽ được sử dụng.
 
 
-The :class:`DebugRunner` class, and the special exceptions it may raise, are of
-most interest to testing framework authors, and will only be sketched here.  See
-the source code, and especially :class:`DebugRunner`'s docstring (which is a
-doctest!) for more details:
+Class :class:`DebugRunner`, cùng các ngoại lệ đặc biệt mà nó có thể phát sinh, chủ yếu được các tác giả framework kiểm thử quan tâm và ở đây chỉ được phác thảo sơ lược. Xem mã nguồn, đặc biệt là docstring của :class:`DebugRunner` (vốn là một doctest!), để biết thêm chi tiết:
 
 
 .. class:: DebugRunner(checker=None, verbose=None, optionflags=0)
 
-   A subclass of :class:`DocTestRunner` that raises an exception as soon as a
-   failure is encountered.  If an unexpected exception occurs, an
-   :exc:`UnexpectedException` exception is raised, containing the test, the
-   example, and the original exception.  If the output doesn't match, then a
-   :exc:`DocTestFailure` exception is raised, containing the test, the example, and
-   the actual output.
+   Một subclass của :class:`DocTestRunner` phát sinh ngoại lệ ngay khi phát hiện lỗi. Nếu xảy ra một ngoại lệ không mong đợi, một
+   Một ngoại lệ :exc:`UnexpectedException` được đưa ra, chứa bài kiểm thử, ví dụ và ngoại lệ ban đầu. Nếu đầu ra không khớp, thì một
+   ngoại lệ :exc:`DocTestFailure` được đưa ra, chứa bài kiểm thử, ví dụ và đầu ra thực tế.
 
-   For information about the constructor parameters and methods, see the
-   documentation for :class:`DocTestRunner` in section :ref:`doctest-advanced-api`.
+   Để biết thông tin về các tham số của hàm khởi tạo và các phương thức, hãy xem tài liệu về :class:`DocTestRunner` trong phần :ref:`doctest-advanced-api`.
 
-There are two exceptions that may be raised by :class:`DebugRunner` instances:
+Có hai ngoại lệ mà các instance của :class:`DebugRunner` có thể đưa ra:
 
 
 .. exception:: DocTestFailure(test, example, got)
 
-   An exception raised by :class:`DocTestRunner` to signal that a doctest example's
-   actual output did not match its expected output. The constructor arguments are
-   used to initialize the attributes of the same names.
+   Một ngoại lệ được :class:`DocTestRunner` đưa ra để báo hiệu rằng đầu ra thực tế của một ví dụ doctest không khớp với đầu ra mong đợi. Các đối số của hàm khởi tạo được dùng để khởi tạo các thuộc tính có cùng tên.
 
-:exc:`DocTestFailure` defines the following attributes:
+:exc:`DocTestFailure` định nghĩa các thuộc tính sau:
 
 
 .. attribute:: DocTestFailure.test
 
-   The :class:`DocTest` object that was being run when the example failed.
+   Đối tượng :class:`DocTest` đang được chạy khi ví dụ không thành công.
 
 
 .. attribute:: DocTestFailure.example
 
-   The :class:`Example` that failed.
+   :class:`Example` đã bị lỗi.
 
 
 .. attribute:: DocTestFailure.got
 
-   The example's actual output.
+   Kết quả thực tế của ví dụ.
 
 
 .. exception:: UnexpectedException(test, example, exc_info)
 
-   An exception raised by :class:`DocTestRunner` to signal that a doctest
-   example raised an unexpected exception.  The constructor arguments are used
-   to initialize the attributes of the same names.
+   Một ngoại lệ do :class:`DocTestRunner` phát sinh để báo hiệu rằng một ví dụ doctest đã phát sinh một ngoại lệ không mong muốn. Các đối số của hàm khởi tạo được dùng để khởi tạo các thuộc tính cùng tên.
 
-:exc:`UnexpectedException` defines the following attributes:
+:exc:`UnexpectedException` định nghĩa các thuộc tính sau:
 
 
 .. attribute:: UnexpectedException.test
 
-   The :class:`DocTest` object that was being run when the example failed.
+   Đối tượng :class:`DocTest` đang được chạy khi ví dụ không thành công.
 
 
 .. attribute:: UnexpectedException.example
 
-   The :class:`Example` that failed.
+   :class:`Example` đã bị lỗi.
 
 
 .. attribute:: UnexpectedException.exc_info
 
-   A tuple containing information about the unexpected exception, as returned by
+   Một tuple chứa thông tin về ngoại lệ không mong muốn, như được trả về bởi
    :func:`sys.exc_info`.
 
 
 .. _doctest-soapbox:
 
-Soapbox
--------
+Chia sẻ quan điểm
+-----------------
 
-As mentioned in the introduction, :mod:`!doctest` has grown to have three primary
-uses:
+Như đã đề cập trong phần giới thiệu, :mod:`!doctest` đã phát triển để phục vụ ba mục đích chính:
 
-#. Checking examples in docstrings.
+#. Kiểm tra các ví dụ trong docstring.
 
-#. Regression testing.
+#. Kiểm thử hồi quy.
 
-#. Executable documentation / literate testing.
+#. Tài liệu có thể thực thi / kiểm thử kiểu literate.
 
-These uses have different requirements, and it is important to distinguish them.
-In particular, filling your docstrings with obscure test cases makes for bad
-documentation.
+Các mục đích này có những yêu cầu khác nhau, và điều quan trọng là phải phân biệt chúng. Đặc biệt, việc lấp đầy docstring bằng những trường hợp kiểm thử khó hiểu sẽ tạo ra tài liệu kém chất lượng.
 
-When writing a docstring, choose docstring examples with care. There's an art to
-this that needs to be learned---it may not be natural at first.  Examples should
-add genuine value to the documentation.  A good example can often be worth many
-words. If done with care, the examples will be invaluable for your users, and
-will pay back the time it takes to collect them many times over as the years go
-by and things change.  I'm still amazed at how often one of my :mod:`!doctest`
-examples stops working after a "harmless" change.
+Khi viết docstring, hãy cẩn thận lựa chọn các ví dụ cho docstring. Đây là một kỹ năng cần học---ban đầu có thể bạn sẽ không thấy tự nhiên. Các ví dụ phải thực sự làm tăng giá trị cho tài liệu. Một ví dụ hay thường có giá trị hơn rất nhiều câu chữ. Nếu được thực hiện cẩn thận, các ví dụ sẽ vô cùng hữu ích cho người dùng và sẽ đền đáp thời gian bạn bỏ ra để thu thập chúng nhiều lần trong những năm tiếp theo, khi mọi thứ thay đổi. Tôi vẫn ngạc nhiên trước việc một trong các ví dụ :mod:`!doctest` của mình thường xuyên ngừng hoạt động sau một thay đổi "vô hại".
 
-Doctest also makes an excellent tool for regression testing, especially if you
-don't skimp on explanatory text.  By interleaving prose and examples, it becomes
-much easier to keep track of what's actually being tested, and why.  When a test
-fails, good prose can make it much easier to figure out what the problem is, and
-how it should be fixed.  It's true that you could write extensive comments in
-code-based testing, but few programmers do. Many have found that using doctest
-approaches instead leads to much clearer tests.  Perhaps this is simply because
-doctest makes writing prose a little easier than writing code, while writing
-comments in code is a little harder.  I think it goes deeper than just that:
-the natural attitude when writing a doctest-based test is that you want to
-explain the fine points of your software, and illustrate them with examples.
-This in turn naturally leads to test files that start with the simplest
-features, and logically progress to complications and edge cases.  A coherent
-narrative is the result, instead of a collection of isolated functions that test
-isolated bits of functionality seemingly at random.  It's a different attitude,
-and produces different results, blurring the distinction between testing and
-explaining.
+Doctest cũng là một công cụ tuyệt vời để kiểm thử hồi quy, đặc biệt nếu bạn không cắt giảm phần văn bản giải thích. Bằng cách xen kẽ phần diễn giải và các ví dụ, việc theo dõi chính xác nội dung đang được kiểm thử và lý do kiểm thử trở nên dễ dàng hơn nhiều. Khi một kiểm thử thất bại, phần diễn giải tốt có thể giúp bạn dễ dàng hơn nhiều trong việc xác định vấn đề là gì và cần khắc phục như thế nào. Đúng là bạn có thể viết các chú thích chi tiết trong hoạt động kiểm thử dựa trên code, nhưng rất ít lập trình viên làm vậy. Nhiều người nhận thấy rằng sử dụng các phương pháp doctest thay vào đó sẽ tạo ra những kiểm thử rõ ràng hơn nhiều. Có lẽ đơn giản là vì doctest khiến việc viết phần diễn giải dễ hơn một chút so với viết code, trong khi việc viết chú thích trong code lại khó hơn một chút. Tôi nghĩ vấn đề còn sâu xa hơn thế: thái độ tự nhiên khi viết một kiểm thử dựa trên doctest là bạn muốn giải thích những điểm tinh tế trong phần mềm của mình và minh họa chúng bằng các ví dụ. Điều này đến lượt nó tự nhiên dẫn đến các tệp kiểm thử bắt đầu từ những tính năng đơn giản nhất, rồi tiến triển một cách logic đến các trường hợp phức tạp và các trường hợp biên. Kết quả là một mạch trình bày mạch lạc, thay vì một tập hợp các hàm biệt lập kiểm thử những phần chức năng biệt lập có vẻ như một cách ngẫu nhiên. Đó là một thái độ khác và tạo ra những kết quả khác, làm mờ ranh giới giữa kiểm thử và giải thích.
 
-Regression testing is best confined to dedicated objects or files.  There are
-several options for organizing tests:
+Tốt nhất nên giới hạn việc kiểm thử hồi quy trong các đối tượng hoặc tệp chuyên dụng. Có một số tùy chọn để tổ chức các kiểm thử:
 
-* Write text files containing test cases as interactive examples, and test the
-  files using :func:`testfile` or :func:`DocFileSuite`.  This is recommended,
-  although is easiest to do for new projects, designed from the start to use
-  doctest.
+* Viết các tệp văn bản chứa các trường hợp kiểm thử dưới dạng ví dụ tương tác, rồi kiểm thử các tệp bằng :func:`testfile` hoặc :func:`DocFileSuite`. Đây là cách được khuyến nghị, mặc dù dễ thực hiện nhất đối với các dự án mới được thiết kế ngay từ đầu để sử dụng doctest.
 
-* Define functions named ``_regrtest_topic`` that consist of single docstrings,
-  containing test cases for the named topics.  These functions can be included in
-  the same file as the module, or separated out into a separate test file.
+* Định nghĩa các hàm có tên ``_regrtest_topic`` chỉ gồm các docstring, chứa các trường hợp kiểm thử cho những chủ đề tương ứng. Các hàm này có thể được đưa vào cùng tệp với module hoặc tách riêng thành một tệp kiểm thử riêng.
 
-* Define a :attr:`~module.__test__` dictionary mapping from regression test topics to
-  docstrings containing test cases.
+* Định nghĩa một từ điển :attr:`~module.__test__` ánh xạ các chủ đề kiểm thử hồi quy với những docstring chứa các trường hợp kiểm thử.
 
-When you have placed your tests in a module, the module can itself be the test
-runner.  When a test fails, you can arrange for your test runner to re-run only
-the failing doctest while you debug the problem.  Here is a minimal example of
-such a test runner::
+Khi đã đặt các kiểm thử vào một module, chính module đó có thể làm test runner. Khi một kiểm thử thất bại, bạn có thể sắp xếp để test runner chỉ chạy lại doctest bị lỗi trong khi gỡ lỗi vấn đề. Sau đây là một ví dụ tối thiểu về một test runner như vậy::
 
     if __name__ == '__main__':
         import doctest
@@ -1974,8 +1463,6 @@ such a test runner::
             print(f"{fail} failures out of {total} tests")
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] Examples containing both expected output and an exception are not supported.
-   Trying to guess where one ends and the other begins is too error-prone, and that
-   also makes for a confusing test.
+.. [#] Không hỗ trợ các ví dụ chứa cả đầu ra dự kiến và một ngoại lệ. Việc cố đoán xem phần này kết thúc ở đâu và phần kia bắt đầu từ đâu rất dễ dẫn đến lỗi, đồng thời cũng khiến bài kiểm thử trở nên khó hiểu.

@@ -1,334 +1,264 @@
-Tkinter dialogs
-===============
+Hộp thoại Tkinter
+=================
 
-:mod:`!tkinter.simpledialog` --- Standard Tkinter input dialogs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:mod:`!tkinter.simpledialog` --- Hộp thoại nhập liệu Tkinter tiêu chuẩn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. module:: tkinter.simpledialog
-   :synopsis: Simple dialog windows
+   :synopsis: Cửa sổ hộp thoại đơn giản
 
-**Source code:** :source:`Lib/tkinter/simpledialog.py`
+**Mã nguồn:** :source:`Lib/tkinter/simpledialog.py`
 
 --------------
 
-The :mod:`!tkinter.simpledialog` module contains convenience classes and
-functions for creating simple modal dialogs to get a value from the user.
+Mô-đun :mod:`!tkinter.simpledialog` chứa các lớp và hàm tiện ích để tạo các hộp thoại modal đơn giản nhằm nhận một giá trị từ người dùng.
 
 
 .. function:: askfloat(title, prompt, *, initialvalue=None, minvalue=None, maxvalue=None, parent=None)
-              askinteger(title, prompt, *, initialvalue=None, minvalue=None, maxvalue=None, parent=None)
-              askstring(title, prompt, *, initialvalue=None, show=None, parent=None)
+              askinteger(title, prompt, *, initialvalue=None, minvalue=None, maxvalue=None, parent=None) askstring(title, prompt, *, initialvalue=None, show=None, parent=None)
 
-   Prompt the user to enter a value of the desired type and return it, or
-   ``None`` if the dialog is cancelled.
+   Yêu cầu người dùng nhập một giá trị thuộc kiểu mong muốn và trả về giá trị đó, hoặc ``None`` nếu hộp thoại bị hủy.
 
-   *title* is the dialog title and *prompt* the message shown above the entry.
-   *initialvalue* is the value initially placed in the entry.
-   *parent* is the window over which the dialog is shown.
-   :func:`askinteger` and :func:`askfloat` also accept *minvalue* and
-   *maxvalue*, which bound the accepted value.
-   :func:`askstring` also accepts *show*, a character used to mask the entered
-   text, for example ``'*'`` to hide a password.
+   *title* là tiêu đề của hộp thoại, còn *prompt* là thông báo hiển thị phía trên ô nhập. *initialvalue* là giá trị được đặt sẵn trong ô nhập. *parent* là cửa sổ mà hộp thoại được hiển thị chồng lên.
+   :func:`askinteger` và :func:`askfloat` cũng chấp nhận *minvalue* và *maxvalue*, dùng để giới hạn giá trị được chấp nhận.
+   :func:`askstring` cũng chấp nhận *show*, một ký tự dùng để che văn bản đã nhập, chẳng hạn như ``'*'`` để ẩn mật khẩu.
 
 .. class:: Dialog(parent, title=None)
 
-   The base class for custom dialogs.
-   Instantiating it shows the dialog modally and returns once the user closes
-   it; the entered value is then available in the :attr:`!result` attribute.
+   Lớp cơ sở cho các hộp thoại tùy chỉnh. Việc khởi tạo lớp này sẽ hiển thị hộp thoại theo chế độ modal và chỉ trả về khi người dùng đóng hộp thoại; giá trị đã nhập sau đó có trong thuộc tính :attr:`!result`.
 
    .. attribute:: result
 
-      The value produced by :meth:`apply`, or ``None`` if the dialog was
-      cancelled.
+      Giá trị do :meth:`apply` tạo ra, hoặc ``None`` nếu hộp thoại bị hủy.
 
    .. method:: body(master)
 
-      Override to construct the dialog's interface and return the widget that
-      should have initial focus.
+      Ghi đè để tạo giao diện hộp thoại và trả về widget cần được đặt tiêu điểm ban đầu.
 
    .. method:: buttonbox()
 
-      Default behaviour adds OK and Cancel buttons. Override for custom button
-      layouts.
+      Hành vi mặc định thêm các nút OK và Cancel. Ghi đè để tùy chỉnh bố cục nút.
 
    .. method:: validate()
 
-      Validate the data entered by the user.
-      Return true if it is valid, in which case the dialog proceeds to
-      :meth:`apply`; return false to keep the dialog open.
-      The default implementation always returns true; override it to check the
-      input.
+      Xác thực dữ liệu do người dùng nhập. Trả về true nếu dữ liệu hợp lệ, khi đó hộp thoại tiếp tục
+      :meth:`apply`; trả về false để giữ hộp thoại mở. Cách triển khai mặc định luôn trả về true; hãy ghi đè phương thức này để kiểm tra dữ liệu nhập.
 
    .. method:: apply()
 
-      Process the data entered by the user, for example by storing it in the
-      :attr:`!result` attribute.
-      Called after :meth:`validate` succeeds and just before the dialog is
-      destroyed.
-      The default implementation does nothing; override it to act on or store
-      the result.
+      Xử lý dữ liệu do người dùng nhập, chẳng hạn bằng cách lưu trữ dữ liệu trong
+      thuộc tính :attr:`!result`. Được gọi sau khi :meth:`validate` thành công và ngay trước khi hộp thoại bị hủy. Cách triển khai mặc định không thực hiện thao tác nào; hãy ghi đè phương thức này để xử lý hoặc lưu trữ kết quả.
 
    .. method:: destroy()
 
-      Destroy the dialog window, clearing the reference to the widget that had
-      the initial focus.
+      Hủy cửa sổ hộp thoại, đồng thời xóa tham chiếu đến widget đang nhận focus ban đầu.
 
 
 .. class:: SimpleDialog(master, text='', buttons=[], default=None, cancel=None, title=None, class_=None)
 
-   A simple modal dialog that displays the message *text* above a row of push
-   buttons whose labels are given by *buttons*, and returns the index of the
-   button the user presses.
-   *default* is the index of the button activated by the Return key, *cancel*
-   the index returned when the window is closed through the window manager,
-   *title* the window title, and *class_* the Tk class name of the window.
+   Một hộp thoại modal đơn giản hiển thị thông báo *text* phía trên một hàng nút nhấn có nhãn được chỉ định bởi *buttons*, đồng thời trả về chỉ mục của nút mà người dùng nhấn. *default* là chỉ mục của nút được kích hoạt bằng phím Return, *cancel* là chỉ mục được trả về khi cửa sổ bị đóng thông qua window manager, *title* là tiêu đề cửa sổ, còn *class_* là tên lớp Tk của cửa sổ.
 
    .. method:: go()
 
-      Display the dialog, wait until the user presses a button or closes the
-      window, and return the index of the chosen button.
+      Hiển thị hộp thoại, chờ người dùng nhấn một nút hoặc đóng cửa sổ, rồi trả về chỉ mục của nút được chọn.
 
 
 
-:mod:`!tkinter.filedialog` --- File selection dialogs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:mod:`!tkinter.filedialog` --- Hộp thoại chọn tệp
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. module:: tkinter.filedialog
-   :synopsis: Dialog classes for file selection
+   :synopsis: Các lớp hộp thoại để chọn tệp
 
-**Source code:** :source:`Lib/tkinter/filedialog.py`
+**Mã nguồn:** :source:`Lib/tkinter/filedialog.py`
 
 --------------
 
-The :mod:`!tkinter.filedialog` module provides classes and factory functions for
-creating file/directory selection windows.
+Mô-đun :mod:`!tkinter.filedialog` cung cấp các lớp và hàm factory để tạo cửa sổ chọn tệp/thư mục.
 
-Native load/save dialogs
-------------------------
+Hộp thoại tải/lưu gốc
+---------------------
 
-The following classes and functions provide file dialog windows that combine a
-native look-and-feel with configuration options to customize behaviour.
-The following keyword arguments are applicable to the classes and functions
-listed below:
+Các lớp và hàm sau đây cung cấp những cửa sổ hộp thoại tệp kết hợp giao diện và cảm nhận gốc với các tùy chọn cấu hình để tùy chỉnh hành vi. Các đối số từ khóa sau áp dụng cho những lớp và hàm được liệt kê bên dưới:
 
- | *parent* - the window to place the dialog on top of
+ | *parent* - cửa sổ để đặt hộp thoại lên trên
 
- | *title* - the title of the window
+ | *title* - tiêu đề của cửa sổ
 
- | *initialdir* - the directory that the dialog starts in
+ | *initialdir* - thư mục mà hộp thoại bắt đầu mở
 
- | *initialfile* - the file selected upon opening of the dialog
+ | *initialfile* - tệp được chọn khi mở hộp thoại
 
- | *filetypes* - a sequence of (label, pattern) tuples, '*' wildcard is allowed
+ | *filetypes* - một chuỗi các tuple (label, pattern), cho phép wildcard '*'
 
- | *defaultextension* - default extension to append to file (save dialogs)
+ | *defaultextension* - phần mở rộng mặc định được thêm vào tệp (hộp thoại lưu)
 
- | *multiple* - when true, selection of multiple items is allowed
+ | *multiple* - khi là true, cho phép chọn nhiều mục
 
 
 **Static factory functions**
 
-The below functions when called create a modal, native look-and-feel dialog,
-wait for the user's selection, and return it.
-The exact return value depends on the function (see below); when the dialog is
-cancelled it is an empty string, an empty tuple or ``None``.
-The precise type of this empty value may vary between platforms and Tk
-versions, so test the result for truth rather than comparing it with a
-specific value.
+Các hàm dưới đây khi được gọi sẽ tạo một hộp thoại modal có giao diện gốc, chờ người dùng lựa chọn rồi trả về lựa chọn đó. Giá trị trả về chính xác phụ thuộc vào hàm (xem bên dưới); khi hộp thoại bị hủy, giá trị đó là một chuỗi rỗng, một tuple rỗng hoặc ``None``. Kiểu chính xác của giá trị rỗng này có thể khác nhau giữa các nền tảng và phiên bản Tk, vì vậy hãy kiểm tra kết quả theo giá trị đúng (truth) thay vì so sánh với một giá trị cụ thể.
 
 .. function:: askopenfile(mode="r", **options)
-              askopenfiles(mode="r", **options)
+              askopenfiles(mode="r", ****options)
 
-   Create an :class:`Open` dialog.
-   :func:`askopenfile` returns the opened file object, or ``None`` if the
-   dialog is cancelled.
-   :func:`askopenfiles` returns a list of the opened file objects, or an empty
-   tuple if cancelled.
-   The files are opened in mode *mode* (read-only ``'r'`` by default).
+   Tạo một hộp thoại :class:`Open`.
+   :func:`askopenfile` trả về đối tượng tệp đã mở hoặc ``None`` nếu hộp thoại bị hủy.
+   :func:`askopenfiles` trả về danh sách các đối tượng tệp đã mở hoặc một tuple rỗng nếu bị hủy. Các tệp được mở ở chế độ *mode* (chỉ đọc ``'r'`` theo mặc định).
 
 .. function:: asksaveasfile(mode="w", **options)
 
-   Create a :class:`SaveAs` dialog and return the opened file object, or
-   ``None`` if the dialog is cancelled.
-   The file is opened in mode *mode* (``'w'`` by default).
+   Tạo một hộp thoại :class:`SaveAs` và trả về đối tượng tệp đã mở hoặc ``None`` nếu hộp thoại bị hủy. Tệp được mở ở chế độ *mode* (``'w'`` theo mặc định).
 
 .. function:: askopenfilename(**options)
-              askopenfilenames(**options)
+              askopenfilenames(****options)
 
-   Create an :class:`Open` dialog.
-   :func:`askopenfilename` returns the selected filename as a string, or an
-   empty string if the dialog is cancelled.
-   :func:`askopenfilenames` returns a tuple of the selected filenames, or an
-   empty tuple if cancelled.
+   Tạo một hộp thoại :class:`Open`.
+   :func:`askopenfilename` trả về tên tệp đã chọn dưới dạng chuỗi hoặc chuỗi rỗng nếu hộp thoại bị hủy.
+   :func:`askopenfilenames` trả về một tuple chứa các tên tệp đã chọn hoặc một tuple rỗng nếu bị hủy.
 
 .. function:: asksaveasfilename(**options)
 
-   Create a :class:`SaveAs` dialog and return the selected filename as a
-   string, or an empty string if the dialog is cancelled.
+   Tạo một hộp thoại :class:`SaveAs` và trả về tên tệp đã chọn dưới dạng chuỗi hoặc chuỗi rỗng nếu hộp thoại bị hủy.
 
 .. function:: askdirectory(**options)
 
-   Prompt the user to select a directory, and return its path as a string, or
-   an empty string if the dialog is cancelled.
-   Additional keyword option: *mustexist* - if true, the user may only select
-   an existing directory (false by default).
+   Nhắc người dùng chọn một thư mục và trả về đường dẫn của thư mục đó dưới dạng chuỗi hoặc chuỗi rỗng nếu hộp thoại bị hủy. Tùy chọn keyword bổ sung: *mustexist* - nếu là true, người dùng chỉ có thể chọn một thư mục hiện có (theo mặc định là false).
 
 .. class:: Open(master=None, **options)
-           SaveAs(master=None, **options)
-           Directory(master=None, **options)
+           SaveAs(master=None, ****options) Directory(master=None, ****options)
 
-   The above three classes provide native dialog windows for loading and saving
-   files and for selecting a directory.
+   Ba lớp trên cung cấp các cửa sổ hộp thoại native để tải và lưu tệp cũng như chọn một thư mục.
 
-**Convenience classes**
+**Các lớp tiện ích**
 
-The below classes are used for creating file/directory windows from scratch.
-These do not emulate the native look-and-feel of the platform.
+Các lớp dưới đây được dùng để tạo cửa sổ tệp/thư mục từ đầu. Chúng không mô phỏng giao diện và cách thức hoạt động nguyên bản của nền tảng.
 
-.. note::  The *FileDialog* class should be subclassed for custom event
-   handling and behaviour.
+.. note::  Lớp *FileDialog* nên được phân lớp để xử lý sự kiện và hành vi tùy chỉnh.
 
 .. class:: FileDialog(master, title=None)
 
-   Create a basic file selection dialog.
+   Tạo hộp thoại chọn tệp cơ bản.
 
    .. method:: cancel_command(event=None)
 
-      Trigger the termination of the dialog window.
+      Kích hoạt việc kết thúc cửa sổ hộp thoại.
 
    .. method:: dirs_double_event(event)
 
-      Event handler for double-click event on directory.
+      Trình xử lý sự kiện double-click trên thư mục.
 
    .. method:: dirs_select_event(event)
 
-      Event handler for click event on directory.
+      Trình xử lý sự kiện click trên thư mục.
 
    .. method:: files_double_event(event)
 
-      Event handler for double-click event on file.
+      Trình xử lý sự kiện double-click trên tệp.
 
    .. method:: files_select_event(event)
 
-      Event handler for single-click event on file.
+      Trình xử lý sự kiện single-click trên tệp.
 
    .. method:: filter_command(event=None)
 
-      Filter the files by directory.
+      Lọc các tệp theo thư mục.
 
    .. method:: get_filter()
 
-      Retrieve the file filter currently in use.
+      Lấy bộ lọc tệp hiện đang được sử dụng.
 
    .. method:: get_selection()
 
-      Retrieve the currently selected item.
+      Lấy mục hiện được chọn.
 
    .. method:: go(dir_or_file=os.curdir, pattern="*", default="", key=None)
 
-      Render dialog and start event loop.
+      Hiển thị hộp thoại và bắt đầu vòng lặp sự kiện.
 
    .. method:: ok_event(event)
 
-      Exit dialog returning current selection.
+      Thoát hộp thoại và trả về lựa chọn hiện tại.
 
    .. method:: ok_command()
 
-      Called when the user confirms the current selection.
-      The base implementation accepts the selection and closes the dialog;
-      :class:`LoadFileDialog` and :class:`SaveFileDialog` override it to check
-      the selection first.
+      Được gọi khi người dùng xác nhận lựa chọn hiện tại. Phần triển khai cơ sở chấp nhận lựa chọn và đóng hộp thoại;
+      :class:`LoadFileDialog` và :class:`SaveFileDialog` ghi đè phương thức này để kiểm tra lựa chọn trước.
 
    .. method:: quit(how=None)
 
-      Exit dialog returning filename, if any.
+      Thoát hộp thoại và trả về tên tệp, nếu có.
 
    .. method:: set_filter(dir, pat)
 
-      Set the file filter.
+      Đặt bộ lọc tệp.
 
    .. method:: set_selection(file)
 
-      Update the current file selection to *file*.
+      Cập nhật lựa chọn tệp hiện tại thành *file*.
 
 
 .. class:: LoadFileDialog(master, title=None)
 
-   A subclass of FileDialog that creates a dialog window for selecting an
-   existing file.
+   Một lớp con của FileDialog tạo cửa sổ hộp thoại để chọn một tệp hiện có.
 
    .. method:: ok_command()
 
-      Test that a file is provided and that the selection indicates an
-      already existing file.
+      Kiểm tra rằng một tệp đã được cung cấp và lựa chọn cho biết đó là một tệp đã tồn tại.
 
 .. class:: SaveFileDialog(master, title=None)
 
-   A subclass of FileDialog that creates a dialog window for selecting a
-   destination file.
+   Một lớp con của FileDialog tạo cửa sổ hộp thoại để chọn tệp đích.
 
    .. method:: ok_command()
 
-      Test whether or not the selection points to a valid file that is not a
-      directory. Confirmation is required if an already existing file is
-      selected.
+      Kiểm tra xem lựa chọn có trỏ đến một tệp hợp lệ không phải là thư mục hay không. Cần xác nhận nếu một tệp đã tồn tại được chọn.
 
-:mod:`!tkinter.commondialog` --- Dialog window templates
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:mod:`!tkinter.commondialog` --- Mẫu cửa sổ hộp thoại
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. module:: tkinter.commondialog
-   :synopsis: Tkinter base class for dialogs
+   :synopsis: Lớp cơ sở Tkinter cho các hộp thoại
 
-**Source code:** :source:`Lib/tkinter/commondialog.py`
+**Mã nguồn:** :source:`Lib/tkinter/commondialog.py`
 
 --------------
 
-The :mod:`!tkinter.commondialog` module provides the :class:`Dialog` class that
-is the base class for dialogs defined in other supporting modules.
+Mô-đun :mod:`!tkinter.commondialog` cung cấp lớp :class:`Dialog`, là lớp cơ sở cho các hộp thoại được định nghĩa trong những mô-đun hỗ trợ khác.
 
 .. class:: Dialog(master=None, **options)
 
    .. method:: show(**options)
 
-      Render the Dialog window.
+      Hiển thị cửa sổ Dialog.
 
 
-:mod:`!tkinter.dialog` --- Classic Tk dialog boxes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:mod:`!tkinter.dialog` --- Hộp thoại Tk cổ điển
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. module:: tkinter.dialog
-   :synopsis: A simple dialog box built on the classic Tk widgets.
+   :synopsis: Một hộp thoại đơn giản được xây dựng trên các widget Tk cổ điển.
 
-**Source code:** :source:`Lib/tkinter/dialog.py`
+**Mã nguồn:** :source:`Lib/tkinter/dialog.py`
 
 --------------
 
-The :mod:`!tkinter.dialog` module provides a simple modal dialog box built on
-the classic (non-themed) Tk widgets.
+Mô-đun :mod:`!tkinter.dialog` cung cấp một hộp thoại modal đơn giản được xây dựng trên các widget Tk cổ điển (không theo chủ đề).
 
 .. data:: DIALOG_ICON
 
-   The name of a bitmap (``'questhead'``) suitable for use as the *bitmap*
-   of a :class:`Dialog`.
+   Tên của một bitmap (``'questhead'``) thích hợp để sử dụng làm *bitmap* của một :class:`Dialog`.
 
 .. class:: Dialog(master=None, cnf={}, **kw)
 
-   Display a modal dialog box built from the classic (non-themed) Tk widgets
-   and wait for the user to press one of its buttons.
-   The options, given through *cnf* or as keyword arguments, are all required:
-   *title* (the window title), *text* (the message), *bitmap* (the name of a
-   bitmap icon, such as :data:`DIALOG_ICON`), *default* (the index of the
-   default button) and *strings* (the sequence of button labels).
-   After construction, the :attr:`!num` attribute holds the index of the button
-   the user pressed.
+   Hiển thị một hộp thoại modal được xây dựng từ các widget Tk cổ điển (không theo chủ đề) và chờ người dùng nhấn một trong các nút của hộp thoại. Các tùy chọn, được cung cấp thông qua *cnf* hoặc dưới dạng đối số từ khóa, đều bắt buộc: *title* (tiêu đề cửa sổ), *text* (thông báo), *bitmap* (tên của biểu tượng bitmap, chẳng hạn như :data:`DIALOG_ICON`), *default* (chỉ mục của nút mặc định) và *strings* (chuỗi nhãn nút). Sau khi khởi tạo, thuộc tính :attr:`!num` chứa chỉ mục của nút mà người dùng đã nhấn.
 
    .. method:: destroy()
 
-      Do nothing.
-      The dialog window is destroyed automatically before the constructor
-      returns, so there is nothing left for this method to do.
+      Không thực hiện thao tác nào. Cửa sổ hộp thoại được tự động hủy trước khi hàm khởi tạo trả về, vì vậy phương thức này không còn việc gì cần thực hiện.
 
 
 .. seealso::
 
-   Modules :mod:`tkinter.messagebox`, :ref:`tut-files`
+   Các module :mod:`tkinter.messagebox`, :ref:`tut-files`

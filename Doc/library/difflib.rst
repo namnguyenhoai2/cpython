@@ -1,14 +1,14 @@
-:mod:`!difflib` --- Helpers for computing deltas
-================================================
+:mod:`!difflib` --- Các công cụ hỗ trợ tính toán độ chênh lệch
+==============================================================
 
 .. module:: difflib
-   :synopsis: Helpers for computing differences between objects.
+   :synopsis: Các công cụ hỗ trợ tính toán sự khác biệt giữa các đối tượng.
 
 .. moduleauthor:: Tim Peters <tim_one@users.sourceforge.net>
 .. sectionauthor:: Tim Peters <tim_one@users.sourceforge.net>
 .. Markup by Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/difflib.py`
+**Mã nguồn:** :source:`Lib/difflib.py`
 
 .. testsetup::
 
@@ -17,247 +17,163 @@
 
 --------------
 
-This module provides classes and functions for comparing sequences.
-Most of them compare sequences of text lines (for example lists of strings,
-or :term:`file objects <file object>`) and
-produce :dfn:`diffs` -- reports on the differences.
-Diffs can be produced in various formats, including HTML and context
-and unified diffs -- formats produced by tools like
-:manpage:`diff <diff(1)>` and :manpage:`git diff <git-diff(1)>`.
+Mô-đun này cung cấp các lớp và hàm để so sánh các chuỗi. Hầu hết chúng so sánh các chuỗi dòng văn bản (ví dụ: danh sách chuỗi hoặc :term:`đối tượng file <file object>`) và tạo ra các :dfn:`diff` -- các báo cáo về những điểm khác biệt. Có thể tạo diff ở nhiều định dạng khác nhau, bao gồm HTML, diff ngữ cảnh và diff thống nhất -- những định dạng được tạo bởi các công cụ như
+:manpage:`diff <diff(1)>` và :manpage:`git diff <git-diff(1)>`.
 
-Comparisons are done using a matching algorithm implemented in
-:class:`SequenceMatcher` -- a flexible class for comparing pairs of sequences
-of any type, not just text, so long as the sequence elements are
+Việc so sánh được thực hiện bằng một thuật toán đối sánh được triển khai trong
+:class:`SequenceMatcher` -- một lớp linh hoạt để so sánh các cặp chuỗi thuộc mọi kiểu, không chỉ văn bản, miễn là các phần tử của chuỗi là
 :term:`hashable`.
 
 
 .. _difflib-junk:
 
-Junk heuristic
---------------
+Heuristic xác định phần tử rác
+------------------------------
 
-:mod:`!difflib` uses a :dfn:`junk` heuristic: some items are deemed to be
-:dfn:`junk`, and ignored when searching for similarities.
-Ideally, these are uninteresting or common items, such as blank lines
-or whitespace.
+:mod:`!difflib` sử dụng một heuristic :dfn:`rác`: một số phần tử được xem là
+:dfn:`rác`, và bị bỏ qua khi tìm kiếm các điểm tương đồng. Lý tưởng nhất là đây phải là những phần tử không đáng chú ý hoặc phổ biến, chẳng hạn như dòng trống hoặc khoảng trắng.
 
-This heuristic can speed the algorithm up (because it reduces the number of
-possible combinations) and it can produce results that are more understandable
-for humans (typically breaking on whitespace).
-But it can also cause pathological cases:
+Heuristic này có thể tăng tốc thuật toán (vì giảm số tổ hợp có thể có) và tạo ra các kết quả dễ hiểu hơn đối với con người (thường ngắt tại khoảng trắng). Tuy nhiên, nó cũng có thể gây ra các trường hợp bất thường:
 
-- Inappropriately chosen junk items can cause an unexpectedly **large** (but
-  still correct) result.
-- The default heuristic is **asymmetric**: only the second sequence is
-  inspected when determining what is considered junk, so comparing A to B can
-  give different results than comparing B to A and reversing the result.
+- Các phần tử rác được chọn không phù hợp có thể tạo ra kết quả **lớn** ngoài dự kiến (nhưng vẫn chính xác).
+- Heuristic mặc định là **bất đối xứng**: chỉ chuỗi thứ hai được kiểm tra khi xác định phần tử nào được xem là rác, vì vậy việc so sánh A với B có thể cho kết quả khác với việc so sánh B với A rồi đảo ngược kết quả.
 
-By default, if the second input sequence is at least 200 items long, items
-that account for more than 1% it are considered *junk*.
+Theo mặc định, nếu chuỗi đầu vào thứ hai có ít nhất 200 phần tử, các phần tử chiếm hơn 1% trong số đó được xem là *rác*.
 
-Depending on your data, you should consider turning this heuristic off
-(setting :class:`~difflib.SequenceMatcher`'s *autojunk* argument to ``False``)
-or tuning it (using the *isjunk* argument, perhaps to one of the
-:ref:`predefined functions <difflib-isjunk-functions>`).
+Tùy thuộc vào dữ liệu của bạn, bạn nên cân nhắc tắt heuristic này (bằng cách đặt đối số :class:`~difflib.SequenceMatcher`'s *autojunk* của ``False``) hoặc tinh chỉnh nó (bằng cách sử dụng đối số *isjunk*, có thể là một trong các
+:ref:`hàm được định nghĩa sẵn <difflib-isjunk-functions>`).
 
 
-The :mod:`!difflib` algorithm
------------------------------
+Thuật toán :mod:`!difflib`
+--------------------------
 
-The algorithm used in :class:`SequenceMatcher` predates, and is a little
-fancier than, an algorithm published in the late 1980s by Ratcliff and
-Obershelp under the hyperbolic name "gestalt pattern matching."
-The idea is to find the longest contiguous subsequence common to both inputs,
-then recursively handle the pieces of the sequences to the left and to the
-right of the matching subsequence.
+Thuật toán được sử dụng trong :class:`SequenceMatcher` có trước một thuật toán được Ratcliff và Obershelp công bố vào cuối những năm 1980, đồng thời cũng cầu kỳ hơn một chút so với thuật toán đó. Họ đặt cho thuật toán này cái tên cường điệu là "so khớp mẫu gestalt". Ý tưởng là tìm dãy con liên tiếp dài nhất cùng xuất hiện trong cả hai đầu vào, sau đó xử lý đệ quy các phần của các dãy nằm bên trái và bên phải dãy con khớp nhau.
 
 .. seealso::
 
-   `Pattern Matching: The Gestalt Approach <https://jacobfilipp.com/DrDobbs/articles/DDJ/1988/8807/8807c/8807c.htm>`_
-      Discussion of a similar algorithm by John W. Ratcliff and D. E. Metzener. This
-      was published in Dr. Dobb's Journal in July, 1988.
+   `So khớp mẫu: Phương pháp Gestalt <https://jacobfilipp.com/DrDobbs/articles/DDJ/1988/8807/8807c/8807c.htm>`_
+      Thảo luận về một thuật toán tương tự của John W. Ratcliff và D. E. Metzener. Bài viết này được đăng trên Dr. Dobb's Journal vào tháng 7 năm 1988.
 
-As an extension to the Ratcliff and Obershelp algorithm, :mod:`!difflib`
-searches for the longest *junk-free* contiguous subsequence.
-See the :ref:`difflib-junk` section for details.
+Là một phần mở rộng của thuật toán Ratcliff và Obershelp, :mod:`!difflib` tìm kiếm dãy con liên tiếp dài nhất *không chứa phần tử rác*. Xem phần :ref:`difflib-junk` để biết chi tiết.
 
 .. impl-detail:: Timing
 
-   The basic Ratcliff-Obershelp algorithm is cubic time in the worst
-   case and quadratic time in the expected case.
-   :mod:`difflib`'s algorithm is quadratic time for the worst case and has
-   expected-case behavior dependent in a complicated way on how many elements
-   the sequences have in common;
-   best case time is linear.
+   Thuật toán Ratcliff-Obershelp cơ bản có độ phức tạp thời gian bậc ba trong trường hợp xấu nhất và bậc hai trong trường hợp kỳ vọng.
+   Thuật toán của :mod:`difflib` có độ phức tạp thời gian bậc hai trong trường hợp xấu nhất, còn hành vi trong trường hợp kỳ vọng phụ thuộc theo cách phức tạp vào số phần tử chung giữa các chuỗi; thời gian trong trường hợp tốt nhất là tuyến tính.
 
 
 .. _difflib-diff-generation:
 
-Diff generation
----------------
+Tạo diff
+--------
 
 .. _differ-objects:
 
 .. class:: Differ
 
-   This is a class for comparing sequences of lines of text, and producing
-   human-readable differences or deltas.  Differ uses :class:`SequenceMatcher`
-   both to compare sequences of lines, and to compare sequences of characters
-   within similar (near-matching) lines.
+   Đây là một lớp dùng để so sánh các chuỗi dòng văn bản và tạo ra các khác biệt hoặc delta mà con người có thể đọc được. Differ sử dụng :class:`SequenceMatcher` để so sánh các chuỗi dòng, cũng như để so sánh các chuỗi ký tự trong những dòng tương tự (gần khớp).
 
-   Each line of a :class:`Differ` delta begins with a two-letter code:
+   Mỗi dòng trong delta của :class:`Differ` bắt đầu bằng một mã gồm hai chữ cái:
 
-   +----------+-------------------------------------------+
-   | Code     | Meaning                                   |
-   +==========+===========================================+
-   | ``'- '`` | line unique to sequence 1                 |
-   +----------+-------------------------------------------+
-   | ``'+ '`` | line unique to sequence 2                 |
-   +----------+-------------------------------------------+
-   | ``'  '`` | line common to both sequences             |
-   +----------+-------------------------------------------+
-   | ``'? '`` | line not present in either input sequence |
-   +----------+-------------------------------------------+
+   +----------+------------------------------------------+
+   | Mã       | Ý nghĩa                                  |
+   +==========+==========================================+
+   | ``'- '`` | dòng chỉ có trong chuỗi 1                |
+   +----------+------------------------------------------+
+   | ``'+ '`` | dòng chỉ có trong chuỗi 2                |
+   +----------+------------------------------------------+
+   | ``'  '`` | dòng chung cho cả hai chuỗi              |
+   +----------+------------------------------------------+
+   | ``'? '`` | dòng không có trong cả hai chuỗi đầu vào |
+   +----------+------------------------------------------+
 
-   Lines beginning with '``?``' attempt to guide the eye to intraline differences,
-   and were not present in either input sequence. These lines can be confusing if
-   the sequences contain whitespace characters, such as spaces, tabs or line breaks.
+   Các dòng bắt đầu bằng '``?``' cố gắng hướng mắt người đọc đến những khác biệt trong dòng và không có trong cả hai chuỗi đầu vào. Những dòng này có thể gây nhầm lẫn nếu các chuỗi chứa ký tự khoảng trắng, chẳng hạn như dấu cách, tab hoặc ngắt dòng.
 
-   Note that :class:`Differ`\ -generated deltas make no claim to be **minimal**
-   diffs. To the contrary, minimal diffs are often counter-intuitive for humans,
-   because they synch up anywhere possible, sometimes at accidental matches
-   100 pages apart.
-   Restricting synch points to contiguous matches preserves some notion of
-   locality, at the occasional cost of producing a longer diff.
+   Lưu ý rằng các phần chênh lệch do :class:`Differ`\  tạo ra không khẳng định là các diff **tối thiểu**. Ngược lại, diff tối thiểu thường phản trực giác đối với con người, vì chúng đồng bộ ở bất kỳ vị trí nào có thể, đôi khi tại các kết quả khớp tình cờ cách nhau 100 trang. Việc giới hạn các điểm đồng bộ vào những kết quả khớp liên tiếp sẽ duy trì một mức độ cục bộ nhất định, nhưng đôi khi phải trả giá bằng việc tạo ra diff dài hơn.
 
-   The :class:`Differ` class has this constructor:
+   Lớp :class:`Differ` có constructor sau đây:
 
    .. method:: __init__(linejunk=None, charjunk=None)
 
-      Optional keyword parameters *linejunk* and *charjunk* are for filter functions
-      (or ``None``):
+      Các tham số từ khóa tùy chọn *linejunk* và *charjunk* dùng cho các hàm lọc (hoặc ``None``):
 
-      *linejunk*: A function that accepts a single string argument, and returns true
-      if the string is junk.  The default is ``None``, meaning that no line is
-      considered junk.
+      *linejunk*: Một hàm nhận một đối số chuỗi duy nhất và trả về true nếu chuỗi đó là rác. Giá trị mặc định là ``None``, nghĩa là không có dòng nào được xem là rác.
 
-      *charjunk*: A function that accepts a single character argument (a string of
-      length 1), and returns true if the character is junk. The default is ``None``,
-      meaning that no character is considered junk.
+      *charjunk*: Một hàm nhận một đối số ký tự duy nhất (một chuỗi có độ dài 1) và trả về true nếu ký tự đó là rác. Giá trị mặc định là ``None``, nghĩa là không có ký tự nào được xem là rác.
 
-      These junk-filtering functions speed up matching to find
-      differences and do not cause any differing lines or characters to
-      be ignored.  Read the description of the
-      :meth:`~SequenceMatcher.find_longest_match` method's *isjunk*
-      parameter for an explanation.
+      Các hàm lọc nội dung rác này giúp tăng tốc quá trình so khớp để tìm ra khác biệt và không khiến bất kỳ dòng hoặc ký tự khác biệt nào bị bỏ qua. Đọc phần mô tả về
+      tham số *isjunk* của phương thức :meth:`~SequenceMatcher.find_longest_match` để biết thêm.
 
-   :class:`Differ` objects are used (deltas generated) via a single method:
+   Các đối tượng :class:`Differ` được sử dụng (các delta được tạo ra) thông qua một phương thức duy nhất:
 
 
    .. method:: Differ.compare(a, b)
 
-      Compare two sequences of lines, and generate the delta (a sequence of lines).
+      So sánh hai chuỗi dòng và tạo delta (một chuỗi các dòng).
 
-      Each sequence must contain individual single-line strings ending with
-      newlines.  Such sequences can be obtained from the
-      :meth:`~io.IOBase.readlines` method of file-like objects.  The generated
-      delta also consists of newline-terminated strings, ready to be
-      printed as-is via the :meth:`~io.IOBase.writelines` method of a
-      file-like object.
+      Mỗi chuỗi phải chứa các chuỗi riêng lẻ trên một dòng và kết thúc bằng ký tự xuống dòng. Có thể lấy các chuỗi như vậy từ
+      phương thức :meth:`~io.IOBase.readlines` của các đối tượng giống tệp. Delta được tạo cũng bao gồm các chuỗi kết thúc bằng ký tự xuống dòng, sẵn sàng được in nguyên trạng bằng phương thức :meth:`~io.IOBase.writelines` của một đối tượng giống tệp.
 
 .. class:: HtmlDiff
 
-   This class can be used to create an HTML table (or a complete HTML file
-   containing the table) showing a side by side, line by line comparison of text
-   with inter-line and intra-line change highlights.  The table can be generated in
-   either full or contextual difference mode.
+   Có thể dùng lớp này để tạo một bảng HTML (hoặc một tệp HTML hoàn chỉnh chứa bảng) hiển thị so sánh văn bản theo từng dòng, đặt cạnh nhau, với phần đánh dấu các thay đổi giữa các dòng và trong từng dòng. Có thể tạo bảng ở chế độ khác biệt đầy đủ hoặc khác biệt theo ngữ cảnh.
 
    .. warning::
 
-      The trailing newlines get stripped before the diff, so the result can be
-      incomplete. See :gh:`71896` for details.
+      Các ký tự xuống dòng ở cuối sẽ bị loại bỏ trước khi tạo diff, vì vậy kết quả có thể không đầy đủ. Xem :gh:`71896` để biết chi tiết.
 
-   The constructor for this class is:
+   Hàm khởi tạo của lớp này là:
 
 
    .. method:: __init__(tabsize=8, wrapcolumn=None, linejunk=None, charjunk=IS_CHARACTER_JUNK)
 
-      Initializes instance of :class:`HtmlDiff`.
+      Khởi tạo một thực thể của :class:`HtmlDiff`.
 
-      *tabsize* is an optional keyword argument to specify tab stop spacing and
-      defaults to ``8``.
+      *tabsize* là một đối số từ khóa tùy chọn dùng để chỉ định khoảng cách giữa các điểm dừng tab và mặc định là ``8``.
 
-      *wrapcolumn* is an optional keyword to specify column number where lines are
-      broken and wrapped, defaults to ``None`` where lines are not wrapped.
+      *wrapcolumn* là một keyword tùy chọn dùng để chỉ định số cột tại đó các dòng được ngắt và bao dòng; mặc định là ``None``, nghĩa là các dòng không được bao.
 
-      *linejunk* and *charjunk* are optional keyword arguments passed into :func:`ndiff`
-      (used by :class:`HtmlDiff` to generate the side by side HTML differences).  See
-      :func:`ndiff` documentation for argument default values and descriptions.
+      *linejunk* và *charjunk* là các đối số keyword tùy chọn được truyền vào :func:`ndiff` (được :class:`HtmlDiff` sử dụng để tạo các điểm khác biệt HTML hiển thị cạnh nhau). Xem
+      :func:`ndiff` tài liệu để biết các giá trị mặc định và mô tả của đối số.
 
-   The following methods are public:
+   Các phương thức sau là public:
 
    .. method:: make_file(fromlines, tolines, fromdesc='', todesc='', context=False, \
                          numlines=5, *, charset='utf-8')
 
-      Compares *fromlines* and *tolines* (lists of strings) and returns a string which
-      is a complete HTML file containing a table showing line by line differences with
-      inter-line and intra-line changes highlighted.
+      So sánh *fromlines* và *tolines* (các danh sách chuỗi), rồi trả về một chuỗi là một tệp HTML hoàn chỉnh chứa bảng hiển thị các điểm khác biệt giữa từng dòng, trong đó các thay đổi giữa các dòng và trong từng dòng được làm nổi bật.
 
-      *fromdesc* and *todesc* are optional keyword arguments to specify from/to file
-      column header strings (both default to an empty string).
+      *fromdesc* và *todesc* là các đối số keyword tùy chọn dùng để chỉ định chuỗi tiêu đề cột của tệp nguồn và tệp đích (cả hai mặc định là chuỗi rỗng).
 
-      *context* and *numlines* are both optional keyword arguments. Set *context* to
-      ``True`` when contextual differences are to be shown, else the default is
-      ``False`` to show the full files. *numlines* defaults to ``5``.  When *context*
-      is ``True`` *numlines* controls the number of context lines which surround the
-      difference highlights.  When *context* is ``False`` *numlines* controls the
-      number of lines which are shown before a difference highlight when using the
-      "next" hyperlinks (setting to zero would cause the "next" hyperlinks to place
-      the next difference highlight at the top of the browser without any leading
-      context).
+      *context* và *numlines* đều là các đối số từ khóa tùy chọn. Đặt *context* thành ``True`` khi cần hiển thị các khác biệt theo ngữ cảnh; nếu không, mặc định là ``False`` để hiển thị toàn bộ các tệp. *numlines* mặc định là ``5``. Khi *context* là ``True``, *numlines* kiểm soát số dòng ngữ cảnh bao quanh phần đánh dấu khác biệt. Khi *context* là ``False``, *numlines* kiểm soát số dòng được hiển thị trước phần đánh dấu khác biệt khi sử dụng các siêu liên kết "next" (đặt thành 0 sẽ khiến các siêu liên kết "next" đặt phần đánh dấu khác biệt tiếp theo ở đầu trình duyệt mà không có ngữ cảnh đứng trước).
 
       .. note::
-         *fromdesc* and *todesc* are interpreted as unescaped HTML and should be
-         properly escaped while receiving input from untrusted sources.
+         *fromdesc* và *todesc* được diễn giải dưới dạng HTML chưa escape và cần được escape đúng cách khi nhận dữ liệu đầu vào từ các nguồn không đáng tin cậy.
 
       .. versionchanged:: 3.5
-         *charset* keyword-only argument was added.  The default charset of
-         HTML document changed from ``'ISO-8859-1'`` to ``'utf-8'``.
+         Đối số chỉ có từ khóa *charset* đã được thêm vào.  Charset mặc định của tài liệu HTML đã thay đổi từ ``'ISO-8859-1'`` thành ``'utf-8'``.
 
    .. method:: make_table(fromlines, tolines, fromdesc='', todesc='', context=False, numlines=5)
 
-      Compares *fromlines* and *tolines* (lists of strings) and returns a string which
-      is a complete HTML table showing line by line differences with inter-line and
-      intra-line changes highlighted.
+      So sánh *fromlines* và *tolines* (các danh sách chuỗi) rồi trả về một chuỗi là bảng HTML hoàn chỉnh, hiển thị các khác biệt theo từng dòng với những thay đổi giữa các dòng và trong từng dòng được đánh dấu.
 
-      The arguments for this method are the same as those for the :meth:`make_file`
-      method.
+      Các đối số của phương thức này giống với các đối số của phương thức :meth:`make_file`.
 
 
 
 .. function:: context_diff(a, b, fromfile='', tofile='', fromfiledate='', tofiledate='', n=3, lineterm='\n')
 
-   Compare *a* and *b* (lists of strings); return a delta (a :term:`generator`
-   generating the delta lines) in context diff format.
+   So sánh *a* và *b* (các danh sách chuỗi); trả về một delta (một :term:`generator` tạo ra các dòng delta) ở định dạng context diff.
 
-   Context diffs are a compact way of showing just the lines that have changed plus
-   a few lines of context.  The changes are shown in a before/after style.  The
-   number of context lines is set by *n* which defaults to three.
+   Context diff là cách ngắn gọn để chỉ hiển thị những dòng đã thay đổi cùng với một vài dòng ngữ cảnh. Các thay đổi được hiển thị theo kiểu trước/sau. Số dòng ngữ cảnh được đặt bằng *n*, mặc định là ba.
 
-   By default, the diff control lines (those with ``***`` or ``---``) are created
-   with a trailing newline.  This is helpful so that inputs created from
-   :func:`io.IOBase.readlines` result in diffs that are suitable for use with
-   :func:`io.IOBase.writelines` since both the inputs and outputs have trailing
-   newlines.
+   Theo mặc định, các dòng điều khiển diff (những dòng có ``***`` hoặc ``---``) được tạo với ký tự xuống dòng ở cuối. Điều này hữu ích để các đầu vào được tạo từ
+   :func:`io.IOBase.readlines` tạo ra các bản diff phù hợp để sử dụng với
+   :func:`io.IOBase.writelines` vì cả đầu vào và đầu ra đều có ký tự xuống dòng ở cuối.
 
-   For inputs that do not have trailing newlines, set the *lineterm* argument to
-   ``""`` so that the output will be uniformly newline free.
+   Đối với các đầu vào không có ký tự xuống dòng ở cuối, hãy đặt đối số *lineterm* thành ``""`` để đầu ra luôn không có ký tự xuống dòng.
 
-   The context diff format normally has a header for filenames and modification
-   times.  Any or all of these may be specified using strings for *fromfile*,
-   *tofile*, *fromfiledate*, and *tofiledate*.  The modification times are normally
-   expressed in the ISO 8601 format. If not specified, the
-   strings default to blanks.
+   Định dạng context diff thường có phần header chứa tên tệp và thời gian sửa đổi. Có thể chỉ định một hoặc tất cả các giá trị này bằng các chuỗi cho *fromfile*, *tofile*, *fromfiledate* và *tofiledate*. Thời gian sửa đổi thường được biểu diễn theo định dạng ISO 8601. Nếu không được chỉ định, các chuỗi này mặc định là chuỗi rỗng.
 
       >>> import sys
       >>> from difflib import *
@@ -279,23 +195,18 @@ Diff generation
       ! hamster
         guido
 
-   See :ref:`difflib-interface` for a more detailed example.
+   Xem :ref:`difflib-interface` để biết ví dụ chi tiết hơn.
 
 
 .. function:: get_close_matches(word, possibilities, n=3, cutoff=0.6)
 
-   Return a list of the best "good enough" matches.  *word* is a sequence for which
-   close matches are desired (typically a string), and *possibilities* is a list of
-   sequences against which to match *word* (typically a list of strings).
+   Trả về danh sách các kết quả khớp "đủ tốt" nhất. *word* là một sequence cần tìm các kết quả khớp gần (thường là một string), còn *possibilities* là danh sách các sequence dùng để đối chiếu với *word* (thường là một danh sách string).
 
-   Optional argument *n* (default ``3``) is the maximum number of close matches to
-   return; *n* must be greater than ``0``.
+   Đối số tùy chọn *n* (mặc định là ``3``) là số lượng tối đa các kết quả khớp gần nhất cần trả về; *n* phải lớn hơn ``0``.
 
-   Optional argument *cutoff* (default ``0.6``) is a float in the range [0, 1].
-   Possibilities that don't score at least that similar to *word* are ignored.
+   Đối số tùy chọn *cutoff* (mặc định là ``0.6``) là một số thực trong khoảng [0, 1]. Các khả năng không đạt mức tương đồng tối thiểu đó với *word* sẽ bị bỏ qua.
 
-   The best (no more than *n*) matches among the possibilities are returned in a
-   list, sorted by similarity score, most similar first.
+   Các kết quả khớp tốt nhất (không quá *n*) trong số các khả năng sẽ được trả về trong một danh sách, được sắp xếp theo điểm tương đồng, với kết quả tương đồng nhất ở trước.
 
       >>> get_close_matches('appel', ['ape', 'apple', 'peach', 'puppy'])
       ['apple', 'ape']
@@ -310,24 +221,13 @@ Diff generation
 
 .. function:: ndiff(a, b, linejunk=None, charjunk=IS_CHARACTER_JUNK)
 
-   Compare *a* and *b* (lists of strings); return a :class:`Differ`\ -style
-   delta (a :term:`generator` generating the delta lines).
+   So sánh *a* và *b* (các danh sách chuỗi); trả về một delta theo kiểu :class:`Differ`\  (một :term:`generator` tạo ra các dòng delta).
 
-   Optional keyword parameters *linejunk* and *charjunk* are filtering functions
-   (or ``None``):
+   Các tham số keyword tùy chọn *linejunk* và *charjunk* là các hàm lọc (hoặc ``None``):
 
-   *linejunk*: A function that accepts a single string argument, and returns
-   true if the string is junk, or false if not. The default is ``None``. There
-   is also a module-level function :func:`IS_LINE_JUNK`, which filters out lines
-   without visible characters, except for at most one hash character (``'#'``)
-   -- however the underlying :class:`SequenceMatcher` class does a dynamic
-   analysis of which lines are so frequent as to constitute noise, and this
-   usually works better than using this function.
+   *linejunk*: Một hàm nhận một đối số chuỗi duy nhất và trả về true nếu chuỗi đó là junk, hoặc false nếu không phải. Giá trị mặc định là ``None``. Ngoài ra còn có hàm cấp module :func:`IS_LINE_JUNK`, dùng để lọc các dòng không có ký tự hiển thị, ngoại trừ tối đa một ký tự dấu thăng (``'#'``) -- tuy nhiên, lớp :class:`SequenceMatcher` cơ sở thực hiện phân tích động để xác định những dòng xuất hiện quá thường xuyên đến mức tạo thành nhiễu, và cách này thường hiệu quả hơn so với việc sử dụng hàm này.
 
-   *charjunk*: A function that accepts a character (a string of length 1), and
-   returns if the character is junk, or false if not. The default is module-level
-   function :func:`IS_CHARACTER_JUNK`, which filters out whitespace characters (a
-   blank or tab; it's a bad idea to include newline in this!).
+   *charjunk*: Một hàm nhận một ký tự (một chuỗi có độ dài 1) và trả về true nếu ký tự đó là junk, hoặc false nếu không phải. Giá trị mặc định là hàm cấp module :func:`IS_CHARACTER_JUNK`, dùng để lọc các ký tự khoảng trắng (dấu cách hoặc tab; không nên đưa ký tự xuống dòng vào hàm này!).
 
       >>> diff = ndiff('one\ntwo\nthree\n'.splitlines(keepends=True),
       ...              'ore\ntree\nemu\n'.splitlines(keepends=True))
@@ -345,17 +245,15 @@ Diff generation
 
 .. function:: restore(sequence, which)
 
-   Return one of the two sequences that generated a delta.
+   Trả về một trong hai chuỗi đã tạo ra delta.
 
-   Given a *sequence* produced by :meth:`Differ.compare` or :func:`ndiff`, extract
-   lines originating from file 1 or 2 (parameter *which*), stripping off line
-   prefixes.
+   Với một *chuỗi* được tạo bởi :meth:`Differ.compare` hoặc :func:`ndiff`, trích xuất các dòng bắt nguồn từ tệp 1 hoặc 2 (tham số *which*), đồng thời loại bỏ tiền tố dòng.
 
-   Example:
+   Ví dụ:
 
       >>> diff = ndiff('one\ntwo\nthree\n'.splitlines(keepends=True),
       ...              'ore\ntree\nemu\n'.splitlines(keepends=True))
-      >>> diff = list(diff) # materialize the generated delta into a list
+      >>> diff = list(diff) # chuyển delta đã tạo thành một danh sách
       >>> print(''.join(restore(diff, 1)), end="")
       one
       two
@@ -368,28 +266,17 @@ Diff generation
 
 .. function:: unified_diff(a, b, fromfile='', tofile='', fromfiledate='', tofiledate='', n=3, lineterm='\n')
 
-   Compare *a* and *b* (lists of strings); return a delta (a :term:`generator`
-   generating the delta lines) in unified diff format.
+   So sánh *a* và *b* (các danh sách chuỗi); trả về một delta (một :term:`generator` tạo ra các dòng delta) ở định dạng unified diff.
 
-   Unified diffs are a compact way of showing just the lines that have changed plus
-   a few lines of context.  The changes are shown in an inline style (instead of
-   separate before/after blocks).  The number of context lines is set by *n* which
-   defaults to three.
+   Unified diff là một cách ngắn gọn để chỉ hiển thị các dòng đã thay đổi cùng với một vài dòng ngữ cảnh. Các thay đổi được hiển thị theo kiểu inline (thay vì các khối before/after riêng biệt). Số lượng dòng ngữ cảnh được đặt bởi *n*, mặc định là ba.
 
-   By default, the diff control lines (those with ``---``, ``+++``, or ``@@``) are
-   created with a trailing newline.  This is helpful so that inputs created from
-   :func:`io.IOBase.readlines` result in diffs that are suitable for use with
-   :func:`io.IOBase.writelines` since both the inputs and outputs have trailing
-   newlines.
+   Theo mặc định, các dòng điều khiển diff (những dòng có ``---``, ``+++``, hoặc ``@@``) được tạo với một ký tự xuống dòng ở cuối. Điều này hữu ích để các đầu vào được tạo từ
+   :func:`io.IOBase.readlines` tạo ra các bản diff phù hợp để sử dụng với
+   :func:`io.IOBase.writelines` vì cả đầu vào và đầu ra đều có ký tự xuống dòng ở cuối.
 
-   For inputs that do not have trailing newlines, set the *lineterm* argument to
-   ``""`` so that the output will be uniformly newline free.
+   Đối với các đầu vào không có ký tự xuống dòng ở cuối, hãy đặt đối số *lineterm* thành ``""`` để đầu ra luôn không có ký tự xuống dòng.
 
-   The unified diff format normally has a header for filenames and modification
-   times.  Any or all of these may be specified using strings for *fromfile*,
-   *tofile*, *fromfiledate*, and *tofiledate*.  The modification times are normally
-   expressed in the ISO 8601 format. If not specified, the
-   strings default to blanks.
+   Định dạng unified diff thường có phần header chứa tên tệp và thời gian sửa đổi. Bạn có thể chỉ định một, một số hoặc tất cả các thông tin này bằng các chuỗi cho *fromfile*, *tofile*, *fromfiledate* và *tofiledate*. Thời gian sửa đổi thường được biểu diễn theo định dạng ISO 8601. Nếu không được chỉ định, các chuỗi sẽ mặc định là chuỗi trống.
 
       >>> s1 = ['bacon\n', 'eggs\n', 'ham\n', 'guido\n']
       >>> s2 = ['python\n', 'eggy\n', 'hamster\n', 'guido\n']
@@ -405,158 +292,108 @@ Diff generation
       +hamster
        guido
 
-   See :ref:`difflib-interface` for a more detailed example.
+   Xem :ref:`difflib-interface` để biết ví dụ chi tiết hơn.
 
 .. function:: diff_bytes(dfunc, a, b, fromfile=b'', tofile=b'', fromfiledate=b'', tofiledate=b'', n=3, lineterm=b'\n')
 
-   Compare *a* and *b* (lists of bytes objects) using *dfunc*; yield a
-   sequence of delta lines (also bytes) in the format returned by *dfunc*.
-   *dfunc* must be a callable, typically either :func:`unified_diff` or
+   So sánh *a* và *b* (các danh sách đối tượng bytes) bằng *dfunc*; tạo ra một chuỗi các dòng delta (cũng là bytes) theo định dạng được trả về bởi *dfunc*. *dfunc* phải là một callable, thường là :func:`unified_diff` hoặc
    :func:`context_diff`.
 
-   Allows you to compare data with unknown or inconsistent encoding. All
-   inputs except *n* must be bytes objects, not str. Works by losslessly
-   converting all inputs (except *n*) to str, and calling ``dfunc(a, b,
-   fromfile, tofile, fromfiledate, tofiledate, n, lineterm)``. The output of
-   *dfunc* is then converted back to bytes, so the delta lines that you
-   receive have the same unknown/inconsistent encodings as *a* and *b*.
+   Cho phép bạn so sánh dữ liệu có encoding không xác định hoặc không nhất quán. Tất cả đầu vào ngoại trừ *n* phải là đối tượng bytes, không phải str. Hàm này hoạt động bằng cách chuyển đổi tất cả đầu vào (ngoại trừ *n*) sang str mà không làm mất dữ liệu, rồi gọi ``dfunc(a, b, fromfile, tofile, fromfiledate, tofiledate, n, lineterm)``. Đầu ra của *dfunc* sau đó được chuyển đổi обратно thành bytes, vì vậy các dòng delta bạn nhận được có cùng encoding không xác định hoặc không nhất quán như *a* và *b*.
 
    .. versionadded:: 3.5
 
 
 .. _difflib-isjunk-functions:
 
-Junk definition functions
+Các hàm xác định dòng rác
 -------------------------
 
 .. function:: IS_LINE_JUNK(line)
 
-   Return ``True`` for ignorable lines.  The line *line* is ignorable if *line* is
-   blank or contains a single ``'#'``, otherwise it is not ignorable.  Used as a
-   default for parameter *linejunk* in :func:`ndiff` in older versions.
+   Trả về ``True`` cho các dòng có thể bỏ qua. Dòng *line* có thể bỏ qua nếu *line* trống hoặc chứa một ``'#'`` duy nhất; nếu không thì không thể bỏ qua. Được dùng làm giá trị mặc định cho tham số *linejunk* trong :func:`ndiff` ở các phiên bản cũ hơn.
 
 
 .. function:: IS_CHARACTER_JUNK(ch)
 
-   Return ``True`` for ignorable characters.  The character *ch* is ignorable if *ch*
-   is a space or tab, otherwise it is not ignorable.  Used as a default for
-   parameter *charjunk* in :func:`ndiff`.
+   Trả về ``True`` cho các ký tự có thể bỏ qua. Ký tự *ch* có thể bỏ qua nếu *ch* là dấu cách hoặc tab; nếu không thì không thể bỏ qua. Được dùng làm giá trị mặc định cho tham số *charjunk* trong :func:`ndiff`.
 
 
 .. _sequence-matcher:
 
-SequenceMatcher objects
------------------------
+Các đối tượng SequenceMatcher
+-----------------------------
 
 .. class:: SequenceMatcher(isjunk=None, a='', b='', autojunk=True)
 
-   Optional argument *isjunk* must be ``None`` (the default) or a one-argument
-   function that takes a sequence element and returns true if and only if the
-   element is "junk" and should be ignored. Passing ``None`` for *isjunk* is
-   equivalent to passing ``lambda x: False``; in other words, no elements are ignored.
-   For example, pass::
+   Đối số tùy chọn *isjunk* phải là ``None`` (mặc định) hoặc một hàm nhận một đối số, lấy một phần tử của sequence và trả về true khi và chỉ khi phần tử đó là "rác" và nên được bỏ qua. Truyền ``None`` cho *isjunk* tương đương với việc truyền ``lambda x: False``; nói cách khác, không có phần tử nào bị bỏ qua. Ví dụ, hãy truyền::
 
       lambda x: x in " \t"
 
-   if you're comparing lines as sequences of characters, and don't want to synch up
-   on blanks or hard tabs.
+   nếu bạn đang so sánh các dòng dưới dạng sequence gồm các ký tự và không muốn đồng bộ tại các khoảng trống hoặc tab cứng.
 
-   The optional arguments *a* and *b* are sequences to be compared; both default to
-   empty strings.  The elements of both sequences must be :term:`hashable`.
+   Các đối số tùy chọn *a* và *b* là các sequence cần so sánh; cả hai mặc định là chuỗi rỗng. Các phần tử của cả hai sequence phải là :term:`hashable`.
 
-   The optional argument *autojunk* can be used to disable the automatic junk
-   heuristic.
+   Có thể sử dụng đối số tùy chọn *autojunk* để tắt heuristic tự động xác định phần tử rác.
 
    .. versionchanged:: 3.2
-      Added the *autojunk* parameter.
+      Đã thêm tham số *autojunk*.
 
-   SequenceMatcher objects get three data attributes: *bjunk* is the
-   set of elements of *b* for which *isjunk* is ``True``; *bpopular* is the set of
-   non-junk elements considered popular by the heuristic (if it is not
-   disabled); *b2j* is a dict mapping the remaining elements of *b* to a list
-   of positions where they occur. All three are reset whenever *b* is reset
-   with :meth:`set_seqs` or :meth:`set_seq2`.
+   Các đối tượng SequenceMatcher có ba thuộc tính dữ liệu: *bjunk* là tập hợp các phần tử của *b* mà *isjunk* là ``True``; *bpopular* là tập hợp các phần tử không phải rác được heuristic xem là phổ biến (nếu heuristic này chưa bị tắt); *b2j* là một dict ánh xạ các phần tử còn lại của *b* tới danh sách các vị trí mà chúng xuất hiện. Cả ba thuộc tính đều được đặt lại bất cứ khi nào *b* được đặt lại bằng :meth:`set_seqs` hoặc :meth:`set_seq2`.
 
    .. versionadded:: 3.2
-      The *bjunk* and *bpopular* attributes.
+      Các thuộc tính *bjunk* và *bpopular*.
 
-   :class:`SequenceMatcher` objects have the following methods:
+   Các đối tượng :class:`SequenceMatcher` có các phương thức sau:
 
    .. method:: set_seqs(a, b)
 
-      Set the two sequences to be compared.
+      Đặt hai chuỗi cần so sánh.
 
-   :class:`SequenceMatcher` computes and caches detailed information about the
-   second sequence, so if you want to compare one sequence against many
-   sequences, use :meth:`set_seq2` to set the commonly used sequence once and
-   call :meth:`set_seq1` repeatedly, once for each of the other sequences.
+   :class:`SequenceMatcher` tính toán và lưu vào bộ nhớ đệm thông tin chi tiết về chuỗi thứ hai, vì vậy nếu bạn muốn so sánh một chuỗi với nhiều chuỗi, hãy dùng :meth:`set_seq2` để đặt chuỗi được sử dụng chung một lần, rồi gọi :meth:`set_seq1` nhiều lần, mỗi lần cho một chuỗi còn lại.
 
 
    .. method:: set_seq1(a)
 
-      Set the first sequence to be compared.  The second sequence to be compared
-      is not changed.
+      Đặt sequence đầu tiên cần so sánh. Sequence thứ hai cần so sánh không bị thay đổi.
 
 
    .. method:: set_seq2(b)
 
-      Set the second sequence to be compared.  The first sequence to be compared
-      is not changed.
+      Đặt sequence thứ hai cần so sánh. Sequence đầu tiên cần so sánh không bị thay đổi.
 
 
    .. method:: find_longest_match(alo=0, ahi=None, blo=0, bhi=None)
 
-      Find longest matching block in ``a[alo:ahi]`` and ``b[blo:bhi]``.
+      Tìm block khớp dài nhất trong ``a[alo:ahi]`` và ``b[blo:bhi]``.
 
-      If *isjunk* was omitted or ``None``, :meth:`find_longest_match` returns
-      ``(i, j, k)`` such that ``a[i:i+k]`` is equal to ``b[j:j+k]``, where ``alo
-      <= i <= i+k <= ahi`` and ``blo <= j <= j+k <= bhi``. For all ``(i', j',
-      k')`` meeting those conditions, the additional conditions ``k >= k'``, ``i
-      <= i'``, and if ``i == i'``, ``j <= j'`` are also met. In other words, of
-      all maximal matching blocks, return one that starts earliest in *a*, and
-      of all those maximal matching blocks that start earliest in *a*, return
-      the one that starts earliest in *b*.
+      Nếu *isjunk* bị bỏ qua hoặc là ``None``, :meth:`find_longest_match` trả về ``(i, j, k)`` sao cho ``a[i:i+k]`` bằng ``b[j:j+k]``, trong đó ``alo <= i <= i+k <= ahi`` và ``blo <= j <= j+k <= bhi``. Với mọi ``(i', j', k')`` thỏa mãn các điều kiện đó, các điều kiện bổ sung ``k >= k'``, ``i <= i'``, và nếu ``i == i'`` thì ``j <= j'`` cũng được thỏa mãn. Nói cách khác, trong tất cả các block khớp cực đại, trả về block bắt đầu sớm nhất trong *a*, và trong tất cả các block khớp cực đại bắt đầu sớm nhất trong *a*, trả về block bắt đầu sớm nhất trong *b*.
 
          >>> s = SequenceMatcher(None, " abcd", "abcd abcd")
          >>> s.find_longest_match(0, 5, 0, 9)
          Match(a=0, b=4, size=5)
 
-      If *isjunk* was provided, first the longest matching block is determined
-      as above, but with the additional restriction that no junk element appears
-      in the block.  Then that block is extended as far as possible by matching
-      (only) junk elements on both sides. So the resulting block never matches
-      on junk except as identical junk happens to be adjacent to an interesting
-      match.
+      Nếu *isjunk* được cung cấp, trước tiên block khớp dài nhất được xác định như trên, nhưng với điều kiện bổ sung là không có phần tử rác nào xuất hiện trong block. Sau đó, block đó được mở rộng tối đa bằng cách chỉ khớp các phần tử rác ở cả hai bên. Vì vậy, block kết quả không bao giờ khớp trên phần tử rác, trừ khi các phần tử rác giống hệt nhau tình cờ nằm liền kề với một phần khớp đáng chú ý.
 
-      Here's the same example as before, but considering blanks to be junk. That
-      prevents ``' abcd'`` from matching the ``' abcd'`` at the tail end of the
-      second sequence directly.  Instead only the ``'abcd'`` can match, and
-      matches the leftmost ``'abcd'`` in the second sequence:
+      Đây là ví dụ tương tự như trước, nhưng coi các khoảng trắng là phần tử rác. Điều đó ngăn ``' abcd'`` khớp trực tiếp với ``' abcd'`` ở cuối sequence thứ hai. Thay vào đó, chỉ ``'abcd'`` có thể khớp và khớp với ``'abcd'`` ở vị trí ngoài cùng bên trái trong sequence thứ hai:
 
          >>> s = SequenceMatcher(lambda x: x==" ", " abcd", "abcd abcd")
          >>> s.find_longest_match(0, 5, 0, 9)
          Match(a=1, b=0, size=4)
 
-      If no blocks match, this returns ``(alo, blo, 0)``.
+      Nếu không có block nào khớp, phương thức này trả về ``(alo, blo, 0)``.
 
-      This method returns a :term:`named tuple` ``Match(a, b, size)``.
+      Phương thức này trả về một :term:`named tuple` ``Match(a, b, size)``.
 
       .. versionchanged:: 3.9
-         Added default arguments.
+         Đã thêm các đối số mặc định.
 
 
    .. method:: get_matching_blocks()
 
-      Return list of triples describing non-overlapping matching subsequences.
-      Each triple is of the form ``(i, j, n)``,
-      and means that ``a[i:i+n] == b[j:j+n]``.  The
-      triples are monotonically increasing in *i* and *j*.
+      Trả về danh sách các bộ ba mô tả các dãy con khớp nhau không chồng lấn. Mỗi bộ ba có dạng ``(i, j, n)``, và có nghĩa là ``a[i:i+n] == b[j:j+n]``. Các bộ ba tăng dần đơn điệu theo *i* và *j*.
 
-      The last triple is a dummy, and has the value ``(len(a), len(b), 0)``.  It
-      is the only triple with ``n == 0``.  If ``(i, j, n)`` and ``(i', j', n')``
-      are adjacent triples in the list, and the second is not the last triple in
-      the list, then ``i+n < i'`` or ``j+n < j'``; in other words, adjacent
-      triples always describe non-adjacent equal blocks.
+      Bộ ba cuối cùng là bộ giả và có giá trị ``(len(a), len(b), 0)``. Đây là bộ ba duy nhất có ``n == 0``. Nếu ``(i, j, n)`` và ``(i', j', n')`` là các bộ ba liền kề trong danh sách, và bộ thứ hai không phải là bộ cuối cùng trong danh sách, thì ``i+n < i'`` hoặc ``j+n < j'``; nói cách khác, các bộ ba liền kề luôn mô tả các khối bằng nhau không liền kề.
 
       .. XXX Explain why a dummy is used!
 
@@ -569,31 +406,23 @@ SequenceMatcher objects
 
    .. method:: get_opcodes()
 
-      Return list of 5-tuples describing how to turn *a* into *b*. Each tuple is
-      of the form ``(tag, i1, i2, j1, j2)``.  The first tuple has ``i1 == j1 ==
-      0``, and remaining tuples have *i1* equal to the *i2* from the preceding
-      tuple, and, likewise, *j1* equal to the previous *j2*.
+      Trả về danh sách các bộ 5 phần tử mô tả cách chuyển *a* thành *b*. Mỗi bộ có dạng ``(tag, i1, i2, j1, j2)``. Bộ đầu tiên có ``i1 == j1 == 0``, còn các bộ còn lại có *i1* bằng *i2* của bộ đứng trước, và tương tự, *j1* bằng *j2* trước đó.
 
-      The *tag* values are strings, with these meanings:
+      Các giá trị *tag* là các chuỗi, với những ý nghĩa sau:
 
-      +---------------+---------------------------------------------+
-      | Value         | Meaning                                     |
-      +===============+=============================================+
-      | ``'replace'`` | ``a[i1:i2]`` should be replaced by          |
-      |               | ``b[j1:j2]``.                               |
-      +---------------+---------------------------------------------+
-      | ``'delete'``  | ``a[i1:i2]`` should be deleted.  Note that  |
-      |               | ``j1 == j2`` in this case.                  |
-      +---------------+---------------------------------------------+
-      | ``'insert'``  | ``b[j1:j2]`` should be inserted at          |
-      |               | ``a[i1:i1]``. Note that ``i1 == i2`` in     |
-      |               | this case.                                  |
-      +---------------+---------------------------------------------+
-      | ``'equal'``   | ``a[i1:i2] == b[j1:j2]`` (the sub-sequences |
-      |               | are equal).                                 |
-      +---------------+---------------------------------------------+
+      +---------------+--------------------------------------------------------------------------------------------+
+      | Giá trị       | Ý nghĩa                                                                                    |
+      +===============+============================================================================================+
+      | ``'replace'`` | ``a[i1:i2]`` nên được thay thế bằng ``b[j1:j2]``.                                          |
+      +---------------+--------------------------------------------------------------------------------------------+
+      | ``'delete'``  | ``a[i1:i2]`` nên bị xóa. Lưu ý rằng ``j1 == j2`` trong trường hợp này.                     |
+      +---------------+--------------------------------------------------------------------------------------------+
+      | ``'insert'``  | ``b[j1:j2]`` nên được chèn tại ``a[i1:i1]``. Lưu ý rằng ``i1 == i2`` trong trường hợp này. |
+      +---------------+--------------------------------------------------------------------------------------------+
+      | ``'equal'``   | ``a[i1:i2] == b[j1:j2]`` (các chuỗi con bằng nhau).                                        |
+      +---------------+--------------------------------------------------------------------------------------------+
 
-      For example::
+      Ví dụ::
 
         >>> a = "qabxcd"
         >>> b = "abycdf"
@@ -610,44 +439,35 @@ SequenceMatcher objects
 
    .. method:: get_grouped_opcodes(n=3)
 
-      Return a :term:`generator` of groups with up to *n* lines of context.
+      Trả về một :term:`generator` gồm các nhóm có tối đa *n* dòng ngữ cảnh.
 
-      Starting with the groups returned by :meth:`get_opcodes`, this method
-      splits out smaller change clusters and eliminates intervening ranges which
-      have no changes.
+      Bắt đầu với các nhóm được :meth:`get_opcodes` trả về, phương thức này tách ra các cụm thay đổi nhỏ hơn và loại bỏ những khoảng xen giữa không có thay đổi.
 
-      The groups are returned in the same format as :meth:`get_opcodes`.
+      Các nhóm được trả về theo cùng định dạng như :meth:`get_opcodes`.
 
 
    .. method:: ratio()
 
-      Return a measure of the sequences' similarity as a float in the range [0,
-      1].
+      Trả về một giá trị đo độ tương đồng của các chuỗi dưới dạng số thực trong phạm vi [0, 1].
 
-      Where T is the total number of elements in both sequences, and M is the
-      number of matches, this is 2.0\*M / T. Note that this is ``1.0`` if the
-      sequences are identical, and ``0.0`` if they have nothing in common.
+      Trong đó T là tổng số phần tử trong cả hai chuỗi, còn M là số lượng phần tử khớp, giá trị này là 2.0\*M / T. Lưu ý rằng giá trị này là ``1.0`` nếu hai chuỗi giống hệt nhau và là ``0.0`` nếu chúng không có điểm chung.
 
-      This is expensive to compute if :meth:`get_matching_blocks` or
-      :meth:`get_opcodes` hasn't already been called, in which case you may want
-      to try :meth:`quick_ratio` or :meth:`real_quick_ratio` first to get an
-      upper bound.
+      Việc tính toán giá trị này tốn kém nếu :meth:`get_matching_blocks` hoặc
+      :meth:`get_opcodes` chưa được gọi trước đó; trong trường hợp này, bạn có thể muốn thử :meth:`quick_ratio` hoặc :meth:`real_quick_ratio` trước để lấy một cận trên.
 
 
    .. method:: quick_ratio()
 
-      Return an upper bound on :meth:`ratio` relatively quickly.
+      Trả về một cận trên của :meth:`ratio` tương đối nhanh.
 
 
    .. method:: real_quick_ratio()
 
-      Return an upper bound on :meth:`ratio` very quickly.
+      Trả về một cận trên của :meth:`ratio` rất nhanh.
 
 
-The three methods that return the ratio of matching to total characters can give
-different results due to differing levels of approximation, although
-:meth:`~SequenceMatcher.quick_ratio` and :meth:`~SequenceMatcher.real_quick_ratio`
-are always at least as large as :meth:`~SequenceMatcher.ratio`:
+Ba phương thức trả về tỷ lệ giữa số ký tự khớp và tổng số ký tự có thể cho các kết quả khác nhau do mức độ xấp xỉ khác nhau, mặc dù
+:meth:`~SequenceMatcher.quick_ratio` và :meth:`~SequenceMatcher.real_quick_ratio` luôn lớn hơn hoặc bằng :meth:`~SequenceMatcher.ratio`:
 
    >>> s = SequenceMatcher(None, "abcd", "bcde")
    >>> s.ratio()
@@ -658,29 +478,27 @@ are always at least as large as :meth:`~SequenceMatcher.ratio`:
    1.0
 
 
-Examples
---------
+Ví dụ
+-----
 
 .. _sequencematcher-examples:
 
-SequenceMatcher examples
+Ví dụ về SequenceMatcher
 ........................
 
-This example compares two strings, considering blanks to be "junk":
+Ví dụ này so sánh hai chuỗi, trong đó coi các khoảng trắng là "junk":
 
    >>> s = SequenceMatcher(lambda x: x == " ",
    ...                     "private Thread currentThread;",
    ...                     "private volatile Thread currentThread;")
 
-:meth:`~SequenceMatcher.ratio` returns a float in [0, 1], measuring the similarity of the
-sequences.  As a rule of thumb, a :meth:`~SequenceMatcher.ratio` value over 0.6 means the
-sequences are close matches:
+:meth:`~SequenceMatcher.ratio` trả về một số thực trong [0, 1], đo độ tương đồng của các sequence. Theo quy tắc kinh nghiệm, giá trị :meth:`~SequenceMatcher.ratio` lớn hơn 0.6 có nghĩa là các sequence gần như khớp nhau:
 
    >>> print(round(s.ratio(), 3))
    0.866
 
-If you're only interested in where the sequences match,
-:meth:`~SequenceMatcher.get_matching_blocks` is handy:
+Nếu bạn chỉ quan tâm đến vị trí các chuỗi khớp nhau,
+:meth:`~SequenceMatcher.get_matching_blocks` rất tiện dụng:
 
    >>> for block in s.get_matching_blocks():
    ...     print("a[%d] and b[%d] match for %d elements" % block)
@@ -688,11 +506,9 @@ If you're only interested in where the sequences match,
    a[8] and b[17] match for 21 elements
    a[29] and b[38] match for 0 elements
 
-Note that the last tuple returned by :meth:`~SequenceMatcher.get_matching_blocks`
-is always a dummy, ``(len(a), len(b), 0)``, and this is the only case in which the last
-tuple element (number of elements matched) is ``0``.
+Lưu ý rằng tuple cuối cùng do :meth:`~SequenceMatcher.get_matching_blocks` trả về luôn là một tuple giả, ``(len(a), len(b), 0)``, và đây là trường hợp duy nhất mà phần tử cuối cùng của tuple (số phần tử khớp) là ``0``.
 
-If you want to know how to change the first sequence into the second, use
+Nếu bạn muốn biết cách biến chuỗi thứ nhất thành chuỗi thứ hai, hãy sử dụng
 :meth:`~SequenceMatcher.get_opcodes`:
 
    >>> for opcode in s.get_opcodes():
@@ -703,23 +519,17 @@ If you want to know how to change the first sequence into the second, use
 
 .. seealso::
 
-   * The :func:`get_close_matches` function in this module which shows how
-     simple code building on :class:`SequenceMatcher` can be used to do useful
-     work.
+   * Hàm :func:`get_close_matches` trong module này cho thấy mã đơn giản xây dựng trên :class:`SequenceMatcher` có thể được dùng để thực hiện công việc hữu ích như thế nào.
 
-   * `Simple version control recipe
-     <https://code.activestate.com/recipes/576729-simple-version-control/>`_ for a small application
-     built with :class:`SequenceMatcher`.
+   * `Công thức kiểm soát phiên bản đơn giản <https://code.activestate.com/recipes/576729-simple-version-control/>`_ cho một ứng dụng nhỏ được xây dựng bằng :class:`SequenceMatcher`.
 
 
 .. _differ-examples:
 
-Differ example
-..............
+Ví dụ về Differ
+...............
 
-This example compares two texts. First we set up the texts, sequences of
-individual single-line strings ending with newlines (such sequences can also be
-obtained from the :meth:`~io.IOBase.readlines` method of file-like objects):
+Ví dụ này so sánh hai văn bản. Trước tiên, chúng ta thiết lập các văn bản, là những chuỗi gồm các chuỗi một dòng riêng lẻ kết thúc bằng ký tự xuống dòng (các chuỗi như vậy cũng có thể lấy được từ phương thức :meth:`~io.IOBase.readlines` của các đối tượng dạng tệp):
 
    >>> text1 = '''  1. Beautiful is better than ugly.
    ...   2. Explicit is better than implicit.
@@ -736,19 +546,17 @@ obtained from the :meth:`~io.IOBase.readlines` method of file-like objects):
    ...   5. Flat is better than nested.
    ... '''.splitlines(keepends=True)
 
-Next we instantiate a Differ object:
+Tiếp theo, chúng ta khởi tạo một đối tượng Differ:
 
    >>> d = Differ()
 
-Note that when instantiating a :class:`Differ` object we may pass functions to
-filter out line and character "junk."  See the :meth:`Differ` constructor for
-details.
+Lưu ý rằng khi khởi tạo một đối tượng :class:`Differ`, chúng ta có thể truyền các hàm để lọc ra các dòng và ký tự “rác”. Xem hàm khởi tạo :meth:`Differ` để biết chi tiết.
 
-Finally, we compare the two:
+Cuối cùng, chúng ta so sánh hai văn bản:
 
    >>> result = list(d.compare(text1, text2))
 
-``result`` is a list of strings, so let's pretty-print it:
+``result`` là một danh sách các chuỗi, vì vậy hãy in nó ở dạng dễ đọc:
 
    >>> from pprint import pprint
    >>> pprint(result)
@@ -763,7 +571,7 @@ Finally, we compare the two:
     '?           ++++ ^                      ^\n',
     '+   5. Flat is better than nested.\n']
 
-As a single multi-line string it looks like this:
+Dưới dạng một chuỗi nhiều dòng, nó trông như sau:
 
    >>> import sys
    >>> sys.stdout.writelines(result)
@@ -781,16 +589,19 @@ As a single multi-line string it looks like this:
 
 .. _difflib-interface:
 
-A command-line interface to difflib
-...................................
+Giao diện dòng lệnh cho difflib
+...............................
 
-This example shows how to use difflib to create a ``diff``-like utility.
+Ví dụ này cho thấy cách sử dụng difflib để tạo một tiện ích tương tự ``diff``.
 
 .. literalinclude:: ../includes/diff.py
 
-ndiff example
-.............
+Ví dụ về ndiff
+..............
 
-This example shows how to use :func:`difflib.ndiff`.
+Ví dụ này cho thấy cách sử dụng :func:`difflib.ndiff`.
 
 .. literalinclude:: ../includes/ndiff.py
+
+.. _`Pattern Matching: The Gestalt Approach`: https://jacobfilipp.com/DrDobbs/articles/DDJ/1988/8807/8807c/8807c.htm
+.. _`Simple version control recipe`: https://code.activestate.com/recipes/576729-simple-version-control/

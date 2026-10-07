@@ -1,10 +1,10 @@
-:mod:`!dis` --- Disassembler for Python bytecode
+:mod:`!dis` --- Trình dịch ngược bytecode Python
 ================================================
 
 .. module:: dis
-   :synopsis: Disassembler for Python bytecode.
+   :synopsis: Trình dịch ngược bytecode Python.
 
-**Source code:** :source:`Lib/dis.py`
+**Mã nguồn:** :source:`Lib/dis.py`
 
 .. testsetup::
 
@@ -14,60 +14,41 @@
 
 --------------
 
-The :mod:`!dis` module supports the analysis of CPython :term:`bytecode` by
-disassembling it. The CPython bytecode which this module takes as an input is
-defined in the file :file:`Include/opcode.h` and used by the compiler and the
-interpreter.
+Mô-đun :mod:`!dis` hỗ trợ việc phân tích :term:`bytecode` của CPython bằng cách dịch ngược nó. Bytecode CPython mà mô-đun này nhận làm đầu vào được định nghĩa trong tệp :file:`Include/opcode.h` và được trình biên dịch cùng trình thông dịch sử dụng.
 
 .. impl-detail::
 
-   Bytecode is an implementation detail of the CPython interpreter.  No
-   guarantees are made that bytecode will not be added, removed, or changed
-   between versions of Python.  Use of this module should not be considered to
-   work across Python VMs or Python releases.
+   Bytecode là một chi tiết triển khai của trình thông dịch CPython. Không có gì đảm bảo rằng bytecode sẽ không được thêm, xóa hoặc thay đổi giữa các phiên bản Python. Không nên xem việc sử dụng mô-đun này là có thể hoạt động trên các Python VM hoặc các bản phát hành Python khác nhau.
 
    .. versionchanged:: 3.6
-      Use 2 bytes for each instruction. Previously the number of bytes varied
-      by instruction.
+      Sử dụng 2 byte cho mỗi instruction. Trước đây, số byte thay đổi tùy theo instruction.
 
    .. versionchanged:: 3.10
-      The argument of jump, exception handling and loop instructions is now
-      the instruction offset rather than the byte offset.
+      Đối số của các instruction nhảy, xử lý ngoại lệ và vòng lặp hiện là offset của instruction thay vì offset byte.
 
    .. versionchanged:: 3.11
-      Some instructions are accompanied by one or more inline cache entries,
-      which take the form of :opcode:`CACHE` instructions. These instructions
-      are hidden by default, but can be shown by passing ``show_caches=True`` to
-      any :mod:`!dis` utility. Furthermore, the interpreter now adapts the
-      bytecode to specialize it for different runtime conditions. The
-      adaptive bytecode can be shown by passing ``adaptive=True``.
+      Một số lệnh đi kèm với một hoặc nhiều mục nhập bộ nhớ đệm nội tuyến, có dạng các lệnh :opcode:`CACHE`. Theo mặc định, các lệnh này bị ẩn, nhưng có thể hiển thị bằng cách truyền ``show_caches=True`` cho bất kỳ tiện ích :mod:`!dis` nào. Ngoài ra, interpreter hiện điều chỉnh bytecode để chuyên biệt hóa nó cho các điều kiện runtime khác nhau. Có thể hiển thị bytecode thích ứng bằng cách truyền ``adaptive=True``.
 
    .. versionchanged:: 3.12
-      The argument of a jump is the offset of the target instruction relative
-      to the instruction that appears immediately after the jump instruction's
-      :opcode:`CACHE` entries.
+      Đối số của một lệnh nhảy là độ lệch của lệnh đích so với lệnh xuất hiện ngay sau lệnh nhảy
+      Các mục nhập :opcode:`CACHE`.
 
-      As a consequence, the presence of the :opcode:`CACHE` instructions is
-      transparent for forward jumps but needs to be taken into account when
-      reasoning about backward jumps.
+      Do đó, sự hiện diện của các lệnh :opcode:`CACHE` không ảnh hưởng đến các lệnh nhảy tiến, nhưng cần được tính đến khi phân tích các lệnh nhảy lùi.
 
    .. versionchanged:: 3.13
-      The output shows logical labels rather than instruction offsets
-      for jump targets and exception handlers. The ``-O`` command line
-      option and the ``show_offsets`` argument were added.
+      Đầu ra hiển thị các nhãn logic thay vì độ lệch lệnh cho các đích nhảy và trình xử lý ngoại lệ. Tùy chọn dòng lệnh ``-O`` và đối số ``show_offsets`` đã được thêm vào.
 
    .. versionchanged:: 3.14
-      The :option:`-P <dis --show-positions>` command-line option
-      and the ``show_positions`` argument were added.
+      Tùy chọn dòng lệnh :option:`-P <dis --show-positions>` và đối số ``show_positions`` đã được thêm vào.
 
-      The :option:`-S <dis --specialized>` command-line option is added.
+      Tùy chọn dòng lệnh :option:`-S <dis --specialized>` được thêm vào.
 
-Example: Given the function :func:`!myfunc`::
+Ví dụ: Với hàm :func:`!myfunc`::
 
    def myfunc(alist):
        return len(alist)
 
-the following command can be used to display the disassembly of
+có thể sử dụng lệnh sau để hiển thị mã disassembly của hàm
 :func:`!myfunc`:
 
 .. doctest::
@@ -80,132 +61,114 @@ the following command can be used to display the disassembly of
                  CALL                     1
                  RETURN_VALUE
 
-(The "2" is a line number).
+(“2” là số dòng).
 
 .. _dis-cli:
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-The :mod:`!dis` module can be invoked as a script from the command line:
+Có thể gọi mô-đun :mod:`!dis` dưới dạng script từ dòng lệnh:
 
 .. code-block:: sh
 
    python -m dis [-h] [-C] [-O] [-P] [-S] [infile]
 
-The following options are accepted:
+Các tùy chọn sau được chấp nhận:
 
 .. program:: dis
 
 .. option:: -h, --help
 
-   Display usage and exit.
+   Hiển thị thông tin sử dụng rồi thoát.
 
 .. option:: -C, --show-caches
 
-   Show inline caches.
+   Hiển thị các inline cache.
 
    .. versionadded:: 3.13
 
 .. option:: -O, --show-offsets
 
-   Show offsets of instructions.
+   Hiển thị các offset của instruction.
 
    .. versionadded:: 3.13
 
 .. option:: -P, --show-positions
 
-   Show positions of instructions in the source code.
+   Hiển thị vị trí của các instruction trong mã nguồn.
 
    .. versionadded:: 3.14
 
 .. option:: -S, --specialized
 
-   Show specialized bytecode.
+   Hiển thị bytecode chuyên biệt.
 
    .. versionadded:: 3.14
 
-If :file:`infile` is specified, its disassembled code will be written to stdout.
-Otherwise, disassembly is performed on compiled source code received from stdin.
+Nếu chỉ định :file:`infile`, mã đã được disassemble của mã đó sẽ được ghi vào stdout. Nếu không, việc disassemble sẽ được thực hiện trên mã nguồn đã biên dịch nhận được từ stdin.
 
-Bytecode analysis
------------------
+Phân tích bytecode
+------------------
 
 .. versionadded:: 3.4
 
-The bytecode analysis API allows pieces of Python code to be wrapped in a
-:class:`Bytecode` object that provides easy access to details of the compiled
-code.
+API phân tích bytecode cho phép các đoạn mã Python được bọc trong một
+:class:`Bytecode` đối tượng cung cấp quyền truy cập dễ dàng vào thông tin chi tiết của mã đã biên dịch.
 
 .. class:: Bytecode(x, *, first_line=None, current_offset=None,\
-                    show_caches=False, adaptive=False, show_offsets=False,\
-                    show_positions=False)
+                    show_caches=False, adaptive=False, show_offsets=False,\ show_positions=False)
 
-   Analyse the bytecode corresponding to a function, generator, asynchronous
-   generator, coroutine, method, string of source code, or a code object (as
-   returned by :func:`compile`).
+   Phân tích bytecode tương ứng với một hàm, generator, asynchronous generator, coroutine, method, chuỗi mã nguồn hoặc code object (do :func:`compile` trả về).
 
-   This is a convenience wrapper around many of the functions listed below, most
-   notably :func:`get_instructions`, as iterating over a :class:`Bytecode`
-   instance yields the bytecode operations as :class:`Instruction` instances.
+   Đây là một wrapper tiện ích bao quanh nhiều hàm được liệt kê bên dưới, đáng chú ý nhất là :func:`get_instructions`, vì việc lặp qua một instance :class:`Bytecode` sẽ trả về các thao tác bytecode dưới dạng các instance :class:`Instruction`.
 
-   If *first_line* is not ``None``, it indicates the line number that should be
-   reported for the first source line in the disassembled code.  Otherwise, the
-   source line information (if any) is taken directly from the disassembled code
-   object.
+   Nếu *first_line* không phải là ``None``, nó cho biết số dòng cần được báo cáo cho dòng mã nguồn đầu tiên trong đoạn mã đã disassemble. Nếu không, thông tin về dòng mã nguồn (nếu có) sẽ được lấy trực tiếp từ code object đã disassemble.
 
-   If *current_offset* is not ``None``, it refers to an instruction offset in the
-   disassembled code. Setting this means :meth:`.dis` will display a "current
-   instruction" marker against the specified opcode.
+   Nếu *current_offset* không phải là ``None``, nó tham chiếu đến offset của một instruction trong đoạn mã đã disassemble. Việc thiết lập giá trị này sẽ khiến :meth:`.dis` hiển thị dấu chỉ báo "current instruction" bên cạnh opcode được chỉ định.
 
-   If *show_caches* is ``True``, :meth:`.dis` will display inline cache
-   entries used by the interpreter to specialize the bytecode.
+   Nếu *show_caches* là ``True``, :meth:`.dis` sẽ hiển thị các mục inline cache được interpreter sử dụng để specialize bytecode.
 
-   If *adaptive* is ``True``, :meth:`.dis` will display specialized bytecode
-   that may be different from the original bytecode.
+   Nếu *adaptive* là ``True``, :meth:`.dis` sẽ hiển thị bytecode chuyên biệt, có thể khác với bytecode ban đầu.
 
-   If *show_offsets* is ``True``, :meth:`.dis` will include instruction
-   offsets in the output.
+   Nếu *show_offsets* là ``True``, :meth:`.dis` sẽ bao gồm các offset của instruction trong đầu ra.
 
-   If *show_positions* is ``True``, :meth:`.dis` will include instruction
-   source code positions in the output.
+   Nếu *show_positions* là ``True``, :meth:`.dis` sẽ bao gồm các vị trí mã nguồn của instruction trong đầu ra.
 
    .. classmethod:: from_traceback(tb, *, show_caches=False)
 
-      Construct a :class:`Bytecode` instance from the given traceback, setting
-      *current_offset* to the instruction responsible for the exception.
+      Tạo một instance :class:`Bytecode` từ traceback đã cho, đặt *current_offset* thành instruction gây ra exception.
 
    .. data:: codeobj
 
-      The compiled code object.
+      Đối tượng code đã biên dịch.
 
    .. data:: first_line
 
-      The first source line of the code object (if available)
+      Dòng mã nguồn đầu tiên của đối tượng code (nếu có)
 
    .. method:: dis()
 
-      Return a formatted view of the bytecode operations (the same as printed by
-      :func:`dis.dis`, but returned as a multi-line string).
+      Trả về chế độ xem được định dạng của các thao tác bytecode (giống như nội dung được in bởi
+      :func:`dis.dis`, nhưng được trả về dưới dạng chuỗi nhiều dòng).
 
    .. method:: info()
 
-      Return a formatted multi-line string with detailed information about the
-      code object, like :func:`code_info`.
+      Trả về một chuỗi nhiều dòng đã được định dạng với thông tin chi tiết về đối tượng code, như :func:`code_info`.
 
    .. versionchanged:: 3.7
-      This can now handle coroutine and asynchronous generator objects.
+      Giờ đây có thể xử lý các đối tượng coroutine và asynchronous generator.
 
    .. versionchanged:: 3.11
-      Added the *show_caches* and *adaptive* parameters.
+      Đã thêm các tham số *show_caches* và *adaptive*.
 
    .. versionchanged:: 3.13
-      Added the *show_offsets* parameter
+      Đã thêm tham số *show_offsets*.
 
    .. versionchanged:: 3.14
-      Added the *show_positions* parameter.
+      Đã thêm tham số *show_positions*.
 
-Example:
+Ví dụ:
 
 .. doctest::
 
@@ -220,347 +183,282 @@ Example:
     RETURN_VALUE
 
 
-Analysis functions
-------------------
+Các hàm phân tích
+-----------------
 
-The :mod:`!dis` module also defines the following analysis functions that convert
-the input directly to the desired output. They can be useful if only a single
-operation is being performed, so the intermediate analysis object isn't useful:
+Mô-đun :mod:`!dis` cũng định nghĩa các hàm phân tích sau đây để chuyển đổi trực tiếp đầu vào thành đầu ra mong muốn. Chúng có thể hữu ích khi chỉ thực hiện một thao tác duy nhất, vì đối tượng phân tích trung gian không hữu ích:
 
 .. function:: code_info(x)
 
-   Return a formatted multi-line string with detailed code object information
-   for the supplied function, generator, asynchronous generator, coroutine,
-   method, source code string or code object.
+   Trả về một chuỗi nhiều dòng đã được định dạng, chứa thông tin chi tiết về đối tượng mã của hàm, generator, asynchronous generator, coroutine, phương thức, chuỗi mã nguồn hoặc đối tượng mã được cung cấp.
 
-   Note that the exact contents of code info strings are highly implementation
-   dependent and they may change arbitrarily across Python VMs or Python
-   releases.
+   Lưu ý rằng nội dung chính xác của các chuỗi thông tin mã phụ thuộc rất nhiều vào cách triển khai và có thể thay đổi tùy ý giữa các Python VM hoặc các bản phát hành Python.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.7
-      This can now handle coroutine and asynchronous generator objects.
+      Hiện tại, hàm này có thể xử lý các đối tượng coroutine và asynchronous generator.
 
 
 .. function:: show_code(x, *, file=None)
 
-   Print detailed code object information for the supplied function, method,
-   source code string or code object to *file* (or ``sys.stdout`` if *file*
-   is not specified).
+   In thông tin chi tiết về đối tượng mã của hàm, phương thức, chuỗi mã nguồn hoặc đối tượng mã được cung cấp ra *file* (hoặc ``sys.stdout`` nếu không chỉ định *file*).
 
-   This is a convenient shorthand for ``print(code_info(x), file=file)``,
-   intended for interactive exploration at the interpreter prompt.
+   Đây là cách viết tắt thuận tiện cho ``print(code_info(x), file=file)``, предназначено để khám phá tương tác tại dấu nhắc trình thông dịch.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.4
-      Added *file* parameter.
+      Đã thêm tham số *file*.
 
 
 .. function:: dis(x=None, *, file=None, depth=None, show_caches=False,\
                   adaptive=False, show_offsets=False, show_positions=False)
 
-   Disassemble the *x* object.  *x* can denote either a module, a class, a
-   method, a function, a generator, an asynchronous generator, a coroutine,
-   a code object, a string of source code or a byte sequence of raw bytecode.
-   For a module, it disassembles all functions. For a class, it disassembles
-   all methods (including class and static methods). For a code object or
-   sequence of raw bytecode, it prints one line per bytecode instruction.
-   It also recursively disassembles nested code objects. These can include
-   generator expressions, nested functions, the bodies of nested classes,
-   and the code objects used for :ref:`annotation scopes <annotation-scopes>`.
-   Strings are first compiled to code objects with the :func:`compile`
-   built-in function before being disassembled.  If no object is provided, this
-   function disassembles the last traceback.
+   Giải mã đối tượng *x*. *x* có thể chỉ một module, một class, một method, một function, một generator, một asynchronous generator, một coroutine, một code object, một chuỗi mã nguồn hoặc một chuỗi byte của bytecode thô. Với một module, hàm này giải mã tất cả các function. Với một class, hàm này giải mã tất cả các method (bao gồm cả class method và static method). Với một code object hoặc chuỗi bytecode thô, hàm này in một dòng cho mỗi chỉ dẫn bytecode. Hàm này cũng giải mã đệ quy các code object lồng nhau. Chúng có thể bao gồm các biểu thức generator, các function lồng nhau, phần thân của các class lồng nhau và các code object được sử dụng cho :ref:`phạm vi chú thích <annotation-scopes>`. Các chuỗi trước tiên được biên dịch thành code object bằng hàm dựng sẵn :func:`compile` trước khi được giải mã. Nếu không cung cấp đối tượng nào, hàm này sẽ giải mã traceback gần nhất.
 
-   The disassembly is written as text to the supplied *file* argument if
-   provided and to ``sys.stdout`` otherwise.
+   Kết quả phân rã được ghi dưới dạng văn bản vào đối số *file* được cung cấp, nếu có, và vào ``sys.stdout`` nếu không.
 
-   The maximal depth of recursion is limited by *depth* unless it is ``None``.
-   ``depth=0`` means no recursion.
+   Độ sâu đệ quy tối đa được giới hạn bởi *depth*, trừ khi giá trị này là ``None``. ``depth=0`` có nghĩa là không đệ quy.
 
-   If *show_caches* is ``True``, this function will display inline cache
-   entries used by the interpreter to specialize the bytecode.
+   Nếu *show_caches* là ``True``, hàm này sẽ hiển thị các mục nhập inline cache được interpreter sử dụng để chuyên biệt hóa bytecode.
 
-   If *adaptive* is ``True``, this function will display specialized bytecode
-   that may be different from the original bytecode.
+   Nếu *adaptive* là ``True``, hàm này sẽ hiển thị bytecode đã được chuyên biệt hóa, có thể khác với bytecode ban đầu.
 
    .. versionchanged:: 3.4
-      Added *file* parameter.
+      Đã thêm tham số *file*.
 
    .. versionchanged:: 3.7
-      Implemented recursive disassembling and added *depth* parameter.
+      Đã triển khai việc disassemble đệ quy và thêm tham số *depth*.
 
    .. versionchanged:: 3.7
-      This can now handle coroutine and asynchronous generator objects.
+      Hiện tại, hàm này có thể xử lý các đối tượng coroutine và asynchronous generator.
 
    .. versionchanged:: 3.11
-      Added the *show_caches* and *adaptive* parameters.
+      Đã thêm các tham số *show_caches* và *adaptive*.
 
    .. versionchanged:: 3.13
-      Added the *show_offsets* parameter.
+      Đã thêm tham số *show_offsets*.
 
    .. versionchanged:: 3.14
-      Added the *show_positions* parameter.
+      Đã thêm tham số *show_positions*.
 
 .. function:: distb(tb=None, *, file=None, show_caches=False, adaptive=False,\
                     show_offset=False, show_positions=False)
 
-   Disassemble the top-of-stack function of a traceback, using the last
-   traceback if none was passed.  The instruction causing the exception is
-   indicated.
+   Dịch ngược hàm ở đỉnh ngăn xếp của traceback, sử dụng traceback gần nhất nếu không truyền traceback nào. Lệnh gây ra ngoại lệ sẽ được chỉ ra.
 
-   The disassembly is written as text to the supplied *file* argument if
-   provided and to ``sys.stdout`` otherwise.
+   Kết quả phân rã được ghi dưới dạng văn bản vào đối số *file* được cung cấp, nếu có, và vào ``sys.stdout`` nếu không.
 
    .. versionchanged:: 3.4
-      Added *file* parameter.
+      Đã thêm tham số *file*.
 
    .. versionchanged:: 3.11
-      Added the *show_caches* and *adaptive* parameters.
+      Đã thêm các tham số *show_caches* và *adaptive*.
 
    .. versionchanged:: 3.13
-      Added the *show_offsets* parameter.
+      Đã thêm tham số *show_offsets*.
 
    .. versionchanged:: 3.14
-      Added the *show_positions* parameter.
+      Đã thêm tham số *show_positions*.
 
 .. function:: disassemble(code, lasti=-1, *, file=None, show_caches=False,\
                           adaptive=False, show_offsets=False, show_positions=False)
               disco(code, lasti=-1, *, file=None, show_caches=False, adaptive=False,\
                     show_offsets=False, show_positions=False)
 
-   Disassemble a code object, indicating the last instruction if *lasti* was
-   provided.  The output is divided in the following columns:
+   Giải mã một đối tượng code, cho biết instruction cuối cùng nếu *lasti* được cung cấp. Kết quả được chia thành các cột sau:
 
-   #. the source code location of the instruction. Complete location information
-      is shown if *show_positions* is true. Otherwise (the default) only the
-      line number is displayed.
-   #. the current instruction, indicated as ``-->``,
-   #. a labelled instruction, indicated with ``>>``,
-   #. the address of the instruction,
-   #. the operation code name,
-   #. operation parameters, and
-   #. interpretation of the parameters in parentheses.
+   #. vị trí trong mã nguồn của instruction. Thông tin vị trí đầy đủ được hiển thị nếu *show_positions* là true. Nếu không (mặc định), chỉ số dòng được hiển thị.
+   #. instruction hiện tại, được biểu thị bằng ``-->``,
+   #. instruction được gắn nhãn, được biểu thị bằng ``>>``,
+   #. địa chỉ của instruction,
+   #. tên mã thao tác,
+   #. các tham số thao tác, và
+   #. diễn giải các tham số trong dấu ngoặc đơn.
 
-   The parameter interpretation recognizes local and global variable names,
-   constant values, branch targets, and compare operators.
+   Phần diễn giải tham số nhận diện tên biến cục bộ và toàn cục, các giá trị hằng, đích nhánh và các toán tử so sánh.
 
-   The disassembly is written as text to the supplied *file* argument if
-   provided and to ``sys.stdout`` otherwise.
+   Kết quả phân rã được ghi dưới dạng văn bản vào đối số *file* được cung cấp, nếu có, và vào ``sys.stdout`` nếu không.
 
    .. versionchanged:: 3.4
-      Added *file* parameter.
+      Đã thêm tham số *file*.
 
    .. versionchanged:: 3.11
-      Added the *show_caches* and *adaptive* parameters.
+      Đã thêm các tham số *show_caches* và *adaptive*.
 
    .. versionchanged:: 3.13
-      Added the *show_offsets* parameter.
+      Đã thêm tham số *show_offsets*.
 
    .. versionchanged:: 3.14
-      Added the *show_positions* parameter.
+      Đã thêm tham số *show_positions*.
 
 .. function:: get_instructions(x, *, first_line=None, show_caches=False, adaptive=False)
 
-   Return an iterator over the instructions in the supplied function, method,
-   source code string or code object.
+   Trả về một bộ lặp trên các instruction trong function, method, chuỗi mã nguồn hoặc code object được cung cấp.
 
-   The iterator generates a series of :class:`Instruction` named tuples giving
-   the details of each operation in the supplied code.
+   Bộ lặp tạo ra một chuỗi các tuple có tên :class:`Instruction` cung cấp thông tin chi tiết về từng operation trong đoạn code được cung cấp.
 
-   If *first_line* is not ``None``, it indicates the line number that should be
-   reported for the first source line in the disassembled code.  Otherwise, the
-   source line information (if any) is taken directly from the disassembled code
-   object.
+   Nếu *first_line* không phải là ``None``, giá trị này cho biết số dòng cần được báo cáo cho dòng mã nguồn đầu tiên trong code đã disassemble. Nếu không, thông tin về dòng mã nguồn (nếu có) được lấy trực tiếp từ code object đã disassemble.
 
-   The *adaptive* parameter works as it does in :func:`dis`.
+   Tham số *adaptive* hoạt động giống như trong :func:`dis`.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.11
-      Added the *show_caches* and *adaptive* parameters.
+      Đã thêm các tham số *show_caches* và *adaptive*.
 
    .. versionchanged:: 3.13
-      The *show_caches* parameter is deprecated and has no effect. The iterator
-      generates the :class:`Instruction` instances with the *cache_info*
-      field populated (regardless of the value of *show_caches*) and it no longer
-      generates separate items for the cache entries.
+      Tham số *show_caches* đã không còn được dùng và không có tác dụng. Iterator tạo ra các instance :class:`Instruction` với trường *cache_info* được điền dữ liệu (bất kể giá trị của *show_caches*) và không còn tạo các mục riêng cho các mục nhập bộ nhớ đệm.
 
 .. function:: findlinestarts(code)
 
-   This generator function uses the :meth:`~codeobject.co_lines` method
-   of the :ref:`code object <code-objects>` *code* to find the offsets which
-   are starts of
-   lines in the source code.  They are generated as ``(offset, lineno)`` pairs.
+   Hàm generator này sử dụng phương thức :meth:`~codeobject.co_lines` của đối tượng :ref:`code object <code-objects>` *code* để tìm các offset là vị trí bắt đầu của các dòng trong mã nguồn. Các offset này được tạo dưới dạng các cặp ``(offset, lineno)``.
 
    .. versionchanged:: 3.6
-      Line numbers can be decreasing. Before, they were always increasing.
+      Số dòng có thể giảm dần. Trước đây, chúng luôn tăng dần.
 
    .. versionchanged:: 3.10
-      The :pep:`626` :meth:`~codeobject.co_lines` method is used instead of the
-      :attr:`~codeobject.co_firstlineno` and :attr:`~codeobject.co_lnotab`
-      attributes of the :ref:`code object <code-objects>`.
+      Phương thức :pep:`626` :meth:`~codeobject.co_lines` được sử dụng thay cho
+      các thuộc tính :attr:`~codeobject.co_firstlineno` và :attr:`~codeobject.co_lnotab` của đối tượng :ref:`code object <code-objects>`.
 
    .. versionchanged:: 3.13
-      Line numbers can be ``None`` for bytecode that does not map to source lines.
+      Số dòng có thể là ``None`` đối với bytecode không ánh xạ tới các dòng trong mã nguồn.
 
 
 .. function:: findlabels(code)
 
-   Detect all offsets in the raw compiled bytecode string *code* which are jump targets, and
-   return a list of these offsets.
+   Phát hiện tất cả các offset trong chuỗi bytecode đã biên dịch thô *code* là các đích nhảy, rồi trả về danh sách các offset này.
 
 
 .. function:: stack_effect(opcode, oparg=None, *, jump=None)
 
-   Compute the stack effect of *opcode* with argument *oparg*.
+   Tính hiệu ứng ngăn xếp của *opcode* với đối số *oparg*.
 
-   If the code has a jump target and *jump* is ``True``, :func:`~stack_effect`
-   will return the stack effect of jumping.  If *jump* is ``False``,
-   it will return the stack effect of not jumping. And if *jump* is
-   ``None`` (default), it will return the maximal stack effect of both cases.
+   Nếu mã có đích nhảy và *jump* là ``True``, :func:`~stack_effect` sẽ trả về hiệu ứng ngăn xếp của việc nhảy. Nếu *jump* là ``False``, nó sẽ trả về hiệu ứng ngăn xếp của việc không nhảy. Và nếu *jump* là ``None`` (mặc định), nó sẽ trả về hiệu ứng ngăn xếp lớn nhất trong cả hai trường hợp.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.8
-      Added *jump* parameter.
+      Đã thêm tham số *jump*.
 
    .. versionchanged:: 3.13
-      If ``oparg`` is omitted (or ``None``), the stack effect is now returned
-      for ``oparg=0``. Previously this was an error for opcodes that use their
-      arg. It is also no longer an error to pass an integer ``oparg`` when
-      the ``opcode`` does not use it; the ``oparg`` in this case is ignored.
+      Nếu ``oparg`` bị bỏ qua (hoặc là ``None``), hiệu ứng ngăn xếp hiện được trả về cho ``oparg=0``. Trước đây, đây là lỗi đối với các opcode sử dụng đối số của chúng. Việc truyền một số nguyên ``oparg`` khi ``opcode`` không sử dụng nó cũng không còn là lỗi; ``oparg`` trong trường hợp này sẽ bị bỏ qua.
 
 
 .. _bytecodes:
 
-Python Bytecode Instructions
-----------------------------
+Các lệnh Bytecode Python
+------------------------
 
-The :func:`get_instructions` function and :class:`Bytecode` class provide
-details of bytecode instructions as :class:`Instruction` instances:
+Hàm :func:`get_instructions` và lớp :class:`Bytecode` cung cấp thông tin chi tiết về các lệnh bytecode dưới dạng các thực thể :class:`Instruction`:
 
 .. class:: Instruction
 
-   Details for a bytecode operation
+   Thông tin chi tiết về một thao tác bytecode
 
    .. data:: opcode
 
-      numeric code for operation, corresponding to the opcode values listed
-      below and the bytecode values in the :ref:`opcode_collections`.
+      mã số dạng số của thao tác, tương ứng với các giá trị opcode được liệt kê bên dưới và các giá trị bytecode trong :ref:`opcode_collections`.
 
 
    .. data:: opname
 
-      human readable name for operation
+      tên thao tác ở dạng dễ đọc
 
 
    .. data:: baseopcode
 
-      numeric code for the base operation if operation is specialized;
-      otherwise equal to :data:`opcode`
+      mã số dạng số của thao tác cơ sở nếu thao tác được chuyên biệt hóa; nếu không thì bằng :data:`opcode`
 
 
    .. data:: baseopname
 
-      human readable name for the base operation if operation is specialized;
-      otherwise equal to :data:`opname`
+      tên thao tác cơ sở ở dạng dễ đọc nếu thao tác được chuyên biệt hóa; nếu không thì bằng :data:`opname`
 
 
    .. data:: arg
 
-      numeric argument to operation (if any), otherwise ``None``
+      đối số dạng số của thao tác (nếu có), nếu không thì là ``None``
 
    .. data:: oparg
 
-      alias for :data:`arg`
+      bí danh của :data:`arg`
 
    .. data:: argval
 
-      resolved arg value (if any), otherwise ``None``
+      giá trị đối số đã được phân giải (nếu có), nếu không thì là ``None``
 
 
    .. data:: argrepr
 
-      human readable description of operation argument (if any),
-      otherwise an empty string.
+      mô tả dễ đọc đối với đối số của thao tác (nếu có), nếu không thì là một chuỗi rỗng.
 
 
    .. data:: offset
 
-      start index of operation within bytecode sequence
+      chỉ mục bắt đầu của thao tác trong chuỗi bytecode
 
 
    .. data:: start_offset
 
-      start index of operation within bytecode sequence, including prefixed
-      ``EXTENDED_ARG`` operations if present; otherwise equal to :data:`offset`
+      chỉ mục bắt đầu của thao tác trong chuỗi bytecode, bao gồm các thao tác ``EXTENDED_ARG`` có tiền tố nếu có; nếu không thì bằng :data:`offset`
 
 
    .. data:: cache_offset
 
-      start index of the cache entries following the operation
+      chỉ mục bắt đầu của các mục bộ nhớ đệm theo sau thao tác
 
 
    .. data:: end_offset
 
-      end index of the cache entries following the operation
+      chỉ mục kết thúc của các mục bộ nhớ đệm theo sau thao tác
 
 
    .. data:: starts_line
 
-      ``True`` if this opcode starts a source line, otherwise ``False``
+      ``True`` nếu opcode này bắt đầu một dòng mã nguồn, nếu không thì là ``False``
 
 
    .. data:: line_number
 
-      source line number associated with this opcode (if any), otherwise ``None``
+      số dòng mã nguồn liên kết với opcode này (nếu có), nếu không thì là ``None``
 
 
    .. data:: is_jump_target
 
-      ``True`` if other code jumps to here, otherwise ``False``
+      ``True`` nếu mã khác nhảy đến đây, nếu không thì ``False``
 
 
    .. data:: jump_target
 
-      bytecode index of the jump target if this is a jump operation,
-      otherwise ``None``
+      chỉ mục bytecode của đích nhảy nếu đây là một thao tác nhảy, nếu không thì ``None``
 
 
    .. data:: positions
 
-      :class:`dis.Positions` object holding the
-      start and end locations that are covered by this instruction.
+      :class:`dis.Positions` đối tượng chứa vị trí bắt đầu và kết thúc được bao phủ bởi lệnh này.
 
    .. data:: cache_info
 
-      Information about the cache entries of this instruction, as
-      triplets of the form ``(name, size, data)``, where the ``name``
-      and ``size`` describe the cache format and data is the contents
-      of the cache. ``cache_info`` is ``None`` if the instruction does not have
-      caches.
+      Thông tin về các mục bộ nhớ đệm của lệnh này, dưới dạng các bộ ba có dạng ``(name, size, data)``, trong đó ``name`` và ``size`` mô tả định dạng bộ nhớ đệm, còn data là nội dung của bộ nhớ đệm. ``cache_info`` là ``None`` nếu lệnh không có bộ nhớ đệm.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.11
 
-      Field ``positions`` is added.
+      Trường ``positions`` được thêm vào.
 
    .. versionchanged:: 3.13
 
-      Changed field ``starts_line``.
+      Trường ``starts_line`` đã được thay đổi.
 
-      Added fields ``start_offset``, ``cache_offset``, ``end_offset``,
-      ``baseopname``, ``baseopcode``, ``jump_target``, ``oparg``,
-      ``line_number`` and ``cache_info``.
+      Đã thêm các trường ``start_offset``, ``cache_offset``, ``end_offset``, ``baseopname``, ``baseopcode``, ``jump_target``, ``oparg``, ``line_number`` và ``cache_info``.
 
 
 .. class:: Positions
 
-   In case the information is not available, some fields might be ``None``.
+   Trong trường hợp không có thông tin, một số trường có thể bị ``None``.
 
    .. data:: lineno
    .. data:: end_lineno
@@ -570,65 +468,56 @@ details of bytecode instructions as :class:`Instruction` instances:
    .. versionadded:: 3.11
 
 
-The Python compiler currently generates the following bytecode instructions.
+Trình biên dịch Python hiện tạo ra các chỉ thị bytecode sau đây.
 
 
-**General instructions**
+**Các chỉ thị chung**
 
-In the following, We will refer to the interpreter stack as ``STACK`` and describe
-operations on it as if it was a Python list. The top of the stack corresponds to
-``STACK[-1]`` in this language.
+Trong phần sau, chúng ta sẽ gọi stack của trình thông dịch là ``STACK`` và mô tả các thao tác trên đó như thể nó là một danh sách Python. Đỉnh stack tương ứng với ``STACK[-1]`` trong ngôn ngữ này.
 
 .. opcode:: NOP
 
-   Do nothing code.  Used as a placeholder by the bytecode optimizer, and to
-   generate line tracing events.
+   Đoạn mã không thực hiện gì. Được trình tối ưu hóa bytecode sử dụng làm chỗ giữ chỗ và để tạo các sự kiện truy vết dòng.
 
 
 .. opcode:: NOT_TAKEN
 
-   Do nothing code.
-   Used by the interpreter to record :monitoring-event:`BRANCH_LEFT`
-   and :monitoring-event:`BRANCH_RIGHT` events for :mod:`sys.monitoring`.
+   Đoạn mã không thực hiện gì. Được trình thông dịch sử dụng để ghi lại các sự kiện :monitoring-event:`BRANCH_LEFT` và :monitoring-event:`BRANCH_RIGHT` cho :mod:`sys.monitoring`.
 
    .. versionadded:: 3.14
 
 
 .. opcode:: POP_ITER
 
-   Removes the iterator from the top of the stack.
+   Xóa iterator khỏi đỉnh stack.
 
    .. versionadded:: 3.14
 
 
 .. opcode:: POP_TOP
 
-   Removes the top-of-stack item::
+   Xóa phần tử trên cùng của stack::
 
       STACK.pop()
 
 
 .. opcode:: END_FOR
 
-   Removes the top-of-stack item.
-   Equivalent to ``POP_TOP``.
-   Used to clean up at the end of loops, hence the name.
+   Xóa phần tử trên cùng của stack. Tương đương với ``POP_TOP``. Được dùng để dọn dẹp ở cuối các vòng lặp, vì vậy mới có tên này.
 
    .. versionadded:: 3.12
 
 
 .. opcode:: END_SEND
 
-   Implements ``del STACK[-2]``.
-   Used to clean up when a generator exits.
+   Triển khai ``del STACK[-2]``. Được dùng để dọn dẹp khi generator kết thúc.
 
    .. versionadded:: 3.12
 
 
 .. opcode:: COPY (i)
 
-   Push the i-th item to the top of the stack without removing it from its original
-   location::
+   Đưa phần tử thứ i lên trên cùng của stack mà không xóa phần tử đó khỏi vị trí ban đầu::
 
       assert i > 0
       STACK.append(STACK[-i])
@@ -638,7 +527,7 @@ operations on it as if it was a Python list. The top of the stack corresponds to
 
 .. opcode:: SWAP (i)
 
-   Swap the top of the stack with the i-th element::
+   Hoán đổi phần tử trên cùng của stack với phần tử thứ i::
 
       STACK[-i], STACK[-1] = STACK[-1], STACK[-i]
 
@@ -647,80 +536,67 @@ operations on it as if it was a Python list. The top of the stack corresponds to
 
 .. opcode:: CACHE
 
-   Rather than being an actual instruction, this opcode is used to mark extra
-   space for the interpreter to cache useful data directly in the bytecode
-   itself. It is automatically hidden by all ``dis`` utilities, but can be
-   viewed with ``show_caches=True``.
+   Thay vì là một instruction thực sự, opcode này được dùng để đánh dấu phần bộ nhớ bổ sung để interpreter có thể lưu các dữ liệu hữu ích trực tiếp trong bytecode. Nó tự động bị ẩn bởi mọi tiện ích ``dis``, nhưng có thể xem bằng ``show_caches=True``.
 
-   Logically, this space is part of the preceding instruction. Many opcodes
-   expect to be followed by an exact number of caches, and will instruct the
-   interpreter to skip over them at runtime.
+   Về mặt logic, phần bộ nhớ này thuộc về instruction ngay trước đó. Nhiều opcode yêu cầu có chính xác một số lượng cache nhất định theo sau chúng và sẽ chỉ thị cho interpreter bỏ qua chúng trong runtime.
 
-   Populated caches can look like arbitrary instructions, so great care should
-   be taken when reading or modifying raw, adaptive bytecode containing
-   quickened data.
+   Các bộ nhớ đệm đã được điền dữ liệu có thể trông giống như những chỉ dẫn tùy ý, vì vậy cần hết sức cẩn thận khi đọc hoặc sửa đổi bytecode thô, thích ứng có chứa dữ liệu quickened.
 
    .. versionadded:: 3.11
 
 
-**Unary operations**
+**Các phép toán một ngôi**
 
-Unary operations take the top of the stack, apply the operation, and push the
-result back on the stack.
+Các phép toán một ngôi lấy phần tử trên cùng của ngăn xếp, áp dụng phép toán rồi đẩy kết quả trở lại ngăn xếp.
 
 
 .. opcode:: UNARY_NEGATIVE
 
-   Implements ``STACK[-1] = -STACK[-1]``.
+   Triển khai ``STACK[-1] = -STACK[-1]``.
 
 
 .. opcode:: UNARY_NOT
 
-   Implements ``STACK[-1] = not STACK[-1]``.
+   Triển khai ``STACK[-1] = not STACK[-1]``.
 
    .. versionchanged:: 3.13
-      This instruction now requires an exact :class:`bool` operand.
+      Chỉ dẫn này hiện yêu cầu một toán hạng :class:`bool` chính xác.
 
 
 .. opcode:: UNARY_INVERT
 
-   Implements ``STACK[-1] = ~STACK[-1]``.
+   Triển khai ``STACK[-1] = ~STACK[-1]``.
 
 
 .. opcode:: GET_ITER
 
-   Implements ``STACK[-1] = iter(STACK[-1])``.
+   Triển khai ``STACK[-1] = iter(STACK[-1])``.
 
 
 .. opcode:: GET_YIELD_FROM_ITER
 
-   If ``STACK[-1]`` is a :term:`generator iterator` or :term:`coroutine` object
-   it is left as is.  Otherwise, implements ``STACK[-1] = iter(STACK[-1])``.
+   Nếu ``STACK[-1]`` là một đối tượng :term:`generator iterator` hoặc :term:`coroutine`, nó được giữ nguyên. Nếu không, triển khai ``STACK[-1] = iter(STACK[-1])``.
 
    .. versionadded:: 3.5
 
 
 .. opcode:: TO_BOOL
 
-   Implements ``STACK[-1] = bool(STACK[-1])``.
+   Triển khai ``STACK[-1] = bool(STACK[-1])``.
 
    .. versionadded:: 3.13
 
 
-**Binary and in-place operations**
+**Các phép toán nhị phân và tại chỗ**
 
-Binary operations remove the top two items from the stack (``STACK[-1]`` and
-``STACK[-2]``). They perform the operation, then put the result back on the stack.
+Các phép toán nhị phân loại bỏ hai phần tử trên cùng khỏi stack (``STACK[-1]`` và ``STACK[-2]``). Chúng thực hiện phép toán, sau đó đưa kết quả trở lại stack.
 
-In-place operations are like binary operations, but the operation is done in-place
-when ``STACK[-2]`` supports it, and the resulting ``STACK[-1]`` may be (but does
-not have to be) the original ``STACK[-2]``.
+Các phép toán tại chỗ tương tự như phép toán nhị phân, nhưng phép toán được thực hiện tại chỗ khi ``STACK[-2]`` hỗ trợ, và ``STACK[-1]`` kết quả có thể (nhưng không nhất thiết) là ``STACK[-2]`` ban đầu.
 
 
 .. opcode:: BINARY_OP (op)
 
-   Implements the binary and in-place operators (depending on the value of
-   *op*)::
+   Triển khai các toán tử nhị phân và tại chỗ (tùy thuộc vào giá trị của *op*)::
 
       rhs = STACK.pop()
       lhs = STACK.pop()
@@ -728,12 +604,12 @@ not have to be) the original ``STACK[-2]``.
 
    .. versionadded:: 3.11
    .. versionchanged:: 3.14
-      With oparg :``NB_SUBSCR``, implements binary subscript (replaces opcode ``BINARY_SUBSCR``)
+      Với oparg :``NB_SUBSCR``, triển khai phép lập chỉ mục nhị phân (thay thế opcode ``BINARY_SUBSCR``)
 
 
 .. opcode:: STORE_SUBSCR
 
-   Implements::
+   Triển khai::
 
       key = STACK.pop()
       container = STACK.pop()
@@ -743,7 +619,7 @@ not have to be) the original ``STACK[-2]``.
 
 .. opcode:: DELETE_SUBSCR
 
-   Implements::
+   Triển khai::
 
       key = STACK.pop()
       container = STACK.pop()
@@ -751,7 +627,7 @@ not have to be) the original ``STACK[-2]``.
 
 .. opcode:: BINARY_SLICE
 
-   Implements::
+   Triển khai::
 
       end = STACK.pop()
       start = STACK.pop()
@@ -763,7 +639,7 @@ not have to be) the original ``STACK[-2]``.
 
 .. opcode:: STORE_SLICE
 
-   Implements::
+   Triển khai::
 
       end = STACK.pop()
       start = STACK.pop()
@@ -774,273 +650,226 @@ not have to be) the original ``STACK[-2]``.
    .. versionadded:: 3.12
 
 
-**Coroutine opcodes**
+**Các opcode coroutine**
 
 .. opcode:: GET_AWAITABLE (where)
 
-   Implements ``STACK[-1] = get_awaitable(STACK[-1])``, where ``get_awaitable(o)``
-   returns ``o`` if ``o`` is a coroutine object or a generator object with
-   the :data:`~inspect.CO_ITERABLE_COROUTINE` flag, or resolves
-   ``o.__await__``.
+   Triển khai ``STACK[-1] = get_awaitable(STACK[-1])``, trong đó ``get_awaitable(o)`` trả về ``o`` nếu ``o`` là một đối tượng coroutine hoặc một đối tượng generator có cờ :data:`~inspect.CO_ITERABLE_COROUTINE`, hoặc resolve ``o.__await__``.
 
-    If the ``where`` operand is nonzero, it indicates where the instruction
-    occurs:
+    Nếu toán hạng ``where`` khác 0, nó cho biết vị trí thực hiện lệnh:
 
-    * ``1``: After a call to ``__aenter__``
-    * ``2``: After a call to ``__aexit__``
+    * ``1``: Sau một lệnh gọi đến ``__aenter__``
+    * ``2``: Sau một lệnh gọi đến ``__aexit__``
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.11
-      Previously, this instruction did not have an oparg.
+      Trước đây, lệnh này không có oparg.
 
 
 .. opcode:: GET_AITER
 
-   Implements ``STACK[-1] = STACK[-1].__aiter__()``.
+   Triển khai ``STACK[-1] = STACK[-1].__aiter__()``.
 
    .. versionadded:: 3.5
    .. versionchanged:: 3.7
-      Returning awaitable objects from ``__aiter__`` is no longer
-      supported.
+      Không còn hỗ trợ việc trả về các đối tượng awaitable từ ``__aiter__``.
 
 
 .. opcode:: GET_ANEXT
 
-   Implement ``STACK.append(get_awaitable(STACK[-1].__anext__()))`` to the stack.
-   See ``GET_AWAITABLE`` for details about ``get_awaitable``.
+   Đẩy ``STACK.append(get_awaitable(STACK[-1].__anext__()))`` lên ngăn xếp. Xem ``GET_AWAITABLE`` để biết chi tiết về ``get_awaitable``.
 
    .. versionadded:: 3.5
 
 
 .. opcode:: END_ASYNC_FOR
 
-   Terminates an :keyword:`async for` loop.  Handles an exception raised
-   when awaiting a next item. The stack contains the async iterable in
-   ``STACK[-2]`` and the raised exception in ``STACK[-1]``. Both are popped.
-   If the exception is not :exc:`StopAsyncIteration`, it is re-raised.
+   Kết thúc một vòng lặp :keyword:`async for`. Xử lý một ngoại lệ được phát sinh khi chờ mục tiếp theo. Ngăn xếp chứa iterable bất đồng bộ trong ``STACK[-2]`` và ngoại lệ được phát sinh trong ``STACK[-1]``. Cả hai đều được lấy ra khỏi ngăn xếp. Nếu ngoại lệ không phải là :exc:`StopAsyncIteration`, ngoại lệ đó sẽ được phát sinh lại.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.11
-      Exception representation on the stack now consist of one, not three, items.
+      Biểu diễn ngoại lệ trên ngăn xếp giờ đây chỉ gồm một mục thay vì ba mục.
 
 
 .. opcode:: CLEANUP_THROW
 
-   Handles an exception raised during a :meth:`~generator.throw` or
-   :meth:`~generator.close` call through the current frame.  If ``STACK[-1]`` is an
-   instance of :exc:`StopIteration`, pop three values from the stack and push
-   its ``value`` member.  Otherwise, re-raise ``STACK[-1]``.
+   Xử lý một ngoại lệ được phát sinh trong quá trình thực hiện :meth:`~generator.throw` hoặc
+   lệnh gọi :meth:`~generator.close` thông qua frame hiện tại. Nếu ``STACK[-1]`` là một thể hiện của :exc:`StopIteration`, lấy ba giá trị khỏi ngăn xếp và đẩy thành viên ``value`` của nó vào ngăn xếp. Nếu không, phát sinh lại ``STACK[-1]``.
 
    .. versionadded:: 3.12
 
 
 
-**Miscellaneous opcodes**
+**Các opcode khác**
 
 .. opcode:: SET_ADD (i)
 
-   Implements::
+   Triển khai::
 
       item = STACK.pop()
       set.add(STACK[-i], item)
 
-   Used to implement set comprehensions.
+   Dùng để triển khai các phép dựng set.
 
 
 .. opcode:: LIST_APPEND (i)
 
-   Implements::
+   Triển khai::
 
       item = STACK.pop()
       list.append(STACK[-i], item)
 
-   Used to implement list comprehensions.
+   Được dùng để triển khai list comprehension.
 
 
 .. opcode:: MAP_ADD (i)
 
-   Implements::
+   Triển khai::
 
       value = STACK.pop()
       key = STACK.pop()
       dict.__setitem__(STACK[-i], key, value)
 
-   Used to implement dict comprehensions.
+   Được dùng để triển khai dict comprehension.
 
    .. versionadded:: 3.1
    .. versionchanged:: 3.8
-      Map value is ``STACK[-1]`` and map key is ``STACK[-2]``. Before, those
-      were reversed.
+      Giá trị map là ``STACK[-1]`` và khóa map là ``STACK[-2]``. Trước đây, chúng bị đảo ngược.
 
-For all of the :opcode:`SET_ADD`, :opcode:`LIST_APPEND` and :opcode:`MAP_ADD`
-instructions, while the added value or key/value pair is popped off, the
-container object remains on the stack so that it is available for further
-iterations of the loop.
+Đối với tất cả các instruction :opcode:`SET_ADD`, :opcode:`LIST_APPEND` và :opcode:`MAP_ADD`, trong khi giá trị hoặc cặp khóa/giá trị được thêm vào bị lấy ra khỏi stack, đối tượng container vẫn nằm trên stack để có thể được sử dụng cho các lần lặp tiếp theo của vòng lặp.
 
 
 .. opcode:: RETURN_VALUE
 
-   Returns with ``STACK[-1]`` to the caller of the function.
+   Trả về cùng ``STACK[-1]`` cho hàm gọi.
 
 
 .. opcode:: YIELD_VALUE
 
-   Yields ``STACK.pop()`` from a :term:`generator`.
+   Sinh ``STACK.pop()`` từ một :term:`generator`.
 
    .. versionchanged:: 3.11
-      oparg set to be the stack depth.
+      oparg được đặt là độ sâu ngăn xếp.
 
    .. versionchanged:: 3.12
-      oparg set to be the exception block depth, for efficient closing of generators.
+      oparg được đặt là độ sâu của khối ngoại lệ để đóng các generator hiệu quả.
 
    .. versionchanged:: 3.13
-      oparg is ``1`` if this instruction is part of a yield-from or await, and ``0``
-      otherwise.
+      oparg là ``1`` nếu lệnh này là một phần của yield-from hoặc await, và ``0`` trong các trường hợp khác.
 
 .. opcode:: SETUP_ANNOTATIONS
 
-   Checks whether ``__annotations__`` is defined in ``locals()``, if not it is
-   set up to an empty ``dict``. This opcode is only emitted if a class
-   or module body contains :term:`variable annotations <variable annotation>`
-   statically.
+   Kiểm tra xem ``__annotations__`` có được định nghĩa trong ``locals()`` hay không; nếu không, nó được thiết lập thành một ``dict`` rỗng. Opcode này chỉ được phát ra nếu phần thân của lớp hoặc module tĩnh chứa :term:`chú thích biến <variable annotation>`.
 
    .. versionadded:: 3.6
 
 
 .. opcode:: POP_EXCEPT
 
-   Pops a value from the stack, which is used to restore the exception state.
+   Lấy một giá trị khỏi ngăn xếp; giá trị này được dùng để khôi phục trạng thái ngoại lệ.
 
    .. versionchanged:: 3.11
-      Exception representation on the stack now consist of one, not three, items.
+      Biểu diễn ngoại lệ trên ngăn xếp giờ đây chỉ gồm một mục thay vì ba mục.
 
 .. opcode:: RERAISE
 
-   Re-raises the exception currently on top of the stack. If oparg is non-zero,
-   pops an additional value from the stack which is used to set
-   :attr:`~frame.f_lasti` of the current frame.
+   Ném lại ngoại lệ hiện đang ở đỉnh ngăn xếp. Nếu oparg khác không, lấy thêm một giá trị khỏi ngăn xếp để dùng thiết lập
+   :attr:`~frame.f_lasti` của frame hiện tại.
 
    .. versionadded:: 3.9
 
    .. versionchanged:: 3.11
-      Exception representation on the stack now consist of one, not three, items.
+      Biểu diễn ngoại lệ trên ngăn xếp giờ đây chỉ gồm một mục thay vì ba mục.
 
 .. opcode:: PUSH_EXC_INFO
 
-   Pops a value from the stack. Pushes the current exception to the top of the stack.
-   Pushes the value originally popped back to the stack.
-   Used in exception handlers.
+   Lấy một giá trị khỏi ngăn xếp. Đẩy ngoại lệ hiện tại lên đỉnh ngăn xếp. Đẩy lại giá trị vừa lấy vào ngăn xếp. Được sử dụng trong các trình xử lý ngoại lệ.
 
    .. versionadded:: 3.11
 
 .. opcode:: CHECK_EXC_MATCH
 
-   Performs exception matching for ``except``. Tests whether the ``STACK[-2]``
-   is an exception matching ``STACK[-1]``. Pops ``STACK[-1]`` and pushes the boolean
-   result of the test.
+   Thực hiện việc đối sánh ngoại lệ cho ``except``. Kiểm tra xem ``STACK[-2]`` có phải là ngoại lệ khớp với ``STACK[-1]`` hay không. Lấy ``STACK[-1]`` khỏi ngăn xếp và đẩy kết quả boolean của phép kiểm tra.
 
    .. versionadded:: 3.11
 
 .. opcode:: CHECK_EG_MATCH
 
-   Performs exception matching for ``except*``. Applies ``split(STACK[-1])`` on
-   the exception group representing ``STACK[-2]``.
+   Thực hiện việc đối sánh ngoại lệ cho ``except*``. Áp dụng ``split(STACK[-1])`` lên nhóm ngoại lệ đại diện cho ``STACK[-2]``.
 
-   In case of a match, pops two items from the stack and pushes the
-   non-matching subgroup (``None`` in case of full match) followed by the
-   matching subgroup. When there is no match, pops one item (the match
-   type) and pushes ``None``.
+   Trong trường hợp khớp, lấy hai mục khỏi ngăn xếp và đẩy nhóm con không khớp (``None`` trong trường hợp khớp hoàn toàn), sau đó là nhóm con khớp. Khi không có kết quả khớp, lấy một mục (kiểu khớp) và đẩy ``None``.
 
    .. versionadded:: 3.11
 
 .. opcode:: WITH_EXCEPT_START
 
-   Calls the function in position 4 on the stack with arguments (type, val, tb)
-   representing the exception at the top of the stack.
-   Used to implement the call ``context_manager.__exit__(*exc_info())`` when an exception
-   has occurred in a :keyword:`with` statement.
+   Gọi hàm ở vị trí 4 trên stack với các đối số (type, val, tb) biểu diễn ngoại lệ ở đầu stack. Được dùng để triển khai lệnh gọi ``context_manager.__exit__(*exc_info())`` khi một ngoại lệ đã xảy ra trong câu lệnh :keyword:`with`.
 
    .. versionadded:: 3.9
 
    .. versionchanged:: 3.11
-      The ``__exit__`` function is in position 4 of the stack rather than 7.
-      Exception representation on the stack now consist of one, not three, items.
+      Hàm ``__exit__`` nằm ở vị trí 4 trên stack thay vì vị trí 7. Biểu diễn ngoại lệ trên stack giờ đây chỉ gồm một mục thay vì ba mục.
 
 
 .. opcode:: LOAD_COMMON_CONSTANT
 
-   Pushes a common constant onto the stack. The interpreter contains a hardcoded
-   list of constants supported by this instruction.  Used by the :keyword:`assert`
-   statement to load :exc:`AssertionError`.
+   Đẩy một hằng số phổ biến lên stack. Trình thông dịch chứa một danh sách hằng số được hardcode mà instruction này hỗ trợ. Được dùng bởi câu lệnh :keyword:`assert` để tải :exc:`AssertionError`.
 
    .. versionadded:: 3.14
 
 
 .. opcode:: LOAD_BUILD_CLASS
 
-   Pushes :func:`!builtins.__build_class__` onto the stack.  It is later called
-   to construct a class.
+   Đẩy :func:`!builtins.__build_class__` lên stack. Sau đó, nó được gọi để tạo một class.
 
 .. opcode:: GET_LEN
 
-   Perform ``STACK.append(len(STACK[-1]))``. Used in :keyword:`match` statements where
-   comparison with structure of pattern is needed.
+   Thực hiện ``STACK.append(len(STACK[-1]))``. Được dùng trong các câu lệnh :keyword:`match` khi cần so sánh với cấu trúc của pattern.
 
    .. versionadded:: 3.10
 
 
 .. opcode:: MATCH_MAPPING
 
-   If ``STACK[-1]`` is an instance of :class:`collections.abc.Mapping` (or, more
-   technically: if it has the :c:macro:`Py_TPFLAGS_MAPPING` flag set in its
-   :c:member:`~PyTypeObject.tp_flags`), push ``True`` onto the stack.  Otherwise,
-   push ``False``.
+   Nếu ``STACK[-1]`` là một instance của :class:`collections.abc.Mapping` (hoặc, chính xác hơn về mặt kỹ thuật: nếu nó có cờ :c:macro:`Py_TPFLAGS_MAPPING` được đặt trong
+   :c:member:`~PyTypeObject.tp_flags`), đẩy ``True`` lên stack. Nếu không, đẩy ``False``.
 
    .. versionadded:: 3.10
 
 
 .. opcode:: MATCH_SEQUENCE
 
-   If ``STACK[-1]`` is an instance of :class:`collections.abc.Sequence` and is *not* an instance
-   of :class:`str`/:class:`bytes`/:class:`bytearray` (or, more technically: if it has
-   the :c:macro:`Py_TPFLAGS_SEQUENCE` flag set in its :c:member:`~PyTypeObject.tp_flags`),
-   push ``True`` onto the stack.  Otherwise, push ``False``.
+   Nếu ``STACK[-1]`` là một thể hiện của :class:`collections.abc.Sequence` và *không phải* là một thể hiện của :class:`str`/:class:`bytes`/:class:`bytearray` (hoặc chính xác hơn: nếu nó có cờ :c:macro:`Py_TPFLAGS_SEQUENCE` được thiết lập trong :c:member:`~PyTypeObject.tp_flags`), đẩy ``True`` vào stack. Nếu không, đẩy ``False``.
 
    .. versionadded:: 3.10
 
 
 .. opcode:: MATCH_KEYS
 
-   ``STACK[-1]`` is a tuple of mapping keys, and ``STACK[-2]`` is the match subject.
-   If ``STACK[-2]`` contains all of the keys in ``STACK[-1]``, push a :class:`tuple`
-   containing the corresponding values. Otherwise, push ``None``.
+   ``STACK[-1]`` là một tuple gồm các khóa ánh xạ, còn ``STACK[-2]`` là đối tượng được so khớp. Nếu ``STACK[-2]`` chứa tất cả các khóa trong ``STACK[-1]``, đẩy một :class:`tuple` chứa các giá trị tương ứng. Nếu không, đẩy ``None``.
 
    .. versionadded:: 3.10
 
    .. versionchanged:: 3.11
-      Previously, this instruction also pushed a boolean value indicating
-      success (``True``) or failure (``False``).
+      Trước đây, instruction này cũng đẩy một giá trị boolean cho biết thao tác thành công (``True``) hay thất bại (``False``).
 
 
 .. opcode:: STORE_NAME (namei)
 
-   Implements ``name = STACK.pop()``. *namei* is the index of *name* in the attribute
-   :attr:`~codeobject.co_names` of the :ref:`code object <code-objects>`.
-   The compiler tries to use :opcode:`STORE_FAST` or :opcode:`STORE_GLOBAL` if possible.
+   Triển khai ``name = STACK.pop()``. *namei* là chỉ mục của *name* trong thuộc tính
+   :attr:`~codeobject.co_names` của đối tượng :ref:`code object <code-objects>`. Trình biên dịch cố gắng sử dụng :opcode:`STORE_FAST` hoặc :opcode:`STORE_GLOBAL` nếu có thể.
 
 
 .. opcode:: DELETE_NAME (namei)
 
-   Implements ``del name``, where *namei* is the index into :attr:`~codeobject.co_names`
-   attribute of the :ref:`code object <code-objects>`.
+   Triển khai ``del name``, trong đó *namei* là chỉ mục trong thuộc tính :attr:`~codeobject.co_names` của đối tượng :ref:`code object <code-objects>`.
 
 
 .. opcode:: UNPACK_SEQUENCE (count)
 
-   Unpacks ``STACK[-1]`` into *count* individual values, which are put onto the stack
-   right-to-left. Require there to be exactly *count* values.::
+   Giải nén ``STACK[-1]`` thành *count* giá trị riêng lẻ, được đưa vào stack từ phải sang trái. Yêu cầu phải có chính xác *count* giá trị.::
 
       assert(len(STACK[-1]) == count)
       STACK.extend(STACK.pop()[:-count-1:-1])
@@ -1048,99 +877,82 @@ iterations of the loop.
 
 .. opcode:: UNPACK_EX (counts)
 
-   Implements assignment with a starred target: Unpacks an iterable in ``STACK[-1]``
-   into individual values, where the total number of values can be smaller than the
-   number of items in the iterable: one of the new values will be a list of all
-   leftover items.
+   Triển khai phép gán với đích có dấu sao: Giải nén một iterable trong ``STACK[-1]`` thành các giá trị riêng lẻ, trong đó tổng số giá trị có thể nhỏ hơn số lượng phần tử trong iterable: một trong các giá trị mới sẽ là một list chứa tất cả các phần tử còn lại.
 
-   The number of values before and after the list value is limited to 255.
+   Số lượng giá trị trước và sau giá trị list được giới hạn ở mức 255.
 
-   The number of values before the list value is encoded in the argument of the
-   opcode. The number of values after the list if any is encoded using an
-   ``EXTENDED_ARG``. As a consequence, the argument can be seen as a two bytes values
-   where the low byte of *counts* is the number of values before the list value, the
-   high byte of *counts* the number of values after it.
+   Số lượng giá trị trước giá trị list được mã hóa trong đối số của opcode. Số lượng giá trị sau list, nếu có, được mã hóa bằng ``EXTENDED_ARG``. Do đó, đối số có thể được xem là một giá trị gồm hai byte, trong đó byte thấp của *counts* là số lượng giá trị trước giá trị list, còn byte cao của *counts* là số lượng giá trị sau nó.
 
-   The extracted values are put onto the stack right-to-left, i.e. ``a, *b, c = d``
-   will be stored after execution as ``STACK.extend((a, b, c))``.
+   Các giá trị được trích xuất được đưa vào stack theo thứ tự từ phải sang trái, tức là ``a, *b, c = d`` sẽ được lưu trữ sau khi thực thi dưới dạng ``STACK.extend((a, b, c))``.
 
 
 .. opcode:: STORE_ATTR (namei)
 
-   Implements::
+   Triển khai::
 
       obj = STACK.pop()
       value = STACK.pop()
       obj.name = value
 
-   where *namei* is the index of name in :attr:`~codeobject.co_names` of the
-   :ref:`code object <code-objects>`.
+   trong đó *namei* là chỉ mục của name trong :attr:`~codeobject.co_names` của
+   đối tượng :ref:`code object <code-objects>`.
 
 .. opcode:: DELETE_ATTR (namei)
 
-   Implements::
+   Triển khai::
 
       obj = STACK.pop()
       del obj.name
 
-   where *namei* is the index of name into :attr:`~codeobject.co_names` of the
-   :ref:`code object <code-objects>`.
+   trong đó *namei* là chỉ mục của name trong :attr:`~codeobject.co_names` của
+   đối tượng :ref:`code object <code-objects>`.
 
 
 .. opcode:: STORE_GLOBAL (namei)
 
-   Works as :opcode:`STORE_NAME`, but stores the name as a global.
+   Hoạt động như :opcode:`STORE_NAME`, nhưng lưu name dưới dạng biến toàn cục.
 
 
 .. opcode:: DELETE_GLOBAL (namei)
 
-   Works as :opcode:`DELETE_NAME`, but deletes a global name.
+   Hoạt động như :opcode:`DELETE_NAME`, nhưng xóa một name toàn cục.
 
 
 .. opcode:: LOAD_CONST (consti)
 
-   Pushes ``co_consts[consti]`` onto the stack.
+   Đẩy ``co_consts[consti]`` lên stack.
 
 
 .. opcode:: LOAD_SMALL_INT (i)
 
-   Pushes the integer ``i`` onto the stack.
-   ``i`` must be in ``range(256)``
+   Đẩy số nguyên ``i`` lên stack. ``i`` phải nằm trong ``range(256)``
 
    .. versionadded:: 3.14
 
 
 .. opcode:: LOAD_NAME (namei)
 
-   Pushes the value associated with ``co_names[namei]`` onto the stack.
-   The name is looked up within the locals, then the globals, then the builtins.
+   Đẩy giá trị liên kết với ``co_names[namei]`` lên stack. Tên này được tra cứu trong locals, sau đó globals, rồi builtins.
 
 
 .. opcode:: LOAD_LOCALS
 
-   Pushes a reference to the locals dictionary onto the stack.  This is used
-   to prepare namespace dictionaries for :opcode:`LOAD_FROM_DICT_OR_DEREF`
-   and :opcode:`LOAD_FROM_DICT_OR_GLOBALS`.
+   Đẩy một tham chiếu đến từ điển locals lên stack. Thao tác này được dùng để chuẩn bị các từ điển namespace cho :opcode:`LOAD_FROM_DICT_OR_DEREF` và :opcode:`LOAD_FROM_DICT_OR_GLOBALS`.
 
    .. versionadded:: 3.12
 
 
 .. opcode:: LOAD_FROM_DICT_OR_GLOBALS (i)
 
-   Pops a mapping off the stack and looks up the value for ``co_names[namei]``.
-   If the name is not found there, looks it up in the globals and then the builtins,
-   similar to :opcode:`LOAD_GLOBAL`.
-   This is used for loading global variables in
-   :ref:`annotation scopes <annotation-scopes>` within class bodies.
+   Lấy một mapping khỏi stack và tra cứu giá trị của ``co_names[namei]``. Nếu không tìm thấy tên ở đó, tra cứu tên trong globals rồi đến builtins, tương tự như :opcode:`LOAD_GLOBAL`. Thao tác này được dùng để nạp các biến toàn cục trong
+   :ref:`annotation scopes <annotation-scopes>` bên trong các thân lớp.
 
    .. versionadded:: 3.12
 
 
 .. opcode:: BUILD_TEMPLATE
 
-   Constructs a new :class:`~string.templatelib.Template` instance from a tuple
-   of strings and a tuple of interpolations and pushes the resulting object
-   onto the stack::
+   Tạo một instance :class:`~string.templatelib.Template` mới từ một tuple gồm các chuỗi và một tuple gồm các phép nội suy, rồi đẩy đối tượng kết quả lên stack::
 
       interpolations = STACK.pop()
       strings = STACK.pop()
@@ -1151,20 +963,13 @@ iterations of the loop.
 
 .. opcode:: BUILD_INTERPOLATION (format)
 
-   Constructs a new :class:`~string.templatelib.Interpolation` instance from a
-   value and its source expression and pushes the resulting object onto the
-   stack.
+   Tạo một instance :class:`~string.templatelib.Interpolation` mới từ một giá trị và biểu thức nguồn của giá trị đó, rồi đẩy đối tượng kết quả lên stack.
 
-   If no conversion or format specification is present, ``format`` is set to
-   ``2``.
+   Nếu không có đặc tả chuyển đổi hoặc định dạng, ``format`` được đặt thành ``2``.
 
-   If the low bit of ``format`` is set, it indicates that the interpolation
-   contains a format specification.
+   Nếu bit thấp nhất của ``format`` được thiết lập, điều đó cho biết phép nội suy chứa đặc tả định dạng.
 
-   If ``format >> 2`` is non-zero, it indicates that the interpolation
-   contains a conversion. The value of ``format >> 2`` is the conversion type
-   (``0`` for no conversion, ``1`` for ``!s``, ``2`` for ``!r``, and
-   ``3`` for ``!a``)::
+   Nếu ``format >> 2`` khác không, điều đó cho biết phép nội suy chứa một phép chuyển đổi. Giá trị của ``format >> 2`` là kiểu chuyển đổi (``0`` khi không có chuyển đổi, ``1`` cho ``!s``, ``2`` cho ``!r`` và ``3`` cho ``!a``).::
 
       conversion = format >> 2
       if format & 1:
@@ -1180,8 +985,7 @@ iterations of the loop.
 
 .. opcode:: BUILD_TUPLE (count)
 
-   Creates a tuple consuming *count* items from the stack, and pushes the
-   resulting tuple onto the stack::
+   Tạo một tuple bằng cách lấy *count* mục từ stack, rồi đẩy tuple kết quả vào stack::
 
       if count == 0:
           value = ()
@@ -1194,895 +998,753 @@ iterations of the loop.
 
 .. opcode:: BUILD_LIST (count)
 
-   Works as :opcode:`BUILD_TUPLE`, but creates a list.
+   Hoạt động như :opcode:`BUILD_TUPLE`, nhưng tạo một list.
 
 
 .. opcode:: BUILD_SET (count)
 
-   Works as :opcode:`BUILD_TUPLE`, but creates a set.
+   Hoạt động như :opcode:`BUILD_TUPLE`, nhưng tạo một set.
 
 
 .. opcode:: BUILD_MAP (count)
 
-   Pushes a new dictionary object onto the stack.  Pops ``2 * count`` items
-   so that the dictionary holds *count* entries:
-   ``{..., STACK[-4]: STACK[-3], STACK[-2]: STACK[-1]}``.
+   Đẩy một đối tượng dictionary mới vào stack. Lấy ``2 * count`` mục ra khỏi stack để dictionary chứa *count* mục: ``{..., STACK[-4]: STACK[-3], STACK[-2]: STACK[-1]}``.
 
    .. versionchanged:: 3.5
-      The dictionary is created from stack items instead of creating an
-      empty dictionary pre-sized to hold *count* items.
+      Dictionary được tạo từ các mục trên stack thay vì tạo một dictionary rỗng có kích thước định trước để chứa *count* mục.
 
 
 .. opcode:: BUILD_STRING (count)
 
-   Concatenates *count* strings from the stack and pushes the resulting string
-   onto the stack.
+   Nối *count* chuỗi từ stack và đẩy chuỗi kết quả lên stack.
 
    .. versionadded:: 3.6
 
 
 .. opcode:: LIST_EXTEND (i)
 
-   Implements::
+   Triển khai::
 
       seq = STACK.pop()
       list.extend(STACK[-i], seq)
 
-   Used to build lists.
+   Dùng để tạo lists.
 
    .. versionadded:: 3.9
 
 
 .. opcode:: SET_UPDATE (i)
 
-   Implements::
+   Triển khai::
 
       seq = STACK.pop()
       set.update(STACK[-i], seq)
 
-   Used to build sets.
+   Dùng để tạo sets.
 
    .. versionadded:: 3.9
 
 
 .. opcode:: DICT_UPDATE (i)
 
-   Implements::
+   Triển khai::
 
       map = STACK.pop()
       dict.update(STACK[-i], map)
 
-   Used to build dicts.
+   Dùng để tạo dicts.
 
    .. versionadded:: 3.9
 
 
 .. opcode:: DICT_MERGE (i)
 
-   Like :opcode:`DICT_UPDATE` but raises an exception for duplicate keys.
+   Tương tự :opcode:`DICT_UPDATE` nhưng sẽ raise exception khi có các key trùng lặp.
 
    .. versionadded:: 3.9
 
 
 .. opcode:: LOAD_ATTR (namei)
 
-   If the low bit of ``namei`` is not set, this replaces ``STACK[-1]`` with
-   ``getattr(STACK[-1], co_names[namei>>1])``.
+   Nếu bit thấp của ``namei`` không được thiết lập, lệnh này thay thế ``STACK[-1]`` bằng ``getattr(STACK[-1], co_names[namei>>1])``.
 
-   If the low bit of ``namei`` is set, this will attempt to load a method named
-   ``co_names[namei>>1]`` from the ``STACK[-1]`` object. ``STACK[-1]`` is popped.
-   This bytecode distinguishes two cases: if ``STACK[-1]`` has a method with the
-   correct name, the bytecode pushes the unbound method and ``STACK[-1]``.
-   ``STACK[-1]`` will be used as the first argument (``self``) by :opcode:`CALL`
-   or :opcode:`CALL_KW` when calling the unbound method.
-   Otherwise, ``NULL`` and the object returned by
-   the attribute lookup are pushed.
+   Nếu bit thấp của ``namei`` được thiết lập, lệnh này sẽ cố gắng tải một method có tên ``co_names[namei>>1]`` từ object ``STACK[-1]``. ``STACK[-1]`` được lấy ra khỏi stack. Bytecode này phân biệt hai trường hợp: nếu ``STACK[-1]`` có method với tên phù hợp, bytecode sẽ đẩy unbound method và ``STACK[-1]`` lên stack. ``STACK[-1]`` sẽ được :opcode:`CALL` hoặc :opcode:`CALL_KW` sử dụng làm đối số đầu tiên (``self``) khi gọi unbound method. Nếu không, ``NULL`` và object được trả về bởi phép tra cứu thuộc tính sẽ được đẩy lên stack.
 
    .. versionchanged:: 3.12
-      If the low bit of ``namei`` is set, then a ``NULL`` or ``self`` is
-      pushed to the stack before the attribute or unbound method respectively.
+      Nếu bit thấp của ``namei`` được thiết lập, một ``NULL`` hoặc ``self`` sẽ được đẩy lên stack, lần lượt trước thuộc tính hoặc unbound method.
 
 
 .. opcode:: LOAD_SUPER_ATTR (namei)
 
-   This opcode implements :func:`super`, both in its zero-argument and
-   two-argument forms (e.g. ``super().method()``, ``super().attr`` and
-   ``super(cls, self).method()``, ``super(cls, self).attr``).
+   Opcode này triển khai :func:`super`, cả ở dạng không đối số và dạng hai đối số (ví dụ: ``super().method()``, ``super().attr`` và ``super(cls, self).method()``, ``super(cls, self).attr``).
 
-   It pops three values from the stack (from top of stack down):
+   Lệnh này lấy ba giá trị ra khỏi stack (từ đỉnh stack trở xuống):
 
-   * ``self``: the first argument to the current method
-   * ``cls``: the class within which the current method was defined
-   * the global ``super``
+   * ``self``: đối số đầu tiên của method hiện tại
+   * ``cls``: lớp mà trong đó phương thức hiện tại được định nghĩa
+   * ``super`` toàn cục
 
-   With respect to its argument, it works similarly to :opcode:`LOAD_ATTR`,
-   except that ``namei`` is shifted left by 2 bits instead of 1.
+   Đối với đối số của nó, nó hoạt động tương tự như :opcode:`LOAD_ATTR`, ngoại trừ việc ``namei`` được dịch trái 2 bit thay vì 1 bit.
 
-   The low bit of ``namei`` signals to attempt a method load, as with
-   :opcode:`LOAD_ATTR`, which results in pushing ``NULL`` and the loaded method.
-   When it is unset a single value is pushed to the stack.
+   Bit thấp nhất của ``namei`` báo hiệu việc thử tải một phương thức, như với
+   :opcode:`LOAD_ATTR`, thao tác này đẩy ``NULL`` và phương thức đã tải vào ngăn xếp. Khi bit này không được đặt, một giá trị duy nhất được đẩy vào ngăn xếp.
 
-   The second-low bit of ``namei``, if set, means that this was a two-argument
-   call to :func:`super` (unset means zero-argument).
+   Bit thấp thứ hai của ``namei``, nếu được đặt, nghĩa là đây là một lệnh gọi có hai đối số đến :func:`super` (không được đặt nghĩa là không có đối số).
 
    .. versionadded:: 3.12
 
 
 .. opcode:: COMPARE_OP (opname)
 
-   Performs a Boolean operation.  The operation name can be found in
-   ``cmp_op[opname >> 5]``. If the fifth-lowest bit of ``opname`` is set
-   (``opname & 16``), the result should be coerced to ``bool``.
+   Thực hiện một phép toán Boolean. Tên phép toán có thể được tìm thấy trong ``cmp_op[opname >> 5]``. Nếu bit thấp thứ năm của ``opname`` được đặt (``opname & 16``), kết quả phải được ép kiểu thành ``bool``.
 
    .. versionchanged:: 3.13
-      The fifth-lowest bit of the oparg now indicates a forced conversion to
+      Bit thấp thứ năm của oparg hiện cho biết việc ép chuyển đổi thành
       :class:`bool`.
 
 
 .. opcode:: IS_OP (invert)
 
-   Performs ``is`` comparison, or ``is not`` if ``invert`` is 1.
+   Thực hiện phép so sánh ``is``, hoặc ``is not`` nếu ``invert`` là 1.
 
    .. versionadded:: 3.9
 
 
 .. opcode:: CONTAINS_OP (invert)
 
-   Performs ``in`` comparison, or ``not in`` if ``invert`` is 1.
+   Thực hiện phép so sánh ``in``, hoặc ``not in`` nếu ``invert`` là 1.
 
    .. versionadded:: 3.9
 
 
 .. opcode:: IMPORT_NAME (namei)
 
-   Imports the module ``co_names[namei]``.  ``STACK[-1]`` and ``STACK[-2]`` are
-   popped and provide the *fromlist* and *level* arguments of :func:`__import__`.
-   The module object is pushed onto the stack.  The current namespace is not affected: for a proper import statement, a subsequent :opcode:`STORE_FAST` instruction
-   modifies the namespace.
+   Nhập module ``co_names[namei]``. ``STACK[-1]`` và ``STACK[-2]`` được lấy khỏi stack và cung cấp các đối số *fromlist* và *level* của :func:`__import__`. Đối tượng module được đẩy lên stack. Namespace hiện tại không bị ảnh hưởng: để có một câu lệnh import đúng nghĩa, một lệnh :opcode:`STORE_FAST` tiếp theo sẽ sửa đổi namespace.
 
 
 .. opcode:: IMPORT_FROM (namei)
 
-   Loads the attribute ``co_names[namei]`` from the module found in ``STACK[-1]``.
-   The resulting object is pushed onto the stack, to be subsequently stored by a
-   :opcode:`STORE_FAST` instruction.
+   Tải thuộc tính ``co_names[namei]`` từ module được tìm thấy trong ``STACK[-1]``. Đối tượng kết quả được đẩy lên stack để sau đó được lưu bởi một
+   lệnh :opcode:`STORE_FAST`.
 
 
 .. opcode:: JUMP_FORWARD (delta)
 
-   Increments bytecode counter by *delta*.
+   Tăng bộ đếm bytecode thêm *delta*.
 
 
 .. opcode:: JUMP_BACKWARD (delta)
 
-   Decrements bytecode counter by *delta*. Checks for interrupts.
+   Giảm bộ đếm bytecode đi *delta*. Kiểm tra các ngắt.
 
    .. versionadded:: 3.11
 
 
 .. opcode:: JUMP_BACKWARD_NO_INTERRUPT (delta)
 
-   Decrements bytecode counter by *delta*. Does not check for interrupts.
+   Giảm bộ đếm bytecode đi *delta*. Không kiểm tra các ngắt.
 
    .. versionadded:: 3.11
 
 
 .. opcode:: POP_JUMP_IF_TRUE (delta)
 
-   If ``STACK[-1]`` is true, increments the bytecode counter by *delta*.
-   ``STACK[-1]`` is popped.
+   Nếu ``STACK[-1]`` là true, tăng bộ đếm bytecode thêm *delta*. ``STACK[-1]`` được lấy ra khỏi ngăn xếp.
 
    .. versionchanged:: 3.11
-      The oparg is now a relative delta rather than an absolute target.
-      This opcode is a pseudo-instruction, replaced in final bytecode by
-      the directed versions (forward/backward).
+      oparg giờ đây là một delta tương đối thay vì một đích tuyệt đối. Opcode này là một pseudo-instruction, được thay thế trong bytecode cuối cùng bằng các phiên bản có hướng (tiến/lùi).
 
    .. versionchanged:: 3.12
-      This is no longer a pseudo-instruction.
+      Đây không còn là một pseudo-instruction nữa.
 
    .. versionchanged:: 3.13
-      This instruction now requires an exact :class:`bool` operand.
+      Chỉ dẫn này hiện yêu cầu một toán hạng :class:`bool` chính xác.
 
 .. opcode:: POP_JUMP_IF_FALSE (delta)
 
-   If ``STACK[-1]`` is false, increments the bytecode counter by *delta*.
-   ``STACK[-1]`` is popped.
+   Nếu ``STACK[-1]`` là false, tăng bộ đếm bytecode thêm *delta*. ``STACK[-1]`` được lấy ra khỏi ngăn xếp.
 
    .. versionchanged:: 3.11
-      The oparg is now a relative delta rather than an absolute target.
-      This opcode is a pseudo-instruction, replaced in final bytecode by
-      the directed versions (forward/backward).
+      oparg giờ đây là một delta tương đối thay vì một đích tuyệt đối. Opcode này là một pseudo-instruction, được thay thế trong bytecode cuối cùng bằng các phiên bản có hướng (tiến/lùi).
 
    .. versionchanged:: 3.12
-      This is no longer a pseudo-instruction.
+      Đây không còn là một pseudo-instruction nữa.
 
    .. versionchanged:: 3.13
-      This instruction now requires an exact :class:`bool` operand.
+      Chỉ dẫn này hiện yêu cầu một toán hạng :class:`bool` chính xác.
 
 .. opcode:: POP_JUMP_IF_NOT_NONE (delta)
 
-   If ``STACK[-1]`` is not ``None``, increments the bytecode counter by *delta*.
-   ``STACK[-1]`` is popped.
+   Nếu ``STACK[-1]`` không phải ``None``, bộ đếm bytecode được tăng thêm *delta*. ``STACK[-1]`` được lấy ra khỏi ngăn xếp.
 
    .. versionadded:: 3.11
 
    .. versionchanged:: 3.12
-      This is no longer a pseudo-instruction.
+      Đây không còn là một pseudo-instruction nữa.
 
 
 .. opcode:: POP_JUMP_IF_NONE (delta)
 
-   If ``STACK[-1]`` is ``None``, increments the bytecode counter by *delta*.
-   ``STACK[-1]`` is popped.
+   Nếu ``STACK[-1]`` là ``None``, bộ đếm bytecode được tăng thêm *delta*. ``STACK[-1]`` được lấy ra khỏi ngăn xếp.
 
    .. versionadded:: 3.11
 
    .. versionchanged:: 3.12
-      This is no longer a pseudo-instruction.
+      Đây không còn là một pseudo-instruction nữa.
 
 .. opcode:: FOR_ITER (delta)
 
-   ``STACK[-1]`` is an :term:`iterator`.  Call its :meth:`~iterator.__next__` method.
-   If this yields a new value, push it on the stack (leaving the iterator below
-   it).  If the iterator indicates it is :term:`exhausted` then the byte code counter is
-   incremented by *delta*.
+   ``STACK[-1]`` là một :term:`iterator`. Gọi phương thức :meth:`~iterator.__next__` của nó. Nếu thao tác này tạo ra một giá trị mới, hãy đẩy giá trị đó vào stack (giữ iterator bên dưới nó). Nếu iterator cho biết nó đã :term:`exhausted` thì bộ đếm bytecode được tăng thêm *delta*.
 
    .. versionchanged:: 3.12
-      Up until 3.11 the iterator was popped when it was exhausted.
+      Cho đến phiên bản 3.11, iterator bị lấy khỏi stack khi đã cạn.
 
 .. opcode:: LOAD_GLOBAL (namei)
 
-   Loads the global named ``co_names[namei>>1]`` onto the stack.
+   Tải global có tên ``co_names[namei>>1]`` lên stack.
 
    .. versionchanged:: 3.11
-      If the low bit of ``namei`` is set, then a ``NULL`` is pushed to the
-      stack before the global variable.
+      Nếu bit thấp của ``namei`` được đặt, thì một ``NULL`` được đẩy vào stack trước biến global.
 
 .. opcode:: LOAD_FAST (var_num)
 
-   Pushes a reference to the local ``co_varnames[var_num]`` onto the stack.
+   Đẩy một tham chiếu đến local ``co_varnames[var_num]`` lên stack.
 
    .. versionchanged:: 3.12
-      This opcode is now only used in situations where the local variable is
-      guaranteed to be initialized. It cannot raise :exc:`UnboundLocalError`.
+      Opcode này hiện chỉ được sử dụng trong những tình huống mà local được đảm bảo đã được khởi tạo. Nó không thể phát sinh :exc:`UnboundLocalError`.
 
 .. opcode:: LOAD_FAST_BORROW (var_num)
 
-   Pushes a borrowed reference to the local ``co_varnames[var_num]`` onto the
-   stack.
+   Đẩy một tham chiếu mượn đến local ``co_varnames[var_num]`` lên stack.
 
    .. versionadded:: 3.14
 
 .. opcode:: LOAD_FAST_LOAD_FAST (var_nums)
 
-   Pushes references to ``co_varnames[var_nums >> 4]`` and
-   ``co_varnames[var_nums & 15]`` onto the stack.
+   Đẩy các tham chiếu đến ``co_varnames[var_nums >> 4]`` và ``co_varnames[var_nums & 15]`` lên stack.
 
    .. versionadded:: 3.13
 
 
 .. opcode:: LOAD_FAST_BORROW_LOAD_FAST_BORROW (var_nums)
 
-   Pushes borrowed references to ``co_varnames[var_nums >> 4]`` and
-   ``co_varnames[var_nums & 15]`` onto the stack.
+   Đẩy các tham chiếu mượn đến ``co_varnames[var_nums >> 4]`` và ``co_varnames[var_nums & 15]`` lên stack.
 
    .. versionadded:: 3.14
 
 .. opcode:: LOAD_FAST_CHECK (var_num)
 
-   Pushes a reference to the local ``co_varnames[var_num]`` onto the stack,
-   raising an :exc:`UnboundLocalError` if the local variable has not been
-   initialized.
+   Đẩy một tham chiếu đến biến cục bộ ``co_varnames[var_num]`` lên stack, đồng thời phát sinh :exc:`UnboundLocalError` nếu biến cục bộ chưa được khởi tạo.
 
    .. versionadded:: 3.12
 
 .. opcode:: LOAD_FAST_AND_CLEAR (var_num)
 
-   Pushes a reference to the local ``co_varnames[var_num]`` onto the stack (or
-   pushes ``NULL`` onto the stack if the local variable has not been
-   initialized) and sets ``co_varnames[var_num]`` to ``NULL``.
+   Đẩy một tham chiếu đến biến cục bộ ``co_varnames[var_num]`` lên stack (hoặc đẩy ``NULL`` lên stack nếu biến cục bộ chưa được khởi tạo), rồi đặt ``co_varnames[var_num]`` thành ``NULL``.
 
    .. versionadded:: 3.12
 
 .. opcode:: STORE_FAST (var_num)
 
-   Stores ``STACK.pop()`` into the local ``co_varnames[var_num]``.
+   Lưu ``STACK.pop()`` vào biến cục bộ ``co_varnames[var_num]``.
 
 .. opcode:: STORE_FAST_STORE_FAST (var_nums)
 
-   Stores ``STACK[-1]`` into ``co_varnames[var_nums >> 4]``
-   and ``STACK[-2]`` into ``co_varnames[var_nums & 15]``.
+   Lưu ``STACK[-1]`` vào ``co_varnames[var_nums >> 4]`` và ``STACK[-2]`` vào ``co_varnames[var_nums & 15]``.
 
    .. versionadded:: 3.13
 
 .. opcode:: STORE_FAST_LOAD_FAST (var_nums)
 
-   Stores ``STACK.pop()`` into the local ``co_varnames[var_nums >> 4]``
-   and pushes a reference to the local ``co_varnames[var_nums & 15]``
-   onto the stack.
+   Lưu ``STACK.pop()`` vào biến cục bộ ``co_varnames[var_nums >> 4]`` và đẩy một tham chiếu đến biến cục bộ ``co_varnames[var_nums & 15]`` lên stack.
 
    .. versionadded:: 3.13
 
 .. opcode:: DELETE_FAST (var_num)
 
-   Deletes local ``co_varnames[var_num]``.
+   Xóa ``co_varnames[var_num]`` cục bộ.
 
 
 .. opcode:: MAKE_CELL (i)
 
-   Creates a new cell in slot ``i``.  If that slot is nonempty then
-   that value is stored into the new cell.
+   Tạo một cell mới tại vị trí ``i``. Nếu vị trí đó không rỗng thì giá trị đó được lưu vào cell mới.
 
    .. versionadded:: 3.11
 
 
 .. opcode:: LOAD_DEREF (i)
 
-   Loads the cell contained in slot ``i`` of the "fast locals" storage.
-   Pushes a reference to the object the cell contains on the stack.
+   Tải cell nằm ở vị trí ``i`` trong bộ lưu trữ "fast locals". Đẩy một tham chiếu đến đối tượng mà cell chứa lên stack.
 
    .. versionchanged:: 3.11
-      ``i`` is no longer offset by the length of :attr:`~codeobject.co_varnames`.
+      ``i`` không còn được tính lệch theo độ dài của :attr:`~codeobject.co_varnames`.
 
 
 .. opcode:: LOAD_FROM_DICT_OR_DEREF (i)
 
-   Pops a mapping off the stack and looks up the name associated with
-   slot ``i`` of the "fast locals" storage in this mapping.
-   If the name is not found there, loads it from the cell contained in
-   slot ``i``, similar to :opcode:`LOAD_DEREF`. This is used for loading
-   :term:`closure variables <closure variable>` in class bodies (which previously used
-   :opcode:`!LOAD_CLASSDEREF`) and in
-   :ref:`annotation scopes <annotation-scopes>` within class bodies.
+   Lấy một mapping ra khỏi stack và tra cứu tên tương ứng với vị trí ``i`` của bộ lưu trữ "fast locals" trong mapping này. Nếu không tìm thấy tên ở đó, tải tên từ cell nằm ở vị trí ``i``, tương tự như :opcode:`LOAD_DEREF`. Điều này được dùng để tải
+   :term:`các biến closure <closure variable>` trong thân lớp (trước đây sử dụng
+   :opcode:`!LOAD_CLASSDEREF`) và trong
+   :ref:`annotation scopes <annotation-scopes>` bên trong các thân lớp.
 
    .. versionadded:: 3.12
 
 
 .. opcode:: STORE_DEREF (i)
 
-   Stores ``STACK.pop()`` into the cell contained in slot ``i`` of the "fast locals"
-   storage.
+   Lưu ``STACK.pop()`` vào ô nằm trong vị trí ``i`` của vùng lưu trữ "fast locals".
 
    .. versionchanged:: 3.11
-      ``i`` is no longer offset by the length of :attr:`~codeobject.co_varnames`.
+      ``i`` không còn được tính lệch theo độ dài của :attr:`~codeobject.co_varnames`.
 
 
 .. opcode:: DELETE_DEREF (i)
 
-   Empties the cell contained in slot ``i`` of the "fast locals" storage.
-   Used by the :keyword:`del` statement.
+   Xóa nội dung ô nằm trong vị trí ``i`` của vùng lưu trữ "fast locals". Được câu lệnh :keyword:`del` sử dụng.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.11
-      ``i`` is no longer offset by the length of :attr:`~codeobject.co_varnames`.
+      ``i`` không còn được tính lệch theo độ dài của :attr:`~codeobject.co_varnames`.
 
 
 .. opcode:: COPY_FREE_VARS (n)
 
-   Copies the ``n`` :term:`free (closure) variables <closure variable>` from the closure
-   into the frame. Removes the need for special code on the caller's side when calling
-   closures.
+   Sao chép các ``n`` :term:`biến tự do (closure) <closure variable>` từ closure vào frame. Loại bỏ nhu cầu về mã đặc biệt ở phía caller khi gọi closure.
 
    .. versionadded:: 3.11
 
 
 .. opcode:: RAISE_VARARGS (argc)
 
-   Raises an exception using one of the 3 forms of the ``raise`` statement,
-   depending on the value of *argc*:
+   Phát sinh một ngoại lệ bằng một trong 3 dạng của câu lệnh ``raise``, tùy thuộc vào giá trị của *argc*:
 
-   * 0: ``raise`` (re-raise previous exception)
-   * 1: ``raise STACK[-1]`` (raise exception instance or type at ``STACK[-1]``)
-   * 2: ``raise STACK[-2] from STACK[-1]`` (raise exception instance or type at
-     ``STACK[-2]`` with ``__cause__`` set to ``STACK[-1]``)
+   * 0: ``raise`` (nêu lại ngoại lệ trước đó)
+   * 1: ``raise STACK[-1]`` (nêu một thể hiện hoặc kiểu ngoại lệ tại ``STACK[-1]``)
+   * 2: ``raise STACK[-2] from STACK[-1]`` (nêu một thể hiện hoặc kiểu ngoại lệ tại ``STACK[-2]`` với ``__cause__`` được đặt thành ``STACK[-1]``)
 
 
 .. opcode:: CALL (argc)
 
-   Calls a callable object with the number of arguments specified by ``argc``.
-   On the stack are (in ascending order):
+   Gọi một đối tượng callable với số lượng đối số được chỉ định bởi ``argc``. Trên stack, theo thứ tự tăng dần, là:
 
-   * The callable
-   * ``self`` or ``NULL``
-   * The remaining positional arguments
+   * Callable
+   * ``self`` hoặc ``NULL``
+   * Các đối số vị trí còn lại
 
-   ``argc`` is the total of the positional arguments, excluding ``self``.
+   ``argc`` là tổng số đối số vị trí, không bao gồm ``self``.
 
-   ``CALL`` pops all arguments and the callable object off the stack,
-   calls the callable object with those arguments, and pushes the return value
-   returned by the callable object.
+   ``CALL`` lấy tất cả đối số và đối tượng có thể gọi ra khỏi stack, gọi đối tượng có thể gọi đó với các đối số ấy, rồi đẩy giá trị trả về của đối tượng có thể gọi lên stack.
 
    .. versionadded:: 3.11
 
    .. versionchanged:: 3.13
-      The callable now always appears at the same position on the stack.
+      Đối tượng có thể gọi giờ đây luôn xuất hiện ở cùng một vị trí trên stack.
 
    .. versionchanged:: 3.13
-      Calls with keyword arguments are now handled by :opcode:`CALL_KW`.
+      Các lệnh gọi có đối số từ khóa giờ đây được xử lý bởi :opcode:`CALL_KW`.
 
 
 .. opcode:: CALL_KW (argc)
 
-   Calls a callable object with the number of arguments specified by ``argc``,
-   including one or more named arguments. On the stack are (in ascending order):
+   Gọi một đối tượng có thể gọi với số lượng đối số được chỉ định bởi ``argc``, bao gồm một hoặc nhiều đối số được đặt tên. Trên stack có (theo thứ tự tăng dần):
 
-   * The callable
-   * ``self`` or ``NULL``
-   * The remaining positional arguments
-   * The named arguments
-   * A :class:`tuple` of keyword argument names
+   * Callable
+   * ``self`` hoặc ``NULL``
+   * Các đối số vị trí còn lại
+   * Các đối số được đặt tên
+   * Một :class:`tuple` gồm các tên đối số từ khóa
 
-   ``argc`` is the total of the positional and named arguments, excluding ``self``.
-   The length of the tuple of keyword argument names is the number of named arguments.
+   ``argc`` là tổng số đối số vị trí và đối số được đặt tên, không bao gồm ``self``. Độ dài của tuple chứa các tên đối số từ khóa là số lượng đối số được đặt tên.
 
-   ``CALL_KW`` pops all arguments, the keyword names, and the callable object
-   off the stack, calls the callable object with those arguments, and pushes the
-   return value returned by the callable object.
+   ``CALL_KW`` lấy tất cả đối số, các tên từ khóa và đối tượng có thể gọi ra khỏi stack, gọi đối tượng có thể gọi với các đối số đó, rồi đẩy giá trị trả về do đối tượng có thể gọi trả về lên stack.
 
    .. versionadded:: 3.13
 
 
 .. opcode:: CALL_FUNCTION_EX (flags)
 
-   Calls a callable object with variable set of positional and keyword
-   arguments.  If the lowest bit of *flags* is set, the top of the stack
-   contains a mapping object containing additional keyword arguments.
-   Before the callable is called, the mapping object and iterable object
-   are each "unpacked" and their contents passed in as keyword and
-   positional arguments respectively.
-   ``CALL_FUNCTION_EX`` pops all arguments and the callable object off the stack,
-   calls the callable object with those arguments, and pushes the return value
-   returned by the callable object.
+   Gọi một đối tượng có thể gọi với tập hợp thay đổi các đối số vị trí và đối số từ khóa. Nếu bit thấp nhất của *flags* được đặt, phần tử trên cùng của stack chứa một đối tượng ánh xạ gồm các đối số từ khóa bổ sung. Trước khi đối tượng có thể gọi được gọi, đối tượng ánh xạ và đối tượng iterable lần lượt được "giải nén", rồi nội dung của chúng được truyền vào lần lượt dưới dạng đối số từ khóa và đối số vị trí. ``CALL_FUNCTION_EX`` lấy tất cả đối số và đối tượng có thể gọi ra khỏi stack, gọi đối tượng có thể gọi với các đối số đó, rồi đẩy giá trị trả về do đối tượng có thể gọi trả về lên stack.
 
    .. versionadded:: 3.6
 
 
 .. opcode:: PUSH_NULL
 
-   Pushes a ``NULL`` to the stack.
-   Used in the call sequence to match the ``NULL`` pushed by
-   :opcode:`!LOAD_METHOD` for non-method calls.
+   Đẩy một ``NULL`` lên stack. Được dùng trong chuỗi gọi để khớp với ``NULL`` được đẩy bởi
+   :opcode:`!LOAD_METHOD` cho các lệnh gọi không phải phương thức.
 
    .. versionadded:: 3.11
 
 
 .. opcode:: MAKE_FUNCTION
 
-   Pushes a new function object on the stack built from the code object at ``STACK[-1]``.
+   Đẩy một đối tượng hàm mới lên stack, được tạo từ đối tượng mã tại ``STACK[-1]``.
 
    .. versionchanged:: 3.10
-      Flag value ``0x04`` is a tuple of strings instead of dictionary
+      Giá trị cờ ``0x04`` là một tuple các chuỗi thay vì dictionary
 
    .. versionchanged:: 3.11
-      Qualified name at ``STACK[-1]`` was removed.
+      Tên đủ điều kiện tại ``STACK[-1]`` đã bị loại bỏ.
 
    .. versionchanged:: 3.13
-      Extra function attributes on the stack, signaled by oparg flags, were
-      removed. They now use :opcode:`SET_FUNCTION_ATTRIBUTE`.
+      Các thuộc tính hàm bổ sung trên stack, được biểu thị bằng các cờ oparg, đã bị loại bỏ. Hiện chúng sử dụng :opcode:`SET_FUNCTION_ATTRIBUTE`.
 
 
 .. opcode:: SET_FUNCTION_ATTRIBUTE (flag)
 
-   Sets an attribute on a function object. Expects the function at ``STACK[-1]``
-   and the attribute value to set at ``STACK[-2]``; consumes both and leaves the
-   function at ``STACK[-1]``. The flag determines which attribute to set:
+   Đặt một thuộc tính trên đối tượng hàm. Yêu cầu hàm tại ``STACK[-1]`` và giá trị thuộc tính cần đặt tại ``STACK[-2]``; lấy cả hai khỏi stack và để lại hàm tại ``STACK[-1]``. Cờ này xác định thuộc tính cần đặt:
 
-   * ``0x01`` a tuple of default values for positional-only and
-     positional-or-keyword parameters in positional order
-   * ``0x02`` a dictionary of keyword-only parameters' default values
-   * ``0x04`` a tuple of strings containing parameters' annotations
-   * ``0x08`` a tuple containing cells for free variables, making a closure
-   * ``0x10`` the :term:`annotate function` for the function object
+   * ``0x01`` một tuple các giá trị mặc định cho các tham số chỉ vị trí và vị trí-hoặc-từ-khóa theo thứ tự vị trí
+   * ``0x02`` một dictionary chứa các giá trị mặc định của các tham số chỉ nhận đối số theo từ khóa
+   * ``0x04`` một tuple gồm các chuỗi chứa chú thích kiểu của các tham số
+   * ``0x08`` một tuple chứa các cell cho các biến tự do, tạo thành một closure
+   * ``0x10`` :term:`annotate function` cho đối tượng hàm
 
    .. versionadded:: 3.13
 
    .. versionchanged:: 3.14
-      Added ``0x10`` to indicate the annotate function for the function object.
+      Đã thêm ``0x10`` để chỉ hàm annotate cho đối tượng hàm.
 
 
 .. opcode:: BUILD_SLICE (argc)
 
    .. index:: pair: built-in function; slice
 
-   Pushes a slice object on the stack.  *argc* must be 2 or 3.  If it is 2, implements::
+   Đẩy một đối tượng slice vào stack. *argc* phải là 2 hoặc 3. Nếu là 2, thực hiện::
 
       end = STACK.pop()
       start = STACK.pop()
       STACK.append(slice(start, end))
 
-   if it is 3, implements::
+   nếu là 3, thực hiện::
 
       step = STACK.pop()
       end = STACK.pop()
       start = STACK.pop()
       STACK.append(slice(start, end, step))
 
-   See the :func:`slice` built-in function for more information.
+   Xem hàm tích hợp sẵn :func:`slice` để biết thêm thông tin.
 
 
 .. opcode:: EXTENDED_ARG (ext)
 
-   Prefixes any opcode which has an argument too big to fit into the default one
-   byte. *ext* holds an additional byte which act as higher bits in the argument.
-   For each opcode, at most three prefixal ``EXTENDED_ARG`` are allowed, forming
-   an argument from two-byte to four-byte.
+   Thêm tiền tố vào bất kỳ opcode nào có đối số quá lớn, không thể vừa trong một byte mặc định. *ext* chứa một byte bổ sung, đóng vai trò là các bit cao hơn trong đối số. Với mỗi opcode, cho phép tối đa ba ``EXTENDED_ARG`` có tiền tố, tạo thành một đối số dài từ hai đến bốn byte.
 
 
 .. opcode:: CONVERT_VALUE (oparg)
 
-   Convert value to a string, depending on ``oparg``::
+   Chuyển đổi giá trị thành một chuỗi, tùy thuộc vào ``oparg``::
 
       value = STACK.pop()
       result = func(value)
       STACK.append(result)
 
-   * ``oparg == 1``: call :func:`str` on *value*
-   * ``oparg == 2``: call :func:`repr` on *value*
-   * ``oparg == 3``: call :func:`ascii` on *value*
+   * ``oparg == 1``: gọi :func:`str` trên *giá trị*
+   * ``oparg == 2``: gọi :func:`repr` trên *giá trị*
+   * ``oparg == 3``: gọi :func:`ascii` trên *giá trị*
 
-   Used for implementing formatted string literals (f-strings).
+   Được sử dụng để triển khai các string literal có định dạng (f-string).
 
    .. versionadded:: 3.13
 
 
 .. opcode:: FORMAT_SIMPLE
 
-   Formats the value on top of stack::
+   Định dạng giá trị ở đầu ngăn xếp::
 
       value = STACK.pop()
       result = value.__format__("")
       STACK.append(result)
 
-   Used for implementing formatted string literals (f-strings).
+   Được sử dụng để triển khai các string literal có định dạng (f-string).
 
    .. versionadded:: 3.13
 
 .. opcode:: FORMAT_WITH_SPEC
 
-   Formats the given value with the given format spec::
+   Định dạng giá trị đã cho bằng đặc tả định dạng đã cho::
 
       spec = STACK.pop()
       value = STACK.pop()
       result = value.__format__(spec)
       STACK.append(result)
 
-   Used for implementing formatted string literals (f-strings).
+   Được sử dụng để triển khai các string literal có định dạng (f-string).
 
    .. versionadded:: 3.13
 
 
 .. opcode:: MATCH_CLASS (count)
 
-   ``STACK[-1]`` is a tuple of keyword attribute names, ``STACK[-2]`` is the class
-   being matched against, and ``STACK[-3]`` is the match subject.  *count* is the
-   number of positional sub-patterns.
+   ``STACK[-1]`` là một tuple gồm các tên thuộc tính keyword, ``STACK[-2]`` là lớp được dùng để đối sánh, còn ``STACK[-3]`` là đối tượng được đối sánh. *count* là số lượng mẫu con theo vị trí.
 
-   Pop ``STACK[-1]``, ``STACK[-2]``, and ``STACK[-3]``. If ``STACK[-3]`` is an
-   instance of ``STACK[-2]`` and has the positional and keyword attributes
-   required by *count* and ``STACK[-1]``, push a tuple of extracted attributes.
-   Otherwise, push ``None``.
+   Lấy ``STACK[-1]``, ``STACK[-2]`` và ``STACK[-3]`` ra khỏi ngăn xếp. Nếu ``STACK[-3]`` là một thể hiện của ``STACK[-2]`` và có các thuộc tính theo vị trí và keyword mà *count* và ``STACK[-1]`` yêu cầu, hãy đẩy một tuple gồm các thuộc tính đã trích xuất. Nếu không, hãy đẩy ``None``.
 
    .. versionadded:: 3.10
 
    .. versionchanged:: 3.11
-      Previously, this instruction also pushed a boolean value indicating
-      success (``True``) or failure (``False``).
+      Trước đây, instruction này cũng đẩy một giá trị boolean cho biết thao tác thành công (``True``) hay thất bại (``False``).
 
 
 .. opcode:: RESUME (context)
 
-   A no-op. Performs internal tracing, debugging and optimization checks.
+   Một thao tác no-op. Thực hiện các kiểm tra tracing, debugging và tối ưu hóa nội bộ.
 
-   The ``context`` operand consists of two parts. The lowest two bits
-   indicate where the ``RESUME`` occurs:
+   Toán hạng ``context`` gồm hai phần. Hai bit thấp nhất cho biết ``RESUME`` xuất hiện ở đâu:
 
-   * ``0`` The start of a function, which is neither a generator, coroutine
-     nor an async generator
-   * ``1`` After a ``yield`` expression
-   * ``2`` After a ``yield from`` expression
-   * ``3`` After an ``await`` expression
+   * ``0`` Phần đầu của một hàm không phải là generator, coroutine hay async generator
+   * ``1`` Sau một biểu thức ``yield``
+   * ``2`` Sau một biểu thức ``yield from``
+   * ``3`` Sau một biểu thức ``await``
 
-   The next bit is ``1`` if the RESUME is at except-depth ``1``, and ``0``
-   otherwise.
+   Bit tiếp theo là ``1`` nếu RESUME ở độ sâu except ``1``, và ``0`` trong các trường hợp khác.
 
    .. versionadded:: 3.11
 
    .. versionchanged:: 3.13
-      The oparg value changed to include information about except-depth
+      Giá trị oparg đã được thay đổi để bao gồm thông tin về độ sâu của except
 
 
 .. opcode:: RETURN_GENERATOR
 
-   Create a generator, coroutine, or async generator from the current frame.
-   Used as first opcode of in code object for the above mentioned callables.
-   Clear the current frame and return the newly created generator.
+   Tạo một generator, coroutine hoặc async generator từ frame hiện tại. Được dùng làm opcode đầu tiên trong code object của các callable nêu trên. Xóa frame hiện tại và trả về generator mới được tạo.
 
    .. versionadded:: 3.11
 
 
 .. opcode:: SEND (delta)
 
-   Equivalent to ``STACK[-1] = STACK[-2].send(STACK[-1])``. Used in ``yield from``
-   and ``await`` statements.
+   Tương đương với ``STACK[-1] = STACK[-2].send(STACK[-1])``. Được dùng trong các câu lệnh ``yield from`` và ``await``.
 
-   If the call raises :exc:`StopIteration`, pop the top value from the stack,
-   push the exception's ``value`` attribute, and increment the bytecode counter
-   by *delta*.
+   Nếu lệnh gọi phát sinh :exc:`StopIteration`, lấy giá trị trên cùng khỏi stack, đẩy thuộc tính ``value`` của exception vào stack và tăng bộ đếm bytecode thêm *delta*.
 
    .. versionadded:: 3.11
 
 
 .. opcode:: HAVE_ARGUMENT
 
-   This is not really an opcode.  It identifies the dividing line between
-   opcodes in the range [0,255] which don't use their argument and those
-   that do (``< HAVE_ARGUMENT`` and ``>= HAVE_ARGUMENT``, respectively).
+   Đây không thực sự là một opcode. Nó xác định ranh giới phân chia giữa các opcode trong phạm vi [0,255] không sử dụng đối số và các opcode có sử dụng đối số (``< HAVE_ARGUMENT`` và ``>= HAVE_ARGUMENT``, tương ứng).
 
-   If your application uses pseudo instructions or specialized instructions,
-   use the :data:`hasarg` collection instead.
+   Nếu ứng dụng của bạn sử dụng pseudo instruction hoặc specialized instruction, hãy sử dụng collection :data:`hasarg` thay thế.
 
    .. versionchanged:: 3.6
-      Now every instruction has an argument, but opcodes ``< HAVE_ARGUMENT``
-      ignore it. Before, only opcodes ``>= HAVE_ARGUMENT`` had an argument.
+      Giờ đây mọi instruction đều có một argument, nhưng các opcode ``< HAVE_ARGUMENT`` bỏ qua argument đó. Trước đây, chỉ các opcode ``>= HAVE_ARGUMENT`` mới có argument.
 
    .. versionchanged:: 3.12
-      Pseudo instructions were added to the :mod:`!dis` module, and for them
-      it is not true that comparison with ``HAVE_ARGUMENT`` indicates whether
-      they use their arg.
+      Các pseudo instruction đã được thêm vào module :mod:`!dis`, và đối với chúng, không đúng khi cho rằng việc so sánh với ``HAVE_ARGUMENT`` cho biết chúng có sử dụng arg của mình hay không.
 
    .. deprecated:: 3.13
-      Use :data:`hasarg` instead.
+      Thay vào đó, hãy sử dụng :data:`hasarg`.
 
 .. opcode:: CALL_INTRINSIC_1
 
-   Calls an intrinsic function with one argument. Passes ``STACK[-1]`` as the
-   argument and sets ``STACK[-1]`` to the result. Used to implement
-   functionality that is not performance critical.
+   Gọi một hàm intrinsic với một đối số. Truyền ``STACK[-1]`` làm đối số và đặt ``STACK[-1]`` thành kết quả. Được dùng để triển khai chức năng không yêu cầu hiệu năng cao.
 
-   The operand determines which intrinsic function is called:
+   Operand xác định hàm intrinsic nào được gọi:
 
-   +-----------------------------------+-----------------------------------+
-   | Operand                           | Description                       |
-   +===================================+===================================+
-   | ``INTRINSIC_1_INVALID``           | Not valid                         |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_PRINT``               | Prints the argument to standard   |
-   |                                   | out. Used in the REPL.            |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_IMPORT_STAR``         | Performs ``import *`` for the     |
-   |                                   | named module.                     |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_STOPITERATION_ERROR`` | Extracts the return value from a  |
-   |                                   | ``StopIteration`` exception.      |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_ASYNC_GEN_WRAP``      | Wraps an async generator value    |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_UNARY_POSITIVE``      | Performs the unary ``+``          |
-   |                                   | operation                         |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_LIST_TO_TUPLE``       | Converts a list to a tuple        |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_TYPEVAR``             | Creates a :class:`typing.TypeVar` |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_PARAMSPEC``           | Creates a                         |
-   |                                   | :class:`typing.ParamSpec`         |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_TYPEVARTUPLE``        | Creates a                         |
-   |                                   | :class:`typing.TypeVarTuple`      |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_SUBSCRIPT_GENERIC``   | Returns :class:`typing.Generic`   |
-   |                                   | subscripted with the argument     |
-   +-----------------------------------+-----------------------------------+
-   | ``INTRINSIC_TYPEALIAS``           | Creates a                         |
-   |                                   | :class:`typing.TypeAliasType`;    |
-   |                                   | used in the :keyword:`type`       |
-   |                                   | statement. The argument is a tuple|
-   |                                   | of the type alias's name,         |
-   |                                   | type parameters, and value.       |
-   +-----------------------------------+-----------------------------------+
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | Operand                           | Description                                                                                                                                       |
+   +===================================+===================================================================================================================================================+
+   | ``INTRINSIC_1_INVALID``           | Không hợp lệ                                                                                                                                      |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_PRINT``               | In đối số ra đầu ra chuẩn. Được sử dụng trong REPL.                                                                                               |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_IMPORT_STAR``         | Thực hiện ``import *`` cho module được đặt tên.                                                                                                   |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_STOPITERATION_ERROR`` | Trích xuất giá trị trả về từ ngoại lệ ``StopIteration``.                                                                                          |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_ASYNC_GEN_WRAP``      | Bọc một giá trị async generator                                                                                                                   |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_UNARY_POSITIVE``      | Thực hiện phép toán một ngôi ``+``                                                                                                                |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_LIST_TO_TUPLE``       | Chuyển đổi một danh sách thành một tuple                                                                                                          |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_TYPEVAR``             | Tạo một :class:`typing.TypeVar`                                                                                                                   |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_PARAMSPEC``           | Tạo một                                                                                                                                           |
+   |                                   | :class:`typing.ParamSpec`                                                                                                                         |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_TYPEVARTUPLE``        | Tạo một                                                                                                                                           |
+   |                                   | :class:`typing.TypeVarTuple`                                                                                                                      |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_SUBSCRIPT_GENERIC``   | Trả về :class:`typing.Generic` được lập chỉ mục bằng đối số                                                                                       |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``INTRINSIC_TYPEALIAS``           | Tạo một                                                                                                                                           |
+   |                                   | :class:`typing.TypeAliasType`; được dùng trong câu lệnh :keyword:`type`. Đối số là một tuple gồm tên của type alias, các tham số kiểu và giá trị. |
+   +-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 
    .. versionadded:: 3.12
 
 .. opcode:: CALL_INTRINSIC_2
 
-   Calls an intrinsic function with two arguments. Used to implement functionality
-   that is not performance critical::
+   Gọi một hàm nội tại với hai đối số. Được dùng để triển khai chức năng không quan trọng về hiệu năng::
 
       arg2 = STACK.pop()
       arg1 = STACK.pop()
       result = intrinsic2(arg1, arg2)
       STACK.append(result)
 
-   The operand determines which intrinsic function is called:
+   Operand xác định hàm intrinsic nào được gọi:
 
-   +----------------------------------------+-----------------------------------+
-   | Operand                                | Description                       |
-   +========================================+===================================+
-   | ``INTRINSIC_2_INVALID``                | Not valid                         |
-   +----------------------------------------+-----------------------------------+
-   | ``INTRINSIC_PREP_RERAISE_STAR``        | Calculates the                    |
-   |                                        | :exc:`ExceptionGroup` to raise    |
-   |                                        | from a ``try-except*``.           |
-   +----------------------------------------+-----------------------------------+
-   | ``INTRINSIC_TYPEVAR_WITH_BOUND``       | Creates a :class:`typing.TypeVar` |
-   |                                        | with a bound.                     |
-   +----------------------------------------+-----------------------------------+
-   | ``INTRINSIC_TYPEVAR_WITH_CONSTRAINTS`` | Creates a                         |
-   |                                        | :class:`typing.TypeVar` with      |
-   |                                        | constraints.                      |
-   +----------------------------------------+-----------------------------------+
-   | ``INTRINSIC_SET_FUNCTION_TYPE_PARAMS`` | Sets the ``__type_params__``      |
-   |                                        | attribute of a function.          |
-   +----------------------------------------+-----------------------------------+
+   +----------------------------------------+--------------------------------------------------------+
+   | Operand                                | Description                                            |
+   +========================================+========================================================+
+   | ``INTRINSIC_2_INVALID``                | Không hợp lệ                                           |
+   +----------------------------------------+--------------------------------------------------------+
+   | ``INTRINSIC_PREP_RERAISE_STAR``        | Tính toán                                              |
+   |                                        | :exc:`ExceptionGroup` để raise từ một ``try-except*``. |
+   +----------------------------------------+--------------------------------------------------------+
+   | ``INTRINSIC_TYPEVAR_WITH_BOUND``       | Tạo một :class:`typing.TypeVar` với một bound.         |
+   +----------------------------------------+--------------------------------------------------------+
+   | ``INTRINSIC_TYPEVAR_WITH_CONSTRAINTS`` | Tạo một                                                |
+   |                                        | :class:`typing.TypeVar` với các ràng buộc.             |
+   +----------------------------------------+--------------------------------------------------------+
+   | ``INTRINSIC_SET_FUNCTION_TYPE_PARAMS`` | Đặt thuộc tính ``__type_params__`` của một hàm.        |
+   +----------------------------------------+--------------------------------------------------------+
 
    .. versionadded:: 3.12
 
 
 .. opcode:: LOAD_SPECIAL
 
-   Performs special method lookup on ``STACK[-1]``.
-   If ``type(STACK[-1]).__xxx__`` is a method, leave
-   ``type(STACK[-1]).__xxx__; STACK[-1]`` on the stack.
-   If ``type(STACK[-1]).__xxx__`` is not a method, leave
-   ``STACK[-1].__xxx__; NULL`` on the stack.
+   Thực hiện tra cứu phương thức đặc biệt trên ``STACK[-1]``. Nếu ``type(STACK[-1]).__xxx__`` là một phương thức, để lại ``type(STACK[-1]).__xxx__; STACK[-1]`` trên ngăn xếp. Nếu ``type(STACK[-1]).__xxx__`` không phải là một phương thức, để lại ``STACK[-1].__xxx__; NULL`` trên ngăn xếp.
 
    .. versionadded:: 3.14
 
 
 **Pseudo-instructions**
 
-These opcodes do not appear in Python bytecode. They are used by the compiler
-but are replaced by real opcodes or removed before bytecode is generated.
+Các opcode này không xuất hiện trong bytecode Python. Chúng được compiler sử dụng nhưng được thay thế bằng các opcode thực hoặc bị loại bỏ trước khi bytecode được tạo.
 
 .. opcode:: SETUP_FINALLY (target)
 
-   Set up an exception handler for the following code block. If an exception
-   occurs, the value stack level is restored to its current state and control
-   is transferred to the exception handler at ``target``.
+   Thiết lập trình xử lý ngoại lệ cho khối mã tiếp theo. Nếu xảy ra ngoại lệ, mức ngăn xếp giá trị được khôi phục về trạng thái hiện tại và quyền điều khiển được chuyển đến trình xử lý ngoại lệ tại ``target``.
 
 
 .. opcode:: SETUP_CLEANUP (target)
 
-   Like ``SETUP_FINALLY``, but in case of an exception also pushes the last
-   instruction (``lasti``) to the stack so that ``RERAISE`` can restore it.
-   If an exception occurs, the value stack level and the last instruction on
-   the frame are restored to their current state, and control is transferred
-   to the exception handler at ``target``.
+   Tương tự như ``SETUP_FINALLY``, nhưng trong trường hợp xảy ra ngoại lệ, cũng đẩy lệnh cuối cùng (``lasti``) vào ngăn xếp để ``RERAISE`` có thể khôi phục lệnh đó. Nếu xảy ra ngoại lệ, mức ngăn xếp giá trị và lệnh cuối cùng trên frame được khôi phục về trạng thái hiện tại, đồng thời quyền điều khiển được chuyển đến trình xử lý ngoại lệ tại ``target``.
 
 
 .. opcode:: SETUP_WITH (target)
 
-   Like ``SETUP_CLEANUP``, but in case of an exception one more item is popped
-   from the stack before control is transferred to the exception handler at
-   ``target``.
+   Giống như ``SETUP_CLEANUP``, nhưng trong trường hợp xảy ra ngoại lệ, một phần tử nữa sẽ được lấy ra khỏi stack trước khi quyền điều khiển được chuyển đến trình xử lý ngoại lệ tại ``target``.
 
-   This variant is used in :keyword:`with` and :keyword:`async with`
-   constructs, which push the return value of the context manager's
-   :meth:`~object.__enter__` or :meth:`~object.__aenter__` to the stack.
+   Biến thể này được dùng trong các cấu trúc :keyword:`with` và :keyword:`async with`, chúng đẩy giá trị trả về của
+   :meth:`~object.__enter__` hoặc :meth:`~object.__aenter__` của context manager vào stack.
 
 
 .. opcode:: POP_BLOCK
 
-   Marks the end of the code block associated with the last ``SETUP_FINALLY``,
-   ``SETUP_CLEANUP`` or ``SETUP_WITH``.
+   Đánh dấu phần cuối của khối mã liên kết với ``SETUP_FINALLY``, ``SETUP_CLEANUP`` hoặc ``SETUP_WITH`` gần nhất.
 
 
 .. opcode:: LOAD_CONST_IMMORTAL (consti)
 
-   Works as :opcode:`LOAD_CONST`, but is more efficient for immortal objects.
+   Hoạt động như :opcode:`LOAD_CONST`, nhưng hiệu quả hơn đối với các đối tượng bất tử.
 
 
 .. opcode:: JUMP
             JUMP_NO_INTERRUPT
 
-   Undirected relative jump instructions which are replaced by their
-   directed (forward/backward) counterparts by the assembler.
+   Các lệnh nhảy tương đối không định hướng, được assembler thay thế bằng các lệnh tương ứng có hướng (tiến/lùi).
 
 .. opcode:: JUMP_IF_TRUE
             JUMP_IF_FALSE
 
-   Conditional jumps which do not impact the stack. Replaced by the sequence
-   ``COPY 1``, ``TO_BOOL``, ``POP_JUMP_IF_TRUE/FALSE``.
+   Các phép nhảy có điều kiện không ảnh hưởng đến stack. Được thay thế bằng chuỗi ``COPY 1``, ``TO_BOOL``, ``POP_JUMP_IF_TRUE/FALSE``.
 
 .. opcode:: LOAD_CLOSURE (i)
 
-   Pushes a reference to the cell contained in slot ``i`` of the "fast locals"
-   storage.
+   Đẩy một tham chiếu đến cell nằm trong slot ``i`` của vùng lưu trữ "fast locals".
 
-   Note that ``LOAD_CLOSURE`` is replaced with ``LOAD_FAST`` in the assembler.
+   Lưu ý rằng ``LOAD_CLOSURE`` được thay thế bằng ``LOAD_FAST`` trong assembler.
 
    .. versionchanged:: 3.13
-      This opcode is now a pseudo-instruction.
+      Opcode này hiện là một pseudo-instruction.
 
 
 .. _opcode_collections:
 
-Opcode collections
+Các tập hợp opcode
 ------------------
 
-These collections are provided for automatic introspection of bytecode
-instructions:
+Các tập hợp này được cung cấp để tự động introspection các instruction bytecode:
 
 .. versionchanged:: 3.12
-   The collections now contain pseudo instructions and instrumented
-   instructions as well. These are opcodes with values ``>= MIN_PSEUDO_OPCODE``
-   and ``>= MIN_INSTRUMENTED_OPCODE``.
+   Các collection hiện cũng chứa các lệnh giả (pseudo-instruction) và các lệnh instrumented. Đây là những opcode có giá trị ``>= MIN_PSEUDO_OPCODE`` và ``>= MIN_INSTRUMENTED_OPCODE``.
 
 .. data:: opname
 
-   Sequence of operation names, indexable using the bytecode.
+   Chuỗi tên thao tác, có thể lập chỉ mục bằng bytecode.
 
 
 .. data:: opmap
 
-   Dictionary mapping operation names to bytecodes.
+   Từ điển ánh xạ tên thao tác với bytecode.
 
 
 .. data:: cmp_op
 
-   Sequence of all compare operation names.
+   Chuỗi của tất cả tên thao tác so sánh.
 
 
 .. data:: hasarg
 
-   Sequence of bytecodes that use their argument.
+   Chuỗi các bytecode sử dụng đối số của chúng.
 
    .. versionadded:: 3.12
 
 
 .. data:: hasconst
 
-   Sequence of bytecodes that access a constant.
+   Chuỗi các bytecode truy cập một hằng số.
 
 
 .. data:: hasfree
 
-   Sequence of bytecodes that access a :term:`free (closure) variable <closure variable>`.
-   'free' in this context refers to names in the current scope that are
-   referenced by inner scopes or names in outer scopes that are referenced
-   from this scope.  It does *not* include references to global or builtin scopes.
+   Chuỗi các bytecode truy cập một biến :term:`tự do (closure) <closure variable>`. Trong ngữ cảnh này, 'free' chỉ các tên trong scope hiện tại được các scope bên trong tham chiếu, hoặc các tên trong scope bên ngoài được tham chiếu từ scope này. Nó *không* bao gồm các tham chiếu đến scope global hoặc builtin.
 
 
 .. data:: hasname
 
-   Sequence of bytecodes that access an attribute by name.
+   Chuỗi bytecode truy cập một thuộc tính theo tên.
 
 
 .. data:: hasjump
 
-   Sequence of bytecodes that have a jump target. All jumps
-   are relative.
+   Chuỗi bytecode có đích nhảy. Tất cả các lệnh nhảy đều là tương đối.
 
    .. versionadded:: 3.13
 
 .. data:: haslocal
 
-   Sequence of bytecodes that access a local variable.
+   Chuỗi bytecode truy cập một biến cục bộ.
 
 
 .. data:: hascompare
 
-   Sequence of bytecodes of Boolean operations.
+   Chuỗi bytecode của các phép toán Boolean.
 
 .. data:: hasexc
 
-   Sequence of bytecodes that set an exception handler.
+   Chuỗi bytecode thiết lập một trình xử lý ngoại lệ.
 
    .. versionadded:: 3.12
 
 
 .. data:: hasjrel
 
-   Sequence of bytecodes that have a relative jump target.
+   Chuỗi bytecode có đích nhảy tương đối.
 
    .. deprecated:: 3.13
-      All jumps are now relative. Use :data:`hasjump`.
+      Tất cả các lệnh nhảy hiện đều là tương đối. Sử dụng :data:`hasjump`.
 
 
 .. data:: hasjabs
 
-   Sequence of bytecodes that have an absolute jump target.
+   Chuỗi bytecode có một đích nhảy tuyệt đối.
 
    .. deprecated:: 3.13
-      All jumps are now relative. This list is empty.
+      Tất cả các lệnh nhảy hiện đều là tương đối. Danh sách này trống.

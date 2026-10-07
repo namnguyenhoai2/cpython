@@ -1,117 +1,89 @@
 .. _devmode:
 
-Python Development Mode
-=======================
+Chế độ Phát triển Python
+========================
 
 .. versionadded:: 3.7
 
-The Python Development Mode introduces additional runtime checks that are too
-expensive to be enabled by default. It should not be more verbose than the
-default if the code is correct; new warnings are only emitted when an issue is
-detected.
+Chế độ Phát triển Python bổ sung các bước kiểm tra runtime vốn quá tốn kém để bật theo mặc định. Chế độ này không nên dài dòng hơn chế độ mặc định nếu mã nguồn chính xác; các cảnh báo mới chỉ được phát ra khi phát hiện vấn đề.
 
-It can be enabled using the :option:`-X dev <-X>` command line option or by
-setting the :envvar:`PYTHONDEVMODE` environment variable to ``1``.
+Có thể bật chế độ này bằng tùy chọn dòng lệnh :option:`-X dev <-X>` hoặc bằng cách đặt biến môi trường :envvar:`PYTHONDEVMODE` thành ``1``.
 
-See also :ref:`Python debug build <debug-build>`.
+Xem thêm :ref:`bản dựng debug Python <debug-build>`.
 
-Effects of the Python Development Mode
+Ảnh hưởng của Chế độ Phát triển Python
 --------------------------------------
 
-Enabling the Python Development Mode is similar to the following command, but
-with additional effects described below::
+Việc bật Chế độ Phát triển Python tương tự như lệnh sau, nhưng có thêm các ảnh hưởng được mô tả bên dưới::
 
     PYTHONMALLOC=debug PYTHONASYNCIODEBUG=1 python -W default -X faulthandler
 
-Effects of the Python Development Mode:
+Ảnh hưởng của Chế độ Phát triển Python:
 
-* Add ``default`` :ref:`warning filter <describing-warning-filters>`. The
-  following warnings are shown:
+* Thêm ``default`` :ref:`bộ lọc cảnh báo <describing-warning-filters>`. Các cảnh báo sau được hiển thị:
 
   * :exc:`DeprecationWarning`
   * :exc:`ImportWarning`
   * :exc:`PendingDeprecationWarning`
   * :exc:`ResourceWarning`
 
-  Normally, the above warnings are filtered by the default :ref:`warning
-  filters <describing-warning-filters>`.
+  Thông thường, các cảnh báo trên được lọc bởi :ref:`các bộ lọc cảnh báo <describing-warning-filters>` mặc định.
 
-  It behaves as if the :option:`-W default <-W>` command line option is used.
+  Nó hoạt động như thể tùy chọn dòng lệnh :option:`-W default <-W>` được sử dụng.
 
-  Use the :option:`-W error <-W>` command line option or set the
-  :envvar:`PYTHONWARNINGS` environment variable to ``error`` to treat warnings
-  as errors.
+  Sử dụng tùy chọn dòng lệnh :option:`-W error <-W>` hoặc đặt
+  biến môi trường :envvar:`PYTHONWARNINGS` thành ``error`` để coi các cảnh báo là lỗi.
 
-* Install debug hooks on memory allocators to check for:
+* Cài đặt các debug hook trên bộ cấp phát bộ nhớ để kiểm tra:
 
-  * Buffer underflow
-  * Buffer overflow
-  * Memory allocator API violation
-  * Unsafe usage of the GIL
+  * Tràn bộ đệm
+  * Tràn bộ đệm
+  * Vi phạm API của bộ cấp phát bộ nhớ
+  * Sử dụng GIL không an toàn
 
-  See the :c:func:`PyMem_SetupDebugHooks` C function.
+  Xem hàm C :c:func:`PyMem_SetupDebugHooks`.
 
-  It behaves as if the :envvar:`PYTHONMALLOC` environment variable is set to
-  ``debug``.
+  Hoạt động như thể biến môi trường :envvar:`PYTHONMALLOC` được đặt thành ``debug``.
 
-  To enable the Python Development Mode without installing debug hooks on
-  memory allocators, set the :envvar:`PYTHONMALLOC` environment variable to
-  ``default``.
+  Để bật Python Development Mode mà không cài đặt các hook gỡ lỗi trên bộ cấp phát bộ nhớ, hãy đặt biến môi trường :envvar:`PYTHONMALLOC` thành ``default``.
 
-* Call :func:`faulthandler.enable` at Python startup to install handlers for
-  the :const:`~signal.SIGSEGV`, :const:`~signal.SIGFPE`,
-  :const:`~signal.SIGABRT`, :const:`~signal.SIGBUS` and
-  :const:`~signal.SIGILL` signals to dump the Python traceback on a crash.
+* Gọi :func:`faulthandler.enable` khi Python khởi động để cài đặt các trình xử lý cho :const:`~signal.SIGSEGV`, :const:`~signal.SIGFPE`,
+  :const:`~signal.SIGABRT`, :const:`~signal.SIGBUS` và
+  :const:`~signal.SIGILL` báo hiệu việc kết xuất traceback của Python khi xảy ra sự cố.
 
-  It behaves as if the :option:`-X faulthandler <-X>` command line option is
-  used or if the :envvar:`PYTHONFAULTHANDLER` environment variable is set to
-  ``1``.
+  Hoạt động này tương đương với việc sử dụng tùy chọn dòng lệnh :option:`-X faulthandler <-X>` hoặc đặt biến môi trường :envvar:`PYTHONFAULTHANDLER` thành ``1``.
 
-* Enable :ref:`asyncio debug mode <asyncio-debug-mode>`. For example,
-  :mod:`asyncio` checks for coroutines that were not awaited and logs them.
+* Bật :ref:`chế độ debug của asyncio <asyncio-debug-mode>`. Ví dụ:
+  :mod:`asyncio` kiểm tra các coroutine chưa được await và ghi nhật ký về chúng.
 
-  It behaves as if the :envvar:`PYTHONASYNCIODEBUG` environment variable is set
-  to ``1``.
+  Hoạt động này tương đương với việc đặt biến môi trường :envvar:`PYTHONASYNCIODEBUG` thành ``1``.
 
-* Check the *encoding* and *errors* arguments for string encoding and decoding
-  operations. Examples: :func:`open`, :meth:`str.encode` and
+* Kiểm tra các đối số *encoding* và *errors* cho các thao tác mã hóa và giải mã chuỗi. Ví dụ: :func:`open`, :meth:`str.encode` và
   :meth:`bytes.decode`.
 
-  By default, for best performance, the *errors* argument is only checked at
-  the first encoding/decoding error and the *encoding* argument is sometimes
-  ignored for empty strings.
+  Theo mặc định, để đạt hiệu năng tốt nhất, đối số *errors* chỉ được kiểm tra ở lỗi mã hóa/giải mã đầu tiên và đối số *encoding* đôi khi bị bỏ qua đối với các chuỗi rỗng.
 
-* The :class:`io.IOBase` destructor logs ``close()`` exceptions.
-* Set the :attr:`~sys.flags.dev_mode` attribute of :data:`sys.flags` to
-  ``True``.
+* :class:`io.IOBase` destructor ghi nhật ký các ``close()`` ngoại lệ.
+* Đặt thuộc tính :attr:`~sys.flags.dev_mode` của :data:`sys.flags` thành ``True``.
 
-The Python Development Mode does not enable the :mod:`tracemalloc` module by
-default, because the overhead cost (to performance and memory) would be too
-large. Enabling the :mod:`tracemalloc` module provides additional information
-on the origin of some errors. For example, :exc:`ResourceWarning` logs the
-traceback where the resource was allocated, and a buffer overflow error logs
-the traceback where the memory block was allocated.
+Python Development Mode không bật mô-đun :mod:`tracemalloc` theo mặc định vì chi phí overhead (đối với hiệu năng và bộ nhớ) sẽ quá lớn. Việc bật mô-đun :mod:`tracemalloc` cung cấp thêm thông tin về nguồn gốc của một số lỗi. Ví dụ, :exc:`ResourceWarning` ghi nhật ký traceback tại đó tài nguyên được cấp phát, còn lỗi tràn bộ đệm ghi nhật ký traceback tại đó khối bộ nhớ được cấp phát.
 
-The Python Development Mode does not prevent the :option:`-O` command line
-option from removing :keyword:`assert` statements nor from setting
-:const:`__debug__` to ``False``.
+Python Development Mode không ngăn tùy chọn dòng lệnh :option:`-O` loại bỏ các câu lệnh :keyword:`assert` hoặc đặt
+:const:`__debug__` thành ``False``.
 
-The Python Development Mode can only be enabled at the Python startup. Its
-value can be read from :data:`sys.flags.dev_mode <sys.flags>`.
+Python Development Mode chỉ có thể được bật khi Python khởi động. Có thể đọc giá trị của nó từ :data:`sys.flags.dev_mode <sys.flags>`.
 
 .. versionchanged:: 3.8
-   The :class:`io.IOBase` destructor now logs ``close()`` exceptions.
+   Bộ hủy :class:`io.IOBase` hiện ghi nhật ký các ngoại lệ ``close()``.
 
 .. versionchanged:: 3.9
-   The *encoding* and *errors* arguments are now checked for string encoding
-   and decoding operations.
+   Các đối số *encoding* và *errors* hiện được kiểm tra trong các thao tác mã hóa và giải mã chuỗi.
 
 
-ResourceWarning Example
------------------------
+Ví dụ về ResourceWarning
+------------------------
 
-Example of a script counting the number of lines of the text file specified in
-the command line::
+Ví dụ về một script đếm số dòng của tệp văn bản được chỉ định trên dòng lệnh::
 
     import sys
 
@@ -119,20 +91,19 @@ the command line::
         fp = open(sys.argv[1])
         nlines = len(fp.readlines())
         print(nlines)
-        # The file is closed implicitly
+        # Tệp được đóng ngầm định
 
     if __name__ == "__main__":
         main()
 
-The script does not close the file explicitly. By default, Python does not emit
-any warning. Example using README.txt, which has 269 lines:
+Script không đóng tệp một cách rõ ràng. Theo mặc định, Python không phát ra cảnh báo nào. Ví dụ sử dụng README.txt, tệp có 269 dòng:
 
 .. code-block:: shell-session
 
     $ python script.py README.txt
     269
 
-Enabling the Python Development Mode displays a :exc:`ResourceWarning` warning:
+Việc bật Python Development Mode sẽ hiển thị cảnh báo :exc:`ResourceWarning`:
 
 .. code-block:: shell-session
 
@@ -142,8 +113,7 @@ Enabling the Python Development Mode displays a :exc:`ResourceWarning` warning:
       main()
     ResourceWarning: Enable tracemalloc to get the object allocation traceback
 
-In addition, enabling :mod:`tracemalloc` shows the line where the file was
-opened:
+Ngoài ra, việc bật :mod:`tracemalloc` sẽ hiển thị dòng mà tệp được mở:
 
 .. code-block:: shell-session
 
@@ -157,24 +127,21 @@ opened:
       File "script.py", lineno 4
         fp = open(sys.argv[1])
 
-The fix is to close explicitly the file. Example using a context manager::
+Cách khắc phục là đóng tệp một cách rõ ràng. Ví dụ sử dụng context manager::
 
     def main():
-        # Close the file explicitly when exiting the with block
+        # Đóng tệp một cách rõ ràng khi thoát khỏi khối with
         with open(sys.argv[1]) as fp:
             nlines = len(fp.readlines())
         print(nlines)
 
-Not closing a resource explicitly can leave a resource open for way longer than
-expected; it can cause severe issues upon exiting Python. It is bad in
-CPython, but it is even worse in PyPy. Closing resources explicitly makes an
-application more deterministic and more reliable.
+Việc không đóng tài nguyên một cách rõ ràng có thể khiến tài nguyên vẫn mở lâu hơn nhiều so với dự kiến; điều này có thể gây ra các sự cố nghiêm trọng khi thoát Python. Đây là vấn đề không tốt trong CPython, nhưng còn tệ hơn trong PyPy. Việc đóng tài nguyên một cách rõ ràng giúp ứng dụng có tính xác định và đáng tin cậy hơn.
 
 
-Bad file descriptor error example
----------------------------------
+Ví dụ về lỗi bad file descriptor
+--------------------------------
 
-Script displaying the first line of itself::
+Script hiển thị dòng đầu tiên của chính nó::
 
     import os
 
@@ -183,19 +150,18 @@ Script displaying the first line of itself::
         firstline = fp.readline()
         print(firstline.rstrip())
         os.close(fp.fileno())
-        # The file is closed implicitly
+        # Tệp được đóng ngầm
 
     main()
 
-By default, Python does not emit any warning:
+Theo mặc định, Python không phát ra cảnh báo nào:
 
 .. code-block:: shell-session
 
     $ python script.py
     import os
 
-The Python Development Mode shows a :exc:`ResourceWarning` and logs a "Bad file
-descriptor" error when finalizing the file object:
+Python Development Mode hiển thị :exc:`ResourceWarning` và ghi nhật ký lỗi "Bad file descriptor" khi hoàn tất đối tượng file:
 
 .. code-block:: shell-session
 
@@ -210,11 +176,6 @@ descriptor" error when finalizing the file object:
         main()
     OSError: [Errno 9] Bad file descriptor
 
-``os.close(fp.fileno())`` closes the file descriptor. When the file object
-finalizer tries to close the file descriptor again, it fails with the ``Bad
-file descriptor`` error. A file descriptor must be closed only once. In the
-worst case scenario, closing it twice can lead to a crash (see :issue:`18748`
-for an example).
+``os.close(fp.fileno())`` đóng file descriptor. Khi finalizer của đối tượng file cố gắng đóng file descriptor lần nữa, thao tác này thất bại với lỗi ``Bad file descriptor``. Một file descriptor chỉ được đóng một lần. Trong trường hợp xấu nhất, việc đóng nó hai lần có thể dẫn đến sự cố (xem :issue:`18748` để biết ví dụ).
 
-The fix is to remove the ``os.close(fp.fileno())`` line, or open the file with
-``closefd=False``.
+Cách khắc phục là xóa dòng ``os.close(fp.fileno())`` hoặc mở file bằng ``closefd=False``.

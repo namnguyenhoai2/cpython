@@ -1,41 +1,26 @@
-:mod:`!email.header`: Internationalized headers
------------------------------------------------
+:mod:`!email.header`: Tiêu đề được quốc tế hóa
+----------------------------------------------
 
 .. module:: email.header
-   :synopsis: Representing non-ASCII headers
+   :synopsis: Biểu diễn các tiêu đề không phải ASCII
 
-**Source code:** :source:`Lib/email/header.py`
+**Mã nguồn:** :source:`Lib/email/header.py`
 
 --------------
 
-This module is part of the legacy (``Compat32``) email API.  In the current API
-encoding and decoding of headers is handled transparently by the
-dictionary-like API of the :class:`~email.message.EmailMessage` class.  In
-addition to uses in legacy code, this module can be useful in applications that
-need to completely control the character sets used when encoding headers.
+Mô-đun này là một phần của API email cũ (``Compat32``). Trong API hiện tại, việc mã hóa và giải mã tiêu đề được xử lý minh bạch bởi API dạng từ điển của lớp :class:`~email.message.EmailMessage`. Ngoài việc được sử dụng trong mã cũ, mô-đun này còn hữu ích trong các ứng dụng cần kiểm soát hoàn toàn các bộ ký tự được dùng khi mã hóa tiêu đề.
 
-The remaining text in this section is the original documentation of the module.
+Phần văn bản còn lại trong mục này là tài liệu gốc của mô-đun.
 
-:rfc:`2822` is the base standard that describes the format of email messages.
-It derives from the older :rfc:`822` standard which came into widespread use at
-a time when most email was composed of ASCII characters only.  :rfc:`2822` is a
-specification written assuming email contains only 7-bit ASCII characters.
+:rfc:`2822` là tiêu chuẩn cơ sở mô tả định dạng của thư email. Tiêu chuẩn này bắt nguồn từ tiêu chuẩn :rfc:`822` cũ hơn, được sử dụng rộng rãi vào thời điểm hầu hết email chỉ được soạn bằng các ký tự ASCII. :rfc:`2822` là một đặc tả được viết với giả định rằng email chỉ chứa các ký tự ASCII 7 bit.
 
-Of course, as email has been deployed worldwide, it has become
-internationalized, such that language specific character sets can now be used in
-email messages.  The base standard still requires email messages to be
-transferred using only 7-bit ASCII characters, so a slew of RFCs have been
-written describing how to encode email containing non-ASCII characters into
-:rfc:`2822`\ -compliant format. These RFCs include :rfc:`2045`, :rfc:`2046`,
-:rfc:`2047`, and :rfc:`2231`. The :mod:`email` package supports these standards
-in its :mod:`!email.header` and :mod:`email.charset` modules.
+Dĩ nhiên, khi email được triển khai trên toàn thế giới, nó đã trở nên quốc tế hóa, cho phép sử dụng các bộ ký tự dành riêng cho từng ngôn ngữ trong thư email. Tiêu chuẩn cơ sở vẫn yêu cầu thư email chỉ được truyền bằng các ký tự ASCII 7 bit, vì vậy một loạt RFC đã được viết để mô tả cách mã hóa email chứa các ký tự không phải ASCII thành
+định dạng tuân thủ :rfc:`2822`\ . Các RFC này bao gồm :rfc:`2045`, :rfc:`2046`,
+:rfc:`2047` và :rfc:`2231`. Gói :mod:`email` hỗ trợ các tiêu chuẩn này trong các mô-đun :mod:`!email.header` và :mod:`email.charset`.
 
-If you want to include non-ASCII characters in your email headers, say in the
-:mailheader:`Subject` or :mailheader:`To` fields, you should use the
-:class:`Header` class and assign the field in the :class:`~email.message.Message`
-object to an instance of :class:`Header` instead of using a string for the header
-value.  Import the :class:`Header` class from the :mod:`!email.header` module.
-For example::
+Nếu bạn muốn đưa các ký tự non-ASCII vào tiêu đề email, chẳng hạn trong các trường
+:mailheader:`Subject` hoặc :mailheader:`To`, bạn nên sử dụng
+lớp :class:`Header` và gán trường trong đối tượng :class:`~email.message.Message` cho một thực thể :class:`Header` thay vì sử dụng chuỗi làm giá trị tiêu đề.  Nhập lớp :class:`Header` từ mô-đun :mod:`!email.header`. Ví dụ::
 
    >>> from email.message import Message
    >>> from email.header import Header
@@ -47,154 +32,99 @@ For example::
 
 
 
-Notice here how we wanted the :mailheader:`Subject` field to contain a non-ASCII
-character?  We did this by creating a :class:`Header` instance and passing in
-the character set to use when encoding it.  When the subsequent
-:class:`~email.message.Message` instance was flattened, the :mailheader:`Subject`
-field was properly :rfc:`2047` encoded.  MIME-aware mail readers would show this
-header using the embedded ISO-8859-1 character.
+Lưu ý rằng ở đây chúng ta muốn trường :mailheader:`Subject` chứa một ký tự non-ASCII.  Chúng ta thực hiện điều đó bằng cách tạo một thực thể :class:`Header` và truyền vào bộ ký tự cần sử dụng khi mã hóa thực thể này.  Khi phần tiếp theo
+thực thể :class:`~email.message.Message` được chuyển thành dạng phẳng, trường :mailheader:`Subject` đã được mã hóa :rfc:`2047` đúng cách.  Các trình đọc thư hỗ trợ MIME sẽ hiển thị tiêu đề này bằng ký tự ISO-8859-1 được nhúng.
 
-Here is the :class:`Header` class description:
+Sau đây là phần mô tả lớp :class:`Header`:
 
 
 .. class:: Header(s=None, charset=None, maxlinelen=None, header_name=None, continuation_ws=' ', errors='strict')
 
-   Create a MIME-compliant header that can contain strings in different character
-   sets.
+   Tạo một header tuân thủ MIME có thể chứa các chuỗi thuộc nhiều bộ ký tự khác nhau.
 
-   Optional *s* is the initial header value.  If ``None`` (the default), the
-   initial header value is not set.  You can later append to the header with
-   :meth:`append` method calls.  *s* may be an instance of :class:`bytes` or
-   :class:`str`, but see the :meth:`append` documentation for semantics.
+   *s* tùy chọn là giá trị header ban đầu. Nếu ``None`` (mặc định), giá trị header ban đầu sẽ không được thiết lập. Sau đó, bạn có thể nối thêm vào header bằng các lời gọi phương thức
+   :meth:`append`. *s* có thể là một thực thể của :class:`bytes` hoặc
+   :class:`str`, nhưng hãy xem tài liệu :meth:`append` để biết ngữ nghĩa.
 
-   Optional *charset* serves two purposes: it has the same meaning as the *charset*
-   argument to the :meth:`append` method.  It also sets the default character set
-   for all subsequent :meth:`append` calls that omit the *charset* argument.  If
-   *charset* is not provided in the constructor (the default), the ``us-ascii``
-   character set is used both as *s*'s initial charset and as the default for
-   subsequent :meth:`append` calls.
+   *charset* tùy chọn có hai mục đích: nó có cùng ý nghĩa với đối số *charset* của phương thức :meth:`append`. Nó cũng đặt bộ ký tự mặc định cho tất cả các lời gọi :meth:`append` tiếp theo không cung cấp đối số *charset*. Nếu *charset* không được cung cấp trong hàm khởi tạo (mặc định), bộ ký tự ``us-ascii`` sẽ được dùng làm charset ban đầu của *s* cũng như giá trị mặc định cho các lời gọi :meth:`append` tiếp theo.
 
-   The maximum line length can be specified explicitly via *maxlinelen*.  For
-   splitting the first line to a shorter value (to account for the field header
-   which isn't included in *s*, e.g. :mailheader:`Subject`) pass in the name of the
-   field in *header_name*.  The default *maxlinelen* is 78, and the default value
-   for *header_name* is ``None``, meaning it is not taken into account for the
-   first line of a long, split header.
+   Có thể chỉ định rõ ràng độ dài dòng tối đa thông qua *maxlinelen*. Để tách dòng đầu tiên thành một giá trị ngắn hơn (nhằm tính đến field header không được bao gồm trong *s*, chẳng hạn như :mailheader:`Subject`), hãy truyền tên của field vào *header_name*. Giá trị mặc định của *maxlinelen* là 78, còn giá trị mặc định của *header_name* là ``None``, nghĩa là nó không được tính đến đối với dòng đầu tiên của một header dài được tách dòng.
 
-   Optional *continuation_ws* must be :rfc:`2822`\ -compliant folding
-   whitespace, and is usually either a space or a hard tab character.  This
-   character will be prepended to continuation lines.  *continuation_ws*
-   defaults to a single space character.
+   *continuation_ws* tùy chọn phải là khoảng trắng gấp dòng tuân thủ :rfc:`2822`\ -compliant, và thường là một dấu cách hoặc ký tự tab cứng. Ký tự này sẽ được thêm vào trước các dòng tiếp nối. *continuation_ws* mặc định là một ký tự dấu cách đơn.
 
-   Optional *errors* is passed straight through to the :meth:`append` method.
+   *errors* tùy chọn được truyền thẳng vào phương thức :meth:`append`.
 
 
    .. method:: append(s, charset=None, errors='strict')
 
-      Append the string *s* to the MIME header.
+      Nối chuỗi *s* vào header MIME.
 
-      Optional *charset*, if given, should be a :class:`~email.charset.Charset`
-      instance (see :mod:`email.charset`) or the name of a character set, which
-      will be converted to a :class:`~email.charset.Charset` instance.  A value
-      of ``None`` (the default) means that the *charset* given in the constructor
-      is used.
+      *charset* tùy chọn, nếu được cung cấp, phải là một instance của :class:`~email.charset.Charset` (xem :mod:`email.charset`) hoặc tên của một bộ ký tự, tên này sẽ được chuyển đổi thành một instance của :class:`~email.charset.Charset`. Giá trị ``None`` (mặc định) có nghĩa là sử dụng *charset* được cung cấp trong hàm khởi tạo.
 
-      *s* may be an instance of :class:`bytes` or :class:`str`.  If it is an
-      instance of :class:`bytes`, then *charset* is the encoding of that byte
-      string, and a :exc:`UnicodeError` will be raised if the string cannot be
-      decoded with that character set.
+      *s* có thể là một instance của :class:`bytes` hoặc :class:`str`. Nếu là một instance của :class:`bytes`, thì *charset* là encoding của chuỗi byte đó, và sẽ phát sinh :exc:`UnicodeError` nếu không thể giải mã chuỗi bằng bộ ký tự đó.
 
-      If *s* is an instance of :class:`str`, then *charset* is a hint specifying
-      the character set of the characters in the string.
+      Nếu *s* là một instance của :class:`str`, thì *charset* là một gợi ý chỉ định bộ ký tự của các ký tự trong chuỗi.
 
-      In either case, when producing an :rfc:`2822`\ -compliant header using
-      :rfc:`2047` rules, the string will be encoded using the output codec of
-      the charset.  If the string cannot be encoded using the output codec, a
-      UnicodeError will be raised.
+      Trong cả hai trường hợp, khi tạo một header tuân thủ :rfc:`2822`\  bằng cách sử dụng
+      Theo các quy tắc :rfc:`2047`, chuỗi sẽ được mã hóa bằng codec đầu ra của charset. Nếu không thể mã hóa chuỗi bằng codec đầu ra, một UnicodeError sẽ được phát sinh.
 
-      Optional *errors* is passed as the errors argument to the decode call
-      if *s* is a byte string.
+      Tùy chọn *errors* được truyền làm đối số errors cho lệnh gọi decode nếu *s* là một chuỗi byte.
 
 
    .. method:: encode(splitchars=';, \t', maxlinelen=None, linesep='\n')
 
-      Encode a message header into an RFC-compliant format, possibly wrapping
-      long lines and encapsulating non-ASCII parts in base64 or quoted-printable
-      encodings.
+      Mã hóa tiêu đề thư thành định dạng tuân thủ RFC, có thể ngắt các dòng dài và đóng gói các phần không phải ASCII bằng mã hóa base64 hoặc quoted-printable.
 
-      Optional *splitchars* is a string containing characters which should be
-      given extra weight by the splitting algorithm during normal header
-      wrapping.  This is in very rough support of :RFC:`2822`\'s 'higher level
-      syntactic breaks':  split points preceded by a splitchar are preferred
-      during line splitting, with the characters preferred in the order in
-      which they appear in the string.  Space and tab may be included in the
-      string to indicate whether preference should be given to one over the
-      other as a split point when other split chars do not appear in the line
-      being split.  Splitchars does not affect :RFC:`2047` encoded lines.
+      Tùy chọn *splitchars* là một chuỗi chứa các ký tự được thuật toán tách dòng ưu tiên hơn trong quá trình ngắt tiêu đề thông thường. Đây là hỗ trợ rất sơ lược cho :RFC:`2822`\'s 'các điểm ngắt cú pháp cấp cao hơn': các điểm tách đứng trước một splitchar được ưu tiên khi tách dòng, trong đó các ký tự được ưu tiên theo thứ tự xuất hiện trong chuỗi. Có thể đưa dấu cách và tab vào chuỗi để cho biết nên ưu tiên ký tự nào hơn làm điểm tách khi không có ký tự tách nào khác xuất hiện trong dòng đang được tách. Splitchars không ảnh hưởng đến các dòng được mã hóa bằng :RFC:`2047`.
 
-      *maxlinelen*, if given, overrides the instance's value for the maximum
-      line length.
+      *maxlinelen*, nếu được cung cấp, sẽ ghi đè giá trị của instance về độ dài dòng tối đa.
 
-      *linesep* specifies the characters used to separate the lines of the
-      folded header.  It defaults to the most useful value for Python
-      application code (``\n``), but ``\r\n`` can be specified in order
-      to produce headers with RFC-compliant line separators.
+      *linesep* chỉ định các ký tự được dùng để phân tách các dòng của tiêu đề đã được gấp. Giá trị mặc định là giá trị hữu ích nhất cho mã ứng dụng Python (``\n``), nhưng có thể chỉ định ``\r\n`` để tạo các tiêu đề có ký tự phân tách dòng tuân thủ RFC.
 
       .. versionchanged:: 3.2
-         Added the *linesep* argument.
+         Đã thêm đối số *linesep*.
 
 
-   The :class:`Header` class also provides a number of methods to support
-   standard operators and built-in functions.
+   Lớp :class:`Header` cũng cung cấp một số phương thức hỗ trợ các toán tử chuẩn và hàm tích hợp sẵn.
 
    .. method:: __str__()
 
-      Returns an approximation of the :class:`Header` as a string, using an
-      unlimited line length.  All pieces are decoded using the
-      specified encoding and joined together appropriately.  Any pieces with a
-      charset of ``'unknown-8bit'`` are decoded as ASCII using the ``'replace'``
-      error handler.
+      Trả về giá trị gần đúng của :class:`Header` dưới dạng chuỗi, sử dụng độ dài dòng không giới hạn. Tất cả các phần đều được giải mã bằng encoding được chỉ định và nối lại với nhau một cách phù hợp. Mọi phần có charset là ``'unknown-8bit'`` đều được giải mã dưới dạng ASCII bằng error handler ``'replace'``.
 
       .. versionchanged:: 3.2
-         Added handling for the ``'unknown-8bit'`` charset.
+         Đã bổ sung khả năng xử lý charset ``'unknown-8bit'``.
 
 
    .. method:: __eq__(other)
 
-      This method allows you to compare two :class:`Header` instances for
-      equality.
+      Phương thức này cho phép bạn so sánh hai thực thể :class:`Header` để kiểm tra tính bằng nhau.
 
 
    .. method:: __ne__(other)
 
-      This method allows you to compare two :class:`Header` instances for
-      inequality.
+      Phương thức này cho phép bạn so sánh hai thực thể :class:`Header` để kiểm tra tính không bằng nhau.
 
-The :mod:`!email.header` module also provides the following convenient functions.
+Mô-đun :mod:`!email.header` cũng cung cấp các hàm tiện lợi sau đây.
 
 
 .. function:: decode_header(header)
 
-   Decode a message header value without converting the character set. The header
-   value is in *header*.
+   Giải mã giá trị header của một message mà không chuyển đổi charset. Giá trị header nằm trong *header*.
 
-   For historical reasons, this function may return either:
+   Vì những lý do mang tính lịch sử, hàm này có thể trả về một trong các dạng sau:
 
-   1. A list of pairs containing each of the decoded parts of the header,
-      ``(decoded_bytes, charset)``, where *decoded_bytes* is always an instance of
-      :class:`bytes`, and *charset* is either:
+   1. Một danh sách các cặp chứa từng phần đã được giải mã của header, ``(decoded_bytes, charset)``, trong đó *decoded_bytes* luôn là một thể hiện của
+      :class:`bytes`, và *charset* là một trong các giá trị sau:
 
-        - A lower case string containing the name of the character set specified.
+        - Một chuỗi chữ thường chứa tên của bộ ký tự được chỉ định.
 
-        - ``None`` for non-encoded parts of the header.
+        - ``None`` đối với các phần không được mã hóa của header.
 
-   2. A list of length 1 containing a pair ``(string, None)``, where
-      *string* is always an instance of :class:`str`.
+   2. Một danh sách có độ dài 1 chứa một cặp ``(string, None)``, trong đó *string* luôn là một thể hiện của :class:`str`.
 
-   An :exc:`email.errors.HeaderParseError` may be raised when certain decoding
-   errors occur (e.g. a base64 decoding exception).
+   Một :exc:`email.errors.HeaderParseError` có thể được phát sinh khi xảy ra một số lỗi giải mã nhất định (ví dụ: ngoại lệ giải mã base64).
 
-   Here are examples:
+   Dưới đây là các ví dụ:
 
       >>> from email.header import decode_header
       >>> decode_header('=?iso-8859-1?q?p=F6stal?=')
@@ -206,24 +136,19 @@ The :mod:`!email.header` module also provides the following convenient functions
 
    .. note::
 
-       This function exists for backwards compatibility only. For
-       new code, we recommend using :class:`email.headerregistry.HeaderRegistry`.
+       Hàm này chỉ tồn tại để duy trì khả năng tương thích ngược. Đối với mã mới, chúng tôi khuyến nghị sử dụng :class:`email.headerregistry.HeaderRegistry`.
 
 
 .. function:: make_header(decoded_seq, maxlinelen=None, header_name=None, continuation_ws=' ')
 
-   Create a :class:`Header` instance from a sequence of pairs as returned by
+   Tạo một thực thể :class:`Header` từ một chuỗi các cặp như được trả về bởi
    :func:`decode_header`.
 
-   :func:`decode_header` takes a header value string and returns a sequence of
-   pairs of the format ``(decoded_string, charset)`` where *charset* is the name of
-   the character set.
+   :func:`decode_header` nhận một chuỗi giá trị header và trả về một chuỗi các cặp có định dạng ``(decoded_string, charset)``, trong đó *charset* là tên của bộ ký tự.
 
-   This function takes one of those sequence of pairs and returns a
-   :class:`Header` instance.  Optional *maxlinelen*, *header_name*, and
-   *continuation_ws* are as in the :class:`Header` constructor.
+   Hàm này nhận một trong các chuỗi cặp đó và trả về một
+   thực thể :class:`Header`. Các tùy chọn *maxlinelen*, *header_name* và *continuation_ws* giống như trong hàm khởi tạo :class:`Header`.
 
    .. note::
 
-       This function exists for backwards compatibility only, and is
-       not recommended for use in new code.
+       Hàm này chỉ tồn tại để duy trì khả năng tương thích ngược và không được khuyến nghị sử dụng trong mã mới.

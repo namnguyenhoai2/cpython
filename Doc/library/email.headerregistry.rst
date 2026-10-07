@@ -1,284 +1,180 @@
-:mod:`!email.headerregistry`: Custom Header Objects
----------------------------------------------------
+:mod:`!email.headerregistry`: Các đối tượng Header tùy chỉnh
+------------------------------------------------------------
 
 .. module:: email.headerregistry
-   :synopsis: Automatic Parsing of headers based on the field name
+   :synopsis: Tự động phân tích cú pháp các header dựa trên tên trường
 
 .. moduleauthor:: R. David Murray <rdmurray@bitdance.com>
 .. sectionauthor:: R. David Murray <rdmurray@bitdance.com>
 
-**Source code:** :source:`Lib/email/headerregistry.py`
+**Mã nguồn:** :source:`Lib/email/headerregistry.py`
 
 --------------
 
 .. versionadded:: 3.6 [1]_
 
-Headers are represented by customized subclasses of :class:`str`.  The
-particular class used to represent a given header is determined by the
-:attr:`~email.policy.EmailPolicy.header_factory` of the :mod:`~email.policy` in
-effect when the headers are created.  This section documents the particular
-``header_factory`` implemented by the email package for handling :RFC:`5322`
-compliant email messages, which not only provides customized header objects for
-various header types, but also provides an extension mechanism for applications
-to add their own custom header types.
+Các header được biểu diễn bằng các lớp con tùy chỉnh của :class:`str`. Lớp cụ thể được dùng để biểu diễn một header nhất định được xác định bởi
+:attr:`~email.policy.EmailPolicy.header_factory` của :mod:`~email.policy` đang có hiệu lực tại thời điểm các header được tạo. Phần này mô tả ``header_factory`` cụ thể được gói email triển khai để xử lý các thông điệp email tuân thủ :RFC:`5322`, không chỉ cung cấp các đối tượng header tùy chỉnh cho nhiều loại header khác nhau mà còn cung cấp cơ chế mở rộng để các ứng dụng thêm các loại header tùy chỉnh của riêng mình.
 
-When using any of the policy objects derived from
-:data:`~email.policy.EmailPolicy`, all headers are produced by
-:class:`.HeaderRegistry` and have :class:`.BaseHeader` as their last base
-class.  Each header class has an additional base class that is determined by
-the type of the header.  For example, many headers have the class
-:class:`.UnstructuredHeader` as their other base class.  The specialized second
-class for a header is determined by the name of the header, using a lookup
-table stored in the :class:`.HeaderRegistry`.  All of this is managed
-transparently for the typical application program, but interfaces are provided
-for modifying the default behavior for use by more complex applications.
+Khi sử dụng bất kỳ đối tượng policy nào được dẫn xuất từ
+:data:`~email.policy.EmailPolicy`, tất cả header đều được tạo bởi
+:class:`.HeaderRegistry` và có :class:`.BaseHeader` làm lớp cơ sở cuối cùng. Mỗi lớp header có thêm một lớp cơ sở được xác định bởi loại của header. Ví dụ, nhiều header có lớp
+:class:`.UnstructuredHeader` làm lớp cơ sở còn lại. Lớp thứ hai chuyên biệt cho một header được xác định bởi tên của header, bằng cách sử dụng một bảng tra cứu được lưu trong :class:`.HeaderRegistry`. Tất cả những việc này được quản lý minh bạch đối với chương trình ứng dụng thông thường, nhưng các giao diện được cung cấp để sửa đổi hành vi mặc định nhằm phục vụ những ứng dụng phức tạp hơn.
 
-The sections below first document the header base classes and their attributes,
-followed by the API for modifying the behavior of :class:`.HeaderRegistry`, and
-finally the support classes used to represent the data parsed from structured
-headers.
+Các phần bên dưới trước tiên mô tả các lớp cơ sở của header và các thuộc tính của chúng, tiếp theo là API để sửa đổi hành vi của :class:`.HeaderRegistry`, và cuối cùng là các lớp hỗ trợ dùng để biểu diễn dữ liệu được phân tích từ các header có cấu trúc.
 
 
 .. class:: BaseHeader(name, value)
 
-   *name* and *value* are passed to ``BaseHeader`` from the
-   :attr:`~email.policy.EmailPolicy.header_factory` call.  The string value of
-   any header object is the *value* fully decoded to a string.
+   *name* và *value* được truyền vào ``BaseHeader`` từ
+   :attr:`~email.policy.EmailPolicy.header_factory` call. Giá trị chuỗi của bất kỳ đối tượng header nào là *value* được giải mã hoàn toàn thành một chuỗi.
 
-   This base class defines the following read-only properties:
+   Lớp cơ sở này định nghĩa các thuộc tính chỉ đọc sau:
 
 
    .. attribute:: name
 
-      The name of the header (the portion of the field before the ':').  This
-      is exactly the value passed in the
-      :attr:`~email.policy.EmailPolicy.header_factory` call for *name*; that
-      is, case is preserved.
+      Tên của header (phần của trường nằm trước ':'). Đây chính xác là giá trị được truyền vào
+      Lệnh gọi :attr:`~email.policy.EmailPolicy.header_factory` cho *name*; tức là, chữ hoa chữ thường được giữ nguyên.
 
 
    .. attribute:: defects
 
-      A tuple of :exc:`~email.errors.HeaderDefect` instances reporting any
-      RFC compliance problems found during parsing.  The email package tries to
-      be complete about detecting compliance issues.  See the :mod:`~email.errors`
-      module for a discussion of the types of defects that may be reported.
+      Một tuple gồm các thực thể :exc:`~email.errors.HeaderDefect` báo cáo mọi vấn đề về tính tuân thủ RFC được phát hiện trong quá trình phân tích cú pháp. Gói email cố gắng phát hiện đầy đủ các vấn đề về tính tuân thủ. Xem module :mod:`~email.errors` để biết thêm về các loại lỗi có thể được báo cáo.
 
 
    .. attribute:: max_count
 
-      The maximum number of headers of this type that can have the same
-      ``name``.  A value of ``None`` means unlimited.  The ``BaseHeader`` value
-      for this attribute is ``None``; it is expected that specialized header
-      classes will override this value as needed.
+      Số lượng header tối đa thuộc loại này có thể có cùng ``name``. Giá trị ``None`` có nghĩa là không giới hạn. Giá trị ``BaseHeader`` của thuộc tính này là ``None``; dự kiến các lớp header chuyên biệt sẽ ghi đè giá trị này khi cần.
 
-   ``BaseHeader`` also provides the following method, which is called by the
-   email library code and should not in general be called by application
-   programs:
+   ``BaseHeader`` cũng cung cấp phương thức sau, được mã email gọi và nhìn chung không nên được các chương trình ứng dụng gọi:
 
    .. method:: fold(*, policy)
 
-      Return a string containing :attr:`~email.policy.Policy.linesep`
-      characters as required to correctly fold the header according to
-      *policy*.  A :attr:`~email.policy.Policy.cte_type` of ``8bit`` will be
-      treated as if it were ``7bit``, since headers may not contain arbitrary
-      binary data.  If :attr:`~email.policy.EmailPolicy.utf8` is ``False``,
-      non-ASCII data will be :rfc:`2047` encoded.
+      Trả về một chuỗi chứa các ký tự :attr:`~email.policy.Policy.linesep` cần thiết để gấp header đúng theo *policy*. Một :attr:`~email.policy.Policy.cte_type` có giá trị ``8bit`` sẽ được xử lý như thể nó là ``7bit``, vì header không được chứa dữ liệu nhị phân tùy ý. Nếu :attr:`~email.policy.EmailPolicy.utf8` là ``False``, dữ liệu non-ASCII sẽ được mã hóa bằng :rfc:`2047`.
 
 
-   ``BaseHeader`` by itself cannot be used to create a header object.  It
-   defines a protocol that each specialized header cooperates with in order to
-   produce the header object.  Specifically, ``BaseHeader`` requires that
-   the specialized class provide a :func:`classmethod` named ``parse``.  This
-   method is called as follows::
+   Bản thân ``BaseHeader`` không thể được dùng để tạo đối tượng header. Nó định nghĩa một protocol mà mỗi header chuyên biệt phối hợp để tạo ra đối tượng header. Cụ thể, ``BaseHeader`` yêu cầu lớp chuyên biệt cung cấp một :func:`classmethod` có tên ``parse``. Phương thức này được gọi như sau::
 
        parse(string, kwds)
 
-   ``kwds`` is a dictionary containing one pre-initialized key, ``defects``.
-   ``defects`` is an empty list.  The parse method should append any detected
-   defects to this list.  On return, the ``kwds`` dictionary *must* contain
-   values for at least the keys ``decoded``, ``defects`` and ``parse_tree``.
-   ``decoded`` should be the string value for the header (that is, the header
-   value fully decoded to a string). ``parse_tree`` is set to the parse tree obtained
-   from parsing the header. The parse method should assume that *string* may
-   contain content-transfer-encoded parts, but should correctly handle all valid
-   Unicode characters as well so that it can parse un-encoded header values.
+   ``kwds`` là một từ điển chứa một khóa được khởi tạo sẵn, ``defects``. ``defects`` là một danh sách trống. Phương thức parse phải thêm mọi lỗi được phát hiện vào danh sách này. Khi trả về, từ điển ``kwds`` *phải* chứa giá trị cho ít nhất các khóa ``decoded``, ``defects`` và ``parse_tree``. ``decoded`` phải là giá trị chuỗi của header (tức là giá trị header đã được giải mã hoàn toàn thành một chuỗi). ``parse_tree`` được đặt thành cây phân tích cú pháp thu được khi phân tích header. Phương thức parse phải giả định rằng *string* có thể chứa các phần được mã hóa bằng content-transfer, nhưng cũng phải xử lý chính xác mọi ký tự Unicode hợp lệ để có thể phân tích các giá trị header chưa được mã hóa.
 
-   ``BaseHeader``'s ``__new__`` then creates the header instance, and calls its
-   ``init`` method.  The specialized class only needs to provide an ``init``
-   method if it wishes to set additional attributes beyond those provided by
-   ``BaseHeader`` itself.  Such an ``init`` method should look like this::
+   ``BaseHeader``'s ``__new__`` sau đó tạo instance của header và gọi phương thức ``init`` của nó. Lớp chuyên biệt chỉ cần cung cấp phương thức ``init`` nếu muốn thiết lập các thuộc tính bổ sung ngoài những thuộc tính do chính ``BaseHeader`` cung cấp. Một phương thức ``init`` như vậy sẽ có dạng sau::
 
        def init(self, /, *args, **kw):
            self._myattr = kw.pop('myattr')
            super().init(*args, **kw)
 
-   That is, anything extra that the specialized class puts in to the ``kwds``
-   dictionary should be removed and handled, and the remaining contents of
-   ``kw`` (and ``args``) passed to the ``BaseHeader`` ``init`` method.
+   Nói cách khác, mọi nội dung bổ sung mà lớp chuyên biệt đưa vào dictionary ``kwds`` đều phải được loại bỏ và xử lý, còn các nội dung còn lại của ``kw`` (và ``args``) được truyền vào phương thức ``init`` ``BaseHeader``.
 
 
 .. class:: UnstructuredHeader
 
-   An "unstructured" header is the default type of header in :rfc:`5322`.
-   Any header that does not have a specified syntax is treated as
-   unstructured.  The classic example of an unstructured header is the
-   :mailheader:`Subject` header.
+   Header "unstructured" là kiểu header mặc định trong :rfc:`5322`. Mọi header không có cú pháp được chỉ định đều được xử lý dưới dạng unstructured. Ví dụ kinh điển về một header unstructured là
+   header :mailheader:`Subject`.
 
-   In :rfc:`5322`, an unstructured header is a run of arbitrary text in the
-   ASCII character set.  :rfc:`2047`, however, has an :rfc:`5322` compatible
-   mechanism for encoding non-ASCII text as ASCII characters within a header
-   value.  When a *value* containing encoded words is passed to the
-   constructor, the ``UnstructuredHeader`` parser converts such encoded words
-   into a string, following the :rfc:`2047` rules for unstructured text.  The
-   parser uses heuristics to attempt to decode certain non-compliant encoded
-   words.  Defects are registered in such cases, as well as defects for issues
-   such as invalid characters within the encoded words or the non-encoded text.
+   Trong :rfc:`5322`, header unstructured là một chuỗi văn bản tùy ý trong bộ ký tự ASCII. Tuy nhiên, :rfc:`2047` có một cơ chế tương thích với :rfc:`5322` để mã hóa văn bản không phải ASCII thành các ký tự ASCII trong giá trị header. Khi một *value* chứa các encoded word được truyền vào hàm khởi tạo, parser ``UnstructuredHeader`` sẽ chuyển các encoded word đó thành một chuỗi, tuân theo các quy tắc :rfc:`2047` đối với văn bản unstructured. Parser sử dụng các heuristic để cố gắng giải mã một số encoded word không tuân thủ. Trong những trường hợp này, các lỗi sẽ được đăng ký; tương tự, lỗi cũng được đăng ký đối với những vấn đề như ký tự không hợp lệ bên trong encoded word hoặc văn bản không được mã hóa.
 
-   This header type provides no additional attributes.
+   Kiểu header này không cung cấp thuộc tính bổ sung nào.
 
 
 .. class:: DateHeader
 
-   :rfc:`5322` specifies a very specific format for dates within email headers.
-   The ``DateHeader`` parser recognizes that date format, as well as
-   recognizing a number of variant forms that are sometimes found "in the
-   wild".
+   :rfc:`5322` quy định một định dạng rất cụ thể cho ngày tháng trong các email header. Parser ``DateHeader`` nhận dạng định dạng ngày tháng đó, đồng thời nhận dạng một số dạng biến thể đôi khi được tìm thấy "trong thực tế".
 
-   This header type provides the following additional attributes:
+   Loại header này cung cấp các thuộc tính bổ sung sau:
 
    .. attribute:: datetime
 
-      If the header value can be recognized as a valid date of one form or
-      another, this attribute will contain a :class:`~datetime.datetime`
-      instance representing that date.  If the timezone of the input date is
-      specified as ``-0000`` (indicating it is in UTC but contains no
-      information about the source timezone), then :attr:`.datetime` will be a
-      naive :class:`~datetime.datetime`.  If a specific timezone offset is
-      found (including ``+0000``), then :attr:`.datetime` will contain an aware
-      ``datetime`` that uses :class:`datetime.timezone` to record the timezone
-      offset.
+      Nếu giá trị header có thể được nhận dạng là một ngày hợp lệ dưới dạng này hay dạng khác, thuộc tính này sẽ chứa một instance :class:`~datetime.datetime` biểu diễn ngày đó. Nếu múi giờ của ngày đầu vào được chỉ định là ``-0000`` (cho biết ngày ở UTC nhưng không chứa thông tin về múi giờ nguồn), thì :attr:`.datetime` sẽ là một :class:`~datetime.datetime` ngây thơ (naive). Nếu tìm thấy một độ lệch múi giờ cụ thể (bao gồm ``+0000``), thì :attr:`.datetime` sẽ chứa một ``datetime`` có thông tin múi giờ (aware), sử dụng :class:`datetime.timezone` để ghi lại độ lệch múi giờ.
 
-   The ``decoded`` value of the header is determined by formatting the
-   ``datetime`` according to the :rfc:`5322` rules; that is, it is set to::
+   Giá trị ``decoded`` của header được xác định bằng cách định dạng ``datetime`` theo các quy tắc :rfc:`5322`; tức là, nó được đặt thành::
 
        email.utils.format_datetime(self.datetime)
 
-   When creating a ``DateHeader``, *value* may be
-   :class:`~datetime.datetime` instance.  This means, for example, that
-   the following code is valid and does what one would expect::
+   Khi tạo một ``DateHeader``, *value* có thể là
+   Một instance :class:`~datetime.datetime`. Điều này có nghĩa là, chẳng hạn, đoạn mã sau đây hợp lệ và thực hiện đúng như mong đợi::
 
        msg['Date'] = datetime(2011, 7, 15, 21)
 
-   Because this is a naive ``datetime`` it will be interpreted as a UTC
-   timestamp, and the resulting value will have a timezone of ``-0000``.  Much
-   more useful is to use the :func:`~email.utils.localtime` function from the
-   :mod:`~email.utils` module::
+   Vì đây là một ``datetime`` ngây thơ (naive), nó sẽ được diễn giải là một timestamp UTC, và giá trị kết quả sẽ có múi giờ là ``-0000``. Hữu ích hơn nhiều là sử dụng hàm :func:`~email.utils.localtime` từ
+   module :mod:`~email.utils`::
 
        msg['Date'] = utils.localtime()
 
-   This example sets the date header to the current time and date using
-   the current timezone offset.
+   Ví dụ này đặt tiêu đề ngày thành thời gian và ngày hiện tại bằng cách sử dụng độ lệch múi giờ hiện tại.
 
 
 .. class:: AddressHeader
 
-   Address headers are one of the most complex structured header types.
-   The ``AddressHeader`` class provides a generic interface to any address
-   header.
+   Các tiêu đề địa chỉ là một trong những kiểu tiêu đề có cấu trúc phức tạp nhất. Lớp ``AddressHeader`` cung cấp một giao diện tổng quát cho mọi tiêu đề địa chỉ.
 
-   This header type provides the following additional attributes:
+   Loại header này cung cấp các thuộc tính bổ sung sau:
 
 
    .. attribute:: groups
 
-      A tuple of :class:`.Group` objects encoding the
-      addresses and groups found in the header value.  Addresses that are
-      not part of a group are represented in this list as single-address
-      ``Groups`` whose :attr:`~.Group.display_name` is ``None``.
+      Một tuple gồm các đối tượng :class:`.Group` mã hóa các địa chỉ và nhóm được tìm thấy trong giá trị tiêu đề. Các địa chỉ không thuộc một nhóm nào được biểu diễn trong danh sách này dưới dạng ``Groups`` chỉ chứa một địa chỉ, trong đó :attr:`~.Group.display_name` là ``None``.
 
 
    .. attribute:: addresses
 
-      A tuple of :class:`.Address` objects encoding all
-      of the individual addresses from the header value.  If the header value
-      contains any groups, the individual addresses from the group are included
-      in the list at the point where the group occurs in the value (that is,
-      the list of addresses is "flattened" into a one dimensional list).
+      Một tuple gồm các đối tượng :class:`.Address` mã hóa tất cả địa chỉ riêng lẻ trong giá trị tiêu đề. Nếu giá trị tiêu đề chứa bất kỳ nhóm nào, các địa chỉ riêng lẻ trong nhóm sẽ được đưa vào danh sách tại vị trí nhóm xuất hiện trong giá trị (nghĩa là danh sách địa chỉ được "làm phẳng" thành danh sách một chiều).
 
-   The ``decoded`` value of the header will have all encoded words decoded to
-   a string.  :class:`~encodings.idna` encoded domain names are also decoded to
-   a string.  The ``decoded`` value is set by :ref:`joining <meth-str-join>` the
-   :class:`str` value of the elements of the ``groups`` attribute with ``',
-   '``.
+   Giá trị ``decoded`` của tiêu đề sẽ có tất cả các từ được mã hóa được giải mã thành một chuỗi. Tên miền được mã hóa theo :class:`~encodings.idna` cũng được giải mã thành một chuỗi. Giá trị ``decoded`` được thiết lập bằng cách :ref:`nối <meth-str-join>` các
+   Giá trị :class:`str` của các phần tử thuộc thuộc tính ``groups`` với ``', '``.
 
-   A list of :class:`.Address` and :class:`.Group` objects in any combination
-   may be used to set the value of an address header.  ``Group`` objects whose
-   ``display_name`` is ``None`` will be interpreted as single addresses, which
-   allows an address list to be copied with groups intact by using the list
-   obtained from the ``groups`` attribute of the source header.
+   Có thể sử dụng danh sách các đối tượng :class:`.Address` và :class:`.Group` theo bất kỳ tổ hợp nào để đặt giá trị của address header. Các đối tượng ``Group`` có ``display_name`` là ``None`` sẽ được diễn giải là các địa chỉ đơn, cho phép sao chép danh sách địa chỉ với các nhóm được giữ nguyên bằng cách sử dụng danh sách lấy từ thuộc tính ``groups`` của header nguồn.
 
 
 .. class:: SingleAddressHeader
 
-   A subclass of :class:`.AddressHeader` that adds one
-   additional attribute:
+   Một lớp con của :class:`.AddressHeader` bổ sung thêm một thuộc tính:
 
 
    .. attribute:: address
 
-      The single address encoded by the header value.  If the header value
-      actually contains more than one address (which would be a violation of
-      the RFC under the default :mod:`~email.policy`), accessing this attribute
-      will result in a :exc:`ValueError`.
+      Địa chỉ duy nhất được mã hóa bởi giá trị header. Nếu giá trị header thực sự chứa nhiều hơn một địa chỉ (vi phạm RFC theo :mod:`~email.policy` mặc định), việc truy cập thuộc tính này sẽ dẫn đến :exc:`ValueError`.
 
 
-Many of the above classes also have a ``Unique`` variant (for example,
-``UniqueUnstructuredHeader``).  The only difference is that in the ``Unique``
-variant, :attr:`~.BaseHeader.max_count` is set to 1.
+Nhiều lớp ở trên cũng có một biến thể ``Unique`` (ví dụ: ``UniqueUnstructuredHeader``). Điểm khác biệt duy nhất là trong biến thể ``Unique``, :attr:`~.BaseHeader.max_count` được đặt thành 1.
 
 
 .. class:: MIMEVersionHeader
 
-   There is really only one valid value for the :mailheader:`MIME-Version`
-   header, and that is ``1.0``.  For future proofing, this header class
-   supports other valid version numbers.  If a version number has a valid value
-   per :rfc:`2045`, then the header object will have non-``None`` values for
-   the following attributes:
+   Thực tế chỉ có một giá trị hợp lệ cho header :mailheader:`MIME-Version`, đó là ``1.0``. Để đảm bảo khả năng tương thích trong tương lai, lớp header này hỗ trợ các số phiên bản hợp lệ khác. Nếu một số phiên bản có giá trị hợp lệ theo :rfc:`2045`, đối tượng header sẽ có các giá trị khác ``None`` cho những thuộc tính sau:
 
    .. attribute:: version
 
-      The version number as a string, with any whitespace and/or comments
-      removed.
+      Số phiên bản dưới dạng chuỗi, với mọi khoảng trắng và/hoặc chú thích đã được loại bỏ.
 
    .. attribute:: major
 
-      The major version number as an integer
+      Số phiên bản chính dưới dạng số nguyên
 
    .. attribute:: minor
 
-      The minor version number as an integer
+      Số phiên bản phụ dưới dạng số nguyên
 
 
 .. class:: ParameterizedMIMEHeader
 
-    MIME headers all start with the prefix 'Content-'.  Each specific header has
-    a certain value, described under the class for that header.  Some can
-    also take a list of supplemental parameters, which have a common format.
-    This class serves as a base for all the MIME headers that take parameters.
+    Tất cả MIME header đều bắt đầu bằng tiền tố 'Content-'. Mỗi header cụ thể có một giá trị nhất định, được mô tả trong phần về class của header đó. Một số header cũng có thể nhận một danh sách các tham số bổ sung theo một định dạng chung. Class này đóng vai trò là class cơ sở cho tất cả MIME header nhận tham số.
 
     .. attribute:: params
 
-       A dictionary mapping parameter names to parameter values.
+       Một dictionary ánh xạ tên tham số với giá trị tham số.
 
 
 .. class:: ContentTypeHeader
 
-    A :class:`ParameterizedMIMEHeader` class that handles the
-    :mailheader:`Content-Type` header.
+    Một class :class:`ParameterizedMIMEHeader` xử lý
+    header :mailheader:`Content-Type`.
 
     .. attribute:: content_type
 
-       The content type string, in the form ``maintype/subtype``.
+       Chuỗi content type, có dạng ``maintype/subtype``.
 
     .. attribute:: maintype
 
@@ -287,40 +183,30 @@ variant, :attr:`~.BaseHeader.max_count` is set to 1.
 
 .. class:: ContentDispositionHeader
 
-    A :class:`ParameterizedMIMEHeader` class that handles the
+    Một class :class:`ParameterizedMIMEHeader` xử lý
     :mailheader:`Content-Disposition` header.
 
     .. attribute:: content_disposition
 
-       ``inline`` and ``attachment`` are the only valid values in common use.
+       ``inline`` và ``attachment`` là các giá trị hợp lệ duy nhất thường được sử dụng.
 
 
 .. class:: ContentTransferEncodingHeader
 
-   Handles the :mailheader:`Content-Transfer-Encoding` header.
+   Xử lý header :mailheader:`Content-Transfer-Encoding`.
 
    .. attribute:: cte
 
-      Valid values are ``7bit``, ``8bit``, ``base64``, and
-      ``quoted-printable``.  See :rfc:`2045` for more information.
+      Các giá trị hợp lệ là ``7bit``, ``8bit``, ``base64`` và ``quoted-printable``. Xem :rfc:`2045` để biết thêm thông tin.
 
 
 
 .. class:: HeaderRegistry(base_class=BaseHeader, \
-                          default_class=UnstructuredHeader, \
-                          use_default_map=True)
+                          default_class=UnstructuredHeader, \ use_default_map=True)
 
-    This is the factory used by :class:`~email.policy.EmailPolicy` by default.
-    ``HeaderRegistry`` builds the class used to create a header instance
-    dynamically, using *base_class* and a specialized class retrieved from a
-    registry that it holds.  When a given header name does not appear in the
-    registry, the class specified by *default_class* is used as the specialized
-    class.  When *use_default_map* is ``True`` (the default), the standard
-    mapping of header names to classes is copied in to the registry during
-    initialization.  *base_class* is always the last class in the generated
-    class's :class:`~type.__bases__` list.
+    Đây là factory được :class:`~email.policy.EmailPolicy` sử dụng theo mặc định. ``HeaderRegistry`` xây dựng lớp được dùng để tạo một thể hiện header một cách linh động, bằng cách sử dụng *base_class* và một lớp chuyên biệt được lấy từ registry mà nó lưu giữ. Khi một tên header nhất định không xuất hiện trong registry, lớp được chỉ định bởi *default_class* sẽ được dùng làm lớp chuyên biệt. Khi *use_default_map* là ``True`` (giá trị mặc định), ánh xạ tiêu chuẩn từ tên header đến các lớp sẽ được sao chép vào registry trong quá trình khởi tạo. *base_class* luôn là lớp cuối cùng trong danh sách :class:`~type.__bases__` của lớp được tạo.
 
-    The default mappings are:
+    Các ánh xạ mặc định là:
 
       :subject:                   UniqueUnstructuredHeader
       :date:                      UniqueDateHeader
@@ -343,121 +229,87 @@ variant, :attr:`~.BaseHeader.max_count` is set to 1.
       :content-transfer-encoding: ContentTransferEncodingHeader
       :message-id:                MessageIDHeader
 
-    ``HeaderRegistry`` has the following methods:
+    ``HeaderRegistry`` có các phương thức sau:
 
 
     .. method:: map_to_type(self, name, cls)
 
-       *name* is the name of the header to be mapped.  It will be converted to
-       lower case in the registry.  *cls* is the specialized class to be used,
-       along with *base_class*, to create the class used to instantiate headers
-       that match *name*.
+       *name* là tên của header cần ánh xạ. Tên này sẽ được chuyển thành chữ thường trong registry. *cls* là lớp chuyên biệt được sử dụng cùng với *base_class* để tạo lớp dùng để khởi tạo các header khớp với *name*.
 
 
     .. method:: __getitem__(name)
 
-       Construct and return a class to handle creating a *name* header.
+       Xây dựng và trả về một lớp để xử lý việc tạo header *name*.
 
 
     .. method:: __call__(name, value)
 
-       Retrieves the specialized header associated with *name* from the
-       registry (using *default_class* if *name* does not appear in the
-       registry) and composes it with *base_class* to produce a class,
-       calls the constructed class's constructor, passing it the same
-       argument list, and finally returns the class instance created thereby.
+       Lấy header chuyên biệt liên kết với *name* từ registry (sử dụng *default_class* nếu *name* không xuất hiện trong registry), kết hợp nó với *base_class* để tạo ra một lớp, gọi hàm khởi tạo của lớp được xây dựng bằng cách truyền vào cùng danh sách đối số, rồi cuối cùng trả về instance của lớp được tạo theo cách đó.
 
 
-The following classes are the classes used to represent data parsed from
-structured headers and can, in general, be used by an application program to
-construct structured values to assign to specific headers.
+Các lớp sau đây được dùng để biểu diễn dữ liệu được phân tích từ các header có cấu trúc và nhìn chung có thể được chương trình ứng dụng sử dụng để xây dựng các giá trị có cấu trúc nhằm gán cho những header cụ thể.
 
 
 .. class:: Address(display_name='', username='', domain='', addr_spec=None)
 
-   The class used to represent an email address.  The general form of an
-   address is::
+   Lớp dùng để biểu diễn một địa chỉ email. Dạng tổng quát của một địa chỉ là::
 
       [display_name] <username@domain>
 
-   or::
+   hoặc::
 
       username@domain
 
-   where each part must conform to specific syntax rules spelled out in
+   trong đó mỗi phần phải tuân theo các quy tắc cú pháp cụ thể được nêu trong
    :rfc:`5322`.
 
-   As a convenience *addr_spec* can be specified instead of *username* and
-   *domain*, in which case *username* and *domain* will be parsed from the
-   *addr_spec*.  An *addr_spec* must be a properly RFC quoted string; if it is
-   not ``Address`` will raise an error.  Unicode characters are allowed and
-   will be property encoded when serialized.  However, per the RFCs, Unicode is
-   *not* allowed in the username portion of the address.
+   Để thuận tiện, có thể chỉ định *addr_spec* thay cho *username* và *domain*; trong trường hợp đó, *username* và *domain* sẽ được phân tích từ *addr_spec*. Một *addr_spec* phải là một chuỗi được trích dẫn đúng theo RFC; nếu không, ``Address`` sẽ phát sinh lỗi. Các ký tự Unicode được cho phép và sẽ được mã hóa đúng cách khi tuần tự hóa. Tuy nhiên, theo các RFC, Unicode *not* được phép trong phần username của địa chỉ.
 
    .. attribute:: display_name
 
-      The display name portion of the address, if any, with all quoting
-      removed.  If the address does not have a display name, this attribute
-      will be an empty string.
+      Phần tên hiển thị của địa chỉ, nếu có, sau khi đã loại bỏ mọi dấu trích dẫn. Nếu địa chỉ không có tên hiển thị, thuộc tính này sẽ là một chuỗi rỗng.
 
    .. attribute:: username
 
-      The ``username`` portion of the address, with all quoting removed.
+      Phần ``username`` của địa chỉ, sau khi đã loại bỏ mọi dấu trích dẫn.
 
    .. attribute:: domain
 
-      The ``domain`` portion of the address.
+      Phần ``domain`` của địa chỉ.
 
    .. attribute:: addr_spec
 
-      The ``username@domain`` portion of the address, correctly quoted
-      for use as a bare address (the second form shown above).  This
-      attribute is not mutable.
+      Phần ``username@domain`` của địa chỉ, được trích dẫn đúng cách để sử dụng làm địa chỉ không kèm tên (dạng thứ hai được minh họa ở trên). Thuộc tính này không thể thay đổi.
 
    .. method:: __str__()
 
-      The ``str`` value of the object is the address quoted according to
-      :rfc:`5322` rules, but with no Content Transfer Encoding of any non-ASCII
-      characters.
+      Giá trị ``str`` của đối tượng là địa chỉ được trích dẫn theo
+      các quy tắc :rfc:`5322`, nhưng không áp dụng Content Transfer Encoding cho bất kỳ ký tự non-ASCII nào.
 
-   To support SMTP (:rfc:`5321`), ``Address`` handles one special case: if
-   ``username`` and ``domain`` are both the empty string (or ``None``), then
-   the string value of the ``Address`` is ``<>``.
+   Để hỗ trợ SMTP (:rfc:`5321`), ``Address`` xử lý một trường hợp đặc biệt: nếu ``username`` và ``domain`` đều là chuỗi rỗng (hoặc ``None``), thì giá trị chuỗi của ``Address`` là ``<>``.
 
 
 .. class:: Group(display_name=None, addresses=None)
 
-   The class used to represent an address group.  The general form of an
-   address group is::
+   Lớp được dùng để biểu diễn một nhóm địa chỉ. Dạng tổng quát của một nhóm địa chỉ là::
 
      display_name: [address-list];
 
-   As a convenience for processing lists of addresses that consist of a mixture
-   of groups and single addresses, a ``Group`` may also be used to represent
-   single addresses that are not part of a group by setting *display_name* to
-   ``None`` and providing a list of the single address as *addresses*.
+   Để thuận tiện khi xử lý các danh sách địa chỉ gồm hỗn hợp nhóm và địa chỉ đơn lẻ, bạn cũng có thể dùng ``Group`` để biểu diễn các địa chỉ đơn lẻ không thuộc nhóm nào bằng cách đặt *display_name* thành ``None`` và cung cấp danh sách địa chỉ đơn lẻ dưới dạng *addresses*.
 
    .. attribute:: display_name
 
-      The ``display_name`` of the group.  If it is ``None`` and there is
-      exactly one ``Address`` in ``addresses``, then the ``Group`` represents a
-      single address that is not in a group.
+      ``display_name`` của nhóm. Nếu nó là ``None`` và có đúng một ``Address`` trong ``addresses``, thì ``Group`` biểu diễn một địa chỉ đơn lẻ không thuộc nhóm nào.
 
    .. attribute:: addresses
 
-      A possibly empty tuple of :class:`.Address` objects representing the
-      addresses in the group.
+      Một tuple :class:`.Address` có thể rỗng, biểu diễn các địa chỉ trong nhóm.
 
    .. method:: __str__()
 
-      The ``str`` value of a ``Group`` is formatted according to :rfc:`5322`,
-      but with no Content Transfer Encoding of any non-ASCII characters.  If
-      ``display_name`` is none and there is a single ``Address`` in the
-      ``addresses`` list, the ``str`` value will be the same as the ``str`` of
-      that single ``Address``.
+      Giá trị ``str`` của một ``Group`` được định dạng theo :rfc:`5322`, nhưng không áp dụng Content Transfer Encoding cho bất kỳ ký tự non-ASCII nào. Nếu ``display_name`` là none và có một ``Address`` duy nhất trong danh sách ``addresses``, thì giá trị ``str`` sẽ giống với ``str`` của ``Address`` duy nhất đó.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [1] Originally added in 3.3 as a :term:`provisional module <provisional
-       package>`
+.. [1] Được bổ sung lần đầu trong phiên bản 3.3 dưới dạng :term:`mô-đun tạm thời <provisional package>`

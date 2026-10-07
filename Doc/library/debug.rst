@@ -1,13 +1,8 @@
-***********************
-Debugging and Profiling
-***********************
+*****************************
+Gỡ lỗi và lập hồ sơ hiệu năng
+*****************************
 
-These libraries help you with Python development: the debugger enables you to
-step through code, analyze stack frames and set breakpoints etc., and the
-profilers run code and give you a detailed breakdown of execution times,
-allowing you to identify bottlenecks in your programs. Auditing events
-provide visibility into runtime behaviors that would otherwise require
-intrusive debugging or patching.
+Các thư viện này hỗ trợ bạn phát triển Python: trình gỡ lỗi cho phép bạn thực thi từng bước qua mã, phân tích các stack frame và đặt breakpoint, v.v.; còn các profiler chạy mã và cung cấp bảng phân tích chi tiết về thời gian thực thi, giúp bạn xác định các điểm nghẽn trong chương trình. Các sự kiện audit cung cấp khả năng quan sát hành vi runtime mà nếu không sẽ cần đến việc gỡ lỗi hoặc patch can thiệp sâu.
 
 .. toctree::
 

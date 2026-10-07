@@ -1,148 +1,118 @@
-:mod:`!email.errors`: Exception and Defect classes
---------------------------------------------------
+:mod:`!email.errors`: Các lớp Exception và Defect
+-------------------------------------------------
 
 .. module:: email.errors
-   :synopsis: The exception classes used by the email package.
+   :synopsis: Các lớp ngoại lệ được gói email sử dụng.
 
-**Source code:** :source:`Lib/email/errors.py`
+**Mã nguồn:** :source:`Lib/email/errors.py`
 
 --------------
 
-The following exception classes are defined in the :mod:`!email.errors` module:
+Các lớp ngoại lệ sau được định nghĩa trong mô-đun :mod:`!email.errors`:‎
 
 
 .. exception:: MessageError()
 
-   This is the base class for all exceptions that the :mod:`email` package can
-   raise.  It is derived from the standard :exc:`Exception` class and defines no
-   additional methods.
+   Đây là lớp cơ sở cho tất cả các ngoại lệ mà gói :mod:`email` có thể phát sinh. Lớp này kế thừa từ lớp :exc:`Exception` tiêu chuẩn và không định nghĩa thêm phương thức nào.
 
 
 .. exception:: MessageParseError()
 
-   This is the base class for exceptions raised by the
-   :class:`~email.parser.Parser` class.  It is derived from
-   :exc:`MessageError`.  This class is also used internally by the parser used
-   by :mod:`~email.headerregistry`.
+   Đây là lớp cơ sở cho các ngoại lệ được phát sinh bởi
+   :class:`~email.parser.Parser` class. Lớp này kế thừa từ
+   :exc:`MessageError`. Lớp này cũng được trình phân tích cú pháp được :mod:`~email.headerregistry` sử dụng nội bộ.
 
 
 .. exception:: HeaderParseError()
 
-   Raised under some error conditions when parsing the :rfc:`5322` headers of a
-   message, this class is derived from :exc:`MessageParseError`.  The
-   :meth:`~email.message.EmailMessage.set_boundary` method will raise this
-   error if the content type is unknown when the method is called.
-   :class:`~email.header.Header` may raise this error for certain base64
-   decoding errors, and when an attempt is made to create a header that appears
-   to contain an embedded header (that is, there is what is supposed to be a
-   continuation line that has no leading whitespace and looks like a header).
+   Được phát sinh trong một số điều kiện lỗi khi phân tích cú pháp các header :rfc:`5322` của một message, lớp này kế thừa từ :exc:`MessageParseError`. The
+   Phương thức :meth:`~email.message.EmailMessage.set_boundary` sẽ phát sinh lỗi này nếu không xác định được content type khi phương thức được gọi.
+   :class:`~email.header.Header` có thể phát sinh lỗi này đối với một số lỗi giải mã base64 và khi có nỗ lực tạo một header có vẻ chứa một header được nhúng (nghĩa là có một continuation line được cho là không có khoảng trắng ở đầu và trông giống một header).
 
 
 .. exception:: BoundaryError()
 
-   Deprecated and no longer used.
+   Đã lỗi thời và không còn được sử dụng.
 
 
 .. exception:: MultipartConversionError()
 
-   Raised if the :meth:`~email.message.Message.attach` method is called
-   on an instance of a class derived from
-   :class:`~email.mime.nonmultipart.MIMENonMultipart` (e.g.
+   Được phát sinh nếu phương thức :meth:`~email.message.Message.attach` được gọi trên một instance của lớp kế thừa từ
+   :class:`~email.mime.nonmultipart.MIMENonMultipart` (ví dụ:
    :class:`~email.mime.image.MIMEImage`).
-   :exc:`MultipartConversionError` multiply
-   inherits from :exc:`MessageError` and the built-in :exc:`TypeError`.
+   :exc:`MultipartConversionError` kế thừa đa lớp từ :exc:`MessageError` và :exc:`TypeError` tích hợp sẵn.
 
 
 .. exception:: HeaderWriteError()
 
-   Raised when an error occurs when the :mod:`~email.generator` outputs
-   headers.
+   Được phát sinh khi xảy ra lỗi lúc :mod:`~email.generator` xuất các header.
 
 
 .. exception:: MessageDefect()
 
-   This is the base class for all defects found when parsing email messages.
-   It is derived from :exc:`ValueError`.
+   Đây là lớp cơ sở cho tất cả các defect được phát hiện khi phân tích cú pháp email message. Lớp này được dẫn xuất từ :exc:`ValueError`.
 
 .. exception:: HeaderDefect()
 
-   This is the base class for all defects found when parsing email headers.
-   It is derived from :exc:`MessageDefect`.
+   Đây là lớp cơ sở cho tất cả các defect được phát hiện khi phân tích cú pháp email header. Lớp này được dẫn xuất từ :exc:`MessageDefect`.
 
-Here is the list of the defects that the :class:`~email.parser.FeedParser`
-can find while parsing messages.  Note that the defects are added to the message
-where the problem was found, so for example, if a message nested inside a
-:mimetype:`multipart/alternative` had a malformed header, that nested message
-object would have a defect, but the containing messages would not.
+Sau đây là danh sách các defect mà :class:`~email.parser.FeedParser` có thể tìm thấy khi phân tích cú pháp message. Lưu ý rằng các defect được thêm vào message nơi phát hiện vấn đề; vì vậy, ví dụ, nếu một message nằm bên trong một
+:mimetype:`multipart/alternative` có header không đúng định dạng, thì đối tượng message lồng nhau đó sẽ có một defect, còn các message chứa nó thì không.
 
-All defect classes are subclassed from :class:`email.errors.MessageDefect`.
+Tất cả các lớp defect đều là lớp con của :class:`email.errors.MessageDefect`.
 
 .. exception:: NoBoundaryInMultipartDefect
 
-   A message claimed to be a multipart, but had no :mimetype:`boundary`
-   parameter.
+   Một thư được cho là multipart nhưng không có tham số :mimetype:`boundary`.
 
 .. exception:: StartBoundaryNotFoundDefect
 
-   The start boundary claimed in the :mailheader:`Content-Type` header was
-   never found.
+   Không tìm thấy boundary bắt đầu được khai báo trong header :mailheader:`Content-Type`.
 
 .. exception:: CloseBoundaryNotFoundDefect
 
-   A start boundary was found, but no corresponding close boundary was ever
-   found.
+   Đã tìm thấy boundary bắt đầu nhưng không tìm thấy boundary kết thúc tương ứng.
 
    .. versionadded:: 3.3
 
 .. exception:: FirstHeaderLineIsContinuationDefect
 
-   The message had a continuation line as its first header line.
+   Thư có một dòng tiếp diễn làm dòng header đầu tiên.
 
 .. exception:: MisplacedEnvelopeHeaderDefect
 
-   A "Unix From" header was found in the middle of a header block.
+   Đã tìm thấy header "Unix From" ở giữa một khối header.
 
 .. exception:: MissingHeaderBodySeparatorDefect
 
-   A line was found while parsing headers that had no leading white space but
-   contained no ':'.  Parsing continues assuming that the line represents the
-   first line of the body.
+   Trong khi phân tích các header, đã tìm thấy một dòng không có khoảng trắng ở đầu nhưng không chứa ký tự ':'. Quá trình phân tích tiếp tục với giả định rằng dòng này là dòng đầu tiên của phần nội dung.
 
    .. versionadded:: 3.3
 
 .. exception:: MalformedHeaderDefect
 
-   A header was found that was missing a colon, or was otherwise malformed.
+   Đã tìm thấy một header bị thiếu dấu hai chấm hoặc bị sai định dạng theo cách khác.
 
    .. deprecated:: 3.3
-      This defect has not been used for several Python versions.
+      Lỗi này đã không được sử dụng trong một số phiên bản Python.
 
 .. exception:: MultipartInvariantViolationDefect
 
-   A message claimed to be a :mimetype:`multipart`, but no subparts were found.
-   Note that when a message has this defect, its
-   :meth:`~email.message.Message.is_multipart` method may return ``False``
-   even though its content type claims to be :mimetype:`multipart`.
+   Một thông báo được cho là :mimetype:`multipart`, nhưng không tìm thấy phần con nào. Lưu ý rằng khi một thông báo có lỗi này, phương thức
+   :meth:`~email.message.Message.is_multipart` có thể trả về ``False`` mặc dù kiểu nội dung của nó được khai báo là :mimetype:`multipart`.
 
 .. exception:: InvalidBase64PaddingDefect
 
-   When decoding a block of base64 encoded bytes, the padding was not correct.
-   Enough padding is added to perform the decode, but the resulting decoded
-   bytes may be invalid.
+   Khi giải mã một khối byte được mã hóa bằng base64, phần đệm không chính xác. Phần đệm đủ để thực hiện giải mã sẽ được thêm vào, nhưng các byte sau khi giải mã có thể không hợp lệ.
 
 .. exception:: InvalidBase64CharactersDefect
 
-   When decoding a block of base64 encoded bytes, characters outside the base64
-   alphabet were encountered.  The characters are ignored, but the resulting
-   decoded bytes may be invalid.
+   Khi giải mã một khối byte được mã hóa bằng base64, đã gặp các ký tự nằm ngoài bảng chữ cái base64. Các ký tự này sẽ bị bỏ qua, nhưng các byte sau khi giải mã có thể không hợp lệ.
 
 .. exception:: InvalidBase64LengthDefect
 
-   When decoding a block of base64 encoded bytes, the number of non-padding
-   base64 characters was invalid (1 more than a multiple of 4).  The encoded
-   block was kept as-is.
+   Khi giải mã một khối base64, số ký tự base64 không phải ký tự đệm không hợp lệ (lớn hơn một bội số của 4 là 1). Khối đã mã hóa được giữ nguyên.
 
 .. exception:: InvalidDateDefect
 
-   When decoding an invalid or unparsable date field.  The original value is
-   kept as-is.
+   Khi giải mã một trường ngày không hợp lệ hoặc không thể phân tích cú pháp. Giá trị ban đầu được giữ nguyên.

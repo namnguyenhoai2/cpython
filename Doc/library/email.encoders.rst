@@ -1,75 +1,55 @@
-:mod:`!email.encoders`: Encoders
---------------------------------
+:mod:`!email.encoders`: Bộ mã hóa
+---------------------------------
 
 .. module:: email.encoders
-   :synopsis: Encoders for email message payloads.
+   :synopsis: Bộ mã hóa cho payload của email.
 
-**Source code:** :source:`Lib/email/encoders.py`
+**Mã nguồn:** :source:`Lib/email/encoders.py`
 
 --------------
 
-This module is part of the legacy (``Compat32``) email API.  In the
-new API the functionality is provided by the *cte* parameter of
-the :meth:`~email.message.EmailMessage.set_content` method.
+Mô-đun này là một phần của email API cũ (``Compat32``). Trong API mới, chức năng này được cung cấp bởi tham số *cte* của phương thức :meth:`~email.message.EmailMessage.set_content`.
 
-This module is deprecated in Python 3.  The functions provided here
-should not be called explicitly since the :class:`~email.mime.text.MIMEText`
-class sets the content type and CTE header using the *_subtype* and *_charset*
-values passed during the instantiation of that class.
+Mô-đun này không được dùng nữa trong Python 3. Không nên gọi trực tiếp các hàm được cung cấp ở đây, vì lớp :class:`~email.mime.text.MIMEText` sẽ thiết lập content type và header CTE bằng các giá trị *_subtype* và *_charset* được truyền khi khởi tạo lớp đó.
 
-The remaining text in this section is the original documentation of the module.
+Phần văn bản còn lại trong mục này là tài liệu gốc của mô-đun.
 
-When creating :class:`~email.message.Message` objects from scratch, you often
-need to encode the payloads for transport through compliant mail servers. This
-is especially true for :mimetype:`image/\*` and :mimetype:`text/\*` type messages
-containing binary data.
+Khi tạo các đối tượng :class:`~email.message.Message` từ đầu, bạn thường cần mã hóa payload để truyền qua các mail server tuân thủ tiêu chuẩn. Điều này đặc biệt đúng với các thông báo kiểu :mimetype:`image/\*` và :mimetype:`text/\*` có chứa dữ liệu nhị phân.
 
-The :mod:`email` package provides some convenient encoders in its
-:mod:`!encoders` module.  These encoders are actually used by the
-:class:`~email.mime.audio.MIMEAudio` and :class:`~email.mime.image.MIMEImage`
-class constructors to provide default encodings.  All encoder functions take
-exactly one argument, the message object to encode.  They usually extract the
-payload, encode it, and reset the payload to this newly encoded value.  They
-should also set the :mailheader:`Content-Transfer-Encoding` header as appropriate.
+Gói :mod:`email` cung cấp một số bộ mã hóa tiện dụng trong
+mô-đun :mod:`!encoders`. Các bộ mã hóa này thực sự được sử dụng bởi
+các hàm khởi tạo lớp :class:`~email.mime.audio.MIMEAudio` và :class:`~email.mime.image.MIMEImage` để cung cấp các kiểu mã hóa mặc định. Tất cả các hàm mã hóa đều nhận chính xác một đối số là đối tượng message cần mã hóa. Chúng thường trích xuất payload, mã hóa payload rồi đặt lại payload thành giá trị vừa được mã hóa này. Chúng cũng cần đặt header :mailheader:`Content-Transfer-Encoding` thích hợp.
 
-Note that these functions are not meaningful for a multipart message.  They
-must be applied to individual subparts instead, and will raise a
-:exc:`TypeError` if passed a message whose type is multipart.
+Lưu ý rằng các hàm này không có ý nghĩa đối với message multipart. Thay vào đó, phải áp dụng chúng cho từng subpart riêng lẻ; nếu được truyền một
+message có kiểu multipart, chúng sẽ phát sinh :exc:`TypeError`.
 
-Here are the encoding functions provided:
+Sau đây là các hàm mã hóa được cung cấp:
 
 
 .. function:: encode_quopri(msg)
 
-   Encodes the payload into quoted-printable form and sets the
-   :mailheader:`Content-Transfer-Encoding` header to ``quoted-printable`` [#]_.
-   This is a good encoding to use when most of your payload is normal printable
-   data, but contains a few unprintable characters.
+   Mã hóa payload thành dạng quoted-printable và đặt
+   đầu trang :mailheader:`Content-Transfer-Encoding` thành ``quoted-printable`` [#]_. Đây là một kiểu mã hóa phù hợp khi phần lớn payload của bạn là dữ liệu có thể in thông thường nhưng chứa một vài ký tự không thể in.
 
 
 .. function:: encode_base64(msg)
 
-   Encodes the payload into base64 form and sets the
-   :mailheader:`Content-Transfer-Encoding` header to ``base64``.  This is a good
-   encoding to use when most of your payload is unprintable data since it is a more
-   compact form than quoted-printable.  The drawback of base64 encoding is that it
-   renders the text non-human readable.
+   Mã hóa payload thành dạng base64 và đặt
+   đầu trang :mailheader:`Content-Transfer-Encoding` thành ``base64``. Đây là một kiểu mã hóa phù hợp khi phần lớn payload của bạn là dữ liệu không thể in, vì nó có dạng gọn hơn quoted-printable. Nhược điểm của mã hóa base64 là khiến văn bản không thể đọc được đối với con người.
 
 
 .. function:: encode_7or8bit(msg)
 
-   This doesn't actually modify the message's payload, but it does set the
-   :mailheader:`Content-Transfer-Encoding` header to either ``7bit`` or ``8bit`` as
-   appropriate, based on the payload data.
+   Thao tác này thực sự không sửa đổi payload của message, nhưng lại đặt
+   đầu trang :mailheader:`Content-Transfer-Encoding` thành ``7bit`` hoặc ``8bit`` tùy trường hợp, dựa trên dữ liệu payload.
 
 
 .. function:: encode_noop(msg)
 
-   This does nothing; it doesn't even set the
-   :mailheader:`Content-Transfer-Encoding` header.
+   Thao tác này không làm gì cả; thậm chí cũng không đặt
+   đầu trang :mailheader:`Content-Transfer-Encoding`.
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] Note that encoding with :meth:`encode_quopri` also encodes all tabs and space
-   characters in the data.
+.. [#] Lưu ý rằng việc mã hóa bằng :meth:`encode_quopri` cũng mã hóa tất cả các ký tự tab và khoảng trắng trong dữ liệu.
 

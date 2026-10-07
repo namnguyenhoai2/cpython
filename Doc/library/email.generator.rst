@@ -1,283 +1,176 @@
-:mod:`!email.generator`: Generating MIME documents
---------------------------------------------------
+:mod:`!email.generator`: Tạo tài liệu MIME
+------------------------------------------
 
 .. module:: email.generator
-   :synopsis: Generate flat text email messages from a message structure.
+   :synopsis: Tạo các thư email dạng văn bản phẳng từ cấu trúc thư.
 
-**Source code:** :source:`Lib/email/generator.py`
+**Mã nguồn:** :source:`Lib/email/generator.py`
 
 --------------
 
-One of the most common tasks is to generate the flat (serialized) version of
-the email message represented by a message object structure.  You will need to
-do this if you want to send your message via :meth:`smtplib.SMTP.sendmail`,
-or print the message on the console.  Taking a
-message object structure and producing a serialized representation is the job
-of the generator classes.
+Một trong những tác vụ phổ biến nhất là tạo phiên bản phẳng (đã tuần tự hóa) của thư email được biểu diễn bằng cấu trúc đối tượng thư. Bạn cần thực hiện việc này nếu muốn gửi thư qua :meth:`smtplib.SMTP.sendmail` hoặc in thư ra console. Việc nhận một cấu trúc đối tượng thư và tạo ra biểu diễn đã tuần tự hóa là nhiệm vụ của các lớp generator.
 
-As with the :mod:`email.parser` module, you aren't limited to the functionality
-of the bundled generator; you could write one from scratch yourself.  However
-the bundled generator knows how to generate most email in a standards-compliant
-way, should handle MIME and non-MIME email messages just fine, and is designed
-so that the bytes-oriented parsing and generation operations are inverses,
-assuming the same non-transforming :mod:`~email.policy` is used for both.  That
-is, parsing the serialized byte stream via the
-:class:`~email.parser.BytesParser` class and then regenerating the serialized
-byte stream using :class:`BytesGenerator` should produce output identical to
-the input [#]_.  (On the other hand, using the generator on an
-:class:`~email.message.EmailMessage` constructed by program may result in
-changes to the :class:`~email.message.EmailMessage` object as defaults are
-filled in.)
+Cũng như module :mod:`email.parser`, bạn không bị giới hạn ở chức năng của generator đi kèm; bạn có thể tự viết một generator từ đầu. Tuy nhiên, generator đi kèm biết cách tạo hầu hết email theo cách tuân thủ tiêu chuẩn, xử lý tốt cả thư email MIME và không phải MIME, đồng thời được thiết kế để các thao tác phân tích cú pháp và tạo dữ liệu theo hướng byte là nghịch đảo của nhau, với điều kiện sử dụng cùng một :mod:`~email.policy` không biến đổi cho cả hai. Nghĩa là, việc phân tích cú pháp luồng byte đã tuần tự hóa thông qua
+:class:`~email.parser.BytesParser` class rồi tạo lại luồng byte đã tuần tự hóa bằng :class:`BytesGenerator` sẽ cho ra kết quả giống hệt đầu vào [#]_. (Mặt khác, việc sử dụng generator trên một
+:class:`~email.message.EmailMessage` được tạo bằng chương trình có thể dẫn đến thay đổi đối tượng :class:`~email.message.EmailMessage` khi các giá trị mặc định được điền vào.)
 
-The :class:`Generator` class can be used to flatten a message into a text (as
-opposed to binary) serialized representation, but since Unicode cannot
-represent binary data directly, the message is of necessity transformed into
-something that contains only ASCII characters, using the standard email RFC
-Content Transfer Encoding techniques for encoding email messages for transport
-over channels that are not "8 bit clean".
+Lớp :class:`Generator` có thể được dùng để làm phẳng một message thành dạng biểu diễn được serialize dưới dạng văn bản (thay vì nhị phân), nhưng vì Unicode không thể biểu diễn trực tiếp dữ liệu nhị phân nên message nhất thiết được chuyển đổi thành dạng chỉ chứa các ký tự ASCII, bằng cách sử dụng các kỹ thuật RFC Content Transfer Encoding tiêu chuẩn của email để mã hóa message email khi truyền qua các kênh không "8 bit clean".
 
-To accommodate reproducible processing of SMIME-signed messages
-:class:`Generator` disables header folding for message parts of type
-``multipart/signed`` and all subparts.
+Để hỗ trợ việc xử lý có thể tái lập đối với các message được ký bằng SMIME
+:class:`Generator` vô hiệu hóa việc gấp tiêu đề (header folding) cho các phần của message thuộc kiểu ``multipart/signed`` và tất cả các phần con.
 
 
 .. class:: BytesGenerator(outfp, mangle_from_=None, maxheaderlen=None, *, \
                           policy=None)
 
-   Return a :class:`BytesGenerator` object that will write any message provided
-   to the :meth:`flatten` method, or any surrogateescape encoded text provided
-   to the :meth:`write` method, to the :term:`file-like object` *outfp*.
-   *outfp* must support a ``write`` method that accepts binary data.
+   Trả về một đối tượng :class:`BytesGenerator` ghi mọi message được cung cấp cho phương thức :meth:`flatten`, hoặc mọi văn bản được mã hóa bằng surrogateescape được cung cấp cho phương thức :meth:`write`, vào :term:`file-like object` *outfp*. *outfp* phải hỗ trợ phương thức ``write`` chấp nhận dữ liệu nhị phân.
 
-   If optional *mangle_from_* is ``True``, put a ``>`` character in front of
-   any line in the body that starts with the exact string ``"From "``, that is
-   ``From`` followed by a space at the beginning of a line.  *mangle_from_*
-   defaults to the value of the :attr:`~email.policy.Policy.mangle_from_`
-   setting of the *policy* (which is ``True`` for the
-   :data:`~email.policy.compat32` policy and ``False`` for all others).
-   *mangle_from_* is intended for use when messages are stored in Unix mbox
-   format (see :mod:`mailbox` and `WHY THE CONTENT-LENGTH FORMAT IS BAD
-   <https://www.jwz.org/doc/content-length.html>`_).
+   Nếu *mangle_from_* tùy chọn là ``True``, hãy thêm một ký tự ``>`` vào trước mọi dòng trong phần thân bắt đầu bằng chuỗi chính xác ``"From "``, tức là ``From`` theo sau bởi một khoảng trắng ở đầu dòng.  *mangle_from_* mặc định nhận giá trị từ thiết lập :attr:`~email.policy.Policy.mangle_from_` của *policy* (là ``True`` đối với
+   chính sách :data:`~email.policy.compat32` và ``False`` đối với tất cả các chính sách khác). *mangle_from_* được dùng khi message được lưu ở định dạng Unix mbox (xem :mod:`mailbox` và `WHY THE CONTENT-LENGTH FORMAT IS BAD <https://www.jwz.org/doc/content-length.html>`_).
 
-   If *maxheaderlen* is not ``None``, refold any header lines that are longer
-   than *maxheaderlen*, or if ``0``, do not rewrap any headers.  If
-   *manheaderlen* is ``None`` (the default), wrap headers and other message
-   lines according to the *policy* settings.
+   Nếu *maxheaderlen* không phải là ``None``, sẽ định dạng lại các dòng tiêu đề dài hơn *maxheaderlen*; còn nếu là ``0``, sẽ không bọc lại bất kỳ tiêu đề nào. Nếu *manheaderlen* là ``None`` (mặc định), các tiêu đề và những dòng thư khác sẽ được bọc theo các thiết lập *policy*.
 
-   If *policy* is specified, use that policy to control message generation.  If
-   *policy* is ``None`` (the default), use the policy associated with the
-   :class:`~email.message.Message` or :class:`~email.message.EmailMessage`
-   object passed to ``flatten`` to control the message generation.  See
-   :mod:`email.policy` for details on what *policy* controls.
+   Nếu *policy* được chỉ định, hãy sử dụng policy đó để kiểm soát việc tạo thư. Nếu *policy* là ``None`` (mặc định), hãy sử dụng policy được liên kết với
+   đối tượng :class:`~email.message.Message` hoặc :class:`~email.message.EmailMessage` được truyền vào ``flatten`` để kiểm soát việc tạo thư. Xem
+   :mod:`email.policy` để biết chi tiết về những gì *policy* kiểm soát.
 
    .. versionadded:: 3.2
 
-   .. versionchanged:: 3.3 Added the *policy* keyword.
+   .. versionchanged:: 3.3 Đã thêm từ khóa *policy*.
 
-   .. versionchanged:: 3.6 The default behavior of the *mangle_from_*
-      and *maxheaderlen* parameters is to follow the policy.
+   .. versionchanged:: 3.6 Hành vi mặc định của *mangle_from_*
+      và các tham số *maxheaderlen* là tuân theo policy.
 
 
    .. method:: flatten(msg, unixfrom=False, linesep=None)
 
-      Print the textual representation of the message object structure rooted
-      at *msg* to the output file specified when the :class:`BytesGenerator`
-      instance was created.
+      In biểu diễn dạng văn bản của cấu trúc đối tượng message bắt nguồn từ *msg* vào tệp đầu ra được chỉ định khi instance :class:`BytesGenerator` được tạo.
 
-      If the :mod:`~email.policy` option :attr:`~email.policy.Policy.cte_type`
-      is ``8bit`` (the default), copy any headers in the original parsed
-      message that have not been modified to the output with any bytes with the
-      high bit set reproduced as in the original, and preserve the non-ASCII
-      :mailheader:`Content-Transfer-Encoding` of any body parts that have them.
-      If ``cte_type`` is ``7bit``, convert the bytes with the high bit set as
-      needed using an ASCII-compatible :mailheader:`Content-Transfer-Encoding`.
-      That is, transform parts with non-ASCII
-      :mailheader:`Content-Transfer-Encoding`
-      (:mailheader:`Content-Transfer-Encoding: 8bit`) to an ASCII compatible
-      :mailheader:`Content-Transfer-Encoding`, and encode RFC-invalid non-ASCII
-      bytes in headers using the MIME ``unknown-8bit`` character set, thus
-      rendering them RFC-compliant.
+      Nếu tùy chọn :mod:`~email.policy` :attr:`~email.policy.Policy.cte_type` là ``8bit`` (mặc định), sao chép mọi header trong message gốc đã được phân tích mà chưa bị sửa đổi vào đầu ra, với mọi byte có bit cao được tái tạo như trong bản gốc, đồng thời giữ lại phần không phải ASCII
+      :mailheader:`Content-Transfer-Encoding` của mọi body part có chúng. Nếu ``cte_type`` là ``7bit``, chuyển đổi các byte có bit cao khi cần bằng cách sử dụng :mailheader:`Content-Transfer-Encoding` tương thích ASCII. Nghĩa là chuyển đổi các part có :mailheader:`Content-Transfer-Encoding` không phải ASCII
+      :mailheader:`Content-Transfer-Encoding` (:mailheader:`Content-Transfer-Encoding: 8bit`) thành dạng tương thích ASCII
+      :mailheader:`Content-Transfer-Encoding`, và mã hóa các byte không phải ASCII không hợp lệ theo RFC trong header bằng bộ ký tự MIME ``unknown-8bit``, nhờ đó làm cho chúng tuân thủ RFC.
 
       .. XXX: There should be an option that just does the RFC
          compliance transformation on headers but leaves CTE 8bit parts alone.
 
-      If *unixfrom* is ``True``, print the envelope header delimiter used by
-      the Unix mailbox format (see :mod:`mailbox`) before the first of the
-      :rfc:`5322` headers of the root message object.  If the root object has
-      no envelope header, craft a standard one.  The default is ``False``.
-      Note that for subparts, no envelope header is ever printed.
+      Nếu *unixfrom* là ``True``, in dấu phân cách header phong bì được định dạng Unix mailbox sử dụng (xem :mod:`mailbox`) trước header đầu tiên trong số các
+      :rfc:`5322` header của đối tượng message gốc. Nếu đối tượng gốc không có header phong bì, hãy tạo một header tiêu chuẩn. Mặc định là ``False``. Lưu ý rằng đối với các subpart, không bao giờ in header phong bì.
 
-      If *linesep* is not ``None``, use it as the separator character between
-      all the lines of the flattened message.  If *linesep* is ``None`` (the
-      default), use the value specified in the *policy*.
+      Nếu *linesep* không phải là ``None``, hãy dùng nó làm ký tự phân cách giữa tất cả các dòng của thông điệp đã được làm phẳng. Nếu *linesep* là ``None`` (mặc định), hãy dùng giá trị được chỉ định trong *policy*.
 
       .. XXX: flatten should take a *policy* keyword.
 
 
    .. method:: clone(fp)
 
-      Return an independent clone of this :class:`BytesGenerator` instance with
-      the exact same option settings, and *fp* as the new *outfp*.
+      Trả về một bản sao độc lập của thực thể :class:`BytesGenerator` này với chính xác cùng các tùy chọn, và *fp* làm *outfp* mới.
 
 
    .. method:: write(s)
 
-      Encode *s* using the ``ASCII`` codec and the ``surrogateescape`` error
-      handler, and pass it to the *write* method of the *outfp* passed to the
-      :class:`BytesGenerator`'s constructor.
+      Mã hóa *s* bằng ``ASCII`` codec và ``surrogateescape`` error handler, rồi truyền nó cho phương thức *write* của *outfp* được truyền cho
+      hàm khởi tạo của :class:`BytesGenerator`.
 
 
-As a convenience, :class:`~email.message.EmailMessage` provides the methods
-:meth:`~email.message.EmailMessage.as_bytes` and ``bytes(aMessage)`` (a.k.a.
-:meth:`~email.message.EmailMessage.__bytes__`), which simplify the generation of
-a serialized binary representation of a message object.  For more detail, see
+Để thuận tiện, :class:`~email.message.EmailMessage` cung cấp các phương thức
+:meth:`~email.message.EmailMessage.as_bytes` và ``bytes(aMessage)`` (còn được gọi là
+:meth:`~email.message.EmailMessage.__bytes__`), giúp đơn giản hóa việc tạo biểu diễn nhị phân đã tuần tự hóa của một đối tượng thông điệp. Để biết thêm chi tiết, hãy xem
 :mod:`email.message`.
 
 
-Because strings cannot represent binary data, the :class:`Generator` class must
-convert any binary data in any message it flattens to an ASCII compatible
-format, by converting them to an ASCII compatible
-:mailheader:`Content-Transfer_Encoding`.  Using the terminology of the email
-RFCs, you can think of this as :class:`Generator` serializing to an I/O stream
-that is not "8 bit clean".  In other words, most applications will want
-to be using :class:`BytesGenerator`, and not :class:`Generator`.
+Vì chuỗi không thể biểu diễn dữ liệu nhị phân, lớp :class:`Generator` phải chuyển đổi mọi dữ liệu nhị phân trong bất kỳ message nào mà nó flatten sang một định dạng tương thích với ASCII, bằng cách chuyển đổi chúng sang một định dạng tương thích với ASCII
+:mailheader:`Content-Transfer_Encoding`. Theo thuật ngữ của các RFC về email, bạn có thể hình dung đây là :class:`Generator` serialize vào một I/O stream không "8 bit clean". Nói cách khác, hầu hết các ứng dụng sẽ muốn sử dụng :class:`BytesGenerator`, chứ không phải :class:`Generator`.
 
 .. class:: Generator(outfp, mangle_from_=None, maxheaderlen=None, *, \
                      policy=None)
 
-   Return a :class:`Generator` object that will write any message provided
-   to the :meth:`flatten` method, or any text provided to the :meth:`write`
-   method, to the :term:`file-like object` *outfp*.  *outfp* must support a
-   ``write`` method that accepts string data.
+   Trả về một đối tượng :class:`Generator` sẽ ghi mọi message được cung cấp cho phương thức :meth:`flatten`, hoặc mọi văn bản được cung cấp cho phương thức :meth:`write`, vào :term:`file-like object` *outfp*. *outfp* phải hỗ trợ một phương thức ``write`` chấp nhận dữ liệu chuỗi.
 
-   If optional *mangle_from_* is ``True``, put a ``>`` character in front of
-   any line in the body that starts with the exact string ``"From "``, that is
-   ``From`` followed by a space at the beginning of a line.  *mangle_from_*
-   defaults to the value of the :attr:`~email.policy.Policy.mangle_from_`
-   setting of the *policy* (which is ``True`` for the
-   :data:`~email.policy.compat32` policy and ``False`` for all others).
-   *mangle_from_* is intended for use when messages are stored in Unix mbox
-   format (see :mod:`mailbox` and `WHY THE CONTENT-LENGTH FORMAT IS BAD
-   <https://www.jwz.org/doc/content-length.html>`_).
+   Nếu *mangle_from_* tùy chọn là ``True``, hãy thêm một ký tự ``>`` vào trước mọi dòng trong phần thân bắt đầu bằng chuỗi chính xác ``"From "``, tức là ``From`` theo sau bởi một khoảng trắng ở đầu dòng.  *mangle_from_* mặc định nhận giá trị từ thiết lập :attr:`~email.policy.Policy.mangle_from_` của *policy* (là ``True`` đối với
+   chính sách :data:`~email.policy.compat32` và ``False`` đối với tất cả các chính sách khác). *mangle_from_* được dùng khi message được lưu ở định dạng Unix mbox (xem :mod:`mailbox` và `WHY THE CONTENT-LENGTH FORMAT IS BAD <https://www.jwz.org/doc/content-length.html>`_).
 
-   If *maxheaderlen* is not ``None``, refold any header lines that are longer
-   than *maxheaderlen*, or if ``0``, do not rewrap any headers.  If
-   *manheaderlen* is ``None`` (the default), wrap headers and other message
-   lines according to the *policy* settings.
+   Nếu *maxheaderlen* không phải là ``None``, sẽ định dạng lại các dòng tiêu đề dài hơn *maxheaderlen*; còn nếu là ``0``, sẽ không bọc lại bất kỳ tiêu đề nào. Nếu *manheaderlen* là ``None`` (mặc định), các tiêu đề và những dòng thư khác sẽ được bọc theo các thiết lập *policy*.
 
-   If *policy* is specified, use that policy to control message generation.  If
-   *policy* is ``None`` (the default), use the policy associated with the
-   :class:`~email.message.Message` or :class:`~email.message.EmailMessage`
-   object passed to ``flatten`` to control the message generation.  See
-   :mod:`email.policy` for details on what *policy* controls.
+   Nếu *policy* được chỉ định, hãy sử dụng policy đó để kiểm soát việc tạo thư. Nếu *policy* là ``None`` (mặc định), hãy sử dụng policy được liên kết với
+   đối tượng :class:`~email.message.Message` hoặc :class:`~email.message.EmailMessage` được truyền vào ``flatten`` để kiểm soát việc tạo thư. Xem
+   :mod:`email.policy` để biết chi tiết về những gì *policy* kiểm soát.
 
-   .. versionchanged:: 3.3 Added the *policy* keyword.
+   .. versionchanged:: 3.3 Đã thêm từ khóa *policy*.
 
-   .. versionchanged:: 3.6 The default behavior of the *mangle_from_*
-      and *maxheaderlen* parameters is to follow the policy.
+   .. versionchanged:: 3.6 Hành vi mặc định của *mangle_from_*
+      và các tham số *maxheaderlen* là tuân theo policy.
 
 
    .. method:: flatten(msg, unixfrom=False, linesep=None)
 
-      Print the textual representation of the message object structure rooted
-      at *msg* to the output file specified when the :class:`Generator`
-      instance was created.
+      In biểu diễn dạng văn bản của cấu trúc đối tượng thông điệp bắt nguồn từ *msg* vào tệp đầu ra được chỉ định khi thực thể :class:`Generator` được tạo.
 
-      If the :mod:`~email.policy` option :attr:`~email.policy.Policy.cte_type`
-      is ``8bit``, generate the message as if the option were set to ``7bit``.
-      (This is required because strings cannot represent non-ASCII bytes.)
-      Convert any bytes with the high bit set as needed using an
-      ASCII-compatible :mailheader:`Content-Transfer-Encoding`.  That is,
-      transform parts with non-ASCII :mailheader:`Content-Transfer-Encoding`
-      (:mailheader:`Content-Transfer-Encoding: 8bit`) to an ASCII compatible
-      :mailheader:`Content-Transfer-Encoding`, and encode RFC-invalid non-ASCII
-      bytes in headers using the MIME ``unknown-8bit`` character set, thus
-      rendering them RFC-compliant.
+      Nếu tùy chọn :mod:`~email.policy` :attr:`~email.policy.Policy.cte_type` là ``8bit``, hãy tạo thông báo như thể tùy chọn này được đặt thành ``7bit``. (Điều này là bắt buộc vì chuỗi không thể biểu diễn các byte không phải ASCII.) Chuyển đổi mọi byte có bit cao được thiết lập khi cần bằng cách sử dụng một :mailheader:`Content-Transfer-Encoding` tương thích với ASCII. Nghĩa là, biến đổi các phần có :mailheader:`Content-Transfer-Encoding` không phải ASCII (:mailheader:`Content-Transfer-Encoding: 8bit`) thành một dạng tương thích với ASCII
+      :mailheader:`Content-Transfer-Encoding`, và mã hóa các byte không phải ASCII không hợp lệ theo RFC trong header bằng bộ ký tự MIME ``unknown-8bit``, nhờ đó làm cho chúng tuân thủ RFC.
 
-      If *unixfrom* is ``True``, print the envelope header delimiter used by
-      the Unix mailbox format (see :mod:`mailbox`) before the first of the
-      :rfc:`5322` headers of the root message object.  If the root object has
-      no envelope header, craft a standard one.  The default is ``False``.
-      Note that for subparts, no envelope header is ever printed.
+      Nếu *unixfrom* là ``True``, in dấu phân cách header phong bì được định dạng Unix mailbox sử dụng (xem :mod:`mailbox`) trước header đầu tiên trong số các
+      :rfc:`5322` header của đối tượng message gốc. Nếu đối tượng gốc không có header phong bì, hãy tạo một header tiêu chuẩn. Mặc định là ``False``. Lưu ý rằng đối với các subpart, không bao giờ in header phong bì.
 
-      If *linesep* is not ``None``, use it as the separator character between
-      all the lines of the flattened message.  If *linesep* is ``None`` (the
-      default), use the value specified in the *policy*.
+      Nếu *linesep* không phải là ``None``, hãy dùng nó làm ký tự phân cách giữa tất cả các dòng của thông điệp đã được làm phẳng. Nếu *linesep* là ``None`` (mặc định), hãy dùng giá trị được chỉ định trong *policy*.
 
       .. XXX: flatten should take a *policy* keyword.
 
       .. versionchanged:: 3.2
-         Added support for re-encoding ``8bit`` message bodies, and the
-         *linesep* argument.
+         Đã bổ sung hỗ trợ mã hóa lại nội dung thông báo ``8bit`` và đối số *linesep*.
 
 
    .. method:: clone(fp)
 
-      Return an independent clone of this :class:`Generator` instance with the
-      exact same options, and *fp* as the new *outfp*.
+      Trả về một bản sao độc lập của thực thể :class:`Generator` này với các tùy chọn hoàn toàn giống nhau và *fp* làm *outfp* mới.
 
 
    .. method:: write(s)
 
-      Write *s* to the *write* method of the *outfp* passed to the
-      :class:`Generator`'s constructor.  This provides just enough file-like
-      API for :class:`Generator` instances to be used in the :func:`print`
-      function.
+      Ghi *s* vào phương thức *write* của *outfp* được truyền cho
+      :class:`Generator`'s constructor. Điều này cung cấp API dạng tệp vừa đủ để các thực thể :class:`Generator` có thể được sử dụng trong hàm :func:`print`.
 
 
-As a convenience, :class:`~email.message.EmailMessage` provides the methods
-:meth:`~email.message.EmailMessage.as_string` and ``str(aMessage)`` (a.k.a.
-:meth:`~email.message.EmailMessage.__str__`), which simplify the generation of
-a formatted string representation of a message object.  For more detail, see
+Để thuận tiện, :class:`~email.message.EmailMessage` cung cấp các phương thức
+:meth:`~email.message.EmailMessage.as_string` và ``str(aMessage)`` (còn được gọi là
+:meth:`~email.message.EmailMessage.__str__`), giúp đơn giản hóa việc tạo biểu diễn chuỗi đã định dạng của một đối tượng message. Để biết thêm chi tiết, hãy xem
 :mod:`email.message`.
 
 
-The :mod:`!email.generator` module also provides a derived class,
-:class:`DecodedGenerator`, which is like the :class:`Generator` base class,
-except that non-\ :mimetype:`text` parts are not serialized, but are instead
-represented in the output stream by a string derived from a template filled
-in with information about the part.
+Mô-đun :mod:`!email.generator` cũng cung cấp một lớp dẫn xuất,
+:class:`DecodedGenerator`, tương tự như lớp cơ sở :class:`Generator`, ngoại trừ việc các phần không phải \ :mimetype:`text` không được tuần tự hóa mà thay vào đó được biểu diễn trong output stream bằng một chuỗi được tạo từ template, điền thông tin về phần đó.
 
 .. class:: DecodedGenerator(outfp, mangle_from_=None, maxheaderlen=None, \
                             fmt=None, *, policy=None)
 
-   Act like :class:`Generator`, except that for any subpart of the message
-   passed to :meth:`Generator.flatten`, if the subpart is of main type
-   :mimetype:`text`, print the decoded payload of the subpart, and if the main
-   type is not :mimetype:`text`, instead of printing it fill in the string
-   *fmt* using information from the part and print the resulting
-   filled-in string.
+   Hoạt động giống như :class:`Generator`, ngoại trừ việc đối với bất kỳ phần con nào của thông điệp được truyền cho :meth:`Generator.flatten`, nếu phần con đó có kiểu chính là
+   :mimetype:`text`, hãy in payload đã giải mã của phần con đó; nếu kiểu chính không phải là :mimetype:`text`, thay vì in nó, hãy điền thông tin từ phần đó vào chuỗi *fmt* rồi in chuỗi đã được điền.
 
-   To fill in *fmt*, execute ``fmt % part_info``, where ``part_info``
-   is a dictionary composed of the following keys and values:
+   Để điền vào *fmt*, hãy thực thi ``fmt % part_info``, trong đó ``part_info`` là một dictionary gồm các khóa và giá trị sau:
 
-   * ``type`` -- Full MIME type of the non-\ :mimetype:`text` part
+   * ``type`` -- Kiểu MIME đầy đủ của phần không phải \ :mimetype:`text`
 
-   * ``maintype`` -- Main MIME type of the non-\ :mimetype:`text` part
+   * ``maintype`` -- Kiểu MIME chính của phần không phải \ :mimetype:`text`
 
-   * ``subtype`` -- Sub-MIME type of the non-\ :mimetype:`text` part
+   * ``subtype`` -- Kiểu MIME phụ của phần không phải \ :mimetype:`text`
 
-   * ``filename`` -- Filename of the non-\ :mimetype:`text` part
+   * ``filename`` -- Tên tệp của phần không phải \ :mimetype:`text`
 
-   * ``description`` -- Description associated with the non-\ :mimetype:`text` part
+   * ``description`` -- Mô tả liên kết với phần không phải \ :mimetype:`text`
 
-   * ``encoding`` -- Content transfer encoding of the non-\ :mimetype:`text` part
+   * ``encoding`` -- Mã hóa truyền nội dung của phần không phải \ :mimetype:`text`
 
-   If *fmt* is ``None``, use the following default *fmt*:
+   Nếu *fmt* là ``None``, hãy sử dụng *fmt* mặc định sau đây:
 
-      "[Non-text (%(type)s) part of message omitted, filename %(filename)s]"
+      "[Đã bỏ qua phần không phải văn bản (%(type)s) của thư, tên tệp %(filename)s]"
 
-   Optional *_mangle_from_* and *maxheaderlen* are as with the
-   :class:`Generator` base class.
+   *_mangle_from_* và *maxheaderlen* tùy chọn được xử lý giống như trong
+   lớp cơ sở :class:`Generator`.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] This statement assumes that you use the appropriate setting for
-       ``unixfrom``, and that there are no :mod:`email.policy` settings calling for
-       automatic adjustments (for example,
-       :attr:`~email.policy.EmailPolicy.refold_source` must be ``none``, which is
-       *not* the default).  It is also not 100% true, since if the message
-       does not conform to the RFC standards occasionally information about the
-       exact original text is lost during parsing error recovery.  It is a goal
-       to fix these latter edge cases when possible.
+.. [#] Câu lệnh này giả định rằng bạn sử dụng thiết lập thích hợp cho ``unixfrom``, và không có thiết lập :mod:`email.policy` nào yêu cầu điều chỉnh tự động (ví dụ như,
+       :attr:`~email.policy.EmailPolicy.refold_source` phải là ``none``, vốn *không* phải là mặc định). Điều này cũng không hoàn toàn đúng 100%, vì nếu thông điệp không tuân theo các tiêu chuẩn RFC thì đôi khi thông tin về chính xác văn bản gốc sẽ bị mất trong quá trình khôi phục sau lỗi phân tích cú pháp. Mục tiêu là khắc phục các trường hợp biên này khi có thể.
+
+.. _`WHY THE CONTENT-LENGTH FORMAT IS BAD`: https://www.jwz.org/doc/content-length.html

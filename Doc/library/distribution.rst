@@ -1,11 +1,8 @@
-***********************************
-Software Packaging and Distribution
-***********************************
+******************************
+Đóng gói và phân phối phần mềm
+******************************
 
-These libraries help you with publishing and installing Python software.
-While these modules are designed to work in conjunction with the
-`Python Package Index <https://pypi.org>`__, they can also be used
-with a local index server, or without any index server at all.
+Các thư viện này giúp bạn phát hành và cài đặt phần mềm Python. Mặc dù các mô-đun này được thiết kế để hoạt động cùng với `Python Package Index <https://pypi.org>`__, chúng cũng có thể được sử dụng với máy chủ chỉ mục cục bộ hoặc hoàn toàn không cần máy chủ chỉ mục nào.
 
 .. toctree::
 

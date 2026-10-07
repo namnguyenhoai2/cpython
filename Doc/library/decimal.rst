@@ -1,8 +1,8 @@
-:mod:`!decimal` --- Decimal fixed-point and floating-point arithmetic
-=====================================================================
+:mod:`!decimal` --- Số học dấu phẩy cố định và dấu phẩy động thập phân
+======================================================================
 
 .. module:: decimal
-   :synopsis: Implementation of the General Decimal Arithmetic Specification.
+   :synopsis: Triển khai Đặc tả Số học Thập phân Tổng quát.
 
 .. moduleauthor:: Eric Price <eprice at tjhsst.edu>
 .. moduleauthor:: Facundo Batista <facundo at taniquetil.com.ar>
@@ -12,7 +12,7 @@
 .. moduleauthor:: Stefan Krah <skrah at bytereef.org>
 .. sectionauthor:: Raymond D. Hettinger <python at rcn.com>
 
-**Source code:** :source:`Lib/decimal.py`
+**Mã nguồn:** :source:`Lib/decimal.py`
 
 .. import modules for testing inline doctests with the Sphinx doctest builder
 .. testsetup:: *
@@ -30,39 +30,22 @@
 
 --------------
 
-The :mod:`!decimal` module provides support for fast correctly rounded
-decimal floating-point arithmetic. It offers several advantages over the
-:class:`float` datatype:
+Mô-đun :mod:`!decimal` cung cấp khả năng thực hiện số học dấu phẩy động thập phân được làm tròn chính xác và nhanh chóng. Mô-đun này có một số ưu điểm so với
+:class:`float` kiểu dữ liệu:
 
-* Decimal "is based on a `floating-point model
-  <https://speleotrove.com/decimal/damodel.html#refnumber>`__ which was designed
-  with people in mind, and necessarily has a paramount guiding principle --
-  computers must provide an arithmetic that works in the same way as the
-  arithmetic that people learn at school." -- excerpt from the decimal
-  arithmetic specification.
+* Decimal “dựa trên một `mô hình dấu phẩy động <https://speleotrove.com/decimal/damodel.html#refnumber>`__ được thiết kế với con người làm trọng tâm, và tất yếu có một nguyên tắc chỉ đạo tối thượng -- máy tính phải cung cấp một phép tính hoạt động theo cùng cách với phép tính mà con người học ở trường.” -- trích từ đặc tả số học thập phân.
 
-* Decimal numbers can be represented exactly.  In contrast, numbers like
-  ``1.1`` and ``2.2`` do not have exact representations in binary
-  floating point. End users typically would not expect ``1.1 + 2.2`` to display
-  as ``3.3000000000000003`` as it does with binary floating point.
+* Các số thập phân có thể được biểu diễn chính xác. Trái lại, những số như ``1.1`` và ``2.2`` không có biểu diễn chính xác trong số dấu phẩy động nhị phân. Người dùng cuối thường không mong đợi ``1.1 + 2.2`` hiển thị thành ``3.3000000000000003`` như khi dùng số dấu phẩy động nhị phân.
 
-* The exactness carries over into arithmetic.  In decimal floating point, ``0.1
-  + 0.1 + 0.1 - 0.3`` is exactly equal to zero.  In binary floating point, the result
-  is ``5.5511151231257827e-017``.  While near to zero, the differences
-  prevent reliable equality testing and differences can accumulate. For this
-  reason, decimal is preferred in accounting applications which have strict
-  equality invariants.
+* Tính chính xác này cũng được thể hiện trong phép tính số học. Với floating point thập phân, ``0.1
+  + 0.1 + 0.1 - 0.3`` bằng chính xác không. Với floating point nhị phân, kết quả
+  là ``5.5511151231257827e-017``. Mặc dù gần bằng không, những khác biệt này khiến việc kiểm tra tính bằng nhau trở nên không đáng tin cậy, và các sai khác có thể tích lũy. Vì lý do này, decimal được ưu tiên trong các ứng dụng kế toán có các bất biến về tính bằng nhau nghiêm ngặt.
 
-* The decimal module incorporates a notion of significant places so that ``1.30
-  + 1.20`` is ``2.50``.  The trailing zero is kept to indicate significance.
-  This is the customary presentation for monetary applications. For
-  multiplication, the "schoolbook" approach uses all the figures in the
-  multiplicands.  For instance, ``1.3 * 1.2`` gives ``1.56`` while ``1.30 *
-  1.20`` gives ``1.5600``.
+* module decimal tích hợp khái niệm về chữ số có nghĩa, vì vậy ``1.30
+  + 1.20`` is ``2.50``. Số 0 ở cuối được giữ lại để biểu thị tính có nghĩa.
+  Đây là cách trình bày thông dụng trong các ứng dụng tiền tệ. Đối với phép nhân, cách tính "schoolbook" sử dụng tất cả các chữ số trong các thừa số. Chẳng hạn, ``1.3 * 1.2`` cho kết quả ``1.56``, còn ``1.30 * 1.20`` cho kết quả ``1.5600``.
 
-* Unlike hardware based binary floating point, the decimal module has a user
-  alterable precision (defaulting to 28 places) which can be as large as needed for
-  a given problem:
+* Không giống floating point nhị phân dựa trên phần cứng, module decimal có độ chính xác do người dùng thay đổi được (mặc định là 28 chữ số), và có thể lớn đến mức cần thiết cho một bài toán cụ thể:
 
      >>> from decimal import *
      >>> getcontext().prec = 6
@@ -72,63 +55,38 @@ decimal floating-point arithmetic. It offers several advantages over the
      >>> Decimal(1) / Decimal(7)
      Decimal('0.1428571428571428571428571429')
 
-* Both binary and decimal floating point are implemented in terms of published
-  standards.  While the built-in float type exposes only a modest portion of its
-  capabilities, the decimal module exposes all required parts of the standard.
-  When needed, the programmer has full control over rounding and signal handling.
-  This includes an option to enforce exact arithmetic by using exceptions
-  to block any inexact operations.
+* Cả số dấu phẩy động nhị phân và thập phân đều được triển khai dựa trên các tiêu chuẩn đã công bố. Mặc dù kiểu float tích hợp sẵn chỉ cung cấp một phần khiêm tốn các khả năng của mình, module decimal cung cấp tất cả các phần bắt buộc của tiêu chuẩn. Khi cần, lập trình viên có toàn quyền kiểm soát việc làm tròn và xử lý tín hiệu. Điều này bao gồm một tùy chọn để thực thi phép tính chính xác bằng cách sử dụng ngoại lệ nhằm chặn mọi phép toán không chính xác.
 
-* The decimal module was designed to support "without prejudice, both exact
-  unrounded decimal arithmetic (sometimes called fixed-point arithmetic)
-  and rounded floating-point arithmetic."  -- excerpt from the decimal
-  arithmetic specification.
+* Module decimal được thiết kế để hỗ trợ "không thiên lệch, cả phép tính thập phân chính xác không làm tròn (đôi khi được gọi là phép tính dấu phẩy cố định) và phép tính dấu phẩy động có làm tròn." -- trích từ đặc tả phép tính thập phân.
 
-The module design is centered around three concepts:  the decimal number, the
-context for arithmetic, and signals.
+Thiết kế của module xoay quanh ba khái niệm: số thập phân, context cho phép tính và các tín hiệu.
 
-A decimal number is immutable.  It has a sign, coefficient digits, and an
-exponent.  To preserve significance, the coefficient digits do not truncate
-trailing zeros.  Decimals also include special values such as
-``Infinity``, ``-Infinity``, and ``NaN``.  The standard also
-differentiates ``-0`` from ``+0``.
+Một số thập phân là bất biến. Nó có dấu, các chữ số của phần hệ số và số mũ. Để bảo toàn độ chính xác biểu diễn, các chữ số của phần hệ số không cắt bỏ các số 0 ở cuối. Số thập phân cũng bao gồm các giá trị đặc biệt như ``Infinity``, ``-Infinity`` và ``NaN``. Tiêu chuẩn cũng phân biệt ``-0`` với ``+0``.
 
-The context for arithmetic is an environment specifying precision, rounding
-rules, limits on exponents, flags indicating the results of operations, and trap
-enablers which determine whether signals are treated as exceptions.  Rounding
-options include :const:`ROUND_CEILING`, :const:`ROUND_DOWN`,
+Context cho phép tính là một môi trường chỉ định độ chính xác, các quy tắc làm tròn, giới hạn của số mũ, các cờ cho biết kết quả của phép toán và các bộ kích hoạt trap xác định liệu tín hiệu có được xử lý như ngoại lệ hay không. Các tùy chọn làm tròn bao gồm :const:`ROUND_CEILING`, :const:`ROUND_DOWN`,
 :const:`ROUND_FLOOR`, :const:`ROUND_HALF_DOWN`, :const:`ROUND_HALF_EVEN`,
-:const:`ROUND_HALF_UP`, :const:`ROUND_UP`, and :const:`ROUND_05UP`.
+:const:`ROUND_HALF_UP`, :const:`ROUND_UP` và :const:`ROUND_05UP`.
 
-Signals are groups of exceptional conditions arising during the course of
-computation.  Depending on the needs of the application, signals may be ignored,
-considered as informational, or treated as exceptions. The signals in the
-decimal module are: :const:`Clamped`, :const:`InvalidOperation`,
+Tín hiệu là các nhóm điều kiện bất thường phát sinh trong quá trình tính toán. Tùy theo nhu cầu của ứng dụng, tín hiệu có thể bị bỏ qua, được xem là thông tin hoặc được xử lý như ngoại lệ. Các tín hiệu trong module decimal là: :const:`Clamped`, :const:`InvalidOperation`,
 :const:`DivisionByZero`, :const:`Inexact`, :const:`Rounded`, :const:`Subnormal`,
-:const:`Overflow`, :const:`Underflow` and :const:`FloatOperation`.
+:const:`Overflow`, :const:`Underflow` và :const:`FloatOperation`.
 
-For each signal there is a flag and a trap enabler.  When a signal is
-encountered, its flag is set to one, then, if the trap enabler is
-set to one, an exception is raised.  Flags are sticky, so the user needs to
-reset them before monitoring a calculation.
+Mỗi signal đều có một flag và một trap enabler. Khi gặp một signal, flag của nó được đặt thành một, sau đó, nếu trap enabler được đặt thành một, một exception sẽ được raised. Các flag có tính sticky, vì vậy người dùng cần reset chúng trước khi theo dõi một phép tính.
 
 
 .. seealso::
 
-   * IBM's General Decimal Arithmetic Specification, `The General Decimal Arithmetic
-     Specification <https://speleotrove.com/decimal/decarith.html>`_.
+   * Đặc tả General Decimal Arithmetic của IBM, `The General Decimal Arithmetic Specification <https://speleotrove.com/decimal/decarith.html>`_.
 
 .. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 .. _decimal-tutorial:
 
-Quick-start tutorial
---------------------
+Hướng dẫn bắt đầu nhanh
+-----------------------
 
-The usual start to using decimals is importing the module, viewing the current
-context with :func:`getcontext` and, if necessary, setting new values for
-precision, rounding, or enabled traps::
+Cách bắt đầu thông thường khi sử dụng decimal là import module, xem context hiện tại bằng :func:`getcontext` và, nếu cần, đặt các giá trị mới cho precision, rounding hoặc các trap được bật::
 
    >>> from decimal import *
    >>> getcontext()
@@ -136,13 +94,9 @@ precision, rounding, or enabled traps::
            capitals=1, clamp=0, flags=[], traps=[Overflow, DivisionByZero,
            InvalidOperation])
 
-   >>> getcontext().prec = 7       # Set a new precision
+   >>> getcontext().prec = 7       # Đặt precision mới
 
-Decimal instances can be constructed from integers, strings, floats, or tuples.
-Construction from an integer or a float performs an exact conversion of the
-value of that integer or float.  Decimal numbers include special values such as
-``NaN`` which stands for "Not a number", positive and negative
-``Infinity``, and ``-0``::
+Các instance Decimal có thể được tạo từ số nguyên, chuỗi, số thực hoặc tuple. Việc tạo từ số nguyên hoặc số thực sẽ thực hiện chuyển đổi chính xác giá trị của số nguyên hoặc số thực đó. Các số Decimal bao gồm những giá trị đặc biệt như ``NaN``, đại diện cho "Not a number", ``Infinity`` dương và âm, cùng ``-0``::
 
    >>> getcontext().prec = 28
    >>> Decimal(10)
@@ -162,9 +116,7 @@ value of that integer or float.  Decimal numbers include special values such as
    >>> Decimal('-Infinity')
    Decimal('-Infinity')
 
-If the :exc:`FloatOperation` signal is trapped, accidental mixing of
-decimals and floats in constructors or ordering comparisons raises
-an exception::
+Nếu tín hiệu :exc:`FloatOperation` bị bắt, việc vô tình trộn số thập phân và số dấu phẩy động trong các hàm khởi tạo hoặc phép so sánh thứ tự sẽ phát sinh ngoại lệ::
 
    >>> c = getcontext()
    >>> c.traps[FloatOperation] = True
@@ -181,9 +133,7 @@ an exception::
 
 .. versionadded:: 3.3
 
-The significance of a new Decimal is determined solely by the number of digits
-input.  Context precision and rounding only come into play during arithmetic
-operations.
+Ý nghĩa của một Decimal mới chỉ được xác định bởi số chữ số đầu vào. Độ chính xác và cách làm tròn của Context chỉ có tác dụng trong các phép toán số học.
 
 .. doctest:: newcontext
 
@@ -198,8 +148,7 @@ operations.
    >>> Decimal('3.1415926535') + Decimal('2.7182818285')
    Decimal('5.85988')
 
-If the internal limits of the C version are exceeded, constructing
-a decimal raises :class:`InvalidOperation`::
+Nếu vượt quá các giới hạn nội bộ của phiên bản C, việc tạo một số thập phân sẽ phát sinh :class:`InvalidOperation`::
 
    >>> Decimal("1e9999999999999999999")
    Traceback (most recent call last):
@@ -208,8 +157,7 @@ a decimal raises :class:`InvalidOperation`::
 
 .. versionchanged:: 3.3
 
-Decimals interact well with much of the rest of Python.  Here is a small decimal
-floating-point flying circus:
+Các số thập phân tương tác tốt với phần lớn các thành phần còn lại của Python. Sau đây là một màn trình diễn nhỏ về số dấu phẩy động thập phân:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -240,9 +188,8 @@ floating-point flying circus:
    >>> c % a
    Decimal('0.77')
 
-Decimals can be formatted (with :func:`format` built-in or :ref:`f-strings`) in
-fixed-point or scientific notation, using the same formatting syntax (see
-:ref:`formatspec`) as builtin :class:`float` type:
+Các số thập phân có thể được định dạng (bằng :func:`format` tích hợp sẵn hoặc :ref:`f-strings`) theo ký hiệu dấu phẩy cố định hoặc ký hiệu khoa học, sử dụng cùng cú pháp định dạng (xem
+:ref:`formatspec`) như kiểu :class:`float` tích hợp sẵn:
 
 .. doctest::
 
@@ -260,7 +207,7 @@ fixed-point or scientific notation, using the same formatting syntax (see
    ...
    2.67
 
-And some mathematical functions are also available to Decimal:
+Một số hàm toán học cũng khả dụng cho Decimal:
 
    >>> getcontext().prec = 28
    >>> Decimal(2).sqrt()
@@ -272,27 +219,19 @@ And some mathematical functions are also available to Decimal:
    >>> Decimal('10').log10()
    Decimal('1')
 
-The :meth:`~Decimal.quantize` method rounds a number to a fixed exponent.  This method is
-useful for monetary applications that often round results to a fixed number of
-places:
+Phương thức :meth:`~Decimal.quantize` làm tròn một số đến một số mũ cố định. Phương thức này hữu ích cho các ứng dụng tiền tệ, vốn thường làm tròn kết quả đến một số chữ số thập phân cố định:
 
    >>> Decimal('7.325').quantize(Decimal('.01'), rounding=ROUND_DOWN)
    Decimal('7.32')
    >>> Decimal('7.325').quantize(Decimal('1.'), rounding=ROUND_UP)
    Decimal('8')
 
-As shown above, the :func:`getcontext` function accesses the current context and
-allows the settings to be changed.  This approach meets the needs of most
-applications.
+Như đã trình bày ở trên, hàm :func:`getcontext` truy cập context hiện tại và cho phép thay đổi các thiết lập. Cách tiếp cận này đáp ứng nhu cầu của hầu hết các ứng dụng.
 
-For more advanced work, it may be useful to create alternate contexts using the
-:meth:`Context` constructor.  To make an alternate active, use the :func:`setcontext`
-function.
+Đối với các tác vụ nâng cao hơn, việc tạo các context thay thế bằng
+constructor :meth:`Context` có thể hữu ích. Để kích hoạt một context thay thế, hãy sử dụng hàm :func:`setcontext`.
 
-In accordance with the standard, the :mod:`!decimal` module provides two ready to
-use standard contexts, :const:`BasicContext` and :const:`ExtendedContext`. The
-former is especially useful for debugging because many of the traps are
-enabled:
+Theo tiêu chuẩn, module :mod:`!decimal` cung cấp hai context tiêu chuẩn sẵn sàng sử dụng, :const:`BasicContext` và :const:`ExtendedContext`. Context đầu tiên đặc biệt hữu ích cho việc debug vì nhiều trap đã được bật:
 
 .. doctest:: newcontext
    :options: +NORMALIZE_WHITESPACE
@@ -318,10 +257,7 @@ enabled:
        Decimal(42) / Decimal(0)
    DivisionByZero: x / 0
 
-Contexts also have signal flags for monitoring exceptional conditions
-encountered during computations.  The flags remain set until explicitly cleared,
-so it is best to clear the flags before each set of monitored computations by
-using the :meth:`~Context.clear_flags` method. ::
+Các context cũng có các cờ signal để theo dõi những điều kiện bất thường xảy ra trong quá trình tính toán. Các cờ vẫn được đặt cho đến khi được xóa rõ ràng, vì vậy tốt nhất là xóa các cờ trước mỗi nhóm phép tính cần theo dõi bằng phương thức :meth:`~Context.clear_flags`.::
 
    >>> setcontext(ExtendedContext)
    >>> getcontext().clear_flags()
@@ -331,12 +267,9 @@ using the :meth:`~Context.clear_flags` method. ::
    Context(prec=9, rounding=ROUND_HALF_EVEN, Emin=-999999, Emax=999999,
            capitals=1, clamp=0, flags=[Inexact, Rounded], traps=[])
 
-The *flags* entry shows that the rational approximation to pi was
-rounded (digits beyond the context precision were thrown away) and that the
-result is inexact (some of the discarded digits were non-zero).
+Mục nhập *flags* cho biết phép xấp xỉ hữu tỉ của pi đã được làm tròn (các chữ số vượt quá độ chính xác của context đã bị loại bỏ) và kết quả là không chính xác (một số chữ số bị loại bỏ khác không).
 
-Individual traps are set using the dictionary in the :attr:`~Context.traps`
-attribute of a context:
+Các bẫy riêng lẻ được thiết lập bằng dictionary trong thuộc tính :attr:`~Context.traps` của một context:
 
 .. doctest:: newcontext
 
@@ -350,29 +283,22 @@ attribute of a context:
        Decimal(1) / Decimal(0)
    DivisionByZero: x / 0
 
-Most programs adjust the current context only once, at the beginning of the
-program.  And, in many applications, data is converted to :class:`Decimal` with
-a single cast inside a loop.  With context set and decimals created, the bulk of
-the program manipulates the data no differently than with other Python numeric
-types.
+Hầu hết các chương trình chỉ điều chỉnh context hiện tại một lần, ở phần đầu chương trình. Và trong nhiều ứng dụng, dữ liệu được chuyển đổi thành :class:`Decimal` bằng một phép cast duy nhất bên trong vòng lặp. Sau khi context được thiết lập và các số thập phân được tạo, phần lớn chương trình thao tác với dữ liệu không khác gì khi sử dụng các kiểu số Python khác.
 
 .. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 .. _decimal-decimal:
 
-Decimal objects
----------------
+Đối tượng Decimal
+-----------------
 
 
 .. class:: Decimal(value="0", context=None)
 
-   Construct a new :class:`Decimal` object based from *value*.
+   Tạo một đối tượng :class:`Decimal` mới dựa trên *value*.
 
-   *value* can be an integer, string, tuple, :class:`float`, or another :class:`Decimal`
-   object. If no *value* is given, returns ``Decimal('0')``.  If *value* is a
-   string, it should conform to the decimal numeric string syntax after leading
-   and trailing whitespace characters, as well as underscores throughout, are removed::
+   *value* có thể là một số nguyên, chuỗi, tuple, :class:`float`, hoặc một đối tượng :class:`Decimal` khác. Nếu không cung cấp *value*, hàm trả về ``Decimal('0')``. Nếu *value* là một chuỗi, chuỗi đó phải tuân theo cú pháp chuỗi số thập phân sau khi đã loại bỏ các ký tự khoảng trắng ở đầu và cuối, cũng như các dấu gạch dưới trong chuỗi::
 
       sign           ::=  '+' | '-'
       digit          ::=  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
@@ -385,132 +311,83 @@ Decimal objects
       numeric-value  ::=  decimal-part [exponent-part] | infinity
       numeric-string ::=  [sign] numeric-value | [sign] nan
 
-   Other Unicode decimal digits are also permitted where ``digit``
-   appears above.  These include decimal digits from various other
-   alphabets (for example, Arabic-Indic and Devanāgarī digits) along
-   with the fullwidth digits ``'\uff10'`` through ``'\uff19'``.
-   Case is not significant, so, for example, ``inf``, ``Inf``, ``INFINITY``,
-   and ``iNfINity`` are all acceptable spellings for positive infinity.
+   Các chữ số thập phân Unicode khác cũng được phép sử dụng ở vị trí ``digit`` xuất hiện ở trên. Những chữ số này bao gồm các chữ số thập phân từ nhiều bảng chữ cái khác (ví dụ: chữ số Ả Rập-Ấn Độ và Devanāgarī), cùng với các chữ số fullwidth từ ``'\uff10'`` đến ``'\uff19'``. Không phân biệt chữ hoa chữ thường, vì vậy, chẳng hạn, ``inf``, ``Inf``, ``INFINITY`` và ``iNfINity`` đều là cách viết hợp lệ của vô cực dương.
 
-   If *value* is a :class:`tuple`, it should have three components, a sign
-   (``0`` for positive or ``1`` for negative), a :class:`tuple` of
-   digits, and an integer exponent. For example, ``Decimal((0, (1, 4, 1, 4), -3))``
-   returns ``Decimal('1.414')``.
+   Nếu *value* là một :class:`tuple`, nó phải có ba thành phần: một dấu (``0`` cho số dương hoặc ``1`` cho số âm), một :class:`tuple` gồm các chữ số và một số mũ nguyên. Ví dụ, ``Decimal((0, (1, 4, 1, 4), -3))`` trả về ``Decimal('1.414')``.
 
-   If *value* is a :class:`float`, the binary floating-point value is losslessly
-   converted to its exact decimal equivalent.  This conversion can often require
-   53 or more digits of precision.  For example, ``Decimal(float('1.1'))``
-   converts to
-   ``Decimal('1.100000000000000088817841970012523233890533447265625')``.
+   Nếu *value* là một :class:`float`, giá trị dấu phẩy động nhị phân sẽ được chuyển đổi không mất mát sang giá trị thập phân tương đương chính xác. Việc chuyển đổi này thường có thể yêu cầu độ chính xác từ 53 chữ số trở lên. Ví dụ: ``Decimal(float('1.1'))`` được chuyển đổi thành ``Decimal('1.100000000000000088817841970012523233890533447265625')``.
 
-   The *context* precision does not affect how many digits are stored. That is
-   determined exclusively by the number of digits in *value*. For example,
-   ``Decimal('3.00000')`` records all five zeros even if the context precision is
-   only three.
+   Độ chính xác của *context* không ảnh hưởng đến số chữ số được lưu trữ. Điều đó được xác định hoàn toàn bởi số chữ số trong *value*. Ví dụ: ``Decimal('3.00000')`` ghi lại cả năm số 0, ngay cả khi độ chính xác của context chỉ là ba.
 
-   The purpose of the *context* argument is determining what to do if *value* is a
-   malformed string.  If the context traps :const:`InvalidOperation`, an exception
-   is raised; otherwise, the constructor returns a new Decimal with the value of
-   ``NaN``.
+   Mục đích của đối số *context* là xác định cần làm gì nếu *value* là một chuỗi không hợp lệ. Nếu context bẫy :const:`InvalidOperation`, một ngoại lệ sẽ được phát sinh; nếu không, hàm khởi tạo trả về một Decimal mới có giá trị bằng ``NaN``.
 
-   Once constructed, :class:`Decimal` objects are immutable.
+   Sau khi được khởi tạo, các đối tượng :class:`Decimal` là bất biến.
 
    .. versionchanged:: 3.2
-      The argument to the constructor is now permitted to be a :class:`float`
-      instance.
+      Đối số của hàm khởi tạo giờ đây được phép là một thực thể :class:`float`.
 
    .. versionchanged:: 3.3
       :class:`float` arguments raise an exception if the :exc:`FloatOperation`
-      trap is set. By default the trap is off.
+      trap được bật. Theo mặc định, trap bị tắt.
 
    .. versionchanged:: 3.6
-      Underscores are allowed for grouping, as with integral and floating-point
-      literals in code.
+      Có thể sử dụng dấu gạch dưới để phân nhóm, giống như với các literal số nguyên và dấu phẩy động trong mã.
 
-   Decimal floating-point objects share many properties with the other built-in
-   numeric types such as :class:`float` and :class:`int`.  All of the usual math
-   operations and special methods apply.  Likewise, decimal objects can be
-   copied, pickled, printed, used as dictionary keys, used as set elements,
-   compared, sorted, and coerced to another type (such as :class:`float` or
+   Các đối tượng số dấu phẩy động thập phân có nhiều thuộc tính giống với các kiểu số dựng sẵn khác, chẳng hạn như :class:`float` và :class:`int`. Tất cả các phép toán toán học thông thường và phương thức đặc biệt đều áp dụng được. Tương tự, các đối tượng thập phân có thể được sao chép, pickle, in, dùng làm khóa từ điển, dùng làm phần tử của tập hợp, so sánh, sắp xếp và chuyển đổi sang một kiểu khác (chẳng hạn như :class:`float` hoặc
    :class:`int`).
 
-   There are some small differences between arithmetic on Decimal objects and
-   arithmetic on integers and floats.  When the remainder operator ``%`` is
-   applied to Decimal objects, the sign of the result is the sign of the
-   *dividend* rather than the sign of the divisor::
+   Có một số khác biệt nhỏ giữa phép tính trên các đối tượng Decimal và phép tính trên số nguyên và số thực. Khi áp dụng toán tử phần dư ``%`` cho các đối tượng Decimal, dấu của kết quả là dấu của *số bị chia* thay vì dấu của số chia::
 
       >>> (-7) % 4
       1
       >>> Decimal(-7) % Decimal(4)
       Decimal('-3')
 
-   The integer division operator ``//`` behaves analogously, returning the
-   integer part of the true quotient (truncating towards zero) rather than its
-   floor, so as to preserve the usual identity ``x == (x // y) * y + x % y``::
+   Toán tử chia lấy phần nguyên ``//`` hoạt động tương tự, trả về phần nguyên của thương thực (cắt về phía 0) thay vì phần sàn của nó, nhằm duy trì đẳng thức thông thường ``x == (x // y) * y + x % y``::
 
       >>> -7 // 4
       -2
       >>> Decimal(-7) // Decimal(4)
       Decimal('-1')
 
-   The ``%`` and ``//`` operators implement the ``remainder`` and
-   ``divide-integer`` operations (respectively) as described in the
-   specification.
+   Các toán tử ``%`` và ``//`` lần lượt thực hiện các phép toán ``remainder`` và ``divide-integer`` như được mô tả trong đặc tả.
 
-   Decimal objects cannot generally be combined with floats or
-   instances of :class:`fractions.Fraction` in arithmetic operations:
-   an attempt to add a :class:`Decimal` to a :class:`float`, for
-   example, will raise a :exc:`TypeError`.  However, it is possible to
-   use Python's comparison operators to compare a :class:`Decimal`
-   instance ``x`` with another number ``y``.  This avoids confusing results
-   when doing equality comparisons between numbers of different types.
+   Các đối tượng Decimal nhìn chung không thể kết hợp với số thực hoặc các thể hiện của :class:`fractions.Fraction` trong các phép toán số học: chẳng hạn, việc cộng một :class:`Decimal` với một :class:`float` sẽ gây ra :exc:`TypeError`. Tuy nhiên, có thể sử dụng các toán tử so sánh của Python để so sánh một thể hiện :class:`Decimal` ``x`` với một số khác ``y``. Điều này giúp tránh các kết quả gây nhầm lẫn khi thực hiện phép so sánh bằng giữa các số thuộc các kiểu khác nhau.
 
    .. versionchanged:: 3.2
-      Mixed-type comparisons between :class:`Decimal` instances and other
-      numeric types are now fully supported.
+      Các phép so sánh khác kiểu giữa các thực thể :class:`Decimal` và các kiểu số khác hiện đã được hỗ trợ đầy đủ.
 
-   In addition to the standard numeric properties, decimal floating-point
-   objects also have a number of specialized methods:
+   Ngoài các thuộc tính số tiêu chuẩn, các đối tượng số dấu phẩy động thập phân còn có một số phương thức chuyên biệt:
 
 
    .. method:: adjusted()
 
-      Return the adjusted exponent after shifting out the coefficient's
-      rightmost digits until only the lead digit remains:
-      ``Decimal('321e+5').adjusted()`` returns seven.  Used for determining the
-      position of the most significant digit with respect to the decimal point.
+      Trả về số mũ đã điều chỉnh sau khi dịch các chữ số ngoài cùng bên phải của coefficient cho đến khi chỉ còn lại chữ số đầu tiên: ``Decimal('321e+5').adjusted()`` trả về bảy.  Được dùng để xác định vị trí của chữ số có nghĩa nhất so với dấu thập phân.
 
    .. method:: as_integer_ratio()
 
-      Return a pair ``(n, d)`` of integers that represent the given
-      :class:`Decimal` instance as a fraction, in lowest terms and
-      with a positive denominator::
+      Trả về một cặp ``(n, d)`` số nguyên biểu diễn giá trị đã cho
+      :class:`Decimal` instance dưới dạng phân số, ở dạng tối giản và có mẫu số dương::
 
           >>> Decimal('-3.14').as_integer_ratio()
           (-157, 50)
 
-      The conversion is exact.  Raise OverflowError on infinities and ValueError
-      on NaNs.
+      Phép chuyển đổi là chính xác.  Phát sinh OverflowError đối với các giá trị vô cực và ValueError đối với NaN.
 
    .. versionadded:: 3.6
 
    .. method:: as_tuple()
 
-      Return a :term:`named tuple` representation of the number:
-      ``DecimalTuple(sign, digits, exponent)``.
+      Trả về biểu diễn :term:`named tuple` của số: ``DecimalTuple(sign, digits, exponent)``.
 
 
    .. method:: canonical()
 
-      Return the canonical encoding of the argument.  Currently, the encoding of
-      a :class:`Decimal` instance is always canonical, so this operation returns
-      its argument unchanged.
+      Trả về encoding chuẩn tắc của đối số.  Hiện tại, encoding của một instance :class:`Decimal` luôn là chuẩn tắc, vì vậy thao tác này trả về đối số mà không thay đổi.
 
    .. method:: compare(other, context=None)
 
-      Compare the values of two Decimal instances.  :meth:`compare` returns a
-      Decimal instance, and if either operand is a NaN then the result is a
-      NaN::
+      So sánh giá trị của hai đối tượng Decimal.  :meth:`compare` trả về một đối tượng Decimal và nếu một trong hai toán hạng là NaN thì kết quả là NaN::
 
          a or b is a NaN  ==> Decimal('NaN')
          a < b            ==> Decimal('-1')
@@ -519,76 +396,51 @@ Decimal objects
 
    .. method:: compare_signal(other, context=None)
 
-      This operation is identical to the :meth:`compare` method, except that all
-      NaNs signal.  That is, if neither operand is a signaling NaN then any
-      quiet NaN operand is treated as though it were a signaling NaN.
+      Phép toán này giống hệt phương thức :meth:`compare`, ngoại trừ việc tất cả NaN đều phát tín hiệu.  Nghĩa là, nếu không có toán hạng nào là signaling NaN thì mọi toán hạng quiet NaN đều được xử lý như thể là signaling NaN.
 
    .. method:: compare_total(other, context=None)
 
-      Compare two operands using their abstract representation rather than their
-      numerical value.  Similar to the :meth:`compare` method, but the result
-      gives a total ordering on :class:`Decimal` instances.  Two
-      :class:`Decimal` instances with the same numeric value but different
-      representations compare unequal in this ordering:
+      So sánh hai toán hạng bằng cách sử dụng biểu diễn trừu tượng thay vì giá trị số của chúng.  Tương tự phương thức :meth:`compare`, nhưng kết quả cung cấp một thứ tự toàn phần trên các đối tượng :class:`Decimal`.  Hai
+      đối tượng :class:`Decimal` có cùng giá trị số nhưng biểu diễn khác nhau sẽ được so sánh là không bằng nhau theo thứ tự này:
 
          >>> Decimal('12.0').compare_total(Decimal('12'))
          Decimal('-1')
 
-      Quiet and signaling NaNs are also included in the total ordering.  The
-      result of this function is ``Decimal('0')`` if both operands have the same
-      representation, ``Decimal('-1')`` if the first operand is lower in the
-      total order than the second, and ``Decimal('1')`` if the first operand is
-      higher in the total order than the second operand.  See the specification
-      for details of the total order.
+      Quiet NaN và signaling NaN cũng được đưa vào thứ tự toàn phần.  Kết quả của hàm này là ``Decimal('0')`` nếu cả hai toán hạng có cùng biểu diễn, ``Decimal('-1')`` nếu toán hạng thứ nhất đứng trước toán hạng thứ hai trong thứ tự toàn phần, và ``Decimal('1')`` nếu toán hạng thứ nhất đứng sau toán hạng thứ hai trong thứ tự toàn phần.  Xem đặc tả để biết chi tiết về thứ tự toàn phần.
 
-      This operation is unaffected by context and is quiet: no flags are changed
-      and no rounding is performed.  As an exception, the C version may raise
-      InvalidOperation if the second operand cannot be converted exactly.
+      Phép toán này không bị ảnh hưởng bởi context và không phát tín hiệu: không có cờ nào bị thay đổi và không thực hiện làm tròn.  Ngoại lệ là phiên bản C có thể phát sinh InvalidOperation nếu không thể chuyển đổi chính xác toán hạng thứ hai.
 
    .. method:: compare_total_mag(other, context=None)
 
-      Compare two operands using their abstract representation rather than their
-      value as in :meth:`compare_total`, but ignoring the sign of each operand.
-      ``x.compare_total_mag(y)`` is equivalent to
-      ``x.copy_abs().compare_total(y.copy_abs())``.
+      So sánh hai toán hạng bằng cách sử dụng biểu diễn trừu tượng thay vì giá trị của chúng như trong :meth:`compare_total`, nhưng bỏ qua dấu của từng toán hạng. ``x.compare_total_mag(y)`` tương đương với ``x.copy_abs().compare_total(y.copy_abs())``.
 
-      This operation is unaffected by context and is quiet: no flags are changed
-      and no rounding is performed.  As an exception, the C version may raise
-      InvalidOperation if the second operand cannot be converted exactly.
+      Phép toán này không bị ảnh hưởng bởi context và không phát tín hiệu: không có cờ nào bị thay đổi và không thực hiện làm tròn.  Ngoại lệ là phiên bản C có thể phát sinh InvalidOperation nếu không thể chuyển đổi chính xác toán hạng thứ hai.
 
    .. method:: conjugate()
 
-      Just returns self, this method is only to comply with the Decimal
-      Specification.
+      Chỉ trả về chính nó; phương thức này chỉ nhằm tuân thủ Decimal Specification.
 
    .. method:: copy_abs()
 
-      Return the absolute value of the argument.  This operation is unaffected
-      by the context and is quiet: no flags are changed and no rounding is
-      performed.
+      Trả về giá trị tuyệt đối của đối số. Thao tác này không bị ảnh hưởng bởi context và không gây hiệu ứng: không có flag nào bị thay đổi và không thực hiện làm tròn.
 
    .. method:: copy_negate()
 
-      Return the negation of the argument.  This operation is unaffected by the
-      context and is quiet: no flags are changed and no rounding is performed.
+      Trả về giá trị phủ định của đối số. Thao tác này không bị ảnh hưởng bởi context và không gây hiệu ứng: không có flag nào bị thay đổi và không thực hiện làm tròn.
 
    .. method:: copy_sign(other, context=None)
 
-      Return a copy of the first operand with the sign set to be the same as the
-      sign of the second operand.  For example:
+      Trả về một bản sao của toán hạng thứ nhất với dấu được đặt giống với dấu của toán hạng thứ hai. Ví dụ:
 
          >>> Decimal('2.3').copy_sign(Decimal('-1.5'))
          Decimal('-2.3')
 
-      This operation is unaffected by context and is quiet: no flags are changed
-      and no rounding is performed.  As an exception, the C version may raise
-      InvalidOperation if the second operand cannot be converted exactly.
+      Phép toán này không bị ảnh hưởng bởi context và không phát tín hiệu: không có cờ nào bị thay đổi và không thực hiện làm tròn.  Ngoại lệ là phiên bản C có thể phát sinh InvalidOperation nếu không thể chuyển đổi chính xác toán hạng thứ hai.
 
    .. method:: exp(context=None)
 
-      Return the value of the (natural) exponential function ``e**x`` at the
-      given number.  The result is correctly rounded using the
-      :const:`ROUND_HALF_EVEN` rounding mode.
+      Trả về giá trị của hàm mũ (tự nhiên) ``e**x`` tại số đã cho. Kết quả được làm tròn chính xác bằng cách sử dụng
+      chế độ làm tròn :const:`ROUND_HALF_EVEN`.
 
       >>> Decimal(1).exp()
       Decimal('2.718281828459045235360287471')
@@ -597,17 +449,12 @@ Decimal objects
 
    .. classmethod:: from_float(f, /)
 
-      Alternative constructor that only accepts instances of :class:`float` or
+      Hàm khởi tạo thay thế chỉ chấp nhận các thực thể của :class:`float` hoặc
       :class:`int`.
 
-      Note ``Decimal.from_float(0.1)`` is not the same as ``Decimal('0.1')``.
-      Since 0.1 is not exactly representable in binary floating point, the
-      value is stored as the nearest representable value which is
-      ``0x1.999999999999ap-4``.  That equivalent value in decimal is
-      ``0.1000000000000000055511151231257827021181583404541015625``.
+      Lưu ý ``Decimal.from_float(0.1)`` không giống với ``Decimal('0.1')``. Vì 0.1 không thể biểu diễn chính xác dưới dạng số thực dấu phẩy động nhị phân, giá trị này được lưu dưới dạng giá trị có thể biểu diễn gần nhất là ``0x1.999999999999ap-4``. Giá trị tương đương đó ở dạng thập phân là ``0.1000000000000000055511151231257827021181583404541015625``.
 
-      .. note:: From Python 3.2 onwards, a :class:`Decimal` instance
-         can also be constructed directly from a :class:`float`.
+      .. note:: Kể từ Python 3.2, một thực thể :class:`Decimal` cũng có thể được tạo trực tiếp từ một :class:`float`.
 
       .. doctest::
 
@@ -624,9 +471,8 @@ Decimal objects
 
    .. classmethod:: from_number(number, /)
 
-      Alternative constructor that only accepts instances of
-      :class:`float`, :class:`int` or :class:`Decimal`, but not strings
-      or tuples.
+      Hàm khởi tạo thay thế chỉ chấp nhận các thực thể của
+      :class:`float`, :class:`int` hoặc :class:`Decimal`, nhưng không chấp nhận chuỗi hoặc tuple.
 
       .. doctest::
 
@@ -641,225 +487,167 @@ Decimal objects
 
    .. method:: fma(other, third, context=None)
 
-      Fused multiply-add.  Return self*other+third with no rounding of the
-      intermediate product self*other.
+      Phép nhân-cộng hợp nhất. Trả về self*other+third mà không làm tròn tích trung gian self*other.
 
       >>> Decimal(2).fma(3, 5)
       Decimal('11')
 
    .. method:: is_canonical()
 
-      Return :const:`True` if the argument is canonical and :const:`False`
-      otherwise.  Currently, a :class:`Decimal` instance is always canonical, so
-      this operation always returns :const:`True`.
+      Trả về :const:`True` nếu đối số là canonical và :const:`False` nếu không. Hiện tại, một đối tượng :class:`Decimal` luôn là canonical, vì vậy thao tác này luôn trả về :const:`True`.
 
    .. method:: is_finite()
 
-      Return :const:`True` if the argument is a finite number, and
-      :const:`False` if the argument is an infinity or a NaN.
+      Trả về :const:`True` nếu đối số là một số hữu hạn, và
+      :const:`False` nếu đối số là vô cực hoặc NaN.
 
    .. method:: is_infinite()
 
-      Return :const:`True` if the argument is either positive or negative
-      infinity and :const:`False` otherwise.
+      Trả về :const:`True` nếu đối số là vô cực dương hoặc vô cực âm và :const:`False` nếu không.
 
    .. method:: is_nan()
 
-      Return :const:`True` if the argument is a (quiet or signaling) NaN and
-      :const:`False` otherwise.
+      Trả về :const:`True` nếu đối số là NaN (quiet hoặc signaling) và
+      :const:`False` nếu không.
 
    .. method:: is_normal(context=None)
 
-      Return :const:`True` if the argument is a *normal* finite number.  Return
-      :const:`False` if the argument is zero, subnormal, infinite or a NaN.
+      Trả về :const:`True` nếu đối số là một số hữu hạn *normal*. Trả về
+      :const:`False` nếu đối số là số không, số dưới chuẩn, vô hạn hoặc NaN.
 
    .. method:: is_qnan()
 
-      Return :const:`True` if the argument is a quiet NaN, and
-      :const:`False` otherwise.
+      Trả về :const:`True` nếu đối số là NaN im lặng, và
+      :const:`False` nếu không.
 
    .. method:: is_signed()
 
-      Return :const:`True` if the argument has a negative sign and
-      :const:`False` otherwise.  Note that zeros and NaNs can both carry signs.
+      Trả về :const:`True` nếu đối số có dấu âm và
+      :const:`False` nếu không. Lưu ý rằng cả số không và NaN đều có thể mang dấu.
 
    .. method:: is_snan()
 
-      Return :const:`True` if the argument is a signaling NaN and :const:`False`
-      otherwise.
+      Trả về :const:`True` nếu đối số là NaN báo hiệu và :const:`False` nếu không.
 
    .. method:: is_subnormal(context=None)
 
-      Return :const:`True` if the argument is subnormal, and :const:`False`
-      otherwise.
+      Trả về :const:`True` nếu đối số là số dưới chuẩn và :const:`False` nếu không.
 
    .. method:: is_zero()
 
-      Return :const:`True` if the argument is a (positive or negative) zero and
-      :const:`False` otherwise.
+      Trả về :const:`True` nếu đối số là số 0 (dương hoặc âm) và
+      :const:`False` nếu không.
 
    .. method:: ln(context=None)
 
-      Return the natural (base e) logarithm of the operand.  The result is
-      correctly rounded using the :const:`ROUND_HALF_EVEN` rounding mode.
+      Trả về logarit tự nhiên (cơ số e) của toán hạng. Kết quả được làm tròn chính xác bằng chế độ làm tròn :const:`ROUND_HALF_EVEN`.
 
    .. method:: log10(context=None)
 
-      Return the base ten logarithm of the operand.  The result is correctly
-      rounded using the :const:`ROUND_HALF_EVEN` rounding mode.
+      Trả về logarit cơ số mười của toán hạng. Kết quả được làm tròn chính xác bằng chế độ làm tròn :const:`ROUND_HALF_EVEN`.
 
    .. method:: logb(context=None)
 
-      For a nonzero number, return the adjusted exponent of its operand as a
-      :class:`Decimal` instance.  If the operand is a zero then
-      ``Decimal('-Infinity')`` is returned and the :const:`DivisionByZero` flag
-      is raised.  If the operand is an infinity then ``Decimal('Infinity')`` is
-      returned.
+      Đối với một số khác không, trả về số mũ đã điều chỉnh của toán hạng dưới dạng một
+      đối tượng :class:`Decimal`. Nếu toán hạng là số 0 thì trả về ``Decimal('-Infinity')`` và đặt cờ :const:`DivisionByZero`. Nếu toán hạng là vô cực thì trả về ``Decimal('Infinity')``.
 
    .. method:: logical_and(other, context=None)
 
-      :meth:`logical_and` is a logical operation which takes two *logical
-      operands* (see :ref:`logical_operands_label`).  The result is the
-      digit-wise ``and`` of the two operands.
+      :meth:`logical_and` là một phép toán logic nhận hai *toán hạng logic* (xem :ref:`logical_operands_label`). Kết quả là phép ``and`` theo từng chữ số của hai toán hạng.
 
    .. method:: logical_invert(context=None)
 
-      :meth:`logical_invert` is a logical operation.  The
-      result is the digit-wise inversion of the operand.
+      :meth:`logical_invert` là một phép toán logic. Kết quả là phép đảo từng chữ số của toán hạng.
 
    .. method:: logical_or(other, context=None)
 
-      :meth:`logical_or` is a logical operation which takes two *logical
-      operands* (see :ref:`logical_operands_label`).  The result is the
-      digit-wise ``or`` of the two operands.
+      :meth:`logical_or` là một phép toán logic nhận hai *toán hạng logic* (xem :ref:`logical_operands_label`). Kết quả là phép ``or`` theo từng chữ số của hai toán hạng.
 
    .. method:: logical_xor(other, context=None)
 
-      :meth:`logical_xor` is a logical operation which takes two *logical
-      operands* (see :ref:`logical_operands_label`).  The result is the
-      digit-wise exclusive or of the two operands.
+      :meth:`logical_xor` là một phép toán logic nhận hai *toán hạng logic* (xem :ref:`logical_operands_label`). Kết quả là phép OR loại trừ theo từng chữ số của hai toán hạng.
 
    .. method:: max(other, context=None)
 
-      Like ``max(self, other)`` except that the context rounding rule is applied
-      before returning and that ``NaN`` values are either signaled or
-      ignored (depending on the context and whether they are signaling or
-      quiet).
+      Giống như ``max(self, other)``, ngoại trừ việc quy tắc làm tròn của context được áp dụng trước khi trả về, và các giá trị ``NaN`` được báo hiệu hoặc bỏ qua (tùy thuộc vào context và việc chúng là signaling hay quiet).
 
    .. method:: max_mag(other, context=None)
 
-      Similar to the :meth:`.max` method, but the comparison is done using the
-      absolute values of the operands.
+      Tương tự phương thức :meth:`.max`, nhưng phép so sánh được thực hiện bằng cách sử dụng giá trị tuyệt đối của các toán hạng.
 
    .. method:: min(other, context=None)
 
-      Like ``min(self, other)`` except that the context rounding rule is applied
-      before returning and that ``NaN`` values are either signaled or
-      ignored (depending on the context and whether they are signaling or
-      quiet).
+      Giống như ``min(self, other)``, ngoại trừ việc quy tắc làm tròn của context được áp dụng trước khi trả về, và các giá trị ``NaN`` được báo hiệu hoặc bỏ qua (tùy thuộc vào context và việc chúng là signaling hay quiet).
 
    .. method:: min_mag(other, context=None)
 
-      Similar to the :meth:`.min` method, but the comparison is done using the
-      absolute values of the operands.
+      Tương tự phương thức :meth:`.min`, nhưng phép so sánh được thực hiện bằng cách sử dụng giá trị tuyệt đối của các toán hạng.
 
    .. method:: next_minus(context=None)
 
-      Return the largest number representable in the given context (or in the
-      current thread's context if no context is given) that is smaller than the
-      given operand.
+      Trả về số lớn nhất có thể biểu diễn trong context đã cho (hoặc trong context của thread hiện tại nếu không cung cấp context) và nhỏ hơn toán hạng đã cho.
 
    .. method:: next_plus(context=None)
 
-      Return the smallest number representable in the given context (or in the
-      current thread's context if no context is given) that is larger than the
-      given operand.
+      Trả về số nhỏ nhất có thể biểu diễn trong context đã cho (hoặc trong context của thread hiện tại nếu không cung cấp context) và lớn hơn toán hạng đã cho.
 
    .. method:: next_toward(other, context=None)
 
-      If the two operands are unequal, return the number closest to the first
-      operand in the direction of the second operand.  If both operands are
-      numerically equal, return a copy of the first operand with the sign set to
-      be the same as the sign of the second operand.
+      Nếu hai toán hạng không bằng nhau, trả về số gần với toán hạng thứ nhất nhất theo hướng của toán hạng thứ hai. Nếu cả hai toán hạng bằng nhau về giá trị số, trả về một bản sao của toán hạng thứ nhất với dấu được đặt giống dấu của toán hạng thứ hai.
 
    .. method:: normalize(context=None)
 
-      Used for producing canonical values of an equivalence
-      class within either the current context or the specified context.
+      Được dùng để tạo các giá trị chuẩn tắc của một lớp tương đương trong context hiện tại hoặc context được chỉ định.
 
-      This has the same semantics as the unary plus operation, except that if
-      the final result is finite it is reduced to its simplest form, with all
-      trailing zeros removed and its sign preserved. That is, while the
-      coefficient is non-zero and a multiple of ten the coefficient is divided
-      by ten and the exponent is incremented by 1. Otherwise (the coefficient is
-      zero) the exponent is set to 0. In all cases the sign is unchanged.
+      Phương thức này có ngữ nghĩa giống thao tác cộng một ngôi, ngoại trừ việc nếu kết quả cuối cùng là hữu hạn thì kết quả được rút gọn về dạng đơn giản nhất, loại bỏ mọi số 0 ở cuối và giữ nguyên dấu. Cụ thể, khi hệ số khác 0 và là bội số của mười, hệ số được chia cho mười và số mũ được tăng thêm 1. Ngược lại (khi hệ số bằng 0), số mũ được đặt thành 0. Trong mọi trường hợp, dấu không thay đổi.
 
-      For example, ``Decimal('32.100')`` and ``Decimal('0.321000e+2')`` both
-      normalize to the equivalent value ``Decimal('32.1')``.
+      Ví dụ, ``Decimal('32.100')`` và ``Decimal('0.321000e+2')`` đều được chuẩn hóa thành giá trị tương đương ``Decimal('32.1')``.
 
-      Note that rounding is applied *before* reducing to simplest form.
+      Lưu ý rằng việc làm tròn được áp dụng *trước khi* rút gọn về dạng đơn giản nhất.
 
-      In the latest versions of the specification, this operation is also known
-      as ``reduce``.
+      Trong các phiên bản mới nhất của đặc tả, thao tác này còn được gọi là ``reduce``.
 
    .. method:: number_class(context=None)
 
-      Return a string describing the *class* of the operand.  The returned value
-      is one of the following ten strings.
+      Trả về một chuỗi mô tả *class* của toán hạng. Giá trị trả về là một trong mười chuỗi sau.
 
-      * ``"-Infinity"``, indicating that the operand is negative infinity.
-      * ``"-Normal"``, indicating that the operand is a negative normal number.
-      * ``"-Subnormal"``, indicating that the operand is negative and subnormal.
-      * ``"-Zero"``, indicating that the operand is a negative zero.
-      * ``"+Zero"``, indicating that the operand is a positive zero.
-      * ``"+Subnormal"``, indicating that the operand is positive and subnormal.
-      * ``"+Normal"``, indicating that the operand is a positive normal number.
-      * ``"+Infinity"``, indicating that the operand is positive infinity.
-      * ``"NaN"``, indicating that the operand is a quiet NaN (Not a Number).
-      * ``"sNaN"``, indicating that the operand is a signaling NaN.
+      * ``"-Infinity"``, cho biết toán hạng là vô cực âm.
+      * ``"-Normal"``, cho biết toán hạng là một số chuẩn âm.
+      * ``"-Subnormal"``, cho biết toán hạng là số dưới chuẩn âm.
+      * ``"-Zero"``, cho biết toán hạng là số 0 âm.
+      * ``"+Zero"``, cho biết toán hạng là số 0 dương.
+      * ``"+Subnormal"``, cho biết toán hạng là số dương dưới chuẩn.
+      * ``"+Normal"``, cho biết toán hạng là một số dương chuẩn.
+      * ``"+Infinity"``, cho biết toán hạng là vô cực dương.
+      * ``"NaN"``, cho biết toán hạng là NaN yên lặng (Not a Number).
+      * ``"sNaN"``, cho biết toán hạng là NaN báo hiệu.
 
    .. method:: quantize(exp, rounding=None, context=None)
 
-      Return a value equal to the first operand after rounding and having the
-      exponent of the second operand.
+      Trả về một giá trị bằng toán hạng đầu tiên sau khi làm tròn và có số mũ của toán hạng thứ hai.
 
       >>> Decimal('1.41421356').quantize(Decimal('1.000'))
       Decimal('1.414')
 
-      Unlike other operations, if the length of the coefficient after the
-      quantize operation would be greater than precision, then an
-      :const:`InvalidOperation` is signaled. This guarantees that, unless there
-      is an error condition, the quantized exponent is always equal to that of
-      the right-hand operand.
+      Không giống các phép toán khác, nếu độ dài của hệ số sau phép toán quantize lớn hơn precision thì sẽ có một
+      :const:`InvalidOperation` được báo hiệu. Điều này đảm bảo rằng, trừ khi có điều kiện lỗi, số mũ đã lượng tử hóa luôn bằng số mũ của toán hạng bên phải.
 
-      Also unlike other operations, quantize never signals Underflow, even if
-      the result is subnormal and inexact.
+      Ngoài ra, không giống các phép toán khác, quantize không bao giờ báo hiệu Underflow, ngay cả khi kết quả là số dưới chuẩn và không chính xác.
 
-      If the exponent of the second operand is larger than that of the first
-      then rounding may be necessary.  In this case, the rounding mode is
-      determined by the ``rounding`` argument if given, else by the given
-      ``context`` argument; if neither argument is given the rounding mode of
-      the current thread's context is used.
+      Nếu số mũ của toán hạng thứ hai lớn hơn số mũ của toán hạng thứ nhất thì có thể cần làm tròn. Trong trường hợp này, chế độ làm tròn được xác định bởi đối số ``rounding`` nếu được cung cấp, nếu không thì bởi đối số ``context`` đã cho; nếu không cung cấp đối số nào, chế độ làm tròn của context của thread hiện tại sẽ được sử dụng.
 
-      An error is returned whenever the resulting exponent is greater than
-      :attr:`~Context.Emax` or less than :meth:`~Context.Etiny`.
+      Một lỗi được trả về bất cứ khi nào số mũ kết quả lớn hơn
+      :attr:`~Context.Emax` hoặc nhỏ hơn :meth:`~Context.Etiny`.
 
    .. method:: radix()
 
-      Return ``Decimal(10)``, the radix (base) in which the :class:`Decimal`
-      class does all its arithmetic.  Included for compatibility with the
-      specification.
+      Trả về ``Decimal(10)``, cơ số (base) mà lớp :class:`Decimal` sử dụng để thực hiện mọi phép toán. Được cung cấp để tương thích với đặc tả.
 
    .. method:: remainder_near(other, context=None)
 
-      Return the remainder from dividing *self* by *other*.  This differs from
-      ``self % other`` in that the sign of the remainder is chosen so as to
-      minimize its absolute value.  More precisely, the return value is
-      ``self - n * other`` where ``n`` is the integer nearest to the exact
-      value of ``self / other``, and if two integers are equally near then the
-      even one is chosen.
+      Trả về phần dư của *self* khi chia cho *other*. Điều này khác với ``self % other`` ở chỗ dấu của phần dư được chọn để giảm thiểu giá trị tuyệt đối của nó. Cụ thể hơn, giá trị trả về là ``self - n * other``, trong đó ``n`` là số nguyên gần nhất với giá trị chính xác của ``self / other``, và nếu có hai số nguyên cách đều thì chọn số chẵn.
 
-      If the result is zero then its sign will be the sign of *self*.
+      Nếu kết quả bằng không thì dấu của nó sẽ là dấu của *self*.
 
       >>> Decimal(18).remainder_near(Decimal(10))
       Decimal('-2')
@@ -870,110 +658,72 @@ Decimal objects
 
    .. method:: rotate(other, context=None)
 
-      Return the result of rotating the digits of the first operand by an amount
-      specified by the second operand.  The second operand must be an integer in
-      the range -precision through precision.  The absolute value of the second
-      operand gives the number of places to rotate.  If the second operand is
-      positive then rotation is to the left; otherwise rotation is to the right.
-      The coefficient of the first operand is padded on the left with zeros to
-      length precision if necessary.  The sign and exponent of the first operand
-      are unchanged.
+      Trả về kết quả xoay các chữ số của toán hạng thứ nhất theo số lượng được chỉ định bởi toán hạng thứ hai. Toán hạng thứ hai phải là một số nguyên trong phạm vi từ -precision đến precision. Giá trị tuyệt đối của toán hạng thứ hai cho biết số vị trí cần xoay. Nếu toán hạng thứ hai là số dương thì xoay sang trái; nếu không thì xoay sang phải. Nếu cần, phần hệ số của toán hạng thứ nhất sẽ được thêm các số 0 ở bên trái để đạt độ dài precision. Dấu và số mũ của toán hạng thứ nhất không thay đổi.
 
    .. method:: same_quantum(other, context=None)
 
-      Test whether self and other have the same exponent or whether both are
-      ``NaN``.
+      Kiểm tra xem self và other có cùng số mũ hay cả hai đều là ``NaN``.
 
-      This operation is unaffected by context and is quiet: no flags are changed
-      and no rounding is performed.  As an exception, the C version may raise
-      InvalidOperation if the second operand cannot be converted exactly.
+      Phép toán này không bị ảnh hưởng bởi context và không phát tín hiệu: không có cờ nào bị thay đổi và không thực hiện làm tròn.  Ngoại lệ là phiên bản C có thể phát sinh InvalidOperation nếu không thể chuyển đổi chính xác toán hạng thứ hai.
 
    .. method:: scaleb(other, context=None)
 
-      Return the first operand with exponent adjusted by the second.
-      Equivalently, return the first operand multiplied by ``10**other``.  The
-      second operand must be an integer.
+      Trả về toán hạng thứ nhất với số mũ được điều chỉnh theo toán hạng thứ hai. Tương đương, trả về toán hạng thứ nhất nhân với ``10**other``. Toán hạng thứ hai phải là một số nguyên.
 
    .. method:: shift(other, context=None)
 
-      Return the result of shifting the digits of the first operand by an amount
-      specified by the second operand.  The second operand must be an integer in
-      the range -precision through precision.  The absolute value of the second
-      operand gives the number of places to shift.  If the second operand is
-      positive then the shift is to the left; otherwise the shift is to the
-      right.  Digits shifted into the coefficient are zeros.  The sign and
-      exponent of the first operand are unchanged.
+      Trả về kết quả dịch các chữ số của toán hạng thứ nhất theo số lượng được chỉ định bởi toán hạng thứ hai. Toán hạng thứ hai phải là một số nguyên trong phạm vi từ -precision đến precision. Giá trị tuyệt đối của toán hạng thứ hai cho biết số vị trí cần dịch. Nếu toán hạng thứ hai là số dương thì dịch sang trái; nếu không thì dịch sang phải. Các chữ số được dịch vào phần hệ số là các số 0. Dấu và số mũ của toán hạng thứ nhất không thay đổi.
 
    .. method:: sqrt(context=None)
 
-      Return the square root of the argument to full precision.
+      Trả về căn bậc hai của đối số với độ chính xác đầy đủ.
 
 
    .. method:: to_eng_string(context=None)
 
-      Convert to a string, using engineering notation if an exponent is needed.
+      Chuyển đổi thành chuỗi, sử dụng ký hiệu kỹ thuật nếu cần dùng số mũ.
 
-      Engineering notation has an exponent which is a multiple of 3.  This
-      can leave up to 3 digits to the left of the decimal place and may
-      require the addition of either one or two trailing zeros.
+      Ký hiệu kỹ thuật có số mũ là bội số của 3. Điều này có thể để lại tối đa 3 chữ số ở bên trái dấu thập phân và có thể yêu cầu thêm một hoặc hai số 0 ở cuối.
 
-      For example, this converts ``Decimal('123E+1')`` to ``Decimal('1.23E+3')``.
+      Ví dụ, thao tác này chuyển đổi ``Decimal('123E+1')`` thành ``Decimal('1.23E+3')``.
 
    .. method:: to_integral(rounding=None, context=None)
 
-      Identical to the :meth:`to_integral_value` method.  The ``to_integral``
-      name has been kept for compatibility with older versions.
+      Giống hệt phương thức :meth:`to_integral_value`. Tên ``to_integral`` được giữ lại để tương thích với các phiên bản cũ hơn.
 
    .. method:: to_integral_exact(rounding=None, context=None)
 
-      Round to the nearest integer, signaling :const:`Inexact` or
-      :const:`Rounded` as appropriate if rounding occurs.  The rounding mode is
-      determined by the ``rounding`` parameter if given, else by the given
-      ``context``.  If neither parameter is given then the rounding mode of the
-      current context is used.
+      Làm tròn đến số nguyên gần nhất, phát tín hiệu :const:`Inexact` hoặc
+      :const:`Rounded` tùy trường hợp nếu xảy ra làm tròn. Chế độ làm tròn được xác định bởi tham số ``rounding`` nếu được cung cấp, nếu không thì bởi ``context`` đã cho. Nếu không cung cấp tham số nào, chế độ làm tròn của context hiện tại sẽ được sử dụng.
 
    .. method:: to_integral_value(rounding=None, context=None)
 
-      Round to the nearest integer without signaling :const:`Inexact` or
-      :const:`Rounded`.  If given, applies *rounding*; otherwise, uses the
-      rounding method in either the supplied *context* or the current context.
+      Làm tròn đến số nguyên gần nhất mà không phát tín hiệu :const:`Inexact` hoặc
+      :const:`Rounded`. Nếu được cung cấp, áp dụng phương thức làm tròn *rounding*; nếu không, sử dụng phương thức làm tròn trong *context* được cung cấp hoặc context hiện tại.
 
-   Decimal numbers can be rounded using the :func:`.round` function:
+   Các số Decimal có thể được làm tròn bằng hàm :func:`.round`:
 
    .. describe:: round(number)
    .. describe:: round(number, ndigits)
 
-      If *ndigits* is not given or ``None``,
-      returns the nearest :class:`int` to *number*,
-      rounding ties to even, and ignoring the rounding mode of the
-      :class:`Decimal` context.  Raises :exc:`OverflowError` if *number* is an
-      infinity or :exc:`ValueError` if it is a (quiet or signaling) NaN.
+      Nếu *ndigits* không được cung cấp hoặc ``None``, trả về giá trị gần nhất với :class:`int` của *number*, làm tròn các trường hợp hòa về số chẵn và bỏ qua phương thức làm tròn của
+      :class:`Decimal` context. Phát sinh :exc:`OverflowError` nếu *number* là vô cực hoặc :exc:`ValueError` nếu đó là NaN (quiet hoặc signaling).
 
-      If *ndigits* is an :class:`int`, the context's rounding mode is respected
-      and a :class:`Decimal` representing *number* rounded to the nearest
-      multiple of ``Decimal('1E-ndigits')`` is returned; in this case,
-      ``round(number, ndigits)`` is equivalent to
-      ``self.quantize(Decimal('1E-ndigits'))``.  Returns ``Decimal('NaN')`` if
-      *number* is a quiet NaN.  Raises :class:`InvalidOperation` if *number*
-      is an infinity, a signaling NaN, or if the length of the coefficient after
-      the quantize operation would be greater than the current context's
-      precision.  In other words, for the non-corner cases:
+      Nếu *ndigits* là một :class:`int`, phương thức làm tròn của context được tuân theo và một :class:`Decimal` biểu diễn *number* được làm tròn đến bội số gần nhất của ``Decimal('1E-ndigits')`` sẽ được trả về; trong trường hợp này, ``round(number, ndigits)`` tương đương với ``self.quantize(Decimal('1E-ndigits'))``. Trả về ``Decimal('NaN')`` nếu *number* là quiet NaN. Phát sinh :class:`InvalidOperation` nếu *number* là vô cực, signaling NaN hoặc nếu độ dài của coefficient sau thao tác quantize lớn hơn precision của context hiện tại. Nói cách khác, đối với các trường hợp thông thường:
 
-      * if *ndigits* is positive, return *number* rounded to *ndigits* decimal
-        places;
-      * if *ndigits* is zero, return *number* rounded to the nearest integer;
-      * if *ndigits* is negative, return *number* rounded to the nearest
-        multiple of ``10**abs(ndigits)``.
+      * nếu *ndigits* là số dương, trả về *number* được làm tròn đến *ndigits* chữ số thập phân;
+      * nếu *ndigits* bằng không, trả về *number* được làm tròn đến số nguyên gần nhất;
+      * nếu *ndigits* là số âm, trả về *number* được làm tròn đến bội số gần nhất của ``10**abs(ndigits)``.
 
-      For example::
+      Ví dụ::
 
           >>> from decimal import Decimal, getcontext, ROUND_DOWN
           >>> getcontext().rounding = ROUND_DOWN
-          >>> round(Decimal('3.75'))     # context rounding ignored
+          >>> round(Decimal('3.75'))     # bỏ qua việc làm tròn của context
           4
           >>> round(Decimal('3.5'))      # round-ties-to-even
           4
-          >>> round(Decimal('3.75'), 0)  # uses the context rounding
+          >>> round(Decimal('3.75'), 0)  # sử dụng việc làm tròn của context
           Decimal('3')
           >>> round(Decimal('3.75'), 1)
           Decimal('3.7')
@@ -983,62 +733,50 @@ Decimal objects
 
 .. _logical_operands_label:
 
-Logical operands
-^^^^^^^^^^^^^^^^
+Toán hạng logic
+^^^^^^^^^^^^^^^
 
-The :meth:`~Decimal.logical_and`, :meth:`~Decimal.logical_invert`, :meth:`~Decimal.logical_or`,
-and :meth:`~Decimal.logical_xor` methods expect their arguments to be *logical
-operands*.  A *logical operand* is a :class:`Decimal` instance whose
-exponent and sign are both zero, and whose digits are all either
-``0`` or ``1``.
+Các phương thức :meth:`~Decimal.logical_and`, :meth:`~Decimal.logical_invert`, :meth:`~Decimal.logical_or` và :meth:`~Decimal.logical_xor` yêu cầu các đối số của chúng là *toán hạng logic*. Một *toán hạng logic* là một thực thể :class:`Decimal` có số mũ và dấu đều bằng không, đồng thời tất cả các chữ số của nó đều là ``0`` hoặc ``1``.
 
 .. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 .. _decimal-context:
 
-Context objects
----------------
+Đối tượng Context
+-----------------
 
-Contexts are environments for arithmetic operations.  They govern precision, set
-rules for rounding, determine which signals are treated as exceptions, and limit
-the range for exponents.
+Context là các môi trường cho những phép toán số học. Chúng kiểm soát độ chính xác, thiết lập quy tắc làm tròn, xác định những signal nào được xử lý như các exception và giới hạn phạm vi của số mũ.
 
-Each thread has its own current context which is accessed or changed using the
-:func:`getcontext` and :func:`setcontext` functions:
+Mỗi thread có context hiện tại riêng, được truy cập hoặc thay đổi bằng
+các hàm :func:`getcontext` và :func:`setcontext`:
 
 
 .. function:: getcontext()
 
-   Return the current context for the active thread.
+   Trả về context hiện tại của thread đang hoạt động.
 
 
 .. function:: setcontext(c, /)
 
-   Set the current context for the active thread to *c*.
+   Đặt context hiện tại của thread đang hoạt động thành *c*.
 
-You can also use the :keyword:`with` statement and the :func:`localcontext`
-function to temporarily change the active context.
+Bạn cũng có thể sử dụng câu lệnh :keyword:`with` và hàm :func:`localcontext` để tạm thời thay đổi context đang hoạt động.
 
 .. function:: localcontext(ctx=None, **kwargs)
 
-   Return a context manager that will set the current context for the active thread
-   to a copy of *ctx* on entry to the with-statement and restore the previous context
-   when exiting the with-statement. If no context is specified, a copy of the
-   current context is used.  The *kwargs* argument is used to set the attributes
-   of the new context.
+   Trả về một context manager đặt context hiện tại của luồng đang hoạt động thành một bản sao của *ctx* khi bắt đầu câu lệnh with và khôi phục context trước đó khi thoát khỏi câu lệnh with. Nếu không chỉ định context, một bản sao của context hiện tại sẽ được sử dụng. Đối số *kwargs* được dùng để đặt các thuộc tính của context mới.
 
-   For example, the following code sets the current decimal precision to 42 places,
-   performs a calculation, and then automatically restores the previous context::
+   Ví dụ: đoạn mã sau đặt độ chính xác thập phân hiện tại thành 42 chữ số, thực hiện một phép tính, rồi tự động khôi phục context trước đó::
 
       from decimal import localcontext
 
       with localcontext() as ctx:
-          ctx.prec = 42   # Perform a high precision calculation
+          ctx.prec = 42   # Thực hiện phép tính với độ chính xác cao
           s = calculate_something()
-      s = +s  # Round the final result back to the default precision
+      s = +s  # Làm tròn kết quả cuối cùng về độ chính xác mặc định
 
-   Using keyword arguments, the code would be the following::
+   Nếu sử dụng các đối số keyword, đoạn mã sẽ như sau::
 
       from decimal import localcontext
 
@@ -1046,165 +784,114 @@ function to temporarily change the active context.
           s = calculate_something()
       s = +s
 
-   Raises :exc:`TypeError` if *kwargs* supplies an attribute that :class:`Context` doesn't
-   support.  Raises either :exc:`TypeError` or :exc:`ValueError` if *kwargs* supplies an
-   invalid value for an attribute.
+   Tăng :exc:`TypeError` nếu *kwargs* cung cấp một thuộc tính mà :class:`Context` không hỗ trợ. Tăng :exc:`TypeError` hoặc :exc:`ValueError` nếu *kwargs* cung cấp một giá trị không hợp lệ cho một thuộc tính.
 
    .. versionchanged:: 3.11
       :meth:`localcontext` now supports setting context attributes through the use of keyword arguments.
 
 .. function:: IEEEContext(bits)
 
-   Return a context object initialized to the proper values for one of the
-   IEEE interchange formats.  The argument must be a multiple of 32 and less
-   than :const:`IEEE_CONTEXT_MAX_BITS`.
+   Trả về một đối tượng context được khởi tạo với các giá trị thích hợp cho một trong các định dạng trao đổi IEEE. Đối số phải là bội số của 32 và nhỏ hơn :const:`IEEE_CONTEXT_MAX_BITS`.
 
    .. versionadded:: 3.14
 
-New contexts can also be created using the :class:`Context` constructor
-described below. In addition, the module provides three pre-made contexts:
+Bạn cũng có thể tạo các context mới bằng constructor :class:`Context` được mô tả bên dưới. Ngoài ra, module còn cung cấp ba context được tạo sẵn:
 
 
 .. data:: BasicContext
 
-   This is a standard context defined by the General Decimal Arithmetic
-   Specification.  Precision is set to nine.  Rounding is set to
-   :const:`ROUND_HALF_UP`.  All flags are cleared.  All traps are enabled (treated
-   as exceptions) except :const:`Inexact`, :const:`Rounded`, and
+   Đây là một context tiêu chuẩn được định nghĩa bởi General Decimal Arithmetic Specification. Precision được đặt là chín. Rounding được đặt thành
+   :const:`ROUND_HALF_UP`. Tất cả các flag đều được xóa. Tất cả các trap đều được bật (được xử lý như các exception), ngoại trừ :const:`Inexact`, :const:`Rounded`, và
    :const:`Subnormal`.
 
-   Because many of the traps are enabled, this context is useful for debugging.
+   Vì nhiều trap được bật, context này hữu ích cho việc debugging.
 
 
 .. data:: ExtendedContext
 
-   This is a standard context defined by the General Decimal Arithmetic
-   Specification.  Precision is set to nine.  Rounding is set to
-   :const:`ROUND_HALF_EVEN`.  All flags are cleared.  No traps are enabled (so that
-   exceptions are not raised during computations).
+   Đây là một context tiêu chuẩn được định nghĩa bởi General Decimal Arithmetic Specification. Precision được đặt là chín. Rounding được đặt thành
+   :const:`ROUND_HALF_EVEN`. Tất cả các flag đều được xóa. Không có trap nào được bật (vì vậy exception sẽ không được raise trong quá trình tính toán).
 
-   Because the traps are disabled, this context is useful for applications that
-   prefer to have result value of ``NaN`` or ``Infinity`` instead of
-   raising exceptions.  This allows an application to complete a run in the
-   presence of conditions that would otherwise halt the program.
+   Vì các trap bị tắt, context này hữu ích cho những ứng dụng muốn nhận giá trị kết quả là ``NaN`` hoặc ``Infinity`` thay vì raise exception. Điều này cho phép ứng dụng hoàn tất một lần chạy ngay cả khi gặp các điều kiện mà nếu không sẽ làm chương trình dừng lại.
 
 
 .. data:: DefaultContext
 
-   This context is used by the :class:`Context` constructor as a prototype for new
-   contexts.  Changing a field (such a precision) has the effect of changing the
-   default for new contexts created by the :class:`Context` constructor.
+   Context này được hàm :class:`Context` sử dụng làm nguyên mẫu cho các context mới. Việc thay đổi một trường (chẳng hạn như precision) sẽ làm thay đổi giá trị mặc định cho các context mới được tạo bởi hàm :class:`Context`.
 
-   This context is most useful in multi-threaded environments.  Changing one of the
-   fields before threads are started has the effect of setting system-wide
-   defaults.  Changing the fields after threads have started is not recommended as
-   it would require thread synchronization to prevent race conditions.
+   Context này hữu ích nhất trong các môi trường đa luồng. Việc thay đổi một trong các trường trước khi các luồng được khởi động sẽ có tác dụng thiết lập các giá trị mặc định trên toàn hệ thống. Không nên thay đổi các trường sau khi các luồng đã được khởi động, vì điều đó sẽ yêu cầu đồng bộ hóa luồng để ngăn ngừa các race condition.
 
-   In single threaded environments, it is preferable to not use this context at
-   all.  Instead, simply create contexts explicitly as described below.
+   Trong các môi trường đơn luồng, tốt hơn hết là không sử dụng context này. Thay vào đó, chỉ cần tạo các context một cách tường minh như mô tả bên dưới.
 
-   The default values are :attr:`Context.prec`\ =\ ``28``,
-   :attr:`Context.rounding`\ =\ :const:`ROUND_HALF_EVEN`,
-   and enabled traps for :class:`Overflow`, :class:`InvalidOperation`, and
+   Các giá trị mặc định là :attr:`Context.prec`\ =\ ``28``,
+   :attr:`Context.rounding`\ =\ :const:`ROUND_HALF_EVEN`, và các trap được bật cho :class:`Overflow`, :class:`InvalidOperation`, và
    :class:`DivisionByZero`.
 
-In addition to the three supplied contexts, new contexts can be created with the
-:class:`Context` constructor.
+Ngoài ba context được cung cấp, có thể tạo các context mới bằng hàm
+:class:`Context`.
 
 
 .. class:: Context(prec=None, rounding=None, Emin=None, Emax=None, capitals=None, clamp=None, flags=None, traps=None)
 
-   Creates a new context.  If a field is not specified or is :const:`None`, the
-   default values are copied from the :const:`DefaultContext`.  If the *flags*
-   field is not specified or is :const:`None`, all flags are cleared.
+   Tạo một context mới. Nếu một trường không được chỉ định hoặc là :const:`None`, các giá trị mặc định sẽ được sao chép từ :const:`DefaultContext`. Nếu trường *flags* không được chỉ định hoặc là :const:`None`, tất cả các flag sẽ được xóa.
 
    .. attribute:: prec
 
-      An integer in the range [``1``, :const:`MAX_PREC`] that sets
-      the precision for arithmetic operations in the context.
+      Một số nguyên trong phạm vi [``1``, :const:`MAX_PREC`] dùng để thiết lập độ chính xác cho các phép toán số học trong context.
 
    .. attribute:: rounding
 
-      One of the constants listed in the section `Rounding Modes`_.
+      Một trong các hằng số được liệt kê trong phần `Chế độ làm tròn <Rounding Modes_>`_.
 
    .. attribute:: traps
                   flags
 
-      Lists of any signals to be set. Generally, new contexts should only set
-      traps and leave the flags clear.
+      Danh sách các signal cần thiết lập. Thông thường, context mới chỉ nên thiết lập các trap và để các flag ở trạng thái đã xóa.
 
    .. attribute:: Emin
                   Emax
 
-      Integers specifying the outer limits allowable for exponents. *Emin* must
-      be in the range [:const:`MIN_EMIN`, ``0``], *Emax* in the range
-      [``0``, :const:`MAX_EMAX`].
+      Các số nguyên chỉ định giới hạn ngoài cho phép của số mũ. *Emin* phải nằm trong phạm vi [:const:`MIN_EMIN`, ``0``], còn *Emax* phải nằm trong phạm vi [``0``, :const:`MAX_EMAX`].
 
    .. attribute:: capitals
 
-      Either ``0`` or ``1`` (the default). If set to
-      ``1``, exponents are printed with a capital ``E``; otherwise, a
-      lowercase ``e`` is used: ``Decimal('6.02e+23')``.
+      ``0`` hoặc ``1`` (mặc định). Nếu được đặt thành ``1``, số mũ được in bằng ``E`` viết hoa; nếu không, ``e`` viết thường được sử dụng: ``Decimal('6.02e+23')``.
 
    .. attribute:: clamp
 
-      Either ``0`` (the default) or ``1``.  If set to ``1``, the exponent ``e``
-      of a :class:`Decimal` instance representable in this context is strictly
-      limited to the range ``Emin - prec + 1 <= e <= Emax - prec + 1``.
-      If *clamp* is ``0`` then a weaker condition holds: the adjusted exponent of
-      the :class:`Decimal` instance is at most :attr:`~Context.Emax`.  When *clamp* is
-      ``1``, a large normal number will, where possible, have its
-      exponent reduced and a corresponding number of zeros added to its
-      coefficient, in order to fit the exponent constraints; this
-      preserves the value of the number but loses information about
-      significant trailing zeros.  For example::
+      ``0`` (mặc định) hoặc ``1``. Nếu được đặt thành ``1``, số mũ ``e`` của một thực thể :class:`Decimal` có thể biểu diễn trong context này bị giới hạn nghiêm ngặt trong phạm vi ``Emin - prec + 1 <= e <= Emax - prec + 1``. Nếu *clamp* là ``0`` thì điều kiện yếu hơn được áp dụng: số mũ đã điều chỉnh của thực thể :class:`Decimal` nhiều nhất là :attr:`~Context.Emax`. Khi *clamp* là ``1``, một số chuẩn lớn, nếu có thể, sẽ được giảm số mũ và thêm số lượng số 0 tương ứng vào coefficient của nó để phù hợp với các ràng buộc về số mũ; điều này bảo toàn giá trị của số nhưng làm mất thông tin về các số 0 có nghĩa ở cuối. Ví dụ::
 
          >>> Context(prec=6, Emax=999, clamp=1).create_decimal('1.23e999')
          Decimal('1.23000E+999')
 
-      A *clamp* value of ``1`` allows compatibility with the
-      fixed-width decimal interchange formats specified in IEEE 754.
+      Giá trị *clamp* bằng ``1`` cho phép tương thích với các định dạng trao đổi số thập phân có độ rộng cố định được quy định trong IEEE 754.
 
-   The :class:`Context` class defines several general purpose methods as well as
-   a large number of methods for doing arithmetic directly in a given context.
-   In addition, for each of the :class:`Decimal` methods described above (with
-   the exception of the :meth:`~Decimal.adjusted` and :meth:`~Decimal.as_tuple` methods) there is
-   a corresponding :class:`Context` method.  For example, for a :class:`Context`
-   instance ``C`` and :class:`Decimal` instance ``x``, ``C.exp(x)`` is
-   equivalent to ``x.exp(context=C)``.  Each :class:`Context` method accepts a
-   Python integer (an instance of :class:`int`) anywhere that a
-   Decimal instance is accepted.
+   Lớp :class:`Context` định nghĩa một số phương thức đa dụng cũng như nhiều phương thức để thực hiện phép toán trực tiếp trong một context nhất định. Ngoài ra, với mỗi phương thức :class:`Decimal` được mô tả ở trên (ngoại trừ các phương thức :meth:`~Decimal.adjusted` và :meth:`~Decimal.as_tuple`), có một phương thức :class:`Context` tương ứng. Ví dụ, với một thực thể :class:`Context` ``C`` và thực thể :class:`Decimal` ``x``, ``C.exp(x)`` tương đương với ``x.exp(context=C)``. Mỗi phương thức :class:`Context` chấp nhận một số nguyên Python (một thực thể của :class:`int`) ở bất kỳ vị trí nào chấp nhận một thực thể Decimal.
 
 
    .. method:: clear_flags()
 
-      Resets all of the flags to ``0``.
+      Đặt lại tất cả các cờ về ``0``.
 
    .. method:: clear_traps()
 
-      Resets all of the traps to ``0``.
+      Đặt lại tất cả các trap về ``0``.
 
       .. versionadded:: 3.3
 
    .. method:: copy()
 
-      Return a duplicate of the context.
+      Trả về một bản sao của context.
 
    .. method:: copy_decimal(num, /)
 
-      Return a copy of the Decimal instance num.
+      Trả về một bản sao của instance Decimal num.
 
    .. method:: create_decimal(num='0', /)
 
-      Creates a new Decimal instance from *num* but using *self* as
-      context. Unlike the :class:`Decimal` constructor, the context precision,
-      rounding method, flags, and traps are applied to the conversion.
+      Tạo một instance Decimal mới từ *num* nhưng sử dụng *self* làm context. Không giống :class:`Decimal` constructor, precision, phương thức làm tròn, flags và traps của context được áp dụng cho quá trình chuyển đổi.
 
-      This is useful because constants are often given to a greater precision
-      than is needed by the application.  Another benefit is that rounding
-      immediately eliminates unintended effects from digits beyond the current
-      precision. In the following example, using unrounded inputs means that
-      adding zero to a sum can change the result:
+      Điều này hữu ích vì các hằng số thường được cung cấp với precision lớn hơn mức ứng dụng cần. Một lợi ích khác là việc làm tròn ngay lập tức loại bỏ các tác động ngoài ý muốn của những chữ số vượt quá precision hiện tại. Trong ví dụ sau, việc sử dụng các đầu vào chưa được làm tròn có nghĩa là cộng zero vào một tổng có thể làm thay đổi kết quả:
 
       .. doctest:: newcontext
 
@@ -1214,16 +901,11 @@ In addition to the three supplied contexts, new contexts can be created with the
          >>> Decimal('3.4445') + Decimal(0) + Decimal('1.0023')
          Decimal('4.44')
 
-      This method implements the to-number operation of the IBM specification.
-      If the argument is a string, no leading or trailing whitespace or
-      underscores are permitted.
+      Phương thức này triển khai thao tác to-number trong đặc tả IBM. Nếu đối số là một chuỗi, không được phép có khoảng trắng hoặc dấu gạch dưới ở đầu hay cuối.
 
    .. method:: create_decimal_from_float(f, /)
 
-      Creates a new Decimal instance from a float *f* but rounding using *self*
-      as the context.  Unlike the :meth:`Decimal.from_float` class method,
-      the context precision, rounding method, flags, and traps are applied to
-      the conversion.
+      Tạo một instance Decimal mới từ một float *f* nhưng thực hiện làm tròn bằng cách sử dụng *self* làm context. Không giống class method :meth:`Decimal.from_float`, precision, phương thức làm tròn, flags và traps của context được áp dụng cho quá trình chuyển đổi.
 
       .. doctest::
 
@@ -1240,484 +922,443 @@ In addition to the three supplied contexts, new contexts can be created with the
 
    .. method:: Etiny()
 
-      Returns a value equal to ``Emin - prec + 1`` which is the minimum exponent
-      value for subnormal results.  When underflow occurs, the exponent is set
-      to :const:`Etiny`.
+      Trả về một giá trị bằng ``Emin - prec + 1``, là giá trị exponent tối thiểu cho các kết quả subnormal. Khi xảy ra underflow, exponent được đặt thành :const:`Etiny`.
 
    .. method:: Etop()
 
-      Returns a value equal to ``Emax - prec + 1``.
+      Trả về một giá trị bằng ``Emax - prec + 1``.
 
-   The usual approach to working with decimals is to create :class:`Decimal`
-   instances and then apply arithmetic operations which take place within the
-   current context for the active thread.  An alternative approach is to use
-   context methods for calculating within a specific context.  The methods are
-   similar to those for the :class:`Decimal` class and are only briefly
-   recounted here.
+   Cách tiếp cận thông thường khi làm việc với số thập phân là tạo các thực thể :class:`Decimal` rồi áp dụng các phép toán số học diễn ra trong context hiện tại của thread đang hoạt động. Một cách tiếp cận khác là sử dụng các phương thức của context để tính toán trong một context cụ thể. Các phương thức này tương tự như các phương thức của lớp :class:`Decimal` và chỉ được nhắc lại ngắn gọn ở đây.
 
 
    .. method:: abs(x, /)
 
-      Returns the absolute value of *x*.
+      Trả về giá trị tuyệt đối của *x*.
 
 
    .. method:: add(x, y, /)
 
-      Return the sum of *x* and *y*.
+      Trả về tổng của *x* và *y*.
 
 
    .. method:: canonical(x, /)
 
-      Returns the same Decimal object *x*.
+      Trả về chính đối tượng Decimal *x*.
 
 
    .. method:: compare(x, y, /)
 
-      Compares *x* and *y* numerically.
+      So sánh *x* và *y* theo giá trị số.
 
 
    .. method:: compare_signal(x, y, /)
 
-      Compares the values of the two operands numerically.
+      So sánh các giá trị của hai toán hạng theo giá trị số.
 
 
    .. method:: compare_total(x, y, /)
 
-      Compares two operands using their abstract representation.
+      So sánh hai toán hạng bằng cách sử dụng biểu diễn trừu tượng của chúng.
 
 
    .. method:: compare_total_mag(x, y, /)
 
-      Compares two operands using their abstract representation, ignoring sign.
+      So sánh hai toán hạng bằng biểu diễn trừu tượng của chúng, bỏ qua dấu.
 
 
    .. method:: copy_abs(x, /)
 
-      Returns a copy of *x* with the sign set to 0.
+      Trả về một bản sao của *x* với dấu được đặt thành 0.
 
 
    .. method:: copy_negate(x, /)
 
-      Returns a copy of *x* with the sign inverted.
+      Trả về một bản sao của *x* với dấu bị đảo ngược.
 
 
    .. method:: copy_sign(x, y, /)
 
-      Copies the sign from *y* to *x*.
+      Sao chép dấu từ *y* sang *x*.
 
 
    .. method:: divide(x, y, /)
 
-      Return *x* divided by *y*.
+      Trả về *x* chia cho *y*.
 
 
    .. method:: divide_int(x, y, /)
 
-      Return *x* divided by *y*, truncated to an integer.
+      Trả về *x* chia cho *y*, được cắt ngắn thành một số nguyên.
 
 
    .. method:: divmod(x, y, /)
 
-      Divides two numbers and returns the integer part of the result.
+      Chia hai số và trả về phần nguyên của kết quả.
 
 
    .. method:: exp(x, /)
 
-      Returns ``e ** x``.
+      Trả về ``e ** x``.
 
 
    .. method:: fma(x, y, z, /)
 
-      Returns *x* multiplied by *y*, plus *z*.
+      Trả về *x* nhân với *y*, cộng với *z*.
 
 
    .. method:: is_canonical(x, /)
 
-      Returns ``True`` if *x* is canonical; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là số chính tắc; nếu không, trả về ``False``.
 
 
    .. method:: is_finite(x, /)
 
-      Returns ``True`` if *x* is finite; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là số hữu hạn; nếu không, trả về ``False``.
 
 
    .. method:: is_infinite(x, /)
 
-      Returns ``True`` if *x* is infinite; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là vô hạn; nếu không, trả về ``False``.
 
 
    .. method:: is_nan(x, /)
 
-      Returns ``True`` if *x* is a qNaN or sNaN; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là qNaN hoặc sNaN; nếu không, trả về ``False``.
 
 
    .. method:: is_normal(x, /)
 
-      Returns ``True`` if *x* is a normal number; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là một số bình thường; nếu không, trả về ``False``.
 
 
    .. method:: is_qnan(x, /)
 
-      Returns ``True`` if *x* is a quiet NaN; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là NaN im lặng; nếu không, trả về ``False``.
 
 
    .. method:: is_signed(x, /)
 
-      Returns ``True`` if *x* is negative; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là số âm; nếu không, trả về ``False``.
 
 
    .. method:: is_snan(x, /)
 
-      Returns ``True`` if *x* is a signaling NaN; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là NaN báo hiệu; nếu không, trả về ``False``.
 
 
    .. method:: is_subnormal(x, /)
 
-      Returns ``True`` if *x* is subnormal; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là số dưới chuẩn; nếu không, trả về ``False``.
 
 
    .. method:: is_zero(x, /)
 
-      Returns ``True`` if *x* is a zero; otherwise returns ``False``.
+      Trả về ``True`` nếu *x* là số 0; nếu không, trả về ``False``.
 
 
    .. method:: ln(x, /)
 
-      Returns the natural (base e) logarithm of *x*.
+      Trả về logarit tự nhiên (cơ số e) của *x*.
 
 
    .. method:: log10(x, /)
 
-      Returns the base 10 logarithm of *x*.
+      Trả về logarit cơ số 10 của *x*.
 
 
    .. method:: logb(x, /)
 
-       Returns the exponent of the magnitude of the operand's MSD.
+       Trả về số mũ của độ lớn của MSD của toán hạng.
 
 
    .. method:: logical_and(x, y, /)
 
-      Applies the logical operation *and* between each operand's digits.
+      Áp dụng phép toán logic *and* giữa các chữ số của mỗi toán hạng.
 
 
    .. method:: logical_invert(x, /)
 
-      Invert all the digits in *x*.
+      Đảo tất cả các chữ số trong *x*.
 
 
    .. method:: logical_or(x, y, /)
 
-      Applies the logical operation *or* between each operand's digits.
+      Áp dụng phép toán logic *or* giữa các chữ số của mỗi toán hạng.
 
 
    .. method:: logical_xor(x, y, /)
 
-      Applies the logical operation *xor* between each operand's digits.
+      Áp dụng phép toán logic *xor* giữa các chữ số của mỗi toán hạng.
 
 
    .. method:: max(x, y, /)
 
-      Compares two values numerically and returns the maximum.
+      So sánh hai giá trị về mặt số học và trả về giá trị lớn nhất.
 
 
    .. method:: max_mag(x, y, /)
 
-      Compares the values numerically with their sign ignored.
+      So sánh các giá trị về mặt số học mà không xét dấu của chúng.
 
 
    .. method:: min(x, y, /)
 
-      Compares two values numerically and returns the minimum.
+      So sánh hai giá trị về mặt số học và trả về giá trị nhỏ nhất.
 
 
    .. method:: min_mag(x, y, /)
 
-      Compares the values numerically with their sign ignored.
+      So sánh các giá trị về mặt số học mà không xét dấu của chúng.
 
 
    .. method:: minus(x, /)
 
-      Minus corresponds to the unary prefix minus operator in Python.
+      Minus tương ứng với toán tử trừ tiền tố một ngôi trong Python.
 
 
    .. method:: multiply(x, y, /)
 
-      Return the product of *x* and *y*.
+      Trả về tích của *x* và *y*.
 
 
    .. method:: next_minus(x, /)
 
-      Returns the largest representable number smaller than *x*.
+      Trả về số lớn nhất có thể biểu diễn nhưng nhỏ hơn *x*.
 
 
    .. method:: next_plus(x, /)
 
-      Returns the smallest representable number larger than *x*.
+      Trả về số nhỏ nhất có thể biểu diễn nhưng lớn hơn *x*.
 
 
    .. method:: next_toward(x, y, /)
 
-      Returns the number closest to *x*, in direction towards *y*.
+      Trả về số gần nhất với *x*, theo hướng về phía *y*.
 
 
    .. method:: normalize(x, /)
 
-      Reduces *x* to its simplest form.
+      Rút gọn *x* về dạng đơn giản nhất.
 
 
    .. method:: number_class(x, /)
 
-      Returns an indication of the class of *x*.
+      Trả về thông tin cho biết lớp của *x*.
 
 
    .. method:: plus(x, /)
 
-      Plus corresponds to the unary prefix plus operator in Python.  This
-      operation applies the context precision and rounding, so it is *not* an
-      identity operation.
+      Plus tương ứng với toán tử cộng một ngôi ở tiền tố trong Python. Thao tác này áp dụng độ chính xác và quy tắc làm tròn của context, vì vậy nó *không phải* là thao tác đồng nhất.
 
 
    .. method:: power(x, y, modulo=None)
 
-      Return ``x`` to the power of ``y``, reduced modulo ``modulo`` if given.
+      Trả về ``x`` lũy thừa ``y``, được rút gọn theo modulo ``modulo`` nếu được cung cấp.
 
-      With two arguments, compute ``x**y``.  If ``x`` is negative then ``y``
-      must be integral.  The result will be inexact unless ``y`` is integral and
-      the result is finite and can be expressed exactly in 'precision' digits.
-      The rounding mode of the context is used. Results are always correctly rounded
-      in the Python version.
+      Với hai đối số, tính ``x**y``. Nếu ``x`` là số âm thì ``y`` phải là số nguyên. Kết quả sẽ không chính xác trừ khi ``y`` là số nguyên, đồng thời kết quả hữu hạn và có thể được biểu diễn chính xác bằng 'precision' chữ số. Chế độ làm tròn của context được sử dụng. Trong phiên bản Python, kết quả luôn được làm tròn chính xác.
 
-      ``Decimal(0) ** Decimal(0)`` results in ``InvalidOperation``, and if ``InvalidOperation``
-      is not trapped, then results in ``Decimal('NaN')``.
+      ``Decimal(0) ** Decimal(0)`` cho kết quả là ``InvalidOperation``, và nếu ``InvalidOperation`` không bị trap thì cho kết quả là ``Decimal('NaN')``.
 
       .. versionchanged:: 3.3
-         The C module computes :meth:`power` in terms of the correctly rounded
-         :meth:`exp` and :meth:`ln` functions. The result is well-defined but
-         only "almost always correctly rounded".
+         Mô-đun C tính :meth:`power` dựa trên giá trị được làm tròn chính xác
+         Các hàm :meth:`exp` và :meth:`ln`. Kết quả được xác định rõ, nhưng chỉ "gần như luôn được làm tròn chính xác".
 
-      With three arguments, compute ``(x**y) % modulo``.  For the three argument
-      form, the following restrictions on the arguments hold:
+      Với ba đối số, tính ``(x**y) % modulo``. Đối với dạng ba đối số, các đối số phải tuân theo những hạn chế sau:
 
-      - all three arguments must be integral
-      - ``y`` must be nonnegative
-      - at least one of ``x`` or ``y`` must be nonzero
-      - ``modulo`` must be nonzero and have at most 'precision' digits
+      - cả ba đối số phải là số nguyên
+      - ``y`` phải không âm
+      - ít nhất một trong ``x`` hoặc ``y`` phải khác không
+      - ``modulo`` phải khác không và có nhiều nhất 'precision' chữ số
 
-      The value resulting from ``Context.power(x, y, modulo)`` is
-      equal to the value that would be obtained by computing ``(x**y)
-      % modulo`` with unbounded precision, but is computed more
-      efficiently.  The exponent of the result is zero, regardless of
-      the exponents of ``x``, ``y`` and ``modulo``.  The result is
-      always exact.
+      Giá trị thu được từ ``Context.power(x, y, modulo)`` bằng với giá trị sẽ nhận được khi tính ``(x**y) % modulo`` với độ chính xác không giới hạn, nhưng được tính hiệu quả hơn. Số mũ của kết quả bằng không, bất kể các số mũ của ``x``, ``y`` và ``modulo``. Kết quả luôn chính xác.
 
 
    .. method:: quantize(x, y, /)
 
-      Returns a value equal to *x* (rounded), having the exponent of *y*.
+      Trả về một giá trị bằng *x* (đã làm tròn), có số mũ của *y*.
 
 
    .. method:: radix()
 
-      Just returns 10, as this is Decimal, :)
+      Chỉ trả về 10, vì đây là Decimal, :)
 
 
    .. method:: remainder(x, y, /)
 
-      Returns the remainder from integer division.
+      Trả về phần dư của phép chia nguyên.
 
-      The sign of the result, if non-zero, is the same as that of the original
-      dividend.
+      Dấu của kết quả, nếu khác 0, giống với dấu của số bị chia ban đầu.
 
 
    .. method:: remainder_near(x, y, /)
 
-      Returns ``x - y * n``, where *n* is the integer nearest the exact value
-      of ``x / y`` (if the result is 0 then its sign will be the sign of *x*).
+      Trả về ``x - y * n``, trong đó *n* là số nguyên gần nhất với giá trị chính xác của ``x / y`` (nếu kết quả là 0 thì dấu của nó sẽ là dấu của *x*).
 
 
    .. method:: rotate(x, y, /)
 
-      Returns a rotated copy of *x*, *y* times.
+      Trả về một bản sao đã xoay của *x*, *y* lần.
 
 
    .. method:: same_quantum(x, y, /)
 
-      Returns ``True`` if the two operands have the same exponent.
+      Trả về ``True`` nếu hai toán hạng có cùng số mũ.
 
 
    .. method:: scaleb (x, y, /)
 
-      Returns the first operand after adding the second value its exp.
+      Trả về toán hạng thứ nhất sau khi cộng số mũ của giá trị thứ hai vào nó.
 
 
    .. method:: shift(x, y, /)
 
-      Returns a shifted copy of *x*, *y* times.
+      Trả về một bản sao đã dịch của *x*, *y* lần.
 
 
    .. method:: sqrt(x, /)
 
-      Square root of a non-negative number to context precision.
+      Căn bậc hai của một số không âm với độ chính xác của context.
 
 
    .. method:: subtract(x, y, /)
 
-      Return the difference between *x* and *y*.
+      Trả về hiệu giữa *x* và *y*.
 
 
    .. method:: to_eng_string(x, /)
 
-      Convert to a string, using engineering notation if an exponent is needed.
+      Chuyển đổi thành chuỗi, sử dụng ký hiệu kỹ thuật nếu cần số mũ.
 
-      Engineering notation has an exponent which is a multiple of 3.  This
-      can leave up to 3 digits to the left of the decimal place and may
-      require the addition of either one or two trailing zeros.
+      Ký hiệu kỹ thuật có số mũ là bội số của 3. Điều này có thể để lại tối đa 3 chữ số ở bên trái dấu thập phân và có thể yêu cầu thêm một hoặc hai số 0 ở cuối.
 
 
    .. method:: to_integral_exact(x, /)
 
-      Rounds to an integer.
+      Làm tròn thành một số nguyên.
 
 
    .. method:: to_sci_string(x, /)
 
-      Converts a number to a string using scientific notation.
+      Chuyển đổi một số thành chuỗi bằng cách sử dụng ký hiệu khoa học.
 
 .. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 .. _decimal-rounding-modes:
 
-Constants
----------
+Hằng số
+-------
 
-The constants in this section are only relevant for the C module. They
-are also included in the pure Python version for compatibility.
+Các hằng số trong phần này chỉ liên quan đến mô-đun C. Chúng cũng được 포함 trong phiên bản Python thuần túy để đảm bảo khả năng tương thích.
 
-+---------------------------------+---------------------+-------------------------------+
-|                                 |       32-bit        |            64-bit             |
-+=================================+=====================+===============================+
-| .. data:: MAX_PREC              |    ``425000000``    |    ``999999999999999999``     |
-+---------------------------------+---------------------+-------------------------------+
-| .. data:: MAX_EMAX              |    ``425000000``    |    ``999999999999999999``     |
-+---------------------------------+---------------------+-------------------------------+
-| .. data:: MIN_EMIN              |    ``-425000000``   |    ``-999999999999999999``    |
-+---------------------------------+---------------------+-------------------------------+
-| .. data:: MIN_ETINY             |    ``-849999999``   |    ``-1999999999999999997``   |
-+---------------------------------+---------------------+-------------------------------+
-| .. data:: IEEE_CONTEXT_MAX_BITS |    ``256``          |    ``512``                    |
-+---------------------------------+---------------------+-------------------------------+
++---------------------------------+----------------+--------------------------+
+|                                 | 32-bit         | 64-bit                   |
++=================================+================+==========================+
+| .. data:: MAX_PREC              | ``425000000``  | ``999999999999999999``   |
++---------------------------------+----------------+--------------------------+
+| .. data:: MAX_EMAX              | ``425000000``  | ``999999999999999999``   |
++---------------------------------+----------------+--------------------------+
+| .. data:: MIN_EMIN              | ``-425000000`` | ``-999999999999999999``  |
++---------------------------------+----------------+--------------------------+
+| .. data:: MIN_ETINY             | ``-849999999`` | ``-1999999999999999997`` |
++---------------------------------+----------------+--------------------------+
+| .. data:: IEEE_CONTEXT_MAX_BITS | ``256``        | ``512``                  |
++---------------------------------+----------------+--------------------------+
 
 .. data:: HAVE_THREADS
 
-   The value is ``True``.  Deprecated, because Python now always has threads.
+   Giá trị là ``True``. Không còn được dùng, vì Python hiện luôn có thread.
 
    .. deprecated:: 3.9
 
 .. data:: HAVE_CONTEXTVAR
 
-   The default value is ``True``. If Python is :option:`configured using
-   the --without-decimal-contextvar option <--without-decimal-contextvar>`,
-   the C version uses a thread-local rather than a coroutine-local context and the value
-   is ``False``.  This is slightly faster in some nested context scenarios.
+   Giá trị mặc định là ``True``. Nếu Python là :option:`configured using the --without-decimal-contextvar option <--without-decimal-contextvar>`, phiên bản C sử dụng context thread-local thay vì coroutine-local và giá trị là ``False``. Điều này nhanh hơn một chút trong một số tình huống context lồng nhau.
 
    .. versionadded:: 3.8.3
 
 
-Rounding modes
---------------
+.. _`Rounding modes`:
+
+Các chế độ làm tròn
+-------------------
 
 .. data:: ROUND_CEILING
 
-   Round towards ``Infinity``.
+   Làm tròn về phía ``Infinity``.
 
 .. data:: ROUND_DOWN
 
-   Round towards zero.
+   Làm tròn về 0.
 
 .. data:: ROUND_FLOOR
 
-   Round towards ``-Infinity``.
+   Làm tròn về phía ``-Infinity``.
 
 .. data:: ROUND_HALF_DOWN
 
-   Round to nearest with ties going towards zero.
+   Làm tròn đến số gần nhất, nếu hòa thì làm tròn về 0.
 
 .. data:: ROUND_HALF_EVEN
 
-   Round to nearest with ties going to nearest even integer.
+   Làm tròn đến số gần nhất, nếu hòa thì làm tròn đến số nguyên chẵn gần nhất.
 
 .. data:: ROUND_HALF_UP
 
-   Round to nearest with ties going away from zero.
+   Làm tròn đến số gần nhất, nếu hòa thì làm tròn ra xa 0.
 
 .. data:: ROUND_UP
 
-   Round away from zero.
+   Làm tròn ra xa số 0.
 
 .. data:: ROUND_05UP
 
-   Round away from zero if last digit after rounding towards zero would have
-   been 0 or 5; otherwise round towards zero.
+   Làm tròn ra xa số 0 nếu chữ số cuối cùng sau khi làm tròn về phía 0 sẽ là 0 hoặc 5; nếu không thì làm tròn về phía 0.
 
 
 .. _decimal-signals:
 
-Signals
--------
+Tín hiệu
+--------
 
-Signals represent conditions that arise during computation. Each corresponds to
-one context flag and one context trap enabler.
+Tín hiệu biểu thị các điều kiện phát sinh trong quá trình tính toán. Mỗi tín hiệu tương ứng với một cờ ngữ cảnh và một bộ cho phép bẫy ngữ cảnh.
 
-The context flag is set whenever the condition is encountered. After the
-computation, flags may be checked for informational purposes (for instance, to
-determine whether a computation was exact). After checking the flags, be sure to
-clear all flags before starting the next computation.
+Cờ ngữ cảnh được đặt mỗi khi gặp điều kiện tương ứng. Sau khi tính toán xong, có thể kiểm tra các cờ này cho mục đích cung cấp thông tin (chẳng hạn để xác định phép tính có chính xác hay không). Sau khi kiểm tra các cờ, hãy nhớ xóa tất cả các cờ trước khi bắt đầu phép tính tiếp theo.
 
-If the context's trap enabler is set for the signal, then the condition causes a
-Python exception to be raised.  For example, if the :class:`DivisionByZero` trap
-is set, then a :exc:`DivisionByZero` exception is raised upon encountering the
-condition.
+Nếu bộ cho phép bẫy của ngữ cảnh được đặt cho tín hiệu, điều kiện đó sẽ khiến một ngoại lệ Python được phát sinh. Ví dụ, nếu bẫy :class:`DivisionByZero` được đặt, thì một ngoại lệ :exc:`DivisionByZero` sẽ được phát sinh khi gặp điều kiện đó.
 
 
 .. class:: Clamped
 
-   Altered an exponent to fit representation constraints.
+   Đã thay đổi số mũ để phù hợp với các ràng buộc biểu diễn.
 
-   Typically, clamping occurs when an exponent falls outside the context's
-   :attr:`~Context.Emin` and :attr:`~Context.Emax` limits.  If possible, the exponent is reduced to
-   fit by adding zeros to the coefficient.
+   Thông thường, hiện tượng giới hạn xảy ra khi số mũ nằm ngoài các
+   :attr:`~Context.Emin` và :attr:`~Context.Emax` của context. Nếu có thể, số mũ sẽ được giảm xuống cho phù hợp bằng cách thêm các số 0 vào coefficient.
 
 
 .. class:: DecimalException
 
-   Base class for other signals and a subclass of :exc:`ArithmeticError`.
+   Lớp cơ sở cho các signal khác và là lớp con của :exc:`ArithmeticError`.
 
 
 .. class:: DivisionByZero
 
-   Signals the division of a non-infinite number by zero.
+   Báo hiệu phép chia một số không vô hạn cho số 0.
 
-   Can occur with division, modulo division, or when raising a number to a negative
-   power.  If this signal is not trapped, returns ``Infinity`` or
-   ``-Infinity`` with the sign determined by the inputs to the calculation.
+   Có thể xảy ra khi chia, chia modulo hoặc khi nâng một số lên lũy thừa âm. Nếu signal này không bị trap, kết quả trả về là ``Infinity`` hoặc ``-Infinity``, với dấu được xác định bởi các đầu vào của phép tính.
 
 
 .. class:: Inexact
 
-   Indicates that rounding occurred and the result is not exact.
+   Cho biết đã xảy ra việc làm tròn và kết quả không chính xác tuyệt đối.
 
-   Signals when non-zero digits were discarded during rounding. The rounded result
-   is returned.  The signal flag or trap is used to detect when results are
-   inexact.
+   Báo hiệu khi các chữ số khác 0 bị loại bỏ trong quá trình làm tròn. Kết quả đã làm tròn được trả về. Cờ signal hoặc trap được dùng để phát hiện khi kết quả không chính xác.
 
 
 .. class:: InvalidOperation
 
-   An invalid operation was performed.
+   Đã thực hiện một thao tác không hợp lệ.
 
-   Indicates that an operation was requested that does not make sense. If not
-   trapped, returns ``NaN``.  Possible causes include::
+   Cho biết đã yêu cầu một thao tác không có ý nghĩa. Nếu không bị bắt, thao tác này trả về ``NaN``. Các nguyên nhân có thể bao gồm::
 
       Infinity - Infinity
       0 * Infinity
@@ -1732,58 +1373,43 @@ condition.
 
 .. class:: Overflow
 
-   Numerical overflow.
+   Tràn số.
 
-   Indicates the exponent is larger than :attr:`Context.Emax` after rounding has
-   occurred.  If not trapped, the result depends on the rounding mode, either
-   pulling inward to the largest representable finite number or rounding outward
-   to ``Infinity``.  In either case, :class:`Inexact` and :class:`Rounded`
-   are also signaled.
+   Cho biết số mũ lớn hơn :attr:`Context.Emax` sau khi làm tròn. Nếu không bị bắt, kết quả phụ thuộc vào chế độ làm tròn: либо thu hẹp về số hữu hạn lớn nhất có thể biểu diễn, либо làm tròn ra ngoài thành ``Infinity``. Trong cả hai trường hợp, :class:`Inexact` và :class:`Rounded` cũng được phát tín hiệu.
 
 
 .. class:: Rounded
 
-   Rounding occurred though possibly no information was lost.
+   Đã xảy ra việc làm tròn, mặc dù có thể không mất thông tin nào.
 
-   Signaled whenever rounding discards digits; even if those digits are zero
-   (such as rounding ``5.00`` to ``5.0``).  If not trapped, returns
-   the result unchanged.  This signal is used to detect loss of significant
-   digits.
+   Được phát tín hiệu bất cứ khi nào việc làm tròn loại bỏ các chữ số, kể cả khi những chữ số đó là số 0 (chẳng hạn như làm tròn ``5.00`` thành ``5.0``). Nếu không bị bắt, trả về kết quả không thay đổi. Tín hiệu này được dùng để phát hiện việc mất các chữ số có nghĩa.
 
 
 .. class:: Subnormal
 
-   Exponent was lower than :attr:`~Context.Emin` prior to rounding.
+   Số mũ thấp hơn :attr:`~Context.Emin` trước khi làm tròn.
 
-   Occurs when an operation result is subnormal (the exponent is too small). If
-   not trapped, returns the result unchanged.
+   Xảy ra khi kết quả của một phép toán là số dưới chuẩn (số mũ quá nhỏ). Nếu không bị trap, kết quả được trả về không thay đổi.
 
 
 .. class:: Underflow
 
-   Numerical underflow with result rounded to zero.
+   Tràn xuống số học với kết quả được làm tròn thành 0.
 
-   Occurs when a subnormal result is pushed to zero by rounding. :class:`Inexact`
-   and :class:`Subnormal` are also signaled.
+   Xảy ra khi một kết quả dưới chuẩn bị phép làm tròn đẩy về 0. :class:`Inexact` và :class:`Subnormal` cũng được phát tín hiệu.
 
 
 .. class:: FloatOperation
 
-    Enable stricter semantics for mixing floats and Decimals.
+    Bật ngữ nghĩa nghiêm ngặt hơn khi trộn float và Decimal.
 
-    If the signal is not trapped (default), mixing floats and Decimals is
-    permitted in the :class:`~decimal.Decimal` constructor,
-    :meth:`~decimal.Context.create_decimal` and all comparison operators.
-    Both conversion and comparisons are exact. Any occurrence of a mixed
-    operation is silently recorded by setting :exc:`FloatOperation` in the
-    context flags. Explicit conversions with :meth:`~decimal.Decimal.from_float`
-    or :meth:`~decimal.Context.create_decimal_from_float` do not set the flag.
+    Nếu tín hiệu không bị trap (mặc định), việc trộn float và Decimal được cho phép trong hàm khởi tạo :class:`~decimal.Decimal`,
+    :meth:`~decimal.Context.create_decimal` và tất cả các toán tử so sánh. Cả việc chuyển đổi lẫn so sánh đều chính xác. Mọi phép toán trộn đều được ghi nhận một cách im lặng bằng cách đặt :exc:`FloatOperation` trong các cờ của context. Các phép chuyển đổi tường minh bằng :meth:`~decimal.Decimal.from_float` hoặc :meth:`~decimal.Context.create_decimal_from_float` không đặt cờ này.
 
-    Otherwise (the signal is trapped), only equality comparisons and explicit
-    conversions are silent. All other mixed operations raise :exc:`FloatOperation`.
+    Ngược lại (khi tín hiệu bị trap), chỉ các phép so sánh bằng và phép chuyển đổi tường minh là im lặng. Mọi phép toán trộn khác đều raise :exc:`FloatOperation`.
 
 
-The following table summarizes the hierarchy of signals::
+Bảng sau đây tóm tắt hệ thống phân cấp của các tín hiệu::
 
    exceptions.ArithmeticError(exceptions.Exception)
        DecimalException
@@ -1803,26 +1429,20 @@ The following table summarizes the hierarchy of signals::
 
 .. _decimal-notes:
 
-Floating-point notes
---------------------
+Ghi chú về số dấu phẩy động
+---------------------------
 
 
-Mitigating round-off error with increased precision
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Giảm thiểu sai số làm tròn bằng cách tăng độ chính xác
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The use of decimal floating point eliminates decimal representation error
-(making it possible to represent ``0.1`` exactly); however, some operations
-can still incur round-off error when non-zero digits exceed the fixed precision.
+Việc sử dụng số dấu phẩy động thập phân loại bỏ lỗi biểu diễn thập phân (nhờ đó có thể biểu diễn chính xác ``0.1``); tuy nhiên, một số phép toán vẫn có thể phát sinh sai số làm tròn khi số chữ số khác 0 vượt quá độ chính xác cố định.
 
-The effects of round-off error can be amplified by the addition or subtraction
-of nearly offsetting quantities resulting in loss of significance.  Knuth
-provides two instructive examples where rounded floating-point arithmetic with
-insufficient precision causes the breakdown of the associative and distributive
-properties of addition:
+Ảnh hưởng của sai số làm tròn có thể được khuếch đại khi cộng hoặc trừ các đại lượng gần như triệt tiêu nhau, dẫn đến mất độ chính xác đáng kể. Knuth đưa ra hai ví dụ minh họa trong đó phép tính số dấu phẩy động đã làm tròn với độ chính xác không đủ gây ra sự phá vỡ các tính chất kết hợp và phân phối của phép cộng:
 
 .. doctest:: newcontext
 
-   # Examples from Seminumerical Algorithms, Section 4.2.2.
+   # Các ví dụ từ Seminumerical Algorithms, Mục 4.2.2.
    >>> from decimal import Decimal, getcontext
    >>> getcontext().prec = 8
 
@@ -1838,8 +1458,7 @@ properties of addition:
    >>> u * (v+w)
    Decimal('0.0060000')
 
-The :mod:`!decimal` module makes it possible to restore the identities by
-expanding the precision sufficiently to avoid loss of significance:
+Mô-đun :mod:`!decimal` cho phép khôi phục các đẳng thức bằng cách mở rộng độ chính xác đủ để tránh mất độ chính xác đáng kể:
 
 .. doctest:: newcontext
 
@@ -1857,57 +1476,26 @@ expanding the precision sufficiently to avoid loss of significance:
    Decimal('0.0060000')
 
 
-Special values
-^^^^^^^^^^^^^^
+Các giá trị đặc biệt
+^^^^^^^^^^^^^^^^^^^^
 
-The number system for the :mod:`!decimal` module provides special values
-including ``NaN``, ``sNaN``, ``-Infinity``, ``Infinity``,
-and two zeros, ``+0`` and ``-0``.
+Hệ thống số của module :mod:`!decimal` cung cấp các giá trị đặc biệt, bao gồm ``NaN``, ``sNaN``, ``-Infinity``, ``Infinity`` và hai số 0 là ``+0`` và ``-0``.
 
-Infinities can be constructed directly with:  ``Decimal('Infinity')``. Also,
-they can arise from dividing by zero when the :exc:`DivisionByZero` signal is
-not trapped.  Likewise, when the :exc:`Overflow` signal is not trapped, infinity
-can result from rounding beyond the limits of the largest representable number.
+Có thể tạo trực tiếp các giá trị vô cực bằng:  ``Decimal('Infinity')``. Ngoài ra, chúng có thể phát sinh khi chia cho 0 nếu tín hiệu :exc:`DivisionByZero` không bị bắt.  Tương tự, khi tín hiệu :exc:`Overflow` không bị bắt, kết quả làm tròn vượt quá giới hạn của số lớn nhất có thể biểu diễn cũng có thể là vô cực.
 
-The infinities are signed (affine) and can be used in arithmetic operations
-where they get treated as very large, indeterminate numbers.  For instance,
-adding a constant to infinity gives another infinite result.
+Các giá trị vô cực có dấu (affine) và có thể được sử dụng trong các phép toán số học, trong đó chúng được xử lý như những số rất lớn nhưng không xác định.  Chẳng hạn, cộng một hằng số với vô cực sẽ cho một kết quả vô cực khác.
 
-Some operations are indeterminate and return ``NaN``, or if the
-:exc:`InvalidOperation` signal is trapped, raise an exception.  For example,
-``0/0`` returns ``NaN`` which means "not a number".  This variety of
-``NaN`` is quiet and, once created, will flow through other computations
-always resulting in another ``NaN``.  This behavior can be useful for a
-series of computations that occasionally have missing inputs --- it allows the
-calculation to proceed while flagging specific results as invalid.
+Một số phép toán không xác định và trả về ``NaN``, hoặc nếu tín hiệu
+:exc:`InvalidOperation` bị bắt thì phát sinh một ngoại lệ.  Ví dụ, ``0/0`` trả về ``NaN``, có nghĩa là "không phải một số".  Dạng ``NaN`` này là dạng im lặng và sau khi được tạo sẽ truyền qua các phép tính khác, luôn cho ra một ``NaN`` khác.  Hành vi này có thể hữu ích cho một chuỗi phép tính đôi khi bị thiếu đầu vào --- nó cho phép phép tính tiếp tục trong khi đánh dấu các kết quả cụ thể là không hợp lệ.
 
-A variant is ``sNaN`` which signals rather than remaining quiet after every
-operation.  This is a useful return value when an invalid result needs to
-interrupt a calculation for special handling.
+Một biến thể là ``sNaN``, biến thể này phát tín hiệu thay vì im lặng sau mỗi phép toán. Đây là một giá trị trả về hữu ích khi một kết quả không hợp lệ cần ngắt phép tính để được xử lý đặc biệt.
 
-The behavior of Python's comparison operators can be a little surprising where a
-``NaN`` is involved.  A test for equality where one of the operands is a
-quiet or signaling ``NaN`` always returns :const:`False` (even when doing
-``Decimal('NaN')==Decimal('NaN')``), while a test for inequality always returns
-:const:`True`.  An attempt to compare two Decimals using any of the ``<``,
-``<=``, ``>`` or ``>=`` operators will raise the :exc:`InvalidOperation` signal
-if either operand is a ``NaN``, and return :const:`False` if this signal is
-not trapped.  Note that the General Decimal Arithmetic specification does not
-specify the behavior of direct comparisons; these rules for comparisons
-involving a ``NaN`` were taken from the IEEE 854 standard (see Table 3 in
-section 5.7).  To ensure strict standards-compliance, use the :meth:`~Decimal.compare`
-and :meth:`~Decimal.compare_signal` methods instead.
+Hành vi của các toán tử so sánh trong Python có thể hơi bất ngờ khi có ``NaN`` tham gia. Phép kiểm tra bằng nhau trong đó một toán hạng là ``NaN`` im lặng hoặc báo hiệu luôn trả về :const:`False` (ngay cả khi thực hiện ``Decimal('NaN')==Decimal('NaN')``), còn phép kiểm tra không bằng luôn trả về
+:const:`True`. Việc thử so sánh hai Decimal bằng bất kỳ toán tử ``<``, ``<=``, ``>`` hoặc ``>=`` nào sẽ phát tín hiệu :exc:`InvalidOperation` nếu một trong hai toán hạng là ``NaN``, và trả về :const:`False` nếu tín hiệu này không bị bắt. Lưu ý rằng đặc tả General Decimal Arithmetic không quy định hành vi của các phép so sánh trực tiếp; các quy tắc so sánh có liên quan đến ``NaN`` này được lấy từ tiêu chuẩn IEEE 854 (xem Bảng 3 trong mục 5.7). Để đảm bảo tuân thủ nghiêm ngặt các tiêu chuẩn, hãy sử dụng các phương thức :meth:`~Decimal.compare` và :meth:`~Decimal.compare_signal` thay thế.
 
-The signed zeros can result from calculations that underflow. They keep the sign
-that would have resulted if the calculation had been carried out to greater
-precision.  Since their magnitude is zero, both positive and negative zeros are
-treated as equal and their sign is informational.
+Các số 0 có dấu có thể xuất hiện từ những phép tính bị underflow. Chúng giữ lại dấu lẽ ra sẽ có nếu phép tính được thực hiện với độ chính xác cao hơn. Vì độ lớn của chúng bằng 0, cả số 0 dương và số 0 âm đều được xem là bằng nhau, còn dấu của chúng chỉ mang tính thông tin.
 
-In addition to the two signed zeros which are distinct yet equal, there are
-various representations of zero with differing precisions yet equivalent in
-value.  This takes a bit of getting used to.  For an eye accustomed to
-normalized floating-point representations, it is not immediately obvious that
-the following calculation returns a value equal to zero:
+Ngoài hai số 0 có dấu, khác nhau nhưng bằng nhau, còn có nhiều cách biểu diễn số 0 với độ chính xác khác nhau nhưng giá trị tương đương. Điều này cần một chút thời gian để làm quen. Với người đã quen với các biểu diễn dấu phẩy động chuẩn hóa, không dễ nhận ra ngay rằng phép tính sau trả về một giá trị bằng 0:
 
    >>> 1 / Decimal('Infinity')
    Decimal('0E-1000026')
@@ -1917,41 +1505,30 @@ the following calculation returns a value equal to zero:
 
 .. _decimal-threads:
 
-Working with threads
---------------------
+Làm việc với thread
+-------------------
 
-The :func:`getcontext` function accesses a different :class:`Context` object for
-each thread.  Having separate thread contexts means that threads may make
-changes (such as ``getcontext().prec=10``) without interfering with other threads.
+Hàm :func:`getcontext` truy cập một đối tượng :class:`Context` khác nhau cho mỗi thread. Việc có các thread context riêng biệt nghĩa là các thread có thể thực hiện thay đổi (chẳng hạn như ``getcontext().prec=10``) mà không ảnh hưởng đến các thread khác.
 
-Likewise, the :func:`setcontext` function automatically assigns its target to
-the current thread.
+Tương tự, hàm :func:`setcontext` tự động gán target của nó cho thread hiện tại.
 
-If :func:`setcontext` has not been called before :func:`getcontext`, then
-:func:`getcontext` will automatically create a new context for use in the
-current thread.  New context objects have default values set from the
-:data:`decimal.DefaultContext` object.
+Nếu :func:`setcontext` chưa được gọi trước :func:`getcontext` thì
+:func:`getcontext` sẽ tự động tạo một ngữ cảnh mới để sử dụng trong thread hiện tại. Các đối tượng ngữ cảnh mới có các giá trị mặc định được thiết lập từ
+đối tượng :data:`decimal.DefaultContext`.
 
-The :data:`sys.flags.thread_inherit_context` flag affects the context for
-new threads.  If the flag is false, new threads will start with an empty
-context.  In this case, :func:`getcontext` will create a new context object
-when called and use the default values from *DefaultContext*.  If the flag
-is true, new threads will start with a copy of context from the caller of
+Cờ :data:`sys.flags.thread_inherit_context` ảnh hưởng đến ngữ cảnh của các thread mới. Nếu cờ này là false, các thread mới sẽ bắt đầu với ngữ cảnh trống. Trong trường hợp này, :func:`getcontext` sẽ tạo một đối tượng ngữ cảnh mới khi được gọi và sử dụng các giá trị mặc định từ *DefaultContext*. Nếu cờ này là true, các thread mới sẽ bắt đầu với một bản sao ngữ cảnh từ bên gọi
 :meth:`threading.Thread.start`.
 
-To control the defaults so that each thread will use the same values throughout
-the application, directly modify the *DefaultContext* object. This should be
-done *before* any threads are started so that there won't be a race condition
-between threads calling :func:`getcontext`. For example::
+Để kiểm soát các giá trị mặc định sao cho mỗi thread sử dụng cùng một tập giá trị trong toàn bộ ứng dụng, hãy trực tiếp sửa đổi đối tượng *DefaultContext*. Việc này nên được thực hiện *trước* khi bất kỳ thread nào được khởi chạy, để không xảy ra race condition giữa các thread gọi :func:`getcontext`. Ví dụ::
 
-   # Set applicationwide defaults for all threads about to be launched
+   # Thiết lập các giá trị mặc định áp dụng trên toàn ứng dụng cho tất cả thread sắp được khởi chạy
    DefaultContext.prec = 12
    DefaultContext.rounding = ROUND_DOWN
    DefaultContext.traps = ExtendedContext.traps.copy()
    DefaultContext.traps[InvalidOperation] = 1
    setcontext(DefaultContext)
 
-   # Afterwards, the threads can be started
+   # Sau đó, có thể khởi chạy các thread
    t1.start()
    t2.start()
    t3.start()
@@ -1962,11 +1539,10 @@ between threads calling :func:`getcontext`. For example::
 
 .. _decimal-recipes:
 
-Recipes
--------
+Công thức
+---------
 
-Here are a few recipes that serve as utility functions and that demonstrate ways
-to work with the :class:`Decimal` class::
+Dưới đây là một số công thức đóng vai trò như các hàm tiện ích và minh họa cách làm việc với lớp :class:`Decimal`::
 
    def moneyfmt(value, places=2, curr='', sep=',', dp='.',
                 pos='', neg='-', trailneg=''):
@@ -1994,7 +1570,7 @@ to work with the :class:`Decimal` class::
        '<0.02>'
 
        """
-       q = Decimal(10) ** -places      # 2 places --> '0.01'
+       q = Decimal(10) ** -places      # 2 chữ số thập phân --> '0.01'
        sign, digits, exp = value.quantize(q).as_tuple()
        result = []
        digits = list(map(str, digits))
@@ -2025,8 +1601,8 @@ to work with the :class:`Decimal` class::
        3.141592653589793238462643383
 
        """
-       getcontext().prec += 2  # extra digits for intermediate steps
-       three = Decimal(3)      # substitute "three=3.0" for regular floats
+       getcontext().prec += 2  # các chữ số bổ sung cho những bước trung gian
+       three = Decimal(3)      # thay "three=3.0" cho các số thực thông thường
        lasts, t, s, n, na, d, da = 0, three, 3, 1, 0, 0, 24
        while s != lasts:
            lasts = s
@@ -2035,7 +1611,7 @@ to work with the :class:`Decimal` class::
            t = (t * n) / d
            s += t
        getcontext().prec -= 2
-       return +s               # unary plus applies the new precision
+       return +s               # dấu cộng một ngôi áp dụng độ chính xác mới
 
    def exp(x):
        """Return e raised to the power of x.  Result type matches input type.
@@ -2119,32 +1695,28 @@ to work with the :class:`Decimal` class::
 
 .. _decimal-faq:
 
-Decimal FAQ
------------
+Câu hỏi thường gặp về Decimal
+-----------------------------
 
-Q: It is cumbersome to type ``decimal.Decimal('1234.5')``.  Is there a way to
-minimize typing when using the interactive interpreter?
+H: Việc gõ ``decimal.Decimal('1234.5')`` khá bất tiện. Có cách nào giảm số lần gõ khi sử dụng trình thông dịch tương tác không?
 
-A: Some users abbreviate the constructor to just a single letter:
+Đ: Một số người dùng viết tắt hàm khởi tạo thành chỉ một chữ cái:
 
    >>> D = decimal.Decimal
    >>> D('1.23') + D('3.45')
    Decimal('4.68')
 
-Q: In a fixed-point application with two decimal places, some inputs have many
-places and need to be rounded.  Others are not supposed to have excess digits
-and need to be validated.  What methods should be used?
+H: Trong một ứng dụng fixed-point có hai chữ số thập phân, một số đầu vào có nhiều chữ số và cần được làm tròn. Những đầu vào khác không được có chữ số dư thừa và cần được xác thực. Nên sử dụng những phương thức nào?
 
-A: The :meth:`~Decimal.quantize` method rounds to a fixed number of decimal places. If
-the :const:`Inexact` trap is set, it is also useful for validation:
+Đ: Phương thức :meth:`~Decimal.quantize` làm tròn đến một số chữ số thập phân cố định. Nếu trap :const:`Inexact` được thiết lập, phương thức này cũng hữu ích cho việc xác thực:
 
-   >>> TWOPLACES = Decimal(10) ** -2       # same as Decimal('0.01')
+   >>> TWOPLACES = Decimal(10) ** -2       # giống như Decimal('0.01')
 
-   >>> # Round to two places
+   >>> # Làm tròn đến hai chữ số
    >>> Decimal('3.214').quantize(TWOPLACES)
    Decimal('3.21')
 
-   >>> # Validate that a number does not exceed two places
+   >>> # Xác thực rằng một số không vượt quá hai chữ số
    >>> Decimal('3.21').quantize(TWOPLACES, context=Context(traps=[Inexact]))
    Decimal('3.21')
 
@@ -2153,29 +1725,24 @@ the :const:`Inexact` trap is set, it is also useful for validation:
       ...
    Inexact: None
 
-Q: Once I have valid two place inputs, how do I maintain that invariant
-throughout an application?
+H: Khi đã có các đầu vào hợp lệ với hai chữ số thập phân, làm thế nào để duy trì bất biến đó trong suốt ứng dụng?
 
-A: Some operations like addition, subtraction, and multiplication by an integer
-will automatically preserve fixed point.  Others operations, like division and
-non-integer multiplication, will change the number of decimal places and need to
-be followed-up with a :meth:`~Decimal.quantize` step:
+Đ: Một số phép toán như cộng, trừ và nhân với một số nguyên sẽ tự động bảo toàn fixed-point. Các phép toán khác, như chia và nhân với số không nguyên, sẽ thay đổi số chữ số thập phân và cần được thực hiện tiếp theo bằng một bước :meth:`~Decimal.quantize`:
 
-    >>> a = Decimal('102.72')           # Initial fixed-point values
+    >>> a = Decimal('102.72')           # Các giá trị fixed-point ban đầu
     >>> b = Decimal('3.17')
-    >>> a + b                           # Addition preserves fixed-point
+    >>> a + b                           # Phép cộng bảo toàn fixed-point
     Decimal('105.89')
     >>> a - b
     Decimal('99.55')
-    >>> a * 42                          # So does integer multiplication
+    >>> a * 42                          # Phép nhân với số nguyên cũng vậy
     Decimal('4314.24')
-    >>> (a * b).quantize(TWOPLACES)     # Must quantize non-integer multiplication
+    >>> (a * b).quantize(TWOPLACES)     # Phải quantize phép nhân với số không nguyên
     Decimal('325.62')
-    >>> (b / a).quantize(TWOPLACES)     # And quantize division
+    >>> (b / a).quantize(TWOPLACES)     # Và quantize phép chia
     Decimal('0.03')
 
-In developing fixed-point applications, it is convenient to define functions
-to handle the :meth:`~Decimal.quantize` step:
+Khi phát triển các ứng dụng fixed-point, việc định nghĩa các hàm để xử lý bước :meth:`~Decimal.quantize` sẽ rất thuận tiện:
 
     >>> def mul(x, y, fp=TWOPLACES):
     ...     return (x * y).quantize(fp)
@@ -2183,54 +1750,39 @@ to handle the :meth:`~Decimal.quantize` step:
     >>> def div(x, y, fp=TWOPLACES):
     ...     return (x / y).quantize(fp)
 
-    >>> mul(a, b)                       # Automatically preserve fixed-point
+    >>> mul(a, b)                       # Tự động bảo toàn fixed-point
     Decimal('325.62')
     >>> div(b, a)
     Decimal('0.03')
 
-Q: There are many ways to express the same value.  The numbers ``200``,
-``200.000``, ``2E2``, and ``.02E+4`` all have the same value at
-various precisions. Is there a way to transform them to a single recognizable
-canonical value?
+H: Có nhiều cách để biểu diễn cùng một giá trị. Các số ``200``, ``200.000``, ``2E2`` và ``.02E+4`` đều có cùng giá trị ở các độ chính xác khác nhau. Có cách nào biến chúng thành một giá trị chuẩn duy nhất, dễ nhận biết không?
 
-A: The :meth:`~Decimal.normalize` method maps all equivalent values to a single
-representative:
+Đ: Phương thức :meth:`~Decimal.normalize` ánh xạ tất cả các giá trị tương đương về cùng một đại diện duy nhất:
 
    >>> values = map(Decimal, '200 200.000 2E2 .02E+4'.split())
    >>> [v.normalize() for v in values]
    [Decimal('2E+2'), Decimal('2E+2'), Decimal('2E+2'), Decimal('2E+2')]
 
-Q: When does rounding occur in a computation?
+H: Khi nào việc làm tròn xảy ra trong một phép tính?
 
-A: It occurs *after* the computation.  The philosophy of the decimal
-specification is that numbers are considered exact and are created
-independent of the current context.  They can even have greater
-precision than current context.  Computations process with those
-exact inputs and then rounding (or other context operations) is
-applied to the *result* of the computation::
+Đ: Việc đó xảy ra *sau* khi thực hiện phép tính. Triết lý của đặc tả decimal là các số được xem là chính xác và được tạo độc lập với context hiện tại. Chúng thậm chí có thể có độ chính xác cao hơn context hiện tại. Các phép tính được thực hiện với những đầu vào chính xác đó, sau đó việc làm tròn (hoặc các thao tác context khác) được áp dụng cho *kết quả* của phép tính::
 
    >>> getcontext().prec = 5
-   >>> pi = Decimal('3.1415926535')   # More than 5 digits
-   >>> pi                             # All digits are retained
+   >>> pi = Decimal('3.1415926535')   # Hơn 5 chữ số
+   >>> pi                             # Giữ lại tất cả các chữ số
    Decimal('3.1415926535')
-   >>> pi + 0                         # Rounded after an addition
+   >>> pi + 0                         # Làm tròn sau khi cộng
    Decimal('3.1416')
-   >>> pi - Decimal('0.00005')        # Subtract unrounded numbers, then round
+   >>> pi - Decimal('0.00005')        # Trừ các số chưa làm tròn, rồi làm tròn
    Decimal('3.1415')
-   >>> pi + 0 - Decimal('0.00005').   # Intermediate values are rounded
+   >>> pi + 0 - Decimal('0.00005').   # Các giá trị trung gian được làm tròn
    Decimal('3.1416')
 
-Q: Some decimal values always print with exponential notation.  Is there a way
-to get a non-exponential representation?
+H: Một số giá trị thập phân luôn được in ở dạng ký pháp số mũ. Có cách nào để lấy biểu diễn không dùng số mũ không?
 
-A: For some values, exponential notation is the only way to express the number
-of significant places in the coefficient.  For example, expressing
-``5.0E+3`` as ``5000`` keeps the value constant but cannot show the
-original's two-place significance.
+Đ: Với một số giá trị, ký pháp số mũ là cách duy nhất để thể hiện số chữ số có nghĩa trong phần định trị. Ví dụ, biểu diễn ``5.0E+3`` dưới dạng ``5000`` giữ nguyên giá trị nhưng không thể thể hiện độ chính xác hai chữ số ban đầu.
 
-If an application does not care about tracking significance, it is easy to
-remove the exponent and trailing zeroes, losing significance, but keeping the
-value unchanged:
+Nếu ứng dụng không cần theo dõi độ chính xác, bạn có thể dễ dàng loại bỏ số mũ và các số 0 ở cuối, làm mất độ chính xác nhưng vẫn giữ nguyên giá trị:
 
     >>> def remove_exponent(d):
     ...     return d.quantize(Decimal(1)) if d == d.to_integral() else d.normalize()
@@ -2238,33 +1790,22 @@ value unchanged:
     >>> remove_exponent(Decimal('5E+3'))
     Decimal('5000')
 
-Q: Is there a way to convert a regular float to a :class:`Decimal`?
+H: Có cách nào để chuyển một float thông thường thành :class:`Decimal` không?
 
-A: Yes, any binary floating-point number can be exactly expressed as a
-Decimal though an exact conversion may take more precision than intuition would
-suggest:
+Đ: Có, mọi số dấu phẩy động nhị phân đều có thể được biểu diễn chính xác dưới dạng Decimal, mặc dù việc chuyển đổi chính xác có thể đòi hỏi nhiều độ chính xác hơn mức trực giác mách bảo:
 
 .. doctest::
 
     >>> Decimal(math.pi)
     Decimal('3.141592653589793115997963468544185161590576171875')
 
-Q: Within a complex calculation, how can I make sure that I haven't gotten a
-spurious result because of insufficient precision or rounding anomalies.
+H: Trong một phép tính phức tạp, làm thế nào để tôi chắc chắn rằng mình không nhận được kết quả sai lệch do độ chính xác không đủ hoặc các bất thường về làm tròn?
 
-A: The decimal module makes it easy to test results.  A best practice is to
-re-run calculations using greater precision and with various rounding modes.
-Widely differing results indicate insufficient precision, rounding mode issues,
-ill-conditioned inputs, or a numerically unstable algorithm.
+Đ: Module decimal giúp dễ dàng kiểm tra kết quả. Một thực hành tốt là chạy lại các phép tính với độ chính xác cao hơn và nhiều chế độ làm tròn khác nhau. Các kết quả khác biệt đáng kể cho thấy độ chính xác không đủ, vấn đề về chế độ làm tròn, đầu vào không được điều kiện hóa tốt hoặc thuật toán không ổn định về mặt số học.
 
-Q: I noticed that context precision is applied to the results of operations but
-not to the inputs.  Is there anything to watch out for when mixing values of
-different precisions?
+H: Tôi nhận thấy rằng độ chính xác của context được áp dụng cho kết quả của các phép toán nhưng không áp dụng cho đầu vào. Có điều gì cần lưu ý khi kết hợp các giá trị có độ chính xác khác nhau không?
 
-A: Yes.  The principle is that all values are considered to be exact and so is
-the arithmetic on those values.  Only the results are rounded.  The advantage
-for inputs is that "what you type is what you get".  A disadvantage is that the
-results can look odd if you forget that the inputs haven't been rounded:
+Đ: Có. Nguyên tắc là mọi giá trị đều được xem là chính xác, và phép tính trên các giá trị đó cũng vậy. Chỉ các kết quả mới được làm tròn. Ưu điểm đối với đầu vào là "bạn nhập gì thì nhận được đúng thứ đó". Một nhược điểm là kết quả có thể trông kỳ lạ nếu bạn quên rằng đầu vào chưa được làm tròn:
 
 .. doctest:: newcontext
 
@@ -2274,39 +1815,27 @@ results can look odd if you forget that the inputs haven't been rounded:
    >>> Decimal('3.104') + Decimal('0.000') + Decimal('2.104')
    Decimal('5.20')
 
-The solution is either to increase precision or to force rounding of inputs
-using the unary plus operation:
+Giải pháp là tăng độ chính xác hoặc buộc làm tròn đầu vào bằng cách sử dụng phép toán cộng một ngôi:
 
 .. doctest:: newcontext
 
    >>> getcontext().prec = 3
-   >>> +Decimal('1.23456789')      # unary plus triggers rounding
+   >>> +Decimal('1.23456789')      # toán tử cộng một ngôi kích hoạt việc làm tròn
    Decimal('1.23')
 
-Alternatively, inputs can be rounded upon creation using the
-:meth:`Context.create_decimal` method:
+Ngoài ra, có thể làm tròn đầu vào khi tạo bằng cách sử dụng
+:meth:`Context.create_decimal` phương thức:
 
    >>> Context(prec=5, rounding=ROUND_DOWN).create_decimal('1.2345678')
    Decimal('1.2345')
 
-Q: Is the CPython implementation fast for large numbers?
+Hỏi: Việc triển khai CPython có nhanh đối với các số lớn không?
 
-A: Yes.  In the CPython and PyPy3 implementations, the C/CFFI versions of
-the decimal module integrate the high speed `libmpdec
-<https://www.bytereef.org/mpdecimal/doc/libmpdec/index.html>`_ library for
-arbitrary precision correctly rounded decimal floating-point arithmetic [#]_.
-``libmpdec`` uses `Karatsuba multiplication
-<https://en.wikipedia.org/wiki/Karatsuba_algorithm>`_
-for medium-sized numbers and the `Number Theoretic Transform
-<https://en.wikipedia.org/wiki/Discrete_Fourier_transform_(general)#Number-theoretic_transform>`_
-for very large numbers.
+Đáp: Có. Trong các triển khai CPython và PyPy3, các phiên bản C/CFFI của module decimal tích hợp thư viện `libmpdec <https://www.bytereef.org/mpdecimal/doc/libmpdec/index.html>`_ tốc độ cao để thực hiện phép tính số thực dấu phẩy động thập phân có độ chính xác tùy ý và được làm tròn chính xác [#]_. ``libmpdec`` sử dụng `phép nhân Karatsuba <https://en.wikipedia.org/wiki/Karatsuba_algorithm>`_ cho các số có kích thước trung bình và `Biến đổi số học lý thuyết <https://en.wikipedia.org/wiki/Discrete_Fourier_transform_(general)#Number-theoretic_transform>`_ cho các số rất lớn.
 
-The context must be adapted for exact arbitrary precision arithmetic. :attr:`~Context.Emin`
-and :attr:`~Context.Emax` should always be set to the maximum values, :attr:`~Context.clamp`
-should always be 0 (the default).  Setting :attr:`~Context.prec` requires some care.
+Ngữ cảnh phải được điều chỉnh để thực hiện số học chính xác với độ chính xác tùy ý. :attr:`~Context.Emin` và :attr:`~Context.Emax` luôn phải được đặt thành các giá trị tối đa, còn :attr:`~Context.clamp` luôn phải là 0 (giá trị mặc định). Việc đặt :attr:`~Context.prec` cần được thực hiện cẩn thận.
 
-The easiest approach for trying out bignum arithmetic is to use the maximum
-value for :attr:`~Context.prec` as well [#]_::
+Cách dễ nhất để thử số học bignum là sử dụng giá trị tối đa cho :attr:`~Context.prec` cũng như [#]_::
 
     >>> setcontext(Context(prec=MAX_PREC, Emax=MAX_EMAX, Emin=MIN_EMIN))
     >>> x = Decimal(2) ** 256
@@ -2314,30 +1843,27 @@ value for :attr:`~Context.prec` as well [#]_::
     Decimal('904625697166532776746648320380374280103671755200316906558262375061821325312')
 
 
-For inexact results, :const:`MAX_PREC` is far too large on 64-bit platforms and
-the available memory will be insufficient::
+Đối với các kết quả không chính xác, :const:`MAX_PREC` lớn hơn rất nhiều so với mức cần thiết trên các nền tảng 64-bit và bộ nhớ khả dụng sẽ không đủ::
 
    >>> Decimal(1) / 3
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
    MemoryError
 
-On systems with overallocation (e.g. Linux), a more sophisticated approach is to
-adjust :attr:`~Context.prec` to the amount of available RAM.  Suppose that you have 8GB of
-RAM and expect 10 simultaneous operands using a maximum of 500MB each::
+Trên các hệ thống có cơ chế cấp phát quá mức (ví dụ: Linux), một cách tiếp cận tinh vi hơn là điều chỉnh :attr:`~Context.prec` theo dung lượng RAM khả dụng. Giả sử bạn có 8GB RAM và dự kiến có 10 toán hạng đồng thời, mỗi toán hạng sử dụng tối đa 500MB::
 
    >>> import sys
    >>>
-   >>> # Maximum number of digits for a single operand using 500MB in 8-byte words
-   >>> # with 19 digits per word (4-byte and 9 digits for the 32-bit build):
+   >>> # Số chữ số tối đa cho một toán hạng sử dụng 500MB dưới dạng các từ 8 byte
+   >>> # với 19 chữ số trên mỗi từ (bản build 32-bit sử dụng từ 4 byte và 9 chữ số):
    >>> maxdigits = 19 * ((500 * 1024**2) // 8)
    >>>
-   >>> # Check that this works:
+   >>> # Kiểm tra để đảm bảo điều này hoạt động:
    >>> c = Context(prec=maxdigits, Emax=MAX_EMAX, Emin=MIN_EMIN)
    >>> c.traps[Inexact] = True
    >>> setcontext(c)
    >>>
-   >>> # Fill the available precision with nines:
+   >>> # Lấp đầy độ chính xác khả dụng bằng các chữ số 9:
    >>> x = Decimal(0).logical_invert() * 9
    >>> sys.getsizeof(x)
    524288112
@@ -2346,9 +1872,7 @@ RAM and expect 10 simultaneous operands using a maximum of 500MB each::
      File "<stdin>", line 1, in <module>
      decimal.Inexact: [<class 'decimal.Inexact'>]
 
-In general (and especially on systems without overallocation), it is recommended
-to estimate even tighter bounds and set the :attr:`Inexact` trap if all calculations
-are expected to be exact.
+Nói chung (đặc biệt là trên các hệ thống không có cơ chế cấp phát quá mức), bạn nên ước tính các giới hạn chặt chẽ hơn nữa và đặt bẫy :attr:`Inexact` nếu dự kiến tất cả các phép tính đều chính xác.
 
 
 .. [#]
@@ -2356,4 +1880,9 @@ are expected to be exact.
 
 .. [#]
     .. versionchanged:: 3.9
-       This approach now works for all exact results except for non-integer powers.
+       Cách tiếp cận này hiện hoạt động với mọi kết quả chính xác, ngoại trừ các lũy thừa không nguyên.
+
+.. _`The General Decimal Arithmetic Specification`: https://speleotrove.com/decimal/decarith.html
+.. _`libmpdec`: https://www.bytereef.org/mpdecimal/doc/libmpdec/index.html
+.. _`Karatsuba multiplication`: https://en.wikipedia.org/wiki/Karatsuba_algorithm
+.. _`Number Theoretic Transform`: https://en.wikipedia.org/wiki/Discrete_Fourier_transform_(general)#Number-theoretic_transform

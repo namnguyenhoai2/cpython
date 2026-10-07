@@ -1,55 +1,45 @@
 .. _email-examples:
 
-:mod:`email`: Examples
-----------------------
+:mod:`email`: Ví dụ
+-------------------
 
-Here are a few examples of how to use the :mod:`email` package to read, write,
-and send simple email messages, as well as more complex MIME messages.
+Dưới đây là một vài ví dụ về cách sử dụng package :mod:`email` để đọc, ghi và gửi các email đơn giản, cũng như các message MIME phức tạp hơn.
 
-First, let's see how to create and send a simple text message (both the
-text content and the addresses may contain Unicode characters):
+Trước tiên, hãy xem cách tạo và gửi một message văn bản đơn giản (cả nội dung văn bản và địa chỉ đều có thể chứa các ký tự Unicode):
 
 .. literalinclude:: ../includes/email-simple.py
 
 
-Parsing :rfc:`822` headers can easily be done by the using the classes
-from the :mod:`~email.parser` module:
+Bạn có thể dễ dàng phân tích các header :rfc:`822` bằng cách sử dụng các class từ module :mod:`~email.parser`:
 
 .. literalinclude:: ../includes/email-headers.py
 
 
-Here's an example of how to send a MIME message containing a bunch of family
-pictures that may be residing in a directory:
+Dưới đây là một ví dụ về cách gửi một message MIME chứa nhiều ảnh gia đình có thể đang nằm trong một thư mục:
 
 .. literalinclude:: ../includes/email-mime.py
 
 
-Here's an example of how to send the entire contents of a directory as an email
-message: [1]_
+Dưới đây là một ví dụ về cách gửi toàn bộ nội dung của một thư mục dưới dạng email: [1]_
 
 .. literalinclude:: ../includes/email-dir.py
 
 
-Here's an example of how to unpack a MIME message like the one
-above, into a directory of files:
+Dưới đây là một ví dụ về cách giải nén một message MIME như message ở trên thành một thư mục chứa các tệp:
 
 .. literalinclude:: ../includes/email-unpack.py
 
 
-Here's an example of how to create an HTML message with an alternative plain
-text version.  To make things a bit more interesting, we include a related
-image in the html part, and we save a copy of what we are going to send to
-disk, as well as sending it.
+Dưới đây là một ví dụ về cách tạo một thư HTML với phiên bản văn bản thuần thay thế. Để nội dung thú vị hơn một chút, chúng ta đưa một hình ảnh liên quan vào phần HTML và lưu một bản sao của nội dung sắp gửi vào đĩa, đồng thời gửi nó đi.
 
 .. literalinclude:: ../includes/email-alternative.py
 
 
-If we were sent the message from the last example, here is one way we could
-process it:
+Nếu chúng ta nhận được thư từ ví dụ trước, đây là một cách để xử lý thư đó:
 
 .. literalinclude:: ../includes/email-read-alternative.py
 
-Up to the prompt, the output from the above is:
+Cho đến lời nhắc, đầu ra từ ví dụ trên là:
 
 .. code-block:: none
 
@@ -62,6 +52,6 @@ Up to the prompt, the output from the above is:
     Cette recette [1] sera sûrement un très bon repas.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [1] Thanks to Matthew Dixon Cowles for the original inspiration and examples.
+.. [1] Xin cảm ơn Matthew Dixon Cowles vì nguồn cảm hứng và các ví dụ ban đầu.

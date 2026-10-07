@@ -1,79 +1,63 @@
-:mod:`!dbm` --- Interfaces to Unix "databases"
-==============================================
+:mod:`!dbm` --- Giao diện với các "cơ sở dữ liệu" Unix
+======================================================
 
 .. module:: dbm
-   :synopsis: Interfaces to various Unix "database" formats.
+   :synopsis: Giao diện với nhiều định dạng "cơ sở dữ liệu" Unix khác nhau.
 
-**Source code:** :source:`Lib/dbm/__init__.py`
+**Mã nguồn:** :source:`Lib/dbm/__init__.py`
 
 --------------
 
-:mod:`!dbm` is a generic interface to variants of the DBM database:
+:mod:`!dbm` là giao diện chung cho các biến thể của cơ sở dữ liệu DBM:
 
 * :mod:`dbm.sqlite3`
 * :mod:`dbm.gnu`
 * :mod:`dbm.ndbm`
 
-If none of these modules are installed, the
-slow-but-simple implementation in module :mod:`dbm.dumb` will be used.  There
-is a `third party interface <https://www.jcea.es/programacion/pybsddb.htm>`_ to
-the Oracle Berkeley DB.
+Nếu không có module nào trong số này được cài đặt, triển khai đơn giản nhưng chậm trong module :mod:`dbm.dumb` sẽ được sử dụng. Có một `giao diện của bên thứ ba <https://www.jcea.es/programacion/pybsddb.htm>`_ cho Oracle Berkeley DB.
 
 .. exception:: error
 
-   A tuple containing the exceptions that can be raised by each of the supported
-   modules, with a unique exception also named :exc:`dbm.error` as the first
-   item --- the latter is used when :exc:`dbm.error` is raised.
+   Một tuple chứa các ngoại lệ có thể được đưa ra bởi từng module được hỗ trợ, với một ngoại lệ duy nhất cũng có tên là :exc:`dbm.error` ở vị trí đầu tiên --- ngoại lệ sau được sử dụng khi :exc:`dbm.error` được đưa ra.
 
 
 .. function:: whichdb(filename)
 
-   This function attempts to guess which of the several simple database modules
-   available --- :mod:`dbm.sqlite3`, :mod:`dbm.gnu`, :mod:`dbm.ndbm`,
-   or :mod:`dbm.dumb` --- should be used to open a given file.
+   Hàm này cố gắng đoán xem nên sử dụng module cơ sở dữ liệu đơn giản nào trong số các module hiện có --- :mod:`dbm.sqlite3`, :mod:`dbm.gnu`, :mod:`dbm.ndbm` hoặc :mod:`dbm.dumb` --- để mở một tệp cụ thể.
 
-   Return one of the following values:
+   Trả về một trong các giá trị sau:
 
-   * ``None`` if the file can't be opened because it's unreadable or doesn't exist
-   * the empty string (``''``) if the file's format can't be guessed
-   * a string containing the required module name, such as ``'dbm.ndbm'`` or ``'dbm.gnu'``
+   * ``None`` nếu không thể mở tệp vì tệp không thể đọc được hoặc không tồn tại
+   * chuỗi rỗng (``''``) nếu không thể xác định định dạng của tệp
+   * một chuỗi chứa tên module bắt buộc, chẳng hạn như ``'dbm.ndbm'`` hoặc ``'dbm.gnu'``
 
    .. versionchanged:: 3.11
-      *filename* accepts a :term:`path-like object`.
+      *filename* chấp nhận một :term:`path-like object`.
 
 .. Substitutions for the open() flag param docs;
    all submodules use the same text.
 
-.. |flag_r| replace::
-   Open existing database for reading only.
+.. |flag_r| replace::Mở cơ sở dữ liệu hiện có chỉ để đọc.
 
-.. |flag_w| replace::
-   Open existing database for reading and writing.
+.. |flag_w| replace::Mở cơ sở dữ liệu hiện có để đọc và ghi.
 
-.. |flag_c| replace::
-   Open database for reading and writing, creating it if it doesn't exist.
+.. |flag_c| replace::Mở cơ sở dữ liệu để đọc và ghi, đồng thời tạo cơ sở dữ liệu nếu cơ sở dữ liệu đó chưa tồn tại.
 
-.. |flag_n| replace::
-   Always create a new, empty database, open for reading and writing.
+.. |flag_n| replace::Luôn tạo một cơ sở dữ liệu mới, rỗng, để đọc và ghi.
 
-.. |mode_param_doc| replace::
-   The Unix file access mode of the file (default: octal ``0o666``),
-   used only when the database has to be created.
+.. |mode_param_doc| replace::Chế độ truy cập tệp Unix của tệp (mặc định: bát phân ``0o666``), chỉ được sử dụng khi cần tạo cơ sở dữ liệu.
 
 .. function:: open(file, flag='r', mode=0o666)
 
-   Open a database and return the corresponding database object.
+   Mở một cơ sở dữ liệu và trả về đối tượng cơ sở dữ liệu tương ứng.
 
-   :param file:
-      The database file to open.
+   :param file:Tệp cơ sở dữ liệu cần mở.
 
-      If the database file already exists, the :func:`whichdb` function is used to
-      determine its type and the appropriate module is used; if it does not exist,
-      the first submodule listed above that can be imported is used.
+      Nếu tệp cơ sở dữ liệu đã tồn tại, hàm :func:`whichdb` được sử dụng để xác định loại của tệp và module thích hợp sẽ được sử dụng; nếu tệp chưa tồn tại, submodule đầu tiên được liệt kê ở trên có thể được import sẽ được sử dụng.
    :type file: :term:`path-like object`
 
    :param str flag:
-      * ``'r'`` (default): |flag_r|
+      * ``'r'`` (mặc định): |flag_r|
       * ``'w'``: |flag_w|
       * ``'c'``: |flag_c|
       * ``'n'``: |flag_n|
@@ -82,143 +66,120 @@ the Oracle Berkeley DB.
       |mode_param_doc|
 
    .. versionchanged:: 3.11
-      *file* accepts a :term:`path-like object`.
+      *tệp* chấp nhận một :term:`path-like object`.
 
-The object returned by :func:`~dbm.open` supports the basic
-functionality of mutable :term:`mappings <mapping>`;
-keys and their corresponding values can be stored, retrieved, and
-deleted, and iteration, the :keyword:`in` operator and methods :meth:`!keys`,
-:meth:`!get`, :meth:`!setdefault` and :meth:`!clear` are available.
-The :meth:`!keys` method returns a list instead of a view object.
-The :meth:`!setdefault` method requires two arguments.
+Đối tượng được :func:`~dbm.open` trả về hỗ trợ chức năng cơ bản của các :term:`ánh xạ <mapping>` có thể thay đổi; các khóa và giá trị tương ứng có thể được lưu trữ, truy xuất và xóa, đồng thời hỗ trợ phép lặp, toán tử :keyword:`in` và các phương thức :meth:`!keys`,
+:meth:`!get`, :meth:`!setdefault` và :meth:`!clear` đều khả dụng. Phương thức :meth:`!keys` trả về một danh sách thay vì một đối tượng view. Phương thức :meth:`!setdefault` yêu cầu hai đối số.
 
-Key and values are always stored as :class:`bytes`. This means that when
-strings are used they are implicitly converted to the default encoding before
-being stored.
+Khóa và giá trị luôn được lưu trữ dưới dạng :class:`bytes`. Điều này có nghĩa là khi sử dụng chuỗi, chúng sẽ được chuyển đổi ngầm sang encoding mặc định trước khi được lưu trữ.
 
-These objects also support being used in a :keyword:`with` statement, which
-will automatically close them when done.
+Các đối tượng này cũng hỗ trợ được sử dụng trong câu lệnh :keyword:`with`, câu lệnh này sẽ tự động đóng chúng khi hoàn tất.
 
 .. versionchanged:: 3.2
    :meth:`!get` and :meth:`!setdefault` methods are now available for all
    :mod:`!dbm` backends.
 
 .. versionchanged:: 3.4
-   Added native support for the context management protocol to the objects
-   returned by :func:`~dbm.open`.
+   Đã bổ sung hỗ trợ gốc cho context management protocol đối với các đối tượng được :func:`~dbm.open` trả về.
 
 .. versionchanged:: 3.8
-   Deleting a key from a read-only database raises a database module specific exception
-   instead of :exc:`KeyError`.
+   Việc xóa một khóa khỏi cơ sở dữ liệu chỉ đọc sẽ phát sinh ngoại lệ dành riêng cho module cơ sở dữ liệu thay vì :exc:`KeyError`.
 
 .. versionchanged:: 3.13
    :meth:`!clear` methods are now available for all :mod:`!dbm` backends.
 
 
-The following example records some hostnames and a corresponding title,  and
-then prints out the contents of the database::
+Ví dụ sau ghi lại một số hostname cùng với tiêu đề tương ứng, rồi in nội dung của cơ sở dữ liệu::
 
    import dbm
 
-   # Open database, creating it if necessary.
+   # Mở cơ sở dữ liệu, tạo cơ sở dữ liệu nếu cần.
    with dbm.open('cache', 'c') as db:
 
-       # Record some values
+       # Ghi lại một số giá trị
        db[b'hello'] = b'there'
        db['www.python.org'] = 'Python Website'
        db['www.cnn.com'] = 'Cable News Network'
 
-       # Note that the keys are considered bytes now.
+       # Lưu ý rằng các khóa hiện được coi là byte.
        assert db[b'www.python.org'] == b'Python Website'
-       # Notice how the value is now in bytes.
+       # Hãy chú ý rằng giá trị hiện ở dạng byte.
        assert db['www.cnn.com'] == b'Cable News Network'
 
-       # Often-used methods of the dict interface work too.
+       # Các phương thức thường dùng của dict interface cũng hoạt động.
        print(db.get('python.org', b'not present'))
 
-       # Storing a non-string key or value will raise an exception (most
-       # likely a TypeError).
+       # Lưu trữ khóa hoặc giá trị không phải chuỗi sẽ gây ra một ngoại lệ (hầu hết
+       # có thể là một TypeError).
        db['www.yahoo.com'] = 4
 
-   # db is automatically closed when leaving the with statement.
+   # db được tự động đóng khi thoát khỏi câu lệnh with.
 
 
 .. seealso::
 
-   Module :mod:`shelve`
-      Persistence module which stores non-string data.
+   Mô-đun :mod:`shelve`
+      Mô-đun persistence lưu trữ dữ liệu không phải chuỗi.
 
 
-The individual submodules are described in the following sections.
+Các submodule riêng lẻ được mô tả trong các phần sau.
 
-:mod:`!dbm.sqlite3` --- SQLite backend for dbm
+:mod:`!dbm.sqlite3` --- Backend SQLite cho dbm
 ----------------------------------------------
 
 .. module:: dbm.sqlite3
-   :synopsis: SQLite backend for dbm
+   :synopsis: Backend SQLite cho dbm
 
 .. versionadded:: 3.13
 
-**Source code:** :source:`Lib/dbm/sqlite3.py`
+**Mã nguồn:** :source:`Lib/dbm/sqlite3.py`
 
 --------------
 
-This module uses the standard library :mod:`sqlite3` module to provide an
-SQLite backend for the :mod:`!dbm` module.
-The files created by :mod:`!dbm.sqlite3` can thus be opened by :mod:`sqlite3`,
-or any other SQLite browser, including the SQLite CLI.
+Mô-đun này sử dụng mô-đun :mod:`sqlite3` trong thư viện chuẩn để cung cấp backend SQLite cho mô-đun :mod:`!dbm`. Do đó, các tệp được tạo bởi :mod:`!dbm.sqlite3` có thể được mở bằng :mod:`sqlite3` hoặc bất kỳ trình duyệt SQLite nào khác, bao gồm cả SQLite CLI.
 
 .. include:: ../includes/wasm-notavail.rst
 
 .. function:: open(filename, /, flag="r", mode=0o666)
 
-   Open an SQLite database.
+   Mở cơ sở dữ liệu SQLite.
 
-   :param filename:
-      The path to the database to be opened.
+   :param filename:Đường dẫn đến cơ sở dữ liệu cần mở.
    :type filename: :term:`path-like object`
 
    :param str flag:
 
-      * ``'r'`` (default): |flag_r|
+      * ``'r'`` (mặc định): |flag_r|
       * ``'w'``: |flag_w|
       * ``'c'``: |flag_c|
       * ``'n'``: |flag_n|
 
-   :param mode:
-      The Unix file access mode of the file (default: octal ``0o666``),
-      used only when the database has to be created.
+   :param mode:Chế độ truy cập tệp Unix của tệp (mặc định: bát phân ``0o666``), chỉ được sử dụng khi cơ sở dữ liệu cần được tạo.
 
-   The returned database object behaves similar to a mutable :term:`mapping`,
-   but the :meth:`!keys` method returns a list, and
-   the :meth:`!setdefault` method requires two arguments.
-   It also supports a "closing" context manager via the :keyword:`with` keyword.
+   Đối tượng cơ sở dữ liệu được trả về hoạt động tương tự như một :term:`mapping` có thể thay đổi, nhưng phương thức :meth:`!keys` trả về một danh sách và phương thức :meth:`!setdefault` yêu cầu hai đối số. Đối tượng này cũng hỗ trợ context manager "closing" thông qua từ khóa :keyword:`with`.
 
-   The following method is also provided:
+   Phương thức sau đây cũng được cung cấp:
 
    .. method:: sqlite3.close()
 
-      Close the SQLite database.
+      Đóng cơ sở dữ liệu SQLite.
 
 
-:mod:`!dbm.gnu` --- GNU database manager
-----------------------------------------
+:mod:`!dbm.gnu` --- Trình quản lý cơ sở dữ liệu GNU
+---------------------------------------------------
 
 .. module:: dbm.gnu
-   :synopsis: GNU database manager
+   :synopsis: Trình quản lý cơ sở dữ liệu GNU
 
-**Source code:** :source:`Lib/dbm/gnu.py`
+**Mã nguồn:** :source:`Lib/dbm/gnu.py`
 
 --------------
 
-The :mod:`!dbm.gnu` module provides an interface to the :abbr:`GDBM (GNU dbm)`
-library, similar to the :mod:`dbm.ndbm` module, but with additional
-functionality like crash tolerance.
+Mô-đun :mod:`!dbm.gnu` cung cấp giao diện cho thư viện :abbr:`GDBM (GNU dbm)`, tương tự mô-đun :mod:`dbm.ndbm`, nhưng có thêm các chức năng như khả năng chịu lỗi khi gặp sự cố.
 
 .. note::
 
-   The file formats created by :mod:`!dbm.gnu` and :mod:`dbm.ndbm` are incompatible
-   and can not be used interchangeably.
+   Các định dạng tệp được tạo bởi :mod:`!dbm.gnu` và :mod:`dbm.ndbm` không tương thích và không thể sử dụng thay thế cho nhau.
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
@@ -226,81 +187,65 @@ functionality like crash tolerance.
 
 .. exception:: error
 
-   Raised on :mod:`!dbm.gnu`-specific errors, such as I/O errors. :exc:`KeyError` is
-   raised for general mapping errors like specifying an incorrect key.
+   Được nêu ra khi xảy ra các lỗi cụ thể của :mod:`!dbm.gnu`, chẳng hạn như lỗi I/O. :exc:`KeyError` được nêu ra cho các lỗi ánh xạ chung, chẳng hạn như chỉ định một khóa không chính xác.
 
 
 .. data:: open_flags
 
-   A string of characters the *flag* parameter of :meth:`~dbm.gnu.open` supports.
+   Một chuỗi ký tự được tham số *flag* của :meth:`~dbm.gnu.open` hỗ trợ.
 
 
 .. function:: open(filename, flag="r", mode=0o666, /)
 
-   Open a GDBM database and return a :class:`!gdbm` object.
+   Mở cơ sở dữ liệu GDBM và trả về một đối tượng :class:`!gdbm`.
 
-   :param filename:
-      The database file to open.
+   :param filename:Tệp cơ sở dữ liệu cần mở.
    :type filename: :term:`path-like object`
 
    :param str flag:
-      * ``'r'`` (default): |flag_r|
+      * ``'r'`` (mặc định): |flag_r|
       * ``'w'``: |flag_w|
       * ``'c'``: |flag_c|
       * ``'n'``: |flag_n|
 
-      The following additional characters may be appended
-      to control how the database is opened:
+      Có thể nối thêm các ký tự bổ sung sau đây để kiểm soát cách mở cơ sở dữ liệu:
 
-      * ``'f'``: Open the database in fast mode.
-        Writes to the database will not be synchronized.
-      * ``'s'``: Synchronized mode.
-        Changes to the database will be written immediately to the file.
-      * ``'u'``: Do not lock database.
+      * ``'f'``: Mở cơ sở dữ liệu ở chế độ nhanh. Các thao tác ghi vào cơ sở dữ liệu sẽ không được đồng bộ hóa.
+      * ``'s'``: Chế độ đồng bộ. Các thay đổi đối với cơ sở dữ liệu sẽ được ghi ngay vào tệp.
+      * ``'u'``: Không khóa cơ sở dữ liệu.
 
-      Not all flags are valid for all versions of GDBM.
-      See the :data:`open_flags` member for a list of supported flag characters.
+      Không phải mọi cờ đều hợp lệ đối với tất cả các phiên bản của GDBM. Xem thành viên :data:`open_flags` để biết danh sách các ký tự cờ được hỗ trợ.
 
    :param int mode:
       |mode_param_doc|
 
-   :raises error:
-      If an invalid *flag* argument is passed.
+   :raises error:Khi truyền một đối số *flag* không hợp lệ.
 
    .. versionchanged:: 3.11
-      *filename* accepts a :term:`path-like object`.
+      *filename* chấp nhận một :term:`path-like object`.
 
-   :class:`!gdbm` objects behave similar to mutable :term:`mappings <mapping>`,
-   but methods :meth:`!items`, :meth:`!values`, :meth:`!pop`, :meth:`!popitem`,
-   and :meth:`!update` are not supported,
-   the :meth:`!keys` method returns a list, and
-   the :meth:`!setdefault` method requires two arguments.
-   It also supports a "closing" context manager via the :keyword:`with` keyword.
+   Các đối tượng :class:`!gdbm` hoạt động tương tự như các :term:`ánh xạ có thể thay đổi <mapping>`, nhưng các phương thức :meth:`!items`, :meth:`!values`, :meth:`!pop`, :meth:`!popitem` và :meth:`!update` không được hỗ trợ, phương thức :meth:`!keys` trả về một danh sách, và phương thức :meth:`!setdefault` yêu cầu hai đối số. Nó cũng hỗ trợ một context manager "closing" thông qua từ khóa :keyword:`with`.
 
    .. versionchanged:: 3.2
-      Added the :meth:`!get` and :meth:`!setdefault` methods.
+      Đã bổ sung các phương thức :meth:`!get` và :meth:`!setdefault`.
 
    .. versionchanged:: 3.13
-      Added the :meth:`!clear` method.
+      Đã thêm phương thức :meth:`!clear`.
 
-   The following methods are also provided:
+   Các phương thức sau cũng được cung cấp:
 
    .. method:: gdbm.close()
 
-      Close the GDBM database.
+      Đóng cơ sở dữ liệu GDBM.
 
    .. method:: gdbm.firstkey()
 
-      It's possible to loop over every key in the database using this method  and the
-      :meth:`nextkey` method.  The traversal is ordered by GDBM's internal
-      hash values, and won't be sorted by the key values.  This method returns
-      the starting key.
+      Bạn có thể dùng phương thức này và phương thức
+      :meth:`nextkey` để lặp qua mọi khóa trong cơ sở dữ liệu. Việc duyệt được sắp xếp theo các giá trị băm nội bộ của GDBM và sẽ không được sắp xếp theo giá trị khóa. Phương thức này trả về khóa bắt đầu.
 
    .. method:: gdbm.nextkey(key)
 
-      Returns the key that follows *key* in the traversal.  The following code prints
-      every key in the database ``db``, without having to create a list in memory that
-      contains them all::
+      Trả về khóa đứng sau *key* trong quá trình duyệt. Đoạn mã sau in mọi khóa trong cơ sở dữ liệu ``db``, mà không cần tạo một danh sách trong bộ nhớ chứa tất cả các khóa đó::
 
          k = db.firstkey()
          while k is not None:
@@ -309,44 +254,34 @@ functionality like crash tolerance.
 
    .. method:: gdbm.reorganize()
 
-      If you have carried out a lot of deletions and would like to shrink the space
-      used by the GDBM file, this routine will reorganize the database.  :class:`!gdbm`
-      objects will not shorten the length of a database file except by using this
-      reorganization; otherwise, deleted file space will be kept and reused as new
-      (key, value) pairs are added.
+      Nếu bạn đã thực hiện nhiều thao tác xóa và muốn thu nhỏ dung lượng mà tệp GDBM sử dụng, thủ tục này sẽ tổ chức lại cơ sở dữ liệu. Các đối tượng :class:`!gdbm` sẽ không làm giảm độ dài của tệp cơ sở dữ liệu, ngoại trừ bằng cách sử dụng thao tác tổ chức lại này; nếu không, dung lượng tệp đã xóa sẽ được giữ lại và tái sử dụng khi các cặp (khóa, giá trị) mới được thêm vào.
 
    .. method:: gdbm.sync()
 
-      When the database has been opened in fast mode, this method forces any
-      unwritten data to be written to the disk.
+      Khi cơ sở dữ liệu được mở ở chế độ nhanh, phương thức này buộc mọi dữ liệu chưa được ghi phải được ghi vào đĩa.
 
 
-:mod:`!dbm.ndbm` --- New Database Manager
------------------------------------------
+:mod:`!dbm.ndbm` --- Trình quản lý cơ sở dữ liệu mới
+----------------------------------------------------
 
 .. module:: dbm.ndbm
-   :synopsis: The New Database Manager
+   :synopsis: Trình quản lý cơ sở dữ liệu mới
 
-**Source code:** :source:`Lib/dbm/ndbm.py`
+**Mã nguồn:** :source:`Lib/dbm/ndbm.py`
 
 --------------
 
-The :mod:`!dbm.ndbm` module provides an interface to the
-:abbr:`NDBM (New Database Manager)` library.
-This module can be used with the "classic" NDBM interface or the
-:abbr:`GDBM (GNU dbm)` compatibility interface.
+Mô-đun :mod:`!dbm.ndbm` cung cấp giao diện cho
+:abbr:`NDBM (thư viện Trình quản lý cơ sở dữ liệu mới)`. Mô-đun này có thể được sử dụng với giao diện NDBM "cổ điển" hoặc
+giao diện tương thích với :abbr:`GDBM (GNU dbm)`.
 
 .. note::
 
-   The file formats created by :mod:`dbm.gnu` and :mod:`!dbm.ndbm` are incompatible
-   and can not be used interchangeably.
+   Các định dạng tệp được tạo bởi :mod:`dbm.gnu` và :mod:`!dbm.ndbm` không tương thích và không thể sử dụng thay thế cho nhau.
 
 .. warning::
 
-   The NDBM library shipped as part of macOS has an undocumented limitation on the
-   size of values, which can result in corrupted database files
-   when storing values larger than this limit. Reading such corrupted files can
-   result in a hard crash (segmentation fault).
+   Thư viện NDBM đi kèm với macOS có một giới hạn không được ghi nhận trong tài liệu về kích thước của các giá trị, điều này có thể khiến các tệp cơ sở dữ liệu bị hỏng khi lưu trữ các giá trị lớn hơn giới hạn này. Việc đọc các tệp bị hỏng như vậy có thể dẫn đến lỗi nghiêm trọng (segmentation fault).
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
@@ -354,26 +289,23 @@ This module can be used with the "classic" NDBM interface or the
 
 .. exception:: error
 
-   Raised on :mod:`!dbm.ndbm`-specific errors, such as I/O errors. :exc:`KeyError` is raised
-   for general mapping errors like specifying an incorrect key.
+   Được phát sinh khi xảy ra các lỗi đặc thù của :mod:`!dbm.ndbm`, chẳng hạn như lỗi I/O. :exc:`KeyError` được phát sinh đối với các lỗi ánh xạ chung, chẳng hạn như chỉ định một khóa không chính xác.
 
 
 .. data:: library
 
-   Name of the NDBM implementation library used.
+   Tên của thư viện triển khai NDBM được sử dụng.
 
 
 .. function:: open(filename, flag="r", mode=0o666, /)
 
-   Open an NDBM database and return an :class:`!ndbm` object.
+   Mở một cơ sở dữ liệu NDBM và trả về một đối tượng :class:`!ndbm`.
 
-   :param filename:
-      The basename of the database file
-      (without the :file:`.dir` or :file:`.pag` extensions).
+   :param filename:Tên cơ sở của tệp cơ sở dữ liệu (không có phần mở rộng :file:`.dir` hoặc :file:`.pag`).
    :type filename: :term:`path-like object`
 
    :param str flag:
-      * ``'r'`` (default): |flag_r|
+      * ``'r'`` (mặc định): |flag_r|
       * ``'w'``: |flag_w|
       * ``'c'``: |flag_c|
       * ``'n'``: |flag_n|
@@ -382,67 +314,54 @@ This module can be used with the "classic" NDBM interface or the
       |mode_param_doc|
 
    .. versionchanged:: 3.11
-      Accepts :term:`path-like object` for filename.
+      Chấp nhận :term:`path-like object` làm tên tệp.
 
-   :class:`!ndbm` objects behave similar to mutable :term:`mappings <mapping>`,
-   but methods :meth:`!items`, :meth:`!values`, :meth:`!pop`, :meth:`!popitem`,
-   and :meth:`!update` are not supported,
-   the :meth:`!keys` method returns a list, and
-   the :meth:`!setdefault` method requires two arguments.
-   It also supports a "closing" context manager via the :keyword:`with` keyword.
+   Các đối tượng :class:`!ndbm` hoạt động tương tự như các :term:`ánh xạ <mapping>` có thể thay đổi, nhưng các phương thức :meth:`!items`, :meth:`!values`, :meth:`!pop`, :meth:`!popitem` và :meth:`!update` không được hỗ trợ, phương thức :meth:`!keys` trả về một danh sách, còn phương thức :meth:`!setdefault` yêu cầu hai đối số. Đối tượng này cũng hỗ trợ context manager "closing" thông qua từ khóa :keyword:`with`.
 
    .. versionchanged:: 3.2
-      Added the :meth:`!get` and :meth:`!setdefault` methods.
+      Đã thêm các phương thức :meth:`!get` và :meth:`!setdefault`.
 
    .. versionchanged:: 3.13
-      Added the :meth:`!clear` method.
+      Đã thêm phương thức :meth:`!clear`.
 
-   The following method is also provided:
+   Phương thức sau đây cũng được cung cấp:
 
    .. method:: ndbm.close()
 
-      Close the NDBM database.
+      Đóng cơ sở dữ liệu NDBM.
 
 
-:mod:`!dbm.dumb` --- Portable DBM implementation
-------------------------------------------------
+:mod:`!dbm.dumb` --- Triển khai DBM khả chuyển
+----------------------------------------------
 
 .. module:: dbm.dumb
-   :synopsis: Portable implementation of the simple DBM interface.
+   :synopsis: Bản triển khai portable của giao diện DBM đơn giản.
 
-**Source code:** :source:`Lib/dbm/dumb.py`
+**Mã nguồn:** :source:`Lib/dbm/dumb.py`
 
 .. index:: single: databases
 
 .. note::
 
-   The :mod:`!dbm.dumb` module is intended as a last resort fallback for the
-   :mod:`!dbm` module when a more robust module is not available. The :mod:`!dbm.dumb`
-   module is not written for speed and is not nearly as heavily used as the other
-   database modules.
+   Mô-đun :mod:`!dbm.dumb` được dùng như một phương án dự phòng cuối cùng cho
+   mô-đun :mod:`!dbm` khi không có mô-đun mạnh mẽ hơn. Mô-đun :mod:`!dbm.dumb` không được viết để đạt tốc độ cao và cũng không được sử dụng rộng rãi như các mô-đun cơ sở dữ liệu khác.
 
 --------------
 
-The :mod:`!dbm.dumb` module provides a persistent :class:`dict`-like
-interface which is written entirely in Python.
-Unlike other :mod:`!dbm` backends, such as :mod:`dbm.gnu`, no
-external library is required.
+Mô-đun :mod:`!dbm.dumb` cung cấp một giao diện kiểu :class:`dict` có khả năng lưu trữ bền vững, được viết hoàn toàn bằng Python. Không giống các backend :mod:`!dbm` khác, chẳng hạn như :mod:`dbm.gnu`, mô-đun này không yêu cầu thư viện bên ngoài.
 
-The :mod:`!dbm.dumb` module defines the following:
+Mô-đun :mod:`!dbm.dumb` định nghĩa các thành phần sau:
 
 .. exception:: error
 
-   Raised on :mod:`!dbm.dumb`-specific errors, such as I/O errors.  :exc:`KeyError` is
-   raised for general mapping errors like specifying an incorrect key.
+   Được phát sinh khi xảy ra các lỗi đặc thù của :mod:`!dbm.dumb`, chẳng hạn như lỗi I/O. :exc:`KeyError` được phát sinh đối với các lỗi ánh xạ nói chung, chẳng hạn như chỉ định một khóa không đúng.
 
 
 .. function:: open(filename, flag="c", mode=0o666)
 
-   Open a :mod:`!dbm.dumb` database.
+   Mở một cơ sở dữ liệu :mod:`!dbm.dumb`.
 
-   :param filename:
-      The basename of the database file (without extensions).
-      A new database creates the following files:
+   :param filename:Tên cơ sở của tệp cơ sở dữ liệu (không có phần mở rộng). Một cơ sở dữ liệu mới sẽ tạo các tệp sau:
 
       - :file:`{filename}.dat`
       - :file:`{filename}.dir`
@@ -451,39 +370,34 @@ The :mod:`!dbm.dumb` module defines the following:
    :param str flag:
       * ``'r'``: |flag_r|
       * ``'w'``: |flag_w|
-      * ``'c'`` (default): |flag_c|
+      * ``'c'`` (mặc định): |flag_c|
       * ``'n'``: |flag_n|
 
    :param int mode:
       |mode_param_doc|
 
    .. warning::
-      It is possible to crash the Python interpreter when loading a database
-      with a sufficiently large/complex entry due to stack depth limitations in
-      Python's AST compiler.
+      Có thể làm trình thông dịch Python gặp sự cố khi tải một cơ sở dữ liệu có mục nhập đủ lớn/phức tạp do các giới hạn về độ sâu ngăn xếp trong trình biên dịch AST của Python.
 
    .. versionchanged:: 3.5
       :func:`~dbm.dumb.open` always creates a new database when *flag* is ``'n'``.
 
    .. versionchanged:: 3.8
-      A database opened read-only if *flag* is ``'r'``.
-      A database is not created if it does not exist if *flag* is ``'r'`` or ``'w'``.
+      Cơ sở dữ liệu được mở ở chế độ chỉ đọc nếu *flag* là ``'r'``. Cơ sở dữ liệu sẽ không được tạo nếu chưa tồn tại nếu *flag* là ``'r'`` hoặc ``'w'``.
 
    .. versionchanged:: 3.11
-      *filename* accepts a :term:`path-like object`.
+      *filename* chấp nhận một :term:`path-like object`.
 
-   The returned database object behaves similar to a mutable :term:`mapping`,
-   but the :meth:`!keys` and :meth:`!items` methods return lists, and
-   the :meth:`!setdefault` method requires two arguments.
-   It also supports a "closing" context manager via the :keyword:`with` keyword.
+   Đối tượng cơ sở dữ liệu được trả về hoạt động tương tự như một :term:`mapping` có thể thay đổi, nhưng các phương thức :meth:`!keys` và :meth:`!items` trả về danh sách, còn phương thức :meth:`!setdefault` yêu cầu hai đối số. Đối tượng này cũng hỗ trợ trình quản lý ngữ cảnh "closing" thông qua từ khóa :keyword:`with`.
 
-   The following methods are also provided:
+   Các phương thức sau cũng được cung cấp:
 
    .. method:: dumbdbm.close()
 
-      Close the database.
+      Đóng cơ sở dữ liệu.
 
    .. method:: dumbdbm.sync()
 
-      Synchronize the on-disk directory and data files.  This method is called
-      by the :meth:`shelve.Shelf.sync` method.
+      Đồng bộ hóa thư mục và các tệp dữ liệu trên đĩa. Phương thức này được gọi bởi phương thức :meth:`shelve.Shelf.sync`.
+
+.. _`third party interface`: https://www.jcea.es/programacion/pybsddb.htm

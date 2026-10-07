@@ -1,153 +1,112 @@
-:mod:`!ensurepip` --- Bootstrapping the ``pip`` installer
-=========================================================
+:mod:`!ensurepip` --- Khởi tạo bộ cài đặt ``pip``
+=================================================
 
 .. module:: ensurepip
-   :synopsis: Bootstrapping the "pip" installer into an existing Python
-              installation or virtual environment.
+   :synopsis: Khởi tạo bộ cài đặt "pip" vào một cài đặt Python hoặc môi trường ảo hiện có.
 
 .. versionadded:: 3.4
 
-**Source code:** :source:`Lib/ensurepip`
+**Mã nguồn:** :source:`Lib/ensurepip`
 
 --------------
 
-The :mod:`!ensurepip` package provides support for bootstrapping the ``pip``
-installer into an existing Python installation or virtual environment. This
-bootstrapping approach reflects the fact that ``pip`` is an independent
-project with its own release cycle, and the latest available stable version
-is bundled with maintenance and feature releases of the CPython reference
-interpreter.
+Gói :mod:`!ensurepip` cung cấp khả năng khởi tạo bộ cài đặt ``pip`` vào một cài đặt Python hoặc môi trường ảo hiện có. Cách khởi tạo này phản ánh thực tế rằng ``pip`` là một dự án độc lập với chu kỳ phát hành riêng, và phiên bản ổn định mới nhất hiện có được đóng gói cùng với các bản phát hành bảo trì và tính năng của trình thông dịch tham chiếu CPython.
 
-In most cases, end users of Python shouldn't need to invoke this module
-directly (as ``pip`` should be bootstrapped by default), but it may be
-needed if installing ``pip`` was skipped when installing Python (or
-when creating a virtual environment) or after explicitly uninstalling
-``pip``.
+Trong hầu hết trường hợp, người dùng cuối Python không cần gọi trực tiếp mô-đun này (vì ``pip`` thường được khởi tạo theo mặc định), nhưng có thể cần đến nó nếu việc cài đặt ``pip`` bị bỏ qua khi cài đặt Python (hoặc khi tạo môi trường ảo), hoặc sau khi ``pip`` được gỡ cài đặt một cách rõ ràng.
 
 .. note::
 
-   This module *does not* access the internet. All of the components
-   needed to bootstrap ``pip`` are included as internal parts of the
-   package.
+   Mô-đun này *không* truy cập Internet. Tất cả các thành phần cần thiết để khởi tạo ``pip`` đều được tích hợp dưới dạng các phần nội bộ của gói.
 
 .. include:: ../includes/optional-module.rst
 
 .. seealso::
 
    :ref:`installing-index`
-      The end user guide for installing Python packages
+      Hướng dẫn dành cho người dùng cuối về cài đặt các gói Python
 
-   :pep:`453`: Explicit bootstrapping of pip in Python installations
-      The original rationale and specification for this module.
+   :pep:`453`: Khởi tạo pip một cách tường minh trong các bản cài đặt Python
+      Cơ sở lý luận và đặc tả ban đầu cho module này.
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
 .. _ensurepip-cli:
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
 .. program:: ensurepip
 
-The command line interface is invoked using the interpreter's ``-m`` switch.
+Giao diện dòng lệnh được gọi bằng switch ``-m`` của trình thông dịch.
 
-The simplest possible invocation is::
+Cách gọi đơn giản nhất là::
 
     python -m ensurepip
 
-This invocation will install ``pip`` if it is not already installed,
-but otherwise does nothing. To ensure the installed version of ``pip``
-is at least as recent as the one available in ``ensurepip``, pass the
-``--upgrade`` option::
+Cách gọi này sẽ cài đặt ``pip`` nếu nó chưa được cài đặt, còn nếu đã được cài đặt thì không thực hiện thao tác nào. Để đảm bảo phiên bản ``pip`` đã cài đặt ít nhất cũng mới như phiên bản có trong ``ensurepip``, hãy truyền tùy chọn ``--upgrade``::
 
     python -m ensurepip --upgrade
 
-By default, ``pip`` is installed into the current virtual environment
-(if one is active) or into the system site packages (if there is no
-active virtual environment). The installation location can be controlled
-through two additional command line options:
+Theo mặc định, ``pip`` được cài đặt vào virtual environment hiện tại (nếu đang có một virtual environment hoạt động) hoặc vào các site packages của hệ thống (nếu không có virtual environment hoạt động). Có thể kiểm soát vị trí cài đặt thông qua hai tùy chọn dòng lệnh bổ sung:
 
 .. option:: --root <dir>
 
-   Installs ``pip`` relative to the given root directory rather than the root
-   of the currently active virtual environment (if any) or the default root
-   for the current Python installation.
+   Cài đặt ``pip`` tương đối với thư mục gốc đã cho thay vì thư mục gốc của môi trường ảo hiện đang hoạt động (nếu có) hoặc thư mục gốc mặc định của bản cài đặt Python hiện tại.
 
 .. option:: --user
 
-   Installs ``pip`` into the user site packages directory rather than globally
-   for the current Python installation (this option is not permitted inside an
-   active virtual environment).
+   Cài đặt ``pip`` vào thư mục gói của người dùng thay vì cài đặt trên toàn hệ thống cho bản cài đặt Python hiện tại (tùy chọn này không được phép bên trong môi trường ảo đang hoạt động).
 
-By default, the scripts ``pipX`` and ``pipX.Y`` will be installed (where
-X.Y stands for the version of Python used to invoke ``ensurepip``). The
-scripts installed can be controlled through two additional command line
-options:
+Theo mặc định, các script ``pipX`` và ``pipX.Y`` sẽ được cài đặt (trong đó X.Y đại diện cho phiên bản Python được dùng để gọi ``ensurepip``). Có thể kiểm soát các script được cài đặt bằng hai tùy chọn dòng lệnh bổ sung:
 
 .. option:: --altinstall
 
-   If an alternate installation is requested, the ``pipX`` script will *not* be
-   installed.
+   Nếu yêu cầu cài đặt thay thế, script ``pipX`` sẽ *không* được cài đặt.
 
 .. option:: --default-pip
 
-   If a "default pip" installation is requested, the ``pip`` script will be
-   installed in addition to the two regular scripts.
+   Nếu yêu cầu cài đặt "default pip", script ``pip`` sẽ được cài đặt cùng với hai script thông thường.
 
-Providing both of the script selection options will trigger an exception.
+Việc cung cấp cả hai tùy chọn chọn script sẽ kích hoạt một ngoại lệ.
 
-Module API
+API mô-đun
 ----------
 
-:mod:`!ensurepip` exposes two functions for programmatic use:
+:mod:`!ensurepip` cung cấp hai hàm để sử dụng theo cách lập trình:
 
 .. function:: version()
 
-   Returns a string specifying the available version of pip that will be
-   installed when bootstrapping an environment.
+   Trả về một chuỗi chỉ định phiên bản pip có sẵn sẽ được cài đặt khi khởi tạo một môi trường.
 
 .. function:: bootstrap(root=None, upgrade=False, user=False, \
-                        altinstall=False, default_pip=False, \
-                        verbosity=0)
+                        altinstall=False, default_pip=False, \ verbosity=0)
 
-   Bootstraps ``pip`` into the current or designated environment.
+   Khởi tạo ``pip`` vào môi trường hiện tại hoặc môi trường được chỉ định.
 
-   *root* specifies an alternative root directory to install relative to.
-   If *root* is ``None``, then installation uses the default install location
-   for the current environment.
+   *root* chỉ định một thư mục gốc thay thế để cài đặt tương đối với thư mục đó. Nếu *root* là ``None``, quá trình cài đặt sẽ sử dụng vị trí cài đặt mặc định cho môi trường hiện tại.
 
-   *upgrade* indicates whether or not to upgrade an existing installation
-   of an earlier version of ``pip`` to the available version.
+   *upgrade* cho biết có nâng cấp bản cài đặt hiện có của phiên bản ``pip`` trước đó lên phiên bản có sẵn hay không.
 
-   *user* indicates whether to use the user scheme rather than installing
-   globally.
+   *user* cho biết có sử dụng user scheme thay vì cài đặt trên toàn hệ thống hay không.
 
-   By default, the scripts ``pipX`` and ``pipX.Y`` will be installed (where
-   X.Y stands for the current version of Python).
+   Theo mặc định, các script ``pipX`` và ``pipX.Y`` sẽ được cài đặt (trong đó X.Y đại diện cho phiên bản Python hiện tại).
 
-   If *altinstall* is set, then ``pipX`` will *not* be installed.
+   Nếu *altinstall* được đặt, thì ``pipX`` sẽ *not* được cài đặt.
 
-   If *default_pip* is set, then ``pip`` will be installed in addition to
-   the two regular scripts.
+   Nếu *default_pip* được đặt, thì ``pip`` sẽ được cài đặt bổ sung cùng với hai script thông thường.
 
-   Setting both *altinstall* and *default_pip* will trigger
+   Việc đặt cả *altinstall* và *default_pip* sẽ kích hoạt
    :exc:`ValueError`.
 
-   *verbosity* controls the level of output to :data:`sys.stdout` from the
-   bootstrapping operation.
+   *verbosity* kiểm soát mức độ thông tin xuất ra :data:`sys.stdout` từ thao tác bootstrap.
 
    .. audit-event:: ensurepip.bootstrap root ensurepip.bootstrap
 
    .. note::
 
-      The bootstrapping process has side effects on both ``sys.path`` and
-      ``os.environ``. Invoking the command line interface in a subprocess
-      instead allows these side effects to be avoided.
+      Quy trình bootstrap gây ra các tác động phụ trên cả ``sys.path`` và ``os.environ``. Việc gọi giao diện dòng lệnh trong một subprocess thay vào đó cho phép tránh các tác động phụ này.
 
    .. note::
 
-      The bootstrapping process may install additional modules required by
-      ``pip``, but other software should not assume those dependencies will
-      always be present by default (as the dependencies may be removed in a
-      future version of ``pip``).
+      Quy trình bootstrap có thể cài đặt các module bổ sung mà ``pip`` yêu cầu, nhưng phần mềm khác không nên giả định rằng các dependency đó sẽ luôn hiện diện theo mặc định (vì các dependency có thể bị loại bỏ trong phiên bản tương lai của ``pip``).
 

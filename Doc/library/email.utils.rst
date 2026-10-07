@@ -1,100 +1,77 @@
-:mod:`!email.utils`: Miscellaneous utilities
---------------------------------------------
+:mod:`!email.utils`: Các tiện ích khác
+--------------------------------------
 
 .. module:: email.utils
-   :synopsis: Miscellaneous email package utilities.
+   :synopsis: Các tiện ích khác của gói email.
 
-**Source code:** :source:`Lib/email/utils.py`
+**Mã nguồn:** :source:`Lib/email/utils.py`
 
 --------------
 
-There are a couple of useful utilities provided in the :mod:`!email.utils`
-module:
+Mô-đun :mod:`!email.utils` cung cấp một số tiện ích hữu ích:
 
 .. function:: localtime(dt=None)
 
-   Return local time as an aware datetime object.  If called without
-   arguments, return current time.  Otherwise *dt* argument should be a
-   :class:`~datetime.datetime` instance, and it is converted to the local time
-   zone according to the system time zone database.  If *dt* is naive (that
-   is, ``dt.tzinfo`` is ``None``), it is assumed to be in local time.
+   Trả về thời gian địa phương dưới dạng đối tượng datetime có thông tin múi giờ. Nếu được gọi mà không có đối số, hàm trả về thời gian hiện tại. Nếu không, đối số *dt* phải là một
+   :class:`~datetime.datetime` thể hiện, và đối tượng này được chuyển đổi sang múi giờ địa phương theo cơ sở dữ liệu múi giờ của hệ thống. Nếu *dt* là naive (nghĩa là ``dt.tzinfo`` là ``None``), đối tượng này được giả định là ở giờ địa phương.
 
    .. versionadded:: 3.3
 
    .. deprecated-removed:: 3.12 3.14
-      The *isdst* parameter.
+      Tham số *isdst*.
 
 .. function:: make_msgid(idstring=None, domain=None)
 
-   Returns a string suitable for an :rfc:`2822`\ -compliant
-   :mailheader:`Message-ID` header.  Optional *idstring* if given, is a string
-   used to strengthen the uniqueness of the message id.  Optional *domain* if
-   given provides the portion of the msgid after the '@'.  The default is the
-   local hostname.  It is not normally necessary to override this default, but
-   may be useful certain cases, such as a constructing distributed system that
-   uses a consistent domain name across multiple hosts.
+   Trả về một chuỗi phù hợp với :rfc:`2822`\ -compliant
+   :mailheader:`Message-ID` header.  Tùy chọn *idstring* nếu được cung cấp là một chuỗi được dùng để tăng cường tính duy nhất của message id. Tùy chọn *domain* nếu được cung cấp sẽ cung cấp phần của msgid sau '@'. Giá trị mặc định là hostname cục bộ. Thông thường không cần ghi đè giá trị mặc định này, nhưng có thể hữu ích trong một số trường hợp, chẳng hạn như khi xây dựng một hệ thống phân tán sử dụng cùng một domain name trên nhiều máy chủ.
 
    .. versionchanged:: 3.2
-      Added the *domain* keyword.
+      Đã thêm keyword *domain*.
 
 
-The remaining functions are part of the legacy (``Compat32``) email API.  There
-is no need to directly use these with the new API, since the parsing and
-formatting they provide is done automatically by the header parsing machinery
-of the new API.
+Các hàm còn lại thuộc API email cũ (``Compat32``). Không cần sử dụng trực tiếp các hàm này với API mới, vì việc phân tích cú pháp và định dạng mà chúng cung cấp được tự động thực hiện bởi cơ chế phân tích cú pháp header của API mới.
 
 
 .. function:: quote(str)
 
-   Return a new string with backslashes in *str* replaced by two backslashes, and
-   double quotes replaced by backslash-double quote.
+   Trả về một chuỗi mới, trong đó các dấu gạch chéo ngược trong *str* được thay thế bằng hai dấu gạch chéo ngược, còn dấu ngoặc kép được thay thế bằng dấu gạch chéo ngược và dấu ngoặc kép.
 
 
 .. function:: unquote(str)
 
-   Return a new string which is an *unquoted* version of *str*. If *str* ends and
-   begins with double quotes, they are stripped off.  Likewise if *str* ends and
-   begins with angle brackets, they are stripped off.
+   Trả về một chuỗi mới là phiên bản *unquoted* của *str*. Nếu *str* bắt đầu và kết thúc bằng dấu ngoặc kép, các dấu này sẽ được loại bỏ. Tương tự, nếu *str* bắt đầu và kết thúc bằng dấu ngoặc nhọn, các dấu này sẽ được loại bỏ.
 
 
 .. function:: parseaddr(address, *, strict=True)
 
-   Parse address -- which should be the value of some address-containing field such
-   as :mailheader:`To` or :mailheader:`Cc` -- into its constituent *realname* and
-   *email address* parts.  Returns a tuple of that information, unless the parse
-   fails, in which case a 2-tuple of ``('', '')`` is returned.
+   Phân tích địa chỉ -- địa chỉ này phải là giá trị của một trường chứa địa chỉ nào đó, chẳng hạn như :mailheader:`To` hoặc :mailheader:`Cc` -- thành các phần cấu thành là *realname* và *email address*. Trả về một tuple chứa thông tin đó, trừ khi việc phân tích cú pháp thất bại; trong trường hợp đó, một tuple 2 phần tử gồm ``('', '')`` sẽ được trả về.
 
-   If *strict* is true, use a strict parser which rejects malformed inputs.
+   Nếu *strict* là true, hãy sử dụng trình phân tích cú pháp nghiêm ngặt, trình này sẽ từ chối các đầu vào không đúng định dạng.
 
    .. versionchanged:: 3.13
-      Add *strict* optional parameter and reject malformed inputs by default.
+      Thêm tham số tùy chọn *strict* và mặc định từ chối các đầu vào không đúng định dạng.
 
 
 .. function:: formataddr(pair, charset='utf-8')
 
-   The inverse of :meth:`parseaddr`, this takes a 2-tuple of the form ``(realname,
-   email_address)`` and returns the string value suitable for a :mailheader:`To` or
-   :mailheader:`Cc` header.  If the first element of *pair* is false, then the
-   second element is returned unmodified.
+   Là phiên bản đảo ngược của :meth:`parseaddr`, hàm này nhận một bộ 2 phần tử có dạng ``(realname, email_address)`` và trả về giá trị chuỗi phù hợp cho :mailheader:`To` hoặc
+   :mailheader:`Cc` header. Nếu phần tử đầu tiên của *pair* là false thì phần tử thứ hai được trả về không thay đổi.
 
-   Optional *charset* is the character set that will be used in the :rfc:`2047`
-   encoding of the ``realname`` if the ``realname`` contains non-ASCII
-   characters.  Can be an instance of :class:`str` or a
-   :class:`~email.charset.Charset`.  Defaults to ``utf-8``.
+   *charset* tùy chọn là bộ ký tự sẽ được sử dụng trong quá trình mã hóa :rfc:`2047` của ``realname`` nếu ``realname`` chứa các ký tự không phải ASCII. Có thể là một thực thể của :class:`str` hoặc một
+   :class:`~email.charset.Charset`. Mặc định là ``utf-8``.
 
    .. versionchanged:: 3.3
-      Added the *charset* option.
+      Đã thêm tùy chọn *charset*.
 
 
 .. function:: getaddresses(fieldvalues, *, strict=True)
 
-   This method returns a list of 2-tuples of the form returned by ``parseaddr()``.
-   *fieldvalues* is a sequence of header field values as might be returned by
+   Phương thức này trả về một danh sách các bộ 2 phần tử có dạng được trả về bởi ``parseaddr()``. *fieldvalues* là một chuỗi các giá trị trường tiêu đề như có thể được trả về bởi
    :meth:`Message.get_all <email.message.Message.get_all>`.
 
-   If *strict* is true, use a strict parser which rejects malformed inputs.
+   Nếu *strict* là true, hãy sử dụng trình phân tích cú pháp nghiêm ngặt, trình này sẽ từ chối các đầu vào không đúng định dạng.
 
-   Here's a simple example that gets all the recipients of a message::
+   Dưới đây là một ví dụ đơn giản lấy tất cả người nhận của một thư::
 
       from email.utils import getaddresses
 
@@ -105,124 +82,80 @@ of the new API.
       all_recipients = getaddresses(tos + ccs + resent_tos + resent_ccs)
 
    .. versionchanged:: 3.13
-      Add *strict* optional parameter and reject malformed inputs by default.
+      Thêm tham số tùy chọn *strict* và mặc định từ chối các đầu vào không đúng định dạng.
 
 
 .. function:: parsedate(date)
 
-   Attempts to parse a date according to the rules in :rfc:`2822`. however, some
-   mailers don't follow that format as specified, so :func:`parsedate` tries to
-   guess correctly in such cases.  *date* is a string containing an :rfc:`2822`
-   date, such as  ``"Mon, 20 Nov 1995 19:12:08 -0500"``.  If it succeeds in parsing
-   the date, :func:`parsedate` returns a 9-tuple that can be passed directly to
-   :func:`time.mktime`; otherwise ``None`` will be returned.  Note that indexes 6,
-   7, and 8 of the result tuple are not usable.
+   Cố gắng phân tích cú pháp một ngày theo các quy tắc trong :rfc:`2822`. Tuy nhiên, một số mailer không tuân theo định dạng đó như đã chỉ định, vì vậy :func:`parsedate` cố gắng đoán chính xác trong những trường hợp như vậy. *date* là một chuỗi chứa một ngày :rfc:`2822`, chẳng hạn như ``"Mon, 20 Nov 1995 19:12:08 -0500"``. Nếu phân tích cú pháp ngày thành công, :func:`parsedate` trả về một bộ 9 phần tử có thể được truyền trực tiếp cho
+   :func:`time.mktime`; nếu không, ``None`` sẽ được trả về. Lưu ý rằng các chỉ mục 6, 7 và 8 của bộ kết quả không thể sử dụng được.
 
 
 .. function:: parsedate_tz(date)
 
-   Performs the same function as :func:`parsedate`, but returns either ``None`` or
-   a 10-tuple; the first 9 elements make up a tuple that can be passed directly to
-   :func:`time.mktime`, and the tenth is the offset of the date's timezone from UTC
-   (which is the official term for Greenwich Mean Time) [#]_.  If the input string
-   has no timezone, the last element of the tuple returned is ``0``, which represents
-   UTC. Note that indexes 6, 7, and 8 of the result tuple are not usable.
+   Thực hiện cùng chức năng như :func:`parsedate`, nhưng trả về ``None`` hoặc một bộ 10 phần tử; 9 phần tử đầu tiên tạo thành một bộ có thể được truyền trực tiếp cho
+   :func:`time.mktime`, và phần tử thứ mười là độ lệch múi giờ của ngày so với UTC (tên gọi chính thức của Giờ trung bình Greenwich) [#]_. Nếu chuỗi đầu vào không có múi giờ, phần tử cuối cùng của tuple được trả về là ``0``, đại diện cho UTC. Lưu ý rằng các chỉ mục 6, 7 và 8 của tuple kết quả không thể sử dụng.
 
 
 .. function:: parsedate_to_datetime(date)
 
-   The inverse of :func:`format_datetime`.  Performs the same function as
-   :func:`parsedate`, but on success returns a :mod:`~datetime.datetime`;
-   otherwise ``ValueError`` is raised if *date* contains an invalid value such
-   as an hour greater than 23 or a timezone offset not between -24 and 24 hours.
-   If the input date has a timezone of ``-0000``, the ``datetime`` will be a naive
-   ``datetime``, and if the date is conforming to the RFCs it will represent a
-   time in UTC but with no indication of the actual source timezone of the
-   message the date comes from.  If the input date has any other valid timezone
-   offset, the ``datetime`` will be an aware ``datetime`` with the
-   corresponding a :class:`~datetime.timezone` :class:`~datetime.tzinfo`.
+   Phép nghịch đảo của :func:`format_datetime`. Thực hiện cùng chức năng như
+   :func:`parsedate`, nhưng khi thành công sẽ trả về một :mod:`~datetime.datetime`; nếu không, ``ValueError`` sẽ được phát sinh nếu *date* chứa một giá trị không hợp lệ, chẳng hạn như giờ lớn hơn 23 hoặc độ lệch múi giờ không nằm trong khoảng từ -24 đến 24 giờ. Nếu ngày đầu vào có múi giờ là ``-0000``, ``datetime`` sẽ là một ``datetime`` ngây thơ (naive), và nếu ngày đó tuân thủ các RFC thì nó sẽ biểu diễn một thời điểm theo UTC nhưng không cho biết múi giờ nguồn thực tế của thông báo chứa ngày đó. Nếu ngày đầu vào có bất kỳ độ lệch múi giờ hợp lệ nào khác, ``datetime`` sẽ là một ``datetime`` có nhận biết (aware), với :class:`~datetime.timezone` :class:`~datetime.tzinfo` tương ứng.
 
    .. versionadded:: 3.3
 
 
 .. function:: mktime_tz(tuple)
 
-   Turn a 10-tuple as returned by :func:`parsedate_tz` into a UTC
-   timestamp (seconds since the Epoch).  If the timezone item in the
-   tuple is ``None``, assume local time.
+   Chuyển một tuple 10 phần tử do :func:`parsedate_tz` trả về thành dấu thời gian UTC (số giây kể từ Epoch). Nếu mục múi giờ trong tuple là ``None``, hãy giả định đó là giờ địa phương.
 
 
 .. function:: formatdate(timeval=None, localtime=False, usegmt=False)
 
-   Returns a date string as per :rfc:`2822`, e.g.::
+   Trả về một chuỗi ngày theo :rfc:`2822`, ví dụ:::
 
       Fri, 09 Nov 2001 01:08:47 -0000
 
-   Optional *timeval* if given is a floating-point time value as accepted by
-   :func:`time.gmtime` and :func:`time.localtime`, otherwise the current time is
-   used.
+   *timeval* tùy chọn, nếu được cung cấp, là một giá trị thời gian dấu phẩy động được chấp nhận bởi
+   :func:`time.gmtime` và :func:`time.localtime`; nếu không, thời gian hiện tại sẽ được sử dụng.
 
-   Optional *localtime* is a flag that when ``True``, interprets *timeval*, and
-   returns a date relative to the local timezone instead of UTC, properly taking
-   daylight savings time into account. The default is ``False`` meaning UTC is
-   used.
+   *localtime* tùy chọn là một cờ mà khi ``True``, sẽ diễn giải *timeval* và trả về ngày tháng theo múi giờ cục bộ thay vì UTC, đồng thời xử lý đúng giờ mùa hè. Mặc định là ``False``, nghĩa là UTC được sử dụng.
 
-   Optional *usegmt* is a flag that when ``True``, outputs a  date string with the
-   timezone as an ascii string ``GMT``, rather than a numeric ``-0000``. This is
-   needed for some protocols (such as HTTP). This only applies when *localtime* is
-   ``False``.  The default is ``False``.
+   *usegmt* tùy chọn là một cờ mà khi ``True``, sẽ xuất ra chuỗi ngày tháng với múi giờ dưới dạng chuỗi ASCII ``GMT`` thay vì ``-0000`` dạng số. Điều này cần thiết cho một số giao thức (chẳng hạn như HTTP). Tùy chọn này chỉ áp dụng khi *localtime* là ``False``. Mặc định là ``False``.
 
 
 .. function:: format_datetime(dt, usegmt=False)
 
-   Like ``formatdate``, but the input is a :mod:`datetime` instance.  If it is
-   a naive datetime, it is assumed to be "UTC with no information about the
-   source timezone", and the conventional ``-0000`` is used for the timezone.
-   If it is an aware ``datetime``, then the numeric timezone offset is used.
-   If it is an aware timezone with offset zero, then *usegmt* may be set to
-   ``True``, in which case the string ``GMT`` is used instead of the numeric
-   timezone offset.  This provides a way to generate standards conformant HTTP
-   date headers.
+   Tương tự ``formatdate``, nhưng đầu vào là một đối tượng :mod:`datetime`. Nếu đó là một datetime naive, nó được giả định là "UTC không có thông tin về múi giờ nguồn", và ``-0000`` quy ước được sử dụng cho múi giờ. Nếu đó là một ``datetime`` có thông tin múi giờ, độ lệch múi giờ dạng số sẽ được sử dụng. Nếu đó là một múi giờ có thông tin với độ lệch bằng 0, thì *usegmt* có thể được đặt thành ``True``, trong trường hợp đó chuỗi ``GMT`` được sử dụng thay cho độ lệch múi giờ dạng số. Điều này cung cấp một cách để tạo các tiêu đề ngày tháng HTTP phù hợp với tiêu chuẩn.
 
    .. versionadded:: 3.3
 
 
 .. function:: decode_rfc2231(s)
 
-   Decode the string *s* according to :rfc:`2231`.
+   Giải mã chuỗi *s* theo :rfc:`2231`.
 
 
 .. function:: encode_rfc2231(s, charset=None, language=None)
 
-   Encode the string *s* according to :rfc:`2231`.  Optional *charset* and
-   *language*, if given is the character set name and language name to use.  If
-   neither is given, *s* is returned as-is.  If *charset* is given but *language*
-   is not, the string is encoded using the empty string for *language*.
+   Mã hóa chuỗi *s* theo :rfc:`2231`. Tùy chọn *charset* và *language*, nếu được cung cấp, lần lượt là tên bộ ký tự và tên ngôn ngữ cần sử dụng. Nếu không cung cấp tùy chọn nào, *s* được trả về nguyên trạng. Nếu *charset* được cung cấp nhưng *language* không được cung cấp, chuỗi sẽ được mã hóa bằng chuỗi rỗng cho *language*.
 
 
 .. function:: collapse_rfc2231_value(value, errors='replace', fallback_charset='us-ascii')
 
-   When a header parameter is encoded in :rfc:`2231` format,
-   :meth:`Message.get_param <email.message.Message.get_param>` may return a
-   3-tuple containing the character set,
-   language, and value.  :func:`collapse_rfc2231_value` turns this into a
-   string.  Optional *errors* is passed to the *errors* argument of :class:`str`'s
-   :func:`~str.encode` method; it defaults to ``'replace'``.  Optional
-   *fallback_charset* specifies the character set to use if the one in the
-   :rfc:`2231` header is not known by Python; it defaults to ``'us-ascii'``.
+   Khi một tham số tiêu đề được mã hóa theo định dạng :rfc:`2231`,
+   :meth:`Message.get_param <email.message.Message.get_param>` có thể trả về một bộ 3 phần tử chứa bộ ký tự, ngôn ngữ và giá trị. :func:`collapse_rfc2231_value` chuyển đổi bộ này thành một chuỗi. Tùy chọn *errors* được truyền vào đối số *errors* của :class:`str`'s
+   phương thức :func:`~str.encode`; mặc định là ``'replace'``.  Tùy chọn *fallback_charset* chỉ định bộ ký tự sẽ sử dụng nếu bộ ký tự trong
+   tiêu đề :rfc:`2231` không được Python biết đến; mặc định là ``'us-ascii'``.
 
-   For convenience, if the *value* passed to :func:`collapse_rfc2231_value` is not
-   a tuple, it should be a string and it is returned unquoted.
+   Để thuận tiện, nếu *value* được truyền vào :func:`collapse_rfc2231_value` không phải là một tuple, thì nó phải là một chuỗi và được trả về mà không có dấu ngoặc kép.
 
 
 .. function:: decode_params(params)
 
-   Decode parameters list according to :rfc:`2231`.  *params* is a sequence of
-   2-tuples containing elements of the form ``(content-type, string-value)``.
+   Giải mã danh sách tham số theo :rfc:`2231`.  *params* là một chuỗi gồm các tuple 2 phần tử có dạng ``(content-type, string-value)``.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] Note that the sign of the timezone offset is the opposite of the sign of the
-   ``time.timezone`` variable for the same timezone; the latter variable follows
-   the POSIX standard while this module follows :rfc:`2822`.
+.. [#] Lưu ý rằng dấu của độ lệch múi giờ ngược với dấu của biến ``time.timezone`` đối với cùng một múi giờ; biến sau tuân theo tiêu chuẩn POSIX, còn module này tuân theo :rfc:`2822`.

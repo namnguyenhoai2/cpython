@@ -1,320 +1,215 @@
-:mod:`!email.parser`: Parsing email messages
---------------------------------------------
+:mod:`!email.parser`: Phân tích cú pháp thư email
+-------------------------------------------------
 
 .. module:: email.parser
-   :synopsis: Parse flat text email messages to produce a message object structure.
+   :synopsis: Phân tích cú pháp các thư email dạng văn bản phẳng để tạo ra cấu trúc đối tượng thư.
 
-**Source code:** :source:`Lib/email/parser.py`
+**Mã nguồn:** :source:`Lib/email/parser.py`
 
 --------------
 
-Message object structures can be created in one of two ways: they can be
-created from whole cloth by creating an :class:`~email.message.EmailMessage`
-object, adding headers using the dictionary interface, and adding payload(s)
-using :meth:`~email.message.EmailMessage.set_content` and related methods, or
-they can be created by parsing a serialized representation of the email
-message.
+Có thể tạo cấu trúc đối tượng thư theo một trong hai cách: tạo mới hoàn toàn bằng cách tạo một đối tượng :class:`~email.message.EmailMessage`, thêm các header bằng giao diện từ điển và thêm payload bằng :meth:`~email.message.EmailMessage.set_content` cùng các phương thức liên quan, hoặc tạo bằng cách phân tích cú pháp biểu diễn đã được tuần tự hóa của thư email.
 
-The :mod:`email` package provides a standard parser that understands most email
-document structures, including MIME documents.  You can pass the parser a
-bytes, string or file object, and the parser will return to you the root
-:class:`~email.message.EmailMessage` instance of the object structure.  For
-simple, non-MIME messages the payload of this root object will likely be a
-string containing the text of the message.  For MIME messages, the root object
-will return ``True`` from its :meth:`~email.message.EmailMessage.is_multipart`
-method, and the subparts can be accessed via the payload manipulation methods,
-such as :meth:`~email.message.EmailMessage.get_body`,
-:meth:`~email.message.EmailMessage.iter_parts`, and
+Gói :mod:`email` cung cấp một parser tiêu chuẩn hiểu hầu hết các cấu trúc tài liệu email, bao gồm cả tài liệu MIME. Bạn có thể truyền cho parser một đối tượng bytes, string hoặc file, và parser sẽ trả về cho bạn đối tượng gốc
+:class:`~email.message.EmailMessage` của cấu trúc đối tượng. Đối với các thư đơn giản, không phải MIME, payload của đối tượng gốc này có thể sẽ là một string chứa nội dung thư. Đối với thư MIME, đối tượng gốc sẽ trả về ``True`` từ phương thức :meth:`~email.message.EmailMessage.is_multipart` của nó, và có thể truy cập các phần con thông qua những phương thức thao tác payload, chẳng hạn như :meth:`~email.message.EmailMessage.get_body`,
+:meth:`~email.message.EmailMessage.iter_parts`, và
 :meth:`~email.message.EmailMessage.walk`.
 
-There are actually two parser interfaces available for use, the :class:`Parser`
-API and the incremental :class:`FeedParser` API.  The :class:`Parser` API is
-most useful if you have the entire text of the message in memory, or if the
-entire message lives in a file on the file system.  :class:`FeedParser` is more
-appropriate when you are reading the message from a stream which might block
-waiting for more input (such as reading an email message from a socket).  The
-:class:`FeedParser` can consume and parse the message incrementally, and only
-returns the root object when you close the parser.
+Thực tế có hai interface parser sẵn có để sử dụng: API :class:`Parser` và API :class:`FeedParser` theo kiểu incremental. API :class:`Parser` hữu ích nhất nếu bạn có toàn bộ nội dung của thông điệp trong bộ nhớ hoặc nếu toàn bộ thông điệp nằm trong một tệp trên hệ thống tệp. :class:`FeedParser` phù hợp hơn khi bạn đang đọc thông điệp từ một stream có thể bị chặn để chờ thêm dữ liệu đầu vào (chẳng hạn như khi đọc một email message từ socket). API
+:class:`FeedParser` có thể tiếp nhận và phân tích cú pháp thông điệp theo từng phần, đồng thời chỉ trả về đối tượng gốc khi bạn đóng parser.
 
-Note that the parser can be extended in limited ways, and of course you can
-implement your own parser completely from scratch.  All of the logic that
-connects the :mod:`email` package's bundled parser and the
-:class:`~email.message.EmailMessage` class is embodied in the :class:`~email.policy.Policy`
-class, so a custom parser can create message object trees any way it finds
-necessary by implementing custom versions of the appropriate :class:`!Policy`
-methods.
+Lưu ý rằng parser có thể được mở rộng theo một số cách có giới hạn; tất nhiên, bạn cũng có thể tự triển khai hoàn toàn một parser từ đầu. Toàn bộ logic kết nối parser đi kèm của package :mod:`email` với
+class :class:`~email.message.EmailMessage` được thể hiện trong class :class:`~email.policy.Policy`, vì vậy parser tùy chỉnh có thể tạo các cây đối tượng message theo bất kỳ cách nào cần thiết bằng cách triển khai các phiên bản tùy chỉnh của những phương thức :class:`!Policy` phù hợp.
 
 
 FeedParser API
 ^^^^^^^^^^^^^^
 
-The :class:`BytesFeedParser`, imported from the :mod:`email.feedparser` module,
-provides an API that is conducive to incremental parsing of email messages,
-such as would be necessary when reading the text of an email message from a
-source that can block (such as a socket).  The :class:`BytesFeedParser` can of
-course be used to parse an email message fully contained in a :term:`bytes-like
-object`, string, or file, but the :class:`BytesParser` API may be more
-convenient for such use cases.  The semantics and results of the two parser
-APIs are identical.
+:class:`BytesFeedParser`, được import từ module :mod:`email.feedparser`, cung cấp một API phù hợp cho việc phân tích cú pháp email message theo từng phần, chẳng hạn như khi cần đọc nội dung của một email message từ một nguồn có thể bị chặn (ví dụ như socket). Tất nhiên, có thể dùng :class:`BytesFeedParser` để phân tích cú pháp một email message được chứa hoàn toàn trong :term:`bytes-like object`, string hoặc file, nhưng API :class:`BytesParser` có thể thuận tiện hơn cho những trường hợp sử dụng như vậy. Ngữ nghĩa và kết quả của hai API parser là giống hệt nhau.
 
-The :class:`BytesFeedParser`'s API is simple; you create an instance, feed it a
-bunch of bytes until there's no more to feed it, then close the parser to
-retrieve the root message object.  The :class:`BytesFeedParser` is extremely
-accurate when parsing standards-compliant messages, and it does a very good job
-of parsing non-compliant messages, providing information about how a message
-was deemed broken.  It will populate a message object's
-:attr:`~email.message.EmailMessage.defects` attribute with a list of any
-problems it found in a message.  See the :mod:`email.errors` module for the
-list of defects that it can find.
+API của :class:`BytesFeedParser` rất đơn giản; bạn tạo một instance, feed cho nó một lượng byte cho đến khi không còn gì để feed nữa, rồi đóng parser để lấy đối tượng message gốc. :class:`BytesFeedParser` cực kỳ chính xác khi phân tích các message tuân thủ tiêu chuẩn, đồng thời xử lý rất tốt các message không tuân thủ, cung cấp thông tin về lý do message được xem là không hợp lệ. Nó sẽ điền vào đối tượng message một
+thuộc tính :attr:`~email.message.EmailMessage.defects` chứa danh sách mọi vấn đề mà nó phát hiện trong một message. Xem module :mod:`email.errors` để biết danh sách các lỗi mà nó có thể phát hiện.
 
-Here is the API for the :class:`BytesFeedParser`:
+Sau đây là API cho :class:`BytesFeedParser`:
 
 
 .. class:: BytesFeedParser(_factory=None, *, policy=policy.compat32)
 
-   Create a :class:`BytesFeedParser` instance.  Optional *_factory* is a
-   no-argument callable; if not specified use the
-   :attr:`~email.policy.Policy.message_factory` from the *policy*.  Call
-   *_factory* whenever a new message object is needed.
+   Tạo một instance :class:`BytesFeedParser`. *_factory* tùy chọn là một callable không có đối số; nếu không được chỉ định, hãy sử dụng
+   :attr:`~email.policy.Policy.message_factory` từ *policy*. Gọi *_factory* mỗi khi cần một message object mới.
 
-   If *policy* is specified use the rules it specifies to update the
-   representation of the message.  If *policy* is not set, use the
-   :class:`compat32 <email.policy.Compat32>` policy, which maintains backward
-   compatibility with the Python 3.2 version of the email package and provides
-   :class:`~email.message.Message` as the default factory.  All other policies
-   provide :class:`~email.message.EmailMessage` as the default *_factory*. For
-   more information on what else *policy* controls, see the
-   :mod:`~email.policy` documentation.
+   Nếu *policy* được chỉ định, hãy sử dụng các quy tắc mà nó quy định để cập nhật biểu diễn của message. Nếu *policy* chưa được thiết lập, hãy sử dụng
+   policy :class:`compat32 <email.policy.Compat32>`, duy trì khả năng tương thích ngược với phiên bản Python 3.2 của email package và cung cấp
+   :class:`~email.message.Message` làm factory mặc định. Tất cả các policy khác cung cấp :class:`~email.message.EmailMessage` làm *_factory* mặc định. Để biết thêm thông tin về những gì *policy* kiểm soát, hãy xem
+   Tài liệu về :mod:`~email.policy`.
 
-   Note: **The policy keyword should always be specified**; The default will
-   change to :data:`email.policy.default` in a future version of Python.
+   Lưu ý: **Luôn phải chỉ định từ khóa policy**; Giá trị mặc định sẽ thay đổi thành :data:`email.policy.default` trong một phiên bản Python tương lai.
 
    .. versionadded:: 3.2
 
-   .. versionchanged:: 3.3 Added the *policy* keyword.
-   .. versionchanged:: 3.6 *_factory* defaults to the policy ``message_factory``.
+   .. versionchanged:: 3.3 Đã thêm từ khóa *policy*.
+   .. versionchanged:: 3.6 *_factory* mặc định sử dụng policy ``message_factory``.
 
 
    .. method:: feed(data)
 
-      Feed the parser some more data.  *data* should be a :term:`bytes-like
-      object` containing one or more lines.  The lines can be partial and the
-      parser will stitch such partial lines together properly.  The lines can
-      have any of the three common line endings: carriage return, newline, or
-      carriage return and newline (they can even be mixed).
+      Cung cấp thêm dữ liệu cho parser. *data* phải là một :term:`bytes-like object` chứa một hoặc nhiều dòng. Các dòng có thể chưa hoàn chỉnh và parser sẽ ghép các dòng chưa hoàn chỉnh đó lại đúng cách. Các dòng có thể sử dụng bất kỳ kiểu kết thúc dòng phổ biến nào trong ba kiểu: carriage return, newline hoặc carriage return và newline (thậm chí có thể trộn lẫn).
 
 
    .. method:: close()
 
-      Complete the parsing of all previously fed data and return the root
-      message object.  It is undefined what happens if :meth:`~feed` is called
-      after this method has been called.
+      Hoàn tất việc phân tích cú pháp tất cả dữ liệu đã cung cấp trước đó và trả về đối tượng message gốc. Không xác định được điều gì xảy ra nếu :meth:`~feed` được gọi sau khi phương thức này đã được gọi.
 
 
 .. class:: FeedParser(_factory=None, *, policy=policy.compat32)
 
-   Works like :class:`BytesFeedParser` except that the input to the
-   :meth:`~BytesFeedParser.feed` method must be a string.  This is of limited
-   utility, since the only way for such a message to be valid is for it to
-   contain only ASCII text or, if :attr:`~email.policy.EmailPolicy.utf8` is
-   ``True``, no binary attachments.
+   Hoạt động giống như :class:`BytesFeedParser`, ngoại trừ đầu vào của
+   Phương thức :meth:`~BytesFeedParser.feed` phải là một chuỗi. Điều này chỉ hữu ích ở mức hạn chế, vì cách duy nhất để một message như vậy hợp lệ là nó chỉ chứa văn bản ASCII hoặc, nếu :attr:`~email.policy.EmailPolicy.utf8` là ``True``, không có tệp đính kèm nhị phân.
 
-   .. versionchanged:: 3.3 Added the *policy* keyword.
+   .. versionchanged:: 3.3 Đã thêm từ khóa *policy*.
 
 
-Parser API
-^^^^^^^^^^
+API của Parser
+^^^^^^^^^^^^^^
 
-The :class:`BytesParser` class, imported from the :mod:`!email.parser` module,
-provides an API that can be used to parse a message when the complete contents
-of the message are available in a :term:`bytes-like object` or file.  The
-:mod:`!email.parser` module also provides :class:`Parser` for parsing strings,
-and header-only parsers, :class:`BytesHeaderParser` and
-:class:`HeaderParser`, which can be used if you're only interested in the
-headers of the message.  :class:`BytesHeaderParser` and :class:`HeaderParser`
-can be much faster in these situations, since they do not attempt to parse the
-message body, instead setting the payload to the raw body.
+Lớp :class:`BytesParser`, được import từ module :mod:`!email.parser`, cung cấp một API có thể dùng để phân tích một message khi toàn bộ nội dung của message có trong một :term:`bytes-like object` hoặc tệp. Mô-đun
+:mod:`!email.parser` cũng cung cấp :class:`Parser` để phân tích các chuỗi, cùng các parser chỉ dành cho header, :class:`BytesHeaderParser` và
+:class:`HeaderParser`, có thể được sử dụng nếu bạn chỉ quan tâm đến các header của message. :class:`BytesHeaderParser` và :class:`HeaderParser` có thể nhanh hơn nhiều trong những tình huống này, vì chúng không cố gắng phân tích phần body của message mà thay vào đó đặt payload thành body thô.
 
 
 .. class:: BytesParser(_class=None, *, policy=policy.compat32)
 
-   Create a :class:`BytesParser` instance.  The *_class* and *policy*
-   arguments have the same meaning and semantics as the *_factory*
-   and *policy* arguments of :class:`BytesFeedParser`.
+   Tạo một instance :class:`BytesParser`. Các đối số *_class* và *policy* có cùng ý nghĩa và ngữ nghĩa với các đối số *_factory* và *policy* của :class:`BytesFeedParser`.
 
-   Note: **The policy keyword should always be specified**; The default will
-   change to :data:`email.policy.default` in a future version of Python.
+   Lưu ý: **Từ khóa policy luôn phải được chỉ định**; Giá trị mặc định sẽ được đổi thành :data:`email.policy.default` trong một phiên bản Python tương lai.
 
    .. versionchanged:: 3.3
-      Removed the *strict* argument that was deprecated in 2.4.  Added the
-      *policy* keyword.
-   .. versionchanged:: 3.6 *_class* defaults to the policy ``message_factory``.
+      Đã loại bỏ đối số *strict* vốn đã bị ngừng sử dụng từ phiên bản 2.4. Đã thêm từ khóa *policy*.
+   .. versionchanged:: 3.6 *_class* mặc định sử dụng policy ``message_factory``.
 
 
    .. method:: parse(fp, headersonly=False)
 
-      Read all the data from the binary file-like object *fp*, parse the
-      resulting bytes, and return the message object.  *fp* must support
-      both the :meth:`~io.IOBase.readline` and the :meth:`~io.BufferedIOBase.read`
-      methods.
+      Đọc toàn bộ dữ liệu từ đối tượng giống tệp nhị phân *fp*, phân tích cú pháp các byte thu được và trả về đối tượng message. *fp* phải hỗ trợ cả hai phương thức :meth:`~io.IOBase.readline` và :meth:`~io.BufferedIOBase.read`.
 
-      The bytes contained in *fp* must be formatted as a block of :rfc:`5322`
-      (or, if :attr:`~email.policy.EmailPolicy.utf8` is ``True``, :rfc:`6532`)
-      style headers and header continuation lines, optionally preceded by an
-      envelope header.  The header block is terminated either by the end of the
-      data or by a blank line.  Following the header block is the body of the
-      message (which may contain MIME-encoded subparts, including subparts
-      with a :mailheader:`Content-Transfer-Encoding` of ``8bit``).
+      Các byte chứa trong *fp* phải được định dạng dưới dạng một khối các header kiểu :rfc:`5322` (hoặc, nếu :attr:`~email.policy.EmailPolicy.utf8` là ``True``, kiểu :rfc:`6532`) và các dòng tiếp tục header, tùy chọn có thể được đặt trước bởi một envelope header. Khối header kết thúc khi dữ liệu kết thúc hoặc khi gặp một dòng trống. Sau khối header là phần thân của message (có thể chứa các subpart được mã hóa MIME, bao gồm các subpart có :mailheader:`Content-Transfer-Encoding` là ``8bit``).
 
-      Optional *headersonly* is a flag specifying whether to stop parsing after
-      reading the headers or not.  The default is ``False``, meaning it parses
-      the entire contents of the file.
+      *headersonly* tùy chọn là một cờ chỉ định có dừng phân tích cú pháp sau khi đọc các header hay không. Giá trị mặc định là ``False``, nghĩa là phân tích toàn bộ nội dung của tệp.
 
 
    .. method:: parsebytes(bytes, headersonly=False)
 
-      Similar to the :meth:`parse` method, except it takes a :term:`bytes-like
-      object` instead of a file-like object.  Calling this method on a
-      :term:`bytes-like object` is equivalent to wrapping *bytes* in a
-      :class:`~io.BytesIO` instance first and calling :meth:`parse`.
+      Tương tự phương thức :meth:`parse` này, ngoại trừ việc phương thức nhận một :term:`bytes-like object` thay vì một đối tượng giống tệp. Việc gọi phương thức này trên một
+      :term:`bytes-like object` tương đương với việc bọc *bytes* trong một
+      :class:`~io.BytesIO` tạo instance trước và gọi :meth:`parse`.
 
-      Optional *headersonly* is as with the :meth:`parse` method.
+      Tùy chọn *headersonly* cũng giống như với phương thức :meth:`parse`.
 
    .. versionadded:: 3.2
 
 
 .. class:: BytesHeaderParser(_class=None, *, policy=policy.compat32)
 
-   Exactly like :class:`BytesParser`, except that *headersonly*
-   defaults to ``True``.
+   Hoàn toàn giống :class:`BytesParser`, ngoại trừ việc *headersonly* mặc định là ``True``.
 
    .. versionadded:: 3.3
 
 
 .. class:: Parser(_class=None, *, policy=policy.compat32)
 
-   This class is parallel to :class:`BytesParser`, but handles string input.
+   Lớp này tương tự như :class:`BytesParser`, nhưng xử lý đầu vào dạng chuỗi.
 
    .. versionchanged:: 3.3
-      Removed the *strict* argument.  Added the *policy* keyword.
-   .. versionchanged:: 3.6 *_class* defaults to the policy ``message_factory``.
+      Đã loại bỏ đối số *strict*. Đã thêm từ khóa *policy*.
+   .. versionchanged:: 3.6 *_class* mặc định sử dụng policy ``message_factory``.
 
 
    .. method:: parse(fp, headersonly=False)
 
-      Read all the data from the text-mode file-like object *fp*, parse the
-      resulting text, and return the root message object.  *fp* must support
-      both the :meth:`~io.TextIOBase.readline` and the
-      :meth:`~io.TextIOBase.read` methods on file-like objects.
+      Đọc toàn bộ dữ liệu từ đối tượng giống tệp ở chế độ văn bản *fp*, phân tích văn bản thu được và trả về đối tượng thông báo gốc. *fp* phải hỗ trợ cả :meth:`~io.TextIOBase.readline` và
+      :meth:`~io.TextIOBase.read` các phương thức trên đối tượng giống tệp.
 
-      Other than the text mode requirement, this method operates like
+      Ngoài yêu cầu về chế độ văn bản, phương thức này hoạt động giống như
       :meth:`BytesParser.parse`.
 
 
    .. method:: parsestr(text, headersonly=False)
 
-      Similar to the :meth:`parse` method, except it takes a string object
-      instead of a file-like object.  Calling this method on a string is
-      equivalent to wrapping *text* in a :class:`~io.StringIO` instance first
-      and calling :meth:`parse`.
+      Tương tự phương thức :meth:`parse`, nhưng nhận một đối tượng chuỗi thay vì đối tượng giống tệp. Gọi phương thức này trên một chuỗi tương đương với việc trước tiên bọc *text* trong một thực thể :class:`~io.StringIO` rồi gọi :meth:`parse`.
 
-      Optional *headersonly* is as with the :meth:`parse` method.
+      Tùy chọn *headersonly* cũng giống như với phương thức :meth:`parse`.
 
 
 .. class:: HeaderParser(_class=None, *, policy=policy.compat32)
 
-   Exactly like :class:`Parser`, except that *headersonly*
-   defaults to ``True``.
+   Hoàn toàn giống :class:`Parser`, ngoại trừ việc *headersonly* mặc định là ``True``.
 
 
-Since creating a message object structure from a string or a file object is such
-a common task, four functions are provided as a convenience.  They are available
-in the top-level :mod:`email` package namespace.
+Vì việc tạo cấu trúc đối tượng thông báo từ một chuỗi hoặc đối tượng tệp là một tác vụ rất phổ biến, bốn hàm được cung cấp để thuận tiện. Chúng có sẵn trong namespace package cấp cao nhất :mod:`email`.
 
 .. currentmodule:: email
 
 
 .. function:: message_from_bytes(s, _class=None, *, policy=policy.compat32)
 
-   Return a message object structure from a :term:`bytes-like object`.  This is
-   equivalent to ``BytesParser().parsebytes(s)``.  Optional *_class* and
-   *policy* are interpreted as with the :class:`~email.parser.BytesParser` class
-   constructor.
+   Trả về cấu trúc đối tượng message từ một :term:`bytes-like object`. Điều này tương đương với ``BytesParser().parsebytes(s)``. Các *_class* và *policy* tùy chọn được diễn giải như trong hàm khởi tạo lớp :class:`~email.parser.BytesParser`.
 
    .. versionadded:: 3.2
    .. versionchanged:: 3.3
-      Removed the *strict* argument.  Added the *policy* keyword.
+      Đã loại bỏ đối số *strict*. Đã thêm từ khóa *policy*.
 
 
 .. function:: message_from_binary_file(fp, _class=None, *, \
                                        policy=policy.compat32)
 
-   Return a message object structure tree from an open binary :term:`file
-   object`.  This is equivalent to ``BytesParser().parse(fp)``.  *_class* and
-   *policy* are interpreted as with the :class:`~email.parser.BytesParser` class
-   constructor.
+   Trả về cây cấu trúc đối tượng message từ một :term:`file object` nhị phân đang mở. Điều này tương đương với ``BytesParser().parse(fp)``. *_class* và *policy* được diễn giải như trong hàm khởi tạo lớp :class:`~email.parser.BytesParser`.
 
    .. versionadded:: 3.2
    .. versionchanged:: 3.3
-      Removed the *strict* argument.  Added the *policy* keyword.
+      Đã loại bỏ đối số *strict*. Đã thêm từ khóa *policy*.
 
 
 .. function:: message_from_string(s, _class=None, *, policy=policy.compat32)
 
-   Return a message object structure from a string.  This is equivalent to
-   ``Parser().parsestr(s)``.  *_class* and *policy* are interpreted as
-   with the :class:`~email.parser.Parser` class constructor.
+   Trả về cấu trúc đối tượng message từ một chuỗi. Điều này tương đương với ``Parser().parsestr(s)``. *_class* và *policy* được diễn giải như trong hàm khởi tạo lớp :class:`~email.parser.Parser`.
 
    .. versionchanged:: 3.3
-      Removed the *strict* argument.  Added the *policy* keyword.
+      Đã loại bỏ đối số *strict*. Đã thêm từ khóa *policy*.
 
 
 .. function:: message_from_file(fp, _class=None, *, policy=policy.compat32)
 
-   Return a message object structure tree from an open :term:`file object`.
-   This is equivalent to ``Parser().parse(fp)``.  *_class* and *policy* are
-   interpreted as with the :class:`~email.parser.Parser` class constructor.
+   Trả về cây cấu trúc đối tượng thông điệp từ một :term:`file object` đang mở. Điều này tương đương với ``Parser().parse(fp)``. *_class* và *policy* được diễn giải giống như trong hàm khởi tạo lớp :class:`~email.parser.Parser`.
 
    .. versionchanged:: 3.3
-      Removed the *strict* argument.  Added the *policy* keyword.
-   .. versionchanged:: 3.6 *_class* defaults to the policy ``message_factory``.
+      Đã loại bỏ đối số *strict*. Đã thêm từ khóa *policy*.
+   .. versionchanged:: 3.6 *_class* mặc định sử dụng policy ``message_factory``.
 
 
-Here's an example of how you might use :func:`message_from_bytes` at an
-interactive Python prompt::
+Đây là ví dụ về cách bạn có thể sử dụng :func:`message_from_bytes` tại dấu nhắc Python tương tác::
 
    >>> import email
    >>> msg = email.message_from_bytes(myBytes)  # doctest: +SKIP
 
 
-Additional notes
-^^^^^^^^^^^^^^^^
+Ghi chú bổ sung
+^^^^^^^^^^^^^^^
 
-Here are some notes on the parsing semantics:
+Dưới đây là một số ghi chú về ngữ nghĩa phân tích cú pháp:
 
-* Most non-\ :mimetype:`multipart` type messages are parsed as a single message
-  object with a string payload.  These objects will return ``False`` for
-  :meth:`~email.message.EmailMessage.is_multipart`, and
-  :meth:`~email.message.EmailMessage.iter_parts` will yield an empty list.
+* Hầu hết các tin nhắn có kiểu không phải \ :mimetype:`multipart` được phân tích cú pháp thành một đối tượng tin nhắn duy nhất với payload là một chuỗi. Các đối tượng này sẽ trả về ``False`` cho
+  :meth:`~email.message.EmailMessage.is_multipart`, và
+  :meth:`~email.message.EmailMessage.iter_parts` sẽ tạo ra một danh sách rỗng.
 
-* All :mimetype:`multipart` type messages will be parsed as a container message
-  object with a list of sub-message objects for their payload.  The outer
-  container message will return ``True`` for
-  :meth:`~email.message.EmailMessage.is_multipart`, and
-  :meth:`~email.message.EmailMessage.iter_parts` will yield a list of subparts.
+* Tất cả tin nhắn kiểu :mimetype:`multipart` sẽ được phân tích cú pháp thành một đối tượng tin nhắn container với payload là một danh sách các đối tượng tin nhắn con. Tin nhắn container bên ngoài sẽ trả về ``True`` cho
+  :meth:`~email.message.EmailMessage.is_multipart`, và
+  :meth:`~email.message.EmailMessage.iter_parts` sẽ tạo ra một danh sách các phần con.
 
-* Most messages with a content type of :mimetype:`message/\*` (such as
-  :mimetype:`message/delivery-status` and :mimetype:`message/rfc822`) will also
-  be parsed as container object containing a list payload of length 1.  Their
-  :meth:`~email.message.EmailMessage.is_multipart` method will return ``True``.
-  The single element yielded by :meth:`~email.message.EmailMessage.iter_parts`
-  will be a sub-message object.
+* Hầu hết các tin nhắn có content type là :mimetype:`message/\*` (chẳng hạn như
+  :mimetype:`message/delivery-status` và :mimetype:`message/rfc822`) cũng sẽ được phân tích cú pháp thành đối tượng container chứa payload dạng danh sách có độ dài 1. Các
+  Phương thức :meth:`~email.message.EmailMessage.is_multipart` sẽ trả về ``True``. Phần tử duy nhất do :meth:`~email.message.EmailMessage.iter_parts` tạo ra sẽ là một đối tượng sub-message.
 
-* Some non-standards-compliant messages may not be internally consistent about
-  their :mimetype:`multipart`\ -edness.  Such messages may have a
-  :mailheader:`Content-Type` header of type :mimetype:`multipart`, but their
-  :meth:`~email.message.EmailMessage.is_multipart` method may return ``False``.
-  If such messages were parsed with the :class:`~email.parser.FeedParser`,
-  they will have an instance of the
-  :class:`~email.errors.MultipartInvariantViolationDefect` class in their
-  *defects* attribute list.  See :mod:`email.errors` for details.
+* Một số message không tuân thủ tiêu chuẩn có thể không nhất quán về mặt nội bộ đối với tính :mimetype:`multipart`\ -edness của chúng. Những message như vậy có thể có một
+  header :mailheader:`Content-Type` thuộc kiểu :mimetype:`multipart`, nhưng
+  phương thức :meth:`~email.message.EmailMessage.is_multipart` có thể trả về ``False``. Nếu những message như vậy được phân tích cú pháp bằng :class:`~email.parser.FeedParser`, chúng sẽ có một thể hiện của
+  lớp :class:`~email.errors.MultipartInvariantViolationDefect` trong danh sách thuộc tính *defects* của chúng. Xem :mod:`email.errors` để biết chi tiết.

@@ -1,17 +1,15 @@
-:mod:`!distutils` --- Building and installing Python modules
-============================================================
+:mod:`!distutils` --- Xây dựng và cài đặt các mô-đun Python
+===========================================================
 
 .. module:: distutils
-   :synopsis: Removed in 3.12.
+   :synopsis: Đã bị loại bỏ trong 3.12.
    :deprecated:
 
 .. deprecated-removed:: 3.10 3.12
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.12 <whatsnew312-removed-distutils>` after
-being deprecated in Python 3.10.  The removal was decided in :pep:`632`,
-which has `migration advice
-<https://peps.python.org/pep-0632/#migration-advice>`_.
+Mô-đun này không còn thuộc thư viện chuẩn Python. Mô-đun đã được :ref:`loại bỏ trong Python 3.12 <whatsnew312-removed-distutils>` sau khi không còn được khuyến nghị sử dụng trong Python 3.10. Việc loại bỏ này được quyết định trong :pep:`632`, tài liệu này có `hướng dẫn chuyển đổi <https://peps.python.org/pep-0632/#migration-advice>`_.
 
-The last version of Python that provided the :mod:`!distutils` module was
-`Python 3.11 <https://docs.python.org/3.11/library/distutils.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!distutils` này là `Python 3.11 <https://docs.python.org/3.11/library/distutils.html>`_.
+
+.. _`migration advice`: https://peps.python.org/pep-0632/#migration-advice
+.. _`Python 3.11`: https://docs.python.org/3.11/library/distutils.html

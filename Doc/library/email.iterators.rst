@@ -1,52 +1,40 @@
-:mod:`!email.iterators`: Iterators
-----------------------------------
+:mod:`!email.iterators`: Bộ lặp
+-------------------------------
 
 .. module:: email.iterators
-   :synopsis: Iterate over a  message object tree.
+   :synopsis: Lặp qua cây đối tượng message.
 
-**Source code:** :source:`Lib/email/iterators.py`
+**Mã nguồn:** :source:`Lib/email/iterators.py`
 
 --------------
 
-Iterating over a message object tree is fairly easy with the
-:meth:`Message.walk <email.message.Message.walk>` method.  The
-:mod:`!email.iterators` module provides some useful higher level iterations over
-message object trees.
+Việc lặp qua cây đối tượng message khá dễ dàng với
+:meth:`Message.walk <email.message.Message.walk>` phương thức.
+Mô-đun :mod:`!email.iterators` cung cấp một số cách lặp ở cấp cao hữu ích trên các cây đối tượng message.
 
 
 .. function:: body_line_iterator(msg, decode=False)
 
-   This iterates over all the payloads in all the subparts of *msg*, returning the
-   string payloads line-by-line.  It skips over all the subpart headers, and it
-   skips over any subpart with a payload that isn't a Python string.  This is
-   somewhat equivalent to reading the flat text representation of the message from
-   a file using :meth:`~io.TextIOBase.readline`, skipping over all the
-   intervening headers.
+   Cách này lặp qua tất cả payload trong mọi phần con của *msg*, trả về các payload dạng chuỗi theo từng dòng.  Cách này bỏ qua tất cả header của các phần con, đồng thời bỏ qua mọi phần con có payload không phải là một chuỗi Python.  Cách này tương đương ở một mức độ nhất định với việc đọc biểu diễn văn bản phẳng của message từ một tệp bằng :meth:`~io.TextIOBase.readline`, bỏ qua tất cả header nằm xen giữa.
 
-   Optional *decode* is passed through to :meth:`Message.get_payload
-   <email.message.Message.get_payload>`.
+   Tùy chọn *decode* được truyền tiếp đến :meth:`Message.get_payload <email.message.Message.get_payload>`.
 
 
 .. function:: typed_subpart_iterator(msg, maintype='text', subtype=None)
 
-   This iterates over all the subparts of *msg*, returning only those subparts that
-   match the MIME type specified by *maintype* and *subtype*.
+   Hàm này lặp qua tất cả các phần con của *msg*, chỉ trả về những phần con khớp với kiểu MIME được chỉ định bởi *maintype* và *subtype*.
 
-   Note that *subtype* is optional; if omitted, then subpart MIME type matching is
-   done only with the main type.  *maintype* is optional too; it defaults to
+   Lưu ý rằng *subtype* là tùy chọn; nếu bỏ qua, việc khớp kiểu MIME của phần con chỉ được thực hiện với kiểu chính. *maintype* cũng là tùy chọn; giá trị mặc định là
    :mimetype:`text`.
 
-   Thus, by default :func:`typed_subpart_iterator` returns each subpart that has a
-   MIME type of :mimetype:`text/\*`.
+   Do đó, theo mặc định, :func:`typed_subpart_iterator` trả về mỗi phần con có kiểu MIME là :mimetype:`text/\*`.
 
 
-The following function has been added as a useful debugging tool.  It should
-*not* be considered part of the supported public interface for the package.
+Hàm sau đây được bổ sung như một công cụ hữu ích để gỡ lỗi. Không nên *not* coi hàm này là một phần của interface công khai được hỗ trợ của package.
 
 .. function:: _structure(msg, fp=None, level=0, include_default=False)
 
-   Prints an indented representation of the content types of the message object
-   structure.  For example:
+   In ra biểu diễn thụt lề của các kiểu nội dung trong cấu trúc đối tượng message. Ví dụ:
 
    .. testsetup::
 
@@ -78,6 +66,4 @@ The following function has been added as a useful debugging tool.  It should
 
       somefile.close()
 
-   Optional *fp* is a file-like object to print the output to.  It must be
-   suitable for Python's :func:`print` function.  *level* is used internally.
-   *include_default*, if true, prints the default type as well.
+   *fp* tùy chọn là một đối tượng giống tệp để in kết quả ra. Đối tượng này phải phù hợp với hàm :func:`print` của Python. *level* được sử dụng nội bộ. Nếu *include_default* là true, hàm cũng in kiểu mặc định.
