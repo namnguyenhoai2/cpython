@@ -2,100 +2,79 @@
 
 .. _typeobjects:
 
-Type Objects
-------------
+Đối tượng kiểu
+--------------
 
 .. index:: pair: object; type
 
 
 .. c:type:: PyTypeObject
 
-   The C structure of the objects used to describe built-in types.
+   Cấu trúc C của các đối tượng được dùng để mô tả các kiểu dựng sẵn.
 
 
 .. c:var:: PyTypeObject PyType_Type
 
-   This is the type object for type objects; it is the same object as
-   :class:`type` in the Python layer.
+   Đây là đối tượng kiểu dành cho các đối tượng kiểu; nó chính là đối tượng
+   :class:`type` trong lớp Python.
 
 
 .. c:function:: int PyType_Check(PyObject *o)
 
-   Return non-zero if the object *o* is a type object, including instances of
-   types derived from the standard type object.  Return 0 in all other cases.
-   This function always succeeds.
+   Trả về giá trị khác 0 nếu đối tượng *o* là một đối tượng kiểu, bao gồm cả các thể hiện của những kiểu được dẫn xuất từ đối tượng kiểu chuẩn. Trả về 0 trong mọi trường hợp khác. Hàm này luôn thành công.
 
 
 .. c:function:: int PyType_CheckExact(PyObject *o)
 
-   Return non-zero if the object *o* is a type object, but not a subtype of
-   the standard type object.  Return 0 in all other cases.  This function
-   always succeeds.
+   Trả về giá trị khác 0 nếu đối tượng *o* là một đối tượng kiểu, nhưng không phải là kiểu con của đối tượng kiểu chuẩn. Trả về 0 trong mọi trường hợp khác. Hàm này luôn thành công.
 
 
 .. c:function:: unsigned int PyType_ClearCache()
 
-   Clear the internal lookup cache. Return the current version tag.
+   Xóa bộ nhớ đệm tra cứu nội bộ. Trả về thẻ phiên bản hiện tại.
 
 .. c:function:: unsigned long PyType_GetFlags(PyTypeObject* type)
 
-   Return the :c:member:`~PyTypeObject.tp_flags` member of *type*. This function is primarily
-   meant for use with ``Py_LIMITED_API``; the individual flag bits are
-   guaranteed to be stable across Python releases, but access to
-   :c:member:`~PyTypeObject.tp_flags` itself is not part of the :ref:`limited API <limited-c-api>`.
+   Trả về thành phần :c:member:`~PyTypeObject.tp_flags` của *type*. Hàm này chủ yếu được dùng với ``Py_LIMITED_API``; các bit cờ riêng lẻ được đảm bảo ổn định giữa các bản phát hành Python, nhưng quyền truy cập vào
+   :c:member:`~PyTypeObject.tp_flags` bản thân nó không thuộc :ref:`limited API <limited-c-api>`.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.4
-      The return type is now ``unsigned long`` rather than ``long``.
+      Kiểu trả về hiện là ``unsigned long`` thay vì ``long``.
 
 
 .. c:function:: PyObject* PyType_GetDict(PyTypeObject* type)
 
-   Return the type object's internal namespace, which is otherwise only
-   exposed via a read-only proxy (:attr:`cls.__dict__ <type.__dict__>`).
-   This is a
-   replacement for accessing :c:member:`~PyTypeObject.tp_dict` directly.
-   The returned dictionary must be treated as read-only.
+   Trả về namespace nội bộ của đối tượng kiểu, vốn chỉ được cung cấp theo cách khác thông qua một proxy chỉ đọc (:attr:`cls.__dict__ <type.__dict__>`). Đây là cách thay thế cho việc truy cập trực tiếp vào :c:member:`~PyTypeObject.tp_dict`. Từ điển được trả về phải được coi là chỉ đọc.
 
-   This function is meant for specific embedding and language-binding cases,
-   where direct access to the dict is necessary and indirect access
-   (e.g. via the proxy or :c:func:`PyObject_GetAttr`) isn't adequate.
+   Hàm này dành cho các trường hợp embedding và language binding cụ thể, khi cần truy cập trực tiếp vào dict và việc truy cập gián tiếp (ví dụ: thông qua proxy hoặc :c:func:`PyObject_GetAttr`) không đủ đáp ứng.
 
-   Extension modules should continue to use ``tp_dict``,
-   directly or indirectly, when setting up their own types.
+   Các extension module tiếp tục sử dụng ``tp_dict``, trực tiếp hoặc gián tiếp, khi thiết lập các type của riêng chúng.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: void PyType_Modified(PyTypeObject *type)
 
-   Invalidate the internal lookup cache for the type and all of its
-   subtypes.  This function must be called after any manual
-   modification of the attributes or base classes of the type.
+   Vô hiệu hóa bộ nhớ đệm tra cứu nội bộ cho type và tất cả subtype của nó. Hàm này phải được gọi sau mọi sửa đổi thủ công đối với các thuộc tính hoặc base class của type.
 
 
 .. c:function:: int PyType_AddWatcher(PyType_WatchCallback callback)
 
-   Register *callback* as a type watcher. Return a non-negative integer ID
-   which must be passed to future calls to :c:func:`PyType_Watch`. In case of
-   error (e.g. no more watcher IDs available), return ``-1`` and set an
-   exception.
+   Đăng ký *callback* làm trình theo dõi kiểu. Trả về một ID số nguyên không âm, ID này phải được truyền vào các lần gọi sau đến :c:func:`PyType_Watch`. Trong trường hợp xảy ra lỗi (ví dụ: không còn ID trình theo dõi khả dụng), trả về ``-1`` và thiết lập một ngoại lệ.
 
-   In free-threaded builds, :c:func:`PyType_AddWatcher` is not thread-safe,
-   so it must be called at start up (before spawning the first thread).
+   Trong các bản build free-threaded, :c:func:`PyType_AddWatcher` không an toàn với thread, vì vậy phải gọi nó khi khởi động (trước khi tạo thread đầu tiên).
 
    .. versionadded:: 3.12
 
 
 .. c:function:: int PyType_ClearWatcher(int watcher_id)
 
-   Clear watcher identified by *watcher_id* (previously returned from
-   :c:func:`PyType_AddWatcher`). Return ``0`` on success, ``-1`` on error (e.g.
-   if *watcher_id* was never registered.)
+   Xóa trình theo dõi được xác định bởi *watcher_id* (trước đó được trả về từ
+   :c:func:`PyType_AddWatcher`). Trả về ``0`` nếu thành công, ``-1`` nếu xảy ra lỗi (ví dụ: nếu *watcher_id* chưa từng được đăng ký.)
 
-   An extension should never call ``PyType_ClearWatcher`` with a *watcher_id*
-   that was not returned to it by a previous call to
+   Một extension không bao giờ được gọi ``PyType_ClearWatcher`` với *watcher_id* chưa từng được trả về cho extension đó bởi một lần gọi trước đến
    :c:func:`PyType_AddWatcher`.
 
    .. versionadded:: 3.12
@@ -103,400 +82,311 @@ Type Objects
 
 .. c:function:: int PyType_Watch(int watcher_id, PyObject *type)
 
-   Mark *type* as watched. The callback granted *watcher_id* by
-   :c:func:`PyType_AddWatcher` will be called whenever
-   :c:func:`PyType_Modified` reports a change to *type*. (The callback may be
-   called only once for a series of consecutive modifications to *type*, if
-   :c:func:`!_PyType_Lookup` is not called on *type* between the modifications;
-   this is an implementation detail and subject to change.)
+   Đánh dấu *type* là đang được theo dõi. Callback được cấp *watcher_id* bởi
+   :c:func:`PyType_AddWatcher` sẽ được gọi bất cứ khi nào
+   :c:func:`PyType_Modified` báo cáo một thay đổi đối với *type*. (Callback có thể chỉ được gọi một lần cho một loạt các sửa đổi liên tiếp đối với *type*, nếu
+   :c:func:`!_PyType_Lookup` không được gọi trên *type* giữa các lần sửa đổi; đây là một chi tiết triển khai và có thể thay đổi.)
 
-   An extension should never call ``PyType_Watch`` with a *watcher_id* that was
-   not returned to it by a previous call to :c:func:`PyType_AddWatcher`.
+   Một extension không bao giờ được gọi ``PyType_Watch`` với một *watcher_id* chưa được trả về cho nó bởi một lần gọi trước đó tới :c:func:`PyType_AddWatcher`.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: int PyType_Unwatch(int watcher_id, PyObject *type)
 
-   Mark *type* as not watched. This undoes a previous call to
-   :c:func:`PyType_Watch`. *type* must not be ``NULL``.
+   Đánh dấu *type* là không được theo dõi. Thao tác này hoàn tác một lần gọi trước đó tới
+   :c:func:`PyType_Watch`. *type* không được là ``NULL``.
 
-   An extension should never call this function with a *watcher_id* that was
-   not returned to it by a previous call to :c:func:`PyType_AddWatcher`.
+   Một extension không bao giờ được gọi hàm này với một *watcher_id* chưa được trả về cho nó bởi một lần gọi trước đó tới :c:func:`PyType_AddWatcher`.
 
-   On success, this function returns ``0``. On failure, this function returns
-   ``-1`` with an exception set.
+   Khi thành công, hàm này trả về ``0``. Khi thất bại, hàm này trả về ``-1`` cùng với một exception được thiết lập.
 
    .. versionadded:: 3.12
 
 
 .. c:type:: int (*PyType_WatchCallback)(PyObject *type)
 
-   Type of a type-watcher callback function.
+   Kiểu của hàm callback theo dõi kiểu.
 
-   The callback must not modify *type* or cause :c:func:`PyType_Modified` to be
-   called on *type* or any type in its MRO; violating this rule could cause
-   infinite recursion.
+   Callback không được sửa đổi *type* hoặc khiến :c:func:`PyType_Modified` được gọi trên *type* hay bất kỳ kiểu nào trong MRO của nó; vi phạm quy tắc này có thể gây ra đệ quy vô hạn.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: int PyType_HasFeature(PyTypeObject *o, int feature)
 
-   Return non-zero if the type object *o* sets the feature *feature*.
-   Type features are denoted by single bit flags.
+   Trả về giá trị khác 0 nếu đối tượng kiểu *o* thiết lập tính năng *feature*. Các tính năng của kiểu được biểu thị bằng các cờ bit đơn.
 
 
 .. c:function:: int PyType_FastSubclass(PyTypeObject *type, int flag)
 
-   Return non-zero if the type object *type* sets the subclass flag *flag*.
-   Subclass flags are denoted by
-   :c:macro:`Py_TPFLAGS_*_SUBCLASS <Py_TPFLAGS_LONG_SUBCLASS>`.
-   This function is used by many ``_Check`` functions for common types.
+   Trả về giá trị khác 0 nếu đối tượng kiểu *type* thiết lập cờ lớp con *flag*. Các cờ lớp con được biểu thị bằng
+   :c:macro:`Py_TPFLAGS_*_SUBCLASS <Py_TPFLAGS_LONG_SUBCLASS>`. Hàm này được nhiều hàm ``_Check`` sử dụng cho các kiểu thông dụng.
 
    .. seealso::
        :c:func:`PyObject_TypeCheck`, which is used as a slower alternative in
-       ``_Check`` functions for types that don't come with subclass flags.
+       ``_Check`` hàm dành cho các kiểu không đi kèm cờ lớp con.
 
 
 .. c:function:: int PyType_IS_GC(PyTypeObject *o)
 
-   Return true if the type object includes support for the cycle detector; this
-   tests the type flag :c:macro:`Py_TPFLAGS_HAVE_GC`.
+   Trả về true nếu đối tượng kiểu hỗ trợ bộ phát hiện chu kỳ; hàm này kiểm tra cờ kiểu :c:macro:`Py_TPFLAGS_HAVE_GC`.
 
 
 .. c:function:: int PyType_IsSubtype(PyTypeObject *a, PyTypeObject *b)
 
-   Return true if *a* is a subtype of *b*.
+   Trả về true nếu *a* là kiểu con của *b*.
 
-   This function only checks for actual subtypes, which means that
-   :meth:`~type.__subclasscheck__` is not called on *b*.  Call
-   :c:func:`PyObject_IsSubclass` to do the same check that :func:`issubclass`
-   would do.
+   Hàm này chỉ kiểm tra các kiểu con thực sự, nghĩa là
+   :meth:`~type.__subclasscheck__` không được gọi trên *b*. Hãy gọi
+   :c:func:`PyObject_IsSubclass` để thực hiện cùng phép kiểm tra mà :func:`issubclass` sẽ thực hiện.
 
 
 .. c:function:: PyObject* PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
 
-   Generic handler for the :c:member:`~PyTypeObject.tp_alloc` slot of a type
-   object.  Uses Python's default memory allocation mechanism to allocate memory
-   for a new instance, zeros the memory, then initializes the memory as if by
-   calling :c:func:`PyObject_Init` or :c:func:`PyObject_InitVar`.
+   Bộ xử lý chung cho slot :c:member:`~PyTypeObject.tp_alloc` của một đối tượng kiểu. Sử dụng cơ chế cấp phát bộ nhớ mặc định của Python để cấp phát bộ nhớ cho một instance mới, đặt toàn bộ vùng nhớ về 0, sau đó khởi tạo vùng nhớ như thể đang gọi :c:func:`PyObject_Init` hoặc :c:func:`PyObject_InitVar`.
 
-   Do not call this directly to allocate memory for an object; call the type's
-   :c:member:`~PyTypeObject.tp_alloc` slot instead.
+   Không gọi trực tiếp hàm này để cấp phát bộ nhớ cho một đối tượng; thay vào đó, hãy gọi slot của type
+   :c:member:`~PyTypeObject.tp_alloc`.
 
-   For types that support garbage collection (i.e., the
-   :c:macro:`Py_TPFLAGS_HAVE_GC` flag is set), this function behaves like
-   :c:macro:`PyObject_GC_New` or :c:macro:`PyObject_GC_NewVar` (except the
-   memory is guaranteed to be zeroed before initialization), and should be
-   paired with :c:func:`PyObject_GC_Del` in :c:member:`~PyTypeObject.tp_free`.
-   Otherwise, it behaves like :c:macro:`PyObject_New` or
-   :c:macro:`PyObject_NewVar` (except the memory is guaranteed to be zeroed
-   before initialization) and should be paired with :c:func:`PyObject_Free` in
+   Đối với các kiểu hỗ trợ garbage collection (tức là cờ
+   :c:macro:`Py_TPFLAGS_HAVE_GC` được đặt), hàm này hoạt động như
+   :c:macro:`PyObject_GC_New` hoặc :c:macro:`PyObject_GC_NewVar` (ngoại trừ việc bộ nhớ được bảo đảm đã được đặt về 0 trước khi khởi tạo), và nên được dùng cùng với :c:func:`PyObject_GC_Del` trong :c:member:`~PyTypeObject.tp_free`. Nếu không, nó hoạt động như :c:macro:`PyObject_New` hoặc
+   :c:macro:`PyObject_NewVar` (ngoại trừ việc bộ nhớ được bảo đảm đã được đặt về 0 trước khi khởi tạo) và nên được dùng cùng với :c:func:`PyObject_Free` trong
    :c:member:`~PyTypeObject.tp_free`.
 
 
 .. c:function:: PyObject* PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
-   Generic handler for the :c:member:`~PyTypeObject.tp_new` slot of a type
-   object.  Creates a new instance using the type's
-   :c:member:`~PyTypeObject.tp_alloc` slot and returns the resulting object.
+   Trình xử lý chung cho slot :c:member:`~PyTypeObject.tp_new` của một đối tượng kiểu. Tạo một instance mới bằng slot :c:member:`~PyTypeObject.tp_new` của kiểu và trả về đối tượng thu được.
+   :c:member:`~PyTypeObject.tp_alloc` của kiểu và trả về đối tượng thu được.
 
 
 .. c:function:: int PyType_Ready(PyTypeObject *type)
 
-   Finalize a type object.  This should be called on all type objects to finish
-   their initialization.  This function is responsible for adding inherited slots
-   from a type's base class.  Return ``0`` on success, or return ``-1`` and sets an
-   exception on error.
+   Hoàn tất một đối tượng kiểu. Hàm này nên được gọi trên tất cả các đối tượng kiểu để hoàn tất quá trình khởi tạo. Hàm này chịu trách nhiệm thêm các slot được kế thừa từ lớp cơ sở của một kiểu. Trả về ``0`` khi thành công, hoặc trả về ``-1`` và đặt một exception khi xảy ra lỗi.
 
    .. note::
-       If some of the base classes implements the GC protocol and the provided
-       type does not include the :c:macro:`Py_TPFLAGS_HAVE_GC` in its flags, then
-       the GC protocol will be automatically implemented from its parents. On
-       the contrary, if the type being created does include
-       :c:macro:`Py_TPFLAGS_HAVE_GC` in its flags then it **must** implement the
-       GC protocol itself by at least implementing the
+       Nếu một số lớp cơ sở triển khai giao thức GC và kiểu được cung cấp không bao gồm :c:macro:`Py_TPFLAGS_HAVE_GC` trong các cờ của nó, thì giao thức GC sẽ được tự động triển khai từ các lớp cha. Ngược lại, nếu kiểu đang được tạo có bao gồm
+       :c:macro:`Py_TPFLAGS_HAVE_GC` trong các cờ của nó thì nó **bắt buộc** phải tự triển khai giao thức GC bằng cách ít nhất triển khai
        :c:member:`~PyTypeObject.tp_traverse` handle.
 
 
 .. c:function:: PyObject* PyType_GetName(PyTypeObject *type)
 
-   Return the type's name. Equivalent to getting the type's
-   :attr:`~type.__name__` attribute.
+   Trả về tên của type. Tương đương với việc lấy thuộc tính
+   :attr:`~type.__name__` của type.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: PyObject* PyType_GetQualName(PyTypeObject *type)
 
-   Return the type's qualified name. Equivalent to getting the
-   type's :attr:`~type.__qualname__` attribute.
+   Trả về tên đủ điều kiện của type. Tương đương với việc lấy thuộc tính :attr:`~type.__qualname__` của type.
 
    .. versionadded:: 3.11
 
 .. c:function:: PyObject* PyType_GetFullyQualifiedName(PyTypeObject *type)
 
-   Return the type's fully qualified name. Equivalent to
-   ``f"{type.__module__}.{type.__qualname__}"``, or :attr:`type.__qualname__`
-   if :attr:`type.__module__` is not a string or is equal to ``"builtins"``.
+   Trả về tên đầy đủ của type. Tương đương với ``f"{type.__module__}.{type.__qualname__}"``, hoặc :attr:`type.__qualname__` nếu :attr:`type.__module__` không phải là một chuỗi hoặc bằng ``"builtins"``.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: PyObject* PyType_GetModuleName(PyTypeObject *type)
 
-   Return the type's module name. Equivalent to getting the
-   :attr:`type.__module__` attribute.
+   Trả về tên module của kiểu. Tương đương với việc lấy
+   thuộc tính :attr:`type.__module__`.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: void* PyType_GetSlot(PyTypeObject *type, int slot)
 
-   Return the function pointer stored in the given slot. If the
-   result is ``NULL``, this indicates that either the slot is ``NULL``,
-   or that the function was called with invalid parameters.
-   Callers will typically cast the result pointer into the appropriate
-   function type.
+   Trả về con trỏ hàm được lưu trong slot đã cho. Nếu kết quả là ``NULL``, điều này cho biết slot là ``NULL``, hoặc hàm đã được gọi với các tham số không hợp lệ. Thông thường, bên gọi sẽ ép con trỏ kết quả sang kiểu hàm thích hợp.
 
-   See :c:member:`PyType_Slot.slot` for possible values of the *slot* argument.
+   Xem :c:member:`PyType_Slot.slot` để biết các giá trị có thể có của đối số *slot*.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.10
       :c:func:`PyType_GetSlot` can now accept all types.
-      Previously, it was limited to :ref:`heap types <heap-types>`.
+      Trước đây, nó chỉ bị giới hạn ở :ref:`các kiểu heap <heap-types>`.
 
 
 .. c:function:: PyObject* PyType_GetModule(PyTypeObject *type)
 
-   Return the module object associated with the given type when the type was
-   created using :c:func:`PyType_FromModuleAndSpec`.
+   Trả về đối tượng module liên kết với kiểu đã cho khi kiểu đó được tạo bằng :c:func:`PyType_FromModuleAndSpec`.
 
-   The returned reference is :term:`borrowed <borrowed reference>` from *type*,
-   and will be valid as long as you hold a reference to *type*.
-   Do not release it with :c:func:`Py_DECREF` or similar.
+   Tham chiếu được trả về là :term:`mượn <borrowed reference>` từ *kiểu*, và sẽ hợp lệ miễn là bạn còn giữ một tham chiếu đến *kiểu*. Không giải phóng tham chiếu này bằng :c:func:`Py_DECREF` hoặc tương tự.
 
-   If no module is associated with the given type, sets :py:class:`TypeError`
-   and returns ``NULL``.
+   Nếu không có module nào được liên kết với kiểu đã cho, đặt :py:class:`TypeError` và trả về ``NULL``.
 
-   This function is usually used to get the module in which a method is defined.
-   Note that in such a method, ``PyType_GetModule(Py_TYPE(self))``
-   may not return the intended result.
-   ``Py_TYPE(self)`` may be a *subclass* of the intended class, and subclasses
-   are not necessarily defined in the same module as their superclass.
-   See :c:type:`PyCMethod` to get the class that defines the method.
-   See :c:func:`PyType_GetModuleByDef` for cases when :c:type:`!PyCMethod` cannot
-   be used.
+   Hàm này thường được dùng để lấy module mà trong đó một phương thức được định nghĩa. Lưu ý rằng trong một phương thức như vậy, ``PyType_GetModule(Py_TYPE(self))`` có thể không trả về kết quả mong muốn. ``Py_TYPE(self)`` có thể là một *subclass* của class dự kiến, và các subclass không nhất thiết được định nghĩa trong cùng module với superclass của chúng. Xem :c:type:`PyCMethod` để lấy class định nghĩa phương thức. Xem :c:func:`PyType_GetModuleByDef` để biết các trường hợp không thể sử dụng :c:type:`!PyCMethod`.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: void* PyType_GetModuleState(PyTypeObject *type)
 
-   Return the state of the module object associated with the given type.
-   This is a shortcut for calling :c:func:`PyModule_GetState()` on the result
-   of :c:func:`PyType_GetModule`.
+   Trả về trạng thái của đối tượng module được liên kết với kiểu đã cho. Đây là cách viết tắt để gọi :c:func:`PyModule_GetState()` trên kết quả của :c:func:`PyType_GetModule`.
 
-   If no module is associated with the given type, sets :py:class:`TypeError`
-   and returns ``NULL``.
+   Nếu không có module nào được liên kết với kiểu đã cho, đặt :py:class:`TypeError` và trả về ``NULL``.
 
-   If the *type* has an associated module but its state is ``NULL``,
-   returns ``NULL`` without setting an exception.
+   Nếu *type* có module liên kết nhưng trạng thái của module là ``NULL``, trả về ``NULL`` mà không đặt exception.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: PyObject* PyType_GetModuleByDef(PyTypeObject *type, struct PyModuleDef *def)
 
-   Find the first superclass whose module was created from
-   the given :c:type:`PyModuleDef` *def*, and return that module.
+   Tìm superclass đầu tiên có module được tạo từ :c:type:`PyModuleDef` *def* đã cho, rồi trả về module đó.
 
-   If no module is found, raises a :py:class:`TypeError` and returns ``NULL``.
+   Nếu không tìm thấy module nào, phát sinh một :py:class:`TypeError` và trả về ``NULL``.
 
-   This function is intended to be used together with
-   :c:func:`PyModule_GetState()` to get module state from slot methods (such as
-   :c:member:`~PyTypeObject.tp_init` or :c:member:`~PyNumberMethods.nb_add`)
-   and other places where a method's defining class cannot be passed using the
-   :c:type:`PyCMethod` calling convention.
+   Hàm này được dùng cùng với
+   :c:func:`PyModule_GetState()` để lấy trạng thái mô-đun từ các phương thức slot (chẳng hạn như
+   :c:member:`~PyTypeObject.tp_init` hoặc :c:member:`~PyNumberMethods.nb_add`) và những nơi khác mà lớp định nghĩa của một phương thức không thể được truyền bằng quy ước gọi
+   :c:type:`PyCMethod`.
 
-   The returned reference is :term:`borrowed <borrowed reference>` from *type*,
-   and will be valid as long as you hold a reference to *type*.
-   Do not release it with :c:func:`Py_DECREF` or similar.
+   Tham chiếu được trả về là :term:`mượn <borrowed reference>` từ *kiểu*, và sẽ hợp lệ miễn là bạn còn giữ một tham chiếu đến *kiểu*. Không giải phóng tham chiếu này bằng :c:func:`Py_DECREF` hoặc tương tự.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: int PyType_GetBaseByToken(PyTypeObject *type, void *token, PyTypeObject **result)
 
-   Find the first superclass in *type*'s :term:`method resolution order` whose
-   :c:macro:`Py_tp_token` token is equal to the given one.
+   Tìm lớp cha đầu tiên trong *type*'s :term:`method resolution order` mà
+   :c:macro:`Py_tp_token` token bằng với token đã cho.
 
-   * If found, set *\*result* to a new :term:`strong reference`
-     to it and return ``1``.
-   * If not found, set *\*result* to ``NULL`` and return ``0``.
-   * On error, set *\*result* to ``NULL`` and return ``-1`` with an
-     exception set.
+   * Nếu tìm thấy, đặt *\*result* thành một :term:`strong reference` mới tới nó và trả về ``1``.
+   * Nếu không tìm thấy, đặt *\*result* thành ``NULL`` và trả về ``0``.
+   * Khi xảy ra lỗi, đặt *\*result* thành ``NULL`` và trả về ``-1`` với một exception được thiết lập.
 
-   The *result* argument may be ``NULL``, in which case *\*result* is not set.
-   Use this if you need only the return value.
+   Đối số *result* có thể là ``NULL``, trong trường hợp đó *\*result* không được thiết lập. Sử dụng tùy chọn này nếu bạn chỉ cần giá trị trả về.
 
-   The *token* argument may not be ``NULL``.
+   Đối số *token* không được là ``NULL``.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyUnstable_Type_AssignVersionTag(PyTypeObject *type)
 
-   Attempt to assign a version tag to the given type.
+   Cố gắng gán một thẻ phiên bản cho kiểu đã cho.
 
-   Returns 1 if the type already had a valid version tag or a new one was
-   assigned, or 0 if a new tag could not be assigned.
+   Trả về 1 nếu kiểu đã có thẻ phiên bản hợp lệ hoặc một thẻ mới đã được gán, hoặc 0 nếu không thể gán thẻ mới.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: int PyType_SUPPORTS_WEAKREFS(PyTypeObject *type)
 
-   Return true if instances of *type* support creating weak references, false
-   otherwise. This function always succeeds. *type* must not be ``NULL``.
+   Trả về true nếu các instance của *type* hỗ trợ tạo weak reference, ngược lại trả về false. Hàm này luôn thành công. *type* không được là ``NULL``.
 
    .. seealso::
       * :ref:`weakrefobjects`
       * :py:mod:`weakref`
 
 
-Creating Heap-Allocated Types
-.............................
+Tạo các kiểu heap được cấp phát trên heap
+.........................................
 
-The following functions and structs are used to create
-:ref:`heap types <heap-types>`.
+Các hàm và cấu trúc sau được dùng để tạo
+:ref:`các kiểu heap <heap-types>`.
 
 .. c:function:: PyObject* PyType_FromMetaclass(PyTypeObject *metaclass, PyObject *module, PyType_Spec *spec, PyObject *bases)
 
-   Create and return a :ref:`heap type <heap-types>` from the *spec*
-   (see :c:macro:`Py_TPFLAGS_HEAPTYPE`).
+   Tạo và trả về một :ref:`kiểu heap <heap-types>` từ *đặc tả* (xem :c:macro:`Py_TPFLAGS_HEAPTYPE`).
 
-   The metaclass *metaclass* is used to construct the resulting type object.
-   When *metaclass* is ``NULL``, the metaclass is derived from *bases*
-   (or *Py_tp_base[s]* slots if *bases* is ``NULL``, see below).
+   *Metaclass* được dùng để xây dựng đối tượng kiểu kết quả. Khi *metaclass* là ``NULL``, metaclass được suy ra từ *bases* (hoặc các slot *Py_tp_base[s]* nếu *bases* là ``NULL``, xem bên dưới).
 
-   Metaclasses that override :c:member:`~PyTypeObject.tp_new` are not
-   supported, except if ``tp_new`` is ``NULL``.
+   Các metaclass ghi đè :c:member:`~PyTypeObject.tp_new` không được hỗ trợ, trừ khi ``tp_new`` là ``NULL``.
 
-   The *bases* argument can be used to specify base classes; it can either
-   be only one class or a tuple of classes.
-   If *bases* is ``NULL``, the :c:data:`Py_tp_bases` slot is used instead.
-   If that also is ``NULL``, the :c:data:`Py_tp_base` slot is used instead.
-   If that also is ``NULL``, the new type derives from :class:`object`.
+   Đối số *bases* có thể được dùng để chỉ định các lớp cơ sở; đối số này có thể là một lớp duy nhất hoặc một tuple các lớp. Nếu *bases* là ``NULL``, slot :c:data:`Py_tp_bases` sẽ được sử dụng thay thế. Nếu giá trị đó cũng là ``NULL``, slot :c:data:`Py_tp_base` sẽ được sử dụng thay thế. Nếu giá trị đó cũng là ``NULL``, kiểu mới sẽ kế thừa từ :class:`object`.
 
-   The *module* argument can be used to record the module in which the new
-   class is defined. It must be a module object or ``NULL``.
-   If not ``NULL``, the module is associated with the new type and can later be
-   retrieved with :c:func:`PyType_GetModule`.
-   The associated module is not inherited by subclasses; it must be specified
-   for each class individually.
+   Đối số *module* có thể được dùng để ghi lại module nơi lớp mới được định nghĩa. Đối số này phải là một đối tượng module hoặc ``NULL``. Nếu không phải ``NULL``, module sẽ được liên kết với kiểu mới và sau đó có thể được lấy lại bằng :c:func:`PyType_GetModule`. Module được liên kết không được kế thừa bởi các lớp con; module phải được chỉ định riêng cho từng lớp.
 
-   This function calls :c:func:`PyType_Ready` on the new type.
+   Hàm này gọi :c:func:`PyType_Ready` trên kiểu mới.
 
-   Note that this function does *not* fully match the behavior of
-   calling :py:class:`type() <type>` or using the :keyword:`class` statement.
-   With user-provided base types or metaclasses, prefer
-   :ref:`calling <capi-call>` :py:class:`type` (or the metaclass)
-   over ``PyType_From*`` functions.
-   Specifically:
+   Lưu ý rằng hàm này *not* hoàn toàn khớp với hành vi khi gọi :py:class:`type() <type>` hoặc sử dụng câu lệnh :keyword:`class`. Với các kiểu cơ sở hoặc metaclass do người dùng cung cấp, nên ưu tiên
+   :ref:`calling <capi-call>` :py:class:`type` (hoặc metaclass) thay vì các hàm ``PyType_From*``. Cụ thể:
 
-   * :py:meth:`~object.__new__` is not called on the new class
-     (and it must be set to ``type.__new__``).
-   * :py:meth:`~object.__init__` is not called on the new class.
-   * :py:meth:`~object.__init_subclass__` is not called on any bases.
-   * :py:meth:`~object.__set_name__` is not called on new descriptors.
+   * :py:meth:`~object.__new__` không được gọi trên lớp mới (và phải được đặt thành ``type.__new__``).
+   * :py:meth:`~object.__init__` không được gọi trên lớp mới.
+   * :py:meth:`~object.__init_subclass__` không được gọi trên bất kỳ lớp cơ sở nào.
+   * :py:meth:`~object.__set_name__` không được gọi trên các descriptor mới.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: PyObject* PyType_FromModuleAndSpec(PyObject *module, PyType_Spec *spec, PyObject *bases)
 
-   Equivalent to ``PyType_FromMetaclass(NULL, module, spec, bases)``.
+   Tương đương với ``PyType_FromMetaclass(NULL, module, spec, bases)``.
 
    .. versionadded:: 3.9
 
    .. versionchanged:: 3.10
 
-      The function now accepts a single class as the *bases* argument and
-      ``NULL`` as the ``tp_doc`` slot.
+      Hàm hiện chấp nhận một lớp duy nhất làm đối số *bases* và ``NULL`` làm slot ``tp_doc``.
 
    .. versionchanged:: 3.12
 
-      The function now finds and uses a metaclass corresponding to the provided
-      base classes.  Previously, only :class:`type` instances were returned.
+      Hàm hiện tìm và sử dụng một metaclass tương ứng với các lớp cơ sở được cung cấp. Trước đây, chỉ các thực thể :class:`type` được trả về.
 
-      The :c:member:`~PyTypeObject.tp_new` of the metaclass is *ignored*.
-      which may result in incomplete initialization.
-      Creating classes whose metaclass overrides
-      :c:member:`~PyTypeObject.tp_new` is deprecated.
+      :c:member:`~PyTypeObject.tp_new` của metaclass bị *bỏ qua*, điều này có thể dẫn đến việc khởi tạo không đầy đủ. Việc tạo các lớp có metaclass ghi đè
+      :c:member:`~PyTypeObject.tp_new` đã lỗi thời.
 
    .. versionchanged:: 3.14
 
-      Creating classes whose metaclass overrides
-      :c:member:`~PyTypeObject.tp_new` is no longer allowed.
+      Tạo các lớp có metaclass ghi đè
+      :c:member:`~PyTypeObject.tp_new` không còn được cho phép.
 
 
 .. c:function:: PyObject* PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
 
-   Equivalent to ``PyType_FromMetaclass(NULL, NULL, spec, bases)``.
+   Tương đương với ``PyType_FromMetaclass(NULL, NULL, spec, bases)``.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.12
 
-      The function now finds and uses a metaclass corresponding to the provided
-      base classes.  Previously, only :class:`type` instances were returned.
+      Hàm hiện tìm và sử dụng một metaclass tương ứng với các lớp cơ sở được cung cấp. Trước đây, chỉ các thực thể :class:`type` được trả về.
 
-      The :c:member:`~PyTypeObject.tp_new` of the metaclass is *ignored*.
-      which may result in incomplete initialization.
-      Creating classes whose metaclass overrides
-      :c:member:`~PyTypeObject.tp_new` is deprecated.
+      :c:member:`~PyTypeObject.tp_new` của metaclass bị *bỏ qua*, điều này có thể dẫn đến việc khởi tạo không đầy đủ. Việc tạo các lớp có metaclass ghi đè
+      :c:member:`~PyTypeObject.tp_new` đã lỗi thời.
 
    .. versionchanged:: 3.14
 
-      Creating classes whose metaclass overrides
-      :c:member:`~PyTypeObject.tp_new` is no longer allowed.
+      Tạo các lớp có metaclass ghi đè
+      :c:member:`~PyTypeObject.tp_new` không còn được cho phép.
 
 
 .. c:function:: PyObject* PyType_FromSpec(PyType_Spec *spec)
 
-   Equivalent to ``PyType_FromMetaclass(NULL, NULL, spec, NULL)``.
+   Tương đương với ``PyType_FromMetaclass(NULL, NULL, spec, NULL)``.
 
    .. versionchanged:: 3.12
 
-      The function now finds and uses a metaclass corresponding to the
-      base classes provided in *Py_tp_base[s]* slots.
-      Previously, only :class:`type` instances were returned.
+      Giờ đây, hàm sẽ tìm và sử dụng một metaclass tương ứng với các lớp cơ sở được cung cấp trong các slot *Py_tp_base[s]*. Trước đây, chỉ các instance :class:`type` được trả về.
 
-      The :c:member:`~PyTypeObject.tp_new` of the metaclass is *ignored*.
-      which may result in incomplete initialization.
-      Creating classes whose metaclass overrides
-      :c:member:`~PyTypeObject.tp_new` is deprecated.
+      :c:member:`~PyTypeObject.tp_new` của metaclass bị *bỏ qua*, điều này có thể dẫn đến việc khởi tạo không đầy đủ. Việc tạo các lớp có metaclass ghi đè
+      :c:member:`~PyTypeObject.tp_new` đã lỗi thời.
 
    .. versionchanged:: 3.14
 
-      Creating classes whose metaclass overrides
-      :c:member:`~PyTypeObject.tp_new` is no longer allowed.
+      Tạo các lớp có metaclass ghi đè
+      :c:member:`~PyTypeObject.tp_new` không còn được cho phép.
 
 
 .. c:function:: int PyType_Freeze(PyTypeObject *type)
 
-   Make a type immutable: set the :c:macro:`Py_TPFLAGS_IMMUTABLETYPE` flag.
+   Làm cho một kiểu trở nên bất biến: đặt cờ :c:macro:`Py_TPFLAGS_IMMUTABLETYPE`.
 
-   All base classes of *type* must be immutable.
+   Mọi lớp cơ sở của *type* phải là bất biến.
 
-   On success, return ``0``.
-   On error, set an exception and return ``-1``.
+   Nếu thành công, trả về ``0``. Nếu có lỗi, đặt một exception và trả về ``-1``.
 
-   The type must not be used before it's made immutable. For example, type
-   instances must not be created before the type is made immutable.
+   Không được sử dụng kiểu này trước khi làm cho nó trở nên bất biến. Ví dụ: không được tạo các thực thể của kiểu trước khi kiểu này trở nên bất biến.
 
    .. versionadded:: 3.14
 
@@ -511,67 +401,48 @@ The following functions and structs are used to create
 
 .. c:type:: PyType_Spec
 
-   Structure defining a type's behavior.
+   Cấu trúc xác định hành vi của một kiểu.
 
    .. c:member:: const char* name
 
-      Name of the type, used to set :c:member:`PyTypeObject.tp_name`.
+      Tên của kiểu, được dùng để đặt :c:member:`PyTypeObject.tp_name`.
 
    .. c:member:: int basicsize
 
-      If positive, specifies the size of the instance in bytes.
-      It is used to set :c:member:`PyTypeObject.tp_basicsize`.
+      Nếu là số dương, chỉ định kích thước của thực thể tính bằng byte. Giá trị này được dùng để đặt :c:member:`PyTypeObject.tp_basicsize`.
 
-      If zero, specifies that :c:member:`~PyTypeObject.tp_basicsize`
-      should be inherited.
+      Nếu bằng không, chỉ định rằng :c:member:`~PyTypeObject.tp_basicsize` sẽ được kế thừa.
 
-      If negative, the absolute value specifies how much space instances of the
-      class need *in addition* to the superclass.
-      Use :c:func:`PyObject_GetTypeData` to get a pointer to subclass-specific
-      memory reserved this way.
-      For negative :c:member:`!basicsize`, Python will insert padding when
-      needed to meet :c:member:`~PyTypeObject.tp_basicsize`'s alignment
-      requirements.
+      Nếu âm, giá trị tuyệt đối chỉ định lượng không gian mà các thực thể của lớp cần *ngoài phần* của lớp cha. Sử dụng :c:func:`PyObject_GetTypeData` để lấy con trỏ đến vùng nhớ dành riêng cho lớp con theo cách này. Với :c:member:`!basicsize` âm, Python sẽ chèn phần đệm khi cần để đáp ứng các yêu cầu căn chỉnh của :c:member:`~PyTypeObject.tp_basicsize`.
 
       .. versionchanged:: 3.12
 
-         Previously, this field could not be negative.
+         Trước đây, trường này không thể nhận giá trị âm.
 
    .. c:member:: int itemsize
 
-      Size of one element of a variable-size type, in bytes.
-      Used to set :c:member:`PyTypeObject.tp_itemsize`.
-      See ``tp_itemsize`` documentation for caveats.
+      Kích thước tính theo byte của một phần tử thuộc kiểu có kích thước biến đổi. Được dùng để thiết lập :c:member:`PyTypeObject.tp_itemsize`. Xem tài liệu ``tp_itemsize`` để biết các lưu ý.
 
-      If zero, :c:member:`~PyTypeObject.tp_itemsize` is inherited.
-      Extending arbitrary variable-sized classes is dangerous,
-      since some types use a fixed offset for variable-sized memory,
-      which can then overlap fixed-sized memory used by a subclass.
-      To help prevent mistakes, inheriting ``itemsize`` is only possible
-      in the following situations:
+      Nếu bằng không, :c:member:`~PyTypeObject.tp_itemsize` sẽ được kế thừa. Việc mở rộng các lớp có kích thước biến đổi tùy ý rất nguy hiểm, vì một số kiểu sử dụng độ lệch cố định cho vùng nhớ có kích thước biến đổi, và vùng này có thể chồng lấn lên vùng nhớ có kích thước cố định được lớp con sử dụng. Để giúp ngăn ngừa sai sót, chỉ có thể kế thừa ``itemsize`` trong các trường hợp sau:
 
-      - The base is not variable-sized (its
-        :c:member:`~PyTypeObject.tp_itemsize` is zero).
-      - The requested :c:member:`PyType_Spec.basicsize` is positive,
-        suggesting that the memory layout of the base class is known.
-      - The requested :c:member:`PyType_Spec.basicsize` is zero,
-        suggesting that the subclass does not access the instance's memory
-        directly.
-      - With the :c:macro:`Py_TPFLAGS_ITEMS_AT_END` flag.
+      - Lớp cơ sở không có kích thước biến đổi (giá trị của nó
+        :c:member:`~PyTypeObject.tp_itemsize` bằng không).
+      - :c:member:`PyType_Spec.basicsize` được yêu cầu có giá trị dương, cho thấy bố cục bộ nhớ của lớp cơ sở đã được biết.
+      - :c:member:`PyType_Spec.basicsize` được yêu cầu có giá trị bằng không, cho thấy lớp con không truy cập trực tiếp vào bộ nhớ của thực thể.
+      - Với cờ :c:macro:`Py_TPFLAGS_ITEMS_AT_END`.
 
    .. c:member:: unsigned int flags
 
-      Type flags, used to set :c:member:`PyTypeObject.tp_flags`.
+      Các cờ kiểu, được dùng để thiết lập :c:member:`PyTypeObject.tp_flags`.
 
-      If the ``Py_TPFLAGS_HEAPTYPE`` flag is not set,
-      :c:func:`PyType_FromSpecWithBases` sets it automatically.
+      Nếu cờ ``Py_TPFLAGS_HEAPTYPE`` chưa được thiết lập,
+      :c:func:`PyType_FromSpecWithBases` sẽ tự động thiết lập cờ này.
 
    .. c:member:: PyType_Slot *slots
 
-      Array of :c:type:`PyType_Slot` structures.
-      Terminated by the special slot value ``{0, NULL}``.
+      Mảng các cấu trúc :c:type:`PyType_Slot`. Kết thúc bằng giá trị khe đặc biệt ``{0, NULL}``.
 
-      Each slot ID should be specified at most once.
+      Mỗi slot ID chỉ nên được chỉ định nhiều nhất một lần.
 
 .. raw:: html
 
@@ -581,90 +452,72 @@ The following functions and structs are used to create
 
 .. c:type:: PyType_Slot
 
-   Structure defining optional functionality of a type, containing a slot ID
-   and a value pointer.
+   Cấu trúc xác định chức năng tùy chọn của một kiểu, chứa slot ID và con trỏ giá trị.
 
    .. c:member:: int slot
 
-      A slot ID.
+      Một slot ID.
 
-      Slot IDs are named like the field names of the structures
+      Slot ID được đặt tên giống như tên trường của các cấu trúc
       :c:type:`PyTypeObject`, :c:type:`PyNumberMethods`,
-      :c:type:`PySequenceMethods`, :c:type:`PyMappingMethods` and
-      :c:type:`PyAsyncMethods` with an added ``Py_`` prefix.
-      For example, use:
+      :c:type:`PySequenceMethods`, :c:type:`PyMappingMethods` và
+      :c:type:`PyAsyncMethods` với tiền tố ``Py_`` được thêm vào. Ví dụ, sử dụng:
 
-      * :c:data:`Py_tp_dealloc` to set :c:member:`PyTypeObject.tp_dealloc`
-      * :c:data:`Py_nb_add` to set :c:member:`PyNumberMethods.nb_add`
-      * :c:data:`Py_sq_length` to set :c:member:`PySequenceMethods.sq_length`
+      * :c:data:`Py_tp_dealloc` để thiết lập :c:member:`PyTypeObject.tp_dealloc`
+      * :c:data:`Py_nb_add` để thiết lập :c:member:`PyNumberMethods.nb_add`
+      * :c:data:`Py_sq_length` để thiết lập :c:member:`PySequenceMethods.sq_length`
 
-      An additional slot is supported that does not correspond to a
-      :c:type:`!PyTypeObject` struct field:
+      Một slot bổ sung được hỗ trợ nhưng không tương ứng với một
+      :c:type:`!PyTypeObject` trường struct:
 
       * :c:data:`Py_tp_token`
 
-      The following “offset” fields cannot be set using :c:type:`PyType_Slot`:
+      Các trường “offset” sau đây không thể được thiết lập bằng :c:type:`PyType_Slot`:
 
-      * :c:member:`~PyTypeObject.tp_weaklistoffset`
-        (use :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` instead if possible)
-      * :c:member:`~PyTypeObject.tp_dictoffset`
-        (use :c:macro:`Py_TPFLAGS_MANAGED_DICT` instead if possible)
-      * :c:member:`~PyTypeObject.tp_vectorcall_offset`
-        (use ``"__vectorcalloffset__"`` in
+      * :c:member:`~PyTypeObject.tp_weaklistoffset` (hãy sử dụng :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` thay thế nếu có thể)
+      * :c:member:`~PyTypeObject.tp_dictoffset` (hãy sử dụng :c:macro:`Py_TPFLAGS_MANAGED_DICT` thay thế nếu có thể)
+      * :c:member:`~PyTypeObject.tp_vectorcall_offset` (sử dụng ``"__vectorcalloffset__"`` trong
         :ref:`PyMemberDef <pymemberdef-offsets>`)
 
-      If it is not possible to switch to a ``MANAGED`` flag (for example,
-      for vectorcall or to support Python older than 3.12), specify the
-      offset in :c:data:`Py_tp_members`.
-      See :ref:`PyMemberDef documentation <pymemberdef-offsets>`
-      for details.
+      Nếu không thể chuyển sang cờ ``MANAGED`` (ví dụ: đối với vectorcall hoặc để hỗ trợ Python cũ hơn 3.12), hãy chỉ định offset trong :c:data:`Py_tp_members`. Xem :ref:`tài liệu PyMemberDef <pymemberdef-offsets>` để biết chi tiết.
 
-      The following internal fields cannot be set at all when creating a heap
-      type:
+      Không thể đặt các trường nội bộ sau đây khi tạo heap type:
 
       * :c:member:`~PyTypeObject.tp_dict`,
         :c:member:`~PyTypeObject.tp_mro`,
         :c:member:`~PyTypeObject.tp_cache`,
-        :c:member:`~PyTypeObject.tp_subclasses`, and
+        :c:member:`~PyTypeObject.tp_subclasses`, và
         :c:member:`~PyTypeObject.tp_weaklist`.
 
-      Setting :c:data:`Py_tp_bases` or :c:data:`Py_tp_base` may be
-      problematic on some platforms.
-      To avoid issues, use the *bases* argument of
-      :c:func:`PyType_FromSpecWithBases` instead.
+      Việc thiết lập :c:data:`Py_tp_bases` hoặc :c:data:`Py_tp_base` có thể gây ra vấn đề trên một số nền tảng. Để tránh sự cố, hãy sử dụng đối số *bases* của
+      :c:func:`PyType_FromSpecWithBases` thay vào đó.
 
       .. versionchanged:: 3.9
-         Slots in :c:type:`PyBufferProcs` may be set in the unlimited API.
+         Các slot trong :c:type:`PyBufferProcs` có thể được thiết lập trong unlimited API.
 
       .. versionchanged:: 3.11
          :c:member:`~PyBufferProcs.bf_getbuffer` and
          :c:member:`~PyBufferProcs.bf_releasebuffer` are now available
-         under the :ref:`limited API <limited-c-api>`.
+         trong :ref:`limited API <limited-c-api>`.
 
       .. versionchanged:: 3.14
-         The field :c:member:`~PyTypeObject.tp_vectorcall` can now be set
-         using :c:data:`Py_tp_vectorcall`.  See the field's documentation
-         for details.
+         Trường :c:member:`~PyTypeObject.tp_vectorcall` hiện có thể được thiết lập bằng :c:data:`Py_tp_vectorcall`.  Xem tài liệu về trường này để biết chi tiết.
 
    .. c:member:: void *pfunc
 
-      The desired value of the slot. In most cases, this is a pointer
-      to a function.
+      Giá trị mong muốn của slot. Trong hầu hết các trường hợp, đây là một con trỏ đến một hàm.
 
-      *pfunc* values may not be ``NULL``, except for the following slots:
+      Các giá trị *pfunc* không được ``NULL``, ngoại trừ các slot sau:
 
       * :c:data:`Py_tp_doc`
-      * :c:data:`Py_tp_token` (for clarity, prefer :c:data:`Py_TP_USE_SPEC`
-        rather than ``NULL``)
+      * :c:data:`Py_tp_token` (để rõ ràng, hãy ưu tiên :c:data:`Py_TP_USE_SPEC` thay vì ``NULL``)
 
 
 .. c:macro:: Py_tp_token
 
-   A :c:member:`~PyType_Slot.slot` that records a static memory layout ID
-   for a class.
+   Một :c:member:`~PyType_Slot.slot` ghi lại ID bố cục bộ nhớ tĩnh cho một lớp.
 
-   If the :c:type:`PyType_Spec` of the class is statically
-   allocated, the token can be set to the spec using the special value
+   Nếu :c:type:`PyType_Spec` của lớp được cấp phát tĩnh, token có thể được đặt theo đặc tả bằng giá trị đặc biệt
    :c:data:`Py_TP_USE_SPEC`:
 
    .. code-block:: c
@@ -672,18 +525,14 @@ The following functions and structs are used to create
       static PyType_Slot foo_slots[] = {
          {Py_tp_token, Py_TP_USE_SPEC},
 
-   It can also be set to an arbitrary pointer, but you must ensure that:
+   Nó cũng có thể được đặt thành một con trỏ tùy ý, nhưng bạn phải đảm bảo rằng:
 
-   * The pointer outlives the class, so it's not reused for something else
-     while the class exists.
-   * It "belongs" to the extension module where the class lives, so it will not
-     clash with other extensions.
+   * Con trỏ tồn tại lâu hơn lớp, vì vậy nó không được tái sử dụng cho mục đích khác trong khi lớp còn tồn tại.
+   * Nó “thuộc về” module mở rộng nơi lớp được định nghĩa, để không xung đột với các extension khác.
 
-   Use :c:func:`PyType_GetBaseByToken` to check if a class's superclass has
-   a given token -- that is, check whether the memory layout is compatible.
+   Sử dụng :c:func:`PyType_GetBaseByToken` để kiểm tra xem superclass của một lớp có token đã cho hay không -- tức là kiểm tra xem layout bộ nhớ có tương thích hay không.
 
-   To get the token for a given class (without considering superclasses),
-   use :c:func:`PyType_GetSlot` with ``Py_tp_token``.
+   Để lấy token cho một lớp nhất định (không xét các superclass), hãy sử dụng :c:func:`PyType_GetSlot` với ``Py_tp_token``.
 
    .. versionadded:: 3.14
 
@@ -691,8 +540,6 @@ The following functions and structs are used to create
 
    .. c:macro:: Py_TP_USE_SPEC
 
-      Used as a value with :c:data:`Py_tp_token` to set the token to the
-      class's :c:type:`PyType_Spec`.
-      Expands to ``NULL``.
+      Được sử dụng làm giá trị với :c:data:`Py_tp_token` để đặt token thành :c:type:`PyType_Spec` của lớp. Mở rộng thành ``NULL``.
 
       .. versionadded:: 3.14

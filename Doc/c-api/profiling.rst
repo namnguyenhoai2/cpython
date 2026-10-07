@@ -2,238 +2,176 @@
 
 .. _profiling:
 
-Profiling and tracing
-=====================
+Lập hồ sơ hiệu năng và truy vết
+===============================
 
-The Python interpreter provides some low-level support for attaching profiling
-and execution tracing facilities.  These are used for profiling, debugging, and
-coverage analysis tools.
+Trình thông dịch Python cung cấp một số hỗ trợ cấp thấp cho việc gắn các công cụ lập hồ sơ hiệu năng và truy vết thực thi. Các công cụ này được dùng để lập hồ sơ hiệu năng, gỡ lỗi và phân tích độ bao phủ.
 
-This C interface allows the profiling or tracing code to avoid the overhead of
-calling through Python-level callable objects, making a direct C function call
-instead.  The essential attributes of the facility have not changed; the
-interface allows trace functions to be installed per-thread, and the basic
-events reported to the trace function are the same as had been reported to the
-Python-level trace functions in previous versions.
+Giao diện C này cho phép mã lập hồ sơ hiệu năng hoặc truy vết tránh chi phí gọi thông qua các đối tượng callable ở cấp Python bằng cách thực hiện một lần gọi hàm C trực tiếp. Các thuộc tính cốt lõi của cơ chế này không thay đổi; giao diện cho phép cài đặt các hàm truy vết theo từng thread, và các sự kiện cơ bản được báo cáo cho hàm truy vết vẫn giống như những sự kiện đã được báo cáo cho các hàm truy vết ở cấp Python trong các phiên bản trước.
 
 
 .. c:type:: int (*Py_tracefunc)(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
 
-   The type of the trace function registered using :c:func:`PyEval_SetProfile` and
-   :c:func:`PyEval_SetTrace`. The first parameter is the object passed to the
-   registration function as *obj*, *frame* is the frame object to which the event
-   pertains, *what* is one of the constants :c:data:`PyTrace_CALL`,
+   Kiểu của hàm truy vết được đăng ký bằng :c:func:`PyEval_SetProfile` và
+   :c:func:`PyEval_SetTrace`. Tham số đầu tiên là đối tượng được truyền cho hàm đăng ký dưới dạng *obj*, *frame* là đối tượng frame liên quan đến sự kiện, *what* là một trong các hằng số :c:data:`PyTrace_CALL`,
    :c:data:`PyTrace_EXCEPTION`, :c:data:`PyTrace_LINE`, :c:data:`PyTrace_RETURN`,
-   :c:data:`PyTrace_C_CALL`, :c:data:`PyTrace_C_EXCEPTION`, :c:data:`PyTrace_C_RETURN`,
-   or :c:data:`PyTrace_OPCODE`, and *arg* depends on the value of *what*:
+   :c:data:`PyTrace_C_CALL`, :c:data:`PyTrace_C_EXCEPTION`, :c:data:`PyTrace_C_RETURN` hoặc :c:data:`PyTrace_OPCODE`, còn *arg* phụ thuộc vào giá trị của *what*:
 
-   +-------------------------------+----------------------------------------+
-   | Value of *what*               | Meaning of *arg*                       |
-   +===============================+========================================+
-   | :c:data:`PyTrace_CALL`        | Always :c:data:`Py_None`.              |
-   +-------------------------------+----------------------------------------+
-   | :c:data:`PyTrace_EXCEPTION`   | Exception information as returned by   |
-   |                               | :func:`sys.exc_info`.                  |
-   +-------------------------------+----------------------------------------+
-   | :c:data:`PyTrace_LINE`        | Always :c:data:`Py_None`.              |
-   +-------------------------------+----------------------------------------+
-   | :c:data:`PyTrace_RETURN`      | Value being returned to the caller,    |
-   |                               | or ``NULL`` if caused by an exception. |
-   +-------------------------------+----------------------------------------+
-   | :c:data:`PyTrace_C_CALL`      | Function object being called.          |
-   +-------------------------------+----------------------------------------+
-   | :c:data:`PyTrace_C_EXCEPTION` | Function object being called.          |
-   +-------------------------------+----------------------------------------+
-   | :c:data:`PyTrace_C_RETURN`    | Function object being called.          |
-   +-------------------------------+----------------------------------------+
-   | :c:data:`PyTrace_OPCODE`      | Always :c:data:`Py_None`.              |
-   +-------------------------------+----------------------------------------+
+   +-------------------------------+---------------------------------------------------------------------------+
+   | Giá trị của *what*            | Ý nghĩa của *arg*                                                         |
+   +===============================+===========================================================================+
+   | :c:data:`PyTrace_CALL`        | Luôn là :c:data:`Py_None`.                                                |
+   +-------------------------------+---------------------------------------------------------------------------+
+   | :c:data:`PyTrace_EXCEPTION`   | Thông tin ngoại lệ như được trả về bởi                                    |
+   |                               | :func:`sys.exc_info`.                                                     |
+   +-------------------------------+---------------------------------------------------------------------------+
+   | :c:data:`PyTrace_LINE`        | Luôn là :c:data:`Py_None`.                                                |
+   +-------------------------------+---------------------------------------------------------------------------+
+   | :c:data:`PyTrace_RETURN`      | Giá trị được trả về cho caller, hoặc ``NULL`` nếu do một ngoại lệ gây ra. |
+   +-------------------------------+---------------------------------------------------------------------------+
+   | :c:data:`PyTrace_C_CALL`      | Đối tượng hàm đang được gọi.                                              |
+   +-------------------------------+---------------------------------------------------------------------------+
+   | :c:data:`PyTrace_C_EXCEPTION` | Đối tượng hàm đang được gọi.                                              |
+   +-------------------------------+---------------------------------------------------------------------------+
+   | :c:data:`PyTrace_C_RETURN`    | Đối tượng hàm đang được gọi.                                              |
+   +-------------------------------+---------------------------------------------------------------------------+
+   | :c:data:`PyTrace_OPCODE`      | Luôn :c:data:`Py_None`.                                                   |
+   +-------------------------------+---------------------------------------------------------------------------+
 
 .. c:var:: int PyTrace_CALL
 
-   The value of the *what* parameter to a :c:type:`Py_tracefunc` function when a new
-   call to a function or method is being reported, or a new entry into a generator.
-   Note that the creation of the iterator for a generator function is not reported
-   as there is no control transfer to the Python bytecode in the corresponding
-   frame.
+   Giá trị của tham số *what* đối với hàm :c:type:`Py_tracefunc` khi một lệnh gọi mới đến một hàm hoặc phương thức được báo cáo, hoặc khi bắt đầu một generator mới. Lưu ý rằng việc tạo iterator cho một hàm generator không được báo cáo vì không có sự chuyển quyền điều khiển đến mã bytecode Python trong frame tương ứng.
 
 
 .. c:var:: int PyTrace_EXCEPTION
 
-   The value of the *what* parameter to a :c:type:`Py_tracefunc` function when an
-   exception has been raised.  The callback function is called with this value for
-   *what* when after any bytecode is processed after which the exception becomes
-   set within the frame being executed.  The effect of this is that as exception
-   propagation causes the Python stack to unwind, the callback is called upon
-   return to each frame as the exception propagates.  Only trace functions receive
-   these events; they are not needed by the profiler.
+   Giá trị của tham số *what* đối với hàm :c:type:`Py_tracefunc` khi một exception đã được phát sinh. Hàm callback được gọi với giá trị này cho *what* khi bất kỳ bytecode nào được xử lý sau đó khiến exception được thiết lập trong frame đang thực thi. Điều này có nghĩa là khi quá trình lan truyền exception khiến ngăn xếp Python unwinding, callback được gọi khi quay lại mỗi frame trong quá trình exception lan truyền. Chỉ các hàm trace mới nhận được những sự kiện này; profiler không cần chúng.
 
 
 .. c:var:: int PyTrace_LINE
 
-   The value passed as the *what* parameter to a :c:type:`Py_tracefunc` function
-   (but not a profiling function) when a line-number event is being reported.
-   It may be disabled for a frame by setting :attr:`~frame.f_trace_lines` to
-   *0* on that frame.
+   Giá trị được truyền dưới dạng tham số *what* cho hàm :c:type:`Py_tracefunc` (nhưng không phải hàm profiling) khi một sự kiện số dòng được báo cáo. Có thể vô hiệu hóa sự kiện này cho một frame bằng cách đặt :attr:`~frame.f_trace_lines` thành *0* trên frame đó.
 
 
 .. c:var:: int PyTrace_RETURN
 
-   The value for the *what* parameter to :c:type:`Py_tracefunc` functions when a
-   call is about to return.
+   Giá trị của tham số *what* đối với các hàm :c:type:`Py_tracefunc` khi một lệnh gọi sắp trả về.
 
 
 .. c:var:: int PyTrace_C_CALL
 
-   The value for the *what* parameter to :c:type:`Py_tracefunc` functions when a C
-   function is about to be called.
+   Giá trị của tham số *what* đối với các hàm :c:type:`Py_tracefunc` khi một hàm C sắp được gọi.
 
 
 .. c:var:: int PyTrace_C_EXCEPTION
 
-   The value for the *what* parameter to :c:type:`Py_tracefunc` functions when a C
-   function has raised an exception.
+   Giá trị của tham số *what* đối với các hàm :c:type:`Py_tracefunc` khi một hàm C đã phát sinh ngoại lệ.
 
 
 .. c:var:: int PyTrace_C_RETURN
 
-   The value for the *what* parameter to :c:type:`Py_tracefunc` functions when a C
-   function has returned.
+   Giá trị của tham số *what* đối với các hàm :c:type:`Py_tracefunc` khi một hàm C đã trả về.
 
 
 .. c:var:: int PyTrace_OPCODE
 
-   The value for the *what* parameter to :c:type:`Py_tracefunc` functions (but not
-   profiling functions) when a new opcode is about to be executed.  This event is
-   not emitted by default: it must be explicitly requested by setting
-   :attr:`~frame.f_trace_opcodes` to *1* on the frame.
+   Giá trị của tham số *what* đối với các hàm :c:type:`Py_tracefunc` (nhưng không phải các hàm profiling) khi một opcode mới sắp được thực thi. Sự kiện này không được phát ra theo mặc định: phải yêu cầu rõ ràng bằng cách đặt
+   :attr:`~frame.f_trace_opcodes` thành *1* trên frame.
 
 
 .. c:function:: void PyEval_SetProfile(Py_tracefunc func, PyObject *obj)
 
-   Set the profiler function to *func*.  The *obj* parameter is passed to the
-   function as its first parameter, and may be any Python object, or ``NULL``.  If
-   the profile function needs to maintain state, using a different value for *obj*
-   for each thread provides a convenient and thread-safe place to store it.  The
-   profile function is called for all monitored events except :c:data:`PyTrace_LINE`
-   :c:data:`PyTrace_OPCODE` and :c:data:`PyTrace_EXCEPTION`.
+   Đặt hàm profiler thành *func*. Tham số *obj* được truyền cho hàm dưới dạng tham số đầu tiên và có thể là bất kỳ đối tượng Python nào hoặc ``NULL``. Nếu hàm profile cần duy trì trạng thái, việc sử dụng một giá trị *obj* khác nhau cho mỗi thread sẽ cung cấp một nơi thuận tiện và an toàn cho thread để lưu trữ trạng thái đó. Hàm profile được gọi cho tất cả các sự kiện được giám sát, ngoại trừ :c:data:`PyTrace_LINE`
+   :c:data:`PyTrace_OPCODE` và :c:data:`PyTrace_EXCEPTION`.
 
-   See also the :func:`sys.setprofile` function.
+   Xem thêm hàm :func:`sys.setprofile`.
 
-   The caller must have an :term:`attached thread state`.
+   Bên gọi phải có một :term:`attached thread state`.
 
 
 .. c:function:: void PyEval_SetProfileAllThreads(Py_tracefunc func, PyObject *obj)
 
-   Like :c:func:`PyEval_SetProfile` but sets the profile function in all running threads
-   belonging to the current interpreter instead of the setting it only on the current thread.
+   Tương tự :c:func:`PyEval_SetProfile`, nhưng đặt hàm profiling trong tất cả các thread đang chạy thuộc interpreter hiện tại thay vì chỉ đặt hàm đó trên thread hiện tại.
 
-   The caller must have an :term:`attached thread state`.
+   Bên gọi phải có một :term:`attached thread state`.
 
-   As :c:func:`PyEval_SetProfile`, this function ignores any exceptions raised while
-   setting the profile functions in all threads.
+   Giống như :c:func:`PyEval_SetProfile`, hàm này bỏ qua mọi ngoại lệ phát sinh khi đặt các hàm profiling trong tất cả các thread.
 
 .. versionadded:: 3.12
 
 
 .. c:function:: void PyEval_SetTrace(Py_tracefunc func, PyObject *obj)
 
-   Set the tracing function to *func*.  This is similar to
-   :c:func:`PyEval_SetProfile`, except the tracing function does receive line-number
-   events and per-opcode events, but does not receive any event related to C function
-   objects being called.  Any trace function registered using :c:func:`PyEval_SetTrace`
-   will not receive :c:data:`PyTrace_C_CALL`, :c:data:`PyTrace_C_EXCEPTION` or
-   :c:data:`PyTrace_C_RETURN` as a value for the *what* parameter.
+   Đặt hàm tracing thành *func*. Hàm này tương tự như
+   :c:func:`PyEval_SetProfile`, ngoại trừ việc hàm tracing có nhận các sự kiện số dòng và sự kiện trên từng opcode, nhưng không nhận bất kỳ sự kiện nào liên quan đến các đối tượng hàm C được gọi. Bất kỳ hàm trace nào được đăng ký bằng :c:func:`PyEval_SetTrace` sẽ không nhận :c:data:`PyTrace_C_CALL`, :c:data:`PyTrace_C_EXCEPTION` hoặc
+   :c:data:`PyTrace_C_RETURN` làm giá trị cho tham số *what*.
 
-   See also the :func:`sys.settrace` function.
+   Xem thêm hàm :func:`sys.settrace`.
 
-   The caller must have an :term:`attached thread state`.
+   Bên gọi phải có một :term:`attached thread state`.
 
 
 .. c:function:: void PyEval_SetTraceAllThreads(Py_tracefunc func, PyObject *obj)
 
-   Like :c:func:`PyEval_SetTrace` but sets the tracing function in all running threads
-   belonging to the current interpreter instead of the setting it only on the current thread.
+   Tương tự :c:func:`PyEval_SetTrace`, nhưng đặt hàm tracing trong tất cả các thread đang chạy thuộc interpreter hiện tại thay vì chỉ đặt hàm đó trên thread hiện tại.
 
-   The caller must have an :term:`attached thread state`.
+   Bên gọi phải có một :term:`attached thread state`.
 
-   As :c:func:`PyEval_SetTrace`, this function ignores any exceptions raised while
-   setting the trace functions in all threads.
+   Giống như :c:func:`PyEval_SetTrace`, hàm này bỏ qua mọi ngoại lệ phát sinh khi đặt các hàm trace trong tất cả các thread.
 
 .. versionadded:: 3.12
 
 
-Reference tracing
-=================
+Theo dõi tham chiếu
+===================
 
 .. versionadded:: 3.13
 
 
 .. c:type:: int (*PyRefTracer)(PyObject *, int event, void* data)
 
-   The type of the trace function registered using :c:func:`PyRefTracer_SetTracer`.
-   The first parameter is a Python object that has been just created (when **event**
-   is set to :c:data:`PyRefTracer_CREATE`) or about to be destroyed (when **event**
-   is set to :c:data:`PyRefTracer_DESTROY`). The **data** argument is the opaque pointer
-   that was provided when :c:func:`PyRefTracer_SetTracer` was called.
+   Kiểu của hàm trace được đăng ký bằng :c:func:`PyRefTracer_SetTracer`. Tham số đầu tiên là một đối tượng Python vừa được tạo (khi **event** được đặt thành :c:data:`PyRefTracer_CREATE`) hoặc sắp bị hủy (khi **event** được đặt thành :c:data:`PyRefTracer_DESTROY`). Đối số **data** là con trỏ opaque được cung cấp khi gọi :c:func:`PyRefTracer_SetTracer`.
 
-   If a new tracing function is registered replacing the current one, a call to the
-   trace function will be made with the object set to **NULL** and **event** set to
-   :c:data:`PyRefTracer_TRACKER_REMOVED`. This will happen just before the new
-   function is registered.
+   Nếu một hàm tracing mới được đăng ký để thay thế hàm hiện tại, một lệnh gọi đến hàm trace sẽ được thực hiện với object được đặt thành **NULL** và **event** được đặt thành
+   :c:data:`PyRefTracer_TRACKER_REMOVED`. Điều này sẽ xảy ra ngay trước khi hàm mới được đăng ký.
 
 .. versionadded:: 3.13
 
 
 .. c:var:: int PyRefTracer_CREATE
 
-   The value for the *event* parameter to :c:type:`PyRefTracer` functions when a Python
-   object has been created.
+   Giá trị của tham số *event* đối với các hàm :c:type:`PyRefTracer` khi một object Python được tạo.
 
 
 .. c:var:: int PyRefTracer_DESTROY
 
-   The value for the *event* parameter to :c:type:`PyRefTracer` functions when a Python
-   object has been destroyed.
+   Giá trị của tham số *event* đối với các hàm :c:type:`PyRefTracer` khi một object Python bị hủy.
 
 
 .. c:var:: int PyRefTracer_TRACKER_REMOVED
 
-   The value for the *event* parameter to :c:type:`PyRefTracer` functions when the
-   current tracer is about to be replaced by a new one.
+   Giá trị của tham số *event* đối với các hàm :c:type:`PyRefTracer` khi tracer hiện tại sắp được thay thế bằng một tracer mới.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyRefTracer_SetTracer(PyRefTracer tracer, void *data)
 
-   Register a reference tracer function. The function will be called when a new
-   Python object has been created or when an object is going to be destroyed. If
-   **data** is provided it must be an opaque pointer that will be provided when
-   the tracer function is called. Return ``0`` on success. Set an exception and
-   return ``-1`` on error.
+   Đăng ký một hàm reference tracer. Hàm này sẽ được gọi khi một object Python mới được tạo hoặc khi một object sắp bị hủy. Nếu cung cấp **data**, giá trị này phải là một con trỏ opaque sẽ được cung cấp khi hàm tracer được gọi. Trả về ``0`` khi thành công. Đặt một exception và trả về ``-1`` khi có lỗi.
 
-   Note that tracer functions **must not** create Python objects inside or
-   otherwise the call will be re-entrant. The tracer also **must not** clear
-   any existing exception or set an exception.  A :term:`thread state` will be active
-   every time the tracer function is called.
+   Lưu ý rằng các hàm tracer **must not** tạo các object Python bên trong hàm; nếu không, lệnh gọi sẽ có tính re-entrant. Tracer cũng **must not** xóa bất kỳ exception hiện có nào hoặc đặt một exception. Một :term:`thread state` sẽ hoạt động mỗi khi hàm tracer được gọi.
 
-   There must be an :term:`attached thread state` when calling this function.
+   Phải có một :term:`attached thread state` khi gọi hàm này.
 
-   If another tracer function was already registered, the old function will be
-   called with **event** set to :c:data:`PyRefTracer_TRACKER_REMOVED` just before
-   the new function is registered.
+   Nếu một hàm tracer khác đã được đăng ký, hàm cũ sẽ được gọi với **event** được đặt thành :c:data:`PyRefTracer_TRACKER_REMOVED` ngay trước khi hàm mới được đăng ký.
 
 .. versionadded:: 3.13
 
 
 .. c:function:: PyRefTracer PyRefTracer_GetTracer(void** data)
 
-   Get the registered reference tracer function and the value of the opaque data
-   pointer that was registered when :c:func:`PyRefTracer_SetTracer` was called.
-   If no tracer was registered this function will return NULL and will set the
-   **data** pointer to NULL.
+   Lấy hàm reference tracer đã đăng ký và giá trị của con trỏ dữ liệu opaque đã được đăng ký khi :c:func:`PyRefTracer_SetTracer` được gọi. Nếu chưa đăng ký tracer nào, hàm này sẽ trả về NULL và đặt con trỏ **data** thành NULL.
 
-   There must be an :term:`attached thread state` when calling this function.
+   Phải có một :term:`attached thread state` khi gọi hàm này.
 
 .. versionadded:: 3.13

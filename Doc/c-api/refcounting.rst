@@ -3,232 +3,179 @@
 
 .. _countingrefs:
 
-******************
-Reference Counting
-******************
+**************
+Đếm tham chiếu
+**************
 
-The functions and macros in this section are used for managing reference counts
-of Python objects.
+Các hàm và macro trong phần này được dùng để quản lý số lượng tham chiếu của các đối tượng Python.
 
 
 .. c:function:: Py_ssize_t Py_REFCNT(PyObject *o)
 
-   Get the reference count of the Python object *o*.
+   Lấy số lượng tham chiếu của đối tượng Python *o*.
 
-   Note that the returned value may not actually reflect how many
-   references to the object are actually held.  For example, some
-   objects are :term:`immortal` and have a very high refcount that does not
-   reflect the actual number of references.  Consequently, do not rely
-   on the returned value to be accurate, other than a value of 0 or 1.
+   Lưu ý rằng giá trị được trả về có thể không thực sự phản ánh số lượng tham chiếu đang được giữ tới đối tượng. Ví dụ, một số đối tượng là :term:`immortal` và có refcount rất cao, không phản ánh số lượng tham chiếu thực tế. Do đó, không nên dựa vào giá trị được trả về để cho là chính xác, ngoại trừ khi giá trị là 0 hoặc 1.
 
-   Use the :c:func:`Py_SET_REFCNT()` function to set an object reference count.
+   Sử dụng hàm :c:func:`Py_SET_REFCNT()` để đặt số lượng tham chiếu của một đối tượng.
 
    .. note::
 
-      On :term:`free-threaded builds <free-threaded build>` of Python, returning 1
-      isn't sufficient to determine if it's safe to treat *o* as having no
-      access by other threads. Use :c:func:`PyUnstable_Object_IsUniquelyReferenced`
-      for that instead.
+      Trên các bản build :term:`free-threaded builds <free-threaded build>` của Python, việc trả về 1 là chưa đủ để xác định liệu có an toàn khi coi *o* là không bị các thread khác truy cập hay không. Thay vào đó, hãy sử dụng :c:func:`PyUnstable_Object_IsUniquelyReferenced`.
 
-      See also the function :c:func:`PyUnstable_Object_IsUniqueReferencedTemporary()`.
+      Xem thêm hàm :c:func:`PyUnstable_Object_IsUniqueReferencedTemporary()`.
 
    .. versionchanged:: 3.10
       :c:func:`Py_REFCNT()` is changed to the inline static function.
 
    .. versionchanged:: 3.11
-      The parameter type is no longer :c:expr:`const PyObject*`.
+      Kiểu tham số không còn là :c:expr:`const PyObject*` nữa.
 
 
 .. c:function:: void Py_SET_REFCNT(PyObject *o, Py_ssize_t refcnt)
 
-   Set the object *o* reference counter to *refcnt*.
+   Đặt bộ đếm tham chiếu của đối tượng *o* thành *refcnt*.
 
-   On :ref:`Python build with Free Threading <free-threading-build>`, if
-   *refcnt* is larger than ``UINT32_MAX``, the object is made :term:`immortal`.
+   Trong :ref:`bản dựng Python với Free Threading <free-threading-build>`, nếu *refcnt* lớn hơn ``UINT32_MAX``, đối tượng sẽ được đặt thành :term:`immortal`.
 
-   This function has no effect on :term:`immortal` objects.
+   Hàm này không có tác dụng với các đối tượng :term:`immortal`.
 
    .. versionadded:: 3.9
 
    .. versionchanged:: 3.12
-      Immortal objects are not modified.
+      Các đối tượng bất tử không bị sửa đổi.
 
 
 .. c:function:: void Py_INCREF(PyObject *o)
 
-   Indicate taking a new :term:`strong reference` to object *o*,
-   indicating it is in use and should not be destroyed.
+   Cho biết đang lấy một :term:`strong reference` mới đến đối tượng *o*, cho biết đối tượng đang được sử dụng và không nên bị hủy.
 
-   This function has no effect on :term:`immortal` objects.
+   Hàm này không có tác dụng với các đối tượng :term:`immortal`.
 
-   This function is usually used to convert a :term:`borrowed reference` to a
-   :term:`strong reference` in-place. The :c:func:`Py_NewRef` function can be
-   used to create a new :term:`strong reference`.
+   Hàm này thường được dùng để chuyển một :term:`borrowed reference` thành một
+   :term:`strong reference` tại chỗ. Có thể dùng hàm :c:func:`Py_NewRef` để tạo một :term:`strong reference` mới.
 
-   When done using the object, release is by calling :c:func:`Py_DECREF`.
+   Khi dùng xong đối tượng, hãy giải phóng đối tượng bằng cách gọi :c:func:`Py_DECREF`.
 
-   The object must not be ``NULL``; if you aren't sure that it isn't
-   ``NULL``, use :c:func:`Py_XINCREF`.
+   Đối tượng không được ``NULL``; nếu bạn không chắc rằng đối tượng không ``NULL``, hãy sử dụng :c:func:`Py_XINCREF`.
 
-   Do not expect this function to actually modify *o* in any way.
-   For at least :pep:`some objects <0683>`,
-   this function has no effect.
+   Đừng mong hàm này thực sự sửa đổi *o* theo bất kỳ cách nào. Ít nhất đối với :pep:`some objects <0683>`, hàm này không có tác dụng.
 
    .. versionchanged:: 3.12
-      Immortal objects are not modified.
+      Các đối tượng bất tử không bị sửa đổi.
 
 
 .. c:function:: void Py_XINCREF(PyObject *o)
 
-   Similar to :c:func:`Py_INCREF`, but the object *o* can be ``NULL``,
-   in which case this has no effect.
+   Tương tự :c:func:`Py_INCREF`, nhưng đối tượng *o* có thể được ``NULL``, trong trường hợp đó hàm này không có tác dụng.
 
-   See also :c:func:`Py_XNewRef`.
+   Xem thêm :c:func:`Py_XNewRef`.
 
 
 .. c:function:: PyObject* Py_NewRef(PyObject *o)
 
-   Create a new :term:`strong reference` to an object:
-   call :c:func:`Py_INCREF` on *o* and return the object *o*.
+   Tạo một :term:`strong reference` mới cho một đối tượng: gọi :c:func:`Py_INCREF` trên *o* và trả về đối tượng *o*.
 
-   When the :term:`strong reference` is no longer needed, :c:func:`Py_DECREF`
-   should be called on it to release the reference.
+   Khi không còn cần đến :term:`strong reference`, cần gọi :c:func:`Py_DECREF` trên nó để giải phóng tham chiếu.
 
-   The object *o* must not be ``NULL``; use :c:func:`Py_XNewRef` if *o* can be
-   ``NULL``.
+   Đối tượng *o* không được ``NULL``; hãy sử dụng :c:func:`Py_XNewRef` nếu *o* có thể được ``NULL``.
 
-   For example::
+   Ví dụ::
 
        Py_INCREF(obj);
        self->attr = obj;
 
-   can be written as::
+   có thể được viết như sau::
 
        self->attr = Py_NewRef(obj);
 
-   See also :c:func:`Py_INCREF`.
+   Xem thêm :c:func:`Py_INCREF`.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: PyObject* Py_XNewRef(PyObject *o)
 
-   Similar to :c:func:`Py_NewRef`, but the object *o* can be NULL.
+   Tương tự như :c:func:`Py_NewRef`, nhưng đối tượng *o* có thể là NULL.
 
-   If the object *o* is ``NULL``, the function just returns ``NULL``.
+   Nếu đối tượng *o* là ``NULL``, hàm chỉ trả về ``NULL``.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: void Py_DECREF(PyObject *o)
 
-   Release a :term:`strong reference` to object *o*, indicating the
-   reference is no longer used.
+   Giải phóng một :term:`strong reference` tới đối tượng *o*, cho biết rằng tham chiếu đó không còn được sử dụng.
 
-   This function has no effect on :term:`immortal` objects.
+   Hàm này không có tác dụng với các đối tượng :term:`immortal`.
 
-   Once the last :term:`strong reference` is released
-   (i.e. the object's reference count reaches 0),
-   the object's type's deallocation
-   function (which must not be ``NULL``) is invoked.
+   Khi :term:`strong reference` cuối cùng được giải phóng (tức là số lượng tham chiếu của đối tượng giảm xuống 0), hàm giải phóng của kiểu đối tượng (không được là ``NULL``) sẽ được gọi.
 
-   This function is usually used to delete a :term:`strong reference` before
-   exiting its scope.
+   Hàm này thường được dùng để xóa một :term:`strong reference` trước khi thoát khỏi phạm vi của nó.
 
-   The object must not be ``NULL``; if you aren't sure that it isn't ``NULL``,
-   use :c:func:`Py_XDECREF`.
+   Đối tượng không được là ``NULL``; nếu bạn không chắc chắn rằng nó không phải là ``NULL``, hãy sử dụng :c:func:`Py_XDECREF`.
 
-   Do not expect this function to actually modify *o* in any way.
-   For at least :pep:`some objects <683>`,
-   this function has no effect.
+   Đừng mong hàm này thực sự sửa đổi *o* theo bất kỳ cách nào. Ít nhất đối với :pep:`some objects <683>`, hàm này không có tác dụng.
 
    .. warning::
 
-      The deallocation function can cause arbitrary Python code to be invoked (e.g.
-      when a class instance with a :meth:`~object.__del__` method is deallocated).  While
-      exceptions in such code are not propagated, the executed code has free access to
-      all Python global variables.  This means that any object that is reachable from
-      a global variable should be in a consistent state before :c:func:`Py_DECREF` is
-      invoked.  For example, code to delete an object from a list should copy a
-      reference to the deleted object in a temporary variable, update the list data
-      structure, and then call :c:func:`Py_DECREF` for the temporary variable.
+      Hàm giải phóng có thể khiến mã Python tùy ý được gọi (ví dụ: khi một thực thể lớp có phương thức :meth:`~object.__del__` được giải phóng). Mặc dù các ngoại lệ trong mã đó không được truyền lên, mã được thực thi vẫn có toàn quyền truy cập vào tất cả các biến toàn cục của Python. Điều này có nghĩa là mọi đối tượng có thể truy cập từ một biến toàn cục phải ở trạng thái nhất quán trước khi gọi :c:func:`Py_DECREF`. Ví dụ, mã để xóa một đối tượng khỏi danh sách cần sao chép một tham chiếu đến đối tượng bị xóa vào một biến tạm thời, cập nhật cấu trúc dữ liệu danh sách, rồi gọi :c:func:`Py_DECREF` cho biến tạm thời.
 
    .. versionchanged:: 3.12
-      Immortal objects are not modified.
+      Các đối tượng bất tử không bị sửa đổi.
 
 
 .. c:function:: void Py_XDECREF(PyObject *o)
 
-   Similar to :c:func:`Py_DECREF`, but the object *o* can be ``NULL``,
-   in which case this has no effect.
-   The same warning from :c:func:`Py_DECREF` applies here as well.
+   Tương tự như :c:func:`Py_DECREF`, nhưng đối tượng *o* có thể là ``NULL``, trong trường hợp đó thao tác này không có tác dụng. Cảnh báo tương tự từ :c:func:`Py_DECREF` cũng áp dụng ở đây.
 
 
 .. c:function:: void Py_CLEAR(PyObject *o)
 
-   Release a :term:`strong reference` for object *o*.
-   The object may be ``NULL``, in
-   which case the macro has no effect; otherwise the effect is the same as for
-   :c:func:`Py_DECREF`, except that the argument is also set to ``NULL``.  The warning
-   for :c:func:`Py_DECREF` does not apply with respect to the object passed because
-   the macro carefully uses a temporary variable and sets the argument to ``NULL``
-   before releasing the reference.
+   Giải phóng một :term:`strong reference` cho đối tượng *o*. Đối tượng có thể là ``NULL``, trong trường hợp đó macro không có tác dụng; nếu không, tác dụng cũng giống như
+   :c:func:`Py_DECREF`, ngoại trừ việc đối số cũng được đặt thành ``NULL``. Cảnh báo đối với :c:func:`Py_DECREF` không áp dụng cho đối tượng được truyền vào, vì macro sử dụng cẩn thận một biến tạm thời và đặt đối số thành ``NULL`` trước khi giải phóng tham chiếu.
 
-   It is a good idea to use this macro whenever releasing a reference
-   to an object that might be traversed during garbage collection.
+   Bạn nên sử dụng macro này mỗi khi giải phóng một tham chiếu đến đối tượng có thể được duyệt trong quá trình thu gom rác.
 
    .. versionchanged:: 3.12
-      The macro argument is now only evaluated once. If the argument has side
-      effects, these are no longer duplicated.
+      Đối số macro giờ đây chỉ được đánh giá một lần. Nếu đối số có side effect, các side effect này sẽ không còn bị nhân đôi.
 
 
 .. c:function:: void Py_IncRef(PyObject *o)
 
-   Indicate taking a new :term:`strong reference` to object *o*.
-   A function version of :c:func:`Py_XINCREF`.
-   It can be used for runtime dynamic embedding of Python.
+   Cho biết việc lấy một :term:`strong reference` tham chiếu mới đến đối tượng *o*. Một phiên bản hàm của :c:func:`Py_XINCREF`. Có thể dùng để nhúng Python động trong runtime.
 
 
 .. c:function:: void Py_DecRef(PyObject *o)
 
-   Release a :term:`strong reference` to object *o*.
-   A function version of :c:func:`Py_XDECREF`.
-   It can be used for runtime dynamic embedding of Python.
+   Giải phóng một :term:`strong reference` tham chiếu đến đối tượng *o*. Một phiên bản hàm của :c:func:`Py_XDECREF`. Có thể dùng để nhúng Python động trong runtime.
 
 
 .. c:macro:: Py_SETREF(dst, src)
 
-   Macro safely releasing a :term:`strong reference` to object *dst*
-   and setting *dst* to *src*.
+   Macro giải phóng an toàn một :term:`strong reference` tham chiếu đến đối tượng *dst* và đặt *dst* thành *src*.
 
-   As in case of :c:func:`Py_CLEAR`, "the obvious" code can be deadly::
+   Như trong trường hợp của :c:func:`Py_CLEAR`, đoạn mã "hiển nhiên" có thể gây hậu quả nghiêm trọng::
 
        Py_DECREF(dst);
        dst = src;
 
-   The safe way is::
+   Cách an toàn là::
 
         Py_SETREF(dst, src);
 
-   That arranges to set *dst* to *src* *before* releasing the reference
-   to the old value of *dst*, so that any code triggered as a side-effect
-   of *dst* getting torn down no longer believes *dst* points
-   to a valid object.
+   Cách này đảm bảo đặt *dst* thành *src* *trước* khi giải phóng tham chiếu đến giá trị cũ của *dst*, để mọi mã được kích hoạt do *dst* bị hủy không còn tin rằng *dst* trỏ đến một đối tượng hợp lệ.
 
    .. versionadded:: 3.6
 
    .. versionchanged:: 3.12
-      The macro arguments are now only evaluated once. If an argument has side
-      effects, these are no longer duplicated.
+      Các đối số macro giờ đây chỉ được đánh giá một lần. Nếu một đối số có side effect, side effect đó sẽ không còn bị nhân đôi.
 
 
 .. c:macro:: Py_XSETREF(dst, src)
 
-   Variant of :c:macro:`Py_SETREF` macro that uses :c:func:`Py_XDECREF` instead
-   of :c:func:`Py_DECREF`.
+   Biến thể của macro :c:macro:`Py_SETREF` sử dụng :c:func:`Py_XDECREF` thay vì :c:func:`Py_DECREF`.
 
    .. versionadded:: 3.6
 
    .. versionchanged:: 3.12
-      The macro arguments are now only evaluated once. If an argument has side
-      effects, these are no longer duplicated.
+      Các đối số macro giờ đây chỉ được đánh giá một lần. Nếu một đối số có side effect, side effect đó sẽ không còn bị nhân đôi.

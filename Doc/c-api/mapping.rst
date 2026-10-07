@@ -2,19 +2,16 @@
 
 .. _mapping:
 
-Mapping Protocol
+Giao thức ánh xạ
 ================
 
-See also :c:func:`PyObject_GetItem`, :c:func:`PyObject_SetItem` and
+Xem thêm :c:func:`PyObject_GetItem`, :c:func:`PyObject_SetItem` và
 :c:func:`PyObject_DelItem`.
 
 
 .. c:function:: int PyMapping_Check(PyObject *o)
 
-   Return ``1`` if the object provides the mapping protocol or supports slicing,
-   and ``0`` otherwise.  Note that it returns ``1`` for Python classes with
-   a :meth:`~object.__getitem__` method, since in general it is impossible to
-   determine what type of keys the class supports. This function always succeeds.
+   Trả về ``1`` nếu đối tượng cung cấp mapping protocol hoặc hỗ trợ slicing, và ``0`` trong các trường hợp khác. Lưu ý rằng hàm trả về ``1`` đối với các lớp Python có phương thức :meth:`~object.__getitem__`, vì nhìn chung không thể xác định lớp đó hỗ trợ kiểu khóa nào. Hàm này luôn thành công.
 
 
 .. c:function:: Py_ssize_t PyMapping_Size(PyObject *o)
@@ -22,130 +19,101 @@ See also :c:func:`PyObject_GetItem`, :c:func:`PyObject_SetItem` and
 
    .. index:: pair: built-in function; len
 
-   Returns the number of keys in object *o* on success, and ``-1`` on failure.
-   This is equivalent to the Python expression ``len(o)``.
+   Trả về số lượng khóa trong đối tượng *o* khi thành công và ``-1`` khi thất bại. Điều này tương đương với biểu thức Python ``len(o)``.
 
 
 .. c:function:: PyObject* PyMapping_GetItemString(PyObject *o, const char *key)
 
-   This is the same as :c:func:`PyObject_GetItem`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Biến thể này giống :c:func:`PyObject_GetItem`, nhưng *key* được chỉ định dưới dạng chuỗi byte được mã hóa UTF-8 :c:expr:`const char*`, thay vì một :c:expr:`PyObject*`.
 
 
 .. c:function:: int PyMapping_GetOptionalItem(PyObject *obj, PyObject *key, PyObject **result)
 
-   Variant of :c:func:`PyObject_GetItem` which doesn't raise
-   :exc:`KeyError` if the key is not found.
+   Biến thể của :c:func:`PyObject_GetItem` không phát sinh ngoại lệ
+   :exc:`KeyError` nếu không tìm thấy key.
 
-   If the key is found, return ``1`` and set *\*result* to a new
-   :term:`strong reference` to the corresponding value.
-   If the key is not found, return ``0`` and set *\*result* to ``NULL``;
-   the :exc:`KeyError` is silenced.
-   If an error other than :exc:`KeyError` is raised, return ``-1`` and
-   set *\*result* to ``NULL``.
+   Nếu tìm thấy key, trả về ``1`` và đặt *\*result* thành một giá trị mới
+   :term:`strong reference` thành giá trị tương ứng. Nếu không tìm thấy key, trả về ``0`` và đặt *\*result* thành ``NULL``; :exc:`KeyError` bị bỏ qua. Nếu xảy ra lỗi khác với :exc:`KeyError`, trả về ``-1`` và đặt *\*result* thành ``NULL``.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyMapping_GetOptionalItemString(PyObject *obj, const char *key, PyObject **result)
 
-   This is the same as :c:func:`PyMapping_GetOptionalItem`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Điều này giống với :c:func:`PyMapping_GetOptionalItem`, nhưng *key* được chỉ định dưới dạng một :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một :c:expr:`PyObject*`.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyMapping_SetItemString(PyObject *o, const char *key, PyObject *v)
 
-   This is the same as :c:func:`PyObject_SetItem`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Điều này giống với :c:func:`PyObject_SetItem`, nhưng *key* được chỉ định dưới dạng một :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một :c:expr:`PyObject*`.
 
 
 .. c:function:: int PyMapping_DelItem(PyObject *o, PyObject *key)
 
-   This is an alias of :c:func:`PyObject_DelItem`.
+   Đây là bí danh của :c:func:`PyObject_DelItem`.
 
 
 .. c:function:: int PyMapping_DelItemString(PyObject *o, const char *key)
 
-   This is the same as :c:func:`PyObject_DelItem`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Điều này giống với :c:func:`PyObject_DelItem`, nhưng *key* được chỉ định dưới dạng một :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một :c:expr:`PyObject*`.
 
 
 .. c:function:: int PyMapping_HasKeyWithError(PyObject *o, PyObject *key)
 
-   Return ``1`` if the mapping object has the key *key* and ``0`` otherwise.
-   This is equivalent to the Python expression ``key in o``.
-   On failure, return ``-1``.
+   Trả về ``1`` nếu đối tượng mapping có khóa *key* và ``0`` nếu không. Điều này tương đương với biểu thức Python ``key in o``. Khi xảy ra lỗi, trả về ``-1``.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyMapping_HasKeyStringWithError(PyObject *o, const char *key)
 
-   This is the same as :c:func:`PyMapping_HasKeyWithError`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Điều này tương tự như :c:func:`PyMapping_HasKeyWithError`, nhưng *key* được chỉ định dưới dạng một chuỗi byte được mã hóa UTF-8 :c:expr:`const char*`, thay vì một :c:expr:`PyObject*`.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyMapping_HasKey(PyObject *o, PyObject *key)
 
-   Return ``1`` if the mapping object has the key *key* and ``0`` otherwise.
-   This is equivalent to the Python expression ``key in o``.
-   This function always succeeds.
+   Trả về ``1`` nếu đối tượng mapping có khóa *key* và ``0`` nếu không. Điều này tương đương với biểu thức Python ``key in o``. Hàm này luôn thành công.
 
    .. note::
 
-      Exceptions which occur when this calls the :meth:`~object.__getitem__`
-      method are silently ignored.
-      For proper error handling, use :c:func:`PyMapping_HasKeyWithError`,
-      :c:func:`PyMapping_GetOptionalItem` or :c:func:`PyObject_GetItem()` instead.
+      Các ngoại lệ xảy ra khi hàm này gọi phương thức :meth:`~object.__getitem__` sẽ bị bỏ qua một cách im lặng. Để xử lý lỗi đúng cách, hãy sử dụng :c:func:`PyMapping_HasKeyWithError`,
+      thay vào đó sử dụng :c:func:`PyMapping_GetOptionalItem` hoặc :c:func:`PyObject_GetItem()`.
 
 
 .. c:function:: int PyMapping_HasKeyString(PyObject *o, const char *key)
 
-   This is the same as :c:func:`PyMapping_HasKey`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Điều này tương tự như :c:func:`PyMapping_HasKey`, nhưng *key* được chỉ định dưới dạng một chuỗi byte được mã hóa UTF-8 :c:expr:`const char*`, thay vì một :c:expr:`PyObject*`.
 
    .. note::
 
-      Exceptions that occur when this calls the :meth:`~object.__getitem__`
-      method or while creating the temporary :class:`str`
-      object are silently ignored.
-      For proper error handling, use :c:func:`PyMapping_HasKeyStringWithError`,
-      :c:func:`PyMapping_GetOptionalItemString` or
-      :c:func:`PyMapping_GetItemString` instead.
+      Các ngoại lệ xảy ra khi hàm này gọi phương thức :meth:`~object.__getitem__` hoặc trong quá trình tạo đối tượng tạm thời :class:`str` sẽ bị bỏ qua một cách im lặng. Để xử lý lỗi đúng cách, hãy sử dụng :c:func:`PyMapping_HasKeyStringWithError`,
+      :c:func:`PyMapping_GetOptionalItemString` hoặc
+      :c:func:`PyMapping_GetItemString` thay vào đó.
 
 
 .. c:function:: PyObject* PyMapping_Keys(PyObject *o)
 
-   On success, return a list of the keys in object *o*.  On failure, return
-   ``NULL``.
+   Khi thành công, trả về danh sách các khóa trong đối tượng *o*. Khi thất bại, trả về ``NULL``.
 
    .. versionchanged:: 3.7
-      Previously, the function returned a list or a tuple.
+      Trước đây, hàm này trả về một danh sách hoặc một tuple.
 
 
 .. c:function:: PyObject* PyMapping_Values(PyObject *o)
 
-   On success, return a list of the values in object *o*.  On failure, return
-   ``NULL``.
+   Khi thành công, trả về danh sách các giá trị trong đối tượng *o*. Khi thất bại, trả về ``NULL``.
 
    .. versionchanged:: 3.7
-      Previously, the function returned a list or a tuple.
+      Trước đây, hàm này trả về một danh sách hoặc một tuple.
 
 
 .. c:function:: PyObject* PyMapping_Items(PyObject *o)
 
-   On success, return a list of the items in object *o*, where each item is a
-   tuple containing a key-value pair.  On failure, return ``NULL``.
+   Khi thành công, trả về danh sách các mục trong đối tượng *o*, trong đó mỗi mục là một tuple chứa một cặp khóa-giá trị. Khi thất bại, trả về ``NULL``.
 
    .. versionchanged:: 3.7
-      Previously, the function returned a list or a tuple.
+      Trước đây, hàm này trả về một danh sách hoặc một tuple.

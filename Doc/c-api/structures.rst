@@ -2,196 +2,160 @@
 
 .. _common-structs:
 
-Common Object Structures
-========================
+Các cấu trúc đối tượng phổ biến
+===============================
 
-There are a large number of structures which are used in the definition of
-object types for Python.  This section describes these structures and how they
-are used.
+Có rất nhiều cấu trúc được sử dụng trong định nghĩa các kiểu đối tượng cho Python. Phần này mô tả các cấu trúc đó và cách sử dụng chúng.
 
 
-Base object types and macros
-----------------------------
+Các kiểu đối tượng cơ sở và macro
+---------------------------------
 
-All Python objects ultimately share a small number of fields at the beginning
-of the object's representation in memory.  These are represented by the
-:c:type:`PyObject` and :c:type:`PyVarObject` types, which are defined, in turn,
-by the expansions of some macros also used, whether directly or indirectly, in
-the definition of all other Python objects.  Additional macros can be found
-under :ref:`reference counting <countingrefs>`.
+Tất cả các đối tượng Python cuối cùng đều dùng chung một số ít trường ở phần đầu biểu diễn của đối tượng trong bộ nhớ. Các trường này được biểu diễn bởi
+các kiểu :c:type:`PyObject` và :c:type:`PyVarObject`, lần lượt được định nghĩa bởi phần khai triển của một số macro cũng được sử dụng, trực tiếp hoặc gián tiếp, trong định nghĩa của tất cả các đối tượng Python khác. Có thể tìm thấy các macro bổ sung trong phần :ref:`reference counting <countingrefs>`.
 
 
 .. c:type:: PyObject
 
-   All object types are extensions of this type.  This is a type which
-   contains the information Python needs to treat a pointer to an object as an
-   object.  In a normal "release" build, it contains only the object's
-   reference count and a pointer to the corresponding type object.
-   Nothing is actually declared to be a :c:type:`PyObject`, but every pointer
-   to a Python object can be cast to a :c:expr:`PyObject*`.
+   Tất cả các kiểu đối tượng đều là phần mở rộng của kiểu này. Đây là một kiểu chứa thông tin mà Python cần để xử lý một con trỏ tới đối tượng như một đối tượng. Trong bản build "release" thông thường, kiểu này chỉ chứa số lượng tham chiếu của đối tượng và một con trỏ tới đối tượng kiểu tương ứng. Không có gì được khai báo thực sự là một :c:type:`PyObject`, nhưng mọi con trỏ tới một đối tượng Python đều có thể được ép kiểu thành :c:expr:`PyObject*`.
 
-   The members must not be accessed directly; instead use macros such as
-   :c:macro:`Py_REFCNT` and :c:macro:`Py_TYPE`.
+   Không được truy cập trực tiếp vào các thành viên này; thay vào đó, hãy sử dụng các macro như
+   :c:macro:`Py_REFCNT` và :c:macro:`Py_TYPE`.
 
    .. c:member:: Py_ssize_t ob_refcnt
 
-      The object's reference count, as returned by :c:macro:`Py_REFCNT`.
-      Do not use this field directly; instead use functions and macros such as
-      :c:macro:`!Py_REFCNT`, :c:func:`Py_INCREF` and :c:func:`Py_DecRef`.
+      Số lượng tham chiếu của đối tượng, được trả về bởi :c:macro:`Py_REFCNT`. Không sử dụng trực tiếp trường này; thay vào đó, hãy sử dụng các hàm và macro như
+      :c:macro:`!Py_REFCNT`, :c:func:`Py_INCREF` và :c:func:`Py_DecRef`.
 
-      The field type may be different from ``Py_ssize_t``, depending on
-      build configuration and platform.
+      Kiểu của trường có thể khác với ``Py_ssize_t``, tùy thuộc vào cấu hình bản build và nền tảng.
 
    .. c:member:: PyTypeObject* ob_type
 
-      The object's type.
-      Do not use this field directly; use :c:macro:`Py_TYPE` and
-      :c:func:`Py_SET_TYPE` instead.
+      Kiểu của đối tượng. Không sử dụng trực tiếp trường này; hãy sử dụng :c:macro:`Py_TYPE` và
+      :c:func:`Py_SET_TYPE` thay vào đó.
 
 
 .. c:type:: PyVarObject
 
-   An extension of :c:type:`PyObject` that adds the
-   :c:member:`~PyVarObject.ob_size` field.
-   This is intended for objects that have some notion of *length*.
+   Phần mở rộng của :c:type:`PyObject` bổ sung
+   trường :c:member:`~PyVarObject.ob_size`. Trường này dành cho các đối tượng có khái niệm về *length*.
 
-   As with :c:type:`!PyObject`, the members must not be accessed directly;
-   instead use macros such as :c:macro:`Py_SIZE`, :c:macro:`Py_REFCNT` and
+   Cũng như :c:type:`!PyObject`, không được truy cập trực tiếp vào các thành viên; thay vào đó, hãy sử dụng các macro như :c:macro:`Py_SIZE`, :c:macro:`Py_REFCNT` và
    :c:macro:`Py_TYPE`.
 
    .. c:member:: Py_ssize_t ob_size
 
-      A size field, whose contents should be considered an object's internal
-      implementation detail.
+      Một trường kích thước, nội dung của trường này nên được xem là chi tiết triển khai nội bộ của một đối tượng.
 
-      Do not use this field directly; use :c:macro:`Py_SIZE` instead.
+      Không sử dụng trực tiếp trường này; thay vào đó, hãy sử dụng :c:macro:`Py_SIZE`.
 
-      Object creation functions such as :c:func:`PyObject_NewVar` will
-      generally set this field to the requested size (number of items).
-      After creation, arbitrary values can be stored in :c:member:`!ob_size`
-      using :c:macro:`Py_SET_SIZE`.
+      Các hàm tạo đối tượng như :c:func:`PyObject_NewVar` thường sẽ đặt trường này thành kích thước được yêu cầu (số lượng phần tử). Sau khi tạo, có thể lưu trữ các giá trị tùy ý trong :c:member:`!ob_size` bằng :c:macro:`Py_SET_SIZE`.
 
-      To get an object's publicly exposed length, as returned by
-      the Python function :py:func:`len`, use :c:func:`PyObject_Length`
-      instead.
+      Để lấy độ dài được công khai của một đối tượng, như được hàm Python :py:func:`len` trả về, hãy sử dụng :c:func:`PyObject_Length`.
 
 
 .. c:macro:: PyObject_HEAD
 
-   This is a macro used when declaring new types which represent objects
-   without a varying length.  The PyObject_HEAD macro expands to::
+   Đây là một macro được sử dụng khi khai báo các kiểu mới biểu diễn những đối tượng không có độ dài thay đổi. Macro PyObject_HEAD được mở rộng thành::
 
       PyObject ob_base;
 
-   See documentation of :c:type:`PyObject` above.
+   Xem tài liệu về :c:type:`PyObject` ở trên.
 
 
 .. c:macro:: PyObject_VAR_HEAD
 
-   This is a macro used when declaring new types which represent objects
-   with a length that varies from instance to instance.
-   The PyObject_VAR_HEAD macro expands to::
+   Đây là một macro được sử dụng khi khai báo các kiểu mới biểu diễn những đối tượng có độ dài thay đổi tùy theo từng instance. Macro PyObject_VAR_HEAD mở rộng thành::
 
       PyVarObject ob_base;
 
-   See documentation of :c:type:`PyVarObject` above.
+   Xem tài liệu về :c:type:`PyVarObject` ở trên.
 
 
 .. c:var:: PyTypeObject PyBaseObject_Type
 
-   The base class of all other objects, the same as :class:`object` in Python.
+   Lớp cơ sở của tất cả các đối tượng khác, tương đương với :class:`object` trong Python.
 
 
 .. c:function:: int Py_Is(PyObject *x, PyObject *y)
 
-   Test if the *x* object is the *y* object, the same as ``x is y`` in Python.
+   Kiểm tra xem đối tượng *x* có phải là đối tượng *y* hay không, tương đương với ``x is y`` trong Python.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: int Py_IsNone(PyObject *x)
 
-   Test if an object is the ``None`` singleton,
-   the same as ``x is None`` in Python.
+   Kiểm tra xem một đối tượng có phải là singleton ``None`` hay không, tương đương với ``x is None`` trong Python.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: int Py_IsTrue(PyObject *x)
 
-   Test if an object is the ``True`` singleton,
-   the same as ``x is True`` in Python.
+   Kiểm tra xem một đối tượng có phải là singleton ``True`` hay không, tương đương với ``x is True`` trong Python.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: int Py_IsFalse(PyObject *x)
 
-   Test if an object is the ``False`` singleton,
-   the same as ``x is False`` in Python.
+   Kiểm tra xem một đối tượng có phải là singleton ``False``, tương đương với ``x is False`` trong Python hay không.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: PyTypeObject* Py_TYPE(PyObject *o)
 
-   Get the type of the Python object *o*.
+   Lấy kiểu của đối tượng Python *o*.
 
-   The returned reference is :term:`borrowed <borrowed reference>` from *o*.
-   Do not release it with :c:func:`Py_DECREF` or similar.
+   Tham chiếu được trả về là :term:`borrowed <borrowed reference>` từ *o*. Không giải phóng tham chiếu này bằng :c:func:`Py_DECREF` hoặc cách tương tự.
 
    .. versionchanged:: 3.11
       :c:func:`Py_TYPE()` is changed to an inline static function.
-      The parameter type is no longer :c:expr:`const PyObject*`.
+      Kiểu của tham số không còn là :c:expr:`const PyObject*`.
 
 
 .. c:function:: int Py_IS_TYPE(PyObject *o, PyTypeObject *type)
 
-   Return non-zero if the object *o* type is *type*. Return zero otherwise.
-   Equivalent to: ``Py_TYPE(o) == type``.
+   Trả về giá trị khác 0 nếu kiểu của đối tượng *o* là *type*. Nếu không, trả về 0. Tương đương với: ``Py_TYPE(o) == type``.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: void Py_SET_TYPE(PyObject *o, PyTypeObject *type)
 
-   Set the type of object *o* to *type*, without any checking or reference
-   counting.
+   Đặt kiểu của đối tượng *o* thành *type*, mà không thực hiện kiểm tra hay đếm tham chiếu.
 
-   This is a very low-level operation.
-   Consider instead setting the Python attribute :attr:`~object.__class__`
-   using :c:func:`PyObject_SetAttrString` or similar.
+   Đây là một thao tác ở mức rất thấp. Thay vào đó, hãy cân nhắc đặt thuộc tính Python :attr:`~object.__class__` bằng :c:func:`PyObject_SetAttrString` hoặc cách tương tự.
 
-   Note that assigning an incompatible type can lead to undefined behavior.
+   Lưu ý rằng việc gán một kiểu không tương thích có thể dẫn đến hành vi không xác định.
 
-   If *type* is a :ref:`heap type <heap-types>`, the caller must create a
-   new reference to it.
-   Similarly, if the old type of *o* is a heap type, the caller must release
-   a reference to that type.
+   Nếu *kiểu* là một :ref:`kiểu heap <heap-types>`, bên gọi phải tạo một tham chiếu mới đến nó. Tương tự, nếu kiểu cũ của *o* là một kiểu heap, bên gọi phải giải phóng một tham chiếu đến kiểu đó.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: Py_ssize_t Py_SIZE(PyVarObject *o)
 
-   Get the :c:member:`~PyVarObject.ob_size` field of *o*.
+   Lấy trường :c:member:`~PyVarObject.ob_size` của *o*.
 
    .. versionchanged:: 3.11
       :c:func:`Py_SIZE()` is changed to an inline static function.
-      The parameter type is no longer :c:expr:`const PyVarObject*`.
+      Kiểu tham số không còn là :c:expr:`const PyVarObject*`.
 
 
 .. c:function:: void Py_SET_SIZE(PyVarObject *o, Py_ssize_t size)
 
-   Set the :c:member:`~PyVarObject.ob_size` field of *o* to *size*.
+   Đặt trường :c:member:`~PyVarObject.ob_size` của *o* thành *size*.
 
    .. versionadded:: 3.9
 
 
 .. c:macro:: PyObject_HEAD_INIT(type)
 
-   This is a macro which expands to initialization values for a new
-   :c:type:`PyObject` type.  This macro expands to::
+   Đây là một macro mở rộng thành các giá trị khởi tạo cho một
+   :c:type:`PyObject` kiểu. Macro này mở rộng thành::
 
       _PyObject_EXTRA_INIT
       1, type,
@@ -199,36 +163,28 @@ under :ref:`reference counting <countingrefs>`.
 
 .. c:macro:: PyVarObject_HEAD_INIT(type, size)
 
-   This is a macro which expands to initialization values for a new
-   :c:type:`PyVarObject` type, including the :c:member:`~PyVarObject.ob_size` field.
-   This macro expands to::
+   Đây là một macro mở rộng thành các giá trị khởi tạo cho một
+   kiểu :c:type:`PyVarObject`, bao gồm cả trường :c:member:`~PyVarObject.ob_size`. Macro này mở rộng thành::
 
       _PyObject_EXTRA_INIT
       1, type, size,
 
 
-Implementing functions and methods
-----------------------------------
+Triển khai các hàm và phương thức
+---------------------------------
 
 .. c:type:: PyCFunction
 
-   Type of the functions used to implement most Python callables in C.
-   Functions of this type take two :c:expr:`PyObject*` parameters and return
-   one such value.  If the return value is ``NULL``, an exception shall have
-   been set.  If not ``NULL``, the return value is interpreted as the return
-   value of the function as exposed in Python.  The function must return a new
-   reference.
+   Kiểu của các hàm được dùng để triển khai hầu hết các Python callable trong C. Các hàm thuộc kiểu này nhận hai tham số :c:expr:`PyObject*` và trả về một giá trị cùng kiểu. Nếu giá trị trả về là ``NULL``, một exception phải được thiết lập. Nếu không phải ``NULL``, giá trị trả về được hiểu là giá trị trả về của hàm khi được cung cấp trong Python. Hàm phải trả về một reference mới.
 
-   The function signature is::
+   Chữ ký hàm là::
 
       PyObject *PyCFunction(PyObject *self,
                             PyObject *args);
 
 .. c:type:: PyCFunctionWithKeywords
 
-   Type of the functions used to implement Python callables in C
-   with signature :ref:`METH_VARARGS | METH_KEYWORDS <METH_VARARGS-METH_KEYWORDS>`.
-   The function signature is::
+   Kiểu của các hàm được dùng để triển khai Python callable trong C với chữ ký :ref:`METH_VARARGS | METH_KEYWORDS <METH_VARARGS-METH_KEYWORDS>`. Chữ ký hàm là::
 
       PyObject *PyCFunctionWithKeywords(PyObject *self,
                                         PyObject *args,
@@ -237,9 +193,7 @@ Implementing functions and methods
 
 .. c:type:: PyCFunctionFast
 
-   Type of the functions used to implement Python callables in C
-   with signature :c:macro:`METH_FASTCALL`.
-   The function signature is::
+   Kiểu của các hàm được dùng để triển khai Python callable trong C với chữ ký :c:macro:`METH_FASTCALL`. Chữ ký hàm là::
 
       PyObject *PyCFunctionFast(PyObject *self,
                                 PyObject *const *args,
@@ -247,9 +201,7 @@ Implementing functions and methods
 
 .. c:type:: PyCFunctionFastWithKeywords
 
-   Type of the functions used to implement Python callables in C
-   with signature :ref:`METH_FASTCALL | METH_KEYWORDS <METH_FASTCALL-METH_KEYWORDS>`.
-   The function signature is::
+   Kiểu của các hàm được dùng để triển khai các callable Python trong C với chữ ký :ref:`METH_FASTCALL | METH_KEYWORDS <METH_FASTCALL-METH_KEYWORDS>`. Chữ ký hàm là::
 
       PyObject *PyCFunctionFastWithKeywords(PyObject *self,
                                             PyObject *const *args,
@@ -258,9 +210,7 @@ Implementing functions and methods
 
 .. c:type:: PyCMethod
 
-   Type of the functions used to implement Python callables in C
-   with signature :ref:`METH_METHOD | METH_FASTCALL | METH_KEYWORDS <METH_METHOD-METH_FASTCALL-METH_KEYWORDS>`.
-   The function signature is::
+   Kiểu của các hàm được dùng để triển khai các callable Python trong C với chữ ký :ref:`METH_METHOD | METH_FASTCALL | METH_KEYWORDS <METH_METHOD-METH_FASTCALL-METH_KEYWORDS>`. Chữ ký hàm là::
 
       PyObject *PyCMethod(PyObject *self,
                           PyTypeObject *defining_class,
@@ -273,361 +223,263 @@ Implementing functions and methods
 
 .. c:type:: PyMethodDef
 
-   Structure used to describe a method of an extension type.  This structure has
-   four fields:
+   Cấu trúc được dùng để mô tả một phương thức của extension type. Cấu trúc này có bốn trường:
 
    .. c:member:: const char *ml_name
 
-      Name of the method.
+      Tên của phương thức.
 
    .. c:member:: PyCFunction ml_meth
 
-      Pointer to the C implementation.
+      Con trỏ tới phần triển khai bằng C.
 
    .. c:member:: int ml_flags
 
-      Flags bits indicating how the call should be constructed.
+      Các bit cờ cho biết cách tạo lời gọi.
 
    .. c:member:: const char *ml_doc
 
-      Points to the contents of the docstring.
+      Trỏ tới nội dung của docstring.
 
-The :c:member:`~PyMethodDef.ml_meth` is a C function pointer.
-The functions may be of different
-types, but they always return :c:expr:`PyObject*`.  If the function is not of
-the :c:type:`PyCFunction`, the compiler will require a cast in the method table.
-Even though :c:type:`PyCFunction` defines the first parameter as
-:c:expr:`PyObject*`, it is common that the method implementation uses the
-specific C type of the *self* object.
+:c:member:`~PyMethodDef.ml_meth` là một con trỏ hàm C. Các hàm có thể thuộc những kiểu khác nhau, nhưng luôn trả về :c:expr:`PyObject*`. Nếu hàm không thuộc :c:type:`PyCFunction`, trình biên dịch sẽ yêu cầu một phép ép kiểu trong bảng phương thức. Mặc dù :c:type:`PyCFunction` định nghĩa tham số đầu tiên là
+:c:expr:`PyObject*`, thông thường phần triển khai phương thức sẽ sử dụng kiểu C cụ thể của đối tượng *self*.
 
-The :c:member:`~PyMethodDef.ml_flags` field is a bitfield which can include
-the following flags.
-The individual flags indicate either a calling convention or a binding
-convention.
+Trường :c:member:`~PyMethodDef.ml_flags` là một bitfield có thể bao gồm các cờ sau. Các cờ riêng lẻ cho biết quy ước gọi hoặc quy ước liên kết.
 
-There are these calling conventions:
+Có các quy ước gọi sau:
 
 .. c:macro:: METH_VARARGS
 
-   This is the typical calling convention, where the methods have the type
-   :c:type:`PyCFunction`. The function expects two :c:expr:`PyObject*` values.
-   The first one is the *self* object for methods; for module functions, it is
-   the module object.  The second parameter (often called *args*) is a tuple
-   object representing all arguments. This parameter is typically processed
-   using :c:func:`PyArg_ParseTuple` or :c:func:`PyArg_UnpackTuple`.
+   Đây là quy ước gọi thông thường, trong đó các phương thức có kiểu
+   :c:type:`PyCFunction`. Hàm nhận hai giá trị :c:expr:`PyObject*`. Giá trị đầu tiên là đối tượng *self* đối với các phương thức; đối với các hàm module, đó là đối tượng module. Tham số thứ hai (thường được gọi là *args*) là một đối tượng tuple đại diện cho tất cả các đối số. Tham số này thường được xử lý bằng :c:func:`PyArg_ParseTuple` hoặc :c:func:`PyArg_UnpackTuple`.
 
 
 .. c:macro:: METH_KEYWORDS
 
-   Can only be used in certain combinations with other flags:
+   Chỉ có thể được sử dụng trong một số kết hợp nhất định với các cờ khác:
    :ref:`METH_VARARGS | METH_KEYWORDS <METH_VARARGS-METH_KEYWORDS>`,
-   :ref:`METH_FASTCALL | METH_KEYWORDS <METH_FASTCALL-METH_KEYWORDS>` and
+   :ref:`METH_FASTCALL | METH_KEYWORDS <METH_FASTCALL-METH_KEYWORDS>` và
    :ref:`METH_METHOD | METH_FASTCALL | METH_KEYWORDS <METH_METHOD-METH_FASTCALL-METH_KEYWORDS>`.
 
 
 .. _METH_VARARGS-METH_KEYWORDS:
 
 :c:expr:`METH_VARARGS | METH_KEYWORDS`
-   Methods with these flags must be of type :c:type:`PyCFunctionWithKeywords`.
-   The function expects three parameters: *self*, *args*, *kwargs* where
-   *kwargs* is a dictionary of all the keyword arguments or possibly ``NULL``
-   if there are no keyword arguments.  The parameters are typically processed
-   using :c:func:`PyArg_ParseTupleAndKeywords`.
+   Các phương thức có những cờ này phải có kiểu :c:type:`PyCFunctionWithKeywords`. Hàm này nhận ba tham số: *self*, *args*, *kwargs*, trong đó *kwargs* là một dictionary chứa tất cả các đối số từ khóa hoặc có thể là ``NULL`` nếu không có đối số từ khóa nào. Các tham số thường được xử lý bằng :c:func:`PyArg_ParseTupleAndKeywords`.
 
 
 .. c:macro:: METH_FASTCALL
 
-   Fast calling convention supporting only positional arguments.
-   The methods have the type :c:type:`PyCFunctionFast`.
-   The first parameter is *self*, the second parameter is a C array
-   of :c:expr:`PyObject*` values indicating the arguments and the third
-   parameter is the number of arguments (the length of the array).
+   Quy ước gọi nhanh chỉ hỗ trợ các đối số vị trí. Các phương thức có kiểu :c:type:`PyCFunctionFast`. Tham số đầu tiên là *self*, tham số thứ hai là một mảng C gồm các giá trị :c:expr:`PyObject*` cho biết các đối số, còn tham số thứ ba là số lượng đối số (độ dài của mảng).
 
    .. versionadded:: 3.7
 
    .. versionchanged:: 3.10
 
-      ``METH_FASTCALL`` is now part of the :ref:`stable ABI <stable-abi>`.
+      ``METH_FASTCALL`` hiện đã là một phần của :ref:`stable ABI <stable-abi>`.
 
 
 .. _METH_FASTCALL-METH_KEYWORDS:
 
 :c:expr:`METH_FASTCALL | METH_KEYWORDS`
-   Extension of :c:macro:`METH_FASTCALL` supporting also keyword arguments,
-   with methods of type :c:type:`PyCFunctionFastWithKeywords`.
-   Keyword arguments are passed the same way as in the
-   :ref:`vectorcall protocol <vectorcall>`:
-   there is an additional fourth :c:expr:`PyObject*` parameter
-   which is a tuple representing the names of the keyword arguments
-   (which are guaranteed to be strings)
-   or possibly ``NULL`` if there are no keywords.  The values of the keyword
-   arguments are stored in the *args* array, after the positional arguments.
+   Phần mở rộng của :c:macro:`METH_FASTCALL` cũng hỗ trợ các đối số từ khóa, với các phương thức có kiểu :c:type:`PyCFunctionFastWithKeywords`. Các đối số từ khóa được truyền theo cùng cách như trong
+   :ref:`giao thức vectorcall <vectorcall>`: có thêm một :c:expr:`PyObject*` tham số thứ tư, là một tuple biểu diễn tên của các đối số từ khóa (được đảm bảo là các chuỗi) hoặc có thể là ``NULL`` nếu không có từ khóa. Các giá trị của các đối số từ khóa được lưu trong mảng *args*, sau các đối số vị trí.
 
    .. versionadded:: 3.7
 
 
 .. c:macro:: METH_METHOD
 
-   Can only be used in the combination with other flags:
+   Chỉ có thể được sử dụng kết hợp với các flag khác:
    :ref:`METH_METHOD | METH_FASTCALL | METH_KEYWORDS <METH_METHOD-METH_FASTCALL-METH_KEYWORDS>`.
 
 
 .. _METH_METHOD-METH_FASTCALL-METH_KEYWORDS:
 
 :c:expr:`METH_METHOD | METH_FASTCALL | METH_KEYWORDS`
-   Extension of :ref:`METH_FASTCALL | METH_KEYWORDS <METH_FASTCALL-METH_KEYWORDS>`
-   supporting the *defining class*, that is,
-   the class that contains the method in question.
-   The defining class might be a superclass of ``Py_TYPE(self)``.
+   Phần mở rộng của :ref:`METH_FASTCALL | METH_KEYWORDS <METH_FASTCALL-METH_KEYWORDS>`, hỗ trợ *lớp định nghĩa*, tức là lớp chứa phương thức đang xét. Lớp định nghĩa có thể là lớp cha của ``Py_TYPE(self)``.
 
-   The method needs to be of type :c:type:`PyCMethod`, the same as for
-   ``METH_FASTCALL | METH_KEYWORDS`` with ``defining_class`` argument added after
-   ``self``.
+   Phương thức phải có kiểu :c:type:`PyCMethod`, giống như đối với ``METH_FASTCALL | METH_KEYWORDS``, với một đối số ``defining_class`` được thêm vào sau ``self``.
 
    .. versionadded:: 3.9
 
 
 .. c:macro:: METH_NOARGS
 
-   Methods without parameters don't need to check whether arguments are given if
-   they are listed with the :c:macro:`METH_NOARGS` flag.  They need to be of type
-   :c:type:`PyCFunction`.  The first parameter is typically named *self* and will
-   hold a reference to the module or object instance.  In all cases the second
-   parameter will be ``NULL``.
+   Các phương thức không có tham số không cần kiểm tra xem có đối số được truyền vào hay không nếu chúng được liệt kê với flag :c:macro:`METH_NOARGS`. Chúng cần có kiểu
+   :c:type:`PyCFunction`. Tham số đầu tiên thường được đặt tên là *self* và sẽ chứa tham chiếu đến module hoặc instance của đối tượng. Trong mọi trường hợp, tham số thứ hai sẽ là ``NULL``.
 
-   The function must have 2 parameters. Since the second parameter is unused,
-   :c:macro:`Py_UNUSED` can be used to prevent a compiler warning.
+   Hàm phải có 2 tham số. Vì tham số thứ hai không được sử dụng,
+   :c:macro:`Py_UNUSED` có thể được sử dụng để ngăn cảnh báo của compiler.
 
 
 .. c:macro:: METH_O
 
-   Methods with a single object argument can be listed with the :c:macro:`METH_O`
-   flag, instead of invoking :c:func:`PyArg_ParseTuple` with a ``"O"`` argument.
-   They have the type :c:type:`PyCFunction`, with the *self* parameter, and a
-   :c:expr:`PyObject*` parameter representing the single argument.
+   Các method có một đối số object có thể được liệt kê bằng flag :c:macro:`METH_O`, thay vì gọi :c:func:`PyArg_ParseTuple` với một đối số ``"O"``. Chúng có kiểu :c:type:`PyCFunction`, với tham số *self*, và một
+   tham số :c:expr:`PyObject*` đại diện cho đối số duy nhất.
 
 
-These two constants are not used to indicate the calling convention but the
-binding when used with methods of classes.  These may not be used for functions
-defined for modules.  At most one of these flags may be set for any given
-method.
+Hai hằng số này không được dùng để chỉ calling convention mà chỉ binding khi được sử dụng với các method của class. Không được dùng chúng cho các function được định nghĩa trong module. Với mỗi method cụ thể, nhiều nhất chỉ được đặt một trong các flag này.
 
 
 .. c:macro:: METH_CLASS
 
    .. index:: pair: built-in function; classmethod
 
-   The method will be passed the type object as the first parameter rather
-   than an instance of the type.  This is used to create *class methods*,
-   similar to what is created when using the :deco:`classmethod` built-in
-   decorator.
+   Method sẽ nhận đối tượng kiểu làm tham số đầu tiên thay vì một instance của kiểu đó. Cách này được dùng để tạo *class methods*, tương tự như cách tạo ra khi sử dụng built-in decorator :deco:`classmethod`.
 
 
 .. c:macro:: METH_STATIC
 
    .. index:: pair: built-in function; staticmethod
 
-   The method will be passed ``NULL`` as the first parameter rather than an
-   instance of the type.  This is used to create *static methods*, similar to
-   what is created when using the :deco:`staticmethod` built-in decorator.
+   Method sẽ nhận ``NULL`` làm tham số đầu tiên thay vì một instance của kiểu đó. Cách này được dùng để tạo *static methods*, tương tự như cách tạo ra khi sử dụng built-in decorator :deco:`staticmethod`.
 
-One other constant controls whether a method is loaded in place of another
-definition with the same method name.
+Một hằng số khác kiểm soát việc một method có được nạp thay cho một định nghĩa khác có cùng tên method hay không.
 
 
 .. c:macro:: METH_COEXIST
 
-   The method will be loaded in place of existing definitions.  Without
-   *METH_COEXIST*, the default is to skip repeated definitions.  Since slot
-   wrappers are loaded before the method table, the existence of a
-   *sq_contains* slot, for example, would generate a wrapped method named
-   :meth:`~object.__contains__` and preclude the loading of a corresponding
-   PyCFunction with the same name.  With the flag defined, the PyCFunction
-   will be loaded in place of the wrapper object and will co-exist with the
-   slot.  This is helpful because calls to PyCFunctions are optimized more
-   than wrapper object calls.
+   Method này sẽ được nạp thay cho các định nghĩa hiện có. Nếu không có *METH_COEXIST*, mặc định là bỏ qua các định nghĩa lặp lại. Vì các slot wrapper được nạp trước method table, sự tồn tại của một slot *sq_contains*, chẳng hạn, sẽ tạo ra một method wrapper có tên
+   :meth:`~object.__contains__` và ngăn việc nạp một PyCFunction tương ứng có cùng tên. Khi cờ này được định nghĩa, PyCFunction sẽ được nạp thay cho wrapper object và cùng tồn tại với slot. Điều này hữu ích vì các lệnh gọi đến PyCFunction được tối ưu hóa nhiều hơn so với các lệnh gọi đến wrapper object.
 
 
 .. c:var:: PyTypeObject PyCMethod_Type
 
-   The type object corresponding to Python C method objects. This is
-   available as :class:`types.BuiltinMethodType` in the Python layer.
+   Đối tượng type tương ứng với các đối tượng method C của Python. Đối tượng này có sẵn dưới dạng :class:`types.BuiltinMethodType` ở tầng Python.
 
 
 .. c:function:: int PyCMethod_Check(PyObject *op)
 
-   Return true if *op* is an instance of the :c:type:`PyCMethod_Type` type
-   or a subtype of it. This function always succeeds.
+   Trả về true nếu *op* là một instance của type :c:type:`PyCMethod_Type` hoặc một subtype của type đó. Hàm này luôn thành công.
 
 
 .. c:function:: int PyCMethod_CheckExact(PyObject *op)
 
-   This is the same as :c:func:`PyCMethod_Check`, but does not account for
-   subtypes.
+   Điều này tương tự :c:func:`PyCMethod_Check`, nhưng không tính đến các subtype.
 
 
 .. c:function:: PyObject * PyCMethod_New(PyMethodDef *ml, PyObject *self, PyObject *module, PyTypeObject *cls)
 
-   Turn *ml* into a Python :term:`callable` object.
-   The caller must ensure that *ml* outlives the :term:`callable`.
-   Typically, *ml* is defined as a static variable.
+   Chuyển *ml* thành một đối tượng :term:`callable` của Python. Bên gọi phải đảm bảo rằng *ml* tồn tại lâu hơn :term:`callable`. Thông thường, *ml* được định nghĩa dưới dạng một biến static.
 
-   The *self* parameter will be passed as the *self* argument
-   to the C function in ``ml->ml_meth`` when invoked.
-   *self* can be ``NULL``.
+   Tham số *self* sẽ được truyền dưới dạng đối số *self* cho hàm C trong ``ml->ml_meth`` khi được gọi. *self* có thể là ``NULL``.
 
-   The :term:`callable` object's ``__module__`` attribute
-   can be set from the given *module* argument.
-   *module* should be a Python string,
-   which will be used as name of the module the function is defined in.
-   If unavailable, it can be set to :const:`None` or ``NULL``.
+   Thuộc tính ``__module__`` của đối tượng :term:`callable` có thể được thiết lập từ đối số *module* đã cho. *module* phải là một chuỗi Python, được dùng làm tên của module nơi hàm được định nghĩa. Nếu không khả dụng, có thể đặt thuộc tính này thành :const:`None` hoặc ``NULL``.
 
    .. seealso:: :attr:`function.__module__`
 
-   The *cls* parameter will be passed as the *defining_class*
-   argument to the C function.
-   Must be set if :c:macro:`METH_METHOD` is set on ``ml->ml_flags``.
+   Tham số *cls* sẽ được truyền dưới dạng đối số *defining_class* cho hàm C. Phải được đặt nếu :c:macro:`METH_METHOD` được đặt trên ``ml->ml_flags``.
 
    .. versionadded:: 3.9
 
 
 .. c:var:: PyTypeObject PyCFunction_Type
 
-   The type object corresponding to Python C function objects. This is
-   available as :class:`types.BuiltinFunctionType` in the Python layer.
+   Đối tượng kiểu tương ứng với các đối tượng hàm C của Python. Đối tượng này khả dụng dưới dạng :class:`types.BuiltinFunctionType` trong lớp Python.
 
 
 .. c:function:: int PyCFunction_Check(PyObject *op)
 
-   Return true if *op* is an instance of the :c:type:`PyCFunction_Type` type
-   or a subtype of it. This function always succeeds.
+   Trả về true nếu *op* là một thể hiện của kiểu :c:type:`PyCFunction_Type` hoặc một kiểu con của nó. Hàm này luôn thành công.
 
 
 .. c:function:: int PyCFunction_CheckExact(PyObject *op)
 
-   This is the same as :c:func:`PyCFunction_Check`, but does not account for
-   subtypes.
+   Tương tự như :c:func:`PyCFunction_Check`, nhưng không tính đến các kiểu con.
 
 
 .. c:function:: PyObject * PyCFunction_NewEx(PyMethodDef *ml, PyObject *self, PyObject *module)
 
-   Equivalent to ``PyCMethod_New(ml, self, module, NULL)``.
+   Tương đương với ``PyCMethod_New(ml, self, module, NULL)``.
 
 
 .. c:function:: PyObject * PyCFunction_New(PyMethodDef *ml, PyObject *self)
 
-   Equivalent to ``PyCMethod_New(ml, self, NULL, NULL)``.
+   Tương đương với ``PyCMethod_New(ml, self, NULL, NULL)``.
 
 
 .. c:function:: int PyCFunction_GetFlags(PyObject *func)
 
-   Get the function's flags on *func* as they were passed to
+   Lấy các cờ của hàm trên *func* như đã được truyền vào
    :c:member:`~PyMethodDef.ml_flags`.
 
-   If *func* is not a C function object, this fails with an exception.
-   *func* must not be ``NULL``.
+   Nếu *func* không phải là một đối tượng hàm C, thao tác này sẽ thất bại với một ngoại lệ. *func* không được là ``NULL``.
 
-   This function returns the function's flags on success, and ``-1`` with an
-   exception set on failure.
+   Hàm này trả về các cờ của hàm khi thành công và ``-1`` cùng với một ngoại lệ được thiết lập khi thất bại.
 
 
 .. c:function:: int PyCFunction_GET_FLAGS(PyObject *func)
 
-   This is the same as :c:func:`PyCFunction_GetFlags`, but without error
-   or type checking.
+   Điều này tương tự :c:func:`PyCFunction_GetFlags`, nhưng không kiểm tra lỗi hoặc kiểu.
 
 
 .. c:function:: PyCFunction PyCFunction_GetFunction(PyObject *func)
 
-   Get the function pointer on *func* as it was passed to
+   Lấy con trỏ hàm trên *func* như đã được truyền vào
    :c:member:`~PyMethodDef.ml_meth`.
 
-   If *func* is not a C function object, this fails with an exception.
-   *func* must not be ``NULL``.
+   Nếu *func* không phải là một đối tượng hàm C, thao tác này sẽ thất bại với một ngoại lệ. *func* không được là ``NULL``.
 
-   This function returns the function pointer on success, and ``NULL`` with an
-   exception set on failure.
+   Hàm này trả về con trỏ hàm khi thành công và ``NULL`` cùng với một ngoại lệ được thiết lập khi thất bại.
 
 
 .. c:function:: int PyCFunction_GET_FUNCTION(PyObject *func)
 
-   This is the same as :c:func:`PyCFunction_GetFunction`, but without error
-   or type checking.
+   Điều này giống với :c:func:`PyCFunction_GetFunction`, nhưng không thực hiện kiểm tra lỗi hoặc kiểu.
 
 
 .. c:function:: PyObject *PyCFunction_GetSelf(PyObject *func)
 
-   Get the "self" object on *func*. This is the object that would be passed
-   to the first argument of a :c:type:`PyCFunction`. For C function objects
-   created through a :c:type:`PyMethodDef` on a :c:type:`PyModuleDef`, this
-   is the resulting module object.
+   Lấy đối tượng "self" trên *func*. Đây là đối tượng sẽ được truyền vào đối số đầu tiên của một :c:type:`PyCFunction`. Đối với các đối tượng hàm C được tạo thông qua một :c:type:`PyMethodDef` trên một :c:type:`PyModuleDef`, đây là đối tượng module thu được.
 
-   If *func* is not a C function object, this fails with an exception.
-   *func* must not be ``NULL``.
+   Nếu *func* không phải là một đối tượng hàm C, thao tác này sẽ thất bại với một ngoại lệ. *func* không được là ``NULL``.
 
-   This function returns a :term:`borrowed reference` to the "self" object
-   on success, and ``NULL`` with an exception set on failure.
+   Hàm này trả về một :term:`borrowed reference` tới đối tượng "self" khi thành công và ``NULL`` cùng với một ngoại lệ được thiết lập khi thất bại.
 
 
 .. c:function:: PyObject *PyCFunction_GET_SELF(PyObject *func)
 
-   This is the same as :c:func:`PyCFunction_GetSelf`, but without error or
-   type checking.
+   Điều này giống với :c:func:`PyCFunction_GetSelf`, nhưng không thực hiện kiểm tra lỗi hoặc kiểu.
 
 
-Accessing attributes of extension types
----------------------------------------
+Truy cập các thuộc tính của kiểu mở rộng
+----------------------------------------
 
 .. c:type:: PyMemberDef
 
-   Structure which describes an attribute of a type which corresponds to a C
-   struct member.
-   When defining a class, put a NULL-terminated array of these
-   structures in the :c:member:`~PyTypeObject.tp_members` slot.
+   Cấu trúc mô tả một thuộc tính của một kiểu tương ứng với một thành viên struct C. Khi định nghĩa một class, hãy đặt một mảng các cấu trúc này kết thúc bằng NULL vào vị trí :c:member:`~PyTypeObject.tp_members`.
 
-   Its fields are, in order:
+   Các trường của nó, theo thứ tự, là:
 
    .. c:member:: const char* name
 
-         Name of the member.
-         A NULL value marks the end of a ``PyMemberDef[]`` array.
+         Tên của thành viên. Giá trị NULL đánh dấu phần kết thúc của một mảng ``PyMemberDef[]``.
 
-         The string should be static, no copy is made of it.
+         Chuỗi này phải là static; chuỗi sẽ không được sao chép.
 
    .. c:member:: int type
 
-      The type of the member in the C struct.
-      See :ref:`PyMemberDef-types` for the possible values.
+      Kiểu của thành viên trong struct C. Xem :ref:`PyMemberDef-types` để biết các giá trị có thể có.
 
    .. c:member:: Py_ssize_t offset
 
-      The offset in bytes that the member is located on the type’s object struct.
+      Độ lệch tính bằng byte tại đó thành viên nằm trong struct đối tượng của kiểu.
 
    .. c:member:: int flags
 
-      Zero or more of the :ref:`PyMemberDef-flags`, combined using bitwise OR.
+      Không hoặc nhiều giá trị trong số :ref:`PyMemberDef-flags`, được kết hợp bằng phép OR theo bit.
 
    .. c:member:: const char* doc
 
-      The docstring, or NULL.
-      The string should be static, no copy is made of it.
-      Typically, it is defined using :c:macro:`PyDoc_STR`.
+      Docstring hoặc NULL. Chuỗi này phải là tĩnh và không được sao chép. Thông thường, nó được định nghĩa bằng :c:macro:`PyDoc_STR`.
 
-   By default (when :c:member:`~PyMemberDef.flags` is ``0``), members allow
-   both read and write access.
-   Use the :c:macro:`Py_READONLY` flag for read-only access.
-   Certain types, like :c:macro:`Py_T_STRING`, imply :c:macro:`Py_READONLY`.
-   Only :c:macro:`Py_T_OBJECT_EX` (and legacy :c:macro:`T_OBJECT`) members can
-   be deleted.
+   Theo mặc định (khi :c:member:`~PyMemberDef.flags` là ``0``), các thành viên cho phép cả quyền truy cập đọc và ghi. Sử dụng cờ :c:macro:`Py_READONLY` để chỉ cho phép truy cập đọc. Một số kiểu nhất định, chẳng hạn như :c:macro:`Py_T_STRING`, ngầm bao gồm :c:macro:`Py_READONLY`. Chỉ các thành viên :c:macro:`Py_T_OBJECT_EX` (và :c:macro:`T_OBJECT` cũ) mới có thể bị xóa.
 
    .. _pymemberdef-offsets:
 
-   For heap-allocated types (created using :c:func:`PyType_FromSpec` or similar),
-   ``PyMemberDef`` may contain a definition for the special member
-   ``"__vectorcalloffset__"``, corresponding to
-   :c:member:`~PyTypeObject.tp_vectorcall_offset` in type objects.
-   This member must be defined with ``Py_T_PYSSIZET``, and either
-   ``Py_READONLY`` or ``Py_READONLY | Py_RELATIVE_OFFSET``. For example::
+   Đối với các kiểu được cấp phát trên heap (được tạo bằng :c:func:`PyType_FromSpec` hoặc tương tự), ``PyMemberDef`` có thể chứa định nghĩa cho thành viên đặc biệt ``"__vectorcalloffset__"``, tương ứng với
+   :c:member:`~PyTypeObject.tp_vectorcall_offset` trong các đối tượng kiểu. Thành viên này phải được định nghĩa bằng ``Py_T_PYSSIZET``, và ``Py_READONLY`` hoặc ``Py_READONLY | Py_RELATIVE_OFFSET``. Ví dụ::
 
       static PyMemberDef spam_type_members[] = {
           {"__vectorcalloffset__", Py_T_PYSSIZET,
@@ -635,76 +487,59 @@ Accessing attributes of extension types
           {NULL}  /* Sentinel */
       };
 
-   (You may need to ``#include <stddef.h>`` for :c:func:`!offsetof`.)
+   (Bạn có thể cần ``#include <stddef.h>`` cho :c:func:`!offsetof`.)
 
-   The legacy offsets :c:member:`~PyTypeObject.tp_dictoffset` and
-   :c:member:`~PyTypeObject.tp_weaklistoffset` can be defined similarly using
-   ``"__dictoffset__"`` and ``"__weaklistoffset__"`` members, but extensions
-   are strongly encouraged to use :c:macro:`Py_TPFLAGS_MANAGED_DICT` and
-   :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` instead.
+   Các offset cũ :c:member:`~PyTypeObject.tp_dictoffset` và
+   :c:member:`~PyTypeObject.tp_weaklistoffset` có thể được định nghĩa tương tự bằng các thành viên ``"__dictoffset__"`` và ``"__weaklistoffset__"``, nhưng các extension được khuyến khích mạnh mẽ sử dụng :c:macro:`Py_TPFLAGS_MANAGED_DICT` và
+   :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` thay vào đó.
 
    .. versionchanged:: 3.12
 
-      ``PyMemberDef`` is always available.
-      Previously, it required including ``"structmember.h"``.
+      ``PyMemberDef`` luôn khả dụng. Trước đây, cần phải include ``"structmember.h"``.
 
    .. versionchanged:: 3.14
 
-      :c:macro:`Py_RELATIVE_OFFSET` is now allowed for
-      ``"__vectorcalloffset__"``, ``"__dictoffset__"`` and
-      ``"__weaklistoffset__"``.
+      :c:macro:`Py_RELATIVE_OFFSET` hiện được cho phép đối với ``"__vectorcalloffset__"``, ``"__dictoffset__"`` và ``"__weaklistoffset__"``.
 
 .. c:function:: PyObject* PyMember_GetOne(const char *obj_addr, struct PyMemberDef *m)
 
-   Get an attribute belonging to the object at address *obj_addr*.  The
-   attribute is described by ``PyMemberDef`` *m*.  Returns ``NULL``
-   on error.
+   Lấy một thuộc tính thuộc về đối tượng tại địa chỉ *obj_addr*. Thuộc tính này được mô tả bởi ``PyMemberDef`` *m*. Trả về ``NULL`` khi xảy ra lỗi.
 
    .. versionchanged:: 3.12
 
-      ``PyMember_GetOne`` is always available.
-      Previously, it required including ``"structmember.h"``.
+      ``PyMember_GetOne`` luôn khả dụng. Trước đây, cần phải include ``"structmember.h"``.
 
 .. c:function:: int PyMember_SetOne(char *obj_addr, struct PyMemberDef *m, PyObject *o)
 
-   Set an attribute belonging to the object at address *obj_addr* to object *o*.
-   The attribute to set is described by ``PyMemberDef`` *m*.  Returns ``0``
-   if successful and a negative value on failure.
+   Đặt thuộc tính thuộc về đối tượng tại địa chỉ *obj_addr* thành đối tượng *o*. Thuộc tính cần đặt được mô tả bởi ``PyMemberDef`` *m*. Trả về ``0`` nếu thành công và một giá trị âm nếu thất bại.
 
    .. versionchanged:: 3.12
 
-      ``PyMember_SetOne`` is always available.
-      Previously, it required including ``"structmember.h"``.
+      ``PyMember_SetOne`` luôn khả dụng. Trước đây, cần phải include ``"structmember.h"``.
 
 .. _PyMemberDef-flags:
 
-Member flags
-^^^^^^^^^^^^
+Cờ thành viên
+^^^^^^^^^^^^^
 
-The following flags can be used with :c:member:`PyMemberDef.flags`:
+Có thể sử dụng các cờ sau với :c:member:`PyMemberDef.flags`:
 
 .. c:macro:: Py_READONLY
 
-   Not writable.
+   Không thể ghi.
 
 .. c:macro:: Py_AUDIT_READ
 
-   Emit an ``object.__getattr__`` :ref:`audit event <audit-events>`
-   before reading.
+   Phát ra một ``object.__getattr__`` :ref:`sự kiện audit <audit-events>` trước khi đọc.
 
 .. c:macro:: Py_RELATIVE_OFFSET
 
-   Indicates that the :c:member:`~PyMemberDef.offset` of this ``PyMemberDef``
-   entry indicates an offset from the subclass-specific data, rather than
-   from ``PyObject``.
+   Cho biết rằng :c:member:`~PyMemberDef.offset` của mục ``PyMemberDef`` này chỉ một offset tính từ dữ liệu dành riêng cho lớp con, thay vì từ ``PyObject``.
 
-   Can only be used as part of the :c:data:`Py_tp_members`
-   :c:type:`slot <PyType_Slot>` when creating a class using negative
-   :c:member:`~PyType_Spec.basicsize`.
-   It is mandatory in that case.
-   When setting :c:member:`~PyTypeObject.tp_members` from the slot during
-   class creation, Python clears the flag and sets
-   :c:member:`PyMemberDef.offset` to the offset from the ``PyObject`` struct.
+   Chỉ có thể được sử dụng như một phần của :c:data:`Py_tp_members`
+   :c:type:`slot <PyType_Slot>` khi tạo một lớp bằng cách sử dụng giá trị âm
+   :c:member:`~PyType_Spec.basicsize`. Trong trường hợp đó, đây là yêu cầu bắt buộc. Khi đặt :c:member:`~PyTypeObject.tp_members` từ slot trong quá trình tạo lớp, Python sẽ xóa cờ và đặt
+   :c:member:`PyMemberDef.offset` thành độ lệch so với cấu trúc ``PyObject``.
 
 .. index::
    single: READ_RESTRICTED (C macro)
@@ -713,74 +548,75 @@ The following flags can be used with :c:member:`PyMemberDef.flags`:
 
 .. versionchanged:: 3.10
 
-   The :c:macro:`!RESTRICTED`, :c:macro:`!READ_RESTRICTED` and
-   :c:macro:`!WRITE_RESTRICTED` macros available with
-   ``#include "structmember.h"`` are deprecated.
-   :c:macro:`!READ_RESTRICTED` and :c:macro:`!RESTRICTED` are equivalent to
-   :c:macro:`Py_AUDIT_READ`; :c:macro:`!WRITE_RESTRICTED` does nothing.
+   Các macro :c:macro:`!RESTRICTED`, :c:macro:`!READ_RESTRICTED` và
+   macro :c:macro:`!WRITE_RESTRICTED` có sẵn cùng với ``#include "structmember.h"`` đã không còn được khuyến nghị sử dụng.
+   :c:macro:`!READ_RESTRICTED` và :c:macro:`!RESTRICTED` tương đương với
+   :c:macro:`Py_AUDIT_READ`; :c:macro:`!WRITE_RESTRICTED` không thực hiện thao tác nào.
 
 .. index::
    single: READONLY (C macro)
 
 .. versionchanged:: 3.12
 
-   The :c:macro:`!READONLY` macro was renamed to :c:macro:`Py_READONLY`.
-   The :c:macro:`!PY_AUDIT_READ` macro was renamed with the ``Py_`` prefix.
-   The new names are now always available.
-   Previously, these required ``#include "structmember.h"``.
-   The header is still available and it provides the old names.
+   Macro :c:macro:`!READONLY` đã được đổi tên thành :c:macro:`Py_READONLY`. Macro :c:macro:`!PY_AUDIT_READ` đã được đổi tên với tiền tố ``Py_``. Các tên mới hiện luôn khả dụng. Trước đây, các tên này yêu cầu ``#include "structmember.h"``. Tệp tiêu đề vẫn khả dụng và cung cấp các tên cũ.
 
 .. _PyMemberDef-types:
 
-Member types
-^^^^^^^^^^^^
+Các kiểu thành viên
+^^^^^^^^^^^^^^^^^^^
 
-:c:member:`PyMemberDef.type` can be one of the following macros corresponding
-to various C types.
-When the member is accessed in Python, it will be converted to the
-equivalent Python type.
-When it is set from Python, it will be converted back to the C type.
-If that is not possible, an exception such as :exc:`TypeError` or
-:exc:`ValueError` is raised.
+:c:member:`PyMemberDef.type` có thể là một trong các macro sau đây, tương ứng với nhiều kiểu C khác nhau. Khi thành viên được truy cập trong Python, nó sẽ được chuyển đổi thành kiểu Python tương ứng. Khi được thiết lập từ Python, nó sẽ được chuyển đổi обратно thành kiểu C. Nếu không thể thực hiện việc đó, một ngoại lệ như :exc:`TypeError` hoặc
+:exc:`ValueError` sẽ được phát sinh.
 
-Unless marked (D), attributes defined this way cannot be deleted
-using e.g. :keyword:`del` or :py:func:`delattr`.
+Trừ khi được đánh dấu (D), không thể xóa các thuộc tính được định nghĩa theo cách này bằng, chẳng hạn như, :keyword:`del` hoặc :py:func:`delattr`.
 
-================================ ============================= ======================
-Macro name                       C type                        Python type
-================================ ============================= ======================
-.. c:macro:: Py_T_BYTE           :c:expr:`char`                :py:class:`int`
-.. c:macro:: Py_T_SHORT          :c:expr:`short`               :py:class:`int`
-.. c:macro:: Py_T_INT            :c:expr:`int`                 :py:class:`int`
-.. c:macro:: Py_T_LONG           :c:expr:`long`                :py:class:`int`
-.. c:macro:: Py_T_LONGLONG       :c:expr:`long long`           :py:class:`int`
-.. c:macro:: Py_T_UBYTE          :c:expr:`unsigned char`       :py:class:`int`
-.. c:macro:: Py_T_UINT           :c:expr:`unsigned int`        :py:class:`int`
-.. c:macro:: Py_T_USHORT         :c:expr:`unsigned short`      :py:class:`int`
-.. c:macro:: Py_T_ULONG          :c:expr:`unsigned long`       :py:class:`int`
-.. c:macro:: Py_T_ULONGLONG      :c:expr:`unsigned long long`  :py:class:`int`
-.. c:macro:: Py_T_PYSSIZET       :c:expr:`Py_ssize_t`          :py:class:`int`
-.. c:macro:: Py_T_FLOAT          :c:expr:`float`               :py:class:`float`
-.. c:macro:: Py_T_DOUBLE         :c:expr:`double`              :py:class:`float`
-.. c:macro:: Py_T_BOOL           :c:expr:`char`                :py:class:`bool`
-                                 (written as 0 or 1)
-.. c:macro:: Py_T_STRING         :c:expr:`const char *` (*)    :py:class:`str` (RO)
-.. c:macro:: Py_T_STRING_INPLACE :c:expr:`const char[]` (*)    :py:class:`str` (RO)
-.. c:macro:: Py_T_CHAR           :c:expr:`char` (0-127)        :py:class:`str` (**)
-.. c:macro:: Py_T_OBJECT_EX      :c:expr:`PyObject *`          :py:class:`object` (D)
-================================ ============================= ======================
++----------------------------------+---------------------------------------+------------------------+
+| Tên macro                        | Kiểu C                                | Kiểu Python            |
++==================================+=======================================+========================+
+| .. c:macro:: Py_T_BYTE           | :c:expr:`char`                        | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_SHORT          | :c:expr:`short`                       | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_INT            | :c:expr:`int`                         | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_LONG           | :c:expr:`long`                        | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_LONGLONG       | :c:expr:`long long`                   | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_UBYTE          | :c:expr:`unsigned char`               | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_UINT           | :c:expr:`unsigned int`                | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_USHORT         | :c:expr:`unsigned short`              | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_ULONG          | :c:expr:`unsigned long`               | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_ULONGLONG      | :c:expr:`unsigned long long`          | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_PYSSIZET       | :c:expr:`Py_ssize_t`                  | :py:class:`int`        |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_FLOAT          | :c:expr:`float`                       | :py:class:`float`      |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_DOUBLE         | :c:expr:`double`                      | :py:class:`float`      |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_BOOL           | :c:expr:`char` (được ghi là 0 hoặc 1) | :py:class:`bool`       |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_STRING         | :c:expr:`const char *` (*)            | :py:class:`str` (RO)   |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_STRING_INPLACE | :c:expr:`const char[]` (*)            | :py:class:`str` (RO)   |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_CHAR           | :c:expr:`char` (0-127)                | :py:class:`str` (**)   |
++----------------------------------+---------------------------------------+------------------------+
+| .. c:macro:: Py_T_OBJECT_EX      | :c:expr:`PyObject *`                  | :py:class:`object` (D) |
++----------------------------------+---------------------------------------+------------------------+
 
-   (*): Zero-terminated, UTF8-encoded C string.
-   With :c:macro:`!Py_T_STRING` the C representation is a pointer;
-   with :c:macro:`!Py_T_STRING_INPLACE` the string is stored directly
-   in the structure.
+   (*): Chuỗi C kết thúc bằng số 0 và được mã hóa UTF8. Với :c:macro:`!Py_T_STRING`, biểu diễn C là một con trỏ; với :c:macro:`!Py_T_STRING_INPLACE`, chuỗi được lưu trực tiếp trong cấu trúc.
 
-   (**): String of length 1. Only ASCII is accepted.
+   (****): Chuỗi có độ dài 1. Chỉ chấp nhận ASCII.
 
-   (RO): Implies :c:macro:`Py_READONLY`.
+   (RO): Ngụ ý :c:macro:`Py_READONLY`.
 
-   (D): Can be deleted, in which case the pointer is set to ``NULL``.
-   Reading a ``NULL`` pointer raises :py:exc:`AttributeError`.
+   (D): Có thể bị xóa, trong trường hợp đó con trỏ được đặt thành ``NULL``. Việc đọc một con trỏ ``NULL`` sẽ phát sinh :py:exc:`AttributeError`.
 
 .. index::
    single: T_BYTE (C macro)
@@ -805,63 +641,51 @@ Macro name                       C type                        Python type
 
 .. versionadded:: 3.12
 
-   In previous versions, the macros were only available with
-   ``#include "structmember.h"`` and were named without the ``Py_`` prefix
-   (e.g. as ``T_INT``).
-   The header is still available and contains the old names, along with
-   the following deprecated types:
+   Trong các phiên bản trước, các macro chỉ khả dụng với ``#include "structmember.h"`` và được đặt tên không có tiền tố ``Py_`` (ví dụ như ``T_INT``). Header này vẫn khả dụng và chứa các tên cũ, cùng với các kiểu không còn được khuyến nghị sau đây:
 
    .. c:macro:: T_OBJECT
 
-      Like ``Py_T_OBJECT_EX``, but ``NULL`` is converted to ``None``.
-      This results in surprising behavior in Python: deleting the attribute
-      effectively sets it to ``None``.
+      Giống như ``Py_T_OBJECT_EX``, nhưng ``NULL`` được chuyển đổi thành ``None``. Điều này dẫn đến hành vi bất ngờ trong Python: việc xóa thuộc tính thực chất sẽ đặt nó thành ``None``.
 
    .. c:macro:: T_NONE
 
-      Always ``None``. Must be used with :c:macro:`Py_READONLY`.
+      Luôn là ``None``. Phải được sử dụng với :c:macro:`Py_READONLY`.
 
-Defining Getters and Setters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Định nghĩa Getter và Setter
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. c:type:: PyGetSetDef
 
-   Structure to define property-like access for a type. See also description of
-   the :c:member:`PyTypeObject.tp_getset` slot.
+   Cấu trúc dùng để định nghĩa quyền truy cập giống thuộc tính cho một kiểu. Xem thêm mô tả về slot :c:member:`PyTypeObject.tp_getset`.
 
    .. c:member:: const char* name
 
-      attribute name
+      tên thuộc tính
 
    .. c:member:: getter get
 
-      C function to get the attribute.
+      Hàm C để lấy thuộc tính.
 
    .. c:member:: setter set
 
-      Optional C function to set or delete the attribute.
-      If ``NULL``, the attribute is read-only.
+      Hàm C tùy chọn để thiết lập hoặc xóa thuộc tính. Nếu ``NULL``, thuộc tính là chỉ đọc.
 
    .. c:member:: const char* doc
 
-      optional docstring
+      docstring tùy chọn
 
    .. c:member:: void* closure
 
-      Optional user data pointer, providing additional data for getter and setter.
+      Con trỏ dữ liệu người dùng tùy chọn, cung cấp dữ liệu bổ sung cho getter và setter.
 
 .. c:type:: PyObject *(*getter)(PyObject *, void *)
 
-   The ``get`` function takes one :c:expr:`PyObject*` parameter (the
-   instance) and a user data pointer (the associated ``closure``):
+   Hàm ``get`` nhận một tham số :c:expr:`PyObject*` (đối tượng thực thể) và một con trỏ dữ liệu người dùng (đối tượng ``closure`` liên kết):
 
-   It should return a new reference on success or ``NULL`` with a set exception
-   on failure.
+   Hàm này sẽ trả về một tham chiếu mới khi thành công hoặc ``NULL`` với một exception đã được thiết lập khi thất bại.
 
 .. c:type:: int (*setter)(PyObject *, PyObject *, void *)
 
-   ``set`` functions take two :c:expr:`PyObject*` parameters (the instance and
-   the value to be set) and a user data pointer (the associated ``closure``):
+   Các hàm ``set`` nhận hai tham số :c:expr:`PyObject*` (đối tượng thực thể và giá trị cần thiết lập) cùng một con trỏ dữ liệu người dùng (đối tượng ``closure`` liên kết):
 
-   In case the attribute should be deleted the second parameter is ``NULL``.
-   Should return ``0`` on success or ``-1`` with a set exception on failure.
+   Nếu thuộc tính cần được xóa, tham số thứ hai là ``NULL``. Khi thành công, cần trả về ``0``; khi thất bại, trả về ``-1`` cùng với một ngoại lệ đã được thiết lập.

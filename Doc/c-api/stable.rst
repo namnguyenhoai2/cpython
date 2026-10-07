@@ -2,91 +2,59 @@
 
 .. _stable:
 
-***************
-C API Stability
-***************
+**********************
+Tính ổn định của C API
+**********************
 
-Unless documented otherwise, Python's C API is covered by the Backwards
-Compatibility Policy, :pep:`387`.
-Most changes to it are source-compatible (typically by only adding new API).
-Changing existing API or removing API is only done after a deprecation period
-or to fix serious issues.
+Trừ khi có tài liệu nêu rõ khác đi, C API của Python được điều chỉnh bởi Chính sách tương thích ngược, :pep:`387`. Hầu hết các thay đổi đều tương thích với mã nguồn (thường chỉ bằng cách bổ sung API mới). Việc thay đổi API hiện có hoặc loại bỏ API chỉ được thực hiện sau một khoảng thời gian ngừng sử dụng hoặc để khắc phục các vấn đề nghiêm trọng.
 
-CPython's Application Binary Interface (ABI) is forward- and
-backwards-compatible across a minor release (if these are compiled the same
-way; see :ref:`stable-abi-platform` below).
-So, code compiled for Python 3.10.0 will work on 3.10.8 and vice versa,
-but will need to be compiled separately for 3.9.x and 3.11.x.
+Giao diện nhị phân ứng dụng (ABI) của CPython tương thích thuận và ngược giữa các bản phát hành phụ (nếu chúng được biên dịch theo cùng một cách; xem :ref:`stable-abi-platform` bên dưới). Vì vậy, mã được biên dịch cho Python 3.10.0 sẽ hoạt động trên 3.10.8 và ngược lại, nhưng sẽ cần được biên dịch riêng cho 3.9.x và 3.11.x.
 
-There are two tiers of C API with different stability expectations:
+Có hai cấp độ C API với các kỳ vọng khác nhau về tính ổn định:
 
-- :ref:`Unstable API <unstable-c-api>`, may change in minor versions without
-  a deprecation period. It is marked by the ``PyUnstable`` prefix in names.
-- :ref:`Limited API <limited-c-api>`, is compatible across several minor releases.
-  When :c:macro:`Py_LIMITED_API` is defined, only this subset is exposed
-  from ``Python.h``.
+- :ref:`Unstable API <unstable-c-api>` có thể thay đổi trong các phiên bản phụ mà không cần qua khoảng thời gian ngừng sử dụng. API này được đánh dấu bằng tiền tố ``PyUnstable`` trong tên.
+- :ref:`Limited API <limited-c-api>` tương thích giữa một số bản phát hành phụ. Khi :c:macro:`Py_LIMITED_API` được định nghĩa, chỉ tập hợp con này được cung cấp từ ``Python.h``.
 
-These are discussed in more detail below.
+Các cấp độ này được thảo luận chi tiết hơn bên dưới.
 
-Names prefixed by an underscore, such as ``_Py_InternalState``,
-are private API that can change without notice even in patch releases.
-If you need to use this API, consider reaching out to
-`CPython developers <https://discuss.python.org/c/core-dev/c-api/30>`_
-to discuss adding public API for your use case.
+Các tên có tiền tố dấu gạch dưới, chẳng hạn như ``_Py_InternalState``, là private API có thể thay đổi mà không báo trước, ngay cả trong các bản phát hành vá lỗi. Nếu bạn cần sử dụng API này, hãy cân nhắc liên hệ với `các nhà phát triển CPython <https://discuss.python.org/c/core-dev/c-api/30>`_ để thảo luận về việc bổ sung public API cho trường hợp sử dụng của bạn.
 
 .. _unstable-c-api:
 
-Unstable C API
-==============
+C API không ổn định
+===================
 
 .. index:: single: PyUnstable
 
-Any API named with the ``PyUnstable`` prefix exposes CPython implementation
-details, and may change in every minor release (e.g. from 3.9 to 3.10) without
-any deprecation warnings.
-However, it will not change in a bugfix release (e.g. from 3.10.0 to 3.10.1).
+Bất kỳ API nào có tên với tiền tố ``PyUnstable`` đều cung cấp các chi tiết triển khai của CPython và có thể thay đổi trong mọi bản phát hành phụ (ví dụ: từ 3.9 lên 3.10) mà không có bất kỳ cảnh báo ngừng sử dụng nào. Tuy nhiên, API này sẽ không thay đổi trong bản phát hành sửa lỗi (ví dụ: từ 3.10.0 lên 3.10.1).
 
-It is generally intended for specialized, low-level tools like debuggers.
+API này nhìn chung предназнач cho các công cụ chuyên biệt, cấp thấp như trình gỡ lỗi.
 
-Projects that use this API are expected to follow
-CPython development and spend extra effort adjusting to changes.
+Các dự án sử dụng API này được kỳ vọng sẽ theo dõi quá trình phát triển CPython và dành thêm công sức để điều chỉnh theo các thay đổi.
 
 .. _stable-application-binary-interface:
 
-Stable Application Binary Interface
+Giao diện nhị phân ứng dụng ổn định
 ===================================
 
-For simplicity, this document talks about *extensions*, but the Limited API
-and Stable ABI work the same way for all uses of the API – for example,
-embedding Python.
+Để đơn giản, tài liệu này nói về *các extension*, nhưng Limited API và Stable ABI hoạt động theo cùng một cách đối với mọi trường hợp sử dụng API — ví dụ như nhúng Python.
 
 .. _limited-c-api:
 
 Limited C API
 -------------
 
-Python 3.2 introduced the *Limited API*, a subset of Python's C API.
-Extensions that only use the Limited API can be
-compiled once and be loaded on multiple versions of Python.
-Contents of the Limited API are :ref:`listed below <limited-api-list>`.
+Python 3.2 đã giới thiệu *Limited API*, một tập con của C API của Python. Các extension chỉ sử dụng Limited API có thể được biên dịch một lần và nạp trên nhiều phiên bản Python. Nội dung của Limited API được :ref:`liệt kê bên dưới <limited-api-list>`.
 
 .. c:macro:: Py_LIMITED_API
 
-   Define this macro before including ``Python.h`` to opt in to only use
-   the Limited API, and to select the Limited API version.
+   Định nghĩa macro này trước khi include ``Python.h`` để chỉ sử dụng Limited API và chọn phiên bản Limited API.
 
-   Define ``Py_LIMITED_API`` to the value of :c:macro:`PY_VERSION_HEX`
-   corresponding to the lowest Python version your extension supports.
-   The extension will be ABI-compatible with all Python 3 releases
-   from the specified one onward, and can use Limited API introduced up to that
-   version.
+   Định nghĩa ``Py_LIMITED_API`` thành giá trị của :c:macro:`PY_VERSION_HEX` tương ứng với phiên bản Python thấp nhất mà extension của bạn hỗ trợ. Extension sẽ tương thích ABI với mọi bản phát hành Python 3 kể từ phiên bản được chỉ định trở đi và có thể sử dụng Limited API được giới thiệu tối đa ở phiên bản đó.
 
-   Rather than using the ``PY_VERSION_HEX`` macro directly, hardcode a minimum
-   minor version (e.g. ``0x030A0000`` for Python 3.10) for stability when
-   compiling with future Python versions.
+   Thay vì sử dụng trực tiếp macro ``PY_VERSION_HEX``, hãy hardcode một minor version tối thiểu (ví dụ: ``0x030A0000`` cho Python 3.10) để đảm bảo tính ổn định khi biên dịch với các phiên bản Python trong tương lai.
 
-   You can also define ``Py_LIMITED_API`` to ``3``. This works the same as
-   ``0x03020000`` (Python 3.2, the version that introduced Limited API).
+   Bạn cũng có thể định nghĩa ``Py_LIMITED_API`` thành ``3``. Cách này hoạt động giống như ``0x03020000`` (Python 3.2, phiên bản đã giới thiệu Limited API).
 
 
 .. _stable-abi:
@@ -94,117 +62,67 @@ Contents of the Limited API are :ref:`listed below <limited-api-list>`.
 Stable ABI
 ----------
 
-To enable this, Python provides a *Stable ABI*: a set of symbols that will
-remain ABI-compatible across Python 3.x versions.
+Để bật tính năng này, Python cung cấp một *Stable ABI*: một tập hợp các symbol sẽ duy trì khả năng tương thích ABI giữa các phiên bản Python 3.x.
 
 .. note::
 
-   The Stable ABI prevents ABI issues, like linker errors due to missing
-   symbols or data corruption due to changes in structure layouts or function
-   signatures.
-   However, other changes in Python can change the *behavior* of extensions.
-   See Python's Backwards Compatibility Policy (:pep:`387`) for details.
+   Stable ABI ngăn ngừa các vấn đề về ABI, chẳng hạn như lỗi linker do thiếu symbol hoặc hỏng dữ liệu do thay đổi bố cục cấu trúc hay chữ ký hàm. Tuy nhiên, những thay đổi khác trong Python có thể làm thay đổi *hành vi* của các extension. Xem Chính sách Tương thích Ngược của Python (:pep:`387`) để biết chi tiết.
 
-The Stable ABI contains symbols exposed in the :ref:`Limited API
-<limited-c-api>`, but also other ones – for example, functions necessary to
-support older versions of the Limited API.
+Stable ABI chứa các symbol được cung cấp trong :ref:`Limited API <limited-c-api>`, nhưng cũng có những symbol khác – chẳng hạn như các hàm cần thiết để hỗ trợ những phiên bản cũ hơn của Limited API.
 
-On Windows, extensions that use the Stable ABI should be linked against
-``python3.dll`` rather than a version-specific library such as
-``python39.dll``.
+Trên Windows, các extension sử dụng Stable ABI nên được liên kết với ``python3.dll`` thay vì một thư viện dành riêng cho từng phiên bản như ``python39.dll``.
 
-On some platforms, Python will look for and load shared library files named
-with the ``abi3`` tag (e.g. ``mymodule.abi3.so``).
-It does not check if such extensions conform to a Stable ABI.
-The user (or their packaging tools) need to ensure that, for example,
-extensions built with the 3.10+ Limited API are not installed for lower
-versions of Python.
+Trên một số nền tảng, Python sẽ tìm và tải các tệp thư viện dùng chung có tên kèm theo thẻ ``abi3`` (ví dụ: ``mymodule.abi3.so``). Python không kiểm tra xem các extension đó có tuân theo Stable ABI hay không. Người dùng (hoặc các công cụ đóng gói của họ) cần đảm bảo rằng, chẳng hạn, các extension được xây dựng với Limited API 3.10 trở lên không được cài đặt cho các phiên bản Python thấp hơn.
 
-All functions in the Stable ABI are present as functions in Python's shared
-library, not solely as macros. This makes them usable from languages that don't
-use the C preprocessor.
+Tất cả các hàm trong Stable ABI đều hiện diện dưới dạng hàm trong thư viện dùng chung của Python, không chỉ dưới dạng macro. Nhờ đó, chúng có thể được sử dụng từ các ngôn ngữ không dùng bộ tiền xử lý C.
 
 
-Limited API Scope and Performance
+Phạm vi và hiệu năng của Limited API
+------------------------------------
+
+Mục tiêu của Limited API là cho phép mọi thứ có thể thực hiện bằng C API đầy đủ, nhưng có thể phải chịu mức suy giảm hiệu năng.
+
+Ví dụ, mặc dù :c:func:`PyList_GetItem` khả dụng, biến thể macro “unsafe” :c:func:`PyList_GET_ITEM` lại không khả dụng. Macro này có thể nhanh hơn vì nó có thể dựa vào các chi tiết triển khai dành riêng cho từng phiên bản của đối tượng list.
+
+Khi không định nghĩa ``Py_LIMITED_API``, một số hàm C API được inline hoặc thay thế bằng macro. Việc định nghĩa ``Py_LIMITED_API`` sẽ tắt quá trình inline này, giúp duy trì tính ổn định khi các cấu trúc dữ liệu của Python được cải thiện, nhưng có thể làm giảm hiệu năng.
+
+Bằng cách bỏ qua định nghĩa ``Py_LIMITED_API``, bạn có thể biên dịch một extension Limited API với ABI dành riêng cho từng phiên bản. Điều này có thể cải thiện hiệu năng cho phiên bản Python đó, nhưng sẽ hạn chế khả năng tương thích. Khi đó, việc biên dịch với ``Py_LIMITED_API`` sẽ tạo ra một extension có thể được phân phối ở những nơi không có extension dành riêng cho từng phiên bản — chẳng hạn như các bản phát hành trước của một phiên bản Python sắp ra mắt.
+
+
+Các điểm cần lưu ý về Limited API
 ---------------------------------
 
-The goal for the Limited API is to allow everything that is possible with the
-full C API, but possibly with a performance penalty.
+Lưu ý rằng việc biên dịch với ``Py_LIMITED_API`` *không* phải là một bảo đảm hoàn toàn rằng mã tuân theo :ref:`Limited API <limited-c-api>` hoặc :ref:`Stable ABI <stable-abi>`. ``Py_LIMITED_API`` chỉ bao quát các định nghĩa, nhưng một API còn bao gồm những vấn đề khác, chẳng hạn như ngữ nghĩa được mong đợi.
 
-For example, while :c:func:`PyList_GetItem` is available, its “unsafe” macro
-variant :c:func:`PyList_GET_ITEM` is not.
-The macro can be faster because it can rely on version-specific implementation
-details of the list object.
+Một vấn đề mà ``Py_LIMITED_API`` không ngăn chặn được là gọi một hàm với các đối số không hợp lệ trong một phiên bản Python thấp hơn. Ví dụ, hãy xét một hàm bắt đầu chấp nhận ``NULL`` cho một đối số. Trong Python 3.9, ``NULL`` giờ đây chọn hành vi mặc định, nhưng trong Python 3.8, đối số sẽ được sử dụng trực tiếp, gây ra thao tác dereference ``NULL`` và làm chương trình bị crash. Lập luận tương tự cũng áp dụng cho các trường của struct.
 
-Without ``Py_LIMITED_API`` defined, some C API functions are inlined or
-replaced by macros.
-Defining ``Py_LIMITED_API`` disables this inlining, allowing stability as
-Python's data structures are improved, but possibly reducing performance.
+Một vấn đề khác là hiện tại một số trường của struct không bị ẩn khi ``Py_LIMITED_API`` được định nghĩa, mặc dù chúng là một phần của Limited API.
 
-By leaving out the ``Py_LIMITED_API`` definition, it is possible to compile
-a Limited API extension with a version-specific ABI. This can improve
-performance for that Python version, but will limit compatibility.
-Compiling with ``Py_LIMITED_API`` will then yield an extension that can be
-distributed where a version-specific one is not available – for example,
-for prereleases of an upcoming Python version.
+Vì những lý do này, chúng tôi khuyến nghị kiểm thử một extension với *all* phiên bản Python nhỏ mà extension đó hỗ trợ, và tốt nhất là build với phiên bản *lowest* như vậy.
 
+Chúng tôi cũng khuyến nghị xem lại tài liệu của tất cả API được sử dụng để kiểm tra xem chúng có được xác định rõ ràng là một phần của Limited API hay không. Ngay cả khi ``Py_LIMITED_API`` được định nghĩa, một số khai báo private vẫn được exposed vì lý do kỹ thuật (hoặc thậm chí là vô tình, do lỗi).
 
-Limited API Caveats
--------------------
-
-Note that compiling with ``Py_LIMITED_API`` is *not* a complete guarantee that
-code conforms to the :ref:`Limited API <limited-c-api>` or the :ref:`Stable ABI
-<stable-abi>`. ``Py_LIMITED_API`` only covers definitions, but an API also
-includes other issues, such as expected semantics.
-
-One issue that ``Py_LIMITED_API`` does not guard against is calling a function
-with arguments that are invalid in a lower Python version.
-For example, consider a function that starts accepting ``NULL`` for an
-argument. In Python 3.9, ``NULL`` now selects a default behavior, but in
-Python 3.8, the argument will be used directly, causing a ``NULL`` dereference
-and crash. A similar argument works for fields of structs.
-
-Another issue is that some struct fields are currently not hidden when
-``Py_LIMITED_API`` is defined, even though they're part of the Limited API.
-
-For these reasons, we recommend testing an extension with *all* minor Python
-versions it supports, and preferably to build with the *lowest* such version.
-
-We also recommend reviewing documentation of all used API to check
-if it is explicitly part of the Limited API. Even with ``Py_LIMITED_API``
-defined, a few private declarations are exposed for technical reasons (or
-even unintentionally, as bugs).
-
-Also note that the Limited API is not necessarily stable: compiling with
-``Py_LIMITED_API`` with Python 3.8 means that the extension will
-run with Python 3.12, but it will not necessarily *compile* with Python 3.12.
-In particular, parts of the Limited API may be deprecated and removed,
-provided that the Stable ABI stays stable.
+Cũng lưu ý rằng Limited API không nhất thiết ổn định: biên dịch với ``Py_LIMITED_API`` trên Python 3.8 có nghĩa là extension sẽ chạy được với Python 3.12, nhưng không nhất thiết sẽ *compile* với Python 3.12. Cụ thể, một số phần của Limited API có thể bị đánh dấu deprecated và bị xóa, miễn là Stable ABI vẫn ổn định.
 
 
 .. _stable-abi-platform:
 
-Platform Considerations
-=======================
+Các cân nhắc về nền tảng
+========================
 
-ABI stability depends not only on Python, but also on the compiler used,
-lower-level libraries and compiler options. For the purposes of
-the :ref:`Stable ABI <stable-abi>`, these details define a “platform”. They
-usually depend on the OS type and processor architecture
+Độ ổn định của ABI không chỉ phụ thuộc vào Python mà còn phụ thuộc vào compiler được sử dụng, các thư viện cấp thấp hơn và các tùy chọn của compiler. Đối với :ref:`Stable ABI <stable-abi>`, những chi tiết này xác định một “platform”. Chúng thường phụ thuộc vào loại OS và kiến trúc bộ xử lý
 
-It is the responsibility of each particular distributor of Python
-to ensure that all Python versions on a particular platform are built
-in a way that does not break the Stable ABI.
-This is the case with Windows and macOS releases from ``python.org`` and many
-third-party distributors.
+Mỗi nhà phân phối Python cụ thể có trách nhiệm đảm bảo rằng tất cả phiên bản Python trên một platform cụ thể đều được build theo cách không làm hỏng Stable ABI. Đây là trường hợp đối với các bản phát hành Windows và macOS từ ``python.org`` cũng như nhiều nhà phân phối bên thứ ba.
 
 
 .. _limited-api-list:
 
-Contents of Limited API
-=======================
+Nội dung của Limited API
+========================
 
 
-Currently, the :ref:`Limited API <limited-c-api>` includes the following items:
+Hiện tại, :ref:`Limited API <limited-c-api>` bao gồm các mục sau:
 
 .. limited-api-list::
+
+.. _`CPython developers`: https://discuss.python.org/c/core-dev/c-api/30

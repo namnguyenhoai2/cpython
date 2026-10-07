@@ -2,105 +2,85 @@
 
 .. _reflection:
 
-Reflection
+Phản chiếu
 ==========
 
 .. c:function:: PyObject* PyEval_GetBuiltins(void)
 
    .. deprecated:: 3.13
 
-      Use :c:func:`PyEval_GetFrameBuiltins` instead.
+      Thay vào đó, hãy sử dụng :c:func:`PyEval_GetFrameBuiltins`.
 
-   Return a dictionary of the builtins in the current execution frame,
-   or the interpreter of the thread state if no frame is currently executing.
+   Trả về một dictionary chứa các builtins trong khung thực thi hiện tại hoặc interpreter của trạng thái luồng nếu hiện không có khung nào đang được thực thi.
 
 
 .. c:function:: PyObject* PyEval_GetLocals(void)
 
    .. deprecated:: 3.13
 
-      Use either :c:func:`PyEval_GetFrameLocals` to obtain the same behaviour as calling
-      :func:`locals` in Python code, or else call :c:func:`PyFrame_GetLocals` on the result
-      of :c:func:`PyEval_GetFrame` to access the :attr:`~frame.f_locals` attribute of the
-      currently executing frame.
+      Sử dụng :c:func:`PyEval_GetFrameLocals` để nhận được hành vi tương tự như khi gọi
+      :func:`locals` trong mã Python, hoặc gọi :c:func:`PyFrame_GetLocals` trên kết quả của :c:func:`PyEval_GetFrame` để truy cập thuộc tính :attr:`~frame.f_locals` của khung hiện đang được thực thi.
 
-   Return a mapping providing access to the local variables in the current execution frame,
-   or ``NULL`` if no frame is currently executing.
+   Trả về một mapping cho phép truy cập các biến cục bộ trong khung thực thi hiện tại hoặc ``NULL`` nếu hiện không có khung nào đang được thực thi.
 
-   Refer to :func:`locals` for details of the mapping returned at different scopes.
+   Tham khảo :func:`locals` để biết chi tiết về mapping được trả về ở các phạm vi khác nhau.
 
-   As this function returns a :term:`borrowed reference`, the dictionary returned for
-   :term:`optimized scopes <optimized scope>` is cached on the frame object and will remain
-   alive as long as the frame object does. Unlike :c:func:`PyEval_GetFrameLocals` and
-   :func:`locals`, subsequent calls to this function in the same frame will update the
-   contents of the cached dictionary to reflect changes in the state of the local variables
-   rather than returning a new snapshot.
+   Vì hàm này trả về một :term:`borrowed reference`, nên từ điển được trả về cho
+   :term:`các phạm vi tối ưu hóa <optimized scope>` được lưu trong đối tượng frame và sẽ vẫn tồn tại chừng nào đối tượng frame còn tồn tại. Không giống như :c:func:`PyEval_GetFrameLocals` và
+   :func:`locals`, các lần gọi tiếp theo đến hàm này trong cùng frame sẽ cập nhật nội dung của từ điển đã lưu trong bộ nhớ đệm để phản ánh các thay đổi về trạng thái của những biến cục bộ, thay vì trả về một ảnh chụp mới.
 
    .. versionchanged:: 3.13
-      As part of :pep:`667`, :c:func:`PyFrame_GetLocals`, :func:`locals`, and
-      :attr:`FrameType.f_locals <frame.f_locals>` no longer make use of the shared cache
-      dictionary. Refer to the :ref:`What's New entry <whatsnew313-locals-semantics>` for
-      additional details.
+      Trong :pep:`667`, :c:func:`PyFrame_GetLocals`, :func:`locals`, và
+      :attr:`FrameType.f_locals <frame.f_locals>` không còn sử dụng từ điển bộ nhớ đệm dùng chung. Hãy tham khảo :ref:`mục What's New <whatsnew313-locals-semantics>` để biết thêm chi tiết.
 
 
 .. c:function:: PyObject* PyEval_GetGlobals(void)
 
    .. deprecated:: 3.13
 
-      Use :c:func:`PyEval_GetFrameGlobals` instead.
+      Thay vào đó, hãy sử dụng :c:func:`PyEval_GetFrameGlobals`.
 
-   Return a dictionary of the global variables in the current execution frame,
-   or ``NULL`` if no frame is currently executing.
+   Trả về một từ điển chứa các biến toàn cục trong frame thực thi hiện tại, hoặc ``NULL`` nếu hiện không có frame nào đang thực thi.
 
 
 .. c:function:: PyFrameObject* PyEval_GetFrame(void)
 
-   Return the :term:`attached thread state`'s frame, which is ``NULL`` if no frame is
-   currently executing.
+   Trả về frame của :term:`attached thread state`, là ``NULL`` nếu hiện không có frame nào đang thực thi.
 
-   See also :c:func:`PyThreadState_GetFrame`.
+   Xem thêm :c:func:`PyThreadState_GetFrame`.
 
 
 .. c:function:: PyObject* PyEval_GetFrameBuiltins(void)
 
-   Return a dictionary of the builtins in the current execution frame,
-   or the interpreter of the thread state if no frame is currently executing.
+   Trả về một dictionary chứa các builtins trong khung thực thi hiện tại hoặc interpreter của trạng thái luồng nếu hiện không có khung nào đang được thực thi.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: PyObject* PyEval_GetFrameLocals(void)
 
-   Return a dictionary of the local variables in the current execution frame,
-   or ``NULL`` if no frame is currently executing. Equivalent to calling
-   :func:`locals` in Python code.
+   Trả về một dictionary chứa các biến cục bộ trong frame thực thi hiện tại, hoặc ``NULL`` nếu hiện không có frame nào đang thực thi. Tương đương với việc gọi
+   :func:`locals` trong mã Python.
 
-   To access :attr:`~frame.f_locals` on the current frame without making an independent
-   snapshot in :term:`optimized scopes <optimized scope>`, call :c:func:`PyFrame_GetLocals`
-   on the result of :c:func:`PyEval_GetFrame`.
+   Để truy cập :attr:`~frame.f_locals` trên frame hiện tại mà không tạo snapshot độc lập trong các scope được tối ưu hóa :term:`optimized scopes <optimized scope>`, hãy gọi :c:func:`PyFrame_GetLocals` trên kết quả của :c:func:`PyEval_GetFrame`.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: PyObject* PyEval_GetFrameGlobals(void)
 
-   Return a dictionary of the global variables in the current execution frame,
-   or ``NULL`` if no frame is currently executing. Equivalent to calling
-   :func:`globals` in Python code.
+   Trả về một dictionary chứa các biến toàn cục trong frame thực thi hiện tại, hoặc ``NULL`` nếu hiện không có frame nào đang thực thi. Tương đương với việc gọi
+   :func:`globals` trong mã Python.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: const char* PyEval_GetFuncName(PyObject *func)
 
-   Return the name of *func* if it is a function, class or instance object, else the
-   name of *func*\s type.
+   Trả về tên của *func* nếu đó là một đối tượng function, class hoặc instance; nếu không, trả về tên của *func*\s type.
 
 
 .. c:function:: const char* PyEval_GetFuncDesc(PyObject *func)
 
-   Return a description string, depending on the type of *func*.
-   Return values include "()" for functions and methods, " constructor",
-   " instance", and " object".  Concatenated with the result of
-   :c:func:`PyEval_GetFuncName`, the result will be a description of
-   *func*.
+   Trả về một chuỗi mô tả, tùy thuộc vào type của *func*. Các giá trị trả về bao gồm "()" cho function và method, " constructor", " instance" và " object". Khi được nối với kết quả của
+   :c:func:`PyEval_GetFuncName`, kết quả sẽ là phần mô tả của *func*.

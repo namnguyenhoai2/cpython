@@ -2,98 +2,70 @@
 
 .. _marshalling-utils:
 
-Data marshalling support
-========================
+Hỗ trợ marshalling dữ liệu
+==========================
 
-These routines allow C code to work with serialized objects using the same
-data format as the :mod:`marshal` module.  There are functions to write data
-into the serialization format, and additional functions that can be used to
-read the data back.  Files used to store marshalled data must be opened in
-binary mode.
+Các routine này cho phép mã C làm việc với các đối tượng đã được tuần tự hóa bằng cùng định dạng dữ liệu như module :mod:`marshal`. Có các hàm để ghi dữ liệu vào định dạng tuần tự hóa, cùng các hàm bổ sung có thể dùng để đọc lại dữ liệu. Các tệp dùng để lưu trữ dữ liệu đã được marshal phải được mở ở chế độ nhị phân.
 
-Numeric values are stored with the least significant byte first.
+Các giá trị số được lưu với byte có ý nghĩa thấp nhất ở trước.
 
-The module supports several versions of the data format; see
-the :py:mod:`Python module documentation <marshal>` for details.
+Module hỗ trợ một số phiên bản của định dạng dữ liệu; xem tài liệu module :py:mod:`Python <marshal>` để biết chi tiết.
 
 .. c:macro:: Py_MARSHAL_VERSION
 
-   The current format version. See :py:data:`marshal.version`.
+   Phiên bản định dạng hiện tại. Xem :py:data:`marshal.version`.
 
 .. c:function:: void PyMarshal_WriteLongToFile(long value, FILE *file, int version)
 
-   Marshal a :c:expr:`long` integer, *value*, to *file*.  This will only write
-   the least-significant 32 bits of *value*; regardless of the size of the
-   native :c:expr:`long` type.  *version* indicates the file format.
+   Marshal một số nguyên :c:expr:`long`, *value*, vào *file*. Thao tác này chỉ ghi 32 bit có ý nghĩa thấp nhất của *value*, bất kể kích thước của kiểu :c:expr:`long` gốc. *version* cho biết định dạng tệp.
 
-   This function can fail, in which case it sets the error indicator.
-   Use :c:func:`PyErr_Occurred` to check for that.
+   Hàm này có thể không thành công; trong trường hợp đó, hàm sẽ đặt chỉ báo lỗi. Dùng :c:func:`PyErr_Occurred` để kiểm tra điều đó.
 
 .. c:function:: void PyMarshal_WriteObjectToFile(PyObject *value, FILE *file, int version)
 
-   Marshal a Python object, *value*, to *file*.
-   *version* indicates the file format.
+   Marshal một đối tượng Python, *value*, vào *file*. *version* cho biết định dạng tệp.
 
-   This function can fail, in which case it sets the error indicator.
-   Use :c:func:`PyErr_Occurred` to check for that.
+   Hàm này có thể không thành công; trong trường hợp đó, hàm sẽ đặt chỉ báo lỗi. Dùng :c:func:`PyErr_Occurred` để kiểm tra điều đó.
 
 .. c:function:: PyObject* PyMarshal_WriteObjectToString(PyObject *value, int version)
 
-   Return a bytes object containing the marshalled representation of *value*.
-   *version* indicates the file format.
+   Trả về một đối tượng bytes chứa biểu diễn đã được marshal của *value*. *version* cho biết định dạng tệp.
 
 
-The following functions allow marshalled values to be read back in.
+Các hàm sau đây cho phép đọc lại những giá trị đã được marshal.
 
 
 .. c:function:: long PyMarshal_ReadLongFromFile(FILE *file)
 
-   Return a C :c:expr:`long` from the data stream in a :c:expr:`FILE*` opened
-   for reading.  Only a 32-bit value can be read in using this function,
-   regardless of the native size of :c:expr:`long`.
+   Trả về một :c:expr:`long` C từ luồng dữ liệu trong :c:expr:`FILE*` được mở để đọc. Chỉ có thể đọc một giá trị 32-bit bằng hàm này, bất kể kích thước native của :c:expr:`long`.
 
-   On error, sets the appropriate exception (:exc:`EOFError`) and returns
-   ``-1``.
+   Khi xảy ra lỗi, đặt ngoại lệ thích hợp (:exc:`EOFError`) và trả về ``-1``.
 
 
 .. c:function:: int PyMarshal_ReadShortFromFile(FILE *file)
 
-   Return a C :c:expr:`short` from the data stream in a :c:expr:`FILE*` opened
-   for reading.  Only a 16-bit value can be read in using this function,
-   regardless of the native size of :c:expr:`short`.
+   Trả về một :c:expr:`short` C từ luồng dữ liệu trong :c:expr:`FILE*` được mở để đọc. Chỉ có thể đọc một giá trị 16-bit bằng hàm này, bất kể kích thước native của :c:expr:`short`.
 
-   On error, sets the appropriate exception (:exc:`EOFError`) and returns
-   ``-1``.
+   Khi xảy ra lỗi, đặt ngoại lệ thích hợp (:exc:`EOFError`) và trả về ``-1``.
 
 
 .. c:function:: PyObject* PyMarshal_ReadObjectFromFile(FILE *file)
 
-   Return a Python object from the data stream in a :c:expr:`FILE*` opened for
-   reading.
+   Trả về một đối tượng Python từ luồng dữ liệu trong một :c:expr:`FILE*` được mở để đọc.
 
-   On error, sets the appropriate exception (:exc:`EOFError`, :exc:`ValueError`
-   or :exc:`TypeError`) and returns ``NULL``.
+   Khi xảy ra lỗi, đặt ngoại lệ thích hợp (:exc:`EOFError`, :exc:`ValueError` hoặc :exc:`TypeError`) và trả về ``NULL``.
 
 
 .. c:function:: PyObject* PyMarshal_ReadLastObjectFromFile(FILE *file)
 
-   Return a Python object from the data stream in a :c:expr:`FILE*` opened for
-   reading.  Unlike :c:func:`PyMarshal_ReadObjectFromFile`, this function
-   assumes that no further objects will be read from the file, allowing it to
-   aggressively load file data into memory so that the de-serialization can
-   operate from data in memory rather than reading a byte at a time from the
-   file.  Only use this variant if you are certain that you won't be reading
-   anything else from the file.
+   Trả về một đối tượng Python từ luồng dữ liệu trong một :c:expr:`FILE*` được mở để đọc. Không giống như :c:func:`PyMarshal_ReadObjectFromFile`, hàm này giả định rằng sẽ không đọc thêm đối tượng nào từ tệp, cho phép tải mạnh tay dữ liệu tệp vào bộ nhớ để quá trình giải tuần tự hóa có thể hoạt động trên dữ liệu trong bộ nhớ thay vì đọc từng byte một từ tệp. Chỉ sử dụng biến thể này nếu bạn chắc chắn rằng sẽ không đọc thêm bất kỳ thứ gì từ tệp.
 
-   On error, sets the appropriate exception (:exc:`EOFError`, :exc:`ValueError`
-   or :exc:`TypeError`) and returns ``NULL``.
+   Khi xảy ra lỗi, đặt ngoại lệ thích hợp (:exc:`EOFError`, :exc:`ValueError` hoặc :exc:`TypeError`) và trả về ``NULL``.
 
 
 .. c:function:: PyObject* PyMarshal_ReadObjectFromString(const char *data, Py_ssize_t len)
 
-   Return a Python object from the data stream in a byte buffer
-   containing *len* bytes pointed to by *data*.
+   Trả về một đối tượng Python từ luồng dữ liệu trong bộ đệm byte chứa *len* byte được trỏ tới bởi *data*.
 
-   On error, sets the appropriate exception (:exc:`EOFError`, :exc:`ValueError`
-   or :exc:`TypeError`) and returns ``NULL``.
+   Khi xảy ra lỗi, đặt ngoại lệ thích hợp (:exc:`EOFError`, :exc:`ValueError` hoặc :exc:`TypeError`) và trả về ``NULL``.
 

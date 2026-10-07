@@ -3,378 +3,262 @@
 
 .. _veryhigh:
 
-*************************
-The Very High Level Layer
-*************************
+***************
+Lớp cấp rất cao
+***************
 
-The functions in this chapter will let you execute Python source code given in a
-file or a buffer, but they will not let you interact in a more detailed way with
-the interpreter.
+Các hàm trong chương này cho phép bạn thực thi mã nguồn Python được cung cấp trong một tệp hoặc bộ đệm, nhưng không cho phép bạn tương tác với trình thông dịch theo cách chi tiết hơn.
 
-Several of these functions accept a start symbol from the grammar as a
-parameter.  The available start symbols are :c:data:`Py_eval_input`,
-:c:data:`Py_file_input`, :c:data:`Py_single_input`, and
-:c:data:`Py_func_type_input`.  These are described following the functions
-which accept them as parameters.
+Một số hàm trong đó nhận một ký hiệu bắt đầu từ văn phạm làm tham số. Các ký hiệu bắt đầu có sẵn là :c:data:`Py_eval_input`,
+:c:data:`Py_file_input`, :c:data:`Py_single_input`, và
+:c:data:`Py_func_type_input`. Các ký hiệu này được mô tả sau những hàm nhận chúng làm tham số.
 
-Note also that several of these functions take :c:expr:`FILE*` parameters.  One
-particular issue which needs to be handled carefully is that the :c:type:`FILE`
-structure for different C libraries can be different and incompatible.  Under
-Windows (at least), it is possible for dynamically linked extensions to actually
-use different libraries, so care should be taken that :c:expr:`FILE*` parameters
-are only passed to these functions if it is certain that they were created by
-the same library that the Python runtime is using.
+Cũng lưu ý rằng một số hàm trong đó nhận các tham số :c:expr:`FILE*`. Một vấn đề đặc biệt cần được xử lý cẩn thận là cấu trúc :c:type:`FILE` của các thư viện C khác nhau có thể khác nhau và không tương thích. Ít nhất là trên Windows, các phần mở rộng được liên kết động thực sự có thể sử dụng các thư viện khác nhau, vì vậy cần đảm bảo rằng các tham số :c:expr:`FILE*` chỉ được truyền cho những hàm này khi chắc chắn rằng chúng được tạo bởi cùng thư viện mà runtime Python đang sử dụng.
 
 
 .. c:function:: int PyRun_AnyFile(FILE *fp, const char *filename)
 
-   This is a simplified interface to :c:func:`PyRun_AnyFileExFlags` below, leaving
-   *closeit* set to ``0`` and *flags* set to ``NULL``.
+   Đây là giao diện đơn giản hóa cho :c:func:`PyRun_AnyFileExFlags` bên dưới, trong đó *closeit* được đặt thành ``0`` và *flags* được đặt thành ``NULL``.
 
 
 .. c:function:: int PyRun_AnyFileFlags(FILE *fp, const char *filename, PyCompilerFlags *flags)
 
-   This is a simplified interface to :c:func:`PyRun_AnyFileExFlags` below, leaving
-   the *closeit* argument set to ``0``.
+   Đây là một giao diện đơn giản hóa cho :c:func:`PyRun_AnyFileExFlags` bên dưới, giữ đối số *closeit* ở giá trị ``0``.
 
 
 .. c:function:: int PyRun_AnyFileEx(FILE *fp, const char *filename, int closeit)
 
-   This is a simplified interface to :c:func:`PyRun_AnyFileExFlags` below, leaving
-   the *flags* argument set to ``NULL``.
+   Đây là một giao diện đơn giản hóa cho :c:func:`PyRun_AnyFileExFlags` bên dưới, giữ đối số *flags* ở giá trị ``NULL``.
 
 
 .. c:function:: int PyRun_AnyFileExFlags(FILE *fp, const char *filename, int closeit, PyCompilerFlags *flags)
 
-   If *fp* refers to a file associated with an interactive device (console or
-   terminal input or Unix pseudo-terminal), return the value of
-   :c:func:`PyRun_InteractiveLoop`, otherwise return the result of
-   :c:func:`PyRun_SimpleFile`.  *filename* is decoded from the filesystem
-   encoding (:func:`sys.getfilesystemencoding`).  If *filename* is ``NULL``, this
-   function uses ``"???"`` as the filename.
-   If *closeit* is true, the file is closed before
-   ``PyRun_SimpleFileExFlags()`` returns.
+   Nếu *fp* tham chiếu đến một tệp liên kết với thiết bị tương tác (bảng điều khiển hoặc đầu vào từ terminal, hay pseudo-terminal Unix), trả về giá trị của
+   :c:func:`PyRun_InteractiveLoop`, nếu không thì trả về kết quả của
+   :c:func:`PyRun_SimpleFile`. *filename* được giải mã từ encoding của filesystem (:func:`sys.getfilesystemencoding`). Nếu *filename* là ``NULL``, hàm này sử dụng ``"???"`` làm tên tệp. Nếu *closeit* là true, tệp sẽ được đóng trước khi ``PyRun_SimpleFileExFlags()`` trả về.
 
 
 .. c:function:: int PyRun_SimpleString(const char *command)
 
-   This is a simplified interface to :c:func:`PyRun_SimpleStringFlags` below,
-   leaving the :c:struct:`PyCompilerFlags`\* argument set to ``NULL``.
+   Đây là một giao diện đơn giản hóa cho :c:func:`PyRun_SimpleStringFlags` bên dưới, giữ đối số :c:struct:`PyCompilerFlags`\* ở giá trị ``NULL``.
 
 
 .. c:function:: int PyRun_SimpleStringFlags(const char *command, PyCompilerFlags *flags)
 
-   Executes the Python source code from *command* in the :mod:`__main__` module
-   according to the *flags* argument. If :mod:`__main__` does not already exist, it
-   is created.  Returns ``0`` on success or ``-1`` if an exception was raised.  If
-   there was an error, there is no way to get the exception information. For the
-   meaning of *flags*, see below.
+   Thực thi mã nguồn Python từ *command* trong module :mod:`__main__` theo đối số *flags*. Nếu :mod:`__main__` chưa tồn tại, nó sẽ được tạo. Trả về ``0`` khi thành công hoặc ``-1`` nếu xảy ra ngoại lệ. Nếu có lỗi, không có cách nào lấy được thông tin về ngoại lệ. Để biết ý nghĩa của *flags*, hãy xem phần bên dưới.
 
-   Note that if an otherwise unhandled :exc:`SystemExit` is raised, this
-   function will not return ``-1``, but exit the process, as long as
-   :c:member:`PyConfig.inspect` is zero.
+   Lưu ý rằng nếu một :exc:`SystemExit` không được xử lý theo cách khác được phát sinh, hàm này sẽ không trả về ``-1`` mà sẽ thoát khỏi tiến trình, miễn là
+   :c:member:`PyConfig.inspect` bằng không.
 
 
 .. c:function:: int PyRun_SimpleFile(FILE *fp, const char *filename)
 
-   This is a simplified interface to :c:func:`PyRun_SimpleFileExFlags` below,
-   leaving *closeit* set to ``0`` and *flags* set to ``NULL``.
+   Đây là một giao diện đơn giản hóa đối với :c:func:`PyRun_SimpleFileExFlags` bên dưới, trong đó *closeit* được giữ ở ``0`` và *flags* được giữ ở ``NULL``.
 
 
 .. c:function:: int PyRun_SimpleFileEx(FILE *fp, const char *filename, int closeit)
 
-   This is a simplified interface to :c:func:`PyRun_SimpleFileExFlags` below,
-   leaving *flags* set to ``NULL``.
+   Đây là một giao diện đơn giản hóa đối với :c:func:`PyRun_SimpleFileExFlags` bên dưới, trong đó *flags* được giữ ở ``NULL``.
 
 
 .. c:function:: int PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit, PyCompilerFlags *flags)
 
-   Similar to :c:func:`PyRun_SimpleStringFlags`, but the Python source code is read
-   from *fp* instead of an in-memory string. *filename* should be the name of
-   the file, it is decoded from :term:`filesystem encoding and error handler`.
-   If *closeit* is true, the file is closed before
-   ``PyRun_SimpleFileExFlags()`` returns.
+   Tương tự như :c:func:`PyRun_SimpleStringFlags`, nhưng mã nguồn Python được đọc từ *fp* thay vì từ một chuỗi trong bộ nhớ. *filename* phải là tên của tệp; tệp được giải mã từ :term:`filesystem encoding and error handler`. Nếu *closeit* là true, tệp sẽ được đóng trước khi ``PyRun_SimpleFileExFlags()`` trả về.
 
    .. note::
-      On Windows, *fp* should be opened as binary mode (e.g. ``fopen(filename, "rb")``).
-      Otherwise, Python may not handle script file with LF line ending correctly.
+      Trên Windows, *fp* nên được mở ở chế độ nhị phân (ví dụ: ``fopen(filename, "rb")``). Nếu không, Python có thể không xử lý đúng tệp script có phần kết dòng LF.
 
 
 .. c:function:: int PyRun_InteractiveOneObject(FILE *fp, PyObject *filename, PyCompilerFlags *flags)
 
-   Read and execute a single statement from a file associated with an
-   interactive device according to the *flags* argument.  The user will be
-   prompted using ``sys.ps1`` and ``sys.ps2``. *filename* must be a Python
-   :class:`str` object.
+   Đọc và thực thi một câu lệnh duy nhất từ một tệp được liên kết với thiết bị tương tác theo đối số *flags*. Người dùng sẽ được nhắc nhập bằng ``sys.ps1`` và ``sys.ps2``. *filename* phải là một Python
+   đối tượng :class:`str`.
 
-   Returns ``0`` when the input was
-   executed successfully, ``-1`` if there was an exception, or an error code
-   from the :file:`errcode.h` include file distributed as part of Python if
-   there was a parse error.  (Note that :file:`errcode.h` is not included by
-   :file:`Python.h`, so must be included specifically if needed.)
+   Trả về ``0`` khi đầu vào được thực thi thành công, ``-1`` nếu có ngoại lệ hoặc mã lỗi từ tệp include :file:`errcode.h` được phân phối cùng Python nếu xảy ra lỗi phân tích cú pháp. (Lưu ý rằng :file:`errcode.h` không được include bởi
+   :file:`Python.h`, vì vậy phải được include riêng nếu cần.)
 
 
 .. c:function:: int PyRun_InteractiveOne(FILE *fp, const char *filename)
 
-   This is a simplified interface to :c:func:`PyRun_InteractiveOneFlags` below,
-   leaving *flags* set to ``NULL``.
+   Đây là giao diện đơn giản hóa cho :c:func:`PyRun_InteractiveOneFlags` bên dưới, giữ *flags* ở mức ``NULL``.
 
 
 .. c:function:: int PyRun_InteractiveOneFlags(FILE *fp, const char *filename, PyCompilerFlags *flags)
 
-   Similar to :c:func:`PyRun_InteractiveOneObject`, but *filename* is a
-   :c:expr:`const char*`, which is decoded from the
+   Tương tự như :c:func:`PyRun_InteractiveOneObject`, nhưng *filename* là một
+   :c:expr:`const char*`, được giải mã từ
    :term:`filesystem encoding and error handler`.
 
 
 .. c:function:: int PyRun_InteractiveLoop(FILE *fp, const char *filename)
 
-   This is a simplified interface to :c:func:`PyRun_InteractiveLoopFlags` below,
-   leaving *flags* set to ``NULL``.
+   Đây là giao diện đơn giản hóa cho :c:func:`PyRun_InteractiveLoopFlags` bên dưới, giữ *flags* ở mức ``NULL``.
 
 
 .. c:function:: int PyRun_InteractiveLoopFlags(FILE *fp, const char *filename, PyCompilerFlags *flags)
 
-   Read and execute statements from a file associated with an interactive device
-   until EOF is reached.  The user will be prompted using ``sys.ps1`` and
-   ``sys.ps2``.  *filename* is decoded from the :term:`filesystem encoding and
-   error handler`.  Returns ``0`` at EOF or a negative number upon failure.
+   Đọc và thực thi các câu lệnh từ một tệp được liên kết với thiết bị tương tác cho đến khi đạt EOF. Người dùng sẽ được nhắc nhập bằng ``sys.ps1`` và ``sys.ps2``. *filename* được giải mã từ :term:`filesystem encoding and error handler`. Trả về ``0`` khi gặp EOF hoặc một số âm nếu xảy ra lỗi.
 
 
 .. c:var:: int (*PyOS_InputHook)(void)
 
-   Can be set to point to a function with the prototype
-   ``int func(void)``.  The function will be called when Python's
-   interpreter prompt is about to become idle and wait for user input
-   from the terminal.  The return value is ignored.  Overriding this
-   hook can be used to integrate the interpreter's prompt with other
-   event loops, as done in :file:`Modules/_tkinter.c` in the
-   Python source code.
+   Có thể được thiết lập để trỏ đến một hàm có prototype ``int func(void)``. Hàm này sẽ được gọi khi dấu nhắc của trình thông dịch Python sắp chuyển sang trạng thái nhàn rỗi và chờ người dùng nhập dữ liệu từ terminal. Giá trị trả về bị bỏ qua. Việc ghi đè hook này có thể được dùng để tích hợp dấu nhắc của trình thông dịch với các event loop khác, như được thực hiện trong :file:`Modules/_tkinter.c` trong mã nguồn Python.
 
    .. versionchanged:: 3.12
-      This function is only called from the
-      :ref:`main interpreter <sub-interpreter-support>`.
+      Hàm này chỉ được gọi từ
+      :ref:`trình thông dịch chính <sub-interpreter-support>`.
 
 
 .. c:var:: char* (*PyOS_ReadlineFunctionPointer)(FILE *, FILE *, const char *)
 
-   Can be set to point to a function with the prototype
-   ``char *func(FILE *stdin, FILE *stdout, char *prompt)``,
-   overriding the default function used to read a single line of input
-   at the interpreter's prompt.  The function is expected to output
-   the string *prompt* if it's not ``NULL``, and then read a line of
-   input from the provided standard input file, returning the
-   resulting string.  For example, The :mod:`readline` module sets
-   this hook to provide line-editing and tab-completion features.
+   Có thể được thiết lập để trỏ đến một hàm có prototype ``char *func(FILE *stdin, FILE *stdout, char *prompt)``, ghi đè hàm mặc định được dùng để đọc một dòng đầu vào tại dấu nhắc của trình thông dịch. Hàm này phải xuất chuỗi *prompt* nếu chuỗi đó không phải là ``NULL``, sau đó đọc một dòng đầu vào từ tệp đầu vào tiêu chuẩn được cung cấp và trả về chuỗi nhận được. Ví dụ, module :mod:`readline` thiết lập hook này để cung cấp các tính năng chỉnh sửa dòng và tự động hoàn tất bằng phím Tab.
 
-   The result must be a string allocated by :c:func:`PyMem_RawMalloc` or
-   :c:func:`PyMem_RawRealloc`, or ``NULL`` if an error occurred.
+   Kết quả phải là một chuỗi được cấp phát bởi :c:func:`PyMem_RawMalloc` hoặc
+   :c:func:`PyMem_RawRealloc`, hoặc ``NULL`` nếu xảy ra lỗi.
 
    .. versionchanged:: 3.4
-      The result must be allocated by :c:func:`PyMem_RawMalloc` or
-      :c:func:`PyMem_RawRealloc`, instead of being allocated by
-      :c:func:`PyMem_Malloc` or :c:func:`PyMem_Realloc`.
+      Kết quả phải được cấp phát bởi :c:func:`PyMem_RawMalloc` hoặc
+      :c:func:`PyMem_RawRealloc`, thay vì được cấp phát bởi
+      :c:func:`PyMem_Malloc` hoặc :c:func:`PyMem_Realloc`.
 
    .. versionchanged:: 3.12
-      This function is only called from the
-      :ref:`main interpreter <sub-interpreter-support>`.
+      Hàm này chỉ được gọi từ
+      :ref:`trình thông dịch chính <sub-interpreter-support>`.
 
 .. c:function:: PyObject* PyRun_String(const char *str, int start, PyObject *globals, PyObject *locals)
 
-   This is a simplified interface to :c:func:`PyRun_StringFlags` below, leaving
-   *flags* set to ``NULL``.
+   Đây là giao diện đơn giản hóa cho :c:func:`PyRun_StringFlags` bên dưới, để *flags* được đặt thành ``NULL``.
 
 
 .. c:function:: PyObject* PyRun_StringFlags(const char *str, int start, PyObject *globals, PyObject *locals, PyCompilerFlags *flags)
 
-   Execute Python source code from *str* in the context specified by the
-   objects *globals* and *locals* with the compiler flags specified by
-   *flags*.  *globals* must be a dictionary; *locals* can be any object
-   that implements the mapping protocol.  The parameter *start* specifies
-   the start symbol and must be one of the :ref:`available start symbols <start-symbols>`.
+   Thực thi mã nguồn Python từ *str* trong ngữ cảnh được chỉ định bởi các đối tượng *globals* và *locals*, với các cờ của trình biên dịch được chỉ định bởi *flags*.  *globals* phải là một từ điển; *locals* có thể là bất kỳ đối tượng nào triển khai mapping protocol. Tham số *start* chỉ định ký hiệu bắt đầu và phải là một trong các :ref:`ký hiệu bắt đầu khả dụng <start-symbols>`.
 
-   Returns the result of executing the code as a Python object, or ``NULL`` if an
-   exception was raised.
+   Trả về kết quả thực thi mã dưới dạng một đối tượng Python hoặc ``NULL`` nếu xảy ra ngoại lệ.
 
 
 .. c:function:: PyObject* PyRun_File(FILE *fp, const char *filename, int start, PyObject *globals, PyObject *locals)
 
-   This is a simplified interface to :c:func:`PyRun_FileExFlags` below, leaving
-   *closeit* set to ``0`` and *flags* set to ``NULL``.
+   Đây là giao diện đơn giản hóa cho :c:func:`PyRun_FileExFlags` bên dưới, trong đó *closeit* được đặt thành ``0`` và *flags* được đặt thành ``NULL``.
 
 
 .. c:function:: PyObject* PyRun_FileEx(FILE *fp, const char *filename, int start, PyObject *globals, PyObject *locals, int closeit)
 
-   This is a simplified interface to :c:func:`PyRun_FileExFlags` below, leaving
-   *flags* set to ``NULL``.
+   Đây là giao diện đơn giản hóa cho :c:func:`PyRun_FileExFlags` bên dưới, trong đó *flags* được đặt thành ``NULL``.
 
 
 .. c:function:: PyObject* PyRun_FileFlags(FILE *fp, const char *filename, int start, PyObject *globals, PyObject *locals, PyCompilerFlags *flags)
 
-   This is a simplified interface to :c:func:`PyRun_FileExFlags` below, leaving
-   *closeit* set to ``0``.
+   Đây là giao diện đơn giản hóa cho :c:func:`PyRun_FileExFlags` bên dưới, trong đó *closeit* được đặt thành ``0``.
 
 
 .. c:function:: PyObject* PyRun_FileExFlags(FILE *fp, const char *filename, int start, PyObject *globals, PyObject *locals, int closeit, PyCompilerFlags *flags)
 
-   Similar to :c:func:`PyRun_StringFlags`, but the Python source code is read from
-   *fp* instead of an in-memory string. *filename* should be the name of the file,
-   it is decoded from the :term:`filesystem encoding and error handler`.
-   If *closeit* is true, the file is closed before :c:func:`PyRun_FileExFlags`
-   returns.
+   Tương tự như :c:func:`PyRun_StringFlags`, nhưng mã nguồn Python được đọc từ *fp* thay vì từ một chuỗi trong bộ nhớ. *filename* phải là tên của tệp; tệp được giải mã từ :term:`filesystem encoding and error handler`. Nếu *closeit* là true, tệp sẽ được đóng trước khi :c:func:`PyRun_FileExFlags` trả về.
 
 
 .. c:function:: PyObject* Py_CompileString(const char *str, const char *filename, int start)
 
-   This is a simplified interface to :c:func:`Py_CompileStringFlags` below, leaving
-   *flags* set to ``NULL``.
+   Đây là giao diện đơn giản hóa cho :c:func:`Py_CompileStringFlags` bên dưới, trong đó *flags* được đặt thành ``NULL``.
 
 
 .. c:function:: PyObject* Py_CompileStringFlags(const char *str, const char *filename, int start, PyCompilerFlags *flags)
 
-   This is a simplified interface to :c:func:`Py_CompileStringExFlags` below, with
-   *optimize* set to ``-1``.
+   Đây là giao diện đơn giản hóa cho :c:func:`Py_CompileStringExFlags` bên dưới, trong đó *optimize* được đặt thành ``-1``.
 
 
 .. c:function:: PyObject* Py_CompileStringObject(const char *str, PyObject *filename, int start, PyCompilerFlags *flags, int optimize)
 
-   Parse and compile the Python source code in *str*, returning the resulting code
-   object.  The start symbol is given by *start*; this can be used to constrain the
-   code which can be compiled and should be :ref:`available start symbols
-   <start-symbols>`.  The filename specified by
-   *filename* is used to construct the code object and may appear in tracebacks or
-   :exc:`SyntaxError` exception messages.  This returns ``NULL`` if the code
-   cannot be parsed or compiled.
+   Phân tích cú pháp và biên dịch mã nguồn Python trong *str*, trả về code object tương ứng. Ký hiệu bắt đầu được chỉ định bởi *start*; có thể dùng ký hiệu này để giới hạn mã có thể được biên dịch và ký hiệu đó phải thuộc :ref:`available start symbols <start-symbols>`. Tên tệp được chỉ định bởi *filename* được dùng để tạo code object và có thể xuất hiện trong traceback hoặc
+   :exc:`SyntaxError` thông báo ngoại lệ. Hàm này trả về ``NULL`` nếu không thể phân tích cú pháp hoặc biên dịch mã.
 
-   The integer *optimize* specifies the optimization level of the compiler; a
-   value of ``-1`` selects the optimization level of the interpreter as given by
-   :option:`-O` options.  Explicit levels are ``0`` (no optimization;
-   ``__debug__`` is true), ``1`` (asserts are removed, ``__debug__`` is false)
-   or ``2`` (docstrings are removed too).
+   Số nguyên *optimize* chỉ định mức tối ưu hóa của compiler; giá trị ``-1`` sẽ chọn mức tối ưu hóa của interpreter như được nêu trong
+   :option:`-O` options. Các mức tường minh là ``0`` (không tối ưu hóa; ``__debug__`` là true), ``1`` (các câu lệnh assert bị loại bỏ, ``__debug__`` là false) hoặc ``2`` (docstring cũng bị loại bỏ).
 
    .. versionadded:: 3.4
 
 
 .. c:function:: PyObject* Py_CompileStringExFlags(const char *str, const char *filename, int start, PyCompilerFlags *flags, int optimize)
 
-   Like :c:func:`Py_CompileStringObject`, but *filename* is a byte string
-   decoded from the :term:`filesystem encoding and error handler`.
+   Tương tự :c:func:`Py_CompileStringObject`, nhưng *filename* là một chuỗi byte được giải mã từ :term:`filesystem encoding and error handler`.
 
    .. versionadded:: 3.2
 
 .. c:function:: PyObject* PyEval_EvalCode(PyObject *co, PyObject *globals, PyObject *locals)
 
-   This is a simplified interface to :c:func:`PyEval_EvalCodeEx`, with just
-   the code object, and global and local variables.  The other arguments are
-   set to ``NULL``.
+   Đây là interface đơn giản hóa cho :c:func:`PyEval_EvalCodeEx`, chỉ gồm code object cùng các biến global và local. Các đối số còn lại được đặt thành ``NULL``.
 
 
 .. c:function:: PyObject* PyEval_EvalCodeEx(PyObject *co, PyObject *globals, PyObject *locals, PyObject *const *args, int argcount, PyObject *const *kws, int kwcount, PyObject *const *defs, int defcount, PyObject *kwdefs, PyObject *closure)
 
-   Evaluate a precompiled code object, given a particular environment for its
-   evaluation.  This environment consists of a dictionary of global variables,
-   a mapping object of local variables, arrays of arguments, keywords and
-   defaults, a dictionary of default values for :ref:`keyword-only
-   <keyword-only_parameter>` arguments and a closure tuple of cells.
+   Đánh giá một code object đã được biên dịch trước, với một môi trường cụ thể cho việc đánh giá. Môi trường này gồm một dictionary các biến global, một mapping object các biến local, các mảng đối số, từ khóa và giá trị mặc định, một dictionary các giá trị mặc định cho đối số :ref:`keyword-only <keyword-only_parameter>` và một tuple closure gồm các cell.
 
 
 .. c:function:: PyObject* PyEval_EvalFrame(PyFrameObject *f)
 
-   Evaluate an execution frame.  This is a simplified interface to
-   :c:func:`PyEval_EvalFrameEx`, for backward compatibility.
+   Đánh giá một execution frame. Đây là giao diện đơn giản hóa cho
+   :c:func:`PyEval_EvalFrameEx`, để tương thích ngược.
 
 
 .. c:function:: PyObject* PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
 
-   This is the main, unvarnished function of Python interpretation.  The code
-   object associated with the execution frame *f* is executed, interpreting
-   bytecode and executing calls as needed.  The additional *throwflag*
-   parameter can mostly be ignored - if true, then it causes an exception
-   to immediately be thrown; this is used for the :meth:`~generator.throw`
-   methods of generator objects.
+   Đây là hàm nguyên bản chính của quá trình diễn giải Python. Đối tượng mã liên kết với execution frame *f* được thực thi, diễn giải bytecode và thực hiện các lệnh gọi khi cần. Tham số bổ sung *throwflag* phần lớn có thể được bỏ qua - nếu là true, tham số này sẽ khiến một exception được ném ngay lập tức; nó được dùng cho các phương thức :meth:`~generator.throw` của các đối tượng generator.
 
    .. versionchanged:: 3.4
-      This function now includes a debug assertion to help ensure that it
-      does not silently discard an active exception.
+      Hàm này hiện bao gồm một debug assertion để giúp đảm bảo rằng nó không âm thầm loại bỏ một exception đang hoạt động.
 
 
 .. c:function:: int PyEval_MergeCompilerFlags(PyCompilerFlags *cf)
 
-   This function changes the flags of the current evaluation frame, and returns
-   true on success, false on failure.
+   Hàm này thay đổi các flag của evaluation frame hiện tại và trả về true nếu thành công, false nếu thất bại.
 
 
 .. c:struct:: PyCompilerFlags
 
-   This is the structure used to hold compiler flags.  In cases where code is only
-   being compiled, it is passed as ``int flags``, and in cases where code is being
-   executed, it is passed as ``PyCompilerFlags *flags``.  In this case, ``from
-   __future__ import`` can modify *flags*.
+   Đây là cấu trúc dùng để lưu các compiler flag. Trong trường hợp mã chỉ được biên dịch, cấu trúc này được truyền dưới dạng ``int flags``, còn trong trường hợp mã được thực thi, nó được truyền dưới dạng ``PyCompilerFlags *flags``. Trong trường hợp này, ``from __future__ import`` có thể sửa đổi *flags*.
 
-   Whenever ``PyCompilerFlags *flags`` is ``NULL``, :c:member:`~PyCompilerFlags.cf_flags` is treated as
-   equal to ``0``, and any modification due to ``from __future__ import`` is
-   discarded.
+   Bất cứ khi nào ``PyCompilerFlags *flags`` là ``NULL``, :c:member:`~PyCompilerFlags.cf_flags` được xem là bằng ``0``, và mọi sửa đổi do ``from __future__ import`` đều bị loại bỏ.
 
    .. c:member:: int cf_flags
 
-      Compiler flags.
+      Các cờ trình biên dịch.
 
    .. c:member:: int cf_feature_version
 
-      *cf_feature_version* is the minor Python version. It should be
-      initialized to ``PY_MINOR_VERSION``.
+      *cf_feature_version* là phiên bản minor của Python. Nó phải được khởi tạo thành ``PY_MINOR_VERSION``.
 
-      The field is ignored by default, it is used if and only if
-      ``PyCF_ONLY_AST`` flag is set in :c:member:`~PyCompilerFlags.cf_flags`.
+      Theo mặc định, trường này bị bỏ qua; nó được sử dụng khi và chỉ khi cờ ``PyCF_ONLY_AST`` được đặt trong :c:member:`~PyCompilerFlags.cf_flags`.
 
    .. versionchanged:: 3.8
-      Added *cf_feature_version* field.
+      Đã thêm trường *cf_feature_version*.
 
-   The available compiler flags are accessible as macros:
+   Các cờ trình biên dịch hiện có có thể được truy cập dưới dạng macro:
 
    .. c:namespace:: NULL
 
    .. c:macro:: PyCF_ALLOW_TOP_LEVEL_AWAIT
-                PyCF_ONLY_AST
-                PyCF_OPTIMIZED_AST
-                PyCF_TYPE_COMMENTS
+                PyCF_ONLY_AST PyCF_OPTIMIZED_AST PyCF_TYPE_COMMENTS
 
-      See :ref:`compiler flags <ast-compiler-flags>` in documentation of the
-      :py:mod:`!ast` Python module, which exports these constants under
-      the same names.
+      Xem :ref:`compiler flags <ast-compiler-flags>` trong tài liệu của
+      Mô-đun Python :py:mod:`!ast`, xuất các hằng số này với cùng tên.
 
-   .. rubric:: Low-level flags
+   .. rubric:: Cờ cấp thấp
 
-   The following flags and masks serve narrow needs of the standard
-   library and interactive interpreters.  Code outside the standard
-   library rarely has a reason to use them.  They are considered
-   implementation details and may change at any time.
+   Các cờ và mặt nạ sau đây phục vụ những nhu cầu chuyên biệt của thư viện chuẩn và các trình thông dịch tương tác. Mã bên ngoài thư viện chuẩn hiếm khi có lý do để sử dụng chúng. Chúng được xem là chi tiết triển khai và có thể thay đổi bất cứ lúc nào.
 
    .. c:macro:: PyCF_ALLOW_INCOMPLETE_INPUT
 
-      This flag is a private interface between the compiler and the
-      :mod:`codeop` module.  Do not use it; its behavior is unsupported
-      and may change without warning.
+      Cờ này là một giao diện riêng tư giữa trình biên dịch và
+      mô-đun :mod:`codeop`. Không được sử dụng nó; hành vi của nó không được hỗ trợ và có thể thay đổi mà không có cảnh báo.
 
-      With this flag set, when compilation fails because the source text
-      ends where more input is expected, for example in the middle of an
-      indented block or an unterminated string literal, the error raised
-      is the undocumented ``_IncompleteInputError``, a subclass of
-      :exc:`SyntaxError`.  The :mod:`codeop` module sets this flag,
-      together with :c:macro:`PyCF_DONT_IMPLY_DEDENT`, to tell input
-      that is incomplete apart from input with a real syntax error, so
-      that interactive interpreters know when to prompt for another
-      line instead of reporting an error.
+      Khi cờ này được thiết lập, nếu quá trình biên dịch thất bại vì văn bản nguồn kết thúc tại nơi cần thêm dữ liệu đầu vào, chẳng hạn ở giữa một khối thụt lề hoặc một literal chuỗi chưa được kết thúc, lỗi được phát sinh là ``_IncompleteInputError`` không được tài liệu hóa, một lớp con của
+      :exc:`SyntaxError`. Mô-đun :mod:`codeop` thiết lập cờ này cùng với :c:macro:`PyCF_DONT_IMPLY_DEDENT` để phân biệt dữ liệu đầu vào chưa hoàn chỉnh với dữ liệu đầu vào có lỗi cú pháp thực sự, nhờ đó các trình thông dịch tương tác biết khi nào cần nhắc nhập thêm một dòng thay vì báo lỗi.
 
       .. versionadded:: 3.11
 
    .. c:macro:: PyCF_DONT_IMPLY_DEDENT
 
-      By default, when compiling with the :c:var:`Py_single_input` start
-      symbol, reaching the end of the source text implicitly closes any
-      open indented blocks.  With this flag set, open blocks are only
-      closed if the last line of the source ends with a newline; otherwise,
-      compilation fails with a :exc:`SyntaxError`:
+      Theo mặc định, khi biên dịch với ký hiệu bắt đầu :c:var:`Py_single_input`, việc chạm đến cuối văn bản nguồn sẽ ngầm đóng mọi khối thụt lề đang mở. Khi đặt cờ này, các khối đang mở chỉ được đóng nếu dòng cuối cùng của nguồn kết thúc bằng ký tự xuống dòng; nếu không, quá trình biên dịch sẽ thất bại với :exc:`SyntaxError`:
 
       .. code-block:: c
 
@@ -384,24 +268,20 @@ the same library that the Python runtime is using.
          };
          const char *source = "if a:\n    pass";
 
-         /* The "if" block is closed implicitly;
-            this returns a code object: */
+         /* Khối "if" được đóng ngầm;
+            điều này trả về một đối tượng mã: */
          Py_CompileStringFlags(source, "<input>", Py_single_input, &flags);
 
-         /* With the flag, this fails with a SyntaxError,
-            because the last line does not end with a newline: */
+         /* Có cờ này, thao tác sẽ thất bại với SyntaxError,
+            vì dòng cuối cùng không kết thúc bằng ký tự xuống dòng: */
          flags.cf_flags = PyCF_DONT_IMPLY_DEDENT;
          Py_CompileStringFlags(source, "<input>", Py_single_input, &flags);
 
-      The :mod:`codeop` module uses this flag to detect incomplete
-      interactive input.  While the user is still typing inside an
-      indented block, the source does not yet end with a newline, so it
-      fails to compile and the user is prompted for another line.
+      Mô-đun :mod:`codeop` sử dụng cờ này để phát hiện dữ liệu nhập tương tác chưa hoàn chỉnh. Trong khi người dùng vẫn đang nhập bên trong một khối thụt lề, nguồn chưa kết thúc bằng ký tự xuống dòng, nên không biên dịch được và người dùng được nhắc nhập thêm một dòng.
 
    .. c:macro:: PyCF_IGNORE_COOKIE
 
-      Read the source text as UTF-8, ignoring its :pep:`263` encoding
-      declaration ("coding cookie"), if any:
+      Đọc văn bản nguồn dưới dạng UTF-8, bỏ qua khai báo encoding :pep:`263` ("coding cookie") của nó, nếu có:
 
       .. code-block:: c
 
@@ -411,69 +291,52 @@ the same library that the Python runtime is using.
          };
          const char *source = "# coding: latin-1\ns = '\xe9'\n";
 
-         /* The coding cookie is honored: byte 0xE9 is decoded as
-            Latin-1, and this returns a code object that sets s to "é": */
+         /* Cookie mã hóa được áp dụng: byte 0xE9 được giải mã thành
+            Latin-1, và điều này trả về một code object đặt s thành "é": */
          Py_CompileStringFlags(source, "<input>", Py_file_input, &flags);
 
-         /* With the flag, the cookie is ignored and compilation fails
-            with a SyntaxError, because 0xE9 is not valid UTF-8: */
+         /* Với cờ này, cookie bị bỏ qua và quá trình biên dịch thất bại
+            với SyntaxError, vì 0xE9 không hợp lệ trong UTF-8: */
          flags.cf_flags = PyCF_IGNORE_COOKIE;
          Py_CompileStringFlags(source, "<input>", Py_file_input, &flags);
 
-      The :func:`compile`, :func:`eval` and :func:`exec` built-in functions
-      set this flag when the source is a :class:`str` object, because they
-      pass the text to the parser encoded as UTF-8.
+      Các hàm dựng sẵn :func:`compile`, :func:`eval` và :func:`exec` đặt cờ này khi mã nguồn là một đối tượng :class:`str`, vì chúng truyền văn bản tới parser được mã hóa dưới dạng UTF-8.
 
    .. c:macro:: PyCF_SOURCE_IS_UTF8
 
-      Mark the source text as known to be UTF-8 encoded.
-      The :func:`compile`, :func:`eval` and :func:`exec` built-in functions
-      set this flag, but it currently has no effect.
+      Đánh dấu văn bản mã nguồn là đã biết được mã hóa UTF-8. Các hàm dựng sẵn :func:`compile`, :func:`eval` và :func:`exec` đặt cờ này, nhưng hiện tại cờ này không có tác dụng.
 
-   The "``PyCF``" flags above can be combined with "``CO_FUTURE``" flags such
-   as :c:macro:`CO_FUTURE_ANNOTATIONS` to enable features normally
-   selectable using :ref:`future statements <future>`.
-   See :ref:`c_codeobject_flags` for a complete list.
+   Các cờ "``PyCF``" ở trên có thể kết hợp với các cờ "``CO_FUTURE``" như :c:macro:`CO_FUTURE_ANNOTATIONS` để bật các tính năng thường có thể chọn bằng các câu lệnh :ref:`future statements <future>`. Xem :ref:`c_codeobject_flags` để biết danh sách đầy đủ.
 
-   The following masks combine several flags:
+   Các mask sau đây kết hợp nhiều cờ:
 
    .. c:macro:: PyCF_MASK
 
-      Bitmask of all ``CO_FUTURE`` flags (see :ref:`c_codeobject_flags`),
-      which select features normally enabled by
-      :ref:`future statements <future>`.
-      When code compiled with a ``PyCompilerFlags *flags`` argument
-      contains a ``from __future__ import`` statement, the flag for the
-      imported feature is added to *flags*, so that code executed later
-      in the same context inherits it.
+      Bitmask của tất cả các cờ ``CO_FUTURE`` (xem :ref:`c_codeobject_flags`), dùng để chọn các tính năng thường được bật bởi
+      :ref:`future statements <future>`. Khi mã được biên dịch với đối số ``PyCompilerFlags *flags`` chứa câu lệnh ``from __future__ import``, cờ tương ứng với tính năng được import sẽ được thêm vào *flags*, để mã được thực thi sau đó trong cùng context kế thừa cờ này.
 
    .. c:macro:: PyCF_MASK_OBSOLETE
 
-      Do not use this mask in new code.  It is kept only so that old
-      code passing its flags to :func:`compile` keeps working.
+      Không sử dụng mask này trong mã mới. Nó chỉ được giữ lại để mã cũ truyền các cờ của nó cho :func:`compile` vẫn tiếp tục hoạt động.
 
-      Bitmask of flags for obsolete future features that no longer
-      have any effect.
+      Bitmask của các cờ dành cho những tính năng future đã lỗi thời và không còn có tác dụng.
 
    .. c:macro:: PyCF_COMPILE_MASK
 
-      Bitmask of all ``PyCF`` flags that change how the source is
-      compiled, such as :c:macro:`PyCF_ONLY_AST`.
-      The :func:`compile` built-in function uses this mask to validate
-      its *flags* argument.
+      Bitmask của tất cả các cờ ``PyCF`` làm thay đổi cách mã nguồn được biên dịch, chẳng hạn như :c:macro:`PyCF_ONLY_AST`. Hàm built-in :func:`compile` sử dụng mask này để xác thực đối số *flags* của nó.
 
 
 .. _start-symbols:
 
-Available start symbols
-^^^^^^^^^^^^^^^^^^^^^^^
+Các start symbol khả dụng
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. c:var:: int Py_eval_input
 
    .. index:: single: Py_CompileString (C function)
 
-   The start symbol from the Python grammar for isolated expressions; for use with
+   Ký hiệu bắt đầu trong grammar Python dành cho các biểu thức độc lập; dùng với
    :c:func:`Py_CompileString`.
 
 
@@ -481,29 +344,25 @@ Available start symbols
 
    .. index:: single: Py_CompileString (C function)
 
-   The start symbol from the Python grammar for sequences of statements as read
-   from a file or other source; for use with :c:func:`Py_CompileString`.  This is
-   the symbol to use when compiling arbitrarily long Python source code.
+   Ký hiệu bắt đầu trong grammar Python dành cho các chuỗi câu lệnh được đọc từ một tệp hoặc nguồn khác; dùng với :c:func:`Py_CompileString`. Đây là ký hiệu cần dùng khi biên dịch mã nguồn Python có độ dài tùy ý.
 
 
 .. c:var:: int Py_single_input
 
    .. index:: single: Py_CompileString (C function)
 
-   The start symbol from the Python grammar for a single statement; for use with
-   :c:func:`Py_CompileString`. This is the symbol used for the interactive
-   interpreter loop.
+   Ký hiệu bắt đầu trong grammar Python dành cho một câu lệnh đơn; dùng với
+   :c:func:`Py_CompileString`. Đây là ký hiệu được sử dụng cho vòng lặp trình thông dịch tương tác.
 
 
 .. c:var:: int Py_func_type_input
 
    .. index:: single: Py_CompileString (C function)
 
-   The start symbol from the Python grammar for a function type; for use with
-   :c:func:`Py_CompileString`. This is used to parse "signature type comments"
-   from :pep:`484`.
+   Ký hiệu bắt đầu trong grammar Python dành cho một kiểu hàm; dùng với
+   :c:func:`Py_CompileString`. Ký hiệu này được dùng để phân tích cú pháp "signature type comments" từ :pep:`484`.
 
-   This requires the :c:macro:`PyCF_ONLY_AST` flag to be set.
+   Điều này yêu cầu phải đặt cờ :c:macro:`PyCF_ONLY_AST` .
 
    .. seealso::
       * :py:class:`ast.FunctionType`
@@ -512,8 +371,8 @@ Available start symbols
    .. versionadded:: 3.8
 
 
-Stack Effects
-^^^^^^^^^^^^^
+Hiệu ứng ngăn xếp
+^^^^^^^^^^^^^^^^^
 
 .. seealso::
    :py:func:`dis.stack_effect`
@@ -521,32 +380,28 @@ Stack Effects
 
 .. c:macro:: PY_INVALID_STACK_EFFECT
 
-   Sentinel value representing an invalid stack effect.
+   Giá trị sentinel biểu thị một hiệu ứng ngăn xếp không hợp lệ.
 
-   This is currently equivalent to ``INT_MAX``.
+   Hiện tại, giá trị này tương đương với ``INT_MAX``.
 
    .. versionadded:: 3.8
 
 
 .. c:function:: int PyCompile_OpcodeStackEffect(int opcode, int oparg)
 
-   Compute the stack effect of *opcode* with argument *oparg*.
+   Tính hiệu ứng ngăn xếp của *opcode* với đối số *oparg*.
 
-   On success, this function returns the stack effect; on failure, this
-   returns :c:macro:`PY_INVALID_STACK_EFFECT`.
+   Nếu thành công, hàm này trả về hiệu ứng ngăn xếp; nếu thất bại, hàm trả về :c:macro:`PY_INVALID_STACK_EFFECT`.
 
    .. versionadded:: 3.4
 
 
 .. c:function:: int PyCompile_OpcodeStackEffectWithJump(int opcode, int oparg, int jump)
 
-   Similar to :c:func:`PyCompile_OpcodeStackEffect`, but don't include the
-   stack effect of jumping if *jump* is zero.
+   Tương tự như :c:func:`PyCompile_OpcodeStackEffect`, nhưng không bao gồm hiệu ứng ngăn xếp của việc nhảy nếu *jump* bằng không.
 
-   If *jump* is ``0``, this will not include the stack effect of jumping, but
-   if *jump* is ``1`` or ``-1``, this will include it.
+   Nếu *jump* là ``0``, hàm này sẽ không bao gồm hiệu ứng ngăn xếp của việc nhảy, nhưng nếu *jump* là ``1`` hoặc ``-1``, hàm sẽ bao gồm hiệu ứng đó.
 
-   On success, this function returns the stack effect; on failure, this
-   returns :c:macro:`PY_INVALID_STACK_EFFECT`.
+   Nếu thành công, hàm này trả về hiệu ứng ngăn xếp; nếu thất bại, hàm trả về :c:macro:`PY_INVALID_STACK_EFFECT`.
 
    .. versionadded:: 3.8

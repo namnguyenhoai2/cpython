@@ -2,109 +2,82 @@
 
 .. _os:
 
-Operating System Utilities
-==========================
+Tiện ích hệ điều hành
+=====================
 
 
 .. c:function:: PyObject* PyOS_FSPath(PyObject *path)
 
-   Return the file system representation for *path*. If the object is a
-   :class:`str` or :class:`bytes` object, then a new
-   :term:`strong reference` is returned.
-   If the object implements the :class:`os.PathLike` interface,
-   then :meth:`~os.PathLike.__fspath__` is returned as long as it is a
-   :class:`str` or :class:`bytes` object. Otherwise :exc:`TypeError` is raised
-   and ``NULL`` is returned.
+   Trả về biểu diễn hệ thống tệp cho *path*. Nếu đối tượng là một
+   :class:`str` hoặc đối tượng :class:`bytes`, thì một đối tượng mới
+   :term:`strong reference` được trả về. Nếu đối tượng triển khai giao diện :class:`os.PathLike`, thì :meth:`~os.PathLike.__fspath__` được trả về miễn là nó là một
+   :class:`str` hoặc đối tượng :class:`bytes`. Nếu không, :exc:`TypeError` được phát sinh và ``NULL`` được trả về.
 
    .. versionadded:: 3.6
 
 
 .. c:function:: int Py_FdIsInteractive(FILE *fp, const char *filename)
 
-   Return true (nonzero) if the standard I/O file *fp* with name *filename* is
-   deemed interactive.  This is the case for files for which ``isatty(fileno(fp))``
-   is true.  If the :c:member:`PyConfig.interactive` is non-zero, this function
-   also returns true if the *filename* pointer is ``NULL`` or if the name is equal to
-   one of the strings ``'<stdin>'`` or ``'???'``.
+   Trả về true (khác không) nếu tệp I/O chuẩn *fp* có tên *filename* được xem là tương tác. Đây là trường hợp đối với các tệp mà ``isatty(fileno(fp))`` là true. Nếu :c:member:`PyConfig.interactive` khác không, hàm này cũng trả về true nếu con trỏ *filename* là ``NULL`` hoặc nếu tên bằng một trong các chuỗi ``'<stdin>'`` hoặc ``'???'``.
 
-   This function must not be called before Python is initialized.
+   Không được gọi hàm này trước khi Python được khởi tạo.
 
 
 .. c:function:: void PyOS_BeforeFork()
 
-   Function to prepare some internal state before a process fork.  This
-   should be called before calling :c:func:`fork` or any similar function
-   that clones the current process.
-   Only available on systems where :c:func:`fork` is defined.
+   Hàm chuẩn bị một số trạng thái nội bộ trước khi fork tiến trình. Hàm này nên được gọi trước khi gọi :c:func:`fork` hoặc bất kỳ hàm tương tự nào sao chép tiến trình hiện tại. Chỉ khả dụng trên các hệ thống nơi :c:func:`fork` được định nghĩa.
 
    .. warning::
-      The C :c:func:`fork` call should only be made from the
-      :ref:`"main" thread <fork-and-threads>` (of the
-      :ref:`"main" interpreter <sub-interpreter-support>`).  The same is
-      true for ``PyOS_BeforeFork()``.
+      Lời gọi C :c:func:`fork` chỉ nên được thực hiện từ
+      :ref:`luồng "main" <fork-and-threads>` (của
+      :ref:`trình thông dịch "main" <sub-interpreter-support>`). Điều tương tự cũng đúng với ``PyOS_BeforeFork()``.
 
    .. versionadded:: 3.7
 
 
 .. c:function:: void PyOS_AfterFork_Parent()
 
-   Function to update some internal state after a process fork.  This
-   should be called from the parent process after calling :c:func:`fork`
-   or any similar function that clones the current process, regardless
-   of whether process cloning was successful.
-   Only available on systems where :c:func:`fork` is defined.
+   Hàm cập nhật một số trạng thái nội bộ sau khi fork tiến trình. Hàm này nên được gọi từ tiến trình cha sau khi gọi :c:func:`fork` hoặc bất kỳ hàm tương tự nào sao chép tiến trình hiện tại, bất kể việc sao chép tiến trình có thành công hay không. Chỉ khả dụng trên các hệ thống nơi :c:func:`fork` được định nghĩa.
 
    .. warning::
-      The C :c:func:`fork` call should only be made from the
-      :ref:`"main" thread <fork-and-threads>` (of the
-      :ref:`"main" interpreter <sub-interpreter-support>`).  The same is
-      true for ``PyOS_AfterFork_Parent()``.
+      Lời gọi C :c:func:`fork` chỉ nên được thực hiện từ
+      :ref:`luồng "main" <fork-and-threads>` (của
+      :ref:`"main" trình thông dịch <sub-interpreter-support>`).  Điều tương tự cũng đúng với ``PyOS_AfterFork_Parent()``.
 
    .. versionadded:: 3.7
 
 
 .. c:function:: void PyOS_AfterFork_Child()
 
-   Function to update internal interpreter state after a process fork.
-   This must be called from the child process after calling :c:func:`fork`,
-   or any similar function that clones the current process, if there is
-   any chance the process will call back into the Python interpreter.
-   Only available on systems where :c:func:`fork` is defined.
+   Hàm cập nhật trạng thái nội bộ của trình thông dịch sau khi fork tiến trình. Hàm này phải được gọi từ tiến trình con sau khi gọi :c:func:`fork`, hoặc bất kỳ hàm tương tự nào sao chép tiến trình hiện tại, nếu có khả năng tiến trình đó sẽ gọi lại vào trình thông dịch Python. Chỉ khả dụng trên các hệ thống nơi :c:func:`fork` được định nghĩa.
 
    .. warning::
-      The C :c:func:`fork` call should only be made from the
-      :ref:`"main" thread <fork-and-threads>` (of the
-      :ref:`"main" interpreter <sub-interpreter-support>`).  The same is
-      true for ``PyOS_AfterFork_Child()``.
+      Lời gọi C :c:func:`fork` chỉ nên được thực hiện từ
+      :ref:`luồng "main" <fork-and-threads>` (của
+      :ref:`"main" trình thông dịch <sub-interpreter-support>`).  Điều tương tự cũng đúng với ``PyOS_AfterFork_Child()``.
 
    .. versionadded:: 3.7
 
    .. seealso::
       :func:`os.register_at_fork` allows registering custom Python functions
-      to be called by :c:func:`PyOS_BeforeFork()`,
-      :c:func:`PyOS_AfterFork_Parent` and  :c:func:`PyOS_AfterFork_Child`.
+      được gọi bởi :c:func:`PyOS_BeforeFork()`,
+      :c:func:`PyOS_AfterFork_Parent` và  :c:func:`PyOS_AfterFork_Child`.
 
 
 .. c:function:: void PyOS_AfterFork()
 
-   Function to update some internal state after a process fork; this should be
-   called in the new process if the Python interpreter will continue to be used.
-   If a new executable is loaded into the new process, this function does not need
-   to be called.
+   Hàm cập nhật một số trạng thái nội bộ sau khi fork tiến trình; hàm này nên được gọi trong tiến trình mới nếu trình thông dịch Python sẽ tiếp tục được sử dụng. Nếu một tệp thực thi mới được tải vào tiến trình mới, không cần gọi hàm này.
 
    .. deprecated:: 3.7
-      This function is superseded by :c:func:`PyOS_AfterFork_Child()`.
+      Hàm này đã được thay thế bằng :c:func:`PyOS_AfterFork_Child()`.
 
 
 .. c:function:: int PyOS_CheckStack()
 
    .. index:: single: USE_STACKCHECK (C macro)
 
-   Return true when the interpreter runs out of stack space.  This is a reliable
-   check, but is only available when :c:macro:`!USE_STACKCHECK` is defined (currently
-   on certain versions of Windows using the Microsoft Visual C++ compiler).
-   :c:macro:`!USE_STACKCHECK` will be defined automatically; you should never
-   change the definition in your own code.
+   Trả về true khi trình thông dịch hết không gian ngăn xếp. Đây là một phép kiểm tra đáng tin cậy, nhưng chỉ khả dụng khi :c:macro:`!USE_STACKCHECK` được định nghĩa (hiện chỉ có trên một số phiên bản Windows sử dụng trình biên dịch Microsoft Visual C++).
+   :c:macro:`!USE_STACKCHECK` sẽ được tự động định nghĩa; bạn không bao giờ nên thay đổi định nghĩa này trong mã của mình.
 
 
 .. c:type::  void (*PyOS_sighandler_t)(int)
@@ -112,341 +85,252 @@ Operating System Utilities
 
 .. c:function:: PyOS_sighandler_t PyOS_getsig(int i)
 
-   Return the current signal handler for signal *i*.  This is a thin wrapper around
-   either :c:func:`!sigaction` or :c:func:`!signal`.  Do not call those functions
-   directly!
+   Trả về trình xử lý tín hiệu hiện tại cho tín hiệu *i*. Đây là một wrapper mỏng quanh :c:func:`!sigaction` hoặc :c:func:`!signal`. Không được gọi trực tiếp các hàm đó!
 
 
 .. c:function:: PyOS_sighandler_t PyOS_setsig(int i, PyOS_sighandler_t h)
 
-   Set the signal handler for signal *i* to be *h*; return the old signal handler.
-   This is a thin wrapper around either :c:func:`!sigaction` or :c:func:`!signal`.  Do
-   not call those functions directly!
+   Đặt trình xử lý tín hiệu cho tín hiệu *i* thành *h*; trả về trình xử lý tín hiệu cũ. Đây là một wrapper mỏng quanh :c:func:`!sigaction` hoặc :c:func:`!signal`. Không được gọi trực tiếp các hàm đó!
 
 
 .. c:function:: int PyOS_InterruptOccurred(void)
 
-   Check if a :c:macro:`!SIGINT` signal has been received.
+   Kiểm tra xem tín hiệu :c:macro:`!SIGINT` có được nhận hay không.
 
-   Returns ``1`` if a :c:macro:`!SIGINT` has occurred and clears the signal flag,
-   or ``0`` otherwise.
+   Trả về ``1`` nếu :c:macro:`!SIGINT` đã xảy ra và xóa cờ tín hiệu, hoặc ``0`` nếu không.
 
-   In most cases, you should prefer :c:func:`PyErr_CheckSignals` over this function.
-   :c:func:`!PyErr_CheckSignals` invokes the appropriate signal handlers
-   for all pending signals, allowing Python code to handle the signal properly.
-   This function only detects :c:macro:`!SIGINT` and does not invoke any Python
-   signal handlers.
+   Trong hầu hết các trường hợp, bạn nên ưu tiên :c:func:`PyErr_CheckSignals` hơn hàm này.
+   :c:func:`!PyErr_CheckSignals` gọi các trình xử lý tín hiệu thích hợp cho tất cả tín hiệu đang chờ, cho phép mã Python xử lý tín hiệu đúng cách. Hàm này chỉ phát hiện :c:macro:`!SIGINT` và không gọi bất kỳ trình xử lý tín hiệu Python nào.
 
-   This function is async-signal-safe and this function cannot fail.
-   The caller must hold an :term:`attached thread state`.
+   Hàm này an toàn với tín hiệu bất đồng bộ và không thể thất bại. Bên gọi phải nắm giữ một :term:`attached thread state`.
 
 
 .. c:function:: wchar_t* Py_DecodeLocale(const char* arg, size_t *size)
 
    .. warning::
-      This function should not be called directly: use the :c:type:`PyConfig`
-      API with the :c:func:`PyConfig_SetBytesString` function which ensures
-      that :ref:`Python is preinitialized <c-preinit>`.
+      Không nên gọi trực tiếp hàm này: hãy sử dụng API :c:type:`PyConfig` cùng với hàm :c:func:`PyConfig_SetBytesString`, hàm này bảo đảm rằng :ref:`Python được khởi tạo trước <c-preinit>`.
 
-      This function must not be called before :ref:`Python is preinitialized
-      <c-preinit>` and so that the LC_CTYPE locale is properly configured: see
-      the :c:func:`Py_PreInitialize` function.
+      Không được gọi hàm này trước khi :ref:`Python được khởi tạo trước <c-preinit>` và để locale LC_CTYPE được cấu hình đúng cách: xem hàm :c:func:`Py_PreInitialize`.
 
-   Decode a byte string from the :term:`filesystem encoding and error handler`.
-   If the error handler is :ref:`surrogateescape error handler
-   <surrogateescape>`, undecodable bytes are decoded as characters in range
-   U+DC80..U+DCFF; and if a byte sequence can be decoded as a surrogate
-   character, the bytes are escaped using the surrogateescape error handler
-   instead of decoding them.
+   Giải mã một chuỗi byte từ :term:`filesystem encoding and error handler`. Nếu trình xử lý lỗi là :ref:`trình xử lý lỗi surrogateescape <surrogateescape>`, các byte không thể giải mã sẽ được giải mã thành các ký tự trong phạm vi U+DC80..U+DCFF; và nếu một chuỗi byte có thể được giải mã thành một ký tự surrogate, các byte sẽ được escape bằng trình xử lý lỗi surrogateescape thay vì được giải mã.
 
-   Return a pointer to a newly allocated wide character string, use
-   :c:func:`PyMem_RawFree` to free the memory. If size is not ``NULL``, write
-   the number of wide characters excluding the null character into ``*size``
+   Trả về một con trỏ tới chuỗi ký tự wide mới được cấp phát, sử dụng
+   :c:func:`PyMem_RawFree` để giải phóng bộ nhớ. Nếu size không phải là ``NULL``, ghi số ký tự wide, không bao gồm ký tự null, vào ``*size``
 
-   Return ``NULL`` on decoding error or memory allocation error. If *size* is
-   not ``NULL``, ``*size`` is set to ``(size_t)-1`` on memory error or set to
-   ``(size_t)-2`` on decoding error.
+   Trả về ``NULL`` nếu xảy ra lỗi giải mã hoặc lỗi cấp phát bộ nhớ. Nếu *size* không phải là ``NULL``, ``*size`` được đặt thành ``(size_t)-1`` khi có lỗi bộ nhớ hoặc thành ``(size_t)-2`` khi có lỗi giải mã.
 
-   The :term:`filesystem encoding and error handler` are selected by
-   :c:func:`PyConfig_Read`: see :c:member:`~PyConfig.filesystem_encoding` and
-   :c:member:`~PyConfig.filesystem_errors` members of :c:type:`PyConfig`.
+   :term:`filesystem encoding and error handler` được chọn bởi
+   :c:func:`PyConfig_Read`: xem :c:member:`~PyConfig.filesystem_encoding` và
+   các thành viên :c:member:`~PyConfig.filesystem_errors` của :c:type:`PyConfig`.
 
-   Decoding errors should never happen, unless there is a bug in the C
-   library.
+   Lỗi giải mã không bao giờ xảy ra, trừ khi có lỗi trong thư viện C.
 
-   Use the :c:func:`Py_EncodeLocale` function to encode the character string
-   back to a byte string.
+   Sử dụng hàm :c:func:`Py_EncodeLocale` để mã hóa chuỗi ký tự thành chuỗi byte.
 
    .. seealso::
 
-      The :c:func:`PyUnicode_DecodeFSDefaultAndSize` and
-      :c:func:`PyUnicode_DecodeLocaleAndSize` functions.
+      :c:func:`PyUnicode_DecodeFSDefaultAndSize` và
+      các hàm :c:func:`PyUnicode_DecodeLocaleAndSize`.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.7
-      The function now uses the UTF-8 encoding in the :ref:`Python UTF-8 Mode
-      <utf8-mode>`.
+      Hàm này hiện sử dụng bảng mã UTF-8 trong :ref:`Chế độ UTF-8 của Python <utf8-mode>`.
 
    .. versionchanged:: 3.8
-      The function now uses the UTF-8 encoding on Windows if
-      :c:member:`PyPreConfig.legacy_windows_fs_encoding` is zero;
+      Hàm này hiện sử dụng bảng mã UTF-8 trên Windows nếu
+      :c:member:`PyPreConfig.legacy_windows_fs_encoding` bằng không;
 
 
 .. c:function:: char* Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
 
-   Encode a wide character string to the :term:`filesystem encoding and error
-   handler`. If the error handler is :ref:`surrogateescape error handler
-   <surrogateescape>`, surrogate characters in the range U+DC80..U+DCFF are
-   converted to bytes 0x80..0xFF.
+   Mã hóa một chuỗi ký tự wide thành :term:`filesystem encoding and error handler`. Nếu trình xử lý lỗi là :ref:`trình xử lý lỗi surrogateescape <surrogateescape>`, các ký tự surrogate trong phạm vi U+DC80..U+DCFF sẽ được chuyển đổi thành các byte 0x80..0xFF.
 
-   Return a pointer to a newly allocated byte string, use :c:func:`PyMem_Free`
-   to free the memory. Return ``NULL`` on encoding error or memory allocation
-   error.
+   Trả về một con trỏ đến chuỗi byte mới được cấp phát, sử dụng :c:func:`PyMem_Free` để giải phóng bộ nhớ. Trả về ``NULL`` khi xảy ra lỗi mã hóa hoặc lỗi cấp phát bộ nhớ.
 
-   If error_pos is not ``NULL``, ``*error_pos`` is set to ``(size_t)-1`` on
-   success,  or set to the index of the invalid character on encoding error.
+   Nếu error_pos không phải là ``NULL``, ``*error_pos`` được đặt thành ``(size_t)-1`` khi thành công hoặc được đặt thành chỉ mục của ký tự không hợp lệ khi xảy ra lỗi mã hóa.
 
-   The :term:`filesystem encoding and error handler` are selected by
-   :c:func:`PyConfig_Read`: see :c:member:`~PyConfig.filesystem_encoding` and
-   :c:member:`~PyConfig.filesystem_errors` members of :c:type:`PyConfig`.
+   :term:`filesystem encoding and error handler` được chọn bởi
+   :c:func:`PyConfig_Read`: xem :c:member:`~PyConfig.filesystem_encoding` và
+   các thành viên :c:member:`~PyConfig.filesystem_errors` của :c:type:`PyConfig`.
 
-   Use the :c:func:`Py_DecodeLocale` function to decode the bytes string back
-   to a wide character string.
+   Sử dụng hàm :c:func:`Py_DecodeLocale` để giải mã chuỗi byte trở lại thành chuỗi ký tự rộng.
 
    .. warning::
-      This function must not be called before :ref:`Python is preinitialized
-      <c-preinit>` and so that the LC_CTYPE locale is properly configured: see
-      the :c:func:`Py_PreInitialize` function.
+      Không được gọi hàm này trước khi :ref:`Python được khởi tạo trước <c-preinit>` và để locale LC_CTYPE được cấu hình đúng cách: xem hàm :c:func:`Py_PreInitialize`.
 
    .. seealso::
 
-      The :c:func:`PyUnicode_EncodeFSDefault` and
-      :c:func:`PyUnicode_EncodeLocale` functions.
+      :c:func:`PyUnicode_EncodeFSDefault` và
+      các hàm :c:func:`PyUnicode_EncodeLocale`.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.7
-      The function now uses the UTF-8 encoding in the :ref:`Python UTF-8 Mode
-      <utf8-mode>`.
+      Hàm này hiện sử dụng bảng mã UTF-8 trong :ref:`Chế độ UTF-8 của Python <utf8-mode>`.
 
    .. versionchanged:: 3.8
-      The function now uses the UTF-8 encoding on Windows if
-      :c:member:`PyPreConfig.legacy_windows_fs_encoding` is zero.
+      Hàm này hiện sử dụng bảng mã UTF-8 trên Windows nếu
+      :c:member:`PyPreConfig.legacy_windows_fs_encoding` bằng không.
 
 .. c:function:: FILE* Py_fopen(PyObject *path, const char *mode)
 
-   Similar to :c:func:`!fopen`, but *path* is a Python object and
-   an exception is set on error.
+   Tương tự :c:func:`!fopen`, nhưng *path* là một đối tượng Python và một exception được thiết lập khi xảy ra lỗi.
 
-   *path* must be a :class:`str` object, a :class:`bytes` object,
-   or a :term:`path-like object`.
+   *path* phải là một đối tượng :class:`str`, một đối tượng :class:`bytes` hoặc một :term:`path-like object`.
 
-   On success, return the new file pointer.
-   On error, set an exception and return ``NULL``.
+   Khi thành công, trả về con trỏ tệp mới. Khi xảy ra lỗi, đặt một ngoại lệ và trả về ``NULL``.
 
-   The file must be closed by :c:func:`Py_fclose` rather than calling directly
+   Tệp phải được đóng bằng :c:func:`Py_fclose` thay vì gọi trực tiếp
    :c:func:`!fclose`.
 
-   The file descriptor is created non-inheritable (:pep:`446`).
+   Bộ mô tả tệp được tạo ở trạng thái không kế thừa (:pep:`446`).
 
-   The caller must have an :term:`attached thread state`.
+   Bên gọi phải có một :term:`attached thread state`.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int Py_fclose(FILE *file)
 
-   Close a file that was opened by :c:func:`Py_fopen`.
+   Đóng một tệp đã được mở bởi :c:func:`Py_fopen`.
 
-   On success, return ``0``.
-   On error, return ``EOF`` and ``errno`` is set to indicate the error.
-   In either case, any further access (including another call to
-   :c:func:`Py_fclose`) to the stream results in undefined behavior.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, trả về ``EOF`` và ``errno`` được đặt để cho biết lỗi. Trong cả hai trường hợp, mọi lần truy cập tiếp theo (bao gồm cả một lần gọi khác tới
+   :c:func:`Py_fclose`) vào luồng đều dẫn đến hành vi không xác định.
 
    .. versionadded:: 3.14
 
 
 .. _systemfunctions:
 
-System Functions
+Các hàm hệ thống
 ================
 
-These are utility functions that make functionality from the :mod:`sys` module
-accessible to C code.  They all work with the current interpreter thread's
-:mod:`sys` module's dict, which is contained in the internal thread state structure.
+Đây là các hàm tiện ích giúp mã C truy cập chức năng từ module :mod:`sys`. Tất cả đều hoạt động với dict của luồng thông dịch hiện tại
+của module :mod:`sys`, nằm trong cấu trúc trạng thái luồng nội bộ.
 
 .. c:function:: PyObject *PySys_GetObject(const char *name)
 
-   Return the object *name* from the :mod:`sys` module or ``NULL`` if it does
-   not exist, without setting an exception.
+   Trả về đối tượng *name* từ module :mod:`sys` hoặc ``NULL`` nếu đối tượng đó không tồn tại, mà không thiết lập ngoại lệ.
 
 .. c:function:: int PySys_SetObject(const char *name, PyObject *v)
 
-   Set *name* in the :mod:`sys` module to *v* unless *v* is ``NULL``, in which
-   case *name* is deleted from the sys module. Returns ``0`` on success, ``-1``
-   on error.
+   Đặt *name* trong module :mod:`sys` thành *v* trừ khi *v* là ``NULL``; trong trường hợp đó, *name* sẽ bị xóa khỏi module sys. Trả về ``0`` khi thành công và ``-1`` khi có lỗi.
 
 .. c:function:: void PySys_ResetWarnOptions()
 
-   Reset :data:`sys.warnoptions` to an empty list. This function may be
-   called prior to :c:func:`Py_Initialize`.
+   Đặt lại :data:`sys.warnoptions` thành một danh sách rỗng. Có thể gọi hàm này trước :c:func:`Py_Initialize`.
 
    .. deprecated-removed:: 3.13 3.15
-      Clear :data:`sys.warnoptions` and :data:`!warnings.filters` instead.
+      Thay vào đó, xóa :data:`sys.warnoptions` và :data:`!warnings.filters`.
 
 .. c:function:: void PySys_WriteStdout(const char *format, ...)
 
-   Write the output string described by *format* to :data:`sys.stdout`.  No
-   exceptions are raised, even if truncation occurs (see below).
+   Ghi chuỗi đầu ra được mô tả bởi *format* vào :data:`sys.stdout`. Không có ngoại lệ nào được phát sinh, ngay cả khi xảy ra việc cắt ngắn (xem bên dưới).
 
-   *format* should limit the total size of the formatted output string to
-   1000 bytes or less -- after 1000 bytes, the output string is truncated.
-   In particular, this means that no unrestricted "%s" formats should occur;
-   these should be limited using "%.<N>s" where <N> is a decimal number
-   calculated so that <N> plus the maximum size of other formatted text does not
-   exceed 1000 bytes.  Also watch out for "%f", which can print hundreds of
-   digits for very large numbers.
+   *format* nên giới hạn tổng kích thước của chuỗi đầu ra đã định dạng ở mức 1000 byte trở xuống -- sau 1000 byte, chuỗi đầu ra sẽ bị cắt ngắn. Cụ thể, điều này có nghĩa là không được sử dụng các định dạng "%s" không giới hạn; thay vào đó, cần giới hạn chúng bằng "%.<N>s", trong đó <N> là một số thập phân được tính sao cho <N> cộng với kích thước tối đa của phần văn bản đã định dạng khác không vượt quá 1000 byte. Ngoài ra, hãy chú ý đến "%f", vì nó có thể in ra hàng trăm chữ số đối với các số rất lớn.
 
-   If a problem occurs, or :data:`sys.stdout` is unset, the formatted message
-   is written to the real (C level) *stdout*.
+   Nếu xảy ra sự cố hoặc :data:`sys.stdout` chưa được thiết lập, thông báo đã định dạng sẽ được ghi vào *stdout* thực (ở cấp độ C).
 
 .. c:function:: void PySys_WriteStderr(const char *format, ...)
 
-   As :c:func:`PySys_WriteStdout`, but write to :data:`sys.stderr` or *stderr*
-   instead.
+   Tương tự như :c:func:`PySys_WriteStdout`, nhưng thay vào đó ghi vào :data:`sys.stderr` hoặc *stderr*.
 
 .. c:function:: void PySys_FormatStdout(const char *format, ...)
 
-   Function similar to PySys_WriteStdout() but format the message using
-   :c:func:`PyUnicode_FromFormatV` and don't truncate the message to an
-   arbitrary length.
+   Hàm tương tự như PySys_WriteStdout() nhưng định dạng thông báo bằng
+   :c:func:`PyUnicode_FromFormatV` và không cắt ngắn thông báo theo một độ dài tùy ý.
 
    .. versionadded:: 3.2
 
 .. c:function:: void PySys_FormatStderr(const char *format, ...)
 
-   As :c:func:`PySys_FormatStdout`, but write to :data:`sys.stderr` or *stderr*
-   instead.
+   Tương tự như :c:func:`PySys_FormatStdout`, nhưng thay vào đó ghi vào :data:`sys.stderr` hoặc *stderr*.
 
    .. versionadded:: 3.2
 
 .. c:function:: PyObject *PySys_GetXOptions()
 
-   Return the current dictionary of :option:`-X` options, similarly to
-   :data:`sys._xoptions`.  On error, ``NULL`` is returned and an exception is
-   set.
+   Trả về từ điển hiện tại của các tùy chọn :option:`-X`, tương tự như
+   :data:`sys._xoptions`. Khi xảy ra lỗi, ``NULL`` được trả về và một exception được đặt.
 
    .. versionadded:: 3.2
 
 
 .. c:function:: int PySys_Audit(const char *event, const char *format, ...)
 
-   Raise an auditing event with any active hooks. Return zero for success
-   and non-zero with an exception set on failure.
+   Phát sinh một sự kiện auditing với mọi hook đang hoạt động. Trả về số không nếu thành công và giá trị khác không kèm theo một exception được đặt nếu thất bại.
 
-   The *event* string argument must not be *NULL*.
+   Đối số chuỗi *event* không được là *NULL*.
 
-   If any hooks have been added, *format* and other arguments will be used
-   to construct a tuple to pass. Apart from ``N``, the same format characters
-   as used in :c:func:`Py_BuildValue` are available. If the built value is not
-   a tuple, it will be added into a single-element tuple.
+   Nếu đã thêm hook, *format* và các đối số khác sẽ được dùng để tạo một tuple truyền vào. Ngoài ``N``, có thể sử dụng các ký tự định dạng giống như trong :c:func:`Py_BuildValue`. Nếu giá trị được tạo không phải là một tuple, giá trị đó sẽ được thêm vào một tuple có một phần tử.
 
-   The ``N`` format option must not be used. It consumes a reference, but since
-   there is no way to know whether arguments to this function will be consumed,
-   using it may cause reference leaks.
+   Không được sử dụng tùy chọn định dạng ``N``. Tùy chọn này tiêu thụ một reference, nhưng vì không có cách nào biết được các đối số của hàm này có bị tiêu thụ hay không, việc sử dụng tùy chọn này có thể gây rò rỉ reference.
 
-   Note that ``#`` format characters should always be treated as
-   :c:type:`Py_ssize_t`, regardless of whether ``PY_SSIZE_T_CLEAN`` was defined.
+   Lưu ý rằng các ký tự định dạng ``#`` luôn phải được xử lý như
+   :c:type:`Py_ssize_t`, bất kể ``PY_SSIZE_T_CLEAN`` đã được định nghĩa hay chưa.
 
-   :func:`sys.audit` performs the same function from Python code.
+   :func:`sys.audit` thực hiện chức năng tương tự từ mã Python.
 
-   See also :c:func:`PySys_AuditTuple`.
+   Xem thêm :c:func:`PySys_AuditTuple`.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.8.2
 
-      Require :c:type:`Py_ssize_t` for ``#`` format characters. Previously, an
-      unavoidable deprecation warning was raised.
+      Yêu cầu :c:type:`Py_ssize_t` đối với các ký tự định dạng ``#``. Trước đây, một cảnh báo ngừng sử dụng không thể tránh khỏi đã được đưa ra.
 
 
 .. c:function:: int PySys_AuditTuple(const char *event, PyObject *args)
 
-   Similar to :c:func:`PySys_Audit`, but pass arguments as a Python object.
-   *args* must be a :class:`tuple`. To pass no arguments, *args* can be *NULL*.
+   Tương tự :c:func:`PySys_Audit`, nhưng truyền các đối số dưới dạng đối tượng Python. *args* phải là một :class:`tuple`. Để không truyền đối số nào, *args* có thể là *NULL*.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PySys_AddAuditHook(Py_AuditHookFunction hook, void *userData)
 
-   Append the callable *hook* to the list of active auditing hooks.
-   Return zero on success
-   and non-zero on failure. If the runtime has been initialized, also set an
-   error on failure. Hooks added through this API are called for all
-   interpreters created by the runtime.
+   Thêm callable *hook* vào danh sách các hook kiểm tra đang hoạt động. Trả về số 0 khi thành công và số khác 0 khi thất bại. Nếu runtime đã được khởi tạo, đồng thời đặt một lỗi khi thất bại. Các hook được thêm thông qua API này sẽ được gọi cho tất cả interpreter do runtime tạo.
 
-   The *userData* pointer is passed into the hook function. Since hook
-   functions may be called from different runtimes, this pointer should not
-   refer directly to Python state.
+   Con trỏ *userData* được truyền vào hàm hook. Vì các hàm hook có thể được gọi từ các runtime khác nhau, con trỏ này không nên tham chiếu trực tiếp đến trạng thái Python.
 
-   This function is safe to call before :c:func:`Py_Initialize`. When called
-   after runtime initialization, existing audit hooks are notified and may
-   silently abort the operation by raising an error subclassed from
-   :class:`Exception` (other errors will not be silenced).
+   Hàm này có thể được gọi an toàn trước :c:func:`Py_Initialize`. Khi được gọi sau khi runtime được khởi tạo, các audit hook hiện có sẽ được thông báo và có thể âm thầm hủy thao tác bằng cách raise một lớp lỗi kế thừa từ
+   :class:`Exception` (các lỗi khác sẽ không bị bỏ qua).
 
-   The hook function is always called with an :term:`attached thread state` by
-   the Python interpreter that raised the event.
+   Trình thông dịch Python gây ra sự kiện luôn gọi hàm hook với một :term:`attached thread state`.
 
-   See :pep:`578` for a detailed description of auditing.  Functions in the
-   runtime and standard library that raise events are listed in the
-   :ref:`audit events table <audit-events>`.
-   Details are in each function's documentation.
+   Xem :pep:`578` để biết mô tả chi tiết về auditing. Các hàm trong runtime và standard library phát sinh sự kiện được liệt kê trong
+   :ref:`bảng các sự kiện audit <audit-events>`. Thông tin chi tiết nằm trong tài liệu của từng hàm.
 
    .. audit-event:: sys.addaudithook "" c.PySys_AddAuditHook
 
-      If the interpreter is initialized, this function raises an auditing event
-      ``sys.addaudithook`` with no arguments. If any existing hooks raise an
-      exception derived from :class:`Exception`, the new hook will not be
-      added and the exception is cleared. As a result, callers cannot assume
-      that their hook has been added unless they control all existing hooks.
+      Nếu trình thông dịch đã được khởi tạo, hàm này sẽ phát sinh một sự kiện auditing ``sys.addaudithook`` không có đối số. Nếu bất kỳ hook hiện có nào raise một ngoại lệ dẫn xuất từ :class:`Exception`, hook mới sẽ không được thêm vào và ngoại lệ sẽ được xóa. Do đó, bên gọi không thể giả định rằng hook của mình đã được thêm vào, trừ khi kiểm soát tất cả các hook hiện có.
 
    .. c:namespace:: NULL
    .. c:type:: int (*Py_AuditHookFunction) (const char *event, PyObject *args, void *userData)
 
-      The type of the hook function.
-      *event* is the C string event argument passed to :c:func:`PySys_Audit` or
-      :c:func:`PySys_AuditTuple`.
-      *args* is guaranteed to be a :c:type:`PyTupleObject`.
-      *userData* is the argument passed to PySys_AddAuditHook().
+      Kiểu của hàm hook. *event* là đối số sự kiện dạng chuỗi C được truyền đến :c:func:`PySys_Audit` hoặc
+      :c:func:`PySys_AuditTuple`. *args* được đảm bảo là một :c:type:`PyTupleObject`. *userData* là đối số được truyền vào PySys_AddAuditHook().
 
    .. versionadded:: 3.8
 
 
 .. _processcontrol:
 
-Process Control
-===============
+Điều khiển tiến trình
+=====================
 
 
 .. c:function:: void Py_FatalError(const char *message)
 
    .. index:: single: abort (C function)
 
-   Print a fatal error message and kill the process.  No cleanup is performed.
-   This function should only be invoked when a condition is detected that would
-   make it dangerous to continue using the Python interpreter; e.g., when the
-   object administration appears to be corrupted.  On Unix, the standard C library
-   function :c:func:`!abort` is called which will attempt to produce a :file:`core`
-   file.
+   In thông báo lỗi nghiêm trọng rồi kết thúc tiến trình. Không thực hiện bất kỳ thao tác dọn dẹp nào. Chỉ nên gọi hàm này khi phát hiện một điều kiện khiến việc tiếp tục sử dụng trình thông dịch Python trở nên nguy hiểm; chẳng hạn như khi có vẻ như việc quản lý đối tượng đã bị hỏng. Trên Unix, hàm thư viện C chuẩn :c:func:`!abort` được gọi và sẽ cố gắng tạo tệp :file:`core`.
 
-   The ``Py_FatalError()`` function is replaced with a macro which logs
-   automatically the name of the current function, unless the
-   ``Py_LIMITED_API`` macro is defined.
+   Hàm ``Py_FatalError()`` được thay thế bằng một macro tự động ghi nhật ký tên của hàm hiện tại, trừ khi macro ``Py_LIMITED_API`` được định nghĩa.
 
    .. versionchanged:: 3.9
-      Log the function name automatically.
+      Tự động ghi nhật ký tên hàm.
 
 
 .. c:function:: void Py_Exit(int status)
@@ -455,12 +339,10 @@ Process Control
       single: Py_FinalizeEx (C function)
       single: exit (C function)
 
-   Exit the current process.  This calls :c:func:`Py_FinalizeEx` and then calls the
-   standard C library function ``exit(status)``.  If :c:func:`Py_FinalizeEx`
-   indicates an error, the exit status is set to 120.
+   Thoát khỏi tiến trình hiện tại. Hàm này gọi :c:func:`Py_FinalizeEx`, sau đó gọi hàm thư viện C chuẩn ``exit(status)``. Nếu :c:func:`Py_FinalizeEx` cho biết có lỗi, trạng thái thoát được đặt thành 120.
 
    .. versionchanged:: 3.6
-      Errors from finalization no longer ignored.
+      Các lỗi trong quá trình hoàn tất không còn bị bỏ qua.
 
 
 .. c:function:: int Py_AtExit(void (*func) ())
@@ -469,14 +351,9 @@ Process Control
       single: Py_FinalizeEx (C function)
       single: cleanup functions
 
-   Register a cleanup function to be called by :c:func:`Py_FinalizeEx`.  The cleanup
-   function will be called with no arguments and should return no value.  At most
-   32 cleanup functions can be registered.  When the registration is successful,
-   :c:func:`Py_AtExit` returns ``0``; on failure, it returns ``-1``.  The cleanup
-   function registered last is called first. Each cleanup function will be called
-   at most once.  Since Python's internal finalization will have completed before
-   the cleanup function, no Python APIs should be called by *func*.
+   Đăng ký một hàm dọn dẹp để :c:func:`Py_FinalizeEx` gọi. Hàm dọn dẹp sẽ được gọi mà không có đối số nào và không nên trả về giá trị nào. Có thể đăng ký nhiều nhất 32 hàm dọn dẹp. Khi đăng ký thành công,
+   :c:func:`Py_AtExit` trả về ``0``; khi thất bại, hàm này trả về ``-1``. Hàm dọn dẹp được đăng ký sau cùng sẽ được gọi trước. Mỗi hàm dọn dẹp sẽ được gọi nhiều nhất một lần. Vì quá trình finalization nội bộ của Python đã hoàn tất trước khi hàm dọn dẹp được gọi, không nên gọi API Python nào từ *func*.
 
    .. seealso::
 
-      :c:func:`PyUnstable_AtExit` for passing a ``void *data`` argument.
+      :c:func:`PyUnstable_AtExit` để truyền một đối số ``void *data``.

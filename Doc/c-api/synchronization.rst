@@ -2,102 +2,69 @@
 
 .. _synchronization:
 
-Synchronization primitives
-==========================
+Các primitive đồng bộ hóa
+=========================
 
-The C-API provides a basic mutual exclusion lock.
+C-API cung cấp một mutex cơ bản.
 
 .. c:type:: PyMutex
 
-   A mutual exclusion lock.  The :c:type:`!PyMutex` should be initialized to
-   zero to represent the unlocked state.  For example::
+   Một mutex. :c:type:`!PyMutex` phải được khởi tạo bằng 0 để biểu thị trạng thái đã mở khóa. Ví dụ:::
 
       PyMutex mutex = {0};
 
-   Instances of :c:type:`!PyMutex` should not be copied or moved.  Both the
-   contents and address of a :c:type:`!PyMutex` are meaningful, and it must
-   remain at a fixed, writable location in memory.
+   Các instance của :c:type:`!PyMutex` không nên được sao chép hoặc di chuyển. Cả nội dung và địa chỉ của một :c:type:`!PyMutex` đều có ý nghĩa, và nó phải được giữ cố định tại một vị trí có thể ghi trong bộ nhớ.
 
    .. note::
 
-      A :c:type:`!PyMutex` currently occupies one byte, but the size should be
-      considered unstable.  The size may change in future Python releases
-      without a deprecation period.
+      Một :c:type:`!PyMutex` hiện chiếm một byte, nhưng kích thước này nên được xem là không ổn định. Kích thước có thể thay đổi trong các bản phát hành Python sau này mà không cần có thời gian deprecation.
 
    .. versionadded:: 3.13
 
 .. c:function:: void PyMutex_Lock(PyMutex *m)
 
-   Lock mutex *m*.  If another thread has already locked it, the calling
-   thread will block until the mutex is unlocked.  While blocked, the thread
-   will temporarily detach the :term:`thread state <attached thread state>` if one exists.
+   Khóa mutex *m*. Nếu một thread khác đã khóa mutex này, thread gọi sẽ bị chặn cho đến khi mutex được mở khóa. Trong khi bị chặn, thread sẽ tạm thời tách :term:`trạng thái thread <attached thread state>` nếu có.
 
    .. versionadded:: 3.13
 
 .. c:function:: void PyMutex_Unlock(PyMutex *m)
 
-   Unlock mutex *m*. The mutex must be locked --- otherwise, the function will
-   issue a fatal error.
+   Mở khóa mutex *m*. Mutex phải đang được khóa --- nếu không, hàm sẽ phát sinh lỗi nghiêm trọng.
 
    .. versionadded:: 3.13
 
 .. c:function:: int PyMutex_IsLocked(PyMutex *m)
 
-   Returns non-zero if the mutex *m* is currently locked, zero otherwise.
+   Trả về giá trị khác không nếu mutex *m* hiện đang bị khóa, ngược lại trả về giá trị bằng không.
 
    .. note::
 
-      This function is intended for use in assertions and debugging only and
-      should not be used to make concurrency control decisions, as the lock
-      state may change immediately after the check.
+      Hàm này chỉ предназначен cho các phép assertion và việc debug, không nên được dùng để đưa ra quyết định kiểm soát đồng thời, vì trạng thái khóa có thể thay đổi ngay sau khi kiểm tra.
 
    .. versionadded:: 3.14
 
 .. _python-critical-section-api:
 
-Python critical section API
+API vùng tới hạn của Python
 ---------------------------
 
-The critical section API provides a deadlock avoidance layer on top of
-per-object locks for :term:`free-threaded <free threading>` CPython.  They are
-intended to replace reliance on the :term:`global interpreter lock`, and are
-no-ops in versions of Python with the global interpreter lock.
+API vùng tới hạn cung cấp một lớp tránh deadlock trên các khóa riêng theo từng đối tượng cho CPython :term:`không có GIL <free threading>`. Chúng được thiết kế để thay thế việc phụ thuộc vào :term:`global interpreter lock`, và không thực hiện thao tác nào trong các phiên bản Python có global interpreter lock.
 
-Critical sections are intended to be used for custom types implemented
-in C-API extensions. They should generally not be used with built-in types like
-:class:`list` and :class:`dict` because their public C-APIs
-already use critical sections internally, with the notable
-exception of :c:func:`PyDict_Next`, which requires critical section
-to be acquired externally.
+Các vùng tới hạn được thiết kế để sử dụng cho những kiểu tùy chỉnh được triển khai trong các phần mở rộng C-API. Nhìn chung, không nên sử dụng chúng với các kiểu dựng sẵn như
+:class:`list` và :class:`dict` vì các C-API công khai của chúng đã sử dụng vùng tới hạn ở bên trong, ngoại trừ đáng chú ý là :c:func:`PyDict_Next`, vốn yêu cầu vùng tới hạn phải được lấy ở bên ngoài.
 
-Critical sections avoid deadlocks by implicitly suspending active critical
-sections, hence, they do not provide exclusive access such as provided by
-traditional locks like :c:type:`PyMutex`.  When a critical section is started,
-the per-object lock for the object is acquired. If the code executed inside the
-critical section calls C-API functions then it can suspend the critical section thereby
-releasing the per-object lock, so other threads can acquire the per-object lock
-for the same object.
+Các vùng tới hạn tránh deadlock bằng cách ngầm tạm dừng các vùng tới hạn đang hoạt động; do đó, chúng không cung cấp quyền truy cập độc quyền như các khóa truyền thống, chẳng hạn :c:type:`PyMutex`. Khi bắt đầu một vùng tới hạn, khóa riêng theo từng đối tượng của đối tượng đó sẽ được lấy. Nếu mã được thực thi bên trong vùng tới hạn gọi các hàm C-API, vùng tới hạn có thể bị tạm dừng, qua đó giải phóng khóa riêng theo từng đối tượng để các thread khác có thể lấy khóa riêng theo từng đối tượng của cùng đối tượng đó.
 
-Variants that accept :c:type:`PyMutex` pointers rather than Python objects are also
-available. Use these variants to start a critical section in a situation where
-there is no :c:type:`PyObject` -- for example, when working with a C type that
-does not extend or wrap :c:type:`PyObject` but still needs to call into the C
-API in a manner that might lead to deadlocks.
+Các biến thể chấp nhận con trỏ :c:type:`PyMutex` thay vì các đối tượng Python cũng có sẵn. Hãy sử dụng các biến thể này để bắt đầu một critical section trong tình huống không có :c:type:`PyObject` -- chẳng hạn khi làm việc với một kiểu C không mở rộng hoặc bao bọc :c:type:`PyObject` nhưng vẫn cần gọi C API theo cách có thể dẫn đến deadlock.
 
-The functions and structs used by the macros are exposed for cases
-where C macros are not available. They should only be used as in the
-given macro expansions. Note that the sizes and contents of the structures may
-change in future Python versions.
+Các hàm và struct được macro sử dụng được cung cấp cho những trường hợp không có macro C. Chỉ nên sử dụng chúng giống như trong các macro expansion đã cho. Lưu ý rằng kích thước và nội dung của các cấu trúc có thể thay đổi trong các phiên bản Python tương lai.
 
 .. note::
 
-   Operations that need to lock two objects at once must use
-   :c:macro:`Py_BEGIN_CRITICAL_SECTION2`.  You *cannot* use nested critical
-   sections to lock more than one object at once, because the inner critical
-   section may suspend the outer critical sections.  This API does not provide
-   a way to lock more than two objects at once.
+   Các thao tác cần khóa đồng thời hai đối tượng phải sử dụng
+   :c:macro:`Py_BEGIN_CRITICAL_SECTION2`. Bạn *không thể* sử dụng các critical section lồng nhau để khóa đồng thời nhiều hơn một đối tượng, vì critical section bên trong có thể tạm dừng các critical section bên ngoài. API này không cung cấp cách khóa đồng thời nhiều hơn hai đối tượng.
 
-Example usage::
+Ví dụ sử dụng::
 
    static PyObject *
    set_field(MyObject *self, PyObject *value)
@@ -108,194 +75,172 @@ Example usage::
       Py_RETURN_NONE;
    }
 
-In the above example, :c:macro:`Py_SETREF` calls :c:macro:`Py_DECREF`, which
-can call arbitrary code through an object's deallocation function.  The critical
-section API avoids potential deadlocks due to reentrancy and lock ordering
-by allowing the runtime to temporarily suspend the critical section if the
-code triggered by the finalizer blocks and calls :c:func:`PyEval_SaveThread`.
+Trong ví dụ trên, :c:macro:`Py_SETREF` gọi :c:macro:`Py_DECREF`, hàm này có thể gọi mã tùy ý thông qua hàm giải phóng của một đối tượng. API critical section tránh các deadlock tiềm ẩn do khả năng tái nhập và thứ tự khóa bằng cách cho phép runtime tạm thời tạm dừng critical section nếu mã được finalizer kích hoạt bị block và gọi :c:func:`PyEval_SaveThread`.
 
 .. c:macro:: Py_BEGIN_CRITICAL_SECTION(op)
 
-   Acquires the per-object lock for the object *op* and begins a
-   critical section.
+   Lấy khóa cho từng đối tượng của đối tượng *op* và bắt đầu một critical section.
 
-   In the free-threaded build, this macro expands to::
+   Trong bản dựng free-threaded, macro này mở rộng thành::
 
       {
           PyCriticalSection _py_cs;
           PyCriticalSection_Begin(&_py_cs, (PyObject*)(op))
 
-   In the default build, this macro expands to ``{``.
+   Trong bản dựng mặc định, macro này mở rộng thành ``{``.
 
    .. versionadded:: 3.13
 
 .. c:macro:: Py_BEGIN_CRITICAL_SECTION_MUTEX(m)
 
-   Locks the mutex *m* and begins a critical section.
+   Khóa mutex *m* và bắt đầu một critical section.
 
-   In the free-threaded build, this macro expands to::
+   Trong bản dựng free-threaded, macro này mở rộng thành::
 
      {
           PyCriticalSection _py_cs;
           PyCriticalSection_BeginMutex(&_py_cs, m)
 
-   Note that unlike :c:macro:`Py_BEGIN_CRITICAL_SECTION`, there is no cast for
-   the argument of the macro - it must be a :c:type:`PyMutex` pointer.
+   Lưu ý rằng, không giống như :c:macro:`Py_BEGIN_CRITICAL_SECTION`, không có phép ép kiểu cho đối số của macro — đối số phải là một con trỏ :c:type:`PyMutex`.
 
-   On the default build, this macro expands to ``{``.
+   Trong bản dựng mặc định, macro này mở rộng thành ``{``.
 
    .. versionadded:: 3.14
 
 .. c:macro:: Py_END_CRITICAL_SECTION()
 
-   Ends the critical section and releases the per-object lock.
+   Kết thúc critical section và giải phóng khóa trên mỗi đối tượng.
 
-   In the free-threaded build, this macro expands to::
+   Trong bản dựng free-threaded, macro này mở rộng thành::
 
           PyCriticalSection_End(&_py_cs);
       }
 
-   In the default build, this macro expands to ``}``.
+   Trong bản dựng mặc định, macro này được mở rộng thành ``}``.
 
    .. versionadded:: 3.13
 
 .. c:macro:: Py_BEGIN_CRITICAL_SECTION2(a, b)
 
-   Acquires the per-object locks for the objects *a* and *b* and begins a
-   critical section.  The locks are acquired in a consistent order (lowest
-   address first) to avoid lock ordering deadlocks.
+   Lấy các khóa theo từng đối tượng cho các đối tượng *a* và *b* rồi bắt đầu một vùng tới hạn. Các khóa được lấy theo một thứ tự nhất quán (địa chỉ thấp nhất trước) để tránh deadlock do thứ tự khóa.
 
-   In the free-threaded build, this macro expands to::
+   Trong bản dựng free-threaded, macro này mở rộng thành::
 
       {
           PyCriticalSection2 _py_cs2;
           PyCriticalSection2_Begin(&_py_cs2, (PyObject*)(a), (PyObject*)(b))
 
-   In the default build, this macro expands to ``{``.
+   Trong bản dựng mặc định, macro này mở rộng thành ``{``.
 
    .. versionadded:: 3.13
 
 .. c:macro:: Py_BEGIN_CRITICAL_SECTION2_MUTEX(m1, m2)
 
-   Locks the mutexes *m1* and *m2* and begins a critical section.
+   Khóa các mutex *m1* và *m2* rồi bắt đầu một vùng tới hạn.
 
-   In the free-threaded build, this macro expands to::
+   Trong bản dựng free-threaded, macro này mở rộng thành::
 
      {
           PyCriticalSection2 _py_cs2;
           PyCriticalSection2_BeginMutex(&_py_cs2, m1, m2)
 
-   Note that unlike :c:macro:`Py_BEGIN_CRITICAL_SECTION2`, there is no cast for
-   the arguments of the macro - they must be :c:type:`PyMutex` pointers.
+   Lưu ý rằng không giống như :c:macro:`Py_BEGIN_CRITICAL_SECTION2`, các đối số của macro không được ép kiểu - chúng phải là các con trỏ :c:type:`PyMutex`.
 
-   On the default build, this macro expands to ``{``.
+   Trong bản dựng mặc định, macro này mở rộng thành ``{``.
 
    .. versionadded:: 3.14
 
 .. c:macro:: Py_END_CRITICAL_SECTION2()
 
-   Ends the critical section and releases the per-object locks.
+   Kết thúc critical section và giải phóng các khóa trên từng đối tượng.
 
-   In the free-threaded build, this macro expands to::
+   Trong bản dựng free-threaded, macro này mở rộng thành::
 
           PyCriticalSection2_End(&_py_cs2);
       }
 
-   In the default build, this macro expands to ``}``.
+   Trong bản dựng mặc định, macro này được mở rộng thành ``}``.
 
    .. versionadded:: 3.13
 
 
-Legacy locking APIs
--------------------
+Các API khóa cũ
+---------------
 
-These APIs are obsolete since Python 3.13 with the introduction of
+Các API này đã lỗi thời kể từ Python 3.13 với sự ra mắt của
 :c:type:`PyMutex`.
 
 
 .. c:type:: PyThread_type_lock
 
-   A pointer to a mutual exclusion lock.
+   Một con trỏ tới khóa loại trừ tương hỗ.
 
 
 .. c:type:: PyLockStatus
 
-   The result of acquiring a lock with a timeout.
+   Kết quả của việc lấy khóa với thời gian chờ.
 
    .. c:namespace:: NULL
 
    .. c:enumerator:: PY_LOCK_FAILURE
 
-      Failed to acquire the lock.
+      Không thể lấy khóa.
 
    .. c:enumerator:: PY_LOCK_ACQUIRED
 
-      The lock was successfully acquired.
+      Đã lấy khóa thành công.
 
    .. c:enumerator:: PY_LOCK_INTR
 
-      The lock was interrupted by a signal.
+      Việc lấy khóa đã bị gián đoạn bởi một signal.
 
 
 .. c:function:: PyThread_type_lock PyThread_allocate_lock(void)
 
-   Allocate a new lock.
+   Cấp phát một khóa mới.
 
-   On success, this function returns a lock; on failure, this
-   function returns ``0`` without an exception set.
+   Khi thành công, hàm này trả về một khóa; khi thất bại, hàm này trả về ``0`` mà không thiết lập ngoại lệ.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Caller không cần phải giữ :term:`attached thread state`.
 
 
 .. c:function:: void PyThread_free_lock(PyThread_type_lock lock)
 
-   Destroy *lock*. The lock should not be held by any thread when calling
-   this.
+   Hủy *lock*. Không thread nào được giữ lock khi gọi hàm này.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Caller không cần phải giữ :term:`attached thread state`.
 
 
 .. c:function:: PyLockStatus PyThread_acquire_lock_timed(PyThread_type_lock lock, long long microseconds, int intr_flag)
 
-   Acquire *lock* with a timeout.
+   Acquire *lock* với thời gian chờ.
 
-   This will wait for *microseconds* microseconds to acquire the lock. If the
-   timeout expires, this function returns :c:enumerator:`PY_LOCK_FAILURE`.
-   If *microseconds* is ``-1``, this will wait indefinitely until the lock has
-   been released.
+   Hàm này sẽ chờ *microseconds* microseconds để acquire lock. Nếu hết thời gian chờ, hàm này trả về :c:enumerator:`PY_LOCK_FAILURE`. Nếu *microseconds* là ``-1``, hàm sẽ chờ vô thời hạn cho đến khi lock được giải phóng.
 
-   If *intr_flag* is ``1``, acquiring the lock may be interrupted by a signal,
-   in which case this function returns :c:enumerator:`PY_LOCK_INTR`. Upon
-   interruption, it's generally expected that the caller makes a call to
-   :c:func:`Py_MakePendingCalls` to propagate an exception to Python code.
+   Nếu *intr_flag* là ``1``, việc acquire lock có thể bị gián đoạn bởi một signal; khi đó, hàm này trả về :c:enumerator:`PY_LOCK_INTR`. Khi bị gián đoạn, caller thường được kỳ vọng sẽ gọi
+   :c:func:`Py_MakePendingCalls` để truyền một exception đến mã Python.
 
-   If the lock is successfully acquired, this function returns
+   Nếu khóa được lấy thành công, hàm này trả về
    :c:enumerator:`PY_LOCK_ACQUIRED`.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Caller không cần phải giữ :term:`attached thread state`.
 
 
 .. c:function:: int PyThread_acquire_lock(PyThread_type_lock lock, int waitflag)
 
-   Acquire *lock*.
+   Lấy *khóa*.
 
-   If *waitflag* is ``1`` and another thread currently holds the lock, this
-   function will wait until the lock can be acquired and will always return
-   ``1``.
+   Nếu *waitflag* là ``1`` và một thread khác hiện đang giữ khóa, hàm này sẽ chờ cho đến khi có thể lấy khóa và luôn trả về ``1``.
 
-   If *waitflag* is ``0`` and another thread holds the lock, this function will
-   not wait and instead return ``0``. If the lock is not held by any other
-   thread, then this function will acquire it and return ``1``.
+   Nếu *waitflag* là ``0`` và một thread khác đang giữ khóa, hàm này sẽ không chờ mà thay vào đó trả về ``0``. Nếu không có thread nào khác giữ khóa, hàm này sẽ lấy khóa và trả về ``1``.
 
-   Unlike :c:func:`PyThread_acquire_lock_timed`, acquiring the lock cannot be
-   interrupted by a signal.
+   Không giống như :c:func:`PyThread_acquire_lock_timed`, việc lấy khóa không thể bị gián đoạn bởi tín hiệu.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Caller không cần phải giữ :term:`attached thread state`.
 
 
 .. c:function:: int PyThread_release_lock(PyThread_type_lock lock)
 
-   Release *lock*. If *lock* is not held, then this function issues a
-   fatal error.
+   Giải phóng *lock*. Nếu *lock* không được giữ, hàm này sẽ phát sinh lỗi nghiêm trọng.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Caller không cần phải giữ :term:`attached thread state`.

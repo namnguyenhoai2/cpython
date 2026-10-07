@@ -2,8 +2,8 @@
 
 .. _moduleobjects:
 
-Module Objects
---------------
+Đối tượng module
+----------------
 
 .. index:: pair: object; module
 
@@ -12,20 +12,18 @@ Module Objects
 
    .. index:: single: ModuleType (in module types)
 
-   This instance of :c:type:`PyTypeObject` represents the Python module type.  This
-   is exposed to Python programs as :py:class:`types.ModuleType`.
+   Instance này của :c:type:`PyTypeObject` đại diện cho kiểu module Python. Kiểu này được cung cấp cho các chương trình Python dưới dạng :py:class:`types.ModuleType`.
 
 
 .. c:function:: int PyModule_Check(PyObject *p)
 
-   Return true if *p* is a module object, or a subtype of a module object.
-   This function always succeeds.
+   Trả về true nếu *p* là một đối tượng module hoặc một kiểu con của đối tượng module. Hàm này luôn thực thi thành công.
 
 
 .. c:function:: int PyModule_CheckExact(PyObject *p)
 
-   Return true if *p* is a module object, but not a subtype of
-   :c:data:`PyModule_Type`.  This function always succeeds.
+   Trả về true nếu *p* là một đối tượng module nhưng không phải là một kiểu con của
+   :c:data:`PyModule_Type`. Hàm này luôn thực thi thành công.
 
 
 .. c:function:: PyObject* PyModule_NewObject(PyObject *name)
@@ -37,13 +35,10 @@ Module Objects
       single: __package__ (module attribute)
       single: __loader__ (module attribute)
 
-   Return a new module object with :attr:`module.__name__` set to *name*.
-   The module's :attr:`!__name__`, :attr:`~module.__doc__`,
-   :attr:`~module.__package__` and :attr:`~module.__loader__` attributes are
-   filled in (all but :attr:`!__name__` are set to ``None``). The caller is
-   responsible for setting a :attr:`~module.__file__` attribute.
+   Trả về một đối tượng module mới với :attr:`module.__name__` được đặt thành *name*. Các thuộc tính :attr:`!__name__`, :attr:`~module.__doc__` của module,
+   :attr:`~module.__package__` và :attr:`~module.__loader__` được điền vào (tất cả trừ :attr:`!__name__` đều được đặt thành ``None``). Bên gọi chịu trách nhiệm thiết lập thuộc tính :attr:`~module.__file__`.
 
-   Return ``NULL`` with an exception set on error.
+   Trả về ``NULL`` với một exception được đặt khi xảy ra lỗi.
 
    .. versionadded:: 3.3
 
@@ -54,25 +49,20 @@ Module Objects
 
 .. c:function:: PyObject* PyModule_New(const char *name)
 
-   Similar to :c:func:`PyModule_NewObject`, but the name is a UTF-8 encoded
-   string instead of a Unicode object.
+   Tương tự như :c:func:`PyModule_NewObject`, nhưng tên là một chuỗi được mã hóa UTF-8 thay vì một đối tượng Unicode.
 
 
 .. c:function:: PyObject* PyModule_GetDict(PyObject *module)
 
    .. index:: single: __dict__ (module attribute)
 
-   Return the dictionary object that implements *module*'s namespace; this object
-   is the same as the :attr:`~object.__dict__` attribute of the module object.
-   If *module* is not a module object (or a subtype of a module object),
-   :exc:`SystemError` is raised and ``NULL`` is returned.
+   Trả về đối tượng dictionary triển khai namespace của *module*; đối tượng này giống với thuộc tính :attr:`~object.__dict__` của đối tượng module. Nếu *module* không phải là một đối tượng module (hoặc một kiểu con của đối tượng module),
+   :exc:`SystemError` được phát sinh và ``NULL`` được trả về.
 
-   It is recommended extensions use other ``PyModule_*`` and
-   ``PyObject_*`` functions rather than directly manipulate a module's
+   Các extension được khuyến nghị sử dụng những hàm ``PyModule_*`` và ``PyObject_*`` khác thay vì thao tác trực tiếp với namespace của module
    :attr:`~object.__dict__`.
 
-   The returned reference is borrowed from the module; it is valid until
-   the module is destroyed.
+   Tham chiếu được trả về là tham chiếu mượn từ module; nó hợp lệ cho đến khi module bị hủy.
 
 
 .. c:function:: PyObject* PyModule_GetNameObject(PyObject *module)
@@ -81,36 +71,28 @@ Module Objects
       single: __name__ (module attribute)
       single: SystemError (built-in exception)
 
-   Return *module*'s :attr:`~module.__name__` value.  If the module does not
-   provide one, or if it is not a string, :exc:`SystemError` is raised and
-   ``NULL`` is returned.
+   Trả về giá trị :attr:`~module.__name__` của *module*.  Nếu module không cung cấp giá trị này hoặc nếu giá trị đó không phải là một chuỗi, :exc:`SystemError` được phát sinh và ``NULL`` được trả về.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: const char* PyModule_GetName(PyObject *module)
 
-   Similar to :c:func:`PyModule_GetNameObject` but return the name encoded to
-   ``'utf-8'``.
+   Tương tự như :c:func:`PyModule_GetNameObject` nhưng trả về tên được mã hóa thành ``'utf-8'``.
 
-   The returned buffer is only valid until the module is renamed or destroyed.
-   Note that Python code may rename a module by setting its :py:attr:`~module.__name__`
-   attribute.
+   Bộ đệm được trả về chỉ hợp lệ cho đến khi module được đổi tên hoặc hủy. Lưu ý rằng mã Python có thể đổi tên một module bằng cách thiết lập thuộc tính :py:attr:`~module.__name__` của module đó.
 
 .. c:function:: void* PyModule_GetState(PyObject *module)
 
-   Return the "state" of the module, that is, a pointer to the block of memory
-   allocated at module creation time, or ``NULL``.  See
+   Trả về "trạng thái" của module, tức là một con trỏ đến khối bộ nhớ được cấp phát tại thời điểm tạo module, hoặc ``NULL``.  Xem
    :c:member:`PyModuleDef.m_size`.
 
 
 .. c:function:: PyModuleDef* PyModule_GetDef(PyObject *module)
 
-   Return a pointer to the :c:type:`PyModuleDef` struct from which the module was
-   created, or ``NULL`` if the module wasn't created from a definition.
+   Trả về một con trỏ đến struct :c:type:`PyModuleDef` mà từ đó module được tạo, hoặc ``NULL`` nếu module không được tạo từ một định nghĩa.
 
-   On error, return ``NULL`` with an exception set.
-   Use :c:func:`PyErr_Occurred` to tell this case apart from a missing
+   Khi xảy ra lỗi, trả về ``NULL`` cùng với một exception được thiết lập. Sử dụng :c:func:`PyErr_Occurred` để phân biệt trường hợp này với trường hợp bị thiếu
    :c:type:`!PyModuleDef`.
 
 
@@ -120,400 +102,299 @@ Module Objects
       single: __file__ (module attribute)
       single: SystemError (built-in exception)
 
-   Return the name of the file from which *module* was loaded using *module*'s
-   :attr:`~module.__file__` attribute.  If this is not defined, or if it is not a
-   string, raise :exc:`SystemError` and return ``NULL``; otherwise return
-   a reference to a Unicode object.
+   Trả về tên của tệp từ đó *module* được tải bằng cách sử dụng *module*'s
+   :attr:`~module.__file__` attribute.  Nếu thuộc tính này chưa được định nghĩa hoặc không phải là một chuỗi, raise :exc:`SystemError` và trả về ``NULL``; nếu không, trả về một tham chiếu đến một đối tượng Unicode.
 
    .. versionadded:: 3.2
 
 
 .. c:function:: const char* PyModule_GetFilename(PyObject *module)
 
-   Similar to :c:func:`PyModule_GetFilenameObject` but return the filename
-   encoded to 'utf-8'.
+   Tương tự như :c:func:`PyModule_GetFilenameObject` nhưng trả về tên tệp được mã hóa theo 'utf-8'.
 
-   The returned buffer is only valid until the module's :py:attr:`~module.__file__` attribute
-   is reassigned or the module is destroyed.
+   Bộ đệm được trả về chỉ hợp lệ cho đến khi thuộc tính :py:attr:`~module.__file__` của module được gán lại hoặc module bị hủy.
 
    .. deprecated:: 3.2
       :c:func:`PyModule_GetFilename` raises :exc:`UnicodeEncodeError` on
-      unencodable filenames, use :c:func:`PyModule_GetFilenameObject` instead.
+      các tên tệp không thể mã hóa, hãy sử dụng :c:func:`PyModule_GetFilenameObject` thay thế.
 
 
 .. _pymoduledef:
 
-Module definitions
-------------------
+Định nghĩa module
+-----------------
 
-The functions in the previous section work on any module object, including
-modules imported from Python code.
+Các hàm trong phần trước hoạt động trên mọi đối tượng module, bao gồm cả các module được nhập từ mã Python.
 
-Modules defined using the C API typically use a *module definition*,
-:c:type:`PyModuleDef` -- a statically allocated, constant “description" of
-how a module should be created.
+Các module được định nghĩa bằng C API thường sử dụng một *định nghĩa module*,
+:c:type:`PyModuleDef` -- một “mô tả” hằng được cấp phát tĩnh về cách tạo một module.
 
-The definition is usually used to define an extension's “main” module object
-(see :ref:`extension-modules` for details).
-It is also used to
-:ref:`create extension modules dynamically <moduledef-dynamic>`.
+Định nghĩa này thường được dùng để định nghĩa đối tượng module “chính” của một extension (xem :ref:`extension-modules` để biết chi tiết). Nó cũng được dùng để
+:ref:`tạo các module extension một cách động <moduledef-dynamic>`.
 
-Unlike :c:func:`PyModule_New`, the definition allows management of
-*module state* -- a piece of memory that is allocated and cleared together
-with the module object.
-Unlike the module's Python attributes, Python code cannot replace or delete
-data stored in module state.
+Không giống :c:func:`PyModule_New`, định nghĩa này cho phép quản lý *trạng thái module* -- một vùng bộ nhớ được cấp phát và giải phóng cùng với đối tượng module. Không giống các thuộc tính Python của module, mã Python không thể thay thế hoặc xóa dữ liệu được lưu trong trạng thái module.
 
 .. c:type:: PyModuleDef
 
-   The module definition struct, which holds all information needed to create
-   a module object.
-   This structure must be statically allocated (or be otherwise guaranteed
-   to be valid while any modules created from it exist).
-   Usually, there is only one variable of this type for each extension module.
+   Cấu trúc định nghĩa module chứa mọi thông tin cần thiết để tạo một đối tượng module. Cấu trúc này phải được cấp phát tĩnh (hoặc phải được bảo đảm vẫn hợp lệ trong thời gian bất kỳ module nào được tạo từ nó còn tồn tại). Thông thường, mỗi module extension chỉ có một biến thuộc kiểu này.
 
    .. c:member:: PyModuleDef_Base m_base
 
-      Always initialize this member to :c:macro:`PyModuleDef_HEAD_INIT`.
+      Luôn khởi tạo thành viên này thành :c:macro:`PyModuleDef_HEAD_INIT`.
 
    .. c:member:: const char *m_name
 
-      Name for the new module.
+      Tên của module mới.
 
    .. c:member:: const char *m_doc
 
-      Docstring for the module; usually a docstring variable created with
-      :c:macro:`PyDoc_STRVAR` is used.
+      Docstring của module; thường là một biến docstring được tạo bằng
+      :c:macro:`PyDoc_STRVAR` được sử dụng.
 
    .. c:member:: Py_ssize_t m_size
 
-      Module state may be kept in a per-module memory area that can be
-      retrieved with :c:func:`PyModule_GetState`, rather than in static globals.
-      This makes modules safe for use in multiple sub-interpreters.
+      Trạng thái module có thể được lưu trong một vùng nhớ riêng cho từng module, có thể truy xuất bằng :c:func:`PyModule_GetState`, thay vì trong các biến toàn cục static. Điều này giúp các module an toàn khi sử dụng trong nhiều sub-interpreter.
 
-      This memory area is allocated based on *m_size* on module creation,
-      and freed when the module object is deallocated, after the
-      :c:member:`~PyModuleDef.m_free` function has been called, if present.
+      Vùng nhớ này được cấp phát dựa trên *m_size* khi tạo module và được giải phóng khi đối tượng module được hủy, sau khi
+      hàm :c:member:`~PyModuleDef.m_free` đã được gọi, nếu có.
 
-      Setting it to a non-negative value means that the module can be
-      re-initialized and specifies the additional amount of memory it requires
-      for its state.
+      Đặt giá trị này thành một giá trị không âm có nghĩa là module có thể được khởi tạo lại và chỉ định lượng bộ nhớ bổ sung mà module cần cho trạng thái của nó.
 
-      Setting ``m_size`` to ``-1`` means that the module does not support
-      sub-interpreters, because it has global state.
-      Negative ``m_size`` is only allowed when using
-      :ref:`legacy single-phase initialization <single-phase-initialization>`
-      or when :ref:`creating modules dynamically <moduledef-dynamic>`.
+      Đặt ``m_size`` thành ``-1`` có nghĩa là module không hỗ trợ sub-interpreter vì module có trạng thái toàn cục. ``m_size`` âm chỉ được phép khi sử dụng
+      :ref:`khởi tạo một pha kiểu cũ <single-phase-initialization>` hoặc khi :ref:`tạo module một cách động <moduledef-dynamic>`.
 
-      See :PEP:`3121` for more details.
+      Xem :PEP:`3121` để biết thêm chi tiết.
 
    .. c:member:: PyMethodDef* m_methods
 
-      A pointer to a table of module-level functions, described by
-      :c:type:`PyMethodDef` values.  Can be ``NULL`` if no functions are present.
+      Một con trỏ trỏ đến bảng các hàm cấp module, được mô tả bởi
+      các giá trị :c:type:`PyMethodDef`. Có thể là ``NULL`` nếu không có hàm nào.
 
    .. c:member:: PyModuleDef_Slot* m_slots
 
-      An array of slot definitions for multi-phase initialization, terminated by
-      a ``{0, NULL}`` entry.
-      When using legacy single-phase initialization, *m_slots* must be ``NULL``.
+      Một mảng các định nghĩa slot cho quá trình khởi tạo nhiều giai đoạn, kết thúc bằng một mục ``{0, NULL}``. Khi sử dụng quá trình khởi tạo một giai đoạn kiểu cũ, *m_slots* phải là ``NULL``.
 
       .. versionchanged:: 3.5
 
-         Prior to version 3.5, this member was always set to ``NULL``,
-         and was defined as:
+         Trước phiên bản 3.5, thành viên này luôn được đặt thành ``NULL`` và được định nghĩa như sau:
 
            .. c:member:: inquiry m_reload
 
    .. c:member:: traverseproc m_traverse
 
-      A traversal function to call during GC traversal of the module object, or
-      ``NULL`` if not needed.
+      Một hàm traversal được gọi trong quá trình traversal đối tượng module bởi GC, hoặc ``NULL`` nếu không cần.
 
-      This function is not called if the module state was requested but is not
-      allocated yet. This is the case immediately after the module is created
-      and before the module is executed (:c:data:`Py_mod_exec` function). More
-      precisely, this function is not called if :c:member:`~PyModuleDef.m_size` is greater
-      than 0 and the module state (as returned by :c:func:`PyModule_GetState`)
-      is ``NULL``.
+      Hàm này không được gọi nếu trạng thái module đã được yêu cầu nhưng chưa được cấp phát. Điều này xảy ra ngay sau khi module được tạo và trước khi module được thực thi (hàm :c:data:`Py_mod_exec`). Cụ thể hơn, hàm này không được gọi nếu :c:member:`~PyModuleDef.m_size` lớn hơn 0 và trạng thái module (do :c:func:`PyModule_GetState` trả về) là ``NULL``.
 
       .. versionchanged:: 3.9
-         No longer called before the module state is allocated.
+         Không còn được gọi trước khi trạng thái module được cấp phát.
 
    .. c:member:: inquiry m_clear
 
-      A clear function to call during GC clearing of the module object, or
-      ``NULL`` if not needed.
+      Một hàm clear để gọi trong quá trình GC dọn dẹp đối tượng module, hoặc ``NULL`` nếu không cần.
 
-      This function is not called if the module state was requested but is not
-      allocated yet. This is the case immediately after the module is created
-      and before the module is executed (:c:data:`Py_mod_exec` function). More
-      precisely, this function is not called if :c:member:`~PyModuleDef.m_size` is greater
-      than 0 and the module state (as returned by :c:func:`PyModule_GetState`)
-      is ``NULL``.
+      Hàm này không được gọi nếu trạng thái module đã được yêu cầu nhưng chưa được cấp phát. Điều này xảy ra ngay sau khi module được tạo và trước khi module được thực thi (hàm :c:data:`Py_mod_exec`). Cụ thể hơn, hàm này không được gọi nếu :c:member:`~PyModuleDef.m_size` lớn hơn 0 và trạng thái module (do :c:func:`PyModule_GetState` trả về) là ``NULL``.
 
-      Like :c:member:`PyTypeObject.tp_clear`, this function is not *always*
-      called before a module is deallocated. For example, when reference
-      counting is enough to determine that an object is no longer used,
-      the cyclic garbage collector is not involved and
-      :c:member:`~PyModuleDef.m_free` is called directly.
+      Tương tự như :c:member:`PyTypeObject.tp_clear`, hàm này *không phải lúc nào cũng* được gọi trước khi một module được giải phóng. Ví dụ: khi việc đếm tham chiếu đủ để xác định rằng một đối tượng không còn được sử dụng, trình thu gom rác tuần hoàn không tham gia và
+      :c:member:`~PyModuleDef.m_free` được gọi trực tiếp.
 
       .. versionchanged:: 3.9
-         No longer called before the module state is allocated.
+         Không còn được gọi trước khi trạng thái module được cấp phát.
 
    .. c:member:: freefunc m_free
 
-      A function to call during deallocation of the module object, or ``NULL``
-      if not needed.
+      Một hàm để gọi trong quá trình giải phóng đối tượng module, hoặc ``NULL`` nếu không cần.
 
-      This function is not called if the module state was requested but is not
-      allocated yet. This is the case immediately after the module is created
-      and before the module is executed (:c:data:`Py_mod_exec` function). More
-      precisely, this function is not called if :c:member:`~PyModuleDef.m_size` is greater
-      than 0 and the module state (as returned by :c:func:`PyModule_GetState`)
-      is ``NULL``.
+      Hàm này không được gọi nếu trạng thái module đã được yêu cầu nhưng chưa được cấp phát. Điều này xảy ra ngay sau khi module được tạo và trước khi module được thực thi (hàm :c:data:`Py_mod_exec`). Cụ thể hơn, hàm này không được gọi nếu :c:member:`~PyModuleDef.m_size` lớn hơn 0 và trạng thái module (do :c:func:`PyModule_GetState` trả về) là ``NULL``.
 
       .. versionchanged:: 3.9
-         No longer called before the module state is allocated.
+         Không còn được gọi trước khi trạng thái module được cấp phát.
 
 
 .. c:var:: PyTypeObject PyModuleDef_Type
 
-   The type of ``PyModuleDef`` objects.
+   Kiểu của các đối tượng ``PyModuleDef``.
 
 
-Module slots
-............
+Các slot của module
+...................
 
 .. c:type:: PyModuleDef_Slot
 
    .. c:member:: int slot
 
-      A slot ID, chosen from the available values explained below.
+      ID của slot, được chọn từ các giá trị có sẵn được giải thích bên dưới.
 
    .. c:member:: void* value
 
-      Value of the slot, whose meaning depends on the slot ID.
+      Giá trị của slot, có ý nghĩa phụ thuộc vào ID của slot.
 
    .. versionadded:: 3.5
 
-The available slot types are:
+Các loại slot có sẵn là:
 
 .. c:macro:: Py_mod_create
 
-   Specifies a function that is called to create the module object itself.
-   The *value* pointer of this slot must point to a function of the signature:
+   Chỉ định một hàm được gọi để tự tạo đối tượng module. Con trỏ *value* của slot này phải trỏ đến một hàm có chữ ký:
 
    .. c:function:: PyObject* create_module(PyObject *spec, PyModuleDef *def)
       :no-index-entry:
       :no-contents-entry:
 
-   The function receives a :py:class:`~importlib.machinery.ModuleSpec`
-   instance, as defined in :PEP:`451`, and the module definition.
-   It should return a new module object, or set an error
-   and return ``NULL``.
+   Hàm nhận một instance :py:class:`~importlib.machinery.ModuleSpec`, như được định nghĩa trong :PEP:`451`, cùng với định nghĩa module. Hàm phải trả về một đối tượng module mới, hoặc đặt lỗi và trả về ``NULL``.
 
-   This function should be kept minimal. In particular, it should not
-   call arbitrary Python code, as trying to import the same module again may
-   result in an infinite loop.
+   Hàm này nên được giữ ở mức tối thiểu. Đặc biệt, hàm không nên gọi mã Python tùy ý, vì việc cố gắng import lại cùng module có thể dẫn đến vòng lặp vô hạn.
 
-   Multiple ``Py_mod_create`` slots may not be specified in one module
-   definition.
+   Không được chỉ định nhiều slot ``Py_mod_create`` trong một định nghĩa module.
 
-   If ``Py_mod_create`` is not specified, the import machinery will create
-   a normal module object using :c:func:`PyModule_New`. The name is taken from
-   *spec*, not the definition, to allow extension modules to dynamically adjust
-   to their place in the module hierarchy and be imported under different
-   names through symlinks, all while sharing a single module definition.
+   Nếu không chỉ định ``Py_mod_create``, cơ chế import sẽ tạo một đối tượng module thông thường bằng :c:func:`PyModule_New`. Tên được lấy từ *spec*, không phải từ định nghĩa, để cho phép các extension module tự động điều chỉnh theo vị trí của chúng trong hệ thống phân cấp module và được import dưới các tên khác nhau thông qua symlink, đồng thời vẫn dùng chung một định nghĩa module duy nhất.
 
-   There is no requirement for the returned object to be an instance of
-   :c:type:`PyModule_Type`. Any type can be used, as long as it supports
-   setting and getting import-related attributes.
-   However, only ``PyModule_Type`` instances may be returned if the
-   ``PyModuleDef`` has non-``NULL`` ``m_traverse``, ``m_clear``,
-   ``m_free``; non-zero ``m_size``; or slots other than ``Py_mod_create``.
+   Không có yêu cầu đối tượng được trả về phải là một instance của
+   :c:type:`PyModule_Type`. Có thể sử dụng bất kỳ kiểu nào, miễn là kiểu đó hỗ trợ thiết lập và lấy các thuộc tính liên quan đến import. Tuy nhiên, chỉ được trả về các instance ``PyModule_Type`` nếu ``PyModuleDef`` có ``NULL`` ``m_traverse``, ``m_clear``, ``m_free`` không phải ``m_size``; hoặc có các slot khác ngoài ``Py_mod_create``.
 
    .. versionadded:: 3.5
 
 .. c:macro:: Py_mod_exec
 
-   Specifies a function that is called to *execute* the module.
-   This is equivalent to executing the code of a Python module: typically,
-   this function adds classes and constants to the module.
-   The signature of the function is:
+   Chỉ định một hàm được gọi để *thực thi* module. Điều này tương đương với việc thực thi mã của một module Python: thông thường, hàm này thêm các lớp và hằng số vào module. Chữ ký của hàm là:
 
    .. c:function:: int exec_module(PyObject* module)
       :no-index-entry:
       :no-contents-entry:
 
-   If multiple ``Py_mod_exec`` slots are specified, they are processed in the
-   order they appear in the *m_slots* array.
+   Nếu chỉ định nhiều ``Py_mod_exec`` slot__, chúng sẽ được xử lý theo thứ tự xuất hiện trong mảng *m_slots*.
 
    .. versionadded:: 3.5
 
 .. c:macro:: Py_mod_multiple_interpreters
 
-   Specifies one of the following values:
+   Chỉ định một trong các giá trị sau:
 
    .. c:namespace:: NULL
 
    .. c:macro:: Py_MOD_MULTIPLE_INTERPRETERS_NOT_SUPPORTED
 
-      The module does not support being imported in subinterpreters.
+      Module không hỗ trợ việc được import trong các subinterpreter.
 
    .. c:macro:: Py_MOD_MULTIPLE_INTERPRETERS_SUPPORTED
 
-      The module supports being imported in subinterpreters,
-      but only when they share the main interpreter's GIL.
-      (See :ref:`isolating-extensions-howto`.)
+      Module hỗ trợ được import trong các subinterpreter, nhưng chỉ khi chúng dùng chung GIL của interpreter chính. (Xem :ref:`isolating-extensions-howto`.)
 
    .. c:macro:: Py_MOD_PER_INTERPRETER_GIL_SUPPORTED
 
-      The module supports being imported in subinterpreters,
-      even when they have their own GIL.
-      (See :ref:`isolating-extensions-howto`.)
+      Module hỗ trợ được import trong các subinterpreter, ngay cả khi chúng có GIL riêng. (Xem :ref:`isolating-extensions-howto`.)
 
-   This slot determines whether or not importing this module
-   in a subinterpreter will fail.
+   Slot này xác định việc import module này trong một subinterpreter có thất bại hay không.
 
-   Multiple ``Py_mod_multiple_interpreters`` slots may not be specified
-   in one module definition.
+   Không được chỉ định nhiều khe ``Py_mod_multiple_interpreters`` trong một định nghĩa module.
 
-   If ``Py_mod_multiple_interpreters`` is not specified, the import
-   machinery defaults to ``Py_MOD_MULTIPLE_INTERPRETERS_SUPPORTED``.
+   Nếu không chỉ định ``Py_mod_multiple_interpreters``, cơ chế import sẽ mặc định dùng ``Py_MOD_MULTIPLE_INTERPRETERS_SUPPORTED``.
 
    .. versionadded:: 3.12
 
 .. c:macro:: Py_mod_gil
 
-   Specifies one of the following values:
+   Chỉ định một trong các giá trị sau:
 
    .. c:namespace:: NULL
 
    .. c:macro:: Py_MOD_GIL_USED
 
-      The module depends on the presence of the global interpreter lock (GIL),
-      and may access global state without synchronization.
+      Module này phụ thuộc vào sự hiện diện của global interpreter lock (GIL) và có thể truy cập trạng thái toàn cục mà không cần đồng bộ hóa.
 
    .. c:macro:: Py_MOD_GIL_NOT_USED
 
-      The module is safe to run without an active GIL.
+      Module này có thể chạy an toàn mà không cần GIL đang hoạt động.
 
-   This slot is ignored by Python builds not configured with
-   :option:`--disable-gil`.  Otherwise, it determines whether or not importing
-   this module will cause the GIL to be automatically enabled. See
-   :ref:`whatsnew313-free-threaded-cpython` for more detail.
+   Khe này bị các bản build Python không được cấu hình với bỏ qua
+   :option:`--disable-gil`. Nếu không, khe này xác định việc import module này có khiến GIL tự động được bật hay không. Xem
+   :ref:`whatsnew313-free-threaded-cpython` để biết thêm chi tiết.
 
-   Multiple ``Py_mod_gil`` slots may not be specified in one module definition.
+   Không được chỉ định nhiều ``Py_mod_gil`` trong một định nghĩa module.
 
-   If ``Py_mod_gil`` is not specified, the import machinery defaults to
-   ``Py_MOD_GIL_USED``.
+   Nếu ``Py_mod_gil`` không được chỉ định, cơ chế import sẽ mặc định sử dụng ``Py_MOD_GIL_USED``.
 
    .. versionadded:: 3.13
 
 
 .. _moduledef-dynamic:
 
-Creating extension modules dynamically
---------------------------------------
+Tạo module extension một cách động
+----------------------------------
 
-The following functions may be used to create a module outside of an
-extension's :ref:`initialization function <extension-export-hook>`.
-They are also used in
-:ref:`single-phase initialization <single-phase-initialization>`.
+Có thể sử dụng các hàm sau để tạo một module bên ngoài :ref:`hàm khởi tạo <extension-export-hook>` của extension. Chúng cũng được sử dụng trong
+:ref:`khởi tạo một pha <single-phase-initialization>`.
 
 .. c:function:: PyObject* PyModule_Create(PyModuleDef *def)
 
-   Create a new module object, given the definition in *def*.
-   This is a macro that calls :c:func:`PyModule_Create2` with
-   *module_api_version* set to :c:macro:`PYTHON_API_VERSION`, or
-   to :c:macro:`PYTHON_ABI_VERSION` if using the
+   Tạo một đối tượng module mới dựa trên định nghĩa trong *def*. Đây là một macro gọi :c:func:`PyModule_Create2` với *module_api_version* được đặt thành :c:macro:`PYTHON_API_VERSION`, hoặc thành :c:macro:`PYTHON_ABI_VERSION` nếu sử dụng
    :ref:`limited API <limited-c-api>`.
 
 .. c:function:: PyObject* PyModule_Create2(PyModuleDef *def, int module_api_version)
 
-   Create a new module object, given the definition in *def*, assuming the
-   API version *module_api_version*.  If that version does not match the version
-   of the running interpreter, a :exc:`RuntimeWarning` is emitted.
+   Tạo một đối tượng module mới dựa trên định nghĩa trong *def*, với giả định phiên bản API là *module_api_version*. Nếu phiên bản đó không khớp với phiên bản của interpreter đang chạy, một :exc:`RuntimeWarning` sẽ được phát ra.
 
-   Return ``NULL`` with an exception set on error.
+   Trả về ``NULL`` với một ngoại lệ được thiết lập khi xảy ra lỗi.
 
-   This function does not support slots.
-   The :c:member:`~PyModuleDef.m_slots` member of *def* must be ``NULL``.
+   Hàm này không hỗ trợ slots. Thành viên :c:member:`~PyModuleDef.m_slots` của *def* phải là ``NULL``.
 
 
    .. note::
 
-      Most uses of this function should be using :c:func:`PyModule_Create`
-      instead; only use this if you are sure you need it.
+      Hầu hết các trường hợp sử dụng hàm này nên sử dụng :c:func:`PyModule_Create` thay vào đó; chỉ sử dụng hàm này nếu bạn chắc chắn mình cần nó.
 
 .. c:function:: PyObject * PyModule_FromDefAndSpec(PyModuleDef *def, PyObject *spec)
 
-   This macro calls :c:func:`PyModule_FromDefAndSpec2` with
-   *module_api_version* set to :c:macro:`PYTHON_API_VERSION`, or
-   to :c:macro:`PYTHON_ABI_VERSION` if using the
+   Macro này gọi :c:func:`PyModule_FromDefAndSpec2` với *module_api_version* được đặt thành :c:macro:`PYTHON_API_VERSION`, hoặc thành :c:macro:`PYTHON_ABI_VERSION` nếu sử dụng
    :ref:`limited API <limited-c-api>`.
 
    .. versionadded:: 3.5
 
 .. c:function:: PyObject * PyModule_FromDefAndSpec2(PyModuleDef *def, PyObject *spec, int module_api_version)
 
-   Create a new module object, given the definition in *def* and the
-   ModuleSpec *spec*, assuming the API version *module_api_version*.
-   If that version does not match the version of the running interpreter,
-   a :exc:`RuntimeWarning` is emitted.
+   Tạo một đối tượng module mới dựa trên định nghĩa trong *def* và ModuleSpec *spec*, với giả định phiên bản API là *module_api_version*. Nếu phiên bản đó không khớp với phiên bản của interpreter đang chạy, một :exc:`RuntimeWarning` sẽ được phát ra.
 
-   Return ``NULL`` with an exception set on error.
+   Trả về ``NULL`` với một ngoại lệ được thiết lập khi xảy ra lỗi.
 
-   Note that this does not process execution slots (:c:data:`Py_mod_exec`).
-   Both ``PyModule_FromDefAndSpec`` and ``PyModule_ExecDef`` must be called
-   to fully initialize a module.
+   Lưu ý rằng thao tác này không xử lý các execution slot (:c:data:`Py_mod_exec`). Phải gọi cả ``PyModule_FromDefAndSpec`` và ``PyModule_ExecDef`` để khởi tạo đầy đủ một module.
 
    .. note::
 
-      Most uses of this function should be using :c:func:`PyModule_FromDefAndSpec`
-      instead; only use this if you are sure you need it.
+      Hầu hết trường hợp sử dụng hàm này nên dùng :c:func:`PyModule_FromDefAndSpec` thay thế; chỉ sử dụng hàm này nếu bạn chắc chắn mình cần đến nó.
 
    .. versionadded:: 3.5
 
 .. c:function:: int PyModule_ExecDef(PyObject *module, PyModuleDef *def)
 
-   Process any execution slots (:c:data:`Py_mod_exec`) given in *def*.
+   Xử lý mọi execution slot (:c:data:`Py_mod_exec`) được cung cấp trong *def*.
 
    .. versionadded:: 3.5
 
 .. c:macro:: PYTHON_API_VERSION
 
-   The C API version. Defined for backwards compatibility.
+   Phiên bản C API. Được định nghĩa để duy trì khả năng tương thích ngược.
 
-   Currently, this constant is not updated in new Python versions, and is not
-   useful for versioning. This may change in the future.
+   Hiện tại, hằng số này không được cập nhật trong các phiên bản Python mới và không hữu ích cho việc quản lý phiên bản. Điều này có thể thay đổi trong tương lai.
 
 .. c:macro:: PYTHON_ABI_VERSION
 
-   Defined as ``3`` for backwards compatibility.
+   Được định nghĩa là ``3`` để đảm bảo khả năng tương thích ngược.
 
-   Currently, this constant is not updated in new Python versions, and is not
-   useful for versioning. This may change in the future.
+   Hiện tại, hằng số này không được cập nhật trong các phiên bản Python mới và không hữu ích cho việc quản lý phiên bản. Điều này có thể thay đổi trong tương lai.
 
 
-Support functions
------------------
+Các hàm hỗ trợ
+--------------
 
-The following functions are provided to help initialize a module
-state.
-They are intended for a module's execution slots (:c:data:`Py_mod_exec`),
-the initialization function for legacy :ref:`single-phase initialization <single-phase-initialization>`,
-or code that creates modules dynamically.
+Các hàm sau đây được cung cấp để giúp khởi tạo trạng thái module. Chúng предназначены cho các execution slot của module (:c:data:`Py_mod_exec`), hàm khởi tạo cho :ref:`single-phase initialization <single-phase-initialization>` cũ hoặc mã tạo module một cách động.
 
 .. c:function:: int PyModule_AddObjectRef(PyObject *module, const char *name, PyObject *value)
 
-   Add an object to *module* as *name*.  This is a convenience function which
-   can be used from the module's initialization function.
+   Thêm một đối tượng vào *module* với tên *name*. Đây là một hàm tiện ích có thể được sử dụng từ hàm khởi tạo của module.
 
-   On success, return ``0``. On error, raise an exception and return ``-1``.
+   Khi thành công, trả về ``0``. Khi có lỗi, phát sinh một ngoại lệ và trả về ``-1``.
 
-   Example usage::
+   Ví dụ sử dụng::
 
        static int
        add_spam(PyObject *module, int value)
@@ -527,12 +408,9 @@ or code that creates modules dynamically.
            return res;
         }
 
-   To be convenient, the function accepts ``NULL`` *value* with an exception
-   set. In this case, return ``-1`` and just leave the raised exception
-   unchanged.
+   Để thuận tiện, hàm chấp nhận ``NULL`` *value* cùng với một exception set. Trong trường hợp này, hãy trả về ``-1`` và chỉ giữ nguyên exception đã được raise.
 
-   The example can also be written without checking explicitly if *obj* is
-   ``NULL``::
+   Ví dụ này cũng có thể được viết mà không cần kiểm tra một cách tường minh xem *obj* có phải là ``NULL`` hay không.::
 
        static int
        add_spam(PyObject *module, int value)
@@ -543,28 +421,19 @@ or code that creates modules dynamically.
            return res;
         }
 
-   Note that ``Py_XDECREF()`` should be used instead of ``Py_DECREF()`` in
-   this case, since *obj* can be ``NULL``.
+   Lưu ý rằng nên sử dụng ``Py_XDECREF()`` thay vì ``Py_DECREF()`` trong trường hợp này, vì *obj* có thể là ``NULL``.
 
-   The number of different *name* strings passed to this function
-   should be kept small, usually by only using statically allocated strings
-   as *name*.
-   For names that aren't known at compile time, prefer calling
-   :c:func:`PyUnicode_FromString` and :c:func:`PyObject_SetAttr` directly.
-   For more details, see :c:func:`PyUnicode_InternFromString`, which may be
-   used internally to create a key object.
+   Nên giữ số lượng các chuỗi *name* khác nhau được truyền cho hàm này ở mức nhỏ, thường bằng cách chỉ sử dụng các chuỗi được cấp phát tĩnh làm *name*. Đối với những tên không được biết tại thời điểm biên dịch, nên gọi
+   :c:func:`PyUnicode_FromString` và :c:func:`PyObject_SetAttr` trực tiếp. Để biết thêm chi tiết, hãy xem :c:func:`PyUnicode_InternFromString`, có thể được sử dụng nội bộ để tạo một key object.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: int PyModule_Add(PyObject *module, const char *name, PyObject *value)
 
-   Similar to :c:func:`PyModule_AddObjectRef`, but ":term:`steals <steal>`"
-   a reference to *value* (even on error).
-   It can be called with a result of function that returns a new reference
-   without bothering to check its result or even saving it to a variable.
+   Tương tự như :c:func:`PyModule_AddObjectRef`, nhưng ":term:`steals <steal>`" một reference đến *value* (kể cả khi xảy ra lỗi). Có thể gọi hàm này với kết quả của một hàm trả về một new reference mà không cần kiểm tra kết quả hoặc thậm chí lưu kết quả đó vào một biến.
 
-   Example usage::
+   Ví dụ sử dụng::
 
         if (PyModule_Add(module, "spam", PyBytes_FromString(value)) < 0) {
             goto error;
@@ -575,23 +444,19 @@ or code that creates modules dynamically.
 
 .. c:function:: int PyModule_AddObject(PyObject *module, const char *name, PyObject *value)
 
-   Similar to :c:func:`PyModule_AddObjectRef`, but :term:`steals <steal>`
-   a reference to *value* on success (if it returns ``0``).
+   Tương tự như :c:func:`PyModule_AddObjectRef`, nhưng :term:`chiếm <steal>` một tham chiếu đến *giá trị* khi thành công (nếu nó trả về ``0``).
 
-   The new :c:func:`PyModule_Add` or :c:func:`PyModule_AddObjectRef`
-   functions are recommended, since it is
-   easy to introduce reference leaks by misusing the
-   :c:func:`PyModule_AddObject` function.
+   Các hàm mới :c:func:`PyModule_Add` hoặc :c:func:`PyModule_AddObjectRef` được khuyến nghị, vì rất dễ gây rò rỉ tham chiếu do sử dụng sai
+   hàm :c:func:`PyModule_AddObject`.
 
    .. note::
 
-      Unlike other functions that steal references, ``PyModule_AddObject()``
-      only releases the reference to *value* **on success**.
+      Không giống các hàm khác chiếm tham chiếu, ``PyModule_AddObject()`` chỉ giải phóng tham chiếu đến *giá trị* **khi thành công**.
 
-      This means that its return value must be checked, and calling code must
-      :c:func:`Py_XDECREF` *value* manually on error.
+      Điều này có nghĩa là phải kiểm tra giá trị trả về của nó, và mã gọi phải
+      :c:func:`Py_XDECREF` *value* theo cách thủ công khi có lỗi.
 
-   Example usage::
+   Ví dụ sử dụng::
 
         PyObject *obj = PyBytes_FromString(value);
         if (PyModule_AddObject(module, "spam", obj) < 0) {
@@ -609,143 +474,96 @@ or code that creates modules dynamically.
 
 .. c:function:: int PyModule_AddIntConstant(PyObject *module, const char *name, long value)
 
-   Add an integer constant to *module* as *name*.  This convenience function can be
-   used from the module's initialization function.
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Thêm một hằng số nguyên vào *module* với tên *name*. Hàm tiện ích này có thể được sử dụng từ hàm khởi tạo của module. Trả về ``-1`` khi có ngoại lệ được thiết lập do lỗi, và ``0`` khi thành công.
 
-   This is a convenience function that calls :c:func:`PyLong_FromLong` and
-   :c:func:`PyModule_AddObjectRef`; see their documentation for details.
+   Đây là một hàm tiện ích gọi :c:func:`PyLong_FromLong` và
+   :c:func:`PyModule_AddObjectRef`; xem tài liệu của chúng để biết chi tiết.
 
 
 .. c:function:: int PyModule_AddStringConstant(PyObject *module, const char *name, const char *value)
 
-   Add a string constant to *module* as *name*.  This convenience function can be
-   used from the module's initialization function.  The string *value* must be
-   ``NULL``-terminated.
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Thêm một hằng số chuỗi vào *module* với tên *name*. Hàm tiện ích này có thể được sử dụng từ hàm khởi tạo của module. Chuỗi *value* phải được kết thúc bằng ``NULL``. Trả về ``-1`` khi có ngoại lệ được thiết lập do lỗi, và ``0`` khi thành công.
 
-   This is a convenience function that calls
-   :c:func:`PyUnicode_InternFromString` and :c:func:`PyModule_AddObjectRef`;
-   see their documentation for details.
+   Đây là một hàm tiện ích gọi
+   :c:func:`PyUnicode_InternFromString` và :c:func:`PyModule_AddObjectRef`; xem tài liệu của chúng để biết chi tiết.
 
 
 .. c:macro:: PyModule_AddIntMacro(module, macro)
 
-   Add an int constant to *module*. The name and the value are taken from
-   *macro*. For example ``PyModule_AddIntMacro(module, AF_INET)`` adds the int
-   constant *AF_INET* with the value of *AF_INET* to *module*.
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Thêm một hằng số int vào *module*. Tên và giá trị được lấy từ *macro*. Ví dụ, ``PyModule_AddIntMacro(module, AF_INET)`` thêm hằng số int *AF_INET* với giá trị *AF_INET* vào *module*. Trả về ``-1`` khi có ngoại lệ được thiết lập do lỗi, và ``0`` khi thành công.
 
 
 .. c:macro:: PyModule_AddStringMacro(module, macro)
 
-   Add a string constant to *module*.
+   Thêm một hằng số chuỗi vào *mô-đun*.
 
 .. c:function:: int PyModule_AddType(PyObject *module, PyTypeObject *type)
 
-   Add a type object to *module*.
-   The type object is finalized by calling internally :c:func:`PyType_Ready`.
-   The name of the type object is taken from the last component of
-   :c:member:`~PyTypeObject.tp_name` after dot.
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Thêm một đối tượng kiểu vào *mô-đun*. Đối tượng kiểu được hoàn tất bằng cách gọi nội bộ :c:func:`PyType_Ready`. Tên của đối tượng kiểu được lấy từ thành phần cuối cùng của
+   :c:member:`~PyTypeObject.tp_name` sau dấu chấm. Trả về ``-1`` với một exception được thiết lập khi xảy ra lỗi, và ``0`` khi thành công.
 
    .. versionadded:: 3.9
 
 .. c:function:: int PyModule_AddFunctions(PyObject *module, PyMethodDef *functions)
 
-   Add the functions from the ``NULL`` terminated *functions* array to *module*.
-   Refer to the :c:type:`PyMethodDef` documentation for details on individual
-   entries (due to the lack of a shared module namespace, module level
-   "functions" implemented in C typically receive the module as their first
-   parameter, making them similar to instance methods on Python classes).
+   Thêm các hàm từ mảng ``NULL`` được kết thúc bằng *hàm* vào *mô-đun*. Hãy tham khảo tài liệu :c:type:`PyMethodDef` để biết chi tiết về từng mục (do không có namespace mô-đun dùng chung, các "hàm" cấp mô-đun được triển khai bằng C thường nhận mô-đun làm tham số đầu tiên, khiến chúng tương tự các phương thức instance trên các lớp Python).
 
-   This function is called automatically when creating a module from
-   ``PyModuleDef`` (such as when using :ref:`multi-phase-initialization`,
-   ``PyModule_Create``, or ``PyModule_FromDefAndSpec``).
-   Some module authors may prefer defining functions in multiple
-   :c:type:`PyMethodDef` arrays; in that case they should call this function
-   directly.
+   Hàm này được tự động gọi khi tạo một mô-đun từ ``PyModuleDef`` (chẳng hạn khi sử dụng :ref:`multi-phase-initialization`, ``PyModule_Create`` hoặc ``PyModule_FromDefAndSpec``). Một số tác giả mô-đun có thể muốn định nghĩa các hàm trong nhiều
+   mảng :c:type:`PyMethodDef`; trong trường hợp đó, họ nên gọi trực tiếp hàm này.
 
-   The *functions* array must be statically allocated (or otherwise guaranteed
-   to outlive the module object).
+   Mảng *hàm* phải được cấp phát tĩnh (hoặc được đảm bảo bằng cách khác là tồn tại lâu hơn đối tượng mô-đun).
 
    .. versionadded:: 3.5
 
 .. c:function:: int PyModule_SetDocString(PyObject *module, const char *docstring)
 
-   Set the docstring for *module* to *docstring*.
-   This function is called automatically when creating a module from
-   ``PyModuleDef`` (such as when using :ref:`multi-phase-initialization`,
-   ``PyModule_Create``, or ``PyModule_FromDefAndSpec``).
+   Đặt docstring cho *mô-đun* thành *docstring*. Hàm này được tự động gọi khi tạo một mô-đun từ ``PyModuleDef`` (chẳng hạn như khi sử dụng :ref:`multi-phase-initialization`, ``PyModule_Create`` hoặc ``PyModule_FromDefAndSpec``).
 
-   Return ``0`` on success.
-   Return ``-1`` with an exception set on error.
+   Trả về ``0`` khi thành công. Trả về ``-1`` với một ngoại lệ được thiết lập khi xảy ra lỗi.
 
    .. versionadded:: 3.5
 
 .. c:function:: int PyUnstable_Module_SetGIL(PyObject *module, void *gil)
 
-   Indicate that *module* does or does not support running without the global
-   interpreter lock (GIL), using one of the values from
-   :c:macro:`Py_mod_gil`. It must be called during *module*'s initialization
-   function when using :ref:`single-phase-initialization`.
-   If this function is not called during module initialization, the
-   import machinery assumes the module does not support running without the
-   GIL. This function is only available in Python builds configured with
-   :option:`--disable-gil`.
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Cho biết *mô-đun* có hoặc không hỗ trợ chạy mà không cần khóa trình thông dịch toàn cục (GIL), bằng một trong các giá trị từ
+   :c:macro:`Py_mod_gil`. Phải gọi hàm này trong hàm khởi tạo của *mô-đun* khi sử dụng :ref:`single-phase-initialization`. Nếu không gọi hàm này trong quá trình khởi tạo mô-đun, cơ chế nhập mô-đun sẽ giả định rằng mô-đun không hỗ trợ chạy mà không cần GIL. Hàm này chỉ khả dụng trong các bản dựng Python được cấu hình với
+   :option:`--disable-gil`. Trả về ``-1`` với một ngoại lệ được thiết lập khi xảy ra lỗi, ``0`` khi thành công.
 
    .. versionadded:: 3.13
 
 
-Module lookup (single-phase initialization)
-...........................................
+Tra cứu mô-đun (khởi tạo một giai đoạn)
+.......................................
 
-The legacy :ref:`single-phase initialization <single-phase-initialization>`
-initialization scheme creates singleton modules that can be looked up
-in the context of the current interpreter. This allows the module object to be
-retrieved later with only a reference to the module definition.
+Sơ đồ khởi tạo :ref:`khởi tạo một giai đoạn <single-phase-initialization>` kế thừa tạo ra các mô-đun singleton có thể được tra cứu trong ngữ cảnh của trình thông dịch hiện tại. Điều này cho phép truy xuất đối tượng mô-đun về sau chỉ bằng một tham chiếu đến định nghĩa mô-đun.
 
-These functions will not work on modules created using multi-phase initialization,
-since multiple such modules can be created from a single definition.
+Các hàm này sẽ không hoạt động trên những module được tạo bằng cơ chế khởi tạo nhiều pha, vì có thể tạo nhiều module như vậy từ cùng một định nghĩa.
 
 .. c:function:: PyObject* PyState_FindModule(PyModuleDef *def)
 
-   Returns the module object that was created from *def* for the current interpreter.
-   This method requires that the module object has been attached to the interpreter state with
-   :c:func:`PyState_AddModule` beforehand. In case the corresponding module object is not
-   found or has not been attached to the interpreter state yet, it returns ``NULL``.
+   Trả về đối tượng module được tạo từ *def* cho trình thông dịch hiện tại. Phương thức này yêu cầu đối tượng module đã được gắn vào trạng thái của trình thông dịch bằng
+   :c:func:`PyState_AddModule` trước đó. Nếu không tìm thấy đối tượng module tương ứng hoặc đối tượng này chưa được gắn vào trạng thái của trình thông dịch, hàm sẽ trả về ``NULL``.
 
 .. c:function:: int PyState_AddModule(PyObject *module, PyModuleDef *def)
 
-   Attaches the module object passed to the function to the interpreter state. This allows
-   the module object to be accessible via :c:func:`PyState_FindModule`.
+   Gắn đối tượng module được truyền vào hàm vào trạng thái của trình thông dịch. Điều này cho phép truy cập đối tượng module thông qua :c:func:`PyState_FindModule`.
 
-   Only effective on modules created using single-phase initialization.
+   Chỉ có hiệu lực trên các module được tạo bằng cơ chế khởi tạo một pha.
 
-   Python calls ``PyState_AddModule`` automatically after importing a module
-   that uses :ref:`single-phase initialization <single-phase-initialization>`,
-   so it is unnecessary (but harmless) to call it from module initialization
-   code. An explicit call is needed only if the module's own init code
-   subsequently calls ``PyState_FindModule``.
-   The function is mainly intended for implementing alternative import
-   mechanisms (either by calling it directly, or by referring to its
-   implementation for details of the required state updates).
+   Python tự động gọi ``PyState_AddModule`` sau khi import một module sử dụng cơ chế :ref:`khởi tạo một pha <single-phase-initialization>`, vì vậy không cần (nhưng cũng không gây hại) gọi hàm này từ mã khởi tạo module. Chỉ cần gọi tường minh nếu mã khởi tạo của chính module đó tiếp tục gọi ``PyState_FindModule``. Hàm này chủ yếu được dùng để triển khai các cơ chế import thay thế (bằng cách gọi trực tiếp hàm này hoặc tham khảo phần triển khai của nó để biết chi tiết về các cập nhật trạng thái cần thiết).
 
-   If a module was attached previously using the same *def*, it is replaced
-   by the new *module*.
+   Nếu một module trước đó đã được gắn bằng cùng *def*, module đó sẽ được thay thế bằng *module* mới.
 
-   The caller must have an :term:`attached thread state`.
+   Caller phải có một :term:`attached thread state`.
 
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Trả về ``-1`` với một exception được thiết lập khi xảy ra lỗi, và ``0`` khi thành công.
 
    .. versionadded:: 3.3
 
 .. c:function:: int PyState_RemoveModule(PyModuleDef *def)
 
-   Removes the module object created from *def* from the interpreter state.
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Xóa đối tượng module được tạo từ *def* khỏi trạng thái của interpreter. Trả về ``-1`` với một exception được thiết lập khi xảy ra lỗi, và ``0`` khi thành công.
 
-   The caller must have an :term:`attached thread state`.
+   Caller phải có một :term:`attached thread state`.
 
    .. versionadded:: 3.3

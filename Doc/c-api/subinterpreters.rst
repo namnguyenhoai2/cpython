@@ -2,112 +2,80 @@
 
 .. _sub-interpreter-support:
 
-Multiple interpreters in a Python process
-=========================================
+Nhiều trình thông dịch trong một tiến trình Python
+==================================================
 
-While in most uses, you will only embed a single Python interpreter, there
-are cases where you need to create several independent interpreters in the
-same process and perhaps even in the same thread. Sub-interpreters allow
-you to do that.
+Mặc dù trong hầu hết trường hợp sử dụng, bạn chỉ nhúng một trình thông dịch Python, vẫn có những trường hợp bạn cần tạo nhiều trình thông dịch độc lập trong cùng một tiến trình và thậm chí có thể trong cùng một thread. Các trình thông dịch con cho phép bạn thực hiện điều đó.
 
-The "main" interpreter is the first one created when the runtime initializes.
-It is usually the only Python interpreter in a process.  Unlike sub-interpreters,
-the main interpreter has unique process-global responsibilities like signal
-handling.  It is also responsible for execution during runtime initialization and
-is usually the active interpreter during runtime finalization.  The
-:c:func:`PyInterpreterState_Main` function returns a pointer to its state.
+Trình thông dịch "chính" là trình thông dịch đầu tiên được tạo khi runtime khởi tạo. Thông thường, đây là trình thông dịch Python duy nhất trong một tiến trình. Không giống các trình thông dịch con, trình thông dịch chính có những trách nhiệm duy nhất ở cấp độ toàn tiến trình, chẳng hạn như xử lý tín hiệu. Trình thông dịch này cũng chịu trách nhiệm thực thi trong quá trình khởi tạo runtime và thường là trình thông dịch đang hoạt động trong quá trình hoàn tất runtime.
+Hàm :c:func:`PyInterpreterState_Main` trả về một con trỏ đến trạng thái của nó.
 
-You can switch between sub-interpreters using the :c:func:`PyThreadState_Swap`
-function. You can create and destroy them using the following functions:
+Bạn có thể chuyển đổi giữa các trình thông dịch con bằng hàm :c:func:`PyThreadState_Swap`. Bạn có thể tạo và hủy chúng bằng các hàm sau:
 
 
 .. c:type:: PyInterpreterConfig
 
-   Structure containing most parameters to configure a sub-interpreter.
-   Its values are used only in :c:func:`Py_NewInterpreterFromConfig` and
-   never modified by the runtime.
+   Cấu trúc chứa hầu hết các tham số để cấu hình một trình thông dịch con. Các giá trị của cấu trúc chỉ được sử dụng trong :c:func:`Py_NewInterpreterFromConfig` và không bao giờ bị runtime sửa đổi.
 
    .. versionadded:: 3.12
 
-   Structure fields:
+   Các trường của cấu trúc:
 
    .. c:member:: int use_main_obmalloc
 
-      If this is ``0`` then the sub-interpreter will use its own
-      "object" allocator state.
-      Otherwise it will use (share) the main interpreter's.
+      Nếu giá trị này là ``0`` thì sub-interpreter sẽ sử dụng trạng thái bộ cấp phát "object" riêng của nó. Nếu không, nó sẽ sử dụng (chia sẻ) trạng thái của interpreter chính.
 
-      If this is ``0`` then
-      :c:member:`~PyInterpreterConfig.check_multi_interp_extensions`
-      must be ``1`` (non-zero).
-      If this is ``1`` then :c:member:`~PyInterpreterConfig.gil`
-      must not be :c:macro:`PyInterpreterConfig_OWN_GIL`.
+      Nếu giá trị này là ``0`` thì
+      :c:member:`~PyInterpreterConfig.check_multi_interp_extensions` phải là ``1`` (khác không). Nếu giá trị này là ``1`` thì :c:member:`~PyInterpreterConfig.gil` không được là :c:macro:`PyInterpreterConfig_OWN_GIL`.
 
    .. c:member:: int allow_fork
 
-      If this is ``0`` then the runtime will not support forking the
-      process in any thread where the sub-interpreter is currently active.
-      Otherwise fork is unrestricted.
+      Nếu giá trị này là ``0`` thì runtime sẽ không hỗ trợ fork process trong bất kỳ thread nào mà sub-interpreter hiện đang hoạt động. Nếu không, fork không bị hạn chế.
 
-      Note that the :mod:`subprocess` module still works
-      when fork is disallowed.
+      Lưu ý rằng module :mod:`subprocess` vẫn hoạt động khi fork bị vô hiệu hóa.
 
    .. c:member:: int allow_exec
 
-      If this is ``0`` then the runtime will not support replacing the
-      current process via exec (e.g. :func:`os.execv`) in any thread
-      where the sub-interpreter is currently active.
-      Otherwise exec is unrestricted.
+      Nếu giá trị này là ``0`` thì runtime sẽ không hỗ trợ thay thế process hiện tại bằng exec (ví dụ: :func:`os.execv`) trong bất kỳ thread nào mà sub-interpreter hiện đang hoạt động. Nếu không, exec không bị hạn chế.
 
-      Note that the :mod:`subprocess` module still works
-      when exec is disallowed.
+      Lưu ý rằng module :mod:`subprocess` vẫn hoạt động khi exec bị vô hiệu hóa.
 
    .. c:member:: int allow_threads
 
-      If this is ``0`` then the sub-interpreter's :mod:`threading` module
-      won't create threads.
-      Otherwise threads are allowed.
+      Nếu giá trị này là ``0`` thì mô-đun :mod:`threading` của trình thông dịch con sẽ không tạo thread. Nếu không, thread được phép tạo.
 
    .. c:member:: int allow_daemon_threads
 
-      If this is ``0`` then the sub-interpreter's :mod:`threading` module
-      won't create daemon threads.
-      Otherwise daemon threads are allowed (as long as
-      :c:member:`~PyInterpreterConfig.allow_threads` is non-zero).
+      Nếu giá trị này là ``0`` thì mô-đun :mod:`threading` của trình thông dịch con sẽ không tạo daemon thread. Nếu không, daemon thread được phép tạo (miễn là
+      :c:member:`~PyInterpreterConfig.allow_threads` khác không).
 
    .. c:member:: int check_multi_interp_extensions
 
-      If this is ``0`` then all extension modules may be imported,
-      including legacy (single-phase init) modules,
-      in any thread where the sub-interpreter is currently active.
-      Otherwise only multi-phase init extension modules
-      (see :pep:`489`) may be imported.
-      (Also see :c:macro:`Py_mod_multiple_interpreters`.)
+      Nếu giá trị này là ``0`` thì mọi mô-đun mở rộng đều có thể được import, bao gồm các mô-đun legacy (khởi tạo single-phase), trong bất kỳ thread nào mà trình thông dịch con hiện đang hoạt động. Nếu không, chỉ các mô-đun mở rộng khởi tạo multi-phase (xem :pep:`489`) mới có thể được import. (Cũng xem :c:macro:`Py_mod_multiple_interpreters`.)
 
-      This must be ``1`` (non-zero) if
-      :c:member:`~PyInterpreterConfig.use_main_obmalloc` is ``0``.
+      Giá trị này phải là ``1`` (khác không) nếu
+      :c:member:`~PyInterpreterConfig.use_main_obmalloc` là ``0``.
 
    .. c:member:: int gil
 
-      This determines the operation of the GIL for the sub-interpreter.
-      It may be one of the following:
+      Điều này xác định cách GIL hoạt động đối với trình thông dịch con. Giá trị có thể là một trong các giá trị sau:
 
       .. c:namespace:: NULL
 
       .. c:macro:: PyInterpreterConfig_DEFAULT_GIL
 
-         Use the default selection (:c:macro:`PyInterpreterConfig_SHARED_GIL`).
+         Sử dụng lựa chọn mặc định (:c:macro:`PyInterpreterConfig_SHARED_GIL`).
 
       .. c:macro:: PyInterpreterConfig_SHARED_GIL
 
-         Use (share) the main interpreter's GIL.
+         Sử dụng GIL của interpreter chính (share).
 
       .. c:macro:: PyInterpreterConfig_OWN_GIL
 
-         Use the sub-interpreter's own GIL.
+         Sử dụng GIL riêng của sub-interpreter.
 
-      If this is :c:macro:`PyInterpreterConfig_OWN_GIL` then
-      :c:member:`PyInterpreterConfig.use_main_obmalloc` must be ``0``.
+      Nếu đây là :c:macro:`PyInterpreterConfig_OWN_GIL` thì
+      :c:member:`PyInterpreterConfig.use_main_obmalloc` phải là ``0``.
 
 
 .. c:function:: PyStatus Py_NewInterpreterFromConfig(PyThreadState **tstate_p, const PyInterpreterConfig *config)
@@ -120,41 +88,20 @@ function. You can create and destroy them using the following functions:
       single: stderr (in module sys)
       single: stdin (in module sys)
 
-   Create a new sub-interpreter.  This is an (almost) totally separate environment
-   for the execution of Python code.  In particular, the new interpreter has
-   separate, independent versions of all imported modules, including the
-   fundamental modules :mod:`builtins`, :mod:`__main__` and :mod:`sys`.  The
-   table of loaded modules (``sys.modules``) and the module search path
-   (``sys.path``) are also separate.  The new environment has no ``sys.argv``
-   variable.  It has new standard I/O stream file objects ``sys.stdin``,
-   ``sys.stdout`` and ``sys.stderr`` (however these refer to the same underlying
-   file descriptors).
+   Tạo một sub-interpreter mới. Đây là một môi trường (gần như) hoàn toàn tách biệt để thực thi mã Python. Cụ thể, interpreter mới có các phiên bản riêng biệt và độc lập của tất cả module đã import, bao gồm các module cơ bản :mod:`builtins`, :mod:`__main__` và :mod:`sys`. Bảng các module đã tải (``sys.modules``) và đường dẫn tìm kiếm module (``sys.path``) cũng riêng biệt. Môi trường mới không có biến ``sys.argv``. Nó có các đối tượng tệp luồng I/O chuẩn mới ``sys.stdin``, ``sys.stdout`` và ``sys.stderr`` (tuy nhiên, các đối tượng này trỏ đến cùng các file descriptor bên dưới).
 
-   The given *config* controls the options with which the interpreter
-   is initialized.
+   *config* được cung cấp sẽ kiểm soát các tùy chọn dùng để khởi tạo interpreter.
 
-   Upon success, *tstate_p* will be set to the first :term:`thread state`
-   created in the new sub-interpreter.  This thread state is
-   :term:`attached <attached thread state>`.
-   Note that no actual thread is created; see the discussion of thread states
-   below.  If creation of the new interpreter is unsuccessful,
-   *tstate_p* is set to ``NULL``;
-   no exception is set since the exception state is stored in the
-   :term:`attached thread state`, which might not exist.
+   Nếu thành công, *tstate_p* sẽ được đặt thành :term:`thread state` đầu tiên được tạo trong sub-interpreter mới. Trạng thái thread này là
+   :term:`attached <attached thread state>`. Lưu ý rằng không có thread thực tế nào được tạo; xem phần thảo luận về các trạng thái thread bên dưới. Nếu không thể tạo interpreter mới, *tstate_p* được đặt thành ``NULL``; không có exception nào được thiết lập vì trạng thái exception được lưu trong
+   :term:`attached thread state`, vốn có thể không tồn tại.
 
-   Like all other Python/C API functions, an :term:`attached thread state`
-   must be present before calling this function, but it might be detached upon
-   returning. On success, the returned thread state will be :term:`attached <attached thread state>`.
-   If the sub-interpreter is created with its own :term:`GIL` then the
-   :term:`attached thread state` of the calling interpreter will be detached.
-   When the function returns, the new interpreter's :term:`thread state`
-   will be :term:`attached <attached thread state>` to the current thread and
-   the previous interpreter's :term:`attached thread state` will remain detached.
+   Giống như mọi hàm Python/C API khác, phải có một :term:`attached thread state` trước khi gọi hàm này, nhưng nó có thể bị tách (detached) khi hàm trả về. Khi thành công, thread state được trả về sẽ ở trạng thái :term:`attached <attached thread state>`. Nếu sub-interpreter được tạo với :term:`GIL` riêng thì
+   :term:`attached thread state` của interpreter đang gọi sẽ bị tách (detached). Khi hàm trả về, :term:`thread state` của interpreter mới sẽ được :term:`attached <attached thread state>` vào thread hiện tại, còn :term:`attached thread state` của interpreter trước đó vẫn sẽ bị tách.
 
    .. versionadded:: 3.12
 
-   Sub-interpreters are most effective when isolated from each other,
-   with certain functionality restricted::
+   Sub-interpreter hoạt động hiệu quả nhất khi được cô lập với nhau, với một số chức năng bị hạn chế::
 
       PyInterpreterConfig config = {
           .use_main_obmalloc = 0,
@@ -171,41 +118,21 @@ function. You can create and destroy them using the following functions:
           Py_ExitStatusException(status);
       }
 
-   Note that the config is used only briefly and does not get modified.
-   During initialization the config's values are converted into various
-   :c:type:`PyInterpreterState` values.  A read-only copy of the config
-   may be stored internally on the :c:type:`PyInterpreterState`.
+   Lưu ý rằng config chỉ được sử dụng trong thời gian ngắn và không bị sửa đổi. Trong quá trình khởi tạo, các giá trị của config được chuyển đổi thành nhiều
+   Các giá trị :c:type:`PyInterpreterState`. Một bản sao chỉ đọc của config có thể được lưu trữ nội bộ trên :c:type:`PyInterpreterState`.
 
    .. index::
       single: Py_FinalizeEx (C function)
       single: Py_Initialize (C function)
 
-   Extension modules are shared between (sub-)interpreters as follows:
+   Các module mở rộng được dùng chung giữa các interpreter (và sub-interpreter) như sau:
 
-   *  For modules using multi-phase initialization,
-      e.g. :c:func:`PyModule_FromDefAndSpec`, a separate module object is
-      created and initialized for each interpreter.
-      Only C-level static and global variables are shared between these
-      module objects.
+   *  Đối với các module sử dụng khởi tạo nhiều giai đoạn, ví dụ :c:func:`PyModule_FromDefAndSpec`, một đối tượng module riêng biệt được tạo và khởi tạo cho mỗi interpreter. Chỉ các biến static và biến toàn cục ở cấp C được dùng chung giữa các đối tượng module này.
 
-   *  For modules using legacy
-      :ref:`single-phase initialization <single-phase-initialization>`,
-      e.g. :c:func:`PyModule_Create`, the first time a particular extension
-      is imported, it is initialized normally, and a (shallow) copy of its
-      module's dictionary is squirreled away.
-      When the same extension is imported by another (sub-)interpreter, a new
-      module is initialized and filled with the contents of this copy; the
-      extension's ``init`` function is not called.
-      Objects in the module's dictionary thus end up shared across
-      (sub-)interpreters, which might cause unwanted behavior (see
-      `Bugs and caveats`_ below).
+   *  Đối với các module sử dụng khởi tạo kiểu legacy
+      :ref:`khởi tạo một giai đoạn <single-phase-initialization>`, ví dụ :c:func:`PyModule_Create`, lần đầu một extension cụ thể được import, nó được khởi tạo bình thường và một bản sao (nông) của dictionary của module được lưu lại. Khi extension đó được import bởi một interpreter (hoặc sub-interpreter) khác, một module mới được khởi tạo và điền nội dung của bản sao này; hàm ``init`` của extension không được gọi. Do đó, các đối tượng trong dictionary của module cuối cùng được dùng chung giữa các interpreter (hoặc sub-interpreter), điều này có thể gây ra hành vi không mong muốn (xem `Lỗi và lưu ý <Bugs and caveats_>`_ bên dưới).
 
-      Note that this is different from what happens when an extension is
-      imported after the interpreter has been completely re-initialized by
-      calling :c:func:`Py_FinalizeEx` and :c:func:`Py_Initialize`; in that
-      case, the extension's ``initmodule`` function *is* called again.
-      As with multi-phase initialization, this means that only C-level static
-      and global variables are shared between these modules.
+      Lưu ý rằng điều này khác với những gì xảy ra khi một extension được import sau khi interpreter đã được khởi tạo lại hoàn toàn bằng cách gọi :c:func:`Py_FinalizeEx` và :c:func:`Py_Initialize`; trong trường hợp đó, hàm ``initmodule`` của extension *được* gọi lại. Tương tự như khởi tạo nhiều giai đoạn, điều này có nghĩa là chỉ các biến static và biến toàn cục ở cấp C được dùng chung giữa các module này.
 
    .. index:: single: close (in module os)
 
@@ -220,251 +147,178 @@ function. You can create and destroy them using the following functions:
       single: stderr (in module sys)
       single: stdin (in module sys)
 
-   Create a new sub-interpreter.  This is essentially just a wrapper
-   around :c:func:`Py_NewInterpreterFromConfig` with a config that
-   preserves the existing behavior.  The result is an unisolated
-   sub-interpreter that shares the main interpreter's GIL, allows
-   fork/exec, allows daemon threads, and allows single-phase init
-   modules.
+   Tạo một sub-interpreter mới. Về cơ bản, đây chỉ là một wrapper quanh :c:func:`Py_NewInterpreterFromConfig` với config giữ nguyên hành vi hiện có. Kết quả là một sub-interpreter không được cô lập, dùng chung GIL của main interpreter, cho phép fork/exec, cho phép daemon thread và cho phép các module khởi tạo một giai đoạn.
 
 
 .. c:function:: void Py_EndInterpreter(PyThreadState *tstate)
 
    .. index:: single: Py_FinalizeEx (C function)
 
-   Destroy the (sub-)interpreter represented by the given :term:`thread state`.
-   The given thread state must be :term:`attached <attached thread state>`.
-   When the call returns, there will be no :term:`attached thread state`.
-   All thread states associated with this interpreter are destroyed.
+   Hủy trình thông dịch (phụ) được biểu diễn bởi :term:`thread state` đã cho. Trạng thái luồng đã cho phải được :term:`gắn <attached thread state>`. Khi lệnh gọi trả về, sẽ không còn :term:`attached thread state`. Tất cả trạng thái luồng liên kết với trình thông dịch này đều bị hủy.
 
-   :c:func:`Py_FinalizeEx` will destroy all sub-interpreters that
-   haven't been explicitly destroyed at that point.
+   :c:func:`Py_FinalizeEx` sẽ hủy tất cả các trình thông dịch phụ chưa được hủy một cách rõ ràng tại thời điểm đó.
 
 
 .. _per-interpreter-gil:
 
-A per-interpreter GIL
----------------------
+GIL cho mỗi trình thông dịch
+----------------------------
 
 .. versionadded:: 3.12
 
-Using :c:func:`Py_NewInterpreterFromConfig` you can create
-a sub-interpreter that is completely isolated from other interpreters,
-including having its own GIL.  The most important benefit of this
-isolation is that such an interpreter can execute Python code without
-being blocked by other interpreters or blocking any others.  Thus a
-single Python process can truly take advantage of multiple CPU cores
-when running Python code.  The isolation also encourages a different
-approach to concurrency than that of just using threads.
-(See :pep:`554` and :pep:`684`.)
+Bằng cách sử dụng :c:func:`Py_NewInterpreterFromConfig`, bạn có thể tạo một trình thông dịch phụ hoàn toàn biệt lập với các trình thông dịch khác, bao gồm cả việc có GIL riêng. Lợi ích quan trọng nhất của sự cô lập này là trình thông dịch đó có thể thực thi mã Python mà không bị các trình thông dịch khác chặn, cũng như không chặn bất kỳ trình thông dịch nào khác. Nhờ vậy, một tiến trình Python duy nhất có thể thực sự tận dụng nhiều lõi CPU khi chạy mã Python. Sự cô lập này cũng khuyến khích một cách tiếp cận khác đối với concurrency thay vì chỉ sử dụng các thread. (Xem :pep:`554` và :pep:`684`.)
 
-Using an isolated interpreter requires vigilance in preserving that
-isolation.  That especially means not sharing any objects or mutable
-state without guarantees about thread-safety.  Even objects that are
-otherwise immutable (e.g. ``None``, ``(1, 5)``) can't normally be shared
-because of the refcount.  One simple but less-efficient approach around
-this is to use a global lock around all use of some state (or object).
-Alternately, effectively immutable objects (like integers or strings)
-can be made safe in spite of their refcounts by making them :term:`immortal`.
-In fact, this has been done for the builtin singletons, small integers,
-and a number of other builtin objects.
+Việc sử dụng một trình thông dịch biệt lập đòi hỏi phải hết sức cẩn trọng để duy trì sự cô lập đó. Điều này đặc biệt có nghĩa là không chia sẻ bất kỳ đối tượng hoặc trạng thái có thể thay đổi nào nếu không có bảo đảm về thread-safety. Ngay cả những đối tượng vốn bất biến (ví dụ: ``None``, ``(1, 5)``) thông thường cũng không thể được chia sẻ vì refcount. Một cách đơn giản nhưng kém hiệu quả hơn để xử lý việc này là dùng một global lock quanh mọi lần sử dụng một số trạng thái (hoặc đối tượng). Ngoài ra, các đối tượng về hiệu quả là bất biến (như số nguyên hoặc chuỗi) có thể được làm an toàn dù có refcount bằng cách làm cho chúng :term:`immortal`. Trên thực tế, điều này đã được thực hiện đối với các singleton dựng sẵn, các số nguyên nhỏ và một số đối tượng dựng sẵn khác.
 
-If you preserve isolation then you will have access to proper multi-core
-computing without the complications that come with free-threading.
-Failure to preserve isolation will expose you to the full consequences
-of free-threading, including races and hard-to-debug crashes.
+Nếu duy trì sự cô lập, bạn sẽ có quyền truy cập vào khả năng tính toán đa lõi thực sự mà không phải đối mặt với những phức tạp đi kèm với free-threading. Việc không duy trì sự cô lập sẽ khiến bạn phải chịu toàn bộ hệ quả của free-threading, bao gồm race condition và các lỗi crash khó gỡ lỗi.
 
-Aside from that, one of the main challenges of using multiple isolated
-interpreters is how to communicate between them safely (not break
-isolation) and efficiently.  The runtime and stdlib do not provide
-any standard approach to this yet.  A future stdlib module would help
-mitigate the effort of preserving isolation and expose effective tools
-for communicating (and sharing) data between interpreters.
+Ngoài ra, một trong những thách thức chính khi sử dụng nhiều trình thông dịch biệt lập là làm thế nào để giao tiếp giữa chúng một cách an toàn (không phá vỡ sự cô lập) và hiệu quả. Runtime và stdlib hiện vẫn chưa cung cấp cách tiếp cận tiêu chuẩn nào cho việc này. Một module stdlib trong tương lai sẽ giúp giảm bớt nỗ lực duy trì sự cô lập và cung cấp các công cụ hiệu quả để giao tiếp (và chia sẻ) dữ liệu giữa các trình thông dịch.
 
 
-Bugs and caveats
-----------------
+.. _`Bugs and caveats`:
 
-Because sub-interpreters (and the main interpreter) are part of the same
-process, the insulation between them isn't perfect --- for example, using
-low-level file operations like :func:`os.close` they can
-(accidentally or maliciously) affect each other's open files.  Because of the
-way extensions are shared between (sub-)interpreters, some extensions may not
-work properly; this is especially likely when using single-phase initialization
-or (static) global variables.
-It is possible to insert objects created in one sub-interpreter into
-a namespace of another (sub-)interpreter; this should be avoided if possible.
+Lỗi và lưu ý
+------------
 
-Special care should be taken to avoid sharing user-defined functions,
-methods, instances or classes between sub-interpreters, since import
-operations executed by such objects may affect the wrong (sub-)interpreter's
-dictionary of loaded modules. It is equally important to avoid sharing
-objects from which the above are reachable.
+Vì các sub-interpreter (và interpreter chính) là một phần của cùng một process, mức độ cách ly giữa chúng không hoàn hảo --- chẳng hạn, khi sử dụng các thao tác tệp cấp thấp như :func:`os.close`, chúng có thể (vô tình hoặc có ác ý) ảnh hưởng đến các tệp đang mở của nhau. Do cách các extension được dùng chung giữa các (sub-)interpreter, một số extension có thể không hoạt động đúng; điều này đặc biệt dễ xảy ra khi sử dụng khởi tạo một pha hoặc các biến toàn cục (static). Có thể chèn các đối tượng được tạo trong một sub-interpreter vào namespace của một (sub-)interpreter khác; nếu có thể, nên tránh việc này.
 
-Also note that combining this functionality with ``PyGILState_*`` APIs
-is delicate, because these APIs assume a bijection between Python thread states
-and OS-level threads, an assumption broken by the presence of sub-interpreters.
-It is highly recommended that you don't switch sub-interpreters between a pair
-of matching :c:func:`PyGILState_Ensure` and :c:func:`PyGILState_Release` calls.
-Furthermore, extensions (such as :mod:`ctypes`) using these APIs to allow calling
-of Python code from non-Python created threads will probably be broken when using
-sub-interpreters.
+Cần đặc biệt cẩn thận để tránh chia sẻ các hàm, phương thức, instance hoặc class do người dùng định nghĩa giữa các sub-interpreter, vì các thao tác import do những đối tượng này thực hiện có thể ảnh hưởng đến dictionary chứa các module đã tải của (sub-)interpreter không đúng. Việc tránh chia sẻ các đối tượng mà từ đó có thể truy cập đến những đối tượng nêu trên cũng quan trọng không kém.
+
+Ngoài ra, hãy lưu ý rằng việc kết hợp chức năng này với các API ``PyGILState_*`` rất dễ phát sinh vấn đề, vì các API này giả định có ánh xạ song ánh giữa trạng thái thread của Python và các thread ở cấp hệ điều hành, trong khi sự hiện diện của các sub-interpreter phá vỡ giả định đó. Bạn nên tuyệt đối tránh chuyển đổi sub-interpreter giữa một cặp lệnh gọi :c:func:`PyGILState_Ensure` và :c:func:`PyGILState_Release` tương ứng. Hơn nữa, các extension (chẳng hạn như :mod:`ctypes`) sử dụng những API này để cho phép gọi mã Python từ các thread không được Python tạo ra có thể sẽ bị hỏng khi sử dụng sub-interpreter.
 
 
-High-level APIs
----------------
+API cấp cao
+-----------
 
 .. c:type:: PyInterpreterState
 
-   This data structure represents the state shared by a number of cooperating
-   threads.  Threads belonging to the same interpreter share their module
-   administration and a few other internal items. There are no public members in
-   this structure.
+   Cấu trúc dữ liệu này biểu diễn trạng thái được chia sẻ bởi một số thread phối hợp với nhau. Các thread thuộc cùng một interpreter chia sẻ hoạt động quản lý module và một vài mục nội bộ khác. Cấu trúc này không có member công khai nào.
 
-   Threads belonging to different interpreters initially share nothing, except
-   process state like available memory, open file descriptors and such.  The global
-   interpreter lock is also shared by all threads, regardless of to which
-   interpreter they belong.
+   Các thread thuộc các interpreter khác nhau ban đầu không chia sẻ gì, ngoại trừ trạng thái của process như bộ nhớ khả dụng, các file descriptor đang mở và những thứ tương tự. Global interpreter lock cũng được tất cả các thread chia sẻ, bất kể chúng thuộc interpreter nào.
 
    .. versionchanged:: 3.12
 
-      :pep:`684` introduced the possibility
-      of a :ref:`per-interpreter GIL <per-interpreter-gil>`.
-      See :c:func:`Py_NewInterpreterFromConfig`.
+      :pep:`684` đã mở ra khả năng sử dụng :ref:`GIL theo từng interpreter <per-interpreter-gil>`. Xem :c:func:`Py_NewInterpreterFromConfig`.
 
 
 .. c:function:: PyInterpreterState* PyInterpreterState_Get(void)
 
-   Get the current interpreter.
+   Lấy interpreter hiện tại.
 
-   Issue a fatal error if there is no :term:`attached thread state`.
-   It cannot return NULL.
+   Phát sinh lỗi nghiêm trọng nếu không có :term:`attached thread state`. Hàm này không thể trả về NULL.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: int64_t PyInterpreterState_GetID(PyInterpreterState *interp)
 
-   Return the interpreter's unique ID.  If there was any error in doing
-   so then ``-1`` is returned and an error is set.
+   Trả về ID duy nhất của interpreter. Nếu xảy ra bất kỳ lỗi nào trong quá trình thực hiện, ``-1`` sẽ được trả về và một lỗi sẽ được thiết lập.
 
-   The caller must have an :term:`attached thread state`.
+   Caller phải có :term:`attached thread state`.
 
    .. versionadded:: 3.7
 
 
 .. c:function:: PyObject* PyInterpreterState_GetDict(PyInterpreterState *interp)
 
-   Return a dictionary in which interpreter-specific data may be stored.
-   If this function returns ``NULL`` then no exception has been raised and
-   the caller should assume no interpreter-specific dict is available.
+   Trả về một dictionary dùng để lưu trữ dữ liệu dành riêng cho interpreter. Nếu hàm này trả về ``NULL`` thì không có exception nào được phát sinh và caller nên giả định rằng không có dict dành riêng cho interpreter.
 
-   This is not a replacement for :c:func:`PyModule_GetState()`, which
-   extensions should use to store interpreter-specific state information.
+   Đây không phải là phương án thay thế cho :c:func:`PyModule_GetState()`, vốn nên được các extension sử dụng để lưu trữ thông tin trạng thái dành riêng cho interpreter.
 
-   The returned dictionary is borrowed from the interpreter and is valid until
-   interpreter shutdown.
+   Từ điển được trả về là đối tượng mượn từ trình thông dịch và hợp lệ cho đến khi trình thông dịch tắt.
 
    .. versionadded:: 3.8
 
 
 .. c:type:: PyObject* (*_PyFrameEvalFunction)(PyThreadState *tstate, _PyInterpreterFrame *frame, int throwflag)
 
-   Type of a frame evaluation function.
+   Kiểu của hàm đánh giá frame.
 
-   The *throwflag* parameter is used by the ``throw()`` method of generators:
-   if non-zero, handle the current exception.
+   Tham số *throwflag* được phương thức ``throw()`` của generator sử dụng: nếu khác không, hãy xử lý ngoại lệ hiện tại.
 
    .. versionchanged:: 3.9
-      The function now takes a *tstate* parameter.
+      Hàm hiện nhận tham số *tstate*.
 
    .. versionchanged:: 3.11
-      The *frame* parameter changed from ``PyFrameObject*`` to ``_PyInterpreterFrame*``.
+      Tham số *frame* đã thay đổi từ ``PyFrameObject*`` thành ``_PyInterpreterFrame*``.
 
 
 .. c:function:: _PyFrameEvalFunction _PyInterpreterState_GetEvalFrameFunc(PyInterpreterState *interp)
 
-   Get the frame evaluation function.
+   Lấy hàm đánh giá frame.
 
-   See the :pep:`523` "Adding a frame evaluation API to CPython".
+   Xem :pep:`523` "Thêm API đánh giá frame vào CPython".
 
    .. versionadded:: 3.9
 
 
 .. c:function:: void _PyInterpreterState_SetEvalFrameFunc(PyInterpreterState *interp, _PyFrameEvalFunction eval_frame)
 
-   Set the frame evaluation function.
+   Thiết lập hàm đánh giá frame.
 
-   See the :pep:`523` "Adding a frame evaluation API to CPython".
+   Xem :pep:`523` "Thêm API đánh giá frame vào CPython".
 
    .. versionadded:: 3.9
 
 
-Low-level APIs
---------------
+API cấp thấp
+------------
 
-All of the following functions must be called after :c:func:`Py_Initialize`.
+Tất cả các hàm sau đây phải được gọi sau :c:func:`Py_Initialize`.
 
 .. versionchanged:: 3.7
    :c:func:`Py_Initialize()` now initializes the :term:`GIL`
-   and sets an :term:`attached thread state`.
+   và thiết lập một :term:`attached thread state`.
 
 
 .. c:function:: PyInterpreterState* PyInterpreterState_New()
 
-   Create a new interpreter state object.  An :term:`attached thread state` is not needed,
-   but may optionally exist if it is necessary to serialize calls to this
-   function.
+   Tạo một đối tượng trạng thái interpreter mới. Không cần :term:`attached thread state`, nhưng có thể tồn tại tùy chọn nếu cần tuần tự hóa các lệnh gọi đến hàm này.
 
    .. audit-event:: cpython.PyInterpreterState_New "" c.PyInterpreterState_New
 
 
 .. c:function:: void PyInterpreterState_Clear(PyInterpreterState *interp)
 
-   Reset all information in an interpreter state object.  There must be
-   an :term:`attached thread state` for the interpreter.
+   Đặt lại tất cả thông tin trong một đối tượng trạng thái interpreter. Phải có một :term:`attached thread state` cho interpreter.
 
    .. audit-event:: cpython.PyInterpreterState_Clear "" c.PyInterpreterState_Clear
 
 
 .. c:function:: void PyInterpreterState_Delete(PyInterpreterState *interp)
 
-   Destroy an interpreter state object.  There **should not** be an
-   :term:`attached thread state` for the target interpreter. The interpreter
-   state must have been reset with a previous call to :c:func:`PyInterpreterState_Clear`.
+   Hủy đối tượng trạng thái interpreter. **không nên** có một
+   :term:`attached thread state` cho interpreter đích. Trạng thái interpreter phải đã được đặt lại bằng một lần gọi trước đó đến :c:func:`PyInterpreterState_Clear`.
 
 
 .. _advanced-debugging:
 
-Advanced debugger support
--------------------------
+Hỗ trợ trình gỡ lỗi nâng cao
+----------------------------
 
-These functions are only intended to be used by advanced debugging tools.
+Các hàm này chỉ dành cho các công cụ gỡ lỗi nâng cao.
 
 
 .. c:function:: PyInterpreterState* PyInterpreterState_Head()
 
-   Return the interpreter state object at the head of the list of all such objects.
+   Trả về đối tượng trạng thái interpreter ở đầu danh sách gồm tất cả các đối tượng như vậy.
 
 
 .. c:function:: PyInterpreterState* PyInterpreterState_Main()
 
-   Return the main interpreter state object.
+   Trả về đối tượng trạng thái interpreter chính.
 
 
 .. c:function:: PyInterpreterState* PyInterpreterState_Next(PyInterpreterState *interp)
 
-   Return the next interpreter state object after *interp* from the list of all
-   such objects.
+   Trả về đối tượng trạng thái interpreter tiếp theo sau *interp* trong danh sách gồm tất cả các đối tượng như vậy.
 
 
 .. c:function:: PyThreadState * PyInterpreterState_ThreadHead(PyInterpreterState *interp)
 
-   Return the pointer to the first :c:type:`PyThreadState` object in the list of
-   threads associated with the interpreter *interp*.
+   Trả về con trỏ đến đối tượng :c:type:`PyThreadState` đầu tiên trong danh sách các thread liên kết với interpreter *interp*.
 
 
 .. c:function:: PyThreadState* PyThreadState_Next(PyThreadState *tstate)
 
-   Return the next thread state object after *tstate* from the list of all such
-   objects belonging to the same :c:type:`PyInterpreterState` object.
+   Trả về đối tượng trạng thái thread tiếp theo sau *tstate* từ danh sách tất cả các đối tượng như vậy thuộc cùng một đối tượng :c:type:`PyInterpreterState`.

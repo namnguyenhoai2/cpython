@@ -2,94 +2,82 @@
 
 .. _instancemethod-objects:
 
-Instance Method Objects
------------------------
+Đối tượng phương thức instance
+------------------------------
 
 .. index:: pair: object; instancemethod
 
-An instance method is a wrapper for a :c:type:`PyCFunction` and the new way
-to bind a :c:type:`PyCFunction` to a class object. It replaces the former call
-``PyMethod_New(func, NULL, class)``.
+Một phương thức instance là một trình bao bọc cho một :c:type:`PyCFunction` và là cách mới để liên kết một :c:type:`PyCFunction` với một đối tượng lớp. Nó thay thế lệnh gọi trước đây ``PyMethod_New(func, NULL, class)``.
 
 
 .. c:var:: PyTypeObject PyInstanceMethod_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python instance
-   method type. It is not exposed to Python programs.
+   Instance này của :c:type:`PyTypeObject` đại diện cho kiểu phương thức instance của Python. Nó không được cung cấp cho các chương trình Python.
 
 
 .. c:function:: int PyInstanceMethod_Check(PyObject *o)
 
-   Return true if *o* is an instance method object (has type
-   :c:data:`PyInstanceMethod_Type`).  The parameter must not be ``NULL``.
-   This function always succeeds.
+   Trả về true nếu *o* là một đối tượng phương thức instance (có kiểu
+   :c:data:`PyInstanceMethod_Type`). Tham số không được là ``NULL``. Hàm này luôn thực hiện thành công.
 
 
 .. c:function:: PyObject* PyInstanceMethod_New(PyObject *func)
 
-   Return a new instance method object, with *func* being any callable object.
-   *func* is the function that will be called when the instance method is
-   called.
+   Trả về một đối tượng phương thức instance mới, trong đó *func* là bất kỳ đối tượng callable nào. *func* là hàm sẽ được gọi khi phương thức instance được gọi.
 
 
 .. c:function:: PyObject* PyInstanceMethod_Function(PyObject *im)
 
-   Return the function object associated with the instance method *im*.
+   Trả về đối tượng hàm được liên kết với phương thức instance *im*.
 
 
 .. c:function:: PyObject* PyInstanceMethod_GET_FUNCTION(PyObject *im)
 
-   Macro version of :c:func:`PyInstanceMethod_Function` which avoids error checking.
+   Phiên bản macro của :c:func:`PyInstanceMethod_Function` không thực hiện kiểm tra lỗi.
 
 
 .. _method-objects:
 
-Method Objects
---------------
+Đối tượng phương thức
+---------------------
 
 .. index:: pair: object; method
 
-Methods are bound function objects. Methods are always bound to an instance of
-a user-defined class. Unbound methods (methods bound to a class object) are
-no longer available.
+Phương thức là các đối tượng hàm được liên kết. Phương thức luôn được liên kết với một instance của lớp do người dùng định nghĩa. Các phương thức chưa liên kết (phương thức được liên kết với một đối tượng lớp) không còn khả dụng.
 
 
 .. c:var:: PyTypeObject PyMethod_Type
 
    .. index:: single: MethodType (in module types)
 
-   This instance of :c:type:`PyTypeObject` represents the Python method type.  This
-   is exposed to Python programs as ``types.MethodType``.
+   Instance này của :c:type:`PyTypeObject` đại diện cho kiểu phương thức Python. Kiểu này được cung cấp cho các chương trình Python dưới dạng ``types.MethodType``.
 
 
 .. c:function:: int PyMethod_Check(PyObject *o)
 
-   Return true if *o* is a method object (has type :c:data:`PyMethod_Type`).  The
-   parameter must not be ``NULL``.  This function always succeeds.
+   Trả về true nếu *o* là một đối tượng phương thức (có kiểu :c:data:`PyMethod_Type`). Tham số không được là ``NULL``. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PyMethod_New(PyObject *func, PyObject *self)
 
-   Return a new method object, with *func* being any callable object and *self*
-   the instance the method should be bound. *func* is the function that will
-   be called when the method is called. *self* must not be ``NULL``.
+   Trả về một đối tượng phương thức mới, trong đó *func* là bất kỳ đối tượng có thể gọi nào và *self* là instance mà phương thức sẽ được liên kết. *func* là hàm sẽ được gọi khi phương thức được gọi. *self* không được là ``NULL``.
 
 
 .. c:function:: PyObject* PyMethod_Function(PyObject *meth)
 
-   Return the function object associated with the method *meth*.
+   Trả về đối tượng hàm liên kết với phương thức *meth*.
 
 
 .. c:function:: PyObject* PyMethod_GET_FUNCTION(PyObject *meth)
 
-   Macro version of :c:func:`PyMethod_Function` which avoids error checking.
+   Phiên bản macro của :c:func:`PyMethod_Function`, không thực hiện kiểm tra lỗi.
 
 
 .. c:function:: PyObject* PyMethod_Self(PyObject *meth)
 
-   Return the instance associated with the method *meth*.
+   Trả về instance được liên kết với method *meth*.
 
 
 .. c:function:: PyObject* PyMethod_GET_SELF(PyObject *meth)
 
-   Macro version of :c:func:`PyMethod_Self` which avoids error checking.
+   Phiên bản macro của :c:func:`PyMethod_Self`, không thực hiện kiểm tra lỗi.

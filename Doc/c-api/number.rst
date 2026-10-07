@@ -2,290 +2,222 @@
 
 .. _number:
 
-Number Protocol
-===============
+Giao thức số
+============
 
 
 .. c:function:: int PyNumber_Check(PyObject *o)
 
-   Returns ``1`` if the object *o* provides numeric protocols, and false otherwise.
-   This function always succeeds.
+   Trả về ``1`` nếu đối tượng *o* cung cấp các giao thức số, và trả về false trong các trường hợp khác. Hàm này luôn thành công.
 
    .. versionchanged:: 3.8
-      Returns ``1`` if *o* is an index integer.
+      Trả về ``1`` nếu *o* là một số nguyên chỉ mục.
 
 
 .. c:function:: PyObject* PyNumber_Add(PyObject *o1, PyObject *o2)
 
-   Returns the result of adding *o1* and *o2*, or ``NULL`` on failure.  This is the
-   equivalent of the Python expression ``o1 + o2``.
+   Trả về kết quả cộng *o1* và *o2*, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 + o2``.
 
 
 .. c:function:: PyObject* PyNumber_Subtract(PyObject *o1, PyObject *o2)
 
-   Returns the result of subtracting *o2* from *o1*, or ``NULL`` on failure.  This is
-   the equivalent of the Python expression ``o1 - o2``.
+   Trả về kết quả lấy *o2* trừ *o1*, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 - o2``.
 
 
 .. c:function:: PyObject* PyNumber_Multiply(PyObject *o1, PyObject *o2)
 
-   Returns the result of multiplying *o1* and *o2*, or ``NULL`` on failure.  This is
-   the equivalent of the Python expression ``o1 * o2``.
+   Trả về kết quả nhân *o1* với *o2*, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 * o2``.
 
 
 .. c:function:: PyObject* PyNumber_MatrixMultiply(PyObject *o1, PyObject *o2)
 
-   Returns the result of matrix multiplication on *o1* and *o2*, or ``NULL`` on
-   failure.  This is the equivalent of the Python expression ``o1 @ o2``.
+   Trả về kết quả phép nhân ma trận trên *o1* và *o2*, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 @ o2``.
 
    .. versionadded:: 3.5
 
 
 .. c:function:: PyObject* PyNumber_FloorDivide(PyObject *o1, PyObject *o2)
 
-   Return the floor of *o1* divided by *o2*, or ``NULL`` on failure.  This is
-   the equivalent of the Python expression ``o1 // o2``.
+   Trả về giá trị sàn của *o1* chia cho *o2*, hoặc ``NULL`` nếu xảy ra lỗi. Đây là biểu thức Python tương đương với ``o1 // o2``.
 
 
 .. c:function:: PyObject* PyNumber_TrueDivide(PyObject *o1, PyObject *o2)
 
-   Return a reasonable approximation for the mathematical value of *o1* divided by
-   *o2*, or ``NULL`` on failure.  The return value is "approximate" because binary
-   floating-point numbers are approximate; it is not possible to represent all real
-   numbers in base two.  This function can return a floating-point value when
-   passed two integers.  This is the equivalent of the Python expression ``o1 / o2``.
+   Trả về giá trị xấp xỉ hợp lý của *o1* chia cho *o2*, hoặc ``NULL`` nếu xảy ra lỗi. Giá trị trả về là "xấp xỉ" vì các số dấu phẩy động nhị phân là các giá trị xấp xỉ; không thể biểu diễn mọi số thực trong hệ cơ số hai. Hàm này có thể trả về một giá trị dấu phẩy động khi được truyền vào hai số nguyên. Đây là biểu thức Python tương đương với ``o1 / o2``.
 
 
 .. c:function:: PyObject* PyNumber_Remainder(PyObject *o1, PyObject *o2)
 
-   Returns the remainder of dividing *o1* by *o2*, or ``NULL`` on failure.  This is
-   the equivalent of the Python expression ``o1 % o2``.
+   Trả về phần dư của phép chia *o1* cho *o2*, hoặc ``NULL`` nếu xảy ra lỗi. Đây là biểu thức Python tương đương với ``o1 % o2``.
 
 
 .. c:function:: PyObject* PyNumber_Divmod(PyObject *o1, PyObject *o2)
 
    .. index:: pair: built-in function; divmod
 
-   See the built-in function :func:`divmod`. Returns ``NULL`` on failure.  This is
-   the equivalent of the Python expression ``divmod(o1, o2)``.
+   Xem hàm tích hợp :func:`divmod`. Trả về ``NULL`` nếu xảy ra lỗi. Đây là biểu thức Python tương đương với ``divmod(o1, o2)``.
 
 
 .. c:function:: PyObject* PyNumber_Power(PyObject *o1, PyObject *o2, PyObject *o3)
 
    .. index:: pair: built-in function; pow
 
-   See the built-in function :func:`pow`. Returns ``NULL`` on failure.  This is the
-   equivalent of the Python expression ``pow(o1, o2, o3)``, where *o3* is optional.
-   If *o3* is to be ignored, pass :c:data:`Py_None` in its place (passing ``NULL`` for
-   *o3* would cause an illegal memory access).
+   Xem hàm tích hợp :func:`pow`. Trả về ``NULL`` nếu xảy ra lỗi. Đây là biểu thức Python tương đương với ``pow(o1, o2, o3)``, trong đó *o3* là tùy chọn. Nếu muốn bỏ qua *o3*, hãy truyền :c:data:`Py_None` thay cho nó (truyền ``NULL`` cho *o3* sẽ gây ra lỗi truy cập bộ nhớ trái phép).
 
 
 .. c:function:: PyObject* PyNumber_Negative(PyObject *o)
 
-   Returns the negation of *o* on success, or ``NULL`` on failure. This is the
-   equivalent of the Python expression ``-o``.
+   Trả về phép phủ định của *o* nếu thành công, hoặc ``NULL`` nếu xảy ra lỗi. Đây là biểu thức Python tương đương với ``-o``.
 
 
 .. c:function:: PyObject* PyNumber_Positive(PyObject *o)
 
-   Returns *o* on success, or ``NULL`` on failure.  This is the equivalent of the
-   Python expression ``+o``.
+   Trả về *o* nếu thành công, hoặc ``NULL`` nếu xảy ra lỗi. Đây là biểu thức Python tương đương với ``+o``.
 
 
 .. c:function:: PyObject* PyNumber_Absolute(PyObject *o)
 
    .. index:: pair: built-in function; abs
 
-   Returns the absolute value of *o*, or ``NULL`` on failure.  This is the equivalent
-   of the Python expression ``abs(o)``.
+   Trả về giá trị tuyệt đối của *o*, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``abs(o)``.
 
 
 .. c:function:: PyObject* PyNumber_Invert(PyObject *o)
 
-   Returns the bitwise negation of *o* on success, or ``NULL`` on failure.  This is
-   the equivalent of the Python expression ``~o``.
+   Trả về phép phủ định bit của *o* nếu thành công, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``~o``.
 
 
 .. c:function:: PyObject* PyNumber_Lshift(PyObject *o1, PyObject *o2)
 
-   Returns the result of left shifting *o1* by *o2* on success, or ``NULL`` on
-   failure.  This is the equivalent of the Python expression ``o1 << o2``.
+   Trả về kết quả dịch trái *o1* đi *o2* bit nếu thành công, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 << o2``.
 
 
 .. c:function:: PyObject* PyNumber_Rshift(PyObject *o1, PyObject *o2)
 
-   Returns the result of right shifting *o1* by *o2* on success, or ``NULL`` on
-   failure.  This is the equivalent of the Python expression ``o1 >> o2``.
+   Trả về kết quả dịch phải *o1* đi *o2* bit nếu thành công, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 >> o2``.
 
 
 .. c:function:: PyObject* PyNumber_And(PyObject *o1, PyObject *o2)
 
-   Returns the "bitwise and" of *o1* and *o2* on success and ``NULL`` on failure.
-   This is the equivalent of the Python expression ``o1 & o2``.
+   Trả về phép "and theo bit" của *o1* và *o2* nếu thành công, và ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 & o2``.
 
 
 .. c:function:: PyObject* PyNumber_Xor(PyObject *o1, PyObject *o2)
 
-   Returns the "bitwise exclusive or" of *o1* by *o2* on success, or ``NULL`` on
-   failure.  This is the equivalent of the Python expression ``o1 ^ o2``.
+   Trả về phép "exclusive or theo bit" của *o1* với *o2* nếu thành công, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 ^ o2``.
 
 
 .. c:function:: PyObject* PyNumber_Or(PyObject *o1, PyObject *o2)
 
-   Returns the "bitwise or" of *o1* and *o2* on success, or ``NULL`` on failure.
-   This is the equivalent of the Python expression ``o1 | o2``.
+   Trả về phép "or theo bit" của *o1* và *o2* nếu thành công, hoặc ``NULL`` nếu thất bại. Đây là tương đương với biểu thức Python ``o1 | o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceAdd(PyObject *o1, PyObject *o2)
 
-   Returns the result of adding *o1* and *o2*, or ``NULL`` on failure.  The operation
-   is done *in-place* when *o1* supports it.  This is the equivalent of the Python
-   statement ``o1 += o2``.
+   Trả về kết quả của phép cộng *o1* và *o2*, hoặc ``NULL`` nếu thất bại. Phép toán được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 += o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceSubtract(PyObject *o1, PyObject *o2)
 
-   Returns the result of subtracting *o2* from *o1*, or ``NULL`` on failure.  The
-   operation is done *in-place* when *o1* supports it.  This is the equivalent of
-   the Python statement ``o1 -= o2``.
+   Trả về kết quả của phép trừ *o2* khỏi *o1*, hoặc ``NULL`` nếu thất bại. Phép toán được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 -= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceMultiply(PyObject *o1, PyObject *o2)
 
-   Returns the result of multiplying *o1* and *o2*, or ``NULL`` on failure.  The
-   operation is done *in-place* when *o1* supports it.  This is the equivalent of
-   the Python statement ``o1 *= o2``.
+   Trả về kết quả của phép nhân *o1* và *o2*, hoặc ``NULL`` nếu thất bại. Phép toán được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 *= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceMatrixMultiply(PyObject *o1, PyObject *o2)
 
-   Returns the result of matrix multiplication on *o1* and *o2*, or ``NULL`` on
-   failure.  The operation is done *in-place* when *o1* supports it.  This is
-   the equivalent of the Python statement ``o1 @= o2``.
+   Trả về kết quả của phép nhân ma trận trên *o1* và *o2*, hoặc ``NULL`` nếu thất bại. Phép toán được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 @= o2``.
 
    .. versionadded:: 3.5
 
 
 .. c:function:: PyObject* PyNumber_InPlaceFloorDivide(PyObject *o1, PyObject *o2)
 
-   Returns the mathematical floor of dividing *o1* by *o2*, or ``NULL`` on failure.
-   The operation is done *in-place* when *o1* supports it.  This is the equivalent
-   of the Python statement ``o1 //= o2``.
+   Trả về phần nguyên theo toán học của phép chia *o1* cho *o2*, hoặc ``NULL`` nếu thất bại. Phép toán được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 //= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceTrueDivide(PyObject *o1, PyObject *o2)
 
-   Return a reasonable approximation for the mathematical value of *o1* divided by
-   *o2*, or ``NULL`` on failure.  The return value is "approximate" because binary
-   floating-point numbers are approximate; it is not possible to represent all real
-   numbers in base two.  This function can return a floating-point value when
-   passed two integers.  The operation is done *in-place* when *o1* supports it.
-   This is the equivalent of the Python statement ``o1 /= o2``.
+   Trả về giá trị xấp xỉ hợp lý theo toán học của *o1* chia cho *o2*, hoặc ``NULL`` nếu thất bại. Giá trị trả về là "xấp xỉ" vì các số dấu phẩy động nhị phân là các giá trị xấp xỉ; không thể biểu diễn mọi số thực trong hệ cơ số hai. Hàm này có thể trả về một giá trị dấu phẩy động khi được truyền vào hai số nguyên. Phép toán được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 /= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceRemainder(PyObject *o1, PyObject *o2)
 
-   Returns the remainder of dividing *o1* by *o2*, or ``NULL`` on failure.  The
-   operation is done *in-place* when *o1* supports it.  This is the equivalent of
-   the Python statement ``o1 %= o2``.
+   Trả về phần dư của phép chia *o1* cho *o2*, hoặc ``NULL`` nếu thất bại. Phép toán được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 %= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlacePower(PyObject *o1, PyObject *o2, PyObject *o3)
 
    .. index:: pair: built-in function; pow
 
-   See the built-in function :func:`pow`. Returns ``NULL`` on failure.  The operation
-   is done *in-place* when *o1* supports it.  This is the equivalent of the Python
-   statement ``o1 **= o2`` when o3 is :c:data:`Py_None`, or an in-place variant of
-   ``pow(o1, o2, o3)`` otherwise. If *o3* is to be ignored, pass :c:data:`Py_None`
-   in its place (passing ``NULL`` for *o3* would cause an illegal memory access).
+   Xem hàm tích hợp :func:`pow`. Trả về ``NULL`` khi xảy ra lỗi. Thao tác được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 **= o2`` khi o3 là :c:data:`Py_None`, hoặc một biến thể in-place của ``pow(o1, o2, o3)`` trong các trường hợp khác. Nếu *o3* cần được bỏ qua, hãy truyền :c:data:`Py_None` thay cho nó (truyền ``NULL`` cho *o3* sẽ gây ra lỗi truy cập bộ nhớ).
 
 
 .. c:function:: PyObject* PyNumber_InPlaceLshift(PyObject *o1, PyObject *o2)
 
-   Returns the result of left shifting *o1* by *o2* on success, or ``NULL`` on
-   failure.  The operation is done *in-place* when *o1* supports it.  This is the
-   equivalent of the Python statement ``o1 <<= o2``.
+   Trả về kết quả dịch trái *o1* theo *o2* khi thành công, hoặc ``NULL`` khi xảy ra lỗi. Thao tác được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 <<= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceRshift(PyObject *o1, PyObject *o2)
 
-   Returns the result of right shifting *o1* by *o2* on success, or ``NULL`` on
-   failure.  The operation is done *in-place* when *o1* supports it.  This is the
-   equivalent of the Python statement ``o1 >>= o2``.
+   Trả về kết quả dịch phải *o1* theo *o2* khi thành công, hoặc ``NULL`` khi xảy ra lỗi. Thao tác được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 >>= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceAnd(PyObject *o1, PyObject *o2)
 
-   Returns the "bitwise and" of *o1* and *o2* on success and ``NULL`` on failure. The
-   operation is done *in-place* when *o1* supports it.  This is the equivalent of
-   the Python statement ``o1 &= o2``.
+   Trả về phép "AND theo bit" của *o1* và *o2* khi thành công, hoặc ``NULL`` khi xảy ra lỗi. Thao tác được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 &= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceXor(PyObject *o1, PyObject *o2)
 
-   Returns the "bitwise exclusive or" of *o1* by *o2* on success, or ``NULL`` on
-   failure.  The operation is done *in-place* when *o1* supports it.  This is the
-   equivalent of the Python statement ``o1 ^= o2``.
+   Trả về phép "XOR theo bit" của *o1* với *o2* khi thành công, hoặc ``NULL`` khi xảy ra lỗi. Thao tác được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 ^= o2``.
 
 
 .. c:function:: PyObject* PyNumber_InPlaceOr(PyObject *o1, PyObject *o2)
 
-   Returns the "bitwise or" of *o1* and *o2* on success, or ``NULL`` on failure.  The
-   operation is done *in-place* when *o1* supports it.  This is the equivalent of
-   the Python statement ``o1 |= o2``.
+   Trả về phép "OR theo bit" của *o1* và *o2* khi thành công, hoặc ``NULL`` khi xảy ra lỗi. Thao tác được thực hiện *in-place* khi *o1* hỗ trợ. Đây là tương đương với câu lệnh Python ``o1 |= o2``.
 
 
 .. c:function:: PyObject* PyNumber_Long(PyObject *o)
 
    .. index:: pair: built-in function; int
 
-   Returns the *o* converted to an integer object on success, or ``NULL`` on
-   failure.  This is the equivalent of the Python expression ``int(o)``.
+   Trả về *o* được chuyển đổi thành một đối tượng số nguyên khi thành công, hoặc ``NULL`` khi xảy ra lỗi. Đây là tương đương với biểu thức Python ``int(o)``.
 
 
 .. c:function:: PyObject* PyNumber_Float(PyObject *o)
 
    .. index:: pair: built-in function; float
 
-   Returns the *o* converted to a float object on success, or ``NULL`` on failure.
-   This is the equivalent of the Python expression ``float(o)``.
+   Trả về *o* được chuyển đổi thành một đối tượng float khi thành công hoặc ``NULL`` khi thất bại. Đây là tương đương với biểu thức Python ``float(o)``.
 
 
 .. c:function:: PyObject* PyNumber_Index(PyObject *o)
 
-   Returns the *o* converted to a Python int on success or ``NULL`` with a
-   :exc:`TypeError` exception raised on failure.
+   Trả về *o* được chuyển đổi thành một Python int khi thành công hoặc ``NULL`` kèm theo một
+   ngoại lệ :exc:`TypeError` được phát sinh khi thất bại.
 
    .. versionchanged:: 3.10
-      The result always has exact type :class:`int`.  Previously, the result
-      could have been an instance of a subclass of ``int``.
+      Kết quả luôn có kiểu chính xác là :class:`int`. Trước đây, kết quả có thể là một thực thể của lớp con của ``int``.
 
 
 .. c:function:: PyObject* PyNumber_ToBase(PyObject *n, int base)
 
-   Returns the integer *n* converted to base *base* as a string.  The *base*
-   argument must be one of 2, 8, 10, or 16.  For base 2, 8, or 16, the
-   returned string is prefixed with a base marker of ``'0b'``, ``'0o'``, or
-   ``'0x'``, respectively.  If *n* is not a Python int, it is converted with
-   :c:func:`PyNumber_Index` first.
+   Trả về số nguyên *n* được chuyển đổi sang cơ số *base* dưới dạng chuỗi. Đối số *base* phải là một trong các giá trị 2, 8, 10 hoặc 16. Với cơ số 2, 8 hoặc 16, chuỗi trả về lần lượt được thêm tiền tố là ký hiệu cơ số ``'0b'``, ``'0o'`` hoặc ``'0x'``. Nếu *n* không phải là một Python int, nó sẽ được chuyển đổi bằng
+   :c:func:`PyNumber_Index` trước tiên.
 
 
 .. c:function:: Py_ssize_t PyNumber_AsSsize_t(PyObject *o, PyObject *exc)
 
-   Returns *o* converted to a :c:type:`Py_ssize_t` value if *o* can be interpreted as an
-   integer.  If the call fails, an exception is raised and ``-1`` is returned.
+   Trả về *o* được chuyển đổi thành một giá trị :c:type:`Py_ssize_t` nếu *o* có thể được diễn giải là một số nguyên. Nếu lệnh gọi thất bại, một ngoại lệ sẽ được phát sinh và ``-1`` được trả về.
 
-   If *o* can be converted to a Python int but the attempt to
-   convert to a :c:type:`Py_ssize_t` value would raise an :exc:`OverflowError`, then the
-   *exc* argument is the type of exception that will be raised (usually
-   :exc:`IndexError` or :exc:`OverflowError`).  If *exc* is ``NULL``, then the
-   exception is cleared and the value is clipped to ``PY_SSIZE_T_MIN`` for a negative
-   integer or ``PY_SSIZE_T_MAX`` for a positive integer.
+   Nếu *o* có thể được chuyển đổi thành một số nguyên Python nhưng nỗ lực chuyển đổi thành giá trị :c:type:`Py_ssize_t` sẽ gây ra một :exc:`OverflowError`, thì đối số *exc* là kiểu ngoại lệ sẽ được phát sinh (thường là
+   :exc:`IndexError` hoặc :exc:`OverflowError`). Nếu *exc* là ``NULL``, thì ngoại lệ được xóa và giá trị được giới hạn thành ``PY_SSIZE_T_MIN`` đối với số nguyên âm hoặc ``PY_SSIZE_T_MAX`` đối với số nguyên dương.
 
 
 .. c:function:: int PyIndex_Check(PyObject *o)
 
-   Returns ``1`` if *o* is an index integer (has the ``nb_index`` slot of the
-   ``tp_as_number`` structure filled in), and ``0`` otherwise.
-   This function always succeeds.
+   Trả về ``1`` nếu *o* là một số nguyên chỉ mục (có slot ``nb_index`` của cấu trúc ``tp_as_number`` được điền), và ``0`` nếu không. Hàm này luôn thành công.

@@ -2,150 +2,111 @@
 
 .. _thread-local-storage:
 
-Thread-local storage support
-============================
+Hỗ trợ lưu trữ cục bộ theo thread
+=================================
 
-The Python interpreter provides low-level support for thread-local storage
-(TLS) which wraps the underlying native TLS implementation to support the
-Python-level thread-local storage API (:class:`threading.local`).  The
-CPython C level APIs are similar to those offered by pthreads and Windows:
-use a thread key and functions to associate a :c:expr:`void*` value per
-thread.
+Trình thông dịch Python cung cấp hỗ trợ cấp thấp cho lưu trữ cục bộ theo thread (TLS), bao bọc triển khai TLS gốc bên dưới để hỗ trợ API lưu trữ cục bộ theo thread ở cấp Python (:class:`threading.local`). Các API cấp C của CPython tương tự những API do pthreads và Windows cung cấp: sử dụng một khóa thread và các hàm để liên kết một giá trị :c:expr:`void*` cho mỗi thread.
 
-A :term:`thread state` does *not* need to be :term:`attached <attached thread state>`
-when calling these functions; they supply their own locking.
+Một :term:`thread state` không cần được *không* gắn :term:`attached <attached thread state>` khi gọi các hàm này; chúng tự thực hiện việc khóa.
 
-Note that :file:`Python.h` does not include the declaration of the TLS APIs,
-you need to include :file:`pythread.h` to use thread-local storage.
+Lưu ý rằng :file:`Python.h` không bao gồm khai báo của các API TLS; bạn cần include :file:`pythread.h` để sử dụng lưu trữ cục bộ theo thread.
 
 .. note::
-   None of these API functions handle memory management on behalf of the
-   :c:expr:`void*` values.  You need to allocate and deallocate them yourself.
-   If the :c:expr:`void*` values happen to be :c:expr:`PyObject*`, these
-   functions don't do refcount operations on them either.
+   Không hàm API nào trong số này quản lý bộ nhớ thay cho các
+   giá trị :c:expr:`void*`. Bạn cần tự cấp phát và giải phóng chúng. Nếu các giá trị :c:expr:`void*` tình cờ là :c:expr:`PyObject*`, các hàm này cũng không thực hiện thao tác refcount trên chúng.
 
 .. _thread-specific-storage-api:
 
-Thread-specific storage API
----------------------------
+API lưu trữ dành riêng cho thread
+---------------------------------
 
-The thread-specific storage (TSS) API was introduced to supersede the use of the existing TLS API within the
-CPython interpreter.  This API uses a new type :c:type:`Py_tss_t` instead of
-:c:expr:`int` to represent thread keys.
+API bộ nhớ lưu trữ dành riêng cho luồng (TSS) được giới thiệu để thay thế việc sử dụng API TLS hiện có trong trình thông dịch CPython. API này sử dụng một kiểu mới :c:type:`Py_tss_t` thay vì
+:c:expr:`int` để biểu diễn các khóa luồng.
 
 .. versionadded:: 3.7
 
-.. seealso:: "A New C-API for Thread-Local Storage in CPython" (:pep:`539`)
+.. seealso:: "Một C-API mới cho Thread-Local Storage trong CPython" (:pep:`539`)
 
 
 .. c:type:: Py_tss_t
 
-   This data structure represents the state of a thread key, the definition of
-   which may depend on the underlying TLS implementation, and it has an
-   internal field representing the key's initialization state.  There are no
-   public members in this structure.
+   Cấu trúc dữ liệu này biểu diễn trạng thái của một khóa luồng, với định nghĩa có thể phụ thuộc vào triển khai TLS bên dưới, đồng thời có một trường nội bộ biểu diễn trạng thái khởi tạo của khóa. Cấu trúc này không có thành viên công khai.
 
-   When :ref:`Py_LIMITED_API <stable>` is not defined, static allocation of
-   this type by :c:macro:`Py_tss_NEEDS_INIT` is allowed.
+   Khi :ref:`Py_LIMITED_API <stable>` chưa được định nghĩa, có thể cấp phát tĩnh kiểu này bằng :c:macro:`Py_tss_NEEDS_INIT`.
 
 
 .. c:macro:: Py_tss_NEEDS_INIT
 
-   This macro expands to the initializer for :c:type:`Py_tss_t` variables.
-   Note that this macro won't be defined with :ref:`Py_LIMITED_API <stable>`.
+   Macro này mở rộng thành trình khởi tạo cho các biến :c:type:`Py_tss_t`. Lưu ý rằng macro này sẽ không được định nghĩa cùng với :ref:`Py_LIMITED_API <stable>`.
 
 
-Dynamic allocation
-------------------
+Cấp phát động
+-------------
 
-Dynamic allocation of the :c:type:`Py_tss_t`, required in extension modules
-built with :ref:`Py_LIMITED_API <stable>`, where static allocation of this type
-is not possible due to its implementation being opaque at build time.
+Cấp phát động :c:type:`Py_tss_t`, bắt buộc trong các mô-đun mở rộng được xây dựng với :ref:`Py_LIMITED_API <stable>`, vì không thể cấp phát tĩnh kiểu này do cách triển khai của nó là không trong suốt tại thời điểm xây dựng.
 
 
 .. c:function:: Py_tss_t* PyThread_tss_alloc()
 
-   Return a value which is the same state as a value initialized with
-   :c:macro:`Py_tss_NEEDS_INIT`, or ``NULL`` in the case of dynamic allocation
-   failure.
+   Trả về một giá trị có trạng thái giống với giá trị được khởi tạo bằng
+   :c:macro:`Py_tss_NEEDS_INIT`, hoặc ``NULL`` trong trường hợp cấp phát động không thành công.
 
 
 .. c:function:: void PyThread_tss_free(Py_tss_t *key)
 
-   Free the given *key* allocated by :c:func:`PyThread_tss_alloc`, after
-   first calling :c:func:`PyThread_tss_delete` to ensure any associated
-   thread locals have been unassigned. This is a no-op if the *key*
-   argument is ``NULL``.
+   Giải phóng *key* đã cho được :c:func:`PyThread_tss_alloc` cấp phát, sau khi gọi :c:func:`PyThread_tss_delete` trước để đảm bảo mọi biến cục bộ của thread liên kết đều đã được hủy gán. Đây là thao tác không thực hiện gì nếu đối số *key* là ``NULL``.
 
    .. note::
-      A freed key becomes a dangling pointer. You should reset the key to
-      ``NULL``.
+      Một key đã được giải phóng sẽ trở thành con trỏ treo. Bạn nên đặt lại key thành ``NULL``.
 
 
-Methods
--------
+Các phương thức
+---------------
 
-The parameter *key* of these functions must not be ``NULL``.  Moreover, the
-behaviors of :c:func:`PyThread_tss_set` and :c:func:`PyThread_tss_get` are
-undefined if the given :c:type:`Py_tss_t` has not been initialized by
+Tham số *key* của các hàm này không được là ``NULL``.  Ngoài ra, hành vi của :c:func:`PyThread_tss_set` và :c:func:`PyThread_tss_get` là không xác định nếu :c:type:`Py_tss_t` đã cho chưa được khởi tạo bằng
 :c:func:`PyThread_tss_create`.
 
 
 .. c:function:: int PyThread_tss_is_created(Py_tss_t *key)
 
-   Return a non-zero value if the given :c:type:`Py_tss_t` has been initialized
-   by :c:func:`PyThread_tss_create`.
+   Trả về giá trị khác không nếu :c:type:`Py_tss_t` đã được khởi tạo bởi :c:func:`PyThread_tss_create`.
 
 
 .. c:function:: int PyThread_tss_create(Py_tss_t *key)
 
-   Return a zero value on successful initialization of a TSS key.  The behavior
-   is undefined if the value pointed to by the *key* argument is not
-   initialized by :c:macro:`Py_tss_NEEDS_INIT`.  This function can be called
-   repeatedly on the same key -- calling it on an already initialized key is a
-   no-op and immediately returns success.
+   Trả về giá trị bằng không khi khởi tạo thành công một khóa TSS. Hành vi không được xác định nếu giá trị được trỏ tới bởi đối số *key* chưa được khởi tạo bởi :c:macro:`Py_tss_NEEDS_INIT`. Có thể gọi hàm này nhiều lần trên cùng một khóa -- gọi hàm trên một khóa đã được khởi tạo sẽ không thực hiện thao tác nào và ngay lập tức trả về thành công.
 
 
 .. c:function:: void PyThread_tss_delete(Py_tss_t *key)
 
-   Destroy a TSS key to forget the values associated with the key across all
-   threads, and change the key's initialization state to uninitialized.  A
-   destroyed key is able to be initialized again by
-   :c:func:`PyThread_tss_create`. This function can be called repeatedly on
-   the same key -- calling it on an already destroyed key is a no-op.
+   Hủy một khóa TSS để quên các giá trị liên kết với khóa trên tất cả các thread, đồng thời chuyển trạng thái khởi tạo của khóa thành chưa khởi tạo. Một khóa đã bị hủy có thể được khởi tạo lại bởi
+   :c:func:`PyThread_tss_create`. Có thể gọi hàm này nhiều lần trên cùng một khóa -- gọi hàm trên một khóa đã bị hủy sẽ không thực hiện thao tác nào.
 
 
 .. c:function:: int PyThread_tss_set(Py_tss_t *key, void *value)
 
-   Return a zero value to indicate successfully associating a :c:expr:`void*`
-   value with a TSS key in the current thread.  Each thread has a distinct
-   mapping of the key to a :c:expr:`void*` value.
+   Trả về giá trị bằng không để cho biết đã liên kết thành công một giá trị :c:expr:`void*` với khóa TSS trong thread hiện tại. Mỗi thread có một ánh xạ riêng từ khóa đến giá trị :c:expr:`void*`.
 
 
 .. c:function:: void* PyThread_tss_get(Py_tss_t *key)
 
-   Return the :c:expr:`void*` value associated with a TSS key in the current
-   thread.  This returns ``NULL`` if no value is associated with the key in the
-   current thread.
+   Trả về giá trị :c:expr:`void*` được liên kết với khóa TSS trong thread hiện tại. Hàm này trả về ``NULL`` nếu không có giá trị nào được liên kết với khóa trong thread hiện tại.
 
 
 .. _thread-local-storage-api:
 
-Legacy APIs
------------
+API cũ
+------
 
 .. deprecated:: 3.7
-   This API is superseded by the
-   :ref:`thread-specific storage (TSS) API <thread-specific-storage-api>`.
+   API này bị thay thế bởi
+   :ref:`API lưu trữ dành riêng cho thread (TSS) <thread-specific-storage-api>`.
 
 .. note::
-   This version of the API does not support platforms where the native TLS key
-   is defined in a way that cannot be safely cast to ``int``.  On such platforms,
-   :c:func:`PyThread_create_key` will return immediately with a failure status,
-   and the other TLS functions will all be no-ops on such platforms.
+   Phiên bản API này không hỗ trợ các nền tảng mà khóa TLS gốc được định nghĩa theo cách không thể ép kiểu an toàn thành ``int``.  Trên những nền tảng đó,
+   :c:func:`PyThread_create_key` sẽ ngay lập tức trả về trạng thái thất bại, còn tất cả các hàm TLS khác sẽ không thực hiện thao tác nào trên những nền tảng đó.
 
-Due to the compatibility problem noted above, this version of the API should not
-be used in new code.
+Do vấn đề tương thích nêu trên, không nên sử dụng phiên bản API này trong mã mới.
 
 .. c:function:: int PyThread_create_key()
 .. c:function:: void PyThread_delete_key(int key)

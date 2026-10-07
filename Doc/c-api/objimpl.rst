@@ -2,12 +2,11 @@
 
 .. _newtypes:
 
-*****************************
-Object Implementation Support
-*****************************
+***************************
+Hỗ trợ triển khai đối tượng
+***************************
 
-This chapter describes the functions, types, and macros used when defining new
-object types.
+Chương này mô tả các hàm, kiểu và macro được sử dụng khi định nghĩa các kiểu đối tượng mới.
 
 .. toctree::
 

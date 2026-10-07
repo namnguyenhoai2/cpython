@@ -5,55 +5,48 @@
 .. index::
    pair: object; PickleBuffer
 
-Pickle buffer objects
----------------------
+Đối tượng bộ đệm pickle
+-----------------------
 
 .. versionadded:: 3.8
 
-A :class:`pickle.PickleBuffer` object wraps a :ref:`buffer-providing object
-<bufferobjects>` for out-of-band data transfer with the :mod:`pickle` module.
+Một đối tượng :class:`pickle.PickleBuffer` bao bọc một :ref:`đối tượng cung cấp bộ đệm <bufferobjects>` để truyền dữ liệu ngoài băng với mô-đun :mod:`pickle`.
 
 
 .. c:var:: PyTypeObject PyPickleBuffer_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python pickle buffer type.
-   This is the same object as :class:`pickle.PickleBuffer` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` đại diện cho kiểu bộ đệm pickle của Python. Đây là cùng một đối tượng với :class:`pickle.PickleBuffer` trong lớp Python.
 
 
 .. c:function:: int PyPickleBuffer_Check(PyObject *op)
 
-   Return true if *op* is a pickle buffer instance.
-   This function always succeeds.
+   Trả về true nếu *op* là một instance bộ đệm pickle. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject *PyPickleBuffer_FromObject(PyObject *obj)
 
-   Create a pickle buffer from the object *obj*.
+   Tạo một bộ đệm pickle từ đối tượng *obj*.
 
-   This function will fail if *obj* doesn't support the :ref:`buffer protocol <bufferobjects>`.
+   Hàm này sẽ thất bại nếu *obj* không hỗ trợ :ref:`giao thức bộ đệm <bufferobjects>`.
 
-   On success, return a new pickle buffer instance.
-   On failure, set an exception and return ``NULL``.
+   Khi thành công, trả về một instance bộ đệm pickle mới. Khi thất bại, đặt một ngoại lệ và trả về ``NULL``.
 
-   Analogous to calling :class:`pickle.PickleBuffer` with *obj* in Python.
+   Tương tự như việc gọi :class:`pickle.PickleBuffer` với *obj* trong Python.
 
 
 .. c:function:: const Py_buffer *PyPickleBuffer_GetBuffer(PyObject *picklebuf)
 
-   Get a pointer to the underlying :c:type:`Py_buffer` that the pickle buffer wraps.
+   Lấy con trỏ tới :c:type:`Py_buffer` bên dưới mà pickle buffer bao bọc.
 
-   The returned pointer is valid as long as *picklebuf* is alive and has not been
-   released. The caller must not modify or free the returned :c:type:`Py_buffer`.
-   If the pickle buffer has been released, raise :exc:`ValueError`.
+   Con trỏ được trả về hợp lệ miễn là *picklebuf* vẫn tồn tại và chưa được giải phóng. Bên gọi không được sửa đổi hoặc giải phóng :c:type:`Py_buffer` được trả về. Nếu pickle buffer đã được giải phóng, hãy phát sinh :exc:`ValueError`.
 
-   On success, return a pointer to the buffer view.
-   On failure, set an exception and return ``NULL``.
+   Khi thành công, trả về con trỏ tới buffer view. Khi thất bại, đặt một exception và trả về ``NULL``.
 
 
 .. c:function:: int PyPickleBuffer_Release(PyObject *picklebuf)
 
-   Release the underlying buffer held by the pickle buffer.
+   Giải phóng buffer bên dưới được pickle buffer giữ.
 
-   Return ``0`` on success. On failure, set an exception and return ``-1``.
+   Trả về ``0`` khi thành công. Khi thất bại, đặt một exception và trả về ``-1``.
 
-   Analogous to calling :meth:`pickle.PickleBuffer.release` in Python.
+   Tương tự như việc gọi :meth:`pickle.PickleBuffer.release` trong Python.

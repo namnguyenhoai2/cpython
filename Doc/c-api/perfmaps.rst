@@ -2,89 +2,69 @@
 
 .. _perfmaps:
 
-Support for Perf Maps
-----------------------
+Hỗ trợ Perf Maps
+----------------
 
-On supported platforms (as of this writing, only Linux), the runtime can take
-advantage of *perf map files* to make Python functions visible to an external
-profiling tool (such as `perf <https://perf.wiki.kernel.org/index.php/Main_Page>`_).
-A running process may create a file in the ``/tmp`` directory, which contains entries
-that can map a section of executable code to a name. This interface is described in the
-`documentation of the Linux Perf tool <https://git.kernel.org/pub/scm/linux/
-kernel/git/torvalds/linux.git/tree/tools/perf/Documentation/jit-interface.txt>`_.
+Trên các nền tảng được hỗ trợ (tại thời điểm viết tài liệu này, chỉ có Linux), runtime có thể tận dụng *các tệp perf map* để hiển thị các hàm Python trong một công cụ profiling bên ngoài (chẳng hạn như `perf <https://perf.wiki.kernel.org/index.php/Main_Page>`_). Một tiến trình đang chạy có thể tạo một tệp trong thư mục ``/tmp``, tệp này chứa các mục có thể ánh xạ một đoạn mã thực thi với một tên. Giao diện này được mô tả trong `tài liệu về công cụ Linux Perf <https://git.kernel.org/pub/scm/linux/ kernel/git/torvalds/linux.git/tree/tools/perf/Documentation/jit-interface.txt>`_.
 
-In Python, these helper APIs can be used by libraries and features that rely
-on generating machine code on the fly.
+Trong Python, các helper API này có thể được các thư viện và tính năng dựa vào việc tạo mã máy ngay trong lúc chạy sử dụng.
 
-Note that holding an :term:`attached thread state` is not required for these APIs.
+Lưu ý rằng không cần phải nắm giữ :term:`attached thread state` để sử dụng các API này.
 
 .. c:function:: int PyUnstable_PerfMapState_Init(void)
 
-   Open the ``/tmp/perf-$pid.map`` file, unless it's already opened, and create
-   a lock to ensure thread-safe writes to the file (provided the writes are
-   done through :c:func:`PyUnstable_WritePerfMapEntry`). Normally, there's no need
-   to call this explicitly; just use :c:func:`PyUnstable_WritePerfMapEntry`
-   and it will initialize the state on first call.
+   Mở tệp ``/tmp/perf-$pid.map``, trừ khi tệp đã được mở, rồi tạo một lock để đảm bảo việc ghi vào tệp an toàn đối với thread (với điều kiện việc ghi được thực hiện thông qua :c:func:`PyUnstable_WritePerfMapEntry`). Thông thường, bạn không cần gọi hàm này một cách rõ ràng; chỉ cần sử dụng :c:func:`PyUnstable_WritePerfMapEntry` và trạng thái sẽ được khởi tạo trong lần gọi đầu tiên.
 
-   Returns ``0`` on success, ``-1`` on failure to create/open the perf map file,
-   or ``-2`` on failure to create a lock. Check ``errno`` for more information
-   about the cause of a failure.
+   Trả về ``0`` nếu thành công, ``-1`` nếu không tạo hoặc mở được tệp perf map, hoặc ``-2`` nếu không tạo được lock. Kiểm tra ``errno`` để biết thêm thông tin về nguyên nhân gây ra lỗi.
 
 .. c:function:: int PyUnstable_WritePerfMapEntry(const void *code_addr, unsigned int code_size, const char *entry_name)
 
-   Write one single entry to the ``/tmp/perf-$pid.map`` file. This function is
-   thread safe. Here is what an example entry looks like::
+   Ghi một mục duy nhất vào tệp ``/tmp/perf-$pid.map``. Hàm này an toàn đối với thread. Dưới đây là một mục mẫu::
 
-      # address      size  name
+      # địa chỉ      kích thước  tên
       7f3529fcf759 b     py::bar:/run/t.py
 
-   Will call :c:func:`PyUnstable_PerfMapState_Init` before writing the entry, if
-   the perf map file is not already opened. Returns ``0`` on success, or the
-   same error codes as :c:func:`PyUnstable_PerfMapState_Init` on failure.
+   Sẽ gọi :c:func:`PyUnstable_PerfMapState_Init` trước khi ghi mục nhập, nếu tệp perf map chưa được mở. Trả về ``0`` khi thành công hoặc các mã lỗi giống như :c:func:`PyUnstable_PerfMapState_Init` khi thất bại.
 
 .. c:function:: void PyUnstable_PerfMapState_Fini(void)
 
-   Close the perf map file opened by :c:func:`PyUnstable_PerfMapState_Init`.
-   This is called by the runtime itself during interpreter shut-down. In
-   general, there shouldn't be a reason to explicitly call this, except to
-   handle specific scenarios such as forking.
+   Đóng tệp perf map được mở bởi :c:func:`PyUnstable_PerfMapState_Init`. Runtime tự gọi hàm này trong quá trình tắt trình thông dịch. Nhìn chung, không có lý do gì để gọi hàm này một cách rõ ràng, ngoại trừ việc xử lý các tình huống cụ thể như tạo fork.
 
 .. c:function:: int PyUnstable_CopyPerfMapFile(const char *parent_filename)
 
-   Open the ``/tmp/perf-$pid.map`` file and append the content of *parent_filename*
-   to it.
+   Mở tệp ``/tmp/perf-$pid.map`` và nối nội dung của *parent_filename* vào tệp đó.
 
-   This function is available on all platforms but only generates output on platforms
-   that support perf maps (currently only Linux). On other platforms, it does nothing.
+   Hàm này khả dụng trên mọi nền tảng nhưng chỉ tạo đầu ra trên các nền tảng hỗ trợ perf map (hiện tại chỉ có Linux). Trên các nền tảng khác, hàm không thực hiện thao tác nào.
 
    .. versionadded:: 3.13
 
 .. c:function:: int PyUnstable_PerfTrampoline_CompileCode(PyCodeObject *code)
 
-   Compile the given code object using the current perf trampoline.
+   Biên dịch code object đã cho bằng perf trampoline hiện tại.
 
-   The "current" trampoline is the one set by the runtime or the most recent
-   :c:func:`PyUnstable_PerfTrampoline_SetPersistAfterFork` call.
+   Trampoline “hiện tại” là trampoline được runtime thiết lập hoặc trampoline gần nhất
+   Gọi :c:func:`PyUnstable_PerfTrampoline_SetPersistAfterFork`.
 
-   If no trampoline is set, falls back to normal compilation (no perf map entry).
+   Nếu không thiết lập trampoline, hệ thống sẽ chuyển sang biên dịch thông thường (không có mục perf map).
 
-   :param code: The code object to compile.
-   :return: 0 on success, -1 on failure.
+   :param code: Đối tượng code cần biên dịch.
+   :return: 0 nếu thành công, -1 nếu thất bại.
 
    .. versionadded:: 3.13
 
 .. c:function:: int PyUnstable_PerfTrampoline_SetPersistAfterFork(int enable)
 
-   Set whether the perf trampoline should persist after a fork.
+   Thiết lập liệu perf trampoline có tiếp tục tồn tại sau fork hay không.
 
-   * If ``enable`` is true (non-zero): perf map file remains open/valid post-fork.
-     Child process inherits all existing perf map entries.
-   * If ``enable`` is false (zero): perf map closes post-fork.
-     Child process gets empty perf map.
+   * Nếu ``enable`` là true (khác 0): tệp perf map vẫn mở/hợp lệ sau fork. Tiến trình con kế thừa tất cả các mục perf map hiện có.
+   * Nếu ``enable`` là false (bằng 0): perf map sẽ đóng sau fork. Tiến trình con nhận được perf map trống.
 
-   Default: false (clears on fork).
+   Mặc định: false (bị xóa khi fork).
 
-   :param enable: 1 to enable, 0 to disable.
-   :return: 0 on success, -1 on failure.
+   :param enable: 1 để bật, 0 để tắt.
+   :return: 0 nếu thành công, -1 nếu thất bại.
 
    .. versionadded:: 3.13
+
+.. _`perf`: https://perf.wiki.kernel.org/index.php/Main_Page
+.. _`documentation of the Linux Perf tool`: https://git.kernel.org/pub/scm/linux/ kernel/git/torvalds/linux.git/tree/tools/perf/Documentation/jit-interface.txt

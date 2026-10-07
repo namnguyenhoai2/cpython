@@ -2,13 +2,11 @@
 
 .. _utilities:
 
-*********
-Utilities
-*********
+************
+Các tiện ích
+************
 
-The functions in this chapter perform various utility tasks, ranging from
-helping C code be more portable across platforms, using Python modules from C,
-and parsing function arguments and constructing Python values from C values.
+Các hàm trong chương này thực hiện nhiều tác vụ tiện ích khác nhau, từ hỗ trợ mã C có tính di động cao hơn giữa các nền tảng, sử dụng các module Python từ C, đến phân tích cú pháp đối số hàm và xây dựng các giá trị Python từ các giá trị C.
 
 .. toctree::
 

@@ -2,206 +2,193 @@
 
 .. _c-api-monitoring:
 
-Monitoring C API
-================
+API C về giám sát
+=================
 
-Added in version 3.13.
+Được thêm trong phiên bản 3.13.
 
-An extension may need to interact with the event monitoring system. Subscribing
-to events and registering callbacks can be done via the Python API exposed in
+Một extension có thể cần tương tác với hệ thống giám sát sự kiện. Việc đăng ký sự kiện và đăng ký callback có thể được thực hiện thông qua Python API được cung cấp trong
 :mod:`sys.monitoring`.
 
-Generating Execution Events
-===========================
+Tạo sự kiện thực thi
+====================
 
-The functions below make it possible for an extension to fire monitoring
-events as it emulates the execution of Python code. Each of these functions
-accepts a ``PyMonitoringState`` struct which contains concise information
-about the activation state of events, as well as the event arguments, which
-include a ``PyObject*`` representing the code object, the instruction offset
-and sometimes additional, event-specific arguments (see :mod:`sys.monitoring`
-for details about the signatures of the different event callbacks).
-The ``codelike`` argument should be an instance of :class:`types.CodeType`
-or of a type that emulates it.
+Các hàm dưới đây cho phép một extension kích hoạt các sự kiện giám sát khi mô phỏng việc thực thi mã Python. Mỗi hàm này nhận một struct ``PyMonitoringState``, struct này chứa thông tin ngắn gọn về trạng thái kích hoạt của các sự kiện, cũng như các đối số sự kiện, bao gồm một ``PyObject*`` đại diện cho đối tượng mã, offset của chỉ thị và đôi khi có thêm các đối số dành riêng cho từng sự kiện (xem :mod:`sys.monitoring` để biết chi tiết về chữ ký của các callback sự kiện khác nhau). Đối số ``codelike`` phải là một thực thể của :class:`types.CodeType` hoặc của một kiểu mô phỏng nó.
 
-The VM disables tracing when firing an event, so there is no need for user
-code to do that.
+VM vô hiệu hóa việc tracing khi kích hoạt một sự kiện, vì vậy mã người dùng không cần thực hiện việc đó.
 
-Monitoring functions should not be called with an exception set,
-except those listed below as working with the current exception.
+Không nên gọi các hàm giám sát khi một exception đang được thiết lập, ngoại trừ những hàm được liệt kê bên dưới là hoạt động với exception hiện tại.
 
 .. c:type:: PyMonitoringState
 
-  Representation of the state of an event type. It is allocated by the user
-  while its contents are maintained by the monitoring API functions described below.
+  Biểu diễn trạng thái của một loại sự kiện. Người dùng cấp phát đối tượng này, còn nội dung của nó được duy trì bởi các hàm monitoring API được mô tả dưới đây.
 
 
-All of the functions below return 0 on success and -1 (with an exception set) on error.
+Tất cả các hàm dưới đây trả về 0 khi thành công và -1 (với một exception được thiết lập) khi xảy ra lỗi.
 
-See :mod:`sys.monitoring` for descriptions of the events.
+Xem :mod:`sys.monitoring` để biết mô tả về các sự kiện.
 
 .. c:function:: int PyMonitoring_FirePyStartEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire a ``PY_START`` event.
+   Kích hoạt một sự kiện ``PY_START``.
 
 
 .. c:function:: int PyMonitoring_FirePyResumeEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire a ``PY_RESUME`` event.
+   Kích hoạt một sự kiện ``PY_RESUME``.
 
 
 .. c:function:: int PyMonitoring_FirePyReturnEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject* retval)
 
-   Fire a ``PY_RETURN`` event.
+   Kích hoạt một sự kiện ``PY_RETURN``.
 
 
 .. c:function:: int PyMonitoring_FirePyYieldEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject* retval)
 
-   Fire a ``PY_YIELD`` event.
+   Kích hoạt một sự kiện ``PY_YIELD``.
 
 
 .. c:function:: int PyMonitoring_FireCallEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject* callable, PyObject *arg0)
 
-   Fire a ``CALL`` event.
+   Phát một sự kiện ``CALL``.
 
 
 .. c:function:: int PyMonitoring_FireLineEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, int lineno)
 
-   Fire a ``LINE`` event.
+   Phát một sự kiện ``LINE``.
 
 
 .. c:function:: int PyMonitoring_FireJumpEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject *target_offset)
 
-   Fire a ``JUMP`` event.
+   Phát một sự kiện ``JUMP``.
 
 
 .. c:function:: int PyMonitoring_FireBranchLeftEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject *target_offset)
 
-   Fire a ``BRANCH_LEFT`` event.
+   Phát một sự kiện ``BRANCH_LEFT``.
 
 
 .. c:function:: int PyMonitoring_FireBranchRightEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject *target_offset)
 
-   Fire a ``BRANCH_RIGHT`` event.
+   Phát một sự kiện ``BRANCH_RIGHT``.
 
 
 .. c:function:: int PyMonitoring_FireCReturnEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject *retval)
 
-   Fire a ``C_RETURN`` event.
+   Phát một sự kiện ``C_RETURN``.
 
 
 .. c:function:: int PyMonitoring_FirePyThrowEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire a ``PY_THROW`` event with the current exception (as returned by
+   Phát một sự kiện ``PY_THROW`` với ngoại lệ hiện tại (do
    :c:func:`PyErr_GetRaisedException`).
 
 
 .. c:function:: int PyMonitoring_FireRaiseEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire a ``RAISE`` event with the current exception (as returned by
+   Phát một sự kiện ``RAISE`` với ngoại lệ hiện tại (như được trả về bởi
    :c:func:`PyErr_GetRaisedException`).
 
 
 .. c:function:: int PyMonitoring_FireCRaiseEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire a ``C_RAISE`` event with the current exception (as returned by
+   Phát một sự kiện ``C_RAISE`` với ngoại lệ hiện tại (như được trả về bởi
    :c:func:`PyErr_GetRaisedException`).
 
 
 .. c:function:: int PyMonitoring_FireReraiseEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire a ``RERAISE`` event with the current exception (as returned by
+   Phát một sự kiện ``RERAISE`` với ngoại lệ hiện tại (như được trả về bởi
    :c:func:`PyErr_GetRaisedException`).
 
 
 .. c:function:: int PyMonitoring_FireExceptionHandledEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire an ``EXCEPTION_HANDLED`` event with the current exception (as returned by
+   Phát một sự kiện ``EXCEPTION_HANDLED`` với ngoại lệ hiện tại (như được trả về bởi
    :c:func:`PyErr_GetRaisedException`).
 
 
 .. c:function:: int PyMonitoring_FirePyUnwindEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset)
 
-   Fire a ``PY_UNWIND`` event with the current exception (as returned by
+   Phát một sự kiện ``PY_UNWIND`` với ngoại lệ hiện tại (như được trả về bởi
    :c:func:`PyErr_GetRaisedException`).
 
 
 .. c:function:: int PyMonitoring_FireStopIterationEvent(PyMonitoringState *state, PyObject *codelike, int32_t offset, PyObject *value)
 
-   Fire a ``STOP_ITERATION`` event. If ``value`` is an instance of :exc:`StopIteration`, it is used. Otherwise,
-   a new :exc:`StopIteration` instance is created with ``value`` as its argument.
+   Phát một sự kiện ``STOP_ITERATION``. Nếu ``value`` là một instance của :exc:`StopIteration`, nó sẽ được sử dụng. Nếu không, một instance :exc:`StopIteration` mới sẽ được tạo với ``value`` làm đối số.
 
 
-Managing the Monitoring State
------------------------------
+Quản lý trạng thái giám sát
+---------------------------
 
-Monitoring states can be managed with the help of monitoring scopes. A scope
-would typically correspond to a Python function.
+Trạng thái monitoring có thể được quản lý với sự trợ giúp của các phạm vi monitoring. Một phạm vi thường tương ứng với một hàm Python.
 
 .. c:function:: int PyMonitoring_EnterScope(PyMonitoringState *state_array, uint64_t *version, const uint8_t *event_types, Py_ssize_t length)
 
-   Enter a monitored scope. ``event_types`` is an array of the event IDs for
-   events that may be fired from the scope. For example, the ID of a ``PY_START``
-   event is the value ``PY_MONITORING_EVENT_PY_START``, which is numerically equal
-   to the base-2 logarithm of ``sys.monitoring.events.PY_START``.
-   ``state_array`` is an array with a monitoring state entry for each event in
-   ``event_types``, it is allocated by the user but populated by
-   :c:func:`!PyMonitoring_EnterScope` with information about the activation state of
-   the event. The size of ``event_types`` (and hence also of ``state_array``)
-   is given in ``length``.
+   Đi vào một phạm vi được monitoring. ``event_types`` là một mảng chứa các ID sự kiện của những sự kiện có thể được kích hoạt từ phạm vi này. Ví dụ, ID của sự kiện ``PY_START`` là giá trị ``PY_MONITORING_EVENT_PY_START``, về mặt số học bằng logarit cơ số 2 của ``sys.monitoring.events.PY_START``. ``state_array`` là một mảng có một mục nhập trạng thái monitoring cho mỗi sự kiện trong ``event_types``, mảng này do người dùng cấp phát nhưng được điền bởi
+   :c:func:`!PyMonitoring_EnterScope` cùng thông tin về trạng thái kích hoạt của sự kiện. Kích thước của ``event_types`` (và do đó cả ``state_array``) được cung cấp trong ``length``.
 
-   The ``version`` argument is a pointer to a value which should be allocated
-   by the user together with ``state_array`` and initialized to 0,
-   and then set only by :c:func:`!PyMonitoring_EnterScope` itself. It allows this
-   function to determine whether event states have changed since the previous call,
-   and to return quickly if they have not.
+   Đối số ``version`` là một con trỏ đến một giá trị mà người dùng phải cấp phát cùng với ``state_array``, khởi tạo bằng 0, sau đó chỉ được chính :c:func:`!PyMonitoring_EnterScope` thiết lập. Đối số này cho phép hàm xác định xem trạng thái sự kiện có thay đổi kể từ lần gọi trước hay không, và nhanh chóng trả về nếu không thay đổi.
 
-   The scopes referred to here are lexical scopes: a function, class or method.
-   :c:func:`!PyMonitoring_EnterScope` should be called whenever the lexical scope is
-   entered. Scopes can be reentered, reusing the same *state_array* and *version*,
-   in situations like when emulating a recursive Python function. When a code-like's
-   execution is paused, such as when emulating a generator, the scope needs to
-   be exited and re-entered.
+   Các phạm vi được đề cập ở đây là phạm vi từ vựng: một hàm, lớp hoặc phương thức.
+   :c:func:`!PyMonitoring_EnterScope` nên được gọi bất cứ khi nào phạm vi từ vựng được đi vào. Có thể đi vào lại các phạm vi bằng cách sử dụng lại *state_array* và *version* tương tự, trong những tình huống như khi mô phỏng một hàm Python đệ quy. Khi quá trình thực thi một cấu trúc giống mã bị tạm dừng, chẳng hạn khi mô phỏng một generator, cần thoát khỏi phạm vi rồi đi vào lại.
 
-   The macros for *event_types* are:
+   Các macro cho *event_types* là:
 
    .. c:namespace:: NULL
 
    .. The table is here to make the docs searchable, and to allow automatic
       links to the identifiers.
 
-   ================================================== =====================================
-   Macro                                              Event
-   ================================================== =====================================
-   .. c:macro:: PY_MONITORING_EVENT_BRANCH_LEFT       :monitoring-event:`BRANCH_LEFT`
-   .. c:macro:: PY_MONITORING_EVENT_BRANCH_RIGHT      :monitoring-event:`BRANCH_RIGHT`
-   .. c:macro:: PY_MONITORING_EVENT_CALL              :monitoring-event:`CALL`
-   .. c:macro:: PY_MONITORING_EVENT_C_RAISE           :monitoring-event:`C_RAISE`
-   .. c:macro:: PY_MONITORING_EVENT_C_RETURN          :monitoring-event:`C_RETURN`
-   .. c:macro:: PY_MONITORING_EVENT_EXCEPTION_HANDLED :monitoring-event:`EXCEPTION_HANDLED`
-   .. c:macro:: PY_MONITORING_EVENT_INSTRUCTION       :monitoring-event:`INSTRUCTION`
-   .. c:macro:: PY_MONITORING_EVENT_JUMP              :monitoring-event:`JUMP`
-   .. c:macro:: PY_MONITORING_EVENT_LINE              :monitoring-event:`LINE`
-   .. c:macro:: PY_MONITORING_EVENT_PY_RESUME         :monitoring-event:`PY_RESUME`
-   .. c:macro:: PY_MONITORING_EVENT_PY_RETURN         :monitoring-event:`PY_RETURN`
-   .. c:macro:: PY_MONITORING_EVENT_PY_START          :monitoring-event:`PY_START`
-   .. c:macro:: PY_MONITORING_EVENT_PY_THROW          :monitoring-event:`PY_THROW`
-   .. c:macro:: PY_MONITORING_EVENT_PY_UNWIND         :monitoring-event:`PY_UNWIND`
-   .. c:macro:: PY_MONITORING_EVENT_PY_YIELD          :monitoring-event:`PY_YIELD`
-   .. c:macro:: PY_MONITORING_EVENT_RAISE             :monitoring-event:`RAISE`
-   .. c:macro:: PY_MONITORING_EVENT_RERAISE           :monitoring-event:`RERAISE`
-   .. c:macro:: PY_MONITORING_EVENT_STOP_ITERATION    :monitoring-event:`STOP_ITERATION`
-   ================================================== =====================================
+   +----------------------------------------------------+---------------------------------------+
+   | Macro                                              | Event                                 |
+   +====================================================+=======================================+
+   | .. c:macro:: PY_MONITORING_EVENT_BRANCH_LEFT       | :monitoring-event:`BRANCH_LEFT`       |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_BRANCH_RIGHT      | :monitoring-event:`BRANCH_RIGHT`      |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_CALL              | :monitoring-event:`CALL`              |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_C_RAISE           | :monitoring-event:`C_RAISE`           |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_C_RETURN          | :monitoring-event:`C_RETURN`          |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_EXCEPTION_HANDLED | :monitoring-event:`EXCEPTION_HANDLED` |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_INSTRUCTION       | :monitoring-event:`INSTRUCTION`       |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_JUMP              | :monitoring-event:`JUMP`              |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_LINE              | :monitoring-event:`LINE`              |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_PY_RESUME         | :monitoring-event:`PY_RESUME`         |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_PY_RETURN         | :monitoring-event:`PY_RETURN`         |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_PY_START          | :monitoring-event:`PY_START`          |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_PY_THROW          | :monitoring-event:`PY_THROW`          |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_PY_UNWIND         | :monitoring-event:`PY_UNWIND`         |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_PY_YIELD          | :monitoring-event:`PY_YIELD`          |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_RAISE             | :monitoring-event:`RAISE`             |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_RERAISE           | :monitoring-event:`RERAISE`           |
+   +----------------------------------------------------+---------------------------------------+
+   | .. c:macro:: PY_MONITORING_EVENT_STOP_ITERATION    | :monitoring-event:`STOP_ITERATION`    |
+   +----------------------------------------------------+---------------------------------------+
 
 .. c:function:: int PyMonitoring_ExitScope(void)
 
-   Exit the last scope that was entered with :c:func:`!PyMonitoring_EnterScope`.
+   Thoát khỏi phạm vi cuối cùng đã được nhập bằng :c:func:`!PyMonitoring_EnterScope`.
 
 
 .. c:function:: int PY_MONITORING_IS_INSTRUMENTED_EVENT(uint8_t ev)
 
-   Return true if the event corresponding to the event ID *ev* is
-   a :ref:`local event <monitoring-event-local>`.
+   Trả về true nếu event tương ứng với event ID *ev* là một :ref:`sự kiện cục bộ <monitoring-event-local>`.
 
    .. versionadded:: 3.13
 

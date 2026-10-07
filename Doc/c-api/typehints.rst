@@ -2,30 +2,19 @@
 
 .. _typehintobjects:
 
-Objects for Type Hinting
-------------------------
+Đối tượng để gợi ý kiểu
+-----------------------
 
-Various built-in types for type hinting are provided.  Currently,
-two types exist -- :ref:`GenericAlias <types-genericalias>` and
-:ref:`Union <types-union>`.  Only ``GenericAlias`` is exposed to C.
+Có nhiều kiểu dựng sẵn được cung cấp để gợi ý kiểu. Hiện tại, có hai kiểu là :ref:`GenericAlias <types-genericalias>` và
+:ref:`Union <types-union>`. Chỉ ``GenericAlias`` được cung cấp cho C.
 
 .. c:function:: PyObject* Py_GenericAlias(PyObject *origin, PyObject *args)
 
-   Create a :ref:`GenericAlias <types-genericalias>` object.
-   Equivalent to calling the Python class
-   :class:`types.GenericAlias`.  The *origin* and *args* arguments set the
-   ``GenericAlias``\ 's ``__origin__`` and ``__args__`` attributes respectively.
-   *origin* should be a :c:expr:`PyTypeObject*`, and *args* can be a
-   :c:expr:`PyTupleObject*` or any ``PyObject*``.  If *args* passed is
-   not a tuple, a 1-tuple is automatically constructed and ``__args__`` is set
-   to ``(args,)``.
-   Minimal checking is done for the arguments, so the function will succeed even
-   if *origin* is not a type.
-   The ``GenericAlias``\ 's ``__parameters__`` attribute is constructed lazily
-   from ``__args__``.  On failure, an exception is raised and ``NULL`` is
-   returned.
+   Tạo một đối tượng :ref:`GenericAlias <types-genericalias>`. Tương đương với việc gọi class Python
+   :class:`types.GenericAlias`. Các đối số *origin* và *args* lần lượt thiết lập các thuộc tính ``__origin__`` và ``__args__`` của ``GenericAlias``\ . *origin* phải là một :c:expr:`PyTypeObject*`, còn *args* có thể là
+   một :c:expr:`PyTupleObject*` hoặc bất kỳ ``PyObject*`` nào. Nếu *args* được truyền vào không phải là một tuple, một tuple 1 phần tử sẽ được tự động tạo và ``__args__`` được đặt thành ``(args,)``. Chỉ thực hiện kiểm tra tối thiểu đối với các đối số, vì vậy hàm vẫn thành công ngay cả khi *origin* không phải là một kiểu. Đối tượng ``GenericAlias``\  có thuộc tính ``__parameters__`` được tạo một cách trì hoãn từ ``__args__``. Khi thất bại, một ngoại lệ được phát sinh và ``NULL`` được trả về.
 
-   Here's an example of how to make an extension type generic::
+   Sau đây là ví dụ về cách tạo một kiểu mở rộng generic::
 
       ...
       static PyMethodDef my_obj_methods[] = {
@@ -35,13 +24,13 @@ two types exist -- :ref:`GenericAlias <types-genericalias>` and
           ...
       }
 
-   .. seealso:: The data model method :meth:`~object.__class_getitem__`.
+   .. seealso:: Phương thức data model :meth:`~object.__class_getitem__`.
 
    .. versionadded:: 3.9
 
 .. c:var:: PyTypeObject Py_GenericAliasType
 
-   The C type of the object returned by :c:func:`Py_GenericAlias`. Equivalent to
-   :class:`types.GenericAlias` in Python.
+   Kiểu C của đối tượng được trả về bởi :c:func:`Py_GenericAlias`. Tương đương với
+   :class:`types.GenericAlias` trong Python.
 
    .. versionadded:: 3.9

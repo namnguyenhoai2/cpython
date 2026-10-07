@@ -2,25 +2,21 @@
 
 .. _noneobject:
 
-The ``None`` Object
--------------------
+Đối tượng ``None``
+------------------
 
 .. index:: pair: object; None
 
-Note that the :c:type:`PyTypeObject` for ``None`` is not directly exposed in the
-Python/C API.  Since ``None`` is a singleton, testing for object identity (using
-``==`` in C) is sufficient. There is no :c:func:`!PyNone_Check` function for the
-same reason.
+Lưu ý rằng :c:type:`PyTypeObject` cho ``None`` không được cung cấp trực tiếp trong Python/C API. Vì ``None`` là một singleton, chỉ cần kiểm tra identity của đối tượng (sử dụng ``==`` trong C). Vì lý do tương tự, không có hàm :c:func:`!PyNone_Check`.
 
 
 .. c:var:: PyObject* Py_None
 
-   The Python ``None`` object, denoting lack of value.  This object has no methods
-   and is :term:`immortal`.
+   Đối tượng Python ``None``, biểu thị việc thiếu giá trị. Đối tượng này không có phương thức và là :term:`immortal`.
 
    .. versionchanged:: 3.12
       :c:data:`Py_None` is :term:`immortal`.
 
 .. c:macro:: Py_RETURN_NONE
 
-   Return :c:data:`Py_None` from a function.
+   Trả về :c:data:`Py_None` từ một hàm.

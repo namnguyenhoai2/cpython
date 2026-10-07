@@ -2,83 +2,54 @@
 
 .. _threads:
 
-Thread states and the global interpreter lock
-=============================================
+Trạng thái luồng và khóa trình thông dịch toàn cục
+==================================================
 
 .. index::
    single: global interpreter lock
    single: interpreter lock
    single: lock, interpreter
 
-Unless on a :term:`free-threaded build` of :term:`CPython`,
-the Python interpreter is generally not thread-safe.  In order to support
-multi-threaded Python programs, there's a global lock, called the :term:`global
-interpreter lock` or :term:`GIL`, that must be held by a thread before
-accessing Python objects. Without the lock, even the simplest operations
-could cause problems in a multi-threaded program: for example, when
-two threads simultaneously increment the reference count of the same object, the
-reference count could end up being incremented only once instead of twice.
+Trừ khi đang chạy trên một :term:`free-threaded build` của :term:`CPython`, trình thông dịch Python nhìn chung không an toàn với luồng. Để hỗ trợ các chương trình Python đa luồng, có một khóa toàn cục, được gọi là :term:`global interpreter lock` hoặc :term:`GIL`, mà một luồng phải nắm giữ trước khi truy cập các đối tượng Python. Nếu không có khóa này, ngay cả những thao tác đơn giản nhất cũng có thể gây ra sự cố trong một chương trình đa luồng: ví dụ, khi hai luồng đồng thời tăng số lượng tham chiếu của cùng một đối tượng, số lượng tham chiếu có thể cuối cùng chỉ được tăng một lần thay vì hai lần.
 
-As such, only a thread that holds the GIL may operate on Python objects or
-invoke Python's C API.
+Do đó, chỉ luồng đang nắm giữ GIL mới có thể thao tác trên các đối tượng Python hoặc gọi Python's C API.
 
 .. index:: single: setswitchinterval (in module sys)
 
-In order to emulate concurrency, the interpreter regularly tries to switch
-threads between bytecode instructions (see :func:`sys.setswitchinterval`).
-This is why locks are also necessary for thread-safety in pure-Python code.
+Để mô phỏng tính đồng thời, trình thông dịch thường xuyên cố gắng chuyển đổi giữa các luồng ở ranh giới các chỉ thị bytecode (xem :func:`sys.setswitchinterval`). Đây là lý do các khóa cũng cần thiết để bảo đảm an toàn luồng trong mã Python thuần.
 
-Additionally, the global interpreter lock is released around blocking I/O
-operations, such as reading or writing to a file. From the C API, this is done
-by :ref:`detaching the thread state <detaching-thread-state>`.
+Ngoài ra, khóa trình thông dịch toàn cục được giải phóng trong khoảng thời gian thực hiện các thao tác I/O chặn, chẳng hạn như đọc hoặc ghi tệp. Trong C API, việc này được thực hiện bằng cách :ref:`tách trạng thái luồng <detaching-thread-state>`.
 
 
 .. index::
    single: PyThreadState (C type)
 
-The Python interpreter keeps some thread-local information inside
-a data structure called :c:type:`PyThreadState`, known as a :term:`thread state`.
-Each thread has a thread-local pointer to a :c:type:`PyThreadState`; a thread state
-referenced by this pointer is considered to be :term:`attached <attached thread state>`.
+Trình thông dịch Python lưu một số thông tin cục bộ theo luồng bên trong một cấu trúc dữ liệu có tên là :c:type:`PyThreadState`, được gọi là :term:`thread state`. Mỗi luồng có một con trỏ cục bộ theo luồng trỏ đến một :c:type:`PyThreadState`; trạng thái luồng được con trỏ này tham chiếu được xem là :term:`được gắn <attached thread state>`.
 
-A thread can only have one :term:`attached thread state` at a time. An attached
-thread state is typically analogous with holding the GIL, except on
-free-threaded builds.  On builds with the GIL enabled, attaching a thread state
-will block until the GIL can be acquired. However, even on builds with the GIL
-disabled, it is still required to have an attached thread state, as the interpreter
-needs to keep track of which threads may access Python objects.
+Mỗi lần một luồng chỉ có thể có một :term:`attached thread state`. Một trạng thái luồng được gắn thường tương đương với việc nắm giữ GIL, ngoại trừ trong các bản dựng free-threaded. Trên các bản dựng bật GIL, việc gắn trạng thái luồng sẽ chặn cho đến khi có thể giành được GIL. Tuy nhiên, ngay cả trên các bản dựng tắt GIL, vẫn cần có một trạng thái luồng được gắn, vì trình thông dịch cần theo dõi những luồng nào có thể truy cập các đối tượng Python.
 
 .. note::
 
-   Even on the free-threaded build, attaching a thread state may block, as the
-   GIL can be re-enabled or threads might be temporarily suspended (such as during
-   a garbage collection).
+   Ngay cả trong bản build free-threaded, việc gắn trạng thái luồng cũng có thể bị chặn, vì GIL có thể được bật lại hoặc các luồng có thể tạm thời bị đình chỉ (chẳng hạn trong quá trình thu gom rác).
 
-Generally, there will always be an attached thread state when using Python's
-C API, including during embedding and when implementing methods, so it's uncommon
-to need to set up a thread state on your own. Only in some specific cases, such
-as in a :c:macro:`Py_BEGIN_ALLOW_THREADS` block or in a fresh thread, will the
-thread not have an attached thread state.
-If uncertain, check if :c:func:`PyThreadState_GetUnchecked` returns ``NULL``.
+Nhìn chung, sẽ luôn có một trạng thái luồng được gắn khi sử dụng C API của Python, bao gồm cả trong quá trình nhúng và khi triển khai các phương thức, vì vậy hiếm khi bạn cần tự thiết lập trạng thái luồng. Chỉ trong một số trường hợp cụ thể, chẳng hạn như trong khối :c:macro:`Py_BEGIN_ALLOW_THREADS` hoặc trong một luồng mới, luồng mới không có trạng thái luồng được gắn. Nếu không chắc chắn, hãy kiểm tra xem :c:func:`PyThreadState_GetUnchecked` có trả về ``NULL`` hay không.
 
-If it turns out that you do need to create a thread state, call :c:func:`PyThreadState_New`
-followed by :c:func:`PyThreadState_Swap`, or use the dangerous
-:c:func:`PyGILState_Ensure` function.
+Nếu xác định rằng bạn cần tạo trạng thái luồng, hãy gọi :c:func:`PyThreadState_New` rồi gọi :c:func:`PyThreadState_Swap`, hoặc sử dụng hàm nguy hiểm
+:c:func:`PyGILState_Ensure`.
 
 
 .. _detaching-thread-state:
 
-Detaching the thread state from extension code
-----------------------------------------------
+Tách trạng thái luồng khỏi mã extension
+---------------------------------------
 
-Most extension code manipulating the :term:`thread state` has the following simple
-structure::
+Hầu hết mã extension thao tác với :term:`thread state` đều có cấu trúc đơn giản sau đây::
 
    Save the thread state in a local variable.
    ... Do some blocking I/O operation ...
    Restore the thread state from the local variable.
 
-This is so common that a pair of macros exists to simplify it::
+Điều này phổ biến đến mức đã có một cặp macro để đơn giản hóa việc này::
 
    Py_BEGIN_ALLOW_THREADS
    ... Do some blocking I/O operation ...
@@ -88,11 +59,9 @@ This is so common that a pair of macros exists to simplify it::
    single: Py_BEGIN_ALLOW_THREADS (C macro)
    single: Py_END_ALLOW_THREADS (C macro)
 
-The :c:macro:`Py_BEGIN_ALLOW_THREADS` macro opens a new block and declares a
-hidden local variable; the :c:macro:`Py_END_ALLOW_THREADS` macro closes the
-block.
+Macro :c:macro:`Py_BEGIN_ALLOW_THREADS` mở một block mới và khai báo một biến cục bộ ẩn; macro :c:macro:`Py_END_ALLOW_THREADS` đóng block đó.
 
-The block above expands to the following code::
+Block ở trên được mở rộng thành đoạn mã sau::
 
    PyThreadState *_save;
 
@@ -104,104 +73,71 @@ The block above expands to the following code::
    single: PyEval_RestoreThread (C function)
    single: PyEval_SaveThread (C function)
 
-Here is how these functions work:
+Các hàm này hoạt động như sau:
 
-The attached thread state implies that the GIL is held for the interpreter.
-To detach it, :c:func:`PyEval_SaveThread` is called and the result is stored
-in a local variable.
+Thread state được gắn vào cho biết GIL đang được giữ cho interpreter. Để tách thread state, gọi :c:func:`PyEval_SaveThread` và lưu kết quả vào một biến cục bộ.
 
-By detaching the thread state, the GIL is released, which allows other threads
-to attach to the interpreter and execute while the current thread performs
-blocking I/O. When the I/O operation is complete, the old thread state is
-reattached by calling :c:func:`PyEval_RestoreThread`, which will wait until
-the GIL can be acquired.
+Việc tách thread state sẽ giải phóng GIL, cho phép các thread khác gắn vào interpreter và thực thi trong khi thread hiện tại thực hiện I/O chặn. Khi thao tác I/O hoàn tất, thread state cũ được gắn lại bằng cách gọi :c:func:`PyEval_RestoreThread`, hàm này sẽ chờ cho đến khi có thể lấy được GIL.
 
 .. note::
-   Performing blocking I/O is the most common use case for detaching
-   the thread state, but it is also useful to call it over long-running
-   native code that doesn't need access to Python objects or Python's C API.
-   For example, the standard :mod:`zlib` and :mod:`hashlib` modules detach the
-   :term:`thread state <attached thread state>` when compressing or hashing
-   data.
+   Thực hiện I/O chặn là trường hợp sử dụng phổ biến nhất của việc tách thread state, nhưng việc gọi nó trong đoạn mã native chạy lâu và không cần truy cập vào các đối tượng Python hoặc C API của Python cũng rất hữu ích. Ví dụ, các module chuẩn :mod:`zlib` và :mod:`hashlib` sẽ tách
+   :term:`thread state <attached thread state>` khi nén hoặc băm dữ liệu.
 
-On a :term:`free-threaded build`, the :term:`GIL` is usually out of the question,
-but **detaching the thread state is still required**, because the interpreter
-periodically needs to block all threads to get a consistent view of Python objects
-without the risk of race conditions.
-For example, CPython currently suspends all threads for a short period of time
-while running the garbage collector.
+Trên một :term:`free-threaded build`, :term:`GIL` thường là điều không thể thực hiện, nhưng **việc tách trạng thái luồng vẫn là bắt buộc**, vì trình thông dịch định kỳ cần chặn tất cả các luồng để có được chế độ xem nhất quán về các đối tượng Python mà không có nguy cơ xảy ra race condition. Ví dụ: CPython hiện tạm dừng tất cả các luồng trong một khoảng thời gian ngắn khi chạy trình thu gom rác.
 
 .. warning::
 
-   Detaching the thread state can lead to unexpected behavior during interpreter
-   finalization. See :ref:`cautions-regarding-runtime-finalization` for more
-   details.
+   Việc tách trạng thái luồng có thể dẫn đến hành vi không mong muốn trong quá trình hoàn tất trình thông dịch. Xem :ref:`cautions-regarding-runtime-finalization` để biết thêm chi tiết.
 
 
 APIs
 ^^^^
 
-The following macros are normally used without a trailing semicolon; look for
-example usage in the Python source distribution.
+Các macro sau đây thường được sử dụng mà không có dấu chấm phẩy ở cuối; hãy tìm cách sử dụng mẫu trong bản phân phối mã nguồn Python.
 
 .. note::
 
-    These macros are still necessary on the :term:`free-threaded build` to prevent
-    deadlocks.
+    Các macro này vẫn cần thiết trên :term:`free-threaded build` để ngăn deadlock.
 
 .. c:macro:: Py_BEGIN_ALLOW_THREADS
 
-   This macro expands to ``{ PyThreadState *_save; _save = PyEval_SaveThread();``.
-   Note that it contains an opening brace; it must be matched with a following
-   :c:macro:`Py_END_ALLOW_THREADS` macro.  See above for further discussion of this
-   macro.
+   Macro này được mở rộng thành ``{ PyThreadState *_save; _save = PyEval_SaveThread();``. Lưu ý rằng macro này chứa một dấu ngoặc nhọn mở; nó phải được ghép với một macro tiếp theo
+   :c:macro:`Py_END_ALLOW_THREADS`. Xem phần trên để biết thêm thảo luận về macro này.
 
 
 .. c:macro:: Py_END_ALLOW_THREADS
 
-   This macro expands to ``PyEval_RestoreThread(_save); }``. Note that it contains
-   a closing brace; it must be matched with an earlier
-   :c:macro:`Py_BEGIN_ALLOW_THREADS` macro.  See above for further discussion of
-   this macro.
+   Macro này mở rộng thành ``PyEval_RestoreThread(_save); }``. Lưu ý rằng nó chứa một dấu ngoặc nhọn đóng; nó phải được ghép với một
+   macro :c:macro:`Py_BEGIN_ALLOW_THREADS` trước đó. Xem phần trên để biết thêm về macro này.
 
 
 .. c:macro:: Py_BLOCK_THREADS
 
-   This macro expands to ``PyEval_RestoreThread(_save);``: it is equivalent to
-   :c:macro:`Py_END_ALLOW_THREADS` without the closing brace.
+   Macro này mở rộng thành ``PyEval_RestoreThread(_save);``: nó tương đương với
+   :c:macro:`Py_END_ALLOW_THREADS` không có dấu ngoặc nhọn đóng.
 
 
 .. c:macro:: Py_UNBLOCK_THREADS
 
-   This macro expands to ``_save = PyEval_SaveThread();``: it is equivalent to
-   :c:macro:`Py_BEGIN_ALLOW_THREADS` without the opening brace and variable
-   declaration.
+   Macro này mở rộng thành ``_save = PyEval_SaveThread();``: nó tương đương với
+   :c:macro:`Py_BEGIN_ALLOW_THREADS` không có dấu ngoặc nhọn mở và phần khai báo biến.
 
 
-Non-Python created threads
---------------------------
+Các thread được tạo không phải bằng Python
+------------------------------------------
 
-When threads are created using the dedicated Python APIs (such as the
-:mod:`threading` module), a thread state is automatically associated with them,
-However, when a thread is created from native code (for example, by a
-third-party library with its own thread management), it doesn't hold an
-attached thread state.
+Khi các thread được tạo bằng các Python API chuyên dụng (chẳng hạn như
+:mod:`threading` module), một trạng thái thread sẽ tự động được liên kết với chúng. Tuy nhiên, khi một thread được tạo từ mã native (ví dụ: bởi một thư viện bên thứ ba có cơ chế quản lý thread riêng), thread đó không có trạng thái thread được đính kèm.
 
-If you need to call Python code from these threads (often this will be part
-of a callback API provided by the aforementioned third-party library),
-you must first register these threads with the interpreter by
-creating a new thread state and attaching it.
+Nếu cần gọi mã Python từ các thread này (thường đây sẽ là một phần của callback API do thư viện bên thứ ba nói trên cung cấp), trước tiên bạn phải đăng ký các thread này với interpreter bằng cách tạo một trạng thái thread mới và đính kèm trạng thái đó.
 
-The most robust way to do this is through :c:func:`PyThreadState_New` followed
-by :c:func:`PyThreadState_Swap`.
+Cách đáng tin cậy nhất để thực hiện việc này là thông qua :c:func:`PyThreadState_New` rồi đến :c:func:`PyThreadState_Swap`.
 
 .. note::
-   ``PyThreadState_New`` requires an argument pointing to the desired
-   interpreter; such a pointer can be acquired via a call to
-   :c:func:`PyInterpreterState_Get` from the code where the thread was
-   created.
+   ``PyThreadState_New`` yêu cầu một đối số trỏ đến interpreter mong muốn; bạn có thể lấy con trỏ này bằng cách gọi
+   :c:func:`PyInterpreterState_Get` từ mã nơi thread được tạo.
 
-For example::
+Ví dụ::
 
    /* The return value of PyInterpreterState_Get() from the
       function that created this thread. */
@@ -224,28 +160,21 @@ For example::
 
 .. warning::
 
-   If the interpreter finalized before ``PyThreadState_Swap`` was called, then
-   ``interp`` will be a dangling pointer!
+   Nếu interpreter hoàn tất trước khi ``PyThreadState_Swap`` được gọi, thì ``interp`` sẽ là một dangling pointer!
 
 .. _gilstate:
 
-Legacy API
-----------
+API cũ
+------
 
-Another common pattern to call Python code from a non-Python thread is to use
-:c:func:`PyGILState_Ensure` followed by a call to :c:func:`PyGILState_Release`.
+Một mẫu phổ biến khác để gọi mã Python từ một thread không phải Python là sử dụng
+:c:func:`PyGILState_Ensure` rồi gọi :c:func:`PyGILState_Release`.
 
-These functions do not work well when multiple interpreters exist in the Python
-process. If no Python interpreter has ever been used in the current thread (which
-is common for threads created outside Python), ``PyGILState_Ensure`` will create
-and attach a thread state for the "main" interpreter (the first interpreter in
-the Python process).
+Các hàm này không hoạt động tốt khi có nhiều interpreter trong tiến trình Python. Nếu chưa từng có interpreter Python nào được sử dụng trong thread hiện tại (điều thường xảy ra với các thread được tạo bên ngoài Python), ``PyGILState_Ensure`` sẽ tạo và gắn một thread state cho interpreter "main" (interpreter đầu tiên trong tiến trình Python).
 
-Additionally, these functions have thread-safety issues during interpreter
-finalization. Using ``PyGILState_Ensure`` during finalization will likely
-crash the process.
+Ngoài ra, các hàm này có vấn đề về thread-safety trong quá trình hoàn tất interpreter. Việc sử dụng ``PyGILState_Ensure`` trong quá trình hoàn tất có khả năng cao sẽ khiến tiến trình bị crash.
 
-Usage of these functions look like such::
+Cách sử dụng các hàm này như sau::
 
    PyGILState_STATE gstate;
    gstate = PyGILState_Ensure();
@@ -260,57 +189,34 @@ Usage of these functions look like such::
 
 .. _fork-and-threads:
 
-Cautions about fork()
----------------------
-
-Another important thing to note about threads is their behaviour in the face
-of the C :c:func:`fork` call. On most systems with :c:func:`fork`, after a
-process forks only the thread that issued the fork will exist.  This has a
-concrete impact both on how locks must be handled and on all stored state
-in CPython's runtime.
-
-The fact that only the "current" thread remains
-means any locks held by other threads will never be released. Python solves
-this for :func:`os.fork` by acquiring the locks it uses internally before
-the fork, and releasing them afterwards. In addition, it resets any
-:ref:`lock-objects` in the child. When extending or embedding Python, there
-is no way to inform Python of additional (non-Python) locks that need to be
-acquired before or reset after a fork. OS facilities such as
-:c:func:`!pthread_atfork` would need to be used to accomplish the same thing.
-Additionally, when extending or embedding Python, calling :c:func:`fork`
-directly rather than through :func:`os.fork` (and returning to or calling
-into Python) may result in a deadlock by one of Python's internal locks
-being held by a thread that is defunct after the fork.
-:c:func:`PyOS_AfterFork_Child` tries to reset the necessary locks, but is not
-always able to.
-
-The fact that all other threads go away also means that CPython's
-runtime state there must be cleaned up properly, which :func:`os.fork`
-does.  This means finalizing all other :c:type:`PyThreadState` objects
-belonging to the current interpreter and all other
-:c:type:`PyInterpreterState` objects.  Due to this and the special
-nature of the :ref:`"main" interpreter <sub-interpreter-support>`,
-:c:func:`fork` should only be called in that interpreter's "main"
-thread, where the CPython global runtime was originally initialized.
-The only exception is if :c:func:`exec` will be called immediately
-after.
-
-
-High-level APIs
+Lưu ý về fork()
 ---------------
 
-These are the most commonly used types and functions when writing multi-threaded
-C extensions.
+Một điều quan trọng khác cần lưu ý về các thread là hành vi của chúng khi gặp lời gọi :c:func:`fork` trong C. Trên hầu hết các hệ thống có :c:func:`fork`, sau khi một process fork, chỉ thread thực hiện fork còn tồn tại. Điều này ảnh hưởng cụ thể đến cả cách phải xử lý các lock và toàn bộ trạng thái được lưu trong runtime của CPython.
+
+Việc chỉ còn lại thread "hiện tại" có nghĩa là mọi lock do các thread khác nắm giữ sẽ không bao giờ được giải phóng. Python xử lý việc này cho :func:`os.fork` bằng cách lấy các lock mà nó sử dụng nội bộ trước khi fork và giải phóng chúng sau đó. Ngoài ra, nó đặt lại mọi
+:ref:`lock-objects` trong child. Khi mở rộng hoặc nhúng Python, không có cách nào thông báo cho Python về các lock bổ sung (không thuộc Python) cần được lấy trước fork hoặc đặt lại sau fork. Các cơ chế của hệ điều hành như
+:c:func:`!pthread_atfork` cần được sử dụng để thực hiện điều tương tự. Ngoài ra, khi mở rộng hoặc nhúng Python, việc gọi trực tiếp :c:func:`fork` thay vì thông qua :func:`os.fork` (và quay lại Python hoặc gọi vào Python) có thể dẫn đến deadlock do một trong các lock nội bộ của Python đang bị một thread đã không còn tồn tại sau fork nắm giữ.
+:c:func:`PyOS_AfterFork_Child` cố gắng đặt lại các lock cần thiết, nhưng không phải lúc nào cũng làm được.
+
+Việc tất cả các thread khác biến mất cũng có nghĩa là trạng thái runtime của CPython tại đó phải được dọn dẹp đúng cách, và :func:`os.fork` thực hiện việc này. Điều đó có nghĩa là hoàn tất việc xử lý tất cả các đối tượng :c:type:`PyThreadState` khác thuộc về interpreter hiện tại và tất cả các
+Các đối tượng :c:type:`PyInterpreterState`. Do đó và do tính chất đặc biệt của trình thông dịch :ref:`"main" trình thông dịch <sub-interpreter-support>`,
+:c:func:`fork` chỉ nên được gọi trong luồng "main" của trình thông dịch đó, nơi runtime toàn cục của CPython được khởi tạo ban đầu. Ngoại lệ duy nhất là nếu :c:func:`exec` sẽ được gọi ngay sau đó.
+
+
+API cấp cao
+-----------
+
+Đây là các kiểu và hàm được sử dụng phổ biến nhất khi viết các extension C đa luồng.
 
 
 .. c:type:: PyThreadState
 
-   This data structure represents the state of a single thread.  The only public
-   data member is:
+   Cấu trúc dữ liệu này biểu diễn trạng thái của một luồng đơn. Thành viên dữ liệu công khai duy nhất là:
 
    .. c:member:: PyInterpreterState *interp
 
-      This thread's interpreter state.
+      Trạng thái trình thông dịch của luồng này.
 
 
 .. c:function:: void PyEval_InitThreads()
@@ -321,19 +227,18 @@ C extensions.
       single: PyEval_SaveThread()
       single: PyEval_RestoreThread()
 
-   Deprecated function which does nothing.
+   Hàm đã lỗi thời và không thực hiện tác vụ nào.
 
-   In Python 3.6 and older, this function created the GIL if it didn't exist.
+   Trong Python 3.6 trở về trước, hàm này đã tạo GIL nếu nó chưa tồn tại.
 
    .. versionchanged:: 3.9
-      The function now does nothing.
+      Hiện hàm này không thực hiện thao tác nào.
 
    .. versionchanged:: 3.7
-      This function is now called by :c:func:`Py_Initialize()`, so you don't
-      have to call it yourself anymore.
+      Hiện hàm này được :c:func:`Py_Initialize()` gọi, vì vậy bạn không còn phải tự gọi nó nữa.
 
    .. versionchanged:: 3.2
-      This function cannot be called before :c:func:`Py_Initialize()` anymore.
+      Hiện không thể gọi hàm này trước :c:func:`Py_Initialize()` nữa.
 
    .. deprecated:: 3.9
 
@@ -342,444 +247,328 @@ C extensions.
 
 .. c:function:: PyThreadState* PyEval_SaveThread()
 
-   Detach the :term:`attached thread state` and return it.
-   The thread will have no :term:`thread state` upon returning.
+   Tách :term:`attached thread state` và trả về nó. Khi trả về, thread sẽ không có :term:`thread state`.
 
 
 .. c:function:: void PyEval_RestoreThread(PyThreadState *tstate)
 
-   Set the :term:`attached thread state` to *tstate*.
-   The passed :term:`thread state` **should not** be :term:`attached <attached thread state>`,
-   otherwise deadlock ensues. *tstate* will be attached upon returning.
+   Đặt :term:`attached thread state` thành *tstate*. :term:`thread state` được truyền vào **không được** :term:`gắn <attached thread state>`, nếu không sẽ xảy ra deadlock. *tstate* sẽ được gắn khi trả về.
 
    .. note::
-      Calling this function from a thread when the runtime is finalizing will
-      hang the thread until the program exits, even if the thread was not
-      created by Python.  Refer to
-      :ref:`cautions-regarding-runtime-finalization` for more details.
+      Gọi hàm này từ một thread khi runtime đang trong quá trình kết thúc sẽ khiến thread bị treo cho đến khi chương trình thoát, ngay cả khi thread đó không được Python tạo. Hãy tham khảo
+      :ref:`cautions-regarding-runtime-finalization` để biết thêm chi tiết.
 
    .. versionchanged:: 3.14
-      Hangs the current thread, rather than terminating it, if called while the
-      interpreter is finalizing.
+      Tạm dừng thread hiện tại thay vì kết thúc thread đó nếu được gọi khi interpreter đang hoàn tất quá trình finalization.
 
 .. c:function:: PyThreadState* PyThreadState_Get()
 
-   Return the :term:`attached thread state`. If the thread has no attached
-   thread state, (such as when inside of :c:macro:`Py_BEGIN_ALLOW_THREADS`
-   block), then this issues a fatal error (so that the caller needn't check
-   for ``NULL``).
+   Trả về :term:`attached thread state`. Nếu thread không có thread state được đính kèm (chẳng hạn như khi đang ở trong block :c:macro:`Py_BEGIN_ALLOW_THREADS`), thao tác này sẽ phát sinh lỗi nghiêm trọng (fatal error), do đó caller không cần kiểm tra ``NULL``.
 
-   See also :c:func:`PyThreadState_GetUnchecked`.
+   Xem thêm :c:func:`PyThreadState_GetUnchecked`.
 
 .. c:function:: PyThreadState* PyThreadState_GetUnchecked()
 
-   Similar to :c:func:`PyThreadState_Get`, but don't kill the process with a
-   fatal error if it is NULL. The caller is responsible to check if the result
-   is NULL.
+   Tương tự :c:func:`PyThreadState_Get`, nhưng không kết thúc process bằng lỗi nghiêm trọng nếu giá trị đó là NULL. Caller có trách nhiệm kiểm tra xem kết quả có phải là NULL hay không.
 
    .. versionadded:: 3.13
-      In Python 3.5 to 3.12, the function was private and known as
-      ``_PyThreadState_UncheckedGet()``.
+      Trong Python 3.5 đến 3.12, hàm này là private và được biết đến với tên ``_PyThreadState_UncheckedGet()``.
 
 
 .. c:function:: PyThreadState* PyThreadState_Swap(PyThreadState *tstate)
 
-   Set the :term:`attached thread state` to *tstate*, and return the
-   :term:`thread state` that was attached prior to calling.
+   Đặt :term:`attached thread state` thành *tstate*, rồi trả về
+   :term:`thread state` đã được gắn trước khi gọi.
 
-   This function is safe to call without an :term:`attached thread state`; it
-   will simply return ``NULL`` indicating that there was no prior thread state.
+   Có thể gọi hàm này một cách an toàn mà không cần :term:`attached thread state`; hàm sẽ chỉ trả về ``NULL``, cho biết không có trạng thái thread trước đó.
 
    .. seealso::
       :c:func:`PyEval_ReleaseThread`
 
    .. note::
-      Similar to :c:func:`PyGILState_Ensure`, this function will hang the
-      thread if the runtime is finalizing.
+      Tương tự như :c:func:`PyGILState_Ensure`, hàm này sẽ khiến thread bị treo nếu runtime đang trong quá trình kết thúc.
 
 
-GIL-state APIs
---------------
+API trạng thái GIL
+------------------
 
-The following functions use thread-local storage, and are not compatible
-with sub-interpreters:
+Các hàm sau sử dụng bộ nhớ lưu trữ cục bộ của thread và không tương thích với sub-interpreter:
 
 .. c:type:: PyGILState_STATE
 
-   The type of the value returned by :c:func:`PyGILState_Ensure` and passed to
+   Kiểu của giá trị được :c:func:`PyGILState_Ensure` trả về và được truyền cho
    :c:func:`PyGILState_Release`.
 
    .. c:enumerator:: PyGILState_LOCKED
 
-      The GIL was already held when :c:func:`PyGILState_Ensure` was called.
+      GIL đã được giữ khi :c:func:`PyGILState_Ensure` được gọi.
 
    .. c:enumerator:: PyGILState_UNLOCKED
 
-      The GIL was not held when :c:func:`PyGILState_Ensure` was called.
+      GIL không được giữ khi :c:func:`PyGILState_Ensure` được gọi.
 
 .. c:function:: PyGILState_STATE PyGILState_Ensure()
 
-   Ensure that the current thread is ready to call the Python C API regardless
-   of the current state of Python, or of the :term:`attached thread state`. This may
-   be called as many times as desired by a thread as long as each call is
-   matched with a call to :c:func:`PyGILState_Release`. In general, other
-   thread-related APIs may be used between :c:func:`PyGILState_Ensure` and
-   :c:func:`PyGILState_Release` calls as long as the thread state is restored to
-   its previous state before the Release().  For example, normal usage of the
-   :c:macro:`Py_BEGIN_ALLOW_THREADS` and :c:macro:`Py_END_ALLOW_THREADS` macros is
-   acceptable.
+   Đảm bảo rằng luồng hiện tại đã sẵn sàng gọi Python C API bất kể trạng thái hiện tại của Python hoặc của :term:`attached thread state`. Một luồng có thể gọi hàm này bao nhiêu lần tùy ý, miễn là mỗi lần gọi đều đi kèm một lần gọi :c:func:`PyGILState_Release`. Nhìn chung, có thể sử dụng các API liên quan đến luồng khác giữa :c:func:`PyGILState_Ensure` và
+   các lần gọi :c:func:`PyGILState_Release`, miễn là trạng thái luồng được khôi phục về trạng thái trước đó trước khi gọi Release().  Ví dụ, cách sử dụng thông thường của các macro
+   :c:macro:`Py_BEGIN_ALLOW_THREADS` và :c:macro:`Py_END_ALLOW_THREADS` là hợp lệ.
 
-   The return value is an opaque "handle" to the :term:`attached thread state` when
-   :c:func:`PyGILState_Ensure` was called, and must be passed to
-   :c:func:`PyGILState_Release` to ensure Python is left in the same state. Even
-   though recursive calls are allowed, these handles *cannot* be shared - each
-   unique call to :c:func:`PyGILState_Ensure` must save the handle for its call
-   to :c:func:`PyGILState_Release`.
+   Giá trị trả về là một "handle" không trong suốt tới :term:`attached thread state` khi
+   :c:func:`PyGILState_Ensure` được gọi và phải được truyền vào
+   :c:func:`PyGILState_Release` để đảm bảo Python được giữ ở cùng trạng thái. Mặc dù cho phép các lần gọi đệ quy, các handle này *không thể* được chia sẻ - mỗi lần gọi riêng biệt tới :c:func:`PyGILState_Ensure` phải lưu handle cho lần gọi :c:func:`PyGILState_Release` tương ứng.
 
-   When the function returns, there will be an :term:`attached thread state`
-   and the thread will be able to call arbitrary Python code.  Failure is a fatal error.
+   Khi hàm trả về, sẽ có một :term:`attached thread state` và thread sẽ có thể gọi mã Python tùy ý. Lỗi này là lỗi nghiêm trọng.
 
    .. warning::
-      Calling this function when the runtime is finalizing is unsafe. Doing
-      so will either hang the thread until the program ends, or fully crash
-      the interpreter in rare cases. Refer to
-      :ref:`cautions-regarding-runtime-finalization` for more details.
+      Việc gọi hàm này khi runtime đang trong quá trình kết thúc là không an toàn. Làm như vậy sẽ khiến thread bị treo cho đến khi chương trình kết thúc hoặc, trong một số trường hợp hiếm, khiến interpreter bị crash hoàn toàn. Tham khảo
+      :ref:`cautions-regarding-runtime-finalization` để biết thêm chi tiết.
 
    .. versionchanged:: 3.14
-      Hangs the current thread, rather than terminating it, if called while the
-      interpreter is finalizing.
+      Treo thread hiện tại thay vì kết thúc thread đó nếu được gọi trong khi interpreter đang trong quá trình kết thúc.
 
 .. c:function:: void PyGILState_Release(PyGILState_STATE)
 
-   Release any resources previously acquired.  After this call, Python's state will
-   be the same as it was prior to the corresponding :c:func:`PyGILState_Ensure` call
-   (but generally this state will be unknown to the caller, hence the use of the
-   GILState API).
+   Giải phóng mọi tài nguyên đã được thu nhận trước đó. Sau lời gọi này, trạng thái của Python sẽ giống như trước lời gọi :c:func:`PyGILState_Ensure` tương ứng (nhưng nhìn chung trạng thái này sẽ không được bên gọi biết, do đó cần sử dụng GILState API).
 
-   Every call to :c:func:`PyGILState_Ensure` must be matched by a call to
-   :c:func:`PyGILState_Release` on the same thread.
+   Mỗi lời gọi đến :c:func:`PyGILState_Ensure` phải tương ứng với một lời gọi đến
+   :c:func:`PyGILState_Release` trên cùng thread.
 
 .. c:function:: PyThreadState* PyGILState_GetThisThreadState()
 
-   Get the :term:`attached thread state` for this thread.  May return ``NULL`` if no
-   GILState API has been used on the current thread.  Note that the main thread
-   always has such a thread-state, even if no auto-thread-state call has been
-   made on the main thread.  This is mainly a helper/diagnostic function.
+   Lấy :term:`attached thread state` cho thread này. Có thể trả về ``NULL`` nếu chưa sử dụng API GILState nào trên thread hiện tại. Lưu ý rằng thread chính luôn có thread-state như vậy, ngay cả khi chưa thực hiện lệnh gọi auto-thread-state nào trên thread chính. Đây chủ yếu là một hàm trợ giúp/chẩn đoán.
 
    .. note::
-      This function may return non-``NULL`` even when the :term:`thread state`
-      is detached.
-      Prefer :c:func:`PyThreadState_Get` or :c:func:`PyThreadState_GetUnchecked`
-      for most cases.
+      Hàm này có thể trả về giá trị khác ``NULL`` ngay cả khi :term:`thread state` được tách rời. Trong hầu hết trường hợp, hãy ưu tiên :c:func:`PyThreadState_Get` hoặc :c:func:`PyThreadState_GetUnchecked`.
 
    .. seealso:: :c:func:`PyThreadState_Get`
 
 .. c:function:: int PyGILState_Check()
 
-   Return ``1`` if the current thread is holding the :term:`GIL` and ``0`` otherwise.
-   This function can be called from any thread at any time.
-   Only if it has had its :term:`thread state <attached thread state>` initialized
-   via :c:func:`PyGILState_Ensure` will it return ``1``.
-   This is mainly a helper/diagnostic function.  It can be useful
-   for example in callback contexts or memory allocation functions when
-   knowing that the :term:`GIL` is locked can allow the caller to perform sensitive
-   actions or otherwise behave differently.
+   Trả về ``1`` nếu thread hiện tại đang giữ :term:`GIL` và ``0`` trong trường hợp ngược lại. Có thể gọi hàm này từ bất kỳ thread nào vào bất kỳ thời điểm nào. Chỉ khi :term:`trạng thái thread <attached thread state>` của thread đó đã được khởi tạo thông qua :c:func:`PyGILState_Ensure` thì hàm mới trả về ``1``. Đây chủ yếu là một hàm trợ giúp/chẩn đoán. Ví dụ, hàm này có thể hữu ích trong các ngữ cảnh callback hoặc các hàm cấp phát bộ nhớ, khi việc biết rằng :term:`GIL` đang bị khóa cho phép caller thực hiện các hành động nhạy cảm hoặc ứng xử khác đi.
 
    .. note::
-      If the current Python process has ever created a subinterpreter, this
-      function will *always* return ``1``. Prefer :c:func:`PyThreadState_GetUnchecked`
-      for most cases.
+      Nếu tiến trình Python hiện tại đã từng tạo một subinterpreter, hàm này *luôn* trả về ``1``. Trong hầu hết trường hợp, hãy ưu tiên :c:func:`PyThreadState_GetUnchecked`.
 
    .. versionadded:: 3.4
 
 
-Low-level APIs
---------------
+API cấp thấp
+------------
 
 .. c:function:: PyThreadState* PyThreadState_New(PyInterpreterState *interp)
 
-   Create a new thread state object belonging to the given interpreter object.
-   An :term:`attached thread state` is not needed.
+   Tạo một đối tượng thread state mới thuộc về đối tượng interpreter đã cho. Không cần có :term:`attached thread state`.
 
 .. c:function:: void PyThreadState_Clear(PyThreadState *tstate)
 
-   Reset all information in a :term:`thread state` object.  *tstate*
-   must be :term:`attached <attached thread state>`
+   Đặt lại toàn bộ thông tin trong một đối tượng :term:`thread state`. *tstate* phải :term:`được gắn <attached thread state>`
 
    .. versionchanged:: 3.9
-      This function now calls the :c:member:`!PyThreadState.on_delete` callback.
-      Previously, that happened in :c:func:`PyThreadState_Delete`.
+      Hàm này hiện gọi callback :c:member:`!PyThreadState.on_delete`. Trước đây, việc đó xảy ra trong :c:func:`PyThreadState_Delete`.
 
    .. versionchanged:: 3.13
-      The :c:member:`!PyThreadState.on_delete` callback was removed.
+      Callback :c:member:`!PyThreadState.on_delete` đã bị loại bỏ.
 
 
 .. c:function:: void PyThreadState_Delete(PyThreadState *tstate)
 
-   Destroy a :term:`thread state` object.  *tstate* should not
-   be :term:`attached <attached thread state>` to any thread.
-   *tstate* must have been reset with a previous call to
+   Hủy đối tượng :term:`thread state`. *tstate* không được :term:`gắn <attached thread state>` vào bất kỳ thread nào. *tstate* phải đã được reset bằng một lệnh gọi trước đó tới
    :c:func:`PyThreadState_Clear`.
 
 
 .. c:function:: void PyThreadState_DeleteCurrent(void)
 
-   Detach the :term:`attached thread state` (which must have been reset
-   with a previous call to :c:func:`PyThreadState_Clear`) and then destroy it.
+   Tách :term:`attached thread state` (đối tượng này phải đã được reset bằng một lệnh gọi trước đó tới :c:func:`PyThreadState_Clear`) rồi hủy nó.
 
-   No :term:`thread state` will be :term:`attached <attached thread state>` upon
-   returning.
+   Không có :term:`thread state` nào được :term:`gắn <attached thread state>` khi trả về.
 
 .. c:function:: PyFrameObject* PyThreadState_GetFrame(PyThreadState *tstate)
 
-   Get the current frame of the Python thread state *tstate*.
+   Lấy frame hiện tại của trạng thái thread Python *tstate*.
 
-   Return a :term:`strong reference`. Return ``NULL`` if no frame is currently
-   executing.
+   Trả về một :term:`strong reference`. Trả về ``NULL`` nếu hiện không có frame nào đang được thực thi.
 
-   See also :c:func:`PyEval_GetFrame`.
+   Xem thêm :c:func:`PyEval_GetFrame`.
 
-   *tstate* must not be ``NULL``, and must be :term:`attached <attached thread state>`.
+   *tstate* không được ``NULL``, và phải được :term:`gắn <attached thread state>`.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: uint64_t PyThreadState_GetID(PyThreadState *tstate)
 
-   Get the unique :term:`thread state` identifier of the Python thread state *tstate*.
+   Lấy mã định danh duy nhất :term:`thread state` của trạng thái luồng Python *tstate*.
 
-   *tstate* must not be ``NULL``, and must be :term:`attached <attached thread state>`.
+   *tstate* không được ``NULL``, và phải được :term:`gắn <attached thread state>`.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: PyInterpreterState* PyThreadState_GetInterpreter(PyThreadState *tstate)
 
-   Get the interpreter of the Python thread state *tstate*.
+   Lấy interpreter của trạng thái luồng Python *tstate*.
 
-   *tstate* must not be ``NULL``, and must be :term:`attached <attached thread state>`.
+   *tstate* không được ``NULL``, và phải được :term:`gắn <attached thread state>`.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: void PyThreadState_EnterTracing(PyThreadState *tstate)
 
-   Suspend tracing and profiling in the Python thread state *tstate*.
+   Tạm dừng tracing và profiling trong trạng thái luồng Python *tstate*.
 
-   Resume them using the :c:func:`PyThreadState_LeaveTracing` function.
+   Tiếp tục chúng bằng hàm :c:func:`PyThreadState_LeaveTracing`.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: void PyThreadState_LeaveTracing(PyThreadState *tstate)
 
-   Resume tracing and profiling in the Python thread state *tstate* suspended
-   by the :c:func:`PyThreadState_EnterTracing` function.
+   Tiếp tục tracing và profiling trong trạng thái luồng Python *tstate* bị tạm dừng bởi hàm :c:func:`PyThreadState_EnterTracing`.
 
-   See also :c:func:`PyEval_SetTrace` and :c:func:`PyEval_SetProfile`
-   functions.
+   Xem thêm các hàm :c:func:`PyEval_SetTrace` và :c:func:`PyEval_SetProfile`.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: int PyUnstable_ThreadState_SetStackProtection(PyThreadState *tstate, void *stack_start_addr, size_t stack_size)
 
-   Set the stack protection start address and stack protection size
-   of a Python thread state.
+   Thiết lập địa chỉ bắt đầu bảo vệ ngăn xếp và kích thước bảo vệ ngăn xếp của một trạng thái luồng Python.
 
-   On success, return ``0``.
-   On failure, set an exception and return ``-1``.
+   Khi thành công, trả về ``0``. Khi thất bại, đặt một exception và trả về ``-1``.
 
-   CPython implements :ref:`recursion control <recursion>` for C code by raising
-   :py:exc:`RecursionError` when it notices that the machine execution stack is close
-   to overflow. See for example the :c:func:`Py_EnterRecursiveCall` function.
-   For this, it needs to know the location of the current thread's stack, which it
-   normally gets from the operating system.
-   When the stack is changed, for example using context switching techniques like the
-   Boost library's ``boost::context``, you must call
-   :c:func:`~PyUnstable_ThreadState_SetStackProtection` to inform CPython of the change.
+   CPython triển khai :ref:`recursion control <recursion>` cho mã C bằng cách phát sinh
+   :py:exc:`RecursionError` khi nhận thấy ngăn xếp thực thi của máy sắp bị tràn. Xem ví dụ về hàm :c:func:`Py_EnterRecursiveCall`. Để thực hiện việc này, nó cần biết vị trí ngăn xếp của luồng hiện tại, thông tin mà nó thường lấy từ hệ điều hành. Khi ngăn xếp bị thay đổi, chẳng hạn bằng các kỹ thuật chuyển đổi ngữ cảnh như ``boost::context`` của thư viện Boost, bạn phải gọi
+   :c:func:`~PyUnstable_ThreadState_SetStackProtection` để thông báo cho CPython về thay đổi.
 
-   Call :c:func:`~PyUnstable_ThreadState_SetStackProtection` either before
-   or after changing the stack.
-   Do not call any other Python C API between the call and the stack
-   change.
+   Gọi :c:func:`~PyUnstable_ThreadState_SetStackProtection` trước hoặc sau khi thay đổi stack. Không gọi bất kỳ Python C API nào khác giữa lúc gọi và lúc thay đổi stack.
 
-   See :c:func:`PyUnstable_ThreadState_ResetStackProtection` for undoing this operation.
+   Xem :c:func:`PyUnstable_ThreadState_ResetStackProtection` để hoàn tác thao tác này.
 
    .. versionadded:: 3.15
 
 
 .. c:function:: void PyUnstable_ThreadState_ResetStackProtection(PyThreadState *tstate)
 
-   Reset the stack protection start address and stack protection size
-   of a Python thread state to the operating system defaults.
+   Đặt lại địa chỉ bắt đầu bảo vệ stack và kích thước bảo vệ stack của trạng thái thread Python về các giá trị mặc định của hệ điều hành.
 
-   See :c:func:`PyUnstable_ThreadState_SetStackProtection` for an explanation.
+   Xem :c:func:`PyUnstable_ThreadState_SetStackProtection` để biết thêm giải thích.
 
    .. versionadded:: 3.15
 
 
 .. c:function:: PyObject* PyThreadState_GetDict()
 
-   Return a dictionary in which extensions can store thread-specific state
-   information.  Each extension should use a unique key to use to store state in
-   the dictionary.  It is okay to call this function when no :term:`thread state`
-   is :term:`attached <attached thread state>`. If this function returns
-   ``NULL``, no exception has been raised and the caller should assume no
-   thread state is attached.
+   Trả về một từ điển để các extension lưu trữ thông tin trạng thái dành riêng cho thread. Mỗi extension nên sử dụng một khóa duy nhất để lưu trạng thái trong từ điển. Có thể gọi hàm này khi không có :term:`thread state` nào được :term:`đính kèm <attached thread state>`. Nếu hàm này trả về ``NULL``, không có ngoại lệ nào được phát sinh và bên gọi nên giả định rằng không có trạng thái thread nào được đính kèm.
 
 
 .. c:function:: void PyEval_AcquireThread(PyThreadState *tstate)
 
-   :term:`Attach <attached thread state>` *tstate* to the current thread,
-   which must not be ``NULL`` or already :term:`attached <attached thread state>`.
+   :term:`Gắn <attached thread state>` *tstate* vào thread hiện tại, thread này không được là ``NULL`` hoặc đã được :term:`đính kèm <attached thread state>`.
 
-   The calling thread must not already have an :term:`attached thread state`.
+   Luồng gọi không được có sẵn một :term:`attached thread state`.
 
    .. note::
-      Calling this function from a thread when the runtime is finalizing will
-      hang the thread until the program exits, even if the thread was not
-      created by Python.  Refer to
-      :ref:`cautions-regarding-runtime-finalization` for more details.
+      Việc gọi hàm này từ một luồng khi runtime đang hoàn tất sẽ khiến luồng bị treo cho đến khi chương trình thoát, ngay cả khi luồng đó không được Python tạo. Hãy tham khảo
+      :ref:`cautions-regarding-runtime-finalization` để biết thêm chi tiết.
 
    .. versionchanged:: 3.8
-      Updated to be consistent with :c:func:`PyEval_RestoreThread`,
-      :c:func:`Py_END_ALLOW_THREADS`, and :c:func:`PyGILState_Ensure`,
-      and terminate the current thread if called while the interpreter is finalizing.
+      Đã được cập nhật để nhất quán với :c:func:`PyEval_RestoreThread`,
+      :c:func:`Py_END_ALLOW_THREADS` và :c:func:`PyGILState_Ensure`, đồng thời chấm dứt luồng hiện tại nếu được gọi khi interpreter đang hoàn tất.
 
    .. versionchanged:: 3.14
-      Hangs the current thread, rather than terminating it, if called while the
-      interpreter is finalizing.
+      Khi được gọi trong lúc interpreter đang hoàn tất, hàm này sẽ làm luồng hiện tại bị treo thay vì chấm dứt luồng.
 
-   :c:func:`PyEval_RestoreThread` is a higher-level function which is always
-   available (even when threads have not been initialized).
+   :c:func:`PyEval_RestoreThread` là một hàm cấp cao hơn, luôn khả dụng (ngay cả khi các luồng chưa được khởi tạo).
 
 
 .. c:function:: void PyEval_ReleaseThread(PyThreadState *tstate)
 
-   Detach the :term:`attached thread state`.
-   The *tstate* argument, which must not be ``NULL``, is only used to check
-   that it represents the :term:`attached thread state` --- if it isn't, a fatal error is
-   reported.
+   Tách :term:`attached thread state`. Đối số *tstate*, không được là ``NULL``, chỉ được dùng để kiểm tra rằng nó đại diện cho :term:`attached thread state` --- nếu không phải, một lỗi nghiêm trọng sẽ được báo cáo.
 
-   :c:func:`PyEval_SaveThread` is a higher-level function which is always
-   available (even when threads have not been initialized).
+   :c:func:`PyEval_SaveThread` là một hàm cấp cao hơn, luôn khả dụng (ngay cả khi các thread chưa được khởi tạo).
 
 
-Asynchronous notifications
-==========================
+Thông báo bất đồng bộ
+=====================
 
-A mechanism is provided to make asynchronous notifications to the main
-interpreter thread.  These notifications take the form of a function
-pointer and a void pointer argument.
+Một cơ chế được cung cấp để gửi thông báo bất đồng bộ đến thread trình thông dịch chính. Các thông báo này có dạng một con trỏ hàm và một đối số con trỏ void.
 
 
 .. c:function:: int Py_AddPendingCall(int (*func)(void *), void *arg)
 
-   Schedule a function to be called from the main interpreter thread.  On
-   success, ``0`` is returned and *func* is queued for being called in the
-   main thread.  On failure, ``-1`` is returned without setting any exception.
+   Lên lịch một hàm để được gọi từ thread trình thông dịch chính. Khi thành công, ``0`` được trả về và *func* được xếp hàng để được gọi trong thread chính. Khi thất bại, ``-1`` được trả về mà không đặt bất kỳ exception nào.
 
-   When successfully queued, *func* will be *eventually* called from the
-   main interpreter thread with the argument *arg*.  It will be called
-   asynchronously with respect to normally running Python code, but with
-   both these conditions met:
+   Khi được xếp hàng thành công, *func* sẽ *eventually* được gọi từ thread trình thông dịch chính với đối số *arg*. Hàm sẽ được gọi bất đồng bộ so với mã Python đang chạy bình thường, nhưng đồng thời phải đáp ứng cả hai điều kiện sau:
 
-   * on a :term:`bytecode` boundary;
-   * with the main thread holding an :term:`attached thread state`
-     (*func* can therefore use the full C API).
+   * tại một ranh giới :term:`bytecode`;
+   * với main thread đang giữ một :term:`attached thread state` (*func* do đó có thể sử dụng toàn bộ C API).
 
-   *func* must return ``0`` on success, or ``-1`` on failure with an exception
-   set.  *func* won't be interrupted to perform another asynchronous
-   notification recursively, but it can still be interrupted to switch
-   threads if the :term:`thread state <attached thread state>` is detached.
+   *func* phải trả về ``0`` khi thành công hoặc ``-1`` khi thất bại và đã thiết lập một exception.  *func* sẽ không bị gián đoạn để thực hiện đệ quy một asynchronous notification khác, nhưng vẫn có thể bị gián đoạn để chuyển thread nếu trạng thái :term:`thread state <attached thread state>` đã được tách.
 
-   This function doesn't need an :term:`attached thread state`. However, to call this
-   function in a subinterpreter, the caller must have an :term:`attached thread state`.
-   Otherwise, the function *func* can be scheduled to be called from the wrong interpreter.
+   Hàm này không cần một :term:`attached thread state`. Tuy nhiên, để gọi hàm này trong một subinterpreter, caller phải có một :term:`attached thread state`. Nếu không, hàm *func* có thể được lên lịch gọi từ interpreter không đúng.
 
    .. warning::
-      This is a low-level function, only useful for very special cases.
-      There is no guarantee that *func* will be called as quick as
-      possible.  If the main thread is busy executing a system call,
-      *func* won't be called before the system call returns.  This
-      function is generally **not** suitable for calling Python code from
-      arbitrary C threads.  Instead, use the :ref:`PyGILState API<gilstate>`.
+      Đây là một hàm cấp thấp, chỉ hữu ích trong những trường hợp rất đặc biệt. Không có gì đảm bảo rằng *func* sẽ được gọi nhanh nhất có thể.  Nếu main thread đang bận thực thi một system call, *func* sẽ không được gọi trước khi system call đó trả về.  Nhìn chung, hàm này **not** phù hợp để gọi mã Python từ các C thread tùy ý.  Thay vào đó, hãy sử dụng :ref:`PyGILState API <gilstate>`.
 
    .. versionadded:: 3.1
 
    .. versionchanged:: 3.9
-      If this function is called in a subinterpreter, the function *func* is
-      now scheduled to be called from the subinterpreter, rather than being
-      called from the main interpreter. Each subinterpreter now has its own
-      list of scheduled calls.
+      Nếu hàm này được gọi trong một subinterpreter, hàm *func* sẽ được lên lịch gọi từ subinterpreter đó thay vì từ main interpreter. Mỗi subinterpreter hiện có danh sách các lệnh gọi đã lên lịch riêng.
 
    .. versionchanged:: 3.12
-      This function now always schedules *func* to be run in the main
-      interpreter.
+      Hàm này hiện luôn lên lịch để *func* được chạy trong main interpreter.
 
 
 .. c:function:: int Py_MakePendingCalls(void)
 
-   Execute all pending calls. This is usually executed automatically by the
-   interpreter.
+   Thực thi tất cả các lệnh gọi đang chờ. Thông thường, interpreter sẽ tự động thực hiện việc này.
 
-   This function returns ``0`` on success, and returns ``-1`` with an exception
-   set on failure.
+   Hàm này trả về ``0`` khi thành công và trả về ``-1`` khi thất bại, đồng thời thiết lập một exception.
 
-   If this is not called in the main thread of the main
-   interpreter, this function does nothing and returns ``0``.
-   The caller must hold an :term:`attached thread state`.
+   Nếu hàm này không được gọi trong thread chính của interpreter chính, hàm sẽ không thực hiện gì và trả về ``0``. Caller phải giữ một :term:`attached thread state`.
 
    .. versionadded:: 3.1
 
    .. versionchanged:: 3.12
-      This function only runs pending calls in the main interpreter.
+      Hàm này chỉ chạy các lời gọi đang chờ xử lý trong interpreter chính.
 
 
 .. c:function:: int PyThreadState_SetAsyncExc(unsigned long id, PyObject *exc)
 
-   Asynchronously raise an exception in a thread. The *id* argument is the thread
-   id of the target thread; *exc* is the exception object to be raised. This
-   function does not :term:`steal` any references to *exc*. To prevent naive misuse, you
-   must write your own C extension to call this.  Must be called with an :term:`attached thread state`.
-   Returns the number of thread states modified; this is normally one, but will be
-   zero if the thread id isn't found.  If *exc* is ``NULL``, the pending
-   exception (if any) for the thread is cleared. This raises no exceptions.
+   Nâng một ngoại lệ trong một thread theo cách bất đồng bộ. Đối số *id* là ID của thread đích; *exc* là đối tượng ngoại lệ cần được nâng lên. Hàm này không :term:`steal` giữ lại bất kỳ tham chiếu nào đến *exc*. Để ngăn việc sử dụng sai một cách ngây thơ, bạn phải tự viết một C extension để gọi hàm này. Phải được gọi với một :term:`attached thread state`. Trả về số lượng thread state đã được sửa đổi; thông thường là một, nhưng sẽ là không nếu không tìm thấy thread ID. Nếu *exc* là ``NULL``, ngoại lệ đang chờ xử lý (nếu có) của thread sẽ được xóa. Hàm này không phát sinh ngoại lệ nào.
 
    .. versionchanged:: 3.7
-      The type of the *id* parameter changed from :c:expr:`long` to
+      Kiểu của tham số *id* đã thay đổi từ :c:expr:`long` thành
       :c:expr:`unsigned long`.
 
 
-Operating system thread APIs
-============================
+API thread của hệ điều hành
+===========================
 
 .. c:macro:: PYTHREAD_INVALID_THREAD_ID
 
-   Sentinel value for an invalid thread ID.
+   Giá trị sentinel cho thread ID không hợp lệ.
 
-   This is currently equivalent to ``(unsigned long)-1``.
+   Hiện tại, điều này tương đương với ``(unsigned long)-1``.
 
 
 .. c:function:: unsigned long PyThread_start_new_thread(void (*func)(void *), void *arg)
 
-   Start function *func* in a new thread with argument *arg*.
-   The resulting thread is not intended to be joined.
+   Bắt đầu hàm *func* trong một thread mới với đối số *arg*. Thread được tạo ra không предназначен để được join.
 
-   *func* must not be ``NULL``, but *arg* may be ``NULL``.
+   *func* không được là ``NULL``, nhưng *arg* có thể là ``NULL``.
 
-   On success, this function returns the identifier of the new thread; on failure,
-   this returns :c:macro:`PYTHREAD_INVALID_THREAD_ID`.
+   Khi thành công, hàm này trả về mã định danh của thread mới; khi thất bại, hàm trả về :c:macro:`PYTHREAD_INVALID_THREAD_ID`.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Bên gọi không cần phải nắm giữ một :term:`attached thread state`.
 
 
 .. c:function:: unsigned long PyThread_get_thread_ident(void)
 
-   Return the identifier of the current thread, which will never be zero.
+   Trả về mã định danh của thread hiện tại, mã này sẽ không bao giờ bằng 0.
 
-   This function cannot fail, and the caller does not need to hold an
+   Hàm này không thể thất bại và bên gọi không cần phải nắm giữ một
    :term:`attached thread state`.
 
    .. seealso::
@@ -788,30 +577,26 @@ Operating system thread APIs
 
 .. c:function:: PyObject *PyThread_GetInfo(void)
 
-   Get general information about the current thread in the form of a
-   :ref:`struct sequence <struct-sequence-objects>` object. This information is
-   accessible as :py:attr:`sys.thread_info` in Python.
+   Nhận thông tin chung về thread hiện tại dưới dạng một
+   :ref:`struct sequence <struct-sequence-objects>` object. Có thể truy cập thông tin này dưới dạng :py:attr:`sys.thread_info` trong Python.
 
-   On success, this returns a new :term:`strong reference` to the thread
-   information; on failure, this returns ``NULL`` with an exception set.
+   Khi thành công, hàm này trả về một :term:`strong reference` tới thông tin thread; khi thất bại, hàm trả về ``NULL`` với một exception đã được thiết lập.
 
-   The caller must hold an :term:`attached thread state`.
+   Caller phải nắm giữ một :term:`attached thread state`.
 
 
 .. c:macro:: PY_HAVE_THREAD_NATIVE_ID
 
-   This macro is defined when the system supports native thread IDs.
+   Macro này được định nghĩa khi hệ thống hỗ trợ native thread ID.
 
 
 .. c:function:: unsigned long PyThread_get_thread_native_id(void)
 
-   Get the native identifier of the current thread as it was assigned by the operating
-   system's kernel, which will never be less than zero.
+   Lấy native identifier của thread hiện tại theo giá trị do kernel của hệ điều hành gán, giá trị này sẽ không bao giờ nhỏ hơn 0.
 
-   This function is only available when :c:macro:`PY_HAVE_THREAD_NATIVE_ID` is
-   defined.
+   Hàm này chỉ khả dụng khi :c:macro:`PY_HAVE_THREAD_NATIVE_ID` được định nghĩa.
 
-   This function cannot fail, and the caller does not need to hold an
+   Hàm này không thể thất bại và bên gọi không cần phải nắm giữ một
    :term:`attached thread state`.
 
    .. seealso::
@@ -820,48 +605,37 @@ Operating system thread APIs
 
 .. c:function:: void PyThread_exit_thread(void)
 
-   Terminate the current thread. This function is generally considered unsafe
-   and should be avoided. It is kept solely for backwards compatibility.
+   Chấm dứt luồng hiện tại. Hàm này thường được xem là không an toàn và nên tránh sử dụng. Hàm này chỉ được giữ lại để đảm bảo khả năng tương thích ngược.
 
-   This function is only safe to call if all functions in the full call
-   stack are written to safely allow it.
+   Hàm này chỉ an toàn khi gọi nếu tất cả các hàm trong toàn bộ call stack được viết để cho phép việc đó một cách an toàn.
 
    .. warning::
 
-      If the current system uses POSIX threads (also known as "pthreads"),
-      this calls :manpage:`pthread_exit(3)`, which attempts to unwind the stack
-      and call C++ destructors on some libc implementations. However, if a
-      ``noexcept`` function is reached, it may terminate the process.
-      Other systems, such as macOS, do unwinding.
+      Nếu hệ thống hiện tại sử dụng các luồng POSIX (còn được gọi là "pthreads"), hàm này gọi :manpage:`pthread_exit(3)`, hàm này cố gắng unwind stack và gọi các destructor C++ trên một số implementation của libc. Tuy nhiên, nếu gặp một hàm ``noexcept``, hàm đó có thể chấm dứt process. Các hệ thống khác, chẳng hạn như macOS, thực hiện unwinding.
 
-      On Windows, this function calls ``_endthreadex()``, which kills the thread
-      without calling C++ destructors.
+      Trên Windows, hàm này gọi ``_endthreadex()``, hàm này kết thúc luồng mà không gọi các destructor C++.
 
-      In any case, there is a risk of corruption on the thread's stack.
+      Trong mọi trường hợp, stack của luồng có nguy cơ bị hỏng.
 
    .. deprecated:: 3.14
 
 
 .. c:function:: void PyThread_init_thread(void)
 
-   Initialize ``PyThread*`` APIs. Python executes this function automatically,
-   so there's little need to call it from an extension module.
+   Khởi tạo các API ``PyThread*``. Python tự động thực thi hàm này, vì vậy extension module hầu như không cần gọi hàm này.
 
 
 .. c:function:: int PyThread_set_stacksize(size_t size)
 
-   Set the stack size of the current thread to *size* bytes.
+   Đặt kích thước ngăn xếp của thread hiện tại thành *size* byte.
 
-   This function returns ``0`` on success, ``-1`` if *size* is invalid, or
-   ``-2`` if the system does not support changing the stack size. This function
-   does not set exceptions.
+   Hàm này trả về ``0`` khi thành công, ``-1`` nếu *size* không hợp lệ hoặc ``-2`` nếu hệ thống không hỗ trợ thay đổi kích thước ngăn xếp. Hàm này không thiết lập exception.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Bên gọi không cần phải nắm giữ một :term:`attached thread state`.
 
 
 .. c:function:: size_t PyThread_get_stacksize(void)
 
-   Return the stack size of the current thread in bytes, or ``0`` if the system's
-   default stack size is in use.
+   Trả về kích thước ngăn xếp của thread hiện tại tính bằng byte hoặc ``0`` nếu đang sử dụng kích thước ngăn xếp mặc định của hệ thống.
 
-   The caller does not need to hold an :term:`attached thread state`.
+   Bên gọi không cần phải nắm giữ một :term:`attached thread state`.

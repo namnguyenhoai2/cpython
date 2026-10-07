@@ -2,150 +2,121 @@
 
 .. _unicodeobjects:
 
-Unicode Objects and Codecs
+Đối tượng Unicode và Codec
 --------------------------
 
 .. sectionauthor:: Marc-André Lemburg <mal@lemburg.com>
 .. sectionauthor:: Georg Brandl <georg@python.org>
 
-Unicode Objects
-^^^^^^^^^^^^^^^
+Đối tượng Unicode
+^^^^^^^^^^^^^^^^^
 
-Since the implementation of :pep:`393` in Python 3.3, Unicode objects internally
-use a variety of representations, in order to allow handling the complete range
-of Unicode characters while staying memory efficient.  There are special cases
-for strings where all code points are below 128, 256, or 65536; otherwise, code
-points must be below 1114112 (which is the full Unicode range).
+Kể từ khi triển khai :pep:`393` trong Python 3.3, các đối tượng Unicode sử dụng nhiều dạng biểu diễn khác nhau ở bên trong, nhằm cho phép xử lý toàn bộ phạm vi ký tự Unicode mà vẫn tiết kiệm bộ nhớ. Có các trường hợp đặc biệt dành cho những chuỗi trong đó tất cả điểm mã đều nhỏ hơn 128, 256 hoặc 65536; nếu không, các điểm mã phải nhỏ hơn 1114112 (là toàn bộ phạm vi Unicode).
 
-UTF-8 representation is created on demand and cached in the Unicode object.
+Biểu diễn UTF-8 được tạo theo yêu cầu và được lưu trong bộ nhớ đệm của đối tượng Unicode.
 
 .. note::
-   The :c:type:`Py_UNICODE` representation has been removed since Python 3.12
-   with deprecated APIs.
-   See :pep:`623` for more information.
+   Biểu diễn :c:type:`Py_UNICODE` đã bị loại bỏ kể từ Python 3.12 cùng với các API đã deprecated. Xem :pep:`623` để biết thêm thông tin.
 
 
-Unicode Type
+Kiểu Unicode
 """"""""""""
 
-These are the basic Unicode object types used for the Unicode implementation in
-Python:
+Đây là các kiểu đối tượng Unicode cơ bản được sử dụng cho việc triển khai Unicode trong Python:
 
 .. c:var:: PyTypeObject PyUnicode_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python Unicode type.
-   It is exposed to Python code as :py:class:`str`.
+   Đối tượng này của :c:type:`PyTypeObject` đại diện cho kiểu Unicode của Python. Nó được cung cấp cho mã Python dưới dạng :py:class:`str`.
 
 
 .. c:var:: PyTypeObject PyUnicodeIter_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python Unicode
-   iterator type. It is used to iterate over Unicode string objects.
+   Đối tượng này của :c:type:`PyTypeObject` đại diện cho kiểu iterator Unicode của Python. Nó được dùng để lặp qua các đối tượng chuỗi Unicode.
 
 
 .. c:type:: Py_UCS4
-            Py_UCS2
-            Py_UCS1
+            Py_UCS2 Py_UCS1
 
-   These types are typedefs for unsigned integer types wide enough to contain
-   characters of 32 bits, 16 bits and 8 bits, respectively.  When dealing with
-   single Unicode characters, use :c:type:`Py_UCS4`.
+   Các kiểu này là những typedef cho các kiểu số nguyên không dấu đủ rộng để chứa lần lượt các ký tự có độ dài 32 bit, 16 bit và 8 bit. Khi làm việc với các ký tự Unicode riêng lẻ, hãy sử dụng :c:type:`Py_UCS4`.
 
    .. versionadded:: 3.3
 
 
 .. c:type:: PyASCIIObject
-            PyCompactUnicodeObject
-            PyUnicodeObject
+            PyCompactUnicodeObject PyUnicodeObject
 
-   These subtypes of :c:type:`PyObject` represent a Python Unicode object.  In
-   almost all cases, they shouldn't be used directly, since all API functions
-   that deal with Unicode objects take and return :c:type:`PyObject` pointers.
+   Các kiểu con này của :c:type:`PyObject` đại diện cho một đối tượng Unicode của Python. Trong hầu hết các trường hợp, không nên sử dụng trực tiếp chúng, vì tất cả các hàm API làm việc với đối tượng Unicode đều nhận và trả về các con trỏ :c:type:`PyObject`.
 
    .. versionadded:: 3.3
 
 
-   The structure of a particular object can be determined using the following
-   macros.
-   The macros cannot fail; their behavior is undefined if their argument
-   is not a Python Unicode object.
+   Có thể xác định cấu trúc của một đối tượng cụ thể bằng các macro sau. Các macro này không thể thất bại; hành vi của chúng không được xác định nếu đối số không phải là một đối tượng Unicode của Python.
 
    .. c:namespace:: NULL
 
    .. c:macro:: PyUnicode_IS_COMPACT(o)
 
-      True if *o* uses the :c:struct:`PyCompactUnicodeObject` structure.
+      Đúng nếu *o* sử dụng cấu trúc :c:struct:`PyCompactUnicodeObject`.
 
       .. versionadded:: 3.3
 
 
    .. c:macro:: PyUnicode_IS_COMPACT_ASCII(o)
 
-      True if *o* uses the :c:struct:`PyASCIIObject` structure.
+      Đúng nếu *o* sử dụng cấu trúc :c:struct:`PyASCIIObject`.
 
       .. versionadded:: 3.3
 
 
-The following APIs are C macros and static inlined functions for fast checks and
-access to internal read-only data of Unicode objects:
+Các API sau đây là các macro C và hàm được inline tĩnh để kiểm tra nhanh và truy cập dữ liệu chỉ đọc nội bộ của các đối tượng Unicode:
 
 .. c:function:: int PyUnicode_Check(PyObject *obj)
 
-   Return true if the object *obj* is a Unicode object or an instance of a Unicode
-   subtype.  This function always succeeds.
+   Trả về true nếu đối tượng *obj* là một đối tượng Unicode hoặc một instance của kiểu con Unicode. Hàm này luôn thực hiện thành công.
 
 
 .. c:function:: int PyUnicode_CheckExact(PyObject *obj)
 
-   Return true if the object *obj* is a Unicode object, but not an instance of a
-   subtype.  This function always succeeds.
+   Trả về true nếu đối tượng *obj* là một đối tượng Unicode, nhưng không phải là một instance của kiểu con. Hàm này luôn thực hiện thành công.
 
 
 .. c:function:: Py_ssize_t PyUnicode_GET_LENGTH(PyObject *unicode)
 
-   Return the length of the Unicode string, in code points.  *unicode* has to be a
-   Unicode object in the "canonical" representation (not checked).
+   Trả về độ dài của chuỗi Unicode, tính theo code point. *unicode* phải là một đối tượng Unicode ở dạng biểu diễn "canonical" (không được kiểm tra).
 
    .. versionadded:: 3.3
 
 
 .. c:function:: Py_UCS1* PyUnicode_1BYTE_DATA(PyObject *unicode)
-                Py_UCS2* PyUnicode_2BYTE_DATA(PyObject *unicode)
-                Py_UCS4* PyUnicode_4BYTE_DATA(PyObject *unicode)
+                Py_UCS2* PyUnicode_2BYTE_DATA(PyObject *unicode) Py_UCS4* PyUnicode_4BYTE_DATA(PyObject *unicode)
 
-   Return a pointer to the canonical representation cast to UCS1, UCS2 or UCS4
-   integer types for direct character access.  No checks are performed if the
-   canonical representation has the correct character size; use
-   :c:func:`PyUnicode_KIND` to select the right function.
+   Trả về một con trỏ đến biểu diễn chuẩn được chuyển kiểu thành các kiểu số nguyên UCS1, UCS2 hoặc UCS4 để truy cập ký tự trực tiếp. Không thực hiện kiểm tra nếu biểu diễn chuẩn có kích thước ký tự chính xác; hãy sử dụng
+   :c:func:`PyUnicode_KIND` để chọn hàm phù hợp.
 
    .. versionadded:: 3.3
 
 
 .. c:macro:: PyUnicode_1BYTE_KIND
-             PyUnicode_2BYTE_KIND
-             PyUnicode_4BYTE_KIND
+             PyUnicode_2BYTE_KIND PyUnicode_4BYTE_KIND
 
-   Return values of the :c:func:`PyUnicode_KIND` macro.
+   Trả về các giá trị của macro :c:func:`PyUnicode_KIND`.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.12
-      ``PyUnicode_WCHAR_KIND`` has been removed.
+      ``PyUnicode_WCHAR_KIND`` đã bị loại bỏ.
 
 
 .. c:function:: int PyUnicode_KIND(PyObject *unicode)
 
-   Return one of the PyUnicode kind constants (see above) that indicate how many
-   bytes per character this Unicode object uses to store its data.  *unicode* has to
-   be a Unicode object in the "canonical" representation (not checked).
+   Trả về một trong các hằng số kind của PyUnicode (xem ở trên), cho biết đối tượng Unicode này sử dụng bao nhiêu byte cho mỗi ký tự để lưu trữ dữ liệu. *unicode* phải là một đối tượng Unicode ở dạng biểu diễn "chuẩn" (không kiểm tra).
 
    .. versionadded:: 3.3
 
 
 .. c:function:: void* PyUnicode_DATA(PyObject *unicode)
 
-   Return a void pointer to the raw Unicode buffer.  *unicode* has to be a Unicode
-   object in the "canonical" representation (not checked).
+   Trả về một con trỏ void đến bộ đệm Unicode thô. *unicode* phải là một đối tượng Unicode ở dạng biểu diễn "chuẩn" (không kiểm tra).
 
    .. versionadded:: 3.3
 
@@ -153,16 +124,13 @@ access to internal read-only data of Unicode objects:
 .. c:function:: void PyUnicode_WRITE(int kind, void *data, \
                                      Py_ssize_t index, Py_UCS4 value)
 
-   Write the code point *value* to the given zero-based *index* in a string.
+   Ghi code point *value* vào *index* đã cho, tính từ 0, trong một chuỗi.
 
-   The *kind* value and *data* pointer must have been obtained from a
-   string using :c:func:`PyUnicode_KIND` and :c:func:`PyUnicode_DATA`
-   respectively. You must hold a reference to that string while calling
-   :c:func:`!PyUnicode_WRITE`. All requirements of
-   :c:func:`PyUnicode_WriteChar` also apply.
+   Giá trị *kind* và con trỏ *data* tương ứng phải được lấy từ một chuỗi bằng :c:func:`PyUnicode_KIND` và :c:func:`PyUnicode_DATA`. Bạn phải giữ một tham chiếu đến chuỗi đó trong khi gọi
+   :c:func:`!PyUnicode_WRITE`. Tất cả các yêu cầu của
+   :c:func:`PyUnicode_WriteChar` cũng được áp dụng.
 
-   The function performs no checks for any of its requirements,
-   and is intended for usage in loops.
+   Hàm không kiểm tra bất kỳ yêu cầu nào trong số này và được thiết kế để sử dụng trong các vòng lặp.
 
    .. versionadded:: 3.3
 
@@ -170,213 +138,185 @@ access to internal read-only data of Unicode objects:
 .. c:function:: Py_UCS4 PyUnicode_READ(int kind, void *data, \
                                        Py_ssize_t index)
 
-   Read a code point from a canonical representation *data* (as obtained with
-   :c:func:`PyUnicode_DATA`).  No checks or ready calls are performed.
+   Đọc một code point từ biểu diễn chuẩn *data* (như thu được bằng
+   :c:func:`PyUnicode_DATA`). Không thực hiện kiểm tra hoặc gọi các hàm ready.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: Py_UCS4 PyUnicode_READ_CHAR(PyObject *unicode, Py_ssize_t index)
 
-   Read a character from a Unicode object *unicode*, which must be in the "canonical"
-   representation.  This is less efficient than :c:func:`PyUnicode_READ` if you
-   do multiple consecutive reads.
+   Đọc một ký tự từ đối tượng Unicode *unicode*, đối tượng này phải ở dạng biểu diễn "canonical". Cách này kém hiệu quả hơn :c:func:`PyUnicode_READ` nếu bạn thực hiện nhiều lần đọc liên tiếp.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: Py_UCS4 PyUnicode_MAX_CHAR_VALUE(PyObject *unicode)
 
-   Return the maximum code point that is suitable for creating another string
-   based on *unicode*, which must be in the "canonical" representation.  This is
-   always an approximation but more efficient than iterating over the string.
+   Trả về code point lớn nhất phù hợp để tạo một chuỗi khác dựa trên *unicode*, đối tượng này phải ở dạng biểu diễn "canonical". Kết quả luôn chỉ là giá trị xấp xỉ nhưng hiệu quả hơn so với việc lặp qua chuỗi.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: int PyUnicode_IsIdentifier(PyObject *unicode)
 
-   Return ``1`` if the string is a valid identifier according to the language
-   definition, section :ref:`identifiers`. Return ``0`` otherwise.
+   Trả về ``1`` nếu chuỗi là một identifier hợp lệ theo định nghĩa ngôn ngữ, mục :ref:`identifiers`. Nếu không, trả về ``0``.
 
    .. versionchanged:: 3.9
-      The function does not call :c:func:`Py_FatalError` anymore if the string
-      is not ready.
+      Hàm không còn gọi :c:func:`Py_FatalError` nếu chuỗi chưa sẵn sàng.
 
 
 .. c:function:: unsigned int PyUnicode_IS_ASCII(PyObject *unicode)
 
-   Return true if the string only contains ASCII characters.
-   Equivalent to :py:meth:`str.isascii`.
+   Trả về true nếu chuỗi chỉ chứa các ký tự ASCII. Tương đương với :py:meth:`str.isascii`.
 
    .. versionadded:: 3.2
 
 
-Unicode Character Properties
+Các thuộc tính ký tự Unicode
 """"""""""""""""""""""""""""
 
-Unicode provides many different character properties. The most often needed ones
-are available through these macros which are mapped to C functions depending on
-the Python configuration.
+Unicode cung cấp nhiều thuộc tính ký tự khác nhau. Những thuộc tính thường cần dùng nhất có sẵn thông qua các macro này, được ánh xạ tới các hàm C tùy thuộc vào cấu hình Python.
 
 
 .. c:function:: int Py_UNICODE_ISSPACE(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a whitespace character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự khoảng trắng hay không.
 
 
 .. c:function:: int Py_UNICODE_ISLOWER(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a lowercase character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự chữ thường hay không.
 
 
 .. c:function:: int Py_UNICODE_ISUPPER(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is an uppercase character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự chữ hoa hay không.
 
 
 .. c:function:: int Py_UNICODE_ISTITLE(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a titlecase character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự viết hoa đầu câu hay không.
 
 
 .. c:function:: int Py_UNICODE_ISLINEBREAK(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a linebreak character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự ngắt dòng hay không.
 
 
 .. c:function:: int Py_UNICODE_ISDECIMAL(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a decimal character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự thập phân hay không.
 
 
 .. c:function:: int Py_UNICODE_ISDIGIT(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a digit character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự chữ số hay không.
 
 
 .. c:function:: int Py_UNICODE_ISNUMERIC(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a numeric character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự số hay không.
 
 
 .. c:function:: int Py_UNICODE_ISALPHA(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is an alphabetic character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự chữ cái hay không.
 
 
 .. c:function:: int Py_UNICODE_ISALNUM(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is an alphanumeric character.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự chữ và số hay không.
 
 
 .. c:function:: int Py_UNICODE_ISPRINTABLE(Py_UCS4 ch)
 
-   Return ``1`` or ``0`` depending on whether *ch* is a printable character,
-   in the sense of :meth:`str.isprintable`.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc *ch* có phải là ký tự in được theo nghĩa của :meth:`str.isprintable` hay không.
 
 
-These APIs can be used for fast direct character conversions:
+Các API này có thể được sử dụng để chuyển đổi ký tự trực tiếp nhanh chóng:
 
 
 .. c:function:: Py_UCS4 Py_UNICODE_TOLOWER(Py_UCS4 ch)
 
-   Return the character *ch* converted to lower case.
+   Trả về ký tự *ch* được chuyển thành chữ thường.
 
 
 .. c:function:: Py_UCS4 Py_UNICODE_TOUPPER(Py_UCS4 ch)
 
-   Return the character *ch* converted to upper case.
+   Trả về ký tự *ch* được chuyển thành chữ hoa.
 
 
 .. c:function:: Py_UCS4 Py_UNICODE_TOTITLE(Py_UCS4 ch)
 
-   Return the character *ch* converted to title case.
+   Trả về ký tự *ch* được chuyển thành kiểu viết hoa chữ cái đầu.
 
 
 .. c:function:: int Py_UNICODE_TODECIMAL(Py_UCS4 ch)
 
-   Return the character *ch* converted to a decimal positive integer.  Return
-   ``-1`` if this is not possible.  This function does not raise exceptions.
+   Trả về ký tự *ch* được chuyển thành một số nguyên dương thập phân. Trả về ``-1`` nếu không thể thực hiện việc này. Hàm này không phát sinh ngoại lệ.
 
 
 .. c:function:: int Py_UNICODE_TODIGIT(Py_UCS4 ch)
 
-   Return the character *ch* converted to a single digit integer. Return ``-1`` if
-   this is not possible.  This function does not raise exceptions.
+   Trả về ký tự *ch* được chuyển thành một số nguyên có một chữ số. Trả về ``-1`` nếu không thể thực hiện việc này. Hàm này không phát sinh ngoại lệ.
 
 
 .. c:function:: double Py_UNICODE_TONUMERIC(Py_UCS4 ch)
 
-   Return the character *ch* converted to a double. Return ``-1.0`` if this is not
-   possible.  This function does not raise exceptions.
+   Trả về ký tự *ch* được chuyển thành một số double. Trả về ``-1.0`` nếu không thể thực hiện việc này. Hàm này không phát sinh ngoại lệ.
 
 
-These APIs can be used to work with surrogates:
+Có thể sử dụng các API này để làm việc với surrogate:
 
 .. c:function:: int Py_UNICODE_IS_SURROGATE(Py_UCS4 ch)
 
-   Check if *ch* is a surrogate (``0xD800 <= ch <= 0xDFFF``).
+   Kiểm tra xem *ch* có phải là một surrogate (``0xD800 <= ch <= 0xDFFF``) hay không.
 
 .. c:function:: int Py_UNICODE_IS_HIGH_SURROGATE(Py_UCS4 ch)
 
-   Check if *ch* is a high surrogate (``0xD800 <= ch <= 0xDBFF``).
+   Kiểm tra xem *ch* có phải là một high surrogate (``0xD800 <= ch <= 0xDBFF``) hay không.
 
 .. c:function:: int Py_UNICODE_IS_LOW_SURROGATE(Py_UCS4 ch)
 
-   Check if *ch* is a low surrogate (``0xDC00 <= ch <= 0xDFFF``).
+   Kiểm tra xem *ch* có phải là một low surrogate (``0xDC00 <= ch <= 0xDFFF``) hay không.
 
 .. c:function:: Py_UCS4 Py_UNICODE_HIGH_SURROGATE(Py_UCS4 ch)
 
-    Return the high UTF-16 surrogate (``0xD800`` to ``0xDBFF``) for a Unicode
-    code point in the range ``[0x10000; 0x10FFFF]``.
+    Trả về high UTF-16 surrogate (``0xD800`` đến ``0xDBFF``) cho một điểm mã Unicode trong phạm vi ``[0x10000; 0x10FFFF]``.
 
 .. c:function:: Py_UCS4 Py_UNICODE_LOW_SURROGATE(Py_UCS4 ch)
 
-    Return the low UTF-16 surrogate (``0xDC00`` to ``0xDFFF``) for a Unicode
-    code point in the range ``[0x10000; 0x10FFFF]``.
+    Trả về low UTF-16 surrogate (``0xDC00`` đến ``0xDFFF``) cho một điểm mã Unicode trong phạm vi ``[0x10000; 0x10FFFF]``.
 
 .. c:function:: Py_UCS4 Py_UNICODE_JOIN_SURROGATES(Py_UCS4 high, Py_UCS4 low)
 
-   Join two surrogate code points and return a single :c:type:`Py_UCS4` value.
-   *high* and *low* are respectively the leading and trailing surrogates in a
-   surrogate pair. *high* must be in the range ``[0xD800; 0xDBFF]`` and *low* must
-   be in the range ``[0xDC00; 0xDFFF]``.
+   Nối hai điểm mã surrogate và trả về một giá trị :c:type:`Py_UCS4` duy nhất. *high* và *low* lần lượt là surrogate đứng đầu và đứng cuối trong một cặp surrogate. *high* phải nằm trong phạm vi ``[0xD800; 0xDBFF]`` và *low* phải nằm trong phạm vi ``[0xDC00; 0xDFFF]``.
 
 
-Creating and accessing Unicode strings
-""""""""""""""""""""""""""""""""""""""
+Tạo và truy cập các chuỗi Unicode
+"""""""""""""""""""""""""""""""""
 
-To create Unicode objects and access their basic sequence properties, use these
-APIs:
+Để tạo các đối tượng Unicode và truy cập các thuộc tính sequence cơ bản của chúng, hãy sử dụng các API sau:
 
 .. c:function:: PyObject* PyUnicode_New(Py_ssize_t size, Py_UCS4 maxchar)
 
-   Create a new Unicode object.  *maxchar* should be the true maximum code point
-   to be placed in the string.  As an approximation, it can be rounded up to the
-   nearest value in the sequence 127, 255, 65535, 1114111.
+   Tạo một đối tượng Unicode mới. *maxchar* phải là code point tối đa thực sự sẽ được đặt vào chuỗi. Để ước lượng, có thể làm tròn lên giá trị gần nhất trong dãy 127, 255, 65535, 1114111.
 
-   On error, set an exception and return ``NULL``.
+   Khi xảy ra lỗi, hãy đặt một exception và trả về ``NULL``.
 
-   After creation, the string can be filled by :c:func:`PyUnicode_WriteChar`,
+   Sau khi được tạo, chuỗi có thể được điền bằng :c:func:`PyUnicode_WriteChar`,
    :c:func:`PyUnicode_CopyCharacters`, :c:func:`PyUnicode_Fill`,
-   :c:func:`PyUnicode_WRITE` or similar.
-   Since strings are supposed to be immutable, take care to not “use” the
-   result while it is being modified. In particular, before it's filled
-   with its final contents, a string:
+   :c:func:`PyUnicode_WRITE` hoặc tương tự. Vì chuỗi được cho là immutable, hãy cẩn thận không “sử dụng” kết quả trong khi nó đang được sửa đổi. Cụ thể, trước khi được điền nội dung cuối cùng, một chuỗi:
 
-   - must not be hashed,
-   - must not be :c:func:`converted to UTF-8 <PyUnicode_AsUTF8AndSize>`,
-     or another non-"canonical" representation,
-   - must not have its reference count changed,
-   - must not be shared with code that might do one of the above.
+   - không được hash,
+   - không được :c:func:`converted to UTF-8 <PyUnicode_AsUTF8AndSize>`, hoặc chuyển đổi sang một biểu diễn không phải là “canonical” khác,
+   - không được thay đổi số lượng tham chiếu của nó,
+   - không được chia sẻ với mã có thể thực hiện một trong các thao tác trên.
 
-   This list is not exhaustive. Avoiding these uses is your responsibility;
-   Python does not always check these requirements.
+   Danh sách này chưa đầy đủ. Bạn có trách nhiệm tránh những cách sử dụng này; Python không phải lúc nào cũng kiểm tra các yêu cầu này.
 
-   To avoid accidentally exposing a partially-written string object, prefer
-   using the :c:type:`PyUnicodeWriter` API, or one of the ``PyUnicode_From*``
-   functions below.
+   Để tránh vô tình để lộ một đối tượng chuỗi mới chỉ được ghi một phần, hãy ưu tiên sử dụng API :c:type:`PyUnicodeWriter`, hoặc một trong các hàm ``PyUnicode_From*`` dưới đây.
 
 
    .. versionadded:: 3.3
@@ -385,401 +325,312 @@ APIs:
 .. c:function:: PyObject* PyUnicode_FromKindAndData(int kind, const void *buffer, \
                                                     Py_ssize_t size)
 
-   Create a new Unicode object with the given *kind* (possible values are
-   :c:macro:`PyUnicode_1BYTE_KIND` etc., as returned by
-   :c:func:`PyUnicode_KIND`).  The *buffer* must point to an array of *size*
-   units of 1, 2 or 4 bytes per character, as given by the kind.
+   Tạo một đối tượng Unicode mới với *kind* đã cho (các giá trị có thể là
+   :c:macro:`PyUnicode_1BYTE_KIND` v.v., như được trả về bởi
+   :c:func:`PyUnicode_KIND`). *buffer* phải trỏ đến một mảng gồm *size* đơn vị, với 1, 2 hoặc 4 byte cho mỗi ký tự, tùy theo kind.
 
-   If necessary, the input *buffer* is copied and transformed into the
-   canonical representation.  For example, if the *buffer* is a UCS4 string
-   (:c:macro:`PyUnicode_4BYTE_KIND`) and it consists only of codepoints in
-   the UCS1 range, it will be transformed into UCS1
-   (:c:macro:`PyUnicode_1BYTE_KIND`).
+   Nếu cần, *buffer* đầu vào sẽ được sao chép và chuyển đổi thành biểu diễn chuẩn. Ví dụ: nếu *buffer* là một chuỗi UCS4 (:c:macro:`PyUnicode_4BYTE_KIND`) và chỉ gồm các codepoint trong phạm vi UCS1, nó sẽ được chuyển đổi thành UCS1 (:c:macro:`PyUnicode_1BYTE_KIND`).
 
    .. versionadded:: 3.3
 
 
 .. c:function:: PyObject* PyUnicode_FromStringAndSize(const char *str, Py_ssize_t size)
 
-   Create a Unicode object from the char buffer *str*.  The bytes will be
-   interpreted as being UTF-8 encoded.  The buffer is copied into the new
-   object.
-   The return value might be a shared object, i.e. modification of the data is
-   not allowed.
+   Tạo một đối tượng Unicode từ bộ đệm char *str*. Các byte sẽ được diễn giải là được mã hóa theo UTF-8. Bộ đệm được sao chép vào đối tượng mới. Giá trị trả về có thể là một đối tượng dùng chung, tức là không được phép sửa đổi dữ liệu.
 
-   This function raises :exc:`SystemError` when:
+   Hàm này phát sinh :exc:`SystemError` khi:
 
    * *size* < 0,
-   * *str* is ``NULL`` and *size* > 0
+   * *str* là ``NULL`` và *size* > 0
 
    .. versionchanged:: 3.12
-      *str* == ``NULL`` with *size* > 0 is not allowed anymore.
+      *str* == ``NULL`` với *size* > 0 không còn được phép nữa.
 
 
 .. c:function:: PyObject *PyUnicode_FromString(const char *str)
 
-   Create a Unicode object from a UTF-8 encoded null-terminated char buffer
-   *str*.
+   Tạo một đối tượng Unicode từ bộ đệm ký tự kết thúc bằng null được mã hóa UTF-8 *str*.
 
 
 .. c:function:: PyObject* PyUnicode_FromFormat(const char *format, ...)
 
-   Take a C :c:func:`printf`\ -style *format* string and a variable number of
-   arguments, calculate the size of the resulting Python Unicode string and return
-   a string with the values formatted into it.  The variable arguments must be C
-   types and must correspond exactly to the format characters in the *format*
-   ASCII-encoded string.
+   Nhận một chuỗi kiểu C :c:func:`printf`\ -style *format* và một số lượng đối số thay đổi, tính kích thước của chuỗi Unicode Python kết quả rồi trả về một chuỗi có các giá trị được định dạng trong đó. Các đối số thay đổi phải là kiểu C và phải tương ứng chính xác với các ký tự định dạng trong chuỗi được mã hóa ASCII *format*.
 
-   A conversion specifier contains two or more characters and has the following
-   components, which must occur in this order:
+   Một conversion specifier chứa từ hai ký tự trở lên và có các thành phần sau, phải xuất hiện theo thứ tự này:
 
-   #. The ``'%'`` character, which marks the start of the specifier.
+   #. Ký tự ``'%'``, đánh dấu phần bắt đầu của specifier.
 
-   #. Conversion flags (optional), which affect the result of some conversion
-      types.
+   #. Các cờ chuyển đổi (tùy chọn), ảnh hưởng đến kết quả của một số kiểu chuyển đổi.
 
-   #. Minimum field width (optional).
-      If specified as an ``'*'`` (asterisk), the actual width is given in the
-      next argument, which must be of type :c:expr:`int`, and the object to
-      convert comes after the minimum field width and optional precision.
+   #. Độ rộng trường tối thiểu (tùy chọn). Nếu được chỉ định là ``'*'`` (dấu hoa thị), độ rộng thực tế được lấy từ đối số tiếp theo, đối số này phải có kiểu :c:expr:`int`, và đối tượng cần chuyển đổi nằm sau độ rộng trường tối thiểu và độ chính xác tùy chọn.
 
-   #. Precision (optional), given as a ``'.'`` (dot) followed by the precision.
-      If specified as ``'*'`` (an asterisk), the actual precision is given in
-      the next argument, which must be of type :c:expr:`int`, and the value to
-      convert comes after the precision.
+   #. Độ chính xác (tùy chọn), được chỉ định bằng ``'.'`` (dấu chấm) theo sau là độ chính xác. Nếu được chỉ định là ``'*'`` (dấu hoa thị), độ chính xác thực tế được lấy từ đối số tiếp theo, đối số này phải có kiểu :c:expr:`int`, và giá trị cần chuyển đổi nằm sau độ chính xác.
 
-   #. Length modifier (optional).
+   #. Bộ điều chỉnh độ dài (tùy chọn).
 
-   #. Conversion type.
+   #. Kiểu chuyển đổi.
 
-   The conversion flag characters are:
+   Các ký tự cờ chuyển đổi là:
 
    .. tabularcolumns:: |l|L|
 
-   +-------+-------------------------------------------------------------+
-   | Flag  | Meaning                                                     |
-   +=======+=============================================================+
-   | ``0`` | The conversion will be zero padded for numeric values.      |
-   +-------+-------------------------------------------------------------+
-   | ``-`` | The converted value is left adjusted (overrides the ``0``   |
-   |       | flag if both are given).                                    |
-   +-------+-------------------------------------------------------------+
+   +-------+---------------------------------------------------------------------------------+
+   | Cờ    | Ý nghĩa                                                                         |
+   +=======+=================================================================================+
+   | ``0`` | Giá trị chuyển đổi sẽ được đệm bằng số 0 đối với các giá trị số.                |
+   +-------+---------------------------------------------------------------------------------+
+   | ``-`` | Giá trị đã chuyển đổi được căn trái (ghi đè cờ ``0`` nếu cả hai được cung cấp). |
+   +-------+---------------------------------------------------------------------------------+
 
-   The length modifiers for following integer conversions (``d``, ``i``,
-   ``o``, ``u``, ``x``, or ``X``) specify the type of the argument
-   (:c:expr:`int` by default):
+   Các length modifier cho những phép chuyển đổi số nguyên sau (``d``, ``i``, ``o``, ``u``, ``x`` hoặc ``X``) xác định kiểu của đối số (:c:expr:`int` theo mặc định):
 
    .. tabularcolumns:: |l|L|
 
-   +----------+-----------------------------------------------------+
-   | Modifier | Types                                               |
-   +==========+=====================================================+
-   | ``l``    | :c:expr:`long` or :c:expr:`unsigned long`           |
-   +----------+-----------------------------------------------------+
-   | ``ll``   | :c:expr:`long long` or :c:expr:`unsigned long long` |
-   +----------+-----------------------------------------------------+
-   | ``j``    | :c:type:`intmax_t` or :c:type:`uintmax_t`           |
-   +----------+-----------------------------------------------------+
-   | ``z``    | :c:type:`size_t` or :c:type:`ssize_t`               |
-   +----------+-----------------------------------------------------+
-   | ``t``    | :c:type:`ptrdiff_t`                                 |
-   +----------+-----------------------------------------------------+
+   +----------+-------------------------------------------------------+
+   | Modifier | Types                                                 |
+   +==========+=======================================================+
+   | ``l``    | :c:expr:`long` hoặc :c:expr:`unsigned long`           |
+   +----------+-------------------------------------------------------+
+   | ``ll``   | :c:expr:`long long` hoặc :c:expr:`unsigned long long` |
+   +----------+-------------------------------------------------------+
+   | ``j``    | :c:type:`intmax_t` hoặc :c:type:`uintmax_t`           |
+   +----------+-------------------------------------------------------+
+   | ``z``    | :c:type:`size_t` hoặc :c:type:`ssize_t`               |
+   +----------+-------------------------------------------------------+
+   | ``t``    | :c:type:`ptrdiff_t`                                   |
+   +----------+-------------------------------------------------------+
 
-   The length modifier ``l`` for following conversions ``s`` or ``V`` specify
-   that the type of the argument is :c:expr:`const wchar_t*`.
+   Bộ bổ nghĩa độ dài ``l`` cho các phép chuyển đổi sau đây, ``s`` hoặc ``V``, chỉ rõ rằng kiểu của đối số là :c:expr:`const wchar_t*`.
 
-   The conversion specifiers are:
+   Các bộ chỉ định chuyển đổi là:
 
    .. list-table::
       :widths: auto
       :header-rows: 1
 
-      * - Conversion Specifier
-        - Type
-        - Comment
+      * - Bộ chỉ định chuyển đổi
+        - Kiểu
+        - Chú thích
 
       * - ``%``
         - *n/a*
-        - The literal ``%`` character.
+        - Ký tự ``%`` theo nghĩa đen.
 
       * - ``d``, ``i``
-        - Specified by the length modifier
-        - The decimal representation of a signed C integer.
+        - Được chỉ định bởi bộ bổ nghĩa độ dài
+        - Biểu diễn thập phân của một số nguyên C có dấu.
 
       * - ``u``
-        - Specified by the length modifier
-        - The decimal representation of an unsigned C integer.
+        - Được chỉ định bởi bộ bổ nghĩa độ dài
+        - Biểu diễn thập phân của một số nguyên C không dấu.
 
       * - ``o``
-        - Specified by the length modifier
-        - The octal representation of an unsigned C integer.
+        - Được chỉ định bởi bộ bổ nghĩa độ dài
+        - Biểu diễn bát phân của một số nguyên C không dấu.
 
       * - ``x``
-        - Specified by the length modifier
-        - The hexadecimal representation of an unsigned C integer (lowercase).
+        - Được chỉ định bởi bộ bổ nghĩa độ dài
+        - Biểu diễn thập lục phân của một số nguyên C không dấu (chữ thường).
 
       * - ``X``
-        - Specified by the length modifier
-        - The hexadecimal representation of an unsigned C integer (uppercase).
+        - Được chỉ định bởi bộ bổ nghĩa độ dài
+        - Biểu diễn thập lục phân của một số nguyên C không dấu (chữ hoa).
 
       * - ``c``
         - :c:expr:`int`
-        - A single character.
+        - Một ký tự đơn.
 
       * - ``s``
-        - :c:expr:`const char*` or :c:expr:`const wchar_t*`
-        - A null-terminated C character array.
+        - :c:expr:`const char*` hoặc :c:expr:`const wchar_t*`
+        - Một mảng ký tự C kết thúc bằng null.
 
       * - ``p``
         - :c:expr:`const void*`
-        - The hex representation of a C  pointer.
-          Mostly equivalent to ``printf("%p")`` except that it is guaranteed to
-          start with the literal ``0x`` regardless of what the platform's
-          ``printf`` yields.
+        - Biểu diễn thập lục phân của một con trỏ C. Phần lớn tương đương với ``printf("%p")``, ngoại trừ việc nó được đảm bảo bắt đầu bằng chuỗi ký tự ``0x`` bất kể ``printf`` của nền tảng trả về giá trị gì.
 
       * - ``A``
         - :c:expr:`PyObject*`
-        - The result of calling :func:`ascii`.
+        - Kết quả của việc gọi :func:`ascii`.
 
       * - ``U``
         - :c:expr:`PyObject*`
-        - A Unicode object.
+        - Một đối tượng Unicode.
 
       * - ``V``
-        - :c:expr:`PyObject*`, :c:expr:`const char*` or :c:expr:`const wchar_t*`
-        - A Unicode object (which may be ``NULL``) and a null-terminated
-          C character array as a second parameter (which will be used,
-          if the first parameter is ``NULL``).
+        - :c:expr:`PyObject*`, :c:expr:`const char*` hoặc :c:expr:`const wchar_t*`
+        - Một đối tượng Unicode (có thể là ``NULL``) và một mảng ký tự C kết thúc bằng null làm tham số thứ hai (sẽ được sử dụng nếu tham số thứ nhất là ``NULL``).
 
       * - ``S``
         - :c:expr:`PyObject*`
-        - The result of calling :c:func:`PyObject_Str`.
+        - Kết quả của việc gọi :c:func:`PyObject_Str`.
 
       * - ``R``
         - :c:expr:`PyObject*`
-        - The result of calling :c:func:`PyObject_Repr`.
+        - Kết quả của việc gọi :c:func:`PyObject_Repr`.
 
       * - ``T``
         - :c:expr:`PyObject*`
-        - Get the fully qualified name of an object type;
-          call :c:func:`PyType_GetFullyQualifiedName`.
+        - Lấy tên đầy đủ của một kiểu đối tượng; gọi :c:func:`PyType_GetFullyQualifiedName`.
 
       * - ``#T``
         - :c:expr:`PyObject*`
-        - Similar to ``T`` format, but use a colon (``:``) as separator between
-          the module name and the qualified name.
+        - Tương tự định dạng ``T``, nhưng sử dụng dấu hai chấm (``:``) làm dấu phân cách giữa tên module và tên đủ điều kiện.
 
       * - ``N``
         - :c:expr:`PyTypeObject*`
-        - Get the fully qualified name of a type;
-          call :c:func:`PyType_GetFullyQualifiedName`.
+        - Lấy tên đủ điều kiện của một kiểu; gọi :c:func:`PyType_GetFullyQualifiedName`.
 
       * - ``#N``
         - :c:expr:`PyTypeObject*`
-        - Similar to ``N`` format, but use a colon (``:``) as separator between
-          the module name and the qualified name.
+        - Tương tự định dạng ``N``, nhưng sử dụng dấu hai chấm (``:``) làm dấu phân cách giữa tên module và tên đủ điều kiện.
 
    .. note::
-      The width formatter unit is number of characters rather than bytes.
-      The precision formatter unit is number of bytes or :c:type:`wchar_t`
-      items (if the length modifier ``l`` is used) for ``"%s"`` and
-      ``"%V"`` (if the ``PyObject*`` argument is ``NULL``), and a number of
-      characters for ``"%A"``, ``"%U"``, ``"%S"``, ``"%R"`` and ``"%V"``
-      (if the ``PyObject*`` argument is not ``NULL``).
+      Đơn vị của formatter độ rộng là số ký tự thay vì số byte. Đơn vị của formatter độ chính xác là số byte hoặc số mục :c:type:`wchar_t` (nếu sử dụng modifier độ dài ``l``) cho ``"%s"`` và ``"%V"`` (nếu đối số ``PyObject*`` là ``NULL``), và là số ký tự cho ``"%A"``, ``"%U"``, ``"%S"``, ``"%R"`` và ``"%V"`` (nếu đối số ``PyObject*`` không phải là ``NULL``).
 
    .. note::
-      Unlike to C :c:func:`printf` the ``0`` flag has effect even when
-      a precision is given for integer conversions (``d``, ``i``, ``u``, ``o``,
-      ``x``, or ``X``).
+      Không giống như trong C :c:func:`printf` cờ ``0`` vẫn có tác dụng ngay cả khi độ chính xác được chỉ định cho các phép chuyển đổi số nguyên (``d``, ``i``, ``u``, ``o``, ``x`` hoặc ``X``).
 
    .. versionchanged:: 3.2
-      Support for ``"%lld"`` and ``"%llu"`` added.
+      Đã bổ sung hỗ trợ cho ``"%lld"`` và ``"%llu"``.
 
    .. versionchanged:: 3.3
-      Support for ``"%li"``, ``"%lli"`` and ``"%zi"`` added.
+      Đã bổ sung hỗ trợ cho ``"%li"``, ``"%lli"`` và ``"%zi"``.
 
    .. versionchanged:: 3.4
-      Support width and precision formatter for ``"%s"``, ``"%A"``, ``"%U"``,
-      ``"%V"``, ``"%S"``, ``"%R"`` added.
+      Đã bổ sung hỗ trợ bộ định dạng width và precision cho ``"%s"``, ``"%A"``, ``"%U"``, ``"%V"``, ``"%S"``, ``"%R"``.
 
    .. versionchanged:: 3.12
-      Support for conversion specifiers ``o`` and ``X``.
-      Support for length modifiers ``j`` and ``t``.
-      Length modifiers are now applied to all integer conversions.
-      Length modifier ``l`` is now applied to conversion specifiers ``s`` and ``V``.
-      Support for variable width and precision ``*``.
-      Support for flag ``-``.
+      Hỗ trợ các conversion specifier ``o`` và ``X``. Hỗ trợ các length modifier ``j`` và ``t``. Length modifier hiện được áp dụng cho tất cả các phép chuyển đổi số nguyên. Length modifier ``l`` hiện được áp dụng cho các conversion specifier ``s`` và ``V``. Hỗ trợ width và precision biến đổi ``*``. Hỗ trợ flag ``-``.
 
-      An unrecognized format character now sets a :exc:`SystemError`.
-      In previous versions it caused all the rest of the format string to be
-      copied as-is to the result string, and any extra arguments discarded.
+      Ký tự định dạng không được nhận dạng hiện đặt một :exc:`SystemError`. Trong các phiên bản trước, ký tự này khiến toàn bộ phần còn lại của format string được sao chép nguyên trạng vào chuỗi kết quả và mọi đối số bổ sung đều bị loại bỏ.
 
    .. versionchanged:: 3.13
-      Support for ``%T``, ``%#T``, ``%N`` and ``%#N`` formats added.
+      Đã bổ sung hỗ trợ các định dạng ``%T``, ``%#T``, ``%N`` và ``%#N``.
 
 
 .. c:function:: PyObject* PyUnicode_FromFormatV(const char *format, va_list vargs)
 
-   Identical to :c:func:`PyUnicode_FromFormat` except that it takes exactly two
-   arguments.
+   Giống hệt :c:func:`PyUnicode_FromFormat`, ngoại trừ việc nó nhận chính xác hai đối số.
 
 
 .. c:function:: PyObject* PyUnicode_FromObject(PyObject *obj)
 
-   Copy an instance of a Unicode subtype to a new true Unicode object if
-   necessary. If *obj* is already a true Unicode object (not a subtype),
-   return a new :term:`strong reference` to the object.
+   Sao chép một instance của Unicode subtype sang một đối tượng Unicode thực mới nếu cần. Nếu *obj* đã là một đối tượng Unicode thực (không phải subtype), trả về một :term:`strong reference` mới cho đối tượng đó.
 
-   Objects other than Unicode or its subtypes will cause a :exc:`TypeError`.
+   Các đối tượng không phải Unicode hoặc subtype của Unicode sẽ gây ra một :exc:`TypeError`.
 
 
 .. c:function:: PyObject* PyUnicode_FromOrdinal(int ordinal)
 
-   Create a Unicode Object from the given Unicode code point *ordinal*.
+   Tạo một Đối tượng Unicode từ điểm mã Unicode đã cho *ordinal*.
 
-   The ordinal must be in ``range(0x110000)``. A :exc:`ValueError` is
-   raised in the case it is not.
+   Giá trị ordinal phải nằm trong ``range(0x110000)``. Một :exc:`ValueError` sẽ được phát sinh nếu không.
 
 
 .. c:function:: PyObject* PyUnicode_FromEncodedObject(PyObject *obj, \
                                const char *encoding, const char *errors)
 
-   Decode an encoded object *obj* to a Unicode object.
+   Giải mã một đối tượng đã mã hóa *obj* thành một đối tượng Unicode.
 
-   :class:`bytes`, :class:`bytearray` and other
-   :term:`bytes-like objects <bytes-like object>`
-   are decoded according to the given *encoding* and using the error handling
-   defined by *errors*. Both can be ``NULL`` to have the interface use the default
-   values (see :ref:`builtincodecs` for details).
+   :class:`bytes`, :class:`bytearray` và các đối tượng khác
+   Các :term:`bytes-like objects <bytes-like object>` được giải mã theo *encoding* đã cho và sử dụng cơ chế xử lý lỗi được định nghĩa bởi *errors*. Cả hai có thể là ``NULL`` để giao diện sử dụng các giá trị mặc định (xem :ref:`builtincodecs` để biết chi tiết).
 
-   All other objects, including Unicode objects, cause a :exc:`TypeError` to be
-   set.
+   Tất cả các đối tượng khác, bao gồm cả các đối tượng Unicode, sẽ khiến một :exc:`TypeError` được thiết lập.
 
-   The API returns ``NULL`` if there was an error.  The caller is responsible for
-   decref'ing the returned objects.
+   API trả về ``NULL`` nếu xảy ra lỗi. Bên gọi chịu trách nhiệm giảm đếm tham chiếu cho các đối tượng được trả về.
 
 
 .. c:function:: void PyUnicode_Append(PyObject **p_left, PyObject *right)
 
-   Append the string *right* to the end of *p_left*.
-   *p_left* must point to a :term:`strong reference` to a Unicode object;
-   :c:func:`!PyUnicode_Append` releases (":term:`steals <steal>`")
-   this reference.
+   Nối chuỗi *right* vào cuối *p_left*. *p_left* phải trỏ đến một :term:`strong reference` tới một đối tượng Unicode;
+   :c:func:`!PyUnicode_Append` giải phóng (":term:`steals <steal>`") tham chiếu này.
 
-   On error, set *\*p_left* to ``NULL`` and set an exception.
+   Khi xảy ra lỗi, đặt *\*p_left* thành ``NULL`` và đặt một exception.
 
-   On success, set *\*p_left* to a new strong reference to the result.
+   Khi thành công, đặt *\*p_left* thành một tham chiếu mạnh mới đến kết quả.
 
 
 .. c:function:: void PyUnicode_AppendAndDel(PyObject **p_left, PyObject *right)
 
-   The function is similar to :c:func:`PyUnicode_Append`, with the only
-   difference being that it decrements the reference count of *right* by one.
+   Hàm này tương tự :c:func:`PyUnicode_Append`, điểm khác biệt duy nhất là nó giảm số lượng tham chiếu của *right* đi một.
 
 
 .. c:function:: PyObject* PyUnicode_BuildEncodingMap(PyObject* string)
 
-   Return a mapping suitable for decoding a custom single-byte encoding.
-   Given a Unicode string *string* of up to 256 characters representing an encoding
-   table, returns either a compact internal mapping object or a dictionary
-   mapping character ordinals to byte values. Raises a :exc:`TypeError` and
-   return ``NULL`` on invalid input.
+   Trả về một ánh xạ thích hợp để giải mã một encoding một byte tùy chỉnh. Với một chuỗi Unicode *string* có tối đa 256 ký tự biểu diễn một bảng encoding, hàm này trả về một đối tượng ánh xạ nội bộ nhỏ gọn hoặc một từ điển ánh xạ số thứ tự ký tự tới các giá trị byte. Phát sinh một :exc:`TypeError` và trả về ``NULL`` nếu đầu vào không hợp lệ.
 
    .. versionadded:: 3.2
 
 
 .. c:function:: const char* PyUnicode_GetDefaultEncoding(void)
 
-   Return the name of the default string encoding, ``"utf-8"``.
-   See :func:`sys.getdefaultencoding`.
+   Trả về tên của encoding chuỗi mặc định, ``"utf-8"``. Xem :func:`sys.getdefaultencoding`.
 
-   The returned string does not need to be freed, and is valid
-   until interpreter shutdown.
+   Chuỗi được trả về không cần được giải phóng và vẫn hợp lệ cho đến khi trình thông dịch tắt.
 
 
 .. c:function:: Py_ssize_t PyUnicode_GetLength(PyObject *unicode)
 
-   Return the length of the Unicode object, in code points.
+   Trả về độ dài của đối tượng Unicode, tính theo điểm mã.
 
-   On error, set an exception and return ``-1``.
+   Khi xảy ra lỗi, đặt một exception và trả về ``-1``.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: Py_ssize_t PyUnicode_CopyCharacters(PyObject *to, \
-                                                    Py_ssize_t to_start, \
-                                                    PyObject *from, \
-                                                    Py_ssize_t from_start, \
-                                                    Py_ssize_t how_many)
+                                                    Py_ssize_t to_start, \ PyObject *from, \ Py_ssize_t from_start, \ Py_ssize_t how_many)
 
-   Copy characters from one Unicode object into another.  This function performs
-   character conversion when necessary and falls back to :c:func:`!memcpy` if
-   possible.  Returns ``-1`` and sets an exception on error, otherwise returns
-   the number of copied characters.
+   Sao chép các ký tự từ một đối tượng Unicode sang một đối tượng khác. Hàm này thực hiện chuyển đổi ký tự khi cần thiết và chuyển sang :c:func:`!memcpy` nếu có thể. Trả về ``-1`` và đặt một exception khi xảy ra lỗi; nếu không, trả về số ký tự đã sao chép.
 
-   The string must not have been “used” yet.
-   See :c:func:`PyUnicode_New` for details.
+   Chuỗi chưa được “sử dụng”. Xem :c:func:`PyUnicode_New` để biết chi tiết.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: int PyUnicode_Resize(PyObject **unicode, Py_ssize_t length);
 
-   Resize a Unicode object *\*unicode* to the new *length* in code points.
+   Đổi kích thước một đối tượng Unicode *\*unicode* thành *length* mới theo các code point.
 
-   Try to resize the string in place (which is usually faster than allocating
-   a new string and copying characters), or create a new string.
+   Hãy thử đổi kích thước chuỗi tại chỗ (thường nhanh hơn việc cấp phát một chuỗi mới và sao chép các ký tự), hoặc tạo một chuỗi mới.
 
-   *\*unicode* is modified to point to the new (resized) object and ``0`` is
-   returned on success. Otherwise, ``-1`` is returned and an exception is set,
-   and *\*unicode* is left untouched.
+   *\*unicode* được sửa đổi để trỏ đến đối tượng mới (đã đổi kích thước), và ``0`` được trả về khi thành công. Nếu không, ``-1`` được trả về và một exception được thiết lập, còn *\*unicode* không bị thay đổi.
 
-   The function doesn't check string content, the result may not be a
-   string in canonical representation.
+   Hàm này không kiểm tra nội dung chuỗi, vì vậy kết quả có thể không phải là chuỗi ở dạng biểu diễn chuẩn.
 
 
 .. c:function:: Py_ssize_t PyUnicode_Fill(PyObject *unicode, Py_ssize_t start, \
                         Py_ssize_t length, Py_UCS4 fill_char)
 
-   Fill a string with a character: write *fill_char* into
-   ``unicode[start:start+length]``.
+   Điền một chuỗi bằng một ký tự: ghi *fill_char* vào ``unicode[start:start+length]``.
 
-   Fail if *fill_char* is bigger than the string maximum character, or if the
-   string has more than 1 reference.
+   Không thành công nếu *fill_char* lớn hơn ký tự lớn nhất của chuỗi hoặc nếu chuỗi có nhiều hơn 1 tham chiếu.
 
-   The string must not have been “used” yet.
-   See :c:func:`PyUnicode_New` for details.
+   Chuỗi chưa được “sử dụng”. Xem :c:func:`PyUnicode_New` để biết chi tiết.
 
-   Return the number of written characters, or return ``-1`` and raise an
-   exception on error.
+   Trả về số ký tự đã ghi hoặc trả về ``-1`` và phát sinh một ngoại lệ khi có lỗi.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: int PyUnicode_WriteChar(PyObject *unicode, Py_ssize_t index, \
-                                        Py_UCS4 character)
+                                        ký tự Py_UCS4)
 
-   Write a *character* to the string *unicode* at the zero-based *index*.
-   Return ``0`` on success, ``-1`` on error with an exception set.
+   Ghi một ký tự *character* vào chuỗi *unicode* tại *index* bắt đầu từ 0. Trả về ``0`` khi thành công và ``-1`` khi có lỗi, đồng thời đặt một ngoại lệ.
 
-   This function checks that *unicode* is a Unicode object, that the index is
-   not out of bounds, and that the object's reference count is one.
-   See :c:func:`PyUnicode_WRITE` for a version that skips these checks,
-   making them your responsibility.
+   Hàm này kiểm tra rằng *unicode* là một đối tượng Unicode, chỉ mục không nằm ngoài phạm vi và số lượng tham chiếu của đối tượng là một. Xem :c:func:`PyUnicode_WRITE` để biết phiên bản bỏ qua các kiểm tra này, qua đó bạn phải tự chịu trách nhiệm thực hiện chúng.
 
-   The string must not have been “used” yet.
-   See :c:func:`PyUnicode_New` for details.
+   Chuỗi chưa được “sử dụng”. Xem :c:func:`PyUnicode_New` để biết chi tiết.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: Py_UCS4 PyUnicode_ReadChar(PyObject *unicode, Py_ssize_t index)
 
-   Read a character from a string.  This function checks that *unicode* is a
-   Unicode object and the index is not out of bounds, in contrast to
-   :c:func:`PyUnicode_READ_CHAR`, which performs no error checking.
+   Đọc một ký tự từ chuỗi. Hàm này kiểm tra rằng *unicode* là một đối tượng Unicode và chỉ mục không nằm ngoài phạm vi, trái với
+   :c:func:`PyUnicode_READ_CHAR`, không thực hiện kiểm tra lỗi.
 
-   Return character on success, ``-1`` on error with an exception set.
+   Trả về ký tự nếu thành công, ``-1`` nếu có lỗi kèm theo một exception đã được thiết lập.
 
    .. versionadded:: 3.3
 
@@ -787,9 +638,7 @@ APIs:
 .. c:function:: PyObject* PyUnicode_Substring(PyObject *unicode, Py_ssize_t start, \
                                               Py_ssize_t end)
 
-   Return a substring of *unicode*, from character index *start* (included) to
-   character index *end* (excluded).  Negative indices are not supported.
-   On error, set an exception and return ``NULL``.
+   Trả về một chuỗi con của *unicode*, từ chỉ mục ký tự *start* (được bao gồm) đến chỉ mục ký tự *end* (không được bao gồm). Không hỗ trợ chỉ mục âm. Khi có lỗi, thiết lập một exception và trả về ``NULL``.
 
    .. versionadded:: 3.3
 
@@ -797,1176 +646,889 @@ APIs:
 .. c:function:: Py_UCS4* PyUnicode_AsUCS4(PyObject *unicode, Py_UCS4 *buffer, \
                                           Py_ssize_t buflen, int copy_null)
 
-   Copy the string *unicode* into a UCS4 buffer, including a null character, if
-   *copy_null* is set.  Returns ``NULL`` and sets an exception on error (in
-   particular, a :exc:`SystemError` if *buflen* is smaller than the length of
-   *unicode*).  *buffer* is returned on success.
+   Sao chép chuỗi *unicode* vào một bộ đệm UCS4, bao gồm một ký tự null nếu *copy_null* được thiết lập. Trả về ``NULL`` và thiết lập một exception khi có lỗi (đặc biệt là một :exc:`SystemError` nếu *buflen* nhỏ hơn độ dài của *unicode*). Trả về *buffer* nếu thành công.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: Py_UCS4* PyUnicode_AsUCS4Copy(PyObject *unicode)
 
-   Copy the string *unicode* into a new UCS4 buffer that is allocated using
-   :c:func:`PyMem_Malloc`.  If this fails, ``NULL`` is returned with a
-   :exc:`MemoryError` set.  The returned buffer always has an extra
-   null code point appended.
+   Sao chép chuỗi *unicode* vào một bộ đệm UCS4 mới được cấp phát bằng cách sử dụng
+   :c:func:`PyMem_Malloc`. Nếu thao tác này không thành công, ``NULL`` sẽ được trả về cùng với một
+   :exc:`MemoryError` được thiết lập. Bộ đệm được trả về luôn có thêm một điểm mã null được nối vào.
 
    .. versionadded:: 3.3
 
 
-Locale Encoding
-"""""""""""""""
+Mã hóa Locale
+"""""""""""""
 
-The current locale encoding can be used to decode text from the operating
-system.
+Có thể sử dụng mã hóa locale hiện tại để giải mã văn bản từ hệ điều hành.
 
 .. c:function:: PyObject* PyUnicode_DecodeLocaleAndSize(const char *str, \
-                                                        Py_ssize_t length, \
-                                                        const char *errors)
+                                                        Py_ssize_t length, \ const char *errors)
 
-   Decode a string from UTF-8 on Android and VxWorks, or from the current
-   locale encoding on other platforms. The supported
-   error handlers are ``"strict"`` and ``"surrogateescape"``
-   (:pep:`383`). The decoder uses ``"strict"`` error handler if
-   *errors* is ``NULL``.  *str* must end with a null character but
-   cannot contain embedded null characters.
+   Giải mã một chuỗi từ UTF-8 trên Android và VxWorks, hoặc từ mã hóa locale hiện tại trên các nền tảng khác. Các trình xử lý lỗi được hỗ trợ là ``"strict"`` và ``"surrogateescape"`` (:pep:`383`). Bộ giải mã sử dụng trình xử lý lỗi ``"strict"`` nếu *errors* là ``NULL``. *str* phải kết thúc bằng một ký tự null nhưng không được chứa các ký tự null lồng bên trong.
 
-   Use :c:func:`PyUnicode_DecodeFSDefaultAndSize` to decode a string from
-   the :term:`filesystem encoding and error handler`.
+   Sử dụng :c:func:`PyUnicode_DecodeFSDefaultAndSize` để giải mã một chuỗi từ :term:`filesystem encoding and error handler`.
 
-   This function ignores the :ref:`Python UTF-8 Mode <utf8-mode>`.
+   Hàm này bỏ qua :ref:`Python UTF-8 Mode <utf8-mode>`.
 
    .. seealso::
 
-      The :c:func:`Py_DecodeLocale` function.
+      Hàm :c:func:`Py_DecodeLocale`.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.7
-      The function now also uses the current locale encoding for the
-      ``surrogateescape`` error handler, except on Android. Previously, :c:func:`Py_DecodeLocale`
-      was used for the ``surrogateescape``, and the current locale encoding was
-      used for ``strict``.
+      Hàm này hiện cũng sử dụng encoding của locale hiện tại cho ``surrogateescape`` error handler, ngoại trừ trên Android. Trước đây, :c:func:`Py_DecodeLocale` được sử dụng cho ``surrogateescape``, còn encoding của locale hiện tại được sử dụng cho ``strict``.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeLocale(const char *str, const char *errors)
 
-   Similar to :c:func:`PyUnicode_DecodeLocaleAndSize`, but compute the string
-   length using :c:func:`!strlen`.
+   Tương tự :c:func:`PyUnicode_DecodeLocaleAndSize`, nhưng tính độ dài chuỗi bằng :c:func:`!strlen`.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: PyObject* PyUnicode_EncodeLocale(PyObject *unicode, const char *errors)
 
-   Encode a Unicode object to UTF-8 on Android and VxWorks, or to the current
-   locale encoding on other platforms. The
-   supported error handlers are ``"strict"`` and ``"surrogateescape"``
-   (:pep:`383`). The encoder uses ``"strict"`` error handler if
-   *errors* is ``NULL``. Return a :class:`bytes` object. *unicode* cannot
-   contain embedded null characters.
+   Mã hóa một đối tượng Unicode thành UTF-8 trên Android và VxWorks, hoặc thành encoding của locale hiện tại trên các nền tảng khác. Các error handler được hỗ trợ là ``"strict"`` và ``"surrogateescape"`` (:pep:`383`). Bộ mã hóa sử dụng ``"strict"`` error handler nếu *errors* là ``NULL``. Trả về một đối tượng :class:`bytes`. *unicode* không được chứa các ký tự null nhúng.
 
-   Use :c:func:`PyUnicode_EncodeFSDefault` to encode a string to the
+   Sử dụng :c:func:`PyUnicode_EncodeFSDefault` để mã hóa một chuỗi thành
    :term:`filesystem encoding and error handler`.
 
-   This function ignores the :ref:`Python UTF-8 Mode <utf8-mode>`.
+   Hàm này bỏ qua :ref:`Python UTF-8 Mode <utf8-mode>`.
 
    .. seealso::
 
-      The :c:func:`Py_EncodeLocale` function.
+      Hàm :c:func:`Py_EncodeLocale`.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.7
-      The function now also uses the current locale encoding for the
-      ``surrogateescape`` error handler, except on Android. Previously,
-      :c:func:`Py_EncodeLocale`
-      was used for the ``surrogateescape``, and the current locale encoding was
-      used for ``strict``.
+      Hàm này hiện cũng sử dụng mã hóa locale hiện tại cho trình xử lý lỗi ``surrogateescape``, ngoại trừ trên Android. Trước đây,
+      :c:func:`Py_EncodeLocale` được sử dụng cho ``surrogateescape``, còn mã hóa locale hiện tại được sử dụng cho ``strict``.
 
 
-File System Encoding
-""""""""""""""""""""
+Mã hóa hệ thống tệp
+"""""""""""""""""""
 
-Functions encoding to and decoding from the :term:`filesystem encoding and
-error handler` (:pep:`383` and :pep:`529`).
+Các hàm mã hóa sang và giải mã từ :term:`filesystem encoding and error handler` (:pep:`383` và :pep:`529`).
 
-To encode file names to :class:`bytes` during argument parsing, the ``"O&"``
-converter should be used, passing :c:func:`!PyUnicode_FSConverter` as the
-conversion function:
+Để mã hóa tên tệp thành :class:`bytes` trong quá trình phân tích đối số, nên sử dụng bộ chuyển đổi ``"O&"``, truyền :c:func:`!PyUnicode_FSConverter` làm hàm chuyển đổi:
 
 .. c:function:: int PyUnicode_FSConverter(PyObject* obj, void* result)
 
-   :ref:`PyArg_Parse\* converter <arg-parsing>`: encode :class:`str` objects -- obtained directly or
-   through the :class:`os.PathLike` interface -- to :class:`bytes` using
-   :c:func:`PyUnicode_EncodeFSDefault`; :class:`bytes` objects are output as-is.
-   *result* must be an address of a C variable of type :c:expr:`PyObject*`
-   (or :c:expr:`PyBytesObject*`).
-   On success, set the variable to a new :term:`strong reference` to
-   a :ref:`bytes object <bytesobjects>` which must be released
-   when it is no longer used and return a non-zero value
-   (:c:macro:`Py_CLEANUP_SUPPORTED`).
-   Embedded null bytes are not allowed in the result.
-   On failure, return ``0`` with an exception set.
+   :ref:`PyArg_Parse\* converter <arg-parsing>`: mã hóa các đối tượng :class:`str` -- nhận trực tiếp hoặc thông qua giao diện :class:`os.PathLike` -- thành :class:`bytes` bằng cách sử dụng
+   :c:func:`PyUnicode_EncodeFSDefault`; các đối tượng :class:`bytes` được xuất nguyên trạng. *result* phải là địa chỉ của một biến C có kiểu :c:expr:`PyObject*` (hoặc :c:expr:`PyBytesObject*`). Khi thành công, gán cho biến này một :term:`strong reference` mới trỏ đến đối tượng :ref:`byte <bytesobjects>`, đối tượng này phải được giải phóng khi không còn được sử dụng, rồi trả về một giá trị khác không (:c:macro:`Py_CLEANUP_SUPPORTED`). Không cho phép các byte null nằm trong kết quả. Khi thất bại, trả về ``0`` cùng với một ngoại lệ đã được thiết lập.
 
-   If *obj* is ``NULL``, the function releases a strong reference
-   stored in the variable referred by *result* and returns ``1``.
+   Nếu *obj* là ``NULL``, hàm sẽ giải phóng tham chiếu mạnh được lưu trong biến được *result* tham chiếu đến và trả về ``1``.
 
    .. versionadded:: 3.1
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
-To decode file names to :class:`str` during argument parsing, the ``"O&"``
-converter should be used, passing :c:func:`!PyUnicode_FSDecoder` as the
-conversion function:
+Để giải mã tên tệp thành :class:`str` trong quá trình phân tích đối số, nên sử dụng bộ chuyển đổi ``"O&"``, truyền :c:func:`!PyUnicode_FSDecoder` làm hàm chuyển đổi:
 
 .. c:function:: int PyUnicode_FSDecoder(PyObject* obj, void* result)
 
-   :ref:`PyArg_Parse\* converter <arg-parsing>`: decode :class:`bytes` objects -- obtained either
-   directly or indirectly through the :class:`os.PathLike` interface -- to
-   :class:`str` using :c:func:`PyUnicode_DecodeFSDefaultAndSize`; :class:`str`
-   objects are output as-is.
-   *result* must be an address of a C variable of type :c:expr:`PyObject*`
-   (or :c:expr:`PyUnicodeObject*`).
-   On success, set the variable to a new :term:`strong reference` to
-   a :ref:`Unicode object <unicodeobjects>` which must be released
-   when it is no longer used and return a non-zero value
-   (:c:macro:`Py_CLEANUP_SUPPORTED`).
-   Embedded null characters are not allowed in the result.
-   On failure, return ``0`` with an exception set.
+   :ref:`PyArg_Parse\* converter <arg-parsing>`: giải mã các đối tượng :class:`bytes` -- thu được trực tiếp hoặc gián tiếp thông qua giao diện :class:`os.PathLike` -- thành
+   :class:`str` bằng cách sử dụng :c:func:`PyUnicode_DecodeFSDefaultAndSize`; :class:`str` các đối tượng được xuất nguyên trạng. *kết quả* phải là địa chỉ của một biến C thuộc kiểu :c:expr:`PyObject*` (hoặc :c:expr:`PyUnicodeObject*`). Khi thành công, hãy đặt biến này thành một :term:`strong reference` mới trỏ đến một :ref:`đối tượng Unicode <unicodeobjects>` mà phải được giải phóng khi không còn được sử dụng và trả về một giá trị khác không (:c:macro:`Py_CLEANUP_SUPPORTED`). Không cho phép các ký tự null được nhúng trong kết quả. Khi thất bại, trả về ``0`` với một exception đã được thiết lập.
 
-   If *obj* is ``NULL``, release the strong reference
-   to the object referred to by *result* and return ``1``.
+   Nếu *obj* là ``NULL``, giải phóng tham chiếu mạnh đến đối tượng được *result* tham chiếu đến và trả về ``1``.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeFSDefaultAndSize(const char *str, Py_ssize_t size)
 
-   Decode a string from the :term:`filesystem encoding and error handler`.
+   Giải mã một chuỗi từ :term:`filesystem encoding and error handler`.
 
-   If you need to decode a string from the current locale encoding, use
+   Nếu bạn cần giải mã một chuỗi từ encoding của locale hiện tại, hãy sử dụng
    :c:func:`PyUnicode_DecodeLocaleAndSize`.
 
    .. seealso::
 
-      The :c:func:`Py_DecodeLocale` function.
+      Hàm :c:func:`Py_DecodeLocale`.
 
    .. versionchanged:: 3.6
-      The :term:`filesystem error handler <filesystem encoding and error
-      handler>` is now used.
+      :term:`bộ xử lý lỗi hệ thống tệp <filesystem encoding and error handler>` hiện được sử dụng.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeFSDefault(const char *str)
 
-   Decode a null-terminated string from the :term:`filesystem encoding and
-   error handler`.
+   Giải mã một chuỗi kết thúc bằng null từ :term:`filesystem encoding and error handler`.
 
-   If the string length is known, use
+   Nếu đã biết độ dài chuỗi, hãy sử dụng
    :c:func:`PyUnicode_DecodeFSDefaultAndSize`.
 
    .. versionchanged:: 3.6
-      The :term:`filesystem error handler <filesystem encoding and error
-      handler>` is now used.
+      :term:`bộ xử lý lỗi hệ thống tệp <filesystem encoding and error handler>` hiện được sử dụng.
 
 
 .. c:function:: PyObject* PyUnicode_EncodeFSDefault(PyObject *unicode)
 
-   Encode a Unicode object to the :term:`filesystem encoding and error
-   handler`, and return :class:`bytes`. Note that the resulting :class:`bytes`
-   object can contain null bytes.
+   Mã hóa một đối tượng Unicode thành :term:`filesystem encoding and error handler` và trả về :class:`bytes`. Lưu ý rằng đối tượng :class:`bytes` thu được có thể chứa các byte null.
 
-   If you need to encode a string to the current locale encoding, use
+   Nếu bạn cần mã hóa một chuỗi theo encoding của locale hiện tại, hãy sử dụng
    :c:func:`PyUnicode_EncodeLocale`.
 
    .. seealso::
 
-      The :c:func:`Py_EncodeLocale` function.
+      hàm :c:func:`Py_EncodeLocale`.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.6
-      The :term:`filesystem error handler <filesystem encoding and error
-      handler>` is now used.
+      :term:`bộ xử lý lỗi hệ thống tệp <filesystem encoding and error handler>` hiện được sử dụng.
 
-wchar_t Support
-"""""""""""""""
+Hỗ trợ wchar_t
+""""""""""""""
 
-:c:type:`wchar_t` support for platforms which support it:
+Hỗ trợ :c:type:`wchar_t` trên các nền tảng hỗ trợ nó:
 
 .. c:function:: PyObject* PyUnicode_FromWideChar(const wchar_t *wstr, Py_ssize_t size)
 
-   Create a Unicode object from the :c:type:`wchar_t` buffer *wstr* of the given *size*.
-   Passing ``-1`` as the *size* indicates that the function must itself compute the length,
-   using :c:func:`!wcslen`.
-   Return ``NULL`` on failure.
+   Tạo một đối tượng Unicode từ vùng đệm :c:type:`wchar_t` *wstr* có *size* đã cho. Việc truyền ``-1`` vào *size* cho biết hàm phải tự tính độ dài bằng :c:func:`!wcslen`. Trả về ``NULL`` nếu thất bại.
 
 
 .. c:function:: Py_ssize_t PyUnicode_AsWideChar(PyObject *unicode, wchar_t *wstr, Py_ssize_t size)
 
-   Copy the Unicode object contents into the :c:type:`wchar_t` buffer *wstr*.  At most
-   *size* :c:type:`wchar_t` characters are copied (excluding a possibly trailing
-   null termination character).  Return the number of :c:type:`wchar_t` characters
-   copied or ``-1`` in case of an error.
+   Sao chép nội dung của đối tượng Unicode vào vùng đệm :c:type:`wchar_t` *wstr*. Tối đa *size* :c:type:`wchar_t` ký tự được sao chép (không tính ký tự kết thúc null có thể xuất hiện ở cuối). Trả về số :c:type:`wchar_t` ký tự được sao chép hoặc ``-1`` trong trường hợp xảy ra lỗi.
 
-   When *wstr* is ``NULL``, instead return the *size* that would be required
-   to store all of *unicode* including a terminating null.
+   Khi *wstr* là ``NULL``, thay vào đó trả về *size* cần thiết để lưu toàn bộ *unicode*, bao gồm cả ký tự kết thúc null.
 
-   Note that the resulting :c:expr:`wchar_t*`
-   string may or may not be null-terminated.  It is the responsibility of the caller
-   to make sure that the :c:expr:`wchar_t*` string is null-terminated in case this is
-   required by the application. Also, note that the :c:expr:`wchar_t*` string
-   might contain null characters, which would cause the string to be truncated
-   when used with most C functions.
+   Lưu ý rằng chuỗi :c:expr:`wchar_t*` kết quả có thể được kết thúc bằng null hoặc không. Người gọi có trách nhiệm bảo đảm chuỗi :c:expr:`wchar_t*` được kết thúc bằng null nếu ứng dụng yêu cầu. Ngoài ra, lưu ý rằng chuỗi :c:expr:`wchar_t*` có thể chứa các ký tự null, khiến chuỗi bị cắt ngắn khi được sử dụng với hầu hết các hàm C.
 
 
 .. c:function:: wchar_t* PyUnicode_AsWideCharString(PyObject *unicode, Py_ssize_t *size)
 
-   Convert the Unicode object to a wide character string. The output string
-   always ends with a null character. If *size* is not ``NULL``, write the number
-   of wide characters (excluding the trailing null termination character) into
-   *\*size*. Note that the resulting :c:type:`wchar_t` string might contain
-   null characters, which would cause the string to be truncated when used with
-   most C functions. If *size* is ``NULL`` and the :c:expr:`wchar_t*` string
-   contains null characters a :exc:`ValueError` is raised.
+   Chuyển đổi đối tượng Unicode thành chuỗi ký tự wide. Chuỗi đầu ra luôn kết thúc bằng ký tự null. Nếu *size* không phải là ``NULL``, ghi số ký tự wide (không tính ký tự kết thúc null) vào *\*size*. Lưu ý rằng chuỗi :c:type:`wchar_t` kết quả có thể chứa các ký tự null, khiến chuỗi bị cắt ngắn khi được sử dụng với hầu hết các hàm C. Nếu *size* là ``NULL`` và chuỗi :c:expr:`wchar_t*` chứa các ký tự null, một :exc:`ValueError` sẽ được phát sinh.
 
-   Returns a buffer allocated by :c:macro:`PyMem_New` (use
-   :c:func:`PyMem_Free` to free it) on success. On error, returns ``NULL``
-   and *\*size* is undefined. Raises a :exc:`MemoryError` if memory allocation
-   is failed.
+   Trả về một bộ đệm được :c:macro:`PyMem_New` cấp phát (dùng
+   :c:func:`PyMem_Free` để giải phóng bộ đệm đó) khi thành công. Khi xảy ra lỗi, trả về ``NULL`` và *\*size* không được xác định. Phát sinh :exc:`MemoryError` nếu cấp phát bộ nhớ thất bại.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.7
-      Raises a :exc:`ValueError` if *size* is ``NULL`` and the :c:expr:`wchar_t*`
-      string contains null characters.
+      Phát sinh :exc:`ValueError` nếu *size* là ``NULL`` và chuỗi :c:expr:`wchar_t*` chứa các ký tự null.
 
 
 .. _builtincodecs:
 
-Built-in Codecs
-^^^^^^^^^^^^^^^
+Các codec tích hợp sẵn
+^^^^^^^^^^^^^^^^^^^^^^
 
-Python provides a set of built-in codecs which are written in C for speed. All of
-these codecs are directly usable via the following functions.
+Python cung cấp một tập hợp các codec tích hợp sẵn được viết bằng C để đạt tốc độ cao. Tất cả các codec này có thể được sử dụng trực tiếp thông qua các hàm sau.
 
-Many of the following APIs take two arguments encoding and errors, and they
-have the same semantics as the ones of the built-in :func:`str` string object
-constructor.
+Nhiều API sau đây nhận hai đối số encoding và errors, và chúng có cùng ngữ nghĩa với các đối số của hàm khởi tạo đối tượng chuỗi tích hợp sẵn :func:`str`.
 
-Setting encoding to ``NULL`` causes the default encoding to be used
-which is UTF-8.  The file system calls should use
-:c:func:`PyUnicode_FSConverter` for encoding file names. This uses the
-:term:`filesystem encoding and error handler` internally.
+Việc đặt encoding thành ``NULL`` khiến encoding mặc định, là UTF-8, được sử dụng. Các lệnh gọi hệ thống tệp nên sử dụng
+:c:func:`PyUnicode_FSConverter` để mã hóa tên tệp. Thành phần này sử dụng
+:term:`filesystem encoding and error handler` ở bên trong.
 
-Error handling is set by errors which may also be set to ``NULL`` meaning to use
-the default handling defined for the codec.  Default error handling for all
-built-in codecs is "strict" (:exc:`ValueError` is raised).
+Việc xử lý lỗi được thiết lập bằng errors, tham số này cũng có thể được đặt thành ``NULL`` để sử dụng cách xử lý mặc định được xác định cho codec. Cách xử lý lỗi mặc định cho tất cả codec tích hợp sẵn là "strict" (:exc:`ValueError` được phát sinh).
 
-The codecs all use a similar interface.  Only deviations from the following
-generic ones are documented for simplicity.
+Tất cả codec đều sử dụng một giao diện tương tự. Để đơn giản, tài liệu chỉ nêu những điểm khác biệt so với các giao diện tổng quát sau đây.
 
 
-Generic Codecs
-""""""""""""""
+Codec tổng quát
+"""""""""""""""
 
-The following macro is provided:
+Macro sau được cung cấp:
 
 
 .. c:macro:: Py_UNICODE_REPLACEMENT_CHARACTER
 
-   The Unicode code point ``U+FFFD`` (replacement character).
+   Điểm mã Unicode ``U+FFFD`` (ký tự thay thế).
 
-   This Unicode character is used as the replacement character during
-   decoding if the *errors* argument is set to "replace".
+   Ký tự Unicode này được sử dụng làm ký tự thay thế trong quá trình giải mã nếu đối số *errors* được đặt thành "replace".
 
 
-These are the generic codec APIs:
+Đây là các API codec tổng quát:
 
 
 .. c:function:: PyObject* PyUnicode_Decode(const char *str, Py_ssize_t size, \
                               const char *encoding, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the encoded string *str*.
-   *encoding* and *errors* have the same meaning as the parameters of the same name
-   in the :func:`str` built-in function.  The codec to be used is looked up
-   using the Python codec registry.  Return ``NULL`` if an exception was raised by
-   the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi đã mã hóa *str*. *encoding* và *errors* có cùng ý nghĩa với các tham số cùng tên trong hàm :func:`str` built-in. Codec được sử dụng sẽ được tra cứu bằng registry codec của Python. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_AsEncodedString(PyObject *unicode, \
                               const char *encoding, const char *errors)
 
-   Encode a Unicode object and return the result as Python bytes object.
-   *encoding* and *errors* have the same meaning as the parameters of the same
-   name in the Unicode :meth:`~str.encode` method. The codec to be used is looked up
-   using the Python codec registry. Return ``NULL`` if an exception was raised by
-   the codec.
+   Mã hóa một đối tượng Unicode và trả về kết quả dưới dạng đối tượng bytes của Python. *encoding* và *errors* có cùng ý nghĩa với các tham số cùng tên trong phương thức Unicode :meth:`~str.encode`. Codec được sử dụng sẽ được tra cứu bằng registry codec của Python. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
-UTF-8 Codecs
-""""""""""""
+Codec UTF-8
+"""""""""""
 
-These are the UTF-8 codec APIs:
+Đây là các API codec UTF-8:
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF8(const char *str, Py_ssize_t size, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the UTF-8 encoded string
-   *str*. Return ``NULL`` if an exception was raised by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi được mã hóa UTF-8 *str*. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF8Stateful(const char *str, Py_ssize_t size, \
                               const char *errors, Py_ssize_t *consumed)
 
-   If *consumed* is ``NULL``, behave like :c:func:`PyUnicode_DecodeUTF8`. If
-   *consumed* is not ``NULL``, trailing incomplete UTF-8 byte sequences will not be
-   treated as an error. Those bytes will not be decoded and the number of bytes
-   that have been decoded will be stored in *consumed*.
+   Nếu *consumed* là ``NULL``, hãy xử lý như :c:func:`PyUnicode_DecodeUTF8`. Nếu *consumed* không phải là ``NULL``, các chuỗi byte UTF-8 chưa hoàn chỉnh ở cuối sẽ không được xem là lỗi. Các byte đó sẽ không được giải mã và số byte đã được giải mã sẽ được lưu trong *consumed*.
 
 
 .. c:function:: PyObject* PyUnicode_AsUTF8String(PyObject *unicode)
 
-   Encode a Unicode object using UTF-8 and return the result as Python bytes
-   object.  Error handling is "strict".  Return ``NULL`` if an exception was
-   raised by the codec.
+   Mã hóa một đối tượng Unicode bằng UTF-8 và trả về kết quả dưới dạng đối tượng bytes của Python. Việc xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh một ngoại lệ.
 
-   The function fails if the string contains surrogate code points
-   (``U+D800`` - ``U+DFFF``).
+   Hàm sẽ thất bại nếu chuỗi chứa các code point surrogate (``U+D800`` - ``U+DFFF``).
 
 
 .. c:function:: const char* PyUnicode_AsUTF8AndSize(PyObject *unicode, Py_ssize_t *size)
 
-   Return a pointer to the UTF-8 encoding of the Unicode object, and
-   store the size of the encoded representation (in bytes) in *size*.  The
-   *size* argument can be ``NULL``; in this case no size will be stored.  The
-   returned buffer always has an extra null byte appended (not included in
-   *size*), regardless of whether there are any other null code points.
+   Trả về một con trỏ đến mã hóa UTF-8 của đối tượng Unicode và lưu kích thước của biểu diễn đã mã hóa (tính bằng byte) vào *size*. Đối số *size* có thể là ``NULL``; trong trường hợp này, không có kích thước nào được lưu. Bộ đệm được trả về luôn có thêm một byte null ở cuối (không được tính trong *size*), bất kể có bất kỳ code point null nào khác hay không.
 
-   On error, set an exception, set *size* to ``-1`` (if it's not NULL) and
-   return ``NULL``.
+   Khi xảy ra lỗi, hãy đặt một ngoại lệ, đặt *size* thành ``-1`` (nếu nó không phải là NULL) và trả về ``NULL``.
 
-   The function fails if the string contains surrogate code points
-   (``U+D800`` - ``U+DFFF``).
+   Hàm sẽ thất bại nếu chuỗi chứa các code point surrogate (``U+D800`` - ``U+DFFF``).
 
-   This caches the UTF-8 representation of the string in the Unicode object, and
-   subsequent calls will return a pointer to the same buffer.  The caller is not
-   responsible for deallocating the buffer. The buffer is deallocated and
-   pointers to it become invalid when the Unicode object is garbage collected.
+   Lệnh này lưu bộ nhớ đệm cho biểu diễn UTF-8 của chuỗi trong đối tượng Unicode, và các lần gọi tiếp theo sẽ trả về con trỏ đến cùng một vùng đệm. Bên gọi không chịu trách nhiệm giải phóng vùng đệm. Vùng đệm sẽ được giải phóng và các con trỏ trỏ đến đó trở nên không hợp lệ khi đối tượng Unicode được garbage collection.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.7
-      The return type is now ``const char *`` rather than ``char *``.
+      Kiểu trả về hiện là ``const char *`` thay vì ``char *``.
 
    .. versionchanged:: 3.10
-      This function is a part of the :ref:`limited API <limited-c-api>`.
+      Hàm này là một phần của :ref:`limited API <limited-c-api>`.
 
 
 .. c:function:: const char* PyUnicode_AsUTF8(PyObject *unicode)
 
-   As :c:func:`PyUnicode_AsUTF8AndSize`, but does not store the size.
+   Tương tự :c:func:`PyUnicode_AsUTF8AndSize`, nhưng không lưu kích thước.
 
    .. warning::
 
-      This function does not have any special behavior for
-      `null characters <https://en.wikipedia.org/wiki/Null_character>`_ embedded within
-      *unicode*. As a result, strings containing null characters will remain in the returned
-      string, which some C functions might interpret as the end of the string, leading to
-      truncation. If truncation is an issue, it is recommended to use :c:func:`PyUnicode_AsUTF8AndSize`
-      instead.
+      Hàm này không có hành vi đặc biệt đối với `ký tự null <https://en.wikipedia.org/wiki/Null_character>`_ được nhúng trong *Unicode*. Do đó, các chuỗi chứa ký tự null sẽ vẫn tồn tại trong chuỗi được trả về; một số hàm C có thể diễn giải ký tự này là phần kết thúc chuỗi, dẫn đến việc chuỗi bị cắt ngắn. Nếu việc cắt ngắn gây ra vấn đề, bạn nên sử dụng :c:func:`PyUnicode_AsUTF8AndSize` thay thế.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.7
-      The return type is now ``const char *`` rather than ``char *``.
+      Kiểu trả về hiện là ``const char *`` thay vì ``char *``.
 
 
-UTF-32 Codecs
-"""""""""""""
+Bộ mã hóa UTF-32
+""""""""""""""""
 
-These are the UTF-32 codec APIs:
+Đây là các API codec UTF-32:
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF32(const char *str, Py_ssize_t size, \
                               const char *errors, int *byteorder)
 
-   Decode *size* bytes from a UTF-32 encoded buffer string and return the
-   corresponding Unicode object.  *errors* (if non-``NULL``) defines the error
-   handling. It defaults to "strict".
+   Giải mã *size* byte từ một chuỗi bộ đệm được mã hóa UTF-32 và trả về đối tượng Unicode tương ứng. *errors* (nếu không phải ``NULL``) xác định cách xử lý lỗi. Giá trị mặc định là "strict".
 
-   If *byteorder* is non-``NULL``, the decoder starts decoding using the given byte
-   order::
+   Nếu *byteorder* khác ``NULL``, bộ giải mã bắt đầu giải mã bằng thứ tự byte đã cho::
 
       *byteorder == -1: little endian
       *byteorder == 0:  native order
       *byteorder == 1:  big endian
 
-   If ``*byteorder`` is zero, and the first four bytes of the input data are a
-   byte order mark (BOM), the decoder switches to this byte order and the BOM is
-   not copied into the resulting Unicode string.  If ``*byteorder`` is ``-1`` or
-   ``1``, any byte order mark is copied to the output.
+   Nếu ``*byteorder`` bằng không và bốn byte đầu tiên của dữ liệu đầu vào là dấu thứ tự byte (BOM), bộ giải mã chuyển sang thứ tự byte này và BOM không được sao chép vào chuỗi Unicode kết quả. Nếu ``*byteorder`` là ``-1`` hoặc ``1``, mọi dấu thứ tự byte đều được sao chép vào đầu ra.
 
-   After completion, *\*byteorder* is set to the current byte order at the end
-   of input data.
+   Sau khi hoàn tất, *\*byteorder* được đặt thành thứ tự byte hiện tại ở cuối dữ liệu đầu vào.
 
-   If *byteorder* is ``NULL``, the codec starts in native order mode.
+   Nếu *byteorder* là ``NULL``, codec bắt đầu ở chế độ thứ tự bản địa.
 
-   Return ``NULL`` if an exception was raised by the codec.
+   Trả về ``NULL`` nếu codec phát sinh một exception.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF32Stateful(const char *str, Py_ssize_t size, \
                               const char *errors, int *byteorder, Py_ssize_t *consumed)
 
-   If *consumed* is ``NULL``, behave like :c:func:`PyUnicode_DecodeUTF32`. If
-   *consumed* is not ``NULL``, :c:func:`PyUnicode_DecodeUTF32Stateful` will not treat
-   trailing incomplete UTF-32 byte sequences (such as a number of bytes not divisible
-   by four) as an error. Those bytes will not be decoded and the number of bytes
-   that have been decoded will be stored in *consumed*.
+   Nếu *consumed* là ``NULL``, hãy hoạt động giống như :c:func:`PyUnicode_DecodeUTF32`. Nếu *consumed* không phải là ``NULL``, :c:func:`PyUnicode_DecodeUTF32Stateful` sẽ không coi các chuỗi byte UTF-32 chưa hoàn chỉnh ở cuối (chẳng hạn như số byte không chia hết cho bốn) là lỗi. Các byte đó sẽ không được giải mã và số byte đã được giải mã sẽ được lưu vào *consumed*.
 
 
 .. c:function:: PyObject* PyUnicode_AsUTF32String(PyObject *unicode)
 
-   Return a Python byte string using the UTF-32 encoding in native byte
-   order. The string always starts with a BOM mark.  Error handling is "strict".
-   Return ``NULL`` if an exception was raised by the codec.
+   Trả về một chuỗi byte Python sử dụng encoding UTF-32 theo thứ tự byte native. Chuỗi luôn bắt đầu bằng dấu BOM. Việc xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh một exception.
 
 
-UTF-16 Codecs
-"""""""""""""
+Codec UTF-16
+""""""""""""
 
-These are the UTF-16 codec APIs:
+Đây là các API codec UTF-16:
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF16(const char *str, Py_ssize_t size, \
                               const char *errors, int *byteorder)
 
-   Decode *size* bytes from a UTF-16 encoded buffer string and return the
-   corresponding Unicode object.  *errors* (if non-``NULL``) defines the error
-   handling. It defaults to "strict".
+   Giải mã *size* byte từ chuỗi bộ đệm được mã hóa UTF-16 và trả về đối tượng Unicode tương ứng. *errors* (nếu không phải ``NULL``) xác định cách xử lý lỗi. Giá trị mặc định là "strict".
 
-   If *byteorder* is non-``NULL``, the decoder starts decoding using the given byte
-   order::
+   Nếu *byteorder* khác ``NULL``, bộ giải mã bắt đầu giải mã bằng thứ tự byte đã cho::
 
       *byteorder == -1: little endian
       *byteorder == 0:  native order
       *byteorder == 1:  big endian
 
-   If ``*byteorder`` is zero, and the first two bytes of the input data are a
-   byte order mark (BOM), the decoder switches to this byte order and the BOM is
-   not copied into the resulting Unicode string.  If ``*byteorder`` is ``-1`` or
-   ``1``, any byte order mark is copied to the output (where it will result in
-   either a ``\ufeff`` or a ``\ufffe`` character).
+   Nếu ``*byteorder`` bằng 0 và hai byte đầu tiên của dữ liệu đầu vào là dấu thứ tự byte (BOM), bộ giải mã chuyển sang thứ tự byte này và BOM không được sao chép vào chuỗi Unicode kết quả. Nếu ``*byteorder`` là ``-1`` hoặc ``1``, mọi dấu thứ tự byte đều được sao chép vào đầu ra (khi đó sẽ tạo thành ký tự ``\ufeff`` hoặc ``\ufffe``).
 
-   After completion, ``*byteorder`` is set to the current byte order at the end
-   of input data.
+   Sau khi hoàn tất, ``*byteorder`` được đặt thành thứ tự byte hiện tại ở cuối dữ liệu đầu vào.
 
-   If *byteorder* is ``NULL``, the codec starts in native order mode.
+   Nếu *byteorder* là ``NULL``, codec bắt đầu ở chế độ thứ tự byte gốc.
 
-   Return ``NULL`` if an exception was raised by the codec.
+   Trả về ``NULL`` nếu codec phát sinh một ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF16Stateful(const char *str, Py_ssize_t size, \
                               const char *errors, int *byteorder, Py_ssize_t *consumed)
 
-   If *consumed* is ``NULL``, behave like :c:func:`PyUnicode_DecodeUTF16`. If
-   *consumed* is not ``NULL``, :c:func:`PyUnicode_DecodeUTF16Stateful` will not treat
-   trailing incomplete UTF-16 byte sequences (such as an odd number of bytes or a
-   split surrogate pair) as an error. Those bytes will not be decoded and the
-   number of bytes that have been decoded will be stored in *consumed*.
+   Nếu *consumed* là ``NULL``, hoạt động như :c:func:`PyUnicode_DecodeUTF16`. Nếu *consumed* không phải là ``NULL``, :c:func:`PyUnicode_DecodeUTF16Stateful` sẽ không xem các chuỗi byte UTF-16 chưa hoàn chỉnh ở cuối (chẳng hạn như số byte lẻ hoặc một cặp surrogate bị tách) là lỗi. Các byte đó sẽ không được giải mã và số byte đã được giải mã sẽ được lưu trong *consumed*.
 
 
 .. c:function:: PyObject* PyUnicode_AsUTF16String(PyObject *unicode)
 
-   Return a Python byte string using the UTF-16 encoding in native byte
-   order. The string always starts with a BOM mark.  Error handling is "strict".
-   Return ``NULL`` if an exception was raised by the codec.
+   Trả về một chuỗi byte Python sử dụng encoding UTF-16 theo thứ tự byte gốc. Chuỗi luôn bắt đầu bằng dấu BOM. Việc xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
-UTF-7 Codecs
-""""""""""""
+Codec UTF-7
+"""""""""""
 
-These are the UTF-7 codec APIs:
+Đây là các API codec UTF-7:
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF7(const char *str, Py_ssize_t size, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the UTF-7 encoded string
-   *str*.  Return ``NULL`` if an exception was raised by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi được mã hóa UTF-7 *str*. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUTF7Stateful(const char *str, Py_ssize_t size, \
                               const char *errors, Py_ssize_t *consumed)
 
-   If *consumed* is ``NULL``, behave like :c:func:`PyUnicode_DecodeUTF7`.  If
-   *consumed* is not ``NULL``, trailing incomplete UTF-7 base-64 sections will not
-   be treated as an error.  Those bytes will not be decoded and the number of
-   bytes that have been decoded will be stored in *consumed*.
+   Nếu *consumed* là ``NULL``, hoạt động như :c:func:`PyUnicode_DecodeUTF7`. Nếu *consumed* không phải là ``NULL``, các phần base-64 UTF-7 chưa hoàn chỉnh ở cuối sẽ không được xem là lỗi. Các byte đó sẽ không được giải mã và số byte đã được giải mã sẽ được lưu trong *consumed*.
 
 
-Unicode-Escape Codecs
-"""""""""""""""""""""
+Các codec Unicode-Escape
+""""""""""""""""""""""""
 
-These are the "Unicode Escape" codec APIs:
+Đây là các API codec "Unicode Escape":
 
 
 .. c:function:: PyObject* PyUnicode_DecodeUnicodeEscape(const char *str, \
                               Py_ssize_t size, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the Unicode-Escape encoded
-   string *str*.  Return ``NULL`` if an exception was raised by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi được mã hóa bằng Unicode-Escape *str*. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_AsUnicodeEscapeString(PyObject *unicode)
 
-   Encode a Unicode object using Unicode-Escape and return the result as a
-   bytes object.  Error handling is "strict".  Return ``NULL`` if an exception was
-   raised by the codec.
+   Mã hóa một đối tượng Unicode bằng Unicode-Escape và trả về kết quả dưới dạng đối tượng bytes. Cách xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
-Raw-Unicode-Escape Codecs
-"""""""""""""""""""""""""
+Các codec Raw-Unicode-Escape
+""""""""""""""""""""""""""""
 
-These are the "Raw Unicode Escape" codec APIs:
+Đây là các API codec "Raw Unicode Escape":
 
 
 .. c:function:: PyObject* PyUnicode_DecodeRawUnicodeEscape(const char *str, \
                               Py_ssize_t size, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the Raw-Unicode-Escape
-   encoded string *str*.  Return ``NULL`` if an exception was raised by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi được mã hóa bằng Raw-Unicode-Escape *str*. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_AsRawUnicodeEscapeString(PyObject *unicode)
 
-   Encode a Unicode object using Raw-Unicode-Escape and return the result as
-   a bytes object.  Error handling is "strict".  Return ``NULL`` if an exception
-   was raised by the codec.
+   Mã hóa một đối tượng Unicode bằng Raw-Unicode-Escape và trả về kết quả dưới dạng đối tượng bytes. Xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
-Latin-1 Codecs
-""""""""""""""
+Codec Latin-1
+"""""""""""""
 
-These are the Latin-1 codec APIs: Latin-1 corresponds to the first 256 Unicode
-ordinals and only these are accepted by the codecs during encoding.
+Đây là các API codec Latin-1: Latin-1 tương ứng với 256 ordinal Unicode đầu tiên và chỉ những ordinal này được codec chấp nhận trong quá trình mã hóa.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeLatin1(const char *str, Py_ssize_t size, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the Latin-1 encoded string
-   *str*.  Return ``NULL`` if an exception was raised by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi được mã hóa bằng Latin-1 *str*. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_AsLatin1String(PyObject *unicode)
 
-   Encode a Unicode object using Latin-1 and return the result as Python bytes
-   object.  Error handling is "strict".  Return ``NULL`` if an exception was
-   raised by the codec.
+   Mã hóa một đối tượng Unicode bằng Latin-1 và trả về kết quả dưới dạng đối tượng bytes của Python. Xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
-ASCII Codecs
-""""""""""""
+Bộ mã ASCII
+"""""""""""
 
-These are the ASCII codec APIs.  Only 7-bit ASCII data is accepted. All other
-codes generate errors.
+Đây là các API codec ASCII. Chỉ chấp nhận dữ liệu ASCII 7 bit. Tất cả các mã khác đều tạo ra lỗi.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeASCII(const char *str, Py_ssize_t size, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the ASCII encoded string
-   *str*.  Return ``NULL`` if an exception was raised by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi được mã hóa ASCII *str*. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_AsASCIIString(PyObject *unicode)
 
-   Encode a Unicode object using ASCII and return the result as Python bytes
-   object.  Error handling is "strict".  Return ``NULL`` if an exception was
-   raised by the codec.
+   Mã hóa một đối tượng Unicode bằng ASCII và trả về kết quả dưới dạng đối tượng bytes của Python. Cách xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
-Character Map Codecs
-""""""""""""""""""""
+Bộ mã ánh xạ ký tự
+""""""""""""""""""
 
-This codec is special in that it can be used to implement many different codecs
-(and this is in fact what was done to obtain most of the standard codecs
-included in the :mod:`!encodings` package). The codec uses mappings to encode and
-decode characters.  The mapping objects provided must support the
-:meth:`~object.__getitem__` mapping interface; dictionaries and sequences work well.
+Codec này đặc biệt ở chỗ có thể được dùng để triển khai nhiều codec khác nhau (và thực tế đây chính là cách hầu hết các codec tiêu chuẩn có trong gói :mod:`!encodings` được tạo ra). Codec sử dụng các ánh xạ để mã hóa và giải mã ký tự. Các đối tượng ánh xạ được cung cấp phải hỗ trợ
+:meth:`~object.__getitem__` giao diện ánh xạ; từ điển và dãy đều hoạt động tốt.
 
-These are the mapping codec APIs:
+Đây là các API codec ánh xạ:
 
 .. c:function:: PyObject* PyUnicode_DecodeCharmap(const char *str, Py_ssize_t length, \
                               PyObject *mapping, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the encoded string *str*
-   using the given *mapping* object.  Return ``NULL`` if an exception was raised
-   by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi đã mã hóa *str* bằng đối tượng *mapping* đã cho. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
-   If *mapping* is ``NULL``, Latin-1 decoding will be applied.  Else
-   *mapping* must map bytes ordinals (integers in the range from 0 to 255)
-   to Unicode strings, integers (which are then interpreted as Unicode
-   ordinals) or ``None``.  Unmapped data bytes -- ones which cause a
-   :exc:`LookupError`, as well as ones which get mapped to ``None``,
-   ``0xFFFE`` or ``'\ufffe'``, are treated as undefined mappings and cause
-   an error.
+   Nếu *mapping* là ``NULL``, thao tác giải mã Latin-1 sẽ được áp dụng. Nếu không, *mapping* phải ánh xạ các ordinal của byte (số nguyên trong phạm vi từ 0 đến 255) thành các chuỗi Unicode, số nguyên (sau đó được diễn giải là ordinal Unicode) hoặc ``None``. Các byte dữ liệu chưa được ánh xạ -- những byte khiến
+   :exc:`LookupError`, cũng như những byte được ánh xạ thành ``None``, ``0xFFFE`` hoặc ``'\ufffe'``, đều được coi là các ánh xạ chưa xác định và gây ra lỗi.
 
 
 .. c:function:: PyObject* PyUnicode_AsCharmapString(PyObject *unicode, PyObject *mapping)
 
-   Encode a Unicode object using the given *mapping* object and return the
-   result as a bytes object.  Error handling is "strict".  Return ``NULL`` if an
-   exception was raised by the codec.
+   Mã hóa một đối tượng Unicode bằng đối tượng *mapping* đã cho và trả về kết quả dưới dạng một đối tượng bytes. Cách xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
-   The *mapping* object must map Unicode ordinal integers to bytes objects,
-   integers in the range from 0 to 255 or ``None``.  Unmapped character
-   ordinals (ones which cause a :exc:`LookupError`) as well as mapped to
-   ``None`` are treated as "undefined mapping" and cause an error.
+   Đối tượng *mapping* phải ánh xạ các số nguyên ordinal Unicode thành các đối tượng bytes, các số nguyên trong phạm vi từ 0 đến 255 hoặc ``None``. Các ordinal của ký tự chưa được ánh xạ (những ordinal khiến :exc:`LookupError`) cũng như các ordinal được ánh xạ thành ``None`` đều được coi là "ánh xạ chưa xác định" và gây ra lỗi.
 
 
-The following codec API is special in that maps Unicode to Unicode.
+API codec sau đây đặc biệt ở chỗ ánh xạ Unicode sang Unicode.
 
 .. c:function:: PyObject* PyUnicode_Translate(PyObject *unicode, PyObject *table, const char *errors)
 
-   Translate a string by applying a character mapping table to it and return the
-   resulting Unicode object. Return ``NULL`` if an exception was raised by the
-   codec.
+   Dịch một chuỗi bằng cách áp dụng bảng ánh xạ ký tự vào chuỗi đó rồi trả về đối tượng Unicode kết quả. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
-   The mapping table must map Unicode ordinal integers to Unicode ordinal integers
-   or ``None`` (causing deletion of the character).
+   Bảng ánh xạ phải ánh xạ các số nguyên thứ tự Unicode sang các số nguyên thứ tự Unicode hoặc ``None`` (khiến ký tự bị xóa).
 
-   Mapping tables need only provide the :meth:`~object.__getitem__` interface; dictionaries
-   and sequences work well.  Unmapped character ordinals (ones which cause a
-   :exc:`LookupError`) are left untouched and are copied as-is.
+   Bảng ánh xạ chỉ cần cung cấp giao diện :meth:`~object.__getitem__`; dictionary và sequence hoạt động tốt. Các số thứ tự ký tự không được ánh xạ (những số gây ra một
+   :exc:`LookupError`) được giữ nguyên và sao chép như hiện tại.
 
-   *errors* has the usual meaning for codecs. It may be ``NULL`` which indicates to
-   use the default error handling.
+   *errors* có ý nghĩa thông thường đối với codec. Giá trị này có thể là ``NULL``, cho biết sử dụng cách xử lý lỗi mặc định.
 
 
-MBCS codecs for Windows
-"""""""""""""""""""""""
+Codec MBCS cho Windows
+""""""""""""""""""""""
 
-These are the MBCS codec APIs. They are currently only available on Windows and
-use the Win32 MBCS converters to implement the conversions.  Note that MBCS (or
-DBCS) is a class of encodings, not just one.  The target encoding is defined by
-the user settings on the machine running the codec.
+Đây là các API codec MBCS. Hiện tại, chúng chỉ khả dụng trên Windows và sử dụng các bộ chuyển đổi MBCS của Win32 để thực hiện việc chuyển đổi. Lưu ý rằng MBCS (hoặc DBCS) là một nhóm các encoding, không chỉ là một encoding duy nhất. Encoding đích được xác định bởi cài đặt người dùng trên máy chạy codec.
 
 .. c:function:: PyObject* PyUnicode_DecodeMBCS(const char *str, Py_ssize_t size, const char *errors)
 
-   Create a Unicode object by decoding *size* bytes of the MBCS encoded string *str*.
-   Return ``NULL`` if an exception was raised by the codec.
+   Tạo một đối tượng Unicode bằng cách giải mã *size* byte của chuỗi được mã hóa MBCS *str*. Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeMBCSStateful(const char *str, Py_ssize_t size, \
                               const char *errors, Py_ssize_t *consumed)
 
-   If *consumed* is ``NULL``, behave like :c:func:`PyUnicode_DecodeMBCS`. If
-   *consumed* is not ``NULL``, :c:func:`PyUnicode_DecodeMBCSStateful` will not decode
-   trailing lead byte and the number of bytes that have been decoded will be stored
-   in *consumed*.
+   Nếu *consumed* là ``NULL``, hoạt động như :c:func:`PyUnicode_DecodeMBCS`. Nếu *consumed* không phải là ``NULL``, :c:func:`PyUnicode_DecodeMBCSStateful` sẽ không giải mã byte dẫn đầu còn lại và số byte đã được giải mã sẽ được lưu trong *consumed*.
 
 
 .. c:function:: PyObject* PyUnicode_DecodeCodePageStateful(int code_page, const char *str, \
                               Py_ssize_t size, const char *errors, Py_ssize_t *consumed)
 
-   Similar to :c:func:`PyUnicode_DecodeMBCSStateful`, except uses the code page
-   specified by *code_page*.
+   Tương tự như :c:func:`PyUnicode_DecodeMBCSStateful`, nhưng sử dụng code page được chỉ định bởi *code_page*.
 
 
 .. c:function:: PyObject* PyUnicode_AsMBCSString(PyObject *unicode)
 
-   Encode a Unicode object using MBCS and return the result as Python bytes
-   object.  Error handling is "strict".  Return ``NULL`` if an exception was
-   raised by the codec.
+   Mã hóa một đối tượng Unicode bằng MBCS và trả về kết quả dưới dạng đối tượng bytes của Python. Cách xử lý lỗi là "strict". Trả về ``NULL`` nếu codec phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_EncodeCodePage(int code_page, PyObject *unicode, const char *errors)
 
-   Encode the Unicode object using the specified code page and return a Python
-   bytes object.  Return ``NULL`` if an exception was raised by the codec. Use
-   :c:macro:`!CP_ACP` code page to get the MBCS encoder.
+   Mã hóa đối tượng Unicode bằng trang mã được chỉ định và trả về một đối tượng bytes của Python. Trả về ``NULL`` nếu codec phát sinh ngoại lệ. Sử dụng
+   trang mã :c:macro:`!CP_ACP` để lấy MBCS encoder.
 
    .. versionadded:: 3.3
 
 
 .. _unicodemethodsandslots:
 
-Methods and Slot Functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các phương thức và hàm slot
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The following APIs are capable of handling Unicode objects and strings on input
-(we refer to them as strings in the descriptions) and return Unicode objects or
-integers as appropriate.
+Các API sau đây có khả năng xử lý các đối tượng Unicode và chuỗi ở đầu vào (trong phần mô tả, chúng tôi gọi chúng là chuỗi) và trả về các đối tượng Unicode hoặc số nguyên tương ứng.
 
-They all return ``NULL`` or ``-1`` if an exception occurs.
+Tất cả đều trả về ``NULL`` hoặc ``-1`` nếu xảy ra ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_Concat(PyObject *left, PyObject *right)
 
-   Concat two strings giving a new Unicode string.
+   Nối hai chuỗi để tạo thành một chuỗi Unicode mới.
 
 
 .. c:function:: PyObject* PyUnicode_Split(PyObject *unicode, PyObject *sep, Py_ssize_t maxsplit)
 
-   Split a string giving a list of Unicode strings.  If *sep* is ``NULL``, splitting
-   will be done at all whitespace substrings.  Otherwise, splits occur at the given
-   separator.  At most *maxsplit* splits will be done.  If negative, no limit is
-   set.  Separators are not included in the resulting list.
+   Tách một chuỗi và trả về danh sách các chuỗi Unicode. Nếu *sep* là ``NULL``, việc tách sẽ được thực hiện tại tất cả các chuỗi con khoảng trắng. Nếu không, các phần tách sẽ xảy ra tại dấu phân cách đã cho. Tối đa *maxsplit* lần tách sẽ được thực hiện. Nếu là số âm, sẽ không đặt giới hạn. Các dấu phân cách không được đưa vào danh sách kết quả.
 
-   On error, return ``NULL`` with an exception set.
+   Khi xảy ra lỗi, trả về ``NULL`` và thiết lập ngoại lệ.
 
-   Equivalent to :py:meth:`str.split`.
+   Tương đương với :py:meth:`str.split`.
 
 
 .. c:function:: PyObject* PyUnicode_RSplit(PyObject *unicode, PyObject *sep, Py_ssize_t maxsplit)
 
-   Similar to :c:func:`PyUnicode_Split`, but splitting will be done beginning
-   at the end of the string.
+   Tương tự :c:func:`PyUnicode_Split`, nhưng việc tách sẽ bắt đầu từ cuối chuỗi.
 
-   On error, return ``NULL`` with an exception set.
+   Khi xảy ra lỗi, trả về ``NULL`` và thiết lập ngoại lệ.
 
-   Equivalent to :py:meth:`str.rsplit`.
+   Tương đương với :py:meth:`str.rsplit`.
 
 
 .. c:function:: PyObject* PyUnicode_Splitlines(PyObject *unicode, int keepends)
 
-   Split a Unicode string at line breaks, returning a list of Unicode strings.
-   CRLF is considered to be one line break.  If *keepends* is ``0``, the Line break
-   characters are not included in the resulting strings.
+   Tách một chuỗi Unicode tại các ngắt dòng, trả về danh sách các chuỗi Unicode. CRLF được xem là một ngắt dòng. Nếu *keepends* là ``0``, các ký tự ngắt dòng không được đưa vào các chuỗi kết quả.
 
 
 .. c:function:: PyObject* PyUnicode_Partition(PyObject *unicode, PyObject *sep)
 
-   Split a Unicode string at the first occurrence of *sep*, and return
-   a 3-tuple containing the part before the separator, the separator itself,
-   and the part after the separator. If the separator is not found,
-   return a 3-tuple containing the string itself, followed by two empty strings.
+   Tách một chuỗi Unicode tại lần xuất hiện đầu tiên của *sep*, rồi trả về một bộ 3 phần tử gồm phần trước dấu phân tách, chính dấu phân tách và phần sau dấu phân tách. Nếu không tìm thấy dấu phân tách, trả về một bộ 3 phần tử gồm chính chuỗi đó, theo sau là hai chuỗi rỗng.
 
-   *sep* must not be empty.
+   *sep* không được để trống.
 
-   On error, return ``NULL`` with an exception set.
+   Khi xảy ra lỗi, trả về ``NULL`` và thiết lập ngoại lệ.
 
-   Equivalent to :py:meth:`str.partition`.
+   Tương đương với :py:meth:`str.partition`.
 
 
 .. c:function:: PyObject* PyUnicode_RPartition(PyObject *unicode, PyObject *sep)
 
-   Similar to :c:func:`PyUnicode_Partition`, but split a Unicode string at the
-   last occurrence of *sep*. If the separator is not found, return a 3-tuple
-   containing two empty strings, followed by the string itself.
+   Tương tự như :c:func:`PyUnicode_Partition`, nhưng tách một chuỗi Unicode tại lần xuất hiện cuối cùng của *sep*. Nếu không tìm thấy dấu phân tách, trả về một tuple 3 phần tử chứa hai chuỗi rỗng, theo sau là chính chuỗi đó.
 
-   *sep* must not be empty.
+   *sep* không được để trống.
 
-   On error, return ``NULL`` with an exception set.
+   Khi xảy ra lỗi, trả về ``NULL`` và thiết lập ngoại lệ.
 
-   Equivalent to :py:meth:`str.rpartition`.
+   Tương đương với :py:meth:`str.rpartition`.
 
 
 .. c:function:: PyObject* PyUnicode_Join(PyObject *separator, PyObject *seq)
 
-   Join a sequence of strings using the given *separator* and return the resulting
-   Unicode string.
+   Nối một chuỗi các chuỗi bằng *dấu phân cách* đã cho và trả về chuỗi Unicode kết quả.
 
 
 .. c:function:: Py_ssize_t PyUnicode_Tailmatch(PyObject *unicode, PyObject *substr, \
                         Py_ssize_t start, Py_ssize_t end, int direction)
 
-   Return ``1`` if *substr* matches ``unicode[start:end]`` at the given tail end
-   (*direction* == ``-1`` means to do a prefix match, *direction* == ``1`` a suffix match),
-   ``0`` otherwise. Return ``-1`` if an error occurred.
+   Trả về ``1`` nếu *substr* khớp với ``unicode[start:end]`` ở phần cuối đã cho (*direction* == ``-1`` nghĩa là thực hiện so khớp tiền tố, *direction* == ``1`` là so khớp hậu tố), ``0`` nếu không. Trả về ``-1`` nếu xảy ra lỗi.
 
 
 .. c:function:: Py_ssize_t PyUnicode_Find(PyObject *unicode, PyObject *substr, \
                                Py_ssize_t start, Py_ssize_t end, int direction)
 
-   Return the first position of *substr* in ``unicode[start:end]`` using the given
-   *direction* (*direction* == ``1`` means to do a forward search, *direction* == ``-1`` a
-   backward search).  The return value is the index of the first match; a value of
-   ``-1`` indicates that no match was found, and ``-2`` indicates that an error
-   occurred and an exception has been set.
+   Trả về vị trí đầu tiên của *substr* trong ``unicode[start:end]`` bằng cách sử dụng *direction* đã cho (*direction* == ``1`` nghĩa là thực hiện tìm kiếm xuôi, *direction* == ``-1`` là tìm kiếm ngược). Giá trị trả về là chỉ mục của kết quả khớp đầu tiên; giá trị ``-1`` cho biết không tìm thấy kết quả khớp nào, còn ``-2`` cho biết đã xảy ra lỗi và một exception đã được thiết lập.
 
 
 .. c:function:: Py_ssize_t PyUnicode_FindChar(PyObject *unicode, Py_UCS4 ch, \
                                Py_ssize_t start, Py_ssize_t end, int direction)
 
-   Return the first position of the character *ch* in ``unicode[start:end]`` using
-   the given *direction* (*direction* == ``1`` means to do a forward search,
-   *direction* == ``-1`` a backward search).  The return value is the index of the
-   first match; a value of ``-1`` indicates that no match was found, and ``-2``
-   indicates that an error occurred and an exception has been set.
+   Trả về vị trí đầu tiên của ký tự *ch* trong ``unicode[start:end]`` bằng cách sử dụng *direction* đã cho (*direction* == ``1`` nghĩa là thực hiện tìm kiếm xuôi, *direction* == ``-1`` là tìm kiếm ngược). Giá trị trả về là chỉ mục của kết quả khớp đầu tiên; giá trị ``-1`` cho biết không tìm thấy kết quả khớp nào, còn ``-2`` cho biết đã xảy ra lỗi và một exception đã được thiết lập.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.7
-      *start* and *end* are now adjusted to behave like ``unicode[start:end]``.
+      *start* và *end* hiện được điều chỉnh để hoạt động như ``unicode[start:end]``.
 
 
 .. c:function:: Py_ssize_t PyUnicode_Count(PyObject *unicode, PyObject *substr, \
                                Py_ssize_t start, Py_ssize_t end)
 
-   Return the number of non-overlapping occurrences of *substr* in
-   ``unicode[start:end]``.  Return ``-1`` if an error occurred.
+   Trả về số lần xuất hiện không chồng lấp của *substr* trong ``unicode[start:end]``.  Trả về ``-1`` nếu xảy ra lỗi.
 
 
 .. c:function:: PyObject* PyUnicode_Replace(PyObject *unicode, PyObject *substr, \
                               PyObject *replstr, Py_ssize_t maxcount)
 
-   Replace at most *maxcount* occurrences of *substr* in *unicode* with *replstr* and
-   return the resulting Unicode object. *maxcount* == ``-1`` means replace all
-   occurrences.
+   Thay thế nhiều nhất *maxcount* lần xuất hiện của *substr* trong *unicode* bằng *replstr* và trả về đối tượng Unicode thu được. *maxcount* == ``-1`` nghĩa là thay thế tất cả các lần xuất hiện.
 
 
 .. c:function:: int PyUnicode_Compare(PyObject *left, PyObject *right)
 
-   Compare two strings and return ``-1``, ``0``, ``1`` for less than, equal, and greater than,
-   respectively.
+   So sánh hai chuỗi và lần lượt trả về ``-1``, ``0``, ``1`` tương ứng với nhỏ hơn, bằng và lớn hơn.
 
-   This function returns ``-1`` upon failure, so one should call
-   :c:func:`PyErr_Occurred` to check for errors.
+   Hàm này trả về ``-1`` khi thất bại, vì vậy cần gọi
+   :c:func:`PyErr_Occurred` để kiểm tra lỗi.
 
    .. seealso::
 
-      The :c:func:`PyUnicode_Equal` function.
+      Hàm :c:func:`PyUnicode_Equal`.
 
 
 .. c:function:: int PyUnicode_Equal(PyObject *a, PyObject *b)
 
-   Test if two strings are equal:
+   Kiểm tra xem hai chuỗi có bằng nhau không:
 
-   * Return ``1`` if *a* is equal to *b*.
-   * Return ``0`` if *a* is not equal to *b*.
-   * Set a :exc:`TypeError` exception and return ``-1`` if *a* or *b* is not a
-     :class:`str` object.
+   * Trả về ``1`` nếu *a* bằng *b*.
+   * Trả về ``0`` nếu *a* không bằng *b*.
+   * Đặt một ngoại lệ :exc:`TypeError` và trả về ``-1`` nếu *a* hoặc *b* không phải là một
+     :class:`str` đối tượng.
 
-   The function always succeeds if *a* and *b* are :class:`str` objects.
+   Hàm luôn thành công nếu *a* và *b* là các đối tượng :class:`str`.
 
-   The function works for :class:`str` subclasses, but does not honor custom
-   ``__eq__()`` method.
+   Hàm hoạt động với các lớp con của :class:`str`, nhưng không tuân theo phương thức ``__eq__()`` tùy chỉnh.
 
    .. seealso::
 
-      The :c:func:`PyUnicode_Compare` function.
+      Hàm :c:func:`PyUnicode_Compare`.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyUnicode_EqualToUTF8AndSize(PyObject *unicode, const char *string, Py_ssize_t size)
 
-   Compare a Unicode object with a char buffer which is interpreted as
-   being UTF-8 or ASCII encoded and return true (``1``) if they are equal,
-   or false (``0``) otherwise.
-   If the Unicode object contains surrogate code points
-   (``U+D800`` - ``U+DFFF``) or the C string is not valid UTF-8,
-   false (``0``) is returned.
+   So sánh một đối tượng Unicode với bộ đệm char được diễn giải là mã hóa UTF-8 hoặc ASCII và trả về true (``1``) nếu chúng bằng nhau, hoặc false (``0``) nếu không. Nếu đối tượng Unicode chứa các điểm mã surrogate (``U+D800`` - ``U+DFFF``) hoặc chuỗi C không phải là UTF-8 hợp lệ, false (``0``) sẽ được trả về.
 
-   This function does not raise exceptions.
+   Hàm này không phát sinh ngoại lệ.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyUnicode_EqualToUTF8(PyObject *unicode, const char *string)
 
-   Similar to :c:func:`PyUnicode_EqualToUTF8AndSize`, but compute *string*
-   length using :c:func:`!strlen`.
-   If the Unicode object contains null characters, false (``0``) is returned.
+   Tương tự :c:func:`PyUnicode_EqualToUTF8AndSize`, nhưng tính độ dài *string* bằng :c:func:`!strlen`. Nếu đối tượng Unicode chứa các ký tự null, false (``0``) sẽ được trả về.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyUnicode_CompareWithASCIIString(PyObject *unicode, const char *string)
 
-   Compare a Unicode object, *unicode*, with *string* and return ``-1``, ``0``, ``1`` for less
-   than, equal, and greater than, respectively. It is best to pass only
-   ASCII-encoded strings, but the function interprets the input string as
-   ISO-8859-1 if it contains non-ASCII characters.
+   So sánh một đối tượng Unicode, *unicode*, với *string* và lần lượt trả về ``-1``, ``0``, ``1`` khi nhỏ hơn, bằng và lớn hơn. Tốt nhất chỉ nên truyền các chuỗi được mã hóa ASCII, nhưng hàm sẽ diễn giải chuỗi đầu vào là ISO-8859-1 nếu chuỗi chứa các ký tự không phải ASCII.
 
-   This function does not raise exceptions.
+   Hàm này không phát sinh ngoại lệ.
 
 
 .. c:function:: PyObject* PyUnicode_RichCompare(PyObject *left,  PyObject *right, int op)
 
-   Rich compare two Unicode strings and return one of the following:
+   So sánh phong phú hai chuỗi Unicode và trả về một trong các giá trị sau:
 
-   * ``NULL`` in case an exception was raised
-   * :c:data:`Py_True` or :c:data:`Py_False` for successful comparisons
-   * :c:data:`Py_NotImplemented` in case the type combination is unknown
+   * ``NULL`` trong trường hợp xảy ra ngoại lệ
+   * :c:data:`Py_True` hoặc :c:data:`Py_False` đối với các phép so sánh thành công
+   * :c:data:`Py_NotImplemented` trong trường hợp không xác định được tổ hợp kiểu
 
-   Possible values for *op* are :c:macro:`Py_GT`, :c:macro:`Py_GE`, :c:macro:`Py_EQ`,
-   :c:macro:`Py_NE`, :c:macro:`Py_LT`, and :c:macro:`Py_LE`.
+   Các giá trị có thể có của *op* là :c:macro:`Py_GT`, :c:macro:`Py_GE`, :c:macro:`Py_EQ`,
+   :c:macro:`Py_NE`, :c:macro:`Py_LT` và :c:macro:`Py_LE`.
 
 
 .. c:function:: PyObject* PyUnicode_Format(PyObject *format, PyObject *args)
 
-   Return a new string object from *format* and *args*; this is analogous to
-   ``format % args``.
+   Trả về một đối tượng chuỗi mới từ *format* và *args*; tương tự như ``format % args``.
 
 
 .. c:function:: int PyUnicode_Contains(PyObject *unicode, PyObject *substr)
 
-   Check whether *substr* is contained in *unicode* and return true or false
-   accordingly.
+   Kiểm tra xem *substr* có nằm trong *unicode* hay không, rồi trả về true hoặc false tương ứng.
 
-   *substr* has to coerce to a one element Unicode string. ``-1`` is returned
-   if there was an error.
+   *substr* phải được ép kiểu thành một chuỗi Unicode gồm một phần tử. ``-1`` được trả về nếu có lỗi.
 
 
 .. c:function:: void PyUnicode_InternInPlace(PyObject **p_unicode)
 
-   Intern the argument :c:expr:`*p_unicode` in place.  The argument must be the address of a
-   pointer variable pointing to a Python Unicode string object.  If there is an
-   existing interned string that is the same as :c:expr:`*p_unicode`, it sets :c:expr:`*p_unicode` to
-   it (releasing the reference to the old string object and creating a new
-   :term:`strong reference` to the interned string object), otherwise it leaves
-   :c:expr:`*p_unicode` alone and interns it.
+   Intern đối số :c:expr:`*p_unicode` tại chỗ. Đối số phải là địa chỉ của một biến con trỏ trỏ đến một đối tượng chuỗi Unicode Python. Nếu đã có một chuỗi được intern giống với :c:expr:`*p_unicode`, hàm đặt :c:expr:`*p_unicode` trỏ đến chuỗi đó (giải phóng tham chiếu đến đối tượng chuỗi cũ và tạo một
+   :term:`strong reference` mới trỏ đến đối tượng chuỗi đã được intern), nếu không thì giữ nguyên
+   :c:expr:`*p_unicode` và intern nó.
 
-   (Clarification: even though there is a lot of talk about references, think
-   of this function as reference-neutral. You must own the object you pass in;
-   after the call you no longer own the passed-in reference, but you newly own
-   the result.)
+   (Làm rõ: mặc dù có nhiều đề cập đến các tham chiếu, hãy xem hàm này là trung tính về tham chiếu. Bạn phải sở hữu đối tượng truyền vào; sau khi gọi hàm, bạn không còn sở hữu tham chiếu đã truyền vào, nhưng sẽ sở hữu kết quả mới.)
 
-   This function never raises an exception.
-   On error, it leaves its argument unchanged without interning it.
+   Hàm này không bao giờ phát sinh ngoại lệ. Khi xảy ra lỗi, hàm giữ nguyên đối số mà không intern đối số đó.
 
-   Instances of subclasses of :py:class:`str` may not be interned, that is,
-   :c:expr:`PyUnicode_CheckExact(*p_unicode)` must be true. If it is not,
-   then -- as with any other error -- the argument is left unchanged.
+   Các instance của lớp con của :py:class:`str` có thể không được intern, tức là
+   :c:expr:`PyUnicode_CheckExact(*p_unicode)` phải là true. Nếu không, thì -- cũng như mọi lỗi khác -- đối số sẽ được giữ nguyên.
 
-   Note that interned strings are not “immortal”.
-   You must keep a reference to the result to benefit from interning.
+   Lưu ý rằng các chuỗi đã được intern không phải là “bất tử”. Bạn phải giữ một tham chiếu đến kết quả để hưởng lợi từ việc interning.
 
 
 .. c:function:: PyObject* PyUnicode_InternFromString(const char *str)
 
-   A combination of :c:func:`PyUnicode_FromString` and
-   :c:func:`PyUnicode_InternInPlace`, meant for statically allocated strings.
+   Một tổ hợp của :c:func:`PyUnicode_FromString` và
+   :c:func:`PyUnicode_InternInPlace`, dành cho các chuỗi được cấp phát tĩnh.
 
-   Return a new ("owned") reference to either a new Unicode string object
-   that has been interned, or an earlier interned string object with the
-   same value.
+   Trả về một tham chiếu mới ("owned") đến một đối tượng chuỗi Unicode mới đã được intern hoặc một đối tượng chuỗi đã được intern trước đó có cùng giá trị.
 
-   Python may keep a reference to the result, or make it :term:`immortal`,
-   preventing it from being garbage-collected promptly.
-   For interning an unbounded number of different strings, such as ones coming
-   from user input, prefer calling :c:func:`PyUnicode_FromString` and
-   :c:func:`PyUnicode_InternInPlace` directly.
+   Python có thể giữ một tham chiếu đến kết quả hoặc làm cho kết quả trở thành :term:`immortal`, khiến kết quả không được thu gom rác kịp thời. Để intern một số lượng không giới hạn các chuỗi khác nhau, chẳng hạn như các chuỗi đến từ dữ liệu đầu vào của người dùng, hãy ưu tiên gọi :c:func:`PyUnicode_FromString` và
+   :c:func:`PyUnicode_InternInPlace` trực tiếp.
 
 
 .. c:function:: unsigned int PyUnicode_CHECK_INTERNED(PyObject *str)
 
-   Return a non-zero value if *str* is interned, zero if not.
-   The *str* argument must be a string; this is not checked.
-   This function always succeeds.
+   Trả về một giá trị khác không nếu *str* đã được intern, hoặc bằng không nếu chưa. Đối số *str* phải là một chuỗi; điều này không được kiểm tra. Hàm này luôn thành công.
 
    .. impl-detail::
 
-      A non-zero return value may carry additional information
-      about *how* the string is interned.
-      The meaning of such non-zero values, as well as each specific string's
-      intern-related details, may change between CPython versions.
+      Giá trị trả về khác không có thể chứa thêm thông tin về *how* chuỗi được intern. Ý nghĩa của các giá trị khác không đó, cũng như thông tin liên quan đến việc intern của từng chuỗi cụ thể, có thể thay đổi giữa các phiên bản CPython.
 
 
 PyUnicodeWriter
 ^^^^^^^^^^^^^^^
 
-The :c:type:`PyUnicodeWriter` API can be used to create a Python :class:`str`
-object.
+API :c:type:`PyUnicodeWriter` có thể được dùng để tạo một đối tượng :class:`str` của Python.
 
 .. versionadded:: 3.14
 
 .. c:type:: PyUnicodeWriter
 
-   A Unicode writer instance.
+   Một thực thể trình ghi Unicode.
 
-   The instance must be destroyed by :c:func:`PyUnicodeWriter_Finish` on
-   success, or :c:func:`PyUnicodeWriter_Discard` on error.
+   Đối tượng phải được hủy bằng :c:func:`PyUnicodeWriter_Finish` khi thành công hoặc bằng :c:func:`PyUnicodeWriter_Discard` khi có lỗi.
 
 .. c:function:: PyUnicodeWriter* PyUnicodeWriter_Create(Py_ssize_t length)
 
-   Create a Unicode writer instance.
+   Tạo một đối tượng PyUnicodeWriter.
 
-   *length* must be greater than or equal to ``0``.
+   *length* phải lớn hơn hoặc bằng ``0``.
 
-   If *length* is greater than ``0``, preallocate an internal buffer of
-   *length* characters.
+   Nếu *length* lớn hơn ``0``, hãy cấp phát trước một bộ đệm nội bộ gồm *length* ký tự.
 
-   Set an exception and return ``NULL`` on error.
+   Đặt một exception và trả về ``NULL`` khi có lỗi.
 
 .. c:function:: PyObject* PyUnicodeWriter_Finish(PyUnicodeWriter *writer)
 
-   Return the final Python :class:`str` object and destroy the writer instance.
+   Trả về đối tượng Python :class:`str` cuối cùng và hủy đối tượng writer.
 
-   Set an exception and return ``NULL`` on error.
+   Đặt một exception và trả về ``NULL`` khi có lỗi.
 
-   The writer instance is invalid after this call.
+   Đối tượng writer không hợp lệ sau lời gọi này.
 
 .. c:function:: void PyUnicodeWriter_Discard(PyUnicodeWriter *writer)
 
-   Discard the internal Unicode buffer and destroy the writer instance.
+   Hủy bộ đệm Unicode nội bộ và hủy đối tượng writer.
 
-   If *writer* is ``NULL``, no operation is performed.
+   Nếu *writer* là ``NULL``, không thực hiện thao tác nào.
 
-   The writer instance is invalid after this call.
+   Đối tượng writer không hợp lệ sau lời gọi này.
 
 .. c:function:: int PyUnicodeWriter_WriteChar(PyUnicodeWriter *writer, Py_UCS4 ch)
 
-   Write the single Unicode character *ch* into *writer*.
+   Ghi ký tự Unicode duy nhất *ch* vào *writer*.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
 .. c:function:: int PyUnicodeWriter_WriteUTF8(PyUnicodeWriter *writer, const char *str, Py_ssize_t size)
 
-   Decode the string *str* from UTF-8 in strict mode and write the output into *writer*.
+   Giải mã chuỗi *str* từ UTF-8 ở strict mode và ghi kết quả vào *writer*.
 
-   *size* is the string length in bytes. If *size* is equal to ``-1``, call
-   ``strlen(str)`` to get the string length.
+   *size* là độ dài chuỗi tính bằng byte. Nếu *size* bằng ``-1``, hãy gọi ``strlen(str)`` để lấy độ dài chuỗi.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
-   See also :c:func:`PyUnicodeWriter_DecodeUTF8Stateful`.
+   Xem thêm :c:func:`PyUnicodeWriter_DecodeUTF8Stateful`.
 
 .. c:function:: int PyUnicodeWriter_WriteASCII(PyUnicodeWriter *writer, const char *str, Py_ssize_t size)
 
-   Write the ASCII string *str* into *writer*.
+   Ghi chuỗi ASCII *str* vào *writer*.
 
-   *size* is the string length in bytes. If *size* is equal to ``-1``, call
-   ``strlen(str)`` to get the string length.
+   *size* là độ dài chuỗi tính bằng byte. Nếu *size* bằng ``-1``, hãy gọi ``strlen(str)`` để lấy độ dài chuỗi.
 
-   *str* must only contain ASCII characters. The behavior is undefined if
-   *str* contains non-ASCII characters.
+   *str* chỉ được chứa các ký tự ASCII. Hành vi không được xác định nếu *str* chứa các ký tự không phải ASCII.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
 .. c:function:: int PyUnicodeWriter_WriteWideChar(PyUnicodeWriter *writer, const wchar_t *str, Py_ssize_t size)
 
-   Write the wide string *str* into *writer*.
+   Ghi chuỗi wide *str* vào *writer*.
 
-   *size* is a number of wide characters. If *size* is equal to ``-1``, call
-   ``wcslen(str)`` to get the string length.
+   *size* là số lượng ký tự wide. Nếu *size* bằng ``-1``, hãy gọi ``wcslen(str)`` để lấy độ dài chuỗi.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
 .. c:function:: int PyUnicodeWriter_WriteUCS4(PyUnicodeWriter *writer, Py_UCS4 *str, Py_ssize_t size)
 
-   Writer the UCS4 string *str* into *writer*.
+   Ghi chuỗi UCS4 *str* vào *writer*.
 
-   *size* is a number of UCS4 characters.
+   *size* là số lượng ký tự UCS4.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
 .. c:function:: int PyUnicodeWriter_WriteStr(PyUnicodeWriter *writer, PyObject *obj)
 
-   Call :c:func:`PyObject_Str` on *obj* and write the output into *writer*.
+   Gọi :c:func:`PyObject_Str` trên *obj* và ghi đầu ra vào *writer*.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
-   To write a :class:`str` subclass which overrides the :meth:`~object.__str__`
-   method, :c:func:`PyUnicode_FromObject` can be used to get the original
-   string.
+   Để viết một lớp con :class:`str` ghi đè phương thức :meth:`~object.__str__`, có thể sử dụng :c:func:`PyUnicode_FromObject` để lấy chuỗi ban đầu.
 
 .. c:function:: int PyUnicodeWriter_WriteRepr(PyUnicodeWriter *writer, PyObject *obj)
 
-   Call :c:func:`PyObject_Repr` on *obj* and write the output into *writer*.
+   Gọi :c:func:`PyObject_Repr` trên *obj* và ghi đầu ra vào *writer*.
 
-   If *obj* is ``NULL``, write the string ``"<NULL>"`` into *writer*.
+   Nếu *obj* là ``NULL``, hãy ghi chuỗi ``"<NULL>"`` vào *writer*.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
    .. versionchanged:: 3.14.4
 
-      Added support for ``NULL``.
+      Đã bổ sung hỗ trợ cho ``NULL``.
 
 .. c:function:: int PyUnicodeWriter_WriteSubstring(PyUnicodeWriter *writer, PyObject *str, Py_ssize_t start, Py_ssize_t end)
 
-   Write the substring ``str[start:end]`` into *writer*.
+   Ghi chuỗi con ``str[start:end]`` vào *writer*.
 
-   *str* must be Python :class:`str` object. *start* must be greater than or
-   equal to 0, and less than or equal to *end*. *end* must be less than or
-   equal to *str* length.
+   *str* phải là một đối tượng Python :class:`str` . *start* phải lớn hơn hoặc bằng 0 và nhỏ hơn hoặc bằng *end*. *end* phải nhỏ hơn hoặc bằng độ dài của *str*.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
 .. c:function:: int PyUnicodeWriter_Format(PyUnicodeWriter *writer, const char *format, ...)
 
-   Similar to :c:func:`PyUnicode_FromFormat`, but write the output directly into *writer*.
+   Tương tự như :c:func:`PyUnicode_FromFormat`, nhưng ghi trực tiếp đầu ra vào *writer*.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
 .. c:function:: int PyUnicodeWriter_DecodeUTF8Stateful(PyUnicodeWriter *writer, const char *string, Py_ssize_t length, const char *errors, Py_ssize_t *consumed)
 
-   Decode the string *str* from UTF-8 with *errors* error handler and write the
-   output into *writer*.
+   Giải mã chuỗi *str* từ UTF-8 bằng trình xử lý lỗi *errors* và ghi đầu ra vào *writer*.
 
-   *size* is the string length in bytes. If *size* is equal to ``-1``, call
-   ``strlen(str)`` to get the string length.
+   *size* là độ dài chuỗi tính bằng byte. Nếu *size* bằng ``-1``, hãy gọi ``strlen(str)`` để lấy độ dài chuỗi.
 
-   *errors* is an :ref:`error handler <error-handlers>` name, such as
-   ``"replace"``. If *errors* is ``NULL``, use the strict error handler.
+   *errors* là tên của một :ref:`error handler <error-handlers>`, chẳng hạn như ``"replace"``. Nếu *errors* là ``NULL``, hãy sử dụng trình xử lý lỗi strict.
 
-   If *consumed* is not ``NULL``, set *\*consumed* to the number of decoded
-   bytes on success.
-   If *consumed* is ``NULL``, treat trailing incomplete UTF-8 byte sequences
-   as an error.
+   Nếu *consumed* không phải là ``NULL``, hãy đặt *\*consumed* thành số byte đã giải mã khi thành công. Nếu *consumed* là ``NULL``, hãy coi các chuỗi byte UTF-8 chưa hoàn chỉnh ở cuối là lỗi.
 
-   On success, return ``0``.
-   On error, set an exception, leave the writer unchanged, and return ``-1``.
+   Khi thành công, trả về ``0``. Khi xảy ra lỗi, đặt một exception, giữ nguyên writer và trả về ``-1``.
 
-   See also :c:func:`PyUnicodeWriter_WriteUTF8`.
+   Xem thêm :c:func:`PyUnicodeWriter_WriteUTF8`.
 
-Deprecated API
-^^^^^^^^^^^^^^
+API đã lỗi thời
+^^^^^^^^^^^^^^^
 
-The following API is deprecated.
+API sau đây đã lỗi thời.
 
 .. c:type:: Py_UNICODE
 
-   This is a typedef of :c:type:`wchar_t`, which is a 16-bit type or 32-bit type
-   depending on the platform.
-   Please use :c:type:`wchar_t` directly instead.
+   Đây là một typedef của :c:type:`wchar_t`, là kiểu 16 bit hoặc 32 bit tùy thuộc vào nền tảng. Thay vào đó, hãy sử dụng trực tiếp :c:type:`wchar_t`.
 
    .. versionchanged:: 3.3
-      In previous versions, this was a 16-bit type or a 32-bit type depending on
-      whether you selected a "narrow" or "wide" Unicode version of Python at
-      build time.
+      Trong các phiên bản trước, đây là kiểu 16 bit hoặc 32 bit tùy thuộc vào việc bạn chọn phiên bản Unicode "narrow" hay "wide" của Python khi xây dựng.
 
    .. deprecated-removed:: 3.13 3.15
 
 
 .. c:function:: int PyUnicode_READY(PyObject *unicode)
 
-   Do nothing and return ``0``.
-   This API is kept only for backward compatibility, but there are no plans
-   to remove it.
+   Không làm gì và trả về ``0``. API này chỉ được giữ lại để đảm bảo khả năng tương thích ngược, nhưng hiện chưa có kế hoạch loại bỏ nó.
 
    .. versionadded:: 3.3
 
    .. deprecated:: 3.10
-      This API does nothing since Python 3.12.
-      Previously, this needed to be called for each string created using
-      the old API (:c:func:`!PyUnicode_FromUnicode` or similar).
+      API này không thực hiện thao tác nào kể từ Python 3.12. Trước đây, cần gọi API này cho mỗi chuỗi được tạo bằng API cũ (:c:func:`!PyUnicode_FromUnicode` hoặc tương tự).
 
 
 .. c:function:: unsigned int PyUnicode_IS_READY(PyObject *unicode)
 
-   Do nothing and return ``1``.
-   This API is kept only for backward compatibility, but there are no plans
-   to remove it.
+   Không làm gì và trả về ``1``. API này chỉ được giữ lại để đảm bảo khả năng tương thích ngược, nhưng hiện chưa có kế hoạch loại bỏ nó.
 
    .. versionadded:: 3.3
 
    .. deprecated:: 3.14
-      This API does nothing since Python 3.12.
-      Previously, this could be called to check if
-      :c:func:`PyUnicode_READY` is necessary.
+      API này không thực hiện thao tác nào kể từ Python 3.12. Trước đây, có thể gọi API này để kiểm tra xem
+      :c:func:`PyUnicode_READY` có cần thiết hay không.
+
+.. _`null characters`: https://en.wikipedia.org/wiki/Null_character

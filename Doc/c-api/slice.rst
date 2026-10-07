@@ -2,71 +2,54 @@
 
 .. _slice-objects:
 
-Slice Objects
--------------
+Đối tượng slice
+---------------
 
 
 .. c:var:: PyTypeObject PySlice_Type
 
-   The type object for slice objects.  This is the same as :class:`slice` in the
-   Python layer.
+   Đối tượng kiểu dành cho các đối tượng slice. Đây chính là :class:`slice` trong lớp Python.
 
 
 .. c:function:: int PySlice_Check(PyObject *ob)
 
-   Return true if *ob* is a slice object; *ob* must not be ``NULL``.  This
-   function always succeeds.
+   Trả về true nếu *ob* là một đối tượng slice; *ob* không được là ``NULL``. Hàm này luôn thực thi thành công.
 
 
 .. c:function:: PyObject* PySlice_New(PyObject *start, PyObject *stop, PyObject *step)
 
-   Return a new slice object with the given values.  The *start*, *stop*, and
-   *step* parameters are used as the values of the slice object attributes of
-   the same names.  Any of the values may be ``NULL``, in which case the
-   ``None`` will be used for the corresponding attribute.
+   Trả về một đối tượng slice mới với các giá trị đã cho. Các tham số *start*, *stop* và *step* được dùng làm giá trị cho các thuộc tính của đối tượng slice có cùng tên. Bất kỳ giá trị nào cũng có thể là ``NULL``, trong trường hợp đó ``None`` sẽ được dùng cho thuộc tính tương ứng.
 
-   Return ``NULL`` with an exception set if
-   the new object could not be allocated.
+   Trả về ``NULL`` với một ngoại lệ được thiết lập nếu không thể cấp phát đối tượng mới.
 
 
 .. c:function:: int PySlice_GetIndices(PyObject *slice, Py_ssize_t length, Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step)
 
-   Retrieve the start, stop and step indices from the slice object *slice*,
-   assuming a sequence of length *length*. Treats indices greater than
-   *length* as errors.
+   Lấy các chỉ số start, stop và step từ đối tượng slice *slice*, với giả định một sequence có độ dài *length*. Xem các chỉ số lớn hơn *length* là lỗi.
 
-   Returns ``0`` on success and ``-1`` on error with no exception set (unless one of
-   the indices was not ``None`` and failed to be converted to an integer,
-   in which case ``-1`` is returned with an exception set).
+   Trả về ``0`` khi thành công và ``-1`` khi có lỗi nhưng chưa thiết lập ngoại lệ (trừ khi một trong các chỉ số không phải là ``None`` và không thể được chuyển đổi thành số nguyên; khi đó ``-1`` được trả về cùng với một ngoại lệ được thiết lập).
 
-   You probably do not want to use this function.
+   Có lẽ bạn không muốn sử dụng hàm này.
 
    .. versionchanged:: 3.2
-      The parameter type for the *slice* parameter was ``PySliceObject*``
-      before.
+      Kiểu tham số của tham số *slice* trước đây là ``PySliceObject*``.
 
 
 .. c:function:: int PySlice_GetIndicesEx(PyObject *slice, Py_ssize_t length, Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step, Py_ssize_t *slicelength)
 
-   Usable replacement for :c:func:`PySlice_GetIndices`.  Retrieve the start,
-   stop, and step indices from the slice object *slice* assuming a sequence of
-   length *length*, and store the length of the slice in *slicelength*.  Out
-   of bounds indices are clipped in a manner consistent with the handling of
-   normal slices.
-   *length* must not be negative.
+   Thay thế có thể sử dụng cho :c:func:`PySlice_GetIndices`. Lấy các chỉ số bắt đầu, kết thúc và bước từ đối tượng lát cắt *slice* với giả định một sequence có độ dài *length*, rồi lưu độ dài của lát cắt vào *slicelength*. Các chỉ số nằm ngoài phạm vi sẽ được giới hạn theo cách nhất quán với việc xử lý các lát cắt thông thường. *length* không được là số âm.
 
-   Return ``0`` on success and ``-1`` on error with an exception set.
+   Trả về ``0`` nếu thành công và ``-1`` nếu xảy ra lỗi kèm theo một exception được thiết lập.
 
    .. note::
-      This function is considered not safe for resizable sequences.
-      Its invocation should be replaced by a combination of
-      :c:func:`PySlice_Unpack` and :c:func:`PySlice_AdjustIndices` where ::
+      Hàm này được xem là không an toàn đối với các sequence có thể thay đổi kích thước. Lời gọi hàm này nên được thay thế bằng sự kết hợp của
+      :c:func:`PySlice_Unpack` và :c:func:`PySlice_AdjustIndices` trong đó::
 
          if (PySlice_GetIndicesEx(slice, length, &start, &stop, &step, &slicelength) < 0) {
              // return error
          }
 
-      is replaced by ::
+      được thay thế bằng::
 
          if (PySlice_Unpack(slice, &start, &stop, &step) < 0) {
              // return error
@@ -74,65 +57,51 @@ Slice Objects
          slicelength = PySlice_AdjustIndices(length, &start, &stop, step);
 
    .. versionchanged:: 3.2
-      The parameter type for the *slice* parameter was ``PySliceObject*``
-      before.
+      Kiểu tham số của tham số *slice* trước đây là ``PySliceObject*``.
 
    .. versionchanged:: 3.6.1
-      If ``Py_LIMITED_API`` is not set or set to the value between ``0x03050400``
-      and ``0x03060000`` (not including) or ``0x03060100`` or higher
-      :c:func:`!PySlice_GetIndicesEx` is implemented as a macro using
-      :c:func:`!PySlice_Unpack` and :c:func:`!PySlice_AdjustIndices`.
-      Arguments *start*, *stop* and *step* are evaluated more than once.
+      Nếu ``Py_LIMITED_API`` không được thiết lập hoặc được thiết lập thành giá trị nằm giữa ``0x03050400`` và ``0x03060000`` (không bao gồm hai giá trị này), hoặc ``0x03060100`` trở lên
+      :c:func:`!PySlice_GetIndicesEx` được triển khai dưới dạng một macro sử dụng
+      :c:func:`!PySlice_Unpack` và :c:func:`!PySlice_AdjustIndices`. Các đối số *start*, *stop* và *step* được đánh giá nhiều hơn một lần.
 
    .. deprecated:: 3.6.1
-      If ``Py_LIMITED_API`` is set to the value less than ``0x03050400`` or
-      between ``0x03060000`` and ``0x03060100`` (not including)
-      :c:func:`!PySlice_GetIndicesEx` is a deprecated function.
+      Nếu ``Py_LIMITED_API`` được thiết lập thành giá trị nhỏ hơn ``0x03050400`` hoặc nằm giữa ``0x03060000`` và ``0x03060100`` (không bao gồm hai giá trị này)
+      :c:func:`!PySlice_GetIndicesEx` là một hàm đã lỗi thời.
 
 
 .. c:function:: int PySlice_Unpack(PyObject *slice, Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step)
 
-   Extract the start, stop and step data members from a slice object as
-   C integers.  Silently reduce values larger than ``PY_SSIZE_T_MAX`` to
-   ``PY_SSIZE_T_MAX``, silently boost the start and stop values less than
-   ``PY_SSIZE_T_MIN`` to ``PY_SSIZE_T_MIN``, and silently boost the step
-   values less than ``-PY_SSIZE_T_MAX`` to ``-PY_SSIZE_T_MAX``.
+   Trích xuất các thành viên dữ liệu start, stop và step từ một đối tượng slice dưới dạng các số nguyên C. Âm thầm giảm các giá trị lớn hơn ``PY_SSIZE_T_MAX`` xuống ``PY_SSIZE_T_MAX``, âm thầm tăng các giá trị start và stop nhỏ hơn ``PY_SSIZE_T_MIN`` lên ``PY_SSIZE_T_MIN``, và âm thầm tăng các giá trị step nhỏ hơn ``-PY_SSIZE_T_MAX`` lên ``-PY_SSIZE_T_MAX``.
 
-   Return ``-1`` with an exception set on error, ``0`` on success.
+   Trả về ``-1`` khi có lỗi với một ngoại lệ được thiết lập, và ``0`` khi thành công.
 
    .. versionadded:: 3.6.1
 
 
 .. c:function:: Py_ssize_t PySlice_AdjustIndices(Py_ssize_t length, Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t step)
 
-   Adjust start/end slice indices assuming a sequence of the specified length.
-   Out of bounds indices are clipped in a manner consistent with the handling
-   of normal slices.
+   Điều chỉnh các chỉ số lát cắt start/end với giả định rằng chuỗi có độ dài được chỉ định. Các chỉ số nằm ngoài phạm vi được giới hạn theo cách nhất quán với việc xử lý các lát cắt thông thường.
 
-   *length* must not be negative.
-   *step* must not be zero and must not be less than ``-PY_SSIZE_T_MAX``,
-   as guaranteed by :c:func:`PySlice_Unpack`.
+   *length* không được âm. *step* không được bằng 0 và không được nhỏ hơn ``-PY_SSIZE_T_MAX``, như được đảm bảo bởi :c:func:`PySlice_Unpack`.
 
-   Return the length of the slice.  Always successful.  Doesn't call Python
-   code.
+   Trả về độ dài của lát cắt. Luôn thành công. Không gọi mã Python.
 
    .. versionadded:: 3.6.1
 
 
-Ellipsis Object
-^^^^^^^^^^^^^^^
+Đối tượng Ellipsis
+^^^^^^^^^^^^^^^^^^
 
 
 .. c:var:: PyTypeObject PyEllipsis_Type
 
-   The type of Python :const:`Ellipsis` object.  Same as :class:`types.EllipsisType`
-   in the Python layer.
+   Kiểu của đối tượng Python :const:`Ellipsis`. Giống :class:`types.EllipsisType` ở tầng Python.
 
 
 .. c:var:: PyObject *Py_Ellipsis
 
-   The Python ``Ellipsis`` object.  This object has no methods.  Like
-   :c:data:`Py_None`, it is an :term:`immortal` singleton object.
+   Đối tượng Python ``Ellipsis``. Đối tượng này không có phương thức nào. Giống như
+   :c:data:`Py_None`, đây là một đối tượng singleton :term:`immortal`.
 
    .. versionchanged:: 3.12
       :c:data:`Py_Ellipsis` is immortal.
