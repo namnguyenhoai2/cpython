@@ -2,30 +2,18 @@
 
 .. _type-structs:
 
-Type Object Structures
-======================
+Cấu trúc đối tượng kiểu
+=======================
 
-Perhaps one of the most important structures of the Python object system is the
-structure that defines a new type: the :c:type:`PyTypeObject` structure.  Type
-objects can be handled using any of the ``PyObject_*`` or
-``PyType_*`` functions, but do not offer much that's interesting to most
-Python applications. These objects are fundamental to how objects behave, so
-they are very important to the interpreter itself and to any extension module
-that implements new types.
+Có lẽ một trong những cấu trúc quan trọng nhất của hệ thống đối tượng Python là cấu trúc định nghĩa một kiểu mới: cấu trúc :c:type:`PyTypeObject`. Có thể xử lý các đối tượng kiểu bằng bất kỳ hàm ``PyObject_*`` hoặc ``PyType_*`` nào, nhưng chúng không cung cấp nhiều chức năng hữu ích cho hầu hết ứng dụng Python. Các đối tượng này là nền tảng cho cách các đối tượng hoạt động, vì vậy chúng rất quan trọng đối với chính trình thông dịch cũng như mọi module mở rộng triển khai các kiểu mới.
 
-Type objects are fairly large compared to most of the standard types. The reason
-for the size is that each type object stores a large number of values, mostly C
-function pointers, each of which implements a small part of the type's
-functionality.  The fields of the type object are examined in detail in this
-section.  The fields will be described in the order in which they occur in the
-structure.
+Các đối tượng kiểu khá lớn so với hầu hết các kiểu chuẩn. Lý do là mỗi đối tượng kiểu lưu trữ một số lượng lớn giá trị, chủ yếu là các con trỏ hàm C, mỗi con trỏ triển khai một phần nhỏ chức năng của kiểu. Các trường của đối tượng kiểu được xem xét chi tiết trong phần này. Các trường sẽ được mô tả theo thứ tự xuất hiện trong cấu trúc.
 
-In addition to the following quick reference, the :ref:`typedef-examples`
-section provides at-a-glance insight into the meaning and use of
+Ngoài phần tham khảo nhanh sau đây, phần :ref:`typedef-examples` cung cấp cái nhìn tổng quan về ý nghĩa và cách sử dụng của
 :c:type:`PyTypeObject`.
 
 
-Quick Reference
+Tham khảo nhanh
 ---------------
 
 .. _tp-slots-table:
@@ -152,22 +140,21 @@ Quick Reference
 
 .. [#slots]
 
-   **()**: A slot name in parentheses indicates it is (effectively) deprecated.
+   **()**: Tên slot trong dấu ngoặc đơn cho biết slot đó đã (về cơ bản) không còn được khuyến nghị sử dụng.
 
-   **<>**: Names in angle brackets should be initially set to ``NULL`` and
-   treated as read-only.
+   **<>**: Tên trong dấu ngoặc nhọn ban đầu nên được đặt thành ``NULL`` và được coi là chỉ đọc.
 
-   **[]**: Names in square brackets are for internal use only.
+   **[]**: Tên trong dấu ngoặc vuông chỉ dành cho mục đích sử dụng nội bộ.
 
-   **<R>** (as a prefix) means the field is required (must be non-``NULL``).
+   **<R>** (ở dạng tiền tố) có nghĩa là trường bắt buộc (phải khác ``NULL``).
 
-.. [#cols] Columns:
+.. [#cols] Các cột:
 
-   **"O"**:  set on :c:data:`PyBaseObject_Type`
+   **"O"**:  được đặt trên :c:data:`PyBaseObject_Type`
 
-   **"T"**:  set on :c:data:`PyType_Type`
+   **"T"**:  được đặt trên :c:data:`PyType_Type`
 
-   **"D"**:  default (if slot is set to ``NULL``)
+   **"D"**:  mặc định (nếu slot được đặt thành ``NULL``)
 
    .. code-block:: none
 
@@ -177,7 +164,7 @@ Quick Reference
 
       Also see the inheritance column ("I").
 
-   **"I"**:  inheritance
+   **"I"**:  kế thừa
 
    .. code-block:: none
 
@@ -186,13 +173,12 @@ Quick Reference
       G - inherited, but only in combination with other slots; see the slot's description
       ? - it's complicated; see the slot's description
 
-   Note that some slots are effectively inherited through the normal
-   attribute lookup chain.
+   Lưu ý rằng một số slot thực chất được kế thừa thông qua chuỗi tra cứu thuộc tính thông thường.
 
 .. _sub-slots:
 
-sub-slots
-^^^^^^^^^
+slot con
+^^^^^^^^
 
 .. table::
    :widths: 26,17,12
@@ -333,11 +319,11 @@ sub-slots
 
 .. _slot-typedefs-table:
 
-slot typedefs
-^^^^^^^^^^^^^
+typedef của slot
+^^^^^^^^^^^^^^^^
 
 +-----------------------------+-----------------------------+----------------------+
-| typedef                     | Parameter Types             | Return Type          |
+| typedef                     | Kiểu tham số                | Kiểu trả về          |
 +=============================+=============================+======================+
 | :c:type:`allocfunc`         | .. line-block::             | :c:type:`PyObject` * |
 |                             |                             |                      |
@@ -467,230 +453,155 @@ slot typedefs
 |                             |    :c:type:`PyObject` *     |                      |
 +-----------------------------+-----------------------------+----------------------+
 
-See :ref:`slot-typedefs` below for more detail.
+Xem :ref:`slot-typedefs` bên dưới để biết thêm chi tiết.
 
 
-PyTypeObject Definition
+Định nghĩa PyTypeObject
 -----------------------
 
-The structure definition for :c:type:`PyTypeObject` can be found in
-:file:`Include/cpython/object.h`.  For convenience of reference, this repeats the
-definition found there:
+Định nghĩa cấu trúc cho :c:type:`PyTypeObject` có thể được tìm thấy trong
+:file:`Include/cpython/object.h`. Để tiện tham khảo, dưới đây là định nghĩa được tìm thấy ở đó:
 
 .. XXX Drop this?
 
 .. literalinclude:: ../includes/typestruct.h
 
 
-PyObject Slots
---------------
+Các slot của PyObject
+---------------------
 
-The type object structure extends the :c:type:`PyVarObject` structure. The
-:c:member:`~PyVarObject.ob_size` field is used for dynamic types (created by :c:func:`!type_new`,
-usually called from a class statement). Note that :c:data:`PyType_Type` (the
-metatype) initializes :c:member:`~PyTypeObject.tp_itemsize`, which means that its instances (i.e.
-type objects) *must* have the :c:member:`~PyVarObject.ob_size` field.
+Cấu trúc đối tượng kiểu mở rộng cấu trúc :c:type:`PyVarObject`. Cấu trúc
+:c:member:`~PyVarObject.ob_size` trường này được sử dụng cho các kiểu động (được tạo bởi :c:func:`!type_new`, thường được gọi từ một câu lệnh class). Lưu ý rằng :c:data:`PyType_Type` (metatype) khởi tạo :c:member:`~PyTypeObject.tp_itemsize`, điều đó có nghĩa là các instance của nó (tức là các đối tượng kiểu) *phải* có trường :c:member:`~PyVarObject.ob_size`.
 
 
 :c:member:`PyObject.ob_refcnt`
 
-   The type object's reference count is initialized to ``1`` by the
-   ``PyObject_HEAD_INIT`` macro.  Note that for :ref:`statically allocated type
-   objects <static-types>`, the type's instances (objects whose :c:member:`~PyObject.ob_type`
-   points back to the type) do *not* count as references.  But for
-   :ref:`dynamically allocated type objects <heap-types>`, the instances *do*
-   count as references.
+   Số lượng tham chiếu của đối tượng kiểu được khởi tạo thành ``1`` bởi macro ``PyObject_HEAD_INIT``. Lưu ý rằng đối với :ref:`các đối tượng kiểu được cấp phát tĩnh <static-types>`, các instance (các đối tượng mà :c:member:`~PyObject.ob_type` trỏ ngược về kiểu) *không* được tính là các tham chiếu. Nhưng đối với
+   :ref:`các đối tượng kiểu được cấp phát động <heap-types>`, các instance *có* được tính là các tham chiếu.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes.
+   Trường này không được các subtype kế thừa.
 
 
 :c:member:`PyObject.ob_type`
 
-   This is the type's type, in other words its metatype.  It is initialized by the
-   argument to the ``PyObject_HEAD_INIT`` macro, and its value should normally be
-   ``&PyType_Type``.  However, for dynamically loadable extension modules that must
-   be usable on Windows (at least), the compiler complains that this is not a valid
-   initializer.  Therefore, the convention is to pass ``NULL`` to the
-   ``PyObject_HEAD_INIT`` macro and to initialize this field explicitly at the
-   start of the module's initialization function, before doing anything else.  This
-   is typically done like this::
+   Đây là kiểu của kiểu, hay nói cách khác là metatype của nó. Nó được khởi tạo bằng đối số truyền cho macro ``PyObject_HEAD_INIT``, và giá trị của nó thông thường phải là ``&PyType_Type``. Tuy nhiên, đối với các extension module có thể tải động và phải sử dụng được trên Windows (ít nhất là vậy), compiler phàn nàn rằng đây không phải là một trình khởi tạo hợp lệ. Vì vậy, quy ước là truyền ``NULL`` cho macro ``PyObject_HEAD_INIT`` và khởi tạo rõ ràng trường này ngay khi bắt đầu hàm khởi tạo module, trước khi thực hiện bất kỳ việc gì khác. Thông thường, việc này được thực hiện như sau::
 
       Foo_Type.ob_type = &PyType_Type;
 
-   This should be done before any instances of the type are created.
-   :c:func:`PyType_Ready` checks if :c:member:`~PyObject.ob_type` is ``NULL``, and if so,
-   initializes it to the :c:member:`~PyObject.ob_type` field of the base class.
-   :c:func:`PyType_Ready` will not change this field if it is non-zero.
+   Việc này phải được thực hiện trước khi tạo bất kỳ instance nào của kiểu.
+   :c:func:`PyType_Ready` kiểm tra xem :c:member:`~PyObject.ob_type` có phải là ``NULL`` hay không, và nếu đúng như vậy thì khởi tạo nó thành trường :c:member:`~PyObject.ob_type` của lớp cơ sở.
+   :c:func:`PyType_Ready` sẽ không thay đổi trường này nếu nó khác không.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Các kiểu con kế thừa trường này.
 
 
-PyVarObject Slots
------------------
+Các slot của PyVarObject
+------------------------
 
 :c:member:`PyVarObject.ob_size`
 
-   For :ref:`statically allocated type objects <static-types>`, this should be
-   initialized to zero. For :ref:`dynamically allocated type objects
-   <heap-types>`, this field has a special internal meaning.
+   Đối với :ref:`các đối tượng kiểu được cấp phát tĩnh <static-types>`, trường này nên được khởi tạo bằng không. Đối với :ref:`các đối tượng kiểu được cấp phát động <heap-types>`, trường này có một ý nghĩa nội bộ đặc biệt.
 
-   This field should be accessed using the :c:func:`Py_SIZE()` macro.
+   Nên truy cập trường này bằng macro :c:func:`Py_SIZE()`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes.
+   Trường này không được các kiểu con kế thừa.
 
 
 PyTypeObject Slots
 ------------------
 
-Each slot has a section describing inheritance.  If :c:func:`PyType_Ready`
-may set a value when the field is set to ``NULL`` then there will also be
-a "Default" section.  (Note that many fields set on :c:data:`PyBaseObject_Type`
-and :c:data:`PyType_Type` effectively act as defaults.)
+Mỗi slot có một phần mô tả việc kế thừa. Nếu :c:func:`PyType_Ready` có thể đặt một giá trị khi trường được đặt thành ``NULL`` thì cũng sẽ có một phần "Default". (Lưu ý rằng nhiều trường được đặt trên :c:data:`PyBaseObject_Type` và :c:data:`PyType_Type` về cơ bản hoạt động như các giá trị mặc định.)
 
 .. c:member:: const char* PyTypeObject.tp_name
 
-   Pointer to a NUL-terminated string containing the name of the type. For types
-   that are accessible as module globals, the string should be the full module
-   name, followed by a dot, followed by the type name; for built-in types, it
-   should be just the type name.  If the module is a submodule of a package, the
-   full package name is part of the full module name.  For example, a type named
-   :class:`!T` defined in module :mod:`!M` in subpackage :mod:`!Q` in package :mod:`!P`
-   should have the :c:member:`~PyTypeObject.tp_name` initializer ``"P.Q.M.T"``.
+   Con trỏ tới một chuỗi kết thúc bằng NUL chứa tên của kiểu. Đối với các kiểu có thể được truy cập dưới dạng biến toàn cục của module, chuỗi này phải là tên module đầy đủ, theo sau là dấu chấm, rồi đến tên kiểu; đối với các kiểu tích hợp sẵn, chuỗi này chỉ nên là tên kiểu. Nếu module là một submodule của một package, tên package đầy đủ là một phần của tên module đầy đủ. Ví dụ: một kiểu có tên
+   :class:`!T` được định nghĩa trong module :mod:`!M` thuộc subpackage :mod:`!Q` trong package :mod:`!P` phải có bộ khởi tạo :c:member:`~PyTypeObject.tp_name` ``"P.Q.M.T"``.
 
-   For :ref:`dynamically allocated type objects <heap-types>`,
-   this should just be the type name, and
-   the module name explicitly stored in the type dict as the value for key
-   ``'__module__'``.
+   Đối với :ref:`các đối tượng kiểu được cấp phát động <heap-types>`, giá trị này chỉ nên là tên kiểu, còn tên module được lưu trữ tường minh trong type dict dưới dạng giá trị của khóa ``'__module__'``.
 
-   For :ref:`statically allocated type objects <static-types>`,
-   the *tp_name* field should contain a dot.
-   Everything before the last dot is made accessible as the :attr:`~type.__module__`
-   attribute, and everything after the last dot is made accessible as the
-   :attr:`~type.__name__` attribute.
+   Đối với :ref:`các đối tượng kiểu được cấp phát tĩnh <static-types>`, trường *tp_name* phải chứa một dấu chấm. Mọi thứ trước dấu chấm cuối cùng được cung cấp dưới dạng thuộc tính :attr:`~type.__module__`, còn mọi thứ sau dấu chấm cuối cùng được cung cấp dưới dạng
+   :attr:`~type.__name__` thuộc tính.
 
-   If no dot is present, the entire :c:member:`~PyTypeObject.tp_name` field is made accessible as the
-   :attr:`~type.__name__` attribute, and the :attr:`~type.__module__` attribute is undefined
-   (unless explicitly set in the dictionary, as explained above).  This means your
-   type will be impossible to pickle.  Additionally, it will not be listed in
-   module documentations created with pydoc.
+   Nếu không có dấu chấm, toàn bộ trường :c:member:`~PyTypeObject.tp_name` được cung cấp dưới dạng
+   :attr:`~type.__name__` thuộc tính, còn thuộc tính :attr:`~type.__module__` không được định nghĩa (trừ khi được đặt rõ ràng trong dictionary, như đã giải thích ở trên). Điều này có nghĩa là kiểu của bạn sẽ không thể được pickle. Ngoài ra, kiểu này sẽ không được liệt kê trong tài liệu module được tạo bằng pydoc.
 
-   This field must not be ``NULL``.  It is the only required field
-   in :c:func:`PyTypeObject` (other than potentially
+   Trường này không được là ``NULL``. Đây là trường bắt buộc duy nhất trong :c:func:`PyTypeObject` (ngoài trường hợp có thể
    :c:member:`~PyTypeObject.tp_itemsize`).
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes.
+   Trường này không được các kiểu con kế thừa.
 
 
 .. c:member:: Py_ssize_t PyTypeObject.tp_basicsize
               Py_ssize_t PyTypeObject.tp_itemsize
 
-   These fields allow calculating the size in bytes of instances of the type.
+   Các trường này cho phép tính kích thước tính theo byte của các thể hiện thuộc kiểu.
 
-   There are two kinds of types: types with fixed-length instances have a zero
-   :c:member:`!tp_itemsize` field, types with variable-length instances have a non-zero
-   :c:member:`!tp_itemsize` field.  For a type with fixed-length instances, all
-   instances have the same size, given in :c:member:`!tp_basicsize`.
-   (Exceptions to this rule can be made using
+   Có hai loại kiểu: các kiểu có thể hiện có độ dài cố định có trường bằng không
+   :c:member:`!tp_itemsize` , còn các kiểu có thể hiện có độ dài thay đổi có trường khác không
+   :c:member:`!tp_itemsize`. Đối với kiểu có các thể hiện có độ dài cố định, mọi thể hiện đều có cùng kích thước, được chỉ định trong :c:member:`!tp_basicsize`. (Có thể tạo ngoại lệ cho quy tắc này bằng cách sử dụng
    :c:func:`PyUnstable_Object_GC_NewWithExtraData`.)
 
-   For a type with variable-length instances, the instances must have an
-   :c:member:`~PyVarObject.ob_size` field, and the instance size is
-   :c:member:`!tp_basicsize` plus N times :c:member:`!tp_itemsize`,
-   where N is the "length" of the object.
+   Đối với kiểu có các thể hiện có độ dài thay đổi, các thể hiện phải có một trường
+   :c:member:`~PyVarObject.ob_size`, và kích thước thể hiện là
+   :c:member:`!tp_basicsize` cộng với N lần :c:member:`!tp_itemsize`, trong đó N là "length" của đối tượng.
 
-   Functions like :c:func:`PyObject_NewVar` will take the value of N as an
-   argument, and store in the instance's :c:member:`~PyVarObject.ob_size` field.
-   Note that the :c:member:`~PyVarObject.ob_size` field may later be used for
-   other purposes. For example, :py:type:`int` instances use the bits of
-   :c:member:`~PyVarObject.ob_size` in an implementation-defined
-   way; the underlying storage and its size should be accessed using
+   Các hàm như :c:func:`PyObject_NewVar` sẽ nhận giá trị N làm đối số và lưu giá trị đó vào trường :c:member:`~PyVarObject.ob_size` của instance. Lưu ý rằng trường :c:member:`~PyVarObject.ob_size` có thể được sử dụng cho các mục đích khác về sau. Ví dụ, các instance của :py:type:`int` sử dụng các bit của
+   :c:member:`~PyVarObject.ob_size` theo cách do implementation định nghĩa; vùng lưu trữ nền tảng và kích thước của nó nên được truy cập bằng
    :c:func:`PyLong_Export`.
 
    .. note::
 
-      The :c:member:`~PyVarObject.ob_size` field should be accessed using
-      the :c:func:`Py_SIZE()` and :c:func:`Py_SET_SIZE()` macros.
+      Nên truy cập trường :c:member:`~PyVarObject.ob_size` bằng các macro :c:func:`Py_SIZE()` và :c:func:`Py_SET_SIZE()`.
 
-   Also, the presence of an :c:member:`~PyVarObject.ob_size` field in the
-   instance layout doesn't mean that the instance structure is variable-length.
-   For example, the :py:type:`list` type has fixed-length instances, yet those
-   instances have a :c:member:`~PyVarObject.ob_size` field.
-   (As with :py:type:`int`, avoid reading lists' :c:member:`!ob_size` directly.
-   Call :c:func:`PyList_Size` instead.)
+   Ngoài ra, việc có trường :c:member:`~PyVarObject.ob_size` trong layout của instance không có nghĩa là cấu trúc instance có độ dài thay đổi. Ví dụ, kiểu :py:type:`list` có các instance với độ dài cố định, nhưng những instance đó vẫn có trường :c:member:`~PyVarObject.ob_size`. (Cũng như với :py:type:`int`, tránh đọc trực tiếp :c:member:`!ob_size` của list. Thay vào đó, hãy gọi :c:func:`PyList_Size`.)
 
-   The :c:member:`!tp_basicsize` includes size needed for data of the type's
-   :c:member:`~PyTypeObject.tp_base`, plus any extra data needed
-   by each instance.
+   :c:member:`!tp_basicsize` bao gồm kích thước cần thiết cho dữ liệu của kiểu
+   :c:member:`~PyTypeObject.tp_base`, cùng với mọi dữ liệu bổ sung cần thiết cho mỗi instance.
 
-   The  correct way to set :c:member:`!tp_basicsize` is to use the
-   ``sizeof`` operator on the struct used to declare the instance layout.
-   This struct must include the struct used to declare the base type.
-   In other words, :c:member:`!tp_basicsize` must be greater than or equal
-   to the base's :c:member:`!tp_basicsize`.
+   Cách đúng để thiết lập :c:member:`!tp_basicsize` là sử dụng toán tử ``sizeof`` trên struct dùng để khai báo bố cục của instance. Struct này phải bao gồm struct dùng để khai báo kiểu cơ sở. Nói cách khác, :c:member:`!tp_basicsize` phải lớn hơn hoặc bằng :c:member:`!tp_basicsize` của kiểu cơ sở.
 
-   Since every type is a subtype of :py:type:`object`, this struct must
-   include :c:type:`PyObject` or :c:type:`PyVarObject` (depending on
-   whether :c:member:`~PyVarObject.ob_size` should be included). These are
-   usually defined by the macro :c:macro:`PyObject_HEAD` or
-   :c:macro:`PyObject_VAR_HEAD`, respectively.
+   Vì mọi kiểu đều là kiểu con của :py:type:`object`, struct này phải bao gồm :c:type:`PyObject` hoặc :c:type:`PyVarObject` (tùy thuộc vào việc có nên bao gồm :c:member:`~PyVarObject.ob_size` hay không). Các thành phần này thường được định nghĩa bởi macro :c:macro:`PyObject_HEAD` hoặc
+   :c:macro:`PyObject_VAR_HEAD`, tương ứng.
 
-   The basic size does not include the GC header size, as that header is not
-   part of :c:macro:`PyObject_HEAD`.
+   Kích thước cơ bản không bao gồm kích thước của phần header GC, vì phần header đó không thuộc :c:macro:`PyObject_HEAD`.
 
-   For cases where struct used to declare the base type is unknown,
-   see :c:member:`PyType_Spec.basicsize` and :c:func:`PyType_FromMetaclass`.
+   Trong trường hợp không xác định được struct dùng để khai báo kiểu cơ sở, hãy xem :c:member:`PyType_Spec.basicsize` và :c:func:`PyType_FromMetaclass`.
 
-   Notes about alignment:
+   Lưu ý về alignment:
 
-   - :c:member:`!tp_basicsize` must be a multiple of ``_Alignof(PyObject)``.
-     When using ``sizeof`` on a ``struct`` that includes
-     :c:macro:`PyObject_HEAD`, as recommended, the compiler ensures this.
-     When not using a C ``struct``, or when using compiler
-     extensions like ``__attribute__((packed))``, it is up to you.
-   - If the variable items require a particular alignment,
-     :c:member:`!tp_basicsize` and :c:member:`!tp_itemsize` must each be a
-     multiple of that alignment.
-     For example, if a type's variable part stores a ``double``, it is
-     your responsibility that both fields are a multiple of
-     ``_Alignof(double)``.
+   - :c:member:`!tp_basicsize` phải là bội số của ``_Alignof(PyObject)``. Khi sử dụng ``sizeof`` trên một ``struct`` có chứa
+     :c:macro:`PyObject_HEAD`, như được khuyến nghị, trình biên dịch sẽ đảm bảo điều này. Khi không sử dụng một ``struct`` C hoặc khi sử dụng các phần mở rộng của trình biên dịch như ``__attribute__((packed))``, bạn phải tự đảm bảo điều đó.
+   - Nếu các phần tử biến đổi yêu cầu một alignment cụ thể,
+     :c:member:`!tp_basicsize` và :c:member:`!tp_itemsize` mỗi giá trị phải là bội số của alignment đó. Ví dụ, nếu phần biến đổi của một kiểu lưu trữ một ``double``, bạn có trách nhiệm đảm bảo rằng cả hai trường đều là bội số của ``_Alignof(double)``.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   These fields are inherited separately by subtypes.
-   (That is, if the field is set to zero, :c:func:`PyType_Ready` will copy
-   the value from the base type, indicating that the instances do not
-   need additional storage.)
+   Các trường này được các kiểu con kế thừa riêng biệt. (Nghĩa là, nếu trường được đặt thành zero, :c:func:`PyType_Ready` sẽ sao chép giá trị từ kiểu cơ sở, cho biết rằng các thực thể không cần thêm bộ nhớ.)
 
-   If the base type has a non-zero :c:member:`~PyTypeObject.tp_itemsize`, it is generally not safe to set
-   :c:member:`~PyTypeObject.tp_itemsize` to a different non-zero value in a subtype (though this
-   depends on the implementation of the base type).
+   Nếu kiểu cơ sở có :c:member:`~PyTypeObject.tp_itemsize` khác zero, nhìn chung việc đặt
+   :c:member:`~PyTypeObject.tp_itemsize` thành một giá trị khác zero trong kiểu con là không an toàn (dù điều này còn phụ thuộc vào cách triển khai của kiểu cơ sở).
 
 
 .. c:member:: destructor PyTypeObject.tp_dealloc
 
    .. corresponding-type-slot:: Py_tp_dealloc
 
-   A pointer to the instance destructor function.  The function signature is::
+   Con trỏ tới hàm hủy instance. Chữ ký của hàm là::
 
       void tp_dealloc(PyObject *self);
 
-   The destructor function should remove all references which the instance owns
-   (e.g., call :c:func:`Py_CLEAR`), free all memory buffers owned by the
-   instance, and call the type's :c:member:`~PyTypeObject.tp_free` function to
-   free the object itself.
+   Hàm hủy phải loại bỏ mọi tham chiếu mà instance sở hữu (ví dụ: gọi :c:func:`Py_CLEAR`), giải phóng tất cả bộ đệm bộ nhớ do instance sở hữu và gọi hàm :c:member:`~PyTypeObject.tp_free` của kiểu để tự giải phóng đối tượng.
 
-   If you may call functions that may set the error indicator, you must use
-   :c:func:`PyErr_GetRaisedException` and :c:func:`PyErr_SetRaisedException`
-   to ensure you don't clobber a preexisting error indicator (the deallocation
-   could have occurred while processing a different error):
+   Nếu bạn có thể gọi các hàm có khả năng thiết lập chỉ báo lỗi, bạn phải sử dụng
+   :c:func:`PyErr_GetRaisedException` và :c:func:`PyErr_SetRaisedException` để đảm bảo bạn không ghi đè chỉ báo lỗi đã tồn tại trước đó (việc giải phóng có thể đã diễn ra trong khi xử lý một lỗi khác):
 
    .. code-block:: c
 
@@ -703,41 +614,25 @@ and :c:data:`PyType_Type` effectively act as defaults.)
          PyErr_SetRaisedException(exc);
      }
 
-   The dealloc handler itself must not raise an exception; if it hits an error
-   case it should call :c:func:`PyErr_FormatUnraisable` to log (and clear) an
-   unraisable exception.
+   Bản thân trình xử lý dealloc không được phát sinh ngoại lệ; nếu gặp trường hợp lỗi, trình xử lý phải gọi :c:func:`PyErr_FormatUnraisable` để ghi nhật ký (và xóa) một ngoại lệ không thể báo cáo.
 
-   No guarantees are made about when an object is destroyed, except:
+   Không có đảm bảo nào về thời điểm một đối tượng bị hủy, ngoại trừ:
 
-   * Python will destroy an object immediately or some time after the final
-     reference to the object is deleted, unless its finalizer
-     (:c:member:`~PyTypeObject.tp_finalize`) subsequently resurrects the
-     object.
-   * An object will not be destroyed while it is being automatically finalized
-     (:c:member:`~PyTypeObject.tp_finalize`) or automatically cleared
-     (:c:member:`~PyTypeObject.tp_clear`).
+   * Python sẽ hủy một đối tượng ngay lập tức hoặc vào một thời điểm nào đó sau khi tham chiếu cuối cùng tới đối tượng bị xóa, trừ khi trình finalizer của đối tượng (:c:member:`~PyTypeObject.tp_finalize`) hồi sinh đối tượng đó sau đó.
+   * Một đối tượng sẽ không bị hủy trong khi đang được hoàn tất tự động (:c:member:`~PyTypeObject.tp_finalize`) hoặc xóa tự động (:c:member:`~PyTypeObject.tp_clear`).
 
-   CPython currently destroys an object immediately from :c:func:`Py_DECREF`
-   when the new reference count is zero, but this may change in a future
-   version.
+   Hiện tại, CPython hủy một đối tượng ngay lập tức từ :c:func:`Py_DECREF` khi số lượng tham chiếu mới bằng 0, nhưng điều này có thể thay đổi trong một phiên bản tương lai.
 
-   It is recommended to call :c:func:`PyObject_CallFinalizerFromDealloc` at the
-   beginning of :c:member:`!tp_dealloc` to guarantee that the object is always
-   finalized before destruction.
+   Bạn nên gọi :c:func:`PyObject_CallFinalizerFromDealloc` ở đầu :c:member:`!tp_dealloc` để đảm bảo rằng đối tượng luôn được hoàn tất trước khi bị hủy.
 
-   If the type supports garbage collection (the :c:macro:`Py_TPFLAGS_HAVE_GC`
-   flag is set), the destructor should call :c:func:`PyObject_GC_UnTrack`
-   before clearing any member fields.
+   Nếu kiểu hỗ trợ garbage collection (cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được thiết lập), destructor nên gọi :c:func:`PyObject_GC_UnTrack` trước khi xóa bất kỳ trường thành viên nào.
 
-   It is permissible to call :c:member:`~PyTypeObject.tp_clear` from
-   :c:member:`!tp_dealloc` to reduce code duplication and to guarantee that the
-   object is always cleared before destruction.  Beware that
-   :c:member:`!tp_clear` might have already been called.
+   Có thể gọi :c:member:`~PyTypeObject.tp_clear` từ
+   :c:member:`!tp_dealloc` để giảm việc trùng lặp mã và đảm bảo rằng đối tượng luôn được xóa trước khi bị hủy.  Hãy lưu ý rằng
+   :c:member:`!tp_clear` có thể đã được gọi.
 
-   If the type is heap allocated (:c:macro:`Py_TPFLAGS_HEAPTYPE`), the
-   deallocator should release the owned reference to its type object (via
-   :c:func:`Py_DECREF`) after calling the type deallocator.  See the example
-   code below.::
+   Nếu kiểu được cấp phát trên heap (:c:macro:`Py_TPFLAGS_HEAPTYPE`), hàm giải phóng phải giải phóng tham chiếu sở hữu đến đối tượng kiểu của nó (thông qua
+   :c:func:`Py_DECREF`) sau khi gọi hàm giải phóng kiểu. Xem mã ví dụ bên dưới.::
 
       static void
       foo_dealloc(PyObject *op)
@@ -748,12 +643,9 @@ and :c:data:`PyType_Type` effectively act as defaults.)
          Py_TYPE(self)->tp_free(self);
       }
 
-   :c:member:`!tp_dealloc` must leave the exception status unchanged.  If it
-   needs to call something that might raise an exception, the exception state
-   must be backed up first and restored later (after logging any exceptions
-   with :c:func:`PyErr_WriteUnraisable`).
+   :c:member:`!tp_dealloc` phải giữ nguyên trạng thái ngoại lệ. Nếu cần gọi một thứ có thể phát sinh ngoại lệ, trước tiên phải sao lưu trạng thái ngoại lệ và khôi phục lại sau đó (sau khi ghi nhật ký mọi ngoại lệ bằng :c:func:`PyErr_WriteUnraisable`).
 
-   Example::
+   Ví dụ::
 
       static void
       foo_dealloc(PyObject *self)
@@ -761,7 +653,7 @@ and :c:data:`PyType_Type` effectively act as defaults.)
           PyObject *exc = PyErr_GetRaisedException();
 
           if (PyObject_CallFinalizerFromDealloc(self) < 0) {
-              // self was resurrected.
+              // self đã được khôi phục.
               goto done;
           }
 
@@ -771,146 +663,108 @@ and :c:data:`PyType_Type` effectively act as defaults.)
               PyObject_GC_UnTrack(self);
           }
 
-          // Optional, but convenient to avoid code duplication.
+          // Tùy chọn, nhưng thuận tiện để tránh trùng lặp mã.
           if (tp->tp_clear && tp->tp_clear(self) < 0) {
               PyErr_WriteUnraisable(self);
           }
 
-          // Any additional destruction goes here.
+          // Đặt mọi thao tác hủy bổ sung ở đây.
 
           tp->tp_free(self);
-          self = NULL;  // In case PyErr_WriteUnraisable() is called below.
+          self = NULL;  // Trong trường hợp PyErr_WriteUnraisable() được gọi bên dưới.
 
           if (tp->tp_flags & Py_TPFLAGS_HEAPTYPE) {
               Py_CLEAR(tp);
           }
 
       done:
-          // Optional, if something was called that might have raised an
-          // exception.
+          // Tùy chọn, nếu có lệnh gọi có thể đã phát sinh một
+          // ngoại lệ.
           if (PyErr_Occurred()) {
               PyErr_WriteUnraisable(self);
           }
           PyErr_SetRaisedException(exc);
       }
 
-   :c:member:`!tp_dealloc` may be called from
-   any Python thread, not just the thread which created the object (if the
-   object becomes part of a refcount cycle, that cycle might be collected by
-   a garbage collection on any thread).  This is not a problem for Python
-   API calls, since the thread on which :c:member:`!tp_dealloc` is called
-   with an :term:`attached thread state`.  However, if the object being
-   destroyed in turn destroys objects from some other C library, care
-   should be taken to ensure that destroying those objects on the thread
-   which called :c:member:`!tp_dealloc` will not violate any assumptions of
-   the library.
+   :c:member:`!tp_dealloc` có thể được gọi từ bất kỳ thread Python nào, không chỉ thread đã tạo đối tượng (nếu đối tượng trở thành một phần của chu kỳ đếm tham chiếu, chu kỳ đó có thể được bộ thu gom rác thu gom trên bất kỳ thread nào). Đây không phải là vấn đề đối với các lệnh gọi Python API, vì thread mà :c:member:`!tp_dealloc` được gọi với một :term:`attached thread state`. Tuy nhiên, nếu đối tượng đang bị hủy lần lượt hủy các đối tượng từ một thư viện C khác, cần đảm bảo rằng việc hủy các đối tượng đó trên thread đã gọi :c:member:`!tp_dealloc` không vi phạm bất kỳ giả định nào của thư viện.
 
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
    .. seealso::
 
-      :ref:`life-cycle` for details about how this slot relates to other slots.
+      :ref:`life-cycle` để biết chi tiết về mối quan hệ của slot này với các slot khác.
 
 
 .. c:member:: Py_ssize_t PyTypeObject.tp_vectorcall_offset
 
-   An optional offset to a per-instance function that implements calling
-   the object using the :ref:`vectorcall protocol <vectorcall>`,
-   a more efficient alternative
-   of the simpler :c:member:`~PyTypeObject.tp_call`.
+   Một offset tùy chọn tới một hàm theo từng instance, triển khai việc gọi đối tượng bằng giao thức :ref:`vectorcall <vectorcall>`, một lựa chọn thay thế hiệu quả hơn cho :c:member:`~PyTypeObject.tp_call` đơn giản hơn.
 
-   This field is only used if the flag :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL`
-   is set. If so, this must be a positive integer containing the offset in the
-   instance of a :c:type:`vectorcallfunc` pointer.
+   Trường này chỉ được sử dụng nếu cờ :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` được thiết lập. Khi đó, trường này phải là một số nguyên dương chứa offset trong instance tới một con trỏ :c:type:`vectorcallfunc`.
 
-   The *vectorcallfunc* pointer may be ``NULL``, in which case the instance behaves
-   as if :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` was not set: calling the instance
-   falls back to :c:member:`~PyTypeObject.tp_call`.
+   Con trỏ *vectorcallfunc* có thể là ``NULL``, trong trường hợp đó instance hoạt động như thể :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` không được thiết lập: việc gọi instance sẽ chuyển sang :c:member:`~PyTypeObject.tp_call`.
 
-   Any class that sets ``Py_TPFLAGS_HAVE_VECTORCALL`` must also set
-   :c:member:`~PyTypeObject.tp_call` and make sure its behaviour is consistent
-   with the *vectorcallfunc* function.
-   This can be done by setting *tp_call* to :c:func:`PyVectorcall_Call`.
+   Mọi class thiết lập ``Py_TPFLAGS_HAVE_VECTORCALL`` cũng phải thiết lập
+   :c:member:`~PyTypeObject.tp_call` và đảm bảo hành vi của nó nhất quán với hàm *vectorcallfunc*. Có thể thực hiện việc này bằng cách thiết lập *tp_call* thành :c:func:`PyVectorcall_Call`.
 
    .. versionchanged:: 3.8
 
-      Before version 3.8, this slot was named ``tp_print``.
-      In Python 2.x, it was used for printing to a file.
-      In Python 3.0 to 3.7, it was unused.
+      Trước phiên bản 3.8, slot này có tên là ``tp_print``. Trong Python 2.x, slot này được dùng để in ra tệp. Trong Python 3.0 đến 3.7, slot này không được sử dụng.
 
    .. versionchanged:: 3.12
 
-      Before version 3.12, it was not recommended for
-      :ref:`mutable heap types <heap-types>` to implement the vectorcall
-      protocol.
-      When a user sets :attr:`~object.__call__` in Python code, only *tp_call* is
-      updated, likely making it inconsistent with the vectorcall function.
-      Since 3.12, setting ``__call__`` will disable vectorcall optimization
-      by clearing the :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` flag.
+      Trước phiên bản 3.12, không nên sử dụng nó cho
+      :ref:`các kiểu heap có thể thay đổi <heap-types>` để triển khai giao thức vectorcall. Khi người dùng đặt :attr:`~object.__call__` trong mã Python, chỉ *tp_call* được cập nhật, có thể khiến nó không nhất quán với hàm vectorcall. Kể từ 3.12, việc đặt ``__call__`` sẽ vô hiệu hóa tối ưu hóa vectorcall bằng cách xóa cờ :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is always inherited.
-   However, the :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` flag is not
-   always inherited. If it's not set, then the subclass won't use
-   :ref:`vectorcall <vectorcall>`, except when
-   :c:func:`PyVectorcall_Call` is explicitly called.
+   Trường này luôn được kế thừa. Tuy nhiên, cờ :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` không phải lúc nào cũng được kế thừa. Nếu cờ này không được đặt, lớp con sẽ không sử dụng
+   :ref:`vectorcall <vectorcall>`, ngoại trừ khi
+   :c:func:`PyVectorcall_Call` được gọi một cách tường minh.
 
 
 .. c:member:: getattrfunc PyTypeObject.tp_getattr
 
    .. corresponding-type-slot:: Py_tp_getattr
 
-   An optional pointer to the get-attribute-string function.
+   Một con trỏ tùy chọn đến hàm get-attribute-string.
 
-   This field is deprecated.  When it is defined, it should point to a function
-   that acts the same as the :c:member:`~PyTypeObject.tp_getattro` function, but taking a C string
-   instead of a Python string object to give the attribute name.
+   Trường này không còn được dùng nữa. Khi được định nghĩa, trường này phải trỏ đến một hàm hoạt động giống như hàm :c:member:`~PyTypeObject.tp_getattro`, nhưng nhận chuỗi C thay vì đối tượng chuỗi Python để cung cấp tên thuộc tính.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:member:`~PyTypeObject.tp_getattr`, :c:member:`~PyTypeObject.tp_getattro`
+   Nhóm: :c:member:`~PyTypeObject.tp_getattr`, :c:member:`~PyTypeObject.tp_getattro`
 
-   This field is inherited by subtypes together with :c:member:`~PyTypeObject.tp_getattro`: a subtype
-   inherits both :c:member:`~PyTypeObject.tp_getattr` and :c:member:`~PyTypeObject.tp_getattro` from its base type when
-   the subtype's :c:member:`~PyTypeObject.tp_getattr` and :c:member:`~PyTypeObject.tp_getattro` are both ``NULL``.
+   Trường này được các kiểu con kế thừa cùng với :c:member:`~PyTypeObject.tp_getattro`: một kiểu con sẽ kế thừa cả :c:member:`~PyTypeObject.tp_getattr` và :c:member:`~PyTypeObject.tp_getattro` từ kiểu cơ sở của nó khi :c:member:`~PyTypeObject.tp_getattr` và :c:member:`~PyTypeObject.tp_getattro` của kiểu con đều là ``NULL``.
 
 
 .. c:member:: setattrfunc PyTypeObject.tp_setattr
 
    .. corresponding-type-slot:: Py_tp_setattr
 
-   An optional pointer to the function for setting and deleting attributes.
+   Một con trỏ tùy chọn trỏ đến hàm dùng để thiết lập và xóa các thuộc tính.
 
-   This field is deprecated.  When it is defined, it should point to a function
-   that acts the same as the :c:member:`~PyTypeObject.tp_setattro` function, but taking a C string
-   instead of a Python string object to give the attribute name.
+   Trường này đã lỗi thời. Khi được định nghĩa, trường này phải trỏ đến một hàm hoạt động giống như hàm :c:member:`~PyTypeObject.tp_setattro`, nhưng nhận một chuỗi C thay vì một đối tượng chuỗi Python để cung cấp tên thuộc tính.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:member:`~PyTypeObject.tp_setattr`, :c:member:`~PyTypeObject.tp_setattro`
+   Nhóm: :c:member:`~PyTypeObject.tp_setattr`, :c:member:`~PyTypeObject.tp_setattro`
 
-   This field is inherited by subtypes together with :c:member:`~PyTypeObject.tp_setattro`: a subtype
-   inherits both :c:member:`~PyTypeObject.tp_setattr` and :c:member:`~PyTypeObject.tp_setattro` from its base type when
-   the subtype's :c:member:`~PyTypeObject.tp_setattr` and :c:member:`~PyTypeObject.tp_setattro` are both ``NULL``.
+   Trường này được các subtype kế thừa cùng với :c:member:`~PyTypeObject.tp_setattro`: một subtype kế thừa cả :c:member:`~PyTypeObject.tp_setattr` và :c:member:`~PyTypeObject.tp_setattro` từ base type của nó khi :c:member:`~PyTypeObject.tp_setattr` và :c:member:`~PyTypeObject.tp_setattro` của subtype đều là ``NULL``.
 
 
 .. c:member:: PyAsyncMethods* PyTypeObject.tp_as_async
 
-   Pointer to an additional structure that contains fields relevant only to
-   objects which implement :term:`awaitable` and :term:`asynchronous iterator`
-   protocols at the C-level.  See :ref:`async-structs` for details.
+   Con trỏ đến một cấu trúc bổ sung chứa các trường chỉ liên quan đến những đối tượng triển khai các protocol :term:`awaitable` và :term:`asynchronous iterator` ở cấp C. Xem :ref:`async-structs` để biết chi tiết.
 
    .. versionadded:: 3.5
-      Formerly known as ``tp_compare`` and ``tp_reserved``.
+      Trước đây có tên là ``tp_compare`` và ``tp_reserved``.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   The :c:member:`~PyTypeObject.tp_as_async` field is not inherited,
-   but the contained fields are inherited individually.
+   Trường :c:member:`~PyTypeObject.tp_as_async` không được kế thừa, nhưng các trường chứa bên trong được kế thừa riêng lẻ.
 
 
 .. c:member:: reprfunc PyTypeObject.tp_repr
@@ -919,65 +773,52 @@ and :c:data:`PyType_Type` effectively act as defaults.)
 
    .. index:: pair: built-in function; repr
 
-   An optional pointer to a function that implements the built-in function
+   Một con trỏ tùy chọn đến một hàm triển khai hàm tích hợp sẵn
    :func:`repr`.
 
-   The signature is the same as for :c:func:`PyObject_Repr`::
+   Chữ ký giống với :c:func:`PyObject_Repr`::
 
       PyObject *tp_repr(PyObject *self);
 
-   The function must return a string or a Unicode object.  Ideally,
-   this function should return a string that, when passed to
-   :func:`eval`, given a suitable environment, returns an object with the
-   same value.  If this is not feasible, it should return a string starting with
-   ``'<'`` and ending with ``'>'`` from which both the type and the value of the
-   object can be deduced.
+   Hàm phải trả về một chuỗi hoặc một đối tượng Unicode. Lý tưởng nhất là hàm này nên trả về một chuỗi mà khi được truyền cho
+   :func:`eval`, trong một môi trường phù hợp, sẽ trả về một đối tượng có cùng giá trị. Nếu không thể thực hiện điều này, hàm nên trả về một chuỗi bắt đầu bằng ``'<'`` và kết thúc bằng ``'>'``, từ đó có thể suy ra cả kiểu và giá trị của đối tượng.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
-   **Default:**
+   **Mặc định:**
 
-   When this field is not set, a string of the form ``<%s object at %p>`` is
-   returned, where ``%s`` is replaced by the type name, and ``%p`` by the object's
-   memory address.
+   Khi trường này chưa được thiết lập, một chuỗi có dạng ``<%s object at %p>`` sẽ được trả về, trong đó ``%s`` được thay thế bằng tên kiểu, còn ``%p`` được thay thế bằng địa chỉ bộ nhớ của đối tượng.
 
 
 .. c:member:: PyNumberMethods* PyTypeObject.tp_as_number
 
-   Pointer to an additional structure that contains fields relevant only to
-   objects which implement the number protocol.  These fields are documented in
+   Con trỏ tới một cấu trúc bổ sung chứa các trường chỉ liên quan đến những đối tượng triển khai number protocol. Các trường này được ghi lại trong
    :ref:`number-structs`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   The :c:member:`~PyTypeObject.tp_as_number` field is not inherited, but the contained fields are
-   inherited individually.
+   Trường :c:member:`~PyTypeObject.tp_as_number` không được kế thừa, nhưng các trường chứa bên trong được kế thừa riêng lẻ.
 
 
 .. c:member:: PySequenceMethods* PyTypeObject.tp_as_sequence
 
-   Pointer to an additional structure that contains fields relevant only to
-   objects which implement the sequence protocol.  These fields are documented
-   in :ref:`sequence-structs`.
+   Con trỏ tới một cấu trúc bổ sung chứa các trường chỉ liên quan đến những đối tượng triển khai sequence protocol. Các trường này được mô tả trong :ref:`sequence-structs`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   The :c:member:`~PyTypeObject.tp_as_sequence` field is not inherited, but the contained fields
-   are inherited individually.
+   Trường :c:member:`~PyTypeObject.tp_as_sequence` không được kế thừa, nhưng các trường chứa bên trong được kế thừa riêng lẻ.
 
 
 .. c:member:: PyMappingMethods* PyTypeObject.tp_as_mapping
 
-   Pointer to an additional structure that contains fields relevant only to
-   objects which implement the mapping protocol.  These fields are documented in
+   Con trỏ tới một cấu trúc bổ sung chứa các trường chỉ liên quan đến những đối tượng triển khai mapping protocol. Các trường này được mô tả trong
    :ref:`mapping-structs`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   The :c:member:`~PyTypeObject.tp_as_mapping` field is not inherited, but the contained fields
-   are inherited individually.
+   Trường :c:member:`~PyTypeObject.tp_as_mapping` không được kế thừa, nhưng các trường chứa bên trong được kế thừa riêng lẻ.
 
 
 .. c:member:: hashfunc PyTypeObject.tp_hash
@@ -986,343 +827,272 @@ and :c:data:`PyType_Type` effectively act as defaults.)
 
    .. index:: pair: built-in function; hash
 
-   An optional pointer to a function that implements the built-in function
+   Một con trỏ tùy chọn đến một hàm triển khai hàm tích hợp sẵn
    :func:`hash`.
 
-   The signature is the same as for :c:func:`PyObject_Hash`::
+   Chữ ký giống như đối với :c:func:`PyObject_Hash`::
 
       Py_hash_t tp_hash(PyObject *);
 
-   The value ``-1`` should not be returned as a
-   normal return value; when an error occurs during the computation of the hash
-   value, the function should set an exception and return ``-1``.
+   Giá trị ``-1`` không nên được trả về như một giá trị trả về thông thường; khi xảy ra lỗi trong quá trình tính giá trị hash, hàm nên đặt một exception và trả về ``-1``.
 
-   When this field is not set (*and* :c:member:`~PyTypeObject.tp_richcompare` is not set),
-   an attempt to take the hash of the object raises :exc:`TypeError`.
-   This is the same as setting it to :c:func:`PyObject_HashNotImplemented`.
+   Khi trường này không được thiết lập (*and* :c:member:`~PyTypeObject.tp_richcompare` không được thiết lập), việc thử lấy hash của đối tượng sẽ raise :exc:`TypeError`. Điều này tương đương với việc thiết lập trường này thành :c:func:`PyObject_HashNotImplemented`.
 
-   This field can be set explicitly to :c:func:`PyObject_HashNotImplemented` to
-   block inheritance of the hash method from a parent type. This is interpreted
-   as the equivalent of ``__hash__ = None`` at the Python level, causing
-   ``isinstance(o, collections.Hashable)`` to correctly return ``False``. Note
-   that the converse is also true - setting ``__hash__ = None`` on a class at
-   the Python level will result in the ``tp_hash`` slot being set to
+   Trường này có thể được thiết lập rõ ràng thành :c:func:`PyObject_HashNotImplemented` để ngăn việc kế thừa phương thức hash từ một kiểu cha. Ở cấp độ Python, điều này được hiểu tương đương với ``__hash__ = None``, khiến ``isinstance(o, collections.Hashable)`` trả về đúng ``False``. Lưu ý rằng điều ngược lại cũng đúng - việc thiết lập ``__hash__ = None`` trên một class ở cấp độ Python sẽ khiến slot ``tp_hash`` được thiết lập thành
    :c:func:`PyObject_HashNotImplemented`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:member:`~PyTypeObject.tp_hash`, :c:member:`~PyTypeObject.tp_richcompare`
+   Nhóm: :c:member:`~PyTypeObject.tp_hash`, :c:member:`~PyTypeObject.tp_richcompare`
 
-   This field is inherited by subtypes together with
-   :c:member:`~PyTypeObject.tp_richcompare`: a subtype inherits both of
-   :c:member:`~PyTypeObject.tp_richcompare` and :c:member:`~PyTypeObject.tp_hash`, when the subtype's
-   :c:member:`~PyTypeObject.tp_richcompare` and :c:member:`~PyTypeObject.tp_hash` are both ``NULL``.
+   Trường này được các kiểu con kế thừa cùng với
+   :c:member:`~PyTypeObject.tp_richcompare`: một kiểu con kế thừa cả hai trong số
+   :c:member:`~PyTypeObject.tp_richcompare` và :c:member:`~PyTypeObject.tp_hash`, khi :c:member:`~PyTypeObject.tp_richcompare` và :c:member:`~PyTypeObject.tp_hash` của kiểu con
+   :c:member:`~PyTypeObject.tp_richcompare` và :c:member:`~PyTypeObject.tp_hash` đều là ``NULL``.
 
-   **Default:**
+   **Mặc định:**
 
-   :c:data:`PyBaseObject_Type` uses :c:func:`PyObject_GenericHash`.
+   :c:data:`PyBaseObject_Type` sử dụng :c:func:`PyObject_GenericHash`.
 
 
 .. c:member:: ternaryfunc PyTypeObject.tp_call
 
    .. corresponding-type-slot:: Py_tp_call
 
-   An optional pointer to a function that implements calling the object.  This
-   should be ``NULL`` if the object is not callable.  The signature is the same as
-   for :c:func:`PyObject_Call`::
+   Một con trỏ tùy chọn đến hàm triển khai việc gọi đối tượng. Giá trị này phải là ``NULL`` nếu đối tượng không thể gọi được. Chữ ký giống như đối với :c:func:`PyObject_Call`::
 
       PyObject *tp_call(PyObject *self, PyObject *args, PyObject *kwargs);
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
 
 .. c:member:: reprfunc PyTypeObject.tp_str
 
    .. corresponding-type-slot:: Py_tp_str
 
-   An optional pointer to a function that implements the built-in operation
-   :func:`str`.  (Note that :class:`str` is a type now, and :func:`str` calls the
-   constructor for that type.  This constructor calls :c:func:`PyObject_Str` to do
-   the actual work, and :c:func:`PyObject_Str` will call this handler.)
+   Một con trỏ tùy chọn đến hàm triển khai thao tác tích hợp sẵn
+   :func:`str`. (Lưu ý rằng :class:`str` hiện là một kiểu, và :func:`str` gọi hàm khởi tạo cho kiểu đó. Hàm khởi tạo này gọi :c:func:`PyObject_Str` để thực hiện công việc thực tế, còn :c:func:`PyObject_Str` sẽ gọi trình xử lý này.)
 
-   The signature is the same as for :c:func:`PyObject_Str`::
+   Chữ ký giống như đối với :c:func:`PyObject_Str`::
 
       PyObject *tp_str(PyObject *self);
 
-   The function must return a string or a Unicode object.  It should be a "friendly" string
-   representation of the object, as this is the representation that will be used,
-   among other things, by the :func:`print` function.
+   Hàm phải trả về một chuỗi hoặc một đối tượng Unicode. Hàm nên trả về biểu diễn chuỗi "thân thiện" của đối tượng, vì đây là biểu diễn sẽ được sử dụng, trong số những mục đích khác, bởi hàm :func:`print`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
-   **Default:**
+   **Mặc định:**
 
-   When this field is not set, :c:func:`PyObject_Repr` is called to return a string
-   representation.
+   Khi trường này không được thiết lập, :c:func:`PyObject_Repr` sẽ được gọi để trả về biểu diễn dạng chuỗi.
 
 
 .. c:member:: getattrofunc PyTypeObject.tp_getattro
 
    .. corresponding-type-slot:: Py_tp_getattro
 
-   An optional pointer to the get-attribute function.
+   Một con trỏ tùy chọn đến hàm get-attribute.
 
-   The signature is the same as for :c:func:`PyObject_GetAttr`::
+   Chữ ký giống với :c:func:`PyObject_GetAttr`::
 
       PyObject *tp_getattro(PyObject *self, PyObject *attr);
 
-   It is usually convenient to set this field to :c:func:`PyObject_GenericGetAttr`,
-   which implements the normal way of looking for object attributes.
+   Thông thường, bạn nên đặt trường này thành :c:func:`PyObject_GenericGetAttr`, vì hàm này triển khai cách thông thường để tìm kiếm các thuộc tính của đối tượng.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:member:`~PyTypeObject.tp_getattr`, :c:member:`~PyTypeObject.tp_getattro`
+   Nhóm: :c:member:`~PyTypeObject.tp_getattr`, :c:member:`~PyTypeObject.tp_getattro`
 
-   This field is inherited by subtypes together with :c:member:`~PyTypeObject.tp_getattr`: a subtype
-   inherits both :c:member:`~PyTypeObject.tp_getattr` and :c:member:`~PyTypeObject.tp_getattro` from its base type when
-   the subtype's :c:member:`~PyTypeObject.tp_getattr` and :c:member:`~PyTypeObject.tp_getattro` are both ``NULL``.
+   Trường này được subtype kế thừa cùng với :c:member:`~PyTypeObject.tp_getattr`: một subtype kế thừa cả :c:member:`~PyTypeObject.tp_getattr` và :c:member:`~PyTypeObject.tp_getattro` từ base type của nó khi :c:member:`~PyTypeObject.tp_getattr` và :c:member:`~PyTypeObject.tp_getattro` của subtype đều là ``NULL``.
 
-   **Default:**
+   **Mặc định:**
 
-   :c:data:`PyBaseObject_Type` uses :c:func:`PyObject_GenericGetAttr`.
+   :c:data:`PyBaseObject_Type` sử dụng :c:func:`PyObject_GenericGetAttr`.
 
 
 .. c:member:: setattrofunc PyTypeObject.tp_setattro
 
    .. corresponding-type-slot:: Py_tp_setattro
 
-   An optional pointer to the function for setting and deleting attributes.
+   Một con trỏ tùy chọn trỏ đến hàm dùng để thiết lập và xóa các thuộc tính.
 
-   The signature is the same as for :c:func:`PyObject_SetAttr`::
+   Chữ ký giống với :c:func:`PyObject_SetAttr`::
 
       int tp_setattro(PyObject *self, PyObject *attr, PyObject *value);
 
-   In addition, setting *value* to ``NULL`` to delete an attribute must be
-   supported.  It is usually convenient to set this field to
-   :c:func:`PyObject_GenericSetAttr`, which implements the normal
-   way of setting object attributes.
+   Ngoài ra, phải hỗ trợ việc đặt *value* thành ``NULL`` để xóa một thuộc tính. Thông thường, sẽ thuận tiện nếu đặt trường này thành
+   :c:func:`PyObject_GenericSetAttr`, triển khai cách thông thường để thiết lập các thuộc tính của đối tượng.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:member:`~PyTypeObject.tp_setattr`, :c:member:`~PyTypeObject.tp_setattro`
+   Nhóm: :c:member:`~PyTypeObject.tp_setattr`, :c:member:`~PyTypeObject.tp_setattro`
 
-   This field is inherited by subtypes together with :c:member:`~PyTypeObject.tp_setattr`: a subtype
-   inherits both :c:member:`~PyTypeObject.tp_setattr` and :c:member:`~PyTypeObject.tp_setattro` from its base type when
-   the subtype's :c:member:`~PyTypeObject.tp_setattr` and :c:member:`~PyTypeObject.tp_setattro` are both ``NULL``.
+   Trường này được các subtype kế thừa cùng với :c:member:`~PyTypeObject.tp_setattr`: một subtype kế thừa cả :c:member:`~PyTypeObject.tp_setattr` và :c:member:`~PyTypeObject.tp_setattro` từ kiểu cơ sở khi :c:member:`~PyTypeObject.tp_setattr` và :c:member:`~PyTypeObject.tp_setattro` của subtype đều là ``NULL``.
 
-   **Default:**
+   **Mặc định:**
 
-   :c:data:`PyBaseObject_Type` uses :c:func:`PyObject_GenericSetAttr`.
+   :c:data:`PyBaseObject_Type` sử dụng :c:func:`PyObject_GenericSetAttr`.
 
 
 .. c:member:: PyBufferProcs* PyTypeObject.tp_as_buffer
 
-   Pointer to an additional structure that contains fields relevant only to objects
-   which implement the buffer interface.  These fields are documented in
+   Con trỏ tới một cấu trúc bổ sung chứa các trường chỉ liên quan đến những đối tượng triển khai buffer interface. Các trường này được mô tả trong
    :ref:`buffer-structs`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   The :c:member:`~PyTypeObject.tp_as_buffer` field is not inherited,
-   but the contained fields are inherited individually.
+   Trường :c:member:`~PyTypeObject.tp_as_buffer` không được kế thừa, nhưng các trường chứa bên trong được kế thừa riêng lẻ.
 
 
 .. c:member:: unsigned long PyTypeObject.tp_flags
 
-   This field is a bit mask of various flags.  Some flags indicate variant
-   semantics for certain situations; others are used to indicate that certain
-   fields in the type object (or in the extension structures referenced via
-   :c:member:`~PyTypeObject.tp_as_number`, :c:member:`~PyTypeObject.tp_as_sequence`, :c:member:`~PyTypeObject.tp_as_mapping`, and
-   :c:member:`~PyTypeObject.tp_as_buffer`) that were historically not always present are valid; if
-   such a flag bit is clear, the type fields it guards must not be accessed and
-   must be considered to have a zero or ``NULL`` value instead.
+   Trường này là mặt nạ bit của nhiều cờ khác nhau. Một số cờ biểu thị ngữ nghĩa khác nhau trong các tình huống nhất định; các cờ khác được dùng để cho biết rằng một số trường trong đối tượng kiểu (hoặc trong các cấu trúc mở rộng được tham chiếu thông qua
+   :c:member:`~PyTypeObject.tp_as_number`, :c:member:`~PyTypeObject.tp_as_sequence`, :c:member:`~PyTypeObject.tp_as_mapping`, và
+   :c:member:`~PyTypeObject.tp_as_buffer`) vốn trong lịch sử không phải lúc nào cũng tồn tại nay là hợp lệ; nếu bit cờ đó bị tắt, không được truy cập các trường kiểu mà nó bảo vệ và phải coi chúng có giá trị bằng không hoặc giá trị ``NULL``.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Inheritance of this field is complicated.  Most flag bits are inherited
-   individually, i.e. if the base type has a flag bit set, the subtype inherits
-   this flag bit.  The flag bits that pertain to extension structures are strictly
-   inherited if the extension structure is inherited, i.e. the base type's value of
-   the flag bit is copied into the subtype together with a pointer to the extension
-   structure.  The :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit is inherited together with
-   the :c:member:`~PyTypeObject.tp_traverse` and :c:member:`~PyTypeObject.tp_clear` fields, i.e. if the
-   :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit is clear in the subtype and the
-   :c:member:`~PyTypeObject.tp_traverse` and :c:member:`~PyTypeObject.tp_clear` fields in the subtype exist and have
-   ``NULL`` values.
+   Việc kế thừa trường này khá phức tạp. Hầu hết các bit cờ được kế thừa riêng lẻ, tức là nếu kiểu cơ sở có một bit cờ được đặt thì kiểu con sẽ kế thừa bit cờ đó. Các bit cờ liên quan đến cấu trúc mở rộng được kế thừa chặt chẽ nếu cấu trúc mở rộng được kế thừa, tức là giá trị bit cờ của kiểu cơ sở được sao chép vào kiểu con cùng với một con trỏ đến cấu trúc mở rộng. Bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được kế thừa cùng với các trường :c:member:`~PyTypeObject.tp_traverse` và :c:member:`~PyTypeObject.tp_clear`, tức là nếu
+   bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC` không được đặt trong kiểu con và
+   các trường :c:member:`~PyTypeObject.tp_traverse` và :c:member:`~PyTypeObject.tp_clear` trong kiểu con tồn tại và có các giá trị ``NULL``.
 
    .. XXX are most flag bits *really* inherited individually?
 
-   **Default:**
+   **Mặc định:**
 
-   :c:data:`PyBaseObject_Type` uses
-   ``Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE``.
+   :c:data:`PyBaseObject_Type` sử dụng ``Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE``.
 
-   **Bit Masks:**
+   **Mặt nạ bit:**
 
    .. c:namespace:: NULL
 
-   The following bit masks are currently defined; these can be ORed together using
-   the ``|`` operator to form the value of the :c:member:`~PyTypeObject.tp_flags` field.  The macro
-   :c:func:`PyType_HasFeature` takes a type and a flags value, *tp* and *f*, and
-   checks whether ``tp->tp_flags & f`` is non-zero.
+   Các mặt nạ bit sau đây hiện được định nghĩa; bạn có thể OR chúng lại với nhau bằng toán tử ``|`` để tạo thành giá trị của trường :c:member:`~PyTypeObject.tp_flags`. Macro
+   :c:func:`PyType_HasFeature` nhận một type và một giá trị flags, *tp* và *f*, rồi kiểm tra xem ``tp->tp_flags & f`` có khác không hay không.
 
    .. c:macro:: Py_TPFLAGS_HEAPTYPE
 
-      This bit is set when the type object itself is allocated on the heap, for
-      example, types created dynamically using :c:func:`PyType_FromSpec`.  In this
-      case, the :c:member:`~PyObject.ob_type` field of its instances is considered a reference to
-      the type, and the type object is INCREF'ed when a new instance is created, and
-      DECREF'ed when an instance is destroyed (this does not apply to instances of
-      subtypes; only the type referenced by the instance's ob_type gets INCREF'ed or
-      DECREF'ed). Heap types should also :ref:`support garbage collection <supporting-cycle-detection>`
-      as they can form a reference cycle with their own module object.
+      Bit này được đặt khi chính type object được cấp phát trên heap, chẳng hạn như các type được tạo động bằng :c:func:`PyType_FromSpec`. Trong trường hợp này, trường :c:member:`~PyObject.ob_type` của các instance thuộc type đó được xem là một tham chiếu đến type, và type object được INCREF khi một instance mới được tạo, đồng thời được DECREF khi một instance bị hủy (điều này không áp dụng cho các instance của subtype; chỉ type được tham chiếu bởi ob_type của instance mới được INCREF hoặc DECREF). Các heap type cũng nên :ref:`hỗ trợ garbage collection <supporting-cycle-detection>` vì chúng có thể tạo thành một reference cycle với module object của chính mình.
 
-      **Inheritance:**
+      **Kế thừa:**
 
       ???
 
 
    .. c:macro:: Py_TPFLAGS_BASETYPE
 
-      This bit is set when the type can be used as the base type of another type.  If
-      this bit is clear, the type cannot be subtyped (similar to a "final" class in
-      Java).
+      Bit này được đặt khi type có thể được sử dụng làm base type của một type khác. Nếu bit này không được đặt, type không thể được subtype (tương tự một lớp "final" trong Java).
 
-      **Inheritance:**
+      **Kế thừa:**
 
       ???
 
 
    .. c:macro:: Py_TPFLAGS_READY
 
-      This bit is set when the type object has been fully initialized by
+      Bit này được đặt khi type object đã được khởi tạo hoàn toàn bởi
       :c:func:`PyType_Ready`.
 
-      **Inheritance:**
+      **Kế thừa:**
 
       ???
 
 
    .. c:macro:: Py_TPFLAGS_READYING
 
-      This bit is set while :c:func:`PyType_Ready` is in the process of initializing
-      the type object.
+      Bit này được đặt trong khi :c:func:`PyType_Ready` đang trong quá trình khởi tạo đối tượng kiểu.
 
-      **Inheritance:**
+      **Kế thừa:**
 
       ???
 
 
    .. c:macro:: Py_TPFLAGS_HAVE_GC
 
-      This bit is set when the object supports garbage collection.  If this bit
-      is set, memory for new instances (see :c:member:`~PyTypeObject.tp_alloc`)
-      must be allocated using :c:macro:`PyObject_GC_New` or
-      :c:func:`PyType_GenericAlloc` and deallocated (see
-      :c:member:`~PyTypeObject.tp_free`) using :c:func:`PyObject_GC_Del`.  More
-      information in section :ref:`supporting-cycle-detection`.
+      Bit này được đặt khi đối tượng hỗ trợ garbage collection. Nếu bit này được đặt, bộ nhớ cho các instance mới (xem :c:member:`~PyTypeObject.tp_alloc`) phải được cấp phát bằng :c:macro:`PyObject_GC_New` hoặc
+      :c:func:`PyType_GenericAlloc` và được giải phóng (xem
+      :c:member:`~PyTypeObject.tp_free`) bằng :c:func:`PyObject_GC_Del`. Xem thêm thông tin trong phần :ref:`supporting-cycle-detection`.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      Group: :c:macro:`Py_TPFLAGS_HAVE_GC`, :c:member:`~PyTypeObject.tp_traverse`, :c:member:`~PyTypeObject.tp_clear`
+      Nhóm: :c:macro:`Py_TPFLAGS_HAVE_GC`, :c:member:`~PyTypeObject.tp_traverse`, :c:member:`~PyTypeObject.tp_clear`
 
-      The :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit is inherited
-      together with the :c:member:`~PyTypeObject.tp_traverse` and :c:member:`~PyTypeObject.tp_clear`
-      fields, i.e.  if the :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit is
-      clear in the subtype and the :c:member:`~PyTypeObject.tp_traverse` and
-      :c:member:`~PyTypeObject.tp_clear` fields in the subtype exist and have ``NULL``
-      values.
+      Bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được kế thừa cùng với các trường :c:member:`~PyTypeObject.tp_traverse` và :c:member:`~PyTypeObject.tp_clear`, tức là nếu bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC` không được thiết lập trong subtype và các trường :c:member:`~PyTypeObject.tp_traverse` và
+      :c:member:`~PyTypeObject.tp_clear` trong subtype tồn tại và có các giá trị ``NULL``.
 
 
    .. c:macro:: Py_TPFLAGS_DEFAULT
 
-      This is a bitmask of all the bits that pertain to the existence of certain
-      fields in the type object and its extension structures. Currently, it includes
-      the following bits: :c:macro:`Py_TPFLAGS_HAVE_STACKLESS_EXTENSION`.
+      Đây là bitmask của tất cả các bit liên quan đến sự tồn tại của một số trường nhất định trong type object và các cấu trúc mở rộng của nó. Hiện tại, nó bao gồm các bit sau: :c:macro:`Py_TPFLAGS_HAVE_STACKLESS_EXTENSION`.
 
-      **Inheritance:**
+      **Kế thừa:**
 
       ???
 
 
    .. c:macro:: Py_TPFLAGS_METHOD_DESCRIPTOR
 
-      This bit indicates that objects behave like unbound methods.
+      Bit này cho biết các object hoạt động như các unbound method.
 
-      If this flag is set for ``type(meth)``, then:
+      Nếu cờ này được thiết lập cho ``type(meth)``, thì:
 
-      - ``meth.__get__(obj, cls)(*args, **kwds)`` (with ``obj`` not None)
-        must be equivalent to ``meth(obj, *args, **kwds)``.
+      - ``meth.__get__(obj, cls)(*args, **kwds)`` (với ``obj`` khác None) phải tương đương với ``meth(obj, *args, **kwds)``.
 
-      - ``meth.__get__(None, cls)(*args, **kwds)``
-        must be equivalent to ``meth(*args, **kwds)``.
+      - ``meth.__get__(None, cls)(*args, **kwds)`` phải tương đương với ``meth(*args, **kwds)``.
 
-      This flag enables an optimization for typical method calls like
-      ``obj.meth()``: it avoids creating a temporary "bound method" object for
-      ``obj.meth``.
+      Cờ này bật một tối ưu hóa cho các method call điển hình như ``obj.meth()``: cờ này tránh việc tạo đối tượng "bound method" tạm thời cho ``obj.meth``.
 
       .. versionadded:: 3.8
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is never inherited by types without the
-      :c:macro:`Py_TPFLAGS_IMMUTABLETYPE` flag set.  For extension types, it is
-      inherited whenever :c:member:`~PyTypeObject.tp_descr_get` is inherited.
+      Cờ này không bao giờ được kế thừa bởi các type không có
+      cờ :c:macro:`Py_TPFLAGS_IMMUTABLETYPE` được thiết lập. Đối với các extension type, cờ này được kế thừa bất cứ khi nào :c:member:`~PyTypeObject.tp_descr_get` được kế thừa.
 
    .. c:macro:: Py_TPFLAGS_MANAGED_DICT
 
-      This bit indicates that instances of the class have a :attr:`~object.__dict__`
-      attribute, and that the space for the dictionary is managed by the VM.
+      Bit này cho biết các instance của class có thuộc tính :attr:`~object.__dict__`, và không gian dành cho dictionary được VM quản lý.
 
-      If this flag is set, :c:macro:`Py_TPFLAGS_HAVE_GC` should also be set.
+      Nếu cờ này được thiết lập, :c:macro:`Py_TPFLAGS_HAVE_GC` cũng nên được thiết lập.
 
-      The type traverse function must call :c:func:`PyObject_VisitManagedDict`
-      and its clear function must call :c:func:`PyObject_ClearManagedDict`.
+      Hàm traverse của kiểu phải gọi :c:func:`PyObject_VisitManagedDict` và hàm clear của nó phải gọi :c:func:`PyObject_ClearManagedDict`.
 
       .. versionadded:: 3.12
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is inherited unless the
-      :c:member:`~PyTypeObject.tp_dictoffset` field is set in a superclass.
+      Cờ này được kế thừa trừ khi
+      trường :c:member:`~PyTypeObject.tp_dictoffset` được đặt trong một lớp cha.
 
 
    .. c:macro:: Py_TPFLAGS_MANAGED_WEAKREF
 
-      This bit indicates that instances of the class should be weakly
-      referenceable.
+      Bit này cho biết các thể hiện của lớp có thể được tham chiếu yếu.
 
       .. versionadded:: 3.12
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is inherited unless the
-      :c:member:`~PyTypeObject.tp_weaklistoffset` field is set in a superclass.
+      Cờ này được kế thừa trừ khi
+      Trường :c:member:`~PyTypeObject.tp_weaklistoffset` được thiết lập trong một superclass.
 
 
    .. c:macro:: Py_TPFLAGS_ITEMS_AT_END
 
-      Only usable with variable-size types, i.e. ones with non-zero
+      Chỉ có thể sử dụng với các kiểu có kích thước biến đổi, tức là những kiểu có giá trị khác không
       :c:member:`~PyTypeObject.tp_itemsize`.
 
-      Indicates that the variable-sized portion of an instance of this type is
-      at the end of the instance's memory area, at an offset of
-      ``Py_TYPE(obj)->tp_basicsize`` (which may be different in each
-      subclass).
+      Cho biết phần có kích thước biến đổi của một instance thuộc kiểu này nằm ở cuối vùng bộ nhớ của instance, tại offset ``Py_TYPE(obj)->tp_basicsize`` (có thể khác nhau ở mỗi subclass).
 
-      When setting this flag, be sure that all superclasses either
-      use this memory layout, or are not variable-sized.
-      Python does not check this.
+      Khi thiết lập cờ này, hãy đảm bảo rằng tất cả superclass либо sử dụng bố cục bộ nhớ này hoặc không có kích thước biến đổi. Python không kiểm tra điều này.
 
       .. versionadded:: 3.12
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is inherited.
+      Cờ này được kế thừa.
 
    .. XXX Document more flags here?
 
@@ -1336,26 +1106,18 @@ and :c:data:`PyType_Type` effectively act as defaults.)
    .. c:macro:: Py_TPFLAGS_BASE_EXC_SUBCLASS
    .. c:macro:: Py_TPFLAGS_TYPE_SUBCLASS
 
-      Functions such as :c:func:`PyLong_Check` will call :c:func:`PyType_FastSubclass`
-      with one of these flags to quickly determine if a type is a subclass
-      of a built-in type; such specific checks are faster than a generic
-      check, like :c:func:`PyObject_IsInstance`. Custom types that inherit
-      from built-ins should have their :c:member:`~PyTypeObject.tp_flags`
-      set appropriately, or the code that interacts with such types
-      will behave differently depending on what kind of check is used.
+      Các hàm như :c:func:`PyLong_Check` sẽ gọi :c:func:`PyType_FastSubclass` với một trong các cờ này để nhanh chóng xác định xem một kiểu có phải là subclass của kiểu dựng sẵn hay không; những phép kiểm tra cụ thể như vậy nhanh hơn phép kiểm tra tổng quát, chẳng hạn như :c:func:`PyObject_IsInstance`. Các kiểu tùy chỉnh kế thừa từ kiểu dựng sẵn nên thiết lập :c:member:`~PyTypeObject.tp_flags` phù hợp; nếu không, mã tương tác với các kiểu đó sẽ hoạt động khác nhau tùy thuộc vào loại phép kiểm tra được sử dụng.
 
 
    .. c:macro:: Py_TPFLAGS_HAVE_FINALIZE
 
-      This bit is set when the :c:member:`~PyTypeObject.tp_finalize` slot is present in the
-      type structure.
+      Bit này được đặt khi slot :c:member:`~PyTypeObject.tp_finalize` xuất hiện trong cấu trúc kiểu.
 
       .. versionadded:: 3.4
 
       .. deprecated:: 3.8
-         This flag isn't necessary anymore, as the interpreter assumes the
-         :c:member:`~PyTypeObject.tp_finalize` slot is always present in the
-         type structure.
+         Cờ này không còn cần thiết nữa, vì trình thông dịch giả định rằng
+         slot :c:member:`~PyTypeObject.tp_finalize` luôn xuất hiện trong cấu trúc kiểu.
 
 
    .. c:macro:: _Py_TPFLAGS_HAVE_VECTORCALL
@@ -1363,160 +1125,132 @@ and :c:data:`PyType_Type` effectively act as defaults.)
 
    .. c:macro:: Py_TPFLAGS_HAVE_VECTORCALL
 
-      This bit is set when the class implements
-      the :ref:`vectorcall protocol <vectorcall>`.
-      See :c:member:`~PyTypeObject.tp_vectorcall_offset` for details.
+      Bit này được đặt khi lớp triển khai giao thức :ref:`vectorcall protocol <vectorcall>`. Xem :c:member:`~PyTypeObject.tp_vectorcall_offset` để biết chi tiết.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This bit is inherited if :c:member:`~PyTypeObject.tp_call` is also
-      inherited.
+      Bit này được kế thừa nếu :c:member:`~PyTypeObject.tp_call` cũng được kế thừa.
 
-      .. versionadded:: 3.8 as ``_Py_TPFLAGS_HAVE_VECTORCALL``
+      .. versionadded:: 3.8 như ``_Py_TPFLAGS_HAVE_VECTORCALL``
 
       .. versionchanged:: 3.9
 
-         Renamed to the current name, without the leading underscore.
-         The old provisional name is :term:`soft deprecated`.
+         Đã được đổi tên thành tên hiện tại, không có dấu gạch dưới ở đầu. Tên tạm thời cũ là :term:`soft deprecated`.
 
       .. versionchanged:: 3.12
 
-         This flag is now removed from a class when the class's
-         :py:meth:`~object.__call__` method is reassigned.
+         Cờ này hiện bị loại bỏ khỏi một class khi phương thức của class
+         :py:meth:`~object.__call__` được gán lại.
 
-         This flag can now be inherited by mutable classes.
+         Cờ này hiện có thể được kế thừa bởi các class có thể thay đổi.
 
    .. c:macro:: Py_TPFLAGS_IMMUTABLETYPE
 
-      This bit is set for type objects that are immutable: type attributes cannot be set nor deleted.
+      Bit này được thiết lập cho các đối tượng kiểu không thể thay đổi: không thể thiết lập hoặc xóa các thuộc tính kiểu.
 
-      :c:func:`PyType_Ready` automatically applies this flag to
-      :ref:`static types <static-types>`.
+      :c:func:`PyType_Ready` tự động áp dụng cờ này cho
+      :ref:`các kiểu static <static-types>`.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is not inherited.
+      Cờ này không được kế thừa.
 
       .. versionadded:: 3.10
 
    .. c:macro:: Py_TPFLAGS_DISALLOW_INSTANTIATION
 
-      Disallow creating instances of the type: set
-      :c:member:`~PyTypeObject.tp_new` to NULL and don't create the ``__new__``
-      key in the type dictionary.
+      Không cho phép tạo các thực thể của kiểu: set
+      Đặt :c:member:`~PyTypeObject.tp_new` thành NULL và không tạo khóa ``__new__`` trong từ điển kiểu.
 
-      The flag must be set before creating the type, not after. For example, it
-      must be set before :c:func:`PyType_Ready` is called on the type.
+      Cờ này phải được đặt trước khi tạo kiểu, không phải sau đó. Ví dụ: cờ phải được đặt trước khi gọi :c:func:`PyType_Ready` trên kiểu.
 
-      The flag is set automatically on :ref:`static types <static-types>` if
-      :c:member:`~PyTypeObject.tp_base` is NULL or ``&PyBaseObject_Type`` and
-      :c:member:`~PyTypeObject.tp_new` is NULL.
+      Cờ này được tự động đặt trên các :ref:`kiểu tĩnh <static-types>` nếu
+      :c:member:`~PyTypeObject.tp_base` là NULL hoặc ``&PyBaseObject_Type`` và
+      :c:member:`~PyTypeObject.tp_new` là NULL.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is not inherited.
-      However, subclasses will not be instantiable unless they provide a
-      non-NULL :c:member:`~PyTypeObject.tp_new` (which is only possible
-      via the C API).
+      Cờ này không được kế thừa. Tuy nhiên, các lớp con sẽ không thể được khởi tạo trừ khi cung cấp một :c:member:`~PyTypeObject.tp_new` khác NULL (điều này chỉ có thể thực hiện thông qua C API).
 
       .. note::
 
-         To disallow instantiating a class directly but allow instantiating
-         its subclasses (e.g. for an :term:`abstract base class`),
-         do not use this flag.
-         Instead, make :c:member:`~PyTypeObject.tp_new` only succeed for
-         subclasses.
+         Để không cho phép khởi tạo trực tiếp một lớp nhưng vẫn cho phép khởi tạo các lớp con của lớp đó (ví dụ: đối với một :term:`abstract base class`), không sử dụng cờ này. Thay vào đó, chỉ để :c:member:`~PyTypeObject.tp_new` thành công đối với các lớp con.
 
       .. versionadded:: 3.10
 
 
    .. c:macro:: Py_TPFLAGS_MAPPING
 
-      This bit indicates that instances of the class may match mapping patterns
-      when used as the subject of a :keyword:`match` block. It is automatically
-      set when registering or subclassing :class:`collections.abc.Mapping`, and
-      unset when registering :class:`collections.abc.Sequence`.
+      Bit này cho biết các instance của lớp có thể khớp với các mapping pattern khi được sử dụng làm subject của một khối :keyword:`match`. Bit này được tự động đặt khi đăng ký hoặc tạo lớp con của :class:`collections.abc.Mapping`, và được bỏ đặt khi đăng ký :class:`collections.abc.Sequence`.
 
       .. note::
 
-         :c:macro:`Py_TPFLAGS_MAPPING` and :c:macro:`Py_TPFLAGS_SEQUENCE` are
-         mutually exclusive; it is an error to enable both flags simultaneously.
+         :c:macro:`Py_TPFLAGS_MAPPING` và :c:macro:`Py_TPFLAGS_SEQUENCE` loại trừ lẫn nhau; việc bật đồng thời cả hai cờ là một lỗi.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is inherited by types that do not already set
+      Cờ này được kế thừa bởi các kiểu chưa thiết lập
       :c:macro:`Py_TPFLAGS_SEQUENCE`.
 
-      .. seealso:: :pep:`634` -- Structural Pattern Matching: Specification
+      .. seealso:: :pep:`634` -- Đối sánh mẫu cấu trúc: Đặc tả
 
       .. versionadded:: 3.10
 
 
    .. c:macro:: Py_TPFLAGS_SEQUENCE
 
-      This bit indicates that instances of the class may match sequence patterns
-      when used as the subject of a :keyword:`match` block. It is automatically
-      set when registering or subclassing :class:`collections.abc.Sequence`, and
-      unset when registering :class:`collections.abc.Mapping`.
+      Bit này cho biết các thể hiện của lớp có thể khớp với các mẫu chuỗi khi được sử dụng làm đối tượng subject của một khối :keyword:`match`. Bit này được tự động thiết lập khi đăng ký hoặc phân lớp :class:`collections.abc.Sequence`, và được hủy thiết lập khi đăng ký :class:`collections.abc.Mapping`.
 
       .. note::
 
-         :c:macro:`Py_TPFLAGS_MAPPING` and :c:macro:`Py_TPFLAGS_SEQUENCE` are
-         mutually exclusive; it is an error to enable both flags simultaneously.
+         :c:macro:`Py_TPFLAGS_MAPPING` và :c:macro:`Py_TPFLAGS_SEQUENCE` loại trừ lẫn nhau; việc bật đồng thời cả hai cờ là một lỗi.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is inherited by types that do not already set
+      Cờ này được kế thừa bởi các kiểu chưa thiết lập
       :c:macro:`Py_TPFLAGS_MAPPING`.
 
-      .. seealso:: :pep:`634` -- Structural Pattern Matching: Specification
+      .. seealso:: :pep:`634` -- Đối sánh mẫu cấu trúc: Đặc tả
 
       .. versionadded:: 3.10
 
 
    .. c:macro:: Py_TPFLAGS_VALID_VERSION_TAG
 
-      Internal. Do not set or unset this flag.
-      To indicate that a class has changed call :c:func:`PyType_Modified`
+      Nội bộ. Không đặt hoặc bỏ đặt cờ này. Để cho biết một lớp đã thay đổi, hãy gọi :c:func:`PyType_Modified`
 
       .. warning::
-         This flag is present in header files, but is not be used.
-         It will be removed in a future version of CPython
+         Cờ này có trong các tệp header nhưng không được sử dụng. Nó sẽ bị xóa trong phiên bản CPython trong tương lai
 
 
    .. c:macro:: Py_TPFLAGS_HAVE_VERSION_TAG
 
-      This macro does nothing.
-      Historically, this would indicate that the
-      :c:member:`~PyTypeObject.tp_version_tag` field was available and
-      initialized.
+      Macro này không thực hiện thao tác nào. Trước đây, macro này cho biết rằng
+      trường :c:member:`~PyTypeObject.tp_version_tag` khả dụng và đã được khởi tạo.
 
       .. soft-deprecated:: 3.13
 
 
    .. c:macro:: Py_TPFLAGS_INLINE_VALUES
 
-      This bit indicates that instances of this type will have an "inline values"
-      array (containing the object's attributes) placed directly after the end
-      of the object.
+      Bit này cho biết các instance của kiểu này sẽ có một mảng "inline values" (chứa các thuộc tính của đối tượng) được đặt ngay sau phần cuối của đối tượng.
 
-      This requires that :c:macro:`Py_TPFLAGS_HAVE_GC` is set.
+      Điều này yêu cầu :c:macro:`Py_TPFLAGS_HAVE_GC` được đặt.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is not inherited.
+      Cờ này không được kế thừa.
 
       .. versionadded:: 3.13
 
 
    .. c:macro:: Py_TPFLAGS_IS_ABSTRACT
 
-      This bit indicates that this is an abstract type and therefore cannot
-      be instantiated.
+      Phần này cho biết đây là một kiểu trừu tượng và do đó không thể được khởi tạo.
 
-      **Inheritance:**
+      **Kế thừa:**
 
-      This flag is not inherited.
+      Cờ này không được kế thừa.
 
       .. seealso::
          :mod:`abc`
@@ -1524,44 +1258,35 @@ and :c:data:`PyType_Type` effectively act as defaults.)
 
    .. c:macro:: Py_TPFLAGS_HAVE_STACKLESS_EXTENSION
 
-      Internal. Do not set or unset this flag.
-      Historically, this was a reserved flag for use in Stackless Python.
+      Nội bộ. Không đặt hoặc hủy đặt cờ này. Trong lịch sử, đây là cờ dành riêng để sử dụng trong Stackless Python.
 
       .. warning::
-            This flag is present in header files, but is not be used.
-            This may be removed in a future version of CPython.
+            Cờ này có trong các tệp tiêu đề nhưng không được sử dụng. Cờ này có thể bị loại bỏ trong một phiên bản CPython tương lai.
 
 
 .. c:member:: const char* PyTypeObject.tp_doc
 
    .. corresponding-type-slot:: Py_tp_doc
 
-   An optional pointer to a NUL-terminated C string giving the docstring for this
-   type object.  This is exposed as the :attr:`~type.__doc__` attribute on the
-   type and instances of the type.
+   Một con trỏ tùy chọn tới chuỗi C kết thúc bằng NUL chứa docstring cho đối tượng kiểu này. Chuỗi này được cung cấp dưới dạng thuộc tính :attr:`~type.__doc__` trên kiểu và các thực thể của kiểu đó.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is *not* inherited by subtypes.
+   Trường này *không* được các kiểu con kế thừa.
 
 
 .. c:member:: traverseproc PyTypeObject.tp_traverse
 
    .. corresponding-type-slot:: Py_tp_traverse
 
-   An optional pointer to a traversal function for the garbage collector.  This is
-   only used if the :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit is set.  The signature is::
+   Một con trỏ tùy chọn tới hàm traversal dành cho bộ thu gom rác. Hàm này chỉ được sử dụng nếu bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được đặt. Chữ ký là::
 
       int tp_traverse(PyObject *self, visitproc visit, void *arg);
 
-   More information about Python's garbage collection scheme can be found
-   in section :ref:`supporting-cycle-detection`.
+   Có thể tìm thấy thêm thông tin về cơ chế thu gom rác của Python trong phần :ref:`supporting-cycle-detection`.
 
-   The :c:member:`~PyTypeObject.tp_traverse` pointer is used by the garbage collector to detect
-   reference cycles. A typical implementation of a :c:member:`~PyTypeObject.tp_traverse` function
-   simply calls :c:func:`Py_VISIT` on each of the instance's members that are Python
-   objects that the instance owns. For example, this is function :c:func:`!local_traverse` from the
-   :mod:`!_thread` extension module::
+   Bộ trỏ :c:member:`~PyTypeObject.tp_traverse` được bộ thu gom rác sử dụng để phát hiện các chu kỳ tham chiếu. Một triển khai điển hình của hàm :c:member:`~PyTypeObject.tp_traverse` chỉ đơn giản là gọi :c:func:`Py_VISIT` trên từng thành viên của instance, vốn là các đối tượng Python mà instance sở hữu. Ví dụ, đây là hàm :c:func:`!local_traverse` từ
+   mô-đun mở rộng :mod:`!_thread`::
 
       static int
       local_traverse(PyObject *op, visitproc visit, void *arg)
@@ -1573,184 +1298,115 @@ and :c:data:`PyType_Type` effectively act as defaults.)
           return 0;
       }
 
-   Note that :c:func:`Py_VISIT` is called only on those members that can participate
-   in reference cycles.  Although there is also a ``self->key`` member, it can only
-   be ``NULL`` or a Python string and therefore cannot be part of a reference cycle.
+   Lưu ý rằng :c:func:`Py_VISIT` chỉ được gọi trên những thành viên có thể tham gia vào các chu kỳ tham chiếu. Mặc dù cũng có một thành viên ``self->key``, thành viên này chỉ có thể là ``NULL`` hoặc một chuỗi Python và do đó không thể nằm trong một chu kỳ tham chiếu.
 
-   On the other hand, even if you know a member can never be part of a cycle, as a
-   debugging aid you may want to visit it anyway just so the :mod:`gc` module's
-   :func:`~gc.get_referents` function will include it.
+   Mặt khác, ngay cả khi biết một member không bao giờ có thể là một phần của cycle, để hỗ trợ gỡ lỗi, bạn vẫn có thể muốn truy cập nó chỉ để hàm của mô-đun :mod:`gc`
+   hàm :func:`~gc.get_referents` sẽ bao gồm nó.
 
-   Heap types (:c:macro:`Py_TPFLAGS_HEAPTYPE`) must visit their type with::
+   Các heap type (:c:macro:`Py_TPFLAGS_HEAPTYPE`) phải truy cập type của chúng bằng::
 
        Py_VISIT(Py_TYPE(self));
 
-   It is only needed since Python 3.9. To support Python 3.8 and older, this
-   line must be conditional::
+   Dòng này chỉ cần thiết kể từ Python 3.9. Để hỗ trợ Python 3.8 và các phiên bản cũ hơn, dòng này phải có điều kiện::
 
        #if PY_VERSION_HEX >= 0x03090000
            Py_VISIT(Py_TYPE(self));
        #endif
 
-   If the :c:macro:`Py_TPFLAGS_MANAGED_DICT` bit is set in the
-   :c:member:`~PyTypeObject.tp_flags` field, the traverse function must call
-   :c:func:`PyObject_VisitManagedDict` like this::
+   Nếu bit :c:macro:`Py_TPFLAGS_MANAGED_DICT` được đặt trong
+   trường :c:member:`~PyTypeObject.tp_flags`, hàm traverse phải gọi
+   :c:func:`PyObject_VisitManagedDict` như sau::
 
        PyObject_VisitManagedDict((PyObject*)self, visit, arg);
 
    .. warning::
-       When implementing :c:member:`~PyTypeObject.tp_traverse`, only the
-       members that the instance *owns* (by having :term:`strong references
-       <strong reference>` to them) must be
-       visited. For instance, if an object supports weak references via the
-       :c:member:`~PyTypeObject.tp_weaklist` slot, the pointer supporting
-       the linked list (what *tp_weaklist* points to) must **not** be
-       visited as the instance does not directly own the weak references to itself
-       (the weakreference list is there to support the weak reference machinery,
-       but the instance has no strong reference to the elements inside it, as they
-       are allowed to be removed even if the instance is still alive).
+       Khi triển khai :c:member:`~PyTypeObject.tp_traverse`, chỉ những thành viên mà instance *owns* (bằng cách có :term:`strong references <strong reference>` đến chúng) mới phải được duyệt. Ví dụ, nếu một đối tượng hỗ trợ weak references thông qua
+       :c:member:`~PyTypeObject.tp_weaklist` slot, con trỏ hỗ trợ danh sách liên kết (đối tượng mà *tp_weaklist* trỏ đến) **not** được duyệt, vì instance không trực tiếp sở hữu các weak references đến chính nó (danh sách weak reference tồn tại để hỗ trợ cơ chế weak reference, nhưng instance không có strong reference đến các phần tử bên trong danh sách, vì chúng được phép bị xóa ngay cả khi instance vẫn còn tồn tại).
 
    .. warning::
-      The traversal function must not have any side effects.  It must not
-      modify the reference counts of any Python objects nor create or destroy
-      any Python objects.
+      Hàm traversal không được có bất kỳ tác dụng phụ nào. Hàm không được sửa đổi số lượng tham chiếu của bất kỳ đối tượng Python nào, cũng không được tạo hoặc hủy bất kỳ đối tượng Python nào.
 
-   Note that :c:func:`Py_VISIT` requires the *visit* and *arg* parameters to
-   :c:func:`!local_traverse` to have these specific names; don't name them just
-   anything.
+   Lưu ý rằng :c:func:`Py_VISIT` yêu cầu các tham số *visit* và *arg*
+   :c:func:`!local_traverse` phải có đúng những tên cụ thể này; đừng đặt tên tùy ý.
 
-   Instances of :ref:`heap-allocated types <heap-types>` hold a reference to
-   their type. Their traversal function must therefore either visit
-   :c:func:`Py_TYPE(self) <Py_TYPE>`, or delegate this responsibility by
-   calling ``tp_traverse`` of another heap-allocated type (such as a
-   heap-allocated superclass).
-   If they do not, the type object may not be garbage-collected.
+   Các instance của :ref:`heap-allocated types <heap-types>` giữ một tham chiếu đến type của chúng. Vì vậy, hàm traversal của chúng phải duyệt
+   :c:func:`Py_TYPE(self) <Py_TYPE>`, hoặc ủy thác trách nhiệm này bằng cách gọi ``tp_traverse`` của một heap-allocated type khác (chẳng hạn như một superclass được cấp phát trên heap). Nếu không, đối tượng type có thể không được garbage collector thu gom.
 
    .. note::
 
-      The :c:member:`~PyTypeObject.tp_traverse` function can be called from any
-      thread.
+      Hàm :c:member:`~PyTypeObject.tp_traverse` có thể được gọi từ bất kỳ thread nào.
 
    .. versionchanged:: 3.9
 
-      Heap-allocated types are expected to visit ``Py_TYPE(self)`` in
-      ``tp_traverse``.  In earlier versions of Python, due to
-      `bug 40217 <https://bugs.python.org/issue40217>`_, doing this
-      may lead to crashes in subclasses.
+      Các kiểu được cấp phát trên heap được kỳ vọng sẽ truy cập ``Py_TYPE(self)`` trong ``tp_traverse``. Trong các phiên bản Python trước đây, do `lỗi 40217 <https://bugs.python.org/issue40217>`_, việc này có thể dẫn đến sự cố trong các lớp con.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:macro:`Py_TPFLAGS_HAVE_GC`, :c:member:`~PyTypeObject.tp_traverse`, :c:member:`~PyTypeObject.tp_clear`
+   Nhóm: :c:macro:`Py_TPFLAGS_HAVE_GC`, :c:member:`~PyTypeObject.tp_traverse`, :c:member:`~PyTypeObject.tp_clear`
 
-   This field is inherited by subtypes together with :c:member:`~PyTypeObject.tp_clear` and the
-   :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit: the flag bit, :c:member:`~PyTypeObject.tp_traverse`, and
-   :c:member:`~PyTypeObject.tp_clear` are all inherited from the base type if they are all zero in
-   the subtype.
+   Trường này được các kiểu con kế thừa cùng với :c:member:`~PyTypeObject.tp_clear` và
+   bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC`: bit cờ, :c:member:`~PyTypeObject.tp_traverse`, và
+   :c:member:`~PyTypeObject.tp_clear` đều được kế thừa từ kiểu cơ sở nếu tất cả đều bằng 0 trong kiểu con.
 
 
 .. c:member:: inquiry PyTypeObject.tp_clear
 
    .. corresponding-type-slot:: Py_tp_clear
 
-   An optional pointer to a clear function.  The signature is::
+   Một con trỏ tùy chọn đến một hàm clear. Chữ ký của hàm là::
 
       int tp_clear(PyObject *);
 
-   The purpose of this function is to break reference cycles that are causing a
-   :term:`cyclic isolate` so that the objects can be safely destroyed.  A
-   cleared object is a partially destroyed object; the object is not obligated
-   to satisfy design invariants held during normal use.
+   Mục đích của hàm này là phá vỡ các chu kỳ tham chiếu đang gây ra một
+   :term:`cyclic isolate` để các đối tượng có thể được hủy an toàn. Một đối tượng đã được clear là một đối tượng đã bị hủy một phần; đối tượng đó không bắt buộc phải đáp ứng các bất biến thiết kế được duy trì trong quá trình sử dụng thông thường.
 
-   :c:member:`!tp_clear` does not need to delete references to objects that
-   can't participate in reference cycles, such as Python strings or Python
-   integers.  However, it may be convenient to clear all references, and write
-   the type's :c:member:`~PyTypeObject.tp_dealloc` function to invoke
-   :c:member:`!tp_clear` to avoid code duplication.  (Beware that
-   :c:member:`!tp_clear` might have already been called. Prefer calling
-   idempotent functions like :c:func:`Py_CLEAR`.)
+   :c:member:`!tp_clear` không cần xóa các tham chiếu đến những đối tượng không thể tham gia vào chu kỳ tham chiếu, chẳng hạn như chuỗi Python hoặc số nguyên Python. Tuy nhiên, việc clear tất cả các tham chiếu có thể thuận tiện, đồng thời viết hàm :c:member:`~PyTypeObject.tp_dealloc` của kiểu để gọi
+   :c:member:`!tp_clear` nhằm tránh trùng lặp mã. (Hãy lưu ý rằng
+   :c:member:`!tp_clear` có thể đã được gọi trước đó. Ưu tiên gọi các hàm idempotent như :c:func:`Py_CLEAR`.)
 
-   Any non-trivial cleanup should be performed in
-   :c:member:`~PyTypeObject.tp_finalize` instead of :c:member:`!tp_clear`.
+   Mọi thao tác dọn dẹp không tầm thường nên được thực hiện trong
+   :c:member:`~PyTypeObject.tp_finalize` thay vì :c:member:`!tp_clear`.
 
    .. note::
 
-      If :c:member:`!tp_clear` fails to break a reference cycle then the
-      objects in the :term:`cyclic isolate` may remain indefinitely
-      uncollectable ("leak").  See :data:`gc.garbage`.
+      Nếu :c:member:`!tp_clear` không phá vỡ được một chu trình tham chiếu thì các đối tượng trong :term:`cyclic isolate` có thể mãi mãi không thể được thu gom ("rò rỉ"). Xem :data:`gc.garbage`.
 
    .. note::
 
-      Referents (direct and indirect) might have already been cleared; they are
-      not guaranteed to be in a consistent state.
+      Các đối tượng được tham chiếu (trực tiếp và gián tiếp) có thể đã được dọn sạch; không đảm bảo chúng ở trạng thái nhất quán.
 
    .. note::
 
-      The :c:member:`~PyTypeObject.tp_clear` function can be called from any
-      thread.
+      Có thể gọi hàm :c:member:`~PyTypeObject.tp_clear` từ bất kỳ luồng nào.
 
    .. note::
 
-      An object is not guaranteed to be automatically cleared before its
-      destructor (:c:member:`~PyTypeObject.tp_dealloc`) is called.
+      Không đảm bảo một đối tượng sẽ được tự động dọn sạch trước khi trình hủy (:c:member:`~PyTypeObject.tp_dealloc`) của nó được gọi.
 
-   This function differs from the destructor
-   (:c:member:`~PyTypeObject.tp_dealloc`) in the following ways:
+   Hàm này khác với trình hủy (:c:member:`~PyTypeObject.tp_dealloc`) ở những điểm sau:
 
-   * The purpose of clearing an object is to remove references to other objects
-     that might participate in a reference cycle.  The purpose of the
-     destructor, on the other hand, is a superset: it must release *all*
-     resources it owns, including references to objects that cannot participate
-     in a reference cycle (e.g., integers) as well as the object's own memory
-     (by calling :c:member:`~PyTypeObject.tp_free`).
-   * When :c:member:`!tp_clear` is called, other objects might still hold
-     references to the object being cleared.  Because of this,
-     :c:member:`!tp_clear` must not deallocate the object's own memory
-     (:c:member:`~PyTypeObject.tp_free`).  The destructor, on the other hand,
-     is only called when no (strong) references exist, and as such, must
-     safely destroy the object itself by deallocating it.
-   * :c:member:`!tp_clear` might never be automatically called.  An object's
-     destructor, on the other hand, will be automatically called some time
-     after the object becomes unreachable (i.e., either there are no references
-     to the object or the object is a member of a :term:`cyclic isolate`).
+   * Mục đích của việc dọn sạch một đối tượng là loại bỏ các tham chiếu đến những đối tượng khác có thể tham gia vào một chu trình tham chiếu. Trong khi đó, mục đích của trình hủy rộng hơn: trình hủy phải giải phóng *tất cả* tài nguyên mà nó sở hữu, bao gồm các tham chiếu đến những đối tượng không thể tham gia vào một chu trình tham chiếu (ví dụ: số nguyên), cũng như bộ nhớ của chính đối tượng đó (bằng cách gọi :c:member:`~PyTypeObject.tp_free`).
+   * Khi :c:member:`!tp_clear` được gọi, các đối tượng khác vẫn có thể đang giữ tham chiếu đến đối tượng đang được dọn dẹp. Vì vậy,
+     :c:member:`!tp_clear` không được giải phóng bộ nhớ của chính đối tượng đó (:c:member:`~PyTypeObject.tp_free`). Ngược lại, destructor chỉ được gọi khi không còn tham chiếu (mạnh) nào tồn tại, nên nó phải hủy đối tượng đó một cách an toàn bằng cách giải phóng nó.
+   * :c:member:`!tp_clear` có thể không bao giờ được gọi tự động. Ngược lại, destructor của một đối tượng sẽ được gọi tự động vào một thời điểm nào đó sau khi đối tượng trở nên không thể truy cập (tức là không còn tham chiếu nào đến đối tượng hoặc đối tượng là thành viên của một :term:`cyclic isolate`).
 
-   No guarantees are made about when, if, or how often Python automatically
-   clears an object, except:
+   Không có đảm bảo nào về thời điểm, việc Python có tự động dọn dẹp một đối tượng hay không, hoặc tần suất thực hiện việc đó, ngoại trừ:
 
-   * Python will not automatically clear an object if it is reachable, i.e.,
-     there is a reference to it and it is not a member of a :term:`cyclic
-     isolate`.
-   * Python will not automatically clear an object if it has not been
-     automatically finalized (see :c:member:`~PyTypeObject.tp_finalize`).  (If
-     the finalizer resurrected the object, the object may or may not be
-     automatically finalized again before it is cleared.)
-   * If an object is a member of a :term:`cyclic isolate`, Python will not
-     automatically clear it if any member of the cyclic isolate has not yet
-     been automatically finalized (:c:member:`~PyTypeObject.tp_finalize`).
-   * Python will not destroy an object until after any automatic calls to its
-     :c:member:`!tp_clear` function have returned.  This ensures that the act
-     of breaking a reference cycle does not invalidate the ``self`` pointer
-     while :c:member:`!tp_clear` is still executing.
-   * Python will not automatically call :c:member:`!tp_clear` multiple times
-     concurrently.
+   * Python sẽ không tự động dọn dẹp một đối tượng nếu đối tượng đó vẫn có thể truy cập, tức là có một tham chiếu đến nó và nó không phải là thành viên của một :term:`cyclic isolate`.
+   * Python sẽ không tự động dọn dẹp một đối tượng nếu đối tượng đó chưa được tự động hoàn tất (xem :c:member:`~PyTypeObject.tp_finalize`). (Nếu finalizer làm đối tượng sống lại, đối tượng đó có thể được tự động hoàn tất lại hoặc không trước khi bị dọn dẹp.)
+   * Nếu một đối tượng là thành viên của một :term:`cyclic isolate`, Python sẽ không tự động dọn dẹp đối tượng đó nếu bất kỳ thành viên nào của cyclic isolate vẫn chưa được tự động hoàn tất (:c:member:`~PyTypeObject.tp_finalize`).
+   * Python sẽ không hủy một đối tượng cho đến sau khi mọi lời gọi tự động đến
+     hàm :c:member:`!tp_clear` đã trả về. Điều này bảo đảm rằng việc phá vỡ một chu kỳ tham chiếu không làm con trỏ ``self`` mất hiệu lực trong khi :c:member:`!tp_clear` vẫn đang thực thi.
+   * Python sẽ không tự động gọi :c:member:`!tp_clear` đồng thời nhiều lần.
 
-   CPython currently only automatically clears objects as needed to break
-   reference cycles in a :term:`cyclic isolate`, but future versions might
-   clear objects regularly before their destruction.
+   Hiện tại, CPython chỉ tự động dọn sạch các đối tượng khi cần để phá vỡ các chu kỳ tham chiếu trong một :term:`cyclic isolate`, nhưng các phiên bản tương lai có thể dọn sạch các đối tượng thường xuyên trước khi hủy chúng.
 
-   Taken together, all :c:member:`~PyTypeObject.tp_clear` functions in the
-   system must combine to break all reference cycles.  This is subtle, and if
-   in any doubt supply a :c:member:`~PyTypeObject.tp_clear` function.  For
-   example, the tuple type does not implement a
-   :c:member:`~PyTypeObject.tp_clear` function, because it's possible to prove
-   that no reference cycle can be composed entirely of tuples.  Therefore the
-   :c:member:`~PyTypeObject.tp_clear` functions of other types are responsible
-   for breaking any cycle containing a tuple.  This isn't immediately obvious,
-   and there's rarely a good reason to avoid implementing
+   Xét tổng thể, tất cả các hàm :c:member:`~PyTypeObject.tp_clear` trong hệ thống phải phối hợp để phá vỡ mọi chu kỳ tham chiếu. Điều này khá tinh tế, và nếu có bất kỳ nghi ngờ nào, hãy cung cấp một hàm :c:member:`~PyTypeObject.tp_clear`. Ví dụ, kiểu tuple không triển khai một
+   hàm :c:member:`~PyTypeObject.tp_clear`, vì có thể chứng minh rằng không có chu kỳ tham chiếu nào chỉ gồm các tuple. Do đó,
+   các hàm :c:member:`~PyTypeObject.tp_clear` của những kiểu khác chịu trách nhiệm phá vỡ mọi chu kỳ chứa tuple. Điều này không dễ nhận thấy ngay, và hiếm khi có lý do chính đáng để tránh triển khai
    :c:member:`~PyTypeObject.tp_clear`.
 
-   Implementations of :c:member:`~PyTypeObject.tp_clear` should drop the instance's references to
-   those of its members that may be Python objects, and set its pointers to those
-   members to ``NULL``, as in the following example::
+   Các triển khai của :c:member:`~PyTypeObject.tp_clear` nên loại bỏ các tham chiếu của instance đến những thành viên có thể là đối tượng Python, đồng thời đặt các con trỏ trỏ đến những thành viên đó thành ``NULL``, như trong ví dụ sau::
 
       static int
       local_clear(PyObject *op)
@@ -1763,775 +1419,596 @@ and :c:data:`PyType_Type` effectively act as defaults.)
           return 0;
       }
 
-   The :c:func:`Py_CLEAR` macro should be used, because clearing references is
-   delicate:  the reference to the contained object must not be released
-   (via :c:func:`Py_DECREF`) until
-   after the pointer to the contained object is set to ``NULL``.  This is because
-   releasing the reference may cause the contained object to become trash,
-   triggering a chain of reclamation activity that may include invoking arbitrary
-   Python code (due to finalizers, or weakref callbacks, associated with the
-   contained object). If it's possible for such code to reference *self* again,
-   it's important that the pointer to the contained object be ``NULL`` at that time,
-   so that *self* knows the contained object can no longer be used.  The
-   :c:func:`Py_CLEAR` macro performs the operations in a safe order.
+   Nên sử dụng macro :c:func:`Py_CLEAR`, vì việc xóa các tham chiếu rất dễ xảy ra lỗi: không được giải phóng tham chiếu đến đối tượng được chứa (thông qua :c:func:`Py_DECREF`) cho đến sau khi con trỏ trỏ đến đối tượng được chứa được đặt thành ``NULL``. Điều này là do việc giải phóng tham chiếu có thể khiến đối tượng được chứa trở thành rác, kích hoạt một chuỗi hoạt động thu hồi có thể bao gồm việc gọi mã Python tùy ý (do các finalizer hoặc weakref callback liên kết với đối tượng được chứa). Nếu mã như vậy có thể tham chiếu lại *self*, điều quan trọng là con trỏ trỏ đến đối tượng được chứa phải là ``NULL`` tại thời điểm đó, để *self* biết rằng đối tượng được chứa không còn được sử dụng. Hàm
+   macro :c:func:`Py_CLEAR` thực hiện các thao tác theo thứ tự an toàn.
 
-   If the :c:macro:`Py_TPFLAGS_MANAGED_DICT` bit is set in the
-   :c:member:`~PyTypeObject.tp_flags` field, the clear function must call
-   :c:func:`PyObject_ClearManagedDict` like this::
+   Nếu bit :c:macro:`Py_TPFLAGS_MANAGED_DICT` được đặt trong
+   đối với trường :c:member:`~PyTypeObject.tp_flags`, hàm clear phải gọi
+   :c:func:`PyObject_ClearManagedDict` như sau::
 
        PyObject_ClearManagedDict((PyObject*)self);
 
-   More information about Python's garbage collection scheme can be found in
-   section :ref:`supporting-cycle-detection`.
+   Có thể tìm thấy thêm thông tin về cơ chế thu gom rác của Python trong phần :ref:`supporting-cycle-detection`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:macro:`Py_TPFLAGS_HAVE_GC`, :c:member:`~PyTypeObject.tp_traverse`, :c:member:`~PyTypeObject.tp_clear`
+   Nhóm: :c:macro:`Py_TPFLAGS_HAVE_GC`, :c:member:`~PyTypeObject.tp_traverse`, :c:member:`~PyTypeObject.tp_clear`
 
-   This field is inherited by subtypes together with :c:member:`~PyTypeObject.tp_traverse` and the
-   :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit: the flag bit, :c:member:`~PyTypeObject.tp_traverse`, and
-   :c:member:`~PyTypeObject.tp_clear` are all inherited from the base type if they are all zero in
-   the subtype.
+   Trường này được các subtype kế thừa cùng với :c:member:`~PyTypeObject.tp_traverse` và
+   bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC`: bit cờ, :c:member:`~PyTypeObject.tp_traverse`, và
+   :c:member:`~PyTypeObject.tp_clear` đều được kế thừa từ kiểu cơ sở nếu tất cả đều bằng 0 trong kiểu con.
 
    .. seealso::
 
-      :ref:`life-cycle` for details about how this slot relates to other slots.
+      :ref:`life-cycle` để biết chi tiết về mối quan hệ của slot này với các slot khác.
 
 
 .. c:member:: richcmpfunc PyTypeObject.tp_richcompare
 
    .. corresponding-type-slot:: Py_tp_richcompare
 
-   An optional pointer to the rich comparison function, whose signature is::
+   Một con trỏ tùy chọn tới hàm rich comparison, có chữ ký là::
 
       PyObject *tp_richcompare(PyObject *self, PyObject *other, int op);
 
-   The first parameter is guaranteed to be an instance of the type
-   that is defined by :c:type:`PyTypeObject`.
+   Tham số đầu tiên được đảm bảo là một thể hiện của kiểu được định nghĩa bởi :c:type:`PyTypeObject`.
 
-   The function should return the result of the comparison (usually ``Py_True``
-   or ``Py_False``).  If the comparison is undefined, it must return
-   ``Py_NotImplemented``, if another error occurred it must return ``NULL`` and
-   set an exception condition.
+   Hàm này phải trả về kết quả của phép so sánh (thường là ``Py_True`` hoặc ``Py_False``). Nếu phép so sánh không được định nghĩa, hàm phải trả về ``Py_NotImplemented``; nếu xảy ra lỗi khác, hàm phải trả về ``NULL`` và thiết lập điều kiện ngoại lệ.
 
-   The following constants are defined to be used as the third argument for
-   :c:member:`~PyTypeObject.tp_richcompare` and for :c:func:`PyObject_RichCompare`:
+   Các hằng số sau đây được định nghĩa để sử dụng làm đối số thứ ba cho
+   :c:member:`~PyTypeObject.tp_richcompare` và :c:func:`PyObject_RichCompare`:
 
    .. c:namespace:: NULL
 
-   +--------------------+------------+
-   | Constant           | Comparison |
-   +====================+============+
-   | .. c:macro:: Py_LT | ``<``      |
-   +--------------------+------------+
-   | .. c:macro:: Py_LE | ``<=``     |
-   +--------------------+------------+
-   | .. c:macro:: Py_EQ | ``==``     |
-   +--------------------+------------+
-   | .. c:macro:: Py_NE | ``!=``     |
-   +--------------------+------------+
-   | .. c:macro:: Py_GT | ``>``      |
-   +--------------------+------------+
-   | .. c:macro:: Py_GE | ``>=``     |
-   +--------------------+------------+
+   +--------------------+--------------+
+   | Hằng số            | Phép so sánh |
+   +====================+==============+
+   | .. c:macro:: Py_LT | ``<``        |
+   +--------------------+--------------+
+   | .. c:macro:: Py_LE | ``<=``       |
+   +--------------------+--------------+
+   | .. c:macro:: Py_EQ | ``==``       |
+   +--------------------+--------------+
+   | .. c:macro:: Py_NE | ``!=``       |
+   +--------------------+--------------+
+   | .. c:macro:: Py_GT | ``>``        |
+   +--------------------+--------------+
+   | .. c:macro:: Py_GE | ``>=``       |
+   +--------------------+--------------+
 
-   The following macro is defined to ease writing rich comparison functions:
+   Macro sau đây được định nghĩa để hỗ trợ việc viết các hàm so sánh phong phú:
 
    .. c:macro:: Py_RETURN_RICHCOMPARE(VAL_A, VAL_B, op)
 
-      Return ``Py_True`` or ``Py_False`` from the function, depending on the
-      result of a comparison.
-      VAL_A and VAL_B must be orderable by C comparison operators (for example,
-      they may be C ints or floats). The third argument specifies the requested
-      operation, as for :c:func:`PyObject_RichCompare`.
+      Trả về ``Py_True`` hoặc ``Py_False`` từ hàm, tùy thuộc vào kết quả so sánh. VAL_A và VAL_B phải có thể được sắp thứ tự bằng các toán tử so sánh của C (ví dụ: chúng có thể là các số nguyên hoặc số thực của C). Đối số thứ ba chỉ định thao tác được yêu cầu, giống như trong :c:func:`PyObject_RichCompare`.
 
-      The returned value is a new :term:`strong reference`.
+      Giá trị được trả về là một :term:`strong reference` mới.
 
-      On error, sets an exception and returns ``NULL`` from the function.
+      Khi xảy ra lỗi, đặt một ngoại lệ và trả về ``NULL`` từ hàm.
 
       .. versionadded:: 3.7
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Group: :c:member:`~PyTypeObject.tp_hash`, :c:member:`~PyTypeObject.tp_richcompare`
+   Nhóm: :c:member:`~PyTypeObject.tp_hash`, :c:member:`~PyTypeObject.tp_richcompare`
 
-   This field is inherited by subtypes together with :c:member:`~PyTypeObject.tp_hash`:
-   a subtype inherits :c:member:`~PyTypeObject.tp_richcompare` and :c:member:`~PyTypeObject.tp_hash` when
-   the subtype's :c:member:`~PyTypeObject.tp_richcompare` and :c:member:`~PyTypeObject.tp_hash` are both
-   ``NULL``.
+   Trường này được các subtype kế thừa cùng với :c:member:`~PyTypeObject.tp_hash`: một subtype kế thừa :c:member:`~PyTypeObject.tp_richcompare` và :c:member:`~PyTypeObject.tp_hash` khi cả :c:member:`~PyTypeObject.tp_richcompare` và :c:member:`~PyTypeObject.tp_hash` của subtype đều là ``NULL``.
 
-   **Default:**
+   **Mặc định:**
 
-   :c:data:`PyBaseObject_Type` provides a :c:member:`~PyTypeObject.tp_richcompare`
-   implementation, which may be inherited.  However, if only
-   :c:member:`~PyTypeObject.tp_hash` is defined, not even the inherited function is used
-   and instances of the type will not be able to participate in any
-   comparisons.
+   :c:data:`PyBaseObject_Type` cung cấp một triển khai :c:member:`~PyTypeObject.tp_richcompare`, có thể được kế thừa. Tuy nhiên, nếu chỉ
+   :c:member:`~PyTypeObject.tp_hash` được định nghĩa thì ngay cả hàm được kế thừa cũng không được sử dụng, và các instance của type sẽ không thể tham gia vào bất kỳ phép so sánh nào.
 
 
 .. c:member:: Py_ssize_t PyTypeObject.tp_weaklistoffset
 
-   While this field is still supported, :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF`
-   should be used instead, if at all possible.
+   Mặc dù trường này vẫn được hỗ trợ, nên sử dụng :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` thay thế nếu có thể.
 
-   If the instances of this type are weakly referenceable, this field is greater
-   than zero and contains the offset in the instance structure of the weak
-   reference list head (ignoring the GC header, if present); this offset is used by
-   :c:func:`PyObject_ClearWeakRefs` and the ``PyWeakref_*`` functions.  The
-   instance structure needs to include a field of type :c:expr:`PyObject*` which is
-   initialized to ``NULL``.
+   Nếu các instance của type này có thể được tham chiếu yếu, trường này lớn hơn 0 và chứa offset trong cấu trúc instance của phần đầu danh sách tham chiếu yếu (bỏ qua phần header GC, nếu có); offset này được sử dụng bởi
+   :c:func:`PyObject_ClearWeakRefs` và các hàm ``PyWeakref_*``. Cấu trúc instance cần bao gồm một trường có kiểu :c:expr:`PyObject*`, được khởi tạo thành ``NULL``.
 
-   Do not confuse this field with :c:member:`~PyTypeObject.tp_weaklist`; that is the list head for
-   weak references to the type object itself.
+   Đừng nhầm trường này với :c:member:`~PyTypeObject.tp_weaklist`; đó là phần đầu danh sách các tham chiếu yếu đến chính đối tượng type.
 
-   It is an error to set both the :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` bit and
+   Việc đặt cả bit :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` và
    :c:member:`~PyTypeObject.tp_weaklistoffset`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes, but see the rules listed below. A subtype
-   may override this offset; this means that the subtype uses a different weak
-   reference list head than the base type.  Since the list head is always found via
-   :c:member:`~PyTypeObject.tp_weaklistoffset`, this should not be a problem.
+   Trường này được các subtype kế thừa, nhưng hãy xem các quy tắc được liệt kê bên dưới. Một subtype có thể ghi đè offset này; điều đó có nghĩa là subtype sử dụng phần đầu danh sách weak reference khác với kiểu cơ sở. Vì phần đầu danh sách luôn được tìm thấy thông qua
+   :c:member:`~PyTypeObject.tp_weaklistoffset`, nên đây không phải là vấn đề.
 
-   **Default:**
+   **Mặc định:**
 
-   If the :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` bit is set in the
-   :c:member:`~PyTypeObject.tp_flags` field, then
-   :c:member:`~PyTypeObject.tp_weaklistoffset` will be set to a negative value,
-   to indicate that it is unsafe to use this field.
+   Nếu bit :c:macro:`Py_TPFLAGS_MANAGED_WEAKREF` được đặt trong
+   trường :c:member:`~PyTypeObject.tp_flags`, thì
+   :c:member:`~PyTypeObject.tp_weaklistoffset` sẽ được đặt thành một giá trị âm để cho biết rằng việc sử dụng trường này là không an toàn.
 
 
 .. c:member:: getiterfunc PyTypeObject.tp_iter
 
    .. corresponding-type-slot:: Py_tp_iter
 
-   An optional pointer to a function that returns an :term:`iterator` for the
-   object.  Its presence normally signals that the instances of this type are
-   :term:`iterable` (although sequences may be iterable without this function).
+   Một con trỏ tùy chọn đến một hàm trả về một :term:`iterator` cho đối tượng. Việc nó tồn tại thường cho biết rằng các thể hiện của kiểu này là
+   :term:`iterable` (mặc dù các sequence có thể iterable mà không cần hàm này).
 
-   This function has the same signature as :c:func:`PyObject_GetIter`::
+   Hàm này có cùng chữ ký với :c:func:`PyObject_GetIter`::
 
       PyObject *tp_iter(PyObject *self);
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
 
 .. c:member:: iternextfunc PyTypeObject.tp_iternext
 
    .. corresponding-type-slot:: Py_tp_iternext
 
-   An optional pointer to a function that returns the next item in an
-   :term:`iterator`. The signature is::
+   Một con trỏ tùy chọn đến một hàm trả về mục tiếp theo trong một
+   :term:`iterator`. Chữ ký là::
 
       PyObject *tp_iternext(PyObject *self);
 
-   When the iterator is :term:`exhausted`, the ``tp_iternext`` function must
-   return ``NULL``; a :exc:`StopIteration` exception may or may not be set.
-   When another error occurs, it must return ``NULL`` too.
-   The presence of ``tp_iternext`` signals that the instances of this type are
-   iterators.
+   Khi iterator là :term:`exhausted`, hàm ``tp_iternext`` phải trả về ``NULL``; một exception :exc:`StopIteration` có thể được thiết lập hoặc không. Khi xảy ra một lỗi khác, hàm cũng phải trả về ``NULL``. Sự hiện diện của ``tp_iternext`` cho biết các instance của kiểu này là iterator.
 
-   Iterator types should also define the :c:member:`~PyTypeObject.tp_iter` function, and that
-   function should return the iterator instance itself (not a new iterator
-   instance).
+   Các kiểu iterator cũng nên định nghĩa hàm :c:member:`~PyTypeObject.tp_iter`, và hàm đó nên trả về chính instance iterator (không phải một instance iterator mới).
 
-   This function has the same signature as :c:func:`PyIter_Next`.
+   Hàm này có cùng signature với :c:func:`PyIter_Next`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
 
 .. c:member:: struct PyMethodDef* PyTypeObject.tp_methods
 
    .. corresponding-type-slot:: Py_tp_methods
 
-   An optional pointer to a static ``NULL``-terminated array of :c:type:`PyMethodDef`
-   structures, declaring regular methods of this type.
+   Một con trỏ tùy chọn trỏ đến một mảng tĩnh được kết thúc bằng ``NULL``, gồm các cấu trúc :c:type:`PyMethodDef`, khai báo các phương thức thông thường của kiểu này.
 
-   For each entry in the array, an entry is added to the type's dictionary (see
-   :c:member:`~PyTypeObject.tp_dict` below) containing a method descriptor.
+   Với mỗi mục trong mảng, một mục được thêm vào dictionary của kiểu (xem
+   :c:member:`~PyTypeObject.tp_dict` bên dưới) chứa một method descriptor.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes (methods are inherited through a
-   different mechanism).
+   Trường này không được kế thừa bởi các subtype (các method được kế thừa thông qua một cơ chế khác).
 
 
 .. c:member:: struct PyMemberDef* PyTypeObject.tp_members
 
    .. corresponding-type-slot:: Py_tp_members
 
-   An optional pointer to a static ``NULL``-terminated array of :c:type:`PyMemberDef`
-   structures, declaring regular data members (fields or slots) of instances of
-   this type.
+   Một con trỏ tùy chọn tới một mảng tĩnh được kết thúc bằng ``NULL``, gồm các cấu trúc :c:type:`PyMemberDef`, khai báo các thành viên dữ liệu thông thường (field hoặc slot) của các instance thuộc kiểu này.
 
-   For each entry in the array, an entry is added to the type's dictionary (see
-   :c:member:`~PyTypeObject.tp_dict` below) containing a member descriptor.
+   Với mỗi mục trong mảng, một mục được thêm vào dictionary của kiểu (xem
+   :c:member:`~PyTypeObject.tp_dict` bên dưới) chứa một member descriptor.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes (members are inherited through a
-   different mechanism).
+   Trường này không được kế thừa bởi các subtype (các member được kế thừa thông qua một cơ chế khác).
 
 
 .. c:member:: struct PyGetSetDef* PyTypeObject.tp_getset
 
    .. corresponding-type-slot:: Py_tp_getset
 
-   An optional pointer to a static ``NULL``-terminated array of :c:type:`PyGetSetDef`
-   structures, declaring computed attributes of instances of this type.
+   Một con trỏ tùy chọn tới một mảng tĩnh các cấu trúc :c:type:`PyGetSetDef` được kết thúc bằng ``NULL``, khai báo các thuộc tính được tính toán của các instance thuộc kiểu này.
 
-   For each entry in the array, an entry is added to the type's dictionary (see
-   :c:member:`~PyTypeObject.tp_dict` below) containing a getset descriptor.
+   Với mỗi mục trong mảng, một mục được thêm vào dictionary của kiểu (xem
+   :c:member:`~PyTypeObject.tp_dict` bên dưới) chứa một getset descriptor.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes (computed attributes are inherited
-   through a different mechanism).
+   Trường này không được kế thừa bởi các subtype (các thuộc tính được tính toán được kế thừa thông qua một cơ chế khác).
 
 
 .. c:member:: PyTypeObject* PyTypeObject.tp_base
 
    .. corresponding-type-slot:: Py_tp_base
 
-   An optional pointer to a base type from which type properties are inherited.  At
-   this level, only single inheritance is supported; multiple inheritance require
-   dynamically creating a type object by calling the metatype.
+   Một con trỏ tùy chọn tới một base type mà từ đó các thuộc tính của kiểu được kế thừa. Ở cấp độ này, chỉ hỗ trợ kế thừa đơn; kế thừa đa cần tạo động một type object bằng cách gọi metatype.
 
    .. note::
 
        .. from Modules/xxmodule.c
 
-       Slot initialization is subject to the rules of initializing globals.
-       C99 requires the initializers to be "address constants".  Function
-       designators like :c:func:`PyType_GenericNew`, with implicit conversion
-       to a pointer, are valid C99 address constants.
+       Việc khởi tạo slot tuân theo các quy tắc khởi tạo biến toàn cục. C99 yêu cầu các biểu thức khởi tạo phải là "hằng địa chỉ" (address constant). Các định danh hàm như :c:func:`PyType_GenericNew`, với phép chuyển đổi ngầm định thành con trỏ, là các hằng địa chỉ hợp lệ trong C99.
 
-       However, the unary '&' operator applied to a non-static variable
-       like :c:data:`PyBaseObject_Type` is not required to produce an address
-       constant.  Compilers may support this (gcc does), MSVC does not.
-       Both compilers are strictly standard conforming in this particular
-       behavior.
+       Tuy nhiên, toán tử một ngôi '&' áp dụng cho một biến không static như :c:data:`PyBaseObject_Type` không bắt buộc phải tạo ra một hằng địa chỉ. Trình biên dịch có thể hỗ trợ điều này (gcc có hỗ trợ), còn MSVC thì không. Cả hai trình biên dịch đều tuân thủ nghiêm ngặt tiêu chuẩn trong hành vi cụ thể này.
 
-       Consequently, :c:member:`~PyTypeObject.tp_base` should be set in
-       the extension module's init function.
+       Do đó, :c:member:`~PyTypeObject.tp_base` nên được thiết lập trong hàm khởi tạo của extension module.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes (obviously).
+   Rõ ràng, subtype không kế thừa field này.
 
-   **Default:**
+   **Mặc định:**
 
-   This field defaults to ``&PyBaseObject_Type`` (which to Python
-   programmers is known as the type :class:`object`).
+   Field này mặc định là ``&PyBaseObject_Type`` (được các lập trình viên Python biết đến là type :class:`object`).
 
 
 .. c:member:: PyObject* PyTypeObject.tp_dict
 
-   The type's dictionary is stored here by :c:func:`PyType_Ready`.
+   Từ điển của kiểu được lưu tại đây bởi :c:func:`PyType_Ready`.
 
-   This field should normally be initialized to ``NULL`` before PyType_Ready is
-   called; it may also be initialized to a dictionary containing initial attributes
-   for the type.  Once :c:func:`PyType_Ready` has initialized the type, extra
-   attributes for the type may be added to this dictionary only if they don't
-   correspond to overloaded operations (like :meth:`~object.__add__`).  Once
-   initialization for the type has finished, this field should be
-   treated as read-only.
+   Trường này thường phải được khởi tạo thành ``NULL`` trước khi gọi PyType_Ready; nó cũng có thể được khởi tạo thành một từ điển chứa các thuộc tính ban đầu cho kiểu. Sau khi :c:func:`PyType_Ready` đã khởi tạo kiểu, chỉ được thêm các thuộc tính bổ sung cho kiểu vào từ điển này nếu chúng không tương ứng với các thao tác nạp chồng (như :meth:`~object.__add__`). Sau khi hoàn tất việc khởi tạo kiểu, trường này phải được xem là chỉ đọc.
 
-   Some types may not store their dictionary in this slot.
-   Use :c:func:`PyType_GetDict` to retrieve the dictionary for an arbitrary
-   type.
+   Một số kiểu có thể không lưu từ điển của chúng trong slot này. Sử dụng :c:func:`PyType_GetDict` để lấy từ điển của một kiểu bất kỳ.
 
    .. versionchanged:: 3.12
 
-      Internals detail: For static builtin types, this is always ``NULL``.
-      Instead, the dict for such types is stored on ``PyInterpreterState``.
-      Use :c:func:`PyType_GetDict` to get the dict for an arbitrary type.
+      Chi tiết nội bộ: Đối với các kiểu dựng sẵn tĩnh, giá trị này luôn là ``NULL``. Thay vào đó, từ điển của các kiểu như vậy được lưu trên ``PyInterpreterState``. Sử dụng :c:func:`PyType_GetDict` để lấy từ điển của một kiểu bất kỳ.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited by subtypes (though the attributes defined in here
-   are inherited through a different mechanism).
+   Trường này không được kế thừa bởi các kiểu con (mặc dù các thuộc tính được định nghĩa trong trường này được kế thừa thông qua một cơ chế khác).
 
-   **Default:**
+   **Mặc định:**
 
-   If this field is ``NULL``, :c:func:`PyType_Ready` will assign a new
-   dictionary to it.
+   Nếu trường này là ``NULL``, :c:func:`PyType_Ready` sẽ gán một dictionary mới cho nó.
 
    .. warning::
 
-      It is not safe to use :c:func:`PyDict_SetItem` on or otherwise modify
-      :c:member:`~PyTypeObject.tp_dict` with the dictionary C-API.
+      Không an toàn khi sử dụng :c:func:`PyDict_SetItem` hoặc sửa đổi nó theo cách khác
+      :c:member:`~PyTypeObject.tp_dict` bằng dictionary C-API.
 
 
 .. c:member:: descrgetfunc PyTypeObject.tp_descr_get
 
    .. corresponding-type-slot:: Py_tp_descr_get
 
-   An optional pointer to a "descriptor get" function.
+   Một con trỏ tùy chọn tới hàm "descriptor get".
 
-   The function signature is::
+   Chữ ký hàm là::
 
       PyObject * tp_descr_get(PyObject *self, PyObject *obj, PyObject *type);
 
    .. XXX explain more?
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
 
 .. c:member:: descrsetfunc PyTypeObject.tp_descr_set
 
    .. corresponding-type-slot:: Py_tp_descr_set
 
-   An optional pointer to a function for setting and deleting
-   a descriptor's value.
+   Một con trỏ tùy chọn trỏ đến một hàm dùng để thiết lập và xóa giá trị của descriptor.
 
-   The function signature is::
+   Chữ ký hàm là::
 
       int tp_descr_set(PyObject *self, PyObject *obj, PyObject *value);
 
-   The *value* argument is set to ``NULL`` to delete the value.
+   Đối số *value* được đặt thành ``NULL`` để xóa giá trị.
 
    .. XXX explain more?
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
 
 .. c:member:: Py_ssize_t PyTypeObject.tp_dictoffset
 
-   While this field is still supported, :c:macro:`Py_TPFLAGS_MANAGED_DICT` should be
-   used instead, if at all possible.
+   Mặc dù trường này vẫn được hỗ trợ, nên sử dụng :c:macro:`Py_TPFLAGS_MANAGED_DICT` thay thế nếu có thể.
 
-   If the instances of this type have a dictionary containing instance variables,
-   this field is non-zero and contains the offset in the instances of the type of
-   the instance variable dictionary; this offset is used by
+   Nếu các instance của kiểu này có một dictionary chứa các biến instance, trường này khác không và chứa offset trong các instance của kiểu đối với dictionary biến instance; offset này được sử dụng bởi
    :c:func:`PyObject_GenericGetAttr`.
 
-   Do not confuse this field with :c:member:`~PyTypeObject.tp_dict`; that is the dictionary for
-   attributes of the type object itself.
+   Đừng nhầm trường này với :c:member:`~PyTypeObject.tp_dict`; đó là dictionary chứa các thuộc tính của chính đối tượng kiểu này.
 
-   The value specifies the offset of the dictionary from the start of the instance structure.
+   Giá trị này chỉ định độ lệch của dictionary tính từ đầu cấu trúc instance.
 
-   The :c:member:`~PyTypeObject.tp_dictoffset` should be regarded as write-only.
-   To get the pointer to the dictionary call :c:func:`PyObject_GenericGetDict`.
-   Calling :c:func:`PyObject_GenericGetDict` may need to allocate memory for the
-   dictionary, so it is may be more efficient to call :c:func:`PyObject_GetAttr`
-   when accessing an attribute on the object.
+   :c:member:`~PyTypeObject.tp_dictoffset` nên được xem là chỉ ghi. Để lấy con trỏ đến dictionary, hãy gọi :c:func:`PyObject_GenericGetDict`. Việc gọi :c:func:`PyObject_GenericGetDict` có thể cần cấp phát bộ nhớ cho dictionary, vì vậy có thể hiệu quả hơn nếu gọi :c:func:`PyObject_GetAttr` khi truy cập một thuộc tính trên đối tượng.
 
-   It is an error to set both the :c:macro:`Py_TPFLAGS_MANAGED_DICT` bit and
+   Sẽ xảy ra lỗi nếu đặt cả bit :c:macro:`Py_TPFLAGS_MANAGED_DICT` và
    :c:member:`~PyTypeObject.tp_dictoffset`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes. A subtype should not override this offset;
-   doing so could be unsafe, if C code tries to access the dictionary at the
-   previous offset.
-   To properly support inheritance, use :c:macro:`Py_TPFLAGS_MANAGED_DICT`.
+   Trường này được các subtype kế thừa. Một subtype không nên ghi đè độ lệch này; làm vậy có thể không an toàn nếu mã C cố truy cập dictionary tại độ lệch trước đó. Để hỗ trợ kế thừa đúng cách, hãy sử dụng :c:macro:`Py_TPFLAGS_MANAGED_DICT`.
 
-   **Default:**
+   **Mặc định:**
 
-   This slot has no default.  For :ref:`static types <static-types>`, if the
-   field is ``NULL`` then no :attr:`~object.__dict__` gets created for instances.
+   Slot này không có giá trị mặc định. Đối với :ref:`các kiểu static <static-types>`, nếu trường là ``NULL`` thì sẽ không tạo :attr:`~object.__dict__` nào cho các instance.
 
-   If the :c:macro:`Py_TPFLAGS_MANAGED_DICT` bit is set in the
-   :c:member:`~PyTypeObject.tp_flags` field, then
-   :c:member:`~PyTypeObject.tp_dictoffset` will be set to ``-1``, to indicate
-   that it is unsafe to use this field.
+   Nếu bit :c:macro:`Py_TPFLAGS_MANAGED_DICT` được đặt trong
+   trường :c:member:`~PyTypeObject.tp_flags`, thì
+   :c:member:`~PyTypeObject.tp_dictoffset` sẽ được đặt thành ``-1``, để cho biết rằng việc sử dụng trường này là không an toàn.
 
 
 .. c:member:: initproc PyTypeObject.tp_init
 
    .. corresponding-type-slot:: Py_tp_init
 
-   An optional pointer to an instance initialization function.
+   Một con trỏ tùy chọn đến hàm khởi tạo instance.
 
-   This function corresponds to the :meth:`~object.__init__` method of classes.  Like
-   :meth:`!__init__`, it is possible to create an instance without calling
-   :meth:`!__init__`, and it is possible to reinitialize an instance by calling its
-   :meth:`!__init__` method again.
+   Hàm này tương ứng với phương thức :meth:`~object.__init__` của các lớp. Giống như
+   :meth:`!__init__`, có thể tạo một instance mà không gọi
+   :meth:`!__init__`, và có thể khởi tạo lại một instance bằng cách gọi
+   lại phương thức :meth:`!__init__`.
 
-   The function signature is::
+   Chữ ký hàm là::
 
       int tp_init(PyObject *self, PyObject *args, PyObject *kwds);
 
-   The self argument is the instance to be initialized; the *args* and *kwds*
-   arguments represent positional and keyword arguments of the call to
+   Đối số self là instance cần được khởi tạo; các đối số *args* và *kwds* đại diện cho các đối số positional và keyword của lệnh gọi đến
    :meth:`~object.__init__`.
 
-   The :c:member:`~PyTypeObject.tp_init` function, if not ``NULL``, is called when an instance is
-   created normally by calling its type, after the type's :c:member:`~PyTypeObject.tp_new` function
-   has returned an instance of the type.  If the :c:member:`~PyTypeObject.tp_new` function returns an
-   instance of some other type that is not a subtype of the original type, no
-   :c:member:`~PyTypeObject.tp_init` function is called; if :c:member:`~PyTypeObject.tp_new` returns an instance of a
-   subtype of the original type, the subtype's :c:member:`~PyTypeObject.tp_init` is called.
+   Hàm :c:member:`~PyTypeObject.tp_init`, nếu không phải là ``NULL``, được gọi khi một instance được tạo theo cách thông thường bằng cách gọi type của nó, sau khi hàm :c:member:`~PyTypeObject.tp_new` của type đã trả về một instance thuộc type đó. Nếu hàm :c:member:`~PyTypeObject.tp_new` trả về một instance thuộc một type khác không phải là subtype của type ban đầu, thì không có
+   hàm :c:member:`~PyTypeObject.tp_init` nào được gọi; nếu :c:member:`~PyTypeObject.tp_new` trả về một instance thuộc subtype của type ban đầu, :c:member:`~PyTypeObject.tp_init` của subtype sẽ được gọi.
 
-   Returns ``0`` on success, ``-1`` and sets an exception on error.
+   Trả về ``0`` khi thành công, trả về ``-1`` và đặt một exception khi có lỗi.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
-   **Default:**
+   **Mặc định:**
 
-   For :ref:`static types <static-types>` this field does not have a default.
+   Đối với :ref:`static types <static-types>`, trường này không có giá trị mặc định.
 
 
 .. c:member:: allocfunc PyTypeObject.tp_alloc
 
    .. corresponding-type-slot:: Py_tp_alloc
 
-   An optional pointer to an instance allocation function.
+   Một con trỏ tùy chọn đến hàm cấp phát instance.
 
-   The function signature is::
+   Chữ ký hàm là::
 
       PyObject *tp_alloc(PyTypeObject *self, Py_ssize_t nitems);
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Static subtypes inherit this slot, which will be
-   :c:func:`PyType_GenericAlloc` if inherited from :class:`object`.
+   Các subtype tĩnh kế thừa slot này, slot này sẽ là
+   :c:func:`PyType_GenericAlloc` nếu được kế thừa từ :class:`object`.
 
-   :ref:`Heap subtypes <heap-types>` do not inherit this slot.
+   :ref:`Các heap subtype <heap-types>` không kế thừa slot này.
 
-   **Default:**
+   **Mặc định:**
 
-   For heap subtypes, this field is always set to
+   Đối với các heap subtype, trường này luôn được thiết lập thành
    :c:func:`PyType_GenericAlloc`.
 
-   For static subtypes, this slot is inherited (see above).
+   Đối với các subtype tĩnh, slot này được kế thừa (xem ở trên).
 
 
 .. c:member:: newfunc PyTypeObject.tp_new
 
    .. corresponding-type-slot:: Py_tp_new
 
-   An optional pointer to an instance creation function.
+   Một con trỏ tùy chọn đến hàm tạo instance.
 
-   The function signature is::
+   Chữ ký hàm là::
 
       PyObject *tp_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds);
 
-   The *subtype* argument is the type of the object being created; the *args* and
-   *kwds* arguments represent positional and keyword arguments of the call to the
-   type.  Note that *subtype* doesn't have to equal the type whose :c:member:`~PyTypeObject.tp_new`
-   function is called; it may be a subtype of that type (but not an unrelated
-   type).
+   Đối số *subtype* là kiểu của đối tượng đang được tạo; các đối số *args* và *kwds* lần lượt biểu diễn các đối số vị trí và đối số từ khóa của lệnh gọi đến kiểu đó. Lưu ý rằng *subtype* không nhất thiết phải bằng kiểu có :c:member:`~PyTypeObject.tp_new` được gọi; nó có thể là một subtype của kiểu đó (nhưng không thể là một kiểu không liên quan).
 
-   The :c:member:`~PyTypeObject.tp_new` function should call ``subtype->tp_alloc(subtype, nitems)``
-   to allocate space for the object, and then do only as much further
-   initialization as is absolutely necessary.  Initialization that can safely be
-   ignored or repeated should be placed in the :c:member:`~PyTypeObject.tp_init` handler.  A good
-   rule of thumb is that for immutable types, all initialization should take place
-   in :c:member:`~PyTypeObject.tp_new`, while for mutable types, most initialization should be
-   deferred to :c:member:`~PyTypeObject.tp_init`.
+   Hàm :c:member:`~PyTypeObject.tp_new` nên gọi ``subtype->tp_alloc(subtype, nitems)`` để cấp phát không gian cho đối tượng, sau đó chỉ thực hiện thêm phần khởi tạo cần thiết tuyệt đối. Phần khởi tạo có thể được bỏ qua hoặc lặp lại một cách an toàn nên được đặt trong handler :c:member:`~PyTypeObject.tp_init`. Một quy tắc kinh nghiệm hữu ích là với các kiểu bất biến, toàn bộ quá trình khởi tạo nên diễn ra trong :c:member:`~PyTypeObject.tp_new`, còn với các kiểu khả biến, phần lớn quá trình khởi tạo nên được trì hoãn đến :c:member:`~PyTypeObject.tp_init`.
 
-   Set the :c:macro:`Py_TPFLAGS_DISALLOW_INSTANTIATION` flag to disallow creating
-   instances of the type in Python.
+   Đặt cờ :c:macro:`Py_TPFLAGS_DISALLOW_INSTANTIATION` để không cho phép tạo các instance của kiểu này trong Python.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes, except it is not inherited by
-   :ref:`static types <static-types>` whose :c:member:`~PyTypeObject.tp_base`
-   is ``NULL`` or ``&PyBaseObject_Type``.
+   Trường này được kế thừa bởi các subtype, ngoại trừ không được kế thừa bởi
+   :ref:`static types <static-types>` có :c:member:`~PyTypeObject.tp_base` là ``NULL`` hoặc ``&PyBaseObject_Type``.
 
-   **Default:**
+   **Mặc định:**
 
-   For :ref:`static types <static-types>` this field has no default.
-   This means if the slot is defined as ``NULL``, the type cannot be called
-   to create new instances; presumably there is some other way to create
-   instances, like a factory function.
+   Đối với :ref:`các kiểu static <static-types>`, trường này không có giá trị mặc định. Điều này có nghĩa là nếu slot được định nghĩa là ``NULL``, thì không thể gọi kiểu này để tạo các instance mới; có lẽ có một cách khác để tạo instance, chẳng hạn như một factory function.
 
 
 .. c:member:: freefunc PyTypeObject.tp_free
 
    .. corresponding-type-slot:: Py_tp_free
 
-   An optional pointer to an instance deallocation function.  Its signature is::
+   Một con trỏ tùy chọn đến hàm giải phóng instance. Chữ ký của hàm là::
 
       void tp_free(void *self);
 
-   This function must free the memory allocated by
+   Hàm này phải giải phóng vùng nhớ được cấp phát bởi
    :c:member:`~PyTypeObject.tp_alloc`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   Static subtypes inherit this slot, which will be :c:func:`PyObject_Free` if
-   inherited from :class:`object`.  Exception: If the type supports garbage
-   collection (i.e., the :c:macro:`Py_TPFLAGS_HAVE_GC` flag is set in
-   :c:member:`~PyTypeObject.tp_flags`) and it would inherit
-   :c:func:`PyObject_Free`, then this slot is not inherited but instead defaults
-   to :c:func:`PyObject_GC_Del`.
+   Các kiểu con static kế thừa slot này, slot sẽ là :c:func:`PyObject_Free` nếu được kế thừa từ :class:`object`. Ngoại lệ: Nếu kiểu hỗ trợ garbage collection (tức là cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được thiết lập trong
+   :c:member:`~PyTypeObject.tp_flags`) và nó sẽ kế thừa
+   :c:func:`PyObject_Free`, sau đó slot này không được kế thừa mà thay vào đó mặc định là :c:func:`PyObject_GC_Del`.
 
-   :ref:`Heap subtypes <heap-types>` do not inherit this slot.
+   :ref:`Các heap subtype <heap-types>` không kế thừa slot này.
 
-   **Default:**
+   **Mặc định:**
 
-   For :ref:`heap subtypes <heap-types>`, this slot defaults to a deallocator suitable to match
-   :c:func:`PyType_GenericAlloc` and the value of the
-   :c:macro:`Py_TPFLAGS_HAVE_GC` flag.
+   Đối với :ref:`heap subtypes <heap-types>`, slot này mặc định là một deallocator phù hợp để khớp với
+   :c:func:`PyType_GenericAlloc` và giá trị của
+   cờ :c:macro:`Py_TPFLAGS_HAVE_GC`.
 
-   For static subtypes, this slot is inherited (see above).
+   Đối với các subtype tĩnh, slot này được kế thừa (xem ở trên).
 
 
 .. c:member:: inquiry PyTypeObject.tp_is_gc
 
    .. corresponding-type-slot:: Py_tp_is_gc
 
-   An optional pointer to a function called by the garbage collector.
+   Một con trỏ tùy chọn đến một hàm được bộ thu gom rác gọi.
 
-   The garbage collector needs to know whether a particular object is collectible
-   or not.  Normally, it is sufficient to look at the object's type's
-   :c:member:`~PyTypeObject.tp_flags` field, and check the :c:macro:`Py_TPFLAGS_HAVE_GC` flag bit.  But
-   some types have a mixture of statically and dynamically allocated instances, and
-   the statically allocated instances are not collectible.  Such types should
-   define this function; it should return ``1`` for a collectible instance, and
-   ``0`` for a non-collectible instance. The signature is::
+   Bộ thu gom rác cần biết một đối tượng cụ thể có thể được thu gom hay không. Thông thường, chỉ cần xem trường của kiểu đối tượng
+   :c:member:`~PyTypeObject.tp_flags` và kiểm tra bit cờ :c:macro:`Py_TPFLAGS_HAVE_GC`. Tuy nhiên, một số kiểu có các thực thể được cấp phát tĩnh và động lẫn lộn, trong đó các thực thể được cấp phát tĩnh không thể được thu gom. Những kiểu như vậy nên định nghĩa hàm này; hàm phải trả về ``1`` cho một thực thể có thể được thu gom và ``0`` cho một thực thể không thể được thu gom. Chữ ký là::
 
       int tp_is_gc(PyObject *self);
 
-   (The only example of this are types themselves.  The metatype,
-   :c:data:`PyType_Type`, defines this function to distinguish between statically
-   and :ref:`dynamically allocated types <heap-types>`.)
+   (Ví dụ duy nhất về trường hợp này là chính các kiểu. Metatype,
+   :c:data:`PyType_Type`, định nghĩa hàm này để phân biệt giữa các kiểu được cấp phát tĩnh và :ref:`các kiểu được cấp phát động <heap-types>`.)
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
-   **Default:**
+   **Mặc định:**
 
-   This slot has no default.  If this field is ``NULL``,
-   :c:macro:`Py_TPFLAGS_HAVE_GC` is used as the functional equivalent.
+   Slot này không có giá trị mặc định. Nếu trường này là ``NULL``,
+   :c:macro:`Py_TPFLAGS_HAVE_GC` được sử dụng như phần tương đương về chức năng.
 
 
 .. c:member:: PyObject* PyTypeObject.tp_bases
 
    .. corresponding-type-slot:: Py_tp_bases
 
-   Tuple of base types.
+   Tuple chứa các kiểu cơ sở.
 
-   This field should be set to ``NULL`` and treated as read-only.
-   Python will fill it in when the type is :c:func:`initialized <PyType_Ready>`.
+   Trường này nên được đặt thành ``NULL`` và được coi là chỉ đọc. Python sẽ điền giá trị vào khi kiểu được :c:func:`khởi tạo <PyType_Ready>`.
 
-   For dynamically created classes, the :c:data:`Py_tp_bases`
-   :c:type:`slot <PyType_Slot>` can be used instead of the *bases* argument
-   of :c:func:`PyType_FromSpecWithBases`.
-   The argument form is preferred.
+   Đối với các lớp được tạo động, :c:data:`Py_tp_bases`
+   :c:type:`slot <PyType_Slot>` có thể được sử dụng thay cho đối số *bases* của :c:func:`PyType_FromSpecWithBases`. Dạng đối số được ưu tiên.
 
    .. warning::
 
-      Multiple inheritance does not work well for statically defined types.
-      If you set ``tp_bases`` to a tuple, Python will not raise an error,
-      but some slots will only be inherited from the first base.
+      Đa kế thừa không hoạt động tốt đối với các kiểu được định nghĩa tĩnh. Nếu đặt ``tp_bases`` thành một tuple, Python sẽ không báo lỗi, nhưng một số slot sẽ chỉ được kế thừa từ lớp cơ sở đầu tiên.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited.
+   Trường này không được kế thừa.
 
 
 .. c:member:: PyObject* PyTypeObject.tp_mro
 
-   Tuple containing the expanded set of base types, starting with the type itself
-   and ending with :class:`object`, in Method Resolution Order.
+   Tuple chứa tập hợp mở rộng của các kiểu cơ sở, bắt đầu bằng chính kiểu đó và kết thúc bằng :class:`object`, theo Thứ tự phân giải phương thức (Method Resolution Order).
 
-   This field should be set to ``NULL`` and treated as read-only.
-   Python will fill it in when the type is :c:func:`initialized <PyType_Ready>`.
+   Trường này nên được đặt thành ``NULL`` và được coi là chỉ đọc. Python sẽ điền giá trị vào khi kiểu được :c:func:`khởi tạo <PyType_Ready>`.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited; it is calculated fresh by
+   Trường này không được kế thừa; nó được tính toán lại bởi
    :c:func:`PyType_Ready`.
 
 
 .. c:member:: PyObject* PyTypeObject.tp_cache
 
-   Unused.  Internal use only.
+   Không được sử dụng. Chỉ dùng nội bộ.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited.
+   Trường này không được kế thừa.
 
 
 .. c:member:: void* PyTypeObject.tp_subclasses
 
-   A collection of subclasses.  Internal use only.  May be an invalid pointer.
+   Một tập hợp các lớp con. Chỉ dùng nội bộ. Có thể là một con trỏ không hợp lệ.
 
-   To get a list of subclasses, call the Python method
+   Để lấy danh sách các lớp con, hãy gọi phương thức Python
    :py:meth:`~type.__subclasses__`.
 
    .. versionchanged:: 3.12
 
-      For some types, this field does not hold a valid :c:expr:`PyObject*`.
-      The type was changed to :c:expr:`void*` to indicate this.
+      Đối với một số kiểu, trường này không chứa :c:expr:`PyObject*` hợp lệ. Kiểu này đã được thay đổi thành :c:expr:`void*` để biểu thị điều đó.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited.
+   Trường này không được kế thừa.
 
 
 .. c:member:: PyObject* PyTypeObject.tp_weaklist
 
-   Weak reference list head, for weak references to this type object.  Not
-   inherited.  Internal use only.
+   Đầu danh sách tham chiếu yếu cho các tham chiếu yếu đến đối tượng kiểu này. Không được kế thừa. Chỉ dùng nội bộ.
 
    .. versionchanged:: 3.12
 
-      Internals detail: For the static builtin types this is always ``NULL``,
-      even if weakrefs are added.  Instead, the weakrefs for each are stored
-      on ``PyInterpreterState``.  Use the public C-API or the internal
-      ``_PyObject_GET_WEAKREFS_LISTPTR()`` macro to avoid the distinction.
+      Chi tiết nội bộ: Đối với các kiểu dựng sẵn tĩnh, giá trị này luôn là ``NULL``, ngay cả khi có thêm các tham chiếu yếu. Thay vào đó, các tham chiếu yếu của từng kiểu được lưu trên ``PyInterpreterState``. Sử dụng C-API công khai hoặc macro ``_PyObject_GET_WEAKREFS_LISTPTR()`` nội bộ để tránh sự khác biệt này.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited.
+   Trường này không được kế thừa.
 
 
 .. c:member:: destructor PyTypeObject.tp_del
 
    .. corresponding-type-slot:: Py_tp_del
 
-   This field is deprecated.  Use :c:member:`~PyTypeObject.tp_finalize` instead.
+   Trường này đã lỗi thời. Thay vào đó, hãy sử dụng :c:member:`~PyTypeObject.tp_finalize`.
 
 
 .. c:member:: unsigned int PyTypeObject.tp_version_tag
 
-   Used to index into the method cache.  Internal use only.
+   Được dùng để lập chỉ mục vào bộ nhớ đệm phương thức. Chỉ dùng nội bộ.
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is not inherited.
+   Trường này không được kế thừa.
 
 
 .. c:member:: destructor PyTypeObject.tp_finalize
 
    .. corresponding-type-slot:: Py_tp_finalize
 
-   An optional pointer to an instance finalization function.  This is the C
-   implementation of the :meth:`~object.__del__` special method.  Its signature
-   is::
+   Một con trỏ tùy chọn đến hàm hoàn tất một instance. Đây là phần triển khai bằng C của special method :meth:`~object.__del__`. Chữ ký của hàm là::
 
       void tp_finalize(PyObject *self);
 
-   The primary purpose of finalization is to perform any non-trivial cleanup
-   that must be performed before the object is destroyed, while the object and
-   any other objects it directly or indirectly references are still in a
-   consistent state.  The finalizer is allowed to execute
-   arbitrary Python code.
+   Mục đích chính của việc hoàn tất là thực hiện mọi thao tác dọn dẹp phức tạp cần được thực hiện trước khi đối tượng bị hủy, trong khi đối tượng đó và mọi đối tượng khác mà nó tham chiếu trực tiếp hoặc gián tiếp vẫn còn ở trạng thái nhất quán. Hàm hoàn tất được phép thực thi mã Python tùy ý.
 
-   Before Python automatically finalizes an object, some of the object's direct
-   or indirect referents might have themselves been automatically finalized.
-   However, none of the referents will have been automatically cleared
-   (:c:member:`~PyTypeObject.tp_clear`) yet.
+   Trước khi Python tự động hoàn tất một đối tượng, một số đối tượng được đối tượng đó tham chiếu trực tiếp hoặc gián tiếp có thể đã được tự động hoàn tất. Tuy nhiên, chưa có đối tượng được tham chiếu nào bị tự động xóa liên kết (:c:member:`~PyTypeObject.tp_clear`) tại thời điểm đó.
 
-   Other non-finalized objects might still be using a finalized object, so the
-   finalizer must leave the object in a sane state (e.g., invariants are still
-   met).
+   Các đối tượng khác chưa được hoàn tất có thể vẫn đang sử dụng một đối tượng đã được hoàn tất, vì vậy hàm hoàn tất phải để đối tượng ở trạng thái hợp lệ (ví dụ: các bất biến vẫn được đảm bảo).
 
    .. note::
 
-      After Python automatically finalizes an object, Python might start
-      automatically clearing (:c:member:`~PyTypeObject.tp_clear`) the object
-      and its referents (direct and indirect).  Cleared objects are not
-      guaranteed to be in a consistent state; a finalized object must be able
-      to tolerate cleared referents.
+      Sau khi Python tự động hoàn tất một đối tượng, Python có thể bắt đầu tự động xóa liên kết (:c:member:`~PyTypeObject.tp_clear`) của đối tượng đó và các đối tượng được nó tham chiếu (trực tiếp và gián tiếp). Không thể đảm bảo các đối tượng đã bị xóa liên kết còn ở trạng thái nhất quán; một đối tượng đã được hoàn tất phải có khả năng chịu được việc các đối tượng được nó tham chiếu đã bị xóa liên kết.
 
    .. note::
 
-      An object is not guaranteed to be automatically finalized before its
-      destructor (:c:member:`~PyTypeObject.tp_dealloc`) is called.  It is
-      recommended to call :c:func:`PyObject_CallFinalizerFromDealloc` at the
-      beginning of :c:member:`!tp_dealloc` to guarantee that the object is
-      always finalized before destruction.
+      Một đối tượng không được đảm bảo sẽ tự động hoàn tất trước khi hàm hủy (:c:member:`~PyTypeObject.tp_dealloc`) của nó được gọi. Bạn nên gọi :c:func:`PyObject_CallFinalizerFromDealloc` ở đầu :c:member:`!tp_dealloc` để đảm bảo đối tượng luôn được hoàn tất trước khi bị hủy.
 
    .. note::
 
-      The :c:member:`~PyTypeObject.tp_finalize` function can be called from any
-      thread, although the :term:`GIL` will be held.
+      Có thể gọi hàm :c:member:`~PyTypeObject.tp_finalize` từ bất kỳ thread nào, mặc dù :term:`GIL` sẽ được giữ.
 
    .. note::
 
-      The :c:member:`!tp_finalize` function can be called during shutdown,
-      after some global variables have been deleted.  See the documentation of
-      the :meth:`~object.__del__` method for details.
+      Có thể gọi hàm :c:member:`!tp_finalize` trong quá trình shutdown, sau khi một số biến toàn cục đã bị xóa. Xem tài liệu về phương thức :meth:`~object.__del__` để biết chi tiết.
 
-   When Python finalizes an object, it behaves like the following algorithm:
+   Khi Python hoàn tất một đối tượng, nó hoạt động theo thuật toán sau:
 
-   #. Python might mark the object as *finalized*.  Currently, Python always
-      marks objects whose type supports garbage collection (i.e., the
-      :c:macro:`Py_TPFLAGS_HAVE_GC` flag is set in
-      :c:member:`~PyTypeObject.tp_flags`) and never marks other types of
-      objects; this might change in a future version.
-   #. If the object is not marked as *finalized* and its
-      :c:member:`!tp_finalize` finalizer function is non-``NULL``, the
-      finalizer function is called.
-   #. If the finalizer function was called and the finalizer made the object
-      reachable (i.e., there is a reference to the object and it is not a
-      member of a :term:`cyclic isolate`), then the finalizer is said to have
-      *resurrected* the object.  It is unspecified whether the finalizer can
-      also resurrect the object by adding a new reference to the object that
-      does not make it reachable, i.e., the object is (still) a member of a
-      cyclic isolate.
-   #. If the finalizer resurrected the object, the object's pending destruction
-      is canceled and the object's *finalized* mark might be removed if
-      present.  Currently, Python never removes the *finalized* mark; this
-      might change in a future version.
+   #. Python có thể đánh dấu đối tượng là *đã hoàn tất*. Hiện tại, Python luôn đánh dấu các đối tượng có kiểu hỗ trợ garbage collection (tức là
+      cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được đặt trong
+      :c:member:`~PyTypeObject.tp_flags`) và không bao giờ đánh dấu các kiểu đối tượng khác; điều này có thể thay đổi trong phiên bản tương lai.
+   #. Nếu đối tượng không được đánh dấu là *đã hoàn tất* và hàm finalizer của nó
+      :c:member:`!tp_finalize` hàm finalizer không phải là ``NULL``, hàm finalizer sẽ được gọi.
+   #. Nếu hàm finalizer đã được gọi và hàm finalizer khiến đối tượng trở nên có thể truy cập được (tức là có một tham chiếu đến đối tượng và đối tượng đó không phải là thành viên của một :term:`cyclic isolate`), thì hàm finalizer được cho là đã *hồi sinh* đối tượng. Không xác định được liệu hàm finalizer có thể hồi sinh đối tượng bằng cách thêm một tham chiếu mới đến đối tượng nhưng không khiến đối tượng đó có thể truy cập được hay không, tức là đối tượng vẫn là thành viên của một isolated cycle.
+   #. Nếu hàm finalizer đã hồi sinh đối tượng, việc hủy đối tượng đang chờ xử lý sẽ bị hủy và dấu *đã hoàn tất* của đối tượng có thể bị xóa nếu tồn tại. Hiện tại, Python không bao giờ xóa dấu *đã hoàn tất*; điều này có thể thay đổi trong phiên bản tương lai.
 
-   *Automatic finalization* refers to any finalization performed by Python
-   except via calls to :c:func:`PyObject_CallFinalizer` or
-   :c:func:`PyObject_CallFinalizerFromDealloc`.  No guarantees are made about
-   when, if, or how often an object is automatically finalized, except:
+   *Việc hoàn tất tự động* đề cập đến mọi hoạt động hoàn tất do Python thực hiện, ngoại trừ thông qua các lệnh gọi đến :c:func:`PyObject_CallFinalizer` hoặc
+   :c:func:`PyObject_CallFinalizerFromDealloc`. Không có bảo đảm nào về thời điểm, việc có thực hiện hay không, hoặc số lần một đối tượng được hoàn tất tự động, ngoại trừ:
 
-   * Python will not automatically finalize an object if it is reachable, i.e.,
-     there is a reference to it and it is not a member of a :term:`cyclic
-     isolate`.
-   * Python will not automatically finalize an object if finalizing it would
-     not mark the object as *finalized*.  Currently, this applies to objects
-     whose type does not support garbage collection, i.e., the
-     :c:macro:`Py_TPFLAGS_HAVE_GC` flag is not set.  Such objects can still be
-     manually finalized by calling :c:func:`PyObject_CallFinalizer` or
+   * Python sẽ không tự động hoàn tất một đối tượng nếu đối tượng đó có thể truy cập được, tức là có một tham chiếu đến đối tượng và đối tượng đó không phải là thành viên của một :term:`cyclic isolate`.
+   * Python sẽ không tự động hoàn tất một đối tượng nếu việc hoàn tất đối tượng đó không khiến đối tượng được đánh dấu là *finalized*. Hiện tại, điều này áp dụng cho các đối tượng có kiểu không hỗ trợ thu gom rác, tức là
+     cờ :c:macro:`Py_TPFLAGS_HAVE_GC` không được đặt. Những đối tượng như vậy vẫn có thể được hoàn tất thủ công bằng cách gọi :c:func:`PyObject_CallFinalizer` hoặc
      :c:func:`PyObject_CallFinalizerFromDealloc`.
-   * Python will not automatically finalize any two members of a :term:`cyclic
-     isolate` concurrently.
-   * Python will not automatically finalize an object after it has
-     automatically cleared (:c:member:`~PyTypeObject.tp_clear`) the object.
-   * If an object is a member of a :term:`cyclic isolate`, Python will not
-     automatically finalize it after automatically clearing (see
-     :c:member:`~PyTypeObject.tp_clear`) any other member.
-   * Python will automatically finalize every member of a :term:`cyclic
-     isolate` before it automatically clears (see
-     :c:member:`~PyTypeObject.tp_clear`) any of them.
-   * If Python is going to automatically clear an object
-     (:c:member:`~PyTypeObject.tp_clear`), it will automatically finalize the
-     object first.
+   * Python sẽ không tự động hoàn tất đồng thời bất kỳ hai thành viên nào của :term:`cyclic isolate`.
+   * Python sẽ không tự động hoàn tất một đối tượng sau khi đã tự động xóa (:c:member:`~PyTypeObject.tp_clear`) đối tượng đó.
+   * Nếu một đối tượng là thành viên của :term:`cyclic isolate`, Python sẽ không tự động hoàn tất đối tượng đó sau khi tự động xóa (xem
+     :c:member:`~PyTypeObject.tp_clear`) bất kỳ thành viên nào khác.
+   * Python sẽ tự động hoàn tất mọi thành viên của :term:`cyclic isolate` trước khi tự động xóa (xem
+     :c:member:`~PyTypeObject.tp_clear`) bất kỳ đối tượng nào trong số đó.
+   * Nếu Python sắp tự động giải phóng một đối tượng (:c:member:`~PyTypeObject.tp_clear`), trước tiên nó sẽ tự động finalize đối tượng đó.
 
-   Python currently only automatically finalizes objects that are members of a
-   :term:`cyclic isolate`, but future versions might finalize objects regularly
-   before their destruction.
+   Python hiện chỉ tự động finalize các đối tượng là thành viên của một
+   :term:`cyclic isolate`, nhưng các phiên bản tương lai có thể thường xuyên finalize các đối tượng trước khi hủy chúng.
 
-   To manually finalize an object, do not call this function directly; call
-   :c:func:`PyObject_CallFinalizer` or
-   :c:func:`PyObject_CallFinalizerFromDealloc` instead.
+   Để finalize một đối tượng theo cách thủ công, không gọi trực tiếp hàm này; hãy gọi
+   :c:func:`PyObject_CallFinalizer` hoặc
+   :c:func:`PyObject_CallFinalizerFromDealloc` thay vào đó.
 
-   :c:member:`~PyTypeObject.tp_finalize` should leave the current exception
-   status unchanged.  The recommended way to write a non-trivial finalizer is
-   to back up the exception at the beginning by calling
-   :c:func:`PyErr_GetRaisedException` and restore the exception at the end by
-   calling :c:func:`PyErr_SetRaisedException`.  If an exception is encountered
-   in the middle of the finalizer, log and clear it with
-   :c:func:`PyErr_WriteUnraisable` or :c:func:`PyErr_FormatUnraisable`.  For
-   example::
+   :c:member:`~PyTypeObject.tp_finalize` phải giữ nguyên trạng thái ngoại lệ hiện tại. Cách được khuyến nghị để viết một finalizer không tầm thường là sao lưu ngoại lệ ngay từ đầu bằng cách gọi
+   :c:func:`PyErr_GetRaisedException` rồi khôi phục ngoại lệ ở cuối bằng cách gọi :c:func:`PyErr_SetRaisedException`. Nếu gặp ngoại lệ ở giữa finalizer, hãy ghi nhật ký và xóa ngoại lệ đó bằng
+   :c:func:`PyErr_WriteUnraisable` hoặc :c:func:`PyErr_FormatUnraisable`. Ví dụ::
 
       static void
       foo_finalize(PyObject *self)
       {
-          // Save the current exception, if any.
+          // Lưu ngoại lệ hiện tại, nếu có.
           PyObject *exc = PyErr_GetRaisedException();
 
           // ...
@@ -2542,29 +2019,27 @@ and :c:data:`PyType_Type` effectively act as defaults.)
           }
 
       done:
-          // Restore the saved exception.  This silently discards any exception
-          // raised above, so be sure to call PyErr_WriteUnraisable first if
-          // necessary.
+          // Khôi phục ngoại lệ đã lưu. Thao tác này âm thầm loại bỏ mọi ngoại lệ
+          // được phát sinh ở trên, vì vậy hãy nhớ gọi PyErr_WriteUnraisable trước nếu
+          // cần thiết.
           PyErr_SetRaisedException(exc);
       }
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is inherited by subtypes.
+   Trường này được các subtype kế thừa.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.8
 
-      Before version 3.8 it was necessary to set the
-      :c:macro:`Py_TPFLAGS_HAVE_FINALIZE` flags bit in order for this field to be
-      used.  This is no longer required.
+      Trước phiên bản 3.8, cần thiết lập
+      bit cờ :c:macro:`Py_TPFLAGS_HAVE_FINALIZE` để trường này được sử dụng. Điều này không còn cần thiết nữa.
 
    .. seealso::
 
-      * :pep:`442`: "Safe object finalization"
-      * :ref:`life-cycle` for details about how this slot relates to other
-        slots.
+      * :pep:`442`: "Hoàn tất đối tượng an toàn"
+      * :ref:`life-cycle` để biết chi tiết về mối quan hệ giữa slot này và các slot khác.
       * :c:func:`PyObject_CallFinalizer`
       * :c:func:`PyObject_CallFinalizerFromDealloc`
 
@@ -2573,111 +2048,87 @@ and :c:data:`PyType_Type` effectively act as defaults.)
 
    .. corresponding-type-slot:: Py_tp_vectorcall
 
-   A :ref:`vectorcall function <vectorcall>` to use for calls of this type
-   object (rather than instances).
-   In other words, ``tp_vectorcall`` can be used to optimize ``type.__call__``,
-   which typically returns a new instance of *type*.
+   Một :ref:`hàm vectorcall <vectorcall>` được dùng cho các lệnh gọi tới type object này (thay vì các instance). Nói cách khác, ``tp_vectorcall`` có thể được dùng để tối ưu ``type.__call__``, vốn thường trả về một instance mới của *type*.
 
-   As with any vectorcall function, if ``tp_vectorcall`` is ``NULL``,
-   the *tp_call* protocol (``Py_TYPE(type)->tp_call``) is used instead.
+   Cũng như với bất kỳ hàm vectorcall nào, nếu ``tp_vectorcall`` là ``NULL``, giao thức *tp_call* (``Py_TYPE(type)->tp_call``) sẽ được sử dụng thay thế.
 
    .. note::
 
-      The :ref:`vectorcall protocol <vectorcall>` requires that the vectorcall
-      function has the same behavior as the corresponding ``tp_call``.
-      This means that ``type->tp_vectorcall`` must match the behavior of
-      ``Py_TYPE(type)->tp_call``.
+      :ref:`vectorcall protocol <vectorcall>` yêu cầu hàm vectorcall có cùng hành vi với ``tp_call`` tương ứng. Điều này có nghĩa là ``type->tp_vectorcall`` phải khớp với hành vi của ``Py_TYPE(type)->tp_call``.
 
-      Specifically, if *type* uses the default metaclass,
-      ``type->tp_vectorcall`` must behave the same as
-      :c:expr:`PyType_Type->tp_call`, which:
+      Cụ thể, nếu *type* sử dụng metaclass mặc định, ``type->tp_vectorcall`` phải hoạt động giống như
+      :c:expr:`PyType_Type->tp_call`, thực hiện các thao tác sau:
 
-      - calls ``type->tp_new``,
+      - gọi ``type->tp_new``,
 
-      - if the result is a subclass of *type*, calls ``type->tp_init``
-        on the result of ``tp_new``, and
+      - nếu kết quả là một lớp con của *type*, gọi ``type->tp_init`` trên kết quả của ``tp_new``, và
 
-      - returns the result of ``tp_new``.
+      - trả về kết quả của ``tp_new``.
 
-      Typically, ``tp_vectorcall`` is overridden to optimize this process
-      for specific :c:member:`~PyTypeObject.tp_new` and
-      :c:member:`~PyTypeObject.tp_init`.
-      When doing this for user-subclassable types, note that both can be
-      overridden (using :py:func:`~object.__new__` and
-      :py:func:`~object.__init__`, respectively).
+      Thông thường, ``tp_vectorcall`` được ghi đè để tối ưu hóa quy trình này cho các :c:member:`~PyTypeObject.tp_new` cụ thể và
+      :c:member:`~PyTypeObject.tp_init`. Khi thực hiện việc này với các kiểu có thể được phân lớp bởi người dùng, lưu ý rằng cả hai đều có thể được ghi đè (bằng cách sử dụng :py:func:`~object.__new__` và
+      :py:func:`~object.__init__`, tương ứng).
 
 
 
-   **Inheritance:**
+   **Kế thừa:**
 
-   This field is never inherited.
+   Trường này không bao giờ được kế thừa.
 
-   .. versionadded:: 3.9 (the field exists since 3.8 but it's only used since 3.9)
+   .. versionadded:: 3.9 (trường này tồn tại từ phiên bản 3.8 nhưng chỉ được sử dụng từ phiên bản 3.9)
 
 
 .. c:member:: unsigned char PyTypeObject.tp_watched
 
-   Internal. Do not use.
+   Nội bộ. Không sử dụng.
 
    .. versionadded:: 3.12
 
 
 .. _static-types:
 
-Static Types
-------------
+Kiểu tĩnh
+---------
 
-Traditionally, types defined in C code are *static*, that is,
-a static :c:type:`PyTypeObject` structure is defined directly in code
-and initialized using :c:func:`PyType_Ready`.
+Theo truyền thống, các kiểu được định nghĩa trong mã C là *tĩnh*, nghĩa là một :c:type:`PyTypeObject` cấu trúc tĩnh được định nghĩa trực tiếp trong mã và được khởi tạo bằng :c:func:`PyType_Ready`.
 
-This results in types that are limited relative to types defined in Python:
+Điều này tạo ra các kiểu bị hạn chế hơn so với các kiểu được định nghĩa trong Python:
 
-* Static types are limited to one base, i.e. they cannot use multiple
-  inheritance.
-* Static type objects (but not necessarily their instances) are immutable.
-  It is not possible to add or modify the type object's attributes from Python.
-* Static type objects are shared across
-  :ref:`sub-interpreters <sub-interpreter-support>`, so they should not
-  include any subinterpreter-specific state.
+* Kiểu tĩnh chỉ có một lớp cơ sở, tức là chúng không thể sử dụng đa kế thừa.
+* Các đối tượng kiểu tĩnh (nhưng không nhất thiết là các instance của chúng) là bất biến. Không thể thêm hoặc sửa đổi các thuộc tính của đối tượng kiểu từ Python.
+* Các đối tượng kiểu tĩnh được dùng chung giữa
+  :ref:`các sub-interpreter <sub-interpreter-support>`, vì vậy chúng không nên chứa trạng thái dành riêng cho từng sub-interpreter.
 
-Also, since :c:type:`PyTypeObject` is only part of the :ref:`Limited API
-<limited-c-api>` as an opaque struct, any extension modules using static types must be
-compiled for a specific Python minor version.
+Ngoài ra, vì :c:type:`PyTypeObject` chỉ là một phần của :ref:`Limited API <limited-c-api>` dưới dạng một struct không trong suốt, nên mọi extension module sử dụng kiểu tĩnh phải được biên dịch cho một phiên bản minor cụ thể của Python.
 
 
 .. _heap-types:
 
-Heap Types
-----------
+Kiểu trên heap
+--------------
 
-An alternative to :ref:`static types <static-types>` is *heap-allocated types*,
-or *heap types* for short, which correspond closely to classes created by
-Python's ``class`` statement. Heap types have the :c:macro:`Py_TPFLAGS_HEAPTYPE`
-flag set.
+Một lựa chọn thay thế cho :ref:`kiểu tĩnh <static-types>` là *kiểu được cấp phát trên heap*, gọi ngắn gọn là *kiểu heap*, tương ứng khá sát với các lớp được tạo bằng câu lệnh ``class`` của Python. Kiểu heap được đặt cờ :c:macro:`Py_TPFLAGS_HEAPTYPE`.
 
-This is done by filling a :c:type:`PyType_Spec` structure and calling
+Việc này được thực hiện bằng cách điền vào một cấu trúc :c:type:`PyType_Spec` rồi gọi
 :c:func:`PyType_FromSpec`, :c:func:`PyType_FromSpecWithBases`,
-:c:func:`PyType_FromModuleAndSpec`, or :c:func:`PyType_FromMetaclass`.
+:c:func:`PyType_FromModuleAndSpec`, hoặc :c:func:`PyType_FromMetaclass`.
 
 
 .. _number-structs:
 
-Number Object Structures
-------------------------
+Cấu trúc đối tượng số
+---------------------
 
 .. sectionauthor:: Amaury Forgeot d'Arc
 
 
 .. c:type:: PyNumberMethods
 
-   This structure holds pointers to the functions which an object uses to
-   implement the number protocol.  Each function is used by the function of
-   similar name documented in the :ref:`number` section.
+   Cấu trúc này chứa các con trỏ đến những hàm mà một đối tượng sử dụng để triển khai number protocol. Mỗi hàm được sử dụng bởi hàm có tên tương tự được mô tả trong phần :ref:`number`.
 
    .. XXX Drop the definition?
 
-   Here is the structure definition::
+   Đây là định nghĩa cấu trúc::
 
        typedef struct {
             binaryfunc nb_add;
@@ -2724,18 +2175,11 @@ Number Object Structures
 
    .. note::
 
-      Binary and ternary functions must check the type of all their operands,
-      and implement the necessary conversions (at least one of the operands is
-      an instance of the defined type).  If the operation is not defined for the
-      given operands, binary and ternary functions must return
-      ``Py_NotImplemented``, if another error occurred they must return ``NULL``
-      and set an exception.
+      Các hàm nhị phân và tam phân phải kiểm tra kiểu của tất cả các toán hạng và thực hiện các chuyển đổi cần thiết (ít nhất một trong các toán hạng là một instance của kiểu đã định nghĩa). Nếu phép toán không được định nghĩa cho các toán hạng đã cho, các hàm nhị phân và tam phân phải trả về ``Py_NotImplemented``; nếu xảy ra lỗi khác, chúng phải trả về ``NULL`` và đặt một exception.
 
    .. note::
 
-      The :c:member:`~PyNumberMethods.nb_reserved` field should always be ``NULL``.  It
-      was previously called :c:member:`!nb_long`, and was renamed in
-      Python 3.0.1.
+      Trường :c:member:`~PyNumberMethods.nb_reserved` luôn phải là ``NULL``. Trước đây nó được gọi là :c:member:`!nb_long` và đã được đổi tên trong Python 3.0.1.
 
 .. c:member:: binaryfunc PyNumberMethods.nb_add
 
@@ -2883,7 +2327,7 @@ Number Object Structures
 
 .. _mapping-structs:
 
-Mapping Object Structures
+Cấu trúc đối tượng ánh xạ
 -------------------------
 
 .. sectionauthor:: Amaury Forgeot d'Arc
@@ -2891,139 +2335,104 @@ Mapping Object Structures
 
 .. c:type:: PyMappingMethods
 
-   This structure holds pointers to the functions which an object uses to
-   implement the mapping protocol.  It has three members:
+   Cấu trúc này chứa các con trỏ đến những hàm mà một đối tượng sử dụng để triển khai giao thức ánh xạ. Nó có ba thành phần:
 
 .. c:member:: lenfunc PyMappingMethods.mp_length
 
    .. corresponding-type-slot:: Py_mp_length
 
-   This function is used by :c:func:`PyMapping_Size` and
-   :c:func:`PyObject_Size`, and has the same signature.  This slot may be set to
-   ``NULL`` if the object has no defined length.
+   Hàm này được :c:func:`PyMapping_Size` sử dụng và
+   :c:func:`PyObject_Size`, và có cùng chữ ký. Ô này có thể được đặt thành ``NULL`` nếu đối tượng không có độ dài được định nghĩa.
 
 .. c:member:: binaryfunc PyMappingMethods.mp_subscript
 
    .. corresponding-type-slot:: Py_mp_subscript
 
-   This function is used by :c:func:`PyObject_GetItem` and
-   :c:func:`PySequence_GetSlice`, and has the same signature as
-   :c:func:`!PyObject_GetItem`.  This slot must be filled for the
-   :c:func:`PyMapping_Check` function to return ``1``, it can be ``NULL``
-   otherwise.
+   Hàm này được :c:func:`PyObject_GetItem` sử dụng và
+   :c:func:`PySequence_GetSlice`, đồng thời có cùng chữ ký với
+   :c:func:`!PyObject_GetItem`. Vị trí này phải được điền để hàm
+   :c:func:`PyMapping_Check` trả về ``1``, nếu không thì có thể là ``NULL``.
 
 .. c:member:: objobjargproc PyMappingMethods.mp_ass_subscript
 
    .. corresponding-type-slot:: Py_mp_ass_subscript
 
-   This function is used by :c:func:`PyObject_SetItem`,
-   :c:func:`PyObject_DelItem`, :c:func:`PySequence_SetSlice` and
-   :c:func:`PySequence_DelSlice`.  It has the same signature as
-   :c:func:`!PyObject_SetItem`, but *v* can also be set to ``NULL`` to delete
-   an item.  If this slot is ``NULL``, the object does not support item
-   assignment and deletion.
+   Hàm này được :c:func:`PyObject_SetItem` sử dụng,
+   :c:func:`PyObject_DelItem`, :c:func:`PySequence_SetSlice` và
+   :c:func:`PySequence_DelSlice`. Hàm này có cùng chữ ký với
+   :c:func:`!PyObject_SetItem`, nhưng *v* cũng có thể được đặt thành ``NULL`` để xóa một mục. Nếu slot này là ``NULL``, đối tượng không hỗ trợ phép gán và xóa mục.
 
 
 .. _sequence-structs:
 
-Sequence Object Structures
---------------------------
+Cấu trúc đối tượng sequence
+---------------------------
 
 .. sectionauthor:: Amaury Forgeot d'Arc
 
 
 .. c:type:: PySequenceMethods
 
-   This structure holds pointers to the functions which an object uses to
-   implement the sequence protocol.
+   Cấu trúc này chứa các con trỏ đến những hàm mà một đối tượng sử dụng để triển khai sequence protocol.
 
 .. c:member:: lenfunc PySequenceMethods.sq_length
 
    .. corresponding-type-slot:: Py_sq_length
 
-   This function is used by :c:func:`PySequence_Size` and
-   :c:func:`PyObject_Size`, and has the same signature.  It is also used for
-   handling negative indices via the :c:member:`~PySequenceMethods.sq_item`
-   and the :c:member:`~PySequenceMethods.sq_ass_item` slots.
+   Hàm này được :c:func:`PySequence_Size` sử dụng và
+   :c:func:`PyObject_Size`, đồng thời có cùng signature. Hàm này cũng được dùng để xử lý các chỉ mục âm thông qua các slot :c:member:`~PySequenceMethods.sq_item` và :c:member:`~PySequenceMethods.sq_ass_item`.
 
 .. c:member:: binaryfunc PySequenceMethods.sq_concat
 
    .. corresponding-type-slot:: Py_sq_concat
 
-   This function is used by :c:func:`PySequence_Concat` and has the same
-   signature.  It is also used by the ``+`` operator, after trying the numeric
-   addition via the :c:member:`~PyNumberMethods.nb_add` slot.
+   Hàm này được :c:func:`PySequence_Concat` sử dụng và có cùng signature. Hàm này cũng được toán tử ``+`` sử dụng, sau khi thử phép cộng số thông qua slot :c:member:`~PyNumberMethods.nb_add`.
 
 .. c:member:: ssizeargfunc PySequenceMethods.sq_repeat
 
    .. corresponding-type-slot:: Py_sq_repeat
 
-   This function is used by :c:func:`PySequence_Repeat` and has the same
-   signature.  It is also used by the ``*`` operator, after trying numeric
-   multiplication via the :c:member:`~PyNumberMethods.nb_multiply` slot.
+   Hàm này được :c:func:`PySequence_Repeat` sử dụng và có cùng signature. Hàm này cũng được toán tử ``*`` sử dụng, sau khi thử phép nhân số thông qua slot :c:member:`~PyNumberMethods.nb_multiply`.
 
 .. c:member:: ssizeargfunc PySequenceMethods.sq_item
 
    .. corresponding-type-slot:: Py_sq_item
 
-   This function is used by :c:func:`PySequence_GetItem` and has the same
-   signature.  It is also used by :c:func:`PyObject_GetItem`, after trying
-   the subscription via the :c:member:`~PyMappingMethods.mp_subscript` slot.
-   This slot must be filled for the :c:func:`PySequence_Check`
-   function to return ``1``, it can be ``NULL`` otherwise.
+   Hàm này được :c:func:`PySequence_GetItem` sử dụng và có cùng chữ ký. Hàm cũng được :c:func:`PyObject_GetItem` sử dụng, sau khi thử phép subscription thông qua slot :c:member:`~PyMappingMethods.mp_subscript`. Slot này phải được điền để hàm :c:func:`PySequence_Check` trả về ``1``, nếu không thì có thể là ``NULL``.
 
-   Negative indexes are handled as follows: if the :c:member:`~PySequenceMethods.sq_length` slot is
-   filled, it is called and the sequence length is used to compute a positive
-   index which is passed to  :c:member:`~PySequenceMethods.sq_item`.  If :c:member:`!sq_length` is ``NULL``,
-   the index is passed as is to the function.
+   Các chỉ mục âm được xử lý như sau: nếu slot :c:member:`~PySequenceMethods.sq_length` được điền, slot này sẽ được gọi và độ dài của sequence được dùng để tính một chỉ mục dương, rồi truyền chỉ mục đó cho :c:member:`~PySequenceMethods.sq_item`. Nếu :c:member:`!sq_length` là ``NULL``, chỉ mục được truyền nguyên trạng cho hàm.
 
 .. c:member:: ssizeobjargproc PySequenceMethods.sq_ass_item
 
    .. corresponding-type-slot:: Py_sq_ass_item
 
-   This function is used by :c:func:`PySequence_SetItem` and has the same
-   signature.  It is also used by :c:func:`PyObject_SetItem` and
-   :c:func:`PyObject_DelItem`, after trying the item assignment and deletion
-   via the :c:member:`~PyMappingMethods.mp_ass_subscript` slot.
-   This slot may be left to ``NULL`` if the object does not support
-   item assignment and deletion.
+   Hàm này được :c:func:`PySequence_SetItem` sử dụng và có cùng chữ ký. Hàm cũng được :c:func:`PyObject_SetItem` và
+   :c:func:`PyObject_DelItem` sử dụng, sau khi thử phép gán và xóa phần tử thông qua slot :c:member:`~PyMappingMethods.mp_ass_subscript`. Có thể để slot này là ``NULL`` nếu đối tượng không hỗ trợ phép gán và xóa phần tử.
 
 .. c:member:: objobjproc PySequenceMethods.sq_contains
 
    .. corresponding-type-slot:: Py_sq_contains
 
-   This function may be used by :c:func:`PySequence_Contains` and has the same
-   signature.  This slot may be left to ``NULL``, in this case
-   :c:func:`!PySequence_Contains` simply traverses the sequence until it
-   finds a match.
+   Hàm này có thể được :c:func:`PySequence_Contains` sử dụng và có cùng chữ ký. Có thể để slot này là ``NULL``, trong trường hợp này
+   :c:func:`!PySequence_Contains` chỉ đơn giản duyệt qua sequence cho đến khi tìm thấy kết quả khớp.
 
 .. c:member:: binaryfunc PySequenceMethods.sq_inplace_concat
 
    .. corresponding-type-slot:: Py_sq_inplace_concat
 
-   This function is used by :c:func:`PySequence_InPlaceConcat` and has the same
-   signature.  It should modify its first operand, and return it.  This slot
-   may be left to ``NULL``, in this case :c:func:`!PySequence_InPlaceConcat`
-   will fall back to :c:func:`PySequence_Concat`.  It is also used by the
-   augmented assignment ``+=``, after trying numeric in-place addition
-   via the :c:member:`~PyNumberMethods.nb_inplace_add` slot.
+   Hàm này được :c:func:`PySequence_InPlaceConcat` sử dụng và có cùng chữ ký. Hàm phải sửa đổi toán hạng đầu tiên và trả về toán hạng đó. Có thể để slot này là ``NULL``; trong trường hợp này, :c:func:`!PySequence_InPlaceConcat` sẽ chuyển sang :c:func:`PySequence_Concat`. Hàm cũng được phép gán tăng cường ``+=`` sử dụng, sau khi thử phép cộng tại chỗ dạng số thông qua slot :c:member:`~PyNumberMethods.nb_inplace_add`.
 
 .. c:member:: ssizeargfunc PySequenceMethods.sq_inplace_repeat
 
    .. corresponding-type-slot:: Py_sq_inplace_repeat
 
-   This function is used by :c:func:`PySequence_InPlaceRepeat` and has the same
-   signature.  It should modify its first operand, and return it.  This slot
-   may be left to ``NULL``, in this case :c:func:`!PySequence_InPlaceRepeat`
-   will fall back to :c:func:`PySequence_Repeat`.  It is also used by the
-   augmented assignment ``*=``, after trying numeric in-place multiplication
-   via the :c:member:`~PyNumberMethods.nb_inplace_multiply` slot.
+   Hàm này được :c:func:`PySequence_InPlaceRepeat` sử dụng và có cùng chữ ký. Hàm này sẽ sửa đổi toán hạng đầu tiên và trả về toán hạng đó. Có thể để slot này là ``NULL``; trong trường hợp này, :c:func:`!PySequence_InPlaceRepeat` sẽ chuyển sang :c:func:`PySequence_Repeat`. Slot này cũng được phép gán tăng cường ``*=`` sử dụng, sau khi đã thử phép nhân tại chỗ số học thông qua slot :c:member:`~PyNumberMethods.nb_inplace_multiply`.
 
 
 .. _buffer-structs:
 
-Buffer Object Structures
-------------------------
+Cấu trúc đối tượng Buffer
+-------------------------
 
 .. sectionauthor:: Greg J. Stein <greg@lyra.org>
 .. sectionauthor:: Benjamin Peterson
@@ -3031,126 +2440,98 @@ Buffer Object Structures
 
 .. c:type:: PyBufferProcs
 
-   This structure holds pointers to the functions required by the
-   :ref:`Buffer protocol <bufferobjects>`. The protocol defines how
-   an exporter object can expose its internal data to consumer objects.
+   Cấu trúc này chứa các con trỏ tới những hàm cần thiết cho
+   :ref:`Buffer protocol <bufferobjects>`. Giao thức này xác định cách một đối tượng exporter có thể cung cấp dữ liệu nội bộ của nó cho các đối tượng consumer.
 
 .. c:member:: getbufferproc PyBufferProcs.bf_getbuffer
 
    .. corresponding-type-slot:: Py_bf_getbuffer
 
-   The signature of this function is::
+   Chữ ký của hàm này là::
 
        int (PyObject *exporter, Py_buffer *view, int flags);
 
-   Handle a request to *exporter* to fill in *view* as specified by *flags*.
-   Except for point (3), an implementation of this function MUST take these
-   steps:
+   Xử lý yêu cầu *exporter* điền *view* theo quy định của *flags*. Ngoại trừ điểm (3), việc triển khai hàm này PHẢI thực hiện các bước sau:
 
-   (1) Check if the request can be met. If not, raise :exc:`BufferError`,
-       set ``view->obj`` to ``NULL`` and return ``-1``.
+   (1) Kiểm tra xem yêu cầu có thể được đáp ứng hay không. Nếu không, hãy raise :exc:`BufferError`, đặt ``view->obj`` thành ``NULL`` rồi trả về ``-1``.
 
-   (2) Fill in the requested fields.
+   (2) Điền các trường được yêu cầu.
 
-   (3) Increment an internal counter for the number of exports.
+   (3) Tăng bộ đếm nội bộ cho số lượng lần export.
 
-   (4) Set ``view->obj`` to *exporter* and increment ``view->obj``.
+   (4) Đặt ``view->obj`` thành *exporter* và tăng ``view->obj``.
 
-   (5) Return ``0``.
+   (5) Trả về ``0``.
 
-   **Thread safety:**
+   **An toàn luồng:**
 
-   In the :term:`free-threaded build`, implementations must ensure:
+   Trong :term:`free-threaded build`, các triển khai phải đảm bảo:
 
-   * The export counter increment in step (3) is atomic.
+   * Thao tác tăng bộ đếm export ở bước (3) là nguyên tử.
 
-   * The underlying buffer data remains valid and at a stable memory
-     location for the lifetime of all exports.
+   * Dữ liệu buffer bên dưới vẫn hợp lệ và ở một vị trí bộ nhớ ổn định trong suốt thời gian tồn tại của tất cả các đối tượng export.
 
-   * For objects that support resizing or reallocation (such as
-     :class:`bytearray`), the export counter is checked atomically before
-     such operations, and :exc:`BufferError` is raised if exports exist.
+   * Đối với các đối tượng hỗ trợ thay đổi kích thước hoặc cấp phát lại (chẳng hạn như
+     :class:`bytearray`), bộ đếm export được kiểm tra nguyên tử trước các thao tác đó và :exc:`BufferError` sẽ được phát sinh nếu có các đối tượng export.
 
-   * The function is safe to call concurrently from multiple threads.
+   * Hàm này an toàn khi được gọi đồng thời từ nhiều thread.
 
-   See also :ref:`thread-safety-memoryview` for the Python-level
-   thread safety guarantees of :class:`memoryview` objects.
+   Xem thêm :ref:`thread-safety-memoryview` để biết các đảm bảo về thread safety ở cấp Python đối với các đối tượng :class:`memoryview`.
 
-   If *exporter* is part of a chain or tree of buffer providers, two main
-   schemes can be used:
+   Nếu *exporter* là một phần của chuỗi hoặc cây các buffer provider, có thể sử dụng hai cơ chế chính:
 
-   * Re-export: Each member of the tree acts as the exporting object and
-     sets ``view->obj`` to a new reference to itself.
+   * Re-export: Mỗi thành viên trong cây đóng vai trò là đối tượng export và đặt ``view->obj`` thành một reference mới trỏ đến chính nó.
 
-   * Redirect: The buffer request is redirected to the root object of the
-     tree. Here, ``view->obj`` will be a new reference to the root
-     object.
+   * Chuyển hướng: Yêu cầu buffer được chuyển hướng đến đối tượng gốc của cây. Tại đây, ``view->obj`` sẽ là một tham chiếu mới đến đối tượng gốc.
 
-   The individual fields of *view* are described in section
-   :ref:`Buffer structure <buffer-structure>`, the rules how an exporter
-   must react to specific requests are in section
+   Các trường riêng lẻ của *view* được mô tả trong phần
+   :ref:`Buffer structure <buffer-structure>`, các quy tắc quy định cách exporter phải phản hồi những yêu cầu cụ thể nằm trong phần
    :ref:`Buffer request types <buffer-request-types>`.
 
-   All memory pointed to in the :c:type:`Py_buffer` structure belongs to
-   the exporter and must remain valid until there are no consumers left.
+   Mọi vùng bộ nhớ được con trỏ trỏ tới trong cấu trúc :c:type:`Py_buffer` đều thuộc về exporter và phải vẫn hợp lệ cho đến khi không còn consumer nào.
    :c:member:`~Py_buffer.format`, :c:member:`~Py_buffer.shape`,
-   :c:member:`~Py_buffer.strides`, :c:member:`~Py_buffer.suboffsets`
-   and :c:member:`~Py_buffer.internal`
-   are read-only for the consumer.
+   :c:member:`~Py_buffer.strides`, :c:member:`~Py_buffer.suboffsets` và :c:member:`~Py_buffer.internal` là chỉ đọc đối với consumer.
 
-   :c:func:`PyBuffer_FillInfo` provides an easy way of exposing a simple
-   bytes buffer while dealing correctly with all request types.
+   :c:func:`PyBuffer_FillInfo` cung cấp một cách dễ dàng để cung cấp một bytes buffer đơn giản trong khi vẫn xử lý đúng tất cả các loại yêu cầu.
 
-   :c:func:`PyObject_GetBuffer` is the interface for the consumer that
-   wraps this function.
+   :c:func:`PyObject_GetBuffer` là giao diện dành cho consumer bao bọc hàm này.
 
 .. c:member:: releasebufferproc PyBufferProcs.bf_releasebuffer
 
    .. corresponding-type-slot:: Py_bf_releasebuffer
 
-   The signature of this function is::
+   Chữ ký của hàm này là::
 
        void (PyObject *exporter, Py_buffer *view);
 
-   Handle a request to release the resources of the buffer. If no resources
-   need to be released, :c:member:`PyBufferProcs.bf_releasebuffer` may be
-   ``NULL``. Otherwise, a standard implementation of this function will take
-   these optional steps:
+   Xử lý yêu cầu giải phóng tài nguyên của buffer. Nếu không cần giải phóng tài nguyên nào, :c:member:`PyBufferProcs.bf_releasebuffer` có thể là ``NULL``. Nếu không, một cách triển khai tiêu chuẩn của hàm này sẽ thực hiện các bước tùy chọn sau:
 
-   (1) Decrement an internal counter for the number of exports.
+   (1) Giảm bộ đếm nội bộ theo dõi số lượng export.
 
-   (2) If the counter is ``0``, free all memory associated with *view*.
+   (2) Nếu bộ đếm là ``0``, giải phóng toàn bộ bộ nhớ liên kết với *view*.
 
-   **Thread safety:**
+   **An toàn luồng:**
 
-   In the :term:`free-threaded build`:
+   Trong :term:`free-threaded build`:
 
-   * The export counter decrement in step (1) must be atomic.
+   * Việc giảm bộ đếm export ở bước (1) phải được thực hiện nguyên tử.
 
-   * Resource cleanup when the counter reaches zero must be done atomically,
-     as the final release may race with concurrent releases from other
-     threads and deallocation must only happen once.
+   * Việc dọn dẹp tài nguyên khi bộ đếm đạt đến 0 phải được thực hiện nguyên tử, vì lần release cuối cùng có thể xảy ra tranh chấp với các lần release đồng thời từ những thread khác và việc giải phóng chỉ được phép xảy ra một lần.
 
-   The exporter MUST use the :c:member:`~Py_buffer.internal` field to keep
-   track of buffer-specific resources. This field is guaranteed to remain
-   constant, while a consumer MAY pass a copy of the original buffer as the
-   *view* argument.
+   Exporter PHẢI sử dụng trường :c:member:`~Py_buffer.internal` để theo dõi các tài nguyên dành riêng cho buffer. Trường này được đảm bảo giữ nguyên, trong khi consumer CÓ THỂ truyền một bản sao của buffer ban đầu làm đối số *view*.
 
 
-   This function MUST NOT decrement ``view->obj``, since that is
-   done automatically in :c:func:`PyBuffer_Release` (this scheme is
-   useful for breaking reference cycles).
+   Hàm này KHÔNG ĐƯỢC giảm ``view->obj``, vì việc đó được tự động thực hiện trong :c:func:`PyBuffer_Release` (cơ chế này hữu ích để phá vỡ các chu kỳ tham chiếu).
 
 
-   :c:func:`PyBuffer_Release` is the interface for the consumer that
-   wraps this function.
+   :c:func:`PyBuffer_Release` là interface dành cho consumer bọc hàm này.
 
 
 .. _async-structs:
 
 
-Async Object Structures
------------------------
+Cấu trúc đối tượng Async
+------------------------
 
 .. sectionauthor:: Yury Selivanov <yselivanov@sprymix.com>
 
@@ -3158,10 +2539,10 @@ Async Object Structures
 
 .. c:type:: PyAsyncMethods
 
-   This structure holds pointers to the functions required to implement
-   :term:`awaitable` and :term:`asynchronous iterator` objects.
+   Cấu trúc này chứa các con trỏ đến những hàm cần thiết để triển khai
+   Các đối tượng :term:`awaitable` và :term:`asynchronous iterator`.
 
-   Here is the structure definition::
+   Sau đây là định nghĩa cấu trúc::
 
         typedef struct {
             unaryfunc am_await;
@@ -3174,138 +2555,122 @@ Async Object Structures
 
    .. corresponding-type-slot:: Py_am_await
 
-   The signature of this function is::
+   Chữ ký của hàm này là::
 
       PyObject *am_await(PyObject *self);
 
-   The returned object must be an :term:`iterator`, i.e. :c:func:`PyIter_Check`
-   must return ``1`` for it.
+   Đối tượng được trả về phải là một :term:`iterator`, tức là :c:func:`PyIter_Check` phải trả về ``1`` cho đối tượng đó.
 
-   This slot may be set to ``NULL`` if an object is not an :term:`awaitable`.
+   Có thể đặt slot này thành ``NULL`` nếu một đối tượng không phải là :term:`awaitable`.
 
 .. c:member:: unaryfunc PyAsyncMethods.am_aiter
 
    .. corresponding-type-slot:: Py_am_aiter
 
-   The signature of this function is::
+   Chữ ký của hàm này là::
 
       PyObject *am_aiter(PyObject *self);
 
-   Must return an :term:`asynchronous iterator` object.
-   See :meth:`~object.__anext__` for details.
+   Phải trả về một đối tượng :term:`asynchronous iterator`. Xem :meth:`~object.__anext__` để biết chi tiết.
 
-   This slot may be set to ``NULL`` if an object does not implement
-   asynchronous iteration protocol.
+   Slot này có thể được đặt thành ``NULL`` nếu một object không triển khai giao thức lặp bất đồng bộ (asynchronous iteration protocol).
 
 .. c:member:: unaryfunc PyAsyncMethods.am_anext
 
    .. corresponding-type-slot:: Py_am_anext
 
-   The signature of this function is::
+   Chữ ký của hàm này là::
 
       PyObject *am_anext(PyObject *self);
 
-   Must return an :term:`awaitable` object.
-   See :meth:`~object.__anext__` for details.
-   This slot may be set to ``NULL``.
+   Phải trả về một object :term:`awaitable`. Xem :meth:`~object.__anext__` để biết chi tiết. Slot này có thể được đặt thành ``NULL``.
 
 .. c:member:: sendfunc PyAsyncMethods.am_send
 
    .. corresponding-type-slot:: Py_am_send
 
-   The signature of this function is::
+   Chữ ký của hàm này là::
 
       PySendResult am_send(PyObject *self, PyObject *arg, PyObject **result);
 
-   See :c:func:`PyIter_Send` for details.
-   This slot may be set to ``NULL``.
+   Xem :c:func:`PyIter_Send` để biết chi tiết. Slot này có thể được đặt thành ``NULL``.
 
    .. versionadded:: 3.10
 
 
 .. _slot-typedefs:
 
-Slot Type typedefs
-------------------
+Các typedef kiểu slot
+---------------------
 
 .. c:type:: PyObject *(*allocfunc)(PyTypeObject *cls, Py_ssize_t nitems)
 
-   The purpose of this function is to separate memory allocation from memory
-   initialization.  It should return a pointer to a block of memory of adequate
-   length for the instance, suitably aligned, and initialized to zeros, but with
-   :c:member:`~PyObject.ob_refcnt` set to ``1`` and :c:member:`~PyObject.ob_type` set to the type argument.  If
-   the type's :c:member:`~PyTypeObject.tp_itemsize` is non-zero, the object's :c:member:`~PyVarObject.ob_size` field
-   should be initialized to *nitems* and the length of the allocated memory block
-   should be ``tp_basicsize + nitems*tp_itemsize``, rounded up to a multiple of
-   ``sizeof(void*)``; otherwise, *nitems* is not used and the length of the block
-   should be :c:member:`~PyTypeObject.tp_basicsize`.
+   Mục đích của hàm này là tách việc cấp phát bộ nhớ khỏi việc khởi tạo bộ nhớ. Hàm này phải trả về một con trỏ tới một khối bộ nhớ có độ dài đủ cho instance, được căn chỉnh phù hợp và khởi tạo về 0, nhưng với
+   :c:member:`~PyObject.ob_refcnt` được đặt thành ``1`` và :c:member:`~PyObject.ob_type` được đặt thành đối số kiểu. Nếu :c:member:`~PyTypeObject.tp_itemsize` của kiểu khác không, trường :c:member:`~PyVarObject.ob_size` của đối tượng phải được khởi tạo thành *nitems* và độ dài của khối bộ nhớ được cấp phát phải là ``tp_basicsize + nitems*tp_itemsize``, được làm tròn lên thành bội số của ``sizeof(void*)``; nếu không, *nitems* không được sử dụng và độ dài của khối phải là :c:member:`~PyTypeObject.tp_basicsize`.
 
-   This function should not do any other instance initialization, not even to
-   allocate additional memory; that should be done by :c:member:`~PyTypeObject.tp_new`.
+   Hàm này không nên thực hiện bất kỳ khởi tạo instance nào khác, kể cả việc cấp phát thêm bộ nhớ; việc đó phải do :c:member:`~PyTypeObject.tp_new` thực hiện.
 
 .. c:type:: void (*destructor)(PyObject *)
 
 .. c:type:: void (*freefunc)(void *)
 
-   See :c:member:`~PyTypeObject.tp_free`.
+   Xem :c:member:`~PyTypeObject.tp_free`.
 
 .. c:type:: PyObject *(*newfunc)(PyTypeObject *, PyObject *, PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_new`.
+   Xem :c:member:`~PyTypeObject.tp_new`.
 
 .. c:type:: int (*initproc)(PyObject *, PyObject *, PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_init`.
+   Xem :c:member:`~PyTypeObject.tp_init`.
 
 .. c:type:: PyObject *(*reprfunc)(PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_repr`.
+   Xem :c:member:`~PyTypeObject.tp_repr`.
 
 .. c:type:: PyObject *(*getattrfunc)(PyObject *self, char *attr)
 
-   Return the value of the named attribute for the object.
+   Trả về giá trị của thuộc tính có tên của đối tượng.
 
 .. c:type:: int (*setattrfunc)(PyObject *self, char *attr, PyObject *value)
 
-   Set the value of the named attribute for the object.
-   The value argument is set to ``NULL`` to delete the attribute.
+   Đặt giá trị của thuộc tính có tên cho đối tượng. Đối số value được đặt thành ``NULL`` để xóa thuộc tính.
 
 .. c:type:: PyObject *(*getattrofunc)(PyObject *self, PyObject *attr)
 
-   Return the value of the named attribute for the object.
+   Trả về giá trị của thuộc tính có tên của đối tượng.
 
-   See :c:member:`~PyTypeObject.tp_getattro`.
+   Xem :c:member:`~PyTypeObject.tp_getattro`.
 
 .. c:type:: int (*setattrofunc)(PyObject *self, PyObject *attr, PyObject *value)
 
-   Set the value of the named attribute for the object.
-   The value argument is set to ``NULL`` to delete the attribute.
+   Đặt giá trị của thuộc tính có tên cho đối tượng. Đối số value được đặt thành ``NULL`` để xóa thuộc tính.
 
-   See :c:member:`~PyTypeObject.tp_setattro`.
+   Xem :c:member:`~PyTypeObject.tp_setattro`.
 
 .. c:type:: PyObject *(*descrgetfunc)(PyObject *, PyObject *, PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_descr_get`.
+   Xem :c:member:`~PyTypeObject.tp_descr_get`.
 
 .. c:type:: int (*descrsetfunc)(PyObject *, PyObject *, PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_descr_set`.
+   Xem :c:member:`~PyTypeObject.tp_descr_set`.
 
 .. c:type:: Py_hash_t (*hashfunc)(PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_hash`.
+   Xem :c:member:`~PyTypeObject.tp_hash`.
 
 .. c:type:: PyObject *(*richcmpfunc)(PyObject *, PyObject *, int)
 
-   See :c:member:`~PyTypeObject.tp_richcompare`.
+   Xem :c:member:`~PyTypeObject.tp_richcompare`.
 
 .. c:type:: PyObject *(*getiterfunc)(PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_iter`.
+   Xem :c:member:`~PyTypeObject.tp_iter`.
 
 .. c:type:: PyObject *(*iternextfunc)(PyObject *)
 
-   See :c:member:`~PyTypeObject.tp_iternext`.
+   Xem :c:member:`~PyTypeObject.tp_iternext`.
 
 .. c:type:: Py_ssize_t (*lenfunc)(PyObject *)
 
@@ -3319,7 +2684,7 @@ Slot Type typedefs
 
 .. c:type:: PySendResult (*sendfunc)(PyObject *, PyObject *, PyObject **)
 
-   See :c:member:`~PyAsyncMethods.am_send`.
+   Xem :c:member:`~PyAsyncMethods.am_send`.
 
 .. c:type:: PyObject *(*ternaryfunc)(PyObject *, PyObject *, PyObject *)
 
@@ -3334,15 +2699,13 @@ Slot Type typedefs
 
 .. _typedef-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-The following are simple examples of Python type definitions.  They
-include common usage you may encounter.  Some demonstrate tricky corner
-cases.  For more examples, practical info, and a tutorial, see
-:ref:`defining-new-types` and :ref:`new-types-topics`.
+Sau đây là các ví dụ đơn giản về định nghĩa kiểu Python. Chúng bao gồm những cách sử dụng phổ biến mà bạn có thể gặp. Một số ví dụ minh họa các trường hợp góc khó xử lý. Để biết thêm ví dụ, thông tin thực tế và hướng dẫn, hãy xem
+:ref:`defining-new-types` và :ref:`new-types-topics`.
 
-A basic :ref:`static type <static-types>`::
+Một :ref:`kiểu tĩnh <static-types>` cơ bản::
 
    typedef struct {
        PyObject_HEAD
@@ -3359,8 +2722,7 @@ A basic :ref:`static type <static-types>`::
        .tp_repr = (reprfunc)myobj_repr,
    };
 
-You may also find older code (especially in the CPython code base)
-with a more verbose initializer::
+Bạn cũng có thể bắt gặp mã cũ hơn (đặc biệt là trong code base CPython) với trình khởi tạo dài dòng hơn::
 
    static PyTypeObject MyObject_Type = {
        PyVarObject_HEAD_INIT(NULL, 0)
@@ -3403,7 +2765,7 @@ with a more verbose initializer::
        myobj_new,                      /* tp_new */
    };
 
-A type that supports weakrefs, instance dicts, and hashing::
+Một kiểu hỗ trợ weakref, instance dict và hashing::
 
    typedef struct {
        PyObject_HEAD
@@ -3428,9 +2790,8 @@ A type that supports weakrefs, instance dicts, and hashing::
        .tp_richcompare = PyBaseObject_Type.tp_richcompare,
    };
 
-A str subclass that cannot be subclassed and cannot be called
-to create instances (e.g. uses a separate factory func) using
-:c:macro:`Py_TPFLAGS_DISALLOW_INSTANTIATION` flag::
+Một lớp con của str không thể được tạo lớp con và không thể được gọi để tạo các instance (ví dụ: sử dụng một hàm factory riêng) bằng cách sử dụng
+:c:macro:`Py_TPFLAGS_DISALLOW_INSTANTIATION` cờ::
 
    typedef struct {
        PyUnicodeObject raw;
@@ -3441,13 +2802,13 @@ to create instances (e.g. uses a separate factory func) using
        PyVarObject_HEAD_INIT(NULL, 0)
        .tp_name = "mymod.MyStr",
        .tp_basicsize = sizeof(MyStr),
-       .tp_base = NULL,  // set to &PyUnicode_Type in module init
+       .tp_base = NULL,  // đặt thành &PyUnicode_Type trong phần khởi tạo mô-đun
        .tp_doc = PyDoc_STR("my custom str"),
        .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION,
        .tp_repr = (reprfunc)myobj_repr,
    };
 
-The simplest :ref:`static type <static-types>` with fixed-length instances::
+Kiểu tĩnh đơn giản nhất với các instance có độ dài cố định: :ref:`kiểu tĩnh <static-types>`::
 
    typedef struct {
        PyObject_HEAD
@@ -3458,7 +2819,7 @@ The simplest :ref:`static type <static-types>` with fixed-length instances::
        .tp_name = "mymod.MyObject",
    };
 
-The simplest :ref:`static type <static-types>` with variable-length instances::
+Kiểu tĩnh đơn giản nhất với các instance có độ dài thay đổi: :ref:`kiểu tĩnh <static-types>`::
 
    typedef struct {
        PyObject_VAR_HEAD
@@ -3471,3 +2832,5 @@ The simplest :ref:`static type <static-types>` with variable-length instances::
        .tp_basicsize = sizeof(MyObject) - sizeof(char *),
        .tp_itemsize = sizeof(char *),
    };
+
+.. _`bug 40217`: https://bugs.python.org/issue40217

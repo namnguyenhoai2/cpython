@@ -3,9 +3,9 @@
 
 .. _memory:
 
-*****************
-Memory Management
-*****************
+**************
+Quản lý bộ nhớ
+**************
 
 .. sectionauthor:: Vladimir Marangozov <Vladimir.Marangozov@inrialpes.fr>
 
@@ -13,32 +13,14 @@ Memory Management
 
 .. _memoryoverview:
 
-Overview
-========
+Tổng quan
+=========
 
-Memory management in Python involves a private heap containing all Python
-objects and data structures. The management of this private heap is ensured
-internally by the *Python memory manager*.  The Python memory manager has
-different components which deal with various dynamic storage management aspects,
-like sharing, segmentation, preallocation or caching.
+Quản lý bộ nhớ trong Python bao gồm một heap riêng chứa tất cả đối tượng và cấu trúc dữ liệu Python. Việc quản lý heap riêng này được đảm bảo nội bộ bởi *trình quản lý bộ nhớ Python*. Trình quản lý bộ nhớ Python có các thành phần khác nhau đảm nhiệm nhiều khía cạnh của việc quản lý lưu trữ động, chẳng hạn như chia sẻ, phân đoạn, cấp phát trước hoặc caching.
 
-At the lowest level, a raw memory allocator ensures that there is enough room in
-the private heap for storing all Python-related data by interacting with the
-memory manager of the operating system. On top of the raw memory allocator,
-several object-specific allocators operate on the same heap and implement
-distinct memory management policies adapted to the peculiarities of every object
-type. For example, integer objects are managed differently within the heap than
-strings, tuples or dictionaries because integers imply different storage
-requirements and speed/space tradeoffs. The Python memory manager thus delegates
-some of the work to the object-specific allocators, but ensures that the latter
-operate within the bounds of the private heap.
+Ở cấp thấp nhất, một bộ cấp phát bộ nhớ thô đảm bảo có đủ chỗ trong heap riêng để lưu trữ tất cả dữ liệu liên quan đến Python bằng cách tương tác với trình quản lý bộ nhớ của hệ điều hành. Bên trên bộ cấp phát bộ nhớ thô, một số bộ cấp phát dành riêng cho từng loại đối tượng hoạt động trên cùng heap và triển khai các chính sách quản lý bộ nhớ riêng, phù hợp với đặc điểm của từng loại đối tượng. Ví dụ, các đối tượng số nguyên được quản lý trong heap khác với chuỗi, tuple hoặc dictionary vì số nguyên có yêu cầu lưu trữ cũng như sự đánh đổi khác nhau giữa tốc độ và không gian. Do đó, trình quản lý bộ nhớ Python ủy thác một phần công việc cho các bộ cấp phát dành riêng cho từng loại đối tượng, đồng thời đảm bảo các bộ cấp phát này hoạt động trong phạm vi của heap riêng.
 
-It is important to understand that the management of the Python heap is
-performed by the interpreter itself and that the user has no control over it,
-even if they regularly manipulate object pointers to memory blocks inside that
-heap.  The allocation of heap space for Python objects and other internal
-buffers is performed on demand by the Python memory manager through the Python/C
-API functions listed in this document.
+Điều quan trọng là phải hiểu rằng việc quản lý heap Python được thực hiện bởi chính trình thông dịch và người dùng không thể kiểm soát việc này, ngay cả khi họ thường xuyên thao tác với các con trỏ đối tượng tới các khối bộ nhớ bên trong heap đó. Việc cấp phát không gian heap cho các đối tượng Python và những buffer nội bộ khác được trình quản lý bộ nhớ Python thực hiện theo nhu cầu thông qua các hàm Python/C API được liệt kê trong tài liệu này.
 
 .. index::
    single: malloc (C function)
@@ -46,274 +28,194 @@ API functions listed in this document.
    single: realloc (C function)
    single: free (C function)
 
-To avoid memory corruption, extension writers should never try to operate on
-Python objects with the functions exported by the C library: :c:func:`malloc`,
-:c:func:`calloc`, :c:func:`realloc` and :c:func:`free`.  This will result in  mixed
-calls between the C allocator and the Python memory manager with fatal
-consequences, because they implement different algorithms and operate on
-different heaps.  However, one may safely allocate and release memory blocks
-with the C library allocator for individual purposes, as shown in the following
-example::
+Để tránh hỏng bộ nhớ, người viết extension không bao giờ được cố gắng thao tác với các đối tượng Python bằng những hàm do thư viện C xuất ra: :c:func:`malloc`,
+:c:func:`calloc`, :c:func:`realloc` và :c:func:`free`. Điều này sẽ dẫn đến việc gọi lẫn lộn giữa bộ cấp phát C và trình quản lý bộ nhớ Python, với hậu quả nghiêm trọng, vì chúng triển khai các thuật toán khác nhau và hoạt động trên các heap khác nhau. Tuy nhiên, bạn có thể an toàn cấp phát và giải phóng các khối bộ nhớ bằng bộ cấp phát của thư viện C cho những mục đích riêng lẻ, như trong ví dụ sau::
 
    PyObject *res;
-   char *buf = (char *) malloc(BUFSIZ); /* for I/O */
+   char *buf = (char *) malloc(BUFSIZ); /* cho I/O */
 
    if (buf == NULL)
        return PyErr_NoMemory();
    ...Do some I/O operation involving buf...
    res = PyBytes_FromString(buf);
-   free(buf); /* malloc'ed */
+   free(buf); /* được cấp phát bằng malloc */
    return res;
 
-In this example, the memory request for the I/O buffer is handled by the C
-library allocator. The Python memory manager is involved only in the allocation
-of the bytes object returned as a result.
+Trong ví dụ này, yêu cầu bộ nhớ cho bộ đệm I/O được trình cấp phát của thư viện C xử lý. Trình quản lý bộ nhớ Python chỉ tham gia vào việc cấp phát đối tượng bytes được trả về làm kết quả.
 
-In most situations, however, it is recommended to allocate memory from the
-Python heap specifically because the latter is under control of the Python
-memory manager. For example, this is required when the interpreter is extended
-with new object types written in C. Another reason for using the Python heap is
-the desire to *inform* the Python memory manager about the memory needs of the
-extension module. Even when the requested memory is used exclusively for
-internal, highly specific purposes, delegating all memory requests to the Python
-memory manager causes the interpreter to have a more accurate image of its
-memory footprint as a whole. Consequently, under certain circumstances, the
-Python memory manager may or may not trigger appropriate actions, like garbage
-collection, memory compaction or other preventive procedures. Note that by using
-the C library allocator as shown in the previous example, the allocated memory
-for the I/O buffer completely escapes the Python memory manager.
+Tuy nhiên, trong hầu hết các trường hợp, bạn nên cấp phát bộ nhớ từ heap Python, cụ thể là vì heap này nằm dưới sự kiểm soát của trình quản lý bộ nhớ Python. Ví dụ, điều này là bắt buộc khi mở rộng trình thông dịch bằng các kiểu đối tượng mới được viết bằng C. Một lý do khác để sử dụng heap Python là mong muốn *thông báo* cho trình quản lý bộ nhớ Python về nhu cầu bộ nhớ của mô-đun mở rộng. Ngay cả khi bộ nhớ được yêu cầu chỉ được sử dụng cho các mục đích nội bộ, rất đặc thù, việc ủy quyền tất cả yêu cầu bộ nhớ cho trình quản lý bộ nhớ Python giúp trình thông dịch có hình dung chính xác hơn về tổng thể lượng bộ nhớ mà nó sử dụng. Do đó, trong một số trường hợp nhất định, trình quản lý bộ nhớ Python có thể kích hoạt hoặc không kích hoạt các hành động phù hợp, chẳng hạn như thu gom rác, nén bộ nhớ hoặc các quy trình phòng ngừa khác. Lưu ý rằng khi sử dụng trình cấp phát của thư viện C như trong ví dụ trước, bộ nhớ được cấp phát cho bộ đệm I/O hoàn toàn nằm ngoài sự quản lý của trình quản lý bộ nhớ Python.
 
 .. seealso::
 
-   The :envvar:`PYTHONMALLOC` environment variable can be used to configure
-   the memory allocators used by Python.
+   Biến môi trường :envvar:`PYTHONMALLOC` có thể được sử dụng để cấu hình các trình cấp phát bộ nhớ mà Python sử dụng.
 
-   The :envvar:`PYTHONMALLOCSTATS` environment variable can be used to print
-   statistics of the :ref:`pymalloc memory allocator <pymalloc>` every time a
-   new pymalloc object arena is created, and on shutdown.
+   Biến môi trường :envvar:`PYTHONMALLOCSTATS` có thể được sử dụng để in thống kê của trình cấp phát bộ nhớ :ref:`pymalloc memory allocator <pymalloc>` mỗi khi một arena đối tượng pymalloc mới được tạo và khi tắt.
 
-Allocator Domains
-=================
+Các miền trình cấp phát
+=======================
 
 .. _allocator-domains:
 
-All allocating functions belong to one of three different "domains" (see also
-:c:type:`PyMemAllocatorDomain`). These domains represent different allocation
-strategies and are optimized for different purposes. The specific details on
-how every domain allocates memory or what internal functions each domain calls
-is considered an implementation detail, but for debugging purposes a simplified
-table can be found at :ref:`default-memory-allocators`.
-The APIs used to allocate and free a block of memory must be from the same domain.
-For example, :c:func:`PyMem_Free` must be used to free memory allocated using :c:func:`PyMem_Malloc`.
+Tất cả các hàm cấp phát thuộc về một trong ba "domain" khác nhau (xem thêm
+:c:type:`PyMemAllocatorDomain`). Các domain này đại diện cho những chiến lược cấp phát khác nhau và được tối ưu hóa cho các mục đích khác nhau. Chi tiết cụ thể về cách mỗi domain cấp phát bộ nhớ hoặc các hàm nội bộ mà mỗi domain gọi được xem là chi tiết triển khai, nhưng để phục vụ việc gỡ lỗi, có thể xem bảng đơn giản hóa tại :ref:`default-memory-allocators`. Các API được dùng để cấp phát và giải phóng một khối bộ nhớ phải thuộc cùng một domain. Ví dụ: phải dùng :c:func:`PyMem_Free` để giải phóng bộ nhớ được cấp phát bằng :c:func:`PyMem_Malloc`.
 
-The three allocation domains are:
+Ba domain cấp phát là:
 
-* Raw domain: intended for allocating memory for general-purpose memory
-  buffers where the allocation *must* go to the system allocator or where the
-  allocator can operate without an :term:`attached thread state`. The memory
-  is requested directly from the system. See :ref:`Raw Memory Interface <raw-memoryinterface>`.
+* Domain Raw: dùng để cấp phát bộ nhớ cho các bộ đệm bộ nhớ đa dụng, trong đó việc cấp phát *must* chuyển đến system allocator hoặc allocator có thể hoạt động mà không cần :term:`attached thread state`. Bộ nhớ được yêu cầu trực tiếp từ hệ thống. Xem :ref:`Raw Memory Interface <raw-memoryinterface>`.
 
-* "Mem" domain: intended for allocating memory for Python buffers and
-  general-purpose memory buffers where the allocation must be performed with
-  an :term:`attached thread state`. The memory is taken from the Python private heap.
-  See :ref:`Memory Interface <memoryinterface>`.
+* Domain "Mem": dùng để cấp phát bộ nhớ cho các bộ đệm Python và các bộ đệm bộ nhớ đa dụng, trong đó việc cấp phát phải được thực hiện bằng :term:`attached thread state`. Bộ nhớ được lấy từ private heap của Python. Xem :ref:`Memory Interface <memoryinterface>`.
 
-* Object domain: intended for allocating memory for Python objects. The
-  memory is taken from the Python private heap. See :ref:`Object allocators <objectinterface>`.
+* Domain Object: dùng để cấp phát bộ nhớ cho các đối tượng Python. Bộ nhớ được lấy từ private heap của Python. Xem :ref:`Object allocators <objectinterface>`.
 
 .. note::
 
-  The :term:`free-threaded <free threading>` build requires that only Python objects are allocated using the "object" domain
-  and that all Python objects are allocated using that domain. This differs from the prior Python versions,
-  where this was only a best practice and not a hard requirement.
+  Bản build :term:`free-threaded <free threading>` yêu cầu chỉ các đối tượng Python được cấp phát bằng domain "object" và tất cả đối tượng Python đều được cấp phát bằng domain đó. Điều này khác với các phiên bản Python trước đây, trong đó đây chỉ là một best practice chứ không phải yêu cầu bắt buộc.
 
-  For example, buffers (non-Python objects) should be allocated using :c:func:`PyMem_Malloc`,
-  :c:func:`PyMem_RawMalloc`, or :c:func:`malloc`, but not :c:func:`PyObject_Malloc`.
+  Ví dụ: các buffer (đối tượng không phải Python) nên được cấp phát bằng :c:func:`PyMem_Malloc`,
+  :c:func:`PyMem_RawMalloc`, hoặc :c:func:`malloc`, nhưng không phải :c:func:`PyObject_Malloc`.
 
-  See :ref:`Memory Allocation APIs <free-threaded-memory-allocation>`.
+  Xem :ref:`Các API cấp phát bộ nhớ <free-threaded-memory-allocation>`.
 
 
 .. _raw-memoryinterface:
 
-Raw Memory Interface
+Giao diện bộ nhớ thô
 ====================
 
-The following function sets are wrappers to the system allocator. These
-functions are thread-safe, so a :term:`thread state` does not
-need to be :term:`attached <attached thread state>`.
+Các tập hợp hàm sau đây là wrapper cho allocator của hệ thống. Các hàm này an toàn với thread, vì vậy một :term:`thread state` không cần phải được :term:`gắn <attached thread state>`.
 
-The :ref:`default raw memory allocator <default-memory-allocators>` uses
-the following functions: :c:func:`malloc`, :c:func:`calloc`, :c:func:`realloc`
-and :c:func:`!free`; call ``malloc(1)`` (or ``calloc(1, 1)``) when requesting
-zero bytes.
+:ref:`Allocator bộ nhớ thô mặc định <default-memory-allocators>` sử dụng các hàm sau: :c:func:`malloc`, :c:func:`calloc`, :c:func:`realloc` và :c:func:`!free`; gọi ``malloc(1)`` (hoặc ``calloc(1, 1)``) khi yêu cầu zero byte.
 
 .. versionadded:: 3.4
 
 .. c:function:: void* PyMem_RawMalloc(size_t n)
 
-   Allocates *n* bytes and returns a pointer of type :c:expr:`void*` to the
-   allocated memory, or ``NULL`` if the request fails.
+   Cấp phát *n* byte và trả về một con trỏ kiểu :c:expr:`void*` trỏ đến vùng nhớ đã cấp phát, hoặc ``NULL`` nếu yêu cầu không thành công.
 
-   Requesting zero bytes returns a distinct non-``NULL`` pointer if possible, as
-   if ``PyMem_RawMalloc(1)`` had been called instead. The memory will not have
-   been initialized in any way.
+   Việc yêu cầu số byte bằng không sẽ trả về một con trỏ không phải ``NULL`` nếu có thể, như thể ``PyMem_RawMalloc(1)`` đã được gọi thay thế. Bộ nhớ sẽ không được khởi tạo theo bất kỳ cách nào.
 
 
 .. c:function:: void* PyMem_RawCalloc(size_t nelem, size_t elsize)
 
-   Allocates *nelem* elements each of size *elsize* bytes and returns
-   a pointer of type :c:expr:`void*` to the allocated memory, or ``NULL`` if the
-   request fails. The memory is initialized to zeros.
+   Cấp phát *nelem* phần tử, mỗi phần tử có kích thước *elsize* byte, và trả về một con trỏ kiểu :c:expr:`void*` trỏ đến vùng nhớ đã cấp phát, hoặc ``NULL`` nếu yêu cầu thất bại. Bộ nhớ được khởi tạo bằng các giá trị zero.
 
-   Requesting zero elements or elements of size zero bytes returns a distinct
-   non-``NULL`` pointer if possible, as if ``PyMem_RawCalloc(1, 1)`` had been
-   called instead.
+   Yêu cầu cấp phát zero phần tử hoặc phần tử có kích thước zero byte sẽ trả về một con trỏ khác ``NULL`` nếu có thể, như thể ``PyMem_RawCalloc(1, 1)`` đã được gọi thay thế.
 
    .. versionadded:: 3.5
 
 
 .. c:function:: void* PyMem_RawRealloc(void *p, size_t n)
 
-   Resizes the memory block pointed to by *p* to *n* bytes. The contents will
-   be unchanged to the minimum of the old and the new sizes.
+   Thay đổi kích thước khối bộ nhớ được trỏ đến bởi *p* thành *n* byte. Nội dung sẽ không thay đổi trong phạm vi kích thước nhỏ hơn giữa kích thước cũ và mới.
 
-   If *p* is ``NULL``, the call is equivalent to ``PyMem_RawMalloc(n)``; else if
-   *n* is equal to zero, the memory block is resized but is not freed, and the
-   returned pointer is non-``NULL``.
+   Nếu *p* là ``NULL``, lệnh gọi tương đương với ``PyMem_RawMalloc(n)``; nếu không, nếu *n* bằng zero, khối bộ nhớ sẽ được thay đổi kích thước nhưng không được giải phóng, và con trỏ được trả về là khác ``NULL``.
 
-   Unless *p* is ``NULL``, it must have been returned by a previous call to
-   :c:func:`PyMem_RawMalloc`, :c:func:`PyMem_RawRealloc` or
+   Trừ khi *p* là ``NULL``, nó phải được trả về bởi một lần gọi trước đó đến
+   :c:func:`PyMem_RawMalloc`, :c:func:`PyMem_RawRealloc` hoặc
    :c:func:`PyMem_RawCalloc`.
 
-   If the request fails, :c:func:`PyMem_RawRealloc` returns ``NULL`` and *p*
-   remains a valid pointer to the previous memory area.
+   Nếu yêu cầu không thành công, :c:func:`PyMem_RawRealloc` trả về ``NULL`` và *p* vẫn là một con trỏ hợp lệ tới vùng bộ nhớ trước đó.
 
 
 .. c:function:: void PyMem_RawFree(void *p)
 
-   Frees the memory block pointed to by *p*, which must have been returned by a
-   previous call to :c:func:`PyMem_RawMalloc`, :c:func:`PyMem_RawRealloc` or
-   :c:func:`PyMem_RawCalloc`.  Otherwise, or if ``PyMem_RawFree(p)`` has been
-   called before, undefined behavior occurs.
+   Giải phóng khối bộ nhớ được *p* trỏ tới; khối này phải đã được trả về bởi một lần gọi trước đó tới :c:func:`PyMem_RawMalloc`, :c:func:`PyMem_RawRealloc` hoặc
+   :c:func:`PyMem_RawCalloc`. Nếu không, hoặc nếu ``PyMem_RawFree(p)`` đã được gọi trước đó, hành vi không xác định sẽ xảy ra.
 
-   If *p* is ``NULL``, no operation is performed.
+   Nếu *p* là ``NULL``, không thực hiện thao tác nào.
 
 
 .. _memoryinterface:
 
-Memory Interface
+Giao diện bộ nhớ
 ================
 
-The following function sets, modeled after the ANSI C standard, but specifying
-behavior when requesting zero bytes, are available for allocating and releasing
-memory from the Python heap.
+Các tập hợp hàm sau đây, được mô phỏng theo tiêu chuẩn ANSI C nhưng quy định hành vi khi yêu cầu số byte bằng không, có sẵn để cấp phát và giải phóng bộ nhớ từ heap Python.
 
-In the GIL-enabled build (default build) the
-:ref:`default memory allocator <default-memory-allocators>` uses the
-:ref:`pymalloc memory allocator <pymalloc>`, whereas in the
-:term:`free-threaded build`, the default is the
-:ref:`mimalloc memory allocator <mimalloc>` instead.
+Trong bản build bật GIL (bản build mặc định), các
+:ref:`bộ cấp phát bộ nhớ mặc định <default-memory-allocators>` sử dụng
+:ref:`bộ cấp phát bộ nhớ pymalloc <pymalloc>`, trong khi ở
+:term:`free-threaded build`, mặc định là
+:ref:`bộ cấp phát bộ nhớ mimalloc <mimalloc>` thay vào đó.
 
 .. warning::
 
-   There must be an :term:`attached thread state` when using these functions.
+   Phải có một :term:`attached thread state` khi sử dụng các hàm này.
 
 .. versionchanged:: 3.6
 
-   The default allocator is now pymalloc instead of system :c:func:`malloc`.
+   Bộ cấp phát mặc định hiện là pymalloc thay vì :c:func:`malloc` hệ thống.
 
 .. versionchanged:: 3.13
 
-   In the :term:`free-threaded <free threading>` build, the default allocator
-   is now :ref:`mimalloc <mimalloc>`.
+   Trong bản build :term:`free-threaded <free threading>`, bộ cấp phát mặc định hiện là :ref:`mimalloc <mimalloc>`.
 
 .. c:function:: void* PyMem_Malloc(size_t n)
 
-   Allocates *n* bytes and returns a pointer of type :c:expr:`void*` to the
-   allocated memory, or ``NULL`` if the request fails.
+   Cấp phát *n* byte và trả về một con trỏ kiểu :c:expr:`void*` trỏ đến vùng nhớ đã cấp phát, hoặc ``NULL`` nếu yêu cầu thất bại.
 
-   Requesting zero bytes returns a distinct non-``NULL`` pointer if possible, as
-   if ``PyMem_Malloc(1)`` had been called instead. The memory will not have
-   been initialized in any way.
+   Việc yêu cầu 0 byte sẽ trả về một con trỏ khác ``NULL`` nếu có thể, như thể ``PyMem_Malloc(1)`` đã được gọi thay thế. Vùng nhớ sẽ không được khởi tạo theo bất kỳ cách nào.
 
 
 .. c:function:: void* PyMem_Calloc(size_t nelem, size_t elsize)
 
-   Allocates *nelem* elements each of size *elsize* bytes and returns
-   a pointer of type :c:expr:`void*` to the allocated memory, or ``NULL`` if the
-   request fails. The memory is initialized to zeros.
+   Cấp phát *nelem* phần tử, mỗi phần tử có kích thước *elsize* byte, và trả về một con trỏ kiểu :c:expr:`void*` trỏ đến vùng nhớ đã cấp phát, hoặc ``NULL`` nếu yêu cầu thất bại. Vùng nhớ được khởi tạo bằng các giá trị 0.
 
-   Requesting zero elements or elements of size zero bytes returns a distinct
-   non-``NULL`` pointer if possible, as if ``PyMem_Calloc(1, 1)`` had been called
-   instead.
+   Việc yêu cầu 0 phần tử hoặc các phần tử có kích thước 0 byte sẽ trả về một con trỏ khác ``NULL`` nếu có thể, như thể ``PyMem_Calloc(1, 1)`` đã được gọi thay thế.
 
    .. versionadded:: 3.5
 
 
 .. c:function:: void* PyMem_Realloc(void *p, size_t n)
 
-   Resizes the memory block pointed to by *p* to *n* bytes. The contents will be
-   unchanged to the minimum of the old and the new sizes.
+   Thay đổi kích thước khối nhớ được con trỏ *p* trỏ đến thành *n* byte. Nội dung sẽ không thay đổi trong phạm vi kích thước nhỏ hơn giữa kích thước cũ và mới.
 
-   If *p* is ``NULL``, the call is equivalent to ``PyMem_Malloc(n)``; else if *n*
-   is equal to zero, the memory block is resized but is not freed, and the
-   returned pointer is non-``NULL``.
+   Nếu *p* là ``NULL``, lệnh gọi này tương đương với ``PyMem_Malloc(n)``; nếu không, nếu *n* bằng 0, khối nhớ sẽ được thay đổi kích thước nhưng không được giải phóng, và con trỏ được trả về sẽ khác ``NULL``.
 
-   Unless *p* is ``NULL``, it must have been returned by a previous call to
-   :c:func:`PyMem_Malloc`, :c:func:`PyMem_Realloc` or :c:func:`PyMem_Calloc`.
+   Trừ khi *p* là ``NULL``, nó phải được trả về từ một lần gọi trước đó tới
+   :c:func:`PyMem_Malloc`, :c:func:`PyMem_Realloc` hoặc :c:func:`PyMem_Calloc`.
 
-   If the request fails, :c:func:`PyMem_Realloc` returns ``NULL`` and *p* remains
-   a valid pointer to the previous memory area.
+   Nếu yêu cầu thất bại, :c:func:`PyMem_Realloc` trả về ``NULL`` và *p* vẫn là một con trỏ hợp lệ đến vùng bộ nhớ trước đó.
 
 
 .. c:function:: void PyMem_Free(void *p)
 
-   Frees the memory block pointed to by *p*, which must have been returned by a
-   previous call to :c:func:`PyMem_Malloc`, :c:func:`PyMem_Realloc` or
-   :c:func:`PyMem_Calloc`.  Otherwise, or if ``PyMem_Free(p)`` has been called
-   before, undefined behavior occurs.
+   Giải phóng khối bộ nhớ được *p* trỏ tới; khối này phải được trả về bởi một lần gọi trước đó đến :c:func:`PyMem_Malloc`, :c:func:`PyMem_Realloc` hoặc
+   :c:func:`PyMem_Calloc`. Nếu không, hoặc nếu ``PyMem_Free(p)`` đã được gọi trước đó, hành vi không xác định sẽ xảy ra.
 
-   If *p* is ``NULL``, no operation is performed.
+   Nếu *p* là ``NULL``, không có thao tác nào được thực hiện.
 
-The following type-oriented macros are provided for convenience.  Note  that
-*TYPE* refers to any C type.
+Các macro định hướng theo kiểu sau đây được cung cấp để thuận tiện. Lưu ý rằng *TYPE* đề cập đến bất kỳ kiểu C nào.
 
 
 .. c:macro:: PyMem_New(TYPE, n)
 
-   Same as :c:func:`PyMem_Malloc`, but allocates ``(n * sizeof(TYPE))`` bytes of
-   memory.  Returns a pointer cast to ``TYPE*``.  The memory will not have
-   been initialized in any way.
+   Tương tự như :c:func:`PyMem_Malloc`, nhưng cấp phát ``(n * sizeof(TYPE))`` byte bộ nhớ. Trả về một con trỏ được ép kiểu thành ``TYPE*``. Bộ nhớ sẽ không được khởi tạo theo bất kỳ cách nào.
 
 
 .. c:macro:: PyMem_Resize(p, TYPE, n)
 
-   Same as :c:func:`PyMem_Realloc`, but the memory block is resized to ``(n *
-   sizeof(TYPE))`` bytes.  Returns a pointer cast to ``TYPE*``. On return,
-   *p* will be a pointer to the new memory area, or ``NULL`` in the event of
-   failure.
+   Giống như :c:func:`PyMem_Realloc`, nhưng khối bộ nhớ được thay đổi kích thước thành ``(n * sizeof(TYPE))`` byte. Trả về một con trỏ được ép kiểu thành ``TYPE*``. Khi trả về, *p* sẽ là con trỏ tới vùng nhớ mới hoặc ``NULL`` nếu xảy ra lỗi.
 
-   This is a C preprocessor macro; *p* is always reassigned.  Save the original
-   value of *p* to avoid losing memory when handling errors.
+   Đây là một macro tiền xử lý C; *p* luôn được gán lại. Hãy lưu giá trị ban đầu của *p* để tránh làm mất vùng nhớ khi xử lý lỗi.
 
 
 .. c:function:: void PyMem_Del(void *p)
 
-   Same as :c:func:`PyMem_Free`.
+   Giống như :c:func:`PyMem_Free`.
 
 
-Deprecated aliases
-------------------
+Bí danh đã lỗi thời
+-------------------
 
-These are :term:`soft deprecated` aliases to existing functions and macros.
-They exist solely for backwards compatibility.
+Đây là các bí danh :term:`soft deprecated` của những hàm và macro hiện có. Chúng chỉ tồn tại để duy trì khả năng tương thích ngược.
 
 .. list-table::
    :widths: auto
    :header-rows: 1
 
-   * * Deprecated alias
-     * Corresponding function or macro
+   * * Bí danh đã lỗi thời
+     * Hàm hoặc macro tương ứng
    * * .. c:macro:: PyMem_MALLOC(size)
      * :c:func:`PyMem_Malloc`
    * * .. c:macro:: PyMem_NEW(type, size)
@@ -329,95 +231,74 @@ They exist solely for backwards compatibility.
 
 .. versionchanged:: 3.4
 
-   The macros are now aliases of the corresponding functions and macros.
-   Previously, their behavior was the same, but their use did not necessarily
-   preserve binary compatibility across Python versions.
+   Các macro hiện là bí danh của các hàm và macro tương ứng. Trước đây, hành vi của chúng giống nhau, nhưng việc sử dụng chúng không nhất thiết vẫn duy trì khả năng tương thích nhị phân giữa các phiên bản Python.
 
 .. deprecated:: 2.0
 
 
 .. _objectinterface:
 
-Object allocators
-=================
+Bộ cấp phát đối tượng
+=====================
 
-The following function sets, modeled after the ANSI C standard, but specifying
-behavior when requesting zero bytes, are available for allocating and releasing
-memory from the Python heap.
+Các nhóm hàm sau đây, được xây dựng theo tiêu chuẩn ANSI C nhưng quy định hành vi khi yêu cầu số byte bằng không, có sẵn để cấp phát và giải phóng bộ nhớ từ heap Python.
 
 .. note::
-    There is no guarantee that the memory returned by these allocators can be
-    successfully cast to a Python object when intercepting the allocating
-    functions in this domain by the methods described in
-    the :ref:`Customize Memory Allocators <customize-memory-allocators>` section.
+    Không có gì đảm bảo rằng bộ nhớ được các bộ cấp phát này trả về có thể được ép kiểu thành công thành một đối tượng Python khi can thiệp vào các hàm cấp phát trong miền này bằng các phương thức được mô tả trong phần :ref:`Customize Memory Allocators <customize-memory-allocators>`.
 
-The :ref:`default object allocator <default-memory-allocators>` uses the
-:ref:`pymalloc memory allocator <pymalloc>`.  In the
-:term:`free-threaded <free threading>` build, the default is the
-:ref:`mimalloc memory allocator <mimalloc>` instead.
+:ref:`Bộ cấp phát đối tượng mặc định <default-memory-allocators>` sử dụng
+:ref:`bộ cấp phát bộ nhớ pymalloc <pymalloc>`.  Trong bản dựng
+:term:`không có GIL <free threading>`, mặc định là
+thay vào đó là :ref:`mimalloc memory allocator <mimalloc>`.
 
 .. warning::
 
-   There must be an :term:`attached thread state` when using these functions.
+   Phải có một :term:`attached thread state` khi sử dụng các hàm này.
 
 .. c:function:: void* PyObject_Malloc(size_t n)
 
-   Allocates *n* bytes and returns a pointer of type :c:expr:`void*` to the
-   allocated memory, or ``NULL`` if the request fails.
+   Cấp phát *n* byte và trả về một con trỏ kiểu :c:expr:`void*` trỏ đến vùng nhớ đã cấp phát, hoặc ``NULL`` nếu yêu cầu thất bại.
 
-   Requesting zero bytes returns a distinct non-``NULL`` pointer if possible, as
-   if ``PyObject_Malloc(1)`` had been called instead. The memory will not have
-   been initialized in any way.
+   Yêu cầu cấp phát 0 byte sẽ trả về một con trỏ khác biệt và không phải ``NULL``, nếu có thể, như thể ``PyObject_Malloc(1)`` đã được gọi thay thế. Vùng nhớ sẽ không được khởi tạo theo bất kỳ cách nào.
 
 
 .. c:function:: void* PyObject_Calloc(size_t nelem, size_t elsize)
 
-   Allocates *nelem* elements each of size *elsize* bytes and returns
-   a pointer of type :c:expr:`void*` to the allocated memory, or ``NULL`` if the
-   request fails. The memory is initialized to zeros.
+   Cấp phát *nelem* phần tử, mỗi phần tử có kích thước *elsize* byte, và trả về một con trỏ kiểu :c:expr:`void*` trỏ đến vùng nhớ đã cấp phát, hoặc ``NULL`` nếu yêu cầu thất bại. Vùng nhớ được khởi tạo bằng các số 0.
 
-   Requesting zero elements or elements of size zero bytes returns a distinct
-   non-``NULL`` pointer if possible, as if ``PyObject_Calloc(1, 1)`` had been called
-   instead.
+   Yêu cầu cấp phát 0 phần tử hoặc phần tử có kích thước 0 byte sẽ trả về một con trỏ khác biệt và không phải ``NULL``, nếu có thể, như thể ``PyObject_Calloc(1, 1)`` đã được gọi thay thế.
 
    .. versionadded:: 3.5
 
 
 .. c:function:: void* PyObject_Realloc(void *p, size_t n)
 
-   Resizes the memory block pointed to by *p* to *n* bytes. The contents will be
-   unchanged to the minimum of the old and the new sizes.
+   Thay đổi kích thước khối nhớ được *p* trỏ đến thành *n* byte. Nội dung sẽ không thay đổi trong phạm vi kích thước nhỏ hơn giữa kích thước cũ và mới.
 
-   If *p* is ``NULL``, the call is equivalent to ``PyObject_Malloc(n)``; else if *n*
-   is equal to zero, the memory block is resized but is not freed, and the
-   returned pointer is non-``NULL``.
+   Nếu *p* là ``NULL``, lời gọi tương đương với ``PyObject_Malloc(n)``; nếu không, nếu *n* bằng không, khối bộ nhớ được thay đổi kích thước nhưng không được giải phóng, và con trỏ được trả về không phải là ``NULL``.
 
-   Unless *p* is ``NULL``, it must have been returned by a previous call to
-   :c:func:`PyObject_Malloc`, :c:func:`PyObject_Realloc` or :c:func:`PyObject_Calloc`.
+   Trừ khi *p* là ``NULL``, nó phải được trả về bởi một lời gọi trước đó đến
+   :c:func:`PyObject_Malloc`, :c:func:`PyObject_Realloc` hoặc :c:func:`PyObject_Calloc`.
 
-   If the request fails, :c:func:`PyObject_Realloc` returns ``NULL`` and *p* remains
-   a valid pointer to the previous memory area.
+   Nếu yêu cầu không thành công, :c:func:`PyObject_Realloc` trả về ``NULL`` và *p* vẫn là một con trỏ hợp lệ đến vùng bộ nhớ trước đó.
 
 
 .. c:function:: void PyObject_Free(void *p)
 
-   Frees the memory block pointed to by *p*, which must have been returned by a
-   previous call to :c:func:`PyObject_Malloc`, :c:func:`PyObject_Realloc` or
-   :c:func:`PyObject_Calloc`.  Otherwise, or if ``PyObject_Free(p)`` has been called
-   before, undefined behavior occurs.
+   Giải phóng khối bộ nhớ được *p* trỏ tới; khối này phải được trả về bởi một lời gọi trước đó đến :c:func:`PyObject_Malloc`, :c:func:`PyObject_Realloc` hoặc
+   :c:func:`PyObject_Calloc`. Nếu không, hoặc nếu ``PyObject_Free(p)`` đã được gọi trước đó, hành vi không xác định sẽ xảy ra.
 
-   If *p* is ``NULL``, no operation is performed.
+   Nếu *p* là ``NULL``, không có thao tác nào được thực hiện.
 
-   Do not call this directly to free an object's memory; call the type's
-   :c:member:`~PyTypeObject.tp_free` slot instead.
+   Đừng gọi trực tiếp hàm này để giải phóng bộ nhớ của một đối tượng; hãy gọi thành phần của type
+   :c:member:`~PyTypeObject.tp_free` slot thay vào đó.
 
-   Do not use this for memory allocated by :c:macro:`PyObject_GC_New` or
-   :c:macro:`PyObject_GC_NewVar`; use :c:func:`PyObject_GC_Del` instead.
+   Không sử dụng hàm này cho bộ nhớ được cấp phát bởi :c:macro:`PyObject_GC_New` hoặc
+   :c:macro:`PyObject_GC_NewVar`; hãy sử dụng :c:func:`PyObject_GC_Del` thay vào đó.
 
    .. seealso::
 
-      * :c:func:`PyObject_GC_Del` is the equivalent of this function for memory
-        allocated by types that support garbage collection.
+      * :c:func:`PyObject_GC_Del` tương đương với hàm này đối với bộ nhớ được cấp phát bởi các type hỗ trợ garbage collection.
       * :c:func:`PyObject_Malloc`
       * :c:func:`PyObject_Realloc`
       * :c:func:`PyObject_Calloc`
@@ -429,74 +310,76 @@ The :ref:`default object allocator <default-memory-allocators>` uses the
 
 .. _default-memory-allocators:
 
-Default Memory Allocators
-=========================
+Các bộ cấp phát bộ nhớ mặc định
+===============================
 
-Default memory allocators:
+Các bộ cấp phát bộ nhớ mặc định:
 
-===================================  =======================  ====================  ======================  ======================
-Configuration                        Name                     PyMem_RawMalloc       PyMem_Malloc            PyObject_Malloc
-===================================  =======================  ====================  ======================  ======================
-Release build                        ``"pymalloc"``           ``malloc``            ``pymalloc``            ``pymalloc``
-Debug build                          ``"pymalloc_debug"``     ``malloc`` + debug    ``pymalloc`` + debug    ``pymalloc`` + debug
-Release build, without pymalloc      ``"malloc"``             ``malloc``            ``malloc``              ``malloc``
-Debug build, without pymalloc        ``"malloc_debug"``       ``malloc`` + debug    ``malloc`` + debug      ``malloc`` + debug
-Free-threaded build                  ``"mimalloc"``           ``mimalloc``          ``mimalloc``            ``mimalloc``
-Free-threaded debug build            ``"mimalloc_debug"``     ``mimalloc`` + debug  ``mimalloc`` + debug    ``mimalloc`` + debug
-===================================  =======================  ====================  ======================  ======================
++----------------------------------------+----------------------+----------------------+----------------------+----------------------+
+| Cấu hình                               | Tên                  | PyMem_RawMalloc      | PyMem_Malloc         | PyObject_Malloc      |
++========================================+======================+======================+======================+======================+
+| Bản dựng Release                       | ``"pymalloc"``       | ``malloc``           | ``pymalloc``         | ``pymalloc``         |
++----------------------------------------+----------------------+----------------------+----------------------+----------------------+
+| Bản dựng Debug                         | ``"pymalloc_debug"`` | ``malloc`` + debug   | ``pymalloc`` + debug | ``pymalloc`` + debug |
++----------------------------------------+----------------------+----------------------+----------------------+----------------------+
+| Bản build phát hành, không có pymalloc | ``"malloc"``         | ``malloc``           | ``malloc``           | ``malloc``           |
++----------------------------------------+----------------------+----------------------+----------------------+----------------------+
+| Bản build debug, không có pymalloc     | ``"malloc_debug"``   | ``malloc`` + debug   | ``malloc`` + debug   | ``malloc`` + debug   |
++----------------------------------------+----------------------+----------------------+----------------------+----------------------+
+| Bản dựng free-threaded                 | ``"mimalloc"``       | ``mimalloc``         | ``mimalloc``         | ``mimalloc``         |
++----------------------------------------+----------------------+----------------------+----------------------+----------------------+
+| Bản dựng debug free-threaded           | ``"mimalloc_debug"`` | ``mimalloc`` + debug | ``mimalloc`` + debug | ``mimalloc`` + debug |
++----------------------------------------+----------------------+----------------------+----------------------+----------------------+
 
-Legend:
+Chú giải:
 
-* Name: value for :envvar:`PYTHONMALLOC` environment variable.
-* ``malloc``: system allocators from the standard C library, C functions:
-  :c:func:`malloc`, :c:func:`calloc`, :c:func:`realloc` and :c:func:`free`.
-* ``pymalloc``: :ref:`pymalloc memory allocator <pymalloc>`.
-* ``mimalloc``: :ref:`mimalloc memory allocator <mimalloc>`.
-* "+ debug": with :ref:`debug hooks on the Python memory allocators
-  <pymem-debug-hooks>`.
-* "Debug build": :ref:`Python build in debug mode <debug-build>`.
+* Tên: giá trị của biến môi trường :envvar:`PYTHONMALLOC`.
+* ``malloc``: các bộ cấp phát của hệ thống từ thư viện C chuẩn, các hàm C:
+  :c:func:`malloc`, :c:func:`calloc`, :c:func:`realloc` và :c:func:`free`.
+* ``pymalloc``: :ref:`bộ cấp phát bộ nhớ pymalloc <pymalloc>`.
+* ``mimalloc``: :ref:`bộ cấp phát bộ nhớ mimalloc <mimalloc>`.
+* "+ debug": với :ref:`các hook gỡ lỗi trên các bộ cấp phát bộ nhớ Python <pymem-debug-hooks>`.
+* "Bản dựng Debug": :ref:`bản dựng Python ở chế độ gỡ lỗi <debug-build>`.
 
 .. _customize-memory-allocators:
 
-Customize Memory Allocators
-===========================
+Tùy chỉnh bộ cấp phát bộ nhớ
+============================
 
 .. versionadded:: 3.4
 
 .. c:type:: PyMemAllocatorEx
 
-   Structure used to describe a memory block allocator. The structure has
-   the following fields:
+   Cấu trúc dùng để mô tả bộ cấp phát khối bộ nhớ. Cấu trúc có các trường sau:
 
-   +----------------------------------------------------------+---------------------------------------+
-   | Field                                                    | Meaning                               |
-   +==========================================================+=======================================+
-   | ``void *ctx``                                            | user context passed as first argument |
-   +----------------------------------------------------------+---------------------------------------+
-   | ``void* malloc(void *ctx, size_t size)``                 | allocate a memory block               |
-   +----------------------------------------------------------+---------------------------------------+
-   | ``void* calloc(void *ctx, size_t nelem, size_t elsize)`` | allocate a memory block initialized   |
-   |                                                          | with zeros                            |
-   +----------------------------------------------------------+---------------------------------------+
-   | ``void* realloc(void *ctx, void *ptr, size_t new_size)`` | allocate or resize a memory block     |
-   +----------------------------------------------------------+---------------------------------------+
-   | ``void free(void *ctx, void *ptr)``                      | free a memory block                   |
-   +----------------------------------------------------------+---------------------------------------+
+   +----------------------------------------------------------+-----------------------------------------------------------+
+   | Trường                                                   | Ý nghĩa                                                   |
+   +==========================================================+===========================================================+
+   | ``void *ctx``                                            | ngữ cảnh người dùng được truyền dưới dạng đối số đầu tiên |
+   +----------------------------------------------------------+-----------------------------------------------------------+
+   | ``void* malloc(void *ctx, size_t size)``                 | cấp phát một khối bộ nhớ                                  |
+   +----------------------------------------------------------+-----------------------------------------------------------+
+   | ``void* calloc(void *ctx, size_t nelem, size_t elsize)`` | cấp phát một khối bộ nhớ được khởi tạo bằng các số 0      |
+   +----------------------------------------------------------+-----------------------------------------------------------+
+   | ``void* realloc(void *ctx, void *ptr, size_t new_size)`` | cấp phát hoặc thay đổi kích thước một khối bộ nhớ         |
+   +----------------------------------------------------------+-----------------------------------------------------------+
+   | ``void free(void *ctx, void *ptr)``                      | giải phóng một khối bộ nhớ                                |
+   +----------------------------------------------------------+-----------------------------------------------------------+
 
    .. versionchanged:: 3.5
-      The :c:type:`!PyMemAllocator` structure was renamed to
-      :c:type:`PyMemAllocatorEx` and a new ``calloc`` field was added.
+      Cấu trúc :c:type:`!PyMemAllocator` đã được đổi tên thành
+      :c:type:`PyMemAllocatorEx` và một trường ``calloc`` mới đã được thêm vào.
 
 
 .. c:type:: PyMemAllocatorDomain
 
-   Enum used to identify an allocator domain. Domains:
+   Enum dùng để xác định miền của allocator. Các miền:
 
    .. c:namespace:: NULL
 
    .. c:macro:: PYMEM_DOMAIN_RAW
 
-      Functions:
+      Các hàm:
 
       * :c:func:`PyMem_RawMalloc`
       * :c:func:`PyMem_RawRealloc`
@@ -505,7 +388,7 @@ Customize Memory Allocators
 
    .. c:macro:: PYMEM_DOMAIN_MEM
 
-      Functions:
+      Các hàm:
 
       * :c:func:`PyMem_Malloc`,
       * :c:func:`PyMem_Realloc`
@@ -514,7 +397,7 @@ Customize Memory Allocators
 
    .. c:macro:: PYMEM_DOMAIN_OBJ
 
-      Functions:
+      Các hàm:
 
       * :c:func:`PyObject_Malloc`
       * :c:func:`PyObject_Realloc`
@@ -523,319 +406,230 @@ Customize Memory Allocators
 
 .. c:function:: void PyMem_GetAllocator(PyMemAllocatorDomain domain, PyMemAllocatorEx *allocator)
 
-   Get the memory block allocator of the specified domain.
+   Lấy bộ cấp phát khối bộ nhớ của miền được chỉ định.
 
 
 .. c:function:: void PyMem_SetAllocator(PyMemAllocatorDomain domain, PyMemAllocatorEx *allocator)
 
-   Set the memory block allocator of the specified domain.
+   Thiết lập bộ cấp phát khối bộ nhớ của miền được chỉ định.
 
-   The new allocator must return a distinct non-``NULL`` pointer when requesting
-   zero bytes.
+   Bộ cấp phát mới phải trả về một con trỏ khác biệt không phải ``NULL`` khi yêu cầu 0 byte.
 
-   For the :c:macro:`PYMEM_DOMAIN_RAW` domain, the allocator must be
-   thread-safe: a :term:`thread state` is not :term:`attached <attached thread state>`
-   when the allocator is called.
+   Đối với miền :c:macro:`PYMEM_DOMAIN_RAW`, bộ cấp phát phải an toàn với thread: một :term:`thread state` không :term:`attached <attached thread state>` khi bộ cấp phát được gọi.
 
-   For the remaining domains, the allocator must also be thread-safe:
-   the allocator may be called in different interpreters that do not
-   share a :term:`GIL`.
+   Đối với các miền còn lại, bộ cấp phát cũng phải an toàn với thread: bộ cấp phát có thể được gọi trong các interpreter khác nhau không dùng chung một :term:`GIL`.
 
-   If the new allocator is not a hook (does not call the previous allocator),
-   the :c:func:`PyMem_SetupDebugHooks` function must be called to reinstall the
-   debug hooks on top on the new allocator.
+   Nếu bộ cấp phát mới không phải là một hook (không gọi bộ cấp phát trước đó), phải gọi hàm :c:func:`PyMem_SetupDebugHooks` để cài đặt lại các debug hook trên bộ cấp phát mới.
 
-   See also :c:member:`PyPreConfig.allocator` and :ref:`Preinitialize Python
-   with PyPreConfig <c-preinit>`.
+   Xem thêm :c:member:`PyPreConfig.allocator` và :ref:`Khởi tạo trước Python bằng PyPreConfig <c-preinit>`.
 
    .. warning::
 
-       :c:func:`PyMem_SetAllocator` does have the following contract:
+       :c:func:`PyMem_SetAllocator` tuân theo hợp đồng sau đây:
 
-       * It can be called after :c:func:`Py_PreInitialize` and before
-         :c:func:`Py_InitializeFromConfig` to install a custom memory
-         allocator. There are no restrictions over the installed allocator
-         other than the ones imposed by the domain (for instance, the Raw
-         Domain allows the allocator to be called without an :term:`attached thread state`).
-         See :ref:`the section on allocator domains <allocator-domains>` for more
-         information.
+       * Có thể gọi nó sau :c:func:`Py_PreInitialize` và trước
+         :c:func:`Py_InitializeFromConfig` để cài đặt một memory allocator tùy chỉnh. Không có hạn chế nào đối với allocator đã cài đặt ngoài những hạn chế do domain áp đặt (chẳng hạn, Raw Domain cho phép gọi allocator mà không cần :term:`attached thread state`). Xem :ref:`phần về các domain của allocator <allocator-domains>` để biết thêm thông tin.
 
-       * If called after Python has finish initializing (after
-         :c:func:`Py_InitializeFromConfig` has been called) the allocator
-         **must** wrap the existing allocator. Substituting the current
-         allocator for some other arbitrary one is **not supported**.
+       * Nếu được gọi sau khi Python hoàn tất việc khởi tạo (sau khi
+         :c:func:`Py_InitializeFromConfig` đã được gọi), allocator **phải** bao bọc allocator hiện có. Việc thay thế allocator hiện tại bằng một allocator tùy ý khác **không được hỗ trợ**.
 
    .. versionchanged:: 3.12
-      All allocators must be thread-safe.
+      Tất cả allocator phải an toàn với thread.
 
 
 .. c:function:: void PyMem_SetupDebugHooks(void)
 
-   Setup :ref:`debug hooks in the Python memory allocators <pymem-debug-hooks>`
-   to detect memory errors.
+   Thiết lập :ref:`các hook debug trong bộ cấp phát bộ nhớ Python <pymem-debug-hooks>` để phát hiện lỗi bộ nhớ.
 
 
 .. _pymem-debug-hooks:
 
-Debug hooks on the Python memory allocators
-===========================================
+Các hook debug trên bộ cấp phát bộ nhớ Python
+=============================================
 
-When :ref:`Python is built in debug mode <debug-build>`, the
-:c:func:`PyMem_SetupDebugHooks` function is called at the :ref:`Python
-preinitialization <c-preinit>` to setup debug hooks on Python memory allocators
-to detect memory errors.
+Khi :ref:`Python được xây dựng ở chế độ debug <debug-build>`, phần này
+hàm :c:func:`PyMem_SetupDebugHooks` được gọi trong :ref:`giai đoạn khởi tạo trước Python <c-preinit>` để thiết lập các hook debug trên bộ cấp phát bộ nhớ Python nhằm phát hiện lỗi bộ nhớ.
 
-The :envvar:`PYTHONMALLOC` environment variable can be used to install debug
-hooks on a Python compiled in release mode (ex: ``PYTHONMALLOC=debug``).
+Có thể sử dụng biến môi trường :envvar:`PYTHONMALLOC` để cài đặt các hook debug trên Python được biên dịch ở chế độ release (ví dụ: ``PYTHONMALLOC=debug``).
 
-The :c:func:`PyMem_SetupDebugHooks` function can be used to set debug hooks
-after calling :c:func:`PyMem_SetAllocator`.
+Có thể sử dụng hàm :c:func:`PyMem_SetupDebugHooks` để thiết lập các hook debug sau khi gọi :c:func:`PyMem_SetAllocator`.
 
-These debug hooks fill dynamically allocated memory blocks with special,
-recognizable bit patterns. Newly allocated memory is filled with the byte
-``0xCD`` (``PYMEM_CLEANBYTE``), freed memory is filled with the byte ``0xDD``
-(``PYMEM_DEADBYTE``). Memory blocks are surrounded by "forbidden bytes"
-filled with the byte ``0xFD`` (``PYMEM_FORBIDDENBYTE``). Strings of these bytes
-are unlikely to be valid addresses, floats, or ASCII strings.
+Các hook debug này lấp đầy các khối bộ nhớ được cấp phát động bằng những mẫu bit đặc biệt, dễ nhận biết. Bộ nhớ mới được cấp phát được lấp đầy bằng byte ``0xCD`` (``PYMEM_CLEANBYTE``), còn bộ nhớ đã giải phóng được lấp đầy bằng byte ``0xDD`` (``PYMEM_DEADBYTE``). Các khối bộ nhớ được bao quanh bởi các "byte bị cấm", được lấp đầy bằng byte ``0xFD`` (``PYMEM_FORBIDDENBYTE``). Các chuỗi byte này khó có khả năng là địa chỉ hợp lệ, số thực hoặc chuỗi ASCII.
 
-Runtime checks:
+Kiểm tra runtime:
 
-- Detect API violations. For example, detect if :c:func:`PyObject_Free` is
-  called on a memory block allocated by :c:func:`PyMem_Malloc`.
-- Detect write before the start of the buffer (buffer underflow).
-- Detect write after the end of the buffer (buffer overflow).
-- Check that there is an :term:`attached thread state` when
-  allocator functions of :c:macro:`PYMEM_DOMAIN_OBJ` (ex:
-  :c:func:`PyObject_Malloc`) and :c:macro:`PYMEM_DOMAIN_MEM` (ex:
-  :c:func:`PyMem_Malloc`) domains are called.
+- Phát hiện các vi phạm API. Ví dụ: phát hiện trường hợp gọi :c:func:`PyObject_Free` trên một khối bộ nhớ được cấp phát bởi :c:func:`PyMem_Malloc`.
+- Phát hiện việc ghi trước phần đầu của bộ đệm (buffer underflow).
+- Phát hiện việc ghi sau phần cuối của bộ đệm (buffer overflow).
+- Kiểm tra rằng có một :term:`attached thread state` khi các hàm allocator của :c:macro:`PYMEM_DOMAIN_OBJ` (ví dụ:
+  :c:func:`PyObject_Malloc`) và các miền :c:macro:`PYMEM_DOMAIN_MEM` (ví dụ:
+  :c:func:`PyMem_Malloc`) được gọi.
 
-On error, the debug hooks use the :mod:`tracemalloc` module to get the
-traceback where a memory block was allocated. The traceback is only displayed
-if :mod:`tracemalloc` is tracing Python memory allocations and the memory block
-was traced.
+Khi xảy ra lỗi, các debug hook sử dụng module :mod:`tracemalloc` để lấy traceback tại nơi một khối bộ nhớ được cấp phát. Traceback chỉ được hiển thị nếu :mod:`tracemalloc` đang trace các lần cấp phát bộ nhớ của Python và khối bộ nhớ đó đã được trace.
 
-Let *S* = ``sizeof(size_t)``. ``2*S`` bytes are added at each end of each block
-of *N* bytes requested.  The memory layout is like so, where p represents the
-address returned by a malloc-like or realloc-like function (``p[i:j]`` means
-the slice of bytes from ``*(p+i)`` inclusive up to ``*(p+j)`` exclusive; note
-that the treatment of negative indices differs from a Python slice):
+Gọi *S* = ``sizeof(size_t)``. Có ``2*S`` byte được thêm vào mỗi đầu của từng khối gồm *N* byte được yêu cầu. Bố cục bộ nhớ như sau, trong đó p biểu thị địa chỉ được trả về bởi một hàm giống malloc hoặc realloc (``p[i:j]`` có nghĩa là lát byte từ ``*(p+i)`` bao gồm đến ``*(p+j)`` không bao gồm; lưu ý rằng cách xử lý các chỉ mục âm khác với lát trong Python):
 
 ``p[-2*S:-S]``
-    Number of bytes originally asked for.  This is a size_t, big-endian (easier
-    to read in a memory dump).
+    Số byte được yêu cầu ban đầu. Đây là một size_t, theo thứ tự big-endian (dễ đọc hơn trong bản kết xuất bộ nhớ).
 ``p[-S]``
-    API identifier (ASCII character):
+    Mã định danh API (ký tự ASCII):
 
-    * ``'r'`` for :c:macro:`PYMEM_DOMAIN_RAW`.
-    * ``'m'`` for :c:macro:`PYMEM_DOMAIN_MEM`.
-    * ``'o'`` for :c:macro:`PYMEM_DOMAIN_OBJ`.
+    * ``'r'`` cho :c:macro:`PYMEM_DOMAIN_RAW`.
+    * ``'m'`` cho :c:macro:`PYMEM_DOMAIN_MEM`.
+    * ``'o'`` cho :c:macro:`PYMEM_DOMAIN_OBJ`.
 
 ``p[-S+1:0]``
-    Copies of PYMEM_FORBIDDENBYTE.  Used to catch under- writes and reads.
+    Các bản sao của PYMEM_FORBIDDENBYTE. Được dùng để phát hiện việc ghi và đọc vượt quá giới hạn.
 
 ``p[0:N]``
-    The requested memory, filled with copies of PYMEM_CLEANBYTE, used to catch
-    reference to uninitialized memory.  When a realloc-like function is called
-    requesting a larger memory block, the new excess bytes are also filled with
-    PYMEM_CLEANBYTE.  When a free-like function is called, these are
-    overwritten with PYMEM_DEADBYTE, to catch reference to freed memory.  When
-    a realloc- like function is called requesting a smaller memory block, the
-    excess old bytes are also filled with PYMEM_DEADBYTE.
+    Vùng bộ nhớ được yêu cầu, chứa các bản sao của PYMEM_CLEANBYTE, được dùng để phát hiện việc tham chiếu đến bộ nhớ chưa được khởi tạo. Khi một hàm dạng realloc được gọi để yêu cầu một khối bộ nhớ lớn hơn, các byte dư mới cũng được điền bằng PYMEM_CLEANBYTE. Khi một hàm dạng free được gọi, chúng sẽ bị ghi đè bằng PYMEM_DEADBYTE để phát hiện việc tham chiếu đến bộ nhớ đã được giải phóng. Khi một hàm dạng realloc được gọi để yêu cầu một khối bộ nhớ nhỏ hơn, các byte cũ dư ra cũng được điền bằng PYMEM_DEADBYTE.
 
 ``p[N:N+S]``
-    Copies of PYMEM_FORBIDDENBYTE.  Used to catch over- writes and reads.
+    Các bản sao của PYMEM_FORBIDDENBYTE. Được dùng để phát hiện việc ghi và đọc vượt quá giới hạn.
 
 ``p[N+S:N+2*S]``
-    Only used if the ``PYMEM_DEBUG_SERIALNO`` macro is defined (not defined by
-    default).
+    Chỉ được sử dụng nếu macro ``PYMEM_DEBUG_SERIALNO`` được định nghĩa (theo mặc định thì không được định nghĩa).
 
-    A serial number, incremented by 1 on each call to a malloc-like or
-    realloc-like function.  Big-endian :c:type:`size_t`.  If "bad memory" is detected
-    later, the serial number gives an excellent way to set a breakpoint on the
-    next run, to capture the instant at which this block was passed out.  The
-    static function bumpserialno() in obmalloc.c is the only place the serial
-    number is incremented, and exists so you can set such a breakpoint easily.
+    Một số sê-ri, được tăng thêm 1 sau mỗi lần gọi một hàm dạng malloc hoặc realloc. :c:type:`size_t` big-endian. Nếu phát hiện "bộ nhớ không hợp lệ" sau đó, số sê-ri cung cấp một cách rất hiệu quả để đặt breakpoint trong lần chạy tiếp theo, nhằm ghi lại thời điểm khối này được cấp phát. Hàm tĩnh bumpserialno() trong obmalloc.c là nơi duy nhất số sê-ri được tăng, và tồn tại để bạn có thể dễ dàng đặt breakpoint như vậy.
 
-A realloc-like or free-like function first checks that the PYMEM_FORBIDDENBYTE
-bytes at each end are intact.  If they've been altered, diagnostic output is
-written to stderr, and the program is aborted via Py_FatalError().  The other
-main failure mode is provoking a memory error when a program reads up one of
-the special bit patterns and tries to use it as an address.  If you get in a
-debugger then and look at the object, you're likely to see that it's entirely
-filled with PYMEM_DEADBYTE (meaning freed memory is getting used) or
-PYMEM_CLEANBYTE (meaning uninitialized memory is getting used).
+Một hàm dạng realloc hoặc free trước tiên sẽ kiểm tra xem các byte PYMEM_FORBIDDENBYTE ở mỗi đầu có còn nguyên vẹn hay không. Nếu chúng đã bị thay đổi, thông tin chẩn đoán sẽ được ghi vào stderr và chương trình bị hủy thông qua Py_FatalError(). Một dạng lỗi chính khác là gây ra lỗi bộ nhớ khi chương trình đọc một trong các mẫu bit đặc biệt rồi cố sử dụng nó làm địa chỉ. Nếu khi đó bạn vào trình debugger và xem đối tượng, rất có thể bạn sẽ thấy nó được điền hoàn toàn bằng PYMEM_DEADBYTE (nghĩa là bộ nhớ đã được giải phóng đang bị sử dụng) hoặc PYMEM_CLEANBYTE (nghĩa là bộ nhớ chưa được khởi tạo đang bị sử dụng).
 
 .. versionchanged:: 3.6
-   The :c:func:`PyMem_SetupDebugHooks` function now also works on Python
-   compiled in release mode.  On error, the debug hooks now use
-   :mod:`tracemalloc` to get the traceback where a memory block was allocated.
-   The debug hooks now also check if there is an :term:`attached thread state` when
-   functions of :c:macro:`PYMEM_DOMAIN_OBJ` and :c:macro:`PYMEM_DOMAIN_MEM` domains are
-   called.
+   Hàm :c:func:`PyMem_SetupDebugHooks` hiện cũng hoạt động trên Python được biên dịch ở chế độ release. Khi có lỗi, các debug hook hiện sử dụng
+   :mod:`tracemalloc` để lấy traceback tại nơi một khối bộ nhớ được cấp phát. Các debug hook hiện cũng kiểm tra xem có :term:`attached thread state` khi các hàm thuộc các miền :c:macro:`PYMEM_DOMAIN_OBJ` và :c:macro:`PYMEM_DOMAIN_MEM` được gọi hay không.
 
 .. versionchanged:: 3.8
-   Byte patterns ``0xCB`` (``PYMEM_CLEANBYTE``), ``0xDB`` (``PYMEM_DEADBYTE``)
-   and ``0xFB`` (``PYMEM_FORBIDDENBYTE``) have been replaced with ``0xCD``,
-   ``0xDD`` and ``0xFD`` to use the same values than Windows CRT debug
-   ``malloc()`` and ``free()``.
+   Các mẫu byte ``0xCB`` (``PYMEM_CLEANBYTE``), ``0xDB`` (``PYMEM_DEADBYTE``) và ``0xFB`` (``PYMEM_FORBIDDENBYTE``) đã được thay thế bằng ``0xCD``, ``0xDD`` và ``0xFD`` để sử dụng cùng các giá trị với ``malloc()`` và ``free()`` debug của Windows CRT.
 
 
 .. _pymalloc:
 
-The pymalloc allocator
-======================
+Bộ cấp phát pymalloc
+====================
 
-Python has a *pymalloc* allocator optimized for small objects (smaller or equal
-to 512 bytes) with a short lifetime. It uses memory mappings called "arenas"
-with a fixed size of either 256 KiB on 32-bit platforms or 1 MiB on 64-bit
-platforms. It falls back to :c:func:`PyMem_RawMalloc` and
-:c:func:`PyMem_RawRealloc` for allocations larger than 512 bytes.
+Python có bộ cấp phát *pymalloc* được tối ưu hóa cho các đối tượng nhỏ (nhỏ hơn hoặc bằng 512 byte) có thời gian tồn tại ngắn. Bộ cấp phát này sử dụng các ánh xạ bộ nhớ được gọi là "arena", với kích thước cố định là 256 KiB trên nền tảng 32-bit hoặc 1 MiB trên nền tảng 64-bit. Bộ cấp phát này chuyển sang :c:func:`PyMem_RawMalloc` và
+:c:func:`PyMem_RawRealloc` cho các lần cấp phát lớn hơn 512 byte.
 
-*pymalloc* is the :ref:`default allocator <default-memory-allocators>` of the
-:c:macro:`PYMEM_DOMAIN_MEM` (ex: :c:func:`PyMem_Malloc`) and
-:c:macro:`PYMEM_DOMAIN_OBJ` (ex: :c:func:`PyObject_Malloc`) domains.
+*pymalloc* là :ref:`bộ cấp phát mặc định <default-memory-allocators>` của
+:c:macro:`PYMEM_DOMAIN_MEM` (ví dụ: :c:func:`PyMem_Malloc`) và
+:c:macro:`PYMEM_DOMAIN_OBJ` (ví dụ: :c:func:`PyObject_Malloc`) miền.
 
-The arena allocator uses the following functions:
+Bộ cấp phát arena sử dụng các hàm sau:
 
-* :c:func:`!VirtualAlloc` and :c:func:`!VirtualFree` on Windows,
-* :c:func:`!mmap` and :c:func:`!munmap` if available,
-* :c:func:`malloc` and :c:func:`free` otherwise.
+* :c:func:`!VirtualAlloc` và :c:func:`!VirtualFree` trên Windows,
+* :c:func:`!mmap` và :c:func:`!munmap` nếu khả dụng,
+* :c:func:`malloc` và :c:func:`free` trong các trường hợp khác.
 
-This allocator is disabled if Python is configured with the
-:option:`--without-pymalloc` option. It can also be disabled at runtime using
-the :envvar:`PYTHONMALLOC` environment variable (ex: ``PYTHONMALLOC=malloc``).
+Bộ cấp phát này bị vô hiệu hóa nếu Python được cấu hình với tùy chọn
+:option:`--without-pymalloc`. Bạn cũng có thể vô hiệu hóa bộ cấp phát này trong runtime bằng biến môi trường :envvar:`PYTHONMALLOC` (ví dụ: ``PYTHONMALLOC=malloc``).
 
-Typically, it makes sense to disable the pymalloc allocator when building
-Python with AddressSanitizer (:option:`--with-address-sanitizer`) which helps
-uncover low level bugs within the C code.
+Thông thường, nên vô hiệu hóa bộ cấp phát pymalloc khi xây dựng Python với AddressSanitizer (:option:`--with-address-sanitizer`), công cụ này giúp phát hiện các lỗi cấp thấp trong mã C.
 
-Customize pymalloc Arena Allocator
-----------------------------------
+Tùy chỉnh bộ cấp phát Arena của pymalloc
+----------------------------------------
 
 .. versionadded:: 3.4
 
 .. c:type:: PyObjectArenaAllocator
 
-   Structure used to describe an arena allocator. The structure has
-   three fields:
+   Cấu trúc dùng để mô tả một bộ cấp phát arena. Cấu trúc này có ba trường:
 
-   +--------------------------------------------------+---------------------------------------+
-   | Field                                            | Meaning                               |
-   +==================================================+=======================================+
-   | ``void *ctx``                                    | user context passed as first argument |
-   +--------------------------------------------------+---------------------------------------+
-   | ``void* alloc(void *ctx, size_t size)``          | allocate an arena of size bytes       |
-   +--------------------------------------------------+---------------------------------------+
-   | ``void free(void *ctx, void *ptr, size_t size)`` | free an arena                         |
-   +--------------------------------------------------+---------------------------------------+
+   +--------------------------------------------------+-----------------------------------------------------+
+   | Trường                                           | Ý nghĩa                                             |
+   +==================================================+=====================================================+
+   | ``void *ctx``                                    | ngữ cảnh người dùng được truyền làm đối số đầu tiên |
+   +--------------------------------------------------+-----------------------------------------------------+
+   | ``void* alloc(void *ctx, size_t size)``          | cấp phát một arena có kích thước tính bằng byte     |
+   +--------------------------------------------------+-----------------------------------------------------+
+   | ``void free(void *ctx, void *ptr, size_t size)`` | giải phóng một arena                                |
+   +--------------------------------------------------+-----------------------------------------------------+
 
 .. c:function:: void PyObject_GetArenaAllocator(PyObjectArenaAllocator *allocator)
 
-   Get the arena allocator.
+   Lấy arena allocator.
 
 .. c:function:: void PyObject_SetArenaAllocator(PyObjectArenaAllocator *allocator)
 
-   Set the arena allocator.
+   Thiết lập arena allocator.
 
 .. _mimalloc:
 
-The mimalloc allocator
-======================
+mimalloc allocator
+==================
 
 .. versionadded:: 3.13
 
-Python supports the `mimalloc <https://github.com/microsoft/mimalloc/>`__
-allocator when the underlying platform support is available.
-mimalloc is a general purpose allocator with excellent performance
-characteristics, initially developed by Daan Leijen for the runtime systems
-of the Koka and Lean languages.
+Python hỗ trợ allocator `mimalloc <https://github.com/microsoft/mimalloc/>`__ khi nền tảng bên dưới có hỗ trợ tương ứng. mimalloc là một allocator đa mục đích có hiệu năng rất tốt, ban đầu được Daan Leijen phát triển cho các hệ thống runtime của các ngôn ngữ Koka và Lean.
 
-Unlike :ref:`pymalloc <pymalloc>`, which is optimized for small objects (512
-bytes or fewer), mimalloc handles allocations of any size.
+Không giống :ref:`pymalloc <pymalloc>`, vốn được tối ưu cho các đối tượng nhỏ (512 byte trở xuống), mimalloc xử lý các allocation với mọi kích thước.
 
-In the :term:`free-threaded <free threading>` build, mimalloc is the default
-and **required** allocator for the :c:macro:`PYMEM_DOMAIN_MEM` and
-:c:macro:`PYMEM_DOMAIN_OBJ` domains.  It cannot be disabled in free-threaded
-builds.  The free-threaded build uses per-thread mimalloc heaps, which allows
-allocation and deallocation to proceed without locking in most cases.
+Trong bản build :term:`free-threaded <free threading>`, mimalloc là allocator mặc định và **bắt buộc** cho :c:macro:`PYMEM_DOMAIN_MEM` và
+:c:macro:`PYMEM_DOMAIN_OBJ` các domain. Không thể vô hiệu hóa trong các bản build free-threaded. Bản build free-threaded sử dụng các heap mimalloc riêng cho từng thread, nhờ đó việc cấp phát và giải phóng có thể tiến hành mà không cần khóa trong hầu hết các trường hợp.
 
-In the default (non-free-threaded) build, mimalloc is available but not the
-default allocator.  It can be selected at runtime using
-:envvar:`PYTHONMALLOC`\ ``=mimalloc`` (or ``mimalloc_debug`` to include
-:ref:`debug hooks <pymem-debug-hooks>`).  It can be disabled at build time
-using the :option:`--without-mimalloc` configure option, but this option
-cannot be combined with :option:`--disable-gil`.
+Trong bản build mặc định (không free-threaded), mimalloc khả dụng nhưng không phải allocator mặc định. Có thể chọn nó trong runtime bằng
+:envvar:`PYTHONMALLOC`\ ``=mimalloc`` (hoặc ``mimalloc_debug`` để bao gồm
+:ref:`debug hooks <pymem-debug-hooks>`). Có thể vô hiệu hóa nó tại thời điểm build bằng tùy chọn configure :option:`--without-mimalloc`, nhưng không thể kết hợp tùy chọn này với :option:`--disable-gil`.
 
-tracemalloc C API
-=================
+C API của tracemalloc
+=====================
 
 .. versionadded:: 3.7
 
 .. c:function:: int PyTraceMalloc_Track(unsigned int domain, uintptr_t ptr, size_t size)
 
-   Track an allocated memory block in the :mod:`tracemalloc` module.
+   Theo dõi một khối bộ nhớ đã cấp phát trong mô-đun :mod:`tracemalloc`.
 
-   Return ``0`` on success, return ``-1`` on error (failed to allocate memory to
-   store the trace). Return ``-2`` if tracemalloc is disabled.
+   Trả về ``0`` khi thành công, trả về ``-1`` khi có lỗi (không thể cấp phát bộ nhớ để lưu trace). Trả về ``-2`` nếu tracemalloc bị vô hiệu hóa.
 
-   If memory block is already tracked, update the existing trace.
+   Nếu khối bộ nhớ đã được theo dõi, hãy cập nhật dấu vết hiện có.
 
 .. c:function:: int PyTraceMalloc_Untrack(unsigned int domain, uintptr_t ptr)
 
-   Untrack an allocated memory block in the :mod:`tracemalloc` module.
-   Do nothing if the block was not tracked.
+   Hủy theo dõi một khối bộ nhớ đã được cấp phát trong mô-đun :mod:`tracemalloc`. Không thực hiện thao tác nào nếu khối này chưa được theo dõi.
 
-   Return ``-2`` if tracemalloc is disabled, otherwise return ``0``.
+   Trả về ``-2`` nếu tracemalloc bị tắt, nếu không thì trả về ``0``.
 
 
 .. _memoryexamples:
 
-Examples
-========
+Ví dụ
+=====
 
-Here is the example from section :ref:`memoryoverview`, rewritten so that the
-I/O buffer is allocated from the Python heap by using the first function set::
+Dưới đây là ví dụ từ phần :ref:`memoryoverview`, được viết lại để bộ đệm I/O được cấp phát từ heap Python bằng cách sử dụng bộ hàm đầu tiên::
 
    PyObject *res;
-   char *buf = (char *) PyMem_Malloc(BUFSIZ); /* for I/O */
+   char *buf = (char *) PyMem_Malloc(BUFSIZ); /* cho I/O */
 
    if (buf == NULL)
        return PyErr_NoMemory();
-   /* ...Do some I/O operation involving buf... */
+   /* ...Thực hiện một thao tác I/O liên quan đến buf... */
    res = PyBytes_FromString(buf);
-   PyMem_Free(buf); /* allocated with PyMem_Malloc */
+   PyMem_Free(buf); /* được cấp phát bằng PyMem_Malloc */
    return res;
 
-The same code using the type-oriented function set::
+Cùng đoạn mã đó khi sử dụng bộ hàm hướng theo kiểu::
 
    PyObject *res;
-   char *buf = PyMem_New(char, BUFSIZ); /* for I/O */
+   char *buf = PyMem_New(char, BUFSIZ); /* cho I/O */
 
    if (buf == NULL)
        return PyErr_NoMemory();
-   /* ...Do some I/O operation involving buf... */
+   /* ...Thực hiện một thao tác I/O liên quan đến buf... */
    res = PyBytes_FromString(buf);
-   PyMem_Free(buf); /* allocated with PyMem_New */
+   PyMem_Free(buf); /* được cấp phát bằng PyMem_New */
    return res;
 
-Note that in the two examples above, the buffer is always manipulated via
-functions belonging to the same set. Indeed, it is required to use the same
-memory API family for a given memory block, so that the risk of mixing different
-allocators is reduced to a minimum. The following code sequence contains two
-errors, one of which is labeled as *fatal* because it mixes two different
-allocators operating on different heaps. ::
+Lưu ý rằng trong hai ví dụ trên, buffer luôn được thao tác thông qua các hàm thuộc cùng một bộ. Thật vậy, bắt buộc phải sử dụng cùng một họ memory API cho một khối bộ nhớ nhất định, để giảm thiểu nguy cơ trộn lẫn các bộ cấp phát khác nhau. Chuỗi mã sau đây chứa hai lỗi, một trong số đó được đánh dấu là *nghiêm trọng* vì nó trộn lẫn hai bộ cấp phát khác nhau hoạt động trên các heap khác nhau.::
 
    char *buf1 = PyMem_New(char, BUFSIZ);
    char *buf2 = (char *) malloc(BUFSIZ);
    char *buf3 = (char *) PyMem_Malloc(BUFSIZ);
    ...
-   PyMem_Del(buf3);  /* Wrong -- should be PyMem_Free() */
-   free(buf2);       /* Right -- allocated via malloc() */
-   free(buf1);       /* Fatal -- should be PyMem_Free()  */
+   PyMem_Del(buf3);  /* Sai -- phải là PyMem_Free() */
+   free(buf2);       /* Đúng -- được cấp phát bằng malloc() */
+   free(buf1);       /* Nghiêm trọng -- phải dùng PyMem_Free()  */
 
-In addition to the functions aimed at handling raw memory blocks from the Python
-heap, objects in Python are allocated and released with :c:macro:`PyObject_New`,
-:c:macro:`PyObject_NewVar` and :c:func:`PyObject_Free`.
+Ngoài các hàm dùng để xử lý các khối bộ nhớ thô từ heap của Python, các đối tượng trong Python được cấp phát và giải phóng bằng :c:macro:`PyObject_New`,
+:c:macro:`PyObject_NewVar` và :c:func:`PyObject_Free`.
 
-These will be explained in the next chapter on defining and implementing new
-object types in C.
+Những nội dung này sẽ được giải thích trong chương tiếp theo về cách định nghĩa và triển khai các kiểu đối tượng mới trong C.

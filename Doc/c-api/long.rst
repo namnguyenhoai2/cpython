@@ -2,87 +2,77 @@
 
 .. _longobjects:
 
-Integer Objects
----------------
+Đối tượng số nguyên
+-------------------
 
 .. index:: pair: object; long integer
            pair: object; integer
 
-All integers are implemented as "long" integer objects of arbitrary size.
+Tất cả số nguyên được triển khai dưới dạng các đối tượng số nguyên "long" có kích thước tùy ý.
 
-On error, most ``PyLong_As*`` APIs return ``(return type)-1`` which cannot be
-distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
+Khi xảy ra lỗi, hầu hết các API ``PyLong_As*`` trả về ``(return type)-1``, giá trị này không thể phân biệt với một số. Hãy sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
 .. c:type:: PyLongObject
 
-   This subtype of :c:type:`PyObject` represents a Python integer object.
+   Kiểu con này của :c:type:`PyObject` đại diện cho một đối tượng số nguyên Python.
 
 
 .. c:var:: PyTypeObject PyLong_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python integer type.
-   This is the same object as :class:`int` in the Python layer.
+   Thể hiện này của :c:type:`PyTypeObject` đại diện cho kiểu số nguyên Python. Đây chính là đối tượng :class:`int` trong lớp Python.
 
 
 .. c:function:: int PyLong_Check(PyObject *p)
 
-   Return true if its argument is a :c:type:`PyLongObject` or a subtype of
-   :c:type:`PyLongObject`.  This function always succeeds.
+   Trả về true nếu đối số của nó là :c:type:`PyLongObject` hoặc một kiểu con của
+   :c:type:`PyLongObject`. Hàm này luôn thành công.
 
 
 .. c:function:: int PyLong_CheckExact(PyObject *p)
 
-   Return true if its argument is a :c:type:`PyLongObject`, but not a subtype of
-   :c:type:`PyLongObject`.  This function always succeeds.
+   Trả về true nếu đối số của nó là một :c:type:`PyLongObject`, nhưng không phải là kiểu con của
+   :c:type:`PyLongObject`. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PyLong_FromLong(long v)
 
-   Return a new :c:type:`PyLongObject` object from *v*, or ``NULL`` on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ *v*, hoặc ``NULL`` nếu thất bại.
 
    .. impl-detail::
 
-      CPython keeps an array of integer objects for all integers
-      between ``-5`` and ``256``.  When you create an int in that range
-      you actually just get back a reference to the existing object.
+      CPython duy trì một mảng các đối tượng số nguyên cho tất cả các số nguyên từ ``-5`` đến ``256``. Khi bạn tạo một int trong phạm vi đó, thực tế bạn chỉ nhận lại một tham chiếu đến đối tượng hiện có.
 
 
 .. c:function:: PyObject* PyLong_FromUnsignedLong(unsigned long v)
 
-   Return a new :c:type:`PyLongObject` object from a C :c:expr:`unsigned long`, or
-   ``NULL`` on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ một :c:expr:`unsigned long` C, hoặc ``NULL`` nếu thất bại.
 
 
 .. c:function:: PyObject* PyLong_FromSsize_t(Py_ssize_t v)
 
-   Return a new :c:type:`PyLongObject` object from a C :c:type:`Py_ssize_t`, or
-   ``NULL`` on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ một :c:type:`Py_ssize_t` C, hoặc ``NULL`` nếu thất bại.
 
 
 .. c:function:: PyObject* PyLong_FromSize_t(size_t v)
 
-   Return a new :c:type:`PyLongObject` object from a C :c:type:`size_t`, or
-   ``NULL`` on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ một :c:type:`size_t` C, hoặc ``NULL`` nếu thất bại.
 
 
 .. c:function:: PyObject* PyLong_FromLongLong(long long v)
 
-   Return a new :c:type:`PyLongObject` object from a C :c:expr:`long long`, or ``NULL``
-   on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ một kiểu C :c:expr:`long long`, hoặc ``NULL`` nếu thất bại.
 
 
 .. c:function:: PyObject* PyLong_FromUnsignedLongLong(unsigned long long v)
 
-   Return a new :c:type:`PyLongObject` object from a C :c:expr:`unsigned long long`,
-   or ``NULL`` on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ một kiểu C :c:expr:`unsigned long long`, hoặc ``NULL`` nếu thất bại.
 
 
 .. c:function:: PyObject* PyLong_FromInt32(int32_t value)
                 PyObject* PyLong_FromInt64(int64_t value)
 
-   Return a new :c:type:`PyLongObject` object from a signed C
-   :c:expr:`int32_t` or :c:expr:`int64_t`, or ``NULL``
-   with an exception set on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ một kiểu C có dấu
+   :c:expr:`int32_t` hoặc :c:expr:`int64_t`, hoặc ``NULL`` với một ngoại lệ được thiết lập nếu thất bại.
 
    .. versionadded:: 3.14
 
@@ -90,84 +80,63 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
 .. c:function:: PyObject* PyLong_FromUInt32(uint32_t value)
                 PyObject* PyLong_FromUInt64(uint64_t value)
 
-   Return a new :c:type:`PyLongObject` object from an unsigned C
-   :c:expr:`uint32_t` or :c:expr:`uint64_t`, or ``NULL``
-   with an exception set on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ một kiểu C không dấu
+   :c:expr:`uint32_t` hoặc :c:expr:`uint64_t`, hoặc ``NULL`` với một exception được thiết lập khi thất bại.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: PyObject* PyLong_FromDouble(double v)
 
-   Return a new :c:type:`PyLongObject` object from the integer part of *v*, or
-   ``NULL`` on failure.
+   Trả về một đối tượng :c:type:`PyLongObject` mới từ phần nguyên của *v*, hoặc ``NULL`` khi thất bại.
 
 
 .. c:function:: PyObject* PyLong_FromString(const char *str, char **pend, int base)
 
-   Return a new :c:type:`PyLongObject` based on the string value in *str*, which
-   is interpreted according to the radix in *base*, or ``NULL`` on failure.  If
-   *pend* is non-``NULL``, *\*pend* will point to the end of *str* on success or
-   to the first character that could not be processed on error.  If *base* is ``0``,
-   *str* is interpreted using the :ref:`integers` definition; in this case, leading
-   zeros in a non-zero decimal number raises a :exc:`ValueError`.  If *base* is not
-   ``0``, it must be between ``2`` and ``36``, inclusive.  Leading and trailing
-   whitespace and single underscores after a base specifier and between digits are
-   ignored.  If there are no digits or *str* is not NULL-terminated following the
-   digits and trailing whitespace, :exc:`ValueError` will be raised.
+   Trả về một :c:type:`PyLongObject` mới dựa trên giá trị chuỗi trong *str*, được diễn giải theo cơ số trong *base*, hoặc ``NULL`` khi thất bại. Nếu *pend* khác ``NULL``, *\*pend* sẽ trỏ đến cuối *str* khi thành công hoặc đến ký tự đầu tiên không thể xử lý khi xảy ra lỗi. Nếu *base* là ``0``, *str* được diễn giải theo định nghĩa :ref:`integers`; trong trường hợp này, các số 0 đứng đầu trong một số thập phân khác 0 sẽ gây ra :exc:`ValueError`. Nếu *base* không phải là ``0``, giá trị này phải nằm trong khoảng từ ``2`` đến ``36``, bao gồm cả hai. Khoảng trắng ở đầu và cuối, cùng với các dấu gạch dưới đơn sau chỉ báo cơ số và giữa các chữ số, sẽ bị bỏ qua. Nếu không có chữ số hoặc *str* không được kết thúc bằng NULL sau các chữ số và khoảng trắng ở cuối, :exc:`ValueError` sẽ được raised.
 
-   .. seealso:: :c:func:`PyLong_AsNativeBytes()` and
+   .. seealso:: :c:func:`PyLong_AsNativeBytes()` và
       :c:func:`PyLong_FromNativeBytes()` functions can be used to convert
-      a :c:type:`PyLongObject` to/from an array of bytes in base ``256``.
+      một :c:type:`PyLongObject` đến/từ một mảng byte ở cơ số ``256``.
 
 
 .. c:function:: PyObject* PyLong_FromUnicodeObject(PyObject *u, int base)
 
-   Convert a sequence of Unicode digits in the string *u* to a Python integer
-   value.
+   Chuyển đổi một chuỗi các chữ số Unicode trong chuỗi *u* thành một giá trị số nguyên Python.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: PyObject* PyLong_FromVoidPtr(void *p)
 
-   Create a Python integer from the pointer *p*. The pointer value can be
-   retrieved from the resulting value using :c:func:`PyLong_AsVoidPtr`.
+   Tạo một số nguyên Python từ con trỏ *p*. Có thể truy xuất giá trị con trỏ từ giá trị thu được bằng :c:func:`PyLong_AsVoidPtr`.
 
 
 .. c:function:: PyObject* PyLong_FromNativeBytes(const void* buffer, size_t n_bytes, int flags)
 
-   Create a Python integer from the value contained in the first *n_bytes* of
-   *buffer*, interpreted as a two's-complement signed number.
+   Tạo một số nguyên Python từ giá trị nằm trong *n_bytes* đầu tiên của *buffer*, được diễn giải là một số có dấu bù hai.
 
-   *flags* are as for :c:func:`PyLong_AsNativeBytes`. Passing ``-1`` will select
-   the native endian that CPython was compiled with and assume that the
-   most-significant bit is a sign bit. Passing
-   ``Py_ASNATIVEBYTES_UNSIGNED_BUFFER`` will produce the same result as calling
-   :c:func:`PyLong_FromUnsignedNativeBytes`. Other flags are ignored.
+   *flags* giống như đối với :c:func:`PyLong_AsNativeBytes`. Truyền ``-1`` sẽ chọn thứ tự byte native mà CPython được biên dịch cùng và giả định rằng bit quan trọng nhất là bit dấu. Truyền ``Py_ASNATIVEBYTES_UNSIGNED_BUFFER`` sẽ cho kết quả giống như gọi
+   :c:func:`PyLong_FromUnsignedNativeBytes`. Các cờ khác bị bỏ qua.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: PyObject* PyLong_FromUnsignedNativeBytes(const void* buffer, size_t n_bytes, int flags)
 
-   Create a Python integer from the value contained in the first *n_bytes* of
-   *buffer*, interpreted as an unsigned number.
+   Tạo một số nguyên Python từ giá trị nằm trong *n_bytes* đầu tiên của *buffer*, được diễn giải là một số không dấu.
 
-   *flags* are as for :c:func:`PyLong_AsNativeBytes`. Passing ``-1`` will select
-   the native endian that CPython was compiled with and assume that the
-   most-significant bit is not a sign bit. Flags other than endian are ignored.
+   *flags* giống như đối với :c:func:`PyLong_AsNativeBytes`. Truyền ``-1`` sẽ chọn thứ tự byte native mà CPython được biên dịch cùng và giả định rằng bit quan trọng nhất không phải là bit dấu. Các cờ khác ngoài thứ tự byte bị bỏ qua.
 
    .. versionadded:: 3.13
 
 
 .. c:macro:: PyLong_FromPid(pid)
 
-   Macro for creating a Python integer from a process identifier.
+   Macro để tạo một số nguyên Python từ mã định danh tiến trình.
 
-   This can be defined as an alias to :c:func:`PyLong_FromLong` or
-   :c:func:`PyLong_FromLongLong`, depending on the size of the system's
-   PID type.
+   Có thể định nghĩa macro này làm bí danh cho :c:func:`PyLong_FromLong` hoặc
+   :c:func:`PyLong_FromLongLong`, tùy thuộc vào kích thước của kiểu PID của hệ thống.
 
    .. versionadded:: 3.2
 
@@ -178,56 +147,49 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
       single: LONG_MAX (C macro)
       single: OverflowError (built-in exception)
 
-   Return a C :c:expr:`long` representation of *obj*.  If *obj* is not an
-   instance of :c:type:`PyLongObject`, first call its :meth:`~object.__index__` method
-   (if present) to convert it to a :c:type:`PyLongObject`.
+   Trả về biểu diễn C :c:expr:`long` của *obj*. Nếu *obj* không phải là một thể hiện của :c:type:`PyLongObject`, trước tiên hãy gọi phương thức :meth:`~object.__index__` của nó (nếu có) để chuyển đổi nó thành một :c:type:`PyLongObject`.
 
-   Raise :exc:`OverflowError` if the value of *obj* is out of range for a
+   Phát sinh :exc:`OverflowError` nếu giá trị của *obj* nằm ngoài phạm vi của một
    :c:expr:`long`.
 
-   Returns ``-1`` on error.  Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``-1`` khi có lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
    .. versionchanged:: 3.10
-      This function will no longer use :meth:`~object.__int__`.
+      Hàm này sẽ không còn sử dụng :meth:`~object.__int__`.
 
    .. c:namespace:: NULL
 
    .. c:function:: long PyLong_AS_LONG(PyObject *obj)
 
-      Exactly equivalent to the preferred ``PyLong_AsLong``. In particular,
-      it can fail with :exc:`OverflowError` or another exception.
+      Hoàn toàn tương đương với ``PyLong_AsLong`` được ưu tiên. Cụ thể, nó có thể thất bại với :exc:`OverflowError` hoặc một ngoại lệ khác.
 
       .. soft-deprecated:: 3.14
 
 .. c:function:: int PyLong_AsInt(PyObject *obj)
 
-   Similar to :c:func:`PyLong_AsLong`, but store the result in a C
-   :c:expr:`int` instead of a C :c:expr:`long`.
+   Tương tự như :c:func:`PyLong_AsLong`, nhưng lưu kết quả vào một C
+   :c:expr:`int` thay vì một C :c:expr:`long`.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: long PyLong_AsLongAndOverflow(PyObject *obj, int *overflow)
 
-   Return a C :c:expr:`long` representation of *obj*.  If *obj* is not an
-   instance of :c:type:`PyLongObject`, first call its :meth:`~object.__index__`
-   method (if present) to convert it to a :c:type:`PyLongObject`.
+   Trả về biểu diễn C :c:expr:`long` của *obj*. Nếu *obj* không phải là một thể hiện của :c:type:`PyLongObject`, trước tiên hãy gọi phương thức :meth:`~object.__index__` của nó (nếu có) để chuyển đổi nó thành một :c:type:`PyLongObject`.
 
-   If the value of *obj* is greater than :c:macro:`LONG_MAX` or less than
-   :c:macro:`LONG_MIN`, set *\*overflow* to ``1`` or ``-1``, respectively, and
-   return ``-1``; otherwise, set *\*overflow* to ``0``.  If any other exception
-   occurs set *\*overflow* to ``0`` and return ``-1`` as usual.
+   Nếu giá trị của *obj* lớn hơn :c:macro:`LONG_MAX` hoặc nhỏ hơn
+   :c:macro:`LONG_MIN`, hãy đặt *\*overflow* thành ``1`` hoặc ``-1``, tương ứng, rồi trả về ``-1``; nếu không, hãy đặt *\*overflow* thành ``0``. Nếu xảy ra bất kỳ ngoại lệ nào khác, hãy đặt *\*overflow* thành ``0`` và trả về ``-1`` như thường lệ.
 
-   Returns ``-1`` on error.  Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``-1`` khi có lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
    .. versionchanged:: 3.10
-      This function will no longer use :meth:`~object.__int__`.
+      Hàm này sẽ không còn sử dụng :meth:`~object.__int__`.
 
 
 .. c:function:: long long PyLong_AsLongLong(PyObject *obj)
@@ -235,42 +197,36 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
    .. index::
       single: OverflowError (built-in exception)
 
-   Return a C :c:expr:`long long` representation of *obj*.  If *obj* is not an
-   instance of :c:type:`PyLongObject`, first call its :meth:`~object.__index__` method
-   (if present) to convert it to a :c:type:`PyLongObject`.
+   Trả về biểu diễn C :c:expr:`long long` của *obj*. Nếu *obj* không phải là một thể hiện của :c:type:`PyLongObject`, trước tiên hãy gọi phương thức :meth:`~object.__index__` của nó (nếu có) để chuyển đổi nó thành một :c:type:`PyLongObject`.
 
-   Raise :exc:`OverflowError` if the value of *obj* is out of range for a
+   Phát sinh :exc:`OverflowError` nếu giá trị của *obj* nằm ngoài phạm vi của một
    :c:expr:`long long`.
 
-   Returns ``-1`` on error.  Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``-1`` khi có lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
    .. versionchanged:: 3.10
-      This function will no longer use :meth:`~object.__int__`.
+      Hàm này sẽ không còn sử dụng :meth:`~object.__int__`.
 
 
 .. c:function:: long long PyLong_AsLongLongAndOverflow(PyObject *obj, int *overflow)
 
-   Return a C :c:expr:`long long` representation of *obj*.  If *obj* is not an
-   instance of :c:type:`PyLongObject`, first call its :meth:`~object.__index__` method
-   (if present) to convert it to a :c:type:`PyLongObject`.
+   Trả về biểu diễn C :c:expr:`long long` của *obj*. Nếu *obj* không phải là một thể hiện của :c:type:`PyLongObject`, trước tiên hãy gọi phương thức :meth:`~object.__index__` của nó (nếu có) để chuyển đổi nó thành một :c:type:`PyLongObject`.
 
-   If the value of *obj* is greater than :c:macro:`LLONG_MAX` or less than
-   :c:macro:`LLONG_MIN`, set *\*overflow* to ``1`` or ``-1``, respectively,
-   and return ``-1``; otherwise, set *\*overflow* to ``0``.  If any other
-   exception occurs set *\*overflow* to ``0`` and return ``-1`` as usual.
+   Nếu giá trị của *obj* lớn hơn :c:macro:`LLONG_MAX` hoặc nhỏ hơn
+   :c:macro:`LLONG_MIN`, lần lượt đặt *\*overflow* thành ``1`` hoặc ``-1``, rồi trả về ``-1``; nếu không, đặt *\*overflow* thành ``0``.  Nếu xảy ra bất kỳ ngoại lệ nào khác, đặt *\*overflow* thành ``0`` và trả về ``-1`` như thường lệ.
 
-   Returns ``-1`` on error.  Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``-1`` khi có lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
    .. versionchanged:: 3.10
-      This function will no longer use :meth:`~object.__int__`.
+      Hàm này sẽ không còn sử dụng :meth:`~object.__int__`.
 
 
 .. c:function:: Py_ssize_t PyLong_AsSsize_t(PyObject *pylong)
@@ -279,13 +235,12 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
       single: PY_SSIZE_T_MAX (C macro)
       single: OverflowError (built-in exception)
 
-   Return a C :c:type:`Py_ssize_t` representation of *pylong*.  *pylong* must
-   be an instance of :c:type:`PyLongObject`.
+   Trả về một biểu diễn C :c:type:`Py_ssize_t` của *pylong*. *pylong* phải là một thực thể của :c:type:`PyLongObject`.
 
-   Raise :exc:`OverflowError` if the value of *pylong* is out of range for a
+   Phát sinh :exc:`OverflowError` nếu giá trị của *pylong* nằm ngoài phạm vi cho một
    :c:type:`Py_ssize_t`.
 
-   Returns ``-1`` on error.  Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``-1`` khi có lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
 
 .. c:function:: unsigned long PyLong_AsUnsignedLong(PyObject *pylong)
@@ -294,14 +249,12 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
       single: ULONG_MAX (C macro)
       single: OverflowError (built-in exception)
 
-   Return a C :c:expr:`unsigned long` representation of *pylong*.  *pylong*
-   must be an instance of :c:type:`PyLongObject`.
+   Trả về biểu diễn C :c:expr:`unsigned long` của *pylong*.  *pylong* phải là một thể hiện của :c:type:`PyLongObject`.
 
-   Raise :exc:`OverflowError` if the value of *pylong* is out of range for a
+   Phát sinh :exc:`OverflowError` nếu giá trị của *pylong* nằm ngoài phạm vi cho một
    :c:expr:`unsigned long`.
 
-   Returns ``(unsigned long)-1`` on error.
-   Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``(unsigned long)-1`` khi xảy ra lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt rõ.
 
 
 .. c:function:: size_t PyLong_AsSize_t(PyObject *pylong)
@@ -310,14 +263,12 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
       single: SIZE_MAX (C macro)
       single: OverflowError (built-in exception)
 
-   Return a C :c:type:`size_t` representation of *pylong*.  *pylong* must be
-   an instance of :c:type:`PyLongObject`.
+   Trả về biểu diễn C :c:type:`size_t` của *pylong*.  *pylong* phải là một thể hiện của :c:type:`PyLongObject`.
 
-   Raise :exc:`OverflowError` if the value of *pylong* is out of range for a
+   Phát sinh :exc:`OverflowError` nếu giá trị của *pylong* nằm ngoài phạm vi cho một
    :c:type:`size_t`.
 
-   Returns ``(size_t)-1`` on error.
-   Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``(size_t)-1`` khi xảy ra lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt rõ.
 
 
 .. c:function:: unsigned long long PyLong_AsUnsignedLongLong(PyObject *pylong)
@@ -325,74 +276,63 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
    .. index::
       single: OverflowError (built-in exception)
 
-   Return a C :c:expr:`unsigned long long` representation of *pylong*.  *pylong*
-   must be an instance of :c:type:`PyLongObject`.
+   Trả về biểu diễn :c:expr:`unsigned long long` bằng C của *pylong*. *pylong* phải là một thực thể của :c:type:`PyLongObject`.
 
-   Raise :exc:`OverflowError` if the value of *pylong* is out of range for an
+   Phát sinh :exc:`OverflowError` nếu giá trị của *pylong* nằm ngoài phạm vi của một
    :c:expr:`unsigned long long`.
 
-   Returns ``(unsigned long long)-1`` on error.
-   Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``(unsigned long long)-1`` khi xảy ra lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
    .. versionchanged:: 3.1
-      A negative *pylong* now raises :exc:`OverflowError`, not :exc:`TypeError`.
+      Một *pylong* âm hiện sẽ phát sinh :exc:`OverflowError`, không phải :exc:`TypeError`.
 
 
 .. c:function:: unsigned long PyLong_AsUnsignedLongMask(PyObject *obj)
 
-   Return a C :c:expr:`unsigned long` representation of *obj*.  If *obj* is not
-   an instance of :c:type:`PyLongObject`, first call its :meth:`~object.__index__`
-   method (if present) to convert it to a :c:type:`PyLongObject`.
+   Trả về biểu diễn :c:expr:`unsigned long` bằng C của *obj*. Nếu *obj* không phải là một thực thể của :c:type:`PyLongObject`, trước tiên hãy gọi phương thức :meth:`~object.__index__` của nó (nếu có) để chuyển đổi nó thành một :c:type:`PyLongObject`.
 
-   If the value of *obj* is out of range for an :c:expr:`unsigned long`,
-   return the reduction of that value modulo ``ULONG_MAX + 1``.
+   Nếu giá trị của *obj* nằm ngoài phạm vi của một :c:expr:`unsigned long`, trả về phần rút gọn của giá trị đó theo modulo ``ULONG_MAX + 1``.
 
-   Returns ``(unsigned long)-1`` on error.  Use :c:func:`PyErr_Occurred` to
-   disambiguate.
+   Trả về ``(unsigned long)-1`` khi xảy ra lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
    .. versionchanged:: 3.10
-      This function will no longer use :meth:`~object.__int__`.
+      Hàm này sẽ không còn sử dụng :meth:`~object.__int__`.
 
 
 .. c:function:: unsigned long long PyLong_AsUnsignedLongLongMask(PyObject *obj)
 
-   Return a C :c:expr:`unsigned long long` representation of *obj*.  If *obj*
-   is not an instance of :c:type:`PyLongObject`, first call its
-   :meth:`~object.__index__` method (if present) to convert it to a
+   Trả về biểu diễn C :c:expr:`unsigned long long` của *obj*. Nếu *obj* không phải là một thể hiện của :c:type:`PyLongObject`, trước tiên hãy gọi phương thức của nó
+   :meth:`~object.__index__` (nếu có) để chuyển đổi nó thành một
    :c:type:`PyLongObject`.
 
-   If the value of *obj* is out of range for an :c:expr:`unsigned long long`,
-   return the reduction of that value modulo ``ULLONG_MAX + 1``.
+   Nếu giá trị của *obj* nằm ngoài phạm vi của một :c:expr:`unsigned long long`, hãy trả về phần dư của giá trị đó khi chia cho ``ULLONG_MAX + 1``.
 
-   Returns ``(unsigned long long)-1`` on error.  Use :c:func:`PyErr_Occurred`
-   to disambiguate.
+   Trả về ``(unsigned long long)-1`` khi xảy ra lỗi. Sử dụng :c:func:`PyErr_Occurred` để phân biệt.
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
    .. versionchanged:: 3.10
-      This function will no longer use :meth:`~object.__int__`.
+      Hàm này sẽ không còn sử dụng :meth:`~object.__int__`.
 
 
 .. c:function:: int PyLong_AsInt32(PyObject *obj, int32_t *value)
                 int PyLong_AsInt64(PyObject *obj, int64_t *value)
 
-   Set *\*value* to a signed C :c:expr:`int32_t` or :c:expr:`int64_t`
-   representation of *obj*.
+   Đặt *\*value* thành biểu diễn C có dấu :c:expr:`int32_t` hoặc :c:expr:`int64_t` của *obj*.
 
-   If *obj* is not an instance of :c:type:`PyLongObject`, first call its
-   :meth:`~object.__index__` method (if present) to convert it to a
+   Nếu *obj* không phải là một thể hiện của :c:type:`PyLongObject`, trước tiên hãy gọi hàm của nó
+   :meth:`~object.__index__` (nếu có) để chuyển đổi nó thành một
    :c:type:`PyLongObject`.
 
-   If the *obj* value is out of range, raise an :exc:`OverflowError`.
+   Nếu giá trị *obj* nằm ngoài phạm vi, hãy đưa ra một :exc:`OverflowError`.
 
-   Set *\*value* and return ``0`` on success.
-   Set an exception and return ``-1`` on error.
+   Đặt *\*value* và trả về ``0`` khi thành công. Đặt một exception và trả về ``-1`` khi có lỗi.
 
-   *value* must not be ``NULL``.
+   *value* không được là ``NULL``.
 
    .. versionadded:: 3.14
 
@@ -400,484 +340,400 @@ distinguished from a number.  Use :c:func:`PyErr_Occurred` to disambiguate.
 .. c:function:: int PyLong_AsUInt32(PyObject *obj, uint32_t *value)
                 int PyLong_AsUInt64(PyObject *obj, uint64_t *value)
 
-   Set *\*value* to an unsigned C :c:expr:`uint32_t` or :c:expr:`uint64_t`
-   representation of *obj*.
+   Đặt *\*value* thành một biểu diễn C unsigned :c:expr:`uint32_t` hoặc :c:expr:`uint64_t` của *obj*.
 
-   If *obj* is not an instance of :c:type:`PyLongObject`, first call its
-   :meth:`~object.__index__` method (if present) to convert it to a
+   Nếu *obj* không phải là một thể hiện của :c:type:`PyLongObject`, trước tiên hãy gọi hàm của nó
+   :meth:`~object.__index__` (nếu có) để chuyển đổi nó thành một
    :c:type:`PyLongObject`.
 
-   * If *obj* is negative, raise a :exc:`ValueError`.
-   * If the *obj* value is out of range, raise an :exc:`OverflowError`.
+   * Nếu *obj* là số âm, hãy phát sinh một :exc:`ValueError`.
+   * Nếu giá trị *obj* nằm ngoài phạm vi, hãy phát sinh một :exc:`OverflowError`.
 
-   Set *\*value* and return ``0`` on success.
-   Set an exception and return ``-1`` on error.
+   Đặt *\*value* và trả về ``0`` khi thành công. Đặt một exception và trả về ``-1`` khi có lỗi.
 
-   *value* must not be ``NULL``.
+   *value* không được là ``NULL``.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: double PyLong_AsDouble(PyObject *pylong)
 
-   Return a C :c:expr:`double` representation of *pylong*.  *pylong* must be
-   an instance of :c:type:`PyLongObject`.
+   Trả về biểu diễn C :c:expr:`double` của *pylong*.  *pylong* phải là một thể hiện của :c:type:`PyLongObject`.
 
-   Raise :exc:`OverflowError` if the value of *pylong* is out of range for a
+   Phát sinh :exc:`OverflowError` nếu giá trị của *pylong* nằm ngoài phạm vi cho một
    :c:expr:`double`.
 
-   Returns ``-1.0`` on error.  Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``-1.0`` khi xảy ra lỗi. Dùng :c:func:`PyErr_Occurred` để phân biệt.
 
 
 .. c:function:: void* PyLong_AsVoidPtr(PyObject *pylong)
 
-   Convert a Python integer *pylong* to a C :c:expr:`void` pointer.
-   If *pylong* cannot be converted, an :exc:`OverflowError` will be raised.  This
-   is only assured to produce a usable :c:expr:`void` pointer for values created
-   with :c:func:`PyLong_FromVoidPtr`.
+   Chuyển một số nguyên Python *pylong* thành một con trỏ C :c:expr:`void`. Nếu không thể chuyển đổi *pylong*, một :exc:`OverflowError` sẽ được phát sinh. Điều này chỉ được đảm bảo tạo ra một con trỏ :c:expr:`void` có thể sử dụng cho các giá trị được tạo bằng :c:func:`PyLong_FromVoidPtr`.
 
-   Returns ``NULL`` on error.  Use :c:func:`PyErr_Occurred` to disambiguate.
+   Trả về ``NULL`` khi xảy ra lỗi. Dùng :c:func:`PyErr_Occurred` để phân biệt.
 
 
 .. c:function:: Py_ssize_t PyLong_AsNativeBytes(PyObject *pylong, void* buffer, Py_ssize_t n_bytes, int flags)
 
-   Copy the Python integer value *pylong* to a native *buffer* of size
-   *n_bytes*. The *flags* can be set to ``-1`` to behave similarly to a C cast,
-   or to values documented below to control the behavior.
+   Sao chép giá trị số nguyên Python *pylong* vào *buffer* native có kích thước *n_bytes*. Có thể đặt *flags* thành ``-1`` để hoạt động tương tự như một phép ép kiểu C, hoặc thành các giá trị được nêu dưới đây để kiểm soát hành vi.
 
-   Returns ``-1`` with an exception raised on error.  This may happen if
-   *pylong* cannot be interpreted as an integer, or if *pylong* was negative
-   and the ``Py_ASNATIVEBYTES_REJECT_NEGATIVE`` flag was set.
+   Trả về ``-1`` và phát sinh ngoại lệ nếu có lỗi. Điều này có thể xảy ra nếu không thể diễn giải *pylong* thành một số nguyên, hoặc nếu *pylong* là số âm và ``Py_ASNATIVEBYTES_REJECT_NEGATIVE`` flag được đặt.
 
-   Otherwise, returns the number of bytes required to store the value.
-   If this is equal to or less than *n_bytes*, the entire value was copied.
-   All *n_bytes* of the buffer are written: remaining bytes filled by
-   copies of the sign bit.
+   Nếu không, trả về số byte cần thiết để lưu trữ giá trị. Nếu giá trị này nhỏ hơn hoặc bằng *n_bytes*, thì toàn bộ giá trị đã được sao chép. Tất cả *n_bytes* của buffer đều được ghi: các byte còn lại được điền bằng các bản sao của bit dấu.
 
-   If the returned value is greater than *n_bytes*, the value was
-   truncated: as many of the lowest bits of the value as could fit are written,
-   and the higher bits are ignored. This matches the typical behavior
-   of a C-style downcast.
+   Nếu giá trị trả về lớn hơn *n_bytes*, giá trị đã bị cắt bớt: số bit thấp nhất của giá trị nhiều nhất có thể vừa với kích thước được ghi, còn các bit cao hơn bị bỏ qua. Điều này phù hợp với hành vi thông thường của phép downcast kiểu C.
 
    .. note::
 
-      Overflow is not considered an error. If the returned value
-      is larger than *n_bytes*, most significant bits were discarded.
+      Tràn số không được xem là lỗi. Nếu giá trị trả về lớn hơn *n_bytes*, các bit có trọng số cao nhất đã bị loại bỏ.
 
-   ``0`` will never be returned.
+   ``0`` sẽ không bao giờ được trả về.
 
-   Values are always copied as two's-complement.
+   Các giá trị luôn được sao chép dưới dạng bù hai.
 
-   Usage example::
+   Ví dụ sử dụng::
 
       int32_t value;
       Py_ssize_t bytes = PyLong_AsNativeBytes(pylong, &value, sizeof(value), -1);
       if (bytes < 0) {
-          // Failed. A Python exception was set with the reason.
+          // Thất bại. Một ngoại lệ Python đã được thiết lập với lý do này.
           return NULL;
       }
       else if (bytes <= (Py_ssize_t)sizeof(value)) {
-          // Success!
+          // Thành công!
       }
       else {
-          // Overflow occurred, but 'value' contains the truncated
-          // lowest bits of pylong.
+          // Đã xảy ra tràn, nhưng 'value' chứa các bit thấp nhất đã bị cắt ngắn
+          // của pylong.
       }
 
-   Passing zero to *n_bytes* will return the size of a buffer that would
-   be large enough to hold the value. This may be larger than technically
-   necessary, but not unreasonably so. If *n_bytes=0*, *buffer* may be
-   ``NULL``.
+   Truyền giá trị bằng không cho *n_bytes* sẽ trả về kích thước của một buffer đủ lớn để chứa giá trị. Kích thước này có thể lớn hơn mức thực sự cần thiết về mặt kỹ thuật, nhưng không lớn một cách bất hợp lý. Nếu *n_bytes=0*, *buffer* có thể là ``NULL``.
 
    .. note::
 
-      Passing *n_bytes=0* to this function is not an accurate way to determine
-      the bit length of the value.
+      Truyền *n_bytes=0* cho hàm này không phải là cách chính xác để xác định độ dài bit của giá trị.
 
-   To get at the entire Python value of an unknown size, the function can be
-   called twice: first to determine the buffer size, then to fill it::
+   Để lấy toàn bộ giá trị Python có kích thước chưa biết, có thể gọi hàm hai lần: lần đầu để xác định kích thước bộ đệm, sau đó để điền dữ liệu vào bộ đệm::
 
-      // Ask how much space we need.
+      // Hỏi xem chúng ta cần bao nhiêu không gian.
       Py_ssize_t expected = PyLong_AsNativeBytes(pylong, NULL, 0, -1);
       if (expected < 0) {
-          // Failed. A Python exception was set with the reason.
+          // Thất bại. Một ngoại lệ Python đã được thiết lập với lý do này.
           return NULL;
       }
-      assert(expected != 0);  // Impossible per the API definition.
+      assert(expected != 0);  // Không thể theo định nghĩa của API.
       uint8_t *bignum = malloc(expected);
       if (!bignum) {
           PyErr_SetString(PyExc_MemoryError, "bignum malloc failed.");
           return NULL;
       }
-      // Safely get the entire value.
+      // Lấy toàn bộ giá trị một cách an toàn.
       Py_ssize_t bytes = PyLong_AsNativeBytes(pylong, bignum, expected, -1);
-      if (bytes < 0) {  // Exception has been set.
+      if (bytes < 0) {  // Ngoại lệ đã được thiết lập.
           free(bignum);
           return NULL;
       }
-      else if (bytes > expected) {  // This should not be possible.
+      else if (bytes > expected) {  // Điều này không thể xảy ra.
           PyErr_SetString(PyExc_RuntimeError,
               "Unexpected bignum truncation after a size check.");
           free(bignum);
           return NULL;
       }
-      // The expected success given the above pre-check.
-      // ... use bignum ...
+      // Kết quả thành công dự kiến dựa trên bước kiểm tra trước ở trên.
+      // ... sử dụng bignum ...
       free(bignum);
 
-   *flags* is either ``-1`` (``Py_ASNATIVEBYTES_DEFAULTS``) to select defaults
-   that behave most like a C cast, or a combination of the other flags in
-   the table below.
-   Note that ``-1`` cannot be combined with other flags.
+   *flags* có thể là ``-1`` (``Py_ASNATIVEBYTES_DEFAULTS``) để chọn các giá trị mặc định hoạt động giống một phép ép kiểu C nhất, hoặc là sự kết hợp của các cờ khác trong bảng dưới đây. Lưu ý rằng ``-1`` không thể kết hợp với các cờ khác.
 
-   Currently, ``-1`` corresponds to
-   ``Py_ASNATIVEBYTES_NATIVE_ENDIAN | Py_ASNATIVEBYTES_UNSIGNED_BUFFER``.
+   Hiện tại, ``-1`` tương ứng với ``Py_ASNATIVEBYTES_NATIVE_ENDIAN | Py_ASNATIVEBYTES_UNSIGNED_BUFFER``.
 
    .. c:namespace:: NULL
 
-   ============================================= ======
-   Flag                                          Value
-   ============================================= ======
-   .. c:macro:: Py_ASNATIVEBYTES_DEFAULTS        ``-1``
-   .. c:macro:: Py_ASNATIVEBYTES_BIG_ENDIAN      ``0``
-   .. c:macro:: Py_ASNATIVEBYTES_LITTLE_ENDIAN   ``1``
-   .. c:macro:: Py_ASNATIVEBYTES_NATIVE_ENDIAN   ``3``
-   .. c:macro:: Py_ASNATIVEBYTES_UNSIGNED_BUFFER ``4``
-   .. c:macro:: Py_ASNATIVEBYTES_REJECT_NEGATIVE ``8``
-   .. c:macro:: Py_ASNATIVEBYTES_ALLOW_INDEX     ``16``
-   ============================================= ======
+   +-----------------------------------------------+---------+
+   | Cờ                                            | Giá trị |
+   +===============================================+=========+
+   | .. c:macro:: Py_ASNATIVEBYTES_DEFAULTS        | ``-1``  |
+   +-----------------------------------------------+---------+
+   | .. c:macro:: Py_ASNATIVEBYTES_BIG_ENDIAN      | ``0``   |
+   +-----------------------------------------------+---------+
+   | .. c:macro:: Py_ASNATIVEBYTES_LITTLE_ENDIAN   | ``1``   |
+   +-----------------------------------------------+---------+
+   | .. c:macro:: Py_ASNATIVEBYTES_NATIVE_ENDIAN   | ``3``   |
+   +-----------------------------------------------+---------+
+   | .. c:macro:: Py_ASNATIVEBYTES_UNSIGNED_BUFFER | ``4``   |
+   +-----------------------------------------------+---------+
+   | .. c:macro:: Py_ASNATIVEBYTES_REJECT_NEGATIVE | ``8``   |
+   +-----------------------------------------------+---------+
+   | .. c:macro:: Py_ASNATIVEBYTES_ALLOW_INDEX     | ``16``  |
+   +-----------------------------------------------+---------+
 
-   Specifying ``Py_ASNATIVEBYTES_NATIVE_ENDIAN`` will override any other endian
-   flags. Passing ``2`` is reserved.
+   Việc chỉ định ``Py_ASNATIVEBYTES_NATIVE_ENDIAN`` sẽ ghi đè mọi cờ endian khác. Việc truyền ``2`` được dành riêng.
 
-   By default, sufficient buffer will be requested to include a sign bit.
-   For example, when converting 128 with *n_bytes=1*, the function will return
-   2 (or more) in order to store a zero sign bit.
+   Theo mặc định, sẽ yêu cầu đủ bộ đệm để bao gồm một bit dấu. Ví dụ, khi chuyển đổi 128 với *n_bytes=1*, hàm sẽ trả về 2 (hoặc nhiều hơn) để lưu trữ một bit dấu bằng không.
 
-   If ``Py_ASNATIVEBYTES_UNSIGNED_BUFFER`` is specified, a zero sign bit
-   will be omitted from size calculations. This allows, for example, 128 to fit
-   in a single-byte buffer. If the destination buffer is later treated as
-   signed, a positive input value may become negative.
-   Note that the flag does not affect handling of negative values: for those,
-   space for a sign bit is always requested.
+   Nếu chỉ định ``Py_ASNATIVEBYTES_UNSIGNED_BUFFER``, một bit dấu bằng không sẽ bị bỏ qua khi tính kích thước. Điều này cho phép, chẳng hạn, 128 vừa với bộ đệm một byte. Nếu bộ đệm đích sau đó được xử lý như một giá trị có dấu, một giá trị đầu vào dương có thể trở thành âm. Lưu ý rằng cờ này không ảnh hưởng đến việc xử lý các giá trị âm: đối với những giá trị đó, luôn yêu cầu khoảng trống cho một bit dấu.
 
-   Specifying ``Py_ASNATIVEBYTES_REJECT_NEGATIVE`` causes an exception to be set
-   if *pylong* is negative. Without this flag, negative values will be copied
-   provided there is enough space for at least one sign bit, regardless of
-   whether ``Py_ASNATIVEBYTES_UNSIGNED_BUFFER`` was specified.
+   Việc chỉ định ``Py_ASNATIVEBYTES_REJECT_NEGATIVE`` khiến một ngoại lệ được thiết lập nếu *pylong* là số âm. Nếu không có cờ này, các giá trị âm sẽ được sao chép miễn là có đủ chỗ cho ít nhất một bit dấu, bất kể ``Py_ASNATIVEBYTES_UNSIGNED_BUFFER`` có được chỉ định hay không.
 
-   If ``Py_ASNATIVEBYTES_ALLOW_INDEX`` is specified and a non-integer value is
-   passed, its :meth:`~object.__index__` method will be called first. This may
-   result in Python code executing and other threads being allowed to run, which
-   could cause changes to other objects or values in use. When *flags* is
-   ``-1``, this option is not set, and non-integer values will raise
+   Nếu chỉ định ``Py_ASNATIVEBYTES_ALLOW_INDEX`` và truyền vào một giá trị không phải số nguyên, phương thức :meth:`~object.__index__` của giá trị đó sẽ được gọi trước. Điều này có thể khiến mã Python được thực thi và cho phép các luồng khác chạy, từ đó có thể gây ra thay đổi đối với các đối tượng hoặc giá trị khác đang được sử dụng. Khi *flags* là ``-1``, tùy chọn này không được thiết lập và các giá trị không phải số nguyên sẽ gây ra lỗi
    :exc:`TypeError`.
 
    .. note::
 
-      With the default *flags* (``-1``, or *UNSIGNED_BUFFER*  without
-      *REJECT_NEGATIVE*), multiple Python integers can map to a single value
-      without overflow. For example, both ``255`` and ``-1`` fit a single-byte
-      buffer and set all its bits.
-      This matches typical C cast behavior.
+      Với *flags* mặc định (``-1``, hoặc *UNSIGNED_BUFFER* mà không có *REJECT_NEGATIVE*), nhiều số nguyên Python có thể ánh xạ đến cùng một giá trị mà không bị tràn. Ví dụ, cả ``255`` và ``-1`` đều vừa với bộ đệm một byte và thiết lập tất cả các bit của bộ đệm. Điều này phù hợp với hành vi ép kiểu C thông thường.
 
    .. versionadded:: 3.13
 
 
 .. c:macro:: PyLong_AsPid(pid)
 
-   Macro for converting a Python integer into a process identifier.
+   Macro để chuyển đổi một số nguyên Python thành mã định danh tiến trình.
 
-   This can be defined as an alias to :c:func:`PyLong_AsLong`,
-   :c:func:`PyLong_FromLongLong`, or :c:func:`PyLong_AsInt`, depending on the
-   size of the system's PID type.
+   Có thể định nghĩa đây là bí danh cho :c:func:`PyLong_AsLong`,
+   :c:func:`PyLong_FromLongLong`, hoặc :c:func:`PyLong_AsInt`, tùy thuộc vào kích thước của kiểu PID của hệ thống.
 
    .. versionadded:: 3.2
 
 
 .. c:function:: int PyLong_GetSign(PyObject *obj, int *sign)
 
-   Get the sign of the integer object *obj*.
+   Lấy dấu của đối tượng số nguyên *obj*.
 
-   On success, set *\*sign* to the integer sign  (0, -1 or +1 for zero, negative or
-   positive integer, respectively) and return 0.
+   Khi thành công, đặt *\*sign* thành dấu của số nguyên (0, -1 hoặc +1 lần lượt cho số nguyên bằng không, âm hoặc dương) và trả về 0.
 
-   On failure, return -1 with an exception set.  This function always succeeds
-   if *obj* is a :c:type:`PyLongObject` or its subtype.
+   Khi thất bại, trả về -1 và đặt một exception. Hàm này luôn thành công nếu *obj* là một :c:type:`PyLongObject` hoặc subtype của nó.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyLong_IsPositive(PyObject *obj)
 
-   Check if the integer object *obj* is positive (``obj > 0``).
+   Kiểm tra xem đối tượng số nguyên *obj* có dương (``obj > 0``) hay không.
 
-   If *obj* is an instance of :c:type:`PyLongObject` or its subtype,
-   return ``1`` when it's positive and ``0`` otherwise.  Else set an
-   exception and return ``-1``.
+   Nếu *obj* là một instance của :c:type:`PyLongObject` hoặc subtype của nó, trả về ``1`` khi nó dương và ``0`` trong trường hợp ngược lại. Nếu không, đặt một exception và trả về ``-1``.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyLong_IsNegative(PyObject *obj)
 
-   Check if the integer object *obj* is negative (``obj < 0``).
+   Kiểm tra xem đối tượng số nguyên *obj* có âm (``obj < 0``) hay không.
 
-   If *obj* is an instance of :c:type:`PyLongObject` or its subtype,
-   return ``1`` when it's negative and ``0`` otherwise.  Else set an
-   exception and return ``-1``.
+   Nếu *obj* là một instance của :c:type:`PyLongObject` hoặc subtype của nó, trả về ``1`` khi nó âm và ``0`` trong các trường hợp khác. Nếu không, đặt một exception và trả về ``-1``.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyLong_IsZero(PyObject *obj)
 
-   Check if the integer object *obj* is zero.
+   Kiểm tra xem integer object *obj* có bằng 0 hay không.
 
-   If *obj* is an instance of :c:type:`PyLongObject` or its subtype,
-   return ``1`` when it's zero and ``0`` otherwise.  Else set an
-   exception and return ``-1``.
+   Nếu *obj* là một instance của :c:type:`PyLongObject` hoặc subtype của nó, trả về ``1`` khi nó bằng 0 và ``0`` trong các trường hợp khác. Nếu không, đặt một exception và trả về ``-1``.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: PyObject* PyLong_GetInfo(void)
 
-   On success, return a read only :term:`named tuple`, that holds
-   information about Python's internal representation of integers.
-   See :data:`sys.int_info` for description of individual fields.
+   Khi thành công, trả về một :term:`named tuple` chỉ đọc, chứa thông tin về biểu diễn nội bộ của các số nguyên trong Python. Xem :data:`sys.int_info` để biết mô tả về từng trường.
 
-   On failure, return ``NULL`` with an exception set.
+   Khi thất bại, trả về ``NULL`` cùng với một exception đã được đặt.
 
    .. versionadded:: 3.1
 
 
 .. c:function:: int PyUnstable_Long_IsCompact(const PyLongObject* op)
 
-   Return 1 if *op* is compact, 0 otherwise.
+   Trả về 1 nếu *op* là compact, nếu không thì trả về 0.
 
-   This function makes it possible for performance-critical code to implement
-   a “fast path” for small integers. For compact values use
-   :c:func:`PyUnstable_Long_CompactValue`; for others fall back to a
-   :c:func:`PyLong_As* <PyLong_AsSize_t>` function or
+   Hàm này cho phép mã yêu cầu hiệu năng cao triển khai “fast path” cho các số nguyên nhỏ. Đối với các giá trị compact, hãy sử dụng
+   :c:func:`PyUnstable_Long_CompactValue`; đối với các trường hợp khác, chuyển sang một
+   :c:func:`PyLong_As* <PyLong_AsSize_t>` hàm hoặc
    :c:func:`PyLong_AsNativeBytes`.
 
-   The speedup is expected to be negligible for most users.
+   Đối với hầu hết người dùng, mức tăng tốc dự kiến là không đáng kể.
 
-   Exactly what values are considered compact is an implementation detail
-   and is subject to change.
+   Chính xác những giá trị nào được xem là compact là một chi tiết triển khai và có thể thay đổi.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: Py_ssize_t PyUnstable_Long_CompactValue(const PyLongObject* op)
 
-   If *op* is compact, as determined by :c:func:`PyUnstable_Long_IsCompact`,
-   return its value.
+   Nếu *op* là compact, như được xác định bởi :c:func:`PyUnstable_Long_IsCompact`, hãy trả về giá trị của nó.
 
-   Otherwise, the return value is undefined.
+   Nếu không, giá trị trả về không được xác định.
 
    .. versionadded:: 3.12
 
 
-Export API
-^^^^^^^^^^
+API xuất
+^^^^^^^^
 
 .. versionadded:: 3.14
 
 .. c:struct:: PyLongLayout
 
-   Layout of an array of "digits" ("limbs" in the GMP terminology), used to
-   represent absolute value for arbitrary precision integers.
+   Bố cục của một mảng gồm các "digit" ("limb" theo thuật ngữ của GMP), được dùng để biểu diễn giá trị tuyệt đối của các số nguyên có độ chính xác tùy ý.
 
-   Use :c:func:`PyLong_GetNativeLayout` to get the native layout of Python
-   :class:`int` objects, used internally for integers with "big enough"
-   absolute value.
+   Sử dụng :c:func:`PyLong_GetNativeLayout` để lấy bố cục gốc của Python
+   Các đối tượng :class:`int`, được sử dụng nội bộ cho các số nguyên có giá trị tuyệt đối "đủ lớn".
 
-   See also :data:`sys.int_info` which exposes similar information in Python.
+   Xem thêm :data:`sys.int_info`, cung cấp thông tin tương tự trong Python.
 
    .. c:member:: uint8_t bits_per_digit
 
-      Bits per digit. For example, a 15 bit digit means that bits 0-14 contain
-      meaningful information.
+      Số bit trên mỗi digit. Ví dụ, digit 15 bit có nghĩa là các bit 0-14 chứa thông tin có ý nghĩa.
 
    .. c:member:: uint8_t digit_size
 
-      Digit size in bytes. For example, a 15 bit digit will require at least 2
-      bytes.
+      Kích thước của digit tính bằng byte. Ví dụ, digit 15 bit sẽ cần ít nhất 2 byte.
 
    .. c:member:: int8_t digits_order
 
-      Digits order:
+      Thứ tự các digit:
 
-      - ``1`` for most significant digit first
-      - ``-1`` for least significant digit first
+      - ``1`` cho thứ tự chữ số quan trọng nhất trước
+      - ``-1`` cho thứ tự chữ số ít quan trọng nhất trước
 
    .. c:member:: int8_t digit_endianness
 
-      Digit endianness:
+      Thứ tự byte của chữ số:
 
-      - ``1`` for most significant byte first (big endian)
-      - ``-1`` for least significant byte first (little endian)
+      - ``1`` cho thứ tự byte quan trọng nhất trước (big endian)
+      - ``-1`` cho thứ tự byte ít quan trọng nhất trước (little endian)
 
 
 .. c:function:: const PyLongLayout* PyLong_GetNativeLayout(void)
 
-   Get the native layout of Python :class:`int` objects.
+   Lấy bố cục gốc của các đối tượng Python :class:`int`.
 
-   See the :c:struct:`PyLongLayout` structure.
+   Xem cấu trúc :c:struct:`PyLongLayout`.
 
-   The function must not be called before Python initialization nor after
-   Python finalization. The returned layout is valid until Python is
-   finalized. The layout is the same for all Python sub-interpreters
-   in a process, and so it can be cached.
+   Không được gọi hàm này trước khi Python được khởi tạo hoặc sau khi Python được hoàn tất. Bố cục được trả về hợp lệ cho đến khi Python được hoàn tất. Bố cục này giống nhau đối với tất cả các Python sub-interpreter trong một tiến trình, vì vậy có thể được lưu vào bộ nhớ đệm.
 
 
 .. c:struct:: PyLongExport
 
-   Export of a Python :class:`int` object.
+   Xuất một đối tượng :class:`int` của Python.
 
-   There are two cases:
+   Có hai trường hợp:
 
-   * If :c:member:`digits` is ``NULL``, only use the :c:member:`value` member.
-   * If :c:member:`digits` is not ``NULL``, use :c:member:`negative`,
-     :c:member:`ndigits` and :c:member:`digits` members.
+   * Nếu :c:member:`digits` là ``NULL``, chỉ sử dụng thành viên :c:member:`value`.
+   * Nếu :c:member:`digits` không phải là ``NULL``, sử dụng :c:member:`negative`,
+     các thành viên :c:member:`ndigits` và :c:member:`digits`.
 
    .. c:member:: int64_t value
 
-      The native integer value of the exported :class:`int` object.
-      Only valid if :c:member:`digits` is ``NULL``.
+      Giá trị số nguyên gốc của đối tượng :class:`int` đã xuất. Chỉ hợp lệ nếu :c:member:`digits` là ``NULL``.
 
    .. c:member:: uint8_t negative
 
-      ``1`` if the number is negative, ``0`` otherwise.
-      Only valid if :c:member:`digits` is not ``NULL``.
+      ``1`` nếu số đó là số âm, ``0`` nếu không. Chỉ hợp lệ khi :c:member:`digits` không phải là ``NULL``.
 
    .. c:member:: Py_ssize_t ndigits
 
-      Number of digits in :c:member:`digits` array.
-      Only valid if :c:member:`digits` is not ``NULL``.
+      Số chữ số trong mảng :c:member:`digits`. Chỉ hợp lệ khi :c:member:`digits` không phải là ``NULL``.
 
    .. c:member:: const void *digits
 
-      Read-only array of unsigned digits. Can be ``NULL``.
+      Mảng chỉ đọc gồm các chữ số không dấu. Có thể là ``NULL``.
 
 
 .. c:function:: int PyLong_Export(PyObject *obj, PyLongExport *export_long)
 
-   Export a Python :class:`int` object.
+   Xuất một đối tượng :class:`int` của Python.
 
-   *export_long* must point to a :c:struct:`PyLongExport` structure allocated
-   by the caller. It must not be ``NULL``.
+   *export_long* phải trỏ đến một cấu trúc :c:struct:`PyLongExport` do bên gọi cấp phát. Giá trị này không được là ``NULL``.
 
-   On success, fill in *\*export_long* and return ``0``.
-   On error, set an exception and return ``-1``.
+   Khi thành công, điền *\*export_long* và trả về ``0``. Khi xảy ra lỗi, đặt một exception và trả về ``-1``.
 
-   :c:func:`PyLong_FreeExport` must be called when the export is no longer
-   needed.
+   Phải gọi :c:func:`PyLong_FreeExport` khi không còn cần đến export nữa.
 
     .. impl-detail::
-        This function always succeeds if *obj* is a Python :class:`int` object
-        or a subclass.
+        Hàm này luôn thành công nếu *obj* là một Python :class:`int` object hoặc một lớp con.
 
 
 .. c:function:: void PyLong_FreeExport(PyLongExport *export_long)
 
-   Release the export *export_long* created by :c:func:`PyLong_Export`.
+   Giải phóng *export_long* export được tạo bởi :c:func:`PyLong_Export`.
 
    .. impl-detail::
-      Calling :c:func:`PyLong_FreeExport` is optional if *export_long->digits*
-      is ``NULL``.
+      Việc gọi :c:func:`PyLong_FreeExport` là tùy chọn nếu *export_long->digits* là ``NULL``.
 
 
-PyLongWriter API
+API PyLongWriter
 ^^^^^^^^^^^^^^^^
 
-The :c:type:`PyLongWriter` API can be used to import an integer.
+Có thể sử dụng API :c:type:`PyLongWriter` để import một số nguyên.
 
 .. versionadded:: 3.14
 
 .. c:struct:: PyLongWriter
 
-   A Python :class:`int` writer instance.
+   Một instance writer Python :class:`int`.
 
-   The instance must be destroyed by :c:func:`PyLongWriter_Finish` or
+   Instance phải được hủy bởi :c:func:`PyLongWriter_Finish` hoặc
    :c:func:`PyLongWriter_Discard`.
 
 
 .. c:function:: PyLongWriter* PyLongWriter_Create(int negative, Py_ssize_t ndigits, void **digits)
 
-   Create a :c:type:`PyLongWriter`.
+   Tạo một :c:type:`PyLongWriter`.
 
-   On success, allocate *\*digits* and return a writer.
-   On error, set an exception and return ``NULL``.
+   Khi thành công, cấp phát *\*digits* rồi trả về một writer. Khi có lỗi, đặt một exception và trả về ``NULL``.
 
-   *negative* is ``1`` if the number is negative, or ``0`` otherwise.
+   *negative* là ``1`` nếu số đó âm, hoặc ``0`` nếu không.
 
-   *ndigits* is the number of digits in the *digits* array. It must be
-   greater than 0.
+   *ndigits* là số lượng chữ số trong mảng *digits*. Giá trị này phải lớn hơn 0.
 
-   *digits* must not be NULL.
+   *digits* không được là NULL.
 
-   After a successful call to this function, the caller should fill in the
-   array of digits *digits* and then call :c:func:`PyLongWriter_Finish` to get
-   a Python :class:`int`.
-   The layout of *digits* is described by :c:func:`PyLong_GetNativeLayout`.
+   Sau khi gọi hàm này thành công, bên gọi nên điền vào mảng chữ số *digits*, sau đó gọi :c:func:`PyLongWriter_Finish` để nhận một :class:`int` Python. Bố cục của *digits* được mô tả bởi :c:func:`PyLong_GetNativeLayout`.
 
-   Digits must be in the range [``0``; ``(1 << bits_per_digit) - 1``]
-   (where the :c:struct:`~PyLongLayout.bits_per_digit` is the number of bits
-   per digit).
-   Any unused most significant digits must be set to ``0``.
+   Các chữ số phải nằm trong phạm vi [``0``; ``(1 << bits_per_digit) - 1``] (trong đó :c:struct:`~PyLongLayout.bits_per_digit` là số bit trên mỗi chữ số). Mọi chữ số có trọng số cao nhất không được sử dụng phải được đặt thành ``0``.
 
-   Alternately, call :c:func:`PyLongWriter_Discard` to destroy the writer
-   instance without creating an :class:`~int` object.
+   Ngoài ra, gọi :c:func:`PyLongWriter_Discard` để hủy instance writer mà không tạo đối tượng :class:`~int`.
 
 
 .. c:function:: PyObject* PyLongWriter_Finish(PyLongWriter *writer)
 
-   Finish a :c:type:`PyLongWriter` created by :c:func:`PyLongWriter_Create`.
+   Hoàn tất một :c:type:`PyLongWriter` được tạo bởi :c:func:`PyLongWriter_Create`.
 
-   On success, return a Python :class:`int` object.
-   On error, set an exception and return ``NULL``.
+   Khi thành công, trả về một đối tượng Python :class:`int`. Khi xảy ra lỗi, thiết lập một exception và trả về ``NULL``.
 
-   The function takes care of normalizing the digits and converts the object
-   to a compact integer if needed.
+   Hàm này đảm nhiệm việc chuẩn hóa các chữ số và chuyển đối tượng thành số nguyên compact nếu cần.
 
-   The writer instance and the *digits* array are invalid after the call.
+   Instance writer và mảng *digits* không còn hợp lệ sau lời gọi này.
 
 
 .. c:function:: void PyLongWriter_Discard(PyLongWriter *writer)
 
-   Discard a :c:type:`PyLongWriter` created by :c:func:`PyLongWriter_Create`.
+   Hủy một :c:type:`PyLongWriter` được tạo bởi :c:func:`PyLongWriter_Create`.
 
-   If *writer* is ``NULL``, no operation is performed.
+   Nếu *writer* là ``NULL``, không thực hiện thao tác nào.
 
-   The writer instance and the *digits* array are invalid after the call.
+   Instance writer và mảng *digits* không còn hợp lệ sau lời gọi này.
 
 
-Deprecated API
-^^^^^^^^^^^^^^
+API không còn được khuyến nghị
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-These macros are :term:`soft deprecated`. They describe parameters
-of the internal representation of :c:type:`PyLongObject` instances.
+Các macro này là :term:`soft deprecated`. Chúng mô tả các tham số của biểu diễn nội bộ của các thể hiện :c:type:`PyLongObject`.
 
-Use :c:func:`PyLong_GetNativeLayout` instead, along with :c:func:`PyLong_Export`
-to read integer data or :c:type:`PyLongWriter` to write it.
-These currently use the same layout, but are designed to continue working correctly
-even if CPython's internal integer representation changes.
+Thay vào đó, hãy sử dụng :c:func:`PyLong_GetNativeLayout`, cùng với :c:func:`PyLong_Export` để đọc dữ liệu số nguyên hoặc :c:type:`PyLongWriter` để ghi dữ liệu đó. Hiện tại, các API này sử dụng cùng một bố cục, nhưng được thiết kế để tiếp tục hoạt động chính xác ngay cả khi biểu diễn số nguyên nội bộ của CPython thay đổi.
 
 
 .. c:macro:: PyLong_SHIFT
 
-   This is equivalent to :c:member:`~PyLongLayout.bits_per_digit` in
-   the output of :c:func:`PyLong_GetNativeLayout`.
+   Điều này tương đương với :c:member:`~PyLongLayout.bits_per_digit` trong đầu ra của :c:func:`PyLong_GetNativeLayout`.
 
 
 .. c:macro:: PyLong_BASE
 
-   This is currently equivalent to :c:expr:`1 << PyLong_SHIFT`.
+   Hiện tại, điều này tương đương với :c:expr:`1 << PyLong_SHIFT`.
 
 
 .. c:macro:: PyLong_MASK
 
-   This is currently equivalent to :c:expr:`(1 << PyLong_SHIFT) - 1`
+   Hiện tại, điều này tương đương với :c:expr:`(1 << PyLong_SHIFT) - 1`
