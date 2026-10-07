@@ -518,13 +518,13 @@ Sau đây là một ví dụ về cách bạn có thể viết một hàm tính 
 
        n = PyList_Size(list);
        if (n < 0)
-           return -1; /* Not a list */
+           return -1; /* Không phải list */
        for (i = 0; i < n; i++) {
-           item = PyList_GetItem(list, i); /* Can't fail */
-           if (!PyLong_Check(item)) continue; /* Skip non-integers */
+           item = PyList_GetItem(list, i); /* Không thể thất bại */
+           if (!PyLong_Check(item)) continue; /* Bỏ qua giá trị không phải số nguyên */
            value = PyLong_AsLong(item);
            if (value == -1 && PyErr_Occurred())
-               /* Integer too big to fit in a C long, bail out */
+               /* Số nguyên quá lớn để chứa trong kiểu long của C, thoát */
                return -1;
            total += value;
        }
@@ -543,21 +543,21 @@ Sau đây là một ví dụ về cách bạn có thể viết một hàm tính 
        PyObject *item;
        n = PySequence_Length(sequence);
        if (n < 0)
-           return -1; /* Has no length */
+           return -1; /* Không có độ dài */
        for (i = 0; i < n; i++) {
            item = PySequence_GetItem(sequence, i);
            if (item == NULL)
-               return -1; /* Not a sequence, or other failure */
+               return -1; /* Không phải sequence, hoặc có lỗi khác */
            if (PyLong_Check(item)) {
                value = PyLong_AsLong(item);
                Py_DECREF(item);
                if (value == -1 && PyErr_Occurred())
-                   /* Integer too big to fit in a C long, bail out */
+                   /* Số nguyên quá lớn để chứa trong kiểu long của C, thoát */
                    return -1;
                total += value;
            }
            else {
-               Py_DECREF(item); /* Discard reference ownership */
+               Py_DECREF(item); /* Loại bỏ quyền sở hữu tham chiếu */
            }
        }
        return total;
@@ -627,17 +627,17 @@ Dưới đây là mã C tương ứng, với đầy đủ chi tiết::
    int
    incr_item(PyObject *dict, PyObject *key)
    {
-       /* Objects all initialized to NULL for Py_XDECREF */
+       /* Mọi đối tượng đều được khởi tạo thành NULL để dùng Py_XDECREF */
        PyObject *item = NULL, *const_one = NULL, *incremented_item = NULL;
-       int rv = -1; /* Return value initialized to -1 (failure) */
+       int rv = -1; /* Giá trị trả về được khởi tạo là -1 (thất bại) */
 
        item = PyObject_GetItem(dict, key);
        if (item == NULL) {
-           /* Handle KeyError only: */
+           /* Chỉ xử lý KeyError: */
            if (!PyErr_ExceptionMatches(PyExc_KeyError))
                goto error;
 
-           /* Clear the error and use zero: */
+           /* Xóa lỗi và dùng giá trị không: */
            PyErr_Clear();
            item = PyLong_FromLong(0L);
            if (item == NULL)
@@ -653,18 +653,18 @@ Dưới đây là mã C tương ứng, với đầy đủ chi tiết::
 
        if (PyObject_SetItem(dict, key, incremented_item) < 0)
            goto error;
-       rv = 0; /* Success */
-       /* Continue with cleanup code */
+       rv = 0; /* Thành công */
+       /* Tiếp tục với mã dọn dẹp */
 
     error:
-       /* Cleanup code, shared by success and failure path */
+       /* Mã dọn dẹp, dùng chung cho đường dẫn thành công và thất bại */
 
-       /* Use Py_XDECREF() to ignore NULL references */
+       /* Dùng Py_XDECREF() để bỏ qua các tham chiếu NULL */
        Py_XDECREF(item);
        Py_XDECREF(const_one);
        Py_XDECREF(incremented_item);
 
-       return rv; /* -1 for error, 0 for success */
+       return rv; /* -1 khi lỗi, 0 khi thành công */
    }
 
 .. index:: single: incr_item()
