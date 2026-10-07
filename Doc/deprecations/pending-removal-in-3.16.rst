@@ -1,30 +1,19 @@
-Pending removal in Python 3.16
-------------------------------
+Sắp bị loại bỏ trong Python 3.16
+--------------------------------
 
-* The import system:
+* Hệ thống import:
 
-  * Setting :attr:`~module.__loader__` on a module while
-    failing to set :attr:`__spec__.loader <importlib.machinery.ModuleSpec.loader>`
-    is deprecated. In Python 3.16, :attr:`!__loader__` will cease to be set or
-    taken into consideration by the import system or the standard library.
+  * Việc thiết lập :attr:`~module.__loader__` trên một module nhưng không thiết lập :attr:`__spec__.loader <importlib.machinery.ModuleSpec.loader>` đã không còn được khuyến nghị. Trong Python 3.16, :attr:`!__loader__` sẽ không còn được hệ thống import hoặc thư viện chuẩn thiết lập hay xem xét nữa.
 
 * :mod:`array`:
 
-  * The ``'u'`` format code (:c:type:`wchar_t`)
-    has been deprecated in documentation since Python 3.3
-    and at runtime since Python 3.13.
-    Use the ``'w'`` format code (:c:type:`Py_UCS4`)
-    for Unicode characters instead.
+  * Mã định dạng ``'u'`` (:c:type:`wchar_t`) đã không còn được khuyến nghị trong tài liệu kể từ Python 3.3 và tại runtime kể từ Python 3.13. Thay vào đó, hãy sử dụng mã định dạng ``'w'`` (:c:type:`Py_UCS4`) cho các ký tự Unicode.
 
 * :mod:`asyncio`:
 
-  * :func:`!asyncio.iscoroutinefunction` is deprecated
-    and will be removed in Python 3.16;
-    use :func:`inspect.iscoroutinefunction` instead.
-    (Contributed by Jiahao Li and Kumar Aditya in :gh:`122875`.)
+  * :func:`!asyncio.iscoroutinefunction` không còn được khuyến nghị và sẽ bị loại bỏ trong Python 3.16; hãy sử dụng :func:`inspect.iscoroutinefunction` thay thế. (Do Jiahao Li và Kumar Aditya đóng góp trong :gh:`122875`.)
 
-  * :mod:`asyncio` policy system is deprecated and will be removed in Python 3.16.
-    In particular, the following classes and functions are deprecated:
+  * Hệ thống policy :mod:`asyncio` không còn được khuyến nghị và sẽ bị loại bỏ trong Python 3.16. Cụ thể, các class và function sau đây không còn được khuyến nghị:
 
     * :class:`asyncio.AbstractEventLoopPolicy`
     * :class:`asyncio.DefaultEventLoopPolicy`
@@ -33,10 +22,9 @@ Pending removal in Python 3.16
     * :func:`asyncio.get_event_loop_policy`
     * :func:`asyncio.set_event_loop_policy`
 
-    Users should use :func:`asyncio.run` or :class:`asyncio.Runner` with
-    *loop_factory* to use the desired event loop implementation.
+    Người dùng nên sử dụng :func:`asyncio.run` hoặc :class:`asyncio.Runner` cùng với *loop_factory* để sử dụng implementation event loop mong muốn.
 
-    For example, to use :class:`asyncio.SelectorEventLoop` on Windows::
+    Ví dụ, để sử dụng :class:`asyncio.SelectorEventLoop` trên Windows::
 
       import asyncio
 
@@ -45,61 +33,41 @@ Pending removal in Python 3.16
 
       asyncio.run(main(), loop_factory=asyncio.SelectorEventLoop)
 
-    (Contributed by Kumar Aditya in :gh:`127949`.)
+    (Do Kumar Aditya đóng góp trong :gh:`127949`.)
 
 * :mod:`builtins`:
 
-  * Bitwise inversion on boolean types, ``~True`` or ``~False``
-    has been deprecated since Python 3.12,
-    as it produces surprising and unintuitive results (``-2`` and ``-1``).
-    Use ``not x`` instead for the logical negation of a Boolean.
-    In the rare case that you need the bitwise inversion of
-    the underlying integer, convert to ``int`` explicitly (``~int(x)``).
+  * Phép đảo bit trên các kiểu boolean, ``~True`` hoặc ``~False`` đã không còn được khuyến nghị kể từ Python 3.12, vì nó tạo ra các kết quả bất ngờ và phản trực giác (``-2`` và ``-1``). Thay vào đó, hãy dùng ``not x`` để phủ định logic của một Boolean. Trong trường hợp hiếm khi cần phép đảo bit của số nguyên cơ sở, hãy chuyển đổi rõ ràng sang ``int`` (``~int(x)``).
 
 * :mod:`functools`:
 
-  * Calling the Python implementation of :func:`functools.reduce` with *function*
-    or *sequence* as keyword arguments has been deprecated since Python 3.14.
+  * Việc gọi implementation Python của :func:`functools.reduce` với *function* hoặc *sequence* làm keyword argument đã không còn được khuyến nghị kể từ Python 3.14.
 
 * :mod:`logging`:
 
-  Support for custom logging handlers with the *strm* argument is deprecated
-  and scheduled for removal in Python 3.16. Define handlers with the *stream*
-  argument instead. (Contributed by Mariusz Felisiak in :gh:`115032`.)
+  Hỗ trợ các logging handler tùy chỉnh với đối số *strm* đã không còn được khuyến nghị và dự kiến sẽ bị loại bỏ trong Python 3.16. Thay vào đó, hãy định nghĩa handler với đối số *stream*. (Do Mariusz Felisiak đóng góp trong :gh:`115032`.)
 
 * :mod:`mimetypes`:
 
-  * Valid extensions start with a '.' or are empty for
-    :meth:`mimetypes.MimeTypes.add_type`.
-    Undotted extensions are deprecated and will
-    raise a :exc:`ValueError` in Python 3.16.
-    (Contributed by Hugo van Kemenade in :gh:`75223`.)
+  * Các phần mở rộng hợp lệ bắt đầu bằng '.' hoặc là chuỗi rỗng đối với
+    :meth:`mimetypes.MimeTypes.add_type`. Các phần mở rộng không có dấu chấm đã không còn được khuyến nghị và sẽ gây ra :exc:`ValueError` trong Python 3.16. (Do Hugo van Kemenade đóng góp trong :gh:`75223`.)
 
 * :mod:`shutil`:
 
-  * The :class:`!ExecError` exception
-    has been deprecated since Python 3.14.
-    It has not been used by any function in :mod:`!shutil` since Python 3.4,
-    and is now an alias of :exc:`RuntimeError`.
+  * Ngoại lệ :class:`!ExecError` đã bị phản đối kể từ Python 3.14. Ngoại lệ này không được bất kỳ hàm nào trong :mod:`!shutil` sử dụng kể từ Python 3.4 và hiện là bí danh của :exc:`RuntimeError`.
 
 * :mod:`symtable`:
 
-  * The :meth:`Class.get_methods <symtable.Class.get_methods>` method
-    has been deprecated since Python 3.14.
+  * Phương thức :meth:`Class.get_methods <symtable.Class.get_methods>` đã bị phản đối kể từ Python 3.14.
 
 * :mod:`sys`:
 
-  * The :func:`~sys._enablelegacywindowsfsencoding` function
-    has been deprecated since Python 3.13.
-    Use the :envvar:`PYTHONLEGACYWINDOWSFSENCODING` environment variable instead.
+  * Hàm :func:`~sys._enablelegacywindowsfsencoding` đã bị phản đối kể từ Python 3.13. Thay vào đó, hãy sử dụng biến môi trường :envvar:`PYTHONLEGACYWINDOWSFSENCODING`.
 
 * :mod:`sysconfig`:
 
-  * The :func:`!sysconfig.expand_makefile_vars` function
-    has been deprecated since Python 3.14.
-    Use the ``vars`` argument of :func:`sysconfig.get_paths` instead.
+  * Hàm :func:`!sysconfig.expand_makefile_vars` đã bị phản đối kể từ Python 3.14. Thay vào đó, hãy sử dụng đối số ``vars`` của :func:`sysconfig.get_paths`.
 
 * :mod:`tarfile`:
 
-  * The undocumented and unused :attr:`!TarFile.tarfile` attribute
-    has been deprecated since Python 3.13.
+  * Thuộc tính :attr:`!TarFile.tarfile` không được ghi chép và không được sử dụng đã bị phản đối kể từ Python 3.13.

@@ -1,5 +1,5 @@
-Deprecations
-============
+Các nội dung không còn được khuyến nghị sử dụng
+===============================================
 
 .. include:: pending-removal-in-3.15.rst
 
@@ -13,8 +13,8 @@ Deprecations
 
 .. include:: pending-removal-in-future.rst
 
-C API deprecations
-------------------
+Các nội dung không còn được khuyến nghị sử dụng trong C API
+-----------------------------------------------------------
 
 .. include:: c-api-pending-removal-in-3.15.rst
 

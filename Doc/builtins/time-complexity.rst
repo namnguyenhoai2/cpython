@@ -1,334 +1,277 @@
 .. _time-complexity:
 
-===============================================
-Time complexity of operations on built-in types
-===============================================
+=============================================================
+Độ phức tạp thời gian của các thao tác trên các kiểu dựng sẵn
+=============================================================
 
-This page documents the time complexity of various operations on built-in types
-in CPython. Other Python implementations may have different performance
-characteristics. Additionally, the listed costs assume exact built-in types, as
-instances of subclasses may have different costs.
+Trang này ghi lại độ phức tạp thời gian của nhiều thao tác trên các kiểu dựng sẵn trong CPython. Các triển khai Python khác có thể có đặc tính hiệu năng khác. Ngoài ra, các chi phí được liệt kê giả định các kiểu dựng sẵn chính xác, vì các thực thể của lớp con có thể có chi phí khác.
 
-We use |big O notation|_ to describe how the running time of an operation grows
-with the size of its inputs. Unless stated otherwise, *n* denotes the number of
-elements currently in the container, and *k* is the value of a numeric
-parameter, such as an index or a repeat count.
+Chúng tôi sử dụng |big O notation|_ để mô tả thời gian chạy của một thao tác tăng như thế nào theo kích thước đầu vào. Nếu không có nêu khác, *n* biểu thị số phần tử hiện có trong container, còn *k* là giá trị của một tham số số, chẳng hạn như chỉ mục hoặc số lần lặp.
 
-.. |big O notation| replace:: Big *O* notation
+.. |big O notation| replace:: Ký hiệu Big *O*
 .. _big O notation: https://en.wikipedia.org/wiki/Big_O_notation
 
 
 :class:`!list`
 ==============
 
-Lists are mutable sequences; for more detail on the implementation see
-:ref:`how-are-lists-implemented`. The largest costs come from growing beyond the
-current allocation size (because everything must move), or from inserting or
-deleting somewhere near the beginning (because everything after that must move).
-If you need to add or remove at both ends, consider using a
-:class:`collections.deque` instead.
+List là các sequence có thể thay đổi; để biết thêm chi tiết về quá trình triển khai, hãy xem
+:ref:`how-are-lists-implemented`. Các chi phí lớn nhất phát sinh khi mở rộng vượt quá kích thước cấp phát hiện tại (vì mọi thứ phải được di chuyển), hoặc khi chèn hay xóa ở vị trí gần đầu (vì mọi thứ phía sau vị trí đó phải được di chuyển). Nếu bạn cần thêm hoặc xóa ở cả hai đầu, hãy cân nhắc sử dụng một
+:class:`collections.deque` thay thế.
 
 .. list-table::
    :header-rows: 1
 
-   * - Operation
-     - Complexity
-   * - Copy (``l.copy()``)
+   * - Thao tác
+     - Độ phức tạp
+   * - Sao chép (``l.copy()``)
      - *O*\ (*n*)
-   * - Append (``l.append(x)``) [1]_
+   * - Thêm (``l.append(x)``) [1]_
      - *O*\ (1)
-   * - Pop (``l.pop(k)``) [1]_ [2]_
+   * - Lấy ra (``l.pop(k)``) [1]_ [2]_
      - *O*\ (*n* - *k*)
-   * - Insert (``l.insert(k, x)``) [1]_ [2]_
+   * - Chèn (``l.insert(k, x)``) [1]_ [2]_
      - *O*\ (*n* - *k*)
-   * - Get item (``l[k]``)
+   * - Lấy mục (``l[k]``)
      - *O*\ (1)
-   * - Set item (``l[k] = x``)
+   * - Đặt mục (``l[k] = x``)
      - *O*\ (1)
-   * - Delete item (``del l[k]``) [2]_
+   * - Xóa phần tử (``del l[k]``) [2]_
      - *O*\ (*n* - *k*)
-   * - Iteration
+   * - Lặp
      - *O*\ (*n*)
-   * - Get slice (``l[i:j]``)
+   * - Lấy slice (``l[i:j]``)
      - *O*\ (*j* - *i*)
-   * - Set slice (``l[i:j] = t``) [1]_
-     - *O*\ (*j* - *i*) if len(*t*) == *j* - *i*,
-       otherwise *O*\ (*n* - *i* + len(*t*))
-   * - Delete slice (``del l[i:j]``)
+   * - Gán slice (``l[i:j] = t``) [1]_
+     - *O*\ (*j* - *i*) nếu len(*t*) == *j* - *i*, nếu không thì *O*\ (*n* - *i* + len(*t*) )
+   * - Xóa slice (``del l[i:j]``)
      - *O*\ (*n* - *i*)
-   * - Extend (``l.extend(t)``) [1]_ [3]_
+   * - Mở rộng (``l.extend(t)``) [1]_ [3]_
      - *O*\ (len(*t*))
-   * - Sort (``l.sort()``) [4]_
+   * - Sắp xếp (``l.sort()``) [4]_
      - *O*\ (*n* log *n*)
-   * - Concatenate (``l1 + l2``)
+   * - Nối (``l1 + l2``)
      - *O*\ (len(*l1*) + len(*l2*))
-   * - Multiply (``l * k``)
+   * - Nhân (``l * k``)
      - *O*\ (*nk*)
    * - ``x in l``
      - *O*\ (*n*)
    * - ``min(l)``, ``max(l)``
      - *O*\ (*n*)
-   * - Get length (``len(l)``) [5]_
+   * - Lấy độ dài (``len(l)``) [5]_
      - *O*\ (1)
 
 
 :class:`!tuple`
 ===============
 
-A :class:`tuple` is an :term:`immutable` sequence. Because a tuple can never
-change, there are no insertion or deletion costs, and making a copy simply
-returns the same object, so is constant time (*O*\ (1)).
+Một :class:`tuple` là một chuỗi :term:`immutable`. Vì tuple không bao giờ thay đổi, nên không có chi phí chèn hoặc xóa, và việc tạo bản sao chỉ trả về cùng một đối tượng, do đó có thời gian hằng số (*O*\ (1)).
 
 .. list-table::
    :header-rows: 1
 
-   * - Operation
-     - Complexity
-   * - Copy (``tuple(t)``)
+   * - Thao tác
+     - Độ phức tạp
+   * - Sao chép (``tuple(t)``)
      - *O*\ (1)
-   * - Get item (``t[k]``)
+   * - Lấy phần tử (``t[k]``)
      - *O*\ (1)
-   * - Get slice (``t[i:j]``)
+   * - Lấy lát cắt (``t[i:j]``)
      - *O*\ (*j* - *i*)
-   * - Concatenate (``t1 + t2``)
+   * - Nối (``t1 + t2``)
      - *O*\ (len(*t1*) + len(*t2*))
-   * - Multiply (``t * k``)
+   * - Nhân (``t * k``)
      - *O*\ (*nk*)
-   * - Iteration
+   * - Lặp
      - *O*\ (*n*)
    * - ``x in t``
      - *O*\ (*n*)
    * - ``min(t)``, ``max(t)``
      - *O*\ (*n*)
-   * - Get length (``len(t)``) [5]_
+   * - Lấy độ dài (``len(t)``) [5]_
      - *O*\ (1)
 
 
 :class:`!dict`
 ==============
 
-The times listed for dict objects are average-case times, as they assume the
-hash function for the objects is sufficiently robust to make collisions
-uncommon. They also assume the keys are well-distributed among the set of
-possible keys. In the worst case, when every key hashes to the same value,
-each of the *O*\ (1) operations below instead takes *O*\ (*n*) time. They also
-assume that hashing and comparing a key is *O*\ (1). For more detail on the
-implementation, see :ref:`how-are-dictionaries-implemented`.
+Các thời gian được liệt kê cho các đối tượng dict là thời gian trong trường hợp trung bình, vì chúng giả định rằng hàm băm của các đối tượng đủ mạnh để khiến các vụ va chạm xảy ra không thường xuyên. Chúng cũng giả định rằng các khóa được phân bổ đồng đều trong tập hợp các khóa khả dĩ. Trong trường hợp xấu nhất, khi mọi khóa đều được băm thành cùng một giá trị, mỗi thao tác *O*\ (1) dưới đây thay vào đó sẽ mất thời gian *O*\ (*n*). Chúng cũng giả định rằng việc băm và so sánh một khóa có độ phức tạp *O*\ (1). Để biết thêm chi tiết về cách triển khai, hãy xem :ref:`how-are-dictionaries-implemented`.
 
 .. list-table::
    :header-rows: 1
 
-   * - Operation
-     - Complexity
+   * - Thao tác
+     - Độ phức tạp
    * - ``key in d``
      - *O*\ (1)
-   * - Copy (``d.copy()``) [7]_
+   * - Sao chép (``d.copy()``) [7]_
      - *O*\ (*n*)
-   * - Get item (``d[key]``, ``d.get(key)``)
+   * - Lấy phần tử (``d[key]``, ``d.get(key)``)
      - *O*\ (1)
-   * - Set item (``d[key] = value``) [1]_
+   * - Đặt mục (``d[key] = value``) [1]_
      - *O*\ (1)
-   * - Delete item (``del d[key]``, ``d.pop(key)``)
+   * - Xóa mục (``del d[key]``, ``d.pop(key)``)
      - *O*\ (1)
-   * - Update (``d.update(t)``, ``d |= t``) [1]_ [3]_ [7]_
+   * - Cập nhật (``d.update(t)``, ``d |= t``) [1]_ [3]_ [7]_
      - *O*\ (len(*t*))
-   * - Iteration [7]_
+   * - Lặp lại [7]_
      - *O*\ (*n*)
-   * - Get length (``len(d)``) [5]_
+   * - Lấy độ dài (``len(d)``) [5]_
      - *O*\ (1)
 
 
 :class:`!set`, :class:`!frozenset`
 ==================================
 
-See :class:`dict` as the :class:`set` and :class:`frozenset` implementations are
-similar, and the same caveats apply.
-In the worst case, *O*\ (1) operations instead take *O*\ (*n*) time,
-and operations that look up every element degrade accordingly.
+Xem :class:`dict` vì các cài đặt :class:`set` và :class:`frozenset` tương tự, và các điểm cần lưu ý cũng giống nhau. Trong trường hợp xấu nhất, các thao tác *O*\ (1) thay vào đó mất *O*\ (*n*) thời gian, và các thao tác tra cứu mọi phần tử cũng suy giảm tương ứng.
 
-A :class:`frozenset` is :term:`immutable`, so it does not support adding,
-discarding, or the in-place update operations. The others below apply to it at
-the same costs.
+Một :class:`frozenset` là :term:`immutable`, vì vậy nó không hỗ trợ các thao tác thêm, loại bỏ hoặc cập nhật tại chỗ. Các thao tác còn lại bên dưới áp dụng cho nó với cùng chi phí.
 
 .. list-table::
    :header-rows: 1
 
-   * - Operation
-     - Complexity
+   * - Thao tác
+     - Độ phức tạp
    * - ``x in s``
      - *O*\ (1)
-   * - Copy (``s.copy()``) [6]_ [7]_
+   * - Sao chép (``s.copy()``) [6]_ [7]_
      - *O*\ (*n*)
-   * - Add (``s.add(x)``) [1]_
+   * - Thêm (``s.add(x)``) [1]_
      - *O*\ (1)
-   * - Discard (``s.discard(x)``, ``s.remove(x)``)
+   * - Loại bỏ (``s.discard(x)``, ``s.remove(x)``)
      - *O*\ (1)
-   * - Union (``s1 | s2``, ``s1.union(s2)``) [7]_
+   * - Phép hợp (``s1 | s2``, ``s1.union(s2)``) [7]_
      - *O*\ (len(*s1*) + len(*s2*))
-   * - Update (``s1 |= s2``, ``s1.update(s2)``) [1]_ [7]_
+   * - Cập nhật (``s1 |= s2``, ``s1.update(s2)``) [1]_ [7]_
      - *O*\ (len(*s2*))
-   * - Intersection (``s1 & s2``, ``s1.intersection(s2)``) [7]_ [8]_
+   * - Phép giao (``s1 & s2``, ``s1.intersection(s2)``) [7]_ [8]_
      - *O*\ (min(len(*s1*), len(*s2*)))
-   * - Intersection update (``s1 &= s2``, ``s1.intersection_update(s2)``) [1]_ [7]_ [8]_
+   * - Cập nhật phép giao (``s1 &= s2``, ``s1.intersection_update(s2)``) [1]_ [7]_ [8]_
      - *O*\ (min(len(*s1*), len(*s2*)))
-   * - Difference (``s1 - s2``, ``s1.difference(s2)``) [7]_ [9]_
+   * - Hiệu (``s1 - s2``, ``s1.difference(s2)``) [7]_ [9]_
      - *O*\ (len(*s1*))
-   * - Difference update (``s1 -= s2``, ``s1.difference_update(s2)``) [1]_ [7]_ [8]_
+   * - Cập nhật hiệu (``s1 -= s2``, ``s1.difference_update(s2)``) [1]_ [7]_ [8]_
      - *O*\ (min(len(*s1*), len(*s2*)))
-   * - Symmetric difference (``s1 ^ s2``, ``s1.symmetric_difference(s2)``) [7]_
+   * - Hiệu đối xứng (``s1 ^ s2``, ``s1.symmetric_difference(s2)``) [7]_
      - *O*\ (len(*s1*) + len(*s2*))
-   * - Symmetric difference update (``s1 ^= s2``, ``s1.symmetric_difference_update(s2)``) [1]_ [7]_
+   * - Cập nhật hiệu đối xứng (``s1 ^= s2``, ``s1.symmetric_difference_update(s2)``) [1]_ [7]_
      - *O*\ (len(*s2*))
-   * - Get length (``len(s)``) [5]_
+   * - Lấy độ dài (``len(s)``) [5]_
      - *O*\ (1)
 
 
 :class:`!str`, :class:`!bytes`, :class:`!bytearray`
 ===================================================
 
-:class:`str` and :class:`bytes` objects are immutable sequences of characters and
-bytes, respectively. As with tuples, copying one returns the original object.
-A :class:`bytearray` is mutable, and additionally supports the mutating operations
-of :class:`list` (except :meth:`!sort`), at the same costs. However, deleting at
-the front with ``del`` (``del b[0]``, ``del b[:k]``) only advances the start of
-the buffer instead of moving the remaining bytes, and is amortized *O*\ (1).
+Các đối tượng :class:`str` và :class:`bytes` lần lượt là các chuỗi ký tự và byte bất biến. Tương tự như tuple, việc sao chép một đối tượng sẽ trả về chính đối tượng ban đầu. Một :class:`bytearray` có thể thay đổi, đồng thời hỗ trợ các thao tác biến đổi của :class:`list` (ngoại trừ :meth:`!sort`), với cùng chi phí. Tuy nhiên, việc xóa ở đầu bằng ``del`` (``del b[0]``, ``del b[:k]``) chỉ tiến vị trí bắt đầu của bộ đệm thay vì di chuyển các byte còn lại, và có chi phí trung bình *O*\ (1).
 
 .. list-table::
    :header-rows: 1
 
-   * - Operation
-     - Complexity
-   * - Get item (``s[k]``)
+   * - Thao tác
+     - Độ phức tạp
+   * - Lấy phần tử (``s[k]``)
      - *O*\ (1)
-   * - Get slice (``s[i:j]``)
+   * - Lấy lát cắt (``s[i:j]``)
      - *O*\ (*j* - *i*)
-   * - Concatenate (``s + t``) [10]_
+   * - Nối (``s + t``) [10]_
      - *O*\ (len(*s*) + len(*t*))
-   * - Multiply (``s * k``)
+   * - Nhân (``s * k``)
      - *O*\ (*nk*)
-   * - Substring search (``x in s``, ``s.find(x)``, ``s.index(x)``) [11]_
+   * - Tìm kiếm chuỗi con (``x in s``, ``s.find(x)``, ``s.index(x)``) [11]_
      - *O*\ (*n*)
-   * - Reverse substring search (``s.rfind(x)``, ``s.rindex(x)``) [11]_ [12]_
+   * - Tìm kiếm chuỗi con ngược (``s.rfind(x)``, ``s.rindex(x)``) [11]_ [12]_
      - *O*\ (*n* × len(*x*))
-   * - Encode or decode [13]_
+   * - Mã hóa hoặc giải mã [13]_
      - *O*\ (*n*)
-   * - Iteration
+   * - Phép lặp
      - *O*\ (*n*)
-   * - Get length (``len(s)``) [5]_
+   * - Lấy độ dài (``len(s)``) [5]_
      - *O*\ (1)
 
 
 :class:`!memoryview`
 ====================
 
-:class:`memoryview` objects allow Python code to access the internal data
-of an object that supports the :ref:`buffer protocol <bufferobjects>` without
-copying. In particular, slicing a memory view returns a new view onto the same
-buffer.
+Các đối tượng :class:`memoryview` cho phép mã Python truy cập dữ liệu nội bộ của một đối tượng hỗ trợ :ref:`buffer protocol <bufferobjects>` mà không cần sao chép. Cụ thể, việc cắt một memory view sẽ trả về một view mới trên cùng bộ đệm.
 
 .. list-table::
    :header-rows: 1
 
-   * - Operation
-     - Complexity
-   * - Create (``memoryview(obj)``)
+   * - Thao tác
+     - Độ phức tạp
+   * - Tạo (``memoryview(obj)``)
      - *O*\ (1)
-   * - Get item (``v[k]``)
+   * - Lấy mục (``v[k]``)
      - *O*\ (1)
-   * - Get slice (``v[i:j]``)
+   * - Lấy slice (``v[i:j]``)
      - *O*\ (1)
-   * - Index (``v.index(x)``) [11]_ [14]_
+   * - Chỉ mục (``v.index(x)``) [11]_ [14]_
      - *O*\ (*n*)
-   * - Count (``v.count(x)``) [14]_
+   * - Đếm (``v.count(x)``) [14]_
      - *O*\ (*n*)
-   * - Convert to bytes (``v.tobytes()``, ``bytes(v)``)
+   * - Chuyển đổi thành bytes (``v.tobytes()``, ``bytes(v)``)
      - *O*\ (*n*)
-   * - Get length (``len(v)``) [5]_
+   * - Lấy độ dài (``len(v)``) [5]_
      - *O*\ (1)
 
 
 :class:`!range`
 ===============
 
-A :class:`range` object computes its items on demand from its *start*, *stop* and
-*step* values, so most operations do not depend on the length of the range.
+Đối tượng :class:`range` tính toán các phần tử của nó theo yêu cầu từ các giá trị *start*, *stop* và *step*, vì vậy hầu hết các thao tác không phụ thuộc vào độ dài của range.
 
 .. list-table::
    :header-rows: 1
 
-   * - Operation
-     - Complexity
-   * - Get item (``r[k]``)
+   * - Thao tác
+     - Độ phức tạp
+   * - Lấy phần tử (``r[k]``)
      - *O*\ (1)
-   * - Get slice (``r[i:j]``)
+   * - Lấy lát cắt (``r[i:j]``)
      - *O*\ (1)
    * - ``x in r`` [15]_
      - *O*\ (1)
-   * - Index and count (``r.index(x)``, ``r.count(x)``) [15]_
+   * - Lập chỉ mục và đếm (``r.index(x)``, ``r.count(x)``) [15]_
      - *O*\ (1)
-   * - Iteration
+   * - Lặp lại
      - *O*\ (*n*)
    * - ``min(r)``, ``max(r)``
      - *O*\ (*n*)
-   * - Get length (``len(r)``) [5]_
+   * - Lấy độ dài (``len(r)``) [5]_
      - *O*\ (1)
 
 
-Notes
-=====
+Ghi chú
+=======
 
-.. [1] Amortized. An individual operation may occasionally be *O*\ (*n*)
-   when the underlying storage is resized, but this cost is spread over
-   many operations, depending on the history of the container.
+.. [1] Tính trung bình. Một thao tác riêng lẻ đôi khi có thể là *O*\ (*n*) khi bộ nhớ lưu trữ bên dưới được thay đổi kích thước, nhưng chi phí này được phân bổ cho nhiều thao tác, tùy thuộc vào lịch sử của container.
 
-.. [2] Popping or deleting the element at index *k* of a list of size *n*
-   shifts all elements after *k* one slot to the left, moving *n* - *k* - 1
-   elements; inserting at index *k* shifts the elements from *k* onwards one
-   slot to the right, moving *n* - *k* elements. The worst case is index 0,
-   where the whole rest of the list has to be moved; the average case, an
-   index in the middle of the list, takes *O*\ (*n*/2) = *O*\ (*n*)
-   operations; and operating at the end of the list moves nothing and is
-   *O*\ (1).
+.. [2] Việc lấy ra hoặc xóa phần tử tại chỉ mục *k* của một danh sách có kích thước *n* sẽ dịch chuyển tất cả phần tử sau *k* sang trái một vị trí, di chuyển *n* - *k* - 1 phần tử; việc chèn tại chỉ mục *k* sẽ dịch chuyển các phần tử từ *k* trở đi sang phải một vị trí, di chuyển *n* - *k* phần tử. Trường hợp xấu nhất là chỉ mục 0, khi toàn bộ phần còn lại của danh sách phải được di chuyển; trường hợp trung bình, với một chỉ mục ở giữa danh sách, cần *O*\ (*n*/2) = *O*\ (*n*) thao tác; còn thao tác ở cuối danh sách không di chuyển gì và có độ phức tạp *O*\ (1).
 
-.. [3] Plus the cost of iterating over *t*, which may be expensive for an
-   arbitrary iterable.
+.. [3] Cộng thêm chi phí duyệt qua *t*, việc này có thể tốn kém đối với một iterable bất kỳ.
 
-.. [4] This is the worst case scenario. Sorting is adaptive and input that is
-   already sorted or reverse-sorted takes only *O*\ (*n*) comparisons.
-   See :source:`Objects/listsort.txt` for more information.
+.. [4] Đây là trường hợp xấu nhất. Việc sắp xếp có tính thích ứng, và dữ liệu đầu vào đã được sắp xếp hoặc sắp xếp theo thứ tự ngược chỉ cần *O*\ (*n*) phép so sánh. Xem :source:`Objects/listsort.txt` để biết thêm thông tin.
 
-.. [5] The number of elements is stored in the object, so ``len()`` does
-   not need to count them.
+.. [5] Số lượng phần tử được lưu trong đối tượng, vì vậy ``len()`` không cần đếm chúng.
 
-.. [6] Copying a :class:`frozenset` is *O*\ (1) as it
-   returns the original object.
+.. [6] Việc sao chép một :class:`frozenset` có độ phức tạp *O*\ (1), vì nó trả về đối tượng ban đầu.
 
-.. [7] These operations scan the container's internal hash table, which is
-   not shrunk when elements are removed. After removing most elements, they
-   still take time proportional to the container's former size, until a
-   later insertion triggers a resize.
+.. [7] Các thao tác này quét bảng băm nội bộ của container, bảng này không được thu nhỏ khi các phần tử bị xóa. Sau khi xóa hầu hết các phần tử, chúng vẫn mất thời gian tỷ lệ thuận với kích thước trước đây của container, cho đến khi một lần chèn sau đó kích hoạt việc thay đổi kích thước.
 
-.. [8] *O*\ (len(*t*)) if *t* is not a set.
+.. [8] *O*\ (len(*t*)) nếu *t* không phải là set.
 
-.. [9] *O*\ (len(*s*) + len(*t*)) if *t* is not a set.
+.. [9] *O*\ (len(*s*) + len(*t*)) nếu *t* không phải là set.
 
-.. [10] Each concatenation builds a new object, so building a string by
-   concatenating many pieces in a loop is quadratic in the total length.
-   See the :ref:`note on concatenating immutable sequences
-   <typesseq-repeated-concatenation>` for alternatives.
+.. [10] Mỗi phép nối tạo ra một đối tượng mới, vì vậy việc xây dựng một chuỗi bằng cách nối nhiều phần trong một vòng lặp có độ phức tạp bậc hai theo tổng độ dài. Xem :ref:`ghi chú về việc nối các sequence bất biến <typesseq-repeated-concatenation>` để biết các phương án thay thế.
 
-.. [11] With *start* and *end* arguments, *n* is the length of the region
-   searched rather than of *s*, and unlike slicing nothing is copied.
+.. [11] Với các đối số *start* và *end*, *n* là độ dài của vùng được tìm kiếm thay vì độ dài của *s*, và không có gì được sao chép, không giống như khi slicing.
 
-.. [12] This is the worst case. Reverse searches are *O*\ (*n*) on typical
-   input. Forward searches instead use a more elaborate algorithm with a
-   linear worst case, described in
+.. [12] Đây là trường hợp xấu nhất. Với dữ liệu đầu vào thông thường, việc tìm kiếm ngược là *O*\ (*n*). Ngược lại, việc tìm kiếm xuôi sử dụng một thuật toán phức tạp hơn với trường hợp xấu nhất có độ phức tạp tuyến tính, được mô tả trong
    :source:`Objects/stringlib/stringlib_find_two_way_notes.txt`.
 
-.. [13] This assumes a codec that does a constant amount of work per character.
+.. [13] Điều này giả định một codec thực hiện một lượng công việc không đổi cho mỗi ký tự.
 
-.. [14] These unpack and compare each element individually, so they are much
-   slower than the equivalent :class:`bytes` methods.
+.. [14] Các phương thức này giải nén và so sánh từng phần tử riêng lẻ, vì vậy chúng chậm hơn nhiều so với các phương thức :class:`bytes` tương đương.
 
-.. [15] Assuming :class:`int` or :class:`bool` arguments. For other types,
-   the range is searched like any other sequence in *O*\ (*n*) time.
+.. [15] Giả sử các đối số :class:`int` hoặc :class:`bool`. Với các kiểu khác, phạm vi được tìm kiếm như mọi sequence khác trong thời gian *O*\ (*n*).

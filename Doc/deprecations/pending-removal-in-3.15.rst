@@ -1,101 +1,59 @@
-Pending removal in Python 3.15
-------------------------------
+Sắp bị loại bỏ trong Python 3.15
+--------------------------------
 
-* The import system:
+* Hệ thống import:
 
-  * Setting :attr:`~module.__cached__` on a module while
-    failing to set :attr:`__spec__.cached <importlib.machinery.ModuleSpec.cached>`
-    is deprecated. In Python 3.15, :attr:`!__cached__` will cease to be set or
-    take into consideration by the import system or standard library. (:gh:`97879`)
+  * Việc đặt :attr:`~module.__cached__` trên một module nhưng không đặt :attr:`__spec__.cached <importlib.machinery.ModuleSpec.cached>` đã không còn được khuyến nghị. Trong Python 3.15, :attr:`!__cached__` sẽ không còn được hệ thống import hoặc thư viện chuẩn đặt hay xem xét nữa. (:gh:`97879`)
 
-  * Setting :attr:`~module.__package__` on a module while
-    failing to set :attr:`__spec__.parent <importlib.machinery.ModuleSpec.parent>`
-    is deprecated. In Python 3.15, :attr:`!__package__` will cease to be set or
-    take into consideration by the import system or standard library. (:gh:`97879`)
+  * Việc đặt :attr:`~module.__package__` trên một module nhưng không đặt :attr:`__spec__.parent <importlib.machinery.ModuleSpec.parent>` đã không còn được khuyến nghị. Trong Python 3.15, :attr:`!__package__` sẽ không còn được hệ thống import hoặc thư viện chuẩn đặt hay xem xét nữa. (:gh:`97879`)
 
 * :mod:`ctypes`:
 
-  * The undocumented :func:`!ctypes.SetPointerType` function
-    has been deprecated since Python 3.13.
+  * Hàm :func:`!ctypes.SetPointerType` chưa được ghi chép đã không còn được khuyến nghị kể từ Python 3.13.
 
 * :mod:`http.server`:
 
-  * The obsolete and rarely used :class:`~http.server.CGIHTTPRequestHandler`
-    has been deprecated since Python 3.13.
-    No direct replacement exists.
-    *Anything* is better than CGI to interface
-    a web server with a request handler.
+  * :class:`~http.server.CGIHTTPRequestHandler` lỗi thời và hiếm khi được sử dụng đã không còn được khuyến nghị kể từ Python 3.13. Không có phương án thay thế trực tiếp. *Bất kỳ thứ gì* đều tốt hơn CGI để kết nối một web server với một request handler.
 
-  * The :option:`!--cgi` flag to the :program:`python -m http.server`
-    command-line interface has been deprecated since Python 3.13.
+  * Cờ :option:`!--cgi` của giao diện dòng lệnh :program:`python -m http.server` đã không còn được khuyến nghị kể từ Python 3.13.
 
 * :mod:`importlib`:
 
-  * ``load_module()`` method: use ``exec_module()`` instead.
+  * Phương thức ``load_module()``: hãy sử dụng ``exec_module()`` thay thế.
 
 * :mod:`pathlib`:
 
-  * :meth:`.PurePath.is_reserved`
-    has been deprecated since Python 3.13.
-    Use :func:`os.path.isreserved` to detect reserved paths on Windows.
+  * :meth:`.PurePath.is_reserved` đã bị deprecated kể từ Python 3.13. Sử dụng :func:`os.path.isreserved` để phát hiện các đường dẫn dành riêng trên Windows.
 
 * :mod:`platform`:
 
-  * :func:`~platform.java_ver` has been deprecated since Python 3.13.
-    This function is only useful for Jython support, has a confusing API,
-    and is largely untested.
+  * :func:`~platform.java_ver` đã bị deprecated kể từ Python 3.13. Hàm này chỉ hữu ích để hỗ trợ Jython, có API khó hiểu và hầu như chưa được kiểm thử.
 
 * :mod:`sysconfig`:
 
-  * The *check_home* argument of :func:`sysconfig.is_python_build` has been
-    deprecated since Python 3.12.
+  * Đối số *check_home* của :func:`sysconfig.is_python_build` đã bị deprecated kể từ Python 3.12.
 
 * :mod:`threading`:
 
-  * :func:`~threading.RLock` will take no arguments in Python 3.15.
-    Passing any arguments has been deprecated since Python 3.14,
-    as the Python version does not permit any arguments,
-    but the C version allows any number of positional or keyword arguments,
-    ignoring every argument.
+  * :func:`~threading.RLock` sẽ không nhận đối số nào trong Python 3.15. Việc truyền bất kỳ đối số nào đã bị deprecated kể từ Python 3.14, vì phiên bản Python không cho phép bất kỳ đối số nào, nhưng phiên bản C cho phép mọi số lượng đối số vị trí hoặc đối số từ khóa và bỏ qua tất cả các đối số.
 
 * :mod:`types`:
 
-  * :class:`types.CodeType`: Accessing :attr:`~codeobject.co_lnotab` was
-    deprecated in :pep:`626`
-    since 3.10 and was planned to be removed in 3.12,
-    but it only got a proper :exc:`DeprecationWarning` in 3.12.
-    May be removed in 3.15.
-    (Contributed by Nikita Sobolev in :gh:`101866`.)
+  * :class:`types.CodeType`: Việc truy cập :attr:`~codeobject.co_lnotab` đã bị deprecated trong :pep:`626` kể từ 3.10 và dự kiến bị xóa trong 3.12, nhưng chỉ nhận được một :exc:`DeprecationWarning` chính thức trong 3.12. Có thể bị xóa trong 3.15. (Do Nikita Sobolev đóng góp trong :gh:`101866`.)
 
 * :mod:`typing`:
 
-  * The undocumented keyword argument syntax for creating
-    :class:`~typing.NamedTuple` classes
-    (for example, ``Point = NamedTuple("Point", x=int, y=int)``)
-    has been deprecated since Python 3.13.
-    Use the class-based syntax or the functional syntax instead.
+  * Cú pháp đối số từ khóa không được ghi lại để tạo
+    Các lớp :class:`~typing.NamedTuple` (ví dụ: ``Point = NamedTuple("Point", x=int, y=int)``) đã không còn được dùng kể từ Python 3.13. Thay vào đó, hãy sử dụng cú pháp dựa trên lớp hoặc cú pháp hàm.
 
-  * When using the functional syntax of :class:`~typing.TypedDict`\s, failing
-    to pass a value to the *fields* parameter (``TD = TypedDict("TD")``) or
-    passing ``None`` (``TD = TypedDict("TD", None)``) has been deprecated
-    since Python 3.13.
-    Use ``class TD(TypedDict): pass`` or ``TD = TypedDict("TD", {})``
-    to create a TypedDict with zero field.
+  * Khi sử dụng cú pháp hàm của :class:`~typing.TypedDict`\s, việc không truyền giá trị cho tham số *fields* (``TD = TypedDict("TD")``) hoặc truyền ``None`` (``TD = TypedDict("TD", None)``) đã không còn được dùng kể từ Python 3.13. Hãy sử dụng ``class TD(TypedDict): pass`` hoặc ``TD = TypedDict("TD", {})`` để tạo một TypedDict không có trường.
 
-  * The :deco:`typing.no_type_check_decorator` decorator function
-    has been deprecated since Python 3.13.
-    After eight years in the :mod:`typing` module,
-    it has yet to be supported by any major type checker.
+  * Hàm decorator :deco:`typing.no_type_check_decorator` đã không còn được dùng kể từ Python 3.13. Sau tám năm trong module :mod:`typing`, hàm này vẫn chưa được bất kỳ type checker lớn nào hỗ trợ.
 
 * :mod:`wave`:
 
-  * The :meth:`~wave.Wave_read.getmark`, :meth:`!setmark`,
-    and :meth:`~wave.Wave_read.getmarkers` methods of
-    the :class:`~wave.Wave_read` and :class:`~wave.Wave_write` classes
-    have been deprecated since Python 3.13.
+  * Các phương thức :meth:`~wave.Wave_read.getmark`, :meth:`!setmark` và :meth:`~wave.Wave_read.getmarkers` của các lớp :class:`~wave.Wave_read` và :class:`~wave.Wave_write` đã không còn được dùng kể từ Python 3.13.
 
 * :mod:`zipimport`:
 
-  * :meth:`~zipimport.zipimporter.load_module` has been deprecated since
-    Python 3.10. Use :meth:`~zipimport.zipimporter.exec_module` instead.
-    (Contributed by Jiahao Li in :gh:`125746`.)
+  * :meth:`~zipimport.zipimporter.load_module` đã không còn được dùng kể từ Python 3.10. Thay vào đó, hãy sử dụng :meth:`~zipimport.zipimporter.exec_module`. (Do Jiahao Li đóng góp trong :gh:`125746`.)

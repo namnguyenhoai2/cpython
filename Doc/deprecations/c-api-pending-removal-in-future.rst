@@ -1,42 +1,24 @@
-Pending removal in future versions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Đang chờ bị xóa trong các phiên bản tương lai
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The following APIs are deprecated and will be removed,
-although there is currently no date scheduled for their removal.
+Các API sau đây không còn được khuyến nghị và sẽ bị xóa, mặc dù hiện chưa có ngày cụ thể nào được lên lịch cho việc xóa chúng.
 
-* :c:macro:`Py_TPFLAGS_HAVE_FINALIZE`:
-  Unneeded since Python 3.8.
-* :c:func:`PyErr_Fetch`:
-  Use :c:func:`PyErr_GetRaisedException` instead.
-* :c:func:`PyErr_NormalizeException`:
-  Use :c:func:`PyErr_GetRaisedException` instead.
-* :c:func:`PyErr_Restore`:
-  Use :c:func:`PyErr_SetRaisedException` instead.
-* :c:func:`PyModule_GetFilename`:
-  Use :c:func:`PyModule_GetFilenameObject` instead.
-* :c:func:`PyOS_AfterFork`:
-  Use :c:func:`PyOS_AfterFork_Child` instead.
-* :c:func:`PySlice_GetIndicesEx`:
-  Use :c:func:`PySlice_Unpack` and :c:func:`PySlice_AdjustIndices` instead.
-* :c:func:`PyUnicode_READY`:
-  Unneeded since Python 3.12
-* :c:func:`!PyErr_Display`:
-  Use :c:func:`PyErr_DisplayException` instead.
-* :c:func:`!_PyErr_ChainExceptions`:
-  Use :c:func:`!_PyErr_ChainExceptions1` instead.
-* :c:member:`!PyBytesObject.ob_shash` member:
-  call :c:func:`PyObject_Hash` instead.
-* Thread Local Storage (TLS) API:
+* :c:macro:`Py_TPFLAGS_HAVE_FINALIZE`: Không cần thiết kể từ Python 3.8.
+* :c:func:`PyErr_Fetch`: Thay vào đó, hãy sử dụng :c:func:`PyErr_GetRaisedException`.
+* :c:func:`PyErr_NormalizeException`: Thay vào đó, hãy sử dụng :c:func:`PyErr_GetRaisedException`.
+* :c:func:`PyErr_Restore`: Thay vào đó, hãy sử dụng :c:func:`PyErr_SetRaisedException`.
+* :c:func:`PyModule_GetFilename`: Thay vào đó, hãy sử dụng :c:func:`PyModule_GetFilenameObject`.
+* :c:func:`PyOS_AfterFork`: Thay vào đó, hãy sử dụng :c:func:`PyOS_AfterFork_Child`.
+* :c:func:`PySlice_GetIndicesEx`: Thay vào đó, hãy sử dụng :c:func:`PySlice_Unpack` và :c:func:`PySlice_AdjustIndices`.
+* :c:func:`PyUnicode_READY`: Không cần thiết kể từ Python 3.12
+* :c:func:`!PyErr_Display`: Thay vào đó, hãy sử dụng :c:func:`PyErr_DisplayException`.
+* :c:func:`!_PyErr_ChainExceptions`: Thay vào đó, hãy sử dụng :c:func:`!_PyErr_ChainExceptions1`.
+* Thành viên :c:member:`!PyBytesObject.ob_shash`: thay vào đó, hãy gọi :c:func:`PyObject_Hash`.
+* API Thread Local Storage (TLS):
 
-  * :c:func:`PyThread_create_key`:
-    Use :c:func:`PyThread_tss_alloc` instead.
-  * :c:func:`PyThread_delete_key`:
-    Use :c:func:`PyThread_tss_free` instead.
-  * :c:func:`PyThread_set_key_value`:
-    Use :c:func:`PyThread_tss_set` instead.
-  * :c:func:`PyThread_get_key_value`:
-    Use :c:func:`PyThread_tss_get` instead.
-  * :c:func:`PyThread_delete_key_value`:
-    Use :c:func:`PyThread_tss_delete` instead.
-  * :c:func:`PyThread_ReInitTLS`:
-    Unneeded since Python 3.7.
+  * :c:func:`PyThread_create_key`: Thay vào đó, hãy sử dụng :c:func:`PyThread_tss_alloc`.
+  * :c:func:`PyThread_delete_key`: Thay vào đó, hãy sử dụng :c:func:`PyThread_tss_free`.
+  * :c:func:`PyThread_set_key_value`: Thay vào đó, hãy sử dụng :c:func:`PyThread_tss_set`.
+  * :c:func:`PyThread_get_key_value`: Thay vào đó, hãy sử dụng :c:func:`PyThread_tss_get`.
+  * :c:func:`PyThread_delete_key_value`: Thay vào đó, hãy sử dụng :c:func:`PyThread_tss_delete`.
+  * :c:func:`PyThread_ReInitTLS`: Không cần thiết kể từ Python 3.7.

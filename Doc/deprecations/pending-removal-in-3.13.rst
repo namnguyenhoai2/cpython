@@ -1,7 +1,7 @@
-Pending removal in Python 3.13
-------------------------------
+Đang chờ loại bỏ trong Python 3.13
+----------------------------------
 
-Modules (see :pep:`594`):
+Mô-đun (xem :pep:`594`):
 
 * :mod:`!aifc`
 * :mod:`!audioop`
@@ -23,11 +23,11 @@ Modules (see :pep:`594`):
 * :mod:`!uu`
 * :mod:`!xdrlib`
 
-Other modules:
+Các mô-đun khác:
 
-* :mod:`!lib2to3`, and the :program:`2to3` program (:gh:`84540`)
+* :mod:`!lib2to3`, và chương trình :program:`2to3` (:gh:`84540`)
 
-APIs:
+API:
 
 * :class:`!configparser.LegacyInterpolation` (:gh:`90765`)
 * ``locale.resetlocale()`` (:gh:`90817`)
@@ -37,4 +37,4 @@ APIs:
 * :func:`!unittest.makeSuite` (:gh:`50096`)
 * :meth:`!unittest.TestProgram.usageExit` (:gh:`67048`)
 * :class:`!webbrowser.MacOSX` (:gh:`86421`)
-* :class:`classmethod` descriptor chaining (:gh:`89519`)
+* Chuỗi descriptor :class:`classmethod` (:gh:`89519`)

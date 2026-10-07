@@ -1,4 +1,4 @@
-Pending removal in Python 3.16
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Dự kiến bị loại bỏ trong Python 3.16
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* The bundled copy of ``libmpdec``.
+* Bản sao đi kèm của ``libmpdec``.

@@ -1,11 +1,10 @@
 .. XXX document all delegations to __special__ methods
 .. _built-in-funcs:
 
-Built-in Functions
-==================
+Các hàm tích hợp sẵn
+====================
 
-The Python interpreter has a number of functions and types built into it that
-are always available.  They are listed here in alphabetical order.
+Trình thông dịch Python có một số hàm và kiểu dữ liệu được tích hợp sẵn, luôn khả dụng. Chúng được liệt kê theo thứ tự bảng chữ cái ở đây.
 
 +---------------------------------------------------------------------------------------------------+
 |                                        Built-in Functions                                         |
@@ -56,25 +55,21 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: abs(number, /)
 
-   Return the absolute value of a number.  The argument may be an
-   integer, a floating-point number, or an object implementing
-   :meth:`~object.__abs__`.
-   If the argument is a complex number, its magnitude is returned.
+   Trả về giá trị tuyệt đối của một số. Đối số có thể là một số nguyên, số dấu phẩy động hoặc một đối tượng triển khai
+   :meth:`~object.__abs__`. Nếu đối số là một số phức, độ lớn của nó sẽ được trả về.
 
 
 .. function:: aiter(async_iterable, /)
 
-   Return an :term:`asynchronous iterator` for an :term:`asynchronous iterable`.
-   Equivalent to calling ``x.__aiter__()``.
+   Trả về một :term:`asynchronous iterator` cho một :term:`asynchronous iterable`. Tương đương với việc gọi ``x.__aiter__()``.
 
-   Note: Unlike :func:`iter`, :func:`aiter` has no 2-argument variant.
+   Lưu ý: Không giống như :func:`iter`, :func:`aiter` không có biến thể nhận 2 đối số.
 
    .. versionadded:: 3.10
 
 .. function:: all(iterable, /)
 
-   Return ``True`` if all elements of the *iterable* are true (or if the iterable
-   is empty).  Equivalent to::
+   Trả về ``True`` nếu tất cả các phần tử của *iterable* đều đúng (hoặc nếu iterable rỗng). Tương đương với::
 
       def all(iterable):
           for element in iterable:
@@ -86,23 +81,17 @@ are always available.  They are listed here in alphabetical order.
 .. awaitablefunction:: anext(async_iterator, /)
                        anext(async_iterator, default, /)
 
-   When awaited, return the next item from the given :term:`asynchronous
-   iterator`, or *default* if given and the iterator is :term:`exhausted`.
+   Khi được await, trả về mục tiếp theo từ :term:`asynchronous iterator` đã cho, hoặc *default* nếu được cung cấp và iterator đã :term:`exhausted`.
 
-   This is the async variant of the :func:`next` builtin, and behaves
-   similarly.
+   Đây là biến thể async của hàm dựng sẵn :func:`next`, và hoạt động tương tự.
 
-   This calls the :meth:`~object.__anext__` method of *async_iterator*,
-   returning an :term:`awaitable`. Awaiting this returns the next value of the
-   iterator. If *default* is given, it is returned if the iterator is exhausted,
-   otherwise :exc:`StopAsyncIteration` is raised.
+   Lệnh này gọi phương thức :meth:`~object.__anext__` của *async_iterator*, trả về một :term:`awaitable`. Việc await giá trị này sẽ trả về giá trị tiếp theo của iterator. Nếu *default* được cung cấp, giá trị đó sẽ được trả về khi iterator đã cạn; nếu không, :exc:`StopAsyncIteration` sẽ được phát sinh.
 
    .. versionadded:: 3.10
 
 .. function:: any(iterable, /)
 
-   Return ``True`` if any element of the *iterable* is true.  If the iterable
-   is empty, return ``False``.  Equivalent to::
+   Trả về ``True`` nếu bất kỳ phần tử nào của *iterable* là true. Nếu iterable rỗng, trả về ``False``. Tương đương với::
 
       def any(iterable):
           for element in iterable:
@@ -113,71 +102,52 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: ascii(object, /)
 
-   As :func:`repr`, return a string containing a printable representation of an
-   object, but escape the non-ASCII characters in the string returned by
-   :func:`repr` using ``\x``, ``\u``, or ``\U`` escapes.  This generates a string
-   similar to that returned by :func:`repr` in Python 2.
+   Giống như :func:`repr`, trả về một chuỗi chứa biểu diễn có thể in được của một đối tượng, nhưng escape các ký tự không phải ASCII trong chuỗi được trả về bởi
+   :func:`repr` bằng các escape ``\x``, ``\u`` hoặc ``\U``. Lệnh này tạo ra một chuỗi tương tự chuỗi được trả về bởi :func:`repr` trong Python 2.
 
 
 .. function:: bin(integer, /)
 
-   Convert an integer number to a binary string prefixed with "0b". The result
-   is a valid Python expression. If *integer* is not a Python :class:`int` object, it
-   has to define an :meth:`~object.__index__` method that returns an integer. Some
-   examples:
+   Chuyển đổi một số nguyên thành chuỗi nhị phân có tiền tố "0b". Kết quả là một biểu thức Python hợp lệ. Nếu *số nguyên* không phải là một :class:`int` đối tượng Python, đối tượng đó phải định nghĩa một :meth:`~object.__index__` phương thức trả về một số nguyên. Một số ví dụ:
 
       >>> bin(3)
       '0b11'
       >>> bin(-10)
       '-0b1010'
 
-   If the prefix "0b" is desired or not, you can use either of the following ways.
+   Cho dù có muốn tiền tố "0b" hay không, bạn có thể sử dụng một trong các cách sau.
 
       >>> format(14, '#b'), format(14, 'b')
       ('0b1110', '1110')
       >>> f'{14:#b}', f'{14:b}'
       ('0b1110', '1110')
 
-   See also :func:`enum.bin` to represent negative values as twos-complement.
+   Xem thêm :func:`enum.bin` để biểu diễn các giá trị âm dưới dạng bù hai.
 
-   See also :func:`format` for more information.
+   Xem thêm :func:`format` để biết thêm thông tin.
 
 
 .. class:: bool(object=False, /)
 
-   Return a Boolean value, i.e. one of ``True`` or ``False``.  The argument
-   is converted using the standard :ref:`truth testing procedure <truth>`.
-   If the argument is false
-   or omitted, this returns ``False``; otherwise, it returns ``True``.  The
-   :class:`bool` class is a subclass of :class:`int` (see :ref:`typesnumeric`).
-   It cannot be subclassed further.  Its only instances are ``False`` and
-   ``True`` (see :ref:`typebool`).
+   Trả về một giá trị Boolean, tức là một trong ``True`` hoặc ``False``. Đối số được chuyển đổi bằng cách sử dụng :ref:`truth testing procedure <truth>` tiêu chuẩn. Nếu đối số là false hoặc bị bỏ qua, hàm này trả về ``False``; nếu không, hàm trả về ``True``.  The
+   Lớp :class:`bool` là lớp con của :class:`int` (xem :ref:`typesnumeric`). Không thể tạo lớp con của lớp này thêm nữa. Các thể hiện duy nhất của lớp là ``False`` và ``True`` (xem :ref:`typebool`).
 
    .. index:: pair: Boolean; type
 
    .. versionchanged:: 3.7
-      The parameter is now positional-only.
+      Tham số này hiện chỉ có thể được truyền theo vị trí.
 
 .. function:: breakpoint(*args, **kws)
 
-   This function drops you into the debugger at the call site.  Specifically,
-   it calls :func:`sys.breakpointhook`, passing ``args`` and ``kws`` straight
-   through.  By default, ``sys.breakpointhook()`` calls
-   :func:`pdb.set_trace` expecting no arguments.  In this case, it is
-   purely a convenience function so you don't have to explicitly import
-   :mod:`pdb` or type as much code to enter the debugger.  However,
-   :func:`sys.breakpointhook` can be set to some other function and
-   :func:`breakpoint` will automatically call that, allowing you to drop into
-   the debugger of choice.
-   If :func:`sys.breakpointhook` is not accessible, this function will
-   raise :exc:`RuntimeError`.
+   Hàm này đưa bạn vào trình debugger tại vị trí gọi. Cụ thể, hàm này gọi :func:`sys.breakpointhook`, truyền thẳng ``args`` và ``kws``. Theo mặc định, ``sys.breakpointhook()`` gọi
+   :func:`pdb.set_trace` mà không yêu cầu đối số nào. Trong trường hợp này, đây chỉ là một hàm tiện ích để bạn không phải tự import :func:`pdb.set_trace` một cách rõ ràng
+   :mod:`pdb` hoặc nhập đủ mã để vào trình gỡ lỗi. Tuy nhiên,
+   :func:`sys.breakpointhook` có thể được đặt thành một hàm khác và
+   :func:`breakpoint` sẽ tự động gọi hàm đó, cho phép bạn vào trình debugger mà mình muốn. Nếu :func:`sys.breakpointhook` không thể truy cập được, hàm này sẽ phát sinh :exc:`RuntimeError`.
 
-   By default, the behavior of :func:`breakpoint` can be changed with
-   the :envvar:`PYTHONBREAKPOINT` environment variable.
-   See :func:`sys.breakpointhook` for usage details.
+   Theo mặc định, hành vi của :func:`breakpoint` có thể được thay đổi bằng biến môi trường :envvar:`PYTHONBREAKPOINT`. Xem :func:`sys.breakpointhook` để biết chi tiết sử dụng.
 
-   Note that this is not guaranteed if :func:`sys.breakpointhook`
-   has been replaced.
+   Lưu ý rằng điều này không được đảm bảo nếu :func:`sys.breakpointhook` đã bị thay thế.
 
    .. audit-event:: builtins.breakpoint breakpointhook breakpoint
 
@@ -188,30 +158,21 @@ are always available.  They are listed here in alphabetical order.
            bytearray(source, encoding, errors='strict')
    :noindex:
 
-   Return a new array of bytes.  The :class:`bytearray` class is a mutable
-   sequence of integers in the range 0 <= x < 256.  It has most of the usual
-   methods of mutable sequences, described in :ref:`typesseq-mutable`, as well
-   as most methods that the :class:`bytes` type has, see :ref:`bytes-methods`.
+   Trả về một mảng byte mới. Lớp :class:`bytearray` là một sequence có thể thay đổi gồm các số nguyên trong phạm vi 0 <= x < 256. Lớp này có hầu hết các phương thức thông thường của sequence có thể thay đổi, được mô tả trong :ref:`typesseq-mutable`, cũng như hầu hết các phương thức của kiểu :class:`bytes`; xem :ref:`bytes-methods`.
 
-   The optional *source* parameter can be used to initialize the array in a few
-   different ways:
+   Tham số *source* tùy chọn có thể được dùng để khởi tạo mảng theo một vài cách khác nhau:
 
-   * If it is a *string*, you must also give the *encoding* (and optionally,
-     *errors*) parameters; :func:`bytearray` then converts the string to
-     bytes using :meth:`str.encode`.
+   * Nếu đó là một *string*, bạn cũng phải cung cấp tham số *encoding* (và tùy chọn *errors*); :func:`bytearray` sau đó chuyển đổi string thành byte bằng cách sử dụng :meth:`str.encode`.
 
-   * If it is an *integer*, the array will have that size and will be
-     initialized with null bytes.
+   * Nếu đó là một *integer*, mảng sẽ có kích thước đó và được khởi tạo bằng các byte null.
 
-   * If it is an object conforming to the :ref:`buffer interface <bufferobjects>`,
-     a read-only buffer of the object will be used to initialize the bytes array.
+   * Nếu đó là một đối tượng tuân theo :ref:`buffer interface <bufferobjects>`, một buffer chỉ đọc của đối tượng sẽ được dùng để khởi tạo mảng byte.
 
-   * If it is an *iterable*, it must be an iterable of integers in the range
-     ``0 <= x < 256``, which are used as the initial contents of the array.
+   * Nếu đó là một *iterable*, nó phải là một iterable gồm các số nguyên trong phạm vi ``0 <= x < 256``, được dùng làm nội dung ban đầu của mảng.
 
-   Without an argument, an array of size 0 is created.
+   Nếu không có đối số, một mảng có kích thước 0 sẽ được tạo.
 
-   See also :ref:`binaryseq` and :ref:`typebytearray`.
+   Xem thêm :ref:`binaryseq` và :ref:`typebytearray`.
 
 
 .. _func-bytes:
@@ -219,179 +180,120 @@ are always available.  They are listed here in alphabetical order.
            bytes(source, encoding, errors='strict')
    :noindex:
 
-   Return a new "bytes" object which is an immutable sequence of integers in
-   the range ``0 <= x < 256``.  :class:`bytes` is an immutable version of
-   :class:`bytearray` -- it has the same non-mutating methods and the same
-   indexing and slicing behavior.
+   Trả về một đối tượng "bytes" mới, là một chuỗi bất biến gồm các số nguyên trong phạm vi ``0 <= x < 256``.  :class:`bytes` là phiên bản bất biến của
+   :class:`bytearray` -- nó có các phương thức không biến đổi giống nhau, cũng như cách lập chỉ mục và cắt lát giống nhau.
 
-   Accordingly, constructor arguments are interpreted as for :func:`bytearray`.
+   Theo đó, các đối số của hàm khởi tạo được diễn giải như đối với :func:`bytearray`.
 
-   Bytes objects can also be created with literals, see :ref:`strings`.
+   Các đối tượng bytes cũng có thể được tạo bằng các literal, xem :ref:`strings`.
 
-   See also :ref:`binaryseq`, :ref:`typebytes`, and :ref:`bytes-methods`.
+   Xem thêm :ref:`binaryseq`, :ref:`typebytes` và :ref:`bytes-methods`.
 
 
 .. function:: callable(object, /)
 
-   Return :const:`True` if the *object* argument appears callable,
-   :const:`False` if not.  If this returns ``True``, it is still possible that a
-   call fails, but if it is ``False``, calling *object* will never succeed.
-   Note that classes are callable (calling a class returns a new instance);
-   instances are callable if their class has a :meth:`~object.__call__` method.
+   Trả về :const:`True` nếu đối số *object* có vẻ có thể gọi được,
+   :const:`False` nếu không. Nếu kết quả này là ``True``, một lần gọi vẫn có thể thất bại, nhưng nếu là ``False``, việc gọi *object* sẽ không bao giờ thành công. Lưu ý rằng các class có thể gọi được (việc gọi một class sẽ trả về một instance mới); các instance có thể gọi được nếu class của chúng có method :meth:`~object.__call__`.
 
    .. versionadded:: 3.2
-      This function was first removed in Python 3.0 and then brought back
-      in Python 3.2.
+      Hàm này đầu tiên bị loại bỏ trong Python 3.0, sau đó được đưa trở lại trong Python 3.2.
 
 
 .. function:: chr(codepoint, /)
 
-   Return the string representing a character with the specified Unicode code point.
-   For example, ``chr(97)`` returns the string ``'a'``, while
-   ``chr(8364)`` returns the string ``'€'``. This is the inverse of :func:`ord`.
+   Trả về chuỗi biểu diễn một ký tự có code point Unicode được chỉ định. Ví dụ: ``chr(97)`` trả về chuỗi ``'a'``, trong khi ``chr(8364)`` trả về chuỗi ``'€'``. Đây là phép đảo ngược của :func:`ord`.
 
-   The valid range for the argument is from 0 through 1,114,111 (0x10FFFF in
-   base 16).  :exc:`ValueError` will be raised if it is outside that range.
+   Phạm vi hợp lệ của đối số là từ 0 đến 1.114.111 (0x10FFFF trong hệ cơ số 16). :exc:`ValueError` sẽ được phát sinh nếu đối số nằm ngoài phạm vi đó.
 
 
 .. decorator:: classmethod
 
-   Transform a method into a class method.
+   Chuyển một method thành class method.
 
-   A class method receives the class as an implicit first argument, just like an
-   instance method receives the instance. To declare a class method, use this
-   idiom::
+   Một class method nhận class làm đối số đầu tiên ngầm định, giống như một instance method nhận instance. Để khai báo một class method, hãy sử dụng thành ngữ này::
 
       class C:
           @classmethod
           def f(cls, arg1, arg2): ...
 
-   The ``@classmethod`` form is a function :term:`decorator` -- see
-   :ref:`function` for details.
+   Dạng ``@classmethod`` là một hàm :term:`decorator` -- xem
+   :ref:`function` để biết chi tiết.
 
-   A class method can be called either on the class (such as ``C.f()``) or on an instance (such
-   as ``C().f()``).  The instance is ignored except for its class. If a class
-   method is called for a derived class, the derived class object is passed as the
-   implied first argument.
+   Một class method có thể được gọi trên class (chẳng hạn như ``C.f()``) hoặc trên một instance (chẳng hạn như ``C().f()``). Instance bị bỏ qua, ngoại trừ class của nó. Nếu một class method được gọi cho một derived class, đối tượng derived class sẽ được truyền làm đối số đầu tiên ngầm định.
 
-   Class methods are different than C++ or Java static methods. If you want those,
-   see :func:`staticmethod` in this section.
-   For more information on class methods, see :ref:`types`.
+   Class method khác với static method trong C++ hoặc Java. Nếu bạn muốn các phương thức đó, hãy xem :func:`staticmethod` trong phần này. Để biết thêm thông tin về class method, hãy xem :ref:`types`.
 
    .. versionchanged:: 3.9
-      Class methods can now wrap other :term:`descriptors <descriptor>` such as
+      Class method hiện có thể bao bọc các :term:`descriptor <descriptor>` khác, chẳng hạn như
       :func:`property`.
 
    .. versionchanged:: 3.10
-      Class methods now inherit the method attributes
-      (:attr:`~function.__module__`, :attr:`~function.__name__`,
-      :attr:`~function.__qualname__`, :attr:`~function.__doc__` and
-      :attr:`~function.__annotations__`) and have a new ``__wrapped__``
-      attribute.
+      Class method hiện kế thừa các thuộc tính của method (:attr:`~function.__module__`, :attr:`~function.__name__`,
+      :attr:`~function.__qualname__`, :attr:`~function.__doc__` và
+      :attr:`~function.__annotations__`) và có một thuộc tính ``__wrapped__`` mới.
 
    .. deprecated-removed:: 3.11 3.13
-      Class methods can no longer wrap other :term:`descriptors <descriptor>` such as
+      Các phương thức lớp không còn có thể bao bọc các :term:`descriptors <descriptor>` khác như
       :func:`property`.
 
 
 .. function:: compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)
 
-   Compile the *source* into a code or AST object.  Code objects can be executed
-   by :func:`exec` or :func:`eval`.  *source* can either be a normal string, a
-   byte string, or an AST object.  Refer to the :mod:`ast` module documentation
-   for information on how to work with AST objects.
+   Biên dịch *source* thành một đối tượng code hoặc AST. Các đối tượng code có thể được thực thi bởi :func:`exec` hoặc :func:`eval`. *source* có thể là một chuỗi thông thường, một chuỗi byte hoặc một đối tượng AST. Hãy tham khảo tài liệu về module :mod:`ast` để biết cách làm việc với các đối tượng AST.
 
-   The *filename* argument should give the file from which the code was read;
-   pass some recognizable value if it wasn't read from a file (``'<string>'`` is
-   commonly used).
+   Đối số *filename* phải chỉ ra tệp mà từ đó code được đọc; hãy truyền một giá trị dễ nhận biết nếu code không được đọc từ tệp (``'<string>'`` thường được sử dụng).
 
-   The *mode* argument specifies what kind of code must be compiled; it can be
-   ``'exec'`` if *source* consists of a sequence of statements, ``'eval'`` if it
-   consists of a single expression, or ``'single'`` if it consists of a single
-   interactive statement (in the latter case, expression statements that
-   evaluate to something other than ``None`` will be printed).
+   Đối số *mode* chỉ định loại code cần được biên dịch; giá trị này có thể là ``'exec'`` nếu *source* gồm một chuỗi câu lệnh, ``'eval'`` nếu gồm một biểu thức duy nhất hoặc ``'single'`` nếu gồm một câu lệnh tương tác duy nhất (trong trường hợp sau, các câu lệnh biểu thức đánh giá thành giá trị khác ``None`` sẽ được in ra).
 
-   The optional arguments *flags* and *dont_inherit* control which
-   :ref:`compiler options <ast-compiler-flags>` should be activated
-   and which :ref:`future features <future>` should be allowed. If neither
-   is present (or both are zero) the code is compiled with the same flags that
-   affect the code that is calling :func:`compile`. If the *flags*
-   argument is given and *dont_inherit* is not (or is zero) then the compiler
-   options and the future statements specified by the *flags* argument are used
-   in addition to those that would be used anyway. If *dont_inherit* is a
-   non-zero integer then the *flags* argument is it -- the flags (future
-   features and compiler options) in the surrounding code are ignored.
+   Các đối số tùy chọn *flags* và *dont_inherit* kiểm soát những
+   :ref:`các tùy chọn trình biên dịch <ast-compiler-flags>` nào sẽ được kích hoạt và :ref:`các tính năng tương lai <future>` nào sẽ được cho phép. Nếu không có tùy chọn nào (hoặc cả hai đều bằng 0), mã sẽ được biên dịch với cùng các cờ ảnh hưởng đến mã đang gọi :func:`compile`. Nếu đối số *flags* được cung cấp và *dont_inherit* không được cung cấp (hoặc bằng 0), các tùy chọn trình biên dịch và các câu lệnh future được chỉ định bởi đối số *flags* sẽ được sử dụng cùng với những tùy chọn vốn được sử dụng. Nếu *dont_inherit* là một số nguyên khác 0, thì đối số *flags* là toàn bộ các cờ đó -- các cờ (tính năng future và tùy chọn trình biên dịch) trong mã bao quanh sẽ bị bỏ qua.
 
-   Compiler options and future statements are specified by bits which can be
-   bitwise ORed together to specify multiple options. The bitfield required to
-   specify a given future feature can be found as the
-   :attr:`~__future__._Feature.compiler_flag` attribute on the
-   :class:`~__future__._Feature` instance in the :mod:`__future__` module.
-   :ref:`Compiler flags <ast-compiler-flags>` can be found in :mod:`ast`
-   module, with ``PyCF_`` prefix.
+   Các tùy chọn trình biên dịch và câu lệnh future được chỉ định bằng các bit có thể được OR theo từng bit để chỉ định nhiều tùy chọn. Bitfield cần thiết để chỉ định một tính năng future cụ thể có thể được tìm thấy dưới dạng
+   :attr:`~__future__._Feature.compiler_flag` thuộc tính trên
+   :class:`~__future__._Feature` instance trong module :mod:`__future__`.
+   :ref:`Các cờ trình biên dịch <ast-compiler-flags>` có thể được tìm thấy trong module :mod:`ast`, với tiền tố ``PyCF_``.
 
-   The argument *optimize* specifies the optimization level of the compiler; the
-   default value of ``-1`` selects the optimization level of the interpreter as
-   given by :option:`-O` options.  Explicit levels are ``0`` (no optimization;
-   ``__debug__`` is true), ``1`` (asserts are removed, ``__debug__`` is false)
-   or ``2`` (docstrings are removed too).
+   Đối số *optimize* chỉ định cấp độ tối ưu hóa của trình biên dịch; giá trị mặc định ``-1`` chọn cấp độ tối ưu hóa của trình thông dịch như được chỉ định bởi các tùy chọn :option:`-O`. Các cấp độ tường minh là ``0`` (không tối ưu hóa; ``__debug__`` là true), ``1`` (các câu lệnh assert bị loại bỏ, ``__debug__`` là false) hoặc ``2`` (docstring cũng bị loại bỏ).
 
-   This function raises :exc:`SyntaxError` if the compiled source is invalid,
-   including a *source* containing a null character or that cannot be decoded;
-   :exc:`ValueError` if *mode* or *flags* is invalid,
-   or if a string *source* contains surrogate characters;
-   :exc:`MemoryError` or :exc:`RecursionError` if *source* is too complex
-   to parse or compile,
-   for example an expression with many thousands of nested operators;
-   and :exc:`OverflowError` if *source* is too large.
+   Hàm này phát sinh :exc:`SyntaxError` nếu mã nguồn đã biên dịch không hợp lệ, bao gồm *mã nguồn* chứa ký tự null hoặc không thể được giải mã;
+   :exc:`ValueError` nếu *mode* hoặc *flags* không hợp lệ, hoặc nếu một chuỗi *source* chứa các ký tự surrogate;
+   :exc:`MemoryError` hoặc :exc:`RecursionError` nếu *source* quá phức tạp để phân tích cú pháp hoặc biên dịch, chẳng hạn như một biểu thức có hàng nghìn toán tử lồng nhau; và :exc:`OverflowError` nếu *source* quá lớn.
 
-   If you want to parse Python code into its AST representation, see
+   Nếu bạn muốn phân tích mã Python thành biểu diễn AST, hãy xem
    :func:`ast.parse`.
 
    .. audit-event:: compile source,filename compile
 
-      Raises an :ref:`auditing event <auditing>` ``compile`` with arguments
-      ``source`` and ``filename``. This event may also be raised by implicit
-      compilation.
+      Phát ra một :ref:`auditing event <auditing>` ``compile`` với các đối số ``source`` và ``filename``. Sự kiện này cũng có thể được phát ra bởi quá trình biên dịch ngầm.
 
    .. note::
 
-      When compiling a string with multi-line code in ``'single'`` or
-      ``'eval'`` mode, input must be terminated by at least one newline
-      character.  This is to facilitate detection of incomplete and complete
-      statements in the :mod:`code` module.
+      Khi biên dịch một chuỗi chứa mã nhiều dòng ở chế độ ``'single'`` hoặc ``'eval'``, dữ liệu đầu vào phải được kết thúc bằng ít nhất một ký tự xuống dòng. Điều này nhằm hỗ trợ việc phát hiện các câu lệnh chưa hoàn chỉnh và hoàn chỉnh trong mô-đun :mod:`code`.
 
    .. warning::
 
-      It is possible to crash the Python interpreter with a
-      sufficiently large/complex string when compiling to an AST
-      object due to stack depth limitations in Python's AST compiler.
+      Có thể làm trình thông dịch Python bị crash bằng một chuỗi đủ lớn/phức tạp khi biên dịch thành đối tượng AST, do các giới hạn về độ sâu ngăn xếp trong trình biên dịch AST của Python.
 
    .. versionchanged:: 3.2
-      Allowed use of Windows and Mac newlines.  Also, input in ``'exec'`` mode
-      does not have to end in a newline anymore.  Added the *optimize* parameter.
+      Cho phép sử dụng ký tự xuống dòng của Windows và Mac. Ngoài ra, dữ liệu đầu vào ở chế độ ``'exec'`` không còn phải kết thúc bằng ký tự xuống dòng. Đã thêm tham số *optimize*.
 
    .. versionchanged:: 3.5
-      Previously, :exc:`TypeError` was raised when null bytes were encountered
-      in *source*.
+      Trước đây, :exc:`TypeError` được phát sinh khi gặp các byte null trong *source*.
 
    .. versionchanged:: 3.8
-      ``ast.PyCF_ALLOW_TOP_LEVEL_AWAIT`` can now be passed in flags to enable
-      support for top-level ``await``, ``async for``, and ``async with``.
+      Giờ đây, có thể truyền ``ast.PyCF_ALLOW_TOP_LEVEL_AWAIT`` trong các cờ để bật hỗ trợ cho ``await``, ``async for`` và ``async with`` ở cấp cao nhất.
 
    .. versionchanged:: 3.12
       :exc:`SyntaxError` is raised instead of :exc:`ValueError` when null bytes
-      are encountered in *source*.
+      được gặp trong *source*.
 
 
 .. class:: complex(number=0, /)
-           complex(string, /)
-           complex(real=0, imag=0)
+           complex(string, /) complex(real=0, imag=0)
 
-   Convert a single string or number to a complex number, or create a
-   complex number from real and imaginary parts.
+   Chuyển đổi một chuỗi hoặc số đơn lẻ thành số phức, hoặc tạo một số phức từ phần thực và phần ảo.
 
-   Examples:
+   Ví dụ:
 
    .. doctest::
 
@@ -412,123 +314,77 @@ are always available.  They are listed here in alphabetical order.
       >>> complex(-1.23, 4.5)
       (-1.23+4.5j)
 
-   If the argument is a string, it must contain either a real part (in the
-   same format as for :func:`float`) or an imaginary part (in the same
-   format but with a ``'j'`` or ``'J'`` suffix), or both real and imaginary
-   parts (the sign of the imaginary part is mandatory in this case).
-   The string can optionally be surrounded by whitespaces and the round
-   parentheses ``'('`` and ``')'``, which are ignored.
-   The string must not contain whitespace between ``'+'``, ``'-'``, the
-   ``'j'`` or ``'J'`` suffix, and the decimal number.
-   For example, ``complex('1+2j')`` is fine, but ``complex('1 + 2j')`` raises
-   :exc:`ValueError`.
-   More precisely, the input must conform to the :token:`~float:complexvalue`
-   production rule in the following grammar, after parentheses and leading and
-   trailing whitespace characters are removed:
+   Nếu đối số là một chuỗi, chuỗi đó phải chứa либо một phần thực (theo cùng định dạng như :func:`float`) hoặc một phần ảo (theo cùng định dạng nhưng có hậu tố ``'j'`` hoặc ``'J'``), hoặc cả phần thực và phần ảo (trong trường hợp này, bắt buộc phải có dấu của phần ảo). Chuỗi có thể tùy chọn được bao quanh bởi khoảng trắng và cặp dấu ngoặc tròn ``'('`` và ``')'``, những ký tự này sẽ bị bỏ qua. Chuỗi không được chứa khoảng trắng giữa ``'+'``, ``'-'``, hậu tố ``'j'`` hoặc ``'J'`` và số thập phân. Ví dụ, ``complex('1+2j')`` là hợp lệ, nhưng ``complex('1 + 2j')`` sẽ phát sinh
+   :exc:`ValueError`. Cụ thể hơn, đầu vào phải tuân theo quy tắc sản xuất :token:`~float:complexvalue` trong văn phạm sau, sau khi đã loại bỏ dấu ngoặc và các ký tự khoảng trắng ở đầu cũng như cuối:
 
    .. productionlist:: float
       complexvalue: `floatvalue` |
                   : `floatvalue` ("j" | "J") |
                   : `floatvalue` `sign` `absfloatvalue` ("j" | "J")
 
-   If the argument is a number, the constructor serves as a numeric
-   conversion like :class:`int` and :class:`float`.
-   For a general Python object ``x``, ``complex(x)`` delegates to
-   ``x.__complex__()``.
-   If :meth:`~object.__complex__` is not defined then it falls back
-   to :meth:`~object.__float__`.
-   If :meth:`!__float__` is not defined then it falls back
-   to :meth:`~object.__index__`.
+   Nếu đối số là một số, hàm khởi tạo đóng vai trò như một phép chuyển đổi số giống như :class:`int` và :class:`float`. Với một đối tượng Python bất kỳ ``x``, ``complex(x)`` ủy quyền cho ``x.__complex__()``. Nếu :meth:`~object.__complex__` chưa được định nghĩa thì hàm sẽ chuyển sang :meth:`~object.__float__`. Nếu :meth:`!__float__` chưa được định nghĩa thì hàm sẽ chuyển sang :meth:`~object.__index__`.
 
-   If two arguments are provided or keyword arguments are used, each argument
-   may be any numeric type (including complex).
-   If both arguments are real numbers, return a complex number with the real
-   component *real* and the imaginary component *imag*.
-   If both arguments are complex numbers, return a complex number with the real
-   component ``real.real-imag.imag`` and the imaginary component
-   ``real.imag+imag.real``.
-   If one of arguments is a real number, only its real component is used in
-   the above expressions.
+   Nếu cung cấp hai đối số hoặc sử dụng các đối số từ khóa, mỗi đối số có thể thuộc bất kỳ kiểu số nào (bao gồm cả số phức). Nếu cả hai đối số là số thực, trả về một số phức với phần thực là *real* và phần ảo là *imag*. Nếu cả hai đối số là số phức, trả về một số phức với phần thực là ``real.real-imag.imag`` và phần ảo là ``real.imag+imag.real``. Nếu một trong các đối số là số thực, chỉ phần thực của đối số đó được sử dụng trong các biểu thức trên.
 
-   See also :meth:`complex.from_number` which only accepts a single numeric argument.
+   Xem thêm :meth:`complex.from_number`, hàm này chỉ chấp nhận một đối số số duy nhất.
 
-   If all arguments are omitted, returns ``0j``.
+   Nếu bỏ qua tất cả các đối số, hàm trả về ``0j``.
 
-   The complex type is described in :ref:`typesnumeric`.
+   Kiểu complex được mô tả trong :ref:`typesnumeric`.
 
    .. versionchanged:: 3.6
-      Grouping digits with underscores as in code literals is allowed.
+      Cho phép nhóm các chữ số bằng dấu gạch dưới như trong các literal mã.
 
    .. versionchanged:: 3.8
-      Falls back to :meth:`~object.__index__` if :meth:`~object.__complex__` and
-      :meth:`~object.__float__` are not defined.
+      Nếu :meth:`~object.__complex__` và :meth:`~object.__index__` không được định nghĩa thì sử dụng :meth:`~object.__index__` làm giá trị dự phòng.
+      :meth:`~object.__float__` không được định nghĩa.
 
    .. deprecated:: 3.14
-      Passing a complex number as the *real* or *imag* argument is now
-      deprecated; it should only be passed as a single positional argument.
+      Việc truyền một số phức làm đối số *real* hoặc *imag* hiện đã không còn được khuyến nghị; số phức chỉ nên được truyền dưới dạng một đối số vị trí duy nhất.
 
 
 .. function:: delattr(object, name, /)
 
-   This is a relative of :func:`setattr`.  The arguments are an object and a
-   string.  The string must be the name of one of the object's attributes.  The
-   function deletes the named attribute, provided the object allows it.  For
-   example, ``delattr(x, 'foobar')`` is equivalent to ``del x.foobar``.
-   *name* need not be a Python identifier (see :func:`setattr`).
+   Đây là một hàm tương tự :func:`setattr`. Các đối số là một object và một string. String phải là tên của một thuộc tính của object. Hàm này xóa thuộc tính có tên đó, miễn là object cho phép. Ví dụ, ``delattr(x, 'foobar')`` tương đương với ``del x.foobar``. *name* không nhất thiết phải là một Python identifier (xem :func:`setattr`).
 
 
 .. _func-dict:
 .. class:: dict(**kwargs)
-           dict(mapping, /, **kwargs)
-           dict(iterable, /, **kwargs)
+           dict(mapping, /, ****kwargs) dict(iterable, /, ****kwargs)
    :noindex:
 
-   Create a new dictionary.  The :class:`dict` object is the dictionary class.
-   See also :ref:`typesmapping` for documentation about this class.
+   Tạo một dictionary mới. Đối tượng :class:`dict` là class dictionary. Xem thêm :ref:`typesmapping` để biết tài liệu về class này.
 
-   For other containers see the built-in :class:`list`, :class:`set`, and
-   :class:`tuple` classes, as well as the :mod:`collections` module.
+   Để biết các container khác, hãy xem các built-in :class:`list`, :class:`set`, và
+   các lớp :class:`tuple`, cũng như mô-đun :mod:`collections`.
 
 
 .. function:: dir()
               dir(object, /)
 
-   Without arguments, return the list of names in the current local scope.  With an
-   argument, attempt to return a list of valid attributes for that object.
+   Nếu không có đối số, trả về danh sách các tên trong phạm vi cục bộ hiện tại. Với một đối số, cố gắng trả về danh sách các thuộc tính hợp lệ của đối tượng đó.
 
-   If the object has a method named :meth:`~object.__dir__`,
-   this method will be called and
-   must return the list of attributes. This allows objects that implement a custom
-   :func:`~object.__getattr__` or :func:`~object.__getattribute__` function
-   to customize the way
-   :func:`dir` reports their attributes.
+   Nếu đối tượng có một phương thức có tên :meth:`~object.__dir__`, phương thức này sẽ được gọi và phải trả về danh sách các thuộc tính. Điều này cho phép các đối tượng triển khai một
+   hàm :func:`~object.__getattr__` hoặc :func:`~object.__getattribute__` tùy chỉnh cách
+   :func:`dir` báo cáo các thuộc tính của chúng.
 
-   If the object does not provide :meth:`~object.__dir__`,
-   the function tries its best to gather information from the object's
-   :attr:`~object.__dict__` attribute, if defined, and
-   from its type object.  The resulting list is not necessarily complete and may
-   be inaccurate when the object has a custom :func:`~object.__getattr__`.
+   Nếu đối tượng không cung cấp :meth:`~object.__dir__`, hàm sẽ cố gắng hết sức để thu thập thông tin từ
+   thuộc tính :attr:`~object.__dict__`, nếu được định nghĩa, và từ đối tượng kiểu của nó. Danh sách kết quả không nhất thiết đầy đủ và có thể không chính xác khi đối tượng có :func:`~object.__getattr__` tùy chỉnh.
 
-   The default :func:`dir` mechanism behaves differently with different types of
-   objects, as it attempts to produce the most relevant, rather than complete,
-   information:
+   Cơ chế :func:`dir` mặc định hoạt động khác nhau với từng loại đối tượng, vì nó cố gắng tạo ra thông tin phù hợp nhất thay vì đầy đủ:
 
-   * If the object is a module object, the list contains the names of the module's
-     attributes.
+   * Nếu đối tượng là một đối tượng module, danh sách chứa tên các thuộc tính của module.
 
-   * If the object is a type or class object, the list contains the names of its
-     attributes, and recursively of the attributes of its bases.
+   * Nếu đối tượng là một đối tượng kiểu hoặc lớp, danh sách chứa tên các thuộc tính của nó, cũng như đệ quy các thuộc tính của các lớp cơ sở của nó.
 
-   * Otherwise, the list contains the object's attributes' names, the names of its
-     class's attributes, and recursively of the attributes of its class's base
-     classes.
+   * Nếu không, danh sách chứa tên các thuộc tính của đối tượng, tên các thuộc tính của lớp của đối tượng và đệ quy các thuộc tính của các lớp cơ sở của lớp đó.
 
-   The resulting list is sorted alphabetically.  For example:
+   Danh sách kết quả được sắp xếp theo thứ tự bảng chữ cái. Ví dụ:
 
       >>> import struct
-      >>> dir()   # show the names in the module namespace  # doctest: +SKIP
+      >>> dir()   # hiển thị tên trong namespace của module  # doctest: +SKIP
       ['__builtins__', '__name__', 'struct']
-      >>> dir(struct)   # show the names in the struct module # doctest: +SKIP
+      >>> dir(struct)   # hiển thị tên trong mô-đun struct # doctest: +SKIP
       ['Struct', '__all__', '__builtins__', '__cached__', '__doc__', '__file__',
        '__initializing__', '__loader__', '__name__', '__package__',
        '_clearcache', 'calcsize', 'error', 'pack', 'pack_into',
@@ -543,33 +399,19 @@ are always available.  They are listed here in alphabetical order.
 
    .. note::
 
-      Because :func:`dir` is supplied primarily as a convenience for use at an
-      interactive prompt, it tries to supply an interesting set of names more
-      than it tries to supply a rigorously or consistently defined set of names,
-      and its detailed behavior may change across releases.  For example,
-      metaclass attributes are not in the result list when the argument is a
-      class.
+      Vì :func:`dir` chủ yếu được cung cấp để thuận tiện khi sử dụng tại dấu nhắc tương tác, nó ưu tiên cung cấp một tập hợp tên thú vị hơn là một tập hợp tên được định nghĩa chặt chẽ hoặc nhất quán, và hành vi chi tiết của nó có thể thay đổi giữa các bản phát hành. Ví dụ: các thuộc tính của metaclass không có trong danh sách kết quả khi đối số là một lớp.
 
 
 .. function:: divmod(a, b, /)
 
-   Take two (non-complex) numbers as arguments and return a pair of numbers
-   consisting of their quotient and remainder when using integer division.  With
-   mixed operand types, the rules for binary arithmetic operators apply.  For
-   integers, the result is the same as ``(a // b, a % b)``. For floating-point
-   numbers the result is ``(q, a % b)``, where *q* is usually ``math.floor(a /
-   b)`` but may be 1 less than that.  In any case ``q * b + a % b`` is very
-   close to *a*, if ``a % b`` is non-zero it has the same sign as *b*, and ``0
-   <= abs(a % b) < abs(b)``.
+   Nhận hai số (không phải số phức) làm đối số và trả về một cặp số gồm thương và phần dư của chúng khi thực hiện phép chia số nguyên. Với các kiểu toán hạng hỗn hợp, các quy tắc dành cho toán tử số học nhị phân được áp dụng. Đối với số nguyên, kết quả giống với ``(a // b, a % b)``. Đối với số dấu phẩy động, kết quả là ``(q, a % b)``, trong đó *q* thường là ``math.floor(a / b)`` nhưng có thể nhỏ hơn giá trị đó 1 đơn vị. Trong mọi trường hợp, ``q * b + a % b`` rất gần với *a*, nếu ``a % b`` khác không thì nó có cùng dấu với *b*, và ``0 <= abs(a % b) < abs(b)``.
 
 
 .. function:: enumerate(iterable, start=0)
 
-   Return an enumerate object. *iterable* must be a sequence, an
-   :term:`iterator`, or some other object which supports iteration.
-   The :meth:`~iterator.__next__` method of the iterator returned by
-   :func:`enumerate` returns a tuple containing a count (from *start* which
-   defaults to 0) and the values obtained from iterating over *iterable*.
+   Trả về một đối tượng enumerate. *iterable* phải là một chuỗi, một
+   :term:`iterator`, hoặc một đối tượng khác hỗ trợ phép lặp. Phương thức :meth:`~iterator.__next__` của iterator được trả về bởi
+   :func:`enumerate` trả về một tuple chứa một bộ đếm (bắt đầu từ *start*, mặc định là 0) và các giá trị nhận được khi lặp qua *iterable*.
 
       >>> seasons = ['Spring', 'Summer', 'Fall', 'Winter']
       >>> list(enumerate(seasons))
@@ -577,7 +419,7 @@ are always available.  They are listed here in alphabetical order.
       >>> list(enumerate(seasons, start=1))
       [(1, 'Spring'), (2, 'Summer'), (3, 'Fall'), (4, 'Winter')]
 
-   Equivalent to::
+   Tương đương với::
 
       def enumerate(iterable, start=0):
           n = start
@@ -589,45 +431,28 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: eval(source, /, globals=None, locals=None)
 
-   :param source:
-      A Python expression.
+   :param source:Một biểu thức Python.
    :type source: :class:`str` | :ref:`code object <code-objects>`
 
-   :param globals:
-      The global namespace (default: ``None``).
+   :param globals:Namespace toàn cục (mặc định: ``None``).
    :type globals: :class:`dict` | ``None``
 
-   :param locals:
-      The local namespace (default: ``None``).
+   :param locals:Namespace cục bộ (mặc định: ``None``).
    :type locals: :term:`mapping` | ``None``
 
-   :returns: The result of the evaluated expression.
-   :raises: Syntax errors are reported as exceptions.
+   :returns: Kết quả của biểu thức đã được đánh giá.
+   :raises: Các lỗi cú pháp được báo cáo dưới dạng ngoại lệ.
 
    .. warning::
 
-      This function executes arbitrary code. Calling it with
-      untrusted user-supplied input will lead to security vulnerabilities.
+      Hàm này thực thi mã tùy ý. Việc gọi hàm với dữ liệu đầu vào do người dùng không đáng tin cậy cung cấp sẽ dẫn đến các lỗ hổng bảo mật.
 
-   The *source* argument is parsed and evaluated as a Python expression
-   (technically speaking, an :ref:`expression list <exprlists>`)
-   using the *globals* and *locals* mappings as global and local namespace.
-   If the *globals* dictionary is present and does not contain a value for the
-   key ``__builtins__``, a
-   reference to the dictionary of the built-in module :mod:`builtins` is
-   inserted under that key before *source* is parsed.
-   Overriding ``__builtins__`` can be used to restrict or change the available
-   names, but this is **not** a security mechanism: the executed code can
-   still access all builtins.
-   If the *locals* mapping is omitted it defaults to the
-   *globals* dictionary.  If both mappings are omitted, the source is
-   executed with the *globals* and *locals* in the environment where
-   :func:`eval` is called.  Note, *eval()* will only have access to the
-   :term:`nested scopes <nested scope>` (non-locals) in the enclosing
-   environment if they are already referenced in the scope that is calling
-   :func:`eval` (e.g. via a :keyword:`nonlocal` statement).
+   Đối số *source* được phân tích cú pháp và đánh giá như một biểu thức Python (nói chính xác hơn là một :ref:`expression list <exprlists>`) bằng cách sử dụng các ánh xạ *globals* và *locals* làm không gian tên toàn cục và cục bộ. Nếu từ điển *globals* hiện diện và không chứa giá trị cho khóa ``__builtins__``, một tham chiếu đến từ điển của mô-đun tích hợp sẵn :mod:`builtins` sẽ được chèn vào khóa đó trước khi *source* được phân tích cú pháp. Có thể ghi đè ``__builtins__`` để giới hạn hoặc thay đổi các tên khả dụng, nhưng đây **not** phải là cơ chế bảo mật: mã được thực thi vẫn có thể truy cập tất cả các đối tượng tích hợp sẵn. Nếu bỏ qua ánh xạ *locals*, ánh xạ này mặc định là từ điển *globals*. Nếu bỏ qua cả hai ánh xạ, mã nguồn sẽ được thực thi với *globals* và *locals* trong môi trường nơi
+   :func:`eval` được gọi. Lưu ý, *eval()* sẽ chỉ có quyền truy cập vào
+   :term:`nested scopes <nested scope>` (không phải biến cục bộ) trong môi trường bao quanh nếu chúng đã được tham chiếu trong phạm vi đang gọi
+   :func:`eval` (ví dụ: thông qua một :keyword:`nonlocal` statement).
 
-   Example:
+   Ví dụ:
 
       >>> x = 1
       >>> eval('x+1')
@@ -636,35 +461,25 @@ are always available.  They are listed here in alphabetical order.
       >>> eval("1, 2")
       (1, 2)
 
-   This function can also be used to execute arbitrary code objects (such as
-   those created by :func:`compile`).  In this case, pass a code object instead
-   of a string.  If the code object has been compiled with ``'exec'`` as the
-   *mode* argument, :func:`eval`\'s return value will be ``None``.
+   Hàm này cũng có thể được dùng để thực thi các đối tượng mã tùy ý (chẳng hạn như những đối tượng được tạo bởi :func:`compile`). Trong trường hợp này, hãy truyền một đối tượng mã thay vì một chuỗi. Nếu đối tượng mã đã được biên dịch với ``'exec'`` làm đối số *mode*, giá trị trả về của :func:`eval`\'s sẽ là ``None``.
 
-   Hints: dynamic execution of statements is supported by the :func:`exec`
-   function.  The :func:`globals` and :func:`locals` functions
-   return the current global and local dictionary, respectively, which may be
-   useful to pass around for use by :func:`eval` or :func:`exec`.
+   Gợi ý: việc thực thi động các câu lệnh được hỗ trợ bởi hàm :func:`exec`. Các hàm :func:`globals` và :func:`locals` lần lượt trả về từ điển toàn cục và cục bộ hiện tại, có thể hữu ích khi truyền chúng để :func:`eval` hoặc :func:`exec` sử dụng.
 
-   If the given source is a string, then leading and trailing spaces and tabs
-   are stripped.
+   Nếu mã nguồn đã cho là một chuỗi, các dấu cách và tab ở đầu và cuối sẽ bị loại bỏ.
 
-   See :func:`ast.literal_eval` for a function to evaluate strings
-   with expressions containing only literals.
+   Xem :func:`ast.literal_eval` để biết hàm đánh giá các chuỗi có biểu thức chỉ chứa các literal.
 
    .. audit-event:: exec code_object eval
 
-      Raises an :ref:`auditing event <auditing>` ``exec`` with the code object
-      as the argument. Code compilation events may also be raised.
+      Phát sinh một :ref:`auditing event <auditing>` ``exec`` với đối tượng mã làm đối số. Các sự kiện biên dịch mã cũng có thể được phát sinh.
 
    .. versionchanged:: 3.13
 
-      The *globals* and *locals* arguments can now be passed as keywords.
+      Các đối số *globals* và *locals* hiện có thể được truyền dưới dạng từ khóa.
 
    .. versionchanged:: 3.13
 
-      The semantics of the default *locals* namespace have been adjusted as
-      described for the :func:`locals` builtin.
+      Ngữ nghĩa của namespace *locals* mặc định đã được điều chỉnh như mô tả đối với builtin :func:`locals`.
 
 .. index:: pair: built-in function; exec
 
@@ -672,94 +487,56 @@ are always available.  They are listed here in alphabetical order.
 
    .. warning::
 
-      This function executes arbitrary code. Calling it with
-      untrusted user-supplied input will lead to security vulnerabilities.
+      Hàm này thực thi mã tùy ý. Việc gọi hàm với dữ liệu đầu vào do người dùng không đáng tin cậy cung cấp sẽ dẫn đến các lỗ hổng bảo mật.
 
-   This function supports dynamic execution of Python code. *source* must be
-   either a string or a code object.  If it is a string, the string is parsed as
-   a suite of Python statements which is then executed (unless a syntax error
-   occurs). [#]_ If it is a code object, it is simply executed.  In all cases,
-   the code that's executed is expected to be valid as file input (see the
-   section :ref:`file-input` in the Reference Manual). Be aware that the
-   :keyword:`nonlocal`, :keyword:`yield`,  and :keyword:`return`
-   statements may not be used outside of
-   function definitions even within the context of code passed to the
-   :func:`exec` function. The return value is ``None``.
+   Hàm này hỗ trợ thực thi động mã Python. *source* phải là một chuỗi hoặc một đối tượng mã. Nếu là một chuỗi, chuỗi đó sẽ được phân tích cú pháp thành một suite gồm các câu lệnh Python rồi được thực thi (trừ khi xảy ra lỗi cú pháp). [#]_ Nếu là một đối tượng mã, đối tượng đó פשוט được thực thi. Trong mọi trường hợp, mã được thực thi được kỳ vọng là hợp lệ khi làm đầu vào tệp (xem phần :ref:`file-input` trong Reference Manual). Lưu ý rằng
+   Các câu lệnh :keyword:`nonlocal`, :keyword:`yield` và :keyword:`return` không được sử dụng bên ngoài phần định nghĩa hàm, ngay cả trong ngữ cảnh của mã được truyền cho
+   hàm :func:`exec`. Giá trị trả về là ``None``.
 
-   In all cases, if the optional parts are omitted, the code is executed in the
-   current scope.  If only *globals* is provided, it must be a dictionary
-   (and not a subclass of dictionary), which
-   will be used for both the global and the local variables.  If *globals* and
-   *locals* are given, they are used for the global and local variables,
-   respectively.  If provided, *locals* can be any mapping object.  Remember
-   that at the module level, globals and locals are the same dictionary.
+   Trong mọi trường hợp, nếu các phần tùy chọn bị bỏ qua, mã sẽ được thực thi trong scope hiện tại. Nếu chỉ cung cấp *globals*, nó phải là một dictionary (không phải lớp con của dictionary) và sẽ được dùng cho cả biến toàn cục lẫn biến cục bộ. Nếu cung cấp *globals* và *locals*, chúng lần lượt được dùng cho biến toàn cục và biến cục bộ. Nếu được cung cấp, *locals* có thể là bất kỳ đối tượng mapping nào. Hãy nhớ rằng ở cấp module, globals và locals là cùng một dictionary.
 
    .. note::
 
-      When ``exec`` gets two separate objects as *globals* and *locals*, the
-      code will be executed as if it were embedded in a class definition. This
-      means functions and classes defined in the executed code will not be able
-      to access variables assigned at the top level (as the "top level"
-      variables are treated as class variables in a class definition).
+      Khi ``exec`` nhận hai đối tượng riêng biệt làm *globals* và *locals*, mã sẽ được thực thi như thể được nhúng trong phần định nghĩa lớp. Điều này có nghĩa là các hàm và lớp được định nghĩa trong mã đã thực thi sẽ không thể truy cập các biến được gán ở cấp cao nhất (vì các biến "cấp cao nhất" được xem là biến lớp trong phần định nghĩa lớp).
 
-   If the *globals* dictionary does not contain a value for the key
-   ``__builtins__``, a reference to the dictionary of the built-in module
-   :mod:`builtins` is inserted under that key.
-   Overriding ``__builtins__`` can be used to restrict or change the available
-   names, but this is **not** a security mechanism: the executed code can
-   still access all builtins.
+   Nếu dictionary *globals* không chứa giá trị cho khóa ``__builtins__``, một tham chiếu đến dictionary của module built-in
+   :mod:`builtins` sẽ được chèn vào khóa đó. Việc ghi đè ``__builtins__`` có thể được dùng để hạn chế hoặc thay đổi các tên khả dụng, nhưng điều này **not** phải là một cơ chế bảo mật: mã được thực thi vẫn có thể truy cập tất cả builtins.
 
-   The *closure* argument specifies a closure--a tuple of cellvars.
-   It's only valid when the *object* is a code object containing
-   :term:`free (closure) variables <closure variable>`.
-   The length of the tuple must exactly match the length of the code object's
-   :attr:`~codeobject.co_freevars` attribute.
+   Đối số *closure* chỉ định một closure—một tuple gồm các cellvar. Đối số này chỉ hợp lệ khi *object* là một code object chứa
+   :term:`các biến tự do (closure) <closure variable>`. Độ dài của tuple phải khớp chính xác với độ dài của đối tượng mã
+   :attr:`~codeobject.co_freevars` thuộc tính.
 
    .. audit-event:: exec code_object exec
 
-      Raises an :ref:`auditing event <auditing>` ``exec`` with the code object
-      as the argument. Code compilation events may also be raised.
+      Phát sinh một :ref:`auditing event <auditing>` ``exec`` với đối tượng mã làm đối số. Các sự kiện biên dịch mã cũng có thể được phát sinh.
 
    .. note::
 
-      The built-in functions :func:`globals` and :func:`locals` return the current
-      global and local namespace, respectively, which may be useful to pass around
-      for use as the second and third argument to :func:`exec`.
+      Các hàm tích hợp :func:`globals` và :func:`locals` lần lượt trả về namespace global và local hiện tại, có thể hữu ích khi truyền chúng để sử dụng làm đối số thứ hai và thứ ba cho :func:`exec`.
 
    .. note::
 
-      The default *locals* act as described for function :func:`locals` below.
-      Pass an explicit *locals* dictionary if you need to see effects of the
-      code on *locals* after function :func:`exec` returns.
+      *locals* mặc định hoạt động như được mô tả cho hàm :func:`locals` bên dưới. Hãy truyền một từ điển *locals* tường minh nếu bạn cần thấy tác động của mã lên *locals* sau khi hàm :func:`exec` trả về.
 
    .. versionchanged:: 3.11
-      Added the *closure* parameter.
+      Đã thêm tham số *closure*.
 
    .. versionchanged:: 3.13
 
-      The *globals* and *locals* arguments can now be passed as keywords.
+      Các đối số *globals* và *locals* hiện có thể được truyền dưới dạng từ khóa.
 
    .. versionchanged:: 3.13
 
-      The semantics of the default *locals* namespace have been adjusted as
-      described for the :func:`locals` builtin.
+      Ngữ nghĩa của namespace *locals* mặc định đã được điều chỉnh như mô tả đối với builtin :func:`locals`.
 
 
 .. function:: filter(function, iterable, /)
 
-   Construct an iterator from those elements of *iterable* for which *function*
-   is true.  *iterable* may be either a sequence, a container which
-   supports iteration, or an iterator.  If *function* is ``None``, the identity
-   function is assumed, that is, all elements of *iterable* that are false are
-   removed.
+   Tạo một iterator từ những phần tử của *iterable* mà *function* trả về true. *iterable* có thể là một sequence, một container hỗ trợ iteration hoặc một iterator. Nếu *function* là ``None``, hàm identity sẽ được giả định, nghĩa là tất cả phần tử của *iterable* có giá trị false sẽ bị loại bỏ.
 
-   Note that ``filter(function, iterable)`` is equivalent to the generator
-   expression ``(item for item in iterable if function(item))`` if function is
-   not ``None`` and ``(item for item in iterable if item)`` if function is
-   ``None``.
+   Lưu ý rằng ``filter(function, iterable)`` tương đương với biểu thức generator ``(item for item in iterable if function(item))`` nếu function không phải là ``None``, và ``(item for item in iterable if item)`` nếu function là ``None``.
 
-   See :func:`itertools.filterfalse` for the complementary function that returns
-   elements of *iterable* for which *function* is false.
+   Xem :func:`itertools.filterfalse` để biết hàm bổ sung trả về những phần tử của *iterable* mà *function* trả về false.
 
 
 .. class:: float(number=0.0, /)
@@ -769,9 +546,9 @@ are always available.  They are listed here in alphabetical order.
       single: NaN
       single: Infinity
 
-   Return a floating-point number constructed from a number or a string.
+   Trả về một số dấu phẩy động được tạo từ một số hoặc một chuỗi.
 
-   Examples:
+   Ví dụ:
 
    .. doctest::
 
@@ -786,14 +563,7 @@ are always available.  They are listed here in alphabetical order.
       >>> float('-Infinity')
       -inf
 
-   If the argument is a string, it should contain a decimal number, optionally
-   preceded by a sign, and optionally embedded in whitespace.  The optional
-   sign may be ``'+'`` or ``'-'``; a ``'+'`` sign has no effect on the value
-   produced.  The argument may also be a string representing a NaN
-   (not-a-number), or positive or negative infinity.
-   More precisely, the input must conform to the :token:`~float:floatvalue`
-   production rule in the following grammar, after leading and trailing
-   whitespace characters are removed:
+   Nếu đối số là một chuỗi, chuỗi đó phải chứa một số thập phân, có thể có dấu ở trước và có thể được đặt giữa các khoảng trắng. Dấu tùy chọn có thể là ``'+'`` hoặc ``'-'``; dấu ``'+'`` không ảnh hưởng đến giá trị được tạo ra. Đối số cũng có thể là một chuỗi biểu diễn NaN (không phải là số), hoặc vô cực dương hay âm. Cụ thể hơn, sau khi loại bỏ các ký tự khoảng trắng ở đầu và cuối, đầu vào phải tuân theo quy tắc sản xuất :token:`~float:floatvalue` trong ngữ pháp sau:
 
    .. productionlist:: float
       sign: "+" | "-"
@@ -807,32 +577,26 @@ are always available.  They are listed here in alphabetical order.
       absfloatvalue: `floatnumber` | `infinity` | `nan`
       floatvalue: [`sign`] `absfloatvalue`
 
-   Case is not significant, so, for example, "inf", "Inf", "INFINITY", and
-   "iNfINity" are all acceptable spellings for positive infinity.
+   Phân biệt chữ hoa chữ thường không quan trọng, vì vậy chẳng hạn như "inf", "Inf", "INFINITY" và "iNfINity" đều là các cách viết hợp lệ của vô cực dương.
 
-   Otherwise, if the argument is an integer or a floating-point number, a
-   floating-point number with the same value (within Python's floating-point
-   precision) is returned.  If the argument is outside the range of a Python
-   float, an :exc:`OverflowError` will be raised.
+   Nếu không, nếu đối số là một số nguyên hoặc số dấu phẩy động, một số dấu phẩy động có cùng giá trị (trong phạm vi độ chính xác số dấu phẩy động của Python) sẽ được trả về. Nếu đối số nằm ngoài phạm vi của một số float trong Python, :exc:`OverflowError` sẽ được phát sinh.
 
-   For a general Python object ``x``, ``float(x)`` delegates to
-   ``x.__float__()``.  If :meth:`~object.__float__` is not defined then it falls back
-   to :meth:`~object.__index__`.
+   Đối với một đối tượng Python tổng quát ``x``, ``float(x)`` ủy quyền cho ``x.__float__()``. Nếu :meth:`~object.__float__` không được định nghĩa, nó sẽ chuyển sang :meth:`~object.__index__`.
 
-   See also :meth:`float.from_number` which only accepts a numeric argument.
+   Xem thêm :meth:`float.from_number`, vốn chỉ chấp nhận một đối số số.
 
-   If no argument is given, ``0.0`` is returned.
+   Nếu không cung cấp đối số nào, ``0.0`` sẽ được trả về.
 
-   The float type is described in :ref:`typesnumeric`.
+   Kiểu float được mô tả trong :ref:`typesnumeric`.
 
    .. versionchanged:: 3.6
-      Grouping digits with underscores as in code literals is allowed.
+      Cho phép nhóm các chữ số bằng dấu gạch dưới như trong các literal mã.
 
    .. versionchanged:: 3.7
-      The parameter is now positional-only.
+      Tham số này hiện chỉ có thể được truyền theo vị trí.
 
    .. versionchanged:: 3.8
-      Falls back to :meth:`~object.__index__` if :meth:`~object.__float__` is not defined.
+      Sử dụng :meth:`~object.__index__` nếu :meth:`~object.__float__` chưa được định nghĩa.
 
 
 .. index::
@@ -841,120 +605,82 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: format(value, format_spec="", /)
 
-   Convert a *value* to a "formatted" representation, as controlled by
-   *format_spec*.  The interpretation of *format_spec* will depend on the type
-   of the *value* argument; however, there is a standard formatting syntax that
-   is used by most built-in types: :ref:`formatspec`.
+   Chuyển đổi một *value* thành dạng biểu diễn "được định dạng", theo quy định của *format_spec*. Cách diễn giải *format_spec* sẽ phụ thuộc vào kiểu của đối số *value*; tuy nhiên, hầu hết các kiểu dựng sẵn đều sử dụng một cú pháp định dạng tiêu chuẩn: :ref:`formatspec`.
 
-   The default *format_spec* is an empty string which usually gives the same
-   effect as calling :func:`str(value) <str>`.
+   *format_spec* mặc định là một chuỗi rỗng, thường cho kết quả giống như khi gọi :func:`str(value) <str>`.
 
-   A call to ``format(value, format_spec)`` is translated to
-   ``type(value).__format__(value, format_spec)`` which bypasses the instance
-   dictionary when searching for the value's :meth:`~object.__format__` method.
-   A :exc:`TypeError` exception is raised if the method search reaches
-   :mod:`object` and the *format_spec* is non-empty, or if either the
-   *format_spec* or the return value are not strings.
+   Lệnh gọi ``format(value, format_spec)`` được chuyển thành ``type(value).__format__(value, format_spec)``, bỏ qua dictionary của instance khi tìm phương thức :meth:`~object.__format__` của giá trị. Một ngoại lệ :exc:`TypeError` sẽ được phát sinh nếu quá trình tìm kiếm phương thức đi đến
+   :mod:`object` và *format_spec* không rỗng, hoặc nếu *format_spec* hay giá trị trả về không phải là các chuỗi.
 
    .. versionchanged:: 3.4
-      ``object().__format__(format_spec)`` raises :exc:`TypeError`
-      if *format_spec* is not an empty string.
+      ``object().__format__(format_spec)`` phát sinh :exc:`TypeError` nếu *format_spec* không phải là một chuỗi rỗng.
 
 
 .. _func-frozenset:
 .. class:: frozenset(iterable=(), /)
    :noindex:
 
-   Return a new :class:`frozenset` object, optionally with elements taken from
-   *iterable*.  :class:`frozenset` is a built-in class.  See also
-   :ref:`types-set` for documentation about this class.
+   Trả về một đối tượng :class:`frozenset` mới, tùy chọn với các phần tử lấy từ *iterable*. :class:`frozenset` là một lớp tích hợp sẵn. Xem thêm
+   :ref:`types-set` để biết tài liệu về lớp này.
 
-   For other containers see the built-in :class:`set`, :class:`list`,
-   :class:`tuple`, and :class:`dict` classes, as well as the :mod:`collections`
-   module.
+   Đối với các container khác, hãy xem :class:`set` tích hợp sẵn, :class:`list`,
+   :class:`tuple` và các lớp :class:`dict`, cũng như mô-đun :mod:`collections`.
 
 
 .. function:: getattr(object, name, /)
               getattr(object, name, default, /)
 
-   Return the value of the named attribute of *object*.  *name* must be a string.
-   If the string is the name of one of the object's attributes, the result is the
-   value of that attribute.  For example, ``getattr(x, 'foobar')`` is equivalent to
-   ``x.foobar``.  If the named attribute does not exist, *default* is returned if
-   provided, otherwise :exc:`AttributeError` is raised.
-   *name* need not be a Python identifier (see :func:`setattr`).
+   Trả về giá trị của thuộc tính có tên của *object*. *name* phải là một chuỗi. Nếu chuỗi này là tên của một trong các thuộc tính của object, kết quả là giá trị của thuộc tính đó. Ví dụ: ``getattr(x, 'foobar')`` tương đương với ``x.foobar``. Nếu thuộc tính có tên không tồn tại, *default* sẽ được trả về nếu được cung cấp; nếu không, :exc:`AttributeError` sẽ phát sinh. *name* không nhất thiết phải là một định danh Python (xem :func:`setattr`).
 
    .. note::
 
-      Since :ref:`private name mangling <private-name-mangling>` happens at
-      compilation time, one must manually mangle a private attribute's
-      (attributes with two leading underscores) name in order to retrieve it with
+      Vì :ref:`private name mangling <private-name-mangling>` diễn ra tại thời điểm biên dịch, cần tự mangle tên của một thuộc tính private (các thuộc tính có hai dấu gạch dưới ở đầu) để truy xuất thuộc tính đó bằng
       :func:`getattr`.
 
 
 .. function:: globals()
 
-   Return the dictionary implementing the current module namespace. For code within
-   functions, this is set when the function is defined and remains the same
-   regardless of where the function is called.
+   Trả về từ điển triển khai namespace của module hiện tại. Đối với mã bên trong các hàm, từ điển này được thiết lập khi hàm được định nghĩa và không thay đổi bất kể hàm được gọi ở đâu.
 
 
 .. function:: hasattr(object, name, /)
 
-   The arguments are an object and a string.  The result is ``True`` if the
-   string is the name of one of the object's attributes, ``False`` if not. (This
-   is implemented by calling ``getattr(object, name)`` and seeing whether it
-   raises an :exc:`AttributeError` or not.)
+   Các đối số là một object và một string. Kết quả là ``True`` nếu string là tên của một thuộc tính của object, và là ``False`` nếu không phải. (Điều này được triển khai bằng cách gọi ``getattr(object, name)`` và kiểm tra xem nó có phát sinh :exc:`AttributeError` hay không.)
 
 
 .. function:: hash(object, /)
 
-   Return the hash value of the object (if it has one).  Hash values are
-   integers.  They are used to quickly compare dictionary keys during a
-   dictionary lookup.  Numeric values that compare equal have the same hash
-   value (even if they are of different types, as is the case for 1 and 1.0).
+   Trả về giá trị hash của object (nếu object có giá trị hash). Giá trị hash là các số nguyên. Chúng được dùng để nhanh chóng so sánh các khóa dictionary trong quá trình tra cứu dictionary. Các giá trị số bằng nhau khi so sánh sẽ có cùng giá trị hash (ngay cả khi chúng thuộc các kiểu khác nhau, như trường hợp của 1 và 1.0).
 
    .. note::
 
-      For objects with custom :meth:`~object.__hash__` methods,
-      note that :func:`hash`
-      truncates the return value based on the bit width of the host machine.
+      Đối với các object có phương thức :meth:`~object.__hash__` tùy chỉnh, lưu ý rằng :func:`hash` sẽ cắt ngắn giá trị trả về dựa trên độ rộng bit của máy chủ.
 
 .. function:: help()
               help(request)
 
-   Invoke the built-in help system.  (This function is intended for interactive
-   use.)  If no argument is given, the interactive help system starts on the
-   interpreter console.  If the argument is a string, then the string is looked up
-   as the name of a module, function, class, method, keyword, or documentation
-   topic, and a help page is printed on the console.  If the argument is any other
-   kind of object, a help page on the object is generated.
+   Gọi hệ thống trợ giúp tích hợp sẵn. (Hàm này предназнач cho việc sử dụng tương tác.) Nếu không cung cấp đối số, hệ thống trợ giúp tương tác sẽ khởi động trên bảng điều khiển của interpreter. Nếu đối số là một string, string đó sẽ được tra cứu dưới dạng tên của module, function, class, method, keyword hoặc chủ đề tài liệu, rồi một trang trợ giúp sẽ được in trên bảng điều khiển. Nếu đối số là bất kỳ loại object nào khác, một trang trợ giúp về object đó sẽ được tạo.
 
-   Note that if a slash(/) appears in the parameter list of a function when
-   invoking :func:`help`, it means that the parameters prior to the slash are
-   positional-only. For more info, see
-   :ref:`the FAQ entry on positional-only parameters <faq-positional-only-arguments>`.
+   Lưu ý rằng nếu dấu gạch chéo(/) xuất hiện trong danh sách tham số của một hàm khi gọi :func:`help`, điều đó có nghĩa là các tham số trước dấu gạch chéo chỉ có thể được truyền theo vị trí. Để biết thêm thông tin, hãy xem
+   :ref:`mục FAQ về tham số chỉ có thể truyền theo vị trí <faq-positional-only-arguments>`.
 
-   This function is added to the built-in namespace by the :mod:`site` module.
+   Hàm này được mô-đun :mod:`site` thêm vào không gian tên dựng sẵn.
 
    .. versionchanged:: 3.4
-      Changes to :mod:`pydoc` and :mod:`inspect` mean that the reported
-      signatures for callables are now more comprehensive and consistent.
+      Các thay đổi đối với :mod:`pydoc` và :mod:`inspect` có nghĩa là các chữ ký được báo cáo cho các callable hiện đầy đủ và nhất quán hơn.
 
 
 .. function:: hex(integer, /)
 
-   Convert an integer number to a lowercase hexadecimal string prefixed with
-   "0x". If *integer* is not a Python :class:`int` object, it has to define an
-   :meth:`~object.__index__` method that returns an integer. Some examples:
+   Chuyển đổi một số nguyên thành chuỗi thập lục phân viết thường có tiền tố "0x". Nếu *integer* không phải là một đối tượng :class:`int` Python, đối tượng đó phải định nghĩa một
+   :meth:`~object.__index__` method trả về một số nguyên. Một số ví dụ:
 
       >>> hex(255)
       '0xff'
       >>> hex(-42)
       '-0x2a'
 
-   If you want to convert an integer number to an uppercase or lower hexadecimal
-   string with prefix or not, you can use either of the following ways:
+   Nếu bạn muốn chuyển đổi một số nguyên thành chuỗi thập lục phân viết hoa hoặc viết thường, có hoặc không có tiền tố, bạn có thể sử dụng một trong các cách sau:
 
      >>> '%#x' % 255, '%x' % 255, '%X' % 255
      ('0xff', 'ff', 'FF')
@@ -963,23 +689,19 @@ are always available.  They are listed here in alphabetical order.
      >>> f'{255:#x}', f'{255:x}', f'{255:X}'
      ('0xff', 'ff', 'FF')
 
-   See also :func:`format` for more information.
+   Xem thêm :func:`format` để biết thêm thông tin.
 
-   See also :func:`int` for converting a hexadecimal string to an
-   integer using a base of 16.
+   Xem thêm :func:`int` để chuyển một chuỗi thập lục phân thành số nguyên bằng cách sử dụng cơ số 16.
 
    .. note::
 
-      To obtain a hexadecimal string representation for a float, use the
-      :meth:`float.hex` method.
+      Để nhận biểu diễn chuỗi thập lục phân của một số float, hãy sử dụng
+      phương thức :meth:`float.hex`.
 
 
 .. function:: id(object, /)
 
-   Return the "identity" of an object.  This is an integer which
-   is guaranteed to be unique and constant for this object during its lifetime.
-   Two objects with non-overlapping lifetimes may have the same :func:`id`
-   value.
+   Trả về "identity" của một đối tượng. Đây là một số nguyên được đảm bảo là duy nhất và không đổi đối với đối tượng này trong suốt vòng đời của nó. Hai đối tượng có vòng đời không giao nhau có thể có cùng giá trị :func:`id`.
 
    .. impl-detail:: This is the address of the object in memory.
 
@@ -989,37 +711,30 @@ are always available.  They are listed here in alphabetical order.
 .. function:: input()
               input(prompt, /)
 
-   If the *prompt* argument is present, it is written to standard output without
-   a trailing newline.  The function then reads a line from input, converts it
-   to a string (stripping a trailing newline), and returns that.  When EOF is
-   read, :exc:`EOFError` is raised.  Example::
+   Nếu có đối số *prompt*, đối số này sẽ được ghi vào đầu ra tiêu chuẩn mà không có ký tự dòng mới ở cuối. Sau đó, hàm đọc một dòng từ đầu vào, chuyển dòng đó thành chuỗi (loại bỏ ký tự dòng mới ở cuối) và trả về chuỗi đó. Khi đọc đến EOF, :exc:`EOFError` được phát sinh. Ví dụ::
 
       >>> s = input('--> ')  # doctest: +SKIP
       --> Monty Python's Flying Circus
       >>> s  # doctest: +SKIP
       "Monty Python's Flying Circus"
 
-   If the :mod:`readline` module was loaded, then :func:`input` will use it
-   to provide elaborate line editing and history features.
+   Nếu mô-đun :mod:`readline` đã được tải, :func:`input` sẽ sử dụng mô-đun đó để cung cấp các tính năng chỉnh sửa dòng lệnh và lịch sử nâng cao.
 
    .. audit-event:: builtins.input prompt input
 
-      Raises an :ref:`auditing event <auditing>` ``builtins.input`` with
-      argument ``prompt`` before reading input
+      Phát sinh :ref:`sự kiện kiểm tra <auditing>` ``builtins.input`` với đối số ``prompt`` trước khi đọc dữ liệu nhập
 
    .. audit-event:: builtins.input/result result input
 
-      Raises an :ref:`auditing event <auditing>` ``builtins.input/result``
-      with the result after successfully reading input.
+      Phát sinh :ref:`sự kiện kiểm tra <auditing>` ``builtins.input/result`` với kết quả sau khi đọc dữ liệu nhập thành công.
 
 
 .. class:: int(number=0, /)
            int(string, /, base=10)
 
-   Return an integer object constructed from a number or a string, or return
-   ``0`` if no arguments are given.
+   Trả về một đối tượng số nguyên được tạo từ một số hoặc một chuỗi, hoặc trả về ``0`` nếu không có đối số nào.
 
-   Examples:
+   Ví dụ:
 
    .. doctest::
 
@@ -1036,110 +751,64 @@ are always available.  They are listed here in alphabetical order.
       >>> int('01110011', base=2)
       115
 
-   If the argument defines :meth:`~object.__int__`,
-   ``int(x)`` returns ``x.__int__()``.  If the argument defines
-   :meth:`~object.__index__`, it returns ``x.__index__()``.
-   For floating-point numbers, this truncates towards zero.
+   Nếu đối số định nghĩa :meth:`~object.__int__`, ``int(x)`` trả về ``x.__int__()``. Nếu đối số định nghĩa
+   :meth:`~object.__index__`, nó trả về ``x.__index__()``. Đối với số dấu phẩy động, thao tác này cắt về 0.
 
-   If the argument is not a number or if *base* is given, then it must be a string,
-   :class:`bytes`, or :class:`bytearray` instance representing an integer
-   in radix *base*.  Optionally, the string can be preceded by ``+`` or ``-``
-   (with no space in between), have leading zeros, be surrounded by whitespace,
-   and have single underscores interspersed between digits.
+   Nếu đối số không phải là một số hoặc nếu *cơ số* được cung cấp, thì đối số phải là một chuỗi,
+   :class:`bytes`, hoặc một instance :class:`bytearray` đại diện cho một số nguyên theo cơ số *cơ số*. Chuỗi này có thể tùy chọn được đặt trước bởi ``+`` hoặc ``-`` (không có khoảng trắng ở giữa), có các số 0 ở đầu, được bao quanh bởi khoảng trắng và có các dấu gạch dưới đơn xen kẽ giữa các chữ số.
 
-   A base-n integer string contains digits, each representing a value from 0 to
-   n-1. The values 0--9 can be represented by any Unicode decimal digit. The
-   values 10--35 can be represented by ``a`` to ``z`` (or ``A`` to ``Z``). The
-   default *base* is 10. The allowed bases are 0 and 2--36. Base-2, -8, and -16
-   strings can be optionally prefixed with ``0b``/``0B``, ``0o``/``0O``, or
-   ``0x``/``0X``, as with integer literals in code.  For base 0, the string is
-   interpreted in a similar way to an :ref:`integer literal in code <integers>`,
-   in that the actual base is 2, 8, 10, or 16 as determined by the prefix. Base
-   0 also disallows leading zeros: ``int('010', 0)`` is not legal, while
-   ``int('010')`` and ``int('010', 8)`` are.
+   Một chuỗi số nguyên cơ số n chứa các chữ số, mỗi chữ số biểu diễn một giá trị từ 0 đến n-1. Các giá trị 0--9 có thể được biểu diễn bằng bất kỳ chữ số thập phân Unicode nào. Các giá trị 10--35 có thể được biểu diễn bằng ``a`` đến ``z`` (hoặc ``A`` đến ``Z``). *Cơ số* mặc định là 10. Các cơ số được phép là 0 và 2--36. Các chuỗi cơ số 2, 8 và 16 có thể tùy chọn được đặt tiền tố bằng ``0b``/``0B``, ``0o``/``0O`` hoặc ``0x``/``0X``, giống như các literal số nguyên trong code. Với cơ số 0, chuỗi được diễn giải tương tự như một :ref:`literal số nguyên trong code <integers>`, trong đó cơ số thực tế là 2, 8, 10 hoặc 16, được xác định bởi tiền tố. Cơ số 0 cũng không cho phép các số 0 ở đầu: ``int('010', 0)`` không hợp lệ, còn ``int('010')`` và ``int('010', 8)`` thì hợp lệ.
 
-   The integer type is described in :ref:`typesnumeric`.
+   Kiểu số nguyên được mô tả trong :ref:`typesnumeric`.
 
    .. versionchanged:: 3.4
-      If *base* is not an instance of :class:`int` and the *base* object has a
-      :meth:`base.__index__ <object.__index__>` method, that method is called
-      to obtain an integer for the base.  Previous versions used
-      :meth:`base.__int__ <object.__int__>` instead of :meth:`base.__index__
-      <object.__index__>`.
+      Nếu *base* không phải là một thể hiện của :class:`int` và đối tượng *base* có một
+      :meth:`base.__index__ <object.__index__>` method, phương thức đó được gọi để lấy một số nguyên cho base. Các phiên bản trước đây sử dụng
+      :meth:`base.__int__ <object.__int__>` thay cho :meth:`base.__index__ <object.__index__>`.
 
    .. versionchanged:: 3.6
-      Grouping digits with underscores as in code literals is allowed.
+      Cho phép nhóm các chữ số bằng dấu gạch dưới như trong các literal mã.
 
    .. versionchanged:: 3.7
-      The first parameter is now positional-only.
+      Tham số đầu tiên hiện chỉ có thể được truyền theo vị trí.
 
    .. versionchanged:: 3.8
-      Falls back to :meth:`~object.__index__` if :meth:`~object.__int__` is not defined.
+      Chuyển sang :meth:`~object.__index__` nếu :meth:`~object.__int__` chưa được định nghĩa.
 
    .. versionchanged:: 3.11
       :class:`int` string inputs and string representations can be limited to
-      help avoid denial of service attacks. A :exc:`ValueError` is raised when
-      the limit is exceeded while converting a string to an :class:`int` or
-      when converting an :class:`int` into a string would exceed the limit.
-      See the :ref:`integer string conversion length limitation
-      <int_max_str_digits>` documentation.
+      giúp tránh các cuộc tấn công từ chối dịch vụ. Một :exc:`ValueError` được phát sinh khi vượt quá giới hạn trong quá trình chuyển đổi một chuỗi thành :class:`int`, hoặc khi việc chuyển đổi một :class:`int` thành chuỗi sẽ vượt quá giới hạn. Xem tài liệu về :ref:`giới hạn độ dài chuyển đổi chuỗi số nguyên <int_max_str_digits>`.
 
    .. versionchanged:: 3.14
       :func:`int` no longer delegates to the :meth:`~object.__trunc__` method.
 
 .. function:: isinstance(object, classinfo, /)
 
-   Return ``True`` if the *object* argument is an instance of the *classinfo*
-   argument, or of a (direct, indirect, or :term:`virtual <abstract base
-   class>`) subclass thereof.  If *object* is not
-   an object of the given type, the function always returns ``False``.
-   If *classinfo* is a tuple of type objects (or recursively, other such
-   tuples) or a :ref:`types-union` of multiple types, return ``True`` if
-   *object* is an instance of any of the types.
-   If *classinfo* is not a type or tuple of types and such tuples,
-   a :exc:`TypeError` exception is raised. :exc:`TypeError` may not be
-   raised for an invalid type if an earlier check succeeds.
+   Trả về ``True`` nếu đối số *object* là một thể hiện của đối số *classinfo*, hoặc của một lớp con (trực tiếp, gián tiếp hoặc :term:`virtual <abstract base class>`) của đối số đó. Nếu *object* không phải là một đối tượng thuộc kiểu đã cho, hàm luôn trả về ``False``. Nếu *classinfo* là một tuple gồm các đối tượng kiểu (hoặc đệ quy, các tuple tương tự khác) hoặc một :ref:`types-union` gồm nhiều kiểu, trả về ``True`` nếu *object* là một thể hiện của bất kỳ kiểu nào trong số đó. Nếu *classinfo* không phải là một kiểu hoặc tuple của các kiểu và các tuple tương tự, một ngoại lệ :exc:`TypeError` sẽ được phát sinh. :exc:`TypeError` có thể không được phát sinh đối với một kiểu không hợp lệ nếu một phép kiểm tra trước đó thành công.
 
    .. versionchanged:: 3.10
-      *classinfo* can be a :ref:`types-union`.
+      *classinfo* có thể là một :ref:`types-union`.
 
 
 .. function:: issubclass(class, classinfo, /)
 
-   Return ``True`` if *class* is a subclass (direct, indirect, or :term:`virtual
-   <abstract base class>`) of *classinfo*.  A
-   class is considered a subclass of itself. *classinfo* may be a tuple of class
-   objects (or recursively, other such tuples)
-   or a :ref:`types-union`, in which case return ``True`` if *class* is a
-   subclass of any entry in *classinfo*.  In any other case, a :exc:`TypeError`
-   exception is raised.
+   Trả về ``True`` nếu *class* là một lớp con (trực tiếp, gián tiếp hoặc :term:`virtual <abstract base class>`) của *classinfo*. Một lớp được xem là lớp con của chính nó. *classinfo* có thể là một tuple gồm các đối tượng lớp (hoặc đệ quy, các tuple tương tự khác) hoặc một :ref:`types-union`; trong trường hợp đó, trả về ``True`` nếu *class* là lớp con của bất kỳ phần tử nào trong *classinfo*. Trong mọi trường hợp khác, một ngoại lệ :exc:`TypeError` sẽ được phát sinh.
 
    .. versionchanged:: 3.10
-      *classinfo* can be a :ref:`types-union`.
+      *classinfo* có thể là một :ref:`types-union`.
 
 
 .. function:: iter(iterable, /)
               iter(callable, sentinel, /)
 
-   Return an :term:`iterator` object.  The first argument is interpreted very
-   differently depending on the presence of the second argument. Without a
-   second argument, the single argument must be a collection object which supports the
-   :term:`iterable` protocol (the :meth:`~object.__iter__` method),
-   or it must support
-   the sequence protocol (the :meth:`~object.__getitem__` method with integer arguments
-   starting at ``0``).  If it does not support either of those protocols,
-   :exc:`TypeError` is raised. If the second argument, *sentinel*, is given,
-   then the first argument must be a callable object.  The iterator created in this case
-   will call *callable* with no arguments for each call to its
-   :meth:`~iterator.__next__` method; if the value returned is equal to
-   *sentinel*, :exc:`StopIteration` will be raised, otherwise the value will
-   be returned.
+   Trả về một đối tượng :term:`iterator`. Đối số đầu tiên được diễn giải rất khác nhau tùy thuộc vào việc có đối số thứ hai hay không. Nếu không có đối số thứ hai, đối số duy nhất phải là một đối tượng collection hỗ trợ
+   giao thức :term:`iterable` (phương thức :meth:`~object.__iter__`) hoặc phải hỗ trợ giao thức sequence (phương thức :meth:`~object.__getitem__` với các đối số số nguyên bắt đầu từ ``0``). Nếu không hỗ trợ giao thức nào trong hai giao thức đó,
+   :exc:`TypeError` được phát sinh. Nếu cung cấp đối số thứ hai, *sentinel*, thì đối số thứ nhất phải là một đối tượng callable. Iterator được tạo trong trường hợp này sẽ gọi *callable* mà không có đối số trong mỗi lần gọi phương thức của nó
+   :meth:`~iterator.__next__`; nếu giá trị được trả về bằng *sentinel*, :exc:`StopIteration` sẽ được phát sinh; nếu không, giá trị đó sẽ được trả về.
 
-   See also :ref:`typeiter`.
+   Xem thêm :ref:`typeiter`.
 
-   One useful application of the second form of :func:`iter` is to build a
-   block-reader. For example, reading fixed-width blocks from a binary
-   database file until the end of file is reached::
+   Một ứng dụng hữu ích của dạng thứ hai của :func:`iter` là xây dựng một block-reader. Ví dụ: đọc các block có kích thước cố định từ một tệp cơ sở dữ liệu nhị phân cho đến khi đạt đến cuối tệp::
 
       from functools import partial
       with open('mydata.db', 'rb') as f:
@@ -1149,196 +818,129 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: len(object, /)
 
-   Return the length (the number of items) of an object.  The argument may be a
-   sequence (such as a string, bytes, tuple, list, or range) or a collection
-   (such as a dictionary, set, or frozen set).
+   Trả về độ dài (số lượng phần tử) của một đối tượng. Đối số có thể là một sequence (chẳng hạn như chuỗi, bytes, tuple, list hoặc range) hoặc một collection (chẳng hạn như dictionary, set hoặc frozen set).
 
    .. impl-detail::
 
-      ``len`` raises :exc:`OverflowError` on lengths larger than
-      :data:`sys.maxsize`, such as :class:`range(2 ** 100) <range>`.
+      ``len`` phát sinh :exc:`OverflowError` với các độ dài lớn hơn
+      :data:`sys.maxsize`, chẳng hạn như :class:`range(2 ** 100) <range>`.
 
 
 .. _func-list:
 .. class:: list(iterable=(), /)
    :noindex:
 
-   Rather than being a function, :class:`list` is actually a mutable
-   sequence type, as documented in :ref:`typesseq-list` and :ref:`typesseq`.
+   Thay vì là một hàm, :class:`list` thực chất là một kiểu sequence có thể thay đổi, như được mô tả trong :ref:`typesseq-list` và :ref:`typesseq`.
 
 
 .. function:: locals()
 
-   Return a mapping object representing the current local symbol table, with
-   variable names as the keys, and their currently bound references as the
-   values.
+   Trả về một đối tượng mapping biểu thị symbol table cục bộ hiện tại, với tên biến làm khóa và các tham chiếu hiện đang được liên kết với chúng làm giá trị.
 
-   At module scope, as well as when using :func:`exec` or :func:`eval` with
-   a single namespace, this function returns the same namespace as
+   Ở phạm vi module, cũng như khi sử dụng :func:`exec` hoặc :func:`eval` với một namespace duy nhất, hàm này trả về cùng namespace với
    :func:`globals`.
 
-   At class scope, it returns the namespace that will be passed to the
-   metaclass constructor.
+   Ở phạm vi lớp, hàm này trả về namespace sẽ được truyền cho hàm khởi tạo metaclass.
 
-   When using ``exec()`` or ``eval()`` with separate local and global
-   arguments, it returns the local namespace passed in to the function call.
+   Khi sử dụng ``exec()`` hoặc ``eval()`` với các đối số local và global riêng biệt, hàm này trả về local namespace được truyền vào lời gọi hàm.
 
-   In all of the above cases, each call to ``locals()`` in a given frame of
-   execution will return the *same* mapping object. Changes made through
-   the mapping object returned from ``locals()`` will be visible as assigned,
-   reassigned, or deleted local variables, and assigning, reassigning, or
-   deleting local variables will immediately affect the contents of the
-   returned mapping object.
+   Trong tất cả các trường hợp trên, mỗi lần gọi ``locals()`` trong một frame thực thi nhất định sẽ trả về cùng một đối tượng mapping *same*. Các thay đổi được thực hiện thông qua đối tượng mapping do ``locals()`` trả về sẽ hiển thị dưới dạng các biến cục bộ được gán, gán lại hoặc xóa, đồng thời việc gán, gán lại hoặc xóa các biến cục bộ sẽ ngay lập tức ảnh hưởng đến nội dung của đối tượng mapping được trả về.
 
-   In an :term:`optimized scope` (including functions, generators, and
-   coroutines), each call to ``locals()`` instead returns a fresh dictionary
-   containing the current bindings of the function's local variables and any
-   nonlocal cell references. In this case, name binding changes made via the
-   returned dict are *not* written back to the corresponding local variables
-   or nonlocal cell references, and assigning, reassigning, or deleting local
-   variables and nonlocal cell references does *not* affect the contents
-   of previously returned dictionaries.
+   Trong một :term:`optimized scope` (bao gồm các hàm, generator và coroutine), mỗi lần gọi ``locals()`` thay vào đó sẽ trả về một dictionary mới chứa các binding hiện tại của biến cục bộ trong hàm và mọi tham chiếu cell nonlocal. Trong trường hợp này, các thay đổi binding tên được thực hiện thông qua dict được trả về *not* được ghi ngược vào các biến cục bộ hoặc tham chiếu cell nonlocal tương ứng, và việc gán, gán lại hoặc xóa các biến cục bộ cũng như tham chiếu cell nonlocal *not* không ảnh hưởng đến nội dung của các dictionary đã được trả về trước đó.
 
-   Calling ``locals()`` as part of a comprehension in a function, generator, or
-   coroutine is equivalent to calling it in the containing scope, except that
-   the comprehension's initialised iteration variables will be included. In
-   other scopes, it behaves as if the comprehension were running as a nested
-   function.
+   Việc gọi ``locals()`` trong một comprehension thuộc một function, generator hoặc coroutine tương đương với việc gọi nó trong scope chứa, ngoại trừ việc các biến lặp được khởi tạo của comprehension cũng sẽ được đưa vào. Trong các scope khác, nó hoạt động như thể comprehension đang chạy dưới dạng một function lồng nhau.
 
-   Calling ``locals()`` as part of a generator expression is equivalent to
-   calling it in a nested generator function.
+   Việc gọi ``locals()`` trong một generator expression tương đương với việc gọi nó trong một generator function lồng nhau.
 
    .. versionchanged:: 3.12
-      The behaviour of ``locals()`` in a comprehension has been updated as
-      described in :pep:`709`.
+      Hành vi của ``locals()`` trong một comprehension đã được cập nhật như mô tả trong :pep:`709`.
 
    .. versionchanged:: 3.13
-      As part of :pep:`667`, the semantics of mutating the mapping objects
-      returned from this function are now defined. The behavior in
-      :term:`optimized scopes <optimized scope>` is now as described above.
-      Aside from being defined, the behaviour in other scopes remains
-      unchanged from previous versions.
+      Trong khuôn khổ :pep:`667`, ngữ nghĩa của việc thay đổi các đối tượng mapping được function này trả về hiện đã được định nghĩa. Hành vi trong
+      :term:`các scope được tối ưu hóa <optimized scope>` hiện được mô tả như trên. Ngoài việc đã được định nghĩa, hành vi trong các scope khác vẫn không thay đổi so với các phiên bản trước.
 
 
 .. function:: map(function, iterable, /, *iterables, strict=False)
 
-   Return an iterator that applies *function* to every item of *iterable*,
-   yielding the results.  If additional *iterables* arguments are passed,
-   *function* must take that many arguments and is applied to the items from all
-   iterables in parallel.  With multiple iterables, the iterator stops when the
-   shortest iterable is :term:`exhausted`.  If *strict* is ``True`` and one of the
-   iterables is exhausted before the others, a :exc:`ValueError` is raised. For
-   cases where the function inputs are already arranged into argument tuples,
-   see :func:`itertools.starmap`.
+   Trả về một iterator áp dụng *function* cho từng mục của *iterable*, rồi trả về các kết quả. Nếu truyền thêm các đối số *iterables*, *function* phải nhận số lượng đối số tương ứng và được áp dụng song song cho các mục từ tất cả các iterable. Với nhiều iterable, iterator sẽ dừng khi iterable ngắn nhất đã :term:`exhausted`. Nếu *strict* là ``True`` và một trong các iterable cạn kiệt trước những iterable khác, một :exc:`ValueError` sẽ được sinh ra. Trong trường hợp các đầu vào của function đã được sắp xếp thành các tuple đối số, hãy xem :func:`itertools.starmap`.
 
    .. versionchanged:: 3.14
-      Added the *strict* parameter.
+      Đã thêm tham số *strict*.
 
 
 .. function:: max(iterable, /, *, key=None)
-              max(iterable, /, *, default, key=None)
-              max(arg1, arg2, /, *args, key=None)
+              max(iterable, /, *, default, key=None) max(arg1, arg2, /, *args, key=None)
 
-   Return the largest item in an iterable or the largest of two or more
-   arguments.
+   Trả về mục lớn nhất trong một iterable hoặc giá trị lớn nhất trong hai hay nhiều đối số.
 
-   If one positional argument is provided, it should be an :term:`iterable`.
-   The largest item in the iterable is returned.  If two or more positional
-   arguments are provided, the largest of the positional arguments is
-   returned.
+   Nếu cung cấp một đối số vị trí, đối số đó phải là một :term:`iterable`. Mục lớn nhất trong iterable sẽ được trả về. Nếu cung cấp từ hai đối số vị trí trở lên, đối số vị trí lớn nhất sẽ được trả về.
 
-   There are two optional keyword-only arguments. The *key* argument specifies
-   a one-argument ordering function like that used for :meth:`list.sort`. The
-   *default* argument specifies an object to return if the provided iterable is
-   empty. If the iterable is empty and *default* is not provided, a
-   :exc:`ValueError` is raised.
+   Có hai đối số chỉ dành cho từ khóa tùy chọn. Đối số *key* chỉ định một hàm sắp xếp nhận một đối số, tương tự hàm được dùng cho :meth:`list.sort`. Đối số *default* chỉ định một đối tượng sẽ được trả về nếu iterable được cung cấp là rỗng. Nếu iterable rỗng và không cung cấp *default*, một
+   :exc:`ValueError` sẽ được phát sinh.
 
-   If multiple items are maximal, the function returns the first one
-   encountered.  This is consistent with other sort-stability preserving tools
-   such as ``sorted(iterable, key=keyfunc, reverse=True)[0]`` and
-   ``heapq.nlargest(1, iterable, key=keyfunc)``.
+   Nếu nhiều mục có cùng giá trị lớn nhất, hàm sẽ trả về mục đầu tiên được gặp. Điều này nhất quán với các công cụ khác có khả năng duy trì tính ổn định khi sắp xếp, chẳng hạn như ``sorted(iterable, key=keyfunc, reverse=True)[0]`` và ``heapq.nlargest(1, iterable, key=keyfunc)``.
 
    .. versionchanged:: 3.4
-      Added the *default* keyword-only parameter.
+      Đã thêm tham số chỉ dành cho từ khóa *default*.
 
    .. versionchanged:: 3.8
-      The *key* can be ``None``.
+      *key* có thể ``None``.
 
 
 .. _func-memoryview:
 .. class:: memoryview(object)
    :noindex:
 
-   Return a "memory view" object created from the given argument.  See
-   :ref:`typememoryview` for more information.
+   Trả về một đối tượng "memory view" được tạo từ đối số đã cho. Xem
+   :ref:`typememoryview` để biết thêm thông tin.
 
 
 .. function:: min(iterable, /, *, key=None)
-              min(iterable, /, *, default, key=None)
-              min(arg1, arg2, /, *args, key=None)
+              min(iterable, /, *, default, key=None) min(arg1, arg2, /, *args, key=None)
 
-   Return the smallest item in an iterable or the smallest of two or more
-   arguments.
+   Trả về phần tử nhỏ nhất trong một iterable hoặc giá trị nhỏ nhất trong hai hay nhiều đối số.
 
-   If one positional argument is provided, it should be an :term:`iterable`.
-   The smallest item in the iterable is returned.  If two or more positional
-   arguments are provided, the smallest of the positional arguments is
-   returned.
+   Nếu cung cấp một đối số vị trí, đối số đó phải là một :term:`iterable`. Phần tử nhỏ nhất trong iterable sẽ được trả về. Nếu cung cấp từ hai đối số vị trí trở lên, đối số vị trí nhỏ nhất sẽ được trả về.
 
-   There are two optional keyword-only arguments. The *key* argument specifies
-   a one-argument ordering function like that used for :meth:`list.sort`. The
-   *default* argument specifies an object to return if the provided iterable is
-   empty. If the iterable is empty and *default* is not provided, a
-   :exc:`ValueError` is raised.
+   Có hai đối số chỉ dành cho từ khóa tùy chọn. Đối số *key* chỉ định một hàm sắp xếp nhận một đối số, tương tự hàm được dùng cho :meth:`list.sort`. Đối số *default* chỉ định một đối tượng sẽ được trả về nếu iterable được cung cấp là rỗng. Nếu iterable rỗng và không cung cấp *default*, một
+   :exc:`ValueError` sẽ được phát sinh.
 
-   If multiple items are minimal, the function returns the first one
-   encountered.  This is consistent with other sort-stability preserving tools
-   such as ``sorted(iterable, key=keyfunc)[0]`` and ``heapq.nsmallest(1,
-   iterable, key=keyfunc)``.
+   Nếu có nhiều mục cùng đạt giá trị nhỏ nhất, hàm sẽ trả về mục đầu tiên được gặp. Điều này nhất quán với các công cụ khác cũng duy trì tính ổn định của việc sắp xếp, chẳng hạn như ``sorted(iterable, key=keyfunc)[0]`` và ``heapq.nsmallest(1, iterable, key=keyfunc)``.
 
    .. versionchanged:: 3.4
-      Added the *default* keyword-only parameter.
+      Đã thêm tham số chỉ dành cho từ khóa *default*.
 
    .. versionchanged:: 3.8
-      The *key* can be ``None``.
+      *key* có thể ``None``.
 
 
 .. function:: next(iterator, /)
               next(iterator, default, /)
 
-   Retrieve the next item from the :term:`iterator` by calling its
-   :meth:`~iterator.__next__` method.  If *default* is given, it is returned
-   if the iterator is :term:`exhausted`, otherwise :exc:`StopIteration` is raised.
+   Lấy mục tiếp theo từ :term:`iterator` bằng cách gọi phương thức
+   :meth:`~iterator.__next__` của nó. Nếu *default* được cung cấp, giá trị này sẽ được trả về nếu iterator là :term:`exhausted`; nếu không, :exc:`StopIteration` sẽ được phát sinh.
 
 
 .. class:: object()
 
-   This is the ultimate base class of all other classes. It has methods
-   that are common to all instances of Python classes. When the constructor
-   is called, it returns a new featureless object. The constructor does not
-   accept any arguments.
+   Đây là lớp cơ sở tối cao của tất cả các lớp khác. Lớp này có các phương thức dùng chung cho mọi instance của các lớp Python. Khi được gọi, hàm khởi tạo trả về một đối tượng mới không có tính năng. Hàm khởi tạo không nhận bất kỳ đối số nào.
 
    .. note::
 
-      :class:`object` instances do *not* have :attr:`~object.__dict__`
-      attributes, so you can't assign arbitrary attributes to an instance of
+      Các instance :class:`object` không *not* có :attr:`~object.__dict__` thuộc tính, vì vậy bạn không thể gán các thuộc tính tùy ý cho một instance của
       :class:`object`.
 
 
 .. function:: oct(integer, /)
 
-  Convert an integer number to an octal string prefixed with "0o".  The result
-  is a valid Python expression. If *integer* is not a Python :class:`int` object, it
-  has to define an :meth:`~object.__index__` method that returns an integer. For
-  example:
+  Chuyển đổi một số nguyên thành chuỗi bát phân có tiền tố "0o". Kết quả là một biểu thức Python hợp lệ. Nếu *integer* không phải là một đối tượng :class:`int` Python, đối tượng đó phải định nghĩa một phương thức :meth:`~object.__index__` trả về một số nguyên. Ví dụ:
 
       >>> oct(8)
       '0o10'
       >>> oct(-56)
       '-0o70'
 
-  If you want to convert an integer number to an octal string either with the prefix
-  "0o" or not, you can use either of the following ways.
+  Nếu muốn chuyển đổi một số nguyên thành chuỗi bát phân có hoặc không có tiền tố "0o", bạn có thể sử dụng một trong các cách sau.
 
       >>> '%#o' % 10, '%o' % 10
       ('0o12', '12')
@@ -1347,167 +949,100 @@ are always available.  They are listed here in alphabetical order.
       >>> f'{10:#o}', f'{10:o}'
       ('0o12', '12')
 
-  See also :func:`format` for more information.
+  Xem thêm :func:`format` để biết thêm thông tin.
 
 .. index::
    single: file object; open() built-in function
 
 .. function:: open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
 
-   Open *file* and return a corresponding :term:`file object`.  If the file
-   cannot be opened, an :exc:`OSError` is raised. See
-   :ref:`tut-files` for more examples of how to use this function.
+   Mở *file* và trả về một :term:`file object` tương ứng. Nếu không thể mở tệp, một :exc:`OSError` sẽ được raise. Xem
+   :ref:`tut-files` để biết thêm ví dụ về cách sử dụng hàm này.
 
-   *file* is a :term:`path-like object` giving the pathname (absolute or
-   relative to the current working directory) of the file to be opened or an
-   integer file descriptor of the file to be wrapped.  (If a file descriptor is
-   given, it is closed when the returned I/O object is closed unless *closefd*
-   is set to ``False``.)
+   *file* là một :term:`path-like object` cung cấp tên đường dẫn (tuyệt đối hoặc tương đối với thư mục làm việc hiện tại) của tệp cần mở hoặc một bộ mô tả tệp dạng số của tệp cần bọc. (Nếu cung cấp bộ mô tả tệp, bộ mô tả này sẽ được đóng khi đối tượng I/O được trả về đóng, trừ khi *closefd* được đặt thành ``False``.)
 
-   *mode* is an optional string that specifies the mode in which the file is
-   opened.  It defaults to ``'r'`` which means open for reading in text mode.
-   Other common values are ``'w'`` for writing (truncating the file if it
-   already exists), ``'x'`` for exclusive creation, and ``'a'`` for appending
-   (which on *some* Unix systems, means that *all* writes append to the end of
-   the file regardless of the current seek position).  In text mode, if
-   *encoding* is not specified the encoding used is platform-dependent:
-   :func:`locale.getencoding` is called to get the current locale encoding.
-   (For reading and writing raw bytes use binary mode and leave
-   *encoding* unspecified.)  The available modes are:
+   *mode* là một chuỗi tùy chọn chỉ định chế độ mở tệp. Mặc định là ``'r'``, nghĩa là mở để đọc ở chế độ văn bản. Các giá trị phổ biến khác là ``'w'`` để ghi (cắt ngắn tệp nếu tệp đã tồn tại), ``'x'`` để tạo tệp độc quyền và ``'a'`` để nối thêm (trên *some* hệ thống Unix, điều này có nghĩa là *all* thao tác ghi đều nối vào cuối tệp bất kể vị trí seek hiện tại). Ở chế độ văn bản, nếu không chỉ định *encoding*, encoding được sử dụng phụ thuộc vào nền tảng:
+   :func:`locale.getencoding` được gọi để lấy encoding của locale hiện tại. (Để đọc và ghi các byte thô, hãy sử dụng chế độ nhị phân và không chỉ định *encoding*.) Các chế độ khả dụng là:
 
    .. _filemodes:
 
    .. index::
       pair: file; modes
 
-   ========= ===============================================================
-   Character Meaning
-   ========= ===============================================================
-   ``'r'``   open for reading (default)
-   ``'w'``   open for writing, truncating the file first
-   ``'x'``   open for exclusive creation, failing if the file already exists
-   ``'a'``   open for writing, appending to the end of file if it exists
-   ``'b'``   binary mode
-   ``'t'``   text mode (default)
-   ``'+'``   open for updating (reading and writing)
-   ========= ===============================================================
+   +---------+--------------------------------------------------------+
+   | Ký tự   | Ý nghĩa                                                |
+   +=========+========================================================+
+   | ``'r'`` | mở để đọc (mặc định)                                   |
+   +---------+--------------------------------------------------------+
+   | ``'w'`` | mở để ghi, trước tiên cắt ngắn tệp                     |
+   +---------+--------------------------------------------------------+
+   | ``'x'`` | mở để tạo tệp độc quyền, và báo lỗi nếu tệp đã tồn tại |
+   +---------+--------------------------------------------------------+
+   | ``'a'`` | mở để ghi, nối thêm vào cuối tệp nếu tệp đã tồn tại    |
+   +---------+--------------------------------------------------------+
+   | ``'b'`` | chế độ nhị phân                                        |
+   +---------+--------------------------------------------------------+
+   | ``'t'`` | chế độ văn bản (mặc định)                              |
+   +---------+--------------------------------------------------------+
+   | ``'+'`` | mở để cập nhật (đọc và ghi)                            |
+   +---------+--------------------------------------------------------+
 
-   The default mode is ``'r'`` (open for reading text, a synonym of ``'rt'``).
-   Modes ``'w+'`` and ``'w+b'`` open and truncate the file.  Modes ``'r+'``
-   and ``'r+b'`` open the file with no truncation.
+   Chế độ mặc định là ``'r'`` (mở để đọc văn bản, đồng nghĩa với ``'rt'``). Các chế độ ``'w+'`` và ``'w+b'`` mở và cắt ngắn tệp. Các chế độ ``'r+'`` và ``'r+b'`` mở tệp mà không cắt ngắn.
 
-   As mentioned in the :ref:`io-overview`, Python distinguishes between binary
-   and text I/O.  Files opened in binary mode (including ``'b'`` in the *mode*
-   argument) return contents as :class:`bytes` objects without any decoding.  In
-   text mode (the default, or when ``'t'`` is included in the *mode* argument),
-   the contents of the file are returned as :class:`str`, the bytes having been
-   first decoded using a platform-dependent encoding or using the specified
-   *encoding* if given.
+   Như đã đề cập trong :ref:`io-overview`, Python phân biệt I/O nhị phân và I/O văn bản. Các tệp được mở ở chế độ nhị phân (bao gồm ``'b'`` trong đối số *mode*) trả về nội dung dưới dạng đối tượng :class:`bytes` mà không giải mã. Ở chế độ văn bản (mặc định hoặc khi ``'t'`` được đưa vào đối số *mode*), nội dung của tệp được trả về dưới dạng :class:`str`; các byte trước đó đã được giải mã bằng bảng mã phụ thuộc vào nền tảng hoặc bằng *encoding* được chỉ định nếu có.
 
    .. note::
 
-      Python doesn't depend on the underlying operating system's notion of text
-      files; all the processing is done by Python itself, and is therefore
-      platform-independent.
+      Python không phụ thuộc vào cách hệ điều hành nền tảng định nghĩa tệp văn bản; mọi quá trình xử lý đều do Python tự thực hiện và vì vậy không phụ thuộc nền tảng.
 
-   *buffering* is an optional integer used to set the buffering policy.  Pass 0
-   to switch buffering off (only allowed in binary mode), 1 to select line
-   buffering (only usable when writing in text mode), and an integer > 1 to indicate the size
-   in bytes of a fixed-size chunk buffer. Note that specifying a buffer size this
-   way applies for binary buffered I/O, but ``TextIOWrapper`` (i.e., files opened
-   with ``mode='r+'``) would have another buffering. To disable buffering in
-   ``TextIOWrapper``, consider using the ``write_through`` flag for
-   :func:`io.TextIOWrapper.reconfigure`. When no *buffering* argument is
-   given, the default buffering policy works as follows:
+   *buffering* là một số nguyên tùy chọn dùng để thiết lập chính sách buffering. Truyền 0 để tắt buffering (chỉ được phép ở chế độ nhị phân), 1 để chọn line buffering (chỉ có thể sử dụng khi ghi ở chế độ văn bản), và một số nguyên > 1 để chỉ kích thước tính theo byte của bộ đệm khối có kích thước cố định. Lưu ý rằng việc chỉ định kích thước bộ đệm theo cách này áp dụng cho I/O nhị phân có buffering, nhưng ``TextIOWrapper`` (tức là các tệp được mở bằng ``mode='r+'``) sẽ có cơ chế buffering khác. Để tắt buffering trong ``TextIOWrapper``, hãy cân nhắc sử dụng cờ ``write_through`` cho
+   :func:`io.TextIOWrapper.reconfigure`. Khi không cung cấp đối số *buffering*, chính sách buffering mặc định hoạt động như sau:
 
-   * Binary files are buffered in fixed-size chunks; the size of the buffer
-     is ``max(min(blocksize, 8 MiB), DEFAULT_BUFFER_SIZE)``
-     when the device block size is available.
-     On most systems, the buffer will typically be 128 kilobytes long.
+   * Các tệp nhị phân được buffering theo các khối có kích thước cố định; kích thước của bộ đệm là ``max(min(blocksize, 8 MiB), DEFAULT_BUFFER_SIZE)`` khi có sẵn kích thước khối của thiết bị. Trên hầu hết các hệ thống, bộ đệm thường có kích thước 128 kilobyte.
 
-   * "Interactive" text files (files for which :meth:`~io.IOBase.isatty`
-     returns ``True``) use line buffering.  Other text files use the policy
-     described above for binary files.
+   * Các tệp văn bản “tương tác” (những tệp mà :meth:`~io.IOBase.isatty` trả về ``True``) sử dụng line buffering. Các tệp văn bản khác sử dụng chính sách được mô tả ở trên dành cho tệp nhị phân.
 
-   *encoding* is the name of the encoding used to decode or encode the file.
-   This should only be used in text mode.  The default encoding is platform
-   dependent (whatever :func:`locale.getencoding` returns), but any
-   :term:`text encoding` supported by Python can be used.
-   See the :mod:`codecs` module for the list of supported encodings.
+   *encoding* là tên của encoding được sử dụng để giải mã hoặc mã hóa tệp. Chỉ nên sử dụng tùy chọn này ở chế độ văn bản. Encoding mặc định phụ thuộc vào nền tảng (bất kỳ giá trị nào :func:`locale.getencoding` trả về), nhưng bất kỳ
+   :term:`text encoding` được Python hỗ trợ đều có thể được sử dụng. Xem module :mod:`codecs` để biết danh sách các encoding được hỗ trợ.
 
-   *errors* is an optional string that specifies how encoding and decoding
-   errors are to be handled—this cannot be used in binary mode.
-   A variety of standard error handlers are available
-   (listed under :ref:`error-handlers`), though any
-   error handling name that has been registered with
-   :func:`codecs.register_error` is also valid.  The standard names
-   include:
+   *errors* là một chuỗi tùy chọn chỉ định cách xử lý lỗi mã hóa và giải mã—không thể sử dụng tùy chọn này ở chế độ nhị phân. Có nhiều error handler tiêu chuẩn (được liệt kê trong :ref:`error-handlers`), mặc dù mọi tên xử lý lỗi đã được đăng ký với
+   :func:`codecs.register_error` cũng hợp lệ. Các tên tiêu chuẩn gồm:
 
-   * ``'strict'`` to raise a :exc:`ValueError` exception if there is
-     an encoding error.  The default value of ``None`` has the same
-     effect.
+   * ``'strict'`` sẽ raise một ngoại lệ :exc:`ValueError` nếu xảy ra lỗi mã hóa. Giá trị mặc định của ``None`` cũng có tác dụng tương tự.
 
-   * ``'ignore'`` ignores errors.  Note that ignoring encoding errors
-     can lead to data loss.
+   * ``'ignore'`` bỏ qua các lỗi. Lưu ý rằng việc bỏ qua lỗi mã hóa có thể dẫn đến mất dữ liệu.
 
-   * ``'replace'`` causes a replacement marker (such as ``'?'``) to be inserted
-     where there is malformed data.
+   * ``'replace'`` khiến một dấu đánh dấu thay thế (chẳng hạn như ``'?'``) được chèn vào vị trí có dữ liệu không đúng định dạng.
 
-   * ``'surrogateescape'`` will represent any incorrect bytes as low
-     surrogate code units ranging from U+DC80 to U+DCFF.
-     These surrogate code units will then be turned back into
-     the same bytes when the ``surrogateescape`` error handler is used
-     when writing data.  This is useful for processing files in an
-     unknown encoding.
+   * ``'surrogateescape'`` sẽ biểu diễn mọi byte không hợp lệ dưới dạng các code unit surrogate thấp trong khoảng từ U+DC80 đến U+DCFF. Sau đó, các code unit surrogate này sẽ được chuyển lại thành chính những byte đó khi error handler ``surrogateescape`` được sử dụng lúc ghi dữ liệu. Điều này hữu ích khi xử lý các tệp có encoding không xác định.
 
-   * ``'xmlcharrefreplace'`` is only supported when writing to a file.
-     Characters not supported by the encoding are replaced with the
-     appropriate XML character reference :samp:`&#{nnn};`.
+   * ``'xmlcharrefreplace'`` chỉ được hỗ trợ khi ghi vào tệp. Các ký tự không được encoding hỗ trợ sẽ được thay thế bằng tham chiếu ký tự XML thích hợp :samp:`&#{nnn};`.
 
-   * ``'backslashreplace'`` replaces malformed data by Python's backslashed
-     escape sequences.
+   * ``'backslashreplace'`` thay thế dữ liệu không đúng định dạng bằng các chuỗi escape có dấu gạch chéo ngược của Python.
 
-   * ``'namereplace'`` (also only supported when writing)
-     replaces unsupported characters with ``\N{...}`` escape sequences.
+   * ``'namereplace'`` (cũng chỉ được hỗ trợ khi ghi) thay thế các ký tự không được hỗ trợ bằng các chuỗi escape ``\N{...}``.
 
    .. index::
       single: universal newlines; open() built-in function
 
    .. _open-newline-parameter:
 
-   *newline* determines how to parse newline characters from the stream.
-   It can be ``None``, ``''``, ``'\n'``, ``'\r'``, and
-   ``'\r\n'``.  It works as follows:
+   *newline* xác định cách phân tích các ký tự dòng mới từ stream. Giá trị này có thể là ``None``, ``''``, ``'\n'``, ``'\r'`` hoặc ``'\r\n'``. Cách hoạt động như sau:
 
-   * When reading input from the stream, if *newline* is ``None``, universal
-     newlines mode is enabled.  Lines in the input can end in ``'\n'``,
-     ``'\r'``, or ``'\r\n'``, and these are translated into ``'\n'`` before
-     being returned to the caller.  If it is ``''``, universal newlines mode is
-     enabled, but line endings are returned to the caller untranslated.  If it
-     has any of the other legal values, input lines are only terminated by the
-     given string, and the line ending is returned to the caller untranslated.
+   * Khi đọc dữ liệu đầu vào từ stream, nếu *newline* là ``None``, chế độ dòng mới phổ quát được bật. Các dòng trong dữ liệu đầu vào có thể kết thúc bằng ``'\n'``, ``'\r'`` hoặc ``'\r\n'``, và chúng được chuyển thành ``'\n'`` trước khi trả về cho caller. Nếu giá trị là ``''``, chế độ dòng mới phổ quát vẫn được bật, nhưng các ký tự kết thúc dòng được trả về cho caller mà không được dịch. Nếu có một trong các giá trị hợp lệ khác, các dòng đầu vào chỉ được kết thúc bằng chuỗi đã cho, và ký tự kết thúc dòng được trả về cho caller mà không được dịch.
 
-   * When writing output to the stream, if *newline* is ``None``, any ``'\n'``
-     characters written are translated to the system default line separator,
-     :data:`os.linesep`.  If *newline* is ``''`` or ``'\n'``, no translation
-     takes place.  If *newline* is any of the other legal values, any ``'\n'``
-     characters written are translated to the given string.
+   * Khi ghi dữ liệu đầu ra vào stream, nếu *newline* là ``None``, mọi ký tự ``'\n'`` được ghi sẽ được chuyển thành dấu phân cách dòng mặc định của hệ thống,
+     :data:`os.linesep`. Nếu *newline* là ``''`` hoặc ``'\n'``, không có phép chuyển đổi nào được thực hiện. Nếu *newline* là một trong các giá trị hợp lệ khác, mọi ký tự ``'\n'`` được ghi sẽ được chuyển thành chuỗi đã cho.
 
-   If *closefd* is ``False`` and a file descriptor rather than a filename was
-   given, the underlying file descriptor will be kept open when the file is
-   closed.  If a filename is given *closefd* must be ``True`` (the default);
-   otherwise, an error will be raised.
+   Nếu *closefd* là ``False`` và một file descriptor thay vì tên tệp được cung cấp, file descriptor bên dưới sẽ vẫn mở khi tệp được đóng. Nếu cung cấp tên tệp, *closefd* phải là ``True`` (giá trị mặc định); nếu không, một lỗi sẽ được phát sinh.
 
-   A custom opener can be used by passing a callable as *opener*. The underlying
-   file descriptor for the file object is then obtained by calling *opener* with
-   (*file*, *flags*). *opener* must return an open file descriptor (passing
-   :mod:`os.open` as *opener* results in functionality similar to passing
-   ``None``).
+   Có thể sử dụng một opener tùy chỉnh bằng cách truyền một callable dưới dạng *opener*. Sau đó, bộ mô tả tệp bên dưới của đối tượng tệp được lấy bằng cách gọi *opener* với (*file*, *flags*). *opener* phải trả về một bộ mô tả tệp đang mở (truyền
+   :mod:`os.open` dưới dạng *opener* sẽ cho kết quả tương tự như truyền ``None``).
 
-   The newly created file is :ref:`non-inheritable <fd_inheritance>`.
+   Tệp mới được tạo là :ref:`non-inheritable <fd_inheritance>`.
 
-   The following example uses the :ref:`dir_fd <dir_fd>` parameter of the
-   :func:`os.open` function to open a file relative to a given directory::
+   Ví dụ sau sử dụng tham số :ref:`dir_fd <dir_fd>` của
+   hàm :func:`os.open` để mở một tệp tương đối với một thư mục đã cho::
 
       >>> import os
       >>> dir_fd = os.open('somedir', os.O_RDONLY)
@@ -1517,19 +1052,11 @@ are always available.  They are listed here in alphabetical order.
       >>> with open('spamspam.txt', 'w', opener=opener) as f:
       ...     print('This will be written to somedir/spamspam.txt', file=f)
       ...
-      >>> os.close(dir_fd)  # don't leak a file descriptor
+      >>> os.close(dir_fd)  # không làm rò rỉ bộ mô tả tệp
 
-   The type of :term:`file object` returned by the :func:`open` function
-   depends on the mode.  When :func:`open` is used to open a file in a text
-   mode (``'w'``, ``'r'``, ``'wt'``, ``'rt'``, etc.), it returns a subclass of
-   :class:`io.TextIOBase` (specifically :class:`io.TextIOWrapper`).  When used
-   to open a file in a binary mode with buffering, the returned class is a
-   subclass of :class:`io.BufferedIOBase`.  The exact class varies: in read
-   binary mode, it returns an :class:`io.BufferedReader`; in write binary and
-   append binary modes, it returns an :class:`io.BufferedWriter`, and in
-   read/write mode, it returns an :class:`io.BufferedRandom`.  When buffering is
-   disabled, the raw stream, a subclass of :class:`io.RawIOBase`,
-   :class:`io.FileIO`, is returned.
+   Kiểu của :term:`file object` được hàm :func:`open` trả về phụ thuộc vào mode. Khi sử dụng :func:`open` để mở một tệp ở chế độ văn bản (``'w'``, ``'r'``, ``'wt'``, ``'rt'``, v.v.), hàm này trả về một lớp con của
+   :class:`io.TextIOBase` (cụ thể là :class:`io.TextIOWrapper`). Khi được dùng để mở một tệp ở chế độ nhị phân có buffering, lớp được trả về là lớp con của :class:`io.BufferedIOBase`. Lớp cụ thể sẽ khác nhau: ở chế độ đọc nhị phân, hàm trả về một :class:`io.BufferedReader`; ở chế độ ghi nhị phân và nối thêm nhị phân, hàm trả về một :class:`io.BufferedWriter`; còn ở chế độ đọc/ghi, hàm trả về một :class:`io.BufferedRandom`. Khi buffering bị tắt, luồng thô, là lớp con của :class:`io.RawIOBase`,
+   :class:`io.FileIO`, sẽ được trả về.
 
    .. index::
       single: line-buffered I/O
@@ -1540,83 +1067,56 @@ are always available.  They are listed here in alphabetical order.
       single: text mode
       pair: module; sys
 
-   See also the file handling modules, such as :mod:`fileinput`, :mod:`io`
-   (where :func:`open` is declared), :mod:`os`, :mod:`os.path`, :mod:`tempfile`,
-   and :mod:`shutil`.
+   Xem thêm các module xử lý tệp, chẳng hạn như :mod:`fileinput`, :mod:`io` (nơi :func:`open` được khai báo), :mod:`os`, :mod:`os.path`, :mod:`tempfile` và :mod:`shutil`.
 
    .. audit-event:: open path,mode,flags open
 
-   The ``mode`` and ``flags`` arguments may have been modified or inferred from
-   the original call.
+   Các đối số ``mode`` và ``flags`` có thể đã được sửa đổi hoặc suy ra từ lời gọi ban đầu.
 
    .. versionchanged:: 3.3
 
-      * The *opener* parameter was added.
-      * The ``'x'`` mode was added.
-      * :exc:`IOError` used to be raised, it is now an alias of :exc:`OSError`.
-      * :exc:`FileExistsError` is now raised if the file opened in exclusive
-        creation mode (``'x'``) already exists.
+      * Tham số *opener* đã được thêm vào.
+      * Chế độ ``'x'`` đã được thêm vào.
+      * Trước đây :exc:`IOError` được đưa ra; hiện tại nó là bí danh của :exc:`OSError`.
+      * :exc:`FileExistsError` giờ đây được phát sinh nếu tệp được mở ở chế độ tạo độc quyền (``'x'``) đã tồn tại.
 
    .. versionchanged:: 3.4
 
-      * The file is now non-inheritable.
+      * Tệp giờ đây không thể được kế thừa.
 
    .. versionchanged:: 3.5
 
-      * If the system call is interrupted and the signal handler does not raise an
-        exception, the function now retries the system call instead of raising an
-        :exc:`InterruptedError` exception (see :pep:`475` for the rationale).
-      * The ``'namereplace'`` error handler was added.
+      * Nếu system call bị gián đoạn và signal handler không phát sinh ngoại lệ, hàm giờ đây sẽ thử lại system call thay vì phát sinh một
+        ngoại lệ :exc:`InterruptedError` (xem :pep:`475` để biết lý do).
+      * Đã bổ sung error handler ``'namereplace'``.
 
    .. versionchanged:: 3.6
 
-      * Support added to accept objects implementing :class:`os.PathLike`.
-      * On Windows, opening a console buffer may return a subclass of
-        :class:`io.RawIOBase` other than :class:`io.FileIO`.
+      * Đã bổ sung hỗ trợ để chấp nhận các đối tượng triển khai :class:`os.PathLike`.
+      * Trên Windows, việc mở bộ đệm console có thể trả về một lớp con của
+        :class:`io.RawIOBase` khác với :class:`io.FileIO`.
 
    .. versionchanged:: 3.11
-      The ``'U'`` mode has been removed.
+      Chế độ ``'U'`` đã bị loại bỏ.
 
 .. function:: ord(character, /)
 
-   Return the ordinal value of a character.
+   Trả về giá trị ordinal của một ký tự.
 
-   If the argument is a one-character string, return the Unicode code point
-   of that character.  For example,
-   ``ord('a')`` returns the integer ``97`` and ``ord('€')`` (Euro sign)
-   returns ``8364``.  This is the inverse of :func:`chr`.
+   Nếu đối số là một chuỗi gồm một ký tự, trả về code point Unicode của ký tự đó. Ví dụ, ``ord('a')`` trả về số nguyên ``97`` và ``ord('€')`` (ký hiệu Euro) trả về ``8364``. Đây là phép nghịch đảo của :func:`chr`.
 
-   If the argument is a :class:`bytes` or :class:`bytearray` object of
-   length 1, return its single byte value.
-   For example, ``ord(b'a')`` returns the integer ``97``.
+   Nếu đối số là một đối tượng :class:`bytes` hoặc :class:`bytearray` có độ dài bằng 1, trả về giá trị byte duy nhất của đối tượng đó. Ví dụ, ``ord(b'a')`` trả về số nguyên ``97``.
 
 
 .. function:: pow(base, exp, mod=None)
 
-   Return *base* to the power *exp*; if *mod* is present, return *base* to the
-   power *exp*, modulo *mod* (computed more efficiently than
-   ``pow(base, exp) % mod``). The two-argument form ``pow(base, exp)`` is
-   equivalent to using the power operator: ``base**exp``.
+   Trả về *base* lũy thừa *exp*; nếu có *mod*, trả về *base* lũy thừa *exp*, theo modulo *mod* (được tính hiệu quả hơn ``pow(base, exp) % mod``). Dạng hai đối số ``pow(base, exp)`` tương đương với việc sử dụng toán tử lũy thừa: ``base**exp``.
 
-   When arguments are builtin numeric types with mixed operand types, the
-   coercion rules for binary arithmetic operators apply.  For :class:`int`
-   operands, the result has the same type as the operands (after coercion)
-   unless the second argument is negative; in that case, all arguments are
-   converted to float and a float result is delivered.  For example, ``pow(10, 2)``
-   returns ``100``, but ``pow(10, -2)`` returns ``0.01``.  For a negative base of
-   type :class:`int` or :class:`float` and a non-integral exponent, a complex
-   result is delivered.  For example, ``pow(-9, 0.5)`` returns a value close
-   to ``3j``. Whereas, for a negative base of type :class:`int` or :class:`float`
-   with an integral exponent, a float result is delivered. For example,
-   ``pow(-9, 2.0)`` returns ``81.0``.
+   Khi các đối số là các kiểu số dựng sẵn với các kiểu toán hạng khác nhau, các quy tắc ép kiểu dành cho các toán tử số học nhị phân sẽ được áp dụng. Đối với các toán hạng :class:`int`, kết quả có cùng kiểu với các toán hạng (sau khi ép kiểu), trừ khi đối số thứ hai là số âm; trong trường hợp đó, tất cả các đối số được chuyển đổi thành float và kết quả float được trả về. Ví dụ, ``pow(10, 2)`` trả về ``100``, nhưng ``pow(10, -2)`` trả về ``0.01``. Đối với một cơ số âm có kiểu :class:`int` hoặc :class:`float` và số mũ không nguyên, kết quả complex sẽ được trả về. Ví dụ, ``pow(-9, 0.5)`` trả về một giá trị gần với ``3j``. Ngược lại, đối với một cơ số âm có kiểu :class:`int` hoặc :class:`float` với số mũ nguyên, kết quả float sẽ được trả về. Ví dụ, ``pow(-9, 2.0)`` trả về ``81.0``.
 
-   For :class:`int` operands *base* and *exp*, if *mod* is present, *mod* must
-   also be of integer type and *mod* must be nonzero. If *mod* is present and
-   *exp* is negative, *base* must be relatively prime to *mod*. In that case,
-   ``pow(inv_base, -exp, mod)`` is returned, where *inv_base* is an inverse to
-   *base* modulo *mod*.
+   Đối với :class:`int` các toán hạng *base* và *exp*, nếu có *mod*, thì *mod* cũng phải thuộc kiểu số nguyên và *mod* phải khác không. Nếu có *mod* và *exp* là số âm, thì *base* phải nguyên tố cùng nhau với *mod*. Trong trường hợp đó, ``pow(inv_base, -exp, mod)`` được trả về, trong đó *inv_base* là nghịch đảo của *base* theo modulo *mod*.
 
-   Here's an example of computing an inverse for ``38`` modulo ``97``::
+   Sau đây là một ví dụ về cách tính nghịch đảo của ``38`` theo modulo ``97``::
 
       >>> pow(38, -1, mod=97)
       23
@@ -1624,49 +1124,34 @@ are always available.  They are listed here in alphabetical order.
       True
 
    .. versionchanged:: 3.8
-      For :class:`int` operands, the three-argument form of ``pow`` now allows
-      the second argument to be negative, permitting computation of modular
-      inverses.
+      Với các toán hạng :class:`int`, dạng ba đối số của ``pow`` hiện cho phép đối số thứ hai là số âm, từ đó cho phép tính nghịch đảo modulo.
 
    .. versionchanged:: 3.8
-      Allow keyword arguments.  Formerly, only positional arguments were
-      supported.
+      Cho phép các đối số keyword. Trước đây, chỉ các đối số positional được hỗ trợ.
 
 
 .. function:: print(*objects, sep=' ', end='\n', file=None, flush=False)
 
-   Print *objects* to the text stream *file*, separated by *sep* and followed
-   by *end*.  *sep*, *end*, *file*, and *flush*, if present, must be given as keyword
-   arguments.
+   In *objects* vào luồng văn bản *file*, được phân tách bằng *sep* và kết thúc bằng *end*. *sep*, *end*, *file* và *flush*, nếu có, phải được truyền dưới dạng các đối số keyword.
 
-   All non-keyword arguments are converted to strings like :func:`str` does and
-   written to the stream, separated by *sep* and followed by *end*.  Both *sep*
-   and *end* must be strings; they can also be ``None``, which means to use the
-   default values.  If no *objects* are given, :func:`print` will just write
-   *end*.
+   Tất cả các đối số không phải keyword được chuyển đổi thành chuỗi giống như :func:`str` và được ghi vào luồng, phân tách bằng *sep* và kết thúc bằng *end*. Cả *sep* và *end* đều phải là chuỗi; chúng cũng có thể là ``None``, nghĩa là sử dụng các giá trị mặc định. Nếu không cung cấp *objects*, :func:`print` sẽ chỉ ghi *end*.
 
-   The *file* argument must be an object with a ``write(string)`` method; if it
-   is not present or ``None``, :data:`sys.stdout` will be used.  Since printed
-   arguments are converted to text strings, :func:`print` cannot be used with
-   binary mode file objects.  For these, use ``file.write(...)`` instead.
+   Đối số *file* phải là một đối tượng có phương thức ``write(string)``; nếu phương thức này không tồn tại hoặc ``None``, :data:`sys.stdout` sẽ được sử dụng. Vì các đối số được in được chuyển đổi thành chuỗi văn bản, không thể sử dụng :func:`print` với các đối tượng tệp ở chế độ nhị phân. Với các đối tượng này, hãy sử dụng ``file.write(...)`` thay thế.
 
-   Output buffering is usually determined by *file*.
-   However, if *flush* is true, the stream is forcibly flushed.
+   Việc đệm đầu ra thường được xác định bởi *file*. Tuy nhiên, nếu *flush* là true, stream sẽ bị flush cưỡng bức.
 
 
    .. versionchanged:: 3.3
-      Added the *flush* keyword argument.
+      Đã thêm đối số từ khóa *flush*.
 
 
 .. class:: property(fget=None, fset=None, fdel=None, doc=None)
 
-   Return a property attribute.
+   Trả về một thuộc tính property.
 
-   *fget* is a function for getting an attribute value.  *fset* is a function
-   for setting an attribute value. *fdel* is a function for deleting an attribute
-   value.  And *doc* creates a docstring for the attribute.
+   *fget* là một hàm dùng để lấy giá trị thuộc tính. *fset* là một hàm dùng để đặt giá trị thuộc tính. *fdel* là một hàm dùng để xóa giá trị thuộc tính. Còn *doc* tạo docstring cho thuộc tính.
 
-   A typical use is to define a managed attribute ``x``::
+   Một cách sử dụng điển hình là định nghĩa một thuộc tính được quản lý ``x``::
 
       class C:
           def __init__(self):
@@ -1683,12 +1168,9 @@ are always available.  They are listed here in alphabetical order.
 
           x = property(getx, setx, delx, "I'm the 'x' property.")
 
-   If *c* is an instance of *C*, ``c.x`` will invoke the getter,
-   ``c.x = value`` will invoke the setter, and ``del c.x`` the deleter.
+   Nếu *c* là một thể hiện của *C*, ``c.x`` sẽ gọi getter, ``c.x = value`` sẽ gọi setter và ``del c.x`` sẽ gọi deleter.
 
-   If given, *doc* will be the docstring of the property attribute. Otherwise, the
-   property will copy *fget*'s docstring (if it exists).  This makes it possible to
-   create read-only properties easily using :deco:`property` as a :term:`decorator`::
+   Nếu được cung cấp, *doc* sẽ là docstring của thuộc tính property. Nếu không, property sẽ sao chép docstring của *fget* (nếu có). Điều này giúp dễ dàng tạo các property chỉ đọc bằng cách sử dụng :deco:`property` làm một :term:`decorator`::
 
       class Parrot:
           def __init__(self):
@@ -1699,18 +1181,13 @@ are always available.  They are listed here in alphabetical order.
               """Get the current voltage."""
               return self._voltage
 
-   The ``@property`` decorator turns the :meth:`!voltage` method into a "getter"
-   for a read-only attribute with the same name, and it sets the docstring for
-   *voltage* to "Get the current voltage."
+   Decorator ``@property`` biến phương thức :meth:`!voltage` thành một "getter" cho thuộc tính chỉ đọc có cùng tên, đồng thời đặt chuỗi tài liệu cho *voltage* thành "Get the current voltage."
 
    .. decorator:: property.getter
    .. decorator:: property.setter
    .. decorator:: property.deleter
 
-      A property object has ``getter``, ``setter``,
-      and ``deleter`` methods usable as decorators that create a
-      copy of the property with the corresponding accessor function set to the
-      decorated function.  This is best explained with an example:
+      Một đối tượng property có các phương thức ``getter``, ``setter`` và ``deleter`` có thể dùng làm decorator để tạo một bản sao của property với hàm accessor tương ứng được gán cho hàm đã áp dụng decorator. Ví dụ sau sẽ giải thích rõ hơn:
 
       .. testcode::
 
@@ -1731,20 +1208,16 @@ are always available.  They are listed here in alphabetical order.
              def x(self):
                  del self._x
 
-      This code is exactly equivalent to the first example.  Be sure to give the
-      additional functions the same name as the original property (``x`` in this
-      case.)
+      Đoạn mã này hoàn toàn tương đương với ví dụ đầu tiên. Hãy nhớ đặt cho các hàm bổ sung cùng tên với property ban đầu (trong trường hợp này là ``x``).
 
-      The returned property object also has the attributes ``fget``, ``fset``, and
-      ``fdel`` corresponding to the constructor arguments.
+      Đối tượng property được trả về cũng có các thuộc tính ``fget``, ``fset`` và ``fdel`` tương ứng với các đối số của hàm khởi tạo.
 
    .. versionchanged:: 3.5
-      The docstrings of property objects are now writeable.
+      Giờ đây, chuỗi tài liệu của các đối tượng property có thể được ghi.
 
    .. attribute:: __name__
 
-      Attribute holding the name of the property. The name of the property
-      can be changed at runtime.
+      Thuộc tính chứa tên của property. Có thể thay đổi tên của property trong runtime.
 
       .. versionadded:: 3.13
 
@@ -1754,24 +1227,15 @@ are always available.  They are listed here in alphabetical order.
            range(start, stop, step=1, /)
    :noindex:
 
-   Rather than being a function, :class:`range` is actually an immutable
-   sequence type, as documented in :ref:`typesseq-range` and :ref:`typesseq`.
+   Thay vì là một hàm, :class:`range` thực ra là một kiểu sequence bất biến, như được mô tả trong :ref:`typesseq-range` và :ref:`typesseq`.
 
 
 .. function:: repr(object, /)
 
-   Return a string containing a printable representation of an object.  For many
-   types, this function makes an attempt to return a string that would yield an
-   object with the same value when passed to :func:`eval`; otherwise, the
-   representation is a string enclosed in angle brackets that contains the name
-   of the type of the object together with additional information often
-   including the name and address of the object.  A class can control what this
-   function returns for its instances
-   by defining a :meth:`~object.__repr__` method.
-   If :func:`sys.displayhook` is not accessible, this function will raise
+   Trả về một chuỗi chứa biểu diễn có thể in được của một đối tượng. Với nhiều kiểu, hàm này cố gắng trả về một chuỗi có thể tạo ra một đối tượng có cùng giá trị khi được truyền cho :func:`eval`; nếu không, biểu diễn sẽ là một chuỗi được đặt trong dấu ngoặc nhọn, chứa tên kiểu của đối tượng cùng với thông tin bổ sung, thường bao gồm tên và địa chỉ của đối tượng. Một class có thể kiểm soát giá trị mà hàm này trả về cho các instance của nó bằng cách định nghĩa phương thức :meth:`~object.__repr__`. Nếu :func:`sys.displayhook` không thể truy cập, hàm này sẽ phát sinh
    :exc:`RuntimeError`.
 
-   This class has a custom representation that can be evaluated::
+   Class này có một biểu diễn tùy chỉnh có thể được đánh giá::
 
       class Person:
          def __init__(self, name, age):
@@ -1784,159 +1248,104 @@ are always available.  They are listed here in alphabetical order.
 
 .. function:: reversed(object, /)
 
-   Return a reverse :term:`iterator`.  The argument must be an object which has
-   a :meth:`~object.__reversed__` method or supports the sequence protocol (the
-   :meth:`~object.__len__` method and the :meth:`~object.__getitem__` method
-   with integer arguments starting at ``0``).
+   Trả về một :term:`iterator` ngược. Đối số phải là một đối tượng có phương thức :meth:`~object.__reversed__` hoặc hỗ trợ sequence protocol (giao thức sequence) (phương thức
+   :meth:`~object.__len__` và phương thức :meth:`~object.__getitem__` với các đối số số nguyên bắt đầu từ ``0``).
 
 
 .. function:: round(number, ndigits=None)
 
-   Return *number* rounded to *ndigits* precision after the decimal
-   point.  If *ndigits* is omitted or is ``None``, it returns the
-   nearest integer to its input.
+   Trả về *number* được làm tròn đến độ chính xác *ndigits* chữ số sau dấu thập phân. Nếu *ndigits* bị bỏ qua hoặc là ``None``, hàm sẽ trả về số nguyên gần nhất với giá trị đầu vào.
 
-   For the built-in types supporting :func:`round`, values are rounded to the
-   closest multiple of 10 to the power minus *ndigits*; if two multiples are
-   equally close, rounding is done toward the even choice (so, for example,
-   both ``round(0.5)`` and ``round(-0.5)`` are ``0``, and ``round(1.5)`` is
-   ``2``).  Any integer value is valid for *ndigits* (positive, zero, or
-   negative).  The return value is an integer if *ndigits* is omitted or
-   ``None``.
-   Otherwise, the return value has the same type as *number*.
+   Đối với các kiểu dựng sẵn hỗ trợ :func:`round`, các giá trị được làm tròn đến bội số gần nhất của 10 lũy thừa âm *ndigits*; nếu hai bội số cách đều nhau, việc làm tròn sẽ hướng đến lựa chọn chẵn (vì vậy, chẳng hạn, cả ``round(0.5)`` và ``round(-0.5)`` đều là ``0``, còn ``round(1.5)`` là ``2``). Mọi giá trị số nguyên đều hợp lệ cho *ndigits* (dương, bằng không hoặc âm). Giá trị trả về là một số nguyên nếu *ndigits* bị bỏ qua hoặc là ``None``. Nếu không, giá trị trả về có cùng kiểu với *number*.
 
-   For a general Python object ``number``, ``round`` delegates to
-   ``number.__round__``.
+   Đối với một đối tượng Python tổng quát ``number``, ``round`` ủy quyền cho ``number.__round__``.
 
    .. note::
 
-      The behavior of :func:`round` for floats can be surprising: for example,
-      ``round(2.675, 2)`` gives ``2.67`` instead of the expected ``2.68``.
-      This is not a bug: it's a result of the fact that most decimal fractions
-      can't be represented exactly as a float.  See :ref:`tut-fp-issues` for
-      more information.
+      Hành vi của :func:`round` đối với số thực có thể gây bất ngờ: chẳng hạn, ``round(2.675, 2)`` cho kết quả ``2.67`` thay vì ``2.68`` như mong đợi. Đây không phải là lỗi: nguyên nhân là hầu hết các phân số thập phân không thể được biểu diễn chính xác dưới dạng số thực. Xem :ref:`tut-fp-issues` để biết thêm thông tin.
 
 
 .. _func-set:
 .. class:: set(iterable=(), /)
    :noindex:
 
-   Return a new :class:`set` object, optionally with elements taken from
-   *iterable*.  :class:`set` is a built-in class.  See also
-   :ref:`types-set` for documentation about this class.
+   Trả về một đối tượng :class:`set` mới, tùy chọn với các phần tử được lấy từ *iterable*. :class:`set` là một lớp tích hợp sẵn. Xem thêm
+   :ref:`types-set` để biết tài liệu về lớp này.
 
-   For other containers see the built-in :class:`frozenset`, :class:`list`,
-   :class:`tuple`, and :class:`dict` classes, as well as the :mod:`collections`
-   module.
+   Đối với các container khác, hãy xem :class:`frozenset` tích hợp sẵn, :class:`list`,
+   :class:`tuple` và các lớp :class:`dict`, cũng như mô-đun :mod:`collections`.
 
 
 .. function:: setattr(object, name, value, /)
 
-   This is the counterpart of :func:`getattr`.  The arguments are an object, a
-   string, and an arbitrary value.  The string may name an existing attribute or a
-   new attribute.  The function assigns the value to the attribute, provided the
-   object allows it.  For example, ``setattr(x, 'foobar', 123)`` is equivalent to
-   ``x.foobar = 123``.
+   Đây là thành phần tương ứng của :func:`getattr`. Các đối số là một đối tượng, một chuỗi và một giá trị tùy ý. Chuỗi này có thể chỉ định một thuộc tính hiện có hoặc một thuộc tính mới. Hàm gán giá trị cho thuộc tính, với điều kiện đối tượng cho phép. Ví dụ, ``setattr(x, 'foobar', 123)`` tương đương với ``x.foobar = 123``.
 
-   *name* need not be a Python identifier as defined in :ref:`identifiers`
-   unless the object chooses to enforce that, for example in a custom
-   :meth:`~object.__getattribute__` or via :attr:`~object.__slots__`.
-   An attribute whose name is not an identifier will not be accessible using
-   the dot notation, but is accessible through :func:`getattr` etc..
+   *name* không nhất thiết phải là một định danh Python như được định nghĩa trong :ref:`identifiers`, trừ khi đối tượng chọn thực thi yêu cầu đó, chẳng hạn trong một
+   :meth:`~object.__getattribute__` hoặc thông qua :attr:`~object.__slots__`. Một thuộc tính có tên không phải là định danh sẽ không thể được truy cập bằng ký hiệu dấu chấm, nhưng có thể được truy cập thông qua :func:`getattr` và các cách tương tự.
 
    .. note::
 
-      Since :ref:`private name mangling <private-name-mangling>` happens at
-      compilation time, one must manually mangle a private attribute's
-      (attributes with two leading underscores) name in order to set it with
+      Vì :ref:`private name mangling <private-name-mangling>` diễn ra tại thời điểm biên dịch, ta phải tự biến đổi tên của một thuộc tính private (các thuộc tính có hai dấu gạch dưới ở đầu) để đặt nó bằng
       :func:`setattr`.
 
 
 .. class:: slice(stop, /)
            slice(start, stop, step=None, /)
 
-   Return a :term:`slice` object representing the set of indices specified by
-   ``range(start, stop, step)``.  The *start* and *step* arguments default to
-   ``None``.
+   Trả về một đối tượng :term:`slice` đại diện cho tập hợp các chỉ mục được chỉ định bởi ``range(start, stop, step)``. Các đối số *start* và *step* mặc định là ``None``.
 
-   Slice objects are also generated when :ref:`slicing syntax <slicings>`
-   is used.  For example: ``a[start:stop:step]`` or ``a[start:stop, i]``.
+   Các đối tượng Slice cũng được tạo khi sử dụng :ref:`cú pháp slicing <slicings>`. Ví dụ: ``a[start:stop:step]`` hoặc ``a[start:stop, i]``.
 
-   See :func:`itertools.islice` for an alternate version that returns an
+   Xem :func:`itertools.islice` để biết một phiên bản thay thế trả về một
    :term:`iterator`.
 
    .. attribute:: slice.start
-                  slice.stop
-                  slice.step
+                  slice.stop slice.step
 
-      These read-only attributes are set to the argument values
-      (or their default).  They have no other explicit functionality;
-      however, they are used by NumPy and other third-party packages.
+      Các thuộc tính chỉ đọc này được đặt thành các giá trị đối số (hoặc giá trị mặc định tương ứng). Chúng không có chức năng rõ ràng nào khác; tuy nhiên, NumPy và các package bên thứ ba khác sử dụng chúng.
 
    .. versionchanged:: 3.12
-      Slice objects are now :term:`hashable` (provided :attr:`~slice.start`,
-      :attr:`~slice.stop`, and :attr:`~slice.step` are hashable).
+      Các đối tượng Slice hiện đã :term:`hashable` (với điều kiện :attr:`~slice.start`,
+      :attr:`~slice.stop`, và :attr:`~slice.step` đều có thể băm).
 
 .. function:: sorted(iterable, /, *, key=None, reverse=False)
 
-   Return a new sorted list from the items in *iterable*.
+   Trả về một danh sách mới đã được sắp xếp từ các phần tử trong *iterable*.
 
-   Has two optional arguments which must be specified as keyword arguments.
+   Có hai đối số tùy chọn, phải được chỉ định dưới dạng đối số từ khóa.
 
-   *key* specifies a function of one argument that is used to extract a comparison
-   key from each element in *iterable* (for example, ``key=str.lower``).  The
-   default value is ``None`` (compare the elements directly).
+   *key* chỉ định một hàm nhận một đối số, được dùng để trích xuất khóa so sánh từ mỗi phần tử trong *iterable* (ví dụ: ``key=str.lower``). Giá trị mặc định là ``None`` (so sánh trực tiếp các phần tử).
 
-   *reverse* is a boolean value.  If set to ``True``, then the list elements are
-   sorted as if each comparison were reversed.
+   *reverse* là một giá trị boolean. Nếu được đặt thành ``True``, các phần tử trong danh sách sẽ được sắp xếp như thể mỗi phép so sánh đều bị đảo ngược.
 
-   Use :func:`functools.cmp_to_key` to convert an old-style *cmp* function to a
-   *key* function.
+   Sử dụng :func:`functools.cmp_to_key` để chuyển một hàm *cmp* kiểu cũ thành một hàm *key*.
 
-   The built-in :func:`sorted` function is guaranteed to be stable. A sort is
-   stable if it guarantees not to change the relative order of elements that
-   compare equal --- this is helpful for sorting in multiple passes (for
-   example, sort by department, then by salary grade).
+   Hàm dựng sẵn :func:`sorted` được đảm bảo là stable. Một phép sắp xếp là stable nếu đảm bảo không thay đổi thứ tự tương đối của các phần tử được so sánh là bằng nhau --- điều này hữu ích khi sắp xếp qua nhiều lượt (ví dụ: sắp xếp theo phòng ban, sau đó theo bậc lương).
 
-   The sort algorithm uses only ``<`` comparisons between items.  While
-   defining an :meth:`~object.__lt__` method will suffice for sorting,
-   :PEP:`8` recommends that all six :ref:`rich comparisons
-   <comparisons>` be implemented.  This will help avoid bugs when using
-   the same data with other ordering tools such as :func:`max` that rely
-   on a different underlying method.  Implementing all six comparisons
-   also helps avoid confusion for mixed type comparisons which can call
-   the reflected :meth:`~object.__gt__` method.
+   Thuật toán sắp xếp chỉ sử dụng các phép so sánh ``<`` giữa các mục. Mặc dù chỉ cần định nghĩa phương thức :meth:`~object.__lt__` để sắp xếp,
+   :PEP:`8` khuyến nghị triển khai cả sáu phép :ref:`rich comparisons <comparisons>`. Điều này giúp tránh lỗi khi sử dụng cùng một dữ liệu với các công cụ sắp xếp khác, chẳng hạn như :func:`max`, vốn dựa vào một phương thức nền tảng khác. Việc triển khai cả sáu phép so sánh cũng giúp tránh nhầm lẫn khi so sánh các kiểu hỗn hợp, vì chúng có thể gọi phương thức :meth:`~object.__gt__` phản chiếu.
 
-   For sorting examples and a brief sorting tutorial, see :ref:`sortinghowto`.
+   Để xem các ví dụ về sắp xếp và hướng dẫn ngắn về sắp xếp, hãy xem :ref:`sortinghowto`.
 
 .. decorator:: staticmethod
 
-   Transform a method into a static method.
+   Chuyển một phương thức thành một static method.
 
-   A static method does not receive an implicit first argument. To declare a static
-   method, use this idiom::
+   Một phương thức static không nhận đối số đầu tiên ngầm định. Để khai báo một phương thức static, hãy sử dụng thành ngữ này::
 
       class C:
           @staticmethod
           def f(arg1, arg2, argN): ...
 
-   The ``@staticmethod`` form is a function :term:`decorator` -- see
-   :ref:`function` for details.
+   Dạng ``@staticmethod`` là một hàm :term:`decorator` -- xem
+   :ref:`function` để biết chi tiết.
 
-   A static method can be called either on the class (such as ``C.f()``) or on
-   an instance (such as ``C().f()``).
-   Moreover, the static method :term:`descriptor` is also callable, so it can
-   be used in the class definition (such as ``f()``).
+   Một phương thức static có thể được gọi trên lớp (chẳng hạn như ``C.f()``) hoặc trên một thể hiện (chẳng hạn như ``C().f()``). Ngoài ra, phương thức static :term:`descriptor` cũng có thể được gọi, vì vậy nó có thể được sử dụng trong định nghĩa lớp (chẳng hạn như ``f()``).
 
-   Static methods in Python are similar to those found in Java or C++. Also, see
-   :deco:`classmethod` for a variant that is useful for creating alternate class
-   constructors.
+   Các phương thức static trong Python tương tự như các phương thức trong Java hoặc C++. Ngoài ra, hãy xem
+   :deco:`classmethod` để biết một biến thể hữu ích trong việc tạo các hàm khởi tạo lớp thay thế.
 
-   Like all decorators, it is also possible to call ``staticmethod`` as
-   a regular function and do something with its result.  This is needed
-   in some cases where you need a reference to a function from a class
-   body and you want to avoid the automatic transformation to instance
-   method.  For these cases, use this idiom::
+   Giống như mọi decorator, bạn cũng có thể gọi ``staticmethod`` như một hàm thông thường và thực hiện điều gì đó với kết quả của nó. Điều này cần thiết trong một số trường hợp khi bạn cần tham chiếu đến một hàm từ phần thân lớp và muốn tránh việc tự động chuyển đổi hàm đó thành phương thức instance. Trong những trường hợp này, hãy sử dụng thành ngữ này::
 
       def regular_function():
           ...
@@ -1944,14 +1353,12 @@ are always available.  They are listed here in alphabetical order.
       class C:
           method = staticmethod(regular_function)
 
-   For more information on static methods, see :ref:`types`.
+   Để biết thêm thông tin về các phương thức static, xem :ref:`types`.
 
    .. versionchanged:: 3.10
-      Static methods now inherit the method attributes
-      (:attr:`~function.__module__`, :attr:`~function.__name__`,
-      :attr:`~function.__qualname__`, :attr:`~function.__doc__` and
-      :attr:`~function.__annotations__`), have a new ``__wrapped__`` attribute,
-      and are now callable as regular functions.
+      Các phương thức static hiện kế thừa các thuộc tính của phương thức (:attr:`~function.__module__`, :attr:`~function.__name__`,
+      :attr:`~function.__qualname__`, :attr:`~function.__doc__` và
+      :attr:`~function.__annotations__`), có thuộc tính ``__wrapped__`` mới và hiện có thể được gọi như các hàm thông thường.
 
 
 .. index::
@@ -1959,116 +1366,67 @@ are always available.  They are listed here in alphabetical order.
 
 .. _func-str:
 .. class:: str(*, encoding='utf-8', errors='strict')
-           str(object)
-           str(object, encoding, errors='strict')
-           str(object, *, errors)
+           str(object) str(object, encoding, errors='strict') str(object, *, errors)
    :noindex:
 
-   Return a :class:`str` version of *object*.  See :func:`str` for details.
+   Trả về phiên bản :class:`str` của *object*. Xem :func:`str` để biết chi tiết.
 
-   ``str`` is the built-in string :term:`class`.  For general information
-   about strings, see :ref:`textseq`.
+   ``str`` là :term:`class` chuỗi dựng sẵn. Để biết thông tin chung về chuỗi, xem :ref:`textseq`.
 
 
 .. function:: sum(iterable, /, start=0)
 
-   Sums *start* and the items of an *iterable* from left to right and returns the
-   total.  The *iterable*'s items are normally numbers, and the start value is not
-   allowed to be a string.
+   Tính tổng *start* và các phần tử của một *iterable* từ trái sang phải rồi trả về tổng. Các phần tử của *iterable* thường là các số và giá trị start không được là một chuỗi.
 
-   For some use cases, there are good alternatives to :func:`sum`.
-   The preferred, fast way to concatenate a sequence of strings is by calling
-   ``''.join(sequence)``.  To add floating-point values with extended precision,
-   see :func:`math.fsum`\.  To concatenate a series of iterables, consider using
+   Trong một số trường hợp sử dụng, có những lựa chọn thay thế phù hợp cho :func:`sum`. Cách nhanh được ưu tiên để nối một chuỗi các chuỗi là gọi ``''.join(sequence)``. Để cộng các giá trị dấu phẩy động với độ chính xác mở rộng, hãy xem :func:`math.fsum`\. Để nối một chuỗi các iterable, hãy cân nhắc sử dụng
    :func:`itertools.chain`.
 
    .. versionchanged:: 3.8
-      The *start* parameter can be specified as a keyword argument.
+      Tham số *start* có thể được chỉ định dưới dạng đối số từ khóa.
 
-   .. versionchanged:: 3.12 Summation of floats switched to an algorithm
-      that gives higher accuracy and better commutativity on most builds.
+   .. versionchanged:: 3.12 Việc tính tổng các số thực đã chuyển sang một thuật toán
+      mang lại độ chính xác cao hơn và tính giao hoán tốt hơn trên hầu hết các bản build.
 
    .. versionchanged:: 3.14
-      Added specialization for summation of complexes,
-      using same algorithm as for summation of floats.
+      Đã thêm cơ chế chuyên biệt hóa cho việc tính tổng các số phức, sử dụng cùng thuật toán như khi tính tổng các số thực.
 
 
 .. class:: super()
            super(type, object_or_type=None, /)
 
-   Return a proxy object that delegates method calls to a parent or sibling
-   class of *type*.  This is useful for accessing inherited methods that have
-   been overridden in a class.
+   Trả về một proxy object ủy quyền các lệnh gọi phương thức cho một lớp cha hoặc lớp anh em của *type*. Điều này hữu ích để truy cập các phương thức kế thừa đã bị ghi đè trong một lớp.
 
-   The *object_or_type* determines the :term:`method resolution order`
-   to be searched.  The search starts from the class right after the
-   *type*.
+   *object_or_type* xác định :term:`method resolution order` cần được tìm kiếm. Việc tìm kiếm bắt đầu từ lớp ngay sau *type*.
 
-   For example, if :attr:`~type.__mro__` of *object_or_type* is
-   ``D -> B -> C -> A -> object`` and the value of *type* is ``B``,
-   then :func:`super` searches ``C -> A -> object``.
+   Ví dụ, nếu :attr:`~type.__mro__` của *object_or_type* là ``D -> B -> C -> A -> object`` và giá trị của *type* là ``B``, thì :func:`super` sẽ tìm kiếm ``C -> A -> object``.
 
-   The :attr:`~type.__mro__` attribute of the class corresponding to
-   *object_or_type* lists the method resolution search order used by both
-   :func:`getattr` and :func:`super`.  The attribute is dynamic and can change
-   whenever the inheritance hierarchy is updated.
+   Thuộc tính :attr:`~type.__mro__` của lớp tương ứng với *object_or_type* liệt kê thứ tự tìm kiếm để phân giải phương thức được cả
+   :func:`getattr` và :func:`super` sử dụng. Thuộc tính này là động và có thể thay đổi bất cứ khi nào hệ thống phân cấp kế thừa được cập nhật.
 
-   If the second argument is omitted, the super object returned is unbound.  If
-   the second argument is an object, ``isinstance(obj, type)`` must be true.  If
-   the second argument is a type, ``issubclass(type2, type)`` must be true (this
-   is useful for classmethods).
+   Nếu bỏ qua đối số thứ hai, đối tượng super được trả về sẽ không bị ràng buộc. Nếu đối số thứ hai là một object, ``isinstance(obj, type)`` phải là true. Nếu đối số thứ hai là một type, ``issubclass(type2, type)`` phải là true (điều này hữu ích cho classmethod).
 
-   When called directly within an ordinary method of a class, both arguments may
-   be omitted ("zero-argument :func:`!super`"). In this case, *type* will be the
-   enclosing class, and *obj* will be the first argument of the immediately
-   enclosing function (typically ``self``). (This means that zero-argument
-   :func:`!super` will not work as expected within nested functions, including
-   generator expressions, which implicitly create nested functions.)
+   Khi được gọi trực tiếp bên trong một phương thức thông thường của một lớp, có thể bỏ qua cả hai đối số (":func:`!super` không có đối số"). Trong trường hợp này, *type* sẽ là lớp bao quanh, còn *obj* sẽ là đối số đầu tiên của hàm bao quanh ngay lập tức (thường là ``self``). (Điều này có nghĩa là :func:`!super` không có đối số
+   :func:`!super` sẽ không hoạt động như mong đợi trong các hàm lồng nhau, bao gồm cả biểu thức generator, vốn ngầm tạo ra các hàm lồng nhau.)
 
-   There are two typical use cases for *super*.  In a class hierarchy with
-   single inheritance, *super* can be used to refer to parent classes without
-   naming them explicitly, thus making the code more maintainable.  This use
-   closely parallels the use of *super* in other programming languages.
+   Có hai trường hợp sử dụng điển hình cho *super*. Trong hệ thống phân cấp lớp với kế thừa đơn, *super* có thể được dùng để tham chiếu đến các lớp cha mà không cần nêu tên chúng một cách rõ ràng, nhờ đó giúp mã dễ bảo trì hơn. Cách sử dụng này tương tự với cách dùng *super* trong các ngôn ngữ lập trình khác.
 
-   The second use case is to support cooperative multiple inheritance in a
-   dynamic execution environment.  This use case is unique to Python and is
-   not found in statically compiled languages or languages that only support
-   single inheritance.  This makes it possible to implement "diamond diagrams"
-   where multiple base classes implement the same method.  Good design dictates
-   that such implementations have the same calling signature in every case (because the
-   order of calls is determined at runtime, because that order adapts
-   to changes in the class hierarchy, and because that order can include
-   sibling classes that are unknown prior to runtime).
+   Trường hợp sử dụng thứ hai là hỗ trợ multiple inheritance mang tính hợp tác trong môi trường thực thi động. Trường hợp sử dụng này là đặc trưng của Python và không có trong các ngôn ngữ được biên dịch tĩnh hoặc các ngôn ngữ chỉ hỗ trợ kế thừa đơn. Nhờ đó, có thể triển khai "sơ đồ hình thoi", trong đó nhiều lớp cơ sở triển khai cùng một phương thức. Thiết kế tốt yêu cầu các triển khai như vậy có cùng calling signature trong mọi trường hợp (vì thứ tự gọi được xác định tại runtime, vì thứ tự đó thích ứng với các thay đổi trong hệ thống phân cấp lớp, và vì thứ tự đó có thể bao gồm các lớp anh em chưa được biết trước khi runtime).
 
-   For both use cases, a typical superclass call looks like this::
+   Đối với cả hai trường hợp sử dụng, một lời gọi lớp cha điển hình có dạng như sau::
 
       class C(B):
           def method(self, arg):
-              super().method(arg)    # This does the same thing as:
+              super().method(arg)    # Điều này thực hiện cùng một việc như:
                                      # super(C, self).method(arg)
 
-   In addition to method lookups, :func:`super` also works for attribute
-   lookups.  One possible use case for this is calling :term:`descriptors <descriptor>`
-   in a parent or sibling class.
+   Ngoài việc tra cứu phương thức, :func:`super` cũng hoạt động với việc tra cứu thuộc tính. Một trường hợp sử dụng có thể là gọi :term:`descriptors <descriptor>` trong một lớp cha hoặc lớp anh em.
 
-   Note that :func:`super` is implemented as part of the binding process for
-   explicit dotted attribute lookups such as ``super().__getitem__(name)``.
-   It does so by implementing its own :meth:`~object.__getattribute__` method
-   for searching
-   classes in a predictable order that supports cooperative multiple inheritance.
-   Accordingly, :func:`super` is undefined for implicit lookups using statements or
-   operators such as ``super()[name]``.
+   Lưu ý rằng :func:`super` được triển khai như một phần của quá trình binding cho các tra cứu thuộc tính dạng dấu chấm tường minh như ``super().__getitem__(name)``. Nó thực hiện điều này bằng cách triển khai phương thức :meth:`~object.__getattribute__` riêng để tìm kiếm các lớp theo một thứ tự xác định, hỗ trợ kế thừa đa lớp mang tính phối hợp. Do đó, :func:`super` không được định nghĩa cho các tra cứu ngầm định sử dụng các câu lệnh hoặc toán tử như ``super()[name]``.
 
-   Also note that, aside from the zero argument form, :func:`super` is not
-   limited to use inside methods.  The two argument form specifies the
-   arguments exactly and makes the appropriate references.  The zero
-   argument form only works inside a class definition, as the compiler fills
-   in the necessary details to correctly retrieve the class being defined,
-   as well as accessing the current instance for ordinary methods.
+   Cũng lưu ý rằng, ngoài dạng không có đối số, :func:`super` không bị giới hạn trong việc sử dụng bên trong các phương thức. Dạng có hai đối số chỉ rõ chính xác các đối số và tạo ra các tham chiếu thích hợp. Dạng không có đối số chỉ hoạt động bên trong định nghĩa lớp, vì compiler điền các chi tiết cần thiết để truy xuất chính xác lớp đang được định nghĩa, đồng thời truy cập instance hiện tại đối với các phương thức thông thường.
 
-   For practical suggestions on how to design cooperative classes using
-   :func:`super`, see `guide to using super()
-   <https://rhettinger.wordpress.com/2011/05/26/super-considered-super/>`_.
+   Để biết các gợi ý thực tế về cách thiết kế các lớp mang tính phối hợp bằng cách sử dụng
+   :func:`super`, xem `hướng dẫn sử dụng super() <https://rhettinger.wordpress.com/2011/05/26/super-considered-super/>`_.
 
    .. versionchanged:: 3.14
      :class:`super` objects are now :mod:`pickleable <pickle>` and
@@ -2079,87 +1437,65 @@ are always available.  They are listed here in alphabetical order.
 .. class:: tuple(iterable=(), /)
    :noindex:
 
-   Rather than being a function, :class:`tuple` is actually an immutable
-   sequence type, as documented in :ref:`typesseq-tuple` and :ref:`typesseq`.
+   Thay vì là một hàm, :class:`tuple` thực chất là một kiểu sequence bất biến, như được ghi chép trong :ref:`typesseq-tuple` và :ref:`typesseq`.
 
 
 .. class:: type(object, /)
-           type(name, bases, dict, /, **kwargs)
+           type(name, bases, dict, /, ****kwargs)
 
    .. index:: pair: object; type
 
-   With one argument, return the type of an *object*.  The return value is a
-   type object and generally the same object as returned by
+   Với một đối số, trả về kiểu của một *đối tượng*. Giá trị trả về là một đối tượng kiểu và thường là cùng đối tượng được trả về bởi
    :attr:`object.__class__`.
 
-   The :func:`isinstance` built-in function is recommended for testing the type
-   of an object, because it takes subclasses into account.
+   Hàm dựng sẵn :func:`isinstance` được khuyến nghị để kiểm tra kiểu của một đối tượng, vì hàm này có tính đến các lớp con.
 
-   With three arguments, return a new type object.  This is essentially a
-   dynamic form of the :keyword:`class` statement. The *name* string is
-   the class name and becomes the :attr:`~type.__name__` attribute.
-   The *bases* tuple contains the base classes and becomes the
-   :attr:`~type.__bases__` attribute; if empty, :class:`object`, the
-   ultimate base of all classes, is added.  The *dict* dictionary contains
-   attribute and method definitions for the class body; it may be copied
-   or wrapped before becoming the :attr:`~type.__dict__` attribute.
-   The following two statements create identical :class:`!type` objects:
+   Với ba đối số, trả về một đối tượng kiểu mới. Đây thực chất là dạng động của câu lệnh :keyword:`class`. Chuỗi *name* là tên lớp và trở thành thuộc tính :attr:`~type.__name__`. Tuple *bases* chứa các lớp cơ sở và trở thành
+   thuộc tính :attr:`~type.__bases__`; nếu rỗng, :class:`object`, lớp cơ sở tối thượng của mọi lớp, sẽ được thêm vào. Từ điển *dict* chứa các định nghĩa thuộc tính và phương thức cho phần thân lớp; từ điển này có thể được sao chép hoặc bọc trước khi trở thành thuộc tính :attr:`~type.__dict__`. Hai câu lệnh sau tạo ra các đối tượng :class:`!type` giống hệt nhau:
 
       >>> class X:
       ...     a = 1
       ...
       >>> X = type('X', (), dict(a=1))
 
-   See also:
+   Xem thêm:
 
    * :ref:`Documentation on attributes and methods on classes <class-attrs-and-methods>`.
    * :ref:`bltin-type-objects`
 
-   Keyword arguments provided to the three argument form are passed to the
-   appropriate metaclass machinery (usually :meth:`~object.__init_subclass__`)
-   in the same way that keywords in a class
-   definition (besides *metaclass*) would.
+   Các đối số từ khóa được cung cấp cho dạng ba đối số sẽ được truyền đến cơ chế metaclass thích hợp (thường là :meth:`~object.__init_subclass__`) theo cùng cách như các từ khóa trong định nghĩa lớp (ngoại trừ *metaclass*).
 
-   Unlike a :keyword:`class` statement, the three argument form does not
-   call the metaclass ``__prepare__`` method (see :ref:`prepare`).  Use
-   :func:`types.new_class` to dynamically create a class using the
-   appropriate metaclass.
+   Không giống câu lệnh :keyword:`class`, dạng ba đối số không gọi phương thức ``__prepare__`` của metaclass (xem :ref:`prepare`). Hãy dùng
+   :func:`types.new_class` để tạo động một lớp bằng cách sử dụng metaclass thích hợp.
 
-   See also :ref:`class-customization`.
+   Xem thêm :ref:`class-customization`.
 
    .. versionchanged:: 3.6
-      Subclasses of :class:`!type` which don't override ``type.__new__`` may no
-      longer use the one-argument form to get the type of an object.
+      Các lớp con của :class:`!type` không ghi đè ``type.__new__`` có thể không còn sử dụng dạng một đối số để lấy kiểu của một đối tượng.
 
 .. function:: vars()
               vars(object, /)
 
-   Return the :attr:`~object.__dict__` attribute for a module, class, instance,
-   or any other object with a :attr:`!__dict__` attribute.
+   Trả về thuộc tính :attr:`~object.__dict__` của một module, lớp, instance hoặc bất kỳ đối tượng nào khác có thuộc tính :attr:`!__dict__`.
 
-   Objects such as modules and instances have an updateable :attr:`~object.__dict__`
-   attribute; however, other objects may have write restrictions on their
-   :attr:`!__dict__` attributes (for example, classes use a
-   :class:`types.MappingProxyType` to prevent direct dictionary updates).
+   Các đối tượng như module và instance có thuộc tính :attr:`~object.__dict__` có thể cập nhật; tuy nhiên, các đối tượng khác có thể hạn chế việc ghi vào
+   các thuộc tính :attr:`!__dict__` (ví dụ: các lớp sử dụng một
+   :class:`types.MappingProxyType` để ngăn việc cập nhật trực tiếp từ điển).
 
-   Without an argument, :func:`vars` acts like :func:`locals`.
+   Nếu không có đối số, :func:`vars` hoạt động giống như :func:`locals`.
 
-   A :exc:`TypeError` exception is raised if an object is specified but
-   it doesn't have a :attr:`~object.__dict__` attribute (for example, if
-   its class defines the :attr:`~object.__slots__` attribute).
+   Một ngoại lệ :exc:`TypeError` sẽ được phát sinh nếu một đối tượng được chỉ định nhưng không có thuộc tính :attr:`~object.__dict__` (ví dụ: nếu lớp của đối tượng đó định nghĩa thuộc tính :attr:`~object.__slots__`).
 
    .. versionchanged:: 3.13
 
-      The result of calling this function without an argument has been
-      updated as described for the :func:`locals` builtin.
+      Kết quả của việc gọi hàm này không có đối số đã được cập nhật như mô tả đối với builtin :func:`locals`.
 
 
 .. function:: zip(*iterables, strict=False)
 
-   Iterate over several iterables in parallel, producing tuples with an item
-   from each one.
+   Lặp qua nhiều iterable song song, tạo ra các tuple với một phần tử từ mỗi iterable.
 
-   Example::
+   Ví dụ::
 
       >>> for item in zip([1, 2, 3], ['sugar', 'spice', 'everything nice']):
       ...     print(item)
@@ -2168,38 +1504,26 @@ are always available.  They are listed here in alphabetical order.
       (2, 'spice')
       (3, 'everything nice')
 
-   More formally: :func:`zip` returns an iterator of tuples, where the *i*-th
-   tuple contains the *i*-th element from each of the argument iterables.
+   Cụ thể hơn: :func:`zip` trả về một iterator gồm các tuple, trong đó tuple thứ *i* chứa phần tử thứ *i* từ mỗi iterable đối số.
 
-   Another way to think of :func:`zip` is that it turns rows into columns, and
-   columns into rows.  This is similar to `transposing a matrix
-   <https://en.wikipedia.org/wiki/Transpose>`_.
+   Một cách khác để hiểu :func:`zip` là nó biến các hàng thành các cột và các cột thành các hàng. Điều này tương tự như `chuyển vị một ma trận <https://en.wikipedia.org/wiki/Transpose>`_.
 
-   :func:`zip` is lazy: The elements won't be processed until the iterable is
-   iterated on, e.g. by a :keyword:`!for` loop or by wrapping in a
+   :func:`zip` hoạt động theo cơ chế lazy: Các phần tử sẽ không được xử lý cho đến khi iterable được lặp qua, chẳng hạn bằng vòng :keyword:`!for` hoặc bằng cách bọc trong một
    :class:`list`.
 
-   One thing to consider is that the iterables passed to :func:`zip` could have
-   different lengths; sometimes by design, and sometimes because of a bug in
-   the code that prepared these iterables.  Python offers three different
-   approaches to dealing with this issue:
+   Một điều cần cân nhắc là các iterable được truyền vào :func:`zip` có thể có độ dài khác nhau; đôi khi là có chủ ý, đôi khi là do lỗi trong mã chuẩn bị các iterable này. Python cung cấp ba cách tiếp cận khác nhau để xử lý vấn đề này:
 
-   * By default, :func:`zip` stops when the shortest iterable is :term:`exhausted`.
-     It will ignore the remaining items in the longer iterables, cutting off
-     the result to the length of the shortest iterable::
+   * Theo mặc định, :func:`zip` dừng khi iterable ngắn nhất đã :term:`exhausted`. Nó sẽ bỏ qua các phần tử còn lại trong những iterable dài hơn, cắt kết quả để có độ dài bằng iterable ngắn nhất::
 
         >>> list(zip(range(3), ['fee', 'fi', 'fo', 'fum']))
         [(0, 'fee'), (1, 'fi'), (2, 'fo')]
 
-   * :func:`zip` is often used in cases where the iterables are assumed to be
-     of equal length.  In such cases, it's recommended to use the ``strict=True``
-     option. Its output is the same as regular :func:`zip`::
+   * :func:`zip` thường được sử dụng khi giả định rằng các iterable có cùng độ dài. Trong những trường hợp như vậy, bạn nên sử dụng tùy chọn ``strict=True``. Kết quả của nó giống với :func:`zip` thông thường::
 
         >>> list(zip(('a', 'b', 'c'), (1, 2, 3), strict=True))
         [('a', 1), ('b', 2), ('c', 3)]
 
-     Unlike the default behavior, it raises a :exc:`ValueError` if one iterable
-     is :term:`exhausted` before the others:
+     Không giống hành vi mặc định, nó sẽ raise một :exc:`ValueError` nếu một iterable :term:`exhausted` trước các iterable khác:
 
         >>> for item in zip(range(3), ['fee', 'fi', 'fo', 'fum'], strict=True):  # doctest: +SKIP
         ...     print(item)
@@ -2212,31 +1536,20 @@ are always available.  They are listed here in alphabetical order.
         ValueError: zip() argument 2 is longer than argument 1
 
      ..
-        This doctest is disabled because doctest does not support capturing
-        output and exceptions in the same code unit.
-        https://github.com/python/cpython/issues/65382
+        Doctest này bị vô hiệu hóa vì doctest không hỗ trợ việc thu thập đầu ra và ngoại lệ trong cùng một đơn vị mã. https://github.com/python/cpython/issues/65382
 
-     Without the ``strict=True`` argument, any bug that results in iterables of
-     different lengths will be silenced, possibly manifesting as a hard-to-find
-     bug in another part of the program.
+     Nếu không có đối số ``strict=True``, mọi lỗi dẫn đến các iterable có độ dài khác nhau sẽ bị bỏ qua, và có thể biểu hiện thành một lỗi khó phát hiện ở một phần khác của chương trình.
 
-   * Shorter iterables can be padded with a constant value to make all the
-     iterables have the same length.  This is done by
+   * Các iterable ngắn hơn có thể được bổ sung bằng một giá trị hằng để tất cả các iterable có cùng độ dài. Việc này được thực hiện bằng cách
      :func:`itertools.zip_longest`.
 
-   Edge cases: With a single iterable argument, :func:`zip` returns an
-   iterator of 1-tuples.  With no arguments, it returns an empty iterator.
+   Các trường hợp biên: Với một đối số iterable duy nhất, :func:`zip` trả về một iterator gồm các tuple 1 phần tử. Không có đối số, hàm trả về một iterator rỗng.
 
-   Tips and tricks:
+   Mẹo và thủ thuật:
 
-   * The left-to-right evaluation order of the iterables is guaranteed. This
-     makes possible an idiom for clustering a data series into n-length groups
-     using ``zip(*[iter(s)]*n, strict=True)``.  This repeats the *same* iterator
-     ``n`` times so that each output tuple has the result of ``n`` calls to the
-     iterator. This has the effect of dividing the input into n-length chunks.
+   * Thứ tự đánh giá các iterable từ trái sang phải được đảm bảo. Điều này cho phép sử dụng một cách viết để gom một chuỗi dữ liệu thành các nhóm có độ dài n bằng ``zip(*[iter(s)]*n, strict=True)``. Cách này lặp lại iterator *same* ``n`` lần để mỗi tuple đầu ra chứa kết quả của ``n`` lần gọi iterator. Nhờ đó, đầu vào được chia thành các đoạn có độ dài n.
 
-   * :func:`zip` in conjunction with the ``*`` operator can be used to unzip a
-     list::
+   * Có thể sử dụng :func:`zip` kết hợp với toán tử ``*`` để giải nén một danh sách::
 
         >>> x = [1, 2, 3]
         >>> y = [4, 5, 6]
@@ -2247,7 +1560,7 @@ are always available.  They are listed here in alphabetical order.
         True
 
    .. versionchanged:: 3.10
-      Added the ``strict`` argument.
+      Đã thêm đối số ``strict``.
 
 
 .. function:: __import__(name, globals=None, locals=None, fromlist=(), level=0)
@@ -2258,72 +1571,46 @@ are always available.  They are listed here in alphabetical order.
 
    .. note::
 
-      This is an advanced function that is not needed in everyday Python
-      programming, unlike :func:`importlib.import_module`.
+      Đây là một hàm nâng cao không cần thiết trong lập trình Python hằng ngày, không giống như :func:`importlib.import_module`.
 
-   This function is invoked by the :keyword:`import` statement.  It can be
-   replaced (by importing the :mod:`builtins` module and assigning to
-   ``builtins.__import__``) in order to change semantics of the
-   :keyword:`!import` statement, but doing so is **strongly** discouraged as it
-   is usually simpler to use import hooks (see :pep:`302`) to attain the same
-   goals and does not cause issues with code which assumes the default import
-   implementation is in use.  Direct use of :func:`__import__` is also
-   discouraged in favor of :func:`importlib.import_module`.
+   Hàm này được gọi bởi câu lệnh :keyword:`import`. Có thể thay thế hàm này (bằng cách import module :mod:`builtins` và gán cho ``builtins.__import__``) để thay đổi ngữ nghĩa của
+   câu lệnh :keyword:`!import`, nhưng việc này **rất** không được khuyến khích vì thường sử dụng import hooks (xem :pep:`302`) sẽ đơn giản hơn để đạt được các mục tiêu tương tự và không gây ra vấn đề với mã giả định rằng implementation mặc định của import đang được sử dụng. Việc sử dụng trực tiếp :func:`__import__` cũng không được khuyến khích; thay vào đó nên dùng :func:`importlib.import_module`.
 
-   The function imports the module *name*, potentially using the given *globals*
-   and *locals* to determine how to interpret the name in a package context.
-   The *fromlist* gives the names of objects or submodules that should be
-   imported from the module given by *name*.  The standard implementation does
-   not use its *locals* argument at all and uses its *globals* only to
-   determine the package context of the :keyword:`import` statement.
+   Hàm này import module *name*, có thể sử dụng *globals* và *locals* được cung cấp để xác định cách diễn giải tên trong ngữ cảnh package. *fromlist* cung cấp tên của các đối tượng hoặc submodule cần được import từ module được chỉ định bởi *name*. Implementation tiêu chuẩn hoàn toàn không sử dụng đối số *locals* và chỉ sử dụng *globals* để xác định ngữ cảnh package của câu lệnh :keyword:`import`.
 
-   *level* specifies whether to use absolute or relative imports. ``0`` (the
-   default) means only perform absolute imports.  Positive values for
-   *level* indicate the number of parent directories to search relative to the
-   directory of the module calling :func:`__import__` (see :pep:`328` for the
-   details).
+   *level* chỉ định việc sử dụng import tuyệt đối hay tương đối. ``0`` (mặc định) có nghĩa là chỉ thực hiện import tuyệt đối. Các giá trị dương của *level* cho biết số lượng thư mục cha cần tìm kiếm, tính tương đối với thư mục của module gọi :func:`__import__` (xem :pep:`328` để biết chi tiết).
 
-   When the *name* variable is of the form ``package.module``, normally, the
-   top-level package (the name up till the first dot) is returned, *not* the
-   module named by *name*.  However, when a non-empty *fromlist* argument is
-   given, the module named by *name* is returned.
+   Khi biến *name* có dạng ``package.module``, thông thường, package cấp cao nhất (tên tính đến dấu chấm đầu tiên) được trả về, *không* phải module có tên *name*. Tuy nhiên, khi cung cấp đối số *fromlist* không rỗng, module có tên *name* sẽ được trả về.
 
-   For example, the statement ``import spam`` results in bytecode resembling the
-   following code::
+   Ví dụ, câu lệnh ``import spam`` cho ra bytecode tương tự như đoạn mã sau::
 
       spam = __import__('spam', globals(), locals(), [], 0)
 
-   The statement ``import spam.ham`` results in this call::
+   Câu lệnh ``import spam.ham`` cho ra lời gọi này::
 
       spam = __import__('spam.ham', globals(), locals(), [], 0)
 
-   Note how :func:`__import__` returns the toplevel module here because this is
-   the object that is bound to a name by the :keyword:`import` statement.
+   Lưu ý rằng :func:`__import__` trả về module toplevel ở đây vì đây là đối tượng được liên kết với một tên bằng câu lệnh :keyword:`import`.
 
-   On the other hand, the statement ``from spam.ham import eggs, sausage as
-   saus`` results in ::
+   Mặt khác, câu lệnh ``from spam.ham import eggs, sausage as saus`` cho ra::
 
       _temp = __import__('spam.ham', globals(), locals(), ['eggs', 'sausage'], 0)
       eggs = _temp.eggs
       saus = _temp.sausage
 
-   Here, the ``spam.ham`` module is returned from :func:`__import__`.  From this
-   object, the names to import are retrieved and assigned to their respective
-   names.
+   Ở đây, module ``spam.ham`` được trả về từ :func:`__import__`. Từ đối tượng này, các tên cần import được truy xuất và gán cho các tên tương ứng.
 
-   If you simply want to import a module (potentially within a package) by name,
-   use :func:`importlib.import_module`.
+   Nếu chỉ muốn import một module (có thể nằm trong một package) theo tên, hãy sử dụng :func:`importlib.import_module`.
 
    .. versionchanged:: 3.3
-      Negative values for *level* are no longer supported (which also changes
-      the default value to 0).
+      Các giá trị âm cho *level* không còn được hỗ trợ (điều này cũng thay đổi giá trị mặc định thành 0).
 
    .. versionchanged:: 3.9
-      When the command line options :option:`-E` or :option:`-I` are being used,
-      the environment variable :envvar:`PYTHONCASEOK` is now ignored.
+      Khi đang sử dụng các tùy chọn dòng lệnh :option:`-E` hoặc :option:`-I`, biến môi trường :envvar:`PYTHONCASEOK` hiện sẽ bị bỏ qua.
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] Note that the parser only accepts the Unix-style end of line convention.
-   If you are reading the code from a file, make sure to use newline conversion
-   mode to convert Windows or Mac-style newlines.
+.. [#] Lưu ý rằng trình phân tích cú pháp chỉ chấp nhận quy ước kết thúc dòng kiểu Unix. Nếu bạn đang đọc mã từ một tệp, hãy nhớ sử dụng chế độ chuyển đổi dòng mới để chuyển đổi các dòng mới kiểu Windows hoặc Mac.
+
+.. _`guide to using super()`: https://rhettinger.wordpress.com/2011/05/26/super-considered-super/
+.. _`transposing a matrix`: https://en.wikipedia.org/wiki/Transpose
