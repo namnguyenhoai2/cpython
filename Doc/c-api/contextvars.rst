@@ -2,8 +2,8 @@
 
 .. _contextvarsobjects:
 
-Context Variables Objects
--------------------------
+Đối tượng biến ngữ cảnh
+-----------------------
 
 .. _contextvarsobjects_pointertype_change:
 .. versionadded:: 3.7
@@ -12,10 +12,8 @@ Context Variables Objects
 
    .. note::
 
-      In Python 3.7.1 the signatures of all context variables
-      C APIs were **changed** to use :c:type:`PyObject` pointers instead
-      of :c:type:`PyContext`, :c:type:`PyContextVar`, and
-      :c:type:`PyContextToken`, e.g.::
+      Trong Python 3.7.1, chữ ký của tất cả các API C cho biến ngữ cảnh đã được **thay đổi** để sử dụng :c:type:`PyObject` các con trỏ thay vì :c:type:`PyContext`, :c:type:`PyContextVar`, và
+      :c:type:`PyContextToken`, ví dụ.::
 
          // in 3.7.0:
          PyContext *PyContext_New(void);
@@ -23,162 +21,129 @@ Context Variables Objects
          // in 3.7.1+:
          PyObject *PyContext_New(void);
 
-      See :issue:`34762` for more details.
+      Xem :issue:`34762` để biết thêm chi tiết.
 
 
-This section details the public C API for the :mod:`contextvars` module.
+Phần này trình bày chi tiết API C công khai cho module :mod:`contextvars`.
 
 .. c:type:: PyContext
 
-   The C structure used to represent a :class:`contextvars.Context`
-   object.
+   Cấu trúc C được sử dụng để biểu diễn một đối tượng :class:`contextvars.Context`.
 
 .. c:type:: PyContextVar
 
-   The C structure used to represent a :class:`contextvars.ContextVar`
-   object.
+   Cấu trúc C được sử dụng để biểu diễn một đối tượng :class:`contextvars.ContextVar`.
 
 .. c:type:: PyContextToken
 
-   The C structure used to represent a :class:`contextvars.Token` object.
+   Cấu trúc C được dùng để biểu diễn một đối tượng :class:`contextvars.Token`.
 
 .. c:var:: PyTypeObject PyContext_Type
 
-   The type object representing the *context* type.
+   Đối tượng kiểu biểu diễn kiểu *context*.
 
 .. c:var:: PyTypeObject PyContextVar_Type
 
-   The type object representing the *context variable* type.
+   Đối tượng kiểu biểu diễn kiểu *context variable*.
 
 .. c:var:: PyTypeObject PyContextToken_Type
 
-   The type object representing the *context variable token* type.
+   Đối tượng kiểu biểu diễn kiểu *context variable token*.
 
 
-Type-check macros:
+Các macro kiểm tra kiểu:
 
 .. c:function:: int PyContext_CheckExact(PyObject *o)
 
-   Return true if *o* is of type :c:data:`PyContext_Type`. *o* must not be
-   ``NULL``.  This function always succeeds.
+   Trả về true nếu *o* thuộc kiểu :c:data:`PyContext_Type`. *o* không được là ``NULL``. Hàm này luôn thành công.
 
 .. c:function:: int PyContextVar_CheckExact(PyObject *o)
 
-   Return true if *o* is of type :c:data:`PyContextVar_Type`. *o* must not be
-   ``NULL``.  This function always succeeds.
+   Trả về true nếu *o* thuộc kiểu :c:data:`PyContextVar_Type`. *o* không được là ``NULL``. Hàm này luôn thành công.
 
 .. c:function:: int PyContextToken_CheckExact(PyObject *o)
 
-   Return true if *o* is of type :c:data:`PyContextToken_Type`.
-   *o* must not be ``NULL``.  This function always succeeds.
+   Trả về true nếu *o* thuộc kiểu :c:data:`PyContextToken_Type`. *o* không được là ``NULL``. Hàm này luôn thực hiện thành công.
 
 
-Context object management functions:
+Các hàm quản lý đối tượng context:
 
 .. c:function:: PyObject *PyContext_New(void)
 
-   Create a new empty context object.  Returns ``NULL`` if an error
-   has occurred.
+   Tạo một đối tượng context trống mới. Trả về ``NULL`` nếu đã xảy ra lỗi.
 
 .. c:function:: PyObject *PyContext_Copy(PyObject *ctx)
 
-   Create a shallow copy of the passed *ctx* context object.
-   Returns ``NULL`` if an error has occurred.
+   Tạo một bản sao nông của đối tượng context *ctx* được truyền vào. Trả về ``NULL`` nếu đã xảy ra lỗi.
 
 .. c:function:: PyObject *PyContext_CopyCurrent(void)
 
-   Create a shallow copy of the current thread context.
-   Returns ``NULL`` if an error has occurred.
+   Tạo một bản sao nông của context của thread hiện tại. Trả về ``NULL`` nếu đã xảy ra lỗi.
 
 .. c:function:: int PyContext_Enter(PyObject *ctx)
 
-   Set *ctx* as the current context for the current thread.
-   Returns ``0`` on success, and ``-1`` on error.
+   Đặt *ctx* làm context hiện tại cho thread hiện tại. Trả về ``0`` khi thành công và ``-1`` khi xảy ra lỗi.
 
 .. c:function:: int PyContext_Exit(PyObject *ctx)
 
-   Deactivate the *ctx* context and restore the previous context as the
-   current context for the current thread.  Returns ``0`` on success,
-   and ``-1`` on error.
+   Vô hiệu hóa context *ctx* và khôi phục context trước đó làm context hiện tại cho thread hiện tại. Trả về ``0`` khi thành công và ``-1`` khi xảy ra lỗi.
 
 .. c:function:: int PyContext_AddWatcher(PyContext_WatchCallback callback)
 
-   Register *callback* as a context object watcher for the current interpreter.
-   Return an ID which may be passed to :c:func:`PyContext_ClearWatcher`.
-   In case of error (e.g. no more watcher IDs available),
-   return ``-1`` and set an exception.
+   Đăng ký *callback* làm trình theo dõi đối tượng context cho interpreter hiện tại. Trả về một ID có thể được truyền vào :c:func:`PyContext_ClearWatcher`. Nếu xảy ra lỗi (ví dụ: không còn ID trình theo dõi nào khả dụng), trả về ``-1`` và đặt một exception.
 
    .. versionadded:: 3.14
 
 .. c:function:: int PyContext_ClearWatcher(int watcher_id)
 
-   Clear watcher identified by *watcher_id* previously returned from
-   :c:func:`PyContext_AddWatcher` for the current interpreter.
-   Return ``0`` on success, or ``-1`` and set an exception on error
-   (e.g. if the given *watcher_id* was never registered.)
+   Xóa trình theo dõi được xác định bởi *watcher_id* trước đó được trả về từ
+   :c:func:`PyContext_AddWatcher` cho interpreter hiện tại. Trả về ``0`` nếu thành công hoặc ``-1`` và đặt một exception nếu xảy ra lỗi (ví dụ: nếu *watcher_id* đã cho chưa từng được đăng ký).
 
    .. versionadded:: 3.14
 
 .. c:type:: PyContextEvent
 
-   Enumeration of possible context object watcher events:
+   Liệt kê các sự kiện có thể xảy ra đối với trình theo dõi đối tượng context:
 
-   - ``Py_CONTEXT_SWITCHED``: The :term:`current context` has switched to a
-     different context.  The object passed to the watch callback is the
-     now-current :class:`contextvars.Context` object, or None if no context is
-     current.
+   - ``Py_CONTEXT_SWITCHED``: :term:`current context` đã chuyển sang một context khác. Đối tượng được truyền vào watch callback là đối tượng :class:`contextvars.Context` hiện tại hoặc None nếu hiện không có context nào.
 
    .. versionadded:: 3.14
 
 .. c:type:: int (*PyContext_WatchCallback)(PyContextEvent event, PyObject *obj)
 
-   Context object watcher callback function.  The object passed to the callback
-   is event-specific; see :c:type:`PyContextEvent` for details.
+   Hàm callback của trình theo dõi đối tượng context. Đối tượng được truyền vào callback phụ thuộc vào sự kiện; xem :c:type:`PyContextEvent` để biết chi tiết.
 
-   If the callback returns with an exception set, it must return ``-1``; this
-   exception will be printed as an unraisable exception using
-   :c:func:`PyErr_FormatUnraisable`. Otherwise it should return ``0``.
+   Nếu callback kết thúc khi một exception đang được đặt, nó phải trả về ``-1``; exception này sẽ được in dưới dạng unraisable exception bằng cách sử dụng
+   :c:func:`PyErr_FormatUnraisable`. Nếu không, nó sẽ trả về ``0``.
 
-   There may already be a pending exception set on entry to the callback. In
-   this case, the callback should return ``0`` with the same exception still
-   set. This means the callback may not call any other API that can set an
-   exception unless it saves and clears the exception state first, and restores
-   it before returning.
+   Có thể đã có một exception đang chờ được thiết lập khi callback được gọi. Trong trường hợp này, callback phải trả về ``0`` và vẫn giữ nguyên exception đó. Điều này có nghĩa là callback không được gọi bất kỳ API nào khác có thể thiết lập exception, trừ khi trước tiên lưu và xóa trạng thái exception, rồi khôi phục trạng thái đó trước khi trả về.
 
    .. versionadded:: 3.14
 
 
-Context variable functions:
+Các hàm biến ngữ cảnh:
 
 .. c:function:: PyObject *PyContextVar_New(const char *name, PyObject *def)
 
-   Create a new ``ContextVar`` object.  The *name* parameter is used
-   for introspection and debug purposes.  The *def* parameter specifies
-   a default value for the context variable, or ``NULL`` for no default.
-   If an error has occurred, this function returns ``NULL``.
+   Tạo một đối tượng ``ContextVar`` mới. Tham số *name* được dùng cho mục đích introspection và debug. Tham số *def* chỉ định giá trị mặc định cho biến ngữ cảnh, hoặc ``NULL`` nếu không có giá trị mặc định. Nếu đã xảy ra lỗi, hàm này trả về ``NULL``.
 
 .. c:function:: int PyContextVar_Get(PyObject *var, PyObject *default_value, PyObject **value)
 
-   Get the value of a context variable.  Returns ``-1`` if an error has
-   occurred during lookup, and ``0`` if no error occurred, whether or not
-   a value was found.
+   Lấy giá trị của một biến ngữ cảnh. Trả về ``-1`` nếu xảy ra lỗi trong quá trình tra cứu và ``0`` nếu không xảy ra lỗi, bất kể có tìm thấy giá trị hay không.
 
-   If the context variable was found, *value* will be a pointer to it.
-   If the context variable was *not* found, *value* will point to:
+   Nếu tìm thấy biến context, *giá trị* sẽ là một con trỏ trỏ đến biến đó. Nếu không tìm thấy biến context, *không* *giá trị* sẽ trỏ đến:
 
-   - *default_value*, if not ``NULL``;
-   - the default value of *var*, if not ``NULL``;
+   - *default_value*, nếu không phải ``NULL``;
+   - giá trị mặc định của *var*, nếu không ``NULL``;
    - ``NULL``
 
-   Except for ``NULL``, the function returns a new reference.
+   Ngoại trừ ``NULL``, hàm trả về một tham chiếu mới.
 
 .. c:function:: PyObject *PyContextVar_Set(PyObject *var, PyObject *value)
 
-   Set the value of *var* to *value* in the current context.  Returns
-   a new token object for this change, or ``NULL`` if an error has occurred.
+   Đặt giá trị của *var* thành *value* trong context hiện tại. Trả về một đối tượng token mới cho thay đổi này hoặc ``NULL`` nếu đã xảy ra lỗi.
 
 .. c:function:: int PyContextVar_Reset(PyObject *var, PyObject *token)
 
-   Reset the state of the *var* context variable to that it was in before
-   :c:func:`PyContextVar_Set` that returned the *token* was called.
-   This function returns ``0`` on success and ``-1`` on error.
+   Đặt lại trạng thái của biến ngữ cảnh *var* về trạng thái trước đó
+   :c:func:`PyContextVar_Set` đã trả về *token* được gọi. Hàm này trả về ``0`` khi thành công và ``-1`` khi xảy ra lỗi.

@@ -1,13 +1,10 @@
 .. _c-api-index:
 
-##################################
-  Python/C API reference manual
-##################################
+###############################
+Tài liệu tham khảo API Python/C
+###############################
 
-This manual documents the API used by C and C++ programmers who want to write
-extension modules or embed Python.  It is a companion to :ref:`extending-index`,
-which describes the general principles of extension writing but does not
-document the API functions in detail.
+Tài liệu này mô tả API được các lập trình viên C và C++ sử dụng để viết các module mở rộng hoặc nhúng Python. Đây là tài liệu đi kèm với :ref:`extending-index`, trong đó trình bày các nguyên tắc chung về việc viết phần mở rộng nhưng không mô tả chi tiết các hàm API.
 
 .. toctree::
    :maxdepth: 2

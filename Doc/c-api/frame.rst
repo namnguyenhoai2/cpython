@@ -1,283 +1,250 @@
 .. highlight:: c
 
-Frame objects
--------------
+Đối tượng frame
+---------------
 
 .. c:type:: PyFrameObject
 
-   The C structure of the objects used to describe frame objects.
+   Cấu trúc C của các đối tượng được dùng để mô tả đối tượng frame.
 
-   There are no public members in this structure.
+   Cấu trúc này không có thành viên công khai.
 
    .. versionchanged:: 3.11
-      The members of this structure were removed from the public C API.
-      Refer to the :ref:`What's New entry <pyframeobject-3.11-hiding>`
-      for details.
+      Các thành viên của cấu trúc này đã bị xóa khỏi public C API. Hãy tham khảo mục :ref:`What's New entry <pyframeobject-3.11-hiding>` để biết chi tiết.
 
-The :c:func:`PyEval_GetFrame` and :c:func:`PyThreadState_GetFrame` functions
-can be used to get a frame object.
+Có thể sử dụng các hàm :c:func:`PyEval_GetFrame` và :c:func:`PyThreadState_GetFrame` để lấy một đối tượng frame.
 
-See also :ref:`Reflection <reflection>`.
+Xem thêm :ref:`Reflection <reflection>`.
 
 .. c:var:: PyTypeObject PyFrame_Type
 
-   The type of frame objects.
-   It is the same object as :py:class:`types.FrameType` in the Python layer.
+   Kiểu của các đối tượng frame. Đây là cùng một đối tượng với :py:class:`types.FrameType` trong lớp Python.
 
    .. versionchanged:: 3.11
 
-      Previously, this type was only available after including
-      ``<frameobject.h>``.
+      Trước đây, kiểu này chỉ khả dụng sau khi đưa vào ``<frameobject.h>``.
 
 .. c:function:: PyFrameObject *PyFrame_New(PyThreadState *tstate, PyCodeObject *code, PyObject *globals, PyObject *locals)
 
-   Create a new frame object. This function returns a :term:`strong reference`
-   to the new frame object on success, and returns ``NULL`` with an exception
-   set on failure.
+   Tạo một đối tượng frame mới. Khi thành công, hàm này trả về một :term:`strong reference` trỏ tới đối tượng frame mới và khi thất bại, trả về ``NULL`` cùng với một ngoại lệ đã được thiết lập.
 
 .. c:function:: int PyFrame_Check(PyObject *obj)
 
-   Return non-zero if *obj* is a frame object.
+   Trả về giá trị khác 0 nếu *obj* là một đối tượng frame.
 
    .. versionchanged:: 3.11
 
-      Previously, this function was only available after including
-      ``<frameobject.h>``.
+      Trước đây, hàm này chỉ khả dụng sau khi đưa vào ``<frameobject.h>``.
 
 .. c:function:: PyFrameObject* PyFrame_GetBack(PyFrameObject *frame)
 
-   Get the *frame* next outer frame.
+   Lấy frame bên ngoài tiếp theo của *frame*.
 
-   Return a :term:`strong reference`, or ``NULL`` if *frame* has no outer
-   frame.
-   This raises no exceptions.
+   Trả về :term:`strong reference`, hoặc ``NULL`` nếu *frame* không có frame bên ngoài. Hàm này không phát sinh ngoại lệ.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: PyObject* PyFrame_GetBuiltins(PyFrameObject *frame)
 
-   Get the *frame*'s :attr:`~frame.f_builtins` attribute.
+   Lấy *khung* :attr:`~frame.f_builtins` thuộc tính.
 
-   Return a :term:`strong reference`. The result cannot be ``NULL``.
+   Trả về một :term:`strong reference`. Kết quả không thể là ``NULL``.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: PyCodeObject* PyFrame_GetCode(PyFrameObject *frame)
 
-   Get the *frame* code.
+   Lấy mã *frame*.
 
-   Return a :term:`strong reference`.
+   Trả về một :term:`strong reference`.
 
-   The result (frame code) cannot be ``NULL``.
+   Kết quả (mã frame) không thể là ``NULL``.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: PyObject* PyFrame_GetGenerator(PyFrameObject *frame)
 
-   Get the generator, coroutine, or async generator that owns this frame,
-   or ``NULL`` if this frame is not owned by a generator.
-   Does not raise an exception, even if the return value is ``NULL``.
+   Lấy generator, coroutine hoặc async generator sở hữu frame này, hoặc ``NULL`` nếu frame này không thuộc về generator nào. Không phát sinh ngoại lệ, ngay cả khi giá trị trả về là ``NULL``.
 
-   Return a :term:`strong reference`, or ``NULL``.
+   Trả về một :term:`strong reference`, hoặc ``NULL``.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: PyObject* PyFrame_GetGlobals(PyFrameObject *frame)
 
-   Get the *frame*'s :attr:`~frame.f_globals` attribute.
+   Lấy thuộc tính :attr:`~frame.f_globals` của *frame*.
 
-   Return a :term:`strong reference`. The result cannot be ``NULL``.
+   Trả về một :term:`strong reference`. Kết quả không thể là ``NULL``.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: int PyFrame_GetLasti(PyFrameObject *frame)
 
-   Get the *frame*'s :attr:`~frame.f_lasti` attribute.
+   Lấy *khung* của :attr:`~frame.f_lasti` thuộc tính.
 
-   Returns -1 if ``frame.f_lasti`` is ``None``.
+   Trả về -1 nếu ``frame.f_lasti`` là ``None``.
 
    .. versionadded:: 3.11
 
 
 .. c:function:: PyObject* PyFrame_GetVar(PyFrameObject *frame, PyObject *name)
 
-   Get the variable *name* of *frame*.
+   Lấy biến *name* của *frame*.
 
-   * Return a :term:`strong reference` to the variable value on success.
-   * Raise :exc:`NameError` and return ``NULL`` if the variable does not exist.
-   * Raise an exception and return ``NULL`` on error.
+   * Trả về một :term:`strong reference` đến giá trị biến khi thành công.
+   * Phát sinh :exc:`NameError` và trả về ``NULL`` nếu biến không tồn tại.
+   * Phát sinh một ngoại lệ và trả về ``NULL`` khi xảy ra lỗi.
 
-   *name* type must be a :class:`str`.
+   Kiểu *name* phải là một :class:`str`.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: PyObject* PyFrame_GetVarString(PyFrameObject *frame, const char *name)
 
-   Similar to :c:func:`PyFrame_GetVar`, but the variable name is a C string
-   encoded in UTF-8.
+   Tương tự như :c:func:`PyFrame_GetVar`, nhưng tên biến là một chuỗi C được mã hóa bằng UTF-8.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: PyObject* PyFrame_GetLocals(PyFrameObject *frame)
 
-   Get the *frame*'s :attr:`~frame.f_locals` attribute.
-   If the frame refers to an :term:`optimized scope`, this returns a
-   write-through proxy object that allows modifying the locals.
-   In all other cases (classes, modules, :func:`exec`, :func:`eval`) it returns
-   the mapping representing the frame locals directly (as described for
+   Lấy thuộc tính :attr:`~frame.f_locals` của *frame*. Nếu frame tham chiếu đến một :term:`optimized scope`, thao tác này trả về một đối tượng proxy cho phép ghi xuyên để sửa đổi các biến cục bộ. Trong mọi trường hợp khác (class, module, :func:`exec`, :func:`eval`), thao tác này trả về trực tiếp mapping biểu diễn các biến cục bộ của frame (như được mô tả cho
    :func:`locals`).
 
-   Return a :term:`strong reference`.
+   Trả về một :term:`strong reference`.
 
    .. versionadded:: 3.11
 
    .. versionchanged:: 3.13
-      As part of :pep:`667`, return an instance of :c:var:`PyFrameLocalsProxy_Type`.
+      Là một phần của :pep:`667`, trả về một instance của :c:var:`PyFrameLocalsProxy_Type`.
 
 
 .. c:function:: int PyFrame_GetLineNumber(PyFrameObject *frame)
 
-   Return the line number that *frame* is currently executing.
+   Trả về số dòng mà *frame* hiện đang thực thi.
 
 
-Frame locals proxies
-^^^^^^^^^^^^^^^^^^^^
+Proxy biến cục bộ của frame
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 3.13
 
-The :attr:`~frame.f_locals` attribute on a :ref:`frame object <frame-objects>`
-is an instance of a "frame-locals proxy". The proxy object exposes a
-write-through view of the underlying locals dictionary for the frame. This
-ensures that the variables exposed by ``f_locals`` are always up to date with
-the live local variables in the frame itself.
+Thuộc tính :attr:`~frame.f_locals` trên một :ref:`đối tượng frame <frame-objects>` là một instance của “frame-locals proxy”. Đối tượng proxy cung cấp chế độ xem cho phép ghi xuyên vào từ điển locals bên dưới của frame. Điều này đảm bảo các biến được ``f_locals`` cung cấp luôn được cập nhật theo các biến cục bộ đang hoạt động trong chính frame.
 
-See :pep:`667` for more information.
+Xem :pep:`667` để biết thêm thông tin.
 
 .. c:var:: PyTypeObject PyFrameLocalsProxy_Type
 
-   The type of frame :func:`locals` proxy objects.
+   Kiểu của các đối tượng proxy :func:`locals` thuộc frame.
 
 .. c:function:: int PyFrameLocalsProxy_Check(PyObject *obj)
 
-   Return non-zero if *obj* is a frame :func:`locals` proxy.
+   Trả về giá trị khác 0 nếu *obj* là proxy :func:`locals` của frame.
 
 
-Legacy local variable APIs
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+API biến cục bộ kiểu cũ
+^^^^^^^^^^^^^^^^^^^^^^^
 
-These APIs are :term:`soft deprecated`. As of Python 3.13, they do nothing.
-They exist solely for backwards compatibility.
+Các API này đã :term:`soft deprecated`. Kể từ Python 3.13, chúng không thực hiện thao tác nào. Chúng chỉ tồn tại để đảm bảo khả năng tương thích ngược.
 
 
 .. c:function:: void PyFrame_LocalsToFast(PyFrameObject *f, int clear)
 
-   Prior to Python 3.13, this function would copy the :attr:`~frame.f_locals`
-   attribute of *f* to the internal "fast" array of local variables, allowing
-   changes in frame objects to be visible to the interpreter. If *clear* was
-   true, this function would process variables that were unset in the locals
-   dictionary.
+   Trước Python 3.13, hàm này sẽ sao chép thuộc tính :attr:`~frame.f_locals` của *f* vào mảng “nhanh” nội bộ của các biến cục bộ, cho phép các thay đổi trong đối tượng frame được trình thông dịch nhìn thấy. Nếu *clear* có giá trị true, hàm này sẽ xử lý các biến chưa được thiết lập trong từ điển locals.
 
    .. soft-deprecated:: 3.13
-      This function now does nothing.
+      Hàm này hiện không làm gì cả.
 
 
 .. c:function:: void PyFrame_FastToLocals(PyFrameObject *f)
 
-   Prior to Python 3.13, this function would copy the internal "fast" array
-   of local variables (which is used by the interpreter) to the
-   :attr:`~frame.f_locals` attribute of *f*, allowing changes in local
-   variables to be visible to frame objects.
+   Trước Python 3.13, hàm này sẽ sao chép mảng biến cục bộ "fast" nội bộ (được interpreter sử dụng) vào
+   thuộc tính :attr:`~frame.f_locals` của *f*, cho phép các thay đổi trong biến cục bộ hiển thị trong các đối tượng frame.
 
    .. soft-deprecated:: 3.13
-      This function now does nothing.
+      Hàm này hiện không làm gì cả.
 
 
 .. c:function:: int PyFrame_FastToLocalsWithError(PyFrameObject *f)
 
-   Prior to Python 3.13, this function was similar to
-   :c:func:`PyFrame_FastToLocals`, but would return ``0`` on success, and
-   ``-1`` with an exception set on failure.
+   Trước Python 3.13, hàm này tương tự như
+   :c:func:`PyFrame_FastToLocals`, nhưng sẽ trả về ``0`` khi thành công và ``-1`` khi thất bại với một exception đã được thiết lập.
 
    .. soft-deprecated:: 3.13
-      This function now does nothing.
+      Hàm này hiện không làm gì cả.
 
 
 .. seealso::
    :pep:`667`
 
 
-Internal frames
-^^^^^^^^^^^^^^^
+Các frame nội bộ
+^^^^^^^^^^^^^^^^
 
-Unless using :pep:`523`, you will not need this.
+Trừ khi sử dụng :pep:`523`, bạn sẽ không cần đến phần này.
 
 .. c:struct:: _PyInterpreterFrame
 
-   The interpreter's internal frame representation.
+   Biểu diễn frame nội bộ của interpreter.
 
    .. versionadded:: 3.11
 
 .. c:function:: PyObject* PyUnstable_InterpreterFrame_GetCode(struct _PyInterpreterFrame *frame);
 
-    Return a :term:`strong reference` to the code object for the frame.
+    Trả về một :term:`strong reference` tới code object của frame.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: int PyUnstable_InterpreterFrame_GetLasti(struct _PyInterpreterFrame *frame);
 
-   Return the byte offset into the last executed instruction.
+   Trả về độ lệch byte tới instruction được thực thi gần nhất.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: int PyUnstable_InterpreterFrame_GetLine(struct _PyInterpreterFrame *frame);
 
-   Return the currently executing line number, or -1 if there is no line number.
+   Trả về số dòng hiện đang được thực thi hoặc -1 nếu không có số dòng.
 
    .. versionadded:: 3.12
 
 
 .. c:var:: const PyTypeObject *PyUnstable_ExecutableKinds
 
-   An array of executable kinds (executor types) for frames, used for internal
-   debugging and tracing.
+   Một mảng các loại có thể thực thi (executor type) cho các frame, được dùng để debug và tracing nội bộ.
 
-   Tools like debuggers and profilers can use this to identify the type of execution
-   context associated with a frame (such as to filter out internal frames).
-   The entries are indexed by the following constants:
+   Các công cụ như trình gỡ lỗi và trình phân tích hiệu năng có thể sử dụng thông tin này để xác định loại ngữ cảnh thực thi liên kết với một frame (chẳng hạn để lọc các frame nội bộ). Các mục được lập chỉ mục bằng các hằng số sau:
 
    .. list-table::
       :header-rows: 1
       :widths: auto
 
-      * - Constant
-        - Description
+      * - Hằng số
+        - Mô tả
       * - .. c:macro:: PyUnstable_EXECUTABLE_KIND_SKIP
-        - The frame is internal (For example: inlined) and should be skipped by tools.
+        - Frame là frame nội bộ (ví dụ: được inline) và các công cụ nên bỏ qua frame này.
       * - .. c:macro:: PyUnstable_EXECUTABLE_KIND_PY_FUNCTION
-        - The frame corresponds to a standard Python function.
+        - Frame tương ứng với một hàm Python tiêu chuẩn.
       * - .. c:macro:: PyUnstable_EXECUTABLE_KIND_BUILTIN_FUNCTION
-        - The frame corresponds to a function defined in native code.
+        - Frame tương ứng với một hàm được định nghĩa trong mã native.
       * - .. c:macro:: PyUnstable_EXECUTABLE_KIND_METHOD_DESCRIPTOR
-        - The frame corresponds to a method on a class instance.
+        - Frame tương ứng với một phương thức trên một thực thể lớp.
 
-   Note that reading the executable kind from a frame is currently only
-   possible with undocumented internal APIs.
+   Lưu ý rằng hiện tại chỉ có thể đọc loại executable từ một frame bằng các API nội bộ chưa được công bố.
 
    .. versionadded:: 3.13
 
 
 .. c:macro:: PyUnstable_EXECUTABLE_KINDS
 
-   The number of entries in :c:data:`PyUnstable_ExecutableKinds`.
+   Số lượng mục trong :c:data:`PyUnstable_ExecutableKinds`.
 
    .. versionadded:: 3.13
 

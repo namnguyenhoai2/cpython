@@ -1,140 +1,133 @@
 .. highlight:: c
 
-PyHash API
+API PyHash
 ----------
 
-See also the :c:member:`PyTypeObject.tp_hash` member and :ref:`numeric-hash`.
+Xem thêm thành viên :c:member:`PyTypeObject.tp_hash` và :ref:`numeric-hash`.
 
 .. c:type:: Py_hash_t
 
-   Hash value type: signed integer.
+   Kiểu giá trị hash: số nguyên có dấu.
 
    .. versionadded:: 3.2
 
 
 .. c:type:: Py_uhash_t
 
-   Hash value type: unsigned integer.
+   Kiểu giá trị hash: số nguyên không dấu.
 
    .. versionadded:: 3.2
 
 
 .. c:macro:: Py_HASH_ALGORITHM
 
-   A numerical value indicating the algorithm for hashing of :class:`str`,
-   :class:`bytes`, and :class:`memoryview`.
+   Một giá trị số cho biết thuật toán dùng để băm :class:`str`,
+   :class:`bytes` và :class:`memoryview`.
 
-   The algorithm name is exposed by :data:`sys.hash_info.algorithm`.
+   Tên thuật toán được cung cấp thông qua :data:`sys.hash_info.algorithm`.
 
    .. versionadded:: 3.4
 
 
 .. c:macro:: Py_HASH_FNV
-             Py_HASH_SIPHASH24
-             Py_HASH_SIPHASH13
+             Py_HASH_SIPHASH24 Py_HASH_SIPHASH13
 
-   Numerical values to compare to :c:macro:`Py_HASH_ALGORITHM` to determine
-   which algorithm is used for hashing. The hash algorithm can be configured
-   via the configure :option:`--with-hash-algorithm` option.
+   Các giá trị số để so sánh với :c:macro:`Py_HASH_ALGORITHM` nhằm xác định thuật toán nào được sử dụng để băm. Có thể cấu hình thuật toán băm thông qua tùy chọn :option:`--with-hash-algorithm` configure.
 
    .. versionadded:: 3.4
-      Add :c:macro:`!Py_HASH_FNV` and :c:macro:`!Py_HASH_SIPHASH24`.
+      Thêm :c:macro:`!Py_HASH_FNV` và :c:macro:`!Py_HASH_SIPHASH24`.
 
    .. versionadded:: 3.11
-      Add :c:macro:`!Py_HASH_SIPHASH13`.
+      Thêm :c:macro:`!Py_HASH_SIPHASH13`.
 
 
 .. c:macro:: Py_HASH_CUTOFF
 
-   Buffers of length in range ``[1, Py_HASH_CUTOFF)`` are hashed using DJBX33A
-   instead of the algorithm described by :c:macro:`Py_HASH_ALGORITHM`.
+   Các buffer có độ dài trong phạm vi ``[1, Py_HASH_CUTOFF)`` được băm bằng DJBX33A thay vì thuật toán được mô tả bởi :c:macro:`Py_HASH_ALGORITHM`.
 
-   - A :c:macro:`!Py_HASH_CUTOFF` of 0 disables the optimization.
-   - :c:macro:`!Py_HASH_CUTOFF` must be non-negative and less or equal than 7.
+   - Giá trị :c:macro:`!Py_HASH_CUTOFF` bằng 0 sẽ tắt tính năng tối ưu hóa.
+   - :c:macro:`!Py_HASH_CUTOFF` phải không âm và nhỏ hơn hoặc bằng 7.
 
-   32-bit platforms should use a cutoff smaller than 64-bit platforms because
-   it is easier to create colliding strings. A cutoff of 7 on 64-bit platforms
-   and 5 on 32-bit platforms should provide a decent safety margin.
+   Các nền tảng 32-bit nên sử dụng ngưỡng nhỏ hơn các nền tảng 64-bit vì việc tạo các chuỗi xung đột dễ hơn. Ngưỡng 7 trên các nền tảng 64-bit và 5 trên các nền tảng 32-bit sẽ cung cấp một biên độ an toàn khá tốt.
 
-   This corresponds to the :data:`sys.hash_info.cutoff` constant.
+   Điều này tương ứng với hằng số :data:`sys.hash_info.cutoff`.
 
    .. versionadded:: 3.4
 
 
 .. c:macro:: PyHASH_MODULUS
 
-   The `Mersenne prime <https://en.wikipedia.org/wiki/Mersenne_prime>`_ ``P = 2**n -1``,
-   used for numeric hash scheme.
+   `Số nguyên tố Mersenne <https://en.wikipedia.org/wiki/Mersenne_prime>`_ ``P = 2**n -1``, được dùng cho lược đồ băm số.
 
-   This corresponds to the :data:`sys.hash_info.modulus` constant.
+   Điều này tương ứng với hằng số :data:`sys.hash_info.modulus`.
 
    .. versionadded:: 3.13
 
 
 .. c:macro:: PyHASH_BITS
 
-   The exponent ``n`` of ``P`` in :c:macro:`PyHASH_MODULUS`.
+   Số mũ ``n`` của ``P`` trong :c:macro:`PyHASH_MODULUS`.
 
    .. versionadded:: 3.13
 
 
 .. c:macro:: PyHASH_MULTIPLIER
 
-   Prime multiplier used in string and various other hashes.
+   Bộ nhân số nguyên tố được sử dụng trong hash chuỗi và nhiều loại hash khác.
 
    .. versionadded:: 3.13
 
 
 .. c:macro:: PyHASH_INF
 
-   The hash value returned for a positive infinity.
+   Giá trị hash được trả về cho một giá trị dương vô cực.
 
-   This corresponds to the :data:`sys.hash_info.inf` constant.
+   Điều này tương ứng với hằng số :data:`sys.hash_info.inf`.
 
    .. versionadded:: 3.13
 
 
 .. c:macro:: PyHASH_IMAG
 
-   The multiplier used for the imaginary part of a complex number.
+   Hệ số nhân được sử dụng cho phần ảo của một số phức.
 
-   This corresponds to the :data:`sys.hash_info.imag` constant.
+   Điều này tương ứng với hằng số :data:`sys.hash_info.imag`.
 
    .. versionadded:: 3.13
 
 
 .. c:type:: PyHash_FuncDef
 
-   Hash function definition used by :c:func:`PyHash_GetFuncDef`.
+   Định nghĩa hàm băm được :c:func:`PyHash_GetFuncDef` sử dụng.
 
    .. c:member:: Py_hash_t (*const hash)(const void *, Py_ssize_t)
 
-      Hash function.
+      Hàm băm.
 
    .. c:member:: const char *name
 
-      Hash function name (UTF-8 encoded string).
+      Tên hàm băm (chuỗi được mã hóa UTF-8).
 
-      This corresponds to the :data:`sys.hash_info.algorithm` constant.
+      Điều này tương ứng với hằng số :data:`sys.hash_info.algorithm`.
 
    .. c:member:: const int hash_bits
 
-      Internal size of the hash value in bits.
+      Kích thước nội bộ của giá trị băm tính theo bit.
 
-      This corresponds to the :data:`sys.hash_info.hash_bits` constant.
+      Điều này tương ứng với hằng số :data:`sys.hash_info.hash_bits`.
 
    .. c:member:: const int seed_bits
 
-      Size of seed input in bits.
+      Kích thước của đầu vào seed tính theo bit.
 
-      This corresponds to the :data:`sys.hash_info.seed_bits` constant.
+      Điều này tương ứng với hằng số :data:`sys.hash_info.seed_bits`.
 
    .. versionadded:: 3.4
 
 
 .. c:function:: PyHash_FuncDef* PyHash_GetFuncDef(void)
 
-   Get the hash function definition.
+   Lấy định nghĩa của hàm băm.
 
    .. seealso::
       :pep:`456` "Secure and interchangeable hash algorithm".
@@ -144,39 +137,35 @@ See also the :c:member:`PyTypeObject.tp_hash` member and :ref:`numeric-hash`.
 
 .. c:function:: Py_hash_t Py_HashPointer(const void *ptr)
 
-   Hash a pointer value: process the pointer value as an integer (cast it to
-   ``uintptr_t`` internally). The pointer is not dereferenced.
+   Băm một giá trị con trỏ: xử lý giá trị con trỏ như một số nguyên (ép kiểu nội bộ thành ``uintptr_t``). Con trỏ không được tham chiếu đến.
 
-   The function cannot fail: it cannot return ``-1``.
+   Hàm này không thể thất bại: nó không thể trả về ``-1``.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: Py_hash_t Py_HashBuffer(const void *ptr, Py_ssize_t len)
 
-   Compute and return the hash value of a buffer of *len* bytes
-   starting at address *ptr*. The hash is guaranteed to match that of
-   :class:`bytes`, :class:`memoryview`, and other built-in objects
-   that implement the :ref:`buffer protocol <bufferobjects>`.
+   Tính và trả về giá trị hash của một buffer gồm *len* byte bắt đầu tại địa chỉ *ptr*. Hash này được đảm bảo khớp với hash của
+   :class:`bytes`, :class:`memoryview`, và các đối tượng dựng sẵn khác triển khai :ref:`buffer protocol <bufferobjects>`.
 
-   Use this function to implement hashing for immutable objects whose
-   :c:member:`~PyTypeObject.tp_richcompare` function compares to another
-   object's buffer.
+   Sử dụng hàm này để triển khai việc hashing cho các đối tượng bất biến mà
+   :c:member:`~PyTypeObject.tp_richcompare` so sánh với buffer của một đối tượng khác.
 
-   *len* must be greater than or equal to ``0``.
+   *len* phải lớn hơn hoặc bằng ``0``.
 
-   This function always succeeds.
+   Hàm này luôn thành công.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: Py_hash_t PyObject_GenericHash(PyObject *obj)
 
-   Generic hashing function that is meant to be put into a type
-   object's ``tp_hash`` slot.
-   Its result only depends on the object's identity.
+   Hàm hashing tổng quát được dùng để đặt vào slot ``tp_hash`` của đối tượng kiểu. Kết quả của hàm chỉ phụ thuộc vào identity của đối tượng.
 
    .. impl-detail::
-      In CPython, it is equivalent to :c:func:`Py_HashPointer`.
+      Trong CPython, điều này tương đương với :c:func:`Py_HashPointer`.
 
    .. versionadded:: 3.13
+
+.. _`Mersenne prime`: https://en.wikipedia.org/wiki/Mersenne_prime

@@ -2,79 +2,67 @@
 
 .. _dictobjects:
 
-Dictionary Objects
-------------------
+Đối tượng từ điển
+-----------------
 
 .. index:: pair: object; dictionary
 
 
 .. c:type:: PyDictObject
 
-   This subtype of :c:type:`PyObject` represents a Python dictionary object.
+   Kiểu con này của :c:type:`PyObject` đại diện cho một đối tượng từ điển Python.
 
 
 .. c:var:: PyTypeObject PyDict_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python dictionary
-   type.  This is the same object as :class:`dict` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` đại diện cho kiểu từ điển Python. Đây là cùng một đối tượng với :class:`dict` trong tầng Python.
 
 
 .. c:function:: int PyDict_Check(PyObject *p)
 
-   Return true if *p* is a dict object or an instance of a subtype of the dict
-   type.  This function always succeeds.
+   Trả về true nếu *p* là một đối tượng dict hoặc là một instance của kiểu con của kiểu dict. Hàm này luôn thực thi thành công.
 
 
 .. c:function:: int PyDict_CheckExact(PyObject *p)
 
-   Return true if *p* is a dict object, but not an instance of a subtype of
-   the dict type.  This function always succeeds.
+   Trả về true nếu *p* là một đối tượng dict nhưng không phải là một instance của kiểu con của kiểu dict. Hàm này luôn thực thi thành công.
 
 
 .. c:function:: PyObject* PyDict_New()
 
-   Return a new empty dictionary, or ``NULL`` on failure.
+   Trả về một từ điển mới, rỗng hoặc ``NULL`` nếu xảy ra lỗi.
 
 
 .. c:function:: PyObject* PyDictProxy_New(PyObject *mapping)
 
-   Return a :class:`types.MappingProxyType` object for a mapping which
-   enforces read-only behavior.  This is normally used to create a view to
-   prevent modification of the dictionary for non-dynamic class types.
+   Trả về một đối tượng :class:`types.MappingProxyType` cho một mapping áp dụng hành vi chỉ đọc. Đối tượng này thường được dùng để tạo một view nhằm ngăn việc sửa đổi từ điển đối với các kiểu lớp không động.
 
 
 .. c:var:: PyTypeObject PyDictProxy_Type
 
-   The type object for mapping proxy objects created by
-   :c:func:`PyDictProxy_New` and for the read-only ``__dict__`` attribute
-   of many built-in types. A :c:type:`PyDictProxy_Type` instance provides a
-   dynamic, read-only view of an underlying dictionary: changes to the
-   underlying dictionary are reflected in the proxy, but the proxy itself
-   does not support mutation operations. This corresponds to
-   :class:`types.MappingProxyType` in Python.
+   Kiểu đối tượng dành cho các đối tượng mapping proxy được tạo bởi
+   :c:func:`PyDictProxy_New` và cho thuộc tính ``__dict__`` chỉ đọc của nhiều kiểu dựng sẵn. Một thực thể :c:type:`PyDictProxy_Type` cung cấp một chế độ xem động, chỉ đọc của một dictionary nền: các thay đổi đối với dictionary nền được phản ánh trong proxy, nhưng bản thân proxy không hỗ trợ các thao tác biến đổi. Điều này tương ứng với
+   :class:`types.MappingProxyType` trong Python.
 
 
 .. c:function:: void PyDict_Clear(PyObject *p)
 
-   Empty an existing dictionary of all key-value pairs.
+   Xóa tất cả các cặp khóa-giá trị khỏi một dictionary hiện có.
 
 
 .. c:function:: int PyDict_Contains(PyObject *p, PyObject *key)
 
-   Determine if dictionary *p* contains *key*.  If an item in *p* matches
-   *key*, return ``1``, otherwise return ``0``.  On error, return ``-1``.
-   This is equivalent to the Python expression ``key in p``.
+   Xác định xem dictionary *p* có chứa *key* hay không. Nếu một mục trong *p* khớp với *key*, trả về ``1``, nếu không thì trả về ``0``. Khi có lỗi, trả về ``-1``. Tương đương với biểu thức Python ``key in p``.
 
    .. note::
 
-      The operation is atomic on :term:`free threading <free-threaded build>`
-      when *key* is :class:`str`, :class:`int`, :class:`float`, :class:`bool` or :class:`bytes`.
+      Thao tác này là nguyên tử trong :term:`free threading <free-threaded build>` khi *key* là :class:`str`, :class:`int`, :class:`float`, :class:`bool` hoặc :class:`bytes`.
 
 
 .. c:function:: int PyDict_ContainsString(PyObject *p, const char *key)
 
-   This is the same as :c:func:`PyDict_Contains`, but *key* is specified as a
-   :c:expr:`const char*` UTF-8 encoded bytes string, rather than a
+   Điều này giống với :c:func:`PyDict_Contains`, nhưng *key* được chỉ định dưới dạng
+   :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một
    :c:expr:`PyObject*`.
 
    .. versionadded:: 3.13
@@ -82,134 +70,105 @@ Dictionary Objects
 
 .. c:function:: PyObject* PyDict_Copy(PyObject *p)
 
-   Return a new dictionary that contains the same key-value pairs as *p*.
+   Trả về một dictionary mới chứa các cặp khóa-giá trị giống với *p*.
 
 
 .. c:function:: int PyDict_SetItem(PyObject *p, PyObject *key, PyObject *val)
 
-   Insert *val* into the dictionary *p* with a key of *key*.  *key* must be
-   :term:`hashable`; if it isn't, :exc:`TypeError` will be raised. Return
-   ``0`` on success or ``-1`` on failure.
-   This function *does not* ":term:`steal`" a reference to *val*.
+   Chèn *val* vào dictionary *p* với khóa là *key*.  *key* phải là
+   :term:`hashable`; nếu không, :exc:`TypeError` sẽ được phát sinh. Trả về ``0`` khi thành công hoặc ``-1`` khi thất bại. Hàm này *không* ":term:`steal`" một tham chiếu đến *val*.
 
    .. note::
 
-      The operation is atomic on :term:`free threading <free-threaded build>`
-      when *key* is :class:`str`, :class:`int`, :class:`float`, :class:`bool` or :class:`bytes`.
+      Thao tác này là nguyên tử trong :term:`free threading <free-threaded build>` khi *key* là :class:`str`, :class:`int`, :class:`float`, :class:`bool` hoặc :class:`bytes`.
 
 
 .. c:function:: int PyDict_SetItemString(PyObject *p, const char *key, PyObject *val)
 
-   This is the same as :c:func:`PyDict_SetItem`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Tương tự như :c:func:`PyDict_SetItem`, nhưng *key* được chỉ định dưới dạng :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một :c:expr:`PyObject*`.
 
 
 .. c:function:: int PyDict_DelItem(PyObject *p, PyObject *key)
 
-   Remove the entry in dictionary *p* with key *key*. *key* must be :term:`hashable`;
-   if it isn't, :exc:`TypeError` is raised.
-   If *key* is not in the dictionary, :exc:`KeyError` is raised.
-   Return ``0`` on success or ``-1`` on failure.
+   Xóa mục trong dictionary *p* có khóa *key*. *key* phải là :term:`hashable`; nếu không, :exc:`TypeError` sẽ được phát sinh. Nếu *key* không có trong dictionary, :exc:`KeyError` sẽ được phát sinh. Trả về ``0`` khi thành công hoặc ``-1`` khi thất bại.
 
    .. note::
 
-      The operation is atomic on :term:`free threading <free-threaded build>`
-      when *key* is :class:`str`, :class:`int`, :class:`float`, :class:`bool` or :class:`bytes`.
+      Thao tác này là nguyên tử trong :term:`free threading <free-threaded build>` khi *key* là :class:`str`, :class:`int`, :class:`float`, :class:`bool` hoặc :class:`bytes`.
 
 
 .. c:function:: int PyDict_DelItemString(PyObject *p, const char *key)
 
-   This is the same as :c:func:`PyDict_DelItem`, but *key* is
-   specified as a :c:expr:`const char*` UTF-8 encoded bytes string,
-   rather than a :c:expr:`PyObject*`.
+   Điều này giống với :c:func:`PyDict_DelItem`, nhưng *key* được chỉ định dưới dạng một :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một :c:expr:`PyObject*`.
 
 
 .. c:function:: int PyDict_GetItemRef(PyObject *p, PyObject *key, PyObject **result)
 
-   Return a new :term:`strong reference` to the object from dictionary *p*
-   which has a key *key*:
+   Trả về một :term:`strong reference` mới trỏ đến đối tượng trong dictionary *p* có khóa *key*:
 
-   * If the key is present, set *\*result* to a new :term:`strong reference`
-     to the value and return ``1``.
-   * If the key is missing, set *\*result* to ``NULL`` and return ``0``.
-   * On error, raise an exception, set *\*result* to ``NULL`` and return ``-1``.
+   * Nếu khóa tồn tại, đặt *\*result* thành một :term:`strong reference` mới trỏ đến giá trị và trả về ``1``.
+   * Nếu thiếu khóa, đặt *\*result* thành ``NULL`` và trả về ``0``.
+   * Khi xảy ra lỗi, phát sinh một ngoại lệ, đặt *\*result* thành ``NULL`` và trả về ``-1``.
 
    .. note::
 
-      The operation is atomic on :term:`free threading <free-threaded build>`
-      when *key* is :class:`str`, :class:`int`, :class:`float`, :class:`bool` or :class:`bytes`.
+      Thao tác này là nguyên tử trong :term:`free threading <free-threaded build>` khi *key* là :class:`str`, :class:`int`, :class:`float`, :class:`bool` hoặc :class:`bytes`.
 
    .. versionadded:: 3.13
 
-   See also the :c:func:`PyObject_GetItem` function.
+   Xem thêm hàm :c:func:`PyObject_GetItem`.
 
 
 .. c:function:: PyObject* PyDict_GetItem(PyObject *p, PyObject *key)
 
-   Return a :term:`borrowed reference` to the object from dictionary *p* which
-   has a key *key*.  Return ``NULL`` if the key *key* is missing *without*
-   setting an exception.
+   Trả về một :term:`borrowed reference` đến đối tượng trong từ điển *p* có khóa *key*. Trả về ``NULL`` nếu thiếu khóa *key* *without* đặt một ngoại lệ.
 
    .. note::
 
-      Exceptions that occur while this calls :meth:`~object.__hash__` and
-      :meth:`~object.__eq__` methods are silently ignored.
-      Prefer the :c:func:`PyDict_GetItemWithError` function instead.
+      Các ngoại lệ xảy ra khi lệnh này gọi :meth:`~object.__hash__` và
+      các phương thức :meth:`~object.__eq__` bị bỏ qua một cách im lặng. Ưu tiên sử dụng hàm :c:func:`PyDict_GetItemWithError`.
 
    .. note::
 
-      In the :term:`free-threaded build`, the returned
-      :term:`borrowed reference` may become invalid if another thread modifies
-      the dictionary concurrently. Prefer :c:func:`PyDict_GetItemRef`, which
-      returns a :term:`strong reference`.
+      Trong :term:`free-threaded build`, giá trị được trả về
+      :term:`borrowed reference` có thể trở nên không hợp lệ nếu một thread khác đồng thời sửa đổi từ điển. Ưu tiên :c:func:`PyDict_GetItemRef`, hàm này trả về một :term:`strong reference`.
 
    .. versionchanged:: 3.10
-      Calling this API without an :term:`attached thread state` had been allowed for historical
-      reason. It is no longer allowed.
+      Việc gọi API này mà không có :term:`attached thread state` trước đây đã được cho phép vì lý do lịch sử. Hiện nay việc đó không còn được phép.
 
 
 .. c:function:: PyObject* PyDict_GetItemWithError(PyObject *p, PyObject *key)
 
-   Variant of :c:func:`PyDict_GetItem` that does not suppress
-   exceptions. Return ``NULL`` **with** an exception set if an exception
-   occurred.  Return ``NULL`` **without** an exception set if the key
-   wasn't present.
+   Biến thể của :c:func:`PyDict_GetItem` không bỏ qua các exception. Trả về ``NULL`` **with** một exception set nếu xảy ra exception. Trả về ``NULL`` **without** một exception set nếu không tìm thấy key.
 
    .. note::
 
-      In the :term:`free-threaded build`, the returned
-      :term:`borrowed reference` may become invalid if another thread modifies
-      the dictionary concurrently. Prefer :c:func:`PyDict_GetItemRef`, which
-      returns a :term:`strong reference`.
+      Trong :term:`free-threaded build`, giá trị được trả về
+      :term:`borrowed reference` có thể trở nên không hợp lệ nếu một thread khác đồng thời sửa đổi từ điển. Ưu tiên :c:func:`PyDict_GetItemRef`, hàm này trả về một :term:`strong reference`.
 
 
 .. c:function:: PyObject* PyDict_GetItemString(PyObject *p, const char *key)
 
-   This is the same as :c:func:`PyDict_GetItem`, but *key* is specified as a
-   :c:expr:`const char*` UTF-8 encoded bytes string, rather than a
+   Điều này giống :c:func:`PyDict_GetItem`, nhưng *key* được chỉ định là một
+   :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một
    :c:expr:`PyObject*`.
 
    .. note::
 
-      Exceptions that occur while this calls :meth:`~object.__hash__` and
-      :meth:`~object.__eq__` methods or while creating the temporary :class:`str`
-      object are silently ignored.
-      Prefer using the :c:func:`PyDict_GetItemWithError` function with your own
-      :c:func:`PyUnicode_FromString` *key* instead.
+      Các ngoại lệ xảy ra khi lệnh này gọi :meth:`~object.__hash__` và
+      :meth:`~object.__eq__` các phương thức hoặc trong khi tạo đối tượng :class:`str` tạm thời sẽ bị bỏ qua mà không báo lỗi. Nên sử dụng hàm :c:func:`PyDict_GetItemWithError` với chính bạn
+      :c:func:`PyUnicode_FromString` *key* thay vào đó.
 
    .. note::
 
-      In the :term:`free-threaded build`, the returned
-      :term:`borrowed reference` may become invalid if another thread modifies
-      the dictionary concurrently. Prefer :c:func:`PyDict_GetItemStringRef`,
-      which returns a :term:`strong reference`.
+      Trong :term:`free-threaded build`, giá trị được trả về
+      :term:`borrowed reference` có thể trở nên không hợp lệ nếu một thread khác đồng thời sửa đổi dictionary. Ưu tiên :c:func:`PyDict_GetItemStringRef`, hàm này trả về một :term:`strong reference`.
 
 
 .. c:function:: int PyDict_GetItemStringRef(PyObject *p, const char *key, PyObject **result)
 
-   Similar to :c:func:`PyDict_GetItemRef`, but *key* is specified as a
-   :c:expr:`const char*` UTF-8 encoded bytes string, rather than a
+   Tương tự như :c:func:`PyDict_GetItemRef`, nhưng *key* được chỉ định là một
+   :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một
    :c:expr:`PyObject*`.
 
    .. versionadded:: 3.13
@@ -217,75 +176,51 @@ Dictionary Objects
 
 .. c:function:: PyObject* PyDict_SetDefault(PyObject *p, PyObject *key, PyObject *defaultobj)
 
-   This is the same as the Python-level :meth:`dict.setdefault`.  If present, it
-   returns the value corresponding to *key* from the dictionary *p*.  If the key
-   is not in the dict, it is inserted with value *defaultobj* and *defaultobj*
-   is returned.  This function evaluates the hash function of *key* only once,
-   instead of evaluating it independently for the lookup and the insertion.
+   Đây cũng chính là :meth:`dict.setdefault` ở cấp Python. Nếu được cung cấp, hàm này trả về giá trị tương ứng với *key* từ dictionary *p*. Nếu key không có trong dict, key đó được chèn với giá trị *defaultobj* và *defaultobj* được trả về. Hàm này chỉ đánh giá hàm băm của *key* một lần, thay vì đánh giá riêng cho thao tác tra cứu và thao tác chèn.
 
    .. versionadded:: 3.4
 
    .. note::
 
-      In the :term:`free-threaded build`, the returned
-      :term:`borrowed reference` may become invalid if another thread modifies
-      the dictionary concurrently. Prefer :c:func:`PyDict_SetDefaultRef`,
-      which returns a :term:`strong reference`.
+      Trong :term:`free-threaded build`, giá trị được trả về
+      :term:`borrowed reference` có thể trở nên không hợp lệ nếu một thread khác đồng thời sửa đổi dictionary. Nên dùng :c:func:`PyDict_SetDefaultRef`, hàm này trả về một :term:`strong reference`.
 
 
 
 .. c:function:: int PyDict_SetDefaultRef(PyObject *p, PyObject *key, PyObject *default_value, PyObject **result)
 
-   Inserts *default_value* into the dictionary *p* with a key of *key* if the
-   key is not already present in the dictionary. If *result* is not ``NULL``,
-   then *\*result* is set to a :term:`strong reference` to either
-   *default_value*, if the key was not present, or the existing value, if *key*
-   was already present in the dictionary.
-   Returns ``1`` if the key was present and *default_value* was not inserted,
-   or ``0`` if the key was not present and *default_value* was inserted.
-   On failure, returns ``-1``, sets an exception, and sets ``*result``
-   to ``NULL``.
+   Chèn *default_value* vào dictionary *p* với khóa là *key* nếu khóa này chưa tồn tại trong dictionary. Nếu *result* không phải là ``NULL``, thì *\*result* được gán một :term:`strong reference` tới *default_value* nếu khóa chưa tồn tại, hoặc tới giá trị hiện có nếu *key* đã tồn tại trong dictionary. Trả về ``1`` nếu khóa đã tồn tại và *default_value* chưa được chèn, hoặc ``0`` nếu khóa chưa tồn tại và *default_value* đã được chèn. Khi thất bại, trả về ``-1``, thiết lập một exception và đặt ``*result`` thành ``NULL``.
 
-   For clarity: if you have a strong reference to *default_value* before
-   calling this function, then after it returns, you hold a strong reference
-   to both *default_value* and *\*result* (if it's not ``NULL``).
-   These may refer to the same object: in that case you hold two separate
-   references to it.
+   Để rõ ràng: nếu bạn có một strong reference tới *default_value* trước khi gọi hàm này, thì sau khi hàm trả về, bạn giữ một strong reference tới cả *default_value* và *\*result* (nếu nó không phải là ``NULL``). Các tham chiếu này có thể trỏ tới cùng một đối tượng; trong trường hợp đó, bạn giữ hai tham chiếu riêng biệt tới đối tượng đó.
 
    .. note::
 
-      The operation is atomic on :term:`free threading <free-threaded build>`
-      when *key* is :class:`str`, :class:`int`, :class:`float`, :class:`bool` or :class:`bytes`.
+      Thao tác này là nguyên tử trong :term:`free threading <free-threaded build>` khi *key* là :class:`str`, :class:`int`, :class:`float`, :class:`bool` hoặc :class:`bytes`.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyDict_Pop(PyObject *p, PyObject *key, PyObject **result)
 
-   Remove *key* from dictionary *p* and optionally return the removed value.
-   Do not raise :exc:`KeyError` if the key is missing.
+   Xóa *key* khỏi dictionary *p* và tùy chọn trả về giá trị đã xóa. Không raise :exc:`KeyError` nếu không tìm thấy khóa.
 
-   - If the key is present, set *\*result* to a new reference to the removed
-     value if *result* is not ``NULL``, and return ``1``.
-   - If the key is missing, set *\*result* to ``NULL`` if *result* is not
-     ``NULL``, and return ``0``.
-   - On error, raise an exception and return ``-1``.
+   - Nếu khóa tồn tại, đặt *\*result* thành một tham chiếu mới tới giá trị đã xóa nếu *result* không phải là ``NULL``, rồi trả về ``1``.
+   - Nếu không tìm thấy khóa, đặt *\*result* thành ``NULL`` nếu *result* không phải là ``NULL``, rồi trả về ``0``.
+   - Khi xảy ra lỗi, hãy phát sinh một exception và trả về ``-1``.
 
-   Similar to :meth:`dict.pop`, but without the default value and
-   not raising :exc:`KeyError` if the key is missing.
+   Tương tự :meth:`dict.pop`, nhưng không có giá trị mặc định và không phát sinh :exc:`KeyError` nếu thiếu khóa.
 
    .. note::
 
-      The operation is atomic on :term:`free threading <free-threaded build>`
-      when *key* is :class:`str`, :class:`int`, :class:`float`, :class:`bool` or :class:`bytes`.
+      Thao tác này là nguyên tử trong :term:`free threading <free-threaded build>` khi *key* là :class:`str`, :class:`int`, :class:`float`, :class:`bool` hoặc :class:`bytes`.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: int PyDict_PopString(PyObject *p, const char *key, PyObject **result)
 
-   Similar to :c:func:`PyDict_Pop`, but *key* is specified as a
-   :c:expr:`const char*` UTF-8 encoded bytes string, rather than a
+   Tương tự :c:func:`PyDict_Pop`, nhưng *key* được chỉ định là một
+   :c:expr:`const char*` chuỗi byte được mã hóa UTF-8, thay vì một
    :c:expr:`PyObject*`.
 
    .. versionadded:: 3.13
@@ -293,47 +228,37 @@ Dictionary Objects
 
 .. c:function:: PyObject* PyDict_Items(PyObject *p)
 
-   Return a :c:type:`PyListObject` containing all the items from the dictionary.
+   Trả về một :c:type:`PyListObject` chứa tất cả các mục từ dictionary.
 
 
 .. c:function:: PyObject* PyDict_Keys(PyObject *p)
 
-   Return a :c:type:`PyListObject` containing all the keys from the dictionary.
+   Trả về một :c:type:`PyListObject` chứa tất cả các khóa từ dictionary.
 
 
 .. c:function:: PyObject* PyDict_Values(PyObject *p)
 
-   Return a :c:type:`PyListObject` containing all the values from the dictionary
-   *p*.
+   Trả về một :c:type:`PyListObject` chứa tất cả các giá trị từ từ điển *p*.
 
 
 .. c:function:: Py_ssize_t PyDict_Size(PyObject *p)
 
    .. index:: pair: built-in function; len
 
-   Return the number of items in the dictionary.  This is equivalent to
-   ``len(p)`` on a dictionary.
+   Trả về số lượng phần tử trong từ điển. Điều này tương đương với ``len(p)`` trên một từ điển.
 
 
 .. c:function:: Py_ssize_t PyDict_GET_SIZE(PyObject *p)
 
-   Similar to :c:func:`PyDict_Size`, but without error checking.
+   Tương tự như :c:func:`PyDict_Size`, nhưng không kiểm tra lỗi.
 
 
 .. c:function:: int PyDict_Next(PyObject *p, Py_ssize_t *ppos, PyObject **pkey, PyObject **pvalue)
 
-   Iterate over all key-value pairs in the dictionary *p*.  The
-   :c:type:`Py_ssize_t` referred to by *ppos* must be initialized to ``0``
-   prior to the first call to this function to start the iteration; the
-   function returns true for each pair in the dictionary, and false once all
-   pairs have been reported.  The parameters *pkey* and *pvalue* should either
-   point to :c:expr:`PyObject*` variables that will be filled in with each key
-   and value, respectively, or may be ``NULL``.  Any references returned through
-   them are borrowed.  *ppos* should not be altered during iteration. Its
-   value represents offsets within the internal dictionary structure, and
-   since the structure is sparse, the offsets are not consecutive.
+   Lặp qua tất cả các cặp khóa-giá trị trong từ điển *p*.
+   :c:type:`Py_ssize_t` được *ppos* tham chiếu đến phải được khởi tạo thành ``0`` trước lần gọi đầu tiên đến hàm này để bắt đầu quá trình lặp; hàm trả về true cho mỗi cặp trong từ điển và false sau khi tất cả các cặp đã được báo cáo. Các tham số *pkey* và *pvalue* phải trỏ đến các biến :c:expr:`PyObject*` sẽ lần lượt được điền bằng từng khóa và giá trị, hoặc có thể là ``NULL``. Mọi tham chiếu được trả về thông qua chúng đều là tham chiếu mượn. Không được thay đổi *ppos* trong quá trình lặp. Giá trị của nó biểu thị các offset trong cấu trúc từ điển nội bộ; vì cấu trúc này thưa nên các offset không liên tiếp.
 
-   For example::
+   Ví dụ::
 
       PyObject *key, *value;
       Py_ssize_t pos = 0;
@@ -343,9 +268,7 @@ Dictionary Objects
           ...
       }
 
-   The dictionary *p* should not be mutated during iteration.  It is safe to
-   modify the values of the keys as you iterate over the dictionary, but only
-   so long as the set of keys does not change.  For example::
+   Không được thay đổi từ điển *p* trong quá trình lặp. Bạn có thể an toàn sửa đổi các giá trị của khóa khi lặp qua từ điển, nhưng chỉ khi tập hợp các khóa không thay đổi. Ví dụ::
 
       PyObject *key, *value;
       Py_ssize_t pos = 0;
@@ -365,10 +288,8 @@ Dictionary Objects
           Py_DECREF(o);
       }
 
-   The function is not thread-safe in the :term:`free-threaded <free threading>`
-   build without external synchronization.  You can use
-   :c:macro:`Py_BEGIN_CRITICAL_SECTION` to lock the dictionary while iterating
-   over it::
+   Hàm này không an toàn với thread trong bản build :term:`free-threaded <free threading>` nếu không có cơ chế đồng bộ hóa bên ngoài. Bạn có thể sử dụng
+   :c:macro:`Py_BEGIN_CRITICAL_SECTION` để khóa dictionary trong khi lặp qua nó::
 
       Py_BEGIN_CRITICAL_SECTION(self->dict);
       while (PyDict_Next(self->dict, &pos, &key, &value)) {
@@ -378,55 +299,33 @@ Dictionary Objects
 
    .. note::
 
-      On the free-threaded build, this function can be used safely inside a
-      critical section. However, the references returned for *pkey* and *pvalue*
-      are :term:`borrowed <borrowed reference>` and are only valid while the
-      critical section is held. If you need to use these objects outside the
-      critical section or when the critical section can be suspended, create a
-      :term:`strong reference <strong reference>` (for example, using
+      Trong bản build free-threaded, có thể sử dụng hàm này an toàn bên trong critical section. Tuy nhiên, các tham chiếu được trả về cho *pkey* và *pvalue* là :term:`borrowed <borrowed reference>` và chỉ hợp lệ khi critical section đang được giữ. Nếu cần sử dụng các đối tượng này bên ngoài critical section hoặc khi critical section có thể bị tạm dừng, hãy tạo một
+      :term:`strong reference <strong reference>` (ví dụ: bằng cách sử dụng
       :c:func:`Py_NewRef`).
 
 .. c:function:: int PyDict_Merge(PyObject *a, PyObject *b, int override)
 
-   Iterate over mapping object *b* adding key-value pairs to dictionary *a*.
-   *b* may be a dictionary, or any object supporting :c:func:`PyMapping_Keys`
-   and :c:func:`PyObject_GetItem`. If *override* is true, existing pairs in *a*
-   will be replaced if a matching key is found in *b*, otherwise pairs will
-   only be added if there is not a matching key in *a*. Return ``0`` on
-   success or ``-1`` if an exception was raised.
+   Lặp qua đối tượng mapping *b* và thêm các cặp khóa-giá trị vào dictionary *a*. *b* có thể là một dictionary hoặc bất kỳ đối tượng nào hỗ trợ :c:func:`PyMapping_Keys` và :c:func:`PyObject_GetItem`. Nếu *override* là true, các cặp hiện có trong *a* sẽ được thay thế nếu tìm thấy khóa tương ứng trong *b*; nếu không, các cặp chỉ được thêm vào khi không có khóa tương ứng trong *a*. Trả về ``0`` nếu thành công hoặc ``-1`` nếu một exception được phát sinh.
 
    .. note::
 
-      In the :term:`free-threaded build`, when *b* is a
-      :class:`dict` (with the standard iterator), both *a* and *b* are locked
-      for the duration of the operation. When *b* is a non-dict mapping, only
-      *a* is locked; *b* may be concurrently modified by another thread.
+      Trong :term:`free-threaded build`, khi *b* là một
+      :class:`dict` (với iterator tiêu chuẩn), cả *a* và *b* đều bị khóa trong suốt thời gian thực hiện thao tác. Khi *b* là một mapping không phải dict, chỉ *a* bị khóa; *b* có thể bị một thread khác sửa đổi đồng thời.
 
 
 .. c:function:: int PyDict_Update(PyObject *a, PyObject *b)
 
-   This is the same as ``PyDict_Merge(a, b, 1)`` in C, and is similar to
-   ``a.update(b)`` in Python except that :c:func:`PyDict_Update` doesn't fall
-   back to the iterating over a sequence of key value pairs if the second
-   argument has no "keys" attribute.  Return ``0`` on success or ``-1`` if an
-   exception was raised.
+   Điều này tương tự ``PyDict_Merge(a, b, 1)`` trong C và gần giống ``a.update(b)`` trong Python, ngoại trừ việc :c:func:`PyDict_Update` không chuyển sang lặp qua một chuỗi các cặp khóa-giá trị nếu đối số thứ hai không có thuộc tính "keys". Trả về ``0`` khi thành công hoặc ``-1`` nếu một ngoại lệ được phát sinh.
 
    .. note::
 
-      In the :term:`free-threaded build`, when *b* is a
-      :class:`dict` (with the standard iterator), both *a* and *b* are locked
-      for the duration of the operation. When *b* is a non-dict mapping, only
-      *a* is locked; *b* may be concurrently modified by another thread.
+      Trong :term:`free-threaded build`, khi *b* là một
+      :class:`dict` (với iterator tiêu chuẩn), cả *a* và *b* đều bị khóa trong suốt thời gian thực hiện thao tác. Khi *b* là một mapping không phải dict, chỉ *a* bị khóa; *b* có thể bị một thread khác sửa đổi đồng thời.
 
 
 .. c:function:: int PyDict_MergeFromSeq2(PyObject *a, PyObject *seq2, int override)
 
-   Update or merge into dictionary *a*, from the key-value pairs in *seq2*.
-   *seq2* must be an iterable object producing iterable objects of length 2,
-   viewed as key-value pairs.  In case of duplicate keys, the last wins if
-   *override* is true, else the first wins. Return ``0`` on success or ``-1``
-   if an exception was raised. Equivalent Python (except for the return
-   value)::
+   Cập nhật hoặc hợp nhất vào dictionary *a* từ các cặp khóa-giá trị trong *seq2*. *seq2* phải là một đối tượng iterable tạo ra các đối tượng iterable có độ dài 2, được xem là các cặp khóa-giá trị. Khi có khóa trùng lặp, khóa xuất hiện sau cùng sẽ được ưu tiên nếu *override* là true; nếu không, khóa xuất hiện đầu tiên sẽ được ưu tiên. Trả về ``0`` khi thành công hoặc ``-1`` nếu một ngoại lệ được phát sinh. Tương đương với Python (ngoại trừ giá trị trả về)::
 
       def PyDict_MergeFromSeq2(a, seq2, override):
           for key, value in seq2:
@@ -435,222 +334,171 @@ Dictionary Objects
 
    .. note::
 
-      In the :term:`free-threaded <free threading>` build, only *a* is locked.
-      The iteration over *seq2* is not synchronized; *seq2* may be concurrently
-      modified by another thread.
+      Trong bản build :term:`free-threaded <free threading>`, chỉ *a* được khóa. Việc lặp qua *seq2* không được đồng bộ hóa; *seq2* có thể bị một thread khác sửa đổi đồng thời.
 
 
 .. c:function:: int PyDict_AddWatcher(PyDict_WatchCallback callback)
 
-   Register *callback* as a dictionary watcher. Return a non-negative integer
-   id which must be passed to future calls to :c:func:`PyDict_Watch`. In case
-   of error (e.g. no more watcher IDs available), return ``-1`` and set an
-   exception.
+   Đăng ký *callback* làm dictionary watcher. Trả về một id dạng số nguyên không âm, id này phải được truyền vào các lần gọi sau của :c:func:`PyDict_Watch`. Trong trường hợp xảy ra lỗi (ví dụ: không còn watcher ID khả dụng), trả về ``-1`` và thiết lập một ngoại lệ.
 
    .. note::
 
-      This function is not internally synchronized. In the
-      :term:`free-threaded <free threading>` build, callers should ensure no
-      concurrent calls to :c:func:`PyDict_AddWatcher` or
-      :c:func:`PyDict_ClearWatcher` are in progress.
+      Hàm này không được đồng bộ hóa nội bộ. Trong
+      bản dựng :term:`free-threaded <free threading>`, bên gọi nên đảm bảo không có lệnh gọi đồng thời nào đến :c:func:`PyDict_AddWatcher` hoặc
+      :c:func:`PyDict_ClearWatcher` đang được thực hiện.
 
    .. versionadded:: 3.12
 
 .. c:function:: int PyDict_ClearWatcher(int watcher_id)
 
-   Clear watcher identified by *watcher_id* previously returned from
-   :c:func:`PyDict_AddWatcher`. Return ``0`` on success, ``-1`` on error (e.g.
-   if the given *watcher_id* was never registered.)
+   Xóa watcher được xác định bởi *watcher_id* đã được trả về trước đó từ
+   :c:func:`PyDict_AddWatcher`. Trả về ``0`` khi thành công, ``-1`` khi có lỗi (ví dụ: nếu *watcher_id* đã cho không được đăng ký.)
 
    .. note::
 
-      This function is not internally synchronized. In the
-      :term:`free-threaded <free threading>` build, callers should ensure no
-      concurrent calls to :c:func:`PyDict_AddWatcher` or
-      :c:func:`PyDict_ClearWatcher` are in progress.
+      Hàm này không được đồng bộ hóa nội bộ. Trong
+      bản dựng :term:`free-threaded <free threading>`, bên gọi nên đảm bảo không có lệnh gọi đồng thời nào đến :c:func:`PyDict_AddWatcher` hoặc
+      :c:func:`PyDict_ClearWatcher` đang được thực hiện.
 
    .. versionadded:: 3.12
 
 .. c:function:: int PyDict_Watch(int watcher_id, PyObject *dict)
 
-   Mark dictionary *dict* as watched. The callback granted *watcher_id* by
-   :c:func:`PyDict_AddWatcher` will be called when *dict* is modified or
-   deallocated. Return ``0`` on success or ``-1`` on error.
+   Đánh dấu dictionary *dict* là được theo dõi. Callback được cấp *watcher_id* bởi
+   :c:func:`PyDict_AddWatcher` sẽ được gọi khi *dict* bị sửa đổi hoặc giải phóng. Trả về ``0`` khi thành công hoặc ``-1`` khi có lỗi.
 
    .. versionadded:: 3.12
 
 .. c:function:: int PyDict_Unwatch(int watcher_id, PyObject *dict)
 
-   Mark dictionary *dict* as no longer watched. The callback granted
-   *watcher_id* by :c:func:`PyDict_AddWatcher` will no longer be called when
-   *dict* is modified or deallocated. The dict must previously have been
-   watched by this watcher. Return ``0`` on success or ``-1`` on error.
+   Đánh dấu dictionary *dict* không còn được theo dõi. Callback được cấp *watcher_id* bởi :c:func:`PyDict_AddWatcher` sẽ không còn được gọi khi *dict* bị sửa đổi hoặc giải phóng. Dictionary trước đó phải được watcher này theo dõi. Trả về ``0`` khi thành công hoặc ``-1`` khi có lỗi.
 
    .. versionadded:: 3.12
 
 .. c:type:: PyDict_WatchEvent
 
-   Enumeration of possible dictionary watcher events: ``PyDict_EVENT_ADDED``,
-   ``PyDict_EVENT_MODIFIED``, ``PyDict_EVENT_DELETED``, ``PyDict_EVENT_CLONED``,
-   ``PyDict_EVENT_CLEARED``, or ``PyDict_EVENT_DEALLOCATED``.
+   Liệt kê các sự kiện có thể xảy ra của watcher dictionary: ``PyDict_EVENT_ADDED``, ``PyDict_EVENT_MODIFIED``, ``PyDict_EVENT_DELETED``, ``PyDict_EVENT_CLONED``, ``PyDict_EVENT_CLEARED`` hoặc ``PyDict_EVENT_DEALLOCATED``.
 
    .. versionadded:: 3.12
 
 .. c:type:: int (*PyDict_WatchCallback)(PyDict_WatchEvent event, PyObject *dict, PyObject *key, PyObject *new_value)
 
-   Type of a dict watcher callback function.
+   Kiểu của hàm callback theo dõi dict.
 
-   If *event* is ``PyDict_EVENT_CLEARED`` or ``PyDict_EVENT_DEALLOCATED``, both
-   *key* and *new_value* will be ``NULL``. If *event* is ``PyDict_EVENT_ADDED``
-   or ``PyDict_EVENT_MODIFIED``, *new_value* will be the new value for *key*.
-   If *event* is ``PyDict_EVENT_DELETED``, *key* is being deleted from the
-   dictionary and *new_value* will be ``NULL``.
+   Nếu *event* là ``PyDict_EVENT_CLEARED`` hoặc ``PyDict_EVENT_DEALLOCATED``, cả *key* và *new_value* sẽ là ``NULL``. Nếu *event* là ``PyDict_EVENT_ADDED`` hoặc ``PyDict_EVENT_MODIFIED``, *new_value* sẽ là giá trị mới của *key*. Nếu *event* là ``PyDict_EVENT_DELETED``, *key* đang bị xóa khỏi dictionary và *new_value* sẽ là ``NULL``.
 
-   ``PyDict_EVENT_CLONED`` occurs when *dict* was previously empty and another
-   dict is merged into it. To maintain efficiency of this operation, per-key
-   ``PyDict_EVENT_ADDED`` events are not issued in this case; instead a
-   single ``PyDict_EVENT_CLONED`` is issued, and *key* will be the source
-   dictionary.
+   ``PyDict_EVENT_CLONED`` xảy ra khi *dict* trước đó đang rỗng và một dict khác được hợp nhất vào đó. Để duy trì hiệu quả của thao tác này, các sự kiện ``PyDict_EVENT_ADDED`` theo từng khóa sẽ không được phát ra trong trường hợp này; thay vào đó, một ``PyDict_EVENT_CLONED`` duy nhất sẽ được phát ra và *key* sẽ là dictionary nguồn.
 
-   The callback may inspect but must not modify *dict*; doing so could have
-   unpredictable effects, including infinite recursion. Do not trigger Python
-   code execution in the callback, as it could modify the dict as a side effect.
+   Callback có thể kiểm tra nhưng không được sửa đổi *dict*; việc này có thể gây ra những tác động không thể dự đoán, bao gồm đệ quy vô hạn. Không được kích hoạt việc thực thi mã Python trong callback, vì điều đó có thể sửa đổi dict như một tác dụng phụ.
 
-   If *event* is ``PyDict_EVENT_DEALLOCATED``, taking a new reference in the
-   callback to the about-to-be-destroyed dictionary will resurrect it and
-   prevent it from being freed at this time. When the resurrected object is
-   destroyed later, any watcher callbacks active at that time will be called
-   again.
+   Nếu *event* là ``PyDict_EVENT_DEALLOCATED``, việc tạo một tham chiếu mới trong callback đến dict sắp bị hủy sẽ làm nó sống lại và ngăn không cho nó được giải phóng tại thời điểm này. Khi đối tượng được khôi phục này bị hủy sau đó, mọi callback của watcher đang hoạt động tại thời điểm đó sẽ được gọi lại.
 
-   Callbacks occur before the notified modification to *dict* takes place, so
-   the prior state of *dict* can be inspected.
+   Callback được thực thi trước khi thay đổi được thông báo đối với *dict* diễn ra, vì vậy có thể kiểm tra trạng thái trước đó của *dict*.
 
-   If the callback sets an exception, it must return ``-1``; this exception will
-   be printed as an unraisable exception using :c:func:`PyErr_WriteUnraisable`.
-   Otherwise it should return ``0``.
+   Nếu callback đặt một exception, nó phải trả về ``-1``; exception này sẽ được in dưới dạng unraisable exception bằng :c:func:`PyErr_WriteUnraisable`. Nếu không, nó nên trả về ``0``.
 
-   There may already be a pending exception set on entry to the callback. In
-   this case, the callback should return ``0`` with the same exception still
-   set. This means the callback may not call any other API that can set an
-   exception unless it saves and clears the exception state first, and restores
-   it before returning.
+   Có thể đã có một exception đang chờ được đặt khi callback bắt đầu. Trong trường hợp này, callback nên trả về ``0`` và vẫn giữ nguyên exception đó. Điều này có nghĩa là callback không được gọi bất kỳ API nào khác có thể đặt exception, trừ khi trước tiên nó lưu và xóa trạng thái exception, rồi khôi phục trạng thái đó trước khi trả về.
 
    .. versionadded:: 3.12
 
 
-Dictionary View Objects
-^^^^^^^^^^^^^^^^^^^^^^^
+Đối tượng view từ điển
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. c:function:: int PyDictViewSet_Check(PyObject *op)
 
-   Return true if *op* is a view of a set inside a dictionary. This is currently
-   equivalent to :c:expr:`PyDictKeys_Check(op) || PyDictItems_Check(op)`. This
-   function always succeeds.
+   Trả về true nếu *op* là một view của một set bên trong dict. Hiện tại, điều này tương đương với :c:expr:`PyDictKeys_Check(op) || PyDictItems_Check(op)`. Hàm này luôn thành công.
 
 
 .. c:var:: PyTypeObject PyDictKeys_Type
 
-   Type object for a view of dictionary keys. In Python, this is the type of
-   the object returned by :meth:`dict.keys`.
+   Đối tượng kiểu cho một view của các khóa dictionary. Trong Python, đây là kiểu của đối tượng được :meth:`dict.keys` trả về.
 
 
 .. c:function:: int PyDictKeys_Check(PyObject *op)
 
-   Return true if *op* is an instance of a dictionary keys view. This function
-   always succeeds.
+   Trả về true nếu *op* là một thể hiện của view các khóa dictionary. Hàm này luôn thành công.
 
 
 .. c:var:: PyTypeObject PyDictValues_Type
 
-   Type object for a view of dictionary values. In Python, this is the type of
-   the object returned by :meth:`dict.values`.
+   Đối tượng kiểu cho một view của các giá trị dictionary. Trong Python, đây là kiểu của đối tượng được :meth:`dict.values` trả về.
 
 
 .. c:function:: int PyDictValues_Check(PyObject *op)
 
-   Return true if *op* is an instance of a dictionary values view. This function
-   always succeeds.
+   Trả về true nếu *op* là một thể hiện của view các giá trị dictionary. Hàm này luôn thành công.
 
 
 .. c:var:: PyTypeObject PyDictItems_Type
 
-   Type object for a view of dictionary items. In Python, this is the type of
-   the object returned by :meth:`dict.items`.
+   Đối tượng kiểu cho một view của các mục dictionary. Trong Python, đây là kiểu của đối tượng được :meth:`dict.items` trả về.
 
 
 .. c:function:: int PyDictItems_Check(PyObject *op)
 
-   Return true if *op* is an instance of a dictionary items view. This function
-   always succeeds.
+   Trả về true nếu *op* là một thể hiện của view các mục dictionary. Hàm này luôn thành công.
 
 
-Ordered Dictionaries
+Dictionary có thứ tự
 ^^^^^^^^^^^^^^^^^^^^
 
-Python's C API provides interface for :class:`collections.OrderedDict` from C.
-Since Python 3.7, dictionaries are ordered by default, so there is usually
-little need for these functions; prefer ``PyDict*`` where possible.
+C API của Python cung cấp giao diện cho :class:`collections.OrderedDict` từ C. Kể từ Python 3.7, dictionary được sắp xếp theo thứ tự mặc định, vì vậy thường không cần nhiều đến các hàm này; hãy ưu tiên ``PyDict*`` khi có thể.
 
 
 .. c:var:: PyTypeObject PyODict_Type
 
-   Type object for ordered dictionaries. This is the same object as
-   :class:`collections.OrderedDict` in the Python layer.
+   Đối tượng kiểu dành cho dictionary có thứ tự. Đây là cùng một đối tượng với
+   :class:`collections.OrderedDict` ở lớp Python.
 
 
 .. c:function:: int PyODict_Check(PyObject *od)
 
-   Return true if *od* is an ordered dictionary object or an instance of a
-   subtype of the :class:`~collections.OrderedDict` type.  This function
-   always succeeds.
+   Trả về true nếu *od* là một đối tượng dictionary có thứ tự hoặc là một thực thể của kiểu con của kiểu :class:`~collections.OrderedDict`. Hàm này luôn thực hiện thành công.
 
 
 .. c:function:: int PyODict_CheckExact(PyObject *od)
 
-   Return true if *od* is an ordered dictionary object, but not an instance of
-   a subtype of the :class:`~collections.OrderedDict` type.
-   This function always succeeds.
+   Trả về true nếu *od* là một đối tượng dictionary có thứ tự, nhưng không phải là một thực thể của kiểu con của kiểu :class:`~collections.OrderedDict`. Hàm này luôn thực hiện thành công.
 
 
 .. c:var:: PyTypeObject PyODictKeys_Type
 
-   Analogous to :c:type:`PyDictKeys_Type` for ordered dictionaries.
+   Tương tự như :c:type:`PyDictKeys_Type` đối với dictionary có thứ tự.
 
 
 .. c:var:: PyTypeObject PyODictValues_Type
 
-   Analogous to :c:type:`PyDictValues_Type` for ordered dictionaries.
+   Tương tự như :c:type:`PyDictValues_Type` đối với dictionary có thứ tự.
 
 
 .. c:var:: PyTypeObject PyODictItems_Type
 
-   Analogous to :c:type:`PyDictItems_Type` for ordered dictionaries.
+   Tương tự như :c:type:`PyDictItems_Type` đối với các từ điển có thứ tự.
 
 
 .. c:function:: PyObject *PyODict_New(void)
 
-   Return a new empty ordered dictionary, or ``NULL`` on failure.
+   Trả về một từ điển có thứ tự mới, rỗng hoặc ``NULL`` nếu không thành công.
 
-   This is analogous to :c:func:`PyDict_New`.
+   Tương tự như :c:func:`PyDict_New`.
 
 
 .. c:function:: int PyODict_SetItem(PyObject *od, PyObject *key, PyObject *value)
 
-   Insert *value* into the ordered dictionary *od* with a key of *key*.
-   Return ``0`` on success or ``-1`` with an exception set on failure.
+   Chèn *value* vào từ điển có thứ tự *od* với khóa là *key*. Trả về ``0`` nếu thành công hoặc ``-1`` cùng với một ngoại lệ được thiết lập nếu không thành công.
 
-   This is analogous to :c:func:`PyDict_SetItem`.
+   Tương tự như :c:func:`PyDict_SetItem`.
 
 
 .. c:function:: int PyODict_DelItem(PyObject *od, PyObject *key)
 
-   Remove the entry in the ordered dictionary *od* with key *key*.
-   Return ``0`` on success or ``-1`` with an exception set on failure.
+   Xóa mục nhập trong từ điển có thứ tự *od* có khóa *key*. Trả về ``0`` nếu thành công hoặc ``-1`` cùng với một ngoại lệ được thiết lập nếu không thành công.
 
-   This is analogous to :c:func:`PyDict_DelItem`.
+   Tương tự như :c:func:`PyDict_DelItem`.
 
 
-These are :term:`soft deprecated` aliases to ``PyDict`` APIs:
+Đây là các bí danh :term:`soft deprecated` cho các API ``PyDict``:
 
 
 .. list-table::

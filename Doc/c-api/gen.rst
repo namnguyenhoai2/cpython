@@ -2,98 +2,80 @@
 
 .. _gen-objects:
 
-Generator Objects
------------------
+Đối tượng Generator
+-------------------
 
-Generator objects are what Python uses to implement generator iterators. They
-are normally created by iterating over a function that yields values, rather
-than explicitly calling :c:func:`PyGen_New` or :c:func:`PyGen_NewWithQualName`.
+Đối tượng generator là những gì Python sử dụng để triển khai các generator iterator. Chúng thường được tạo bằng cách lặp qua một hàm trả về các giá trị, thay vì gọi tường minh :c:func:`PyGen_New` hoặc :c:func:`PyGen_NewWithQualName`.
 
 
 .. c:type:: PyGenObject
 
-   The C structure used for generator objects.
+   Cấu trúc C được sử dụng cho các đối tượng generator.
 
 
 .. c:var:: PyTypeObject PyGen_Type
 
-   The type object corresponding to generator objects.
+   Đối tượng kiểu tương ứng với các đối tượng generator.
 
 
 .. c:function:: int PyGen_Check(PyObject *ob)
 
-   Return true if *ob* is a generator object; *ob* must not be ``NULL``.  This
-   function always succeeds.
+   Trả về true nếu *ob* là một đối tượng generator; *ob* không được là ``NULL``. Hàm này luôn thực hiện thành công.
 
 
 .. c:function:: int PyGen_CheckExact(PyObject *ob)
 
-   Return true if *ob*'s type is :c:type:`PyGen_Type`; *ob* must not be
-   ``NULL``.  This function always succeeds.
+   Trả về true nếu kiểu của *ob* là :c:type:`PyGen_Type`; *ob* không được là ``NULL``. Hàm này luôn thực hiện thành công.
 
 
 .. c:function:: PyObject* PyGen_New(PyFrameObject *frame)
 
-   Create and return a new generator object based on the *frame* object.
-   A reference to *frame* is ":term:`stolen <steal>`" by this function (even
-   on error). The argument must not be ``NULL``.
+   Tạo và trả về một đối tượng generator mới dựa trên đối tượng *frame*. Một tham chiếu đến *frame* bị hàm này ":term:`stolen <steal>`" (ngay cả khi xảy ra lỗi). Đối số này không được là ``NULL``.
 
 .. c:function:: PyObject* PyGen_NewWithQualName(PyFrameObject *frame, PyObject *name, PyObject *qualname)
 
-   Create and return a new generator object based on the *frame* object,
-   with ``__name__`` and ``__qualname__`` set to *name* and *qualname*.
-   A reference to *frame* is ":term:`stolen <steal>`" by this function (even
-   on error).  The *frame* argument must not be ``NULL``.
+   Tạo và trả về một đối tượng generator mới dựa trên đối tượng *frame*, với ``__name__`` và ``__qualname__`` được đặt thành *name* và *qualname*. Tham chiếu đến *frame* bị hàm này ":term:`stolen <steal>`" (ngay cả khi xảy ra lỗi). Đối số *frame* không được là ``NULL``.
 
 
 .. c:function:: PyCodeObject* PyGen_GetCode(PyGenObject *gen)
 
-   Return a new :term:`strong reference` to the code object wrapped by *gen*.
-   This function always succeeds.
+   Trả về một :term:`strong reference` mới cho đối tượng mã được bao bọc bởi *gen*. Hàm này luôn thành công.
 
 
-Asynchronous Generator Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Đối tượng Generator bất đồng bộ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. seealso::
    :pep:`525`
 
 .. c:var:: PyTypeObject PyAsyncGen_Type
 
-   The type object corresponding to asynchronous generator objects. This is
-   available as :class:`types.AsyncGeneratorType` in the Python layer.
+   Đối tượng kiểu tương ứng với các đối tượng generator bất đồng bộ. Đối tượng này khả dụng dưới dạng :class:`types.AsyncGeneratorType` trong lớp Python.
 
    .. versionadded:: 3.6
 
 .. c:function:: PyObject *PyAsyncGen_New(PyFrameObject *frame, PyObject *name, PyObject *qualname)
 
-   Create a new asynchronous generator wrapping *frame*, with ``__name__`` and
-   ``__qualname__`` set to *name* and *qualname*.
-   *frame* is ":term:`stolen <steal>`" by this function (even on error) and
-   must not be ``NULL``.
+   Tạo một generator bất đồng bộ mới bao bọc *frame*, với ``__name__`` và ``__qualname__`` được đặt thành *name* và *qualname*. *frame* bị hàm này ":term:`stolen <steal>`" (kể cả khi xảy ra lỗi) và không được là ``NULL``.
 
-   On success, this function returns a :term:`strong reference` to the
-   new asynchronous generator. On failure, this function returns ``NULL``
-   with an exception set.
+   Khi thành công, hàm này trả về một :term:`strong reference` cho generator bất đồng bộ mới. Khi thất bại, hàm này trả về ``NULL`` với một ngoại lệ được thiết lập.
 
    .. versionadded:: 3.6
 
 .. c:function:: int PyAsyncGen_CheckExact(PyObject *op)
 
-   Return true if *op* is an asynchronous generator object, false otherwise.
-   This function always succeeds.
+   Trả về true nếu *op* là một đối tượng generator bất đồng bộ, nếu không thì trả về false. Hàm này luôn thành công.
 
    .. versionadded:: 3.6
 
 
-Deprecated API
-^^^^^^^^^^^^^^
+API đã lỗi thời
+^^^^^^^^^^^^^^^
 
 .. c:macro:: PyAsyncGenASend_CheckExact(op)
 
-   This is an API that was included in Python's C API
-   by mistake.
+   Đây là một API được đưa vào C API của Python do nhầm lẫn.
 
-   It is solely here for completeness; do not use this API.
+   API này chỉ được giữ lại để đầy đủ; không sử dụng API này.
 
    .. soft-deprecated:: 3.14

@@ -7,247 +7,156 @@
 
 .. _bufferobjects:
 
-Buffer Protocol
----------------
+Giao thức Buffer
+----------------
 
 .. sectionauthor:: Greg Stein <gstein@lyra.org>
 .. sectionauthor:: Benjamin Peterson
 .. sectionauthor:: Stefan Krah
 
 
-Certain objects available in Python wrap access to an underlying memory
-array or *buffer*.  Such objects include the built-in :class:`bytes` and
-:class:`bytearray`, and some extension types like :class:`array.array`.
-Third-party libraries may define their own types for special purposes, such
-as image processing or numeric analysis.
+Một số đối tượng có sẵn trong Python bao bọc quyền truy cập vào một mảng bộ nhớ bên dưới hoặc *buffer*. Các đối tượng như vậy bao gồm :class:`bytes` dựng sẵn và
+:class:`bytearray`, cùng một số kiểu mở rộng như :class:`array.array`. Các thư viện bên thứ ba có thể định nghĩa các kiểu riêng cho những mục đích đặc biệt, chẳng hạn như xử lý hình ảnh hoặc phân tích số.
 
-While each of these types have their own semantics, they share the common
-characteristic of being backed by a possibly large memory buffer.  It is
-then desirable, in some situations, to access that buffer directly and
-without intermediate copying.
+Mặc dù mỗi kiểu trong số này có ngữ nghĩa riêng, chúng đều có chung đặc điểm là được hỗ trợ bởi một bộ đệm bộ nhớ có thể rất lớn. Do đó, trong một số trường hợp, việc truy cập trực tiếp vào bộ đệm đó mà không cần sao chép trung gian là điều mong muốn.
 
-Python provides such a facility at the C and Python level in the form of the
-:ref:`buffer protocol <bufferobjects>`.  This protocol has two sides:
+Python cung cấp một cơ chế như vậy ở cấp độ C và Python dưới dạng
+:ref:`buffer protocol <bufferobjects>`. Giao thức này có hai phía:
 
 .. index:: single: PyBufferProcs (C type)
 
-- on the producer side, a type can export a "buffer interface" which allows
-  objects of that type to expose information about their underlying buffer.
-  This interface is described in the section :ref:`buffer-structs`; for
-  Python see :ref:`python-buffer-protocol`.
+- ở phía nhà sản xuất, một kiểu có thể export một "buffer interface", cho phép các đối tượng thuộc kiểu đó cung cấp thông tin về bộ đệm bên dưới của chúng. Giao diện này được mô tả trong phần :ref:`buffer-structs`; đối với Python, hãy xem :ref:`python-buffer-protocol`.
 
-- on the consumer side, several means are available to obtain a pointer to
-  the raw underlying data of an object (for example a method parameter). For
-  Python see :class:`memoryview`.
+- Ở phía bên sử dụng, có một số cách để lấy con trỏ đến dữ liệu thô bên dưới của một đối tượng (chẳng hạn như một tham số phương thức). Để biết thông tin về Python, hãy xem :class:`memoryview`.
 
-Simple objects such as :class:`bytes` and :class:`bytearray` expose their
-underlying buffer in byte-oriented form.  Other forms are possible; for example,
-the elements exposed by an :class:`array.array` can be multi-byte values.
+Các đối tượng đơn giản như :class:`bytes` và :class:`bytearray` cung cấp bộ đệm bên dưới của chúng dưới dạng hướng theo byte. Các dạng khác cũng có thể thực hiện được; chẳng hạn, các phần tử do một :class:`array.array` cung cấp có thể là các giá trị nhiều byte.
 
-An example consumer of the buffer interface is the :meth:`~io.BufferedIOBase.write`
-method of file objects: any object that can export a series of bytes through
-the buffer interface can be written to a file.  While :meth:`!write` only
-needs read-only access to the internal contents of the object passed to it,
-other methods such as :meth:`~io.BufferedIOBase.readinto` need write access
-to the contents of their argument.  The buffer interface allows objects to
-selectively allow or reject exporting of read-write and read-only buffers.
+Một ví dụ về consumer của giao diện bộ đệm là phương thức :meth:`~io.BufferedIOBase.write` của các đối tượng tệp: bất kỳ đối tượng nào có thể xuất một chuỗi byte thông qua giao diện bộ đệm đều có thể được ghi vào tệp. Trong khi :meth:`!write` chỉ cần quyền truy cập chỉ đọc vào nội dung bên trong của đối tượng được truyền cho nó, các phương thức khác như :meth:`~io.BufferedIOBase.readinto` cần quyền ghi vào nội dung của đối số. Giao diện bộ đệm cho phép các đối tượng chủ động cho phép hoặc từ chối việc xuất bộ đệm đọc-ghi và chỉ đọc.
 
-There are two ways for a consumer of the buffer interface to acquire a buffer
-over a target object:
+Có hai cách để consumer của giao diện bộ đệm lấy một bộ đệm trên đối tượng đích:
 
-* call :c:func:`PyObject_GetBuffer` with the right parameters;
+* gọi :c:func:`PyObject_GetBuffer` với các tham số phù hợp;
 
-* call :c:func:`PyArg_ParseTuple` (or one of its siblings) with one of the
-  ``y*``, ``w*`` or ``s*`` :ref:`format codes <arg-parsing>`.
+* gọi :c:func:`PyArg_ParseTuple` (hoặc một hàm cùng nhóm) với một trong các ``y*``, ``w*`` hoặc ``s*`` :ref:`mã định dạng <arg-parsing>`.
 
-In both cases, :c:func:`PyBuffer_Release` must be called when the buffer
-isn't needed anymore.  Failure to do so could lead to various issues such as
-resource leaks.
+Trong cả hai trường hợp, phải gọi :c:func:`PyBuffer_Release` khi không còn cần bộ đệm nữa. Nếu không, có thể phát sinh nhiều vấn đề khác nhau, chẳng hạn như rò rỉ tài nguyên.
 
 .. versionadded:: 3.12
 
-   The buffer protocol is now accessible in Python, see
-   :ref:`python-buffer-protocol` and :class:`memoryview`.
+   Giao thức buffer hiện có thể được truy cập trong Python, xem
+   :ref:`python-buffer-protocol` và :class:`memoryview`.
 
 .. _buffer-structure:
 
-Buffer structure
-================
+Cấu trúc buffer
+===============
 
-Buffer structures (or simply "buffers") are useful as a way to expose the
-binary data from another object to the Python programmer.  They can also be
-used as a zero-copy slicing mechanism.  Using their ability to reference a
-block of memory, it is possible to expose any data to the Python programmer
-quite easily.  The memory could be a large, constant array in a C extension,
-it could be a raw block of memory for manipulation before passing to an
-operating system library, or it could be used to pass around structured data
-in its native, in-memory format.
+Các cấu trúc buffer (hay gọi đơn giản là "buffer") rất hữu ích để cung cấp dữ liệu nhị phân từ một đối tượng khác cho lập trình viên Python. Chúng cũng có thể được sử dụng như một cơ chế cắt không sao chép. Nhờ khả năng tham chiếu đến một vùng bộ nhớ, chúng ta có thể dễ dàng cung cấp bất kỳ dữ liệu nào cho lập trình viên Python. Vùng bộ nhớ đó có thể là một mảng hằng lớn trong một phần mở rộng C, một vùng bộ nhớ thô để thao tác trước khi truyền cho thư viện hệ điều hành, hoặc được dùng để truyền dữ liệu có cấu trúc dưới dạng gốc trong bộ nhớ của nó.
 
-Contrary to most data types exposed by the Python interpreter, buffers
-are not :c:type:`PyObject` pointers but rather simple C structures.  This
-allows them to be created and copied very simply.  When a generic wrapper
-around a buffer is needed, a :ref:`memoryview <memoryview-objects>` object
-can be created.
+Không giống hầu hết các kiểu dữ liệu được trình thông dịch Python cung cấp, buffer không phải là các con trỏ :c:type:`PyObject` mà là những cấu trúc C đơn giản. Điều này cho phép tạo và sao chép chúng rất dễ dàng. Khi cần một wrapper tổng quát quanh một buffer, có thể tạo một đối tượng :ref:`memoryview <memoryview-objects>`.
 
-For short instructions how to write an exporting object, see
-:ref:`Buffer Object Structures <buffer-structs>`. For obtaining
-a buffer, see :c:func:`PyObject_GetBuffer`.
+Để biết hướng dẫn ngắn về cách viết một đối tượng xuất buffer, hãy xem
+:ref:`Buffer Object Structures <buffer-structs>`. Để lấy một buffer, hãy xem :c:func:`PyObject_GetBuffer`.
 
 .. c:type:: Py_buffer
 
    .. c:member:: void *buf
 
-      A pointer to the start of the logical structure described by the buffer
-      fields. This can be any location within the underlying physical memory
-      block of the exporter. For example, with negative :c:member:`~Py_buffer.strides`
-      the value may point to the end of the memory block.
+      Con trỏ đến vị trí bắt đầu của cấu trúc logic được mô tả bởi các trường của buffer. Đây có thể là bất kỳ vị trí nào trong khối memory vật lý bên dưới của exporter. Ví dụ, với :c:member:`~Py_buffer.strides` âm, giá trị này có thể trỏ đến cuối khối memory.
 
-      For :term:`contiguous` arrays, the value points to the beginning of
-      the memory block.
+      Đối với các mảng :term:`contiguous`, giá trị này trỏ đến đầu khối memory.
 
    .. c:member:: PyObject *obj
 
-      A new reference to the exporting object. The reference is owned by
-      the consumer and automatically released
-      (i.e. reference count decremented)
-      and set to ``NULL`` by
-      :c:func:`PyBuffer_Release`. The field is the equivalent of the return
-      value of any standard C-API function.
+      Một tham chiếu mới đến đối tượng exporter. Tham chiếu này thuộc quyền sở hữu của consumer và được tự động giải phóng (tức là giảm reference count) rồi đặt thành ``NULL`` bởi
+      :c:func:`PyBuffer_Release`. Trường này tương đương với giá trị trả về của bất kỳ hàm C-API tiêu chuẩn nào.
 
-      As a special case, for *temporary* buffers that are wrapped by
-      :c:func:`PyMemoryView_FromBuffer` or :c:func:`PyBuffer_FillInfo`
-      this field is ``NULL``. In general, exporting objects MUST NOT
-      use this scheme.
+      Trong trường hợp đặc biệt, đối với các buffer *tạm thời* được bọc bởi
+      :c:func:`PyMemoryView_FromBuffer` hoặc :c:func:`PyBuffer_FillInfo`, trường này là ``NULL``. Nhìn chung, các đối tượng exporter KHÔNG ĐƯỢC sử dụng cơ chế này.
 
    .. c:member:: Py_ssize_t len
 
-      ``product(shape) * itemsize``. For contiguous arrays, this is the length
-      of the underlying memory block. For non-contiguous arrays, it is the length
-      that the logical structure would have if it were copied to a contiguous
-      representation.
+      ``product(shape) * itemsize``. Đối với các mảng contiguous, đây là độ dài của khối memory bên dưới. Đối với các mảng non-contiguous, đây là độ dài mà cấu trúc logic sẽ có nếu được sao chép sang dạng contiguous.
 
-      Accessing ``((char *)buf)[0] up to ((char *)buf)[len-1]`` is only valid
-      if the buffer has been obtained by a request that guarantees contiguity. In
-      most cases such a request will be :c:macro:`PyBUF_SIMPLE` or :c:macro:`PyBUF_WRITABLE`.
+      Việc truy cập ``((char *)buf)[0] up to ((char *)buf)[len-1]`` chỉ hợp lệ nếu buffer được lấy từ một request bảo đảm tính liên tục. Trong hầu hết trường hợp, request đó sẽ là :c:macro:`PyBUF_SIMPLE` hoặc :c:macro:`PyBUF_WRITABLE`.
 
    .. c:member:: int readonly
 
-      An indicator of whether the buffer is read-only. This field is controlled
-      by the :c:macro:`PyBUF_WRITABLE` flag.
+      Một chỉ báo cho biết buffer có ở chế độ chỉ đọc hay không. Trường này được điều khiển bởi cờ :c:macro:`PyBUF_WRITABLE`.
 
    .. c:member:: Py_ssize_t itemsize
 
-      Item size in bytes of a single element. Same as the value of :func:`struct.calcsize`
-      called on non-``NULL`` :c:member:`~Py_buffer.format` values.
+      Kích thước của một phần tử tính bằng byte. Tương đương với giá trị trả về khi gọi :func:`struct.calcsize` trên các giá trị ``NULL`` :c:member:`~Py_buffer.format` không phải ``NULL``.
 
-      Important exception: If a consumer requests a buffer without the
-      :c:macro:`PyBUF_FORMAT` flag, :c:member:`~Py_buffer.format` will
-      be set to  ``NULL``,  but :c:member:`~Py_buffer.itemsize` still has
-      the value for the original format.
+      Ngoại lệ quan trọng: Nếu consumer yêu cầu một buffer mà không có cờ
+      :c:macro:`PyBUF_FORMAT`, :c:member:`~Py_buffer.format` sẽ được đặt thành  ``NULL``,  nhưng :c:member:`~Py_buffer.itemsize` vẫn giữ giá trị của định dạng ban đầu.
 
-      If :c:member:`~Py_buffer.shape` is present, the equality
-      ``product(shape) * itemsize == len`` still holds and the consumer
-      can use :c:member:`~Py_buffer.itemsize` to navigate the buffer.
+      Nếu :c:member:`~Py_buffer.shape` hiện diện, đẳng thức ``product(shape) * itemsize == len`` vẫn đúng và consumer có thể sử dụng :c:member:`~Py_buffer.itemsize` để duyệt buffer.
 
-      If :c:member:`~Py_buffer.shape` is ``NULL`` as a result of a :c:macro:`PyBUF_SIMPLE`
-      or a :c:macro:`PyBUF_WRITABLE` request, the consumer must disregard
-      :c:member:`~Py_buffer.itemsize` and assume ``itemsize == 1``.
+      Nếu :c:member:`~Py_buffer.shape` là ``NULL`` do một request :c:macro:`PyBUF_SIMPLE` hoặc :c:macro:`PyBUF_WRITABLE`, consumer phải bỏ qua
+      :c:member:`~Py_buffer.itemsize` và giả định ``itemsize == 1``.
 
    .. c:member:: char *format
 
-      A *NULL* terminated string in :mod:`struct` module style syntax describing
-      the contents of a single item. If this is ``NULL``, ``"B"`` (unsigned bytes)
-      is assumed.
+      Một chuỗi kết thúc bằng *NULL* theo cú pháp kiểu module :mod:`struct`, mô tả nội dung của một mục đơn. Nếu đây là ``NULL``, ``"B"`` (các byte không dấu) được giả định.
 
-      This field is controlled by the :c:macro:`PyBUF_FORMAT` flag.
+      Trường này được điều khiển bởi cờ :c:macro:`PyBUF_FORMAT`.
 
    .. c:member:: int ndim
 
-      The number of dimensions the memory represents as an n-dimensional array.
-      If it is ``0``, :c:member:`~Py_buffer.buf` points to a single item representing
-      a scalar. In this case, :c:member:`~Py_buffer.shape`, :c:member:`~Py_buffer.strides`
-      and :c:member:`~Py_buffer.suboffsets` MUST be ``NULL``.
-      The maximum number of dimensions is given by :c:macro:`PyBUF_MAX_NDIM`.
+      Số chiều mà bộ nhớ biểu diễn dưới dạng một mảng n chiều. Nếu là ``0``, :c:member:`~Py_buffer.buf` trỏ đến một mục đơn biểu diễn một scalar. Trong trường hợp này, :c:member:`~Py_buffer.shape`, :c:member:`~Py_buffer.strides` và :c:member:`~Py_buffer.suboffsets` PHẢI là ``NULL``. Số chiều tối đa được xác định bởi :c:macro:`PyBUF_MAX_NDIM`.
 
    .. c:member:: Py_ssize_t *shape
 
-      An array of :c:type:`Py_ssize_t` of length :c:member:`~Py_buffer.ndim`
-      indicating the shape of the memory as an n-dimensional array. Note that
-      ``shape[0] * ... * shape[ndim-1] * itemsize`` MUST be equal to
+      Một mảng :c:type:`Py_ssize_t` có độ dài :c:member:`~Py_buffer.ndim`, cho biết hình dạng của bộ nhớ dưới dạng một mảng n chiều. Lưu ý rằng ``shape[0] * ... * shape[ndim-1] * itemsize`` PHẢI bằng
       :c:member:`~Py_buffer.len`.
 
-      Shape values are restricted to ``shape[n] >= 0``. The case
-      ``shape[n] == 0`` requires special attention. See `complex arrays`_
-      for further information.
+      Các giá trị hình dạng bị giới hạn ở ``shape[n] >= 0``. Trường hợp ``shape[n] == 0`` cần được chú ý đặc biệt. Xem `complex arrays <complex arrays_>`_ để biết thêm thông tin.
 
-      The shape array is read-only for the consumer.
+      Mảng hình dạng chỉ được đọc đối với consumer.
 
    .. c:member:: Py_ssize_t *strides
 
-      An array of :c:type:`Py_ssize_t` of length :c:member:`~Py_buffer.ndim`
-      giving the number of bytes to skip to get to a new element in each
-      dimension.
+      Một mảng :c:type:`Py_ssize_t` có độ dài :c:member:`~Py_buffer.ndim`, cung cấp số byte cần bỏ qua để đi tới một phần tử mới trong mỗi chiều.
 
-      Stride values can be any integer. For regular arrays, strides are
-      usually positive, but a consumer MUST be able to handle the case
-      ``strides[n] <= 0``. See `complex arrays`_ for further information.
+      Các giá trị stride có thể là bất kỳ số nguyên nào. Đối với các mảng thông thường, stride thường là số dương, nhưng bên sử dụng PHẢI có khả năng xử lý trường hợp ``strides[n] <= 0``. Xem `complex arrays <complex arrays_>`_ để biết thêm thông tin.
 
-      The strides array is read-only for the consumer.
+      Mảng stride chỉ được phép đọc đối với bên sử dụng.
 
    .. c:member:: Py_ssize_t *suboffsets
 
-      An array of :c:type:`Py_ssize_t` of length :c:member:`~Py_buffer.ndim`.
-      If ``suboffsets[n] >= 0``, the values stored along the nth dimension are
-      pointers and the suboffset value dictates how many bytes to add to each
-      pointer after de-referencing. A suboffset value that is negative
-      indicates that no de-referencing should occur (striding in a contiguous
-      memory block).
+      Một mảng :c:type:`Py_ssize_t` có độ dài :c:member:`~Py_buffer.ndim`. Nếu ``suboffsets[n] >= 0``, các giá trị được lưu dọc theo chiều thứ n là các con trỏ và giá trị suboffset quy định số byte cần cộng vào mỗi con trỏ sau khi bỏ tham chiếu. Giá trị suboffset âm cho biết không được thực hiện bỏ tham chiếu (stride trong một khối bộ nhớ liền kề).
 
-      If all suboffsets are negative (i.e. no de-referencing is needed), then
-      this field must be ``NULL`` (the default value).
+      Nếu tất cả suboffset đều âm (tức là không cần bỏ tham chiếu), thì trường này phải là ``NULL`` (giá trị mặc định).
 
-      This type of array representation is used by the Python Imaging Library
-      (PIL). See `complex arrays`_ for further information how to access elements
-      of such an array.
+      Kiểu biểu diễn mảng này được Python Imaging Library (PIL) sử dụng. Xem `complex arrays <complex arrays_>`_ để biết thêm thông tin về cách truy cập các phần tử của loại mảng này.
 
-      The suboffsets array is read-only for the consumer.
+      Mảng suboffsets chỉ được phép đọc đối với bên sử dụng.
 
    .. c:member:: void *internal
 
-      This is for use internally by the exporting object. For example, this
-      might be re-cast as an integer by the exporter and used to store flags
-      about whether or not the shape, strides, and suboffsets arrays must be
-      freed when the buffer is released. The consumer MUST NOT alter this
-      value.
+      Trường này được đối tượng exporter sử dụng nội bộ. Ví dụ, exporter có thể chuyển trường này thành một số nguyên và dùng nó để lưu các cờ cho biết có cần giải phóng các mảng shape, strides và suboffsets khi buffer được giải phóng hay không. Consumer TUYỆT ĐỐI KHÔNG ĐƯỢC thay đổi giá trị này.
 
 
-Constants:
+Hằng số:
 
 .. c:macro:: PyBUF_MAX_NDIM
 
-   The maximum number of dimensions the memory represents.
-   Exporters MUST respect this limit, consumers of multi-dimensional
-   buffers SHOULD be able to handle up to :c:macro:`!PyBUF_MAX_NDIM` dimensions.
-   Currently set to 64.
+   Số chiều tối đa mà vùng nhớ biểu diễn. Exporter PHẢI tuân thủ giới hạn này; consumer của các buffer đa chiều NÊN có khả năng xử lý tối đa :c:macro:`!PyBUF_MAX_NDIM` chiều. Hiện được đặt là 64.
 
 
 .. _buffer-request-types:
 
-Buffer request types
-====================
+Các loại yêu cầu buffer
+=======================
 
-Buffers are usually obtained by sending a buffer request to an exporting
-object via :c:func:`PyObject_GetBuffer`. Since the complexity of the logical
-structure of the memory can vary drastically, the consumer uses the *flags*
-argument to specify the exact buffer type it can handle.
+Buffer thường được lấy bằng cách gửi một yêu cầu buffer đến đối tượng exporter thông qua :c:func:`PyObject_GetBuffer`. Vì độ phức tạp của cấu trúc logic của vùng nhớ có thể thay đổi rất lớn, consumer sử dụng đối số *flags* để chỉ định chính xác loại buffer mà nó có thể xử lý.
 
-All :c:type:`Py_buffer` fields are unambiguously defined by the request
-type.
+Tất cả các trường :c:type:`Py_buffer` đều được xác định rõ ràng bởi loại yêu cầu.
 
-request-independent fields
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-The following fields are not influenced by *flags* and must always be filled in
-with the correct values: :c:member:`~Py_buffer.obj`, :c:member:`~Py_buffer.buf`,
+các trường không phụ thuộc vào yêu cầu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các trường sau đây không bị ảnh hưởng bởi *flags* và luôn phải được điền bằng các giá trị chính xác: :c:member:`~Py_buffer.obj`, :c:member:`~Py_buffer.buf`,
 :c:member:`~Py_buffer.len`, :c:member:`~Py_buffer.itemsize`, :c:member:`~Py_buffer.ndim`.
 
 readonly, format
@@ -255,128 +164,110 @@ readonly, format
 
    .. c:macro:: PyBUF_WRITABLE
 
-      Controls the :c:member:`~Py_buffer.readonly` field. If set, the exporter
-      MUST provide a writable buffer or else report failure. Otherwise, the
-      exporter MAY provide either a read-only or writable buffer, but the choice
-      MUST be consistent for all consumers. For example, :c:expr:`PyBUF_SIMPLE | PyBUF_WRITABLE`
-      can be used to request a simple writable buffer.
+      Kiểm soát trường :c:member:`~Py_buffer.readonly`. Nếu được đặt, exporter PHẢI cung cấp một writable buffer; nếu không thì phải báo lỗi. Nếu không, exporter CÓ THỂ cung cấp writable buffer hoặc read-only buffer, nhưng lựa chọn này PHẢI nhất quán với tất cả consumer. Ví dụ, có thể dùng :c:expr:`PyBUF_SIMPLE | PyBUF_WRITABLE` để yêu cầu một writable buffer đơn giản.
 
    .. c:macro:: PyBUF_WRITEABLE
 
-      This is an alias to :c:macro:`PyBUF_WRITABLE`.
+      Đây là bí danh của :c:macro:`PyBUF_WRITABLE`.
 
       .. soft-deprecated:: 3.13
 
    .. c:macro:: PyBUF_FORMAT
 
-      Controls the :c:member:`~Py_buffer.format` field. If set, this field MUST
-      be filled in correctly. Otherwise, this field MUST be ``NULL``.
+      Kiểm soát trường :c:member:`~Py_buffer.format`. Nếu được đặt, trường này PHẢI được điền chính xác. Nếu không, trường này PHẢI là ``NULL``.
 
 
-:c:macro:`PyBUF_WRITABLE` can be \|'d to any of the flags in the next section.
-Since :c:macro:`PyBUF_SIMPLE` is defined as 0, :c:macro:`PyBUF_WRITABLE`
-can be used as a stand-alone flag to request a simple writable buffer.
+:c:macro:`PyBUF_WRITABLE` có thể được \|'d với bất kỳ cờ nào trong phần tiếp theo. Vì :c:macro:`PyBUF_SIMPLE` được định nghĩa là 0, :c:macro:`PyBUF_WRITABLE` có thể được dùng như một cờ độc lập để yêu cầu một writable buffer đơn giản.
 
-:c:macro:`PyBUF_FORMAT` must be \|'d to any of the flags except :c:macro:`PyBUF_SIMPLE`, because
-the latter already implies format ``B`` (unsigned bytes). :c:macro:`!PyBUF_FORMAT` cannot be
-used on its own.
+:c:macro:`PyBUF_FORMAT` phải được \|'d với bất kỳ cờ nào ngoại trừ :c:macro:`PyBUF_SIMPLE`, vì cờ sau đã ngầm định format ``B`` (các byte không dấu). Không thể dùng :c:macro:`!PyBUF_FORMAT` riêng lẻ.
 
 
 shape, strides, suboffsets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The flags that control the logical structure of the memory are listed
-in decreasing order of complexity. Note that each flag contains all bits
-of the flags below it.
+Các cờ kiểm soát cấu trúc logic của bộ nhớ được liệt kê theo thứ tự giảm dần về độ phức tạp. Lưu ý rằng mỗi cờ chứa tất cả các bit của những cờ bên dưới nó.
 
 .. tabularcolumns:: |p{0.35\linewidth}|l|l|l|
 
 +-----------------------------+-------+---------+------------+
-|  Request                    | shape | strides | suboffsets |
+| Yêu cầu                     | shape | strides | suboffsets |
 +=============================+=======+=========+============+
-| .. c:macro:: PyBUF_INDIRECT |  yes  |   yes   | if needed  |
+| .. c:macro:: PyBUF_INDIRECT | có    | có      | nếu cần    |
 +-----------------------------+-------+---------+------------+
-| .. c:macro:: PyBUF_STRIDES  |  yes  |   yes   |    NULL    |
+| .. c:macro:: PyBUF_STRIDES  | có    | có      | NULL       |
 +-----------------------------+-------+---------+------------+
-| .. c:macro:: PyBUF_ND       |  yes  |   NULL  |    NULL    |
+| .. c:macro:: PyBUF_ND       | có    | NULL    | NULL       |
 +-----------------------------+-------+---------+------------+
-| .. c:macro:: PyBUF_SIMPLE   |  NULL |   NULL  |    NULL    |
+| .. c:macro:: PyBUF_SIMPLE   | NULL  | NULL    | NULL       |
 +-----------------------------+-------+---------+------------+
 
 
 .. index:: contiguous, C-contiguous, Fortran contiguous
 
-contiguity requests
-~~~~~~~~~~~~~~~~~~~
+yêu cầu về tính liên tục
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-C or Fortran :term:`contiguity <contiguous>` can be explicitly requested,
-with and without stride information. Without stride information, the buffer
-must be C-contiguous.
+Có thể yêu cầu rõ ràng :term:`tính liên tục <contiguous>` theo C hoặc Fortran, có hoặc không có thông tin về stride. Nếu không có thông tin về stride, buffer phải liên tục theo C.
 
 .. tabularcolumns:: |p{0.35\linewidth}|l|l|l|l|
 
-+-----------------------------------+-------+---------+------------+--------+
-|  Request                          | shape | strides | suboffsets | contig |
-+===================================+=======+=========+============+========+
-| .. c:macro:: PyBUF_C_CONTIGUOUS   |  yes  |   yes   |    NULL    |   C    |
-+-----------------------------------+-------+---------+------------+--------+
-| .. c:macro:: PyBUF_F_CONTIGUOUS   |  yes  |   yes   |    NULL    |   F    |
-+-----------------------------------+-------+---------+------------+--------+
-| .. c:macro:: PyBUF_ANY_CONTIGUOUS |  yes  |   yes   |    NULL    | C or F |
-+-----------------------------------+-------+---------+------------+--------+
-| :c:macro:`PyBUF_ND`               |  yes  |   NULL  |    NULL    |   C    |
-+-----------------------------------+-------+---------+------------+--------+
++-----------------------------------+-------+---------+------------+----------+
+| Request                           | shape | strides | suboffsets | contig   |
++===================================+=======+=========+============+==========+
+| .. c:macro:: PyBUF_C_CONTIGUOUS   | có    | có      | NULL       | C        |
++-----------------------------------+-------+---------+------------+----------+
+| .. c:macro:: PyBUF_F_CONTIGUOUS   | có    | có      | NULL       | F        |
++-----------------------------------+-------+---------+------------+----------+
+| .. c:macro:: PyBUF_ANY_CONTIGUOUS | có    | có      | NULL       | C hoặc F |
++-----------------------------------+-------+---------+------------+----------+
+| :c:macro:`PyBUF_ND`               | có    | NULL    | NULL       | C        |
++-----------------------------------+-------+---------+------------+----------+
 
 
-compound requests
-~~~~~~~~~~~~~~~~~
+các yêu cầu kết hợp
+~~~~~~~~~~~~~~~~~~~
 
-All possible requests are fully defined by some combination of the flags in
-the previous section. For convenience, the buffer protocol provides frequently
-used combinations as single flags.
+Mọi request khả dĩ đều được xác định đầy đủ bởi một số tổ hợp các flag trong phần trước. Để thuận tiện, buffer protocol cung cấp các tổ hợp thường dùng dưới dạng các flag đơn.
 
-In the following table *U* stands for undefined contiguity. The consumer would
-have to call :c:func:`PyBuffer_IsContiguous` to determine contiguity.
+Trong bảng sau, *U* biểu thị tính liên tục không xác định. Consumer sẽ phải gọi :c:func:`PyBuffer_IsContiguous` để xác định tính liên tục.
 
 .. tabularcolumns:: |p{0.35\linewidth}|l|l|l|l|l|l|
 
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-|  Request                      | shape | strides | suboffsets | contig | readonly | format |
+| Yêu cầu                       | shape | strides | suboffsets | contig | chỉ đọc  | format |
 +===============================+=======+=========+============+========+==========+========+
-| .. c:macro:: PyBUF_FULL       |  yes  |   yes   | if needed  |   U    |     0    |  yes   |
+| .. c:macro:: PyBUF_FULL       | có    | có      | nếu cần    | U      | 0        | có     |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-| .. c:macro:: PyBUF_FULL_RO    |  yes  |   yes   | if needed  |   U    |  1 or 0  |  yes   |
+| .. c:macro:: PyBUF_FULL_RO    | có    | có      | nếu cần    | U      | 1 hoặc 0 | có     |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-| .. c:macro:: PyBUF_RECORDS    |  yes  |   yes   |    NULL    |   U    |     0    |  yes   |
+| .. c:macro:: PyBUF_RECORDS    | có    | có      | NULL       | U      | 0        | có     |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-| .. c:macro:: PyBUF_RECORDS_RO |  yes  |   yes   |    NULL    |   U    |  1 or 0  |  yes   |
+| .. c:macro:: PyBUF_RECORDS_RO | có    | có      | NULL       | U      | 1 hoặc 0 | có     |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-| .. c:macro:: PyBUF_STRIDED    |  yes  |   yes   |    NULL    |   U    |     0    |  NULL  |
+| .. c:macro:: PyBUF_STRIDED    | có    | có      | NULL       | U      | 0        | NULL   |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-| .. c:macro:: PyBUF_STRIDED_RO |  yes  |   yes   |    NULL    |   U    |  1 or 0  |  NULL  |
+| .. c:macro:: PyBUF_STRIDED_RO | có    | có      | NULL       | U      | 1 hoặc 0 | NULL   |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-| .. c:macro:: PyBUF_CONTIG     |  yes  |   NULL  |    NULL    |   C    |     0    |  NULL  |
+| .. c:macro:: PyBUF_CONTIG     | có    | NULL    | NULL       | C      | 0        | NULL   |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
-| .. c:macro:: PyBUF_CONTIG_RO  |  yes  |   NULL  |    NULL    |   C    |  1 or 0  |  NULL  |
+| .. c:macro:: PyBUF_CONTIG_RO  | có    | NULL    | NULL       | C      | 1 hoặc 0 | NULL   |
 +-------------------------------+-------+---------+------------+--------+----------+--------+
 
 
-Complex arrays
-==============
+.. _`Complex arrays`:
 
-NumPy-style: shape and strides
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mảng phức tạp
+=============
 
-The logical structure of NumPy-style arrays is defined by :c:member:`~Py_buffer.itemsize`,
-:c:member:`~Py_buffer.ndim`, :c:member:`~Py_buffer.shape` and :c:member:`~Py_buffer.strides`.
+Theo kiểu NumPy: shape và strides
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If ``ndim == 0``, the memory location pointed to by :c:member:`~Py_buffer.buf` is
-interpreted as a scalar of size :c:member:`~Py_buffer.itemsize`. In that case,
-both :c:member:`~Py_buffer.shape` and :c:member:`~Py_buffer.strides` are ``NULL``.
+Cấu trúc logic của các mảng theo kiểu NumPy được xác định bởi :c:member:`~Py_buffer.itemsize`,
+:c:member:`~Py_buffer.ndim`, :c:member:`~Py_buffer.shape` và :c:member:`~Py_buffer.strides`.
 
-If :c:member:`~Py_buffer.strides` is ``NULL``, the array is interpreted as
-a standard n-dimensional C-array. Otherwise, the consumer must access an
-n-dimensional array as follows:
+Nếu ``ndim == 0``, vị trí bộ nhớ được :c:member:`~Py_buffer.buf` trỏ tới được diễn giải là một scalar có kích thước :c:member:`~Py_buffer.itemsize`. Trong trường hợp đó, cả :c:member:`~Py_buffer.shape` và :c:member:`~Py_buffer.strides` đều là ``NULL``.
+
+Nếu :c:member:`~Py_buffer.strides` là ``NULL``, mảng được diễn giải là một mảng C n-chiều tiêu chuẩn. Nếu không, consumer phải truy cập mảng n-chiều như sau:
 
 .. code-block:: c
 
@@ -384,9 +275,7 @@ n-dimensional array as follows:
    item = *((typeof(item) *)ptr);
 
 
-As noted above, :c:member:`~Py_buffer.buf` can point to any location within
-the actual memory block. An exporter can check the validity of a buffer with
-this function:
+Như đã lưu ý ở trên, :c:member:`~Py_buffer.buf` có thể trỏ tới bất kỳ vị trí nào bên trong khối bộ nhớ thực tế. Exporter có thể kiểm tra tính hợp lệ của một buffer bằng hàm này:
 
 .. code-block:: python
 
@@ -417,21 +306,13 @@ this function:
        return 0 <= offset+imin and offset+imax+itemsize <= memlen
 
 
-PIL-style: shape, strides and suboffsets
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PIL-style: shape, strides và suboffsets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In addition to the regular items, PIL-style arrays can contain pointers
-that must be followed in order to get to the next element in a dimension.
-For example, the regular three-dimensional C-array ``char v[2][2][3]`` can
-also be viewed as an array of 2 pointers to 2 two-dimensional arrays:
-``char (*v[2])[2][3]``. In suboffsets representation, those two pointers
-can be embedded at the start of :c:member:`~Py_buffer.buf`, pointing
-to two ``char x[2][3]`` arrays that can be located anywhere in memory.
+Ngoài các phần tử thông thường, mảng PIL-style có thể chứa các con trỏ cần được đi theo để đến phần tử tiếp theo trong một chiều. Ví dụ, mảng C ba chiều thông thường ``char v[2][2][3]`` cũng có thể được xem như một mảng gồm 2 con trỏ trỏ tới 2 mảng hai chiều: ``char (*v[2])[2][3]``. Trong biểu diễn suboffsets, hai con trỏ đó có thể được nhúng ở đầu :c:member:`~Py_buffer.buf`, trỏ tới hai mảng ``char x[2][3]`` có thể nằm ở bất kỳ vị trí nào trong bộ nhớ.
 
 
-Here is a function that returns a pointer to the element in an N-D array
-pointed to by an N-dimensional index when there are both non-``NULL`` strides
-and suboffsets::
+Sau đây là một hàm trả về con trỏ tới phần tử trong một mảng N-D được trỏ tới bởi một chỉ mục N-chiều khi có cả các stride không phải ``NULL`` và suboffsets::
 
    void *get_item_pointer(int ndim, void *buf, Py_ssize_t *strides,
                           Py_ssize_t *suboffsets, Py_ssize_t *indices) {
@@ -447,110 +328,78 @@ and suboffsets::
    }
 
 
-Buffer-related functions
-========================
+Các hàm liên quan đến buffer
+============================
 
 .. c:function:: int PyObject_CheckBuffer(PyObject *obj)
 
-   Return ``1`` if *obj* supports the buffer interface otherwise ``0``.  When ``1`` is
-   returned, it doesn't guarantee that :c:func:`PyObject_GetBuffer` will
-   succeed.  This function always succeeds.
+   Trả về ``1`` nếu *obj* hỗ trợ giao diện buffer, nếu không thì trả về ``0``. Khi trả về ``1``, điều đó không đảm bảo rằng :c:func:`PyObject_GetBuffer` sẽ thành công. Hàm này luôn thành công.
 
 
 .. c:function:: int PyObject_GetBuffer(PyObject *exporter, Py_buffer *view, int flags)
 
-   Send a request to *exporter* to fill in *view* as specified by  *flags*.
-   If the exporter cannot provide a buffer of the exact type, it MUST raise
-   :exc:`BufferError`, set ``view->obj`` to ``NULL`` and
-   return ``-1``.
+   Gửi yêu cầu đến *exporter* để điền *view* theo chỉ định của *flags*. Nếu exporter không thể cung cấp buffer có kiểu chính xác, nó PHẢI phát sinh
+   :exc:`BufferError`, đặt ``view->obj`` thành ``NULL`` và trả về ``-1``.
 
-   On success, fill in *view*, set ``view->obj`` to a new reference
-   to *exporter* and return 0. In the case of chained buffer providers
-   that redirect requests to a single object, ``view->obj`` MAY
-   refer to this object instead of *exporter* (See :ref:`Buffer Object Structures <buffer-structs>`).
+   Khi thành công, điền *view*, đặt ``view->obj`` thành một tham chiếu mới đến *exporter* và trả về 0. Trong trường hợp các buffer provider liên kết với nhau chuyển hướng yêu cầu đến một đối tượng duy nhất, ``view->obj`` CÓ THỂ tham chiếu đến đối tượng này thay vì *exporter* (Xem :ref:`Cấu trúc đối tượng buffer <buffer-structs>`).
 
-   Successful calls to :c:func:`PyObject_GetBuffer` must be paired with calls
-   to :c:func:`PyBuffer_Release`, similar to :c:func:`malloc` and :c:func:`free`.
-   Thus, after the consumer is done with the buffer, :c:func:`PyBuffer_Release`
-   must be called exactly once.
+   Các lời gọi thành công đến :c:func:`PyObject_GetBuffer` phải đi kèm với các lời gọi đến :c:func:`PyBuffer_Release`, tương tự như :c:func:`malloc` và :c:func:`free`. Do đó, sau khi consumer sử dụng xong buffer, phải gọi :c:func:`PyBuffer_Release` đúng một lần.
 
 
 .. c:function:: void PyBuffer_Release(Py_buffer *view)
 
-   Release the buffer *view* and release the :term:`strong reference`
-   (i.e. decrement the reference count) to the view's supporting object,
-   ``view->obj``. This function MUST be called when the buffer
-   is no longer being used, otherwise reference leaks may occur.
+   Giải phóng buffer *view* và giải phóng :term:`strong reference` (tức là giảm số lượng tham chiếu) đến đối tượng hỗ trợ view, ``view->obj``. PHẢI gọi hàm này khi buffer không còn được sử dụng; nếu không, có thể xảy ra rò rỉ tham chiếu.
 
-   It is an error to call this function on a buffer that was not obtained via
+   Việc gọi hàm này trên một buffer không được lấy thông qua là một lỗi
    :c:func:`PyObject_GetBuffer`.
 
 
 .. c:function:: Py_ssize_t PyBuffer_SizeFromFormat(const char *format)
 
-   Return the implied :c:member:`~Py_buffer.itemsize` from :c:member:`~Py_buffer.format`.
-   On error, raise an exception and return -1.
+   Trả về :c:member:`~Py_buffer.itemsize` ngầm định từ :c:member:`~Py_buffer.format`. Khi có lỗi, phát sinh một ngoại lệ và trả về -1.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: int PyBuffer_IsContiguous(const Py_buffer *view, char order)
 
-   Return ``1`` if the memory defined by the *view* is C-style (*order* is
-   ``'C'``) or Fortran-style (*order* is ``'F'``) :term:`contiguous` or either one
-   (*order* is ``'A'``).  Return ``0`` otherwise.  This function always succeeds.
+   Trả về ``1`` nếu vùng nhớ được xác định bởi *view* có kiểu C (*order* là ``'C'``) hoặc kiểu Fortran (*order* là ``'F'``) :term:`contiguous`, hoặc thuộc cả hai kiểu (*order* là ``'A'``). Trả về ``0`` nếu không. Hàm này luôn thành công.
 
 
 .. c:function:: void* PyBuffer_GetPointer(const Py_buffer *view, const Py_ssize_t *indices)
 
-   Get the memory area pointed to by the *indices* inside the given *view*.
-   *indices* must point to an array of ``view->ndim`` indices.
+   Lấy vùng nhớ được trỏ tới bởi *indices* bên trong *view* đã cho. *indices* phải trỏ tới một mảng gồm các ``view->ndim`` chỉ số.
 
 
 .. c:function:: int PyBuffer_FromContiguous(const Py_buffer *view, const void *buf, Py_ssize_t len, char fort)
 
-   Copy contiguous *len* bytes from *buf* to *view*.
-   *fort* can be ``'C'`` or ``'F'`` (for C-style or Fortran-style ordering).
-   ``0`` is returned on success, ``-1`` on error.
+   Sao chép *len* byte liên tiếp từ *buf* sang *view*. *fort* có thể là ``'C'`` hoặc ``'F'`` (tương ứng với thứ tự kiểu C hoặc kiểu Fortran). Trả về ``0`` khi thành công và ``-1`` khi có lỗi.
 
 
 .. c:function:: int PyBuffer_ToContiguous(void *buf, const Py_buffer *src, Py_ssize_t len, char order)
 
-   Copy *len* bytes from *src* to its contiguous representation in *buf*.
-   *order* can be ``'C'`` or ``'F'`` or ``'A'`` (for C-style or Fortran-style
-   ordering or either one). ``0`` is returned on success, ``-1`` on error.
+   Sao chép *len* byte từ *src* sang biểu diễn liên tiếp của nó trong *buf*. *order* có thể là ``'C'``, ``'F'`` hoặc ``'A'`` (tương ứng với thứ tự kiểu C, kiểu Fortran hoặc cả hai). Trả về ``0`` khi thành công và ``-1`` khi có lỗi.
 
-   This function fails if *len* != *src->len*.
+   Hàm này không thành công nếu *len* != *src->len*.
 
 
 .. c:function:: int PyObject_CopyData(PyObject *dest, PyObject *src)
 
-   Copy data from *src* to *dest* buffer. Can convert between C-style and
-   or Fortran-style buffers.
+   Sao chép dữ liệu từ *src* sang *dest* buffer. Có thể chuyển đổi giữa các buffer kiểu C và kiểu Fortran.
 
-   ``0`` is returned on success, ``-1`` on error.
+   ``0`` được trả về khi thành công, ``-1`` khi có lỗi.
 
 .. c:function:: void PyBuffer_FillContiguousStrides(int ndims, Py_ssize_t *shape, Py_ssize_t *strides, int itemsize, char order)
 
-   Fill the *strides* array with byte-strides of a :term:`contiguous` (C-style if
-   *order* is ``'C'`` or Fortran-style if *order* is ``'F'``) array of the
-   given shape with the given number of bytes per element.
+   Điền mảng *strides* bằng các bước theo byte của một mảng :term:`contiguous` (kiểu C nếu *order* là ``'C'`` hoặc kiểu Fortran nếu *order* là ``'F'``) có shape đã cho và số byte trên mỗi phần tử đã cho.
 
 
 .. c:function:: int PyBuffer_FillInfo(Py_buffer *view, PyObject *exporter, void *buf, Py_ssize_t len, int readonly, int flags)
 
-   Handle buffer requests for an exporter that wants to expose *buf* of size *len*
-   with writability set according to *readonly*. *buf* is interpreted as a sequence
-   of unsigned bytes.
+   Xử lý các yêu cầu về buffer cho một exporter muốn cung cấp *buf* có kích thước *len*, với khả năng ghi được thiết lập theo *readonly*. *buf* được diễn giải là một chuỗi các byte không dấu.
 
-   The *flags* argument indicates the request type. This function always fills in
-   *view* as specified by flags, unless *buf* has been designated as read-only
-   and :c:macro:`PyBUF_WRITABLE` is set in *flags*.
+   Đối số *flags* cho biết loại yêu cầu. Hàm này luôn điền *view* theo chỉ định của flags, trừ khi *buf* đã được chỉ định là chỉ đọc và :c:macro:`PyBUF_WRITABLE` được thiết lập trong *flags*.
 
-   On success, set ``view->obj`` to a new reference to *exporter* and
-   return 0. Otherwise, raise :exc:`BufferError`, set
-   ``view->obj`` to ``NULL`` and return ``-1``;
+   Khi thành công, đặt ``view->obj`` thành một tham chiếu mới đến *exporter* và trả về 0. Nếu không, raise :exc:`BufferError`, đặt ``view->obj`` thành ``NULL`` và trả về ``-1``;”
 
-   If this function is used as part of a :ref:`getbufferproc <buffer-structs>`,
-   *exporter* MUST be set to the exporting object and *flags* must be passed
-   unmodified. Otherwise, *exporter* MUST be ``NULL``.
+   Nếu hàm này được sử dụng như một phần của :ref:`getbufferproc <buffer-structs>`, *exporter* PHẢI được đặt thành đối tượng xuất và *flags* phải được truyền nguyên trạng. Nếu không, *exporter* PHẢI là ``NULL``.

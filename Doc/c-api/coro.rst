@@ -2,34 +2,29 @@
 
 .. _coro-objects:
 
-Coroutine Objects
------------------
+Đối tượng Coroutine
+-------------------
 
 .. versionadded:: 3.5
 
-Coroutine objects are what functions declared with an ``async`` keyword
-return.
+Các đối tượng coroutine là những gì các hàm được khai báo bằng từ khóa ``async`` trả về.
 
 
 .. c:type:: PyCoroObject
 
-   The C structure used for coroutine objects.
+   Cấu trúc C được sử dụng cho các đối tượng coroutine.
 
 
 .. c:var:: PyTypeObject PyCoro_Type
 
-   The type object corresponding to coroutine objects.
+   Đối tượng kiểu tương ứng với các đối tượng coroutine.
 
 
 .. c:function:: int PyCoro_CheckExact(PyObject *ob)
 
-   Return true if *ob*'s type is :c:type:`PyCoro_Type`; *ob* must not be ``NULL``.
-   This function always succeeds.
+   Trả về true nếu kiểu của *ob* là :c:type:`PyCoro_Type`; *ob* không được là ``NULL``. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PyCoro_New(PyFrameObject *frame, PyObject *name, PyObject *qualname)
 
-   Create and return a new coroutine object based on the *frame* object,
-   with ``__name__`` and ``__qualname__`` set to *name* and *qualname*.
-   A reference to *frame* is stolen by this function.  The *frame* argument
-   must not be ``NULL``.
+   Tạo và trả về một đối tượng coroutine mới dựa trên đối tượng *frame*, với ``__name__`` và ``__qualname__`` được đặt thành *name* và *qualname*. Hàm này lấy đi một tham chiếu đến *frame*. Đối số *frame* không được là ``NULL``.

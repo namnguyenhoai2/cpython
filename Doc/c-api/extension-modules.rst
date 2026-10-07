@@ -2,106 +2,64 @@
 
 .. _extension-modules:
 
-Defining extension modules
---------------------------
+Định nghĩa các mô-đun mở rộng
+-----------------------------
 
-A C extension for CPython is a shared library (for example, a ``.so`` file
-on Linux, ``.pyd`` DLL on Windows), which is loadable into the Python process
-(for example, it is compiled with compatible compiler settings), and which
-exports an :ref:`initialization function <extension-export-hook>`.
+Một phần mở rộng C cho CPython là một thư viện dùng chung (ví dụ: tệp ``.so`` trên Linux, DLL ``.pyd`` trên Windows), có thể được tải vào tiến trình Python (ví dụ: được biên dịch với các tùy chọn trình biên dịch tương thích), và xuất một :ref:`hàm khởi tạo <extension-export-hook>`.
 
-To be importable by default (that is, by
-:py:class:`importlib.machinery.ExtensionFileLoader`),
-the shared library must be available on :py:attr:`sys.path`,
-and must be named after the module name plus an extension listed in
+Để có thể được import theo mặc định (nghĩa là bởi
+:py:class:`importlib.machinery.ExtensionFileLoader`), thư viện dùng chung phải có sẵn trong :py:attr:`sys.path`, và phải được đặt tên theo tên mô-đun cộng với một phần mở rộng được liệt kê trong
 :py:attr:`importlib.machinery.EXTENSION_SUFFIXES`.
 
 .. note::
 
-   Building, packaging and distributing extension modules is best done with
-   third-party tools, and is out of scope of this document.
-   One suitable tool is Setuptools, whose documentation can be found at
-   https://setuptools.pypa.io/en/latest/setuptools.html.
+   Tốt nhất nên xây dựng, đóng gói và phân phối các mô-đun mở rộng bằng các công cụ của bên thứ ba; việc này nằm ngoài phạm vi của tài liệu này. Một công cụ phù hợp là Setuptools, tài liệu của công cụ này có tại https://setuptools.pypa.io/en/latest/setuptools.html.
 
-Normally, the initialization function returns a module definition initialized
-using :c:func:`PyModuleDef_Init`.
-This allows splitting the creation process into several phases:
+Thông thường, hàm khởi tạo trả về một định nghĩa mô-đun được khởi tạo bằng :c:func:`PyModuleDef_Init`. Điều này cho phép chia quá trình tạo thành nhiều giai đoạn:
 
-- Before any substantial code is executed, Python can determine which
-  capabilities the module supports, and it can adjust the environment or
-  refuse loading an incompatible extension.
-- By default, Python itself creates the module object -- that is, it does
-  the equivalent of :py:meth:`object.__new__` for classes.
-  It also sets initial attributes like :attr:`~module.__package__` and
+- Trước khi bất kỳ đoạn mã đáng kể nào được thực thi, Python có thể xác định mô-đun hỗ trợ những khả năng nào, đồng thời điều chỉnh môi trường hoặc từ chối tải một phần mở rộng không tương thích.
+- Theo mặc định, chính Python tạo đối tượng module -- tức là, nó thực hiện tương đương với :py:meth:`object.__new__` đối với các lớp. Nó cũng thiết lập các thuộc tính ban đầu như :attr:`~module.__package__` và
   :attr:`~module.__loader__`.
-- Afterwards, the module object is initialized using extension-specific
-  code -- the equivalent of :py:meth:`~object.__init__` on classes.
+- Sau đó, đối tượng module được khởi tạo bằng mã dành riêng cho extension -- tương đương với :py:meth:`~object.__init__` trên các lớp.
 
-This is called *multi-phase initialization* to distinguish it from the legacy
-(but still supported) *single-phase initialization* scheme,
-where the initialization function returns a fully constructed module.
-See the :ref:`single-phase-initialization section below <single-phase-initialization>`
-for details.
+Điều này được gọi là *khởi tạo nhiều giai đoạn* để phân biệt với lược đồ *khởi tạo một giai đoạn* cũ (nhưng vẫn được hỗ trợ), trong đó hàm khởi tạo trả về một module đã được xây dựng hoàn chỉnh. Xem :ref:`phần khởi tạo một giai đoạn bên dưới <single-phase-initialization>` để biết chi tiết.
 
 .. versionchanged:: 3.5
 
-   Added support for multi-phase initialization (:pep:`489`).
+   Đã bổ sung hỗ trợ cho khởi tạo nhiều giai đoạn (:pep:`489`).
 
 
-Multiple module instances
-.........................
+Nhiều thực thể module
+.....................
 
-By default, extension modules are not singletons.
-For example, if the :py:attr:`sys.modules` entry is removed and the module
-is re-imported, a new module object is created, and typically populated with
-fresh method and type objects.
-The old module is subject to normal garbage collection.
-This mirrors the behavior of pure-Python modules.
+Theo mặc định, các extension module không phải là singleton. Ví dụ: nếu mục nhập :py:attr:`sys.modules` bị xóa rồi module được import lại, một đối tượng module mới sẽ được tạo và thường được nạp các đối tượng method và type mới. Module cũ sẽ được xử lý bởi cơ chế thu gom rác thông thường. Điều này phản ánh hành vi của các module Python thuần.
 
-Additional module instances may be created in
-:ref:`sub-interpreters <sub-interpreter-support>`
-or after Python runtime reinitialization
-(:c:func:`Py_Finalize` and :c:func:`Py_Initialize`).
-In these cases, sharing Python objects between module instances would likely
-cause crashes or undefined behavior.
+Các thực thể module bổ sung có thể được tạo trong
+:ref:`các trình thông dịch con <sub-interpreter-support>` hoặc sau khi runtime Python được khởi tạo lại (:c:func:`Py_Finalize` và :c:func:`Py_Initialize`). Trong những trường hợp này, việc chia sẻ các đối tượng Python giữa các instance của module có thể gây ra lỗi nghiêm trọng hoặc hành vi không xác định.
 
-To avoid such issues, each instance of an extension module should
-be *isolated*: changes to one instance should not implicitly affect the others,
-and all state owned by the module, including references to Python objects,
-should be specific to a particular module instance.
-See :ref:`isolating-extensions-howto` for more details and a practical guide.
+Để tránh những vấn đề như vậy, mỗi instance của extension module phải được *cô lập*: các thay đổi đối với một instance không được ngầm ảnh hưởng đến các instance khác, và mọi trạng thái do module sở hữu, bao gồm các tham chiếu đến đối tượng Python, phải dành riêng cho một instance cụ thể của module. Xem :ref:`isolating-extensions-howto` để biết thêm chi tiết và hướng dẫn thực tế.
 
-A simpler way to avoid these issues is
-:ref:`raising an error on repeated initialization <isolating-extensions-optout>`.
+Một cách đơn giản hơn để tránh những vấn đề này là
+:ref:`phát sinh lỗi khi khởi tạo lại <isolating-extensions-optout>`.
 
-All modules are expected to support
-:ref:`sub-interpreters <sub-interpreter-support>`, or otherwise explicitly
-signal a lack of support.
-This is usually achieved by isolation or blocking repeated initialization,
-as above.
-A module may also be limited to the main interpreter using
-the :c:data:`Py_mod_multiple_interpreters` slot.
+Tất cả các module được kỳ vọng hỗ trợ
+:ref:`các trình thông dịch con <sub-interpreter-support>`, hoặc phải báo hiệu rõ ràng rằng chúng không hỗ trợ. Điều này thường đạt được bằng cách cô lập hoặc chặn việc khởi tạo lại, như trên. Một module cũng có thể bị giới hạn chỉ chạy trong trình thông dịch chính bằng cách sử dụng slot :c:data:`Py_mod_multiple_interpreters`.
 
 
 .. _extension-export-hook:
 
-Initialization function
-.......................
+Hàm khởi tạo
+............
 
-The initialization function defined by an extension module has the
-following signature:
+Hàm khởi tạo được định nghĩa bởi một extension module có chữ ký sau:
 
 .. c:function:: PyObject* PyInit_modulename(void)
 
-Its name should be :samp:`PyInit_{<name>}`, with ``<name>`` replaced by the
-name of the module.
+Tên của hàm phải là :samp:`PyInit_{<name>}`, trong đó ``<name>`` được thay thế bằng tên của module.
 
-For modules with ASCII-only names, the function must instead be named
-:samp:`PyInit_{<name>}`, with ``<name>`` replaced by the name of the module.
-When using :ref:`multi-phase-initialization`, non-ASCII module names
-are allowed. In this case, the initialization function name is
-:samp:`PyInitU_{<name>}`, with ``<name>`` encoded using Python's
-*punycode* encoding with hyphens replaced by underscores. In Python:
+Đối với các module có tên chỉ gồm ASCII, hàm phải được đặt tên là
+:samp:`PyInit_{<name>}`, trong đó ``<name>`` được thay thế bằng tên của module. Khi sử dụng :ref:`multi-phase-initialization`, có thể dùng tên module không phải ASCII. Trong trường hợp này, tên hàm khởi tạo là
+:samp:`PyInitU_{<name>}`, trong đó ``<name>`` được mã hóa bằng encoding *punycode* của Python, với dấu gạch nối được thay thế bằng dấu gạch dưới. Trong Python:
 
 .. code-block:: python
 
@@ -112,18 +70,17 @@ are allowed. In this case, the initialization function name is
             suffix = b'U_' + name.encode('punycode').replace(b'-', b'_')
         return b'PyInit' + suffix
 
-It is recommended to define the initialization function using a helper macro:
+Bạn nên định nghĩa hàm khởi tạo bằng một helper macro:
 
 .. c:macro:: PyMODINIT_FUNC
 
-   Declare an extension module initialization function.
-   This macro:
+   Khai báo một hàm khởi tạo extension module. Macro này:
 
-   * specifies the :c:expr:`PyObject*` return type,
-   * adds any special linkage declarations required by the platform, and
-   * for C++, declares the function as ``extern "C"``.
+   * chỉ định kiểu trả về :c:expr:`PyObject*`,
+   * thêm mọi khai báo liên kết đặc biệt mà nền tảng yêu cầu, và
+   * đối với C++, khai báo hàm là ``extern "C"``.
 
-For example, a module called ``spam`` would be defined like this::
+Ví dụ: một module có tên ``spam`` sẽ được định nghĩa như sau::
 
    static struct PyModuleDef spam_module = {
        .m_base = PyModuleDef_HEAD_INIT,
@@ -137,79 +94,51 @@ For example, a module called ``spam`` would be defined like this::
        return PyModuleDef_Init(&spam_module);
    }
 
-It is possible to export multiple modules from a single shared library by
-defining multiple initialization functions. However, importing them requires
-using symbolic links or a custom importer, because by default only the
-function corresponding to the filename is found.
-See the `Multiple modules in one library <https://peps.python.org/pep-0489/#multiple-modules-in-one-library>`__
-section in :pep:`489` for details.
+Có thể export nhiều module từ một shared library bằng cách định nghĩa nhiều hàm khởi tạo. Tuy nhiên, để import chúng, bạn cần sử dụng symbolic link hoặc importer tùy chỉnh, vì theo mặc định, chỉ tìm thấy hàm tương ứng với tên tệp. Xem phần `Multiple modules in one library <https://peps.python.org/pep-0489/#multiple-modules-in-one-library>`__ trong :pep:`489` để biết chi tiết.
 
-The initialization function is typically the only non-\ ``static``
-item defined in the module's C source.
+Hàm khởi tạo thường là mục không phải \ ``static`` duy nhất được định nghĩa trong mã nguồn C của module.
 
 
 .. _multi-phase-initialization:
 
-Multi-phase initialization
-..........................
+Khởi tạo nhiều giai đoạn
+........................
 
-Normally, the :ref:`initialization function <extension-export-hook>`
-(``PyInit_modulename``) returns a :c:type:`PyModuleDef` instance with
-non-``NULL`` :c:member:`~PyModuleDef.m_slots`.
-Before it is returned, the ``PyModuleDef`` instance must be initialized
-using the following function:
+Thông thường, :ref:`hàm khởi tạo <extension-export-hook>` (``PyInit_modulename``) trả về một thực thể :c:type:`PyModuleDef` có ``NULL`` :c:member:`~PyModuleDef.m_slots` không phải ``NULL``. Trước khi được trả về, thực thể ``PyModuleDef`` phải được khởi tạo bằng hàm sau:
 
 
 .. c:function:: PyObject* PyModuleDef_Init(PyModuleDef *def)
 
-   Ensure a module definition is a properly initialized Python object that
-   correctly reports its type and a reference count.
+   Đảm bảo rằng định nghĩa module là một đối tượng Python được khởi tạo đúng cách, báo cáo chính xác kiểu của nó và số lượng tham chiếu.
 
-   Return *def* cast to ``PyObject*``, or ``NULL`` if an error occurred.
+   Trả về *def* được chuyển kiểu thành ``PyObject*``, hoặc ``NULL`` nếu xảy ra lỗi.
 
-   Calling this function is required for :ref:`multi-phase-initialization`.
-   It should not be used in other contexts.
+   Việc gọi hàm này là bắt buộc đối với :ref:`multi-phase-initialization`. Không nên sử dụng hàm này trong các ngữ cảnh khác.
 
-   Note that Python assumes that ``PyModuleDef`` structures are statically
-   allocated.
-   This function may return either a new reference or a borrowed one;
-   this reference must not be released.
+   Lưu ý rằng Python giả định các cấu trúc ``PyModuleDef`` được cấp phát tĩnh. Hàm này có thể trả về một tham chiếu mới hoặc một tham chiếu mượn; không được giải phóng tham chiếu này.
 
    .. versionadded:: 3.5
 
 
 .. _single-phase-initialization:
 
-Legacy single-phase initialization
-..................................
+Khởi tạo một giai đoạn kiểu cũ
+..............................
 
 .. attention::
-   Single-phase initialization is a legacy mechanism to initialize extension
-   modules, with known drawbacks and design flaws. Extension module authors
-   are encouraged to use multi-phase initialization instead.
+   Khởi tạo một giai đoạn là cơ chế kiểu cũ để khởi tạo các module mở rộng, với những hạn chế và lỗi thiết kế đã biết. Tác giả module mở rộng được khuyến khích sử dụng khởi tạo nhiều giai đoạn thay thế.
 
-In single-phase initialization, the
-:ref:`initialization function <extension-export-hook>` (``PyInit_modulename``)
-should create, populate and return a module object.
-This is typically done using :c:func:`PyModule_Create` and functions like
+Trong quá trình khởi tạo một pha,
+:ref:`hàm khởi tạo <extension-export-hook>` (``PyInit_modulename``) sẽ tạo, điền dữ liệu và trả về một đối tượng module. Việc này thường được thực hiện bằng :c:func:`PyModule_Create` và các hàm như
 :c:func:`PyModule_AddObjectRef`.
 
-Single-phase initialization differs from the :ref:`default <multi-phase-initialization>`
-in the following ways:
+Việc khởi tạo một pha khác với :ref:`mặc định <multi-phase-initialization>` ở những điểm sau:
 
-* Single-phase modules are, or rather *contain*, “singletons”.
+* Các module khởi tạo một pha là, hay chính xác hơn là *chứa*, các “singleton”.
 
-  When the module is first initialized, Python saves the contents of
-  the module's ``__dict__`` (that is, typically, the module's functions and
-  types).
+  Khi module được khởi tạo lần đầu, Python lưu nội dung của ``__dict__`` của module (thông thường là các hàm và kiểu của module).
 
-  For subsequent imports, Python does not call the initialization function
-  again.
-  Instead, it creates a new module object with a new ``__dict__``, and copies
-  the saved contents to it.
-  For example, given a single-phase module ``_testsinglephase``
-  [#testsinglephase]_ that defines a function ``sum`` and an exception class
-  ``error``:
+  Trong các lần import tiếp theo, Python không gọi lại hàm khởi tạo. Thay vào đó, Python tạo một đối tượng module mới với ``__dict__`` mới, rồi sao chép nội dung đã lưu vào đó. Ví dụ, với một module khởi tạo một pha ``_testsinglephase`` [#testsinglephase]_ định nghĩa một hàm ``sum`` và một lớp ngoại lệ ``error``:
 
   .. code-block:: python
 
@@ -226,22 +155,15 @@ in the following ways:
      >>> one.error is two.error
      True
 
-  The exact behavior should be considered a CPython implementation detail.
+  Hành vi chính xác nên được xem là một chi tiết triển khai của CPython.
 
-* To work around the fact that ``PyInit_modulename`` does not take a *spec*
-  argument, some state of the import machinery is saved and applied to the
-  first suitable module created during the ``PyInit_modulename`` call.
-  Specifically, when a sub-module is imported, this mechanism prepends the
-  parent package name to the name of the module.
+* Để khắc phục việc ``PyInit_modulename`` không nhận đối số *spec*, một phần trạng thái của cơ chế import được lưu lại và áp dụng cho module phù hợp đầu tiên được tạo trong lệnh gọi ``PyInit_modulename``. Cụ thể, khi một sub-module được import, cơ chế này thêm tên package cha vào trước tên của module.
 
-  A single-phase ``PyInit_modulename`` function should create “its” module
-  object as soon as possible, before any other module objects can be created.
+  Một hàm ``PyInit_modulename`` khởi tạo một pha nên tạo đối tượng module “của nó” sớm nhất có thể, trước khi bất kỳ đối tượng module nào khác được tạo.
 
-* Non-ASCII module names (``PyInitU_modulename``) are not supported.
+* Không hỗ trợ tên module không phải ASCII (``PyInitU_modulename``).
 
-* Single-phase modules support module lookup functions like
+* Các module khởi tạo một pha hỗ trợ những hàm tra cứu module như
   :c:func:`PyState_FindModule`.
 
-.. [#testsinglephase] ``_testsinglephase`` is an internal module used
-   in CPython's self-test suite; your installation may or may not
-   include it.
+.. [#testsinglephase] ``_testsinglephase`` là một module nội bộ được sử dụng trong bộ kiểm thử tự thân của CPython; bản cài đặt của bạn có thể có hoặc không có module này.

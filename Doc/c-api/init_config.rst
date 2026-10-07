@@ -2,34 +2,32 @@
 
 .. _init-config:
 
-***********************************
-Python Initialization Configuration
-***********************************
+************************
+Cấu hình khởi tạo Python
+************************
 
 
 .. _pyinitconfig_api:
 
-PyInitConfig C API
+C API PyInitConfig
 ==================
 
 .. versionadded:: 3.14
 
-Python can be initialized with :c:func:`Py_InitializeFromInitConfig`.
+Python có thể được khởi tạo bằng :c:func:`Py_InitializeFromInitConfig`.
 
-The :c:func:`Py_RunMain` function can be used to write a customized Python
-program.
+Hàm :c:func:`Py_RunMain` có thể được sử dụng để viết một chương trình Python tùy chỉnh.
 
-See also :ref:`Initialization, Finalization, and Threads <initialization>`.
+Xem thêm :ref:`Initialization, Finalization, and Threads <initialization>`.
 
 .. seealso::
    :pep:`741` "Python Configuration C API".
 
 
-Example
--------
+Ví dụ
+-----
 
-Example of customized Python always running with the :ref:`Python Development
-Mode <devmode>` enabled; return ``-1`` on error:
+Ví dụ về Python tùy chỉnh luôn chạy với :ref:`Python Development Mode <devmode>` được bật; trả về ``-1`` khi có lỗi:
 
 .. code-block:: c
 
@@ -41,12 +39,12 @@ Mode <devmode>` enabled; return ``-1`` on error:
             return -1;
         }
 
-        // Enable the Python Development Mode
+        // Bật Python Development Mode
         if (PyInitConfig_SetInt(config, "dev_mode", 1) < 0) {
             goto error;
         }
 
-        // Initialize Python with the configuration
+        // Khởi tạo Python với cấu hình
         if (Py_InitializeFromInitConfig(config) < 0) {
             goto error;
         }
@@ -55,10 +53,10 @@ Mode <devmode>` enabled; return ``-1`` on error:
 
     error:
         {
-            // Display the error message.
+            // Hiển thị thông báo lỗi.
             //
-            // This uncommon braces style is used, because you cannot make
-            // goto targets point to variable declarations.
+            // Kiểu dấu ngoặc nhọn không phổ biến này được sử dụng vì bạn không thể khiến
+            // các đích goto trỏ đến khai báo biến.
             const char *err_msg;
             (void)PyInitConfig_GetError(config, &err_msg);
             printf("PYTHON INIT ERROR: %s\n", err_msg);
@@ -67,510 +65,484 @@ Mode <devmode>` enabled; return ``-1`` on error:
         }
     }
 
-Create Config
--------------
+Tạo Config
+----------
 
 .. c:struct:: PyInitConfig
 
-   Opaque structure to configure the Python initialization.
+   Cấu trúc opaque để cấu hình việc khởi tạo Python.
 
 
 .. c:function:: PyInitConfig* PyInitConfig_Create(void)
 
-   Create a new initialization configuration using :ref:`Isolated Configuration
-   <init-isolated-conf>` default values.
+   Tạo một cấu hình khởi tạo mới bằng các giá trị mặc định của :ref:`Cấu hình biệt lập <init-isolated-conf>`.
 
-   It must be freed by :c:func:`PyInitConfig_Free`.
+   Phải giải phóng cấu hình này bằng :c:func:`PyInitConfig_Free`.
 
-   Return ``NULL`` on memory allocation failure.
+   Trả về ``NULL`` nếu cấp phát bộ nhớ không thành công.
 
 
 .. c:function:: void PyInitConfig_Free(PyInitConfig *config)
 
-   Free memory of the initialization configuration *config*.
+   Giải phóng bộ nhớ của cấu hình khởi tạo *config*.
 
-   If *config* is ``NULL``, no operation is performed.
+   Nếu *config* là ``NULL``, không thực hiện thao tác nào.
 
 
-Error Handling
---------------
+Xử lý lỗi
+---------
 
 .. c:function:: int PyInitConfig_GetError(PyInitConfig* config, const char **err_msg)
 
-   Get the *config* error message.
+   Lấy thông báo lỗi của *config*.
 
-   * Set *\*err_msg* and return ``1`` if an error is set.
-   * Set *\*err_msg* to ``NULL`` and return ``0`` otherwise.
+   * Đặt *\*err_msg* và trả về ``1`` nếu đã thiết lập lỗi.
+   * Đặt *\*err_msg* thành ``NULL`` và trả về ``0`` nếu không.
 
-   An error message is a UTF-8 encoded string.
+   Thông báo lỗi là một chuỗi được mã hóa UTF-8.
 
-   If *config* has an exit code, format the exit code as an error
-   message.
+   Nếu *config* có mã thoát, hãy định dạng mã thoát thành thông báo lỗi.
 
-   The error message remains valid until another ``PyInitConfig``
-   function is called with *config*. The caller doesn't have to free the
-   error message.
+   Thông báo lỗi vẫn hợp lệ cho đến khi một ``PyInitConfig`` function khác được gọi với *config*. Bên gọi không cần giải phóng thông báo lỗi.
 
 
 .. c:function:: int PyInitConfig_GetExitCode(PyInitConfig* config, int *exitcode)
 
-   Get the *config* exit code.
+   Lấy mã thoát của *config*.
 
-   * Set *\*exitcode* and return ``1`` if *config* has an exit code set.
-   * Return ``0`` if *config* has no exit code set.
+   * Đặt *\*exitcode* và trả về ``1`` nếu *config* đã được thiết lập mã thoát.
+   * Trả về ``0`` nếu *config* chưa được đặt mã thoát.
 
-   Only the ``Py_InitializeFromInitConfig()`` function can set an exit
-   code if the ``parse_argv`` option is non-zero.
+   Chỉ hàm ``Py_InitializeFromInitConfig()`` mới có thể đặt mã thoát nếu tùy chọn ``parse_argv`` khác không.
 
-   An exit code can be set when parsing the command line failed (exit
-   code ``2``) or when a command line option asks to display the command
-   line help (exit code ``0``).
+   Mã thoát có thể được đặt khi quá trình phân tích dòng lệnh không thành công (mã thoát ``2``) hoặc khi một tùy chọn dòng lệnh yêu cầu hiển thị trợ giúp dòng lệnh (mã thoát ``0``).
 
 
-Get Options
------------
+Lấy tùy chọn
+------------
 
-The configuration option *name* parameter must be a non-NULL null-terminated
-UTF-8 encoded string. See :ref:`Configuration Options <pyinitconfig-opts>`.
+Tham số *name* của tùy chọn cấu hình phải là một chuỗi được mã hóa UTF-8, kết thúc bằng null và khác NULL. Xem :ref:`Configuration Options <pyinitconfig-opts>`.
 
 .. c:function:: int PyInitConfig_HasOption(PyInitConfig *config, const char *name)
 
-   Test if the configuration has an option called *name*.
+   Kiểm tra xem cấu hình có tùy chọn tên *name* hay không.
 
-   Return ``1`` if the option exists, or return ``0`` otherwise.
+   Trả về ``1`` nếu tùy chọn tồn tại hoặc trả về ``0`` nếu không.
 
 
 .. c:function:: int PyInitConfig_GetInt(PyInitConfig *config, const char *name, int64_t *value)
 
-   Get an integer configuration option.
+   Lấy một tùy chọn cấu hình kiểu số nguyên.
 
-   * Set *\*value*, and return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
+   * Đặt *\*value*, và trả về ``0`` khi thành công.
+   * Đặt một lỗi trong *config* và trả về ``-1`` khi có lỗi.
 
 
 .. c:function:: int PyInitConfig_GetStr(PyInitConfig *config, const char *name, char **value)
 
-   Get a string configuration option as a null-terminated UTF-8
-   encoded string.
+   Lấy một tùy chọn cấu hình chuỗi dưới dạng chuỗi được mã hóa UTF-8 kết thúc bằng null.
 
-   * Set *\*value*, and return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
+   * Đặt *\*value*, và trả về ``0`` khi thành công.
+   * Đặt một lỗi trong *config* và trả về ``-1`` khi có lỗi.
 
-   *\*value* can be set to ``NULL`` if the option is an optional string and the
-   option is unset.
+   *\*value* có thể được đặt thành ``NULL`` nếu tùy chọn là một chuỗi không bắt buộc và chưa được thiết lập.
 
-   On success, the string must be released with ``free(value)`` if it's not
-   ``NULL``.
+   Khi thành công, phải giải phóng chuỗi bằng ``free(value)`` nếu chuỗi không phải là ``NULL``.
 
 
 .. c:function:: int PyInitConfig_GetStrList(PyInitConfig *config, const char *name, size_t *length, char ***items)
 
-   Get a string list configuration option as an array of
-   null-terminated UTF-8 encoded strings.
+   Lấy tùy chọn cấu hình danh sách chuỗi dưới dạng một mảng các chuỗi được mã hóa UTF-8 và kết thúc bằng ký tự null.
 
-   * Set *\*length* and *\*value*, and return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
+   * Đặt *\*length* và *\*value*, rồi trả về ``0`` khi thành công.
+   * Đặt một lỗi trong *config* và trả về ``-1`` khi có lỗi.
 
-   On success, the string list must be released with
-   ``PyInitConfig_FreeStrList(length, items)``.
+   Khi thành công, phải giải phóng danh sách chuỗi bằng ``PyInitConfig_FreeStrList(length, items)``.
 
 
 .. c:function:: void PyInitConfig_FreeStrList(size_t length, char **items)
 
-   Free memory of a string list created by
-   ``PyInitConfig_GetStrList()``.
+   Giải phóng bộ nhớ của danh sách chuỗi được tạo bởi ``PyInitConfig_GetStrList()``.
 
 
-Set Options
------------
+Đặt tùy chọn
+------------
 
-The configuration option *name* parameter must be a non-NULL null-terminated
-UTF-8 encoded string. See :ref:`Configuration Options <pyinitconfig-opts>`.
+Tham số *name* của tùy chọn cấu hình phải là một chuỗi được mã hóa UTF-8, kết thúc bằng null và khác NULL. Xem :ref:`Configuration Options <pyinitconfig-opts>`.
 
-Some configuration options have side effects on other options. This logic is
-only implemented when ``Py_InitializeFromInitConfig()`` is called, not by the
-"Set" functions below. For example, setting ``dev_mode`` to ``1`` does not set
-``faulthandler`` to ``1``.
+Một số tùy chọn cấu hình có tác dụng phụ đối với các tùy chọn khác. Logic này chỉ được triển khai khi ``Py_InitializeFromInitConfig()`` được gọi, không phải bởi các hàm "Set" bên dưới. Ví dụ, việc đặt ``dev_mode`` thành ``1`` không đặt ``faulthandler`` thành ``1``.
 
 .. c:function:: int PyInitConfig_SetInt(PyInitConfig *config, const char *name, int64_t value)
 
-   Set an integer configuration option.
+   Đặt một tùy chọn cấu hình dạng số nguyên.
 
-   * Return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
+   * Trả về ``0`` khi thành công.
+   * Đặt lỗi trong *config* và trả về ``-1`` khi có lỗi.
 
 
 .. c:function:: int PyInitConfig_SetStr(PyInitConfig *config, const char *name, const char *value)
 
-   Set a string configuration option from a null-terminated UTF-8
-   encoded string. The string is copied.
+   Đặt một tùy chọn cấu hình dạng chuỗi từ một chuỗi được mã hóa UTF-8, kết thúc bằng null. Chuỗi được sao chép.
 
-   * Return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
+   * Trả về ``0`` khi thành công.
+   * Đặt lỗi trong *config* và trả về ``-1`` khi có lỗi.
 
 
 .. c:function:: int PyInitConfig_SetStrList(PyInitConfig *config, const char *name, size_t length, char * const *items)
 
-   Set a string list configuration option from an array of
-   null-terminated UTF-8 encoded strings. The string list is copied.
+   Đặt một tùy chọn cấu hình danh sách chuỗi từ một mảng các chuỗi được mã hóa UTF-8 và kết thúc bằng null. Danh sách chuỗi được sao chép.
 
-   * Return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
+   * Trả về ``0`` khi thành công.
+   * Đặt lỗi trong *config* và trả về ``-1`` khi có lỗi.
 
 
-Module
+Mô-đun
 ------
 
 .. c:function:: int PyInitConfig_AddModule(PyInitConfig *config, const char *name, PyObject* (*initfunc)(void))
 
-   Add a built-in extension module to the table of built-in modules.
+   Thêm một mô-đun mở rộng tích hợp sẵn vào bảng các mô-đun tích hợp sẵn.
 
-   The new module can be imported by the name *name*, and uses the function
-   *initfunc* as the initialization function called on the first attempted
-   import.
+   Mô-đun mới có thể được nhập bằng tên *name*, và sử dụng hàm *initfunc* làm hàm khởi tạo được gọi khi lần đầu tiên thử nhập.
 
-   * Return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
+   * Trả về ``0`` khi thành công.
+   * Đặt một lỗi trong *config* và trả về ``-1`` khi xảy ra lỗi.
 
-   If Python is initialized multiple times, ``PyInitConfig_AddModule()`` must
-   be called at each Python initialization.
+   Nếu Python được khởi tạo nhiều lần, phải gọi ``PyInitConfig_AddModule()`` ở mỗi lần khởi tạo Python.
 
-   Similar to the :c:func:`PyImport_AppendInittab` function.
+   Tương tự như hàm :c:func:`PyImport_AppendInittab`.
 
 
-Initialize Python
------------------
+Khởi tạo Python
+---------------
 
 .. c:function:: int Py_InitializeFromInitConfig(PyInitConfig *config)
 
-   Initialize Python from the initialization configuration.
+   Khởi tạo Python từ cấu hình khởi tạo.
 
-   * Return ``0`` on success.
-   * Set an error in *config* and return ``-1`` on error.
-   * Set an exit code in *config* and return ``-1`` if Python wants to
-     exit.
+   * Trả về ``0`` khi thành công.
+   * Đặt một lỗi trong *config* và trả về ``-1`` khi xảy ra lỗi.
+   * Đặt mã thoát trong *config* và trả về ``-1`` nếu Python muốn thoát.
 
-   See ``PyInitConfig_GetExitcode()`` for the exit code case.
+   Xem ``PyInitConfig_GetExitcode()`` để biết trường hợp mã thoát.
 
 
 .. _pyinitconfig-opts:
 
-Configuration Options
-=====================
+Tùy chọn cấu hình
+=================
 
 .. list-table::
    :header-rows: 1
 
-   * - Option
-     - PyConfig/PyPreConfig member
-     - Type
-     - Visibility
+   * - Tùy chọn
+     - thành viên PyConfig/PyPreConfig
+     - Kiểu
+     - Khả năng hiển thị
    * - ``"allocator"``
      - :c:member:`allocator <PyPreConfig.allocator>`
      - ``int``
-     - Read-only
+     - Chỉ đọc
    * - ``"argv"``
      - :c:member:`argv <PyConfig.argv>`
      - ``list[str]``
-     - Public
+     - Công khai
    * - ``"base_exec_prefix"``
      - :c:member:`base_exec_prefix <PyConfig.base_exec_prefix>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"base_executable"``
      - :c:member:`base_executable <PyConfig.base_executable>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"base_prefix"``
      - :c:member:`base_prefix <PyConfig.base_prefix>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"buffered_stdio"``
      - :c:member:`buffered_stdio <PyConfig.buffered_stdio>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"bytes_warning"``
      - :c:member:`bytes_warning <PyConfig.bytes_warning>`
      - ``int``
-     - Public
+     - Công khai
    * - ``"check_hash_pycs_mode"``
      - :c:member:`check_hash_pycs_mode <PyConfig.check_hash_pycs_mode>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"code_debug_ranges"``
      - :c:member:`code_debug_ranges <PyConfig.code_debug_ranges>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"coerce_c_locale"``
      - :c:member:`coerce_c_locale <PyPreConfig.coerce_c_locale>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"coerce_c_locale_warn"``
      - :c:member:`coerce_c_locale_warn <PyPreConfig.coerce_c_locale_warn>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"configure_c_stdio"``
      - :c:member:`configure_c_stdio <PyConfig.configure_c_stdio>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"configure_locale"``
      - :c:member:`configure_locale <PyPreConfig.configure_locale>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"cpu_count"``
      - :c:member:`cpu_count <PyConfig.cpu_count>`
      - ``int``
-     - Public
+     - Công khai
    * - ``"dev_mode"``
      - :c:member:`dev_mode <PyConfig.dev_mode>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"dump_refs"``
      - :c:member:`dump_refs <PyConfig.dump_refs>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"dump_refs_file"``
      - :c:member:`dump_refs_file <PyConfig.dump_refs_file>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"exec_prefix"``
      - :c:member:`exec_prefix <PyConfig.exec_prefix>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"executable"``
      - :c:member:`executable <PyConfig.executable>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"faulthandler"``
      - :c:member:`faulthandler <PyConfig.faulthandler>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"filesystem_encoding"``
      - :c:member:`filesystem_encoding <PyConfig.filesystem_encoding>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"filesystem_errors"``
      - :c:member:`filesystem_errors <PyConfig.filesystem_errors>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"hash_seed"``
      - :c:member:`hash_seed <PyConfig.hash_seed>`
      - ``int``
-     - Read-only
+     - Chỉ đọc
    * - ``"home"``
      - :c:member:`home <PyConfig.home>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"import_time"``
      - :c:member:`import_time <PyConfig.import_time>`
      - ``int``
-     - Read-only
+     - Chỉ đọc
    * - ``"inspect"``
      - :c:member:`inspect <PyConfig.inspect>`
      - ``bool``
-     - Public
+     - Công khai
    * - ``"install_signal_handlers"``
      - :c:member:`install_signal_handlers <PyConfig.install_signal_handlers>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"int_max_str_digits"``
      - :c:member:`int_max_str_digits <PyConfig.int_max_str_digits>`
      - ``int``
-     - Public
+     - Công khai
    * - ``"interactive"``
      - :c:member:`interactive <PyConfig.interactive>`
      - ``bool``
-     - Public
+     - Công khai
    * - ``"isolated"``
      - :c:member:`isolated <PyConfig.isolated>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"legacy_windows_fs_encoding"``
      - :c:member:`legacy_windows_fs_encoding <PyPreConfig.legacy_windows_fs_encoding>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"legacy_windows_stdio"``
      - :c:member:`legacy_windows_stdio <PyConfig.legacy_windows_stdio>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"malloc_stats"``
      - :c:member:`malloc_stats <PyConfig.malloc_stats>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"module_search_paths"``
      - :c:member:`module_search_paths <PyConfig.module_search_paths>`
      - ``list[str]``
-     - Public
+     - Công khai
    * - ``"optimization_level"``
      - :c:member:`optimization_level <PyConfig.optimization_level>`
      - ``int``
-     - Public
+     - Công khai
    * - ``"orig_argv"``
      - :c:member:`orig_argv <PyConfig.orig_argv>`
      - ``list[str]``
-     - Read-only
+     - Chỉ đọc
    * - ``"parse_argv"``
      - :c:member:`parse_argv <PyConfig.parse_argv>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"parser_debug"``
      - :c:member:`parser_debug <PyConfig.parser_debug>`
      - ``bool``
-     - Public
+     - Công khai
    * - ``"pathconfig_warnings"``
      - :c:member:`pathconfig_warnings <PyConfig.pathconfig_warnings>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"perf_profiling"``
      - :c:member:`perf_profiling <PyConfig.perf_profiling>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"platlibdir"``
      - :c:member:`platlibdir <PyConfig.platlibdir>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"prefix"``
      - :c:member:`prefix <PyConfig.prefix>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"program_name"``
      - :c:member:`program_name <PyConfig.program_name>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"pycache_prefix"``
      - :c:member:`pycache_prefix <PyConfig.pycache_prefix>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"quiet"``
      - :c:member:`quiet <PyConfig.quiet>`
      - ``bool``
-     - Public
+     - Công khai
    * - ``"run_command"``
      - :c:member:`run_command <PyConfig.run_command>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"run_filename"``
      - :c:member:`run_filename <PyConfig.run_filename>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"run_module"``
      - :c:member:`run_module <PyConfig.run_module>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"run_presite"``
      - :c:member:`run_presite <PyConfig.run_presite>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"safe_path"``
      - :c:member:`safe_path <PyConfig.safe_path>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"show_ref_count"``
      - :c:member:`show_ref_count <PyConfig.show_ref_count>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"site_import"``
      - :c:member:`site_import <PyConfig.site_import>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"skip_source_first_line"``
      - :c:member:`skip_source_first_line <PyConfig.skip_source_first_line>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"stdio_encoding"``
      - :c:member:`stdio_encoding <PyConfig.stdio_encoding>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"stdio_errors"``
      - :c:member:`stdio_errors <PyConfig.stdio_errors>`
      - ``str``
-     - Read-only
+     - Chỉ đọc
    * - ``"stdlib_dir"``
      - :c:member:`stdlib_dir <PyConfig.stdlib_dir>`
      - ``str``
-     - Public
+     - Công khai
    * - ``"tracemalloc"``
      - :c:member:`tracemalloc <PyConfig.tracemalloc>`
      - ``int``
-     - Read-only
+     - Chỉ đọc
    * - ``"use_environment"``
      - :c:member:`use_environment <PyConfig.use_environment>`
      - ``bool``
-     - Public
+     - Công khai
    * - ``"use_frozen_modules"``
      - :c:member:`use_frozen_modules <PyConfig.use_frozen_modules>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"use_hash_seed"``
      - :c:member:`use_hash_seed <PyConfig.use_hash_seed>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"use_system_logger"``
      - :c:member:`use_system_logger <PyConfig.use_system_logger>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"user_site_directory"``
      - :c:member:`user_site_directory <PyConfig.user_site_directory>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"utf8_mode"``
      - :c:member:`utf8_mode <PyPreConfig.utf8_mode>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"verbose"``
      - :c:member:`verbose <PyConfig.verbose>`
      - ``int``
-     - Public
+     - Công khai
    * - ``"warn_default_encoding"``
      - :c:member:`warn_default_encoding <PyConfig.warn_default_encoding>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
    * - ``"warnoptions"``
      - :c:member:`warnoptions <PyConfig.warnoptions>`
      - ``list[str]``
-     - Public
+     - Công khai
    * - ``"write_bytecode"``
      - :c:member:`write_bytecode <PyConfig.write_bytecode>`
      - ``bool``
-     - Public
+     - Công khai
    * - ``"xoptions"``
      - :c:member:`xoptions <PyConfig.xoptions>`
      - ``dict[str, str]``
-     - Public
+     - Công khai
    * - ``"_pystats"``
      - :c:member:`_pystats <PyConfig._pystats>`
      - ``bool``
-     - Read-only
+     - Chỉ đọc
 
-Visibility:
+Khả năng hiển thị:
 
-* Public: Can be retrieved by :c:func:`PyConfig_Get` and set by
+* Công khai: Có thể được truy xuất bằng :c:func:`PyConfig_Get` và thiết lập bằng
   :c:func:`PyConfig_Set`.
-* Read-only: Can be retrieved by :c:func:`PyConfig_Get`, but cannot be set by
+* Chỉ đọc: Có thể được truy xuất bằng :c:func:`PyConfig_Get`, nhưng không thể được thiết lập bằng
   :c:func:`PyConfig_Set`.
 
 
-Runtime Python configuration API
-================================
+API cấu hình Python trong runtime
+=================================
 
-At runtime, it's possible to get and set configuration options using
-:c:func:`PyConfig_Get` and  :c:func:`PyConfig_Set` functions.
+Trong runtime, có thể lấy và thiết lập các tùy chọn cấu hình bằng
+:c:func:`PyConfig_Get` và  :c:func:`PyConfig_Set` functions.
 
-The configuration option *name* parameter must be a non-NULL null-terminated
-UTF-8 encoded string. See :ref:`Configuration Options <pyinitconfig-opts>`.
+Tham số *name* của tùy chọn cấu hình phải là một chuỗi được mã hóa UTF-8, kết thúc bằng null và không phải NULL. Xem :ref:`Configuration Options <pyinitconfig-opts>`.
 
-Some options are read from the :mod:`sys` attributes. For example, the option
-``"argv"`` is read from :data:`sys.argv`.
+Một số tùy chọn được đọc từ các thuộc tính :mod:`sys`. Ví dụ: tùy chọn ``"argv"`` được đọc từ :data:`sys.argv`.
 
 
 .. c:function:: PyObject* PyConfig_Get(const char *name)
 
-   Get the current runtime value of a configuration option as a Python object.
+   Lấy giá trị runtime hiện tại của một tùy chọn cấu hình dưới dạng một đối tượng Python.
 
-   * Return a new reference on success.
-   * Set an exception and return ``NULL`` on error.
+   * Trả về một reference mới nếu thành công.
+   * Đặt một exception và trả về ``NULL`` nếu xảy ra lỗi.
 
-   The object type depends on the configuration option. It can be:
+   Kiểu đối tượng phụ thuộc vào tùy chọn cấu hình. Nó có thể là:
 
    * ``bool``
    * ``int``
@@ -578,92 +550,81 @@ Some options are read from the :mod:`sys` attributes. For example, the option
    * ``list[str]``
    * ``dict[str, str]``
 
-   The caller must have an :term:`attached thread state`. The function cannot
-   be called before Python initialization nor after Python finalization.
+   Caller phải có một :term:`attached thread state`. Không thể gọi hàm này trước khi khởi tạo Python hoặc sau khi Python hoàn tất việc kết thúc.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyConfig_GetInt(const char *name, int *value)
 
-   Similar to :c:func:`PyConfig_Get`, but get the value as a C int.
+   Tương tự như :c:func:`PyConfig_Get`, nhưng lấy giá trị dưới dạng một int C.
 
-   * Return ``0`` on success.
-   * Set an exception and return ``-1`` on error.
+   * Trả về ``0`` nếu thành công.
+   * Đặt một ngoại lệ và trả về ``-1`` khi xảy ra lỗi.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: PyObject* PyConfig_Names(void)
 
-   Get all configuration option names as a ``frozenset``.
+   Lấy tất cả tên tùy chọn cấu hình dưới dạng một ``frozenset``.
 
-   * Return a new reference on success.
-   * Set an exception and return ``NULL`` on error.
+   * Trả về một reference mới nếu thành công.
+   * Đặt một exception và trả về ``NULL`` nếu xảy ra lỗi.
 
-   The caller must have an :term:`attached thread state`. The function cannot
-   be called before Python initialization nor after Python finalization.
+   Caller phải có một :term:`attached thread state`. Không thể gọi hàm này trước khi khởi tạo Python hoặc sau khi Python hoàn tất việc kết thúc.
 
    .. versionadded:: 3.14
 
 
 .. c:function:: int PyConfig_Set(const char *name, PyObject *value)
 
-   Set the current runtime value of a configuration option.
+   Đặt giá trị runtime hiện tại của một tùy chọn cấu hình.
 
-   * Raise a :exc:`ValueError` if there is no option *name*.
-   * Raise a :exc:`ValueError` if *value* is an invalid value.
-   * Raise a :exc:`ValueError` if the option is read-only (cannot be set).
-   * Raise a :exc:`TypeError` if *value* has not the proper type.
+   * Nêu một :exc:`ValueError` nếu không có tùy chọn *name*.
+   * Phát sinh :exc:`ValueError` nếu *value* là một giá trị không hợp lệ.
+   * Phát sinh :exc:`ValueError` nếu tùy chọn này chỉ được đọc (không thể thiết lập).
+   * Phát sinh :exc:`TypeError` nếu *value* không có kiểu phù hợp.
 
-   The caller must have an :term:`attached thread state`. The function cannot
-   be called before Python initialization nor after Python finalization.
+   Caller phải có một :term:`attached thread state`. Không thể gọi hàm này trước khi khởi tạo Python hoặc sau khi Python hoàn tất việc kết thúc.
 
    .. audit-event:: cpython.PyConfig_Set name,value c.PyConfig_Set
 
    .. versionadded:: 3.14
 
    .. versionchanged:: 3.14.7
-      The function now replaces :data:`sys.flags` (create a new object),
-      instead of modifying :data:`sys.flags` in-place.
+      Hàm hiện thay thế :data:`sys.flags` (tạo một đối tượng mới), thay vì sửa đổi :data:`sys.flags` tại chỗ.
 
 
 .. _pyconfig_api:
 
-PyConfig C API
+C API PyConfig
 ==============
 
 .. versionadded:: 3.8
 
-Python can be initialized with :c:func:`Py_InitializeFromConfig` and the
-:c:type:`PyConfig` structure. It can be preinitialized with
-:c:func:`Py_PreInitialize` and the :c:type:`PyPreConfig` structure.
+Python có thể được khởi tạo bằng :c:func:`Py_InitializeFromConfig` và
+:c:type:`PyConfig` cấu trúc. Cấu trúc này có thể được khởi tạo trước bằng
+:c:func:`Py_PreInitialize` và cấu trúc :c:type:`PyPreConfig`.
 
-There are two kinds of configuration:
+Có hai loại cấu hình:
 
-* The :ref:`Python Configuration <init-python-config>` can be used to build a
-  customized Python which behaves as the regular Python. For example,
-  environment variables and command line arguments are used to configure
-  Python.
+* :ref:`Cấu hình Python <init-python-config>` có thể được dùng để xây dựng một Python tùy chỉnh nhưng hoạt động như Python thông thường. Ví dụ, các biến môi trường và đối số dòng lệnh được dùng để cấu hình Python.
 
-* The :ref:`Isolated Configuration <init-isolated-conf>` can be used to embed
-  Python into an application. It isolates Python from the system. For example,
-  environment variables are ignored, the LC_CTYPE locale is left unchanged and
-  no signal handler is registered.
+* :ref:`Cấu hình cô lập <init-isolated-conf>` có thể được dùng để nhúng Python vào một ứng dụng. Cấu hình này cô lập Python khỏi hệ thống. Ví dụ, các biến môi trường bị bỏ qua, locale LC_CTYPE không bị thay đổi và không có trình xử lý tín hiệu nào được đăng ký.
 
-The :c:func:`Py_RunMain` function can be used to write a customized Python
-program.
+Có thể sử dụng hàm :c:func:`Py_RunMain` để viết một chương trình Python tùy chỉnh.
 
-See also :ref:`Initialization, Finalization, and Threads <initialization>`.
+Xem thêm :ref:`Khởi tạo, Kết thúc và Luồng <initialization>`.
 
 .. seealso::
    :pep:`587` "Python Initialization Configuration".
 
 
-Example
--------
+Ví dụ
+-----
 
-Example of customized Python always running in isolated mode::
+Ví dụ về Python được tùy chỉnh luôn chạy ở chế độ isolated::
 
     int main(int argc, char **argv)
     {
@@ -704,116 +665,109 @@ PyWideStringList
 
 .. c:type:: PyWideStringList
 
-   List of ``wchar_t*`` strings.
+   Danh sách các chuỗi ``wchar_t*``.
 
-   If *length* is non-zero, *items* must be non-``NULL`` and all strings must be
-   non-``NULL``.
+   Nếu *length* khác không, *items* phải khác ``NULL`` và tất cả các chuỗi phải khác ``NULL``.
 
    .. c:namespace:: NULL
 
-   Methods:
+   Các phương thức:
 
    .. c:function:: PyStatus PyWideStringList_Append(PyWideStringList *list, const wchar_t *item)
 
-      Append *item* to *list*.
+      Nối thêm *item* vào *list*.
 
-      Python must be preinitialized to call this function.
+      Python phải được khởi tạo trước để gọi hàm này.
 
    .. c:function:: PyStatus PyWideStringList_Insert(PyWideStringList *list, Py_ssize_t index, const wchar_t *item)
 
-      Insert *item* into *list* at *index*.
+      Chèn *item* vào *list* tại *index*.
 
-      If *index* is greater than or equal to *list* length, append *item* to
-      *list*.
+      Nếu *index* lớn hơn hoặc bằng độ dài của *list*, hãy nối thêm *item* vào *list*.
 
-      *index* must be greater than or equal to ``0``.
+      *index* phải lớn hơn hoặc bằng ``0``.
 
-      Python must be preinitialized to call this function.
+      Python phải được khởi tạo trước để gọi hàm này.
 
    .. c:namespace:: PyWideStringList
 
-   Structure fields:
+   Các trường của cấu trúc:
 
    .. c:member:: Py_ssize_t length
 
-      List length.
+      Độ dài danh sách.
 
    .. c:member:: wchar_t** items
 
-      List items.
+      Các mục trong danh sách.
 
 PyStatus
 --------
 
 .. c:type:: PyStatus
 
-   Structure to store an initialization function status: success, error
-   or exit.
+   Cấu trúc dùng để lưu trạng thái của một hàm khởi tạo: thành công, lỗi hoặc thoát.
 
-   For an error, it can store the C function name which created the error.
+   Đối với lỗi, cấu trúc này có thể lưu tên hàm C đã tạo ra lỗi.
 
-   Structure fields:
+   Các trường của cấu trúc:
 
    .. c:member:: int exitcode
 
-      Exit code. Argument passed to ``exit()``.
+      Mã thoát. Đối số được truyền cho ``exit()``.
 
    .. c:member:: const char *err_msg
 
-      Error message.
+      Thông báo lỗi.
 
    .. c:member:: const char *func
 
-      Name of the function which created an error, can be ``NULL``.
+      Tên của hàm đã tạo ra lỗi, có thể là ``NULL``.
 
    .. c:namespace:: NULL
 
-   Functions to create a status:
+   Các hàm để tạo status:
 
    .. c:function:: PyStatus PyStatus_Ok(void)
 
-      Success.
+      Thành công.
 
    .. c:function:: PyStatus PyStatus_Error(const char *err_msg)
 
-      Initialization error with a message.
+      Lỗi khởi tạo kèm thông báo.
 
-      *err_msg* must not be ``NULL``.
+      *err_msg* không được là ``NULL``.
 
    .. c:function:: PyStatus PyStatus_NoMemory(void)
 
-      Memory allocation failure (out of memory).
+      Lỗi cấp phát bộ nhớ (hết bộ nhớ).
 
    .. c:function:: PyStatus PyStatus_Exit(int exitcode)
 
-      Exit Python with the specified exit code.
+      Thoát Python với mã thoát được chỉ định.
 
-   Functions to handle a status:
+   Các hàm xử lý một trạng thái:
 
    .. c:function:: int PyStatus_Exception(PyStatus status)
 
-      Is the status an error or an exit? If true, the exception must be
-      handled; by calling :c:func:`Py_ExitStatusException` for example.
+      Trạng thái là lỗi hay yêu cầu thoát? Nếu đúng, phải xử lý ngoại lệ; chẳng hạn bằng cách gọi :c:func:`Py_ExitStatusException`.
 
    .. c:function:: int PyStatus_IsError(PyStatus status)
 
-      Is the result an error?
+      Kết quả có phải là lỗi không?
 
    .. c:function:: int PyStatus_IsExit(PyStatus status)
 
-      Is the result an exit?
+      Kết quả có phải là yêu cầu thoát không?
 
    .. c:function:: void Py_ExitStatusException(PyStatus status)
 
-      Call ``exit(exitcode)`` if *status* is an exit. Print the error
-      message and exit with a non-zero exit code if *status* is an error.  Must
-      only be called if ``PyStatus_Exception(status)`` is non-zero.
+      Gọi ``exit(exitcode)`` nếu *status* là yêu cầu thoát. In thông báo lỗi và thoát với mã thoát khác 0 nếu *status* là lỗi. Chỉ được gọi khi ``PyStatus_Exception(status)`` khác 0.
 
 .. note::
-   Internally, Python uses macros which set ``PyStatus.func``,
-   whereas functions to create a status set ``func`` to ``NULL``.
+   Bên trong, Python sử dụng các macro để thiết lập ``PyStatus.func``, trong khi các hàm tạo trạng thái thiết lập ``func`` thành ``NULL``.
 
-Example::
+Ví dụ::
 
     PyStatus alloc(void **ptr, size_t size)
     {
@@ -841,212 +795,177 @@ PyPreConfig
 
 .. c:type:: PyPreConfig
 
-   Structure used to preinitialize Python.
+   Cấu trúc được dùng để tiền khởi tạo Python.
 
    .. c:namespace:: NULL
 
-   Function to initialize a preconfiguration:
+   Hàm để khởi tạo cấu hình tiền khởi tạo:
 
    .. c:function:: void PyPreConfig_InitPythonConfig(PyPreConfig *preconfig)
 
-      Initialize the preconfiguration with :ref:`Python Configuration
-      <init-python-config>`.
+      Khởi tạo cấu hình tiền khởi tạo với :ref:`Python Configuration <init-python-config>`.
 
    .. c:function:: void PyPreConfig_InitIsolatedConfig(PyPreConfig *preconfig)
 
-      Initialize the preconfiguration with :ref:`Isolated Configuration
-      <init-isolated-conf>`.
+      Khởi tạo cấu hình tiền khởi tạo với :ref:`Isolated Configuration <init-isolated-conf>`.
 
    .. c:namespace:: PyPreConfig
 
-   Structure fields:
+   Các trường của cấu trúc:
 
    .. c:member:: int allocator
 
-      Name of the Python memory allocators:
+      Tên của các bộ cấp phát bộ nhớ Python:
 
-      * ``PYMEM_ALLOCATOR_NOT_SET`` (``0``): don't change memory allocators
-        (use defaults).
-      * ``PYMEM_ALLOCATOR_DEFAULT`` (``1``): :ref:`default memory allocators
-        <default-memory-allocators>`.
-      * ``PYMEM_ALLOCATOR_DEBUG`` (``2``): :ref:`default memory allocators
-        <default-memory-allocators>` with :ref:`debug hooks
-        <pymem-debug-hooks>`.
-      * ``PYMEM_ALLOCATOR_MALLOC`` (``3``): use ``malloc()`` of the C library.
-      * ``PYMEM_ALLOCATOR_MALLOC_DEBUG`` (``4``): force usage of
-        ``malloc()`` with :ref:`debug hooks <pymem-debug-hooks>`.
-      * ``PYMEM_ALLOCATOR_PYMALLOC`` (``5``): :ref:`Python pymalloc memory
-        allocator <pymalloc>`.
-      * ``PYMEM_ALLOCATOR_PYMALLOC_DEBUG`` (``6``): :ref:`Python pymalloc
-        memory allocator <pymalloc>` with :ref:`debug hooks
-        <pymem-debug-hooks>`.
-      * ``PYMEM_ALLOCATOR_MIMALLOC`` (``6``): use ``mimalloc``, a fast
-        malloc replacement.
-      * ``PYMEM_ALLOCATOR_MIMALLOC_DEBUG`` (``7``): use ``mimalloc``, a fast
-        malloc replacement with :ref:`debug hooks <pymem-debug-hooks>`.
+      * ``PYMEM_ALLOCATOR_NOT_SET`` (``0``): không thay đổi các trình cấp phát bộ nhớ (sử dụng mặc định).
+      * ``PYMEM_ALLOCATOR_DEFAULT`` (``1``): :ref:`các trình cấp phát bộ nhớ mặc định <default-memory-allocators>`.
+      * ``PYMEM_ALLOCATOR_DEBUG`` (``2``): :ref:`các trình cấp phát bộ nhớ mặc định <default-memory-allocators>` cùng với :ref:`các hook gỡ lỗi <pymem-debug-hooks>`.
+      * ``PYMEM_ALLOCATOR_MALLOC`` (``3``): sử dụng ``malloc()`` của thư viện C.
+      * ``PYMEM_ALLOCATOR_MALLOC_DEBUG`` (``4``): buộc sử dụng ``malloc()`` cùng với :ref:`các hook gỡ lỗi <pymem-debug-hooks>`.
+      * ``PYMEM_ALLOCATOR_PYMALLOC`` (``5``): :ref:`trình cấp phát bộ nhớ pymalloc của Python <pymalloc>`.
+      * ``PYMEM_ALLOCATOR_PYMALLOC_DEBUG`` (``6``): :ref:`trình cấp phát bộ nhớ pymalloc của Python <pymalloc>` cùng với :ref:`các hook gỡ lỗi <pymem-debug-hooks>`.
+      * ``PYMEM_ALLOCATOR_MIMALLOC`` (``6``): sử dụng ``mimalloc``, một phương án thay thế malloc nhanh.
+      * ``PYMEM_ALLOCATOR_MIMALLOC_DEBUG`` (``7``): sử dụng ``mimalloc``, một phương án thay thế malloc nhanh với các hook :ref:`debug hooks <pymem-debug-hooks>`.
 
 
-      ``PYMEM_ALLOCATOR_PYMALLOC`` and ``PYMEM_ALLOCATOR_PYMALLOC_DEBUG`` are
-      not supported if Python is :option:`configured using --without-pymalloc
-      <--without-pymalloc>`.
+      ``PYMEM_ALLOCATOR_PYMALLOC`` và ``PYMEM_ALLOCATOR_PYMALLOC_DEBUG`` không được hỗ trợ nếu Python ở chế độ :option:`configured using --without-pymalloc <--without-pymalloc>`.
 
-      ``PYMEM_ALLOCATOR_MIMALLOC`` and ``PYMEM_ALLOCATOR_MIMALLOC_DEBUG`` are
-      not supported if Python is :option:`configured using --without-mimalloc
-      <--without-mimalloc>` or if the underlying atomic support isn't
-      available.
+      ``PYMEM_ALLOCATOR_MIMALLOC`` và ``PYMEM_ALLOCATOR_MIMALLOC_DEBUG`` không được hỗ trợ nếu Python ở chế độ :option:`configured using --without-mimalloc <--without-mimalloc>` hoặc nếu hệ thống hỗ trợ atomic bên dưới không khả dụng.
 
-      See :ref:`Memory Management <memory>`.
+      Xem :ref:`Memory Management <memory>`.
 
-      Default: ``PYMEM_ALLOCATOR_NOT_SET``.
+      Mặc định: ``PYMEM_ALLOCATOR_NOT_SET``.
 
    .. c:member:: int configure_locale
 
-      Set the LC_CTYPE locale to the user preferred locale.
+      Đặt locale LC_CTYPE thành locale ưu tiên của người dùng.
 
-      If equals to ``0``, set :c:member:`~PyPreConfig.coerce_c_locale` and
-      :c:member:`~PyPreConfig.coerce_c_locale_warn` members to ``0``.
+      Nếu bằng ``0``, đặt :c:member:`~PyPreConfig.coerce_c_locale` và
+      các thành viên :c:member:`~PyPreConfig.coerce_c_locale_warn` thành ``0``.
 
-      See the :term:`locale encoding`.
+      Xem :term:`locale encoding`.
 
-      Default: ``1`` in Python config, ``0`` in isolated config.
+      Mặc định: ``1`` trong cấu hình Python, ``0`` trong cấu hình isolated.
 
    .. c:member:: int coerce_c_locale
 
-      If equals to ``2``, coerce the C locale.
+      Nếu bằng ``2``, ép locale C.
 
-      If equals to ``1``, read the LC_CTYPE locale to decide if it should be
-      coerced.
+      Nếu bằng ``1``, đọc locale LC_CTYPE để quyết định có nên ép locale hay không.
 
-      See the :term:`locale encoding`.
+      Xem :term:`locale encoding`.
 
-      Default: ``-1`` in Python config, ``0`` in isolated config.
+      Mặc định: ``-1`` trong cấu hình Python, ``0`` trong cấu hình cô lập.
 
    .. c:member:: int coerce_c_locale_warn
 
-      If non-zero, emit a warning if the C locale is coerced.
+      Nếu khác không, phát cảnh báo nếu locale C bị ép buộc.
 
-      Default: ``-1`` in Python config, ``0`` in isolated config.
+      Mặc định: ``-1`` trong cấu hình Python, ``0`` trong cấu hình cô lập.
 
    .. c:member:: int dev_mode
 
-      :ref:`Python Development Mode <devmode>`: see
+      :ref:`Python Development Mode <devmode>`: xem
       :c:member:`PyConfig.dev_mode`.
 
-      Default: ``-1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``-1`` trong chế độ Python, ``0`` trong chế độ cô lập.
 
    .. c:member:: int isolated
 
-      Isolated mode: see :c:member:`PyConfig.isolated`.
+      Chế độ cô lập: xem :c:member:`PyConfig.isolated`.
 
-      Default: ``0`` in Python mode, ``1`` in isolated mode.
+      Mặc định: ``0`` trong chế độ Python, ``1`` trong chế độ cô lập.
 
    .. c:member:: int legacy_windows_fs_encoding
 
-      If non-zero:
+      Nếu khác không:
 
-      * Set :c:member:`PyPreConfig.utf8_mode` to ``0``,
-      * Set :c:member:`PyConfig.filesystem_encoding` to ``"mbcs"``,
-      * Set :c:member:`PyConfig.filesystem_errors` to ``"replace"``.
+      * Đặt :c:member:`PyPreConfig.utf8_mode` thành ``0``,
+      * Đặt :c:member:`PyConfig.filesystem_encoding` thành ``"mbcs"``,
+      * Đặt :c:member:`PyConfig.filesystem_errors` thành ``"replace"``.
 
-      Initialized from the :envvar:`PYTHONLEGACYWINDOWSFSENCODING` environment
-      variable value.
+      Được khởi tạo từ giá trị của biến môi trường :envvar:`PYTHONLEGACYWINDOWSFSENCODING`.
 
-      Only available on Windows. ``#ifdef MS_WINDOWS`` macro can be used for
-      Windows specific code.
+      Chỉ khả dụng trên Windows. Macro ``#ifdef MS_WINDOWS`` có thể được sử dụng cho mã dành riêng cho Windows.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: int parse_argv
 
-      If non-zero, :c:func:`Py_PreInitializeFromArgs` and
-      :c:func:`Py_PreInitializeFromBytesArgs` parse their ``argv`` argument the
-      same way the regular Python parses command line arguments: see
-      :ref:`Command Line Arguments <using-on-cmdline>`.
+      Nếu khác không, :c:func:`Py_PreInitializeFromArgs` và
+      :c:func:`Py_PreInitializeFromBytesArgs` phân tích đối số ``argv`` của chúng theo cùng cách Python thông thường phân tích các đối số dòng lệnh: xem
+      :ref:`Đối số dòng lệnh <using-on-cmdline>`.
 
-      Default: ``1`` in Python config, ``0`` in isolated config.
+      Mặc định: ``1`` trong cấu hình Python, ``0`` trong cấu hình isolated.
 
    .. c:member:: int use_environment
 
-      Use :ref:`environment variables <using-on-envvars>`? See
+      Sử dụng :ref:`biến môi trường <using-on-envvars>`? Xem
       :c:member:`PyConfig.use_environment`.
 
-      Default: ``1`` in Python config and ``0`` in isolated config.
+      Mặc định: ``1`` trong cấu hình Python và ``0`` trong cấu hình biệt lập.
 
    .. c:member:: int utf8_mode
 
-      If non-zero, enable the :ref:`Python UTF-8 Mode <utf8-mode>`.
+      Nếu khác không, bật :ref:`Python UTF-8 Mode <utf8-mode>`.
 
-      Set to ``0`` or ``1`` by the :option:`-X utf8 <-X>` command line option
-      and the :envvar:`PYTHONUTF8` environment variable.
+      Được đặt thành ``0`` hoặc ``1`` bằng tùy chọn dòng lệnh :option:`-X utf8 <-X>` và biến môi trường :envvar:`PYTHONUTF8`.
 
-      Also set to ``1`` if the ``LC_CTYPE`` locale is ``C`` or ``POSIX``.
+      Cũng được đặt thành ``1`` nếu locale ``LC_CTYPE`` là ``C`` hoặc ``POSIX``.
 
-      Default: ``-1`` in Python config and ``0`` in isolated config.
+      Mặc định: ``-1`` trong cấu hình Python và ``0`` trong cấu hình cô lập.
 
 
 .. _c-preinit:
 
-Preinitialize Python with PyPreConfig
+Tiền khởi tạo Python bằng PyPreConfig
 -------------------------------------
 
-The preinitialization of Python:
+Quá trình tiền khởi tạo Python:
 
-* Set the Python memory allocators (:c:member:`PyPreConfig.allocator`)
-* Configure the LC_CTYPE locale (:term:`locale encoding`)
-* Set the :ref:`Python UTF-8 Mode <utf8-mode>`
-  (:c:member:`PyPreConfig.utf8_mode`)
+* Đặt các memory allocator của Python (:c:member:`PyPreConfig.allocator`)
+* Cấu hình locale LC_CTYPE (:term:`locale encoding`)
+* Thiết lập :ref:`Python UTF-8 Mode <utf8-mode>` (:c:member:`PyPreConfig.utf8_mode`)
 
-The current preconfiguration (``PyPreConfig`` type) is stored in
-``_PyRuntime.preconfig``.
+Cấu hình tiền khởi tạo hiện tại (``PyPreConfig`` type) được lưu trong ``_PyRuntime.preconfig``.
 
-Functions to preinitialize Python:
+Các hàm để tiền khởi tạo Python:
 
 .. c:function:: PyStatus Py_PreInitialize(const PyPreConfig *preconfig)
 
-   Preinitialize Python from *preconfig* preconfiguration.
+   Tiền khởi tạo Python từ cấu hình tiền khởi tạo *preconfig*.
 
-   *preconfig* must not be ``NULL``.
+   *preconfig* không được là ``NULL``.
 
 .. c:function:: PyStatus Py_PreInitializeFromBytesArgs(const PyPreConfig *preconfig, int argc, char * const *argv)
 
-   Preinitialize Python from *preconfig* preconfiguration.
+   Tiền khởi tạo Python từ cấu hình tiền khởi tạo *preconfig*.
 
-   Parse *argv* command line arguments (bytes strings) if
-   :c:member:`~PyPreConfig.parse_argv` of *preconfig* is non-zero.
+   Phân tích các đối số dòng lệnh *argv* (chuỗi byte) nếu
+   :c:member:`~PyPreConfig.parse_argv` của *preconfig* khác không.
 
-   *preconfig* must not be ``NULL``.
+   *preconfig* không được là ``NULL``.
 
 .. c:function:: PyStatus Py_PreInitializeFromArgs(const PyPreConfig *preconfig, int argc, wchar_t * const * argv)
 
-   Preinitialize Python from *preconfig* preconfiguration.
+   Tiền khởi tạo Python từ cấu hình tiền khởi tạo *preconfig*.
 
-   Parse *argv* command line arguments (wide strings) if
-   :c:member:`~PyPreConfig.parse_argv` of *preconfig* is non-zero.
+   Phân tích các đối số dòng lệnh *argv* (chuỗi ký tự rộng) nếu
+   :c:member:`~PyPreConfig.parse_argv` của *preconfig* khác không.
 
-   *preconfig* must not be ``NULL``.
+   *preconfig* không được là ``NULL``.
 
-The caller is responsible to handle exceptions (error or exit) using
-:c:func:`PyStatus_Exception` and :c:func:`Py_ExitStatusException`.
+Bên gọi có trách nhiệm xử lý các ngoại lệ (lỗi hoặc thoát) bằng cách sử dụng
+:c:func:`PyStatus_Exception` và :c:func:`Py_ExitStatusException`.
 
-For :ref:`Python Configuration <init-python-config>`
-(:c:func:`PyPreConfig_InitPythonConfig`), if Python is initialized with
-command line arguments, the command line arguments must also be passed to
-preinitialize Python, since they have an effect on the pre-configuration
-like encodings. For example, the :option:`-X utf8 <-X>` command line option
-enables the :ref:`Python UTF-8 Mode <utf8-mode>`.
+Đối với :ref:`Python Configuration <init-python-config>` (:c:func:`PyPreConfig_InitPythonConfig`), nếu Python được khởi tạo với các đối số dòng lệnh, các đối số dòng lệnh đó cũng phải được truyền vào bước khởi tạo trước Python, vì chúng ảnh hưởng đến cấu hình trước, chẳng hạn như các encoding. Ví dụ, tùy chọn dòng lệnh :option:`-X utf8 <-X>` bật :ref:`Python UTF-8 Mode <utf8-mode>`.
 
-``PyMem_SetAllocator()`` can be called after :c:func:`Py_PreInitialize` and
-before :c:func:`Py_InitializeFromConfig` to install a custom memory allocator.
-It can be called before :c:func:`Py_PreInitialize` if
-:c:member:`PyPreConfig.allocator` is set to ``PYMEM_ALLOCATOR_NOT_SET``.
+Có thể gọi ``PyMem_SetAllocator()`` sau :c:func:`Py_PreInitialize` và trước :c:func:`Py_InitializeFromConfig` để cài đặt một memory allocator tùy chỉnh. Có thể gọi hàm này trước :c:func:`Py_PreInitialize` nếu
+:c:member:`PyPreConfig.allocator` được đặt thành ``PYMEM_ALLOCATOR_NOT_SET``.
 
-Python memory allocation functions like :c:func:`PyMem_RawMalloc` must not be
-used before the Python preinitialization, whereas calling directly ``malloc()``
-and ``free()`` is always safe. :c:func:`Py_DecodeLocale` must not be called
-before the Python preinitialization.
+Không được sử dụng các hàm cấp phát bộ nhớ của Python như :c:func:`PyMem_RawMalloc` trước khi thực hiện bước khởi tạo trước Python, trong khi việc gọi trực tiếp ``malloc()`` và ``free()`` luôn an toàn. Không được gọi :c:func:`Py_DecodeLocale` trước khi thực hiện bước khởi tạo trước Python.
 
-Example using the preinitialization to enable
-the :ref:`Python UTF-8 Mode <utf8-mode>`::
+Ví dụ sử dụng bước khởi tạo trước để bật :ref:`Python UTF-8 Mode <utf8-mode>`::
 
     PyStatus status;
     PyPreConfig preconfig;
@@ -1071,114 +990,94 @@ PyConfig
 
 .. c:type:: PyConfig
 
-   Structure containing most parameters to configure Python.
+   Cấu trúc chứa hầu hết các tham số để cấu hình Python.
 
-   When done, the :c:func:`PyConfig_Clear` function must be used to release the
-   configuration memory.
+   Sau khi hoàn tất, phải sử dụng hàm :c:func:`PyConfig_Clear` để giải phóng bộ nhớ cấu hình.
 
    .. c:namespace:: NULL
 
-   Structure methods:
+   Các phương thức của cấu trúc:
 
    .. c:function:: void PyConfig_InitPythonConfig(PyConfig *config)
 
-      Initialize configuration with the :ref:`Python Configuration
-      <init-python-config>`.
+      Khởi tạo cấu hình bằng :ref:`Cấu hình Python <init-python-config>`.
 
    .. c:function:: void PyConfig_InitIsolatedConfig(PyConfig *config)
 
-      Initialize configuration with the :ref:`Isolated Configuration
-      <init-isolated-conf>`.
+      Khởi tạo cấu hình bằng :ref:`Cấu hình cô lập <init-isolated-conf>`.
 
    .. c:function:: PyStatus PyConfig_SetString(PyConfig *config, wchar_t * const *config_str, const wchar_t *str)
 
-      Copy the wide character string *str* into ``*config_str``.
+      Sao chép chuỗi ký tự rộng *str* vào ``*config_str``.
 
-      :ref:`Preinitialize Python <c-preinit>` if needed.
+      :ref:`Tiền khởi tạo Python <c-preinit>` nếu cần.
 
    .. c:function:: PyStatus PyConfig_SetBytesString(PyConfig *config, wchar_t * const *config_str, const char *str)
 
-      Decode *str* using :c:func:`Py_DecodeLocale` and set the result into
-      ``*config_str``.
+      Giải mã *str* bằng :c:func:`Py_DecodeLocale` và đặt kết quả vào ``*config_str``.
 
-      :ref:`Preinitialize Python <c-preinit>` if needed.
+      :ref:`Tiền khởi tạo Python <c-preinit>` nếu cần.
 
    .. c:function:: PyStatus PyConfig_SetArgv(PyConfig *config, int argc, wchar_t * const *argv)
 
-      Set command line arguments (:c:member:`~PyConfig.argv` member of
-      *config*) from the *argv* list of wide character strings.
+      Đặt các đối số dòng lệnh (thành viên :c:member:`~PyConfig.argv` của *config*) từ danh sách chuỗi ký tự wide *argv*.
 
-      :ref:`Preinitialize Python <c-preinit>` if needed.
+      :ref:`Tiền khởi tạo Python <c-preinit>` nếu cần.
 
    .. c:function:: PyStatus PyConfig_SetBytesArgv(PyConfig *config, int argc, char * const *argv)
 
-      Set command line arguments (:c:member:`~PyConfig.argv` member of
-      *config*) from the *argv* list of bytes strings. Decode bytes using
+      Đặt các đối số dòng lệnh (thành viên :c:member:`~PyConfig.argv` của *config*) từ danh sách chuỗi byte *argv*. Giải mã các byte bằng
       :c:func:`Py_DecodeLocale`.
 
-      :ref:`Preinitialize Python <c-preinit>` if needed.
+      :ref:`Tiền khởi tạo Python <c-preinit>` nếu cần.
 
    .. c:function:: PyStatus PyConfig_SetWideStringList(PyConfig *config, PyWideStringList *list, Py_ssize_t length, wchar_t **items)
 
-      Set the list of wide strings *list* to *length* and *items*.
+      Đặt danh sách chuỗi wide *list* thành *length* và *items*.
 
-      :ref:`Preinitialize Python <c-preinit>` if needed.
+      :ref:`Tiền khởi tạo Python <c-preinit>` nếu cần.
 
    .. c:function:: PyStatus PyConfig_Read(PyConfig *config)
 
-      Read all Python configuration.
+      Đọc toàn bộ cấu hình Python.
 
-      Fields which are already initialized are left unchanged.
+      Các trường đã được khởi tạo sẽ không bị thay đổi.
 
-      Fields for :ref:`path configuration <init-path-config>` are no longer
-      calculated or modified when calling this function, as of Python 3.11.
+      Các trường dành cho cấu hình :ref:`path configuration <init-path-config>` không còn được tính toán hoặc sửa đổi khi gọi hàm này kể từ Python 3.11.
 
-      The :c:func:`PyConfig_Read` function only parses
-      :c:member:`PyConfig.argv` arguments once: :c:member:`PyConfig.parse_argv`
-      is set to ``2`` after arguments are parsed. Since Python arguments are
-      stripped from :c:member:`PyConfig.argv`, parsing arguments twice would
-      parse the application options as Python options.
+      Hàm :c:func:`PyConfig_Read` chỉ phân tích cú pháp
+      Các :c:member:`PyConfig.argv` đối số chỉ được phân tích cú pháp một lần: :c:member:`PyConfig.parse_argv` được đặt thành ``2`` sau khi các đối số được phân tích cú pháp. Vì các đối số Python bị loại bỏ khỏi :c:member:`PyConfig.argv`, việc phân tích cú pháp các đối số hai lần sẽ phân tích các tùy chọn của ứng dụng như các tùy chọn Python.
 
-      :ref:`Preinitialize Python <c-preinit>` if needed.
+      :ref:`Tiền khởi tạo Python <c-preinit>` nếu cần.
 
       .. versionchanged:: 3.10
-         The :c:member:`PyConfig.argv` arguments are now only parsed once,
-         :c:member:`PyConfig.parse_argv` is set to ``2`` after arguments are
-         parsed, and arguments are only parsed if
-         :c:member:`PyConfig.parse_argv` equals ``1``.
+         Các đối số :c:member:`PyConfig.argv` giờ đây chỉ được phân tích một lần,
+         :c:member:`PyConfig.parse_argv` được đặt thành ``2`` sau khi các đối số được phân tích, và các đối số chỉ được phân tích nếu
+         :c:member:`PyConfig.parse_argv` bằng ``1``.
 
       .. versionchanged:: 3.11
          :c:func:`PyConfig_Read` no longer calculates all paths, and so fields
-         listed under :ref:`Python Path Configuration <init-path-config>` may
-         no longer be updated until :c:func:`Py_InitializeFromConfig` is
-         called.
+         được liệt kê trong :ref:`Python Path Configuration <init-path-config>` có thể không được cập nhật cho đến khi gọi :c:func:`Py_InitializeFromConfig`.
 
    .. c:function:: void PyConfig_Clear(PyConfig *config)
 
-      Release configuration memory.
+      Giải phóng bộ nhớ cấu hình.
 
-   Most ``PyConfig`` methods :ref:`preinitialize Python <c-preinit>` if needed.
-   In that case, the Python preinitialization configuration
-   (:c:type:`PyPreConfig`) is based on the :c:type:`PyConfig`. If configuration
-   fields which are in common with :c:type:`PyPreConfig` are tuned, they must
-   be set before calling a :c:type:`PyConfig` method:
+   Hầu hết các phương thức ``PyConfig`` :ref:`preinitialize Python <c-preinit>` nếu cần. Trong trường hợp đó, cấu hình tiền khởi tạo Python (:c:type:`PyPreConfig`) dựa trên :c:type:`PyConfig`. Nếu các trường cấu hình dùng chung với :c:type:`PyPreConfig` được điều chỉnh, chúng phải được thiết lập trước khi gọi phương thức :c:type:`PyConfig`:
 
    * :c:member:`PyConfig.dev_mode`
    * :c:member:`PyConfig.isolated`
    * :c:member:`PyConfig.parse_argv`
    * :c:member:`PyConfig.use_environment`
 
-   Moreover, if :c:func:`PyConfig_SetArgv` or :c:func:`PyConfig_SetBytesArgv`
-   is used, this method must be called before other methods, since the
-   preinitialization configuration depends on command line arguments (if
-   :c:member:`~PyConfig.parse_argv` is non-zero).
+   Ngoài ra, nếu sử dụng :c:func:`PyConfig_SetArgv` hoặc :c:func:`PyConfig_SetBytesArgv`, phương thức này phải được gọi trước các phương thức khác, vì cấu hình tiền khởi tạo phụ thuộc vào các đối số dòng lệnh (nếu
+   :c:member:`~PyConfig.parse_argv` khác không).
 
-   The caller of these methods is responsible to handle exceptions (error or
-   exit) using ``PyStatus_Exception()`` and ``Py_ExitStatusException()``.
+   Bên gọi các phương thức này chịu trách nhiệm xử lý các ngoại lệ (lỗi hoặc thoát) bằng ``PyStatus_Exception()`` và ``Py_ExitStatusException()``.
 
    .. c:namespace:: PyConfig
 
-   Structure fields:
+   Các trường của cấu trúc:
 
    .. c:member:: PyWideStringList argv
 
@@ -1186,42 +1085,32 @@ PyConfig
          single: main()
          single: argv (in module sys)
 
-      Set :data:`sys.argv` command line arguments based on
-      :c:member:`~PyConfig.argv`.  These parameters are similar to those passed
-      to the program's :c:func:`main` function with the difference that the
-      first entry should refer to the script file to be executed rather than
-      the executable hosting the Python interpreter.  If there isn't a script
-      that will be run, the first entry in :c:member:`~PyConfig.argv` can be an
-      empty string.
+      Đặt các đối số dòng lệnh của :data:`sys.argv` dựa trên
+      :c:member:`~PyConfig.argv`. Các tham số này tương tự như các tham số được truyền vào hàm :c:func:`main` của chương trình, với điểm khác biệt là mục đầu tiên phải tham chiếu đến tệp script sẽ được thực thi thay vì tệp thực thi lưu trữ trình thông dịch Python. Nếu không có script nào được chạy, mục đầu tiên trong :c:member:`~PyConfig.argv` có thể là một chuỗi rỗng.
 
-      Set :c:member:`~PyConfig.parse_argv` to ``1`` to parse
-      :c:member:`~PyConfig.argv` the same way the regular Python parses Python
-      command line arguments and then to strip Python arguments from
+      Đặt :c:member:`~PyConfig.parse_argv` thành ``1`` để phân tích cú pháp
+      :c:member:`~PyConfig.argv` theo cùng cách Python thông thường phân tích các đối số dòng lệnh của Python, sau đó loại bỏ các đối số của Python khỏi
       :c:member:`~PyConfig.argv`.
 
-      If :c:member:`~PyConfig.argv` is empty, an empty string is added to
-      ensure that :data:`sys.argv` always exists and is never empty.
+      Nếu :c:member:`~PyConfig.argv` trống, một chuỗi rỗng sẽ được thêm vào để đảm bảo rằng :data:`sys.argv` luôn tồn tại và không bao giờ trống.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      See also the :c:member:`~PyConfig.orig_argv` member.
+      Xem thêm thành viên :c:member:`~PyConfig.orig_argv`.
 
    .. c:member:: int safe_path
 
-      If equals to zero, ``Py_RunMain()`` prepends a potentially unsafe path to
-      :data:`sys.path` at startup:
+      Nếu bằng 0, ``Py_RunMain()`` sẽ thêm tiền tố là một đường dẫn có thể không an toàn vào
+      :data:`sys.path` khi khởi động:
 
-      * If :c:member:`argv[0] <PyConfig.argv>` is equal to ``L"-m"``
-        (``python -m module``), prepend the current working directory.
-      * If running a script (``python script.py``), prepend the script's
-        directory.  If it's a symbolic link, resolve symbolic links.
-      * Otherwise (``python -c code`` and ``python``), prepend an empty string,
-        which means the current working directory.
+      * Nếu :c:member:`argv[0] <PyConfig.argv>` bằng ``L"-m"`` (``python -m module``), thêm tiền tố là thư mục làm việc hiện tại.
+      * Nếu đang chạy một script (``python script.py``), thêm tiền tố là thư mục của script. Nếu đó là một symbolic link, hãy phân giải các symbolic link.
+      * Nếu không (``python -c code`` và ``python``), thêm một chuỗi rỗng vào đầu, nghĩa là thư mục làm việc hiện tại.
 
-      Set to ``1`` by the :option:`-P` command line option and the
-      :envvar:`PYTHONSAFEPATH` environment variable.
+      Được đặt thành ``1`` bởi tùy chọn dòng lệnh :option:`-P` và
+      biến môi trường :envvar:`PYTHONSAFEPATH`.
 
-      Default: ``0`` in Python config, ``1`` in isolated config.
+      Mặc định: ``0`` trong cấu hình Python, ``1`` trong cấu hình isolated.
 
       .. versionadded:: 3.11
 
@@ -1229,832 +1118,720 @@ PyConfig
 
       :data:`sys.base_exec_prefix`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` output.
+      Là một phần của đầu ra :ref:`Cấu hình đường dẫn Python <init-path-config>`.
 
-      See also :c:member:`PyConfig.exec_prefix`.
+      Xem thêm :c:member:`PyConfig.exec_prefix`.
 
    .. c:member:: wchar_t* base_executable
 
-      Python base executable: ``sys._base_executable``.
+      Tệp thực thi cơ sở của Python: ``sys._base_executable``.
 
-      Set by the ``__PYVENV_LAUNCHER__`` environment variable.
+      Được thiết lập bởi biến môi trường ``__PYVENV_LAUNCHER__``.
 
-      Set from :c:member:`PyConfig.executable` if ``NULL``.
+      Được thiết lập từ :c:member:`PyConfig.executable` nếu ``NULL``.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` output.
+      Là một phần của đầu ra :ref:`Cấu hình đường dẫn Python <init-path-config>`.
 
-      See also :c:member:`PyConfig.executable`.
+      Xem thêm :c:member:`PyConfig.executable`.
 
    .. c:member:: wchar_t* base_prefix
 
       :data:`sys.base_prefix`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` output.
+      Là một phần của đầu ra :ref:`Cấu hình đường dẫn Python <init-path-config>`.
 
-      See also :c:member:`PyConfig.prefix`.
+      Xem thêm :c:member:`PyConfig.prefix`.
 
    .. c:member:: int buffered_stdio
 
-      If equals to ``0`` and :c:member:`~PyConfig.configure_c_stdio` is non-zero,
-      disable buffering on the C streams stdout and stderr.
+      Nếu bằng ``0`` và :c:member:`~PyConfig.configure_c_stdio` khác 0, hãy tắt buffering trên các luồng C stdout và stderr.
 
-      Set to ``0`` by the :option:`-u` command line option and the
-      :envvar:`PYTHONUNBUFFERED` environment variable.
+      Được đặt thành ``0`` bởi tùy chọn dòng lệnh :option:`-u` và
+      biến môi trường :envvar:`PYTHONUNBUFFERED`.
 
-      stdin is always opened in buffered mode.
+      stdin luôn được mở ở chế độ buffered.
 
-      Default: ``1``.
+      Mặc định: ``1``.
 
    .. c:member:: int bytes_warning
 
-      If equals to ``1``, issue a warning when comparing :class:`bytes` or
-      :class:`bytearray` with :class:`str`, or comparing :class:`bytes` with
+      Nếu bằng ``1``, phát cảnh báo khi so sánh :class:`bytes` hoặc
+      :class:`bytearray` với :class:`str`, hoặc so sánh :class:`bytes` với
       :class:`int`.
 
-      If equal or greater to ``2``, raise a :exc:`BytesWarning` exception in these
-      cases.
+      Nếu bằng hoặc lớn hơn ``2``, raise một exception :exc:`BytesWarning` trong các trường hợp này.
 
-      Incremented by the :option:`-b` command line option.
+      Được tăng lên bởi tùy chọn dòng lệnh :option:`-b`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: int warn_default_encoding
 
-      If non-zero, emit a :exc:`EncodingWarning` warning when :class:`io.TextIOWrapper`
-      uses its default encoding. See :ref:`io-encoding-warning` for details.
+      Nếu khác không, phát cảnh báo :exc:`EncodingWarning` khi :class:`io.TextIOWrapper` sử dụng encoding mặc định. Xem :ref:`io-encoding-warning` để biết chi tiết.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
       .. versionadded:: 3.10
 
    .. c:member:: int code_debug_ranges
 
-      If equals to ``0``, disables the inclusion of the end line and column
-      mappings in code objects. Also disables traceback printing carets to
-      specific error locations.
+      Nếu bằng ``0``, tắt việc đưa ánh xạ dòng và cột kết thúc vào các code object. Đồng thời tắt việc in các dấu mũ trong traceback để chỉ đến những vị trí lỗi cụ thể.
 
-      Set to ``0`` by the :envvar:`PYTHONNODEBUGRANGES` environment variable
-      and by the :option:`-X no_debug_ranges <-X>` command line option.
+      Được đặt thành ``0`` bởi biến môi trường :envvar:`PYTHONNODEBUGRANGES` và tùy chọn dòng lệnh :option:`-X no_debug_ranges <-X>`.
 
-      Default: ``1``.
+      Mặc định: ``1``.
 
       .. versionadded:: 3.11
 
    .. c:member:: wchar_t* check_hash_pycs_mode
 
-      Control the validation behavior of hash-based ``.pyc`` files:
-      value of the :option:`--check-hash-based-pycs` command line option.
+      Kiểm soát hành vi xác thực của các tệp ``.pyc`` dựa trên hash: giá trị của tùy chọn dòng lệnh :option:`--check-hash-based-pycs`.
 
-      Valid values:
+      Các giá trị hợp lệ:
 
-      - ``L"always"``: Hash the source file for invalidation regardless of
-        value of the 'check_source' flag.
-      - ``L"never"``: Assume that hash-based pycs always are valid.
-      - ``L"default"``: The 'check_source' flag in hash-based pycs
-        determines invalidation.
+      - ``L"always"``: Băm tệp nguồn để vô hiệu hóa bất kể giá trị của cờ 'check_source'.
+      - ``L"never"``: Giả định rằng các pyc dựa trên hash luôn hợp lệ.
+      - ``L"default"``: Cờ 'check_source' trong các pyc dựa trên hash xác định cơ chế vô hiệu hóa.
 
-      Default: ``L"default"``.
+      Mặc định: ``L"default"``.
 
-      See also :pep:`552` "Deterministic pycs".
+      Xem thêm :pep:`552` "Các pyc xác định".
 
    .. c:member:: int configure_c_stdio
 
-      If non-zero, configure C standard streams:
+      Nếu khác không, cấu hình các luồng chuẩn của C:
 
-      * On Windows, set the binary mode (``O_BINARY``) on stdin, stdout and
-        stderr.
-      * If :c:member:`~PyConfig.buffered_stdio` equals zero, disable buffering
-        of stdin, stdout and stderr streams.
-      * If :c:member:`~PyConfig.interactive` is non-zero, enable stream
-        buffering on stdin and stdout (only stdout on Windows).
+      * Trên Windows, đặt chế độ nhị phân (``O_BINARY``) cho stdin, stdout và stderr.
+      * Nếu :c:member:`~PyConfig.buffered_stdio` bằng 0, tắt bộ đệm của các luồng stdin, stdout và stderr.
+      * Nếu :c:member:`~PyConfig.interactive` khác không, bật bộ đệm luồng trên stdin và stdout (chỉ stdout trên Windows).
 
-      Default: ``1`` in Python config, ``0`` in isolated config.
+      Mặc định: ``1`` trong cấu hình Python, ``0`` trong cấu hình cô lập.
 
    .. c:member:: int dev_mode
 
-      If non-zero, enable the :ref:`Python Development Mode <devmode>`.
+      Nếu khác không, bật :ref:`Python Development Mode <devmode>`.
 
-      Set to ``1`` by the :option:`-X dev <-X>` option and the
-      :envvar:`PYTHONDEVMODE` environment variable.
+      Được đặt thành ``1`` bởi tùy chọn :option:`-X dev <-X>` và
+      biến môi trường :envvar:`PYTHONDEVMODE`.
 
-      Default: ``-1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``-1`` trong chế độ Python, ``0`` trong chế độ cô lập.
 
    .. c:member:: int dump_refs
 
-      Dump Python references?
+      Kết xuất các tham chiếu Python?
 
-      If non-zero, dump all objects which are still alive at exit.
+      Nếu khác không, kết xuất tất cả các đối tượng vẫn còn tồn tại khi thoát.
 
-      Set to ``1`` by the :envvar:`PYTHONDUMPREFS` environment variable.
+      Được đặt thành ``1`` bởi biến môi trường :envvar:`PYTHONDUMPREFS`.
 
-      Needs a special build of Python with the ``Py_TRACE_REFS`` macro defined:
-      see the :option:`configure --with-trace-refs option <--with-trace-refs>`.
+      Cần một bản build đặc biệt của Python với macro ``Py_TRACE_REFS`` được định nghĩa: xem :option:`configure --with-trace-refs option <--with-trace-refs>`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: wchar_t* dump_refs_file
 
-      Filename where to dump Python references.
+      Tên tệp nơi ghi kết xuất các tham chiếu Python.
 
-      Set by the :envvar:`PYTHONDUMPREFSFILE` environment variable.
+      Được đặt bởi biến môi trường :envvar:`PYTHONDUMPREFSFILE`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
       .. versionadded:: 3.11
 
    .. c:member:: wchar_t* exec_prefix
 
-      The site-specific directory prefix where the platform-dependent Python
-      files are installed: :data:`sys.exec_prefix`.
+      Tiền tố thư mục dành riêng cho site, nơi các tệp Python phụ thuộc nền tảng được cài đặt: :data:`sys.exec_prefix`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` output.
+      Là một phần của đầu ra :ref:`Cấu hình đường dẫn Python <init-path-config>`.
 
-      See also :c:member:`PyConfig.base_exec_prefix`.
+      Xem thêm :c:member:`PyConfig.base_exec_prefix`.
 
    .. c:member:: wchar_t* executable
 
-      The absolute path of the executable binary for the Python interpreter:
+      Đường dẫn tuyệt đối của tệp nhị phân thực thi cho trình thông dịch Python:
       :data:`sys.executable`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` output.
+      Là một phần của đầu ra :ref:`Cấu hình đường dẫn Python <init-path-config>`.
 
-      See also :c:member:`PyConfig.base_executable`.
+      Xem thêm :c:member:`PyConfig.base_executable`.
 
    .. c:member:: int faulthandler
 
-      Enable faulthandler?
+      Bật faulthandler?
 
-      If non-zero, call :func:`faulthandler.enable` at startup.
+      Nếu khác không, gọi :func:`faulthandler.enable` khi khởi động.
 
-      Set to ``1`` by :option:`-X faulthandler <-X>` and the
-      :envvar:`PYTHONFAULTHANDLER` environment variable.
+      Được đặt thành ``1`` bởi :option:`-X faulthandler <-X>` và
+      biến môi trường :envvar:`PYTHONFAULTHANDLER`.
 
-      Default: ``-1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``-1`` trong chế độ Python, ``0`` trong chế độ cô lập.
 
    .. c:member:: wchar_t* filesystem_encoding
 
-      :term:`Filesystem encoding <filesystem encoding and error handler>`:
+      :term:`Mã hóa hệ thống tệp <filesystem encoding and error handler>`:
       :func:`sys.getfilesystemencoding`.
 
-      On macOS, Android and VxWorks: use ``"utf-8"`` by default.
+      Trên macOS, Android và VxWorks: mặc định sử dụng ``"utf-8"``.
 
-      On Windows: use ``"utf-8"`` by default, or ``"mbcs"`` if
-      :c:member:`~PyPreConfig.legacy_windows_fs_encoding` of
-      :c:type:`PyPreConfig` is non-zero.
+      Trên Windows: theo mặc định, sử dụng ``"utf-8"``, hoặc ``"mbcs"`` nếu
+      :c:member:`~PyPreConfig.legacy_windows_fs_encoding` của
+      :c:type:`PyPreConfig` khác 0.
 
-      Default encoding on other platforms:
+      Encoding mặc định trên các nền tảng khác:
 
-      * ``"utf-8"`` if :c:member:`PyPreConfig.utf8_mode` is non-zero.
-      * ``"ascii"`` if Python detects that ``nl_langinfo(CODESET)`` announces
-        the ASCII encoding, whereas the ``mbstowcs()`` function
-        decodes from a different encoding (usually Latin1).
-      * ``"utf-8"`` if ``nl_langinfo(CODESET)`` returns an empty string.
-      * Otherwise, use the :term:`locale encoding`:
-        ``nl_langinfo(CODESET)`` result.
+      * ``"utf-8"`` nếu :c:member:`PyPreConfig.utf8_mode` khác 0.
+      * ``"ascii"`` nếu Python phát hiện rằng ``nl_langinfo(CODESET)`` công bố encoding ASCII, trong khi hàm ``mbstowcs()`` giải mã từ một encoding khác (thường là Latin1).
+      * ``"utf-8"`` nếu ``nl_langinfo(CODESET)`` trả về một chuỗi rỗng.
+      * Nếu không, hãy sử dụng kết quả :term:`locale encoding`: ``nl_langinfo(CODESET)``.
 
-      At Python startup, the encoding name is normalized to the Python codec
-      name. For example, ``"ANSI_X3.4-1968"`` is replaced with ``"ascii"``.
+      Khi Python khởi động, tên encoding được chuẩn hóa thành tên codec của Python. Ví dụ: ``"ANSI_X3.4-1968"`` được thay thế bằng ``"ascii"``.
 
-      See also the :c:member:`~PyConfig.filesystem_errors` member.
+      Xem thêm member :c:member:`~PyConfig.filesystem_errors`.
 
    .. c:member:: wchar_t* filesystem_errors
 
-      :term:`Filesystem error handler <filesystem encoding and error handler>`:
+      :term:`Bộ xử lý lỗi hệ thống tệp <filesystem encoding and error handler>`:
       :func:`sys.getfilesystemencodeerrors`.
 
-      On Windows: use ``"surrogatepass"`` by default, or ``"replace"``  if
-      :c:member:`~PyPreConfig.legacy_windows_fs_encoding` of
-      :c:type:`PyPreConfig` is non-zero.
+      Trên Windows: theo mặc định, sử dụng ``"surrogatepass"``, hoặc ``"replace"``  nếu
+      :c:member:`~PyPreConfig.legacy_windows_fs_encoding` của
+      :c:type:`PyPreConfig` khác 0.
 
-      On other platforms: use ``"surrogateescape"`` by default.
+      Trên các nền tảng khác: theo mặc định, sử dụng ``"surrogateescape"``.
 
-      Supported error handlers:
+      Các trình xử lý lỗi được hỗ trợ:
 
       * ``"strict"``
       * ``"surrogateescape"``
-      * ``"surrogatepass"`` (only supported with the UTF-8 encoding)
+      * ``"surrogatepass"`` (chỉ được hỗ trợ với mã hóa UTF-8)
 
-      See also the :c:member:`~PyConfig.filesystem_encoding` member.
+      Xem thêm thành viên :c:member:`~PyConfig.filesystem_encoding`.
 
    .. c:member:: int use_frozen_modules
 
-      If non-zero, use frozen modules.
+      Nếu khác không, sử dụng các mô-đun frozen.
 
-      Set by the :envvar:`PYTHON_FROZEN_MODULES` environment variable.
+      Được thiết lập bởi biến môi trường :envvar:`PYTHON_FROZEN_MODULES`.
 
-      Default: ``1`` in a release build, or ``0`` in a :ref:`debug build
-      <debug-build>`.
+      Mặc định: ``1`` trong bản dựng phát hành hoặc ``0`` trong :ref:`bản dựng gỡ lỗi <debug-build>`.
 
    .. c:member:: unsigned long hash_seed
    .. c:member:: int use_hash_seed
 
-      Randomized hash function seed.
+      Seed của hàm băm ngẫu nhiên.
 
-      If :c:member:`~PyConfig.use_hash_seed` is zero, a seed is chosen randomly
-      at Python startup, and :c:member:`~PyConfig.hash_seed` is ignored.
+      Nếu :c:member:`~PyConfig.use_hash_seed` bằng 0, một seed được chọn ngẫu nhiên khi Python khởi động, và :c:member:`~PyConfig.hash_seed` bị bỏ qua.
 
-      Set by the :envvar:`PYTHONHASHSEED` environment variable.
+      Được thiết lập bởi biến môi trường :envvar:`PYTHONHASHSEED`.
 
-      Default *use_hash_seed* value: ``-1`` in Python mode, ``0`` in isolated
-      mode.
+      Giá trị mặc định của *use_hash_seed*: ``-1`` trong chế độ Python, ``0`` trong chế độ cô lập.
 
    .. c:member:: wchar_t* home
 
-      Set the default Python "home" directory, that is, the location of the
-      standard Python libraries (see :envvar:`PYTHONHOME`).
+      Thiết lập thư mục "home" mặc định của Python, tức là vị trí của các thư viện Python chuẩn (xem :envvar:`PYTHONHOME`).
 
-      Set by the :envvar:`PYTHONHOME` environment variable.
+      Được thiết lập bởi biến môi trường :envvar:`PYTHONHOME`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` input.
+      Một phần của :ref:`Cấu hình Đường dẫn Python <init-path-config>` đầu vào.
 
    .. c:member:: int import_time
 
-      If ``1``, profile import time.
-      If ``2``, include additional output that indicates
-      when an imported module has already been loaded.
+      Nếu ``1``, đo thời gian import. Nếu ``2``, bao gồm đầu ra bổ sung cho biết khi một module được import đã được tải.
 
-      Set by the :option:`-X importtime <-X>` option and the
-      :envvar:`PYTHONPROFILEIMPORTTIME` environment variable.
+      Được thiết lập bởi tùy chọn :option:`-X importtime <-X>` và
+      biến môi trường :envvar:`PYTHONPROFILEIMPORTTIME`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
      .. versionchanged:: 3.14
 
-        Added support for ``import_time = 2``
+        Đã thêm hỗ trợ cho ``import_time = 2``
 
    .. c:member:: int inspect
 
-      Enter interactive mode after executing a script or a command.
+      Chuyển sang chế độ tương tác sau khi thực thi script hoặc lệnh.
 
-      If greater than ``0``, enable inspect: when a script is passed as first
-      argument or the -c option is used, enter interactive mode after executing
-      the script or the command, even when :data:`sys.stdin` does not appear to
-      be a terminal.
+      Nếu lớn hơn ``0``, bật inspect: khi một script được truyền dưới dạng đối số đầu tiên hoặc tùy chọn -c được sử dụng, chuyển sang chế độ tương tác sau khi thực thi script hoặc lệnh, ngay cả khi :data:`sys.stdin` dường như không phải là một terminal.
 
-      Incremented by the :option:`-i` command line option. Set to ``1`` if the
-      :envvar:`PYTHONINSPECT` environment variable is non-empty.
+      Được tăng lên bởi tùy chọn dòng lệnh :option:`-i`. Đặt thành ``1`` nếu
+      biến môi trường :envvar:`PYTHONINSPECT` không rỗng.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: int install_signal_handlers
 
-      Install Python signal handlers?
+      Cài đặt các signal handler của Python?
 
-      Default: ``1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``1`` trong chế độ Python, ``0`` trong chế độ isolated.
 
    .. c:member:: int interactive
 
-      If greater than ``0``, enable the interactive mode (REPL).
+      Nếu lớn hơn ``0``, bật chế độ tương tác (REPL).
 
-      Incremented by the :option:`-i` command line option.
+      Được tăng lên bởi tùy chọn dòng lệnh :option:`-i`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: int int_max_str_digits
 
-      Configures the :ref:`integer string conversion length limitation
-      <int_max_str_digits>`.  An initial value of ``-1`` means the value will
-      be taken from the command line or environment or otherwise default to
-      4300 (:data:`sys.int_info.default_max_str_digits`).  A value of ``0``
-      disables the limitation.  Values greater than zero but less than 640
-      (:data:`sys.int_info.str_digits_check_threshold`) are unsupported and
-      will produce an error.
+      Cấu hình :ref:`giới hạn độ dài chuyển đổi chuỗi số nguyên <int_max_str_digits>`.  Giá trị ban đầu là ``-1``, nghĩa là giá trị sẽ được lấy từ dòng lệnh hoặc môi trường; nếu không, mặc định là 4300 (:data:`sys.int_info.default_max_str_digits`).  Giá trị ``0`` sẽ tắt giới hạn.  Các giá trị lớn hơn 0 nhưng nhỏ hơn 640 (:data:`sys.int_info.str_digits_check_threshold`) không được hỗ trợ và sẽ gây ra lỗi.
 
-      Configured by the :option:`-X int_max_str_digits <-X>` command line
-      flag or the :envvar:`PYTHONINTMAXSTRDIGITS` environment variable.
+      Được cấu hình bằng cờ dòng lệnh :option:`-X int_max_str_digits <-X>` hoặc biến môi trường :envvar:`PYTHONINTMAXSTRDIGITS`.
 
-      Default: ``-1`` in Python mode.  4300
-      (:data:`sys.int_info.default_max_str_digits`) in isolated mode.
+      Mặc định: ``-1`` ở chế độ Python.  4300 (:data:`sys.int_info.default_max_str_digits`) ở chế độ cô lập.
 
       .. versionadded:: 3.12
 
    .. c:member:: int cpu_count
 
-      If the value of :c:member:`~PyConfig.cpu_count` is not ``-1`` then it will
-      override the return values of :func:`os.cpu_count`,
-      :func:`os.process_cpu_count`, and :func:`multiprocessing.cpu_count`.
+      Nếu giá trị của :c:member:`~PyConfig.cpu_count` không phải là ``-1`` thì giá trị đó sẽ ghi đè các giá trị trả về của :func:`os.cpu_count`,
+      :func:`os.process_cpu_count` và :func:`multiprocessing.cpu_count`.
 
-      Configured by the :samp:`-X cpu_count={n|default}` command line
-      flag or the :envvar:`PYTHON_CPU_COUNT` environment variable.
+      Được cấu hình bằng cờ dòng lệnh :samp:`-X cpu_count={n|default}` hoặc biến môi trường :envvar:`PYTHON_CPU_COUNT`.
 
-      Default: ``-1``.
+      Mặc định: ``-1``.
 
       .. versionadded:: 3.13
 
    .. c:member:: int isolated
 
-      If greater than ``0``, enable isolated mode:
+      Nếu lớn hơn ``0``, bật isolated mode:
 
-      * Set :c:member:`~PyConfig.safe_path` to ``1``:
-        don't prepend a potentially unsafe path to :data:`sys.path` at Python
-        startup, such as the current directory, the script's directory or an
-        empty string.
-      * Set :c:member:`~PyConfig.use_environment` to ``0``: ignore ``PYTHON``
-        environment variables.
-      * Set :c:member:`~PyConfig.user_site_directory` to ``0``: don't add the user
-        site directory to :data:`sys.path`.
-      * Python REPL doesn't import :mod:`readline` nor enable default readline
-        configuration on interactive prompts.
+      * Đặt :c:member:`~PyConfig.safe_path` thành ``1``: không thêm tiền tố là một đường dẫn có khả năng không an toàn vào :data:`sys.path` khi Python khởi động, chẳng hạn như thư mục hiện tại, thư mục của script hoặc một chuỗi rỗng.
+      * Đặt :c:member:`~PyConfig.use_environment` thành ``0``: bỏ qua các biến môi trường ``PYTHON``.
+      * Đặt :c:member:`~PyConfig.user_site_directory` thành ``0``: không thêm thư mục site của người dùng vào :data:`sys.path`.
+      * Python REPL không import :mod:`readline` cũng như không bật cấu hình readline mặc định trong các lời nhắc tương tác.
 
-      Set to ``1`` by the :option:`-I` command line option.
+      Được đặt thành ``1`` bởi tùy chọn dòng lệnh :option:`-I`.
 
-      Default: ``0`` in Python mode, ``1`` in isolated mode.
+      Mặc định: ``0`` trong chế độ Python, ``1`` trong chế độ cô lập.
 
-      See also the :ref:`Isolated Configuration <init-isolated-conf>` and
+      Xem thêm :ref:`Cấu hình cô lập <init-isolated-conf>` và
       :c:member:`PyPreConfig.isolated`.
 
    .. c:member:: int legacy_windows_stdio
 
-      If non-zero, use :class:`io.FileIO` instead of
-      :class:`!io._WindowsConsoleIO` for :data:`sys.stdin`, :data:`sys.stdout`
-      and :data:`sys.stderr`.
+      Nếu khác không, sử dụng :class:`io.FileIO` thay vì
+      :class:`!io._WindowsConsoleIO` cho :data:`sys.stdin`, :data:`sys.stdout` và :data:`sys.stderr`.
 
-      Set to ``1`` if the :envvar:`PYTHONLEGACYWINDOWSSTDIO` environment
-      variable is set to a non-empty string.
+      Được đặt thành ``1`` nếu biến môi trường :envvar:`PYTHONLEGACYWINDOWSSTDIO` được đặt thành một chuỗi không rỗng.
 
-      Only available on Windows. ``#ifdef MS_WINDOWS`` macro can be used for
-      Windows specific code.
+      Chỉ khả dụng trên Windows. Có thể sử dụng macro ``#ifdef MS_WINDOWS`` cho mã dành riêng cho Windows.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
-      See also the :pep:`528` (Change Windows console encoding to UTF-8).
+      Xem thêm :pep:`528` (Thay đổi mã hóa console của Windows thành UTF-8).
 
    .. c:member:: int malloc_stats
 
-      If non-zero, dump statistics on :ref:`Python pymalloc memory allocator
-      <pymalloc>` at exit.
+      Nếu khác 0, kết xuất thống kê về :ref:`bộ cấp phát bộ nhớ Python pymalloc <pymalloc>` khi thoát.
 
-      Set to ``1`` by the :envvar:`PYTHONMALLOCSTATS` environment variable.
+      Được đặt thành ``1`` bởi biến môi trường :envvar:`PYTHONMALLOCSTATS`.
 
-      The option is ignored if Python is :option:`configured using
-      the --without-pymalloc option <--without-pymalloc>`.
+      Tùy chọn này bị bỏ qua nếu Python là :option:`configured using the --without-pymalloc option <--without-pymalloc>`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: wchar_t* platlibdir
 
-      Platform library directory name: :data:`sys.platlibdir`.
+      Tên thư mục thư viện nền tảng: :data:`sys.platlibdir`.
 
-      Set by the :envvar:`PYTHONPLATLIBDIR` environment variable.
+      Được thiết lập bởi biến môi trường :envvar:`PYTHONPLATLIBDIR`.
 
-      Default: value of the ``PLATLIBDIR`` macro which is set by the
-      :option:`configure --with-platlibdir option <--with-platlibdir>`
-      (default: ``"lib"``, or ``"DLLs"`` on Windows).
+      Mặc định: giá trị của macro ``PLATLIBDIR``, được thiết lập bởi
+      :option:`configure --with-platlibdir option <--with-platlibdir>` (mặc định: ``"lib"``, hoặc ``"DLLs"`` trên Windows).
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` input.
+      Một phần của :ref:`Cấu hình Đường dẫn Python <init-path-config>` đầu vào.
 
       .. versionadded:: 3.9
 
       .. versionchanged:: 3.11
-         This macro is now used on Windows to locate the standard
-         library extension modules, typically under ``DLLs``. However,
-         for compatibility, note that this value is ignored for any
-         non-standard layouts, including in-tree builds and virtual
-         environments.
+         Macro này hiện được sử dụng trên Windows để xác định vị trí các module mở rộng của thư viện chuẩn, thường nằm trong ``DLLs``. Tuy nhiên, để đảm bảo khả năng tương thích, lưu ý rằng giá trị này bị bỏ qua đối với mọi bố cục không chuẩn, bao gồm các bản build trong cây mã nguồn và môi trường ảo.
 
    .. c:member:: wchar_t* pythonpath_env
 
-      Module search paths (:data:`sys.path`) as a string separated by ``DELIM``
-      (:data:`os.pathsep`).
+      Các đường dẫn tìm kiếm module (:data:`sys.path`) dưới dạng chuỗi được phân tách bằng ``DELIM`` (:data:`os.pathsep`).
 
-      Set by the :envvar:`PYTHONPATH` environment variable.
+      Được thiết lập bởi biến môi trường :envvar:`PYTHONPATH`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` input.
+      Một phần của :ref:`Cấu hình Đường dẫn Python <init-path-config>` đầu vào.
 
    .. c:member:: PyWideStringList module_search_paths
    .. c:member:: int module_search_paths_set
 
-      Module search paths: :data:`sys.path`.
+      Đường dẫn tìm kiếm module: :data:`sys.path`.
 
-      If :c:member:`~PyConfig.module_search_paths_set` is equal to ``0``,
-      :c:func:`Py_InitializeFromConfig` will replace
-      :c:member:`~PyConfig.module_search_paths` and sets
-      :c:member:`~PyConfig.module_search_paths_set` to ``1``.
+      Nếu :c:member:`~PyConfig.module_search_paths_set` bằng ``0``,
+      :c:func:`Py_InitializeFromConfig` sẽ thay thế
+      :c:member:`~PyConfig.module_search_paths` và đặt
+      :c:member:`~PyConfig.module_search_paths_set` thành ``1``.
 
-      Default: empty list (``module_search_paths``) and ``0``
-      (``module_search_paths_set``).
+      Mặc định: danh sách trống (``module_search_paths``) và ``0`` (``module_search_paths_set``).
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` output.
+      Là một phần của đầu ra :ref:`Cấu hình đường dẫn Python <init-path-config>`.
 
    .. c:member:: int optimization_level
 
-      Compilation optimization level:
+      Mức tối ưu hóa khi biên dịch:
 
-      * ``0``: Peephole optimizer, set ``__debug__`` to ``True``.
-      * ``1``: Level 0, remove assertions, set ``__debug__`` to ``False``.
-      * ``2``: Level 1, strip docstrings.
+      * ``0``: Trình tối ưu hóa Peephole, đặt ``__debug__`` thành ``True``.
+      * ``1``: Mức 0, loại bỏ các câu lệnh assertion, đặt ``__debug__`` thành ``False``.
+      * ``2``: Mức 1, loại bỏ docstring.
 
-      Incremented by the :option:`-O` command line option. Set to the
-      :envvar:`PYTHONOPTIMIZE` environment variable value.
+      Được tăng lên bởi tùy chọn dòng lệnh :option:`-O`. Đặt thành
+      giá trị của biến môi trường :envvar:`PYTHONOPTIMIZE`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: PyWideStringList orig_argv
 
-      The list of the original command line arguments passed to the Python
-      executable: :data:`sys.orig_argv`.
+      Danh sách các đối số dòng lệnh ban đầu được truyền cho tệp thực thi Python: :data:`sys.orig_argv`.
 
-      If :c:member:`~PyConfig.orig_argv` list is empty and
-      :c:member:`~PyConfig.argv` is not a list only containing an empty
-      string, :c:func:`PyConfig_Read` copies :c:member:`~PyConfig.argv` into
-      :c:member:`~PyConfig.orig_argv` before modifying
-      :c:member:`~PyConfig.argv` (if :c:member:`~PyConfig.parse_argv` is
-      non-zero).
+      Nếu danh sách :c:member:`~PyConfig.orig_argv` trống và
+      :c:member:`~PyConfig.argv` không phải là một danh sách chỉ chứa một chuỗi rỗng, :c:func:`PyConfig_Read` sao chép :c:member:`~PyConfig.argv` vào
+      :c:member:`~PyConfig.orig_argv` trước khi sửa đổi
+      :c:member:`~PyConfig.argv` (nếu :c:member:`~PyConfig.parse_argv` khác không).
 
-      See also the :c:member:`~PyConfig.argv` member and the
-      :c:func:`Py_GetArgcArgv` function.
+      Xem thêm thành viên :c:member:`~PyConfig.argv` và
+      hàm :c:func:`Py_GetArgcArgv`.
 
-      Default: empty list.
+      Mặc định: danh sách trống.
 
       .. versionadded:: 3.10
 
    .. c:member:: int parse_argv
 
-      Parse command line arguments?
+      Phân tích cú pháp các đối số dòng lệnh?
 
-      If equals to ``1``, parse :c:member:`~PyConfig.argv` the same way the regular
-      Python parses :ref:`command line arguments <using-on-cmdline>`, and strip
-      Python arguments from :c:member:`~PyConfig.argv`.
+      Nếu bằng ``1``, hãy phân tích cú pháp :c:member:`~PyConfig.argv` theo cùng cách Python thông thường phân tích cú pháp :ref:`command line arguments <using-on-cmdline>`, rồi loại bỏ các đối số Python khỏi :c:member:`~PyConfig.argv`.
 
-      The :c:func:`PyConfig_Read` function only parses
-      :c:member:`PyConfig.argv` arguments once: :c:member:`PyConfig.parse_argv`
-      is set to ``2`` after arguments are parsed. Since Python arguments are
-      stripped from :c:member:`PyConfig.argv`, parsing arguments twice would
-      parse the application options as Python options.
+      Hàm :c:func:`PyConfig_Read` chỉ phân tích cú pháp
+      Các :c:member:`PyConfig.argv` đối số chỉ được phân tích cú pháp một lần: :c:member:`PyConfig.parse_argv` được đặt thành ``2`` sau khi các đối số được phân tích cú pháp. Vì các đối số Python bị loại bỏ khỏi :c:member:`PyConfig.argv`, việc phân tích cú pháp các đối số hai lần sẽ phân tích các tùy chọn của ứng dụng như các tùy chọn Python.
 
-      Default: ``1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``1`` trong chế độ Python, ``0`` trong chế độ isolated.
 
       .. versionchanged:: 3.10
-         The :c:member:`PyConfig.argv` arguments are now only parsed if
-         :c:member:`PyConfig.parse_argv` equals to ``1``.
+         Các đối số :c:member:`PyConfig.argv` hiện chỉ được phân tích cú pháp nếu
+         :c:member:`PyConfig.parse_argv` bằng ``1``.
 
    .. c:member:: int parser_debug
 
-      Parser debug mode. If greater than ``0``, turn on parser debugging output (for expert only, depending
-      on compilation options).
+      Chế độ debug của parser. Nếu lớn hơn ``0``, bật đầu ra debug của parser (chỉ dành cho chuyên gia, tùy thuộc vào các tùy chọn biên dịch).
 
-      Incremented by the :option:`-d` command line option. Set to the
-      :envvar:`PYTHONDEBUG` environment variable value.
+      Được tăng lên bởi tùy chọn dòng lệnh :option:`-d`. Đặt thành
+      giá trị của biến môi trường :envvar:`PYTHONDEBUG`.
 
-      Needs a :ref:`debug build of Python <debug-build>` (the ``Py_DEBUG`` macro
-      must be defined).
+      Cần một bản build :ref:`debug của Python <debug-build>` (macro ``Py_DEBUG`` phải được định nghĩa).
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: int pathconfig_warnings
 
-      If non-zero, calculation of path configuration is allowed to log
-      warnings into ``stderr``. If equals to ``0``, suppress these warnings.
+      Nếu khác không, việc tính toán cấu hình đường dẫn được phép ghi cảnh báo vào ``stderr``. Nếu bằng ``0``, các cảnh báo này sẽ bị bỏ qua.
 
-      Default: ``1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``1`` trong chế độ Python, ``0`` trong chế độ isolated.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` input.
+      Một phần của :ref:`Cấu hình Đường dẫn Python <init-path-config>` đầu vào.
 
       .. versionchanged:: 3.11
-         Now also applies on Windows.
+         Hiện cũng áp dụng trên Windows.
 
    .. c:member:: wchar_t* prefix
 
-      The site-specific directory prefix where the platform independent Python
-      files are installed: :data:`sys.prefix`.
+      Tiền tố thư mục dành riêng cho site nơi các tệp Python độc lập với nền tảng được cài đặt: :data:`sys.prefix`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` output.
+      Là một phần của đầu ra :ref:`Cấu hình đường dẫn Python <init-path-config>`.
 
-      See also :c:member:`PyConfig.base_prefix`.
+      Xem thêm :c:member:`PyConfig.base_prefix`.
 
    .. c:member:: wchar_t* program_name
 
-      Program name used to initialize :c:member:`~PyConfig.executable` and in
-      early error messages during Python initialization.
+      Tên chương trình được dùng để khởi tạo :c:member:`~PyConfig.executable` và trong các thông báo lỗi sớm trong quá trình khởi tạo Python.
 
-      * On macOS, use :envvar:`PYTHONEXECUTABLE` environment variable if set.
-      * If the ``WITH_NEXT_FRAMEWORK`` macro is defined, use
-        ``__PYVENV_LAUNCHER__`` environment variable if set.
-      * Use ``argv[0]`` of :c:member:`~PyConfig.argv` if available and
-        non-empty.
-      * Otherwise, use ``L"python"`` on Windows, or ``L"python3"`` on other
-        platforms.
+      * Trên macOS, sử dụng biến môi trường :envvar:`PYTHONEXECUTABLE` nếu biến này được đặt.
+      * Nếu macro ``WITH_NEXT_FRAMEWORK`` được định nghĩa, sử dụng biến môi trường ``__PYVENV_LAUNCHER__`` nếu biến này được đặt.
+      * Sử dụng ``argv[0]`` của :c:member:`~PyConfig.argv` nếu có và không rỗng.
+      * Nếu không, sử dụng ``L"python"`` trên Windows hoặc ``L"python3"`` trên các nền tảng khác.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
-      Part of the :ref:`Python Path Configuration <init-path-config>` input.
+      Một phần của :ref:`Cấu hình Đường dẫn Python <init-path-config>` đầu vào.
 
    .. c:member:: wchar_t* pycache_prefix
 
-      Directory where cached ``.pyc`` files are written:
+      Thư mục nơi các tệp ``.pyc`` được lưu vào bộ nhớ đệm:
       :data:`sys.pycache_prefix`.
 
-      Set by the :option:`-X pycache_prefix=PATH <-X>` command line option and
-      the :envvar:`PYTHONPYCACHEPREFIX` environment variable.
-      The command-line option takes precedence.
+      Được thiết lập bởi tùy chọn dòng lệnh :option:`-X pycache_prefix=PATH <-X>` và biến môi trường :envvar:`PYTHONPYCACHEPREFIX`. Tùy chọn dòng lệnh được ưu tiên.
 
-      If ``NULL``, :data:`sys.pycache_prefix` is set to ``None``.
+      Nếu ``NULL``, :data:`sys.pycache_prefix` được đặt thành ``None``.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
    .. c:member:: int quiet
 
-      Quiet mode. If greater than ``0``, don't display the copyright and version at
-      Python startup in interactive mode.
+      Chế độ im lặng. Nếu lớn hơn ``0``, không hiển thị thông tin bản quyền và phiên bản khi Python khởi động ở chế độ tương tác.
 
-      Incremented by the :option:`-q` command line option.
+      Được tăng lên bởi tùy chọn dòng lệnh :option:`-q`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: wchar_t* run_command
 
-      Value of the :option:`-c` command line option.
+      Giá trị của tùy chọn dòng lệnh :option:`-c`.
 
-      Used by :c:func:`Py_RunMain`.
+      Được :c:func:`Py_RunMain` sử dụng.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
    .. c:member:: wchar_t* run_filename
 
-      Filename passed on the command line: trailing command line argument
-      without :option:`-c` or :option:`-m`. It is used by the
-      :c:func:`Py_RunMain` function.
+      Tên tệp được truyền trên dòng lệnh: đối số dòng lệnh ở cuối, không có :option:`-c` hoặc :option:`-m`. Nó được sử dụng bởi
+      hàm :c:func:`Py_RunMain`.
 
-      For example, it is set to ``script.py`` by the ``python3 script.py arg``
-      command line.
+      Ví dụ, nó được đặt thành ``script.py`` bởi dòng lệnh ``python3 script.py arg``.
 
-      See also the :c:member:`PyConfig.skip_source_first_line` option.
+      Xem thêm tùy chọn :c:member:`PyConfig.skip_source_first_line`.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
    .. c:member:: wchar_t* run_module
 
-      Value of the :option:`-m` command line option.
+      Giá trị của tùy chọn dòng lệnh :option:`-m`.
 
-      Used by :c:func:`Py_RunMain`.
+      Được :c:func:`Py_RunMain` sử dụng.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
    .. c:member:: wchar_t* run_presite
 
-      ``package.module`` path to module that should be imported before
-      ``site.py`` is run.
+      ``package.module`` đường dẫn đến mô-đun cần được import trước khi chạy ``site.py``.
 
-      Set by the :option:`-X presite=package.module <-X>` command-line
-      option and the :envvar:`PYTHON_PRESITE` environment variable.
-      The command-line option takes precedence.
+      Được thiết lập bằng tùy chọn dòng lệnh :option:`-X presite=package.module <-X>` và biến môi trường :envvar:`PYTHON_PRESITE`. Tùy chọn dòng lệnh được ưu tiên.
 
-      Needs a :ref:`debug build of Python <debug-build>` (the ``Py_DEBUG`` macro
-      must be defined).
+      Cần một bản build :ref:`debug của Python <debug-build>` (macro ``Py_DEBUG`` phải được định nghĩa).
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
    .. c:member:: int show_ref_count
 
-      Show total reference count at exit (excluding :term:`immortal` objects)?
+      Hiển thị tổng số lượt tham chiếu khi thoát (không bao gồm các đối tượng :term:`immortal` )?
 
-      Set to ``1`` by :option:`-X showrefcount <-X>` command line option.
+      Được thiết lập thành ``1`` bởi tùy chọn dòng lệnh :option:`-X showrefcount <-X>`.
 
-      Needs a :ref:`debug build of Python <debug-build>` (the ``Py_REF_DEBUG``
-      macro must be defined).
+      Cần một bản dựng :ref:`debug của Python <debug-build>` (macro ``Py_REF_DEBUG`` phải được định nghĩa).
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: int site_import
 
-      Import the :mod:`site` module at startup?
+      Nhập module :mod:`site` khi khởi động?
 
-      If equal to zero, disable the import of the module site and the
-      site-dependent manipulations of :data:`sys.path` that it entails.
+      Nếu bằng không, vô hiệu hóa việc nhập module site và các thao tác phụ thuộc vào site đối với :data:`sys.path` mà việc đó kéo theo.
 
-      Also disable these manipulations if the :mod:`site` module is explicitly
-      imported later (call :func:`site.main` if you want them to be triggered).
+      Ngoài ra, hãy vô hiệu hóa các thao tác này nếu mô-đun :mod:`site` được import một cách rõ ràng sau đó (hãy gọi :func:`site.main` nếu bạn muốn kích hoạt chúng).
 
-      Set to ``0`` by the :option:`-S` command line option.
+      Được đặt thành ``0`` bởi tùy chọn dòng lệnh :option:`-S`.
 
-      :data:`sys.flags.no_site <sys.flags>` is set to the inverted value of
+      :data:`sys.flags.no_site <sys.flags>` được đặt thành giá trị đảo của
       :c:member:`~PyConfig.site_import`.
 
-      Default: ``1``.
+      Mặc định: ``1``.
 
    .. c:member:: int skip_source_first_line
 
-      If non-zero, skip the first line of the :c:member:`PyConfig.run_filename`
-      source.
+      Nếu khác không, bỏ qua dòng đầu tiên của mã nguồn :c:member:`PyConfig.run_filename`.
 
-      It allows the usage of non-Unix forms of ``#!cmd``. This is intended for
-      a DOS specific hack only.
+      Cho phép sử dụng các dạng ``#!cmd`` không phải Unix. Tùy chọn này chỉ dành cho một thủ thuật riêng của DOS.
 
-      Set to ``1`` by the :option:`-x` command line option.
+      Được đặt thành ``1`` bởi tùy chọn dòng lệnh :option:`-x`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: wchar_t* stdio_encoding
    .. c:member:: wchar_t* stdio_errors
 
-      Encoding and encoding errors of :data:`sys.stdin`, :data:`sys.stdout` and
-      :data:`sys.stderr` (but :data:`sys.stderr` always uses
-      ``"backslashreplace"`` error handler).
+      Encoding và lỗi encoding của :data:`sys.stdin`, :data:`sys.stdout` và
+      :data:`sys.stderr` (nhưng :data:`sys.stderr` luôn sử dụng error handler ``"backslashreplace"``).
 
-      Use the :envvar:`PYTHONIOENCODING` environment variable if it is
-      non-empty.
+      Sử dụng biến môi trường :envvar:`PYTHONIOENCODING` nếu biến này không rỗng.
 
-      Default encoding:
+      Encoding mặc định:
 
-      * ``"UTF-8"`` if :c:member:`PyPreConfig.utf8_mode` is non-zero.
-      * Otherwise, use the :term:`locale encoding`.
+      * ``"UTF-8"`` nếu :c:member:`PyPreConfig.utf8_mode` khác không.
+      * Nếu không, hãy sử dụng :term:`locale encoding`.
 
-      Default error handler:
+      Trình xử lý lỗi mặc định:
 
-      * On Windows: use ``"surrogateescape"``.
-      * ``"surrogateescape"`` if :c:member:`PyPreConfig.utf8_mode` is non-zero,
-        or if the LC_CTYPE locale is "C" or "POSIX".
-      * ``"strict"`` otherwise.
+      * Trên Windows: sử dụng ``"surrogateescape"``.
+      * ``"surrogateescape"`` nếu :c:member:`PyPreConfig.utf8_mode` khác không hoặc nếu locale LC_CTYPE là "C" hoặc "POSIX".
+      * ``"strict"`` nếu không.
 
-      See also :c:member:`PyConfig.legacy_windows_stdio`.
+      Xem thêm :c:member:`PyConfig.legacy_windows_stdio`.
 
    .. c:member:: int tracemalloc
 
-      Enable tracemalloc?
+      Bật tracemalloc?
 
-      If non-zero, call :func:`tracemalloc.start` at startup.
+      Nếu khác không, gọi :func:`tracemalloc.start` khi khởi động.
 
-      Set by :option:`-X tracemalloc=N <-X>` command line option and by the
-      :envvar:`PYTHONTRACEMALLOC` environment variable.
+      Được thiết lập bởi tùy chọn dòng lệnh :option:`-X tracemalloc=N <-X>` và bởi
+      biến môi trường :envvar:`PYTHONTRACEMALLOC`.
 
-      Default: ``-1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``-1`` trong chế độ Python, ``0`` trong chế độ cô lập.
 
    .. c:member:: int perf_profiling
 
-      Enable the Linux ``perf`` profiler support?
+      Bật hỗ trợ profiler ``perf`` của Linux?
 
-      If equals to ``1``, enable support for the Linux ``perf`` profiler.
+      Nếu bằng ``1``, bật hỗ trợ cho profiler ``perf`` của Linux.
 
-      If equals to ``2``, enable support for the Linux ``perf`` profiler with
-      DWARF JIT support.
+      Nếu bằng ``2``, bật hỗ trợ cho trình profiler ``perf`` của Linux với hỗ trợ DWARF JIT.
 
-      Set to ``1`` by :option:`-X perf <-X>` command-line option and the
-      :envvar:`PYTHONPERFSUPPORT` environment variable.
+      Được đặt thành ``1`` bằng tùy chọn dòng lệnh :option:`-X perf <-X>` và
+      biến môi trường :envvar:`PYTHONPERFSUPPORT`.
 
-      Set to ``2`` by the :option:`-X perf_jit <-X>` command-line option and
-      the :envvar:`PYTHON_PERF_JIT_SUPPORT` environment variable.
+      Được đặt thành ``2`` bằng tùy chọn dòng lệnh :option:`-X perf_jit <-X>` và biến môi trường :envvar:`PYTHON_PERF_JIT_SUPPORT`.
 
-      Default: ``-1``.
+      Mặc định: ``-1``.
 
       .. seealso::
-         See :ref:`perf_profiling` for more information.
+         Xem :ref:`perf_profiling` để biết thêm thông tin.
 
       .. versionadded:: 3.12
 
    .. c:member:: wchar_t* stdlib_dir
 
-      Directory of the Python standard library.
+      Thư mục của thư viện chuẩn Python.
 
-      Default: ``NULL``.
+      Mặc định: ``NULL``.
 
       .. versionadded:: 3.11
 
    .. c:member:: int use_environment
 
-      Use :ref:`environment variables <using-on-envvars>`?
+      Sử dụng :ref:`biến môi trường <using-on-envvars>`?
 
-      If equals to zero, ignore the :ref:`environment variables
-      <using-on-envvars>`.
+      Nếu bằng không, bỏ qua :ref:`biến môi trường <using-on-envvars>`.
 
-      Set to ``0`` by the :option:`-E` environment variable.
+      Được đặt thành ``0`` bởi biến môi trường :option:`-E`.
 
-      Default: ``1`` in Python config and ``0`` in isolated config.
+      Mặc định: ``1`` trong cấu hình Python và ``0`` trong cấu hình isolated.
 
    .. c:member:: int use_system_logger
 
-      If non-zero, ``stdout`` and ``stderr`` will be redirected to the system
-      log.
+      Nếu khác không, ``stdout`` và ``stderr`` sẽ được chuyển hướng đến system log.
 
-      Only available on macOS 10.12 and later, and on iOS.
+      Chỉ khả dụng trên macOS 10.12 trở lên và trên iOS.
 
-      Default: ``0`` (don't use the system log) on macOS; ``1`` on iOS (use the
-      system log).
+      Mặc định: ``0`` (không sử dụng nhật ký hệ thống) trên macOS; ``1`` trên iOS (sử dụng nhật ký hệ thống).
 
       .. versionadded:: 3.14
 
    .. c:member:: int user_site_directory
 
-      If non-zero, add the user site directory to :data:`sys.path`.
+      Nếu khác không, thêm thư mục site của người dùng vào :data:`sys.path`.
 
-      Set to ``0`` by the :option:`-s` and :option:`-I` command line options.
+      Được đặt thành ``0`` bởi các tùy chọn dòng lệnh :option:`-s` và :option:`-I`.
 
-      Set to ``0`` by the :envvar:`PYTHONNOUSERSITE` environment variable.
+      Được đặt thành ``0`` bởi biến môi trường :envvar:`PYTHONNOUSERSITE`.
 
-      Default: ``1`` in Python mode, ``0`` in isolated mode.
+      Mặc định: ``1`` trong chế độ Python, ``0`` trong chế độ isolated.
 
    .. c:member:: int verbose
 
-      Verbose mode. If greater than ``0``, print a message each time a module is
-      imported, showing the place (filename or built-in module) from which
-      it is loaded.
+      Chế độ chi tiết. Nếu lớn hơn ``0``, in một thông báo mỗi khi một module được import, cho biết vị trí (tên tệp hoặc module tích hợp) mà từ đó module được tải.
 
-      If greater than or equal to ``2``, print a message for each file that is
-      checked for when searching for a module. Also provides information on
-      module cleanup at exit.
+      Nếu lớn hơn hoặc bằng ``2``, in một thông báo cho mỗi tệp được kiểm tra khi tìm kiếm một module. Đồng thời cung cấp thông tin về việc dọn dẹp module khi thoát.
 
-      Incremented by the :option:`-v` command line option.
+      Được tăng lên bởi tùy chọn dòng lệnh :option:`-v`.
 
-      Set by the :envvar:`PYTHONVERBOSE` environment variable value.
+      Được đặt theo giá trị của biến môi trường :envvar:`PYTHONVERBOSE`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
    .. c:member:: PyWideStringList warnoptions
 
-      Options of the :mod:`warnings` module to build warnings filters, lowest
-      to highest priority: :data:`sys.warnoptions`.
+      Các tùy chọn của mô-đun :mod:`warnings` để xây dựng bộ lọc cảnh báo, theo thứ tự từ ưu tiên thấp đến cao: :data:`sys.warnoptions`.
 
-      The :mod:`warnings` module adds :data:`sys.warnoptions` in the reverse
-      order: the last :c:member:`PyConfig.warnoptions` item becomes the first
-      item of ``warnings.filters`` which is checked first (highest priority).
+      Mô-đun :mod:`warnings` thêm :data:`sys.warnoptions` theo thứ tự ngược lại: mục :c:member:`PyConfig.warnoptions` cuối cùng trở thành mục đầu tiên của ``warnings.filters``, được kiểm tra trước (ưu tiên cao nhất).
 
-      The :option:`-W` command line options adds its value to
-      :c:member:`~PyConfig.warnoptions`, it can be used multiple times.
+      Các tùy chọn dòng lệnh :option:`-W` thêm giá trị của chúng vào
+      :c:member:`~PyConfig.warnoptions`, có thể được sử dụng nhiều lần.
 
-      The :envvar:`PYTHONWARNINGS` environment variable can also be used to add
-      warning options. Multiple options can be specified, separated by commas
-      (``,``).
+      Biến môi trường :envvar:`PYTHONWARNINGS` cũng có thể được dùng để thêm các tùy chọn cảnh báo. Có thể chỉ định nhiều tùy chọn, phân tách bằng dấu phẩy (``,``).
 
-      Default: empty list.
+      Mặc định: danh sách trống.
 
    .. c:member:: int write_bytecode
 
-      If equal to ``0``, Python won't try to write ``.pyc`` files on the import of
-      source modules.
+      Nếu bằng ``0``, Python sẽ không cố gắng ghi các tệp ``.pyc`` khi import các mô-đun nguồn.
 
-      Set to ``0`` by the :option:`-B` command line option and the
-      :envvar:`PYTHONDONTWRITEBYTECODE` environment variable.
+      Được đặt thành ``0`` bởi tùy chọn dòng lệnh :option:`-B` và
+      biến môi trường :envvar:`PYTHONDONTWRITEBYTECODE`.
 
-      :data:`sys.dont_write_bytecode` is initialized to the inverted value of
+      :data:`sys.dont_write_bytecode` được khởi tạo bằng giá trị đảo của
       :c:member:`~PyConfig.write_bytecode`.
 
-      Default: ``1``.
+      Mặc định: ``1``.
 
    .. c:member:: PyWideStringList xoptions
 
-      Values of the :option:`-X` command line options: :data:`sys._xoptions`.
+      Các giá trị của các tùy chọn dòng lệnh :option:`-X`: :data:`sys._xoptions`.
 
-      Default: empty list.
+      Mặc định: danh sách trống.
 
    .. c:member:: int _pystats
 
-      If non-zero, write performance statistics at Python exit.
+      Nếu khác 0, ghi thống kê hiệu năng khi Python thoát.
 
-      Need a special build with the ``Py_STATS`` macro:
-      see :option:`--enable-pystats`.
+      Cần một bản build đặc biệt có macro ``Py_STATS``: xem :option:`--enable-pystats`.
 
-      Default: ``0``.
+      Mặc định: ``0``.
 
-If :c:member:`~PyConfig.parse_argv` is non-zero, :c:member:`~PyConfig.argv`
-arguments are parsed the same way the regular Python parses :ref:`command line
-arguments <using-on-cmdline>`, and Python arguments are stripped from
+Nếu :c:member:`~PyConfig.parse_argv` khác 0, :c:member:`~PyConfig.argv` các đối số được phân tích cú pháp theo cùng cách Python thông thường phân tích cú pháp :ref:`các đối số dòng lệnh <using-on-cmdline>`, và các đối số Python bị loại bỏ khỏi
 :c:member:`~PyConfig.argv`.
 
-The :c:member:`~PyConfig.xoptions` options are parsed to set other options: see
-the :option:`-X` command line option.
+Các tùy chọn :c:member:`~PyConfig.xoptions` được phân tích cú pháp để thiết lập các tùy chọn khác: xem tùy chọn dòng lệnh :option:`-X`.
 
 .. versionchanged:: 3.9
 
-   The ``show_alloc_count`` field has been removed.
+   Trường ``show_alloc_count`` đã bị xóa.
 
 
 .. _init-from-config:
 
-Initialization with PyConfig
-----------------------------
+Khởi tạo với PyConfig
+---------------------
 
-Initializing the interpreter from a populated configuration struct is handled
-by calling :c:func:`Py_InitializeFromConfig`.
+Việc khởi tạo interpreter từ một struct cấu hình đã được điền đầy đủ được thực hiện bằng cách gọi :c:func:`Py_InitializeFromConfig`.
 
-The caller is responsible to handle exceptions (error or exit) using
-:c:func:`PyStatus_Exception` and :c:func:`Py_ExitStatusException`.
+Bên gọi có trách nhiệm xử lý các exception (lỗi hoặc thoát) bằng cách sử dụng
+:c:func:`PyStatus_Exception` và :c:func:`Py_ExitStatusException`.
 
-If :c:func:`PyImport_FrozenModules`, :c:func:`PyImport_AppendInittab` or
-:c:func:`PyImport_ExtendInittab` are used, they must be set or called after
-Python preinitialization and before the Python initialization. If Python is
-initialized multiple times, :c:func:`PyImport_AppendInittab` or
-:c:func:`PyImport_ExtendInittab` must be called before each Python
-initialization.
+Nếu :c:func:`PyImport_FrozenModules`, :c:func:`PyImport_AppendInittab` hoặc
+:c:func:`PyImport_ExtendInittab` được sử dụng, chúng phải được thiết lập hoặc gọi sau khi Python được tiền khởi tạo và trước khi Python được khởi tạo. Nếu Python được khởi tạo nhiều lần, :c:func:`PyImport_AppendInittab` hoặc
+:c:func:`PyImport_ExtendInittab` phải được gọi trước mỗi lần khởi tạo Python.
 
-The current configuration (``PyConfig`` type) is stored in
-``PyInterpreterState.config``.
+Cấu hình hiện tại (kiểu ``PyConfig``) được lưu trong ``PyInterpreterState.config``.
 
-Example setting the program name::
+Ví dụ thiết lập tên chương trình::
 
     void init_python(void)
     {
@@ -2082,12 +1859,7 @@ Example setting the program name::
         Py_ExitStatusException(status);
     }
 
-More complete example modifying the default configuration, read the
-configuration, and then override some parameters. Note that since
-3.11, many parameters are not calculated until initialization, and
-so values cannot be read from the configuration structure. Any values
-set before initialize is called will be left unchanged by
-initialization::
+Ví dụ đầy đủ hơn về việc sửa đổi cấu hình mặc định, đọc cấu hình rồi ghi đè một số tham số. Lưu ý rằng kể từ phiên bản 3.11, nhiều tham số không được tính cho đến khi khởi tạo, vì vậy không thể đọc các giá trị từ cấu trúc cấu hình. Mọi giá trị được thiết lập trước khi gọi initialize sẽ không bị thay đổi bởi quá trình khởi tạo::
 
     PyStatus init_python(const char *program_name)
     {
@@ -2144,65 +1916,50 @@ initialization::
 
 .. _init-isolated-conf:
 
-Isolated Configuration
-----------------------
+Cấu hình cô lập
+---------------
 
-:c:func:`PyPreConfig_InitIsolatedConfig` and
-:c:func:`PyConfig_InitIsolatedConfig` functions create a configuration to
-isolate Python from the system. For example, to embed Python into an
-application.
+:c:func:`PyPreConfig_InitIsolatedConfig` và
+Các hàm :c:func:`PyConfig_InitIsolatedConfig` tạo một cấu hình để cô lập Python khỏi hệ thống. Ví dụ: để nhúng Python vào một ứng dụng.
 
-This configuration ignores global configuration variables, environment
-variables, command line arguments (:c:member:`PyConfig.argv` is not parsed)
-and user site directory. The C standard streams (ex: ``stdout``) and the
-LC_CTYPE locale are left unchanged. Signal handlers are not installed.
+Cấu hình này bỏ qua các biến cấu hình toàn cục, biến môi trường, đối số dòng lệnh (:c:member:`PyConfig.argv` không được phân tích) và thư mục site của người dùng. Các luồng chuẩn của C (ví dụ: ``stdout``) và locale LC_CTYPE được giữ nguyên. Các trình xử lý tín hiệu không được cài đặt.
 
-Configuration files are still used with this configuration to determine
-paths that are unspecified. Ensure :c:member:`PyConfig.home` is specified
-to avoid computing the default path configuration.
+Các tệp cấu hình vẫn được sử dụng với cấu hình này để xác định những đường dẫn chưa được chỉ định. Hãy bảo đảm :c:member:`PyConfig.home` được chỉ định để tránh việc tính toán cấu hình đường dẫn mặc định.
 
 
 .. _init-python-config:
 
-Python Configuration
---------------------
+Cấu hình Python
+---------------
 
-:c:func:`PyPreConfig_InitPythonConfig` and :c:func:`PyConfig_InitPythonConfig`
-functions create a configuration to build a customized Python which behaves as
-the regular Python.
+Các hàm :c:func:`PyPreConfig_InitPythonConfig` và :c:func:`PyConfig_InitPythonConfig` tạo một cấu hình để xây dựng Python tùy chỉnh hoạt động như Python thông thường.
 
-Environments variables and command line arguments are used to configure
-Python, whereas global configuration variables are ignored.
+Các biến môi trường và đối số dòng lệnh được sử dụng để cấu hình Python, trong khi các biến cấu hình toàn cục bị bỏ qua.
 
-This function enables C locale coercion (:pep:`538`)
-and :ref:`Python UTF-8 Mode <utf8-mode>`
-(:pep:`540`) depending on the LC_CTYPE locale, :envvar:`PYTHONUTF8` and
-:envvar:`PYTHONCOERCECLOCALE` environment variables.
+Hàm này bật tính cưỡng chế locale C (:pep:`538`) và :ref:`Chế độ UTF-8 của Python <utf8-mode>` (:pep:`540`) tùy thuộc vào locale LC_CTYPE, :envvar:`PYTHONUTF8` và
+:envvar:`PYTHONCOERCECLOCALE` các biến môi trường.
 
 
 .. _init-path-config:
 
-Python Path Configuration
+Cấu hình đường dẫn Python
 -------------------------
 
-:c:type:`PyConfig` contains multiple fields for the path configuration:
+:c:type:`PyConfig` chứa nhiều trường cho cấu hình đường dẫn:
 
-* Path configuration inputs:
+* Các đầu vào cấu hình đường dẫn:
 
   * :c:member:`PyConfig.home`
   * :c:member:`PyConfig.platlibdir`
   * :c:member:`PyConfig.pathconfig_warnings`
   * :c:member:`PyConfig.program_name`
   * :c:member:`PyConfig.pythonpath_env`
-  * current working directory: to get absolute paths
-  * ``PATH`` environment variable to get the program full path
-    (from :c:member:`PyConfig.program_name`)
-  * ``__PYVENV_LAUNCHER__`` environment variable
-  * (Windows only) Application paths in the registry under
-    "Software\Python\PythonCore\X.Y\PythonPath" of HKEY_CURRENT_USER and
-    HKEY_LOCAL_MACHINE (where X.Y is the Python version).
+  * thư mục làm việc hiện tại: để lấy các đường dẫn tuyệt đối
+  * biến môi trường ``PATH`` để lấy đường dẫn đầy đủ của chương trình (từ :c:member:`PyConfig.program_name`)
+  * biến môi trường ``__PYVENV_LAUNCHER__``
+  * (Chỉ dành cho Windows) Các đường dẫn ứng dụng trong registry tại "Software\Python\PythonCore\X.Y\PythonPath" của HKEY_CURRENT_USER và HKEY_LOCAL_MACHINE (trong đó X.Y là phiên bản Python).
 
-* Path configuration output fields:
+* Các trường đầu ra của cấu hình đường dẫn:
 
   * :c:member:`PyConfig.base_exec_prefix`
   * :c:member:`PyConfig.base_executable`
@@ -2213,74 +1970,53 @@ Python Path Configuration
     :c:member:`PyConfig.module_search_paths`
   * :c:member:`PyConfig.prefix`
 
-If at least one "output field" is not set, Python calculates the path
-configuration to fill unset fields. If
-:c:member:`~PyConfig.module_search_paths_set` is equal to ``0``,
-:c:member:`~PyConfig.module_search_paths` is overridden and
-:c:member:`~PyConfig.module_search_paths_set` is set to ``1``.
+Nếu ít nhất một "trường đầu ra" chưa được thiết lập, Python sẽ tính toán cấu hình đường dẫn để điền các trường chưa được thiết lập. Nếu
+:c:member:`~PyConfig.module_search_paths_set` bằng ``0``,
+:c:member:`~PyConfig.module_search_paths` bị ghi đè và
+:c:member:`~PyConfig.module_search_paths_set` được đặt thành ``1``.
 
-It is possible to completely ignore the function calculating the default
-path configuration by setting explicitly all path configuration output
-fields listed above. A string is considered as set even if it is non-empty.
-``module_search_paths`` is considered as set if
-``module_search_paths_set`` is set to ``1``. In this case,
-``module_search_paths`` will be used without modification.
+Có thể hoàn toàn bỏ qua hàm tính toán cấu hình đường dẫn mặc định bằng cách thiết lập rõ ràng tất cả các trường đầu ra của cấu hình đường dẫn được liệt kê ở trên. Một chuỗi được xem là đã thiết lập ngay cả khi chuỗi đó không rỗng. ``module_search_paths`` được xem là đã thiết lập nếu ``module_search_paths_set`` được đặt thành ``1``. Trong trường hợp này, ``module_search_paths`` sẽ được sử dụng mà không sửa đổi.
 
-Set :c:member:`~PyConfig.pathconfig_warnings` to ``0`` to suppress warnings when
-calculating the path configuration (Unix only, Windows does not log any warning).
+Đặt :c:member:`~PyConfig.pathconfig_warnings` thành ``0`` để ngăn các cảnh báo khi tính toán cấu hình đường dẫn (chỉ Unix; Windows không ghi bất kỳ cảnh báo nào).
 
-If :c:member:`~PyConfig.base_prefix` or :c:member:`~PyConfig.base_exec_prefix`
-fields are not set, they inherit their value from :c:member:`~PyConfig.prefix`
-and :c:member:`~PyConfig.exec_prefix` respectively.
+Nếu các trường :c:member:`~PyConfig.base_prefix` hoặc :c:member:`~PyConfig.base_exec_prefix` chưa được thiết lập, chúng lần lượt kế thừa giá trị từ :c:member:`~PyConfig.prefix` và :c:member:`~PyConfig.exec_prefix`.
 
-:c:func:`Py_RunMain` and :c:func:`Py_Main` modify :data:`sys.path`:
+:c:func:`Py_RunMain` và :c:func:`Py_Main` sửa đổi :data:`sys.path`:
 
-* If :c:member:`~PyConfig.run_filename` is set and is a directory which contains a
-  ``__main__.py`` script, prepend :c:member:`~PyConfig.run_filename` to
+* Nếu :c:member:`~PyConfig.run_filename` được thiết lập và là một thư mục chứa một script ``__main__.py``, thêm :c:member:`~PyConfig.run_filename` vào đầu
   :data:`sys.path`.
-* If :c:member:`~PyConfig.isolated` is zero:
+* Nếu :c:member:`~PyConfig.isolated` bằng không:
 
-  * If :c:member:`~PyConfig.run_module` is set, prepend the current directory
-    to :data:`sys.path`. Do nothing if the current directory cannot be read.
-  * If :c:member:`~PyConfig.run_filename` is set, prepend the directory of the
-    filename to :data:`sys.path`.
-  * Otherwise, prepend an empty string to :data:`sys.path`.
+  * Nếu :c:member:`~PyConfig.run_module` được thiết lập, thêm thư mục hiện tại vào đầu :data:`sys.path`. Không làm gì nếu không thể đọc thư mục hiện tại.
+  * Nếu :c:member:`~PyConfig.run_filename` được thiết lập, thêm thư mục chứa tên tệp vào đầu :data:`sys.path`.
+  * Nếu không, thêm một chuỗi rỗng vào đầu :data:`sys.path`.
 
-If :c:member:`~PyConfig.site_import` is non-zero, :data:`sys.path` can be
-modified by the :mod:`site` module. If
-:c:member:`~PyConfig.user_site_directory` is non-zero and the user's
-site-package directory exists, the :mod:`site` module appends the user's
-site-package directory to :data:`sys.path`.
+Nếu :c:member:`~PyConfig.site_import` khác không, :data:`sys.path` có thể được sửa đổi bởi module :mod:`site`. Nếu
+:c:member:`~PyConfig.user_site_directory` khác không và thư mục site-package của người dùng tồn tại, module :mod:`site` sẽ nối thư mục site-package của người dùng vào :data:`sys.path`.
 
-The following configuration files are used by the path configuration:
+Các tệp cấu hình sau được sử dụng cho cấu hình đường dẫn:
 
 * ``pyvenv.cfg``
-* ``._pth`` file (ex: ``python._pth``)
-* ``pybuilddir.txt`` (Unix only)
+* tệp ``._pth`` (ví dụ: ``python._pth``)
+* ``pybuilddir.txt`` (chỉ dành cho Unix)
 
-If a ``._pth`` file is present:
+Nếu có tệp ``._pth``:
 
-* Set :c:member:`~PyConfig.isolated` to ``1``.
-* Set :c:member:`~PyConfig.use_environment` to ``0``.
-* Set :c:member:`~PyConfig.site_import` to ``0``.
-* Set :c:member:`~PyConfig.safe_path` to ``1``.
+* Đặt :c:member:`~PyConfig.isolated` thành ``1``.
+* Đặt :c:member:`~PyConfig.use_environment` thành ``0``.
+* Đặt :c:member:`~PyConfig.site_import` thành ``0``.
+* Đặt :c:member:`~PyConfig.safe_path` thành ``1``.
 
-If :c:member:`~PyConfig.home` is not set and a ``pyvenv.cfg`` file is present in
-the same directory as :c:member:`~PyConfig.executable`, or its parent,
-:c:member:`~PyConfig.prefix` and :c:member:`~PyConfig.exec_prefix` are set that
-location. When this happens, :c:member:`~PyConfig.base_prefix` and
-:c:member:`~PyConfig.base_exec_prefix` still keep their value, pointing to the
-base installation. See :ref:`sys-path-init-virtual-environments` for more
-information.
+Nếu :c:member:`~PyConfig.home` chưa được đặt và có tệp ``pyvenv.cfg`` trong cùng thư mục với :c:member:`~PyConfig.executable` hoặc trong thư mục cha của nó,
+:c:member:`~PyConfig.prefix` và :c:member:`~PyConfig.exec_prefix` được đặt thành vị trí đó. Khi điều này xảy ra, :c:member:`~PyConfig.base_prefix` và
+:c:member:`~PyConfig.base_exec_prefix` vẫn giữ nguyên giá trị, trỏ đến bản cài đặt cơ sở. Xem :ref:`sys-path-init-virtual-environments` để biết thêm thông tin.
 
-The ``__PYVENV_LAUNCHER__`` environment variable is used to set
+Biến môi trường ``__PYVENV_LAUNCHER__`` được dùng để đặt
 :c:member:`PyConfig.base_executable`.
 
 .. versionchanged:: 3.14
 
-   :c:member:`~PyConfig.prefix`, and :c:member:`~PyConfig.exec_prefix`, are now
-   set to the ``pyvenv.cfg`` directory. This was previously done by :mod:`site`,
-   therefore affected by :option:`-S`.
+   :c:member:`~PyConfig.prefix` và :c:member:`~PyConfig.exec_prefix` hiện được đặt thành thư mục ``pyvenv.cfg``. Trước đây, việc này được thực hiện bởi :mod:`site`, nên bị ảnh hưởng bởi :option:`-S`.
 
 
 Py_GetArgcArgv()
@@ -2288,17 +2024,13 @@ Py_GetArgcArgv()
 
 .. c:function:: void Py_GetArgcArgv(int *argc, wchar_t ***argv)
 
-   Get the original command line arguments, before Python modified them.
+   Lấy các đối số dòng lệnh ban đầu, trước khi Python sửa đổi chúng.
 
-   See also :c:member:`PyConfig.orig_argv` member.
+   Xem thêm member :c:member:`PyConfig.orig_argv`.
 
-Delaying main module execution
-==============================
+Trì hoãn việc thực thi module chính
+===================================
 
-In some embedding use cases, it may be desirable to separate interpreter initialization
-from the execution of the main module.
+Trong một số trường hợp nhúng, bạn có thể muốn tách việc khởi tạo interpreter khỏi việc thực thi module chính.
 
-This separation can be achieved by setting ``PyConfig.run_command`` to the empty
-string during initialization (to prevent the interpreter from dropping into the
-interactive prompt), and then subsequently executing the desired main module
-code using ``__main__.__dict__`` as the global namespace.
+Có thể thực hiện việc tách này bằng cách đặt ``PyConfig.run_command`` thành chuỗi rỗng trong quá trình khởi tạo (để ngăn interpreter chuyển sang dấu nhắc tương tác), sau đó thực thi mã của module chính mong muốn bằng cách sử dụng ``__main__.__dict__`` làm global namespace.

@@ -2,35 +2,28 @@
 
 .. _complexobjects:
 
-Complex Number Objects
-----------------------
+Đối tượng số phức
+-----------------
 
 .. index:: pair: object; complex number
 
-Python's complex number objects are implemented as two distinct types when
-viewed from the C API:  one is the Python object exposed to Python programs, and
-the other is a C structure which represents the actual complex number value.
-The API provides functions for working with both.
+Các đối tượng số phức của Python được triển khai thành hai kiểu riêng biệt khi nhìn từ C API: một kiểu là đối tượng Python được cung cấp cho các chương trình Python, kiểu còn lại là một cấu trúc C biểu diễn giá trị số phức thực tế. API cung cấp các hàm để làm việc với cả hai kiểu này.
 
 
-Complex Numbers as C Structures
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Số phức dưới dạng cấu trúc C
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Note that the functions which accept these structures as parameters and return
-them as results do so *by value* rather than dereferencing them through
-pointers.  This is consistent throughout the API.
+Lưu ý rằng các hàm nhận những cấu trúc này làm tham số và trả về chúng dưới dạng kết quả thực hiện việc đó *theo giá trị* thay vì giải tham chiếu chúng thông qua con trỏ. Điều này nhất quán trong toàn bộ API.
 
 
 .. c:type:: Py_complex
 
-   The C structure which corresponds to the value portion of a Python complex
-   number object.  Most of the functions for dealing with complex number objects
-   use structures of this type as input or output values, as appropriate.
+   Cấu trúc C tương ứng với phần giá trị của một đối tượng số phức Python. Hầu hết các hàm xử lý đối tượng số phức đều sử dụng các cấu trúc thuộc kiểu này làm giá trị đầu vào hoặc đầu ra, tùy trường hợp.
 
    .. c:member:: double real
                  double imag
 
-   The structure is defined as::
+   Cấu trúc được định nghĩa như sau::
 
       typedef struct {
           double real;
@@ -40,132 +33,111 @@ pointers.  This is consistent throughout the API.
 
 .. c:function:: Py_complex _Py_c_sum(Py_complex left, Py_complex right)
 
-   Return the sum of two complex numbers, using the C :c:type:`Py_complex`
-   representation.
+   Trả về tổng của hai số phức, sử dụng biểu diễn :c:type:`Py_complex` của C.
 
 
 .. c:function:: Py_complex _Py_c_diff(Py_complex left, Py_complex right)
 
-   Return the difference between two complex numbers, using the C
-   :c:type:`Py_complex` representation.
+   Trả về hiệu của hai số phức, sử dụng biểu diễn C
+   :c:type:`Py_complex`.
 
 
 .. c:function:: Py_complex _Py_c_neg(Py_complex num)
 
-   Return the negation of the complex number *num*, using the C
-   :c:type:`Py_complex` representation.
+   Trả về số đối của số phức *num*, sử dụng biểu diễn C
+   :c:type:`Py_complex`.
 
 
 .. c:function:: Py_complex _Py_c_prod(Py_complex left, Py_complex right)
 
-   Return the product of two complex numbers, using the C :c:type:`Py_complex`
-   representation.
+   Trả về tích của hai số phức, sử dụng biểu diễn :c:type:`Py_complex` của C.
 
 
 .. c:function:: Py_complex _Py_c_quot(Py_complex dividend, Py_complex divisor)
 
-   Return the quotient of two complex numbers, using the C :c:type:`Py_complex`
-   representation.
+   Trả về thương của hai số phức, sử dụng biểu diễn :c:type:`Py_complex` của C.
 
-   If *divisor* is null, this method returns zero and sets
-   :c:data:`errno` to :c:macro:`!EDOM`.
+   Nếu *divisor* là null, phương thức này trả về 0 và đặt
+   :c:data:`errno` thành :c:macro:`!EDOM`.
 
 
 .. c:function:: Py_complex _Py_c_pow(Py_complex num, Py_complex exp)
 
-   Return the exponentiation of *num* by *exp*, using the C :c:type:`Py_complex`
-   representation.
+   Trả về kết quả lũy thừa của *num* với số mũ *exp*, sử dụng biểu diễn C :c:type:`Py_complex`.
 
-   If *num* is null and *exp* is not a positive real number,
-   this method returns zero and sets :c:data:`errno` to :c:macro:`!EDOM`.
+   Nếu *num* là null và *exp* không phải là một số thực dương, phương thức này trả về 0 và đặt :c:data:`errno` thành :c:macro:`!EDOM`.
 
-   Set :c:data:`errno` to :c:macro:`!ERANGE` on overflows.
+   Đặt :c:data:`errno` thành :c:macro:`!ERANGE` khi xảy ra tràn số.
 
 
-Complex Numbers as Python Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Số phức dưới dạng đối tượng Python
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. c:type:: PyComplexObject
 
-   This subtype of :c:type:`PyObject` represents a Python complex number object.
+   Subtype này của :c:type:`PyObject` đại diện cho một đối tượng số phức Python.
 
 
 .. c:var:: PyTypeObject PyComplex_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python complex number
-   type. It is the same object as :class:`complex` in the Python layer.
+   Đối tượng này của :c:type:`PyTypeObject` đại diện cho kiểu số phức Python. Nó là cùng một đối tượng với :class:`complex` ở tầng Python.
 
 
 .. c:function:: int PyComplex_Check(PyObject *p)
 
-   Return true if its argument is a :c:type:`PyComplexObject` or a subtype of
-   :c:type:`PyComplexObject`.  This function always succeeds.
+   Trả về true nếu đối số của nó là một :c:type:`PyComplexObject` hoặc là kiểu con của
+   :c:type:`PyComplexObject`. Hàm này luôn thành công.
 
 
 .. c:function:: int PyComplex_CheckExact(PyObject *p)
 
-   Return true if its argument is a :c:type:`PyComplexObject`, but not a subtype of
-   :c:type:`PyComplexObject`.  This function always succeeds.
+   Trả về true nếu đối số của nó là một :c:type:`PyComplexObject`, nhưng không phải là kiểu con của
+   :c:type:`PyComplexObject`. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PyComplex_FromCComplex(Py_complex v)
 
-   Create a new Python complex number object from a C :c:type:`Py_complex` value.
-   Return ``NULL`` with an exception set on error.
+   Tạo một đối tượng số phức Python mới từ một giá trị :c:type:`Py_complex` của C. Trả về ``NULL`` và thiết lập ngoại lệ nếu xảy ra lỗi.
 
 
 .. c:function:: PyObject* PyComplex_FromDoubles(double real, double imag)
 
-   Return a new :c:type:`PyComplexObject` object from *real* and *imag*.
-   Return ``NULL`` with an exception set on error.
+   Trả về một đối tượng :c:type:`PyComplexObject` mới từ *real* và *imag*. Trả về ``NULL`` và thiết lập ngoại lệ nếu xảy ra lỗi.
 
 
 .. c:function:: double PyComplex_RealAsDouble(PyObject *op)
 
-   Return the real part of *op* as a C :c:expr:`double`.
+   Trả về phần thực của *op* dưới dạng một :c:expr:`double` trong C.
 
-   If *op* is not a Python complex number object but has a
-   :meth:`~object.__complex__` method, this method will first be called to
-   convert *op* to a Python complex number object.  If :meth:`!__complex__` is
-   not defined then it falls back to call :c:func:`PyFloat_AsDouble` and
-   returns its result.
+   Nếu *op* không phải là một đối tượng số phức Python nhưng có một
+   phương thức :meth:`~object.__complex__`, phương thức này sẽ được gọi trước tiên để chuyển đổi *op* thành một đối tượng số phức Python. Nếu :meth:`!__complex__` chưa được định nghĩa thì phương thức này sẽ gọi :c:func:`PyFloat_AsDouble` thay thế và trả về kết quả của nó.
 
-   Upon failure, this method returns ``-1.0`` with an exception set, so one
-   should call :c:func:`PyErr_Occurred` to check for errors.
+   Khi thất bại, phương thức này trả về ``-1.0`` cùng với một ngoại lệ đã được thiết lập, vì vậy cần gọi :c:func:`PyErr_Occurred` để kiểm tra lỗi.
 
    .. versionchanged:: 3.13
-      Use :meth:`~object.__complex__` if available.
+      Sử dụng :meth:`~object.__complex__` nếu có.
 
 .. c:function:: double PyComplex_ImagAsDouble(PyObject *op)
 
-   Return the imaginary part of *op* as a C :c:expr:`double`.
+   Trả về phần ảo của *op* dưới dạng một :c:expr:`double` trong C.
 
-   If *op* is not a Python complex number object but has a
-   :meth:`~object.__complex__` method, this method will first be called to
-   convert *op* to a Python complex number object.  If :meth:`!__complex__` is
-   not defined then it falls back to call :c:func:`PyFloat_AsDouble` and
-   returns ``0.0`` on success.
+   Nếu *op* không phải là một đối tượng số phức Python nhưng có một
+   phương thức :meth:`~object.__complex__`, phương thức này trước tiên sẽ được gọi để chuyển *op* thành một đối tượng số phức Python. Nếu :meth:`!__complex__` chưa được định nghĩa thì phương thức này sẽ chuyển sang gọi :c:func:`PyFloat_AsDouble` và trả về ``0.0`` khi thành công.
 
-   Upon failure, this method returns ``-1.0`` with an exception set, so one
-   should call :c:func:`PyErr_Occurred` to check for errors.
+   Khi thất bại, phương thức này trả về ``-1.0`` cùng với một ngoại lệ đã được thiết lập, vì vậy cần gọi :c:func:`PyErr_Occurred` để kiểm tra lỗi.
 
    .. versionchanged:: 3.13
-      Use :meth:`~object.__complex__` if available.
+      Sử dụng :meth:`~object.__complex__` nếu có.
 
 .. c:function:: Py_complex PyComplex_AsCComplex(PyObject *op)
 
-   Return the :c:type:`Py_complex` value of the complex number *op*.
+   Trả về giá trị :c:type:`Py_complex` của số phức *op*.
 
-   If *op* is not a Python complex number object but has a :meth:`~object.__complex__`
-   method, this method will first be called to convert *op* to a Python complex
-   number object.  If :meth:`!__complex__` is not defined then it falls back to
-   :meth:`~object.__float__`.  If :meth:`!__float__` is not defined then it falls back
-   to :meth:`~object.__index__`.
+   Nếu *op* không phải là một đối tượng số phức Python nhưng có phương thức :meth:`~object.__complex__`, phương thức này trước tiên sẽ được gọi để chuyển *op* thành một đối tượng số phức Python. Nếu :meth:`!__complex__` chưa được định nghĩa thì phương thức này sẽ chuyển sang
+   :meth:`~object.__float__`. Nếu :meth:`!__float__` chưa được định nghĩa thì phương thức này sẽ chuyển sang :meth:`~object.__index__`.
 
-   Upon failure, this method returns :c:type:`Py_complex`
-   with :c:member:`~Py_complex.real` set to ``-1.0`` and with an exception set, so one
-   should call :c:func:`PyErr_Occurred` to check for errors.
+   Khi thất bại, phương thức này trả về :c:type:`Py_complex` với :c:member:`~Py_complex.real` được đặt thành ``-1.0`` và một exception được thiết lập, vì vậy cần gọi :c:func:`PyErr_Occurred` để kiểm tra lỗi.
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có sẵn.

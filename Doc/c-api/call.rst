@@ -2,348 +2,263 @@
 
 .. _call:
 
-Call Protocol
+Giao thức gọi
 =============
 
-CPython supports two different calling protocols:
-*tp_call* and vectorcall.
+CPython hỗ trợ hai giao thức gọi khác nhau: *tp_call* và vectorcall.
 
-The *tp_call* Protocol
-----------------------
+Giao thức *tp_call*
+-------------------
 
-Instances of classes that set :c:member:`~PyTypeObject.tp_call` are callable.
-The signature of the slot is::
+Các instance của những class thiết lập :c:member:`~PyTypeObject.tp_call` có thể được gọi. Chữ ký của slot là::
 
     PyObject *tp_call(PyObject *callable, PyObject *args, PyObject *kwargs);
 
-A call is made using a tuple for the positional arguments
-and a dict for the keyword arguments, similarly to
-``callable(*args, **kwargs)`` in Python code.
-*args* must be non-NULL (use an empty tuple if there are no arguments)
-but *kwargs* may be *NULL* if there are no keyword arguments.
+Một lệnh gọi được thực hiện bằng cách sử dụng một tuple cho các đối số vị trí và một dict cho các đối số từ khóa, tương tự như ``callable(*args, **kwargs)`` trong mã Python. *args* phải khác NULL (sử dụng một tuple rỗng nếu không có đối số nào), nhưng *kwargs* có thể là *NULL* nếu không có đối số từ khóa.
 
-This convention is not only used by *tp_call*:
-:c:member:`~PyTypeObject.tp_new` and :c:member:`~PyTypeObject.tp_init`
-also pass arguments this way.
+Quy ước này không chỉ được sử dụng bởi *tp_call*:
+:c:member:`~PyTypeObject.tp_new` và :c:member:`~PyTypeObject.tp_init` cũng truyền các đối số theo cách này.
 
-To call an object, use :c:func:`PyObject_Call` or another
-:ref:`call API <capi-call>`.
+Để gọi một đối tượng, hãy sử dụng :c:func:`PyObject_Call` hoặc một
+:ref:`API gọi <capi-call>`.
 
 
 .. _vectorcall:
 
-The Vectorcall Protocol
------------------------
+Giao thức Vectorcall
+--------------------
 
 .. versionadded:: 3.9
 
-The vectorcall protocol was introduced in :pep:`590` as an additional protocol
-for making calls more efficient.
+Giao thức vectorcall được giới thiệu trong :pep:`590` như một giao thức bổ sung để thực hiện các lệnh gọi hiệu quả hơn.
 
-As rule of thumb, CPython will prefer the vectorcall for internal calls
-if the callable supports it. However, this is not a hard rule.
-Additionally, some third-party extensions use *tp_call* directly
-(rather than using :c:func:`PyObject_Call`).
-Therefore, a class supporting vectorcall must also implement
-:c:member:`~PyTypeObject.tp_call`.
-Moreover, the callable must behave the same
-regardless of which protocol is used.
-The recommended way to achieve this is by setting
-:c:member:`~PyTypeObject.tp_call` to :c:func:`PyVectorcall_Call`.
-This bears repeating:
+Theo nguyên tắc kinh nghiệm, CPython sẽ ưu tiên vectorcall cho các lệnh gọi nội bộ nếu đối tượng có thể gọi hỗ trợ nó. Tuy nhiên, đây không phải là quy tắc bắt buộc. Ngoài ra, một số extension bên thứ ba sử dụng *tp_call* trực tiếp (thay vì sử dụng :c:func:`PyObject_Call`). Vì vậy, một class hỗ trợ vectorcall cũng phải triển khai
+:c:member:`~PyTypeObject.tp_call`. Hơn nữa, đối tượng có thể gọi phải hoạt động giống nhau bất kể sử dụng giao thức nào. Cách được khuyến nghị để đạt được điều này là đặt
+:c:member:`~PyTypeObject.tp_call` thành :c:func:`PyVectorcall_Call`. Cần nhắc lại điều này:
 
 .. warning::
 
-   A class supporting vectorcall **must** also implement
-   :c:member:`~PyTypeObject.tp_call` with the same semantics.
+   Một class hỗ trợ vectorcall **phải** đồng thời triển khai
+   :c:member:`~PyTypeObject.tp_call` với cùng ngữ nghĩa.
 
 .. versionchanged:: 3.12
 
-   The :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` flag is now removed from a class
-   when the class's :py:meth:`~object.__call__` method is reassigned.
-   (This internally sets :c:member:`~PyTypeObject.tp_call` only, and thus
-   may make it behave differently than the vectorcall function.)
-   In earlier Python versions, vectorcall should only be used with
-   :c:macro:`immutable <Py_TPFLAGS_IMMUTABLETYPE>` or static types.
+   Cờ :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` hiện bị xóa khỏi một class khi phương thức :py:meth:`~object.__call__` của class được gán lại. (Về nội bộ, thao tác này chỉ đặt :c:member:`~PyTypeObject.tp_call`, vì vậy nó có thể hoạt động khác với hàm vectorcall.) Trong các phiên bản Python trước đây, chỉ nên sử dụng vectorcall với
+   :c:macro:`bất biến <Py_TPFLAGS_IMMUTABLETYPE>` hoặc các kiểu static.
 
-A class should not implement vectorcall if that would be slower
-than *tp_call*. For example, if the callee needs to convert
-the arguments to an args tuple and kwargs dict anyway, then there is no point
-in implementing vectorcall.
+Một class không nên triển khai vectorcall nếu việc đó chậm hơn *tp_call*. Ví dụ: nếu callee dù sao cũng cần chuyển các đối số thành một args tuple và kwargs dict, thì việc triển khai vectorcall là không cần thiết.
 
-Classes can implement the vectorcall protocol by enabling the
-:c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` flag and setting
-:c:member:`~PyTypeObject.tp_vectorcall_offset` to the offset inside the
-object structure where a *vectorcallfunc* appears.
-This is a pointer to a function with the following signature:
+Các class có thể triển khai giao thức vectorcall bằng cách bật
+:c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` cờ và thiết lập
+:c:member:`~PyTypeObject.tp_vectorcall_offset` đến offset bên trong cấu trúc đối tượng, nơi *vectorcallfunc* xuất hiện. Đây là một con trỏ đến một hàm có chữ ký sau:
 
 .. c:type:: PyObject *(*vectorcallfunc)(PyObject *callable, PyObject *const *args, size_t nargsf, PyObject *kwnames)
 
-- *callable* is the object being called.
-- *args* is a C array consisting of the positional arguments followed by the
-   values of the keyword arguments.
-   This can be *NULL* if there are no arguments.
-- *nargsf* is the number of positional arguments plus possibly the
-   :c:macro:`PY_VECTORCALL_ARGUMENTS_OFFSET` flag.
-   To get the actual number of positional arguments from *nargsf*,
-   use :c:func:`PyVectorcall_NARGS`.
-- *kwnames* is a tuple containing the names of the keyword arguments;
-   in other words, the keys of the kwargs dict.
-   These names must be strings (instances of ``str`` or a subclass)
-   and they must be unique.
-   If there are no keyword arguments, then *kwnames* can instead be *NULL*.
+- *callable* là đối tượng đang được gọi.
+- *args* là một mảng C gồm các đối số vị trí, theo sau là
+   các giá trị của các đối số từ khóa. Giá trị này có thể là *NULL* nếu không có đối số nào.
+- *nargsf* là số lượng đối số vị trí, cộng thêm có thể là
+   cờ :c:macro:`PY_VECTORCALL_ARGUMENTS_OFFSET`. Để lấy số lượng đối số vị trí thực tế từ *nargsf*, hãy sử dụng :c:func:`PyVectorcall_NARGS`.
+- *kwnames* là một tuple chứa tên của các đối số từ khóa;
+   Nói cách khác, đó là các khóa của dict kwargs. Các tên này phải là chuỗi (các instance của ``str`` hoặc lớp con của nó) và phải là duy nhất. Nếu không có đối số từ khóa nào, thì *kwnames* có thể thay bằng *NULL*.
 
 .. c:macro:: PY_VECTORCALL_ARGUMENTS_OFFSET
 
-   If this flag is set in a vectorcall *nargsf* argument, the callee is allowed
-   to temporarily change ``args[-1]``. In other words, *args* points to
-   argument 1 (not 0) in the allocated vector.
-   The callee must restore the value of ``args[-1]`` before returning.
+   Nếu cờ này được đặt trong đối số *nargsf* của một vectorcall, hàm được gọi có thể tạm thời thay đổi ``args[-1]``. Nói cách khác, *args* trỏ đến đối số 1 (không phải 0) trong vector đã cấp phát. Hàm được gọi phải khôi phục giá trị của ``args[-1]`` trước khi trả về.
 
-   For :c:func:`PyObject_VectorcallMethod`, this flag means instead that
-   ``args[0]`` may be changed.
+   Đối với :c:func:`PyObject_VectorcallMethod`, cờ này thay vào đó có nghĩa là ``args[0]`` có thể được thay đổi.
 
-   Whenever they can do so cheaply (without additional allocation), callers
-   are encouraged to use :c:macro:`PY_VECTORCALL_ARGUMENTS_OFFSET`.
-   Doing so will allow callables such as bound methods to make their onward
-   calls (which include a prepended *self* argument) very efficiently.
+   Bất cứ khi nào có thể thực hiện với chi phí thấp (không cần cấp phát bổ sung), các caller được khuyến khích sử dụng :c:macro:`PY_VECTORCALL_ARGUMENTS_OFFSET`. Làm như vậy cho phép các callable như bound method thực hiện các lời gọi tiếp theo của chúng (bao gồm một đối số *self* được thêm vào đầu) một cách rất hiệu quả.
 
    .. versionadded:: 3.8
 
-To call an object that implements vectorcall, use a :ref:`call API <capi-call>`
-function as with any other callable.
-:c:func:`PyObject_Vectorcall` will usually be most efficient.
+Để gọi một đối tượng triển khai vectorcall, hãy sử dụng hàm :ref:`call API <capi-call>` như với bất kỳ callable nào khác.
+:c:func:`PyObject_Vectorcall` thường sẽ có hiệu suất cao nhất.
 
 
-Recursion Control
+Điều khiển đệ quy
 .................
 
-When using *tp_call*, callees do not need to worry about
-:ref:`recursion <recursion>`: CPython uses
-:c:func:`Py_EnterRecursiveCall` and :c:func:`Py_LeaveRecursiveCall`
-for calls made using *tp_call*.
+Khi sử dụng *tp_call*, các hàm được gọi không cần bận tâm về
+:ref:`đệ quy <recursion>`: CPython sử dụng
+:c:func:`Py_EnterRecursiveCall` và :c:func:`Py_LeaveRecursiveCall` cho các lời gọi được thực hiện bằng *tp_call*.
 
-For efficiency, this is not the case for calls done using vectorcall:
-the callee should use *Py_EnterRecursiveCall* and *Py_LeaveRecursiveCall*
-if needed.
+Để đạt hiệu quả, điều này không áp dụng cho các lời gọi được thực hiện bằng vectorcall: hàm được gọi nên sử dụng *Py_EnterRecursiveCall* và *Py_LeaveRecursiveCall* nếu cần.
 
 
-Vectorcall Support API
-......................
+API hỗ trợ Vectorcall
+.....................
 
 .. c:function:: Py_ssize_t PyVectorcall_NARGS(size_t nargsf)
 
-   Given a vectorcall *nargsf* argument, return the actual number of
-   arguments.
-   Currently equivalent to::
+   Với đối số *nargsf* của vectorcall, hãy trả về số lượng đối số thực tế. Hiện tại tương đương với::
 
       (Py_ssize_t)(nargsf & ~PY_VECTORCALL_ARGUMENTS_OFFSET)
 
-   However, the function ``PyVectorcall_NARGS`` should be used to allow
-   for future extensions.
+   Tuy nhiên, nên sử dụng hàm ``PyVectorcall_NARGS`` để cho phép mở rộng trong tương lai.
 
    .. versionadded:: 3.8
 
 .. c:function:: vectorcallfunc PyVectorcall_Function(PyObject *op)
 
-   If *op* does not support the vectorcall protocol (either because the type
-   does not or because the specific instance does not), return *NULL*.
-   Otherwise, return the vectorcall function pointer stored in *op*.
-   This function never raises an exception.
+   Nếu *op* không hỗ trợ giao thức vectorcall (do kiểu không hỗ trợ hoặc do chính instance cụ thể không hỗ trợ), hãy trả về *NULL*. Nếu không, hãy trả về con trỏ hàm vectorcall được lưu trong *op*. Hàm này không bao giờ phát sinh ngoại lệ.
 
-   This is mostly useful to check whether or not *op* supports vectorcall,
-   which can be done by checking ``PyVectorcall_Function(op) != NULL``.
+   Điều này chủ yếu hữu ích để kiểm tra xem *op* có hỗ trợ vectorcall hay không; bạn có thể thực hiện việc này bằng cách kiểm tra ``PyVectorcall_Function(op) != NULL``.
 
    .. versionadded:: 3.9
 
 .. c:function:: PyObject* PyVectorcall_Call(PyObject *callable, PyObject *tuple, PyObject *dict)
 
-   Call *callable*'s :c:type:`vectorcallfunc` with positional and keyword
-   arguments given in a tuple and dict, respectively.
+   Gọi *callable*'s :c:type:`vectorcallfunc` với các đối số vị trí và từ khóa lần lượt được cung cấp trong một tuple và một dict.
 
-   This is a specialized function, intended to be put in the
-   :c:member:`~PyTypeObject.tp_call` slot or be used in an implementation of ``tp_call``.
-   It does not check the :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` flag
-   and it does not fall back to ``tp_call``.
+   Đây là một hàm chuyên dụng, được thiết kế để đặt vào
+   slot :c:member:`~PyTypeObject.tp_call` hoặc được sử dụng trong một triển khai của ``tp_call``. Hàm này không kiểm tra cờ :c:macro:`Py_TPFLAGS_HAVE_VECTORCALL` và không chuyển sang ``tp_call``.
 
    .. versionadded:: 3.8
 
 
 .. _capi-call:
 
-Object Calling API
-------------------
+API gọi đối tượng
+-----------------
 
-Various functions are available for calling a Python object.
-Each converts its arguments to a convention supported by the called object –
-either *tp_call* or vectorcall.
-In order to do as little conversion as possible, pick one that best fits
-the format of data you have available.
+Có nhiều hàm dùng để gọi một đối tượng Python. Mỗi hàm chuyển đổi các đối số của nó sang một quy ước được đối tượng được gọi hỗ trợ – entweder *tp_call* hoặc vectorcall. Để thực hiện ít chuyển đổi nhất có thể, hãy chọn hàm phù hợp nhất với định dạng dữ liệu hiện có.
 
-The following table summarizes the available functions;
-please see individual documentation for details.
+Bảng sau đây tóm tắt các hàm hiện có; vui lòng xem tài liệu riêng của từng hàm để biết chi tiết.
 
-+------------------------------------------+------------------+--------------------+---------------+
-| Function                                 | callable         | args               | kwargs        |
-+==========================================+==================+====================+===============+
-| :c:func:`PyObject_Call`                  | ``PyObject *``   | tuple              | dict/``NULL`` |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallNoArgs`            | ``PyObject *``   | ---                | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallOneArg`            | ``PyObject *``   | 1 object           | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallObject`            | ``PyObject *``   | tuple/``NULL``     | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallFunction`          | ``PyObject *``   | format             | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallMethod`            | obj + ``char*``  | format             | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallFunctionObjArgs`   | ``PyObject *``   | variadic           | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallMethodObjArgs`     | obj + name       | variadic           | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallMethodNoArgs`      | obj + name       | ---                | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_CallMethodOneArg`      | obj + name       | 1 object           | ---           |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_Vectorcall`            | ``PyObject *``   | vectorcall         | vectorcall    |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_VectorcallDict`        | ``PyObject *``   | vectorcall         | dict/``NULL`` |
-+------------------------------------------+------------------+--------------------+---------------+
-| :c:func:`PyObject_VectorcallMethod`      | arg + name       | vectorcall         | vectorcall    |
-+------------------------------------------+------------------+--------------------+---------------+
++----------------------------------------+-----------------+----------------+---------------+
+| Function                               | callable        | args           | kwargs        |
++========================================+=================+================+===============+
+| :c:func:`PyObject_Call`                | ``PyObject *``  | tuple          | dict/``NULL`` |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallNoArgs`          | ``PyObject *``  | ---            | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallOneArg`          | ``PyObject *``  | 1 đối tượng    | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallObject`          | ``PyObject *``  | tuple/``NULL`` | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallFunction`        | ``PyObject *``  | định dạng      | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallMethod`          | obj + ``char*`` | định dạng      | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallFunctionObjArgs` | ``PyObject *``  | variadic       | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallMethodObjArgs`   | obj + name      | variadic       | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallMethodNoArgs`    | obj + name      | ---            | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_CallMethodOneArg`    | obj + name      | 1 đối tượng    | ---           |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_Vectorcall`          | ``PyObject *``  | vectorcall     | vectorcall    |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_VectorcallDict`      | ``PyObject *``  | vectorcall     | dict/``NULL`` |
++----------------------------------------+-----------------+----------------+---------------+
+| :c:func:`PyObject_VectorcallMethod`    | đối số + tên    | vectorcall     | vectorcall    |
++----------------------------------------+-----------------+----------------+---------------+
 
 
 .. c:function:: PyObject* PyObject_Call(PyObject *callable, PyObject *args, PyObject *kwargs)
 
-   Call a callable Python object *callable*, with arguments given by the
-   tuple *args*, and named arguments given by the dictionary *kwargs*.
+   Gọi đối tượng Python có thể gọi được *callable*, với các đối số được cung cấp bởi tuple *args* và các đối số có tên được cung cấp bởi dictionary *kwargs*.
 
-   *args* must not be *NULL*; use an empty tuple if no arguments are needed.
-   If no named arguments are needed, *kwargs* can be *NULL*.
+   *args* không được là *NULL*; hãy sử dụng tuple rỗng nếu không cần đối số nào. Nếu không cần đối số có tên, *kwargs* có thể là *NULL*.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
-   This is the equivalent of the Python expression:
-   ``callable(*args, **kwargs)``.
+   Điều này tương đương với biểu thức Python: ``callable(*args, **kwargs)``.
 
 
 .. c:function:: PyObject* PyObject_CallNoArgs(PyObject *callable)
 
-   Call a callable Python object *callable* without any arguments. It is the
-   most efficient way to call a callable Python object without any argument.
+   Gọi đối tượng Python callable *callable* mà không có đối số nào. Đây là cách hiệu quả nhất để gọi đối tượng Python callable mà không có đối số.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: PyObject* PyObject_CallOneArg(PyObject *callable, PyObject *arg)
 
-   Call a callable Python object *callable* with exactly 1 positional argument
-   *arg* and no keyword arguments.
+   Gọi đối tượng Python callable *callable* với chính xác 1 đối số vị trí *arg* và không có đối số từ khóa nào.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: PyObject* PyObject_CallObject(PyObject *callable, PyObject *args)
 
-   Call a callable Python object *callable*, with arguments given by the
-   tuple *args*.  If no arguments are needed, then *args* can be *NULL*.
+   Gọi đối tượng Python callable *callable* với các đối số được cung cấp bởi tuple *args*. Nếu không cần đối số nào, thì *args* có thể là *NULL*.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
-   This is the equivalent of the Python expression: ``callable(*args)``.
+   Đây là tương đương của biểu thức Python: ``callable(*args)``.
 
 
 .. c:function:: PyObject* PyObject_CallFunction(PyObject *callable, const char *format, ...)
 
-   Call a callable Python object *callable*, with a variable number of C arguments.
-   The C arguments are described using a :c:func:`Py_BuildValue` style format
-   string.  The format can be *NULL*, indicating that no arguments are provided.
+   Gọi một đối tượng Python có thể gọi được *callable*, với số lượng đối số C thay đổi. Các đối số C được mô tả bằng chuỗi định dạng kiểu :c:func:`Py_BuildValue`. Định dạng này có thể là *NULL*, cho biết không có đối số nào được cung cấp.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
-   This is the equivalent of the Python expression: ``callable(*args)``.
+   Đây là tương đương của biểu thức Python: ``callable(*args)``.
 
-   Note that if you only pass :c:expr:`PyObject *` args,
-   :c:func:`PyObject_CallFunctionObjArgs` is a faster alternative.
+   Lưu ý rằng nếu bạn chỉ truyền các đối số :c:expr:`PyObject *`,
+   :c:func:`PyObject_CallFunctionObjArgs` là một lựa chọn nhanh hơn.
 
    .. versionchanged:: 3.4
-      The type of *format* was changed from ``char *``.
+      Kiểu của *format* đã được thay đổi từ ``char *``.
 
 
 .. c:function:: PyObject* PyObject_CallMethod(PyObject *obj, const char *name, const char *format, ...)
 
-   Call the method named *name* of object *obj* with a variable number of C
-   arguments.  The C arguments are described by a :c:func:`Py_BuildValue` format
-   string that should produce a tuple.
+   Gọi phương thức có tên *name* của đối tượng *obj* với số lượng đối số C tùy ý. Các đối số C được mô tả bằng một chuỗi :c:func:`Py_BuildValue` format tạo ra một tuple.
 
-   The format can be *NULL*, indicating that no arguments are provided.
+   format có thể là *NULL*, cho biết không có đối số nào được cung cấp.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
-   This is the equivalent of the Python expression:
-   ``obj.name(arg1, arg2, ...)``.
+   Điều này tương đương với biểu thức Python: ``obj.name(arg1, arg2, ...)``.
 
-   Note that if you only pass :c:expr:`PyObject *` args,
-   :c:func:`PyObject_CallMethodObjArgs` is a faster alternative.
+   Lưu ý rằng nếu bạn chỉ truyền các đối số :c:expr:`PyObject *`,
+   :c:func:`PyObject_CallMethodObjArgs` là một lựa chọn thay thế nhanh hơn.
 
    .. versionchanged:: 3.4
-      The types of *name* and *format* were changed from ``char *``.
+      Kiểu của *name* và *format* đã được thay đổi từ ``char *``.
 
 
 .. c:function:: PyObject* PyObject_CallFunctionObjArgs(PyObject *callable, ...)
 
-   Call a callable Python object *callable*, with a variable number of
-   :c:expr:`PyObject *` arguments.  The arguments are provided as a variable number
-   of parameters followed by *NULL*.
+   Gọi một đối tượng Python có thể gọi được *callable*, với số lượng đối số thay đổi
+   :c:expr:`PyObject *` đối số. Các đối số được cung cấp dưới dạng một số lượng tham số thay đổi, theo sau là *NULL*.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
-   This is the equivalent of the Python expression:
-   ``callable(arg1, arg2, ...)``.
+   Điều này tương đương với biểu thức Python: ``callable(arg1, arg2, ...)``.
 
 
 .. c:function:: PyObject* PyObject_CallMethodObjArgs(PyObject *obj, PyObject *name, ...)
 
-   Call a method of the Python object *obj*, where the name of the method is given as a
-   Python string object in *name*.  It is called with a variable number of
-   :c:expr:`PyObject *` arguments.  The arguments are provided as a variable number
-   of parameters followed by *NULL*.
+   Gọi một phương thức của đối tượng Python *obj*, trong đó tên của phương thức được cung cấp dưới dạng một đối tượng chuỗi Python trong *name*. Phương thức được gọi với số lượng đối số thay đổi
+   :c:expr:`PyObject *` đối số. Các đối số được cung cấp dưới dạng một số lượng tham số thay đổi, theo sau là *NULL*.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
 
 .. c:function:: PyObject* PyObject_CallMethodNoArgs(PyObject *obj, PyObject *name)
 
-   Call a method of the Python object *obj* without arguments,
-   where the name of the method is given as a Python string object in *name*.
+   Gọi một method của đối tượng Python *obj* mà không có đối số, trong đó tên của method được cung cấp dưới dạng một đối tượng chuỗi Python trong *name*.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: PyObject* PyObject_CallMethodOneArg(PyObject *obj, PyObject *name, PyObject *arg)
 
-   Call a method of the Python object *obj* with a single positional argument
-   *arg*, where the name of the method is given as a Python string object in
-   *name*.
+   Gọi một method của đối tượng Python *obj* với một đối số vị trí duy nhất *arg*, trong đó tên của method được cung cấp dưới dạng một đối tượng chuỗi Python trong *name*.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
    .. versionadded:: 3.9
 
@@ -352,60 +267,39 @@ please see individual documentation for details.
 
 .. c:function:: PyObject* PyObject_Vectorcall(PyObject *callable, PyObject *const *args, size_t nargsf, PyObject *kwnames)
 
-   Call a callable Python object *callable*.
-   The arguments are the same as for :c:type:`vectorcallfunc`.
-   If *callable* supports vectorcall_, this directly calls
-   the vectorcall function stored in *callable*.
+   Gọi một đối tượng Python có thể gọi *callable*. Các đối số giống như đối số của :c:type:`vectorcallfunc`. Nếu *callable* hỗ trợ vectorcall_, thao tác này sẽ gọi trực tiếp hàm vectorcall được lưu trong *callable*.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
-   .. versionadded:: 3.8 as ``_PyObject_Vectorcall``
+   .. versionadded:: 3.8 kể từ ``_PyObject_Vectorcall``
 
    .. versionchanged:: 3.9
 
-      Renamed to the current name, without the leading underscore.
-      The old provisional name is :term:`soft deprecated`.
+      Được đổi tên thành tên hiện tại, không có dấu gạch dưới ở đầu. Tên tạm thời cũ là :term:`soft deprecated`.
 
 .. c:function:: PyObject* PyObject_VectorcallDict(PyObject *callable, PyObject *const *args, size_t nargsf, PyObject *kwdict)
 
-   Call *callable* with positional arguments passed exactly as in the vectorcall_ protocol,
-   but with keyword arguments passed as a dictionary *kwdict*.
-   The *args* array contains only the positional arguments.
+   Gọi *callable* với các đối số vị trí được truyền chính xác như trong giao thức vectorcall_, nhưng các đối số từ khóa được truyền dưới dạng từ điển *kwdict*. Mảng *args* chỉ chứa các đối số vị trí.
 
-   Regardless of which protocol is used internally,
-   a conversion of arguments needs to be done.
-   Therefore, this function should only be used if the caller
-   already has a dictionary ready to use for the keyword arguments,
-   but not a tuple for the positional arguments.
+   Bất kể giao thức nào được sử dụng nội bộ, vẫn cần chuyển đổi các đối số. Do đó, chỉ nên sử dụng hàm này nếu bên gọi đã có sẵn một từ điển để dùng cho các đối số từ khóa, nhưng chưa có tuple cho các đối số vị trí.
 
    .. versionadded:: 3.9
 
 .. c:function:: PyObject* PyObject_VectorcallMethod(PyObject *name, PyObject *const *args, size_t nargsf, PyObject *kwnames)
 
-   Call a method using the vectorcall calling convention. The name of the method
-   is given as a Python string *name*. The object whose method is called is
-   *args[0]*, and the *args* array starting at *args[1]* represents the arguments
-   of the call. There must be at least one positional argument.
-   *nargsf* is the number of positional arguments including *args[0]*,
-   plus :c:macro:`PY_VECTORCALL_ARGUMENTS_OFFSET` if the value of ``args[0]`` may
-   temporarily be changed. Keyword arguments can be passed just like in
+   Gọi một phương thức bằng quy ước gọi vectorcall. Tên của phương thức được cung cấp dưới dạng chuỗi Python *name*. Đối tượng có phương thức được gọi là *args[0]*, còn mảng *args* bắt đầu tại *args[1]* biểu thị các đối số của lệnh gọi. Phải có ít nhất một đối số vị trí. *nargsf* là số lượng đối số vị trí, bao gồm *args[0]*, cộng thêm :c:macro:`PY_VECTORCALL_ARGUMENTS_OFFSET` nếu giá trị của ``args[0]`` có thể được thay đổi tạm thời. Các đối số từ khóa có thể được truyền giống như trong
    :c:func:`PyObject_Vectorcall`.
 
-   If the object has the :c:macro:`Py_TPFLAGS_METHOD_DESCRIPTOR` feature,
-   this will call the unbound method object with the full
-   *args* vector as arguments.
+   Nếu đối tượng có tính năng :c:macro:`Py_TPFLAGS_METHOD_DESCRIPTOR`, thao tác này sẽ gọi đối tượng phương thức chưa liên kết với toàn bộ vector *args* làm các đối số.
 
-   Return the result of the call on success, or raise an exception and return
-   *NULL* on failure.
+   Trả về kết quả của lệnh gọi nếu thành công hoặc phát sinh một exception và trả về *NULL* nếu thất bại.
 
    .. versionadded:: 3.9
 
 
-Call Support API
-----------------
+API Hỗ trợ Gọi
+--------------
 
 .. c:function:: int PyCallable_Check(PyObject *o)
 
-   Determine if the object *o* is callable.  Return ``1`` if the object is callable
-   and ``0`` otherwise.  This function always succeeds.
+   Xác định xem đối tượng *o* có thể gọi được hay không. Trả về ``1`` nếu đối tượng có thể gọi được và ``0`` nếu không. Hàm này luôn thực hiện thành công.

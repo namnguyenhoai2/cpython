@@ -2,74 +2,65 @@
 
 .. _apiabiversion:
 
-***********************
-API and ABI Versioning
-***********************
+********************
+Phiên bản API và ABI
+********************
 
 
-Build-time version constants
-----------------------------
+Hằng số phiên bản tại thời điểm build
+-------------------------------------
 
-CPython exposes its version number in the following macros.
-Note that these correspond to the version code is **built** with.
-See :c:var:`Py_Version` for the version used at **run time**.
+CPython cung cấp số phiên bản trong các macro sau. Lưu ý rằng các macro này tương ứng với mã phiên bản được **build** cùng. Xem :c:var:`Py_Version` để biết phiên bản được sử dụng tại **run time**.
 
-See :ref:`stable` for a discussion of API and ABI stability across versions.
+Xem :ref:`stable` để tìm hiểu về tính ổn định của API và ABI giữa các phiên bản.
 
 .. c:macro:: PY_MAJOR_VERSION
 
-   The ``3`` in ``3.4.1a2``.
+   ``3`` trong ``3.4.1a2``.
 
 .. c:macro:: PY_MINOR_VERSION
 
-   The ``4`` in ``3.4.1a2``.
+   ``4`` trong ``3.4.1a2``.
 
 .. c:macro:: PY_MICRO_VERSION
 
-   The ``1`` in ``3.4.1a2``.
+   ``1`` trong ``3.4.1a2``.
 
 .. c:macro:: PY_RELEASE_LEVEL
 
-   The ``a`` in ``3.4.1a2``.
-   This can be ``0xA`` for alpha, ``0xB`` for beta, ``0xC`` for release
-   candidate or ``0xF`` for final.
+   ``3.4.1a2`` chứa ``a``. Giá trị này có thể là ``0xA`` cho alpha, ``0xB`` cho beta, ``0xC`` cho bản phát hành candidate hoặc ``0xF`` cho bản chính thức.
 
 .. c:macro:: PY_RELEASE_SERIAL
 
-   The ``2`` in ``3.4.1a2``. Zero for final releases.
+   ``3.4.1a2`` chứa ``2``. Bằng 0 đối với các bản phát hành chính thức.
 
 .. c:macro:: PY_VERSION_HEX
 
-   The Python version number encoded in a single integer.
-   See :c:func:`Py_PACK_FULL_VERSION` for the encoding details.
+   Số phiên bản Python được mã hóa trong một số nguyên duy nhất. Xem :c:func:`Py_PACK_FULL_VERSION` để biết chi tiết về cách mã hóa.
 
-   Use this for numeric comparisons, for example,
-   ``#if PY_VERSION_HEX >= ...``.
+   Sử dụng giá trị này để so sánh số, ví dụ: ``#if PY_VERSION_HEX >= ...``.
 
-These macros are defined in :source:`Include/patchlevel.h`.
+Các macro này được định nghĩa trong :source:`Include/patchlevel.h`.
 
 
-Run-time version
-----------------
+Phiên bản runtime
+-----------------
 
 .. c:var:: const unsigned long Py_Version
 
-   The Python runtime version number encoded in a single constant integer.
-   See :c:func:`Py_PACK_FULL_VERSION` for the encoding details.
-   This contains the Python version used at run time.
+   Số phiên bản runtime của Python được mã hóa trong một hằng số nguyên duy nhất. Xem :c:func:`Py_PACK_FULL_VERSION` để biết chi tiết về cách mã hóa. Giá trị này chứa phiên bản Python được sử dụng trong thời gian chạy.
 
-   Use this for numeric comparisons, for example, ``if (Py_Version >= ...)``.
+   Dùng nội dung này để so sánh số, ví dụ: ``if (Py_Version >= ...)``.
 
    .. versionadded:: 3.11
 
 
-Bit-packing macros
+Macro đóng gói bit
 ------------------
 
 .. c:function:: uint32_t Py_PACK_FULL_VERSION(int major, int minor, int micro, int release_level, int release_serial)
 
-   Return the given version, encoded as a single 32-bit integer with
-   the following structure:
+   Trả về phiên bản đã cho, được mã hóa thành một số nguyên 32-bit duy nhất với cấu trúc sau:
 
    +------------------+-------+----------------+-----------+--------------------------+
    |                  | No.   |                |           | Example values           |
@@ -87,18 +78,17 @@ Bit-packing macros
    | *release_serial* |   4   | ``0x0000000F`` | 0         | ``0x2``     | ``0x0``    |
    +------------------+-------+----------------+-----------+-------------+------------+
 
-   For example:
+   Ví dụ:
 
-   +-------------+------------------------------------+-----------------+
-   | Version     | ``Py_PACK_FULL_VERSION`` arguments | Encoded version |
-   +=============+====================================+=================+
-   | ``3.4.1a2`` | ``(3, 4, 1, 0xA, 2)``              | ``0x030401a2``  |
-   +-------------+------------------------------------+-----------------+
-   | ``3.10.0``  | ``(3, 10, 0, 0xF, 0)``             | ``0x030a00f0``  |
-   +-------------+------------------------------------+-----------------+
+   +-------------+---------------------------------+-----------------------+
+   | Phiên bản   | đối số ``Py_PACK_FULL_VERSION`` | Phiên bản được mã hóa |
+   +=============+=================================+=======================+
+   | ``3.4.1a2`` | ``(3, 4, 1, 0xA, 2)``           | ``0x030401a2``        |
+   +-------------+---------------------------------+-----------------------+
+   | ``3.10.0``  | ``(3, 10, 0, 0xF, 0)``          | ``0x030a00f0``        |
+   +-------------+---------------------------------+-----------------------+
 
-   Out-of range bits in the arguments are ignored.
-   That is, the macro can be defined as:
+   Các bit nằm ngoài phạm vi trong các đối số sẽ bị bỏ qua. Nghĩa là, macro có thể được định nghĩa như sau:
 
    .. code-block:: c
 
@@ -111,15 +101,12 @@ Bit-packing macros
          (((SERIAL) & 0xf) << 0))
       #endif
 
-   ``Py_PACK_FULL_VERSION`` is primarily a macro, intended for use in
-   ``#if`` directives, but it is also available as an exported function.
+   ``Py_PACK_FULL_VERSION`` chủ yếu là một macro, được dùng trong các chỉ thị ``#if``, nhưng cũng có sẵn dưới dạng một hàm được export.
 
    .. versionadded:: 3.14
 
 .. c:function:: uint32_t Py_PACK_VERSION(int major, int minor)
 
-   Equivalent to ``Py_PACK_FULL_VERSION(major, minor, 0, 0, 0)``.
-   The result does not correspond to any Python release, but is useful
-   in numeric comparisons.
+   Tương đương với ``Py_PACK_FULL_VERSION(major, minor, 0, 0, 0)``. Kết quả không tương ứng với bất kỳ bản phát hành Python nào, nhưng hữu ích khi so sánh số.
 
    .. versionadded:: 3.14

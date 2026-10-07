@@ -2,24 +2,16 @@
 
 .. _datetimeobjects:
 
-DateTime Objects
-----------------
+Đối tượng DateTime
+------------------
 
-Various date and time objects are supplied by the :mod:`datetime` module.
-Before using any of these functions, the header file :file:`datetime.h` must be
-included in your source (note that this is not included by :file:`Python.h`),
-and the macro :c:macro:`PyDateTime_IMPORT` must be invoked, usually as part of
-the module initialisation function.  The macro puts a pointer to a C structure
-into a static variable, :c:data:`PyDateTimeAPI`, that is used by the following
-macros.
+Mô-đun :mod:`datetime` cung cấp nhiều đối tượng ngày và giờ. Trước khi sử dụng bất kỳ hàm nào trong số này, phải đưa tệp tiêu đề :file:`datetime.h` vào mã nguồn của bạn (lưu ý rằng tệp này không được đưa vào bởi :file:`Python.h`), đồng thời phải gọi macro :c:macro:`PyDateTime_IMPORT`, thường là một phần của hàm khởi tạo mô-đun. Macro này đặt một con trỏ tới cấu trúc C vào biến tĩnh :c:data:`PyDateTimeAPI`, được các macro sau sử dụng.
 
 .. c:macro:: PyDateTime_IMPORT()
 
-   Import the datetime C API.
+   Import C API của datetime.
 
-   On success, populate the :c:var:`PyDateTimeAPI` pointer.
-   On failure, set :c:var:`PyDateTimeAPI` to ``NULL`` and set an exception.
-   The caller must check if an error occurred via :c:func:`PyErr_Occurred`:
+   Khi thành công, điền con trỏ :c:var:`PyDateTimeAPI`. Khi thất bại, đặt :c:var:`PyDateTimeAPI` thành ``NULL`` và đặt một exception. Caller phải kiểm tra xem có xảy ra lỗi hay không thông qua :c:func:`PyErr_Occurred`:
 
    .. code-block::
 
@@ -28,344 +20,311 @@ macros.
 
    .. warning::
 
-      This is not compatible with subinterpreters.
+      Điều này không tương thích với subinterpreter.
 
 .. c:type:: PyDateTime_CAPI
 
-   Structure containing the fields for the datetime C API.
+   Cấu trúc chứa các trường cho C API của datetime.
 
-   The fields of this structure are private and subject to change.
+   Các trường của cấu trúc này là private và có thể thay đổi.
 
-   Do not use this directly; prefer ``PyDateTime_*`` APIs instead.
+   Không sử dụng trực tiếp đối tượng này; thay vào đó, hãy ưu tiên các API ``PyDateTime_*``.
 
 .. c:var:: PyDateTime_CAPI *PyDateTimeAPI
 
-   Dynamically allocated object containing the datetime C API.
+   Đối tượng được cấp phát động, chứa C API cho datetime.
 
-   This variable is only available once :c:macro:`PyDateTime_IMPORT` succeeds.
+   Biến này chỉ khả dụng sau khi :c:macro:`PyDateTime_IMPORT` thành công.
 
 .. c:type:: PyDateTime_Date
 
-   This subtype of :c:type:`PyObject` represents a Python date object.
+   Kiểu con này của :c:type:`PyObject` biểu diễn một đối tượng date của Python.
 
 .. c:type:: PyDateTime_DateTime
 
-   This subtype of :c:type:`PyObject` represents a Python datetime object.
+   Kiểu con này của :c:type:`PyObject` biểu diễn một đối tượng datetime của Python.
 
 .. c:type:: PyDateTime_Time
 
-   This subtype of :c:type:`PyObject` represents a Python time object.
+   Kiểu con này của :c:type:`PyObject` biểu diễn một đối tượng time của Python.
 
 .. c:type:: PyDateTime_Delta
 
-   This subtype of :c:type:`PyObject` represents the difference between two datetime values.
+   Kiểu con này của :c:type:`PyObject` biểu diễn sự chênh lệch giữa hai giá trị datetime.
 
 .. c:var:: PyTypeObject PyDateTime_DateType
 
-   This instance of :c:type:`PyTypeObject` represents the Python date type;
-   it is the same object as :class:`datetime.date` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` biểu thị kiểu date của Python; đây là cùng một đối tượng với :class:`datetime.date` trong lớp Python.
 
 .. c:var:: PyTypeObject PyDateTime_DateTimeType
 
-   This instance of :c:type:`PyTypeObject` represents the Python datetime type;
-   it is the same object as :class:`datetime.datetime` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` biểu thị kiểu datetime của Python; đây là cùng một đối tượng với :class:`datetime.datetime` trong lớp Python.
 
 .. c:var:: PyTypeObject PyDateTime_TimeType
 
-   This instance of :c:type:`PyTypeObject` represents the Python time type;
-   it is the same object as :class:`datetime.time` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` biểu thị kiểu time của Python; đây là cùng một đối tượng với :class:`datetime.time` trong lớp Python.
 
 .. c:var:: PyTypeObject PyDateTime_DeltaType
 
-   This instance of :c:type:`PyTypeObject` represents the Python type for
-   the difference between two datetime values;
-   it is the same object as :class:`datetime.timedelta` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` biểu thị kiểu Python cho độ chênh lệch giữa hai giá trị datetime; đây là cùng một đối tượng với :class:`datetime.timedelta` trong lớp Python.
 
 .. c:var:: PyTypeObject PyDateTime_TZInfoType
 
-   This instance of :c:type:`PyTypeObject` represents the Python time zone info type;
-   it is the same object as :class:`datetime.tzinfo` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` biểu thị kiểu thông tin múi giờ của Python; đây là cùng một đối tượng với :class:`datetime.tzinfo` trong lớp Python.
 
 
-Macro for access to the UTC singleton:
+Macro để truy cập singleton UTC:
 
 .. c:var:: PyObject* PyDateTime_TimeZone_UTC
 
-   Returns the time zone singleton representing UTC, the same object as
+   Trả về singleton múi giờ biểu thị UTC, cùng một đối tượng với
    :attr:`datetime.timezone.utc`.
 
    .. versionadded:: 3.7
 
 
-Type-check macros:
+Macro kiểm tra kiểu:
 
 .. c:function:: int PyDate_Check(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_DateType` or a subtype of
-   :c:data:`!PyDateTime_DateType`.  *ob* must not be ``NULL``.  This function always
-   succeeds.
+   Trả về true nếu *ob* có kiểu :c:data:`PyDateTime_DateType` hoặc một kiểu con của kiểu đó
+   :c:data:`!PyDateTime_DateType`.  *ob* không được là ``NULL``.  Hàm này luôn thành công.
 
 
 .. c:function:: int PyDate_CheckExact(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_DateType`. *ob* must not be
-   ``NULL``.  This function always succeeds.
+   Trả về true nếu *ob* có kiểu :c:data:`PyDateTime_DateType`. *ob* không được là ``NULL``.  Hàm này luôn thành công.
 
 
 .. c:function:: int PyDateTime_Check(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_DateTimeType` or a subtype of
-   :c:data:`!PyDateTime_DateTimeType`.  *ob* must not be ``NULL``.  This function always
-   succeeds.
+   Trả về true nếu *ob* có kiểu :c:data:`PyDateTime_DateTimeType` hoặc một kiểu con của kiểu đó
+   :c:data:`!PyDateTime_DateTimeType`.  *ob* không được là ``NULL``.  Hàm này luôn thành công.
 
 
 .. c:function:: int PyDateTime_CheckExact(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_DateTimeType`. *ob* must not
-   be ``NULL``.  This function always succeeds.
+   Trả về true nếu *ob* có kiểu :c:data:`PyDateTime_DateTimeType`. *ob* không được là ``NULL``.  Hàm này luôn thành công.
 
 
 .. c:function:: int PyTime_Check(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_TimeType` or a subtype of
-   :c:data:`!PyDateTime_TimeType`.  *ob* must not be ``NULL``.  This function always
-   succeeds.
+   Trả về true nếu *ob* thuộc kiểu :c:data:`PyDateTime_TimeType` hoặc một kiểu con của
+   :c:data:`!PyDateTime_TimeType`.  *ob* không được là ``NULL``.  Hàm này luôn thực thi thành công.
 
 
 .. c:function:: int PyTime_CheckExact(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_TimeType`. *ob* must not be
-   ``NULL``.  This function always succeeds.
+   Trả về true nếu *ob* thuộc kiểu :c:data:`PyDateTime_TimeType`. *ob* không được là ``NULL``.  Hàm này luôn thực thi thành công.
 
 
 .. c:function:: int PyDelta_Check(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_DeltaType` or a subtype of
-   :c:data:`!PyDateTime_DeltaType`.  *ob* must not be ``NULL``.  This function always
-   succeeds.
+   Trả về true nếu *ob* thuộc kiểu :c:data:`PyDateTime_DeltaType` hoặc một kiểu con của
+   :c:data:`!PyDateTime_DeltaType`.  *ob* không được là ``NULL``.  Hàm này luôn thực thi thành công.
 
 
 .. c:function:: int PyDelta_CheckExact(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_DeltaType`. *ob* must not be
-   ``NULL``.  This function always succeeds.
+   Trả về true nếu *ob* thuộc kiểu :c:data:`PyDateTime_DeltaType`. *ob* không được là ``NULL``.  Hàm này luôn thực thi thành công.
 
 
 .. c:function:: int PyTZInfo_Check(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_TZInfoType` or a subtype of
-   :c:data:`!PyDateTime_TZInfoType`.  *ob* must not be ``NULL``.  This function always
-   succeeds.
+   Trả về true nếu *ob* thuộc kiểu :c:data:`PyDateTime_TZInfoType` hoặc một kiểu con của
+   :c:data:`!PyDateTime_TZInfoType`.  *ob* không được là ``NULL``.  Hàm này luôn thành công.
 
 
 .. c:function:: int PyTZInfo_CheckExact(PyObject *ob)
 
-   Return true if *ob* is of type :c:data:`PyDateTime_TZInfoType`. *ob* must not be
-   ``NULL``.  This function always succeeds.
+   Trả về true nếu *ob* thuộc kiểu :c:data:`PyDateTime_TZInfoType`. *ob* không được là ``NULL``.  Hàm này luôn thành công.
 
 
-Macros to create objects:
+Các macro để tạo object:
 
 .. c:function:: PyObject* PyDate_FromDate(int year, int month, int day)
 
-   Return a :class:`datetime.date` object with the specified year, month and day.
+   Trả về một object :class:`datetime.date` với năm, tháng và ngày được chỉ định.
 
 
 .. c:function:: PyObject* PyDateTime_FromDateAndTime(int year, int month, int day, int hour, int minute, int second, int usecond)
 
-   Return a :class:`datetime.datetime` object with the specified year, month, day, hour,
-   minute, second and microsecond.
+   Trả về một object :class:`datetime.datetime` với năm, tháng, ngày, giờ, phút, giây và microsecond được chỉ định.
 
 
 .. c:function:: PyObject* PyDateTime_FromDateAndTimeAndFold(int year, int month, int day, int hour, int minute, int second, int usecond, int fold)
 
-   Return a :class:`datetime.datetime` object with the specified year, month, day, hour,
-   minute, second, microsecond and fold.
+   Trả về một object :class:`datetime.datetime` với năm, tháng, ngày, giờ, phút, giây, microsecond và fold được chỉ định.
 
    .. versionadded:: 3.6
 
 
 .. c:function:: PyObject* PyTime_FromTime(int hour, int minute, int second, int usecond)
 
-   Return a :class:`datetime.time` object with the specified hour, minute, second and
-   microsecond.
+   Trả về một object :class:`datetime.time` với giờ, phút, giây và microsecond được chỉ định.
 
 
 .. c:function:: PyObject* PyTime_FromTimeAndFold(int hour, int minute, int second, int usecond, int fold)
 
-   Return a :class:`datetime.time` object with the specified hour, minute, second,
-   microsecond and fold.
+   Trả về một đối tượng :class:`datetime.time` với giờ, phút, giây, microsecond và fold được chỉ định.
 
    .. versionadded:: 3.6
 
 
 .. c:function:: PyObject* PyDelta_FromDSU(int days, int seconds, int useconds)
 
-   Return a :class:`datetime.timedelta` object representing the given number
-   of days, seconds and microseconds.  Normalization is performed so that the
-   resulting number of microseconds and seconds lie in the ranges documented for
-   :class:`datetime.timedelta` objects.
+   Trả về một đối tượng :class:`datetime.timedelta` biểu diễn số ngày, giây và microsecond đã cho. Việc chuẩn hóa được thực hiện để số microsecond và giây thu được nằm trong các phạm vi được ghi lại cho
+   các đối tượng :class:`datetime.timedelta`.
 
 
 .. c:function:: PyObject* PyTimeZone_FromOffset(PyObject *offset)
 
-   Return a :class:`datetime.timezone` object with an unnamed fixed offset
-   represented by the *offset* argument.
+   Trả về một đối tượng :class:`datetime.timezone` với offset cố định không có tên, được biểu diễn bằng đối số *offset*.
 
    .. versionadded:: 3.7
 
 
 .. c:function:: PyObject* PyTimeZone_FromOffsetAndName(PyObject *offset, PyObject *name)
 
-   Return a :class:`datetime.timezone` object with a fixed offset represented
-   by the *offset* argument and with tzname *name*.
+   Trả về một đối tượng :class:`datetime.timezone` với offset cố định được biểu diễn bằng đối số *offset* và có tzname là *name*.
 
    .. versionadded:: 3.7
 
 
-Macros to extract fields from date objects.  The argument must be an instance of
-:c:type:`PyDateTime_Date`, including subclasses (such as
-:c:type:`PyDateTime_DateTime`).  The argument must not be ``NULL``, and the type is
-not checked:
+Các macro để trích xuất các trường từ các đối tượng ngày tháng. Đối số phải là một thể hiện của
+:c:type:`PyDateTime_Date`, bao gồm cả các lớp con (chẳng hạn như
+:c:type:`PyDateTime_DateTime`). Đối số không được là ``NULL``, và kiểu không được kiểm tra:
 
 .. c:function:: int PyDateTime_GET_YEAR(PyDateTime_Date *o)
 
-   Return the year, as a positive int.
+   Trả về năm dưới dạng số nguyên dương.
 
 
 .. c:function:: int PyDateTime_GET_MONTH(PyDateTime_Date *o)
 
-   Return the month, as an int from 1 through 12.
+   Trả về tháng dưới dạng số nguyên từ 1 đến 12.
 
 
 .. c:function:: int PyDateTime_GET_DAY(PyDateTime_Date *o)
 
-   Return the day, as an int from 1 through 31.
+   Trả về ngày dưới dạng số nguyên từ 1 đến 31.
 
 
-Macros to extract fields from datetime objects.  The argument must be an
-instance of :c:type:`PyDateTime_DateTime`, including subclasses. The argument
-must not be ``NULL``, and the type is not checked:
+Các macro để trích xuất các trường từ các đối tượng datetime. Đối số phải là một thể hiện của :c:type:`PyDateTime_DateTime`, bao gồm cả các lớp con. Đối số không được là ``NULL``, và kiểu không được kiểm tra:
 
 .. c:function:: int PyDateTime_DATE_GET_HOUR(PyDateTime_DateTime *o)
 
-   Return the hour, as an int from 0 through 23.
+   Trả về giờ dưới dạng số nguyên từ 0 đến 23.
 
 
 .. c:function:: int PyDateTime_DATE_GET_MINUTE(PyDateTime_DateTime *o)
 
-   Return the minute, as an int from 0 through 59.
+   Trả về phút dưới dạng số nguyên từ 0 đến 59.
 
 
 .. c:function:: int PyDateTime_DATE_GET_SECOND(PyDateTime_DateTime *o)
 
-   Return the second, as an int from 0 through 59.
+   Trả về giây, dưới dạng số nguyên từ 0 đến 59.
 
 
 .. c:function:: int PyDateTime_DATE_GET_MICROSECOND(PyDateTime_DateTime *o)
 
-   Return the microsecond, as an int from 0 through 999999.
+   Trả về microsecond, dưới dạng số nguyên từ 0 đến 999999.
 
 
 .. c:function:: int PyDateTime_DATE_GET_FOLD(PyDateTime_DateTime *o)
 
-   Return the fold, as an int from 0 through 1.
+   Trả về fold, dưới dạng số nguyên từ 0 đến 1.
 
    .. versionadded:: 3.6
 
 
 .. c:function:: PyObject* PyDateTime_DATE_GET_TZINFO(PyDateTime_DateTime *o)
 
-   Return the tzinfo (which may be ``None``).
+   Trả về tzinfo (có thể là ``None``).
 
    .. versionadded:: 3.10
 
 
-Macros to extract fields from time objects.  The argument must be an instance of
-:c:type:`PyDateTime_Time`, including subclasses. The argument must not be ``NULL``,
-and the type is not checked:
+Các macro để trích xuất các trường từ các đối tượng thời gian. Đối số phải là một thể hiện của
+:c:type:`PyDateTime_Time`, bao gồm cả các lớp con. Đối số không được là ``NULL``, và kiểu không được kiểm tra:
 
 .. c:function:: int PyDateTime_TIME_GET_HOUR(PyDateTime_Time *o)
 
-   Return the hour, as an int from 0 through 23.
+   Trả về giờ dưới dạng số nguyên từ 0 đến 23.
 
 
 .. c:function:: int PyDateTime_TIME_GET_MINUTE(PyDateTime_Time *o)
 
-   Return the minute, as an int from 0 through 59.
+   Trả về phút dưới dạng số nguyên từ 0 đến 59.
 
 
 .. c:function:: int PyDateTime_TIME_GET_SECOND(PyDateTime_Time *o)
 
-   Return the second, as an int from 0 through 59.
+   Trả về giây, dưới dạng số nguyên từ 0 đến 59.
 
 
 .. c:function:: int PyDateTime_TIME_GET_MICROSECOND(PyDateTime_Time *o)
 
-   Return the microsecond, as an int from 0 through 999999.
+   Trả về microsecond, dưới dạng số nguyên từ 0 đến 999999.
 
 
 .. c:function:: int PyDateTime_TIME_GET_FOLD(PyDateTime_Time *o)
 
-   Return the fold, as an int from 0 through 1.
+   Trả về fold, dưới dạng số nguyên từ 0 đến 1.
 
    .. versionadded:: 3.6
 
 
 .. c:function:: PyObject* PyDateTime_TIME_GET_TZINFO(PyDateTime_Time *o)
 
-   Return the tzinfo (which may be ``None``).
+   Trả về tzinfo (có thể là ``None``).
 
    .. versionadded:: 3.10
 
 
-Macros to extract fields from time delta objects.  The argument must be an
-instance of :c:type:`PyDateTime_Delta`, including subclasses. The argument must
-not be ``NULL``, and the type is not checked:
+Các macro để trích xuất các trường từ đối tượng time delta. Đối số phải là một thể hiện của :c:type:`PyDateTime_Delta`, bao gồm cả các lớp con. Đối số không được là ``NULL``, và kiểu của đối số không được kiểm tra:
 
 .. c:function:: int PyDateTime_DELTA_GET_DAYS(PyDateTime_Delta *o)
 
-   Return the number of days, as an int from -999999999 to 999999999.
+   Trả về số ngày dưới dạng int, trong khoảng từ -999999999 đến 999999999.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: int PyDateTime_DELTA_GET_SECONDS(PyDateTime_Delta *o)
 
-   Return the number of seconds, as an int from 0 through 86399.
+   Trả về số giây dưới dạng int trong khoảng từ 0 đến 86399.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: int PyDateTime_DELTA_GET_MICROSECONDS(PyDateTime_Delta *o)
 
-   Return the number of microseconds, as an int from 0 through 999999.
+   Trả về số microgiây dưới dạng int trong khoảng từ 0 đến 999999.
 
    .. versionadded:: 3.3
 
 
-Macros for the convenience of modules implementing the DB API:
+Các macro nhằm tạo thuận tiện cho những module triển khai DB API:
 
 .. c:function:: PyObject* PyDateTime_FromTimestamp(PyObject *args)
 
-   Create and return a new :class:`datetime.datetime` object given an argument
-   tuple suitable for passing to :meth:`datetime.datetime.fromtimestamp`.
+   Tạo và trả về một đối tượng :class:`datetime.datetime` mới với một tuple đối số phù hợp để truyền vào :meth:`datetime.datetime.fromtimestamp`.
 
 
 .. c:function:: PyObject* PyDate_FromTimestamp(PyObject *args)
 
-   Create and return a new :class:`datetime.date` object given an argument
-   tuple suitable for passing to :meth:`datetime.date.fromtimestamp`.
+   Tạo và trả về một đối tượng :class:`datetime.date` mới với một tuple đối số phù hợp để truyền vào :meth:`datetime.date.fromtimestamp`.
 
 
-Internal data
--------------
+Dữ liệu nội bộ
+--------------
 
-The following symbols are exposed by the C API but should be considered
-internal-only.
+Các ký hiệu sau được C API cung cấp nhưng chỉ nên được xem là dành riêng cho nội bộ.
 
 .. c:macro:: PyDateTime_CAPSULE_NAME
 
-   Name of the datetime capsule to pass to :c:func:`PyCapsule_Import`.
+   Tên của datetime capsule cần truyền cho :c:func:`PyCapsule_Import`.
 
-   Internal usage only. Use :c:macro:`PyDateTime_IMPORT` instead.
+   Chỉ dùng nội bộ. Thay vào đó, hãy sử dụng :c:macro:`PyDateTime_IMPORT`.

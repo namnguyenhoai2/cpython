@@ -2,91 +2,60 @@
 
 .. _fileobjects:
 
-File objects
-------------
+Đối tượng tệp
+-------------
 
 .. index:: pair: object; file
 
-These APIs are a minimal emulation of the Python 2 C API for built-in file
-objects, which used to rely on the buffered I/O (:c:expr:`FILE*`) support
-from the C standard library.  In Python 3, files and streams use the new
-:mod:`io` module, which defines several layers over the low-level unbuffered
-I/O of the operating system.  The functions described below are
-convenience C wrappers over these new APIs, and meant mostly for internal
-error reporting in the interpreter; third-party code is advised to access
-the :mod:`io` APIs instead.
+Các API này là bản mô phỏng tối thiểu của C API Python 2 dành cho các đối tượng tệp tích hợp, vốn từng dựa vào tính năng I/O có bộ đệm (:c:expr:`FILE*`) của thư viện chuẩn C. Trong Python 3, tệp và stream sử dụng
+module :mod:`io`, module này định nghĩa một số tầng trên I/O không có bộ đệm cấp thấp của hệ điều hành. Các hàm được mô tả dưới đây là các wrapper C tiện ích cho những API mới này, chủ yếu предназначены cho việc báo cáo lỗi nội bộ trong trình thông dịch; mã của bên thứ ba nên truy cập các API :mod:`io` thay thế.
 
 
 .. c:function:: PyObject* PyFile_FromFd(int fd, const char *name, const char *mode, int buffering, const char *encoding, const char *errors, const char *newline, int closefd)
 
-   Create a Python file object from the file descriptor of an already
-   opened file *fd*.  The arguments *name*, *encoding*, *errors* and *newline*
-   can be ``NULL`` to use the defaults; *buffering* can be *-1* to use the
-   default. *name* is ignored and kept for backward compatibility. Return
-   ``NULL`` on failure. For a more comprehensive description of the arguments,
-   please refer to the :func:`io.open` function documentation.
+   Tạo một đối tượng tệp Python từ file descriptor của một tệp đã được mở *fd*. Các đối số *name*, *encoding*, *errors* và *newline* có thể là ``NULL`` để sử dụng các giá trị mặc định; *buffering* có thể là *-1* để sử dụng giá trị mặc định. *name* bị bỏ qua và được giữ lại để tương thích ngược. Trả về ``NULL`` nếu thất bại. Để xem mô tả đầy đủ hơn về các đối số, hãy tham khảo tài liệu về hàm :func:`io.open`.
 
    .. warning::
 
-     Since Python streams have their own buffering layer, mixing them with
-     OS-level file descriptors can produce various issues (such as unexpected
-     ordering of data).
+     Vì các stream Python có lớp buffering riêng, việc trộn chúng với file descriptor cấp hệ điều hành có thể gây ra nhiều vấn đề (chẳng hạn như thứ tự dữ liệu không như mong đợi).
 
    .. versionchanged:: 3.2
-      Ignore *name* attribute.
+      Bỏ qua thuộc tính *name*.
 
 
 .. c:function:: int PyObject_AsFileDescriptor(PyObject *p)
 
-   Return the file descriptor associated with *p* as an :c:expr:`int`.  If the
-   object is an integer, its value is returned.  If not, the
-   object's :meth:`~io.IOBase.fileno` method is called if it exists; the
-   method must return an integer, which is returned as the file descriptor
-   value.  Sets an exception and returns ``-1`` on failure.
+   Trả về file descriptor liên kết với *p* dưới dạng một :c:expr:`int`. Nếu đối tượng là một số nguyên, giá trị của nó được trả về. Nếu không, phương thức :meth:`~io.IOBase.fileno` của đối tượng sẽ được gọi nếu tồn tại; phương thức này phải trả về một số nguyên, và số nguyên đó sẽ được trả về làm giá trị file descriptor. Thiết lập một ngoại lệ và trả về ``-1`` nếu thất bại.
 
 
 .. c:function:: PyObject* PyFile_GetLine(PyObject *p, int n)
 
    .. index:: single: EOFError (built-in exception)
 
-   Equivalent to ``p.readline([n])``, this function reads one line from the
-   object *p*.  *p* may be a file object or any object with a
-   :meth:`~io.IOBase.readline`
-   method.  If *n* is ``0``, exactly one line is read, regardless of the length of
-   the line.  If *n* is greater than ``0``, no more than *n* bytes will be read
-   from the file; a partial line can be returned.  In both cases, an empty string
-   is returned if the end of the file is reached immediately.  If *n* is less than
-   ``0``, however, one line is read regardless of length, but :exc:`EOFError` is
-   raised if the end of the file is reached immediately.
+   Tương đương với ``p.readline([n])``, hàm này đọc một dòng từ đối tượng *p*. *p* có thể là một đối tượng tệp hoặc bất kỳ đối tượng nào có
+   phương thức :meth:`~io.IOBase.readline`. Nếu *n* là ``0``, chính xác một dòng sẽ được đọc, bất kể độ dài của dòng. Nếu *n* lớn hơn ``0``, không quá *n* byte sẽ được đọc từ tệp; một dòng chưa đầy đủ có thể được trả về. Trong cả hai trường hợp, một chuỗi rỗng sẽ được trả về nếu gặp cuối tệp ngay lập tức. Tuy nhiên, nếu *n* nhỏ hơn ``0``, một dòng sẽ được đọc bất kể độ dài, nhưng :exc:`EOFError` sẽ được phát sinh nếu gặp cuối tệp ngay lập tức.
 
 
 .. c:function:: int PyFile_SetOpenCodeHook(Py_OpenCodeHookFunction handler)
 
-   Overrides the normal behavior of :func:`io.open_code` to pass its parameter
-   through the provided handler.
+   Ghi đè hành vi thông thường của :func:`io.open_code` để truyền tham số của nó qua handler được cung cấp.
 
-   The *handler* is a function of type:
+   *handler* là một hàm có kiểu:
 
    .. c:namespace:: NULL
    .. c:type:: PyObject * (*Py_OpenCodeHookFunction)(PyObject *, void *)
 
-      Equivalent of :c:expr:`PyObject *(\*)(PyObject *path,
-      void *userData)`, where *path* is guaranteed to be
+      Tương đương với :c:expr:`PyObject *(\*)(PyObject *path, void *userData)`, trong đó *path* được đảm bảo là
       :c:type:`PyUnicodeObject`.
 
-   The *userData* pointer is passed into the hook function. Since hook
-   functions may be called from different runtimes, this pointer should not
-   refer directly to Python state.
+   Con trỏ *userData* được truyền vào hàm hook. Vì các hàm hook có thể được gọi từ các runtime khác nhau, con trỏ này không nên tham chiếu trực tiếp đến trạng thái Python.
 
-   As this hook is intentionally used during import, avoid importing new modules
-   during its execution unless they are known to be frozen or available in
-   ``sys.modules``.
+   Vì hook này được sử dụng có chủ đích trong quá trình import, hãy tránh import các module mới trong khi thực thi hook, trừ khi chúng được biết là frozen hoặc có sẵn trong ``sys.modules``.
 
-   Once a hook has been set, it cannot be removed or replaced, and later calls to
-   :c:func:`PyFile_SetOpenCodeHook` will fail. On failure, the function returns
-   -1 and sets an exception if the interpreter has been initialized.
+   Sau khi một hook được thiết lập, không thể gỡ bỏ hoặc thay thế nó, và các lệnh gọi sau này tới
+   :c:func:`PyFile_SetOpenCodeHook` sẽ thất bại. Khi thất bại, hàm trả về -1 và thiết lập một ngoại lệ nếu trình thông dịch đã được khởi tạo.
 
-   This function is safe to call before :c:func:`Py_Initialize`.
+   Hàm này có thể được gọi an toàn trước :c:func:`Py_Initialize`.
 
    .. audit-event:: setopencodehook "" c.PyFile_SetOpenCodeHook
 
@@ -95,24 +64,19 @@ the :mod:`io` APIs instead.
 
 .. c:function:: PyObject *PyFile_OpenCodeObject(PyObject *path)
 
-   Open *path* with the mode ``'rb'``. *path* must be a Python :class:`str`
-   object. The behavior of this function may be overridden by
-   :c:func:`PyFile_SetOpenCodeHook` to allow for some preprocessing of the
-   text.
+   Mở *path* bằng chế độ ``'rb'``. *path* phải là một đối tượng :class:`str` của Python. Hành vi của hàm này có thể bị ghi đè bởi
+   :c:func:`PyFile_SetOpenCodeHook` để cho phép tiền xử lý văn bản.
 
-   This is analogous to :func:`io.open_code` in Python.
+   Hàm này tương tự như :func:`io.open_code` trong Python.
 
-   On success, this function returns a :term:`strong reference` to a Python
-   file object. On failure, this function returns ``NULL`` with an exception
-   set.
+   Khi thành công, hàm này trả về một :term:`strong reference` trỏ tới một đối tượng tệp Python. Khi thất bại, hàm này trả về ``NULL`` và thiết lập một ngoại lệ.
 
    .. versionadded:: 3.8
 
 
 .. c:function:: PyObject *PyFile_OpenCode(const char *path)
 
-   Similar to :c:func:`PyFile_OpenCodeObject`, but *path* is a
-   UTF-8 encoded :c:expr:`const char*`.
+   Tương tự :c:func:`PyFile_OpenCodeObject`, nhưng *path* là một :c:expr:`const char*` được mã hóa UTF-8.
 
    .. versionadded:: 3.8
 
@@ -121,36 +85,29 @@ the :mod:`io` APIs instead.
 
    .. index:: single: Py_PRINT_RAW (C macro)
 
-   Write object *obj* to file object *p*.  The only supported flag for *flags* is
-   :c:macro:`Py_PRINT_RAW`; if given, the :func:`str` of the object is written
-   instead of the :func:`repr`.
+   Ghi đối tượng *obj* vào đối tượng tệp *p*.  Cờ duy nhất được hỗ trợ cho *flags* là
+   :c:macro:`Py_PRINT_RAW`; nếu được cung cấp, :func:`str` của đối tượng sẽ được ghi thay cho :func:`repr`.
 
-   If *obj* is ``NULL``, write the string ``"<NULL>"``.
+   Nếu *obj* là ``NULL``, hãy ghi chuỗi ``"<NULL>"``.
 
-   Return ``0`` on success or ``-1`` on failure; the
-   appropriate exception will be set.
+   Trả về ``0`` khi thành công hoặc ``-1`` khi thất bại; ngoại lệ thích hợp sẽ được thiết lập.
 
 .. c:function:: int PyFile_WriteString(const char *s, PyObject *p)
 
-   Write string *s* to file object *p*.  Return ``0`` on success or ``-1`` on
-   failure; the appropriate exception will be set.
+   Ghi chuỗi *s* vào đối tượng tệp *p*.  Trả về ``0`` khi thành công hoặc ``-1`` khi thất bại; ngoại lệ thích hợp sẽ được thiết lập.
 
 
-Soft-deprecated API
-^^^^^^^^^^^^^^^^^^^
+API không còn được khuyến khích sử dụng
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. soft-deprecated:: 3.15
 
-These are APIs that were included in Python's C API
-by mistake. They are documented solely for completeness; use other
-``PyFile*`` APIs instead.
+Đây là các API đã vô tình được đưa vào C API của Python. Chúng chỉ được ghi chép để đầy đủ; thay vào đó, hãy sử dụng các API ``PyFile*`` khác.
 
 .. c:function:: PyObject *PyFile_NewStdPrinter(int fd)
 
-   Use :c:func:`PyFile_FromFd` with defaults (``fd, NULL, "w", -1, NULL, NULL, NULL, 0``) instead.
+   Thay vào đó, hãy sử dụng :c:func:`PyFile_FromFd` với các giá trị mặc định (``fd, NULL, "w", -1, NULL, NULL, NULL, 0``).
 
 .. c:var:: PyTypeObject PyStdPrinter_Type
 
-   Type of file-like objects used internally at Python startup when :py:mod:`io` is
-   not yet available.
-   Use Python :py:func:`open` or :c:func:`PyFile_FromFd` to create file objects instead.
+   Kiểu của các đối tượng giống tệp được sử dụng nội bộ khi Python khởi động, lúc :py:mod:`io` chưa khả dụng. Thay vào đó, hãy sử dụng Python :py:func:`open` hoặc :c:func:`PyFile_FromFd` để tạo các đối tượng tệp.

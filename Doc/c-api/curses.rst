@@ -3,81 +3,68 @@
 Curses C API
 ------------
 
-:mod:`curses` exposes a small C interface for extension modules.
-Consumers must include the header file :file:`py_curses.h` (which is not
-included by default by :file:`Python.h`) and :c:func:`import_curses` must
-be invoked, usually as part of the module initialisation function, to populate
+:mod:`curses` cung cấp một giao diện C nhỏ cho các extension module. Consumer phải include tệp header :file:`py_curses.h` (theo mặc định, :file:`Python.h` không include tệp này) và phải gọi :c:func:`import_curses`, thường là một phần của hàm khởi tạo module, để điền
 :c:var:`PyCurses_API`.
 
 .. warning::
 
-   Neither the C API nor the pure Python :mod:`curses` module are compatible
-   with subinterpreters.
+   Cả C API lẫn module Python thuần :mod:`curses` đều không tương thích với subinterpreter.
 
 .. c:macro:: import_curses()
 
-   Import the curses C API. The macro does not need a semi-colon to be called.
+   Import Curses C API. Macro này không cần dấu chấm phẩy khi được gọi.
 
-   On success, populate the :c:var:`PyCurses_API` pointer.
+   Nếu thành công, điền con trỏ :c:var:`PyCurses_API`.
 
-   On failure, set :c:var:`PyCurses_API` to NULL and set an exception.
-   The caller must check if an error occurred via :c:func:`PyErr_Occurred`:
+   Nếu thất bại, đặt :c:var:`PyCurses_API` thành NULL và thiết lập một exception. Caller phải kiểm tra xem có xảy ra lỗi hay không thông qua :c:func:`PyErr_Occurred`:
 
    .. code-block::
 
-      import_curses();  // semi-colon is optional but recommended
+      import_curses();  // dấu chấm phẩy là tùy chọn nhưng được khuyến nghị
       if (PyErr_Occurred()) { /* cleanup */ }
 
 
 .. c:var:: void **PyCurses_API
 
-   Dynamically allocated object containing the curses C API.
-   This variable is only available once :c:macro:`import_curses` succeeds.
+   Đối tượng được cấp phát động chứa C API của curses. Biến này chỉ khả dụng sau khi :c:macro:`import_curses` thành công.
 
-   ``PyCurses_API[0]`` corresponds to :c:data:`PyCursesWindow_Type`.
+   ``PyCurses_API[0]`` tương ứng với :c:data:`PyCursesWindow_Type`.
 
-   ``PyCurses_API[1]``, ``PyCurses_API[2]``, and ``PyCurses_API[3]``
-   are pointers to predicate functions of type ``int (*)(void)``.
+   ``PyCurses_API[1]``, ``PyCurses_API[2]`` và ``PyCurses_API[3]`` là các con trỏ tới những hàm predicate thuộc kiểu ``int (*)(void)``.
 
-   When called, these predicates return whether :func:`curses.setupterm`,
-   :func:`curses.initscr`, and :func:`curses.start_color` have been called
-   respectively.
+   Khi được gọi, các predicate này trả về liệu :func:`curses.setupterm`,
+   :func:`curses.initscr` và :func:`curses.start_color` lần lượt đã được gọi hay chưa.
 
-   See also the convenience macros :c:macro:`PyCursesSetupTermCalled`,
-   :c:macro:`PyCursesInitialised`, and :c:macro:`PyCursesInitialisedColor`.
+   Xem thêm các macro tiện ích :c:macro:`PyCursesSetupTermCalled`,
+   :c:macro:`PyCursesInitialised` và :c:macro:`PyCursesInitialisedColor`.
 
    .. note::
 
-      The number of entries in this structure is subject to changes.
-      Consider using :c:macro:`PyCurses_API_pointers` to check if
-      new fields are available or not.
+      Số lượng mục trong cấu trúc này có thể thay đổi. Hãy cân nhắc sử dụng :c:macro:`PyCurses_API_pointers` để kiểm tra xem có các trường mới hay không.
 
 
 .. c:macro:: PyCurses_API_pointers
 
-   The number of accessible fields (``4``) in :c:var:`PyCurses_API`.
-   This number is incremented whenever new fields are added.
+   Số lượng trường có thể truy cập (``4``) trong :c:var:`PyCurses_API`. Số này được tăng lên mỗi khi có trường mới được thêm vào.
 
 
 .. c:var:: PyTypeObject PyCursesWindow_Type
 
-   The :ref:`heap type <heap-types>` corresponding to :class:`curses.window`.
+   Kiểu :ref:`heap <heap-types>` tương ứng với :class:`curses.window`.
 
 
 .. c:function:: int PyCursesWindow_Check(PyObject *op)
 
-   Return true if *op* is a :class:`curses.window` instance, false otherwise.
+   Trả về true nếu *op* là một :class:`curses.window` instance, ngược lại trả về false.
 
 
-The following macros are convenience macros expanding into C statements.
-In particular, they can only be used as ``macro;`` or ``macro``, but not
-``macro()`` or ``macro();``.
+Các macro sau đây là những macro tiện ích được mở rộng thành các câu lệnh C. Cụ thể, chúng chỉ có thể được sử dụng dưới dạng ``macro;`` hoặc ``macro``, nhưng không thể dưới dạng ``macro()`` hoặc ``macro();``.
 
 .. c:macro:: PyCursesSetupTermCalled
 
-   Macro checking if :func:`curses.setupterm` has been called.
+   Macro kiểm tra xem :func:`curses.setupterm` đã được gọi hay chưa.
 
-   The macro expansion is roughly equivalent to:
+   Khai triển macro gần tương đương với:
 
    .. code-block::
 
@@ -92,9 +79,9 @@ In particular, they can only be used as ``macro;`` or ``macro``, but not
 
 .. c:macro:: PyCursesInitialised
 
-   Macro checking if :func:`curses.initscr` has been called.
+   Macro kiểm tra xem :func:`curses.initscr` đã được gọi hay chưa.
 
-   The macro expansion is roughly equivalent to:
+   Khai triển macro gần tương đương với:
 
    .. code-block::
 
@@ -109,9 +96,9 @@ In particular, they can only be used as ``macro;`` or ``macro``, but not
 
 .. c:macro:: PyCursesInitialisedColor
 
-   Macro checking if :func:`curses.start_color` has been called.
+   Macro kiểm tra xem :func:`curses.start_color` đã được gọi hay chưa.
 
-   The macro expansion is roughly equivalent to:
+   Khai triển macro gần tương đương với:
 
    .. code-block::
 
@@ -124,15 +111,14 @@ In particular, they can only be used as ``macro;`` or ``macro``, but not
       }
 
 
-Internal data
--------------
+Dữ liệu nội bộ
+--------------
 
-The following objects are exposed by the C API but should be considered
-internal-only.
+Các đối tượng sau được C API cung cấp nhưng nên được xem là chỉ dùng nội bộ.
 
 .. c:macro:: PyCurses_CAPSULE_NAME
 
-   Name of the curses capsule to pass to :c:func:`PyCapsule_Import`.
+   Tên của capsule curses cần truyền vào :c:func:`PyCapsule_Import`.
 
-   Internal usage only. Use :c:macro:`import_curses` instead.
+   Chỉ sử dụng nội bộ. Thay vào đó, hãy dùng :c:macro:`import_curses`.
 

@@ -3,31 +3,23 @@
 
 .. _concrete:
 
-**********************
-Concrete Objects Layer
-**********************
+*********************
+Tầng đối tượng cụ thể
+*********************
 
-The functions in this chapter are specific to certain Python object types.
-Passing them an object of the wrong type is not a good idea; if you receive an
-object from a Python program and you are not sure that it has the right type,
-you must perform a type check first; for example, to check that an object is a
-dictionary, use :c:func:`PyDict_Check`.  The chapter is structured like the
-"family tree" of Python object types.
+Các hàm trong chương này dành riêng cho một số kiểu đối tượng Python nhất định. Việc truyền cho chúng một đối tượng không đúng kiểu là điều không nên làm; nếu nhận được một đối tượng từ chương trình Python và không chắc đối tượng đó có đúng kiểu hay không, trước tiên bạn phải thực hiện kiểm tra kiểu; ví dụ, để kiểm tra xem một đối tượng có phải là dictionary hay không, hãy sử dụng :c:func:`PyDict_Check`. Chương này được tổ chức theo dạng "cây gia đình" của các kiểu đối tượng Python.
 
 .. warning::
 
-   While the functions described in this chapter carefully check the type of the
-   objects which are passed in, many of them do not check for ``NULL`` being passed
-   instead of a valid object.  Allowing ``NULL`` to be passed in can cause memory
-   access violations and immediate termination of the interpreter.
+   Mặc dù các hàm được mô tả trong chương này kiểm tra cẩn thận kiểu của những đối tượng được truyền vào, nhiều hàm trong số đó không kiểm tra xem ``NULL`` có được truyền vào thay cho một đối tượng hợp lệ hay không. Việc cho phép truyền ``NULL`` có thể gây ra lỗi vi phạm truy cập bộ nhớ và khiến trình thông dịch kết thúc ngay lập tức.
 
 
 .. _fundamental:
 
-Fundamental Objects
-===================
+Đối tượng cơ bản
+================
 
-This section describes Python type objects and the singleton object ``None``.
+Phần này mô tả các đối tượng kiểu Python và đối tượng singleton ``None``.
 
 .. toctree::
 
@@ -37,8 +29,8 @@ This section describes Python type objects and the singleton object ``None``.
 
 .. _numericobjects:
 
-Numeric Objects
-===============
+Đối tượng số
+============
 
 .. index:: pair: object; numeric
 
@@ -52,14 +44,12 @@ Numeric Objects
 
 .. _sequenceobjects:
 
-Sequence Objects
-================
+Đối tượng dãy
+=============
 
 .. index:: pair: object; sequence
 
-Generic operations on sequence objects were discussed in the previous chapter;
-this section deals with the specific kinds of sequence objects that are
-intrinsic to the Python language.
+Các thao tác chung trên đối tượng sequence đã được trình bày trong chương trước; phần này đề cập đến những loại đối tượng sequence cụ thể vốn có trong ngôn ngữ Python.
 
 .. XXX sort out unicode, str, bytes and bytearray
 
@@ -74,8 +64,8 @@ intrinsic to the Python language.
 
 .. _mapobjects:
 
-Container Objects
-=================
+Đối tượng container
+===================
 
 .. index:: pair: object; mapping
 
@@ -87,8 +77,8 @@ Container Objects
 
 .. _otherobjects:
 
-Function Objects
-================
+Đối tượng function
+==================
 
 .. toctree::
 
@@ -98,8 +88,8 @@ Function Objects
    code.rst
 
 
-Other Objects
-=============
+Các đối tượng khác
+==================
 
 .. toctree::
 
@@ -119,8 +109,8 @@ Other Objects
    typehints.rst
 
 
-C API for extension modules
-===========================
+C API cho các module mở rộng
+============================
 
 .. toctree::
 

@@ -2,71 +2,53 @@
 
 .. _supporting-cycle-detection:
 
-Supporting Cyclic Garbage Collection
-====================================
+Hỗ trợ thu gom rác tuần hoàn
+============================
 
-Python's support for detecting and collecting garbage which involves circular
-references requires support from object types which are "containers" for other
-objects which may also be containers.  Types which do not store references to
-other objects, or which only store references to atomic types (such as numbers
-or strings), do not need to provide any explicit support for garbage
-collection.
+Việc Python hỗ trợ phát hiện và thu gom rác liên quan đến các tham chiếu vòng yêu cầu các kiểu đối tượng là "container" cho những đối tượng khác, vốn cũng có thể là container. Các kiểu không lưu tham chiếu đến đối tượng khác, hoặc chỉ lưu tham chiếu đến các kiểu nguyên tử (chẳng hạn như số hoặc chuỗi), không cần cung cấp bất kỳ hỗ trợ rõ ràng nào cho việc thu gom rác.
 
-To create a container type, the :c:member:`~PyTypeObject.tp_flags` field of the type object must
-include the :c:macro:`Py_TPFLAGS_HAVE_GC` and provide an implementation of the
-:c:member:`~PyTypeObject.tp_traverse` handler.  If instances of the type are mutable, a
-:c:member:`~PyTypeObject.tp_clear` implementation must also be provided.
+Để tạo một kiểu container, trường :c:member:`~PyTypeObject.tp_flags` của đối tượng kiểu phải bao gồm :c:macro:`Py_TPFLAGS_HAVE_GC` và cung cấp một triển khai cho
+trình xử lý :c:member:`~PyTypeObject.tp_traverse`. Nếu các instance của kiểu này có thể thay đổi, một
+triển khai :c:member:`~PyTypeObject.tp_clear` cũng phải được cung cấp.
 
 
 :c:macro:`Py_TPFLAGS_HAVE_GC`
-   Objects with a type with this flag set must conform with the rules
-   documented here.  For convenience these objects will be referred to as
-   container objects.
+   Các đối tượng có kiểu với cờ này được thiết lập phải tuân theo các quy tắc được ghi lại tại đây. Để thuận tiện, các đối tượng này sẽ được gọi là đối tượng container.
 
-Constructors for container types must conform to two rules:
+Các constructor cho kiểu container phải tuân theo hai quy tắc:
 
-#. The memory for the object must be allocated using :c:macro:`PyObject_GC_New`
-   or :c:macro:`PyObject_GC_NewVar`.
+#. Bộ nhớ cho đối tượng phải được cấp phát bằng :c:macro:`PyObject_GC_New` hoặc :c:macro:`PyObject_GC_NewVar`.
 
-#. Once all the fields which may contain references to other containers are
-   initialized, it must call :c:func:`PyObject_GC_Track`.
+#. Sau khi tất cả các trường có thể chứa tham chiếu đến các container khác đã được khởi tạo, nó phải gọi :c:func:`PyObject_GC_Track`.
 
-Similarly, the deallocator for the object must conform to a similar pair of
-rules:
+Tương tự, deallocator của đối tượng phải tuân theo một cặp quy tắc tương tự:
 
-#. Before fields which refer to other containers are invalidated,
-   :c:func:`PyObject_GC_UnTrack` must be called.
+#. Trước khi các trường tham chiếu đến các container khác bị vô hiệu hóa,
+   phải gọi :c:func:`PyObject_GC_UnTrack`.
 
-#. The object's memory must be deallocated using :c:func:`PyObject_GC_Del`.
+#. Bộ nhớ của đối tượng phải được giải phóng bằng :c:func:`PyObject_GC_Del`.
 
    .. warning::
-      If a type adds the Py_TPFLAGS_HAVE_GC, then it *must* implement at least
-      a :c:member:`~PyTypeObject.tp_traverse` handler or explicitly use one
-      from its subclass or subclasses.
+      Nếu một kiểu thêm Py_TPFLAGS_HAVE_GC, thì nó *phải* triển khai ít nhất một handler :c:member:`~PyTypeObject.tp_traverse` hoặc sử dụng rõ ràng một handler từ lớp con hoặc các lớp con của nó.
 
-      When calling :c:func:`PyType_Ready` or some of the APIs that indirectly
-      call it like :c:func:`PyType_FromSpecWithBases` or
-      :c:func:`PyType_FromSpec` the interpreter will automatically populate the
-      :c:member:`~PyTypeObject.tp_flags`, :c:member:`~PyTypeObject.tp_traverse`
-      and :c:member:`~PyTypeObject.tp_clear` fields if the type inherits from a
-      class that implements the garbage collector protocol and the child class
-      does *not* include the :c:macro:`Py_TPFLAGS_HAVE_GC` flag.
+      Khi gọi :c:func:`PyType_Ready` hoặc một số API gián tiếp gọi nó như :c:func:`PyType_FromSpecWithBases` hoặc
+      :c:func:`PyType_FromSpec`, interpreter sẽ tự động điền các trường
+      :c:member:`~PyTypeObject.tp_flags`, :c:member:`~PyTypeObject.tp_traverse` và :c:member:`~PyTypeObject.tp_clear` nếu kiểu này kế thừa từ một class triển khai giao thức garbage collector và class con *không* bao gồm cờ :c:macro:`Py_TPFLAGS_HAVE_GC`.
 
 .. c:macro:: PyObject_GC_New(TYPE, typeobj)
 
-   Analogous to :c:macro:`PyObject_New` but for container objects with the
-   :c:macro:`Py_TPFLAGS_HAVE_GC` flag set.
+   Tương tự như :c:macro:`PyObject_New` nhưng dành cho các đối tượng container có
+   cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được thiết lập.
 
-   Do not call this directly to allocate memory for an object; call the type's
-   :c:member:`~PyTypeObject.tp_alloc` slot instead.
+   Không gọi trực tiếp hàm này để cấp phát bộ nhớ cho một đối tượng; thay vào đó, hãy gọi
+   slot :c:member:`~PyTypeObject.tp_alloc` của kiểu.
 
-   When populating a type's :c:member:`~PyTypeObject.tp_alloc` slot,
-   :c:func:`PyType_GenericAlloc` is preferred over a custom function that
-   simply calls this macro.
+   Khi điền vào slot :c:member:`~PyTypeObject.tp_alloc` của một type,
+   Nên ưu tiên :c:func:`PyType_GenericAlloc` hơn một hàm tùy chỉnh chỉ đơn giản gọi macro này.
 
-   Memory allocated by this macro must be freed with
-   :c:func:`PyObject_GC_Del` (usually called via the object's
-   :c:member:`~PyTypeObject.tp_free` slot).
+   Bộ nhớ được cấp phát bởi macro này phải được giải phóng bằng
+   :c:func:`PyObject_GC_Del` (thường được gọi thông qua slot
+   :c:member:`~PyTypeObject.tp_free` của đối tượng).
 
    .. seealso::
 
@@ -78,19 +60,18 @@ rules:
 
 .. c:macro:: PyObject_GC_NewVar(TYPE, typeobj, size)
 
-   Analogous to :c:macro:`PyObject_NewVar` but for container objects with the
-   :c:macro:`Py_TPFLAGS_HAVE_GC` flag set.
+   Tương tự như :c:macro:`PyObject_NewVar` nhưng dành cho các đối tượng container có
+   cờ :c:macro:`Py_TPFLAGS_HAVE_GC` được thiết lập.
 
-   Do not call this directly to allocate memory for an object; call the type's
-   :c:member:`~PyTypeObject.tp_alloc` slot instead.
+   Không gọi trực tiếp hàm này để cấp phát bộ nhớ cho một đối tượng; thay vào đó, hãy gọi
+   slot :c:member:`~PyTypeObject.tp_alloc` của kiểu.
 
-   When populating a type's :c:member:`~PyTypeObject.tp_alloc` slot,
-   :c:func:`PyType_GenericAlloc` is preferred over a custom function that
-   simply calls this macro.
+   Khi điền vào slot :c:member:`~PyTypeObject.tp_alloc` của một type,
+   Nên ưu tiên :c:func:`PyType_GenericAlloc` hơn một hàm tùy chỉnh chỉ đơn giản gọi macro này.
 
-   Memory allocated by this macro must be freed with
-   :c:func:`PyObject_GC_Del` (usually called via the object's
-   :c:member:`~PyTypeObject.tp_free` slot).
+   Bộ nhớ được cấp phát bởi macro này phải được giải phóng bằng
+   :c:func:`PyObject_GC_Del` (thường được gọi thông qua slot
+   :c:member:`~PyTypeObject.tp_free` của đối tượng).
 
    .. seealso::
 
@@ -102,92 +83,74 @@ rules:
 
 .. c:function:: PyObject* PyUnstable_Object_GC_NewWithExtraData(PyTypeObject *type, size_t extra_size)
 
-   Analogous to :c:macro:`PyObject_GC_New` but allocates *extra_size*
-   bytes at the end of the object (at offset
-   :c:member:`~PyTypeObject.tp_basicsize`).
-   The allocated memory is initialized to zeros,
-   except for the :c:type:`Python object header <PyObject>`.
+   Tương tự như :c:macro:`PyObject_GC_New` nhưng cấp phát thêm *extra_size* byte ở cuối đối tượng (tại offset
+   :c:member:`~PyTypeObject.tp_basicsize`). Bộ nhớ được cấp phát được khởi tạo bằng các số 0, ngoại trừ :c:type:`header đối tượng Python <PyObject>`.
 
-   The extra data will be deallocated with the object, but otherwise it is
-   not managed by Python.
+   Dữ liệu bổ sung sẽ được giải phóng cùng với đối tượng, nhưng ngoài ra Python không quản lý dữ liệu này.
 
-   Memory allocated by this function must be freed with
-   :c:func:`PyObject_GC_Del` (usually called via the object's
-   :c:member:`~PyTypeObject.tp_free` slot).
+   Bộ nhớ được cấp phát bởi hàm này phải được giải phóng bằng
+   :c:func:`PyObject_GC_Del` (thường được gọi thông qua slot
+   :c:member:`~PyTypeObject.tp_free` của đối tượng).
 
    .. warning::
-      The function is marked as unstable because the final mechanism
-      for reserving extra data after an instance is not yet decided.
-      For allocating a variable number of fields, prefer using
-      :c:type:`PyVarObject` and :c:member:`~PyTypeObject.tp_itemsize`
-      instead.
+      Hàm này được đánh dấu là không ổn định vì cơ chế cuối cùng để dành chỗ cho dữ liệu bổ sung sau một instance vẫn chưa được quyết định. Để cấp phát một số lượng trường thay đổi, nên sử dụng
+      :c:type:`PyVarObject` và :c:member:`~PyTypeObject.tp_itemsize` thay vào đó.
 
    .. versionadded:: 3.12
 
 
 .. c:macro:: PyObject_GC_Resize(TYPE, op, newsize)
 
-   Resize an object allocated by :c:macro:`PyObject_NewVar`.
-   Returns the resized object of type ``TYPE*`` (refers to any C type)
-   or ``NULL`` on failure.
+   Thay đổi kích thước một đối tượng được cấp phát bởi :c:macro:`PyObject_NewVar`. Trả về đối tượng đã được thay đổi kích thước thuộc kiểu ``TYPE*`` (tham chiếu đến bất kỳ kiểu C nào) hoặc ``NULL`` nếu thất bại.
 
-   *op* must be of type :c:expr:`PyVarObject *`
-   and must not be tracked by the collector yet.
-   *newsize* must be of type :c:type:`Py_ssize_t`.
+   *op* phải thuộc kiểu :c:expr:`PyVarObject *` và chưa được collector theo dõi. *newsize* phải thuộc kiểu :c:type:`Py_ssize_t`.
 
 
 .. c:function:: void PyObject_GC_Track(PyObject *op)
 
-   Adds the object *op* to the set of container objects tracked by the
-   collector.  The collector can run at unexpected times so objects must be
-   valid while being tracked.  This should be called once all the fields
-   followed by the :c:member:`~PyTypeObject.tp_traverse` handler become valid, usually near the
-   end of the constructor.
+   Thêm đối tượng *op* vào tập hợp các đối tượng container được collector theo dõi. Collector có thể chạy vào những thời điểm không thể dự đoán, vì vậy các đối tượng phải hợp lệ trong khi được theo dõi. Hàm này nên được gọi sau khi tất cả các trường được handler :c:member:`~PyTypeObject.tp_traverse` truy cập đã trở nên hợp lệ, thường là gần cuối constructor.
 
 
 .. c:function:: int PyObject_IS_GC(PyObject *obj)
 
-   Returns non-zero if the object implements the garbage collector protocol,
-   otherwise returns 0.
+   Trả về giá trị khác 0 nếu đối tượng triển khai giao thức garbage collector, ngược lại trả về 0.
 
-   The object cannot be tracked by the garbage collector if this function returns 0.
+   Đối tượng không thể được garbage collector theo dõi nếu hàm này trả về 0.
 
 
 .. c:function:: int PyObject_GC_IsTracked(PyObject *op)
 
-   Returns 1 if the object type of *op* implements the GC protocol and *op* is being
-   currently tracked by the garbage collector and 0 otherwise.
+   Trả về 1 nếu kiểu đối tượng của *op* triển khai giao thức GC và *op* hiện đang được garbage collector theo dõi, ngược lại trả về 0.
 
-   This is analogous to the Python function :func:`gc.is_tracked`.
+   Điều này tương tự như hàm Python :func:`gc.is_tracked`.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: int PyObject_GC_IsFinalized(PyObject *op)
 
-   Returns 1 if the object type of *op* implements the GC protocol and *op* has been
-   already finalized by the garbage collector and 0 otherwise.
+   Trả về 1 nếu kiểu đối tượng của *op* triển khai giao thức GC và *op* đã được garbage collector hoàn tất, ngược lại trả về 0.
 
-   This is analogous to the Python function :func:`gc.is_finalized`.
+   Điều này tương tự như hàm Python :func:`gc.is_finalized`.
 
    .. versionadded:: 3.9
 
 
 .. c:function:: void PyObject_GC_Del(void *op)
 
-   Releases memory allocated to an object using :c:macro:`PyObject_GC_New` or
+   Giải phóng bộ nhớ được cấp phát cho một đối tượng bằng :c:macro:`PyObject_GC_New` hoặc
    :c:macro:`PyObject_GC_NewVar`.
 
-   Do not call this directly to free an object's memory; call the type's
-   :c:member:`~PyTypeObject.tp_free` slot instead.
+   Không gọi trực tiếp hàm này để giải phóng bộ nhớ của một đối tượng; thay vào đó, hãy gọi
+   :c:member:`~PyTypeObject.tp_free` slot của kiểu.
 
-   Do not use this for memory allocated by :c:macro:`PyObject_New`,
-   :c:macro:`PyObject_NewVar`, or related allocation functions; use
-   :c:func:`PyObject_Free` instead.
+   Không sử dụng hàm này cho bộ nhớ được cấp phát bởi :c:macro:`PyObject_New`,
+   :c:macro:`PyObject_NewVar`, hoặc các hàm cấp phát liên quan; hãy sử dụng
+   :c:func:`PyObject_Free` thay vào đó.
 
    .. seealso::
 
-      * :c:func:`PyObject_Free` is the non-GC equivalent of this function.
+      * :c:func:`PyObject_Free` là phiên bản tương đương không dùng GC của hàm này.
       * :c:macro:`PyObject_GC_New`
       * :c:macro:`PyObject_GC_NewVar`
       * :c:func:`PyType_GenericAlloc`
@@ -196,57 +159,35 @@ rules:
 
 .. c:function:: void PyObject_GC_UnTrack(void *op)
 
-   Remove the object *op* from the set of container objects tracked by the
-   collector.  Note that :c:func:`PyObject_GC_Track` can be called again on
-   this object to add it back to the set of tracked objects.  The deallocator
-   (:c:member:`~PyTypeObject.tp_dealloc` handler) should call this for the object before any of
-   the fields used by the :c:member:`~PyTypeObject.tp_traverse` handler become invalid.
+   Xóa đối tượng *op* khỏi tập hợp các đối tượng chứa được bộ thu gom theo dõi. Lưu ý rằng có thể gọi lại :c:func:`PyObject_GC_Track` trên đối tượng này để thêm đối tượng trở lại tập hợp các đối tượng được theo dõi. Bộ giải phóng (:c:member:`~PyTypeObject.tp_dealloc` handler) nên gọi hàm này cho đối tượng trước khi bất kỳ trường nào được :c:member:`~PyTypeObject.tp_traverse` handler sử dụng trở nên không hợp lệ.
 
 
 .. versionchanged:: 3.8
 
-   The :c:func:`!_PyObject_GC_TRACK` and :c:func:`!_PyObject_GC_UNTRACK` macros
-   have been removed from the public C API.
+   Các macro :c:func:`!_PyObject_GC_TRACK` và :c:func:`!_PyObject_GC_UNTRACK` đã bị xóa khỏi public C API.
 
-The :c:member:`~PyTypeObject.tp_traverse` handler accepts a function parameter of this type:
+:c:member:`~PyTypeObject.tp_traverse` handler nhận một tham số hàm thuộc kiểu này:
 
 
 .. c:type:: int (*visitproc)(PyObject *object, void *arg)
 
-   Type of the visitor function passed to the :c:member:`~PyTypeObject.tp_traverse` handler.
-   The function should be called with an object to traverse as *object* and
-   the third parameter to the :c:member:`~PyTypeObject.tp_traverse` handler as *arg*.  The
-   Python core uses several visitor functions to implement cyclic garbage
-   detection; it's not expected that users will need to write their own
-   visitor functions.
+   Kiểu của hàm visitor được truyền cho :c:member:`~PyTypeObject.tp_traverse` handler. Hàm này phải được gọi với đối tượng cần duyệt làm *object* và tham số thứ ba của :c:member:`~PyTypeObject.tp_traverse` handler làm *arg*. Python core sử dụng một số hàm visitor để triển khai việc phát hiện garbage tuần hoàn; người dùng thường không cần tự viết các hàm visitor này.
 
-The :c:member:`~PyTypeObject.tp_traverse` handler must have the following type:
+Handler :c:member:`~PyTypeObject.tp_traverse` phải có kiểu sau:
 
 
 .. c:type:: int (*traverseproc)(PyObject *self, visitproc visit, void *arg)
 
-   Traversal function for a container object.  Implementations must call the
-   *visit* function for each object directly contained by *self*, with the
-   parameters to *visit* being the contained object and the *arg* value passed
-   to the handler.  The *visit* function must not be called with a ``NULL``
-   object argument.  If *visit* returns a non-zero value that value should be
-   returned immediately.
+   Hàm duyệt dành cho một đối tượng container. Các triển khai phải gọi hàm *visit* cho từng đối tượng được chứa trực tiếp bởi *self*, trong đó các tham số truyền cho *visit* là đối tượng được chứa và giá trị *arg* được truyền cho handler. Không được gọi hàm *visit* với đối số là một đối tượng ``NULL``. Nếu *visit* trả về một giá trị khác không, phải trả về ngay giá trị đó.
 
-   The traversal function must not have any side effects.  Implementations
-   may not modify the reference counts of any Python objects nor create or
-   destroy any Python objects.
+   Hàm duyệt không được có bất kỳ side effect nào. Các triển khai không được sửa đổi reference count của bất kỳ đối tượng Python nào, cũng như không được tạo hoặc hủy bất kỳ đối tượng Python nào.
 
-To simplify writing :c:member:`~PyTypeObject.tp_traverse` handlers, a :c:func:`Py_VISIT` macro is
-provided.  In order to use this macro, the :c:member:`~PyTypeObject.tp_traverse` implementation
-must name its arguments exactly *visit* and *arg*:
+Để đơn giản hóa việc viết các handler :c:member:`~PyTypeObject.tp_traverse`, một macro :c:func:`Py_VISIT` được cung cấp. Để sử dụng macro này, triển khai :c:member:`~PyTypeObject.tp_traverse` phải đặt tên chính xác cho các đối số của nó là *visit* và *arg*:
 
 
 .. c:macro:: Py_VISIT(o)
 
-   If the :c:expr:`PyObject *` *o* is not ``NULL``, call the *visit* callback, with arguments *o*
-   and *arg*.  If *visit* returns a non-zero value, then return it.
-   Using this macro, :c:member:`~PyTypeObject.tp_traverse` handlers
-   look like::
+   Nếu :c:expr:`PyObject *` *o* không phải là ``NULL``, hãy gọi callback *visit*, với các đối số *o* và *arg*. Nếu *visit* trả về một giá trị khác không, hãy trả về giá trị đó. Khi sử dụng macro này, các handler :c:member:`~PyTypeObject.tp_traverse` có dạng như sau::
 
       static int
       my_traverse(Noddy *self, visitproc visit, void *arg)
@@ -256,90 +197,66 @@ must name its arguments exactly *visit* and *arg*:
           return 0;
       }
 
-The :c:member:`~PyTypeObject.tp_clear` handler must be of the :c:type:`inquiry` type, or ``NULL``
-if the object is immutable.
+Handler :c:member:`~PyTypeObject.tp_clear` phải thuộc kiểu :c:type:`inquiry`, hoặc ``NULL`` nếu đối tượng là immutable.
 
 
 .. c:type:: int (*inquiry)(PyObject *self)
 
-   Drop references that may have created reference cycles.  Immutable objects
-   do not have to define this method since they can never directly create
-   reference cycles.  Note that the object must still be valid after calling
-   this method (don't just call :c:func:`Py_DECREF` on a reference).  The
-   collector will call this method if it detects that this object is involved
-   in a reference cycle.
+   Loại bỏ các tham chiếu có thể đã tạo ra reference cycle. Các đối tượng immutable không cần định nghĩa phương thức này vì chúng không thể trực tiếp tạo reference cycle. Lưu ý rằng đối tượng vẫn phải hợp lệ sau khi gọi phương thức này (không chỉ gọi :c:func:`Py_DECREF` trên một tham chiếu). Collector sẽ gọi phương thức này nếu phát hiện đối tượng đang tham gia vào một reference cycle.
 
 
-Controlling the Garbage Collector State
+Điều khiển trạng thái Garbage Collector
 ---------------------------------------
 
-The C-API provides the following functions for controlling
-garbage collection runs.
+C-API cung cấp các hàm sau để điều khiển các lần chạy garbage collection.
 
 .. c:function:: Py_ssize_t PyGC_Collect(void)
 
-   Perform a full garbage collection, if the garbage collector is enabled.
-   (Note that :func:`gc.collect` runs it unconditionally.)
+   Thực hiện garbage collection toàn phần nếu garbage collector được bật. (Lưu ý rằng :func:`gc.collect` luôn thực hiện việc này.)
 
-   Returns the number of collected + unreachable objects which cannot
-   be collected.
-   If the garbage collector is disabled or already collecting,
-   returns ``0`` immediately.
-   Errors during garbage collection are passed to :data:`sys.unraisablehook`.
-   This function does not raise exceptions.
+   Trả về số đối tượng đã được thu gom cộng với số đối tượng không thể truy cập mà không thể thu gom. Nếu garbage collector bị tắt hoặc đang thu gom, trả về ``0`` ngay lập tức. Các lỗi trong quá trình garbage collection được truyền đến :data:`sys.unraisablehook`. Hàm này không phát sinh ngoại lệ.
 
 
 .. c:function:: int PyGC_Enable(void)
 
-   Enable the garbage collector: similar to :func:`gc.enable`.
-   Returns the previous state, 0 for disabled and 1 for enabled.
+   Bật garbage collector: tương tự như :func:`gc.enable`. Trả về trạng thái trước đó, 0 nếu bị tắt và 1 nếu được bật.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: int PyGC_Disable(void)
 
-   Disable the garbage collector: similar to :func:`gc.disable`.
-   Returns the previous state, 0 for disabled and 1 for enabled.
+   Tắt garbage collector: tương tự như :func:`gc.disable`. Trả về trạng thái trước đó, 0 nếu bị tắt và 1 nếu được bật.
 
    .. versionadded:: 3.10
 
 
 .. c:function:: int PyGC_IsEnabled(void)
 
-   Query the state of the garbage collector: similar to :func:`gc.isenabled`.
-   Returns the current state, 0 for disabled and 1 for enabled.
+   Truy vấn trạng thái của garbage collector: tương tự như :func:`gc.isenabled`. Trả về trạng thái hiện tại, 0 nếu bị tắt và 1 nếu được bật.
 
    .. versionadded:: 3.10
 
 
-Querying Garbage Collector State
---------------------------------
+Truy vấn trạng thái Bộ thu gom rác
+----------------------------------
 
-The C-API provides the following interface for querying information about
-the garbage collector.
+C-API cung cấp giao diện sau để truy vấn thông tin về bộ thu gom rác.
 
 .. c:function:: void PyUnstable_GC_VisitObjects(gcvisitobjects_t callback, void *arg)
 
-   Run supplied *callback* on all live GC-capable objects. *arg* is passed through to
-   all invocations of *callback*.
+   Chạy *callback* được cung cấp trên tất cả các đối tượng còn tồn tại có khả năng được GC. *arg* được truyền qua cho tất cả các lần gọi *callback*.
 
    .. warning::
-      If new objects are (de)allocated by the callback it is undefined if they
-      will be visited.
+      Nếu các đối tượng mới được cấp phát hoặc giải phóng bởi callback, việc chúng có được truy cập hay không là không xác định.
 
-      Garbage collection is disabled during operation. Explicitly running a collection
-      in the callback may lead to undefined behaviour e.g. visiting the same objects
-      multiple times or not at all.
+      Bộ thu gom rác bị vô hiệu hóa trong quá trình hoạt động. Việc chạy tường minh một lần thu gom trong callback có thể dẫn đến hành vi không xác định, chẳng hạn như truy cập cùng một đối tượng nhiều lần hoặc hoàn toàn không truy cập đối tượng đó.
 
    .. versionadded:: 3.12
 
 .. c:type:: int (*gcvisitobjects_t)(PyObject *object, void *arg)
 
-   Type of the visitor function to be passed to :c:func:`PyUnstable_GC_VisitObjects`.
-   *arg* is the same as the *arg* passed to ``PyUnstable_GC_VisitObjects``.
-   Return ``1`` to continue iteration, return ``0`` to stop iteration. Other return
-   values are reserved for now so behavior on returning anything else is undefined.
+   Kiểu của hàm visitor được truyền vào :c:func:`PyUnstable_GC_VisitObjects`. *arg* giống với *arg* được truyền vào ``PyUnstable_GC_VisitObjects``. Trả về ``1`` để tiếp tục lặp, trả về ``0`` để dừng lặp. Hiện tại, các giá trị trả về khác được dành riêng, vì vậy hành vi khi trả về bất kỳ giá trị nào khác là không xác định.
 
    .. versionadded:: 3.12
 

@@ -2,30 +2,25 @@
 
 .. _boolobjects:
 
-Boolean Objects
----------------
+Đối tượng Boolean
+-----------------
 
-Booleans in Python are implemented as a subclass of integers.  There are only
-two booleans, :c:data:`Py_False` and :c:data:`Py_True`.  As such, the normal
-creation and deletion functions don't apply to booleans.  The following macros
-are available, however.
+Boolean trong Python được triển khai dưới dạng lớp con của số nguyên. Chỉ có hai giá trị boolean là :c:data:`Py_False` và :c:data:`Py_True`. Vì vậy, các hàm tạo và xóa thông thường không áp dụng cho boolean. Tuy nhiên, có các macro sau đây.
 
 
 .. c:var:: PyTypeObject PyBool_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python boolean type; it
-   is the same object as :class:`bool` in the Python layer.
+   Instance này của :c:type:`PyTypeObject` đại diện cho kiểu boolean của Python; nó là cùng một đối tượng với :class:`bool` ở tầng Python.
 
 
 .. c:function:: int PyBool_Check(PyObject *o)
 
-   Return true if *o* is of type :c:data:`PyBool_Type`.  This function always
-   succeeds.
+   Trả về true nếu *o* có kiểu :c:data:`PyBool_Type`. Hàm này luôn thành công.
 
 
 .. c:var:: PyObject* Py_False
 
-   The Python ``False`` object.  This object has no methods and is
+   Đối tượng ``False`` của Python. Đối tượng này không có phương thức và là
    :term:`immortal`.
 
    .. versionchanged:: 3.12
@@ -34,7 +29,7 @@ are available, however.
 
 .. c:var:: PyObject* Py_True
 
-   The Python ``True`` object.  This object has no methods and is
+   Đối tượng ``True`` của Python. Đối tượng này không có phương thức và là
    :term:`immortal`.
 
    .. versionchanged:: 3.12
@@ -43,14 +38,14 @@ are available, however.
 
 .. c:macro:: Py_RETURN_FALSE
 
-   Return :c:data:`Py_False` from a function.
+   Trả về :c:data:`Py_False` từ một hàm.
 
 
 .. c:macro:: Py_RETURN_TRUE
 
-   Return :c:data:`Py_True` from a function.
+   Trả về :c:data:`Py_True` từ một hàm.
 
 
 .. c:function:: PyObject* PyBool_FromLong(long v)
 
-   Return :c:data:`Py_True` or :c:data:`Py_False`, depending on the truth value of *v*.
+   Trả về :c:data:`Py_True` hoặc :c:data:`Py_False`, tùy thuộc vào giá trị đúng/sai của *v*.

@@ -2,264 +2,222 @@
 
 .. _floatobjects:
 
-Floating-Point Objects
-======================
+Đối tượng số dấu phẩy động
+==========================
 
 .. index:: pair: object; floating-point
 
 
 .. c:type:: PyFloatObject
 
-   This subtype of :c:type:`PyObject` represents a Python floating-point object.
+   Kiểu con này của :c:type:`PyObject` đại diện cho một đối tượng số dấu phẩy động trong Python.
 
 
 .. c:var:: PyTypeObject PyFloat_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python floating-point
-   type.  This is the same object as :class:`float` in the Python layer.
+   Thể hiện này của :c:type:`PyTypeObject` đại diện cho kiểu số dấu phẩy động trong Python. Đây là cùng một đối tượng với :class:`float` ở lớp Python.
 
 
 .. c:function:: int PyFloat_Check(PyObject *p)
 
-   Return true if its argument is a :c:type:`PyFloatObject` or a subtype of
-   :c:type:`PyFloatObject`.  This function always succeeds.
+   Trả về true nếu đối số của nó là một :c:type:`PyFloatObject` hoặc một kiểu con của
+   :c:type:`PyFloatObject`. Hàm này luôn thành công.
 
 
 .. c:function:: int PyFloat_CheckExact(PyObject *p)
 
-   Return true if its argument is a :c:type:`PyFloatObject`, but not a subtype of
-   :c:type:`PyFloatObject`.  This function always succeeds.
+   Trả về true nếu đối số của nó là một :c:type:`PyFloatObject`, nhưng không phải là một kiểu con của
+   :c:type:`PyFloatObject`. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PyFloat_FromString(PyObject *str)
 
-   Create a :c:type:`PyFloatObject` object based on the string value in *str*, or
-   ``NULL`` on failure.
+   Tạo một đối tượng :c:type:`PyFloatObject` dựa trên giá trị chuỗi trong *str*, hoặc ``NULL`` nếu thất bại.
 
 
 .. c:function:: PyObject* PyFloat_FromDouble(double v)
 
-   Create a :c:type:`PyFloatObject` object from *v*, or ``NULL`` on failure.
+   Tạo một đối tượng :c:type:`PyFloatObject` từ *v*, hoặc ``NULL`` nếu thất bại.
 
 
 .. c:function:: double PyFloat_AsDouble(PyObject *pyfloat)
 
-   Return a C :c:expr:`double` representation of the contents of *pyfloat*.  If
-   *pyfloat* is not a Python floating-point object but has a :meth:`~object.__float__`
-   method, this method will first be called to convert *pyfloat* into a float.
-   If :meth:`!__float__` is not defined then it falls back to :meth:`~object.__index__`.
-   This method returns ``-1.0`` upon failure, so one should call
-   :c:func:`PyErr_Occurred` to check for errors.
+   Trả về biểu diễn C :c:expr:`double` của nội dung trong *pyfloat*. Nếu *pyfloat* không phải là một đối tượng số thực Python nhưng có phương thức :meth:`~object.__float__`, phương thức này sẽ được gọi trước tiên để chuyển *pyfloat* thành một số thực. Nếu :meth:`!__float__` không được định nghĩa thì hàm sẽ chuyển sang :meth:`~object.__index__`. Phương thức này trả về ``-1.0`` khi thất bại, vì vậy nên gọi
+   :c:func:`PyErr_Occurred` để kiểm tra lỗi.
 
    .. versionchanged:: 3.8
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
 
 .. c:function:: double PyFloat_AS_DOUBLE(PyObject *pyfloat)
 
-   Return a C :c:expr:`double` representation of the contents of *pyfloat*, but
-   without error checking.
+   Trả về biểu diễn C :c:expr:`double` của nội dung trong *pyfloat*, nhưng không kiểm tra lỗi.
 
 
 .. c:function:: PyObject* PyFloat_GetInfo(void)
 
-   Return a structseq instance which contains information about the
-   precision, minimum and maximum values of a float. It's a thin wrapper
-   around the header file :file:`float.h`.
+   Trả về một thực thể structseq chứa thông tin về độ chính xác, giá trị tối thiểu và tối đa của một số thực. Đây là một lớp bao bọc mỏng quanh tệp tiêu đề :file:`float.h`.
 
 
 .. c:function:: double PyFloat_GetMax()
 
-   Return the maximum representable finite float *DBL_MAX* as C :c:expr:`double`.
+   Trả về số thực hữu hạn lớn nhất có thể biểu diễn *DBL_MAX* dưới dạng C :c:expr:`double`.
 
 
 .. c:function:: double PyFloat_GetMin()
 
-   Return the minimum normalized positive float *DBL_MIN* as C :c:expr:`double`.
+   Trả về số thực dương đã chuẩn hóa nhỏ nhất *DBL_MIN* dưới dạng C :c:expr:`double`.
 
 
 .. c:macro:: Py_INFINITY
 
-   This macro expands to a constant expression of type :c:expr:`double`, that
-   represents the positive infinity.
+   Macro này mở rộng thành một biểu thức hằng có kiểu :c:expr:`double`, biểu diễn vô cực dương.
 
-   On most platforms, this is equivalent to the :c:macro:`!INFINITY` macro from
-   the C11 standard ``<math.h>`` header.
+   Trên hầu hết các nền tảng, giá trị này tương đương với macro :c:macro:`!INFINITY` trong header tiêu chuẩn C11 ``<math.h>``.
 
 
 .. c:macro:: Py_NAN
 
-   This macro expands to a constant expression of type :c:expr:`double`, that
-   represents a quiet not-a-number (qNaN) value.
+   Macro này mở rộng thành một biểu thức hằng có kiểu :c:expr:`double`, biểu diễn một giá trị không phải số yên lặng (qNaN).
 
-   On most platforms, this is equivalent to the :c:macro:`!NAN` macro from
-   the C11 standard ``<math.h>`` header.
+   Trên hầu hết các nền tảng, giá trị này tương đương với macro :c:macro:`!NAN` trong header tiêu chuẩn C11 ``<math.h>``.
 
 
 .. c:macro:: Py_HUGE_VAL
 
-   Equivalent to :c:macro:`!INFINITY`.
+   Tương đương với :c:macro:`!INFINITY`.
 
    .. deprecated:: 3.14
-      The macro is :term:`soft deprecated`.
+      Macro là :term:`soft deprecated`.
 
 
 .. c:macro:: Py_MATH_E
 
-   The definition (accurate for a :c:expr:`double` type) of the :data:`math.e` constant.
+   Định nghĩa hằng số :data:`math.e` (chính xác đối với kiểu :c:expr:`double`).
 
 
 .. c:macro:: Py_MATH_El
 
-   High precision (long double) definition of :data:`~math.e` constant.
+   Định nghĩa độ chính xác cao (long double) của hằng số :data:`~math.e`.
 
 
 .. c:macro:: Py_MATH_PI
 
-   The definition (accurate for a :c:expr:`double` type) of the :data:`math.pi` constant.
+   Định nghĩa hằng số :data:`math.pi` (chính xác đối với kiểu :c:expr:`double`).
 
 
 .. c:macro:: Py_MATH_PIl
 
-   High precision (long double) definition of :data:`~math.pi` constant.
+   Định nghĩa độ chính xác cao (long double) của hằng số :data:`~math.pi`.
 
 
 .. c:macro:: Py_MATH_TAU
 
-   The definition (accurate for a :c:expr:`double` type) of the :data:`math.tau` constant.
+   Định nghĩa hằng số :data:`math.tau` (chính xác đối với kiểu :c:expr:`double`).
 
    .. versionadded:: 3.6
 
 
 .. c:macro:: Py_RETURN_NAN
 
-   Return :data:`math.nan` from a function.
+   Trả về :data:`math.nan` từ một hàm.
 
-   On most platforms, this is equivalent to ``return PyFloat_FromDouble(NAN)``.
+   Trên hầu hết các nền tảng, điều này tương đương với ``return PyFloat_FromDouble(NAN)``.
 
 
 .. c:macro:: Py_RETURN_INF(sign)
 
-   Return :data:`math.inf` or :data:`-math.inf <math.inf>` from a function,
-   depending on the sign of *sign*.
+   Trả về :data:`math.inf` hoặc :data:`-math.inf <math.inf>` từ một hàm, tùy thuộc vào dấu của *sign*.
 
-   On most platforms, this is equivalent to the following::
+   Trên hầu hết các nền tảng, điều này tương đương với nội dung sau::
 
       return PyFloat_FromDouble(copysign(INFINITY, sign));
 
 
 .. c:macro:: Py_IS_FINITE(X)
 
-   Return ``1`` if the given floating-point number *X* is finite,
-   that is, it is normal, subnormal or zero, but not infinite or NaN.
-   Return ``0`` otherwise.
+   Trả về ``1`` nếu số dấu phẩy động đã cho *X* là hữu hạn, nghĩa là số đó là số chuẩn, số dưới chuẩn hoặc bằng không, nhưng không phải là vô cực hoặc NaN. Nếu không, trả về ``0``.
 
    .. deprecated:: 3.14
-      The macro is :term:`soft deprecated`.  Use :c:macro:`!isfinite` instead.
+      Macro này là :term:`soft deprecated`. Thay vào đó, hãy sử dụng :c:macro:`!isfinite`.
 
 
 .. c:macro:: Py_IS_INFINITY(X)
 
-   Return ``1`` if the given floating-point number *X* is positive or negative
-   infinity.  Return ``0`` otherwise.
+   Trả về ``1`` nếu số dấu phẩy động đã cho *X* là vô cực dương hoặc vô cực âm. Nếu không, trả về ``0``.
 
    .. deprecated:: 3.14
-      The macro is :term:`soft deprecated`.  Use :c:macro:`!isinf` instead.
+      Macro này là :term:`soft deprecated`. Thay vào đó, hãy sử dụng :c:macro:`!isinf`.
 
 
 .. c:macro:: Py_IS_NAN(X)
 
-   Return ``1`` if the given floating-point number *X* is a not-a-number (NaN)
-   value.  Return ``0`` otherwise.
+   Trả về ``1`` nếu số dấu phẩy động đã cho *X* là một giá trị không phải là số (NaN).  Nếu không, trả về ``0``.
 
    .. deprecated:: 3.14
-      The macro is :term:`soft deprecated`.  Use :c:macro:`!isnan` instead.
+      Macro là :term:`soft deprecated`.  Thay vào đó, hãy sử dụng :c:macro:`!isnan`.
 
 
-Pack and Unpack functions
--------------------------
+Các hàm Pack và Unpack
+----------------------
 
-The pack and unpack functions provide an efficient platform-independent way to
-store floating-point values as byte strings. The Pack routines produce a bytes
-string from a C :c:expr:`double`, and the Unpack routines produce a C
-:c:expr:`double` from such a bytes string. The suffix (2, 4 or 8) specifies the
-number of bytes in the bytes string.
+Các hàm pack và unpack cung cấp một cách hiệu quả, độc lập với nền tảng để lưu trữ các giá trị dấu phẩy động dưới dạng chuỗi byte. Các routine Pack tạo ra một chuỗi bytes từ một :c:expr:`double` C, còn các routine Unpack tạo ra một C
+:c:expr:`double` từ chuỗi bytes đó. Hậu tố (2, 4 hoặc 8) chỉ định số byte trong chuỗi bytes.
 
-On platforms that appear to use IEEE 754 formats these functions work by
-copying bits. On other platforms, the 2-byte format is identical to the IEEE
-754 binary16 half-precision format, the 4-byte format (32-bit) is identical to
-the IEEE 754 binary32 single precision format, and the 8-byte format to the
-IEEE 754 binary64 double precision format, although the packing of INFs and
-NaNs (if such things exist on the platform) isn't handled correctly, and
-attempting to unpack a bytes string containing an IEEE INF or NaN will raise an
-exception.
+Trên các nền tảng có vẻ sử dụng các định dạng IEEE 754, những hàm này hoạt động bằng cách sao chép các bit. Trên các nền tảng khác, định dạng 2 byte giống hệt định dạng binary16 half-precision của IEEE 754, định dạng 4 byte (32 bit) giống hệt định dạng binary32 single precision của IEEE 754, còn định dạng 8 byte giống định dạng binary64 double precision của IEEE 754, mặc dù việc đóng gói INF và NaN (nếu các giá trị như vậy tồn tại trên nền tảng) không được xử lý chính xác, và việc cố gắng unpack một chuỗi bytes chứa INF hoặc NaN IEEE sẽ raise một exception.
 
-Note that NaN type may not be preserved on IEEE platforms (signaling NaNs become
-quiet NaNs), for example on x86 systems in 32-bit mode.
+Lưu ý rằng kiểu NaN có thể không được bảo toàn trên các nền tảng IEEE (signaling NaN trở thành quiet NaN), chẳng hạn như trên các hệ thống x86 ở chế độ 32 bit.
 
-On non-IEEE platforms with more precision, or larger dynamic range, than IEEE
-754 supports, not all values can be packed; on non-IEEE platforms with less
-precision, or smaller dynamic range, not all values can be unpacked. What
-happens in such cases is partly accidental (alas).
+Trên các nền tảng không tuân theo IEEE có độ chính xác cao hơn hoặc phạm vi động lớn hơn những gì IEEE 754 hỗ trợ, không phải mọi giá trị đều có thể được đóng gói; trên các nền tảng không tuân theo IEEE có độ chính xác thấp hơn hoặc phạm vi động nhỏ hơn, không phải mọi giá trị đều có thể được giải nén. Điều xảy ra trong những trường hợp như vậy phần nào là ngẫu nhiên (đáng tiếc là vậy).
 
 .. versionadded:: 3.11
 
-Pack functions
-^^^^^^^^^^^^^^
+Các hàm pack
+^^^^^^^^^^^^
 
-The pack routines write 2, 4 or 8 bytes, starting at *p*. *le* is an
-:c:expr:`int` argument, non-zero if you want the bytes string in little-endian
-format (exponent last, at ``p+1``, ``p+3``, or ``p+6`` and ``p+7``), zero if you
-want big-endian format (exponent first, at *p*). The :c:macro:`PY_BIG_ENDIAN`
-constant can be used to use the native endian: it is equal to ``1`` on big
-endian processor, or ``0`` on little endian processor.
+Các routine pack ghi 2, 4 hoặc 8 byte, bắt đầu từ *p*. *le* là một
+:c:expr:`int` argument, khác 0 nếu bạn muốn chuỗi byte ở định dạng little-endian (exponent ở cuối, tại ``p+1``, ``p+3``, hoặc ``p+6`` và ``p+7``), bằng 0 nếu bạn muốn định dạng big-endian (exponent ở đầu, tại *p*). Hằng số :c:macro:`PY_BIG_ENDIAN` có thể được dùng để sử dụng endian gốc: nó bằng ``1`` trên bộ xử lý big endian hoặc ``0`` trên bộ xử lý little endian.
 
-Return value: ``0`` if all is OK, ``-1`` if error (and an exception is set,
-most likely :exc:`OverflowError`).
+Giá trị trả về: ``0`` nếu mọi thứ đều ổn, ``-1`` nếu có lỗi (và một exception được thiết lập, nhiều khả năng là :exc:`OverflowError`).
 
-There are two problems on non-IEEE platforms:
+Có hai vấn đề trên các nền tảng không tuân theo IEEE:
 
-* What this does is undefined if *x* is a NaN or infinity.
-* ``-0.0`` and ``+0.0`` produce the same bytes string.
+* Điều này không được định nghĩa nếu *x* là NaN hoặc vô hạn.
+* ``-0.0`` và ``+0.0`` tạo ra cùng một chuỗi byte.
 
 .. c:function:: int PyFloat_Pack2(double x, char *p, int le)
 
-   Pack a C double as the IEEE 754 binary16 half-precision format.
+   Đóng gói một C double theo định dạng half-precision nhị phân IEEE 754 binary16.
 
 .. c:function:: int PyFloat_Pack4(double x, char *p, int le)
 
-   Pack a C double as the IEEE 754 binary32 single precision format.
+   Đóng gói một C double theo định dạng single precision nhị phân IEEE 754 binary32.
 
 .. c:function:: int PyFloat_Pack8(double x, char *p, int le)
 
-   Pack a C double as the IEEE 754 binary64 double precision format.
+   Đóng gói một C double theo định dạng double precision nhị phân IEEE 754 binary64.
 
 
-Unpack functions
-^^^^^^^^^^^^^^^^
+Các hàm unpack
+^^^^^^^^^^^^^^
 
-The unpack routines read 2, 4 or 8 bytes, starting at *p*.  *le* is an
-:c:expr:`int` argument, non-zero if the bytes string is in little-endian format
-(exponent last, at ``p+1``, ``p+3`` or ``p+6`` and ``p+7``), zero if big-endian
-(exponent first, at *p*). The :c:macro:`PY_BIG_ENDIAN` constant can be used to
-use the native endian: it is equal to ``1`` on big endian processor, or ``0``
-on little endian processor.
+Các routine unpack đọc 2, 4 hoặc 8 byte, bắt đầu từ *p*.  *le* là một
+:c:expr:`int` đối số, khác 0 nếu chuỗi byte ở định dạng little-endian (exponent ở cuối, tại ``p+1``, ``p+3`` hoặc ``p+6`` và ``p+7``), bằng 0 nếu ở định dạng big-endian (exponent ở đầu, tại *p*). Có thể dùng hằng số :c:macro:`PY_BIG_ENDIAN` để sử dụng endian gốc: hằng số này bằng ``1`` trên bộ xử lý big endian hoặc ``0`` trên bộ xử lý little endian.
 
-Return value: The unpacked double.  On error, this is ``-1.0`` and
-:c:func:`PyErr_Occurred` is true (and an exception is set, most likely
+Giá trị trả về: double đã được giải nén. Khi có lỗi, giá trị này là ``-1.0`` và
+:c:func:`PyErr_Occurred` là true (và một exception được thiết lập, nhiều khả năng
 :exc:`OverflowError`).
 
-Note that on a non-IEEE platform this will refuse to unpack a bytes string that
-represents a NaN or infinity.
+Lưu ý rằng trên nền tảng không phải IEEE, hàm này sẽ từ chối giải nén một chuỗi bytes biểu diễn NaN hoặc infinity.
 
 .. c:function:: double PyFloat_Unpack2(const char *p, int le)
 
-   Unpack the IEEE 754 binary16 half-precision format as a C double.
+   Giải nén định dạng binary16 half-precision IEEE 754 thành một C double.
 
 .. c:function:: double PyFloat_Unpack4(const char *p, int le)
 
-   Unpack the IEEE 754 binary32 single precision format as a C double.
+   Giải nén định dạng binary32 single precision IEEE 754 thành một C double.
 
 .. c:function:: double PyFloat_Unpack8(const char *p, int le)
 
-   Unpack the IEEE 754 binary64 double precision format as a C double.
+   Giải nén định dạng binary64 double precision IEEE 754 thành một C double.

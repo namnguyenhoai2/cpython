@@ -2,83 +2,67 @@
 
 .. _iterator-objects:
 
-Iterator Objects
-----------------
+Đối tượng iterator
+------------------
 
-Python provides two general-purpose iterator objects.  The first, a sequence
-iterator, works with an arbitrary sequence supporting the :meth:`~object.__getitem__`
-method.  The second works with a callable object and a sentinel value, calling
-the callable for each item in the sequence, and ending the iteration when the
-sentinel value is returned.
+Python cung cấp hai đối tượng iterator đa dụng. Đối tượng đầu tiên, iterator của sequence, hoạt động với một sequence bất kỳ hỗ trợ phương thức :meth:`~object.__getitem__`. Đối tượng thứ hai hoạt động với một đối tượng callable và một giá trị sentinel, gọi callable cho từng mục trong sequence và kết thúc quá trình lặp khi giá trị sentinel được trả về.
 
 
 .. c:var:: PyTypeObject PySeqIter_Type
 
-   Type object for iterator objects returned by :c:func:`PySeqIter_New` and the
-   one-argument form of the :func:`iter` built-in function for built-in sequence
-   types.
+   Đối tượng kiểu dành cho các đối tượng iterator được :c:func:`PySeqIter_New` trả về và dạng một đối số của hàm tích hợp :func:`iter` đối với các kiểu sequence tích hợp.
 
 
 .. c:function:: int PySeqIter_Check(PyObject *op)
 
-   Return true if the type of *op* is :c:data:`PySeqIter_Type`.  This function
-   always succeeds.
+   Trả về true nếu kiểu của *op* là :c:data:`PySeqIter_Type`. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PySeqIter_New(PyObject *seq)
 
-   Return an iterator that works with a general sequence object, *seq*.  The
-   iteration ends when the sequence raises :exc:`IndexError` for the subscripting
-   operation.
+   Trả về một iterator hoạt động với một đối tượng sequence tổng quát, *seq*. Quá trình lặp kết thúc khi sequence phát sinh :exc:`IndexError` cho thao tác truy cập chỉ mục.
 
 
 .. c:var:: PyTypeObject PyCallIter_Type
 
-   Type object for iterator objects returned by :c:func:`PyCallIter_New` and the
-   two-argument form of the :func:`iter` built-in function.
+   Đối tượng kiểu dành cho các đối tượng iterator được :c:func:`PyCallIter_New` trả về và dạng hai đối số của hàm tích hợp :func:`iter`.
 
 
 .. c:function:: int PyCallIter_Check(PyObject *op)
 
-   Return true if the type of *op* is :c:data:`PyCallIter_Type`.  This
-   function always succeeds.
+   Trả về true nếu kiểu của *op* là :c:data:`PyCallIter_Type`. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PyCallIter_New(PyObject *callable, PyObject *sentinel)
 
-   Return a new iterator.  The first parameter, *callable*, can be any Python
-   callable object that can be called with no parameters; each call to it should
-   return the next item in the iteration.  When *callable* returns a value equal to
-   *sentinel*, the iteration will be terminated.
+   Trả về một iterator mới. Tham số đầu tiên, *callable*, có thể là bất kỳ đối tượng callable nào của Python có thể được gọi mà không cần tham số; mỗi lần gọi đối tượng này sẽ trả về mục tiếp theo trong quá trình lặp. Khi *callable* trả về một giá trị bằng *sentinel*, quá trình lặp sẽ kết thúc.
 
 
-Range Objects
-^^^^^^^^^^^^^
+Đối tượng range
+^^^^^^^^^^^^^^^
 
 .. c:var:: PyTypeObject PyRange_Type
 
-   The type object for :class:`range` objects.
+   Đối tượng kiểu cho các đối tượng :class:`range`.
 
 
 .. c:function:: int PyRange_Check(PyObject *o)
 
-   Return true if the object *o* is an instance of a :class:`range` object.
-   This function always succeeds.
+   Trả về true nếu đối tượng *o* là một thể hiện của đối tượng :class:`range`. Hàm này luôn thực thi thành công.
 
 
-Builtin Iterator Types
-^^^^^^^^^^^^^^^^^^^^^^
+Các kiểu iterator tích hợp sẵn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-These are built-in iteration types that are included in Python's C API, but
-provide no additional functions. They are here for completeness.
+Đây là các kiểu iteration tích hợp sẵn được đưa vào C API của Python nhưng không cung cấp thêm hàm nào. Chúng được liệt kê ở đây để đầy đủ.
 
 
 .. list-table::
    :widths: auto
    :header-rows: 1
 
-   * * C type
-     * Python type
+   * * Kiểu C
+     * kiểu Python
    * * .. c:var:: PyTypeObject PyEnum_Type
      * :py:class:`enumerate`
    * * .. c:var:: PyTypeObject PyFilter_Type
@@ -91,8 +75,8 @@ provide no additional functions. They are here for completeness.
      * :py:class:`zip`
 
 
-Other Iterator Objects
-^^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng iterator khác
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. c:var:: PyTypeObject PyByteArrayIter_Type
 .. c:var:: PyTypeObject PyBytesIter_Type
@@ -110,12 +94,9 @@ Other Iterator Objects
 .. c:var:: PyTypeObject PyDictRevIterItem_Type
 .. c:var:: PyTypeObject PyODictIter_Type
 
-   Type objects for iterators of various built-in objects.
+   Các đối tượng kiểu dành cho iterator của nhiều đối tượng dựng sẵn khác nhau.
 
-   Do not create instances of these directly; prefer calling
-   :c:func:`PyObject_GetIter` instead.
+   Không tạo trực tiếp các thực thể của những kiểu này; nên gọi
+   :c:func:`PyObject_GetIter` thay vào đó.
 
-   Note that there is no guarantee that a given built-in type uses a given iterator
-   type. For example, iterating over :class:`range` will use one of two iterator
-   types depending on the size of the range. Other types may start using a
-   similar scheme in the future, without warning.
+   Lưu ý rằng không có gì đảm bảo một kiểu dựng sẵn nhất định sẽ sử dụng một kiểu iterator nhất định. Ví dụ: việc lặp qua :class:`range` sẽ sử dụng một trong hai kiểu iterator, tùy thuộc vào kích thước của range. Trong tương lai, các kiểu khác có thể bắt đầu sử dụng cơ chế tương tự mà không có cảnh báo.

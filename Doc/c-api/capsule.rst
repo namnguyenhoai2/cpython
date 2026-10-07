@@ -2,174 +2,133 @@
 
 .. _capsules:
 
-Capsules
---------
+Capsule
+-------
 
 .. index:: pair: object; Capsule
 
-Refer to :ref:`using-capsules` for more information on using these objects.
+Tham khảo :ref:`using-capsules` để biết thêm thông tin về cách sử dụng các đối tượng này.
 
 .. versionadded:: 3.1
 
 
 .. c:type:: PyCapsule
 
-   This subtype of :c:type:`PyObject` represents an opaque value, useful for C
-   extension modules which need to pass an opaque value (as a :c:expr:`void*`
-   pointer) through Python code to other C code.  It is often used to make a C
-   function pointer defined in one module available to other modules, so the
-   regular import mechanism can be used to access C APIs defined in dynamically
-   loaded modules.
+   Kiểu con này của :c:type:`PyObject` biểu diễn một giá trị opaque, hữu ích cho các module mở rộng C cần truyền một giá trị opaque (dưới dạng con trỏ :c:expr:`void*`) qua mã Python đến mã C khác. Nó thường được dùng để cung cấp một con trỏ hàm C được định nghĩa trong một module cho các module khác, nhờ đó có thể sử dụng cơ chế import thông thường để truy cập các C API được định nghĩa trong các module được tải động.
 
 
 .. c:var:: PyTypeObject PyCapsule_Type
 
-   The type object corresponding to capsule objects. This is the same object
-   as :class:`types.CapsuleType` in the Python layer.
+   Đối tượng kiểu tương ứng với các đối tượng capsule. Đây chính là đối tượng :class:`types.CapsuleType` trong lớp Python.
 
 
 .. c:type:: PyCapsule_Destructor
 
-   The type of a destructor callback for a capsule.  Defined as::
+   Kiểu của một callback hủy đối với capsule. Được định nghĩa như sau::
 
       typedef void (*PyCapsule_Destructor)(PyObject *);
 
-   See :c:func:`PyCapsule_New` for the semantics of PyCapsule_Destructor
-   callbacks.
+   Xem :c:func:`PyCapsule_New` để biết ngữ nghĩa của các callback PyCapsule_Destructor.
 
 
 .. c:function:: int PyCapsule_CheckExact(PyObject *p)
 
-   Return true if its argument is a :c:type:`PyCapsule`.  This function always
-   succeeds.
+   Trả về true nếu đối số của nó là một :c:type:`PyCapsule`. Hàm này luôn thành công.
 
 
 .. c:function:: PyObject* PyCapsule_New(void *pointer, const char *name, PyCapsule_Destructor destructor)
 
-   Create a :c:type:`PyCapsule` encapsulating the *pointer*.  The *pointer*
-   argument may not be ``NULL``.
+   Tạo một :c:type:`PyCapsule` đóng gói *con trỏ*. Đối số *con trỏ* không được là ``NULL``.
 
-   On failure, set an exception and return ``NULL``.
+   Nếu thất bại, hãy đặt một exception và trả về ``NULL``.
 
-   The *name* string may either be ``NULL`` or a pointer to a valid C string.  If
-   non-``NULL``, this string must outlive the capsule.  (Though it is permitted to
-   free it inside the *destructor*.)
+   Chuỗi *tên* có thể là ``NULL`` hoặc một con trỏ trỏ đến một chuỗi C hợp lệ. Nếu không phải ``NULL``, chuỗi này phải tồn tại lâu hơn capsule. (Tuy nhiên, bạn được phép giải phóng nó bên trong *hàm hủy*.)
 
-   If the *destructor* argument is not ``NULL``, it will be called with the
-   capsule as its argument when it is destroyed.
+   Nếu đối số *hàm hủy* không phải là ``NULL``, hàm này sẽ được gọi với capsule làm đối số khi capsule bị hủy.
 
-   If this capsule will be stored as an attribute of a module, the *name* should
-   be specified as ``modulename.attributename``.  This will enable other modules
-   to import the capsule using :c:func:`PyCapsule_Import`.
+   Nếu capsule này sẽ được lưu làm thuộc tính của một module, *tên* nên được chỉ định là ``modulename.attributename``. Điều này cho phép các module khác import capsule bằng :c:func:`PyCapsule_Import`.
 
 
 .. c:function:: void* PyCapsule_GetPointer(PyObject *capsule, const char *name)
 
-   Retrieve the *pointer* stored in the capsule.  On failure, set an exception
-   and return ``NULL``.
+   Truy xuất *con trỏ* được lưu trong capsule. Nếu thất bại, hãy đặt một exception và trả về ``NULL``.
 
-   The *name* parameter must compare exactly to the name stored in the capsule.
-   If the name stored in the capsule is ``NULL``, the *name* passed in must also
-   be ``NULL``.  Python uses the C function :c:func:`!strcmp` to compare capsule
-   names.
+   Tham số *tên* phải khớp chính xác với tên được lưu trong capsule. Nếu tên được lưu trong capsule là ``NULL``, *tên* được truyền vào cũng phải là ``NULL``. Python sử dụng hàm C :c:func:`!strcmp` để so sánh tên capsule.
 
 
 .. c:function:: PyCapsule_Destructor PyCapsule_GetDestructor(PyObject *capsule)
 
-   Return the current destructor stored in the capsule.  On failure, set an
-   exception and return ``NULL``.
+   Trả về trình hủy hiện tại được lưu trong capsule. Nếu thất bại, thiết lập một exception và trả về ``NULL``.
 
-   It is legal for a capsule to have a ``NULL`` destructor.  This makes a ``NULL``
-   return code somewhat ambiguous; use :c:func:`PyCapsule_IsValid` or
-   :c:func:`PyErr_Occurred` to disambiguate.
+   Một capsule có thể hợp lệ có trình hủy ``NULL``. Điều này khiến mã trả về ``NULL`` trở nên khá mơ hồ; hãy sử dụng :c:func:`PyCapsule_IsValid` hoặc
+   :c:func:`PyErr_Occurred` để phân biệt.
 
 
 .. c:function:: void* PyCapsule_GetContext(PyObject *capsule)
 
-   Return the current context stored in the capsule.  On failure, set an
-   exception and return ``NULL``.
+   Trả về context hiện tại được lưu trong capsule. Nếu thất bại, thiết lập một exception và trả về ``NULL``.
 
-   It is legal for a capsule to have a ``NULL`` context.  This makes a ``NULL``
-   return code somewhat ambiguous; use :c:func:`PyCapsule_IsValid` or
-   :c:func:`PyErr_Occurred` to disambiguate.
+   Một capsule có thể hợp lệ có context ``NULL``. Điều này khiến mã trả về ``NULL`` trở nên khá mơ hồ; hãy sử dụng :c:func:`PyCapsule_IsValid` hoặc
+   :c:func:`PyErr_Occurred` để phân biệt.
 
 
 .. c:function:: const char* PyCapsule_GetName(PyObject *capsule)
 
-   Return the current name stored in the capsule.  On failure, set an exception
-   and return ``NULL``.
+   Trả về name hiện tại được lưu trong capsule. Nếu thất bại, thiết lập một exception và trả về ``NULL``.
 
-   It is legal for a capsule to have a ``NULL`` name.  This makes a ``NULL`` return
-   code somewhat ambiguous; use :c:func:`PyCapsule_IsValid` or
-   :c:func:`PyErr_Occurred` to disambiguate.
+   Một capsule có thể có tên ``NULL``. Điều này khiến mã trả về ``NULL`` trở nên khá mơ hồ; hãy sử dụng :c:func:`PyCapsule_IsValid` hoặc
+   :c:func:`PyErr_Occurred` để phân biệt.
 
 
 .. c:function:: void* PyCapsule_Import(const char *name, int no_block)
 
-   Import a pointer to a C object from a capsule attribute in a module.  The
-   *name* parameter should specify the full name to the attribute, as in
-   ``module.attribute``.  The *name* stored in the capsule must match this
-   string exactly.
+   Nhập một con trỏ đến đối tượng C từ thuộc tính capsule trong một module. Tham số *name* phải chỉ định tên đầy đủ của thuộc tính, như trong ``module.attribute``. *name* được lưu trong capsule phải khớp chính xác với chuỗi này.
 
-   This function splits *name* on the ``.`` character, and imports the first
-   element. It then processes further elements using attribute lookups.
+   Hàm này tách *name* tại ký tự ``.`` và nhập phần tử đầu tiên. Sau đó, hàm xử lý các phần tử tiếp theo bằng cách tra cứu thuộc tính.
 
-   Return the capsule's internal *pointer* on success.  On failure, set an
-   exception and return ``NULL``.
+   Trả về *pointer* nội bộ của capsule nếu thành công. Khi thất bại, hãy đặt một exception và trả về ``NULL``.
 
    .. note::
 
-      If *name* points to an attribute of some submodule or subpackage, this
-      submodule or subpackage must be previously imported using other means
-      (for example, by using :c:func:`PyImport_ImportModule`) for the
-      attribute lookups to succeed.
+      Nếu *name* trỏ đến một thuộc tính của submodule hoặc subpackage nào đó, submodule hoặc subpackage này phải được import trước bằng cách khác (ví dụ: sử dụng :c:func:`PyImport_ImportModule`) để việc tra cứu thuộc tính thành công.
 
    .. versionchanged:: 3.3
-      *no_block* has no effect anymore.
+      *no_block* không còn có tác dụng.
 
 
 .. c:function:: int PyCapsule_IsValid(PyObject *capsule, const char *name)
 
-   Determines whether or not *capsule* is a valid capsule.  A valid capsule is
-   non-``NULL``, passes :c:func:`PyCapsule_CheckExact`, has a non-``NULL`` pointer
-   stored in it, and its internal name matches the *name* parameter.  (See
-   :c:func:`PyCapsule_GetPointer` for information on how capsule names are
-   compared.)
+   Xác định liệu *capsule* có phải là một capsule hợp lệ hay không. Một capsule hợp lệ là không-``NULL``, vượt qua :c:func:`PyCapsule_CheckExact`, có một con trỏ ``NULL`` khác không được lưu trong đó, và tên nội bộ của nó khớp với tham số *name*. (Xem
+   :c:func:`PyCapsule_GetPointer` để biết thông tin về cách so sánh tên capsule.)
 
-   In other words, if :c:func:`PyCapsule_IsValid` returns a true value, calls to
-   any of the accessors (any function starting with ``PyCapsule_Get``) are
-   guaranteed to succeed.
+   Nói cách khác, nếu :c:func:`PyCapsule_IsValid` trả về giá trị true, các lệnh gọi đến bất kỳ accessor nào (bất kỳ hàm nào bắt đầu bằng ``PyCapsule_Get``) đều được đảm bảo thành công.
 
-   Return a nonzero value if the object is valid and matches the name passed in.
-   Return ``0`` otherwise.  This function will not fail.
+   Trả về một giá trị khác không nếu đối tượng hợp lệ và khớp với tên được truyền vào. Trả về ``0`` nếu không. Hàm này sẽ không thất bại.
 
 
 .. c:function:: int PyCapsule_SetContext(PyObject *capsule, void *context)
 
-   Set the context pointer inside *capsule* to *context*.
+   Đặt con trỏ context bên trong *capsule* thành *context*.
 
-   Return ``0`` on success.  Return nonzero and set an exception on failure.
+   Trả về ``0`` khi thành công. Trả về giá trị khác không và đặt một exception khi thất bại.
 
 
 .. c:function:: int PyCapsule_SetDestructor(PyObject *capsule, PyCapsule_Destructor destructor)
 
-   Set the destructor inside *capsule* to *destructor*.
+   Đặt destructor bên trong *capsule* thành *destructor*.
 
-   Return ``0`` on success.  Return nonzero and set an exception on failure.
+   Trả về ``0`` khi thành công. Trả về giá trị khác không và đặt một exception khi thất bại.
 
 
 .. c:function:: int PyCapsule_SetName(PyObject *capsule, const char *name)
 
-   Set the name inside *capsule* to *name*.  If non-``NULL``, the name must
-   outlive the capsule.  If the previous *name* stored in the capsule was not
-   ``NULL``, no attempt is made to free it.
+   Đặt name bên trong *capsule* thành *name*. Nếu không phải ``NULL``, name phải tồn tại lâu hơn capsule. Nếu *name* trước đó được lưu trong capsule không phải là ``NULL``, sẽ không cố gắng giải phóng nó.
 
-   Return ``0`` on success.  Return nonzero and set an exception on failure.
+   Trả về ``0`` khi thành công. Trả về giá trị khác không và đặt một exception khi thất bại.
 
 
 .. c:function:: int PyCapsule_SetPointer(PyObject *capsule, void *pointer)
 
-   Set the void pointer inside *capsule* to *pointer*.  The pointer may not be
-   ``NULL``.
+   Đặt con trỏ void bên trong *capsule* thành *pointer*. Con trỏ không được là ``NULL``.
 
-   Return ``0`` on success.  Return nonzero and set an exception on failure.
+   Trả về ``0`` khi thành công. Trả về giá trị khác không và đặt một exception khi thất bại.

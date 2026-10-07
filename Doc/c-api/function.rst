@@ -2,179 +2,146 @@
 
 .. _function-objects:
 
-Function Objects
-----------------
+Đối tượng hàm
+-------------
 
 .. index:: pair: object; function
 
-There are a few functions specific to Python functions.
+Có một vài hàm dành riêng cho các hàm Python.
 
 
 .. c:type:: PyFunctionObject
 
-   The C structure used for functions.
+   Cấu trúc C được sử dụng cho các hàm.
 
 
 .. c:var:: PyTypeObject PyFunction_Type
 
    .. index:: single: MethodType (in module types)
 
-   This is an instance of :c:type:`PyTypeObject` and represents the Python function
-   type.  It is exposed to Python programmers as ``types.FunctionType``.
+   Đây là một thực thể của :c:type:`PyTypeObject` và đại diện cho kiểu hàm Python. Nó được cung cấp cho lập trình viên Python dưới dạng ``types.FunctionType``.
 
 
 .. c:function:: int PyFunction_Check(PyObject *o)
 
-   Return true if *o* is a function object (has type :c:data:`PyFunction_Type`).
-   The parameter must not be ``NULL``.  This function always succeeds.
+   Trả về true nếu *o* là một đối tượng hàm (có kiểu :c:data:`PyFunction_Type`). Tham số này không được là ``NULL``. Hàm này luôn thực hiện thành công.
 
 
 .. c:function:: PyObject* PyFunction_New(PyObject *code, PyObject *globals)
 
-   Return a new function object associated with the code object *code*. *globals*
-   must be a dictionary with the global variables accessible to the function.
+   Trả về một đối tượng hàm mới được liên kết với đối tượng mã *code*. *globals* phải là một dictionary chứa các biến toàn cục mà hàm có thể truy cập.
 
-   The function's docstring and name are retrieved from the code object.
-   :attr:`~function.__module__`
-   is retrieved from *globals*. The argument defaults, annotations and closure are
-   set to ``NULL``. :attr:`~function.__qualname__` is set to the same value as
-   the code object's :attr:`~codeobject.co_qualname` field.
+   Docstring và tên của hàm được lấy từ đối tượng mã.
+   :attr:`~function.__module__` được lấy từ *globals*. Các giá trị mặc định của đối số, chú thích và closure được đặt thành ``NULL``. :attr:`~function.__qualname__` được đặt thành cùng giá trị với trường :attr:`~codeobject.co_qualname` của code object.
 
 
 .. c:function:: PyObject* PyFunction_NewWithQualName(PyObject *code, PyObject *globals, PyObject *qualname)
 
-   As :c:func:`PyFunction_New`, but also allows setting the function object's
-   :attr:`~function.__qualname__` attribute.
-   *qualname* should be a unicode object or ``NULL``;
-   if ``NULL``, the :attr:`!__qualname__` attribute is set to the same value as
-   the code object's :attr:`~codeobject.co_qualname` field.
+   Tương tự như :c:func:`PyFunction_New`, nhưng cũng cho phép thiết lập
+   thuộc tính :attr:`~function.__qualname__`. *qualname* phải là một đối tượng unicode hoặc ``NULL``; nếu là ``NULL``, thuộc tính :attr:`!__qualname__` được đặt thành cùng giá trị với trường :attr:`~codeobject.co_qualname` của code object.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: PyObject* PyFunction_GetCode(PyObject *op)
 
-   Return the code object associated with the function object *op*.
+   Trả về code object liên kết với function object *op*.
 
 
 .. c:function:: PyObject* PyFunction_GetGlobals(PyObject *op)
 
-   Return the globals dictionary associated with the function object *op*.
+   Trả về dictionary globals liên kết với function object *op*.
 
 
 .. c:function:: PyObject* PyFunction_GetModule(PyObject *op)
 
-   Return a :term:`borrowed reference` to the :attr:`~function.__module__`
-   attribute of the :ref:`function object <user-defined-funcs>` *op*.
-   It can be *NULL*.
+   Trả về một :term:`borrowed reference` tới thuộc tính :attr:`~function.__module__` của :ref:`function object <user-defined-funcs>` *op*. Giá trị này có thể là *NULL*.
 
-   This is normally a :class:`string <str>` containing the module name,
-   but can be set to any other object by Python code.
+   Đây thường là một :class:`string <str>` chứa tên module, nhưng mã Python có thể đặt nó thành bất kỳ đối tượng nào khác.
 
 
 .. c:function:: PyObject* PyFunction_GetDefaults(PyObject *op)
 
-   Return the argument default values of the function object *op*. This can be a
-   tuple of arguments or ``NULL``.
+   Trả về các giá trị mặc định của đối số của đối tượng hàm *op*. Giá trị này có thể là một tuple các đối số hoặc ``NULL``.
 
 
 .. c:function:: int PyFunction_SetDefaults(PyObject *op, PyObject *defaults)
 
-   Set the argument default values for the function object *op*. *defaults* must be
-   ``Py_None`` or a tuple.
+   Đặt các giá trị mặc định của đối số cho đối tượng hàm *op*. *defaults* phải là ``Py_None`` hoặc một tuple.
 
-   Raises :exc:`SystemError` and returns ``-1`` on failure.
+   Phát sinh :exc:`SystemError` và trả về ``-1`` khi thất bại.
 
 
 .. c:function:: void PyFunction_SetVectorcall(PyFunctionObject *func, vectorcallfunc vectorcall)
 
-   Set the vectorcall field of a given function object *func*.
+   Đặt trường vectorcall của đối tượng hàm đã cho *func*.
 
-   Warning: extensions using this API must preserve the behavior
-   of the unaltered (default) vectorcall function!
+   Cảnh báo: các extension sử dụng API này phải duy trì hành vi của hàm vectorcall chưa được thay đổi (mặc định)!
 
    .. versionadded:: 3.12
 
 
 .. c:function:: PyObject* PyFunction_GetKwDefaults(PyObject *op)
 
-   Return the keyword-only argument default values of the function object *op*. This can be a
-   dictionary of arguments or ``NULL``.
+   Trả về các giá trị mặc định của đối số chỉ từ khóa của đối tượng hàm *op*. Giá trị này có thể là một dictionary các đối số hoặc ``NULL``.
 
 
 .. c:function:: int PyFunction_SetKwDefaults(PyObject *op, PyObject *defaults)
 
-   Set the keyword-only argument default values of the function object *op*.
-   *defaults* must be a dictionary of keyword-only arguments or ``Py_None``.
+   Đặt các giá trị mặc định của đối số chỉ từ khóa cho đối tượng hàm *op*. *defaults* phải là một dictionary của các đối số chỉ từ khóa hoặc ``Py_None``.
 
-   This function returns ``0`` on success, and returns ``-1`` with an exception
-   set on failure.
+   Hàm này trả về ``0`` khi thành công và trả về ``-1`` khi thất bại, đồng thời đặt một exception.
 
 
 .. c:function:: PyObject* PyFunction_GetClosure(PyObject *op)
 
-   Return the closure associated with the function object *op*. This can be ``NULL``
-   or a tuple of cell objects.
+   Trả về closure liên kết với function object *op*. Giá trị này có thể là ``NULL`` hoặc một tuple gồm các cell object.
 
 
 .. c:function:: int PyFunction_SetClosure(PyObject *op, PyObject *closure)
 
-   Set the closure associated with the function object *op*. *closure* must be
-   ``Py_None`` or a tuple of cell objects.
+   Đặt closure liên kết với function object *op*. *closure* phải là ``Py_None`` hoặc một tuple gồm các cell object.
 
-   Raises :exc:`SystemError` and returns ``-1`` on failure.
+   Phát sinh :exc:`SystemError` và trả về ``-1`` khi thất bại.
 
 
 .. c:function:: PyObject *PyFunction_GetAnnotations(PyObject *op)
 
-   Return the annotations of the function object *op*. This can be a
-   mutable dictionary or ``NULL``.
+   Trả về các annotation của function object *op*. Giá trị này có thể là một dictionary có thể thay đổi hoặc ``NULL``.
 
 
 .. c:function:: int PyFunction_SetAnnotations(PyObject *op, PyObject *annotations)
 
-   Set the annotations for the function object *op*. *annotations*
-   must be a dictionary or ``Py_None``.
+   Đặt các annotation cho function object *op*. *annotations* phải là một dictionary hoặc ``Py_None``.
 
-   Raises :exc:`SystemError` and returns ``-1`` on failure.
+   Phát sinh :exc:`SystemError` và trả về ``-1`` khi thất bại.
 
 
 .. c:function:: PyObject *PyFunction_GET_CODE(PyObject *op)
-                PyObject *PyFunction_GET_GLOBALS(PyObject *op)
-                PyObject *PyFunction_GET_MODULE(PyObject *op)
-                PyObject *PyFunction_GET_DEFAULTS(PyObject *op)
-                PyObject *PyFunction_GET_KW_DEFAULTS(PyObject *op)
-                PyObject *PyFunction_GET_CLOSURE(PyObject *op)
-                PyObject *PyFunction_GET_ANNOTATIONS(PyObject *op)
+                PyObject *PyFunction_GET_GLOBALS(PyObject *op) PyObject *PyFunction_GET_MODULE(PyObject *op) PyObject *PyFunction_GET_DEFAULTS(PyObject *op) PyObject *PyFunction_GET_KW_DEFAULTS(PyObject *op) PyObject *PyFunction_GET_CLOSURE(PyObject *op) PyObject *PyFunction_GET_ANNOTATIONS(PyObject *op)
 
-   These functions are similar to their ``PyFunction_Get*`` counterparts, but
-   do not do type checking. Passing anything other than an instance of
-   :c:data:`PyFunction_Type` is undefined behavior.
+   Các hàm này tương tự như các hàm tương ứng ``PyFunction_Get*``, nhưng không thực hiện kiểm tra kiểu. Việc truyền bất kỳ đối tượng nào khác ngoài một thể hiện của
+   :c:data:`PyFunction_Type` là hành vi không được xác định.
 
 
 .. c:function:: int PyFunction_AddWatcher(PyFunction_WatchCallback callback)
 
-   Register *callback* as a function watcher for the current interpreter.
-   Return an ID which may be passed to :c:func:`PyFunction_ClearWatcher`.
-   In case of error (e.g. no more watcher IDs available),
-   return ``-1`` and set an exception.
+   Đăng ký *callback* làm function watcher cho interpreter hiện tại. Trả về một ID có thể được truyền cho :c:func:`PyFunction_ClearWatcher`. Trong trường hợp xảy ra lỗi (ví dụ: không còn ID watcher), trả về ``-1`` và đặt một exception.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: int PyFunction_ClearWatcher(int watcher_id)
 
-   Clear watcher identified by *watcher_id* previously returned from
-   :c:func:`PyFunction_AddWatcher` for the current interpreter.
-   Return ``0`` on success, or ``-1`` and set an exception on error
-   (e.g.  if the given *watcher_id* was never registered.)
+   Xóa watcher được xác định bởi *watcher_id* đã được trả về từ
+   :c:func:`PyFunction_AddWatcher` cho interpreter hiện tại. Trả về ``0`` nếu thành công, hoặc ``-1`` và đặt một exception nếu xảy ra lỗi (ví dụ: nếu *watcher_id* đã cho chưa từng được đăng ký.)
 
    .. versionadded:: 3.12
 
 
 .. c:type:: PyFunction_WatchEvent
 
-    Enumeration of possible function watcher events:
+    Các sự kiện function watcher có thể xảy ra:
 
     - ``PyFunction_EVENT_CREATE``
     - ``PyFunction_EVENT_DESTROY``
@@ -187,38 +154,19 @@ There are a few functions specific to Python functions.
 
 .. c:type:: int (*PyFunction_WatchCallback)(PyFunction_WatchEvent event, PyFunctionObject *func, PyObject *new_value)
 
-   Type of a function watcher callback function.
+   Kiểu của hàm callback theo dõi hàm.
 
-   If *event* is ``PyFunction_EVENT_CREATE`` or ``PyFunction_EVENT_DESTROY``
-   then *new_value* will be ``NULL``. Otherwise, *new_value* will hold a
-   :term:`borrowed reference` to the new value that is about to be stored in
-   *func* for the attribute that is being modified.
+   Nếu *event* là ``PyFunction_EVENT_CREATE`` hoặc ``PyFunction_EVENT_DESTROY`` thì *new_value* sẽ là ``NULL``. Nếu không, *new_value* sẽ chứa một
+   :term:`borrowed reference` đến giá trị mới sắp được lưu vào *func* cho thuộc tính đang được sửa đổi.
 
-   The callback may inspect but must not modify *func*; doing so could have
-   unpredictable effects, including infinite recursion.
+   Callback có thể kiểm tra nhưng không được sửa đổi *func*; việc đó có thể gây ra các hiệu ứng không thể dự đoán, bao gồm cả đệ quy vô hạn.
 
-   If *event* is ``PyFunction_EVENT_CREATE``, then the callback is invoked
-   after *func* has been fully initialized. Otherwise, the callback is invoked
-   before the modification to *func* takes place, so the prior state of *func*
-   can be inspected. The runtime is permitted to optimize away the creation of
-   function objects when possible. In such cases no event will be emitted.
-   Although this creates the possibility of an observable difference of
-   runtime behavior depending on optimization decisions, it does not change
-   the semantics of the Python code being executed.
+   Nếu *event* là ``PyFunction_EVENT_CREATE``, callback được gọi sau khi *func* đã được khởi tạo hoàn toàn. Nếu không, callback được gọi trước khi việc sửa đổi *func* diễn ra, nên có thể kiểm tra trạng thái trước đó của *func*. Runtime được phép tối ưu hóa để loại bỏ việc tạo các đối tượng hàm khi có thể. Trong những trường hợp đó, không có event nào được phát ra. Mặc dù điều này tạo ra khả năng hành vi runtime có thể quan sát được sẽ khác nhau tùy thuộc vào các quyết định tối ưu hóa, nó không làm thay đổi ngữ nghĩa của mã Python đang được thực thi.
 
-   If *event* is ``PyFunction_EVENT_DESTROY``,  Taking a reference in the
-   callback to the about-to-be-destroyed function will resurrect it, preventing
-   it from being freed at this time. When the resurrected object is destroyed
-   later, any watcher callbacks active at that time will be called again.
+   Nếu *event* là ``PyFunction_EVENT_DESTROY``, việc lấy một tham chiếu trong callback đến hàm sắp bị hủy sẽ hồi sinh hàm đó, ngăn không cho nó được giải phóng vào thời điểm này. Khi đối tượng đã được hồi sinh bị hủy sau đó, mọi callback theo dõi đang hoạt động tại thời điểm đó sẽ được gọi lại.
 
-   If the callback sets an exception, it must return ``-1``; this exception will
-   be printed as an unraisable exception using :c:func:`PyErr_WriteUnraisable`.
-   Otherwise it should return ``0``.
+   Nếu callback đặt một exception, nó phải trả về ``-1``; exception này sẽ được in dưới dạng exception không thể báo cáo bằng :c:func:`PyErr_WriteUnraisable`. Nếu không, nó nên trả về ``0``.
 
-   There may already be a pending exception set on entry to the callback. In
-   this case, the callback should return ``0`` with the same exception still
-   set. This means the callback may not call any other API that can set an
-   exception unless it saves and clears the exception state first, and restores
-   it before returning.
+   Có thể đã có một ngoại lệ đang chờ được đặt trước khi callback được gọi. Trong trường hợp này, callback phải trả về ``0`` với cùng ngoại lệ đó vẫn được đặt. Điều này có nghĩa là callback không được gọi bất kỳ API nào khác có thể đặt ngoại lệ, trừ khi trước tiên lưu và xóa trạng thái ngoại lệ, rồi khôi phục trạng thái đó trước khi trả về.
 
    .. versionadded:: 3.12

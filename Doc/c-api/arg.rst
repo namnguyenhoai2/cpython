@@ -2,505 +2,322 @@
 
 .. _arg-parsing:
 
-Parsing arguments and building values
-=====================================
+Phân tích đối số và xây dựng giá trị
+====================================
 
-These functions are useful when creating your own extension functions and
-methods.  Additional information and examples are available in
+Các hàm này hữu ích khi tạo các hàm và phương thức mở rộng của riêng bạn. Thông tin bổ sung và các ví dụ có sẵn trong
 :ref:`extending-index`.
 
-The first three of these functions described, :c:func:`PyArg_ParseTuple`,
-:c:func:`PyArg_ParseTupleAndKeywords`, and :c:func:`PyArg_Parse`, all use *format
-strings* which are used to tell the function about the expected arguments.  The
-format strings use the same syntax for each of these functions.
+Ba hàm đầu tiên được mô tả trong số này, :c:func:`PyArg_ParseTuple`,
+:c:func:`PyArg_ParseTupleAndKeywords`, và :c:func:`PyArg_Parse`, đều sử dụng *chuỗi định dạng* để cho hàm biết các đối số được mong đợi. Các chuỗi định dạng sử dụng cùng một cú pháp cho mỗi hàm này.
 
------------------
-Parsing arguments
------------------
+----------------
+Phân tích đối số
+----------------
 
-A format string consists of zero or more "format units."  A format unit
-describes one Python object; it is usually a single character or a parenthesized
-sequence of format units.  With a few exceptions, a format unit that is not a
-parenthesized sequence normally corresponds to a single address argument to
-these functions.  In the following description, the quoted form is the format
-unit; the entry in (round) parentheses is the Python object type that matches
-the format unit; and the entry in [square] brackets is the type of the C
-variable(s) whose address should be passed.
+Một chuỗi định dạng bao gồm không hoặc nhiều "đơn vị định dạng". Một đơn vị định dạng mô tả một đối tượng Python; thông thường, đó là một ký tự đơn hoặc một chuỗi các đơn vị định dạng được đặt trong ngoặc đơn. Với một vài ngoại lệ, một đơn vị định dạng không phải là một chuỗi được đặt trong ngoặc đơn thường tương ứng với một đối số địa chỉ duy nhất của các hàm này. Trong phần mô tả sau đây, dạng được đặt trong dấu ngoặc kép là đơn vị định dạng; mục trong ngoặc đơn là kiểu đối tượng Python khớp với đơn vị định dạng; còn mục trong ngoặc vuông là kiểu của (các) biến C mà địa chỉ của chúng cần được truyền vào.
 
 .. _arg-parsing-string-and-buffers:
 
-Strings and buffers
--------------------
+Chuỗi và bộ đệm
+---------------
 
 .. note::
 
-   On Python 3.12 and older, the macro :c:macro:`!PY_SSIZE_T_CLEAN` must be
-   defined before including :file:`Python.h` to use all ``#`` variants of
-   formats (``s#``, ``y#``, etc.) explained below.
-   This is not necessary on Python 3.13 and later.
+   Trên Python 3.12 và các phiên bản cũ hơn, macro :c:macro:`!PY_SSIZE_T_CLEAN` phải được định nghĩa trước khi include :file:`Python.h` để sử dụng tất cả các biến thể ``#`` của các định dạng (``s#``, ``y#``, v.v.) được giải thích bên dưới. Điều này không cần thiết trên Python 3.13 và các phiên bản mới hơn.
 
-These formats allow accessing an object as a contiguous chunk of memory.
-You don't have to provide raw storage for the returned unicode or bytes
-area.
+Các định dạng này cho phép truy cập một object dưới dạng một vùng bộ nhớ liền kề. Bạn không cần cung cấp vùng lưu trữ thô cho vùng unicode hoặc bytes được trả về.
 
-Unless otherwise stated, buffers are not NUL-terminated.
+Trừ khi có ghi chú khác, các buffer không được kết thúc bằng NUL.
 
-There are three ways strings and buffers can be converted to C:
+Có ba cách để chuyển đổi strings và buffers sang C:
 
-*  Formats such as ``y*`` and ``s*`` fill a :c:type:`Py_buffer` structure.
-   This locks the underlying buffer so that the caller can subsequently use
-   the buffer even inside a :c:type:`Py_BEGIN_ALLOW_THREADS`
-   block without the risk of mutable data being resized or destroyed.
-   As a result, **you have to call** :c:func:`PyBuffer_Release` after you have
-   finished processing the data (or in any early abort case).
+*  Các định dạng như ``y*`` và ``s*`` điền vào một cấu trúc :c:type:`Py_buffer`. Việc này khóa buffer bên dưới để caller sau đó có thể sử dụng buffer ngay cả bên trong một khối :c:type:`Py_BEGIN_ALLOW_THREADS` mà không có nguy cơ dữ liệu mutable bị thay đổi kích thước hoặc bị hủy. Do đó, **bạn phải gọi** :c:func:`PyBuffer_Release` sau khi xử lý xong dữ liệu (hoặc trong bất kỳ trường hợp hủy sớm nào).
 
-*  The ``es``, ``es#``, ``et`` and ``et#`` formats allocate the result buffer.
-   **You have to call** :c:func:`PyMem_Free` after you have finished
-   processing the data (or in any early abort case).
+*  Các định dạng ``es``, ``es#``, ``et`` và ``et#`` cấp phát buffer kết quả. **Bạn phải gọi** :c:func:`PyMem_Free` sau khi xử lý xong dữ liệu (hoặc trong bất kỳ trường hợp hủy sớm nào).
 
 *  .. _c-arg-borrowed-buffer:
 
-   Other formats take a :class:`str` or a read-only :term:`bytes-like object`,
-   such as :class:`bytes`, and provide a ``const char *`` pointer to
-   its buffer.
-   In this case the buffer is "borrowed": it is managed by the corresponding
-   Python object, and shares the lifetime of this object.
-   You won't have to release any memory yourself.
+   Các format khác nhận một :class:`str` hoặc một :term:`bytes-like object` chỉ đọc, chẳng hạn như :class:`bytes`, và cung cấp một con trỏ ``const char *`` tới buffer của nó. Trong trường hợp này, buffer được “mượn”: nó do đối tượng Python tương ứng quản lý và có cùng vòng đời với đối tượng này. Bạn không cần tự giải phóng bộ nhớ.
 
-   To ensure that the underlying buffer may be safely borrowed, the object's
-   :c:member:`PyBufferProcs.bf_releasebuffer` field must be ``NULL``.
-   This disallows common mutable objects such as :class:`bytearray`,
-   but also some read-only objects such as :class:`memoryview` of
+   Để bảo đảm buffer bên dưới có thể được mượn một cách an toàn, trường
+   :c:member:`PyBufferProcs.bf_releasebuffer` của đối tượng phải là ``NULL``. Điều này không cho phép các đối tượng có thể thay đổi phổ biến như :class:`bytearray`, đồng thời cũng loại trừ một số đối tượng chỉ đọc như :class:`memoryview` của
    :class:`bytes`.
 
-   Besides this ``bf_releasebuffer`` requirement, there is no check to verify
-   whether the input object is immutable (e.g. whether it would honor a request
-   for a writable buffer, or whether another thread can mutate the data).
+   Ngoài yêu cầu về ``bf_releasebuffer`` này, không có bước kiểm tra nào để xác minh liệu đối tượng đầu vào có bất biến hay không (ví dụ: liệu đối tượng đó có đáp ứng yêu cầu về một buffer có thể ghi hay không, hoặc một thread khác có thể thay đổi dữ liệu hay không).
 
 ``s`` (:class:`str`) [const char \*]
-   Convert a Unicode object to a C pointer to a character string.
-   A pointer to an existing string is stored in the character pointer
-   variable whose address you pass.  The C string is NUL-terminated.
-   The Python string must not contain embedded null code points; if it does,
-   a :exc:`ValueError` exception is raised. Unicode objects are converted
-   to C strings using ``'utf-8'`` encoding. If this conversion fails, a
-   :exc:`UnicodeError` is raised.
+   Chuyển đổi một đối tượng Unicode thành con trỏ C trỏ tới một chuỗi ký tự. Con trỏ tới chuỗi hiện có được lưu trong biến con trỏ ký tự có địa chỉ được bạn truyền vào. Chuỗi C được kết thúc bằng NUL. Chuỗi Python không được chứa các code point null nằm bên trong; nếu có, một ngoại lệ :exc:`ValueError` sẽ được phát sinh. Các đối tượng Unicode được chuyển đổi thành chuỗi C bằng encoding ``'utf-8'``. Nếu quá trình chuyển đổi này thất bại, một
+   :exc:`UnicodeError` sẽ được phát sinh.
 
    .. note::
-      This format does not accept :term:`bytes-like objects
-      <bytes-like object>`.  If you want to accept
-      filesystem paths and convert them to C character strings, it is
-      preferable to use the ``O&`` format with :c:func:`PyUnicode_FSConverter`
-      as *converter*.
+      Định dạng này không chấp nhận :term:`các đối tượng dạng bytes <bytes-like object>`. Nếu bạn muốn chấp nhận các đường dẫn hệ thống tệp và chuyển đổi chúng thành chuỗi ký tự C, tốt hơn nên sử dụng định dạng ``O&`` với :c:func:`PyUnicode_FSConverter` làm *converter*.
 
    .. versionchanged:: 3.5
-      Previously, :exc:`TypeError` was raised when embedded null code points
-      were encountered in the Python string.
+      Trước đây, :exc:`TypeError` được phát sinh khi gặp các điểm mã null nhúng trong chuỗi Python.
 
-``s*`` (:class:`str` or :term:`bytes-like object`) [Py_buffer]
-   This format accepts Unicode objects as well as bytes-like objects.
-   It fills a :c:type:`Py_buffer` structure provided by the caller.
-   In this case the resulting C string may contain embedded NUL bytes.
-   Unicode objects are converted to C strings using ``'utf-8'`` encoding.
+``s*`` (:class:`str` hoặc :term:`bytes-like object`) [Py_buffer]
+   Định dạng này chấp nhận cả đối tượng Unicode và các đối tượng dạng bytes. Nó điền vào cấu trúc :c:type:`Py_buffer` do bên gọi cung cấp. Trong trường hợp này, chuỗi C kết quả có thể chứa các byte NUL nhúng. Các đối tượng Unicode được chuyển đổi thành chuỗi C bằng cách sử dụng encoding ``'utf-8'``.
 
-``s#`` (:class:`str`, read-only :term:`bytes-like object`) [const char \*, :c:type:`Py_ssize_t`]
-   Like ``s*``, except that it provides a :ref:`borrowed buffer <c-arg-borrowed-buffer>`.
-   The result is stored into two C variables,
-   the first one a pointer to a C string, the second one its length.
-   The string may contain embedded null bytes. Unicode objects are converted
-   to C strings using ``'utf-8'`` encoding.
+``s#`` (:class:`str`, chỉ đọc :term:`bytes-like object`) [const char \*, :c:type:`Py_ssize_t`]
+   Tương tự ``s*``, nhưng cung cấp một :ref:`buffer mượn <c-arg-borrowed-buffer>`. Kết quả được lưu vào hai biến C, biến thứ nhất là một con trỏ tới chuỗi C, biến thứ hai là độ dài của chuỗi đó. Chuỗi này có thể chứa các byte null nhúng. Các đối tượng Unicode được chuyển đổi thành chuỗi C bằng cách sử dụng encoding ``'utf-8'``.
 
-``z`` (:class:`str` or ``None``) [const char \*]
-   Like ``s``, but the Python object may also be ``None``, in which case the C
-   pointer is set to ``NULL``.
+``z`` (:class:`str` hoặc ``None``) [const char \*]
+   Giống như ``s``, nhưng đối tượng Python cũng có thể là ``None``, trong trường hợp đó con trỏ C được đặt thành ``NULL``.
 
-``z*`` (:class:`str`, :term:`bytes-like object` or ``None``) [Py_buffer]
-   Like ``s*``, but the Python object may also be ``None``, in which case the
-   ``buf`` member of the :c:type:`Py_buffer` structure is set to ``NULL``.
+``z*`` (:class:`str`, :term:`bytes-like object` hoặc ``None``) [Py_buffer]
+   Giống như ``s*``, nhưng đối tượng Python cũng có thể là ``None``, trong trường hợp đó thành viên ``buf`` của cấu trúc :c:type:`Py_buffer` được đặt thành ``NULL``.
 
-``z#`` (:class:`str`, read-only :term:`bytes-like object` or ``None``) [const char \*, :c:type:`Py_ssize_t`]
-   Like ``s#``, but the Python object may also be ``None``, in which case the C
-   pointer is set to ``NULL``.
+``z#`` (:class:`str`, :term:`bytes-like object` chỉ đọc hoặc ``None``) [const char \*, :c:type:`Py_ssize_t`]
+   Giống như ``s#``, nhưng đối tượng Python cũng có thể là ``None``, trong trường hợp đó con trỏ C được đặt thành ``NULL``.
 
-``y`` (read-only :term:`bytes-like object`) [const char \*]
-   This format converts a bytes-like object to a C pointer to a
-   :ref:`borrowed <c-arg-borrowed-buffer>` character string;
-   it does not accept Unicode objects.  The bytes buffer must not
-   contain embedded null bytes; if it does, a :exc:`ValueError`
-   exception is raised.
+``y`` (:term:`bytes-like object` chỉ đọc) [const char \*]
+   Định dạng này chuyển đổi một đối tượng giống bytes thành một con trỏ C tới một
+   :ref:`borrowed <c-arg-borrowed-buffer>` chuỗi ký tự; nó không chấp nhận các đối tượng Unicode. Bộ đệm bytes không được chứa byte null nằm bên trong; nếu có, một ngoại lệ :exc:`ValueError` sẽ được nâng lên.
 
    .. versionchanged:: 3.5
-      Previously, :exc:`TypeError` was raised when embedded null bytes were
-      encountered in the bytes buffer.
+      Trước đây, :exc:`TypeError` được nâng lên khi phát hiện byte null nằm bên trong bộ đệm bytes.
 
 ``y*`` (:term:`bytes-like object`) [Py_buffer]
-   This variant on ``s*`` doesn't accept Unicode objects, only
-   bytes-like objects.  **This is the recommended way to accept
-   binary data.**
+   Biến thể này của ``s*`` không chấp nhận các đối tượng Unicode, chỉ chấp nhận các đối tượng dạng bytes. **Đây là cách được khuyến nghị để chấp nhận dữ liệu nhị phân.**
 
-``y#`` (read-only :term:`bytes-like object`) [const char \*, :c:type:`Py_ssize_t`]
-   This variant on ``s#`` doesn't accept Unicode objects, only bytes-like
-   objects.
+``y#`` (chỉ đọc :term:`bytes-like object`) [const char \*, :c:type:`Py_ssize_t`]
+   Biến thể này của ``s#`` không chấp nhận các đối tượng Unicode, chỉ chấp nhận các đối tượng dạng bytes.
 
 ``S`` (:class:`bytes`) [PyBytesObject \*]
-   Requires that the Python object is a :class:`bytes` object, without
-   attempting any conversion.  Raises :exc:`TypeError` if the object is not
-   a bytes object.  The C variable may also be declared as :c:expr:`PyObject*`.
+   Yêu cầu đối tượng Python là một đối tượng :class:`bytes`, mà không cố gắng thực hiện bất kỳ chuyển đổi nào. Gây ra :exc:`TypeError` nếu đối tượng không phải là đối tượng bytes. Biến C cũng có thể được khai báo là :c:expr:`PyObject*`.
 
 ``Y`` (:class:`bytearray`) [PyByteArrayObject \*]
-   Requires that the Python object is a :class:`bytearray` object, without
-   attempting any conversion.  Raises :exc:`TypeError` if the object is not
-   a :class:`bytearray` object. The C variable may also be declared as :c:expr:`PyObject*`.
+   Yêu cầu đối tượng Python là một đối tượng :class:`bytearray`, mà không cố gắng thực hiện bất kỳ chuyển đổi nào. Gây ra :exc:`TypeError` nếu đối tượng không phải là đối tượng :class:`bytearray`. Biến C cũng có thể được khai báo là :c:expr:`PyObject*`.
 
 ``U`` (:class:`str`) [PyObject \*]
-   Requires that the Python object is a Unicode object, without attempting
-   any conversion.  Raises :exc:`TypeError` if the object is not a Unicode
-   object.  The C variable may also be declared as :c:expr:`PyObject*`.
+   Yêu cầu đối tượng Python là một đối tượng Unicode, mà không cố gắng thực hiện bất kỳ chuyển đổi nào. Gây ra :exc:`TypeError` nếu đối tượng không phải là đối tượng Unicode. Biến C cũng có thể được khai báo là :c:expr:`PyObject*`.
 
-``w*`` (read-write :term:`bytes-like object`) [Py_buffer]
-   This format accepts any object which implements the read-write buffer
-   interface. It fills a :c:type:`Py_buffer` structure provided by the caller.
-   The buffer may contain embedded null bytes. The caller has to call
-   :c:func:`PyBuffer_Release` when it is done with the buffer.
+``w*`` (đọc-ghi :term:`bytes-like object`) [Py_buffer]
+   Định dạng này chấp nhận mọi đối tượng triển khai giao diện bộ đệm đọc-ghi. Nó điền vào một cấu trúc :c:type:`Py_buffer` do bên gọi cung cấp. Bộ đệm có thể chứa các byte null nhúng. Bên gọi phải gọi
+   :c:func:`PyBuffer_Release` khi hoàn tất việc sử dụng buffer.
 
 ``es`` (:class:`str`) [const char \*encoding, char \*\*buffer]
-   This variant on ``s`` is used for encoding Unicode into a character buffer.
-   It only works for encoded data without embedded NUL bytes.
+   Biến thể này của ``s`` được dùng để mã hóa Unicode vào một buffer ký tự. Nó chỉ hoạt động với dữ liệu đã mã hóa không chứa các byte NUL nhúng.
 
-   This format requires two arguments.  The first is only used as input, and
-   must be a :c:expr:`const char*` which points to the name of an encoding as a
-   NUL-terminated string, or ``NULL``, in which case ``'utf-8'`` encoding is used.
-   An exception is raised if the named encoding is not known to Python.  The
-   second argument must be a :c:expr:`char**`; the value of the pointer it
-   references will be set to a buffer with the contents of the argument text.
-   The text will be encoded in the encoding specified by the first argument.
+   Định dạng này yêu cầu hai đối số. Đối số đầu tiên chỉ được dùng làm đầu vào và phải là một :c:expr:`const char*` trỏ đến tên của một encoding dưới dạng chuỗi kết thúc bằng NUL, hoặc ``NULL``, trong trường hợp đó encoding ``'utf-8'`` sẽ được sử dụng. Python sẽ phát sinh ngoại lệ nếu không biết encoding được nêu tên. Đối số thứ hai phải là một :c:expr:`char**`; giá trị của con trỏ mà nó tham chiếu sẽ được đặt thành một buffer chứa nội dung của văn bản đối số. Văn bản sẽ được mã hóa bằng encoding được chỉ định bởi đối số đầu tiên.
 
-   :c:func:`PyArg_ParseTuple` will allocate a buffer of the needed size, copy the
-   encoded data into this buffer and adjust *\*buffer* to reference the newly
-   allocated storage.  The caller is responsible for calling :c:func:`PyMem_Free` to
-   free the allocated buffer after use.
+   :c:func:`PyArg_ParseTuple` sẽ cấp phát một buffer có kích thước cần thiết, sao chép dữ liệu đã mã hóa vào buffer này và điều chỉnh *\*buffer* để tham chiếu đến vùng lưu trữ vừa được cấp phát. Bên gọi chịu trách nhiệm gọi :c:func:`PyMem_Free` để giải phóng buffer đã cấp phát sau khi sử dụng.
 
 ``et`` (:class:`str`, :class:`bytes` or :class:`bytearray`) [const char \*encoding, char \*\*buffer]
-   Same as ``es`` except that byte string objects are passed through without
-   recoding them.  Instead, the implementation assumes that the byte string object uses
-   the encoding passed in as parameter.
+   Tương tự như ``es``, ngoại trừ việc các đối tượng byte string được truyền qua mà không được mã hóa lại. Thay vào đó, phần triển khai giả định rằng đối tượng byte string sử dụng encoding được truyền vào dưới dạng tham số.
 
 ``es#`` (:class:`str`) [const char \*encoding, char \*\*buffer, :c:type:`Py_ssize_t` \*buffer_length]
-   This variant on ``s#`` is used for encoding Unicode into a character buffer.
-   Unlike the ``es`` format, this variant allows input data which contains NUL
-   characters.
+   Biến thể này của ``s#`` được dùng để mã hóa Unicode vào một bộ đệm ký tự. Không giống định dạng ``es``, biến thể này cho phép dữ liệu đầu vào chứa các ký tự NUL.
 
-   It requires three arguments.  The first is only used as input, and must be a
-   :c:expr:`const char*` which points to the name of an encoding as a
-   NUL-terminated string, or ``NULL``, in which case ``'utf-8'`` encoding is used.
-   An exception is raised if the named encoding is not known to Python.  The
-   second argument must be a :c:expr:`char**`; the value of the pointer it
-   references will be set to a buffer with the contents of the argument text.
-   The text will be encoded in the encoding specified by the first argument.
-   The third argument must be a pointer to an integer; the referenced integer
-   will be set to the number of bytes in the output buffer.
+   Nó yêu cầu ba đối số. Đối số đầu tiên chỉ được dùng làm đầu vào và phải là một
+   :c:expr:`const char*` trỏ đến tên của một encoding dưới dạng chuỗi kết thúc bằng NUL, hoặc ``NULL``, trong trường hợp đó encoding ``'utf-8'`` sẽ được sử dụng. Một ngoại lệ sẽ được phát sinh nếu Python không biết encoding được đặt tên. Đối số thứ hai phải là một :c:expr:`char**`; giá trị của con trỏ mà nó tham chiếu sẽ được đặt thành một bộ đệm chứa nội dung của văn bản đối số. Văn bản sẽ được mã hóa bằng encoding được chỉ định bởi đối số đầu tiên. Đối số thứ ba phải là một con trỏ đến một số nguyên; số nguyên được tham chiếu sẽ được đặt thành số byte trong bộ đệm đầu ra.
 
-   There are two modes of operation:
+   Có hai chế độ hoạt động:
 
-   If *\*buffer* points a ``NULL`` pointer, the function will allocate a buffer of
-   the needed size, copy the encoded data into this buffer and set *\*buffer* to
-   reference the newly allocated storage.  The caller is responsible for calling
-   :c:func:`PyMem_Free` to free the allocated buffer after usage.
+   Nếu *\*buffer* trỏ đến một con trỏ ``NULL``, hàm sẽ cấp phát một bộ đệm có kích thước cần thiết, sao chép dữ liệu đã mã hóa vào bộ đệm này và đặt *\*buffer* để tham chiếu đến vùng lưu trữ mới được cấp phát. Người gọi chịu trách nhiệm gọi
+   :c:func:`PyMem_Free` để giải phóng bộ đệm đã cấp phát sau khi sử dụng.
 
-   If *\*buffer* points to a non-``NULL`` pointer (an already allocated buffer),
-   :c:func:`PyArg_ParseTuple` will use this location as the buffer and interpret the
-   initial value of *\*buffer_length* as the buffer size.  It will then copy the
-   encoded data into the buffer and NUL-terminate it.  If the buffer is not large
-   enough, a :exc:`ValueError` will be set.
+   Nếu *\*buffer* trỏ đến một con trỏ không phải ``NULL`` (một buffer đã được cấp phát),
+   :c:func:`PyArg_ParseTuple` sẽ sử dụng vị trí này làm buffer và diễn giải giá trị ban đầu của *\*buffer_length* là kích thước của buffer. Sau đó, nó sẽ sao chép dữ liệu đã mã hóa vào buffer và thêm ký tự kết thúc NUL. Nếu buffer không đủ lớn, một :exc:`ValueError` sẽ được thiết lập.
 
-   In both cases, *\*buffer_length* is set to the length of the encoded data
-   without the trailing NUL byte.
+   Trong cả hai trường hợp, *\*buffer_length* được đặt thành độ dài của dữ liệu đã mã hóa, không bao gồm byte NUL ở cuối.
 
-``et#`` (:class:`str`, :class:`bytes` or :class:`bytearray`) [const char \*encoding, char \*\*buffer, :c:type:`Py_ssize_t` \*buffer_length]
-   Same as ``es#`` except that byte string objects are passed through without recoding
-   them. Instead, the implementation assumes that the byte string object uses the
-   encoding passed in as parameter.
+``et#`` (:class:`str`, :class:`bytes` hoặc :class:`bytearray`) [const char \*encoding, char \*\*buffer, :c:type:`Py_ssize_t` \*buffer_length]
+   Tương tự như ``es#``, ngoại trừ việc các đối tượng chuỗi byte được truyền qua mà không được mã hóa lại. Thay vào đó, implementation giả định rằng đối tượng chuỗi byte sử dụng encoding được truyền vào dưới dạng tham số.
 
 .. versionchanged:: 3.12
-   ``u``, ``u#``, ``Z``, and ``Z#`` are removed because they used a legacy
-   ``Py_UNICODE*`` representation.
+   ``u``, ``u#``, ``Z`` và ``Z#`` bị loại bỏ vì chúng sử dụng biểu diễn ``Py_UNICODE*`` kế thừa.
 
 
-Numbers
--------
+Số
+--
 
-These formats allow representing Python numbers or single characters as C numbers.
-Formats that require :class:`int`, :class:`float` or :class:`complex` can
-also use the corresponding special methods :meth:`~object.__index__`,
-:meth:`~object.__float__` or :meth:`~object.__complex__` to convert
-the Python object to the required type.
+Các định dạng này cho phép biểu diễn số Python hoặc ký tự đơn dưới dạng số C. Các định dạng yêu cầu :class:`int`, :class:`float` hoặc :class:`complex` cũng có thể sử dụng các phương thức đặc biệt tương ứng :meth:`~object.__index__`,
+:meth:`~object.__float__` hoặc :meth:`~object.__complex__` để chuyển đổi đối tượng Python sang kiểu cần thiết.
 
-For signed integer formats, :exc:`OverflowError` is raised if the value
-is out of range for the C type.
-For unsigned integer formats, no range checking is done --- the
-most significant bits are silently truncated when the receiving field is too
-small to receive the value.
+Đối với các định dạng số nguyên có dấu, :exc:`OverflowError` được phát sinh nếu giá trị nằm ngoài phạm vi của kiểu C. Đối với các định dạng số nguyên không dấu, không thực hiện kiểm tra phạm vi --- các bit có trọng số cao nhất sẽ bị cắt ngầm khi trường nhận không đủ lớn để chứa giá trị.
 
 ``b`` (:class:`int`) [unsigned char]
-   Convert a nonnegative Python integer to an unsigned tiny integer, stored in a C
+   Chuyển đổi một số nguyên Python không âm thành một số nguyên cực nhỏ không dấu, được lưu trữ trong một C
    :c:expr:`unsigned char`.
 
 ``B`` (:class:`int`) [unsigned char]
-   Convert a Python integer to a tiny integer without overflow checking, stored in a C
+   Chuyển đổi một số nguyên Python thành một số nguyên cực nhỏ mà không kiểm tra tràn, được lưu trữ trong một C
    :c:expr:`unsigned char`.
 
 ``h`` (:class:`int`) [short int]
-   Convert a Python integer to a C :c:expr:`short int`.
+   Chuyển một số nguyên Python thành :c:expr:`short int` C.
 
 ``H`` (:class:`int`) [unsigned short int]
-   Convert a Python integer to a C :c:expr:`unsigned short int`, without overflow
-   checking.
+   Chuyển một số nguyên Python thành :c:expr:`unsigned short int` C mà không kiểm tra tràn.
 
 ``i`` (:class:`int`) [int]
-   Convert a Python integer to a plain C :c:expr:`int`.
+   Chuyển một số nguyên Python thành :c:expr:`int` C thuần.
 
 ``I`` (:class:`int`) [unsigned int]
-   Convert a Python integer to a C :c:expr:`unsigned int`, without overflow
-   checking.
+   Chuyển một số nguyên Python thành :c:expr:`unsigned int` của C mà không kiểm tra tràn số.
 
 ``l`` (:class:`int`) [long int]
-   Convert a Python integer to a C :c:expr:`long int`.
+   Chuyển một số nguyên Python thành :c:expr:`long int` của C.
 
 ``k`` (:class:`int`) [unsigned long]
-   Convert a Python integer to a C :c:expr:`unsigned long` without
-   overflow checking.
+   Chuyển một số nguyên Python thành :c:expr:`unsigned long` của C mà không kiểm tra tràn số.
 
    .. versionchanged:: 3.14
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
 ``L`` (:class:`int`) [long long]
-   Convert a Python integer to a C :c:expr:`long long`.
+   Chuyển một số nguyên Python thành một :c:expr:`long long` trong C.
 
 ``K`` (:class:`int`) [unsigned long long]
-   Convert a Python integer to a C :c:expr:`unsigned long long`
-   without overflow checking.
+   Chuyển một số nguyên Python thành một :c:expr:`unsigned long long` trong C mà không kiểm tra tràn số.
 
    .. versionchanged:: 3.14
-      Use :meth:`~object.__index__` if available.
+      Sử dụng :meth:`~object.__index__` nếu có.
 
 ``n`` (:class:`int`) [:c:type:`Py_ssize_t`]
-   Convert a Python integer to a C :c:type:`Py_ssize_t`.
+   Chuyển một số nguyên Python thành một :c:type:`Py_ssize_t` trong C.
 
-``c`` (:class:`bytes` or :class:`bytearray` of length 1) [char]
-   Convert a Python byte, represented as a :class:`bytes` or
-   :class:`bytearray` object of length 1, to a C :c:expr:`char`.
+``c`` (:class:`bytes` hoặc :class:`bytearray` có độ dài 1) [char]
+   Chuyển một byte Python, được biểu diễn dưới dạng :class:`bytes` hoặc
+   :class:`bytearray` đối tượng có độ dài 1, thành một :c:expr:`char` trong C.
 
    .. versionchanged:: 3.3
-      Allow :class:`bytearray` objects.
+      Cho phép các đối tượng :class:`bytearray`.
 
-``C`` (:class:`str` of length 1) [int]
-   Convert a Python character, represented as a :class:`str` object of
-   length 1, to a C :c:expr:`int`.
+``C`` (:class:`str` có độ dài 1) [int]
+   Chuyển đổi một ký tự Python, được biểu diễn dưới dạng đối tượng :class:`str` có độ dài 1, thành một :c:expr:`int` trong C.
 
 ``f`` (:class:`float`) [float]
-   Convert a Python floating-point number to a C :c:expr:`float`.
+   Chuyển đổi một số dấu phẩy động Python thành một :c:expr:`float` trong C.
 
 ``d`` (:class:`float`) [double]
-   Convert a Python floating-point number to a C :c:expr:`double`.
+   Chuyển đổi một số dấu phẩy động Python thành :c:expr:`double` của C.
 
 ``D`` (:class:`complex`) [Py_complex]
-   Convert a Python complex number to a C :c:type:`Py_complex` structure.
+   Chuyển đổi một số phức Python thành cấu trúc :c:type:`Py_complex` của C.
 
-Other objects
--------------
+Các đối tượng khác
+------------------
 
 ``O`` (object) [PyObject \*]
-   Store a Python object (without any conversion) in a C object pointer.  The C
-   program thus receives the actual object that was passed.  A new
-   :term:`strong reference` to the object is not created
-   (i.e. its reference count is not increased).
-   The pointer stored is not ``NULL``.
+   Lưu trữ một object Python (không qua chuyển đổi) trong một con trỏ object của C. Do đó, chương trình C nhận chính object thực tế đã được truyền vào. Một
+   :term:`strong reference` tới object không được tạo (tức là reference count của nó không tăng). Con trỏ được lưu trữ không phải là ``NULL``.
 
 ``O!`` (object) [*typeobject*, PyObject \*]
-   Store a Python object in a C object pointer.  This is similar to ``O``, but
-   takes two C arguments: the first is the address of a Python type object, the
-   second is the address of the C variable (of type :c:expr:`PyObject*`) into which
-   the object pointer is stored.  If the Python object does not have the required
-   type, :exc:`TypeError` is raised.
+   Lưu một đối tượng Python vào con trỏ đối tượng C. Tương tự như ``O``, nhưng nhận hai đối số C: đối số đầu tiên là địa chỉ của một đối tượng kiểu Python, đối số thứ hai là địa chỉ của biến C (kiểu :c:expr:`PyObject*`) dùng để lưu con trỏ đối tượng. Nếu đối tượng Python không có kiểu bắt buộc, :exc:`TypeError` sẽ được phát sinh.
 
 .. _o_ampersand:
 
 ``O&`` (object) [*converter*, *address*]
-   Convert a Python object to a C variable through a *converter* function.  This
-   takes two arguments: the first is a function, the second is the address of a C
-   variable (of arbitrary type), converted to :c:expr:`void *`.  The *converter*
-   function in turn is called as follows::
+   Chuyển đổi một đối tượng Python thành một biến C thông qua hàm *converter*. Hàm này nhận hai đối số: đối số đầu tiên là một hàm, đối số thứ hai là địa chỉ của một biến C (kiểu bất kỳ), được chuyển đổi thành :c:expr:`void *`. Sau đó, hàm *converter* được gọi như sau::
 
       status = converter(object, address);
 
-   where *object* is the Python object to be converted and *address* is the
-   :c:expr:`void*` argument that was passed to the ``PyArg_Parse*`` function.
-   The returned *status* should be ``1`` for a successful conversion and ``0`` if
-   the conversion has failed.  When the conversion fails, the *converter* function
-   should raise an exception and leave the content of *address* unmodified.
+   trong đó *object* là đối tượng Python cần chuyển đổi và *address* là
+   :c:expr:`void*` đối số đã được truyền cho hàm ``PyArg_Parse*``. Giá trị *status* trả về phải là ``1`` nếu chuyển đổi thành công và ``0`` nếu chuyển đổi thất bại. Khi chuyển đổi thất bại, hàm *converter* phải phát sinh một exception và giữ nguyên nội dung của *address*.
 
    .. c:macro:: Py_CLEANUP_SUPPORTED
       :no-typesetting:
 
-   If the *converter* returns :c:macro:`!Py_CLEANUP_SUPPORTED`, it may get called a
-   second time if the argument parsing eventually fails, giving the converter a
-   chance to release any memory that it had already allocated. In this second
-   call, the *object* parameter will be ``NULL``; *address* will have the same value
-   as in the original call.
+   Nếu *converter* trả về :c:macro:`!Py_CLEANUP_SUPPORTED`, hàm này có thể được gọi lần thứ hai nếu quá trình phân tích đối số cuối cùng thất bại, cho phép converter giải phóng mọi vùng nhớ mà nó đã cấp phát trước đó. Trong lần gọi thứ hai này, tham số *object* sẽ là ``NULL``; *address* sẽ có cùng giá trị như trong lần gọi ban đầu.
 
-   Examples of converters: :c:func:`PyUnicode_FSConverter` and
+   Ví dụ về các converter: :c:func:`PyUnicode_FSConverter` và
    :c:func:`PyUnicode_FSDecoder`.
 
    .. versionchanged:: 3.1
       :c:macro:`!Py_CLEANUP_SUPPORTED` was added.
 
 ``p`` (:class:`bool`) [int]
-   Tests the value passed in for truth (a boolean **p**\ redicate) and converts
-   the result to its equivalent C true/false integer value.
-   Sets the int to ``1`` if the expression was true and ``0`` if it was false.
-   This accepts any valid Python value.  See :ref:`truth` for more
-   information about how Python tests values for truth.
+   Kiểm tra giá trị được truyền vào về tính đúng (một **p**\ redicate boolean) và chuyển đổi kết quả thành giá trị số nguyên C true/false tương đương. Đặt int thành ``1`` nếu biểu thức đúng và thành ``0`` nếu biểu thức sai. Giá trị này chấp nhận mọi giá trị Python hợp lệ. Xem :ref:`truth` để biết thêm thông tin về cách Python kiểm tra tính đúng của các giá trị.
 
    .. versionadded:: 3.3
 
 ``(items)`` (sequence) [*matching-items*]
-   The object must be a Python sequence (except :class:`str`, :class:`bytes`
-   or :class:`bytearray`) whose length is the number of format units
-   in *items*.  The C arguments must correspond to the individual format units in
-   *items*.  Format units for sequences may be nested.
+   Đối tượng phải là một sequence Python (ngoại trừ :class:`str`, :class:`bytes` hoặc :class:`bytearray`) có độ dài bằng số đơn vị định dạng trong *items*. Các đối số C phải tương ứng với từng đơn vị định dạng trong *items*. Các đơn vị định dạng cho sequence có thể được lồng nhau.
 
-   If *items* contains format units which store a :ref:`borrowed buffer
-   <c-arg-borrowed-buffer>` (``s``, ``s#``, ``z``, ``z#``, ``y``, or ``y#``)
-   or a :term:`borrowed reference` (``S``, ``Y``, ``U``, ``O``, or ``O!``),
-   the object must be a Python tuple.
-   The *converter* for the ``O&`` format unit in *items* must not store
-   a borrowed buffer or a borrowed reference.
+   Nếu *items* chứa các đơn vị định dạng lưu trữ một :ref:`bộ đệm mượn <c-arg-borrowed-buffer>` (``s``, ``s#``, ``z``, ``z#``, ``y``, hoặc ``y#``) hoặc một :term:`borrowed reference` (``S``, ``Y``, ``U``, ``O``, hoặc ``O!``), đối tượng phải là một tuple Python. *bộ chuyển đổi* cho ``O&`` đơn vị định dạng trong *items* không được lưu trữ bộ đệm mượn hoặc tham chiếu mượn.
 
    .. versionchanged:: 3.14
       :class:`str` and :class:`bytearray` objects no longer accepted as a sequence.
 
    .. deprecated:: 3.14
-      Non-tuple sequences are deprecated if *items* contains format units
-      which store a borrowed buffer or a borrowed reference.
+      Các sequence không phải tuple không được khuyến nghị sử dụng nếu *items* chứa các đơn vị định dạng lưu trữ bộ đệm mượn hoặc tham chiếu mượn.
 
-A few other characters have a meaning in a format string.  These may not occur
-inside nested parentheses.  They are:
+Một vài ký tự khác có ý nghĩa trong chuỗi định dạng. Các ký tự này không được xuất hiện bên trong dấu ngoặc đơn lồng nhau. Đó là:
 
 ``|``
-   Indicates that the remaining arguments in the Python argument list are optional.
-   The C variables corresponding to optional arguments should be initialized to
-   their default value --- when an optional argument is not specified,
-   :c:func:`PyArg_ParseTuple` does not touch the contents of the corresponding C
-   variable(s).
-   For example, the format string ``"OO|OO"`` corresponds to the Python
-   signature ``f(a, b, c=None, d=None)``.
+   Cho biết rằng các đối số còn lại trong danh sách đối số Python là tùy chọn. Các biến C tương ứng với những đối số tùy chọn phải được khởi tạo bằng giá trị mặc định --- khi một đối số tùy chọn không được chỉ định,
+   :c:func:`PyArg_ParseTuple` không tác động đến nội dung của (các) biến C tương ứng. Ví dụ, chuỗi định dạng ``"OO|OO"`` tương ứng với chữ ký Python ``f(a, b, c=None, d=None)``.
 
 ``$``
-   :c:func:`PyArg_ParseTupleAndKeywords` only:
-   Indicates that the remaining arguments in the Python argument list are
-   keyword-only.
-   They are optional if ``|`` was specified before ``$``, and required otherwise.
-   ``|`` cannot be specified after ``$``.
-   For example, the format string ``"O|O$O"`` corresponds to the Python
-   signature ``f(a, b=None, *, c=None)``,
-   and the format string ``"OO$OO"`` corresponds to ``f(a, b, *, c, d)``.
+   Chỉ :c:func:`PyArg_ParseTupleAndKeywords`: Cho biết rằng các đối số còn lại trong danh sách đối số Python chỉ có thể được truyền theo từ khóa. Chúng là tùy chọn nếu ``|`` được chỉ định trước ``$``, và là bắt buộc trong trường hợp ngược lại. Không thể chỉ định ``|`` sau ``$``. Ví dụ, chuỗi định dạng ``"O|O$O"`` tương ứng với chữ ký Python ``f(a, b=None, *, c=None)``, còn chuỗi định dạng ``"OO$OO"`` tương ứng với ``f(a, b, *, c, d)``.
 
    .. versionadded:: 3.3
 
 ``:``
-   The list of format units ends here; the string after the colon is used as the
-   function name in error messages (the "associated value" of the exception that
-   :c:func:`PyArg_ParseTuple` raises).
+   Danh sách các đơn vị định dạng kết thúc tại đây; chuỗi sau dấu hai chấm được dùng làm tên hàm trong các thông báo lỗi ("giá trị liên kết" của ngoại lệ mà
+   :c:func:`PyArg_ParseTuple` phát sinh).
 
 ``;``
-   The list of format units ends here; the string after the semicolon is used as
-   the error message *instead* of the default error message.  ``:`` and ``;``
-   mutually exclude each other.
+   Danh sách các đơn vị định dạng kết thúc tại đây; chuỗi sau dấu chấm phẩy được dùng làm thông báo lỗi *thay vì* thông báo lỗi mặc định. ``:`` và ``;`` loại trừ lẫn nhau.
 
-Note that any Python object references which are provided to the caller are
-*borrowed* references; do not release them
-(i.e. do not decrement their reference count)!
+Lưu ý rằng mọi tham chiếu đến đối tượng Python được cung cấp cho caller đều là tham chiếu *mượn*; không giải phóng chúng (tức là không giảm reference count của chúng)!
 
-Additional arguments passed to these functions must be addresses of variables
-whose type is determined by the format string; these are used to store values
-from the input tuple.  There are a few cases, as described in the list of format
-units above, where these parameters are used as input values; they should match
-what is specified for the corresponding format unit in that case.
+Các đối số bổ sung được truyền cho những hàm này phải là địa chỉ của các biến có kiểu được xác định bởi format string; chúng được dùng để lưu trữ các giá trị từ input tuple. Có một vài trường hợp, như được mô tả trong danh sách các format unit ở trên, khi những tham số này được dùng làm giá trị đầu vào; trong trường hợp đó, chúng phải khớp với nội dung được chỉ định cho format unit tương ứng.
 
-For the conversion to succeed, the *arg* object must match the format
-and the format must be exhausted.  On success, the
-``PyArg_Parse*`` functions return true, otherwise they return
-false and raise an appropriate exception. When the
-``PyArg_Parse*`` functions fail due to conversion failure in one
-of the format units, the variables at the addresses corresponding to that
-and the following format units are left untouched.
+Để quá trình chuyển đổi thành công, đối tượng *arg* phải khớp với format và format phải được xử lý hết. Khi thành công, các hàm ``PyArg_Parse*`` trả về true; nếu không, chúng trả về false và raise exception phù hợp. Khi các hàm ``PyArg_Parse*`` thất bại do lỗi chuyển đổi trong một format unit, các biến tại những địa chỉ tương ứng với format unit đó và các format unit tiếp theo sẽ không bị thay đổi.
 
-API Functions
--------------
+Các hàm API
+-----------
 
 .. c:function:: int PyArg_ParseTuple(PyObject *args, const char *format, ...)
 
-   Parse the parameters of a function that takes only positional parameters into
-   local variables.  Returns true on success; on failure, it returns false and
-   raises the appropriate exception.
+   Phân tích các tham số của một hàm chỉ nhận tham số positional vào các biến cục bộ. Trả về true khi thành công; khi thất bại, trả về false và raise exception phù hợp.
 
 
 .. c:function:: int PyArg_VaParse(PyObject *args, const char *format, va_list vargs)
 
-   Identical to :c:func:`PyArg_ParseTuple`, except that it accepts a va_list rather
-   than a variable number of arguments.
+   Tương tự :c:func:`PyArg_ParseTuple`, ngoại trừ việc hàm này nhận va_list thay vì một số lượng đối số thay đổi.
 
 
 .. c:function:: int PyArg_ParseTupleAndKeywords(PyObject *args, PyObject *kw, const char *format, char * const *keywords, ...)
 
-   Parse the parameters of a function that takes both positional and keyword
-   parameters into local variables.
-   The *keywords* argument is a ``NULL``-terminated array of keyword parameter
-   names specified as null-terminated ASCII or UTF-8 encoded C strings.
-   Empty names denote
-   :ref:`positional-only parameters <positional-only_parameter>`.
-   Returns true on success; on failure, it returns false and raises the
-   appropriate exception.
+   Phân tích các tham số của một hàm nhận cả tham số positional và keyword vào các biến cục bộ. Đối số *keywords* là một mảng được kết thúc bằng ``NULL`` gồm các tên tham số keyword được chỉ định dưới dạng các chuỗi C ASCII hoặc UTF-8 kết thúc bằng null. Tên rỗng biểu thị
+   :ref:`tham số chỉ theo vị trí <positional-only_parameter>`. Trả về true nếu thành công; nếu thất bại, hàm trả về false và phát sinh ngoại lệ thích hợp.
 
    .. note::
 
-      The *keywords* parameter declaration is :c:expr:`char * const *` in C and
-      :c:expr:`const char * const *` in C++.
-      This can be overridden with the :c:macro:`PY_CXX_CONST` macro.
+      Khai báo tham số *keywords* là :c:expr:`char * const *` trong C và
+      :c:expr:`const char * const *` trong C++. Có thể ghi đè điều này bằng macro :c:macro:`PY_CXX_CONST`.
 
    .. versionchanged:: 3.6
-      Added support for :ref:`positional-only parameters
-      <positional-only_parameter>`.
+      Đã bổ sung hỗ trợ cho :ref:`tham số chỉ theo vị trí <positional-only_parameter>`.
 
    .. versionchanged:: 3.13
-      The *keywords* parameter has now type :c:expr:`char * const *` in C and
-      :c:expr:`const char * const *` in C++, instead of :c:expr:`char **`.
-      Added support for non-ASCII keyword parameter names.
+      Tham số *keywords* hiện có kiểu :c:expr:`char * const *` trong C và
+      :c:expr:`const char * const *` trong C++, thay vì :c:expr:`char **`. Đã bổ sung hỗ trợ cho tên tham số keyword không phải ASCII.
 
 
 
 .. c:function:: int PyArg_VaParseTupleAndKeywords(PyObject *args, PyObject *kw, const char *format, char * const *keywords, va_list vargs)
 
-   Identical to :c:func:`PyArg_ParseTupleAndKeywords`, except that it accepts a
-   va_list rather than a variable number of arguments.
+   Tương tự :c:func:`PyArg_ParseTupleAndKeywords`, ngoại trừ việc hàm này nhận một va_list thay vì một số lượng đối số thay đổi.
 
 
 .. c:function:: int PyArg_ValidateKeywordArguments(PyObject *)
 
-   Ensure that the keys in the keywords argument dictionary are strings.  This
-   is only needed if :c:func:`PyArg_ParseTupleAndKeywords` is not used, since the
-   latter already does this check.
+   Đảm bảo rằng các khóa trong dictionary đối số keywords là các chuỗi. Việc này chỉ cần thiết nếu không sử dụng :c:func:`PyArg_ParseTupleAndKeywords`, vì đối tượng sau đã thực hiện bước kiểm tra này.
 
    .. versionadded:: 3.2
 
 
 .. c:function:: int PyArg_Parse(PyObject *args, const char *format, ...)
 
-   Parse the parameter of a function that takes a single positional parameter
-   into a local variable.  Returns true on success; on failure, it returns
-   false and raises the appropriate exception.
+   Phân tích tham số của một hàm nhận một tham số positional duy nhất vào một biến cục bộ. Trả về true nếu thành công; nếu thất bại, trả về false và phát sinh exception thích hợp.
 
-   Example::
+   Ví dụ::
 
        // Function using METH_O calling convention
        static PyObject*
@@ -516,23 +333,11 @@ API Functions
 
 .. c:function:: int PyArg_UnpackTuple(PyObject *args, const char *name, Py_ssize_t min, Py_ssize_t max, ...)
 
-   A simpler form of parameter retrieval which does not use a format string to
-   specify the types of the arguments.  Functions which use this method to retrieve
-   their parameters should be declared as :c:macro:`METH_VARARGS` in function or
-   method tables.  The tuple containing the actual parameters should be passed as
-   *args*; it must actually be a tuple.  The length of the tuple must be at least
-   *min* and no more than *max*; *min* and *max* may be equal.  Additional
-   arguments must be passed to the function, each of which should be a pointer to a
-   :c:expr:`PyObject*` variable; these will be filled in with the values from
-   *args*; they will contain :term:`borrowed references <borrowed reference>`.
-   The variables which correspond
-   to optional parameters not given by *args* will not be filled in; these should
-   be initialized by the caller. This function returns true on success and false if
-   *args* is not a tuple or contains the wrong number of elements; an exception
-   will be set if there was a failure.
+   Một cách đơn giản hơn để lấy tham số, không sử dụng format string để chỉ định kiểu của các đối số. Các hàm sử dụng phương thức này để lấy tham số phải được khai báo là :c:macro:`METH_VARARGS` trong các bảng hàm hoặc phương thức. Tuple chứa các tham số thực tế phải được truyền dưới dạng *args*; nó thực sự phải là một tuple. Độ dài của tuple phải ít nhất là *min* và không quá *max*; *min* và *max* có thể bằng nhau. Các đối số bổ sung phải được truyền cho hàm, mỗi đối số trong đó phải là một con trỏ tới một
+   :c:expr:`PyObject*` biến; các biến này sẽ được điền bằng các giá trị từ *args*; chúng sẽ chứa :term:`borrowed references <borrowed reference>`. Các biến tương ứng với những tham số tùy chọn không được cung cấp trong *args* sẽ không được điền; bên gọi phải khởi tạo chúng. Hàm này trả về true nếu thành công và false nếu *args* không phải là một tuple hoặc chứa số phần tử không đúng; một exception sẽ được thiết lập nếu xảy ra lỗi.
 
-   This is an example of the use of this function, taken from the sources for the
-   :mod:`!_weakref` helper module for weak references::
+   Đây là ví dụ về cách sử dụng hàm này, được lấy từ mã nguồn của
+   :mod:`!_weakref` mô-đun trợ giúp dành cho weak references::
 
       static PyObject *
       weakref_ref(PyObject *self, PyObject *args)
@@ -547,199 +352,149 @@ API Functions
           return result;
       }
 
-   The call to :c:func:`PyArg_UnpackTuple` in this example is entirely equivalent to
-   this call to :c:func:`PyArg_ParseTuple`::
+   Lời gọi :c:func:`PyArg_UnpackTuple` trong ví dụ này hoàn toàn tương đương với lời gọi :c:func:`PyArg_ParseTuple`::
 
       PyArg_ParseTuple(args, "O|O:ref", &object, &callback)
 
 .. c:macro:: PY_CXX_CONST
 
-   The value to be inserted, if any, before :c:expr:`char * const *`
-   in the *keywords* parameter declaration of
-   :c:func:`PyArg_ParseTupleAndKeywords` and
-   :c:func:`PyArg_VaParseTupleAndKeywords`.
-   Default empty for C and ``const`` for C++
-   (:c:expr:`const char * const *`).
-   To override, define it to the desired value before including
+   Giá trị cần chèn, nếu có, trước :c:expr:`char * const *` trong khai báo tham số *keywords* của
+   :c:func:`PyArg_ParseTupleAndKeywords` và
+   :c:func:`PyArg_VaParseTupleAndKeywords`. Mặc định là rỗng đối với C và ``const`` đối với C++ (:c:expr:`const char * const *`). Để ghi đè, hãy định nghĩa nó thành giá trị mong muốn trước khi include
    :file:`Python.h`.
 
    .. versionadded:: 3.13
 
 
----------------
-Building values
----------------
+--------------------
+Xây dựng các giá trị
+--------------------
 
 .. c:function:: PyObject* Py_BuildValue(const char *format, ...)
 
-   Create a new value based on a format string similar to those accepted by the
-   ``PyArg_Parse*`` family of functions and a sequence of values.  Returns
-   the value or ``NULL`` in the case of an error; an exception will be raised if
-   ``NULL`` is returned.
+   Tạo một giá trị mới dựa trên chuỗi định dạng tương tự các chuỗi được ``PyArg_Parse*`` và họ hàm của nó chấp nhận, cùng với một dãy giá trị. Trả về giá trị hoặc ``NULL`` nếu xảy ra lỗi; một ngoại lệ sẽ được phát sinh nếu ``NULL`` được trả về.
 
-   :c:func:`Py_BuildValue` does not always build a tuple.  It builds a tuple only if
-   its format string contains two or more format units.  If the format string is
-   empty, it returns ``None``; if it contains exactly one format unit, it returns
-   whatever object is described by that format unit.  To force it to return a tuple
-   of size 0 or one, parenthesize the format string.
+   :c:func:`Py_BuildValue` không phải lúc nào cũng xây dựng một tuple. Nó chỉ xây dựng một tuple nếu chuỗi định dạng chứa từ hai đơn vị định dạng trở lên. Nếu chuỗi định dạng rỗng, nó trả về ``None``; nếu chuỗi chứa chính xác một đơn vị định dạng, nó trả về đối tượng được mô tả bởi đơn vị định dạng đó. Để buộc nó trả về một tuple có kích thước 0 hoặc 1, hãy đặt chuỗi định dạng trong dấu ngoặc đơn.
 
-   When memory buffers are passed as parameters to supply data to build objects, as
-   for the ``s`` and ``s#`` formats, the required data is copied.  Buffers provided
-   by the caller are never referenced by the objects created by
-   :c:func:`Py_BuildValue`.  In other words, if your code invokes :c:func:`malloc`
-   and passes the allocated memory to :c:func:`Py_BuildValue`, your code is
-   responsible for calling :c:func:`free` for that memory once
-   :c:func:`Py_BuildValue` returns.
+   Khi các buffer bộ nhớ được truyền dưới dạng tham số để cung cấp dữ liệu xây dựng đối tượng, như đối với các định dạng ``s`` và ``s#``, dữ liệu cần thiết sẽ được sao chép. Các buffer do bên gọi cung cấp không bao giờ được các đối tượng được tạo bởi
+   :c:func:`Py_BuildValue` tham chiếu. Nói cách khác, nếu mã của bạn gọi :c:func:`malloc` và truyền vùng nhớ đã cấp phát cho :c:func:`Py_BuildValue`, mã của bạn có trách nhiệm gọi :c:func:`free` cho vùng nhớ đó sau khi
+   :c:func:`Py_BuildValue` trả về.
 
-   In the following description, the quoted form is the format unit; the entry in
-   (round) parentheses is the Python object type that the format unit will return;
-   and the entry in [square] brackets is the type of the C value(s) to be passed.
+   Trong phần mô tả sau, dạng được đặt trong dấu ngoặc kép là đơn vị định dạng; mục trong dấu ngoặc tròn là kiểu đối tượng Python mà đơn vị định dạng sẽ trả về; còn mục trong dấu ngoặc vuông là kiểu của (các) giá trị C cần truyền vào.
 
-   The characters space, tab, colon and comma are ignored in format strings (but
-   not within format units such as ``s#``).  This can be used to make long format
-   strings a tad more readable.
+   Các ký tự khoảng trắng, tab, dấu hai chấm và dấu phẩy được bỏ qua trong chuỗi định dạng (nhưng không bị bỏ qua bên trong các đơn vị định dạng như ``s#``). Có thể tận dụng điều này để làm cho các chuỗi định dạng dài dễ đọc hơn một chút.
 
-   ``s`` (:class:`str` or ``None``) [const char \*]
-      Convert a null-terminated C string to a Python :class:`str` object using ``'utf-8'``
-      encoding. If the C string pointer is ``NULL``, ``None`` is used.
+   ``s`` (:class:`str` hoặc ``None``) [const char \*]
+      Chuyển đổi một chuỗi C kết thúc bằng null thành đối tượng Python :class:`str` bằng cách sử dụng encoding ``'utf-8'``. Nếu con trỏ chuỗi C là ``NULL``, thì ``None`` được sử dụng.
 
    ``s#`` (:class:`str` or ``None``) [const char \*, :c:type:`Py_ssize_t`]
-      Convert a C string and its length to a Python :class:`str` object using ``'utf-8'``
-      encoding. If the C string pointer is ``NULL``, the length is ignored and
-      ``None`` is returned.
+      Chuyển đổi một chuỗi C và độ dài của nó thành đối tượng :class:`str` của Python bằng encoding ``'utf-8'``. Nếu con trỏ chuỗi C là ``NULL``, độ dài sẽ bị bỏ qua và ``None`` được trả về.
 
    ``y`` (:class:`bytes`) [const char \*]
-      This converts a C string to a Python :class:`bytes` object.  If the C
-      string pointer is ``NULL``, ``None`` is returned.
+      Hàm này chuyển đổi một chuỗi C thành đối tượng :class:`bytes` của Python. Nếu con trỏ chuỗi C là ``NULL``, ``None`` được trả về.
 
    ``y#`` (:class:`bytes`) [const char \*, :c:type:`Py_ssize_t`]
-      This converts a C string and its lengths to a Python object.  If the C
-      string pointer is ``NULL``, ``None`` is returned.
+      Hàm này chuyển đổi một chuỗi C và các độ dài của nó thành một đối tượng Python. Nếu con trỏ chuỗi C là ``NULL``, ``None`` được trả về.
 
    ``z`` (:class:`str` or ``None``) [const char \*]
-      Same as ``s``.
+      Giống như ``s``.
 
-   ``z#`` (:class:`str` or ``None``) [const char \*, :c:type:`Py_ssize_t`]
-      Same as ``s#``.
+   ``z#`` (:class:`str` hoặc ``None``) [const char \*, :c:type:`Py_ssize_t`]
+      Giống như ``s#``.
 
    ``u`` (:class:`str`) [const wchar_t \*]
-      Convert a null-terminated :c:type:`wchar_t` buffer of Unicode (UTF-16 or UCS-4)
-      data to a Python Unicode object.  If the Unicode buffer pointer is ``NULL``,
-      ``None`` is returned.
+      Chuyển đổi buffer :c:type:`wchar_t` kết thúc bằng null chứa dữ liệu Unicode (UTF-16 hoặc UCS-4) thành một đối tượng Unicode của Python. Nếu con trỏ buffer Unicode là ``NULL``, ``None`` được trả về.
 
    ``u#`` (:class:`str`) [const wchar_t \*, :c:type:`Py_ssize_t`]
-      Convert a Unicode (UTF-16 or UCS-4) data buffer and its length to a Python
-      Unicode object.   If the Unicode buffer pointer is ``NULL``, the length is ignored
-      and ``None`` is returned.
+      Chuyển đổi buffer dữ liệu Unicode (UTF-16 hoặc UCS-4) và độ dài của buffer thành một đối tượng Unicode của Python. Nếu con trỏ buffer Unicode là ``NULL``, độ dài sẽ bị bỏ qua và ``None`` được trả về.
 
    ``U`` (:class:`str` or ``None``) [const char \*]
-      Same as ``s``.
+      Giống như ``s``.
 
    ``U#`` (:class:`str` or ``None``) [const char \*, :c:type:`Py_ssize_t`]
-      Same as ``s#``.
+      Giống như ``s#``.
 
    ``i`` (:class:`int`) [int]
-      Convert a plain C :c:expr:`int` to a Python integer object.
+      Chuyển đổi một :c:expr:`int` C thuần túy thành một đối tượng số nguyên Python.
 
    ``b`` (:class:`int`) [char]
-      Convert a plain C :c:expr:`char` to a Python integer object.
+      Chuyển đổi một :c:expr:`char` C thuần túy thành một đối tượng số nguyên Python.
 
    ``h`` (:class:`int`) [short int]
-      Convert a plain C :c:expr:`short int` to a Python integer object.
+      Chuyển đổi một :c:expr:`short int` C thuần túy thành một đối tượng số nguyên Python.
 
    ``l`` (:class:`int`) [long int]
-      Convert a C :c:expr:`long int` to a Python integer object.
+      Chuyển đổi một :c:expr:`long int` C thành một đối tượng số nguyên Python.
 
    ``B`` (:class:`int`) [unsigned char]
-      Convert a C :c:expr:`unsigned char` to a Python integer object.
+      Chuyển đổi một :c:expr:`unsigned char` C thành một đối tượng số nguyên Python.
 
    ``H`` (:class:`int`) [unsigned short int]
-      Convert a C :c:expr:`unsigned short int` to a Python integer object.
+      Chuyển đổi một :c:expr:`unsigned short int` C thành một đối tượng số nguyên Python.
 
    ``I`` (:class:`int`) [unsigned int]
-      Convert a C :c:expr:`unsigned int` to a Python integer object.
+      Chuyển đổi một :c:expr:`unsigned int` C thành một đối tượng số nguyên Python.
 
    ``k`` (:class:`int`) [unsigned long]
-      Convert a C :c:expr:`unsigned long` to a Python integer object.
+      Chuyển đổi một :c:expr:`unsigned long` C thành một đối tượng số nguyên Python.
 
    ``L`` (:class:`int`) [long long]
-      Convert a C :c:expr:`long long` to a Python integer object.
+      Chuyển đổi một :c:expr:`long long` của C thành một đối tượng số nguyên Python.
 
    .. _capi-py-buildvalue-format-K:
 
    ``K`` (:class:`int`) [unsigned long long]
-      Convert a C :c:expr:`unsigned long long` to a Python integer object.
+      Chuyển đổi một :c:expr:`unsigned long long` của C thành một đối tượng số nguyên Python.
 
    ``n`` (:class:`int`) [:c:type:`Py_ssize_t`]
-      Convert a C :c:type:`Py_ssize_t` to a Python integer.
+      Chuyển đổi một :c:type:`Py_ssize_t` của C thành một số nguyên Python.
 
    ``p`` (:class:`bool`) [int]
-      Convert a C :c:expr:`int` to a Python :class:`bool` object.
+      Chuyển đổi một :c:expr:`int` của C thành một đối tượng :class:`bool` Python.
 
-      Be aware that this format requires an ``int`` argument.
-      Unlike most other contexts in C, variadic arguments are not coerced to
-      a suitable type automatically.
-      You can convert another type (for example, a pointer or a float) to a
-      suitable ``int`` value using ``(x) ? 1 : 0`` or ``!!x``.
+      Lưu ý rằng định dạng này yêu cầu một đối số ``int``. Không giống như hầu hết các ngữ cảnh khác trong C, các đối số biến thiên không được tự động chuyển đổi sang kiểu phù hợp. Bạn có thể chuyển đổi một kiểu khác (ví dụ: một con trỏ hoặc một số thực) thành một giá trị ``int`` phù hợp bằng cách sử dụng ``(x) ? 1 : 0`` hoặc ``!!x``.
 
       .. versionadded:: 3.14
 
-   ``c`` (:class:`bytes` of length 1) [char]
-      Convert a C :c:expr:`int` representing a byte to a Python :class:`bytes` object of
-      length 1.
+   ``c`` (:class:`bytes` có độ dài 1) [char]
+      Chuyển đổi một :c:expr:`int` trong C đại diện cho một byte thành một đối tượng :class:`bytes` trong Python có độ dài 1.
 
-   ``C`` (:class:`str` of length 1) [int]
-      Convert a C :c:expr:`int` representing a character to Python :class:`str`
-      object of length 1.
+   ``C`` (:class:`str` có độ dài 1) [int]
+      Chuyển đổi một :c:expr:`int` trong C đại diện cho một ký tự thành một đối tượng :class:`str` trong Python có độ dài 1.
 
    ``d`` (:class:`float`) [double]
-      Convert a C :c:expr:`double` to a Python floating-point number.
+      Chuyển đổi một :c:expr:`double` trong C thành một số dấu phẩy động trong Python.
 
    ``f`` (:class:`float`) [float]
-      Convert a C :c:expr:`float` to a Python floating-point number.
+      Chuyển đổi một :c:expr:`float` trong C thành một số dấu phẩy động Python.
 
    ``D`` (:class:`complex`) [Py_complex \*]
-      Convert a C :c:type:`Py_complex` structure to a Python complex number.
+      Chuyển đổi một cấu trúc :c:type:`Py_complex` trong C thành một số phức Python.
 
    ``O`` (object) [PyObject \*]
-      Pass a Python object untouched but create a new
-      :term:`strong reference` to it
-      (i.e. its reference count is incremented by one).
-      If the object passed in is a ``NULL`` pointer, it is assumed
-      that this was caused because the call producing the argument found an error and
-      set an exception. Therefore, :c:func:`Py_BuildValue` will return ``NULL`` but won't
-      raise an exception.  If no exception has been raised yet, :exc:`SystemError` is
-      set.
+      Truyền nguyên trạng một đối tượng Python nhưng tạo mới một
+      :term:`strong reference` cho nó (tức là số lượng tham chiếu của nó được tăng thêm một). Nếu đối tượng được truyền vào là một con trỏ ``NULL``, giả định là điều này xảy ra vì lời gọi tạo ra đối số đã phát hiện lỗi và đặt một exception. Do đó, :c:func:`Py_BuildValue` sẽ trả về ``NULL`` nhưng sẽ không phát sinh exception. Nếu chưa có exception nào được phát sinh, :exc:`SystemError` được đặt.
 
    ``S`` (object) [PyObject \*]
-      Same as ``O``.
+      Giống như ``O``.
 
-   ``N`` (object) [PyObject \*]
-      Same as ``O``, except it doesn't create a new :term:`strong reference`.
-      Useful when the object is created by a call to an object constructor in the
-      argument list.
+   ``N`` (đối tượng) [PyObject \*]
+      Giống như ``O``, ngoại trừ việc nó không tạo một :term:`strong reference` mới. Hữu ích khi đối tượng được tạo bằng một lệnh gọi đến hàm khởi tạo đối tượng trong danh sách đối số.
 
-   ``O&`` (object) [*converter*, *anything*]
-      Convert *anything* to a Python object through a *converter* function.  The
-      function is called with *anything* (which should be compatible with :c:expr:`void*`)
-      as its argument and should return a "new" Python object, or ``NULL`` if an
-      error occurred.
+   ``O&`` (đối tượng) [*bộ chuyển đổi*, *bất kỳ*]
+      Chuyển đổi *bất kỳ* thành một đối tượng Python thông qua hàm *bộ chuyển đổi*. Hàm này được gọi với *bất kỳ* (phải tương thích với :c:expr:`void*`) làm đối số và phải trả về một đối tượng Python "mới", hoặc ``NULL`` nếu xảy ra lỗi.
 
-   ``(items)`` (:class:`tuple`) [*matching-items*]
-      Convert a sequence of C values to a Python tuple with the same number of items.
+   ``(items)`` (:class:`tuple`) [*các mục khớp*]
+      Chuyển đổi một chuỗi các giá trị C thành một tuple Python có cùng số lượng mục.
 
    ``[items]`` (:class:`list`) [*matching-items*]
-      Convert a sequence of C values to a Python list with the same number of items.
+      Chuyển đổi một chuỗi các giá trị C thành một danh sách Python có cùng số lượng phần tử.
 
    ``{items}`` (:class:`dict`) [*matching-items*]
-      Convert a sequence of C values to a Python dictionary.  Each pair of consecutive
-      C values adds one item to the dictionary, serving as key and value,
-      respectively.
+      Chuyển đổi một chuỗi các giá trị C thành một từ điển Python. Mỗi cặp giá trị C liên tiếp sẽ thêm một phần tử vào từ điển, lần lượt đóng vai trò là khóa và giá trị.
 
-   If there is an error in the format string, the :exc:`SystemError` exception is
-   set and ``NULL`` returned.
+   Nếu có lỗi trong chuỗi định dạng, ngoại lệ :exc:`SystemError` sẽ được thiết lập và ``NULL`` được trả về.
 
 .. c:function:: PyObject* Py_VaBuildValue(const char *format, va_list vargs)
 
-   Identical to :c:func:`Py_BuildValue`, except that it accepts a va_list
-   rather than a variable number of arguments.
+   Tương tự như :c:func:`Py_BuildValue`, ngoại trừ việc hàm này nhận một va_list thay vì một số lượng đối số thay đổi.

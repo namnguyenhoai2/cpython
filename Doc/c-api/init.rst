@@ -1,9 +1,9 @@
 :orphan:
 
-Initialization, finalization, and threads
-=========================================
+Khởi tạo, hoàn tất và các thread
+================================
 
-This page has been split up into the following:
+Trang này được chia thành các phần sau:
 
 - :ref:`initialization`
 - :ref:`threads`

@@ -1,141 +1,119 @@
 .. _codec-registry:
 
-Codec registry and support functions
-====================================
+Registry codec và các hàm hỗ trợ
+================================
 
 .. c:function:: int PyCodec_Register(PyObject *search_function)
 
-   Register a new codec search function.
+   Đăng ký một hàm tìm kiếm codec mới.
 
-   As a side effect, this tries to load the :mod:`!encodings` package, if not yet
-   done, to make sure that it is always first in the list of search functions.
+   Là một tác dụng phụ, hàm này cố gắng tải gói :mod:`!encodings`, nếu gói chưa được tải, để đảm bảo gói này luôn đứng đầu danh sách các hàm tìm kiếm.
 
 .. c:function:: int PyCodec_Unregister(PyObject *search_function)
 
-   Unregister a codec search function and clear the registry's cache.
-   If the search function is not registered, do nothing.
-   Return 0 on success. Raise an exception and return -1 on error.
+   Hủy đăng ký một hàm tìm kiếm codec và xóa bộ nhớ đệm của registry. Nếu hàm tìm kiếm chưa được đăng ký, không thực hiện thao tác nào. Trả về 0 nếu thành công. Phát sinh một ngoại lệ và trả về -1 nếu xảy ra lỗi.
 
    .. versionadded:: 3.10
 
 .. c:function:: int PyCodec_KnownEncoding(const char *encoding)
 
-   Return ``1`` or ``0`` depending on whether there is a registered codec for
-   the given *encoding*.  This function always succeeds.
+   Trả về ``1`` hoặc ``0`` tùy thuộc vào việc có codec nào được đăng ký cho *encoding* đã cho hay không. Hàm này luôn thành công.
 
 .. c:function:: PyObject* PyCodec_Encode(PyObject *object, const char *encoding, const char *errors)
 
-   Generic codec based encoding API.
+   API mã hóa chung dựa trên codec.
 
-   *object* is passed through the encoder function found for the given
-   *encoding* using the error handling method defined by *errors*.  *errors* may
-   be ``NULL`` to use the default method defined for the codec.  Raises a
-   :exc:`LookupError` if no encoder can be found.
+   Đối tượng *object* được truyền qua hàm encoder được tìm thấy cho *encoding* đã cho bằng phương thức xử lý lỗi được định nghĩa bởi *errors*. *errors* có thể là ``NULL`` để sử dụng phương thức mặc định được định nghĩa cho codec. Phát sinh một
+   :exc:`LookupError` nếu không tìm thấy encoder nào.
 
 .. c:function:: PyObject* PyCodec_Decode(PyObject *object, const char *encoding, const char *errors)
 
-   Generic codec based decoding API.
+   API giải mã tổng quát dựa trên codec.
 
-   *object* is passed through the decoder function found for the given
-   *encoding* using the error handling method defined by *errors*.  *errors* may
-   be ``NULL`` to use the default method defined for the codec.  Raises a
-   :exc:`LookupError` if no decoder can be found.
+   *object* được truyền qua hàm decoder được tìm thấy cho *encoding* đã cho, sử dụng phương thức xử lý lỗi được xác định bởi *errors*.  *errors* có thể là ``NULL`` để sử dụng phương thức mặc định được xác định cho codec.  Raises a
+   :exc:`LookupError` nếu không tìm thấy decoder nào.
 
 
-Codec lookup API
-----------------
+API tra cứu codec
+-----------------
 
-In the following functions, the *encoding* string is looked up converted to all
-lower-case characters, which makes encodings looked up through this mechanism
-effectively case-insensitive.  If no codec is found, a :exc:`KeyError` is set
-and ``NULL`` returned.
+Trong các hàm sau, chuỗi *encoding* được tra cứu sau khi chuyển thành các ký tự viết thường, nhờ đó các encoding được tra cứu thông qua cơ chế này thực tế không phân biệt chữ hoa chữ thường.  Nếu không tìm thấy codec, một :exc:`KeyError` được thiết lập và ``NULL`` được trả về.
 
 .. c:function:: PyObject* PyCodec_Encoder(const char *encoding)
 
-   Get an encoder function for the given *encoding*.
+   Lấy một hàm encoder cho *encoding* đã cho.
 
 .. c:function:: PyObject* PyCodec_Decoder(const char *encoding)
 
-   Get a decoder function for the given *encoding*.
+   Lấy một hàm decoder cho *encoding* đã cho.
 
 .. c:function:: PyObject* PyCodec_IncrementalEncoder(const char *encoding, const char *errors)
 
-   Get an :class:`~codecs.IncrementalEncoder` object for the given *encoding*.
+   Lấy một đối tượng :class:`~codecs.IncrementalEncoder` cho *encoding* đã cho.
 
 .. c:function:: PyObject* PyCodec_IncrementalDecoder(const char *encoding, const char *errors)
 
-   Get an :class:`~codecs.IncrementalDecoder` object for the given *encoding*.
+   Lấy một đối tượng :class:`~codecs.IncrementalDecoder` cho *encoding* đã cho.
 
 .. c:function:: PyObject* PyCodec_StreamReader(const char *encoding, PyObject *stream, const char *errors)
 
-   Get a :class:`~codecs.StreamReader` factory function for the given *encoding*.
+   Lấy một hàm factory :class:`~codecs.StreamReader` cho *encoding* đã cho.
 
 .. c:function:: PyObject* PyCodec_StreamWriter(const char *encoding, PyObject *stream, const char *errors)
 
-   Get a :class:`~codecs.StreamWriter` factory function for the given *encoding*.
+   Lấy một hàm factory :class:`~codecs.StreamWriter` cho *encoding* đã cho.
 
 
-Registry API for Unicode encoding error handlers
-------------------------------------------------
+API registry cho các trình xử lý lỗi encoding Unicode
+-----------------------------------------------------
 
 .. c:function:: int PyCodec_RegisterError(const char *name, PyObject *error)
 
-   Register the error handling callback function *error* under the given *name*.
-   This callback function will be called by a codec when it encounters
-   unencodable characters/undecodable bytes and *name* is specified as the error
-   parameter in the call to the encode/decode function.
+   Đăng ký hàm callback xử lý lỗi *error* với *name* đã cho. Hàm callback này sẽ được codec gọi khi gặp các ký tự không thể encoding hoặc các byte không thể decoding, và *name* được chỉ định làm tham số lỗi trong lệnh gọi đến hàm encode/decode.
 
-   The callback gets a single argument, an instance of
-   :exc:`UnicodeEncodeError`, :exc:`UnicodeDecodeError` or
-   :exc:`UnicodeTranslateError` that holds information about the problematic
-   sequence of characters or bytes and their offset in the original string (see
-   :ref:`unicodeexceptions` for functions to extract this information).  The
-   callback must either raise the given exception, or return a two-item tuple
-   containing the replacement for the problematic sequence, and an integer
-   giving the offset in the original string at which encoding/decoding should be
-   resumed.
+   Callback nhận một đối số duy nhất, là một thể hiện của
+   :exc:`UnicodeEncodeError`, :exc:`UnicodeDecodeError` hoặc
+   :exc:`UnicodeTranslateError` chứa thông tin về chuỗi ký tự hoặc byte có vấn đề và vị trí của chúng trong chuỗi ban đầu (xem
+   :ref:`unicodeexceptions` để biết các hàm trích xuất thông tin này). Callback phải ném exception được cung cấp hoặc trả về một tuple gồm hai phần tử chứa phần thay thế cho chuỗi có vấn đề và một số nguyên cho biết vị trí trong chuỗi ban đầu tại đó quá trình encoding/decoding sẽ được tiếp tục.
 
-   Return ``0`` on success, ``-1`` on error.
+   Trả về ``0`` khi thành công, ``-1`` khi có lỗi.
 
 .. c:function:: PyObject* PyCodec_LookupError(const char *name)
 
-   Lookup the error handling callback function registered under *name*.  As a
-   special case ``NULL`` can be passed, in which case the error handling callback
-   for "strict" will be returned.
+   Tra cứu hàm callback xử lý lỗi được đăng ký dưới *name*. Trường hợp đặc biệt, có thể truyền ``NULL``, khi đó callback xử lý lỗi cho "strict" sẽ được trả về.
 
 .. c:function:: PyObject* PyCodec_StrictErrors(PyObject *exc)
 
-   Raise *exc* as an exception.
+   Ném *exc* dưới dạng exception.
 
 .. c:function:: PyObject* PyCodec_IgnoreErrors(PyObject *exc)
 
-   Ignore the unicode error, skipping the faulty input.
+   Bỏ qua lỗi Unicode, bỏ qua dữ liệu đầu vào bị lỗi.
 
 .. c:function:: PyObject* PyCodec_ReplaceErrors(PyObject *exc)
 
-   Replace the unicode encode error with ``?`` or ``U+FFFD``.
+   Thay thế lỗi mã hóa Unicode bằng ``?`` hoặc ``U+FFFD``.
 
 .. c:function:: PyObject* PyCodec_XMLCharRefReplaceErrors(PyObject *exc)
 
-   Replace the unicode encode error with XML character references.
+   Thay thế lỗi mã hóa Unicode bằng các tham chiếu ký tự XML.
 
 .. c:function:: PyObject* PyCodec_BackslashReplaceErrors(PyObject *exc)
 
-   Replace the unicode encode error with backslash escapes (``\x``, ``\u`` and
-   ``\U``).
+   Thay thế lỗi mã hóa Unicode bằng các chuỗi thoát backslash (``\x``, ``\u`` và ``\U``).
 
 .. c:function:: PyObject* PyCodec_NameReplaceErrors(PyObject *exc)
 
-   Replace the unicode encode error with ``\N{...}`` escapes.
+   Thay thế lỗi mã hóa Unicode bằng các chuỗi thoát ``\N{...}``.
 
    .. versionadded:: 3.5
 
 
-Codec utility variables
------------------------
+Các biến tiện ích của codec
+---------------------------
 
 .. c:var:: const char *Py_hexdigits
 
-   A string constant containing the lowercase hexadecimal digits: ``"0123456789abcdef"``.
+   Một hằng chuỗi chứa các chữ số thập lục phân viết thường: ``"0123456789abcdef"``.
 
    .. versionadded:: 3.3

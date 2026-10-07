@@ -2,114 +2,103 @@
 
 .. _bytearrayobjects:
 
-Byte Array Objects
-------------------
+Đối tượng mảng byte
+-------------------
 
 .. index:: pair: object; bytearray
 
 
 .. c:type:: PyByteArrayObject
 
-   This subtype of :c:type:`PyObject` represents a Python bytearray object.
+   Kiểu con này của :c:type:`PyObject` đại diện cho một đối tượng bytearray của Python.
 
    .. impl-detail::
 
-      The internal buffer of :c:type:`PyByteArrayObject` always includes an
-      extra trailing null byte for compatibility with null terminated C
-      strings.  This extra byte is not counted in :c:func:`PyByteArray_Size`
-      nor in the *len* arguments of the functions below.
+      Bộ đệm nội bộ của :c:type:`PyByteArrayObject` luôn bao gồm thêm một byte null ở cuối để tương thích với các chuỗi C kết thúc bằng null. Byte bổ sung này không được tính trong :c:func:`PyByteArray_Size` cũng như trong các đối số *len* của các hàm bên dưới.
 
 .. c:var:: PyTypeObject PyByteArray_Type
 
-   This instance of :c:type:`PyTypeObject` represents the Python bytearray type;
-   it is the same object as :class:`bytearray` in the Python layer.
+   Thể hiện này của :c:type:`PyTypeObject` đại diện cho kiểu bytearray của Python; nó là cùng một đối tượng với :class:`bytearray` ở lớp Python.
 
 
-Type check macros
-^^^^^^^^^^^^^^^^^
+Macro kiểm tra kiểu
+^^^^^^^^^^^^^^^^^^^
 
 .. c:function:: int PyByteArray_Check(PyObject *o)
 
-   Return true if the object *o* is a bytearray object or an instance of a
-   subtype of the bytearray type.  This function always succeeds.
+   Trả về true nếu đối tượng *o* là một đối tượng bytearray hoặc là một thể hiện của kiểu con của kiểu bytearray. Hàm này luôn thành công.
 
 
 .. c:function:: int PyByteArray_CheckExact(PyObject *o)
 
-   Return true if the object *o* is a bytearray object, but not an instance of a
-   subtype of the bytearray type.  This function always succeeds.
+   Trả về true nếu đối tượng *o* là một đối tượng bytearray, nhưng không phải là một thể hiện của kiểu con của kiểu bytearray. Hàm này luôn thành công.
 
 
-Direct API functions
-^^^^^^^^^^^^^^^^^^^^
+Các hàm API trực tiếp
+^^^^^^^^^^^^^^^^^^^^^
 
 .. c:function:: PyObject* PyByteArray_FromObject(PyObject *o)
 
-   Return a new bytearray object from any object, *o*, that implements the
+   Trả về một đối tượng bytearray mới từ bất kỳ đối tượng nào, *o*, triển khai
    :ref:`buffer protocol <bufferobjects>`.
 
-   On failure, return ``NULL`` with an exception set.
+   Khi xảy ra lỗi, trả về ``NULL`` cùng với một ngoại lệ đã được thiết lập.
 
    .. note::
-      If the object implements the buffer protocol, then the buffer
-      must not be mutated while the bytearray object is being created.
+      Nếu đối tượng triển khai buffer protocol, thì buffer không được thay đổi trong khi đối tượng bytearray đang được tạo.
 
 
 .. c:function:: PyObject* PyByteArray_FromStringAndSize(const char *string, Py_ssize_t len)
 
-   Create a new bytearray object from *string* and its length, *len*.
+   Tạo một đối tượng bytearray mới từ *string* và độ dài của nó, *len*.
 
-   On failure, return ``NULL`` with an exception set.
+   Khi xảy ra lỗi, trả về ``NULL`` cùng với một ngoại lệ đã được thiết lập.
 
 
 .. c:function:: PyObject* PyByteArray_Concat(PyObject *a, PyObject *b)
 
-   Concat bytearrays *a* and *b* and return a new bytearray with the result.
+   Nối các bytearray *a* và *b*, rồi trả về một bytearray mới chứa kết quả.
 
-   On failure, return ``NULL`` with an exception set.
+   Khi xảy ra lỗi, trả về ``NULL`` cùng với một ngoại lệ đã được thiết lập.
 
    .. note::
-      If the object implements the buffer protocol, then the buffer
-      must not be mutated while the bytearray object is being created.
+      Nếu đối tượng triển khai buffer protocol, thì buffer không được thay đổi trong khi đối tượng bytearray đang được tạo.
 
 
 .. c:function:: Py_ssize_t PyByteArray_Size(PyObject *bytearray)
 
-   Return the size of *bytearray* after checking for a ``NULL`` pointer.
+   Trả về kích thước của *bytearray* sau khi kiểm tra một ``NULL`` pointer.
 
 
 .. c:function:: char* PyByteArray_AsString(PyObject *bytearray)
 
-   Return the contents of *bytearray* as a char array after checking for a
-   ``NULL`` pointer.  The returned array always has an extra
-   null byte appended.
+   Trả về nội dung của *bytearray* dưới dạng một mảng char sau khi kiểm tra một ``NULL`` pointer. Mảng được trả về luôn có thêm một byte null ở cuối.
 
    .. note::
-      It is not thread-safe to mutate the bytearray object while using the returned char array.
+      Không an toàn cho thread khi thay đổi đối tượng bytearray trong lúc sử dụng mảng char được trả về.
 
 
 .. c:function:: int PyByteArray_Resize(PyObject *bytearray, Py_ssize_t len)
 
-   Resize the internal buffer of *bytearray* to *len*.
-   Failure is a ``-1`` return with an exception set.
+   Thay đổi kích thước buffer nội bộ của *bytearray* thành *len*. Nếu thất bại, hàm trả về ``-1`` và đặt một exception.
 
    .. versionchanged:: 3.14
-      A negative *len* will now result in an exception being set and -1 returned.
+      Giá trị *len* âm giờ đây sẽ khiến một exception được thiết lập và trả về -1.
 
 
-Macros
-^^^^^^
+Macro
+^^^^^
 
-These macros trade safety for speed and they don't check pointers.
+Các macro này đánh đổi tính an toàn để lấy tốc độ và không kiểm tra pointer.
 
 .. c:function:: char* PyByteArray_AS_STRING(PyObject *bytearray)
 
-   Similar to :c:func:`PyByteArray_AsString`, but without error checking.
+   Tương tự :c:func:`PyByteArray_AsString`, nhưng không kiểm tra lỗi.
 
    .. note::
-      It is not thread-safe to mutate the bytearray object while using the returned char array.
+      Không an toàn luồng khi thay đổi đối tượng bytearray trong lúc sử dụng mảng char được trả về.
 
 
 .. c:function:: Py_ssize_t PyByteArray_GET_SIZE(PyObject *bytearray)
 
-   Similar to :c:func:`PyByteArray_Size`, but without error checking.
+   Tương tự :c:func:`PyByteArray_Size`, nhưng không kiểm tra lỗi.

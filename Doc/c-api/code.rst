@@ -4,175 +4,134 @@
 
 .. _codeobjects:
 
-Code Objects
+Đối tượng mã
 ------------
 
 .. sectionauthor:: Jeffrey Yasskin <jyasskin@gmail.com>
 
-Code objects are a low-level detail of the CPython implementation.
-Each one represents a chunk of executable code that hasn't yet been
-bound into a function.
+Đối tượng mã là một chi tiết cấp thấp trong triển khai CPython. Mỗi đối tượng biểu diễn một đoạn mã có thể thực thi nhưng chưa được liên kết với một hàm.
 
 .. c:type:: PyCodeObject
 
-   The C structure of the objects used to describe code objects.  The
-   fields of this type are subject to change at any time.
+   Cấu trúc C của các đối tượng được dùng để mô tả đối tượng mã. Các trường của kiểu này có thể thay đổi bất kỳ lúc nào.
 
 
 .. c:var:: PyTypeObject PyCode_Type
 
-   This is an instance of :c:type:`PyTypeObject` representing the Python
-   :ref:`code object <code-objects>`.
+   Đây là một thực thể của :c:type:`PyTypeObject` đại diện cho Python
+   :ref:`đối tượng mã <code-objects>`.
 
 
 .. c:function:: int PyCode_Check(PyObject *co)
 
-   Return true if *co* is a :ref:`code object <code-objects>`.
-   This function always succeeds.
+   Trả về true nếu *co* là một :ref:`đối tượng mã <code-objects>`. Hàm này luôn thực hiện thành công.
 
 .. c:function:: Py_ssize_t PyCode_GetNumFree(PyCodeObject *co)
 
-   Return the number of :term:`free (closure) variables <closure variable>`
-   in a code object.
+   Trả về số lượng :term:`biến tự do (closure) <closure variable>` trong một đối tượng mã.
 
 .. c:function:: int PyUnstable_Code_GetFirstFree(PyCodeObject *co)
 
-   Return the position of the first :term:`free (closure) variable <closure variable>`
-   in a code object.
+   Trả về vị trí của :term:`biến free (closure) đầu tiên <closure variable>` trong một code object.
 
    .. versionchanged:: 3.13
 
-      Renamed from ``PyCode_GetFirstFree`` as part of :ref:`unstable-c-api`.
-      The old name is deprecated, but will remain available until the
-      signature changes again.
+      Được đổi tên từ ``PyCode_GetFirstFree`` như một phần của :ref:`unstable-c-api`. Tên cũ đã lỗi thời nhưng vẫn sẽ được cung cấp cho đến khi signature lại thay đổi.
 
 .. c:function:: PyCodeObject* PyUnstable_Code_New(int argcount, int kwonlyargcount, int nlocals, int stacksize, int flags, PyObject *code, PyObject *consts, PyObject *names, PyObject *varnames, PyObject *freevars, PyObject *cellvars, PyObject *filename, PyObject *name, PyObject *qualname, int firstlineno, PyObject *linetable, PyObject *exceptiontable)
 
-   Return a new code object.  If you need a dummy code object to create a frame,
-   use :c:func:`PyCode_NewEmpty` instead.
+   Trả về một code object mới. Nếu bạn cần một code object giả để tạo frame, hãy dùng :c:func:`PyCode_NewEmpty` thay thế.
 
-   Since the definition of the bytecode changes often, calling
-   :c:func:`PyUnstable_Code_New` directly can bind you to a precise Python version.
+   Vì định nghĩa của bytecode thường xuyên thay đổi, việc gọi
+   :c:func:`PyUnstable_Code_New` trực tiếp có thể khiến bạn phụ thuộc vào một phiên bản Python cụ thể.
 
-   The many arguments of this function are inter-dependent in complex
-   ways, meaning that subtle changes to values are likely to result in incorrect
-   execution or VM crashes. Use this function only with extreme care.
+   Nhiều đối số của hàm này phụ thuộc lẫn nhau theo những cách phức tạp, nghĩa là những thay đổi nhỏ đối với các giá trị có thể dẫn đến việc thực thi không chính xác hoặc VM bị lỗi. Chỉ sử dụng hàm này khi hết sức thận trọng.
 
    .. versionchanged:: 3.11
-      Added ``qualname`` and ``exceptiontable`` parameters.
+      Đã thêm các tham số ``qualname`` và ``exceptiontable``.
 
    .. index:: single: PyCode_New (C function)
 
    .. versionchanged:: 3.12
 
-      Renamed from ``PyCode_New`` as part of :ref:`unstable-c-api`.
-      The old name is deprecated, but will remain available until the
-      signature changes again.
+      Được đổi tên từ ``PyCode_New`` trong :ref:`unstable-c-api`. Tên cũ không còn được khuyến nghị, nhưng vẫn sẽ khả dụng cho đến khi signature lại thay đổi.
 
 .. c:function:: PyCodeObject* PyCode_NewWithPosOnlyArgs(...)
    :no-typesetting:
 
 .. c:function:: PyCodeObject* PyUnstable_Code_NewWithPosOnlyArgs(int argcount, int posonlyargcount, int kwonlyargcount, int nlocals, int stacksize, int flags, PyObject *code, PyObject *consts, PyObject *names, PyObject *varnames, PyObject *freevars, PyObject *cellvars, PyObject *filename, PyObject *name, PyObject *qualname, int firstlineno, PyObject *linetable, PyObject *exceptiontable)
 
-   Similar to :c:func:`PyUnstable_Code_New`, but with an extra "posonlyargcount" for positional-only arguments.
-   The same caveats that apply to ``PyUnstable_Code_New`` also apply to this function.
+   Tương tự :c:func:`PyUnstable_Code_New`, nhưng có thêm "posonlyargcount" cho các đối số positional-only. Các lưu ý áp dụng cho ``PyUnstable_Code_New`` cũng áp dụng cho hàm này.
 
-   .. versionadded:: 3.8 as ``PyCode_NewWithPosOnlyArgs``
+   .. versionadded:: 3.8 như ``PyCode_NewWithPosOnlyArgs``
 
    .. versionchanged:: 3.11
-      Added ``qualname`` and  ``exceptiontable`` parameters.
+      Đã thêm các tham số ``qualname`` và ``exceptiontable``.
 
    .. versionchanged:: 3.12
 
-      Renamed to ``PyUnstable_Code_NewWithPosOnlyArgs``.
-      The old name is deprecated, but will remain available until the
-      signature changes again.
+      Được đổi tên thành ``PyUnstable_Code_NewWithPosOnlyArgs``. Tên cũ không còn được khuyến nghị, nhưng vẫn sẽ khả dụng cho đến khi signature lại thay đổi.
 
 .. c:function:: PyCodeObject* PyCode_NewEmpty(const char *filename, const char *funcname, int firstlineno)
 
-   Return a new empty code object with the specified filename,
-   function name, and first line number. The resulting code
-   object will raise an ``Exception`` if executed.
+   Trả về một code object trống mới với filename, tên hàm và số dòng đầu tiên được chỉ định. Code object thu được sẽ phát sinh ``Exception`` nếu được thực thi.
 
 .. c:function:: int PyCode_Addr2Line(PyCodeObject *co, int byte_offset)
 
-    Return the line number of the instruction that occurs on or before ``byte_offset`` and ends after it.
-    If you just need the line number of a frame, use :c:func:`PyFrame_GetLineNumber` instead.
+    Trả về số dòng của instruction xảy ra tại hoặc trước ``byte_offset`` và kết thúc sau đó. Nếu bạn chỉ cần số dòng của một frame, hãy dùng :c:func:`PyFrame_GetLineNumber` thay thế.
 
-    For efficiently iterating over the line numbers in a code object, use :pep:`the API described in PEP 626
-    <0626#out-of-process-debuggers-and-profilers>`.
+    Để lặp hiệu quả qua các số dòng trong một đối tượng code, hãy sử dụng :pep:`the API described in PEP 626 <0626#out-of-process-debuggers-and-profilers>`.
 
 .. c:function:: int PyCode_Addr2Location(PyObject *co, int byte_offset, int *start_line, int *start_column, int *end_line, int *end_column)
 
-   Sets the passed ``int`` pointers to the source code line and column numbers
-   for the instruction at ``byte_offset``. Sets the value to ``0`` when
-   information is not available for any particular element.
+   Đặt các con trỏ ``int`` được truyền vào thành số dòng và số cột trong mã nguồn tương ứng với instruction tại ``byte_offset``. Đặt giá trị thành ``0`` khi không có thông tin cho một phần tử cụ thể nào.
 
-   Returns ``1`` if the function succeeds and 0 otherwise.
+   Trả về ``1`` nếu hàm thành công và trả về 0 trong các trường hợp khác.
 
    .. versionadded:: 3.11
 
 .. c:function:: PyObject* PyCode_GetCode(PyCodeObject *co)
 
-   Equivalent to the Python code ``getattr(co, 'co_code')``.
-   Returns a strong reference to a :c:type:`PyBytesObject` representing the
-   bytecode in a code object. On error, ``NULL`` is returned and an exception
-   is raised.
+   Tương đương với mã Python ``getattr(co, 'co_code')``. Trả về một strong reference đến :c:type:`PyBytesObject` đại diện cho bytecode trong một đối tượng code. Khi xảy ra lỗi, trả về ``NULL`` và phát sinh một exception.
 
-   This ``PyBytesObject`` may be created on-demand by the interpreter and does
-   not necessarily represent the bytecode actually executed by CPython. The
-   primary use case for this function is debuggers and profilers.
+   ``PyBytesObject`` này có thể được interpreter tạo theo yêu cầu và không nhất thiết đại diện cho bytecode thực sự được CPython thực thi. Trường hợp sử dụng chính của hàm này là cho debugger và profiler.
 
    .. versionadded:: 3.11
 
 .. c:function:: PyObject* PyCode_GetVarnames(PyCodeObject *co)
 
-   Equivalent to the Python code ``getattr(co, 'co_varnames')``.
-   Returns a new reference to a :c:type:`PyTupleObject` containing the names of
-   the local variables. On error, ``NULL`` is returned and an exception
-   is raised.
+   Tương đương với mã Python ``getattr(co, 'co_varnames')``. Trả về một reference mới đến :c:type:`PyTupleObject` chứa tên của các biến cục bộ. Khi xảy ra lỗi, trả về ``NULL`` và phát sinh một exception.
 
    .. versionadded:: 3.11
 
 .. c:function:: PyObject* PyCode_GetCellvars(PyCodeObject *co)
 
-   Equivalent to the Python code ``getattr(co, 'co_cellvars')``.
-   Returns a new reference to a :c:type:`PyTupleObject` containing the names of
-   the local variables that are referenced by nested functions. On error, ``NULL``
-   is returned and an exception is raised.
+   Tương đương với mã Python ``getattr(co, 'co_cellvars')``. Trả về một reference mới đến :c:type:`PyTupleObject` chứa tên của các biến cục bộ được các hàm lồng nhau tham chiếu. Khi xảy ra lỗi, trả về ``NULL`` và phát sinh một exception.
 
    .. versionadded:: 3.11
 
 .. c:function:: PyObject* PyCode_GetFreevars(PyCodeObject *co)
 
-   Equivalent to the Python code ``getattr(co, 'co_freevars')``.
-   Returns a new reference to a :c:type:`PyTupleObject` containing the names of
-   the :term:`free (closure) variables <closure variable>`. On error, ``NULL`` is returned
-   and an exception is raised.
+   Tương đương với mã Python ``getattr(co, 'co_freevars')``. Trả về một tham chiếu mới đến một :c:type:`PyTupleObject` chứa tên của các biến :term:`free (closure) variables <closure variable>`. Khi có lỗi, ``NULL`` được trả về và một ngoại lệ được phát sinh.
 
    .. versionadded:: 3.11
 
 .. c:function:: int PyCode_AddWatcher(PyCode_WatchCallback callback)
 
-   Register *callback* as a code object watcher for the current interpreter.
-   Return an ID which may be passed to :c:func:`PyCode_ClearWatcher`.
-   In case of error (e.g. no more watcher IDs available),
-   return ``-1`` and set an exception.
+   Đăng ký *callback* làm watcher đối tượng mã cho interpreter hiện tại. Trả về một ID có thể được truyền vào :c:func:`PyCode_ClearWatcher`. Nếu xảy ra lỗi (ví dụ: không còn ID watcher nào khả dụng), trả về ``-1`` và đặt một ngoại lệ.
 
    .. versionadded:: 3.12
 
 .. c:function:: int PyCode_ClearWatcher(int watcher_id)
 
-   Clear watcher identified by *watcher_id* previously returned from
-   :c:func:`PyCode_AddWatcher` for the current interpreter.
-   Return ``0`` on success, or ``-1`` and set an exception on error
-   (e.g. if the given *watcher_id* was never registered.)
+   Xóa watcher được xác định bởi *watcher_id* đã được trả về trước đó từ
+   :c:func:`PyCode_AddWatcher` cho interpreter hiện tại. Trả về ``0`` nếu thành công, hoặc ``-1`` và đặt một ngoại lệ nếu xảy ra lỗi (ví dụ: nếu *watcher_id* đã cho chưa từng được đăng ký.)
 
    .. versionadded:: 3.12
 
 .. c:type:: PyCodeEvent
 
-   Enumeration of possible code object watcher events:
+   Liệt kê các sự kiện watcher đối tượng mã có thể xảy ra:
    - ``PY_CODE_EVENT_CREATE``
    - ``PY_CODE_EVENT_DESTROY``
 
@@ -180,69 +139,47 @@ bound into a function.
 
 .. c:type:: int (*PyCode_WatchCallback)(PyCodeEvent event, PyCodeObject* co)
 
-   Type of a code object watcher callback function.
+   Kiểu của hàm callback watcher đối tượng mã.
 
-   If *event* is ``PY_CODE_EVENT_CREATE``, then the callback is invoked
-   after *co* has been fully initialized. Otherwise, the callback is invoked
-   before the destruction of *co* takes place, so the prior state of *co*
-   can be inspected.
+   Nếu *event* là ``PY_CODE_EVENT_CREATE``, callback được gọi sau khi *co* đã được khởi tạo hoàn chỉnh. Nếu không, callback được gọi trước khi quá trình hủy *co* diễn ra, để có thể kiểm tra trạng thái trước đó của *co*.
 
-   If *event* is ``PY_CODE_EVENT_DESTROY``, taking a reference in the callback
-   to the about-to-be-destroyed code object will resurrect it and prevent it
-   from being freed at this time. When the resurrected object is destroyed
-   later, any watcher callbacks active at that time will be called again.
+   Nếu *event* là ``PY_CODE_EVENT_DESTROY``, việc giữ một tham chiếu trong callback đến đối tượng mã sắp bị hủy sẽ làm đối tượng đó được phục hồi và ngăn không cho nó được giải phóng vào thời điểm này. Khi đối tượng được phục hồi bị hủy sau đó, mọi callback của watcher đang hoạt động tại thời điểm đó sẽ được gọi lại.
 
-   Users of this API should not rely on internal runtime implementation
-   details. Such details may include, but are not limited to, the exact
-   order and timing of creation and destruction of code objects. While
-   changes in these details may result in differences observable by watchers
-   (including whether a callback is invoked or not), it does not change
-   the semantics of the Python code being executed.
+   Người dùng API này không nên phụ thuộc vào các chi tiết triển khai runtime nội bộ. Những chi tiết đó có thể bao gồm, nhưng không chỉ giới hạn ở, thứ tự và thời điểm chính xác tạo cũng như hủy các đối tượng mã. Mặc dù những thay đổi trong các chi tiết này có thể dẫn đến các khác biệt mà watcher quan sát được (bao gồm cả việc callback có được gọi hay không), chúng không làm thay đổi ngữ nghĩa của mã Python đang được thực thi.
 
-   If the callback sets an exception, it must return ``-1``; this exception will
-   be printed as an unraisable exception using :c:func:`PyErr_WriteUnraisable`.
-   Otherwise it should return ``0``.
+   Nếu callback đặt một ngoại lệ, nó phải trả về ``-1``; ngoại lệ này sẽ được in dưới dạng ngoại lệ không thể phát (unraisable exception) bằng :c:func:`PyErr_WriteUnraisable`. Nếu không, callback nên trả về ``0``.
 
-   There may already be a pending exception set on entry to the callback. In
-   this case, the callback should return ``0`` with the same exception still
-   set. This means the callback may not call any other API that can set an
-   exception unless it saves and clears the exception state first, and restores
-   it before returning.
+   Có thể đã có một ngoại lệ đang chờ được đặt khi bắt đầu callback. Trong trường hợp này, callback nên trả về ``0`` trong khi vẫn giữ nguyên ngoại lệ đó. Điều này có nghĩa là callback không được gọi bất kỳ API nào khác có thể đặt một ngoại lệ, trừ khi trước tiên nó lưu và xóa trạng thái ngoại lệ, rồi khôi phục trạng thái đó trước khi trả về.
 
    .. versionadded:: 3.12
 
 
 .. c:function:: PyObject *PyCode_Optimize(PyObject *code, PyObject *consts, PyObject *names, PyObject *lnotab_obj)
 
-   This is a function that does nothing.
+   Đây là một hàm không thực hiện thao tác nào.
 
-   Prior to Python 3.10, this function would perform basic optimizations to a
-   code object.
+   Trước Python 3.10, hàm này sẽ thực hiện các tối ưu hóa cơ bản cho một đối tượng mã.
 
    .. versionchanged:: 3.10
-      This function now does nothing.
+      Hàm này hiện không thực hiện thao tác nào.
 
    .. soft-deprecated:: 3.13
 
 
 .. _c_codeobject_flags:
 
-Code Object Flags
------------------
+Các cờ của đối tượng mã
+-----------------------
 
-Code objects contain a bit-field of flags, which can be retrieved as the
-:attr:`~codeobject.co_flags` Python attribute (for example using
-:c:func:`PyObject_GetAttrString`), and set using a *flags* argument to
-:c:func:`PyUnstable_Code_New` and similar functions.
+Các đối tượng mã chứa một trường bit gồm các cờ, có thể được truy xuất dưới dạng
+:attr:`~codeobject.co_flags` thuộc tính Python (ví dụ bằng cách sử dụng
+:c:func:`PyObject_GetAttrString`), và được thiết lập bằng đối số *flags* cho
+:c:func:`PyUnstable_Code_New` và các hàm tương tự.
 
-Flags whose names start with ``CO_FUTURE_`` correspond to features normally
-selectable by :ref:`future statements <future>`. These flags can be used in
-:c:member:`PyCompilerFlags.cf_flags`.
-Note that many ``CO_FUTURE_`` flags are mandatory in current versions of
-Python, and setting them has no effect.
+Các cờ có tên bắt đầu bằng ``CO_FUTURE_`` tương ứng với những tính năng thường có thể chọn bằng các câu lệnh :ref:`future statements <future>`. Có thể sử dụng các cờ này trong
+:c:member:`PyCompilerFlags.cf_flags`. Lưu ý rằng nhiều cờ ``CO_FUTURE_`` là bắt buộc trong các phiên bản Python hiện tại, nên việc thiết lập chúng không có tác dụng.
 
-The following flags are available.
-For their meaning, see the linked documentation of their Python equivalents.
+Các flag sau đây hiện có. Để biết ý nghĩa của chúng, hãy xem tài liệu được liên kết về các phiên bản tương đương trong Python.
 
 
 .. list-table::
@@ -250,7 +187,7 @@ For their meaning, see the linked documentation of their Python equivalents.
    :header-rows: 1
 
    * * Flag
-     * Meaning
+     * Ý nghĩa
    * * .. c:macro:: CO_OPTIMIZED
      * :py:data:`inspect.CO_OPTIMIZED`
    * * .. c:macro:: CO_NEWLOCALS
@@ -275,86 +212,69 @@ For their meaning, see the linked documentation of their Python equivalents.
      * :py:data:`inspect.CO_METHOD`
 
    * * .. c:macro:: CO_FUTURE_DIVISION
-     * no effect (:py:data:`__future__.division`)
+     * không có tác dụng (:py:data:`__future__.division`)
    * * .. c:macro:: CO_FUTURE_ABSOLUTE_IMPORT
-     * no effect (:py:data:`__future__.absolute_import`)
+     * không có tác dụng (:py:data:`__future__.absolute_import`)
    * * .. c:macro:: CO_FUTURE_WITH_STATEMENT
-     * no effect (:py:data:`__future__.with_statement`)
+     * không có tác dụng (:py:data:`__future__.with_statement`)
    * * .. c:macro:: CO_FUTURE_PRINT_FUNCTION
-     * no effect (:py:data:`__future__.print_function`)
+     * không có tác dụng (:py:data:`__future__.print_function`)
    * * .. c:macro:: CO_FUTURE_UNICODE_LITERALS
-     * no effect (:py:data:`__future__.unicode_literals`)
+     * không có tác dụng (:py:data:`__future__.unicode_literals`)
    * * .. c:macro:: CO_FUTURE_GENERATOR_STOP
-     * no effect (:py:data:`__future__.generator_stop`)
+     * không có tác dụng (:py:data:`__future__.generator_stop`)
    * * .. c:macro:: CO_FUTURE_ANNOTATIONS
      * :py:data:`__future__.annotations`
 
 
-Extra information
+Thông tin bổ sung
 -----------------
 
-To support low-level extensions to frame evaluation, such as external
-just-in-time compilers, it is possible to attach arbitrary extra data to
-code objects.
+Để hỗ trợ các phần mở rộng cấp thấp cho việc đánh giá frame, chẳng hạn như các trình biên dịch just-in-time bên ngoài, bạn có thể đính kèm dữ liệu tùy ý vào các code object.
 
-These functions are part of the unstable C API tier:
-this functionality is a CPython implementation detail, and the API
-may change without deprecation warnings.
+Các hàm này thuộc tầng C API không ổn định: chức năng này là một chi tiết triển khai của CPython và API có thể thay đổi mà không có cảnh báo ngừng hỗ trợ.
 
 .. c:function:: Py_ssize_t _PyEval_RequestCodeExtraIndex(freefunc free)
    :no-typesetting:
 
 .. c:function:: Py_ssize_t PyUnstable_Eval_RequestCodeExtraIndex(freefunc free)
 
-   Return a new opaque index value used to adding data to code objects.
+   Trả về một giá trị chỉ mục opaque mới được dùng để thêm dữ liệu vào các code object.
 
-   You generally call this function once (per interpreter) and use the result
-   with ``PyCode_GetExtra`` and ``PyCode_SetExtra`` to manipulate
-   data on individual code objects.
+   Thông thường, bạn gọi hàm này một lần (cho mỗi interpreter) rồi sử dụng kết quả cùng với ``PyCode_GetExtra`` và ``PyCode_SetExtra`` để thao tác với dữ liệu trên từng code object.
 
-   If *free* is not ``NULL``: when a code object is deallocated,
-   *free* will be called on non-``NULL`` data stored under the new index.
-   Use :c:func:`Py_DecRef` when storing :c:type:`PyObject`.
+   Nếu *free* không phải là ``NULL``: khi một đối tượng mã được giải phóng, *free* sẽ được gọi trên dữ liệu không phải ``NULL`` được lưu dưới chỉ mục mới. Sử dụng :c:func:`Py_DecRef` khi lưu trữ :c:type:`PyObject`.
 
-   .. versionadded:: 3.6 as ``_PyEval_RequestCodeExtraIndex``
+   .. versionadded:: 3.6 kể từ ``_PyEval_RequestCodeExtraIndex``
 
    .. versionchanged:: 3.12
 
-     Renamed to ``PyUnstable_Eval_RequestCodeExtraIndex``.
-     The old private name is deprecated, but will be available until the API
-     changes.
+     Được đổi tên thành ``PyUnstable_Eval_RequestCodeExtraIndex``. Tên riêng tư cũ đã lỗi thời nhưng sẽ vẫn khả dụng cho đến khi API thay đổi.
 
 .. c:function:: int _PyCode_GetExtra(PyObject *code, Py_ssize_t index, void **extra)
    :no-typesetting:
 
 .. c:function:: int PyUnstable_Code_GetExtra(PyObject *code, Py_ssize_t index, void **extra)
 
-   Set *extra* to the extra data stored under the given index.
-   Return 0 on success. Set an exception and return -1 on failure.
+   Đặt *extra* thành dữ liệu bổ sung được lưu dưới chỉ mục đã cho. Trả về 0 nếu thành công. Đặt một ngoại lệ và trả về -1 nếu thất bại.
 
-   If no data was set under the index, set *extra* to ``NULL`` and return
-   0 without setting an exception.
+   Nếu không có dữ liệu nào được đặt dưới chỉ mục, đặt *extra* thành ``NULL`` và trả về 0 mà không đặt ngoại lệ.
 
-   .. versionadded:: 3.6 as ``_PyCode_GetExtra``
+   .. versionadded:: 3.6 kể từ ``_PyCode_GetExtra``
 
    .. versionchanged:: 3.12
 
-     Renamed to ``PyUnstable_Code_GetExtra``.
-     The old private name is deprecated, but will be available until the API
-     changes.
+     Được đổi tên thành ``PyUnstable_Code_GetExtra``. Tên riêng tư cũ đã lỗi thời nhưng sẽ vẫn khả dụng cho đến khi API thay đổi.
 
 .. c:function:: int _PyCode_SetExtra(PyObject *code, Py_ssize_t index, void *extra)
    :no-typesetting:
 
 .. c:function:: int PyUnstable_Code_SetExtra(PyObject *code, Py_ssize_t index, void *extra)
 
-   Set the extra data stored under the given index to *extra*.
-   Return 0 on success. Set an exception and return -1 on failure.
+   Đặt dữ liệu bổ sung được lưu dưới chỉ mục đã cho thành *extra*. Trả về 0 nếu thành công. Đặt một exception và trả về -1 nếu thất bại.
 
-   .. versionadded:: 3.6 as ``_PyCode_SetExtra``
+   .. versionadded:: 3.6 thành ``_PyCode_SetExtra``
 
    .. versionchanged:: 3.12
 
-     Renamed to ``PyUnstable_Code_SetExtra``.
-     The old private name is deprecated, but will be available until the API
-     changes.
+     Được đổi tên thành ``PyUnstable_Code_SetExtra``. Tên private cũ đã deprecated nhưng sẽ vẫn khả dụng cho đến khi API thay đổi.

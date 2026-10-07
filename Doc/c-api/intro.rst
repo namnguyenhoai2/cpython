@@ -3,144 +3,94 @@
 
 .. _api-intro:
 
-************
-Introduction
-************
+**********
+Giới thiệu
+**********
 
-The Application Programmer's Interface to Python gives C and C++ programmers
-access to the Python interpreter at a variety of levels.  The API is equally
-usable from C++, but for brevity it is generally referred to as the Python/C
-API.  There are two fundamentally different reasons for using the Python/C API.
-The first reason is to write *extension modules* for specific purposes; these
-are C modules that extend the Python interpreter.  This is probably the most
-common use.  The second reason is to use Python as a component in a larger
-application; this technique is generally referred to as :dfn:`embedding` Python
-in an application.
+Application Programmer's Interface của Python cho phép các lập trình viên C và C++ truy cập trình thông dịch Python ở nhiều cấp độ khác nhau. API này cũng có thể được sử dụng hiệu quả từ C++, nhưng để ngắn gọn, nó thường được gọi là Python/C API. Có hai lý do hoàn toàn khác nhau để sử dụng Python/C API. Lý do đầu tiên là viết các *mô-đun mở rộng* cho những mục đích cụ thể; đây là các mô-đun C mở rộng trình thông dịch Python. Đây có lẽ là cách sử dụng phổ biến nhất. Lý do thứ hai là sử dụng Python như một thành phần trong một ứng dụng lớn hơn; kỹ thuật này thường được gọi là :dfn:`nhúng` Python vào một ứng dụng.
 
-Writing an extension module is a relatively well-understood process, where a
-"cookbook" approach works well.  There are several tools that automate the
-process to some extent.  While people have embedded Python in other
-applications since its early existence, the process of embedding Python is
-less straightforward than writing an extension.
+Việc viết một mô-đun mở rộng là một quy trình tương đối dễ hiểu, trong đó cách tiếp cận theo kiểu "cookbook" hoạt động khá hiệu quả. Có một số công cụ tự động hóa quy trình này ở một mức độ nhất định. Mặc dù mọi người đã nhúng Python vào các ứng dụng khác kể từ những ngày đầu của Python, quy trình nhúng Python kém đơn giản hơn so với việc viết một phần mở rộng.
 
-Many API functions are useful independent of whether you're embedding  or
-extending Python; moreover, most applications that embed Python  will need to
-provide a custom extension as well, so it's probably a  good idea to become
-familiar with writing an extension before  attempting to embed Python in a real
-application.
+Nhiều hàm API hữu ích независимо với việc bạn đang nhúng hay mở rộng Python; hơn nữa, hầu hết các ứng dụng nhúng Python cũng sẽ cần cung cấp một phần mở rộng tùy chỉnh, vì vậy có lẽ bạn nên làm quen với việc viết một phần mở rộng trước khi cố gắng nhúng Python vào một ứng dụng thực tế.
 
 
-Language version compatibility
-==============================
+Khả năng tương thích với phiên bản ngôn ngữ
+===========================================
 
-Python's C API is compatible with C11 and C++11 versions of C and C++.
+C API của Python tương thích với các phiên bản C11 và C++11 của C và C++.
 
-This is a lower limit: the C API does not require features from later
-C/C++ versions.
-You do *not* need to enable your compiler's "c11 mode".
+Đây là giới hạn thấp hơn: C API không yêu cầu các tính năng từ những phiên bản C/C++ mới hơn. Bạn *không* cần bật "c11 mode" của trình biên dịch.
 
 
-Coding standards
-================
+Tiêu chuẩn viết mã
+==================
 
-If you're writing C code for inclusion in CPython, you **must** follow the
-guidelines and standards defined in :PEP:`7`.  These guidelines apply
-regardless of the version of Python you are contributing to.  Following these
-conventions is not necessary for your own third party extension modules,
-unless you eventually expect to contribute them to Python.
+Nếu bạn viết mã C để đưa vào CPython, bạn **phải** tuân theo các hướng dẫn và tiêu chuẩn được định nghĩa trong :PEP:`7`. Các hướng dẫn này được áp dụng bất kể phiên bản Python mà bạn đang đóng góp. Việc tuân theo các quy ước này không bắt buộc đối với các mô-đun mở rộng của bên thứ ba do bạn tự viết, trừ khi cuối cùng bạn dự định đóng góp chúng cho Python.
 
 
 .. _api-includes:
 
-Include Files
-=============
+Các tệp Include
+===============
 
-All function, type and macro definitions needed to use the Python/C API are
-included in your code by the following line::
+Tất cả định nghĩa hàm, kiểu và macro cần thiết để sử dụng Python/C API được đưa vào mã của bạn bằng dòng sau::
 
    #define PY_SSIZE_T_CLEAN
    #include <Python.h>
 
-This implies inclusion of the following standard headers: ``<stdio.h>``,
-``<string.h>``, ``<errno.h>``, ``<limits.h>``, ``<assert.h>`` and ``<stdlib.h>``
-(if available).
+Điều này ngầm bao gồm các header tiêu chuẩn sau: ``<stdio.h>``, ``<string.h>``, ``<errno.h>``, ``<limits.h>``, ``<assert.h>`` và ``<stdlib.h>`` (nếu có).
 
 .. note::
 
-   Since Python may define some pre-processor definitions which affect the standard
-   headers on some systems, you *must* include :file:`Python.h` before any standard
-   headers are included.
+   Vì Python có thể định nghĩa một số macro tiền xử lý ảnh hưởng đến các header chuẩn trên một số hệ thống, bạn *phải* include :file:`Python.h` trước khi include bất kỳ header chuẩn nào.
 
-   It is recommended to always define ``PY_SSIZE_T_CLEAN`` before including
-   ``Python.h``.  See :ref:`arg-parsing` for a description of this macro.
+   Khuyến nghị luôn định nghĩa ``PY_SSIZE_T_CLEAN`` trước khi include ``Python.h``. Xem :ref:`arg-parsing` để biết mô tả về macro này.
 
-All user visible names defined by Python.h (except those defined by the included
-standard headers) have one of the prefixes ``Py`` or ``_Py``.  Names beginning
-with ``_Py`` are for internal use by the Python implementation and should not be
-used by extension writers. Structure member names do not have a reserved prefix.
+Tất cả tên hiển thị với người dùng được định nghĩa bởi Python.h (ngoại trừ những tên được định nghĩa bởi các header chuẩn được include) đều có một trong các tiền tố ``Py`` hoặc ``_Py``. Các tên bắt đầu bằng ``_Py`` dành cho mục đích nội bộ của triển khai Python và người viết extension không nên sử dụng chúng. Tên thành viên của cấu trúc không có tiền tố dành riêng.
 
 .. note::
 
-   User code should never define names that begin with ``Py`` or ``_Py``. This
-   confuses the reader, and jeopardizes the portability of the user code to
-   future Python versions, which may define additional names beginning with one
-   of these prefixes.
+   Mã do người dùng viết không bao giờ nên định nghĩa các tên bắt đầu bằng ``Py`` hoặc ``_Py``. Điều này khiến người đọc nhầm lẫn và đe dọa tính khả chuyển của mã người dùng sang các phiên bản Python trong tương lai, vốn có thể định nghĩa thêm các tên bắt đầu bằng một trong những tiền tố này.
 
-The header files are typically installed with Python.  On Unix, these  are
-located in the directories :file:`{prefix}/include/pythonversion/` and
-:file:`{exec_prefix}/include/pythonversion/`, where :option:`prefix <--prefix>` and
-:option:`exec_prefix <--exec-prefix>` are defined by the corresponding parameters to Python's
-:program:`configure` script and *version* is
-``'%d.%d' % sys.version_info[:2]``.  On Windows, the headers are installed
-in :file:`{prefix}/include`, where ``prefix`` is the installation
-directory specified to the installer.
+Các tệp header thường được cài đặt cùng với Python. Trên Unix, chúng nằm trong các thư mục :file:`{prefix}/include/pythonversion/` và
+:file:`{exec_prefix}/include/pythonversion/`, trong đó :option:`prefix <--prefix>` và
+:option:`exec_prefix <--exec-prefix>` được định nghĩa bởi các tham số tương ứng của Python's
+:program:`configure` script và *version* là ``'%d.%d' % sys.version_info[:2]``. Trên Windows, các tệp header được cài đặt trong :file:`{prefix}/include`, trong đó ``prefix`` là thư mục cài đặt được chỉ định cho trình cài đặt.
 
-To include the headers, place both directories (if different) on your compiler's
-search path for includes.  Do *not* place the parent directories on the search
-path and then use ``#include <pythonX.Y/Python.h>``; this will break on
-multi-platform builds since the platform independent headers under
-:option:`prefix <--prefix>` include the platform specific headers from
+Để include các tệp header, hãy đặt cả hai thư mục (nếu khác nhau) vào đường dẫn tìm kiếm include của compiler. *not* đặt các thư mục cha vào đường dẫn tìm kiếm rồi sử dụng ``#include <pythonX.Y/Python.h>``; cách này sẽ gây lỗi khi build đa nền tảng vì các tệp header độc lập với nền tảng nằm dưới
+:option:`prefix <--prefix>` include các tệp header dành riêng cho nền tảng từ
 :option:`exec_prefix <--exec-prefix>`.
 
-C++ users should note that although the API is defined entirely using C, the
-header files properly declare the entry points to be ``extern "C"``. As a result,
-there is no need to do anything special to use the API from C++.
+Người dùng C++ cần lưu ý rằng mặc dù API được định nghĩa hoàn toàn bằng C, các tệp header vẫn khai báo đúng các entry point là ``extern "C"``. Do đó, không cần thực hiện thao tác đặc biệt nào để sử dụng API từ C++.
 
 
-Useful macros
-=============
+Các macro hữu ích
+=================
 
-Several useful macros are defined in the Python header files.  Many are
-defined closer to where they are useful (for example, :c:macro:`Py_RETURN_NONE`,
-:c:macro:`PyMODINIT_FUNC`).
-Others of a more general utility are defined here.  This is not necessarily a
-complete listing.
+Một số macro hữu ích được định nghĩa trong các tệp header của Python. Nhiều macro được định nghĩa gần nơi chúng được sử dụng (ví dụ: :c:macro:`Py_RETURN_NONE`,
+:c:macro:`PyMODINIT_FUNC`). Những macro khác có tính tiện dụng tổng quát hơn được định nghĩa ở đây. Danh sách này không nhất thiết phải đầy đủ.
 
 .. c:macro:: Py_CAN_START_THREADS
 
-   If this macro is defined, then the current system is able to start threads.
+   Nếu macro này được định nghĩa, hệ thống hiện tại có thể khởi chạy các thread.
 
-   Currently, all systems supported by CPython (per :pep:`11`), with the
-   exception of some WebAssembly platforms, support starting threads.
+   Hiện tại, tất cả các hệ thống được CPython hỗ trợ (theo :pep:`11`), ngoại trừ một số nền tảng WebAssembly, đều hỗ trợ khởi chạy các thread.
 
    .. versionadded:: 3.13
 
 .. c:macro:: Py_GETENV(s)
 
-   Like :samp:`getenv({s})`, but returns ``NULL`` if :option:`-E` was passed
-   on the command line (see :c:member:`PyConfig.use_environment`).
+   Tương tự :samp:`getenv({s})`, nhưng trả về ``NULL`` nếu :option:`-E` được truyền trên dòng lệnh (xem :c:member:`PyConfig.use_environment`).
 
 
-Docstring macros
-----------------
+Macro docstring
+---------------
 
 .. c:macro:: PyDoc_STRVAR(name, str)
 
-   Creates a variable with name *name* that can be used in docstrings.
-   If Python is built without docstrings (:option:`--without-doc-strings`),
-   the value will be an empty string.
+   Tạo một biến có tên *name* có thể được sử dụng trong docstring. Nếu Python được build mà không có docstring (:option:`--without-doc-strings`), giá trị sẽ là một chuỗi rỗng.
 
-   Example::
+   Ví dụ::
 
       PyDoc_STRVAR(pop_doc, "Remove and return the rightmost element.");
 
@@ -150,14 +100,13 @@ Docstring macros
           // ...
       }
 
-   Expands to :samp:`PyDoc_VAR({name}) = PyDoc_STR({str})`.
+   Mở rộng thành :samp:`PyDoc_VAR({name}) = PyDoc_STR({str})`.
 
 .. c:macro:: PyDoc_STR(str)
 
-   Expands to the given input string, or an empty string
-   if docstrings are disabled (:option:`--without-doc-strings`).
+   Mở rộng thành chuỗi đầu vào đã cho hoặc một chuỗi rỗng nếu docstring bị vô hiệu hóa (:option:`--without-doc-strings`).
 
-   Example::
+   Ví dụ::
 
       static PyMethodDef pysqlite_row_methods[] = {
           {"keys", (PyCFunction)pysqlite_row_keys, METH_NOARGS,
@@ -167,151 +116,116 @@ Docstring macros
 
 .. c:macro:: PyDoc_VAR(name)
 
-   Declares a static character array variable with the given *name*.
-   Expands to :samp:`static const char {name}[]`
+   Khai báo một biến mảng ký tự tĩnh với *name* đã cho. Mở rộng thành :samp:`static const char {name}[]`
 
-   For example::
+   Ví dụ::
 
       PyDoc_VAR(python_doc) = PyDoc_STR(
          "A genus of constricting snakes in the Pythonidae family native "
          "to the tropics and subtropics of the Eastern Hemisphere.");
 
 
-General utility macros
-----------------------
+Macro tiện ích chung
+--------------------
 
-The following macros are for common tasks not specific to Python.
+Các macro sau đây dùng cho những tác vụ phổ biến không dành riêng cho Python.
 
 .. c:macro:: Py_UNUSED(arg)
 
-   Use this for unused arguments in a function definition to silence compiler
-   warnings. Example: ``int func(int a, int Py_UNUSED(b)) { return a; }``.
+   Dùng macro này cho các đối số không được sử dụng trong định nghĩa hàm để tắt cảnh báo của compiler. Ví dụ: ``int func(int a, int Py_UNUSED(b)) { return a; }``.
 
    .. versionadded:: 3.4
 
 .. c:macro:: Py_GCC_ATTRIBUTE(name)
 
-   Use a GCC attribute *name*, hiding it from compilers that don't support GCC
-   attributes (such as MSVC).
+   Sử dụng thuộc tính GCC *name*, ẩn thuộc tính này khỏi các compiler không hỗ trợ thuộc tính GCC (chẳng hạn như MSVC).
 
-   This expands to :samp:`__attribute__(({name)})` on a GCC compiler,
-   and expands to nothing on compilers that don't support GCC attributes.
+   Trên compiler GCC, macro này mở rộng thành :samp:`__attribute__(({name)})`, còn trên các compiler không hỗ trợ thuộc tính GCC, macro này mở rộng thành chuỗi rỗng.
 
 
-Numeric utilities
-^^^^^^^^^^^^^^^^^
+Tiện ích số
+^^^^^^^^^^^
 
 .. c:macro:: Py_ABS(x)
 
-   Return the absolute value of ``x``.
+   Trả về giá trị tuyệt đối của ``x``.
 
-   The argument may be evaluated more than once.
-   Consequently, do not pass an expression with side-effects directly
-   to this macro.
+   Đối số có thể được đánh giá nhiều hơn một lần. Do đó, không truyền trực tiếp vào macro này một biểu thức có side effect.
 
-   If the result cannot be represented (for example, if ``x`` has
-   :c:macro:`!INT_MIN` value for :c:expr:`int` type), the behavior is
-   undefined.
+   Nếu không thể biểu diễn kết quả (ví dụ: nếu ``x`` có
+   giá trị :c:macro:`!INT_MIN` cho kiểu :c:expr:`int`), hành vi là không xác định.
 
-   Corresponds roughly to :samp:`(({x}) < 0 ? -({x}) : ({x}))`
+   Tương ứng gần đúng với :samp:`(({x}) < 0 ? -({x}) : ({x}))`
 
    .. versionadded:: 3.3
 
 .. c:macro:: Py_MAX(x, y)
              Py_MIN(x, y)
 
-   Return the larger or smaller of the arguments, respectively.
+   Lần lượt trả về giá trị lớn hơn hoặc nhỏ hơn trong các đối số.
 
-   Any arguments may be evaluated more than once.
-   Consequently, do not pass an expression with side-effects directly
-   to this macro.
+   Mọi đối số có thể được đánh giá nhiều hơn một lần. Do đó, không truyền trực tiếp vào macro này một biểu thức có tác dụng phụ.
 
-   :c:macro:`!Py_MAX` corresponds roughly to
+   :c:macro:`!Py_MAX` tương ứng gần đúng với
    :samp:`((({x}) > ({y})) ? ({x}) : ({y}))`.
 
    .. versionadded:: 3.3
 
 .. c:macro:: Py_ARITHMETIC_RIGHT_SHIFT(type, integer, positions)
 
-   Similar to :samp:`{integer} >> {positions}`, but forces sign extension,
-   as the C standard does not define whether a right-shift of a signed
-   integer will perform sign extension or a zero-fill.
+   Tương tự như :samp:`{integer} >> {positions}`, nhưng buộc mở rộng dấu, vì tiêu chuẩn C không quy định liệu phép dịch phải của một số nguyên có dấu có thực hiện mở rộng dấu hay điền bằng số 0 hay không.
 
-   *integer* should be any signed integer type.
-   *positions* is the number of positions to shift to the right.
+   *số nguyên* phải là bất kỳ kiểu số nguyên có dấu nào. *vị trí* là số vị trí cần dịch sang phải.
 
-   Both *integer* and *positions* can be evaluated more than once;
-   consequently, avoid directly passing a function call or some other
-   operation with side-effects to this macro. Instead, store the result as a
-   variable and then pass it.
+   Cả *số nguyên* và *vị trí* đều có thể được đánh giá nhiều lần; do đó, tránh truyền trực tiếp một lệnh gọi hàm hoặc thao tác khác có tác dụng phụ vào macro này. Thay vào đó, hãy lưu kết quả vào một biến rồi truyền biến đó.
 
-   *type* is unused and only kept for backwards compatibility. Historically,
-   *type* was used to cast *integer*.
+   *type* không được sử dụng và chỉ được giữ lại để tương thích ngược. Trước đây, *type* được dùng để ép kiểu *số nguyên*.
 
    .. versionchanged:: 3.1
 
-      This macro is now valid for all signed integer types, not just those for
-      which ``unsigned type`` is legal. As a result, *type* is no longer
-      used.
+      Macro này hiện hợp lệ với mọi kiểu số nguyên có dấu, không chỉ những kiểu mà ``unsigned type`` hợp lệ. Do đó, *type* không còn được sử dụng.
 
 .. c:macro:: Py_CHARMASK(c)
 
-   Argument must be a character or an integer in the range [-128, 127] or [0,
-   255].  This macro returns ``c`` cast to an ``unsigned char``.
+   Đối số phải là một ký tự hoặc một số nguyên trong phạm vi [-128, 127] hoặc [0, 255]. Macro này trả về ``c`` được ép kiểu thành một ``unsigned char``.
 
 
-Assertion utilities
-^^^^^^^^^^^^^^^^^^^
+Các tiện ích assertion
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. c:macro:: Py_UNREACHABLE()
 
-   Use this when you have a code path that cannot be reached by design.
-   For example, in the ``default:`` clause in a ``switch`` statement for which
-   all possible values are covered in ``case`` statements.  Use this in places
-   where you might be tempted to put an ``assert(0)`` or ``abort()`` call.
+   Sử dụng khi bạn có một đường dẫn mã mà theo thiết kế không thể được thực thi. Ví dụ: trong mệnh đề ``default:`` của câu lệnh ``switch``, trong đó mọi giá trị có thể đều đã được bao phủ trong các câu lệnh ``case``. Sử dụng ở những nơi bạn có thể muốn đặt một lệnh gọi ``assert(0)`` hoặc ``abort()``.
 
-   In release mode, the macro helps the compiler to optimize the code, and
-   avoids a warning about unreachable code.  For example, the macro is
-   implemented with ``__builtin_unreachable()`` on GCC in release mode.
+   Ở chế độ release, macro này giúp compiler tối ưu hóa mã và tránh cảnh báo về mã không thể truy cập. Ví dụ, macro này được triển khai bằng ``__builtin_unreachable()`` trên GCC ở chế độ release.
 
-   In debug mode, and on unsupported compilers, the macro expands to a call to
+   Trong chế độ debug và trên các compiler không được hỗ trợ, macro này được mở rộng thành một lời gọi đến
    :c:func:`Py_FatalError`.
 
-   A use for ``Py_UNREACHABLE()`` is following a call to a function that
-   never returns but that is not declared ``_Noreturn``.
+   Một trường hợp sử dụng ``Py_UNREACHABLE()`` là sau lời gọi đến một hàm không bao giờ trả về nhưng không được khai báo là ``_Noreturn``.
 
-   If a code path is very unlikely code but can be reached under exceptional
-   case, this macro must not be used.  For example, under low memory condition
-   or if a system call returns a value out of the expected range.  In this
-   case, it's better to report the error to the caller.  If the error cannot
-   be reported to caller, :c:func:`Py_FatalError` can be used.
+   Nếu một đường dẫn mã rất khó xảy ra nhưng vẫn có thể được thực thi trong trường hợp ngoại lệ, không được sử dụng macro này. Ví dụ: khi bộ nhớ thấp hoặc khi một system call trả về giá trị nằm ngoài phạm vi dự kiến. Trong trường hợp này, tốt hơn là báo lỗi cho caller. Nếu không thể báo lỗi cho caller, có thể sử dụng :c:func:`Py_FatalError`.
 
    .. versionadded:: 3.7
 
 .. c:macro:: Py_SAFE_DOWNCAST(value, larger, smaller)
 
-   Cast *value* to type *smaller* from type *larger*, validating that no
-   information was lost.
+   Ép kiểu *value* sang kiểu *smaller* từ kiểu *larger*, đồng thời xác thực rằng không có thông tin nào bị mất.
 
-   On release builds of Python, this is roughly equivalent to
-   :samp:`(({smaller}) {value})`
-   (in C++, :samp:`static_cast<{smaller}>({value})` will be used instead).
+   Trong các bản build release của Python, điều này gần tương đương với
+   :samp:`(({smaller}) {value})` (trong C++, thay vào đó sẽ sử dụng :samp:`static_cast<{smaller}>({value})`).
 
-   On debug builds (implying that :c:macro:`Py_DEBUG` is defined), this asserts
-   that no information was lost with the cast from *larger* to *smaller*.
+   Trong các bản build debug (ngụ ý rằng :c:macro:`Py_DEBUG` được định nghĩa), điều này xác nhận rằng không có thông tin nào bị mất khi ép kiểu từ *larger* sang *smaller*.
 
-   *value*, *larger*, and *smaller* may all be evaluated more than once in the
-   expression; consequently, do not pass an expression with side-effects
-   directly to this macro.
+   *giá trị*, *lớn hơn*, và *nhỏ hơn* đều có thể được đánh giá nhiều hơn một lần trong biểu thức; do đó, không truyền trực tiếp một biểu thức có side effect vào macro này.
 
 .. c:macro:: Py_BUILD_ASSERT(cond)
 
-   Asserts a compile-time condition *cond*, as a statement.
-   The build will fail if the condition is false or cannot be evaluated at compile time.
+   Kiểm tra một điều kiện tại thời điểm biên dịch *cond*, dưới dạng một câu lệnh. Quá trình build sẽ thất bại nếu điều kiện sai hoặc không thể được đánh giá tại thời điểm biên dịch.
 
-   Corresponds roughly to :samp:`static_assert({cond})` on C23 and above.
+   Về cơ bản, tương ứng với :samp:`static_assert({cond})` trên C23 trở lên.
 
-   For example::
+   Ví dụ::
 
       Py_BUILD_ASSERT(sizeof(PyTime_t) == sizeof(int64_t));
 
@@ -319,10 +233,9 @@ Assertion utilities
 
 .. c:macro:: Py_BUILD_ASSERT_EXPR(cond)
 
-   Asserts a compile-time condition *cond*, as an expression that evaluates to ``0``.
-   The build will fail if the condition is false or cannot be evaluated at compile time.
+   Kiểm tra một điều kiện tại thời điểm biên dịch *cond*, dưới dạng một biểu thức có giá trị là ``0``. Quá trình build sẽ thất bại nếu điều kiện sai hoặc không thể được đánh giá tại thời điểm biên dịch.
 
-   For example::
+   Ví dụ::
 
       #define foo_to_char(foo) \
           ((char *)(foo) + Py_BUILD_ASSERT_EXPR(offsetof(struct foo, string) == 0))
@@ -330,77 +243,60 @@ Assertion utilities
    .. versionadded:: 3.3
 
 
-Type size utilities
-^^^^^^^^^^^^^^^^^^^
+Tiện ích kích thước kiểu
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. c:macro:: Py_ARRAY_LENGTH(array)
 
-   Compute the length of a statically allocated C array at compile time.
+   Tính độ dài của một mảng C được cấp phát tĩnh tại thời điểm biên dịch.
 
-   The *array* argument must be a C array with a size known at compile time.
-   Passing an array with an unknown size, such as a heap-allocated array,
-   will result in a compilation error on some compilers, or otherwise produce
-   incorrect results.
+   Đối số *array* phải là một mảng C có kích thước được biết tại thời điểm biên dịch. Việc truyền một mảng có kích thước không xác định, chẳng hạn như mảng được cấp phát trên heap, sẽ gây ra lỗi biên dịch trên một số compiler hoặc cho kết quả không chính xác trong các trường hợp khác.
 
-   This is roughly equivalent to::
+   Điều này gần tương đương với::
 
       sizeof(array) / sizeof((array)[0])
 
 .. c:macro:: Py_MEMBER_SIZE(type, member)
 
-   Return the size of a structure (*type*) *member* in bytes.
+   Trả về kích thước tính bằng byte của *type* *member* trong một structure.
 
-   Corresponds roughly to :samp:`sizeof((({type} *)NULL)->{member})`.
+   Gần tương đương với :samp:`sizeof((({type} *)NULL)->{member})`.
 
    .. versionadded:: 3.6
 
 
-Macro definition utilities
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tiện ích định nghĩa macro
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. c:macro:: Py_FORCE_EXPANSION(X)
 
-   This is equivalent to :samp:`{X}`, which is useful for token-pasting in
-   macros, as macro expansions in *X* are forcefully evaluated by the
-   preprocessor.
+   Tương đương với :samp:`{X}`, hữu ích cho việc ghép token trong macro, vì các phép mở rộng macro trong *X* bị bộ tiền xử lý buộc phải đánh giá.
 
 .. c:macro:: Py_STRINGIFY(x)
 
-   Convert ``x`` to a C string.  For example, ``Py_STRINGIFY(123)`` returns
-   ``"123"``.
+   Chuyển ``x`` thành một chuỗi C. Ví dụ, ``Py_STRINGIFY(123)`` trả về ``"123"``.
 
    .. versionadded:: 3.4
 
 
-Declaration utilities
+Các tiện ích khai báo
 ---------------------
 
-The following macros can be used in declarations.
-They are most useful for defining the C API itself, and have limited use
-for extension authors.
-Most of them expand to compiler-specific spellings of common extensions
-to the C language.
+Có thể sử dụng các macro sau trong các khai báo. Chúng hữu ích nhất khi định nghĩa chính C API và chỉ có phạm vi sử dụng hạn chế đối với các tác giả extension. Hầu hết chúng mở rộng thành cú pháp dành riêng cho từng compiler của các extension phổ biến cho ngôn ngữ C.
 
 .. c:macro:: Py_ALWAYS_INLINE
 
-   Ask the compiler to always inline a static inline function. The compiler can
-   ignore it and decide to not inline the function.
+   Yêu cầu compiler luôn inline một hàm static inline. Compiler có thể bỏ qua yêu cầu này và quyết định không inline hàm.
 
-   Corresponds to ``always_inline`` attribute in GCC and ``__forceinline``
-   in MSVC.
+   Tương ứng với thuộc tính ``always_inline`` trong GCC và ``__forceinline`` trong MSVC.
 
-   It can be used to inline performance critical static inline functions when
-   building Python in debug mode with function inlining disabled. For example,
-   MSC disables function inlining when building in debug mode.
+   Có thể sử dụng nó để inline các hàm static inline quan trọng về hiệu năng khi build Python ở chế độ debug với tính năng inline hàm bị vô hiệu hóa. Ví dụ, MSC vô hiệu hóa tính năng inline hàm khi build ở chế độ debug.
 
-   Marking blindly a static inline function with Py_ALWAYS_INLINE can result in
-   worse performances (due to increased code size for example). The compiler is
-   usually smarter than the developer for the cost/benefit analysis.
+   Việc áp dụng Py_ALWAYS_INLINE một cách máy móc cho một hàm inline static có thể khiến hiệu năng kém hơn (chẳng hạn do kích thước mã tăng). Trình biên dịch thường phân tích chi phí/lợi ích thông minh hơn lập trình viên.
 
-   If Python is :ref:`built in debug mode <debug-build>` (if the :c:macro:`Py_DEBUG`
-   macro is defined), the :c:macro:`Py_ALWAYS_INLINE` macro does nothing.
+   Nếu Python được :ref:`xây dựng ở chế độ debug <debug-build>` (nếu macro :c:macro:`Py_DEBUG` được định nghĩa), macro :c:macro:`Py_ALWAYS_INLINE` sẽ không thực hiện gì.
 
-   It must be specified before the function return type. Usage::
+   Nó phải được chỉ định trước kiểu trả về của hàm. Cách sử dụng::
 
        static inline Py_ALWAYS_INLINE int random(void) { return 4; }
 
@@ -408,13 +304,12 @@ to the C language.
 
 .. c:macro:: Py_NO_INLINE
 
-   Disable inlining on a function. For example, it reduces the C stack
-   consumption: useful on LTO+PGO builds which heavily inline code (see
+   Tắt inline trên một hàm. Ví dụ, điều này làm giảm mức sử dụng stack C: hữu ích trong các bản build LTO+PGO vốn inline rất nhiều mã (xem
    :issue:`33720`).
 
-   Corresponds to the ``noinline`` attribute/specification on GCC and MSVC.
+   Tương ứng với thuộc tính/chỉ định ``noinline`` trên GCC và MSVC.
 
-   Usage::
+   Cách sử dụng::
 
        Py_NO_INLINE static int random(void) { return 4; }
 
@@ -422,243 +317,140 @@ to the C language.
 
 .. c:macro:: Py_DEPRECATED(version)
 
-   Use this to declare APIs that were deprecated in a specific CPython version.
-   The macro must be placed before the symbol name.
+   Sử dụng macro này để khai báo các API đã bị deprecated trong một phiên bản CPython cụ thể. Macro phải được đặt trước tên symbol.
 
-   Example::
+   Ví dụ::
 
       Py_DEPRECATED(3.8) PyAPI_FUNC(int) Py_OldFunction(void);
 
    .. versionchanged:: 3.8
-      MSVC support was added.
+      Đã bổ sung hỗ trợ MSVC.
 
 .. c:macro:: Py_LOCAL(type)
 
-   Declare a function returning the specified *type* using a fast-calling
-   qualifier for functions that are local to the current file.
-   Semantically, this is equivalent to :samp:`static {type}`.
+   Khai báo một hàm trả về *type* được chỉ định, sử dụng bộ định tính gọi nhanh cho các hàm cục bộ trong tệp hiện tại. Về mặt ngữ nghĩa, điều này tương đương với :samp:`static {type}`.
 
 .. c:macro:: Py_LOCAL_INLINE(type)
 
-   Equivalent to :c:macro:`Py_LOCAL` but additionally requests the function
-   be inlined.
+   Tương đương với :c:macro:`Py_LOCAL` nhưng đồng thời yêu cầu hàm được inline.
 
 .. c:macro:: Py_LOCAL_SYMBOL
 
-   Macro used to declare a symbol as local to the shared library (hidden).
-   On supported platforms, it ensures the symbol is not exported.
+   Macro dùng để khai báo một symbol là cục bộ trong shared library (ẩn). Trên các nền tảng được hỗ trợ, macro này đảm bảo symbol không được export.
 
-   On compatible versions of GCC/Clang, it
-   expands to ``__attribute__((visibility("hidden")))``.
+   Trên các phiên bản GCC/Clang tương thích, macro này mở rộng thành ``__attribute__((visibility("hidden")))``.
 
 .. c:macro:: Py_EXPORTED_SYMBOL
 
-   Macro used to declare a symbol (function or data) as exported.
-   On Windows, this expands to ``__declspec(dllexport)``.
-   On compatible versions of GCC/Clang, it
-   expands to ``__attribute__((visibility("default")))``.
-   This macro is for defining the C API itself; extension modules should not use it.
+   Macro dùng để khai báo một symbol (hàm hoặc dữ liệu) là được export. Trên Windows, macro này mở rộng thành ``__declspec(dllexport)``. Trên các phiên bản GCC/Clang tương thích, macro này mở rộng thành ``__attribute__((visibility("default")))``. Macro này dùng để định nghĩa chính C API; các extension module không nên sử dụng nó.
 
 
 .. c:macro:: Py_IMPORTED_SYMBOL
 
-   Macro used to declare a symbol as imported.
-   On Windows, this expands to ``__declspec(dllimport)``.
-   This macro is for defining the C API itself; extension modules should not use it.
+   Macro dùng để khai báo một symbol là được import. Trên Windows, macro này mở rộng thành ``__declspec(dllimport)``. Macro này dùng để định nghĩa chính C API; các extension module không nên sử dụng nó.
 
 
 .. c:macro:: PyAPI_FUNC(type)
 
-   Macro used by CPython to declare a function as part of the C API.
-   Its expansion depends on the platform and build configuration.
-   This macro is intended for defining CPython's C API itself;
-   extension modules should not use it for their own symbols.
+   Macro được CPython sử dụng để khai báo một hàm là một phần của C API. Phần mở rộng của macro này phụ thuộc vào nền tảng và cấu hình bản build. Macro này dành cho việc định nghĩa chính C API của CPython; các extension module không nên sử dụng nó cho các symbol riêng của mình.
 
 
 .. c:macro:: PyAPI_DATA(type)
 
-   Macro used by CPython to declare a public global variable as part of the C API.
-   Its expansion depends on the platform and build configuration.
-   This macro is intended for defining CPython's C API itself;
-   extension modules should not use it for their own symbols.
+   Macro được CPython sử dụng để khai báo một biến toàn cục công khai là một phần của C API. Phần mở rộng của macro này phụ thuộc vào nền tảng và cấu hình bản build. Macro này dành cho việc định nghĩa chính C API của CPython; các extension module không nên sử dụng nó cho các symbol riêng của mình.
 
 
-Outdated macros
----------------
+Các macro lỗi thời
+------------------
 
-The following macros have been used to features that have been standardized
-in C11.
+Các macro sau đây đã được sử dụng cho những tính năng đã được chuẩn hóa trong C11.
 
 .. c:macro:: Py_ALIGNED(num)
 
-   Specify alignment to *num* bytes on compilers that support it.
+   Chỉ định alignment là *num* byte trên các compiler hỗ trợ tính năng này.
 
-   Consider using the C11 standard ``_Alignas`` specifier over this macro.
+   Hãy cân nhắc sử dụng specifier ``_Alignas`` tiêu chuẩn C11 thay cho macro này.
 
 .. c:macro:: Py_LL(number)
              Py_ULL(number)
 
-   Use *number* as a ``long long`` or ``unsigned long long`` integer literal,
-   respectively.
+   Lần lượt sử dụng *number* làm hằng số nguyên ``long long`` hoặc ``unsigned long long``.
 
-   Expands to *number* followed by ``LL`` or ``LLU``, respectively, but will
-   expand to some compiler-specific suffixes on some older compilers.
+   Mở rộng thành *number* theo sau bởi ``LL`` hoặc ``LLU``, tương ứng, nhưng trên một số compiler cũ sẽ mở rộng thành một số hậu tố dành riêng cho compiler.
 
-   Consider using the C99 standard suffixes ``LL`` and ``LLU`` directly.
+   Cân nhắc sử dụng trực tiếp các hậu tố theo tiêu chuẩn C99 là ``LL`` và ``LLU``.
 
 .. c:macro:: Py_MEMCPY(dest, src, n)
 
-   This is an alias to :c:func:`!memcpy`.
+   Đây là bí danh của :c:func:`!memcpy`.
 
    .. soft-deprecated:: 3.14
-      Use :c:func:`!memcpy` directly instead.
+      Thay vào đó, hãy sử dụng trực tiếp :c:func:`!memcpy`.
 
 .. c:macro:: Py_VA_COPY
 
-   This is an alias to the C99-standard ``va_copy`` function.
+   Đây là bí danh của hàm ``va_copy`` theo tiêu chuẩn C99.
 
-   Historically, this would use a compiler-specific method to copy a ``va_list``.
+   Trước đây, thao tác này sẽ sử dụng một phương thức dành riêng cho compiler để sao chép một ``va_list``.
 
    .. versionchanged:: 3.6
-      This is now an alias to ``va_copy``.
+      Hiện nay, đây là bí danh của ``va_copy``.
 
    .. soft-deprecated:: 3.14
 
 
 .. _api-objects:
 
-Objects, Types and Reference Counts
-===================================
+Đối tượng, Kiểu và Số lượng tham chiếu
+======================================
 
 .. index:: pair: object; type
 
-Most Python/C API functions have one or more arguments as well as a return value
-of type :c:expr:`PyObject*`.  This type is a pointer to an opaque data type
-representing an arbitrary Python object.  Since all Python object types are
-treated the same way by the Python language in most situations (e.g.,
-assignments, scope rules, and argument passing), it is only fitting that they
-should be represented by a single C type.  Almost all Python objects live on the
-heap: you never declare an automatic or static variable of type
-:c:type:`PyObject`, only pointer variables of type :c:expr:`PyObject*` can  be
-declared.  The sole exception are the type objects; since these must never be
-deallocated, they are typically static :c:type:`PyTypeObject` objects.
+Hầu hết các hàm Python/C API đều có một hoặc nhiều đối số, cũng như một giá trị trả về thuộc kiểu :c:expr:`PyObject*`. Kiểu này là một con trỏ tới một kiểu dữ liệu không trong suốt, đại diện cho một đối tượng Python bất kỳ. Vì ngôn ngữ Python xử lý tất cả các kiểu đối tượng Python theo cùng một cách trong hầu hết các tình huống (ví dụ: phép gán, quy tắc phạm vi và truyền đối số), nên việc biểu diễn chúng bằng một kiểu C duy nhất là hoàn toàn phù hợp. Hầu hết mọi đối tượng Python đều nằm trên heap: bạn không bao giờ khai báo một biến tự động hoặc biến static thuộc kiểu
+:c:type:`PyObject`, mà chỉ có thể khai báo các biến con trỏ thuộc kiểu :c:expr:`PyObject*`. Ngoại lệ duy nhất là các đối tượng kiểu; vì chúng không bao giờ được giải phóng, chúng thường là các đối tượng :c:type:`PyTypeObject` static.
 
-All Python objects (even Python integers) have a :dfn:`type` and a
-:dfn:`reference count`.  An object's type determines what kind of object it is
-(e.g., an integer, a list, or a user-defined function; there are many more as
-explained in :ref:`types`).  For each of the well-known types there is a macro
-to check whether an object is of that type; for instance, ``PyList_Check(a)`` is
-true if (and only if) the object pointed to by *a* is a Python list.
+Tất cả các đối tượng Python (kể cả số nguyên Python) đều có một :dfn:`type` và một
+:dfn:`reference count`. Kiểu của một đối tượng xác định đó là loại đối tượng nào (ví dụ: một số nguyên, một danh sách hoặc một hàm do người dùng định nghĩa; còn nhiều loại khác được giải thích trong :ref:`types`). Với mỗi kiểu thường gặp đều có một macro để kiểm tra xem một đối tượng có thuộc kiểu đó hay không; chẳng hạn, ``PyList_Check(a)`` là true khi (và chỉ khi) đối tượng được trỏ tới bởi *a* là một danh sách Python.
 
 
 .. _api-refcounts:
 
-Reference Counts
-----------------
+Số lượng tham chiếu
+-------------------
 
-The reference count is important because today's computers have a  finite
-(and often severely limited) memory size; it counts how many different
-places there are that have a :term:`strong reference` to an object.
-Such a place could be another object, or a global (or static) C variable,
-or a local variable in some C function.
-When the last :term:`strong reference` to an object is released
-(i.e. its reference count becomes zero), the object is deallocated.
-If it contains references to other objects, those references are released.
-Those other objects may be deallocated in turn, if there are no more
-references to them, and so on.  (There's an obvious problem  with
-objects that reference each other here; for now, the solution
-is "don't do that.")
+Số lượng tham chiếu rất quan trọng vì máy tính ngày nay có dung lượng bộ nhớ hữu hạn (và thường bị giới hạn nghiêm trọng); nó đếm có bao nhiêu vị trí khác nhau có :term:`strong reference` đến một đối tượng. Vị trí như vậy có thể là một đối tượng khác, một biến C toàn cục (hoặc static), hoặc một biến cục bộ trong một hàm C nào đó. Khi :term:`strong reference` cuối cùng đến một đối tượng được giải phóng (tức là số lượng tham chiếu của nó trở thành không), đối tượng sẽ được giải phóng. Nếu đối tượng chứa các tham chiếu đến những đối tượng khác, các tham chiếu đó sẽ được giải phóng. Những đối tượng khác đó lần lượt có thể được giải phóng nếu không còn tham chiếu nào đến chúng, và cứ tiếp tục như vậy. (Ở đây có một vấn đề hiển nhiên với các đối tượng tham chiếu lẫn nhau; hiện tại, giải pháp là "đừng làm vậy.")
 
 .. index::
    single: Py_INCREF (C function)
    single: Py_DECREF (C function)
 
-Reference counts are always manipulated explicitly.  The normal way is
-to use the macro :c:func:`Py_INCREF` to take a new reference to an
-object (i.e. increment its reference count by one),
-and :c:func:`Py_DECREF` to release that reference (i.e. decrement the
-reference count by one).  The :c:func:`Py_DECREF` macro
-is considerably more complex than the incref one, since it must check whether
-the reference count becomes zero and then cause the object's deallocator to be
-called.  The deallocator is a function pointer contained in the object's type
-structure.  The type-specific deallocator takes care of releasing references
-for other objects contained in the object if this is a compound
-object type, such as a list, as well as performing any additional finalization
-that's needed.  There's no chance that the reference count can overflow; at
-least as many bits are used to hold the reference count as there are distinct
-memory locations in virtual memory (assuming ``sizeof(Py_ssize_t) >= sizeof(void*)``).
-Thus, the reference count increment is a simple operation.
+Số lượng tham chiếu luôn được thao tác một cách tường minh. Cách thông thường là sử dụng macro :c:func:`Py_INCREF` để tạo một tham chiếu mới đến một đối tượng (tức là tăng số lượng tham chiếu lên một), và :c:func:`Py_DECREF` để giải phóng tham chiếu đó (tức là giảm số lượng tham chiếu đi một). Macro :c:func:`Py_DECREF` phức tạp hơn đáng kể so với macro incref, vì nó phải kiểm tra xem số lượng tham chiếu có trở thành không hay không, rồi khiến deallocator của đối tượng được gọi. Deallocator là một con trỏ hàm nằm trong cấu trúc kiểu của đối tượng. Deallocator dành riêng cho kiểu sẽ đảm nhiệm việc giải phóng các tham chiếu đến những đối tượng khác được chứa trong đối tượng nếu đây là một kiểu đối tượng hợp thành, chẳng hạn như list, đồng thời thực hiện mọi bước hoàn tất bổ sung cần thiết. Không thể xảy ra việc số lượng tham chiếu bị tràn; có ít nhất số bit đủ để chứa số lượng tham chiếu bằng số vị trí bộ nhớ riêng biệt trong bộ nhớ ảo (với giả định ``sizeof(Py_ssize_t) >= sizeof(void*)``). Do đó, thao tác tăng số lượng tham chiếu rất đơn giản.
 
-It is not necessary to hold a :term:`strong reference` (i.e. increment
-the reference count) for every local variable that contains a pointer
-to an object.  In theory, the  object's
-reference count goes up by one when the variable is made to  point to it and it
-goes down by one when the variable goes out of  scope.  However, these two
-cancel each other out, so at the end the  reference count hasn't changed.  The
-only real reason to use the  reference count is to prevent the object from being
-deallocated as  long as our variable is pointing to it.  If we know that there
-is at  least one other reference to the object that lives at least as long as
-our variable, there is no need to take a new :term:`strong reference`
-(i.e. increment the reference count) temporarily.
-An important situation where this arises is in objects  that are passed as
-arguments to C functions in an extension module  that are called from Python;
-the call mechanism guarantees to hold a  reference to every argument for the
-duration of the call.
+Không cần phải giữ một :term:`strong reference` (tức là tăng số lượng tham chiếu) cho mọi biến cục bộ chứa con trỏ đến một đối tượng. Về lý thuyết, số lượng tham chiếu của đối tượng tăng lên một khi biến được cho trỏ đến đối tượng đó và giảm đi một khi biến ra khỏi phạm vi. Tuy nhiên, hai thay đổi này triệt tiêu lẫn nhau, nên cuối cùng số lượng tham chiếu không thay đổi. Lý do thực sự để sử dụng số lượng tham chiếu là ngăn không cho đối tượng bị giải phóng chừng nào biến của chúng ta còn trỏ đến nó. Nếu biết rằng có ít nhất một tham chiếu khác đến đối tượng tồn tại ít nhất lâu bằng biến của chúng ta, thì tạm thời không cần tạo một :term:`strong reference` mới (tức là tăng số lượng tham chiếu). Một tình huống quan trọng thường gặp là khi các đối tượng được truyền làm đối số cho các hàm C trong một extension module được gọi từ Python; cơ chế gọi đảm bảo giữ một tham chiếu đến mọi đối số trong suốt thời gian gọi.
 
-However, a common pitfall is to extract an object from a list and hold on to it
-for a while without taking a new reference.  Some other operation might
-conceivably remove the object from the list, releasing that reference,
-and possibly deallocating it. The real danger is that innocent-looking
-operations may invoke arbitrary Python code which could do this; there is a code
-path which allows control to flow back to the user from a :c:func:`Py_DECREF`, so
-almost any operation is potentially dangerous.
+Tuy nhiên, một sai lầm phổ biến là lấy một đối tượng ra khỏi list rồi giữ nó trong một khoảng thời gian mà không tạo một tham chiếu mới. Một thao tác khác hoàn toàn có thể loại bỏ đối tượng khỏi list, giải phóng tham chiếu đó và có khả năng giải phóng cả đối tượng. Mối nguy hiểm thực sự là những thao tác có vẻ vô hại có thể gọi mã Python tùy ý để thực hiện việc này; có một đường dẫn mã cho phép quyền điều khiển quay trở lại người dùng từ một :c:func:`Py_DECREF`, vì vậy hầu như mọi thao tác đều có khả năng nguy hiểm.
 
-A safe approach is to always use the generic operations (functions  whose name
-begins with ``PyObject_``, ``PyNumber_``, ``PySequence_`` or ``PyMapping_``).
-These operations always create a new :term:`strong reference`
-(i.e. increment the reference count) of the object they return.
-This leaves the caller with the responsibility to call :c:func:`Py_DECREF` when
-they are done with the result; this soon becomes second nature.
+Một cách tiếp cận an toàn là luôn sử dụng các thao tác generic (các hàm có tên bắt đầu bằng ``PyObject_``, ``PyNumber_``, ``PySequence_`` hoặc ``PyMapping_``). Các thao tác này luôn tạo một :term:`strong reference` mới (tức là tăng số lượng tham chiếu) cho đối tượng mà chúng trả về. Điều này để lại cho bên gọi trách nhiệm gọi :c:func:`Py_DECREF` khi đã dùng xong kết quả; chẳng bao lâu việc này sẽ trở thành thói quen tự nhiên.
 
 
 .. _api-refcountdetails:
 
-Reference Count Details
-^^^^^^^^^^^^^^^^^^^^^^^
+Chi tiết về số lượng tham chiếu
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The reference count behavior of functions in the Python/C API is best  explained
-in terms of *ownership of references*.  Ownership pertains to references, never
-to objects (objects are not owned: they are always shared).  "Owning a
-reference" means being responsible for calling Py_DECREF on it when the
-reference is no longer needed.  Ownership can also be transferred, meaning that
-the code that receives ownership of the reference then becomes responsible for
-eventually releasing it by calling :c:func:`Py_DECREF` or :c:func:`Py_XDECREF`
-when it's no longer needed---or passing on this responsibility (usually to its
-caller). When a function passes ownership of a reference on to its caller, the
-caller is said to receive a *new* reference.  When no ownership is transferred,
-the caller is said to *borrow* the reference. Nothing needs to be done for a
+Hành vi đếm tham chiếu của các hàm trong Python/C API được giải thích rõ nhất theo khái niệm *ownership of references*. Quyền sở hữu áp dụng cho các tham chiếu, không bao giờ áp dụng cho các đối tượng (đối tượng không thuộc quyền sở hữu của ai: chúng luôn được chia sẻ). “Sở hữu một tham chiếu” nghĩa là chịu trách nhiệm gọi Py_DECREF trên tham chiếu đó khi không còn cần đến nó. Quyền sở hữu cũng có thể được chuyển giao, nghĩa là đoạn mã nhận quyền sở hữu tham chiếu sau đó chịu trách nhiệm giải phóng tham chiếu này bằng cách gọi :c:func:`Py_DECREF` hoặc :c:func:`Py_XDECREF` khi không còn cần đến nó---hoặc chuyển tiếp trách nhiệm này (thường là cho hàm gọi nó). Khi một hàm chuyển quyền sở hữu tham chiếu cho hàm gọi nó, hàm gọi được cho là nhận một tham chiếu *new*. Khi không có quyền sở hữu nào được chuyển giao, hàm gọi được cho là *borrow* tham chiếu đó. Không cần thực hiện gì đối với một
 :term:`borrowed reference`.
 
-Conversely, when a calling function passes in a reference to an  object, there
-are two possibilities: the function *steals* a  reference to the object, or it
-does not.
+Ngược lại, khi một hàm gọi truyền vào một tham chiếu đến một đối tượng, có hai khả năng: hàm đó *steals* một tham chiếu đến đối tượng hoặc không.
 
-*Stealing a reference* means that when you pass a reference to a
-function, that function assumes that it now owns that reference.
-Since the new owner can use :c:func:`!Py_DECREF` at its discretion,
-you (the caller) must not use that reference after the call.
+*Stealing a reference* có nghĩa là khi bạn truyền một tham chiếu cho một hàm, hàm đó giả định rằng giờ đây nó sở hữu tham chiếu ấy. Vì chủ sở hữu mới có thể sử dụng :c:func:`!Py_DECREF` tùy ý, bạn (hàm gọi) không được sử dụng tham chiếu đó sau lời gọi.
 
 .. index::
    single: PyList_SetItem (C function)
    single: PyTuple_SetItem (C function)
 
-Few functions steal references; the two notable exceptions are
-:c:func:`PyList_SetItem` and :c:func:`PyTuple_SetItem`, which  steal a reference
-to the item (but not to the tuple or list into which the item is put!).  These
-functions were designed to steal a reference because of a common idiom for
-populating a tuple or list with newly created objects; for example, the code to
-create the tuple ``(1, 2, "three")`` could look like this (forgetting about
-error handling for the moment; a better way to code this is shown below)::
+Rất ít hàm lấy cắp tham chiếu; hai ngoại lệ đáng chú ý là
+:c:func:`PyList_SetItem` và :c:func:`PyTuple_SetItem`, các hàm này lấy cắp một tham chiếu đến phần tử (nhưng không lấy cắp tham chiếu đến tuple hoặc list chứa phần tử đó!). Các hàm này được thiết kế để lấy cắp một tham chiếu vì một thành ngữ phổ biến khi điền tuple hoặc list bằng các đối tượng mới được tạo; ví dụ, mã để tạo tuple ``(1, 2, "three")`` có thể trông như sau (tạm thời bỏ qua việc xử lý lỗi; cách viết mã tốt hơn được trình bày bên dưới)::
 
    PyObject *t;
 
@@ -667,36 +459,22 @@ error handling for the moment; a better way to code this is shown below)::
    PyTuple_SetItem(t, 1, PyLong_FromLong(2L));
    PyTuple_SetItem(t, 2, PyUnicode_FromString("three"));
 
-Here, :c:func:`PyLong_FromLong` returns a new reference which is immediately
-stolen by :c:func:`PyTuple_SetItem`.  When you want to keep using an object
-although the reference to it will be stolen, use :c:func:`Py_INCREF` to grab
-another reference before calling the reference-stealing function.
+Ở đây, :c:func:`PyLong_FromLong` trả về một tham chiếu mới, ngay lập tức bị :c:func:`PyTuple_SetItem` lấy cắp. Khi muốn tiếp tục sử dụng một đối tượng dù tham chiếu đến đối tượng đó sẽ bị lấy cắp, hãy dùng :c:func:`Py_INCREF` để lấy thêm một tham chiếu trước khi gọi hàm lấy cắp tham chiếu.
 
-Incidentally, :c:func:`PyTuple_SetItem` is the *only* way to set tuple items;
-:c:func:`PySequence_SetItem` and :c:func:`PyObject_SetItem` refuse to do this
-since tuples are an immutable data type.  You should only use
-:c:func:`PyTuple_SetItem` for tuples that you are creating yourself.
+Nhân tiện, :c:func:`PyTuple_SetItem` là cách *only* để thiết lập các phần tử tuple;
+:c:func:`PySequence_SetItem` và :c:func:`PyObject_SetItem` từ chối thực hiện việc này vì tuple là một kiểu dữ liệu bất biến. Bạn chỉ nên sử dụng
+:c:func:`PyTuple_SetItem` cho các tuple do chính bạn tạo.
 
-Equivalent code for populating a list can be written using :c:func:`PyList_New`
-and :c:func:`PyList_SetItem`.
+Có thể viết code tương đương để điền dữ liệu vào một list bằng cách sử dụng :c:func:`PyList_New` và :c:func:`PyList_SetItem`.
 
-However, in practice, you will rarely use these ways of creating and populating
-a tuple or list.  There's a generic function, :c:func:`Py_BuildValue`, that can
-create most common objects from C values, directed by a :dfn:`format string`.
-For example, the above two blocks of code could be replaced by the following
-(which also takes care of the error checking)::
+Tuy nhiên, trên thực tế, bạn sẽ hiếm khi sử dụng những cách này để tạo và điền dữ liệu vào một tuple hoặc list. Có một hàm generic, :c:func:`Py_BuildValue`, có thể tạo hầu hết các object thông dụng từ các giá trị C, được điều khiển bởi chuỗi :dfn:`format string`. Ví dụ, hai khối code trên có thể được thay thế bằng đoạn sau (đoạn này cũng xử lý việc kiểm tra lỗi)::
 
    PyObject *tuple, *list;
 
    tuple = Py_BuildValue("(iis)", 1, 2, "three");
    list = Py_BuildValue("[iis]", 1, 2, "three");
 
-It is much more common to use :c:func:`PyObject_SetItem` and friends with items
-whose references you are only borrowing, like arguments that were passed in to
-the function you are writing.  In that case, their behaviour regarding references
-is much saner, since you don't have to take a new reference just so you
-can give that reference away ("have it be stolen").  For example, this function
-sets all items of a list (actually, any mutable sequence) to a given item::
+Việc sử dụng :c:func:`PyObject_SetItem` và các hàm liên quan với những item mà bạn chỉ mượn các reference, chẳng hạn như các đối số được truyền vào hàm bạn đang viết, phổ biến hơn nhiều. Trong trường hợp đó, hành vi liên quan đến reference của chúng hợp lý hơn nhiều, vì bạn không phải lấy một reference mới chỉ để có thể chuyển reference đó đi ("để nó bị lấy mất"). Ví dụ, hàm này đặt tất cả item của một list (thực ra là bất kỳ mutable sequence nào) thành một item cho trước::
 
    int
    set_all(PyObject *target, PyObject *item)
@@ -721,30 +499,15 @@ sets all items of a list (actually, any mutable sequence) to a given item::
 
 .. index:: single: set_all()
 
-The situation is slightly different for function return values.   While passing
-a reference to most functions does not change your  ownership responsibilities
-for that reference, many functions that  return a reference to an object give
-you ownership of the reference. The reason is simple: in many cases, the
-returned object is created  on the fly, and the reference you get is the only
-reference to the  object.  Therefore, the generic functions that return object
-references, like :c:func:`PyObject_GetItem` and  :c:func:`PySequence_GetItem`,
-always return a new reference (the caller becomes the owner of the reference).
+Tình huống này hơi khác đối với các giá trị trả về của hàm. Mặc dù việc truyền một reference đến hầu hết các hàm không làm thay đổi trách nhiệm sở hữu của bạn đối với reference đó, nhiều hàm trả về một reference đến một object sẽ trao quyền sở hữu reference đó cho bạn. Lý do rất đơn giản: trong nhiều trường hợp, object được trả về được tạo ngay lúc đó, và reference bạn nhận được là reference duy nhất đến object. Vì vậy, các hàm generic trả về reference đến object, chẳng hạn như :c:func:`PyObject_GetItem` và :c:func:`PySequence_GetItem`, luôn trả về một reference mới (caller trở thành chủ sở hữu của reference).
 
-It is important to realize that whether you own a reference returned  by a
-function depends on which function you call only --- *the plumage* (the type of
-the object passed as an argument to the function) *doesn't enter into it!*
-Thus, if you  extract an item from a list using :c:func:`PyList_GetItem`, you
-don't own the reference --- but if you obtain the same item from the same list
-using :c:func:`PySequence_GetItem` (which happens to take exactly the same
-arguments), you do own a reference to the returned object.
+Điều quan trọng cần nhận ra là việc bạn có sở hữu reference do một hàm trả về hay không chỉ phụ thuộc vào hàm bạn gọi --- *bộ lông* (kiểu của object được truyền làm đối số cho hàm) *không liên quan đến việc đó!* Vì vậy, nếu bạn lấy một item từ list bằng :c:func:`PyList_GetItem`, bạn không sở hữu reference đó --- nhưng nếu bạn lấy cùng item từ cùng list bằng :c:func:`PySequence_GetItem` (tình cờ nhận chính xác cùng các đối số), bạn sở hữu một reference đến object được trả về.
 
 .. index::
    single: PyList_GetItem (C function)
    single: PySequence_GetItem (C function)
 
-Here is an example of how you could write a function that computes the sum of
-the items in a list of integers; once using  :c:func:`PyList_GetItem`, and once
-using :c:func:`PySequence_GetItem`. ::
+Sau đây là một ví dụ về cách bạn có thể viết một hàm tính tổng các phần tử trong một danh sách số nguyên; một lần sử dụng :c:func:`PyList_GetItem`, và một lần sử dụng :c:func:`PySequence_GetItem`.::
 
    long
    sum_list(PyObject *list)
@@ -805,100 +568,50 @@ using :c:func:`PySequence_GetItem`. ::
 
 .. _api-types:
 
-Types
------
+Các kiểu dữ liệu
+----------------
 
-There are few other data types that play a significant role in  the Python/C
-API; most are simple C types such as :c:expr:`int`,  :c:expr:`long`,
-:c:expr:`double` and :c:expr:`char*`.  A few structure types  are used to
-describe static tables used to list the functions exported  by a module or the
-data attributes of a new object type, and another is used to describe the value
-of a complex number.  These will  be discussed together with the functions that
-use them.
+Có một vài kiểu dữ liệu khác đóng vai trò quan trọng trong Python/C API; hầu hết là các kiểu C đơn giản như :c:expr:`int`, :c:expr:`long`,
+:c:expr:`double` và :c:expr:`char*`. Một vài kiểu cấu trúc được dùng để mô tả các bảng tĩnh dùng để liệt kê những hàm được một module export hoặc các thuộc tính dữ liệu của một kiểu đối tượng mới, và một kiểu khác được dùng để mô tả giá trị của một số phức. Những kiểu này sẽ được thảo luận cùng với các hàm sử dụng chúng.
 
 .. c:type:: Py_ssize_t
 
-   A signed integral type such that ``sizeof(Py_ssize_t) == sizeof(size_t)``.
-   C99 doesn't define such a thing directly (size_t is an unsigned integral type).
-   See :pep:`353` for details. ``PY_SSIZE_T_MAX`` is the largest positive value
-   of type :c:type:`Py_ssize_t`.
+   Một kiểu số nguyên có dấu sao cho ``sizeof(Py_ssize_t) == sizeof(size_t)``. C99 không định nghĩa trực tiếp kiểu như vậy (size_t là một kiểu số nguyên không dấu). Xem :pep:`353` để biết chi tiết. ``PY_SSIZE_T_MAX`` là giá trị dương lớn nhất của kiểu :c:type:`Py_ssize_t`.
 
 
 .. _api-exceptions:
 
-Exceptions
-==========
+Ngoại lệ
+========
 
-The Python programmer only needs to deal with exceptions if specific  error
-handling is required; unhandled exceptions are automatically  propagated to the
-caller, then to the caller's caller, and so on, until they reach the top-level
-interpreter, where they are reported to the  user accompanied by a stack
-traceback.
+Lập trình viên Python chỉ cần xử lý ngoại lệ nếu yêu cầu xử lý lỗi cụ thể; các ngoại lệ không được xử lý sẽ tự động được truyền lên caller, rồi đến caller của caller, cứ như vậy cho đến khi chúng đến trình thông dịch cấp cao nhất, tại đó chúng được báo cáo cho người dùng kèm theo stack traceback.
 
 .. index:: single: PyErr_Occurred (C function)
 
-For C programmers, however, error checking always has to be explicit.  All
-functions in the Python/C API can raise exceptions, unless an explicit claim is
-made otherwise in a function's documentation.  In general, when a function
-encounters an error, it sets an exception, discards any object references that
-it owns, and returns an error indicator.  If not documented otherwise, this
-indicator is either ``NULL`` or ``-1``, depending on the function's return type.
-A few functions return a Boolean true/false result, with false indicating an
-error.  Very few functions return no explicit error indicator or have an
-ambiguous return value, and require explicit testing for errors with
-:c:func:`PyErr_Occurred`.  These exceptions are always explicitly documented.
+Tuy nhiên, đối với lập trình viên C, việc kiểm tra lỗi luôn phải được thực hiện một cách rõ ràng. Tất cả các hàm trong Python/C API đều có thể phát sinh ngoại lệ, trừ khi tài liệu của hàm nêu rõ điều ngược lại. Nhìn chung, khi gặp lỗi, một hàm sẽ thiết lập một ngoại lệ, loại bỏ mọi tham chiếu đến đối tượng mà nó sở hữu và trả về một chỉ báo lỗi. Nếu không có tài liệu nêu khác, chỉ báo này là ``NULL`` hoặc ``-1``, tùy thuộc vào kiểu giá trị trả về của hàm. Một số ít hàm trả về kết quả Boolean đúng/sai, trong đó false cho biết đã xảy ra lỗi. Rất ít hàm không trả về chỉ báo lỗi rõ ràng hoặc có giá trị trả về không rõ ràng, nên cần kiểm tra lỗi một cách rõ ràng bằng
+:c:func:`PyErr_Occurred`. Những ngoại lệ này luôn được ghi rõ trong tài liệu.
 
 .. index::
    single: PyErr_SetString (C function)
    single: PyErr_Clear (C function)
 
-Exception state is maintained in per-thread storage (this is  equivalent to
-using global storage in an unthreaded application).  A  thread can be in one of
-two states: an exception has occurred, or not. The function
-:c:func:`PyErr_Occurred` can be used to check for this: it returns a borrowed
-reference to the exception type object when an exception has occurred, and
-``NULL`` otherwise.  There are a number of functions to set the exception state:
-:c:func:`PyErr_SetString` is the most common (though not the most general)
-function to set the exception state, and :c:func:`PyErr_Clear` clears the
-exception state.
+Trạng thái ngoại lệ được duy trì trong bộ lưu trữ riêng cho từng luồng (tương đương với việc sử dụng bộ lưu trữ toàn cục trong một ứng dụng không có luồng). Một luồng có thể ở một trong hai trạng thái: đã xảy ra ngoại lệ hoặc chưa. Có thể sử dụng hàm
+:c:func:`PyErr_Occurred` để kiểm tra trạng thái này: hàm trả về một tham chiếu mượn đến đối tượng kiểu ngoại lệ khi đã xảy ra ngoại lệ và ``NULL`` trong trường hợp ngược lại. Có một số hàm dùng để thiết lập trạng thái ngoại lệ:
+:c:func:`PyErr_SetString` là hàm phổ biến nhất (mặc dù không phải là hàm tổng quát nhất) để thiết lập trạng thái ngoại lệ, còn :c:func:`PyErr_Clear` sẽ xóa trạng thái ngoại lệ.
 
-The full exception state consists of three objects (all of which can  be
-``NULL``): the exception type, the corresponding exception  value, and the
-traceback.  These have the same meanings as the Python result of
-``sys.exc_info()``; however, they are not the same: the Python objects represent
-the last exception being handled by a Python  :keyword:`try` ...
-:keyword:`except` statement, while the C level exception state only exists while
-an exception is being passed on between C functions until it reaches the Python
-bytecode interpreter's  main loop, which takes care of transferring it to
-``sys.exc_info()`` and friends.
+Trạng thái ngoại lệ đầy đủ bao gồm ba đối tượng (tất cả đều có thể là ``NULL``): kiểu ngoại lệ, giá trị ngoại lệ tương ứng và traceback. Những đối tượng này có ý nghĩa giống như kết quả Python của ``sys.exc_info()``; tuy nhiên, chúng không giống nhau: các đối tượng Python biểu diễn ngoại lệ gần nhất đang được xử lý bởi một Python :keyword:`try` ...
+:keyword:`except`, trong khi trạng thái ngoại lệ ở cấp C chỉ tồn tại trong lúc một ngoại lệ được truyền qua lại giữa các hàm C cho đến khi đến vòng lặp chính của trình thông dịch bytecode Python, nơi chịu trách nhiệm chuyển nó sang ``sys.exc_info()`` và các đối tượng liên quan.
 
 .. index:: single: exc_info (in module sys)
 
-Note that starting with Python 1.5, the preferred, thread-safe way to access the
-exception state from Python code is to call the function :func:`sys.exc_info`,
-which returns the per-thread exception state for Python code.  Also, the
-semantics of both ways to access the exception state have changed so that a
-function which catches an exception will save and restore its thread's exception
-state so as to preserve the exception state of its caller.  This prevents common
-bugs in exception handling code caused by an innocent-looking function
-overwriting the exception being handled; it also reduces the often unwanted
-lifetime extension for objects that are referenced by the stack frames in the
-traceback.
+Lưu ý rằng kể từ Python 1.5, cách được ưu tiên và an toàn với thread để truy cập trạng thái ngoại lệ từ mã Python là gọi hàm :func:`sys.exc_info`, hàm này trả về trạng thái ngoại lệ theo từng thread cho mã Python. Ngoài ra, ngữ nghĩa của cả hai cách truy cập trạng thái ngoại lệ đã thay đổi, כך cho một hàm bắt một ngoại lệ sẽ lưu và khôi phục trạng thái ngoại lệ của thread đó để bảo toàn trạng thái ngoại lệ của hàm gọi nó. Điều này ngăn ngừa các lỗi thường gặp trong mã xử lý ngoại lệ do một hàm có vẻ vô hại ghi đè lên ngoại lệ đang được xử lý; đồng thời cũng giảm việc kéo dài vòng đời thường không mong muốn của các đối tượng được tham chiếu bởi các stack frame trong traceback.
 
-As a general principle, a function that calls another function to  perform some
-task should check whether the called function raised an  exception, and if so,
-pass the exception state on to its caller.  It  should discard any object
-references that it owns, and return an  error indicator, but it should *not* set
-another exception --- that would overwrite the exception that was just raised,
-and lose important information about the exact cause of the error.
+Theo nguyên tắc chung, một hàm gọi một hàm khác để thực hiện một tác vụ nào đó nên kiểm tra xem hàm được gọi có phát sinh ngoại lệ hay không; nếu có, nó nên truyền trạng thái ngoại lệ cho hàm gọi nó. Nó nên loại bỏ mọi tham chiếu đối tượng mà nó sở hữu và trả về một chỉ báo lỗi, nhưng *không* được đặt một ngoại lệ khác — điều đó sẽ ghi đè lên ngoại lệ vừa được phát sinh và làm mất thông tin quan trọng về nguyên nhân chính xác của lỗi.
 
 .. index:: single: sum_sequence()
 
-A simple example of detecting exceptions and passing them on is shown in the
-:c:func:`!sum_sequence` example above.  It so happens that this example doesn't
-need to clean up any owned references when it detects an error.  The following
-example function shows some error cleanup.  First, to remind you why you like
-Python, we show the equivalent Python code::
+Một ví dụ đơn giản về cách phát hiện ngoại lệ và truyền chúng đi được trình bày trong
+:c:func:`!sum_sequence` ví dụ ở trên. Tình cờ là ví dụ này không cần dọn dẹp bất kỳ tham chiếu nào đang sở hữu khi phát hiện lỗi. Hàm ví dụ sau đây minh họa một số thao tác dọn dẹp khi có lỗi. Trước hết, để nhắc bạn nhớ lý do mình yêu thích Python, chúng ta trình bày mã Python tương đương::
 
    def incr_item(dict, key):
        try:
@@ -909,7 +622,7 @@ Python, we show the equivalent Python code::
 
 .. index:: single: incr_item()
 
-Here is the corresponding C code, in all its glory::
+Dưới đây là mã C tương ứng, với đầy đủ chi tiết::
 
    int
    incr_item(PyObject *dict, PyObject *key)
@@ -961,26 +674,17 @@ Here is the corresponding C code, in all its glory::
    single: PyErr_Clear (C function)
    single: Py_XDECREF (C function)
 
-This example represents an endorsed use of the ``goto`` statement  in C!
-It illustrates the use of :c:func:`PyErr_ExceptionMatches` and
-:c:func:`PyErr_Clear` to handle specific exceptions, and the use of
-:c:func:`Py_XDECREF` to dispose of owned references that may be ``NULL`` (note the
-``'X'`` in the name; :c:func:`Py_DECREF` would crash when confronted with a
-``NULL`` reference).  It is important that the variables used to hold owned
-references are initialized to ``NULL`` for this to work; likewise, the proposed
-return value is initialized to ``-1`` (failure) and only set to success after
-the final call made is successful.
+Ví dụ này minh họa một cách sử dụng được khuyến nghị của câu lệnh ``goto`` trong C! Nó minh họa cách sử dụng :c:func:`PyErr_ExceptionMatches` và
+:c:func:`PyErr_Clear` để xử lý các ngoại lệ cụ thể, cũng như cách sử dụng
+:c:func:`Py_XDECREF` để giải phóng các tham chiếu được sở hữu có thể là ``NULL`` (hãy lưu ý ``'X'`` trong tên; :c:func:`Py_DECREF` sẽ gây lỗi khi gặp một tham chiếu ``NULL``). Điều quan trọng là các biến được dùng để lưu giữ các tham chiếu được sở hữu phải được khởi tạo thành ``NULL`` để cách này hoạt động; tương tự, giá trị trả về dự kiến được khởi tạo thành ``-1`` (thất bại) và chỉ được đặt thành thành công sau khi lệnh gọi cuối cùng thực hiện thành công.
 
 
 .. _api-embedding:
 
-Embedding Python
-================
+Nhúng Python
+============
 
-The one important task that only embedders (as opposed to extension writers) of
-the Python interpreter have to worry about is the initialization, and possibly
-the finalization, of the Python interpreter.  Most functionality of the
-interpreter can only be used after the interpreter has been initialized.
+Nhiệm vụ quan trọng duy nhất mà những người nhúng (khác với người viết extension) trình thông dịch Python phải quan tâm là khởi tạo và có thể là kết thúc hoạt động của trình thông dịch Python. Hầu hết chức năng của trình thông dịch chỉ có thể được sử dụng sau khi trình thông dịch đã được khởi tạo.
 
 .. index::
    single: Py_Initialize (C function)
@@ -990,32 +694,18 @@ interpreter can only be used after the interpreter has been initialized.
    triple: module; search; path
    single: path (in module sys)
 
-The basic initialization function is :c:func:`Py_Initialize`. This initializes
-the table of loaded modules, and creates the fundamental modules
-:mod:`builtins`, :mod:`__main__`, and :mod:`sys`.  It also
-initializes the module search path (``sys.path``).
+Hàm khởi tạo cơ bản là :c:func:`Py_Initialize`. Hàm này khởi tạo bảng các module đã tải và tạo các module nền tảng
+:mod:`builtins`, :mod:`__main__` và :mod:`sys`. Hàm này cũng khởi tạo đường dẫn tìm kiếm module (``sys.path``).
 
-:c:func:`Py_Initialize` does not set the "script argument list"  (``sys.argv``).
-If this variable is needed by Python code that will be executed later, setting
-:c:member:`PyConfig.argv` and :c:member:`PyConfig.parse_argv` must be set: see
-:ref:`Python Initialization Configuration <init-config>`.
+:c:func:`Py_Initialize` không thiết lập "danh sách đối số của script" (``sys.argv``). Nếu mã Python sẽ được thực thi sau đó cần biến này, hãy thiết lập
+:c:member:`PyConfig.argv` và :c:member:`PyConfig.parse_argv` phải được thiết lập: xem
+:ref:`Cấu hình khởi tạo Python <init-config>`.
 
-On most systems (in particular, on Unix and Windows, although the details are
-slightly different), :c:func:`Py_Initialize` calculates the module search path
-based upon its best guess for the location of the standard Python interpreter
-executable, assuming that the Python library is found in a fixed location
-relative to the Python interpreter executable.  In particular, it looks for a
-directory named :file:`lib/python{X.Y}` relative to the parent directory
-where the executable named :file:`python` is found on the shell command search
-path (the environment variable :envvar:`PATH`).
+Trên hầu hết các hệ thống (đặc biệt là Unix và Windows, mặc dù chi tiết có hơi khác nhau), :c:func:`Py_Initialize` tính toán đường dẫn tìm kiếm module dựa trên phỏng đoán tốt nhất về vị trí của tệp thực thi trình thông dịch Python tiêu chuẩn, với giả định rằng thư viện Python nằm ở một vị trí cố định tương đối so với tệp thực thi trình thông dịch Python. Cụ thể, nó tìm một thư mục có tên :file:`lib/python{X.Y}` tương đối so với thư mục cha, nơi tìm thấy tệp thực thi có tên :file:`python` trên đường dẫn tìm kiếm lệnh của shell (biến môi trường :envvar:`PATH`).
 
-For instance, if the Python executable is found in
-:file:`/usr/local/bin/python`, it will assume that the libraries are in
-:file:`/usr/local/lib/python{X.Y}`.  (In fact, this particular path is also
-the "fallback" location, used when no executable file named :file:`python` is
-found along :envvar:`PATH`.)  The user can override this behavior by setting the
-environment variable :envvar:`PYTHONHOME`, or insert additional directories in
-front of the standard path by setting :envvar:`PYTHONPATH`.
+Ví dụ, nếu tệp thực thi Python được tìm thấy tại
+:file:`/usr/local/bin/python`, nó sẽ giả định rằng các thư viện nằm tại
+:file:`/usr/local/lib/python{X.Y}`. (Trên thực tế, đường dẫn cụ thể này cũng là vị trí "dự phòng", được sử dụng khi không tìm thấy tệp thực thi có tên :file:`python` trong :envvar:`PATH`.) Người dùng có thể ghi đè hành vi này bằng cách đặt biến môi trường :envvar:`PYTHONHOME`, hoặc chèn các thư mục bổ sung vào trước đường dẫn tiêu chuẩn bằng cách đặt :envvar:`PYTHONPATH`.
 
 .. index::
    single: Py_GetPath (C function)
@@ -1023,74 +713,48 @@ front of the standard path by setting :envvar:`PYTHONPATH`.
    single: Py_GetExecPrefix (C function)
    single: Py_GetProgramFullPath (C function)
 
-The embedding application can steer the search by setting
-:c:member:`PyConfig.program_name` *before* calling
-:c:func:`Py_InitializeFromConfig`. Note that
-:envvar:`PYTHONHOME` still overrides this and :envvar:`PYTHONPATH` is still
-inserted in front of the standard path.  An application that requires total
-control has to provide its own implementation of :c:func:`Py_GetPath`,
-:c:func:`Py_GetPrefix`, :c:func:`Py_GetExecPrefix`, and
-:c:func:`Py_GetProgramFullPath` (all defined in :file:`Modules/getpath.c`).
+Ứng dụng nhúng có thể điều khiển quá trình tìm kiếm bằng cách đặt
+:c:member:`PyConfig.program_name` *trước* khi gọi
+:c:func:`Py_InitializeFromConfig`. Lưu ý rằng
+:envvar:`PYTHONHOME` vẫn ghi đè điều này và :envvar:`PYTHONPATH` vẫn được chèn vào trước đường dẫn chuẩn.  Một ứng dụng cần toàn quyền kiểm soát phải cung cấp triển khai riêng cho :c:func:`Py_GetPath`,
+:c:func:`Py_GetPrefix`, :c:func:`Py_GetExecPrefix`, và
+:c:func:`Py_GetProgramFullPath` (tất cả đều được định nghĩa trong :file:`Modules/getpath.c`).
 
 .. index:: single: Py_IsInitialized (C function)
 
-Sometimes, it is desirable to "uninitialize" Python.  For instance,  the
-application may want to start over (make another call to
-:c:func:`Py_Initialize`) or the application is simply done with its  use of
-Python and wants to free memory allocated by Python.  This can be accomplished
-by calling :c:func:`Py_FinalizeEx`.  The function :c:func:`Py_IsInitialized` returns
-true if Python is currently in the initialized state.  More information about
-these functions is given in a later chapter. Notice that :c:func:`Py_FinalizeEx`
-does *not* free all memory allocated by the Python interpreter, e.g. memory
-allocated by extension modules currently cannot be released.
+Đôi khi, việc "hủy khởi tạo" Python là cần thiết.  Chẳng hạn, ứng dụng có thể muốn bắt đầu lại (thực hiện một lệnh gọi khác đến
+:c:func:`Py_Initialize`) hoặc ứng dụng đã dùng xong Python và muốn giải phóng bộ nhớ do Python cấp phát.  Có thể thực hiện điều này bằng cách gọi :c:func:`Py_FinalizeEx`.  Hàm :c:func:`Py_IsInitialized` trả về true nếu Python hiện đang ở trạng thái đã khởi tạo.  Thông tin chi tiết hơn về các hàm này được cung cấp trong một chương sau. Lưu ý rằng :c:func:`Py_FinalizeEx` *không* giải phóng toàn bộ bộ nhớ do trình thông dịch Python cấp phát; chẳng hạn, hiện tại không thể giải phóng bộ nhớ do các extension module cấp phát.
 
 
 .. _api-debugging:
 
-Debugging Builds
-================
+Các bản build dùng để gỡ lỗi
+============================
 
-Python can be built with several macros to enable extra checks of the
-interpreter and extension modules.  These checks tend to add a large amount of
-overhead to the runtime so they are not enabled by default.
+Python có thể được build với một số macro để bật thêm các bước kiểm tra interpreter và extension module. Các bước kiểm tra này thường tạo ra overhead lớn cho runtime, vì vậy mặc định chúng không được bật.
 
-A full list of the various types of debugging builds is in the file
-:file:`Misc/SpecialBuilds.txt` in the Python source distribution. Builds are
-available that support tracing of reference counts, debugging the memory
-allocator, or low-level profiling of the main interpreter loop.  Only the most
-frequently used builds will be described in the remainder of this section.
+Danh sách đầy đủ các loại debug build khác nhau nằm trong tệp
+:file:`Misc/SpecialBuilds.txt` của bản phân phối mã nguồn Python. Có các build hỗ trợ tracing reference count, debugging memory allocator hoặc profiling ở mức thấp vòng lặp chính của interpreter. Phần còn lại của mục này chỉ mô tả những build được sử dụng thường xuyên nhất.
 
 .. c:macro:: Py_DEBUG
 
-Compiling the interpreter with the :c:macro:`!Py_DEBUG` macro defined produces
-what is generally meant by :ref:`a debug build of Python <debug-build>`.
-:c:macro:`!Py_DEBUG` is enabled in the Unix build by adding
-:option:`--with-pydebug` to the :file:`./configure` command.
-It is also implied by the presence of the
-not-Python-specific :c:macro:`!_DEBUG` macro.  When :c:macro:`!Py_DEBUG` is enabled
-in the Unix build, compiler optimization is disabled.
+Biên dịch interpreter với macro :c:macro:`!Py_DEBUG` được định nghĩa sẽ tạo ra thứ thường được gọi là :ref:`a debug build of Python <debug-build>`.
+:c:macro:`!Py_DEBUG` được bật trong Unix build bằng cách thêm
+:option:`--with-pydebug` vào lệnh :file:`./configure`. Macro không dành riêng cho Python là :c:macro:`!_DEBUG` cũng ngầm bật tùy chọn này khi xuất hiện. Khi :c:macro:`!Py_DEBUG` được bật trong Unix build, trình biên dịch sẽ tắt tối ưu hóa.
 
-In addition to the reference count debugging described below, extra checks are
-performed, see :ref:`Python Debug Build <debug-build>`.
+Ngoài việc debugging reference count được mô tả bên dưới, các bước kiểm tra bổ sung cũng được thực hiện; xem :ref:`Python Debug Build <debug-build>`.
 
-Defining ``Py_TRACE_REFS`` enables reference tracing
-(see the :option:`configure --with-trace-refs option <--with-trace-refs>`).
-When defined, a circular doubly linked list of active objects is maintained by adding two extra
-fields to every :c:type:`PyObject`.  Total allocations are tracked as well.  Upon
-exit, all existing references are printed.  (In interactive mode this happens
-after every statement run by the interpreter.)
+Việc định nghĩa ``Py_TRACE_REFS`` cho phép truy vết tham chiếu (xem :option:`configure --with-trace-refs option <--with-trace-refs>`). Khi được định nghĩa, một danh sách liên kết kép vòng tròn gồm các đối tượng đang hoạt động sẽ được duy trì bằng cách thêm hai trường bổ sung vào mỗi :c:type:`PyObject`. Tổng số lần cấp phát cũng được theo dõi. Khi thoát, tất cả các tham chiếu hiện có sẽ được in ra. (Trong chế độ tương tác, việc này diễn ra sau mỗi câu lệnh được trình thông dịch thực thi.)
 
-Please refer to :file:`Misc/SpecialBuilds.txt` in the Python source distribution
-for more detailed information.
+Vui lòng tham khảo :file:`Misc/SpecialBuilds.txt` trong bản phân phối mã nguồn Python để biết thêm thông tin chi tiết.
 
 
 .. _c-api-tools:
 
-Recommended third party tools
-=============================
+Các công cụ bên thứ ba được khuyến nghị
+=======================================
 
-The following third party tools offer both simpler and more sophisticated
-approaches to creating C, C++ and Rust extensions for Python:
+Các công cụ bên thứ ba sau đây cung cấp cả những phương pháp đơn giản hơn và tinh vi hơn để tạo các phần mở rộng C, C++ và Rust cho Python:
 
 * `Cython <https://cython.org/>`_
 * `cffi <https://cffi.readthedocs.io>`_
@@ -1101,22 +765,21 @@ approaches to creating C, C++ and Rust extensions for Python:
 * `PyO3 <https://pyo3.rs/>`_ (Rust)
 * `SWIG <https://www.swig.org>`_
 
-Using tools such as these can help avoid writing code that is tightly bound to
-a particular version of CPython, avoid reference counting errors, and focus
-more on your own code than on using the CPython API. In general, new versions
-of Python can be supported by updating the tool, and your code will often use
-newer and more efficient APIs automatically. Some tools also support compiling
-for other implementations of Python from a single set of sources.
+Việc sử dụng các công cụ như vậy có thể giúp tránh phải viết code gắn chặt với một phiên bản cụ thể của CPython, tránh các lỗi đếm tham chiếu và tập trung nhiều hơn vào code của riêng bạn thay vì sử dụng CPython API. Nhìn chung, các phiên bản Python mới có thể được hỗ trợ bằng cách cập nhật công cụ, và code của bạn thường sẽ tự động sử dụng các API mới hơn, hiệu quả hơn. Một số công cụ cũng hỗ trợ biên dịch cho các triển khai Python khác từ một bộ mã nguồn duy nhất.
 
-These projects are not supported by the same people who maintain Python, and
-issues need to be raised with the projects directly. Remember to check that the
-project is still maintained and supported, as the list above may become
-outdated.
+Các dự án này không được cùng những người duy trì Python hỗ trợ, và bạn cần báo cáo vấn đề trực tiếp với các dự án đó. Hãy nhớ kiểm tra xem dự án còn được duy trì và hỗ trợ hay không, vì danh sách trên có thể trở nên lỗi thời.
 
 .. seealso::
 
-   `Python Packaging User Guide: Binary Extensions <https://packaging.python.org/guides/packaging-binary-extensions/>`_
-      The Python Packaging User Guide not only covers several available
-      tools that simplify the creation of binary extensions, but also
-      discusses the various reasons why creating an extension module may be
-      desirable in the first place.
+   `Hướng dẫn đóng gói Python: Phần mở rộng nhị phân <https://packaging.python.org/guides/packaging-binary-extensions/>`_
+      Hướng dẫn đóng gói Python không chỉ đề cập đến một số công cụ hiện có giúp đơn giản hóa việc tạo các phần mở rộng nhị phân, mà còn thảo luận về nhiều lý do khiến việc tạo một extension module ngay từ đầu có thể là điều đáng cân nhắc.
+
+.. _`Cython`: https://cython.org/
+.. _`cffi`: https://cffi.readthedocs.io
+.. _`HPy`: https://hpyproject.org/
+.. _`nanobind`: https://github.com/wjakob/nanobind
+.. _`Numba`: https://numba.pydata.org/
+.. _`pybind11`: https://pybind11.readthedocs.io/
+.. _`PyO3`: https://pyo3.rs/
+.. _`SWIG`: https://www.swig.org
+.. _`Python Packaging User Guide: Binary Extensions`: https://packaging.python.org/guides/packaging-binary-extensions/

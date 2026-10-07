@@ -2,8 +2,8 @@
 
 .. _importing:
 
-Importing Modules
-=================
+Nhập module
+===========
 
 
 .. c:function:: PyObject* PyImport_ImportModule(const char *name)
@@ -13,259 +13,192 @@ Importing Modules
       single: __all__ (package variable)
       single: modules (in module sys)
 
-   This is a wrapper around :c:func:`PyImport_Import()` which takes a
-   :c:expr:`const char *` as an argument instead of a :c:expr:`PyObject *`.
+   Đây là một wrapper cho :c:func:`PyImport_Import()`, nhận một
+   :c:expr:`const char *` làm đối số thay vì một :c:expr:`PyObject *`.
 
 .. c:function:: PyObject* PyImport_ImportModuleNoBlock(const char *name)
 
-   This function is a deprecated alias of :c:func:`PyImport_ImportModule`.
+   Hàm này là bí danh không còn được khuyến nghị dùng của :c:func:`PyImport_ImportModule`.
 
    .. versionchanged:: 3.3
-      This function used to fail immediately when the import lock was held
-      by another thread.  In Python 3.3 though, the locking scheme switched
-      to per-module locks for most purposes, so this function's special
-      behaviour isn't needed anymore.
+      Trước đây, hàm này sẽ thất bại ngay lập tức khi một thread khác đang giữ import lock. Tuy nhiên, trong Python 3.3, cơ chế khóa đã chuyển sang dùng khóa theo từng module cho hầu hết các mục đích, vì vậy hành vi đặc biệt của hàm này không còn cần thiết nữa.
 
    .. deprecated-removed:: 3.13 3.15
-      Use :c:func:`PyImport_ImportModule` instead.
+      Thay vào đó, hãy dùng :c:func:`PyImport_ImportModule`.
 
 
 .. c:function:: PyObject* PyImport_ImportModuleEx(const char *name, PyObject *globals, PyObject *locals, PyObject *fromlist)
 
    .. index:: pair: built-in function; __import__
 
-   Import a module.  This is best described by referring to the built-in Python
-   function :func:`__import__`.
+   Nhập một module. Cách mô tả phù hợp nhất là tham chiếu đến hàm Python tích hợp sẵn :func:`__import__`.
 
-   The return value is a new reference to the imported module or top-level
-   package, or ``NULL`` with an exception set on failure.  Like for
-   :func:`__import__`, the return value when a submodule of a package was
-   requested is normally the top-level package, unless a non-empty *fromlist*
-   was given.
+   Giá trị trả về là một tham chiếu mới đến module đã nhập hoặc package cấp cao nhất, hoặc ``NULL`` khi việc nhập không thành công và một ngoại lệ được thiết lập. Tương tự như đối với
+   :func:`__import__`, khi yêu cầu một submodule của package, giá trị trả về thường là package cấp cao nhất, trừ khi cung cấp *fromlist* không rỗng.
 
-   Failing imports remove incomplete module objects, like with
+   Các lần nhập không thành công sẽ loại bỏ những đối tượng module chưa hoàn chỉnh, tương tự như với
    :c:func:`PyImport_ImportModule`.
 
 
 .. c:function:: PyObject* PyImport_ImportModuleLevelObject(PyObject *name, PyObject *globals, PyObject *locals, PyObject *fromlist, int level)
 
-   Import a module.  This is best described by referring to the built-in Python
-   function :func:`__import__`, as the standard :func:`__import__` function calls
-   this function directly.
+   Nhập một module. Cách mô tả rõ nhất là tham chiếu đến hàm Python tích hợp sẵn :func:`__import__`, vì hàm :func:`__import__` chuẩn gọi trực tiếp hàm này.
 
-   The return value is a new reference to the imported module or top-level package,
-   or ``NULL`` with an exception set on failure.  Like for :func:`__import__`,
-   the return value when a submodule of a package was requested is normally the
-   top-level package, unless a non-empty *fromlist* was given.
+   Giá trị trả về là một tham chiếu mới đến module đã nhập hoặc package cấp cao nhất, hoặc ``NULL`` khi việc nhập không thành công và một ngoại lệ được thiết lập. Tương tự như đối với :func:`__import__`, khi yêu cầu một submodule của package, giá trị trả về thường là package cấp cao nhất, trừ khi cung cấp *fromlist* không rỗng.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: PyObject* PyImport_ImportModuleLevel(const char *name, PyObject *globals, PyObject *locals, PyObject *fromlist, int level)
 
-   Similar to :c:func:`PyImport_ImportModuleLevelObject`, but the name is a
-   UTF-8 encoded string instead of a Unicode object.
+   Tương tự như :c:func:`PyImport_ImportModuleLevelObject`, nhưng tên là một chuỗi được mã hóa UTF-8 thay vì một đối tượng Unicode.
 
    .. versionchanged:: 3.3
-         Negative values for *level* are no longer accepted.
+         Các giá trị âm cho *level* không còn được chấp nhận.
 
 .. c:function:: PyObject* PyImport_Import(PyObject *name)
 
-   This is a higher-level interface that calls the current "import hook
-   function" (with an explicit *level* of 0, meaning absolute import).  It
-   invokes the :func:`__import__` function from the ``__builtins__`` of the
-   current globals.  This means that the import is done using whatever import
-   hooks are installed in the current environment.
+   Đây là một giao diện cấp cao hơn, gọi "hàm import hook" hiện tại (với *level* rõ ràng là 0, nghĩa là import tuyệt đối). Hàm này gọi hàm :func:`__import__` từ ``__builtins__`` của các biến toàn cục hiện tại. Điều này có nghĩa là thao tác import được thực hiện bằng bất kỳ import hook nào đang được cài đặt trong môi trường hiện tại.
 
-   This function always uses absolute imports.
+   Hàm này luôn sử dụng import tuyệt đối.
 
 
 .. c:function:: PyObject* PyImport_ReloadModule(PyObject *m)
 
-   Reload a module.  Return a new reference to the reloaded module, or ``NULL`` with
-   an exception set on failure (the module still exists in this case).
+   Tải lại một module. Trả về một tham chiếu mới đến module đã được tải lại hoặc ``NULL`` kèm theo một exception được thiết lập nếu xảy ra lỗi (trong trường hợp này, module vẫn tồn tại).
 
 
 .. c:function:: PyObject* PyImport_AddModuleRef(const char *name)
 
-   Return the module object corresponding to a module name.
+   Trả về đối tượng module tương ứng với tên module.
 
-   The *name* argument may be of the form ``package.module``. First check the
-   modules dictionary if there's one there, and if not, create a new one and
-   insert it in the modules dictionary.
+   Đối số *name* có thể có dạng ``package.module``. Trước tiên, hãy kiểm tra từ điển modules nếu đã có module ở đó; nếu chưa có, hãy tạo một module mới và chèn nó vào từ điển modules.
 
-   Return a :term:`strong reference` to the module on success. Return ``NULL``
-   with an exception set on failure.
+   Trả về một :term:`strong reference` đến module nếu thành công. Trả về ``NULL`` kèm theo một exception được thiết lập nếu xảy ra lỗi.
 
-   The module name *name* is decoded from UTF-8.
+   Tên module *name* được giải mã từ UTF-8.
 
-   This function does not load or import the module; if the module wasn't
-   already loaded, you will get an empty module object. Use
-   :c:func:`PyImport_ImportModule` or one of its variants to import a module.
-   Package structures implied by a dotted name for *name* are not created if
-   not already present.
+   Hàm này không tải hoặc import module; nếu module chưa được tải trước đó, bạn sẽ nhận được một đối tượng module rỗng. Sử dụng
+   :c:func:`PyImport_ImportModule` hoặc một trong các biến thể của nó để import module. Các cấu trúc package được ngụ ý bởi một tên có dấu chấm cho *name* sẽ không được tạo nếu chưa tồn tại.
 
    .. versionadded:: 3.13
 
 
 .. c:function:: PyObject* PyImport_AddModuleObject(PyObject *name)
 
-   Similar to :c:func:`PyImport_AddModuleRef`, but return a :term:`borrowed
-   reference` and *name* is a Python :class:`str` object.
+   Tương tự như :c:func:`PyImport_AddModuleRef`, nhưng trả về một :term:`borrowed reference` và *name* là một đối tượng :class:`str` của Python.
 
    .. versionadded:: 3.3
 
 
 .. c:function:: PyObject* PyImport_AddModule(const char *name)
 
-   Similar to :c:func:`PyImport_AddModuleRef`, but return a :term:`borrowed
-   reference`.
+   Tương tự như :c:func:`PyImport_AddModuleRef`, nhưng trả về một :term:`borrowed reference`.
 
 
 .. c:function:: PyObject* PyImport_ExecCodeModule(const char *name, PyObject *co)
 
    .. index:: pair: built-in function; compile
 
-   Given a module name (possibly of the form ``package.module``) and a code object
-   read from a Python bytecode file or obtained from the built-in function
-   :func:`compile`, load the module.  Return a new reference to the module object,
-   or ``NULL`` with an exception set if an error occurred.  *name*
-   is removed from :data:`sys.modules` in error cases, even if *name* was already
-   in :data:`sys.modules` on entry to :c:func:`PyImport_ExecCodeModule`.  Leaving
-   incompletely initialized modules in :data:`sys.modules` is dangerous, as imports of
-   such modules have no way to know that the module object is an unknown (and
-   probably damaged with respect to the module author's intents) state.
+   Với một tên module (có thể có dạng ``package.module``) và một đối tượng mã được đọc từ tệp bytecode Python hoặc nhận được từ hàm dựng sẵn
+   :func:`compile`, tải module. Trả về một tham chiếu mới đến đối tượng module hoặc ``NULL`` với một ngoại lệ đã được thiết lập nếu xảy ra lỗi. *name* sẽ bị xóa khỏi :data:`sys.modules` trong các trường hợp lỗi, ngay cả khi *name* đã có trong :data:`sys.modules` khi bắt đầu :c:func:`PyImport_ExecCodeModule`. Việc để lại các module được khởi tạo chưa hoàn chỉnh trong :data:`sys.modules` rất nguy hiểm, vì các lần import những module như vậy không có cách nào biết rằng đối tượng module đang ở trạng thái không xác định (và có thể đã bị hỏng so với ý định của tác giả module).
 
-   The module's :attr:`~module.__spec__` and :attr:`~module.__loader__` will be
-   set, if not set already, with the appropriate values.  The spec's loader
-   will be set to the module's :attr:`!__loader__` (if set) and to an instance
-   of :class:`~importlib.machinery.SourceFileLoader` otherwise.
+   :attr:`~module.__spec__` và :attr:`~module.__loader__` của module sẽ được thiết lập, nếu chưa được thiết lập, với các giá trị thích hợp. Loader của spec sẽ được đặt thành :attr:`!__loader__` của module (nếu đã được thiết lập) và thành một instance của :class:`~importlib.machinery.SourceFileLoader` trong trường hợp ngược lại.
 
-   The module's :attr:`~module.__file__` attribute will be set to the code
-   object's :attr:`~codeobject.co_filename`.  If applicable,
-   :attr:`~module.__cached__` will also be set.
+   Thuộc tính :attr:`~module.__file__` của module sẽ được đặt thành :attr:`~codeobject.co_filename` của đối tượng mã. Nếu phù hợp,
+   :attr:`~module.__cached__` cũng sẽ được đặt.
 
-   This function will reload the module if it was already imported.  See
-   :c:func:`PyImport_ReloadModule` for the intended way to reload a module.
+   Hàm này sẽ tải lại module nếu module đó đã được import. Xem
+   :c:func:`PyImport_ReloadModule` để biết cách dự kiến dùng để tải lại module.
 
-   If *name* points to a dotted name of the form ``package.module``, any package
-   structures not already created will still not be created.
+   Nếu *name* trỏ đến một tên có dấu chấm theo dạng ``package.module``, mọi cấu trúc package chưa được tạo sẽ vẫn không được tạo.
 
-   See also :c:func:`PyImport_ExecCodeModuleEx` and
+   Xem thêm :c:func:`PyImport_ExecCodeModuleEx` và
    :c:func:`PyImport_ExecCodeModuleWithPathnames`.
 
    .. versionchanged:: 3.12
-      The setting of :attr:`~module.__cached__` and :attr:`~module.__loader__`
-      is deprecated. See :class:`~importlib.machinery.ModuleSpec` for
-      alternatives.
+      Việc thiết lập :attr:`~module.__cached__` và :attr:`~module.__loader__` không còn được khuyến nghị. Xem :class:`~importlib.machinery.ModuleSpec` để biết các phương án thay thế.
 
 
 .. c:function:: PyObject* PyImport_ExecCodeModuleEx(const char *name, PyObject *co, const char *pathname)
 
-   Like :c:func:`PyImport_ExecCodeModule`, but the :attr:`~module.__file__`
-   attribute of the module object is set to *pathname* if it is non-``NULL``.
+   Giống như :c:func:`PyImport_ExecCodeModule`, nhưng thuộc tính :attr:`~module.__file__` của đối tượng module được đặt thành *pathname* nếu nó không phải là ``NULL``.
 
-   See also :c:func:`PyImport_ExecCodeModuleWithPathnames`.
+   Xem thêm :c:func:`PyImport_ExecCodeModuleWithPathnames`.
 
 
 .. c:function:: PyObject* PyImport_ExecCodeModuleObject(PyObject *name, PyObject *co, PyObject *pathname, PyObject *cpathname)
 
-   Like :c:func:`PyImport_ExecCodeModuleEx`, but the :attr:`~module.__cached__`
-   attribute of the module object is set to *cpathname* if it is
-   non-``NULL``.  Of the three functions, this is the preferred one to use.
+   Giống như :c:func:`PyImport_ExecCodeModuleEx`, nhưng thuộc tính :attr:`~module.__cached__` của đối tượng module được đặt thành *cpathname* nếu nó không phải là ``NULL``. Trong ba hàm này, đây là hàm được khuyến nghị sử dụng.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.12
-      Setting :attr:`~module.__cached__` is deprecated. See
-      :class:`~importlib.machinery.ModuleSpec` for alternatives.
+      Việc đặt :attr:`~module.__cached__` không còn được khuyến nghị. Xem
+      :class:`~importlib.machinery.ModuleSpec` để biết các lựa chọn thay thế.
 
 
 .. c:function:: PyObject* PyImport_ExecCodeModuleWithPathnames(const char *name, PyObject *co, const char *pathname, const char *cpathname)
 
-   Like :c:func:`PyImport_ExecCodeModuleObject`, but *name*, *pathname* and
-   *cpathname* are UTF-8 encoded strings. Attempts are also made to figure out
-   what the value for *pathname* should be from *cpathname* if the former is
-   set to ``NULL``.
+   Giống như :c:func:`PyImport_ExecCodeModuleObject`, nhưng *name*, *pathname* và *cpathname* là các chuỗi được mã hóa UTF-8. Đồng thời, hệ thống cũng cố gắng xác định giá trị của *pathname* từ *cpathname* nếu giá trị trước được đặt thành ``NULL``.
 
    .. versionadded:: 3.2
    .. versionchanged:: 3.3
-      Uses :func:`!imp.source_from_cache` in calculating the source path if
-      only the bytecode path is provided.
+      Sử dụng :func:`!imp.source_from_cache` khi tính đường dẫn nguồn nếu chỉ cung cấp đường dẫn bytecode.
    .. versionchanged:: 3.12
-      No longer uses the removed :mod:`!imp` module.
+      Không còn sử dụng module :mod:`!imp` đã bị loại bỏ.
 
 
 .. c:function:: long PyImport_GetMagicNumber()
 
-   Return the magic number for Python bytecode files (a.k.a. :file:`.pyc` file).
-   The magic number should be present in the first four bytes of the bytecode
-   file, in little-endian byte order. Returns ``-1`` on error.
+   Trả về số magic cho các tệp bytecode Python (còn gọi là tệp :file:`.pyc`). Số magic phải có trong bốn byte đầu tiên của tệp bytecode, theo thứ tự byte little-endian. Trả về ``-1`` nếu có lỗi.
 
    .. versionchanged:: 3.3
-      Return value of ``-1`` upon failure.
+      Giá trị trả về của ``-1`` khi thất bại.
 
 
 .. c:function:: const char * PyImport_GetMagicTag()
 
-   Return the magic tag string for :pep:`3147` format Python bytecode file
-   names.  Keep in mind that the value at ``sys.implementation.cache_tag`` is
-   authoritative and should be used instead of this function.
+   Trả về chuỗi thẻ magic cho tên tệp bytecode Python định dạng :pep:`3147`. Hãy lưu ý rằng giá trị tại ``sys.implementation.cache_tag`` là giá trị có thẩm quyền và nên được sử dụng thay cho hàm này.
 
    .. versionadded:: 3.2
 
 .. c:function:: PyObject* PyImport_GetModuleDict()
 
-   Return the dictionary used for the module administration (a.k.a.
-   ``sys.modules``).  Note that this is a per-interpreter variable.
+   Trả về từ điển được sử dụng để quản lý module (còn gọi là ``sys.modules``). Lưu ý rằng đây là một biến riêng của từng interpreter.
 
 .. c:function:: PyObject* PyImport_GetModule(PyObject *name)
 
-   Return the already imported module with the given name.  If the
-   module has not been imported yet then returns ``NULL`` but does not set
-   an error.  Returns ``NULL`` and sets an error if the lookup failed.
+   Trả về module đã được import với tên đã cho. Nếu module chưa được import thì trả về ``NULL`` nhưng không thiết lập lỗi. Trả về ``NULL`` và thiết lập lỗi nếu việc tra cứu thất bại.
 
    .. versionadded:: 3.7
 
 .. c:function:: PyObject* PyImport_GetImporter(PyObject *path)
 
-   Return a finder object for a :data:`sys.path`/:attr:`!pkg.__path__` item
-   *path*, possibly by fetching it from the :data:`sys.path_importer_cache`
-   dict.  If it wasn't yet cached, traverse :data:`sys.path_hooks` until a hook
-   is found that can handle the path item.  Return ``None`` if no hook could;
-   this tells our caller that the :term:`path based finder` could not find a
-   finder for this path item. Cache the result in :data:`sys.path_importer_cache`.
-   Return a new reference to the finder object.
+   Trả về một đối tượng finder cho mục :data:`sys.path`/:attr:`!pkg.__path__` *path*, có thể bằng cách lấy đối tượng đó từ dict :data:`sys.path_importer_cache`. Nếu mục này chưa được lưu vào bộ nhớ đệm, duyệt qua :data:`sys.path_hooks` cho đến khi tìm thấy một hook có thể xử lý mục đường dẫn. Trả về ``None`` nếu không tìm thấy hook nào; điều này cho caller biết rằng :term:`path based finder` không thể tìm thấy finder cho mục đường dẫn này. Lưu kết quả vào :data:`sys.path_importer_cache`. Trả về một tham chiếu mới đến đối tượng finder.
 
 
 .. c:function:: int PyImport_ImportFrozenModuleObject(PyObject *name)
 
-   Load a frozen module named *name*.  Return ``1`` for success, ``0`` if the
-   module is not found, and ``-1`` with an exception set if the initialization
-   failed.  To access the imported module on a successful load, use
-   :c:func:`PyImport_ImportModule`.  (Note the misnomer --- this function would
-   reload the module if it was already imported.)
+   Tải một frozen module có tên *name*. Trả về ``1`` nếu thành công, ``0`` nếu không tìm thấy module và ``-1`` cùng với một exception được thiết lập nếu quá trình khởi tạo thất bại. Để truy cập module đã import sau khi tải thành công, hãy sử dụng
+   :c:func:`PyImport_ImportModule`. (Lưu ý tên gọi không chính xác --- hàm này sẽ tải lại module nếu module đó đã được import.)
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.4
-      The ``__file__`` attribute is no longer set on the module.
+      Thuộc tính ``__file__`` không còn được thiết lập trên module.
 
 
 .. c:function:: int PyImport_ImportFrozenModule(const char *name)
 
-   Similar to :c:func:`PyImport_ImportFrozenModuleObject`, but the name is a
-   UTF-8 encoded string instead of a Unicode object.
+   Tương tự như :c:func:`PyImport_ImportFrozenModuleObject`, nhưng tên là một chuỗi được mã hóa UTF-8 thay vì một đối tượng Unicode.
 
 
 .. c:struct:: _frozen
 
    .. index:: single: freeze utility
 
-   This is the structure type definition for frozen module descriptors, as
-   generated by the :program:`freeze` utility (see :file:`Tools/freeze/` in the
-   Python source distribution).  Its definition, found in :file:`Include/import.h`,
-   is::
+   Đây là định nghĩa kiểu cấu trúc cho các bộ mô tả frozen module, được tạo bởi tiện ích :program:`freeze` (xem :file:`Tools/freeze/` trong bản phân phối mã nguồn Python). Định nghĩa của nó, nằm trong :file:`Include/import.h`, là::
 
       struct _frozen {
           const char *name;
@@ -275,81 +208,59 @@ Importing Modules
       };
 
    .. versionchanged:: 3.11
-      The new ``is_package`` field indicates whether the module is a package or not.
-      This replaces setting the ``size`` field to a negative value.
+      Trường ``is_package`` mới cho biết module có phải là package hay không. Trường này thay thế cho việc đặt trường ``size`` thành một giá trị âm.
 
 .. c:var:: const struct _frozen* PyImport_FrozenModules
 
-   This pointer is initialized to point to an array of :c:struct:`_frozen`
-   records, terminated by one whose members are all ``NULL`` or zero.  When a frozen
-   module is imported, it is searched in this table.  Third-party code could play
-   tricks with this to provide a dynamically created collection of frozen modules.
+   Con trỏ này được khởi tạo để trỏ đến một mảng gồm các bản ghi :c:struct:`_frozen`, kết thúc bằng một bản ghi có tất cả các thành viên là ``NULL`` hoặc bằng không. Khi một frozen module được import, module đó sẽ được tìm kiếm trong bảng này. Mã của bên thứ ba có thể tận dụng điều này để cung cấp một tập hợp frozen module được tạo động.
 
 
 .. c:function:: int PyImport_AppendInittab(const char *name, PyObject* (*initfunc)(void))
 
-   Add a single module to the existing table of built-in modules.  This is a
-   convenience wrapper around :c:func:`PyImport_ExtendInittab`, returning ``-1`` if
-   the table could not be extended.  The new module can be imported by the name
-   *name*, and uses the function *initfunc* as the initialization function called
-   on the first attempted import.  This should be called before
+   Thêm một module duy nhất vào bảng các module tích hợp sẵn hiện có. Đây là một wrapper tiện lợi quanh :c:func:`PyImport_ExtendInittab`, trả về ``-1`` nếu không thể mở rộng bảng. Module mới có thể được import bằng tên *name*, và sử dụng hàm *initfunc* làm hàm khởi tạo được gọi trong lần import đầu tiên. Việc này nên được gọi trước
    :c:func:`Py_Initialize`.
 
 
 .. c:struct:: _inittab
 
-   Structure describing a single entry in the list of built-in modules.
-   Programs which
-   embed Python may use an array of these structures in conjunction with
-   :c:func:`PyImport_ExtendInittab` to provide additional built-in modules.
-   The structure consists of two members:
+   Cấu trúc mô tả một mục duy nhất trong danh sách các module tích hợp sẵn. Các chương trình nhúng Python có thể sử dụng một mảng gồm các cấu trúc này kết hợp với
+   :c:func:`PyImport_ExtendInittab` để cung cấp thêm các module tích hợp sẵn. Cấu trúc gồm hai thành viên:
 
    .. c:member:: const char *name
 
-      The module name, as an ASCII encoded string.
+      Tên module, dưới dạng chuỗi được mã hóa ASCII.
 
    .. c:member:: PyObject* (*initfunc)(void)
 
-      Initialization function for a module built into the interpreter.
+      Hàm khởi tạo cho một module được tích hợp vào trình thông dịch.
 
 
 .. c:function:: int PyImport_ExtendInittab(struct _inittab *newtab)
 
-   Add a collection of modules to the table of built-in modules.  The *newtab*
-   array must end with a sentinel entry which contains ``NULL`` for the :c:member:`~_inittab.name`
-   field; failure to provide the sentinel value can result in a memory fault.
-   Returns ``0`` on success or ``-1`` if insufficient memory could be allocated to
-   extend the internal table.  In the event of failure, no modules are added to the
-   internal table.  This must be called before :c:func:`Py_Initialize`.
+   Thêm một tập hợp module vào bảng các module tích hợp sẵn. Mảng *newtab* phải kết thúc bằng một mục sentinel chứa ``NULL`` cho trường :c:member:`~_inittab.name`; nếu không cung cấp giá trị sentinel, có thể xảy ra lỗi bộ nhớ. Trả về ``0`` khi thành công hoặc ``-1`` nếu không thể cấp phát đủ bộ nhớ để mở rộng bảng nội bộ. Nếu xảy ra lỗi, không module nào được thêm vào bảng nội bộ. Việc này phải được gọi trước :c:func:`Py_Initialize`.
 
-   If Python is initialized multiple times, :c:func:`PyImport_AppendInittab` or
-   :c:func:`PyImport_ExtendInittab` must be called before each Python
-   initialization.
+   Nếu Python được khởi tạo nhiều lần, :c:func:`PyImport_AppendInittab` hoặc
+   :c:func:`PyImport_ExtendInittab` phải được gọi trước mỗi lần khởi tạo Python.
 
 
 .. c:var:: struct _inittab *PyImport_Inittab
 
-   The table of built-in modules used by Python initialization. Do not use this directly;
-   use :c:func:`PyImport_AppendInittab` and :c:func:`PyImport_ExtendInittab`
-   instead.
+   Bảng các module tích hợp được Python sử dụng khi khởi tạo. Không sử dụng trực tiếp bảng này; thay vào đó, hãy sử dụng :c:func:`PyImport_AppendInittab` và :c:func:`PyImport_ExtendInittab`.
 
 
 .. c:function:: PyObject* PyImport_ImportModuleAttr(PyObject *mod_name, PyObject *attr_name)
 
-   Import the module *mod_name* and get its attribute *attr_name*.
+   Import module *mod_name* và lấy thuộc tính *attr_name* của module đó.
 
-   Names must be Python :class:`str` objects.
+   Tên phải là các đối tượng :class:`str` của Python.
 
-   Helper function combining :c:func:`PyImport_Import` and
-   :c:func:`PyObject_GetAttr`. For example, it can raise :exc:`ImportError` if
-   the module is not found, and :exc:`AttributeError` if the attribute doesn't
-   exist.
+   Hàm trợ giúp kết hợp :c:func:`PyImport_Import` và
+   :c:func:`PyObject_GetAttr`. Ví dụ: hàm này có thể phát sinh :exc:`ImportError` nếu không tìm thấy module và :exc:`AttributeError` nếu thuộc tính không tồn tại.
 
    .. versionadded:: 3.14
 
 .. c:function:: PyObject* PyImport_ImportModuleAttrString(const char *mod_name, const char *attr_name)
 
-   Similar to :c:func:`PyImport_ImportModuleAttr`, but names are UTF-8 encoded
-   strings instead of Python :class:`str` objects.
+   Tương tự :c:func:`PyImport_ImportModuleAttr`, nhưng tên là các chuỗi được mã hóa UTF-8 thay vì các đối tượng :class:`str` của Python.
 
    .. versionadded:: 3.14

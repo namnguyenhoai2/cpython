@@ -2,18 +2,13 @@
 
 .. _abstract:
 
-**********************
-Abstract Objects Layer
-**********************
+*************************
+Tầng Đối tượng Trừu tượng
+*************************
 
-The functions in this chapter interact with Python objects regardless of their
-type, or with wide classes of object types (e.g. all numerical types, or all
-sequence types).  When used on object types for which they do not apply, they
-will raise a Python exception.
+Các hàm trong chương này tương tác với các đối tượng Python bất kể kiểu của chúng, hoặc với các nhóm lớn gồm nhiều kiểu đối tượng (ví dụ: tất cả các kiểu số hoặc tất cả các kiểu chuỗi). Khi được sử dụng với những kiểu đối tượng mà chúng không áp dụng được, các hàm này sẽ phát sinh một ngoại lệ Python.
 
-It is not possible to use these functions on objects that are not properly
-initialized, such as a list object that has been created by :c:func:`PyList_New`,
-but whose items have not been set to some non-\ ``NULL`` value yet.
+Không thể sử dụng các hàm này trên những đối tượng chưa được khởi tạo đúng cách, chẳng hạn như một đối tượng danh sách được tạo bởi :c:func:`PyList_New`, nhưng các phần tử của nó chưa được đặt thành một giá trị \ ``NULL`` nào đó.
 
 .. toctree::
 
