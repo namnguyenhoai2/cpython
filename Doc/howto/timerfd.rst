@@ -1,64 +1,60 @@
 .. _timerfd-howto:
 
-*****************************
-  timer file descriptor HOWTO
-*****************************
+*******************************
+HƯỚNG DẪN về bộ mô tả tệp timer
+*******************************
 
 :Release: 1.13
 
-This HOWTO discusses Python's support for the linux timer file descriptor.
+HƯỚNG DẪN này trình bày về khả năng hỗ trợ bộ mô tả tệp timer của Linux trong Python.
 
 
-Examples
-========
+Ví dụ
+=====
 
-The following example shows how to use a timer file descriptor
-to execute a function twice a second:
+Ví dụ sau đây cho thấy cách sử dụng bộ mô tả tệp timer để thực thi một hàm hai lần mỗi giây:
 
 .. code-block:: python
 
-   # Practical scripts should use really use a non-blocking timer,
-   # we use a blocking timer here for simplicity.
+   # Các script thực tế nên thực sự sử dụng timer không chặn,
+   # ở đây chúng ta sử dụng timer chặn để đơn giản hóa.
    import os, time
 
-   # Create the timer file descriptor
+   # Tạo bộ mô tả tệp timer
    fd = os.timerfd_create(time.CLOCK_REALTIME)
 
-   # Start the timer in 1 second, with an interval of half a second
+   # Khởi động bộ hẹn giờ sau 1 giây, với khoảng thời gian là nửa giây
    os.timerfd_settime(fd, initial=1, interval=0.5)
 
    try:
-       # Process timer events four times.
+       # Xử lý các sự kiện của bộ hẹn giờ bốn lần.
        for _ in range(4):
-           # read() will block until the timer expires
+           # read() sẽ chặn cho đến khi bộ hẹn giờ hết hạn
            _ = os.read(fd, 8)
            print("Timer expired")
    finally:
-       # Remember to close the timer file descriptor!
+       # Nhớ đóng bộ mô tả tệp của bộ hẹn giờ!
        os.close(fd)
 
-To avoid the precision loss caused by the :class:`float` type,
-timer file descriptors allow specifying initial expiration and interval
-in integer nanoseconds with ``_ns`` variants of the functions.
+Để tránh mất độ chính xác do kiểu :class:`float` gây ra, bộ mô tả tệp của bộ hẹn giờ cho phép chỉ định thời điểm hết hạn ban đầu và khoảng thời gian tính bằng nanosecond nguyên với các biến thể ``_ns`` của các hàm.
 
-This example shows how :func:`~select.epoll` can be used with timer file
-descriptors to wait until the file descriptor is ready for reading:
+Ví dụ này cho thấy cách có thể sử dụng :func:`~select.epoll` với các bộ mô tả tệp của bộ hẹn giờ để chờ cho đến khi bộ mô tả tệp sẵn sàng cho việc đọc:
 
 .. code-block:: python
 
    import os, time, select, socket, sys
 
-   # Create an epoll object
+   # Tạo một đối tượng epoll
    ep = select.epoll()
 
-   # In this example, use loopback address to send "stop" command to the server.
+   # Trong ví dụ này, sử dụng địa chỉ loopback để gửi lệnh "stop" đến server.
    #
    # $ telnet 127.0.0.1 1234
-   # Trying 127.0.0.1...
-   # Connected to 127.0.0.1.
-   # Escape character is '^]'.
+   # Đang thử 127.0.0.1...
+   # Đã kết nối với 127.0.0.1.
+   # Ký tự thoát là '^]'.
    # stop
-   # Connection closed by foreign host.
+   # Kết nối đã bị máy chủ từ xa đóng.
    #
    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    sock.bind(("127.0.0.1", 1234))
@@ -66,17 +62,17 @@ descriptors to wait until the file descriptor is ready for reading:
    sock.listen(1)
    ep.register(sock, select.EPOLLIN)
 
-   # Create timer file descriptors in non-blocking mode.
+   # Tạo các file descriptor của timer ở chế độ không chặn.
    num = 3
    fds = []
    for _ in range(num):
        fd = os.timerfd_create(time.CLOCK_REALTIME, flags=os.TFD_NONBLOCK)
        fds.append(fd)
-       # Register the timer file descriptor for read events
+       # Đăng ký file descriptor của timer cho các sự kiện đọc.
        ep.register(fd, select.EPOLLIN)
 
-   # Start the timer with os.timerfd_settime_ns() in nanoseconds.
-   # Timer 1 fires every 0.25 seconds; timer 2 every 0.5 seconds; etc
+   # Khởi động timer bằng os.timerfd_settime_ns() với đơn vị nanosecond.
+   # Timer 1 kích hoạt mỗi 0.25 giây; timer 2 mỗi 0.5 giây; v.v.
    for i, fd in enumerate(fds, start=1):
        one_sec_in_nsec = 10**9
        i = i * one_sec_in_nsec
@@ -87,45 +83,45 @@ descriptors to wait until the file descriptor is ready for reading:
        conn = None
        is_active = True
        while is_active:
-           # Wait for the timer to expire for 3 seconds.
-           # epoll.poll() returns a list of (fd, event) pairs.
-           # fd is a file descriptor.
-           # sock and conn[=returned value of socket.accept()] are socket objects, not file descriptors.
-           # So use sock.fileno() and conn.fileno() to get the file descriptors.
+           # Chờ timer hết hạn trong 3 giây.
+           # epoll.poll() trả về một danh sách các cặp (fd, event).
+           # fd là một file descriptor.
+           # sock và conn[=returned value of socket.accept()] là các đối tượng socket, không phải file descriptor.
+           # Vì vậy, hãy dùng sock.fileno() và conn.fileno() để lấy các file descriptor.
            events = ep.poll(timeout)
 
-           # If more than one timer file descriptors are ready for reading at once,
-           # epoll.poll() returns a list of (fd, event) pairs.
+           # Nếu có nhiều timer file descriptor sẵn sàng để đọc cùng lúc,
+           # epoll.poll() trả về một danh sách các cặp (fd, event).
            #
-           # In this example settings,
-           #    1st timer fires every 0.25 seconds in 0.25 seconds. (0.25, 0.5, 0.75, 1.0, ...)
-           #    2nd timer every 0.5 seconds in 0.5 seconds. (0.5, 1.0, 1.5, 2.0, ...)
-           #    3rd timer every 0.75 seconds in 0.75 seconds. (0.75, 1.5, 2.25, 3.0, ...)
+           # Trong thiết lập của ví dụ này,
+           #    timer thứ nhất kích hoạt sau mỗi 0.25 giây. (0.25, 0.5, 0.75, 1.0, ...)
+           #    timer thứ hai kích hoạt sau mỗi 0.5 giây. (0.5, 1.0, 1.5, 2.0, ...)
+           #    Bộ hẹn giờ thứ 3 sau mỗi 0.75 giây, bắt đầu từ 0.75 giây. (0.75, 1.5, 2.25, 3.0, ...)
            #
-           #    In 0.25 seconds, only 1st timer fires.
-           #    In 0.5 seconds, 1st timer and 2nd timer fires at once.
-           #    In 0.75 seconds, 1st timer and 3rd timer fires at once.
-           #    In 1.5 seconds, 1st timer, 2nd timer and 3rd timer fires at once.
+           #    Sau 0.25 giây, chỉ bộ hẹn giờ thứ 1 kích hoạt.
+           #    Sau 0.5 giây, bộ hẹn giờ thứ 1 và thứ 2 kích hoạt đồng thời.
+           #    Sau 0.75 giây, bộ hẹn giờ thứ 1 và thứ 3 kích hoạt đồng thời.
+           #    Sau 1.5 giây, bộ hẹn giờ thứ 1, thứ 2 và thứ 3 kích hoạt đồng thời.
            #
-           # If a timer file descriptor is signaled more than once since
-           # the last os.read() call, os.read() returns the number of signaled
-           # as host order of class bytes.
+           # Nếu một bộ mô tả tệp của bộ hẹn giờ được báo hiệu nhiều hơn một lần kể từ
+           # lần gọi os.read() gần nhất, os.read() trả về số lần được báo hiệu
+           # theo thứ tự byte của máy chủ đối với các byte lớp.
            print(f"Signaled events={events}")
            for fd, event in events:
                if event & select.EPOLLIN:
                    if fd == sock.fileno():
-                       # Check if there is a connection request.
+                       # Kiểm tra xem có yêu cầu kết nối hay không.
                        print(f"Accepting connection {fd}")
                        conn, addr = sock.accept()
                        conn.setblocking(False)
                        print(f"Accepted connection {conn} from {addr}")
                        ep.register(conn, select.EPOLLIN)
                    elif conn and fd == conn.fileno():
-                       # Check if there is data to read.
+                       # Kiểm tra xem có dữ liệu để đọc hay không.
                        print(f"Reading data {fd}")
                        data = conn.recv(1024)
                        if data:
-                           # You should catch UnicodeDecodeError exception for safety.
+                           # Bạn nên bắt ngoại lệ UnicodeDecodeError để đảm bảo an toàn.
                            cmd = data.decode()
                            if cmd.startswith("stop"):
                                print(f"Stopping server")
@@ -133,7 +129,7 @@ descriptors to wait until the file descriptor is ready for reading:
                            else:
                                print(f"Unknown command: {cmd}")
                        else:
-                           # No more data, close connection
+                           # Không còn dữ liệu, đóng kết nối
                            print(f"Closing connection {fd}")
                            ep.unregister(conn)
                            conn.close()
@@ -150,35 +146,34 @@ descriptors to wait until the file descriptor is ready for reading:
            os.close(fd)
        ep.close()
 
-This example shows how :func:`~select.select` can be used with timer file
-descriptors to wait until the file descriptor is ready for reading:
+Ví dụ này cho thấy cách :func:`~select.select` có thể được sử dụng với các bộ mô tả tệp hẹn giờ để chờ cho đến khi bộ mô tả tệp sẵn sàng để đọc:
 
 .. code-block:: python
 
    import os, time, select, socket, sys
 
-   # In this example, use loopback address to send "stop" command to the server.
+   # Trong ví dụ này, sử dụng địa chỉ loopback để gửi lệnh "stop" đến server.
    #
    # $ telnet 127.0.0.1 1234
-   # Trying 127.0.0.1...
-   # Connected to 127.0.0.1.
-   # Escape character is '^]'.
+   # Đang thử 127.0.0.1...
+   # Đã kết nối với 127.0.0.1.
+   # Ký tự thoát là '^]'.
    # stop
-   # Connection closed by foreign host.
+   # Kết nối đã bị máy chủ từ xa đóng.
    #
    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    sock.bind(("127.0.0.1", 1234))
    sock.setblocking(False)
    sock.listen(1)
 
-   # Create timer file descriptors in non-blocking mode.
+   # Tạo các file descriptor của timer ở chế độ không chặn.
    num = 3
    fds = [os.timerfd_create(time.CLOCK_REALTIME, flags=os.TFD_NONBLOCK)
           for _ in range(num)]
    select_fds = fds + [sock]
 
-   # Start the timers with os.timerfd_settime() in seconds.
-   # Timer 1 fires every 0.25 seconds; timer 2 every 0.5 seconds; etc
+   # Khởi động các bộ hẹn giờ bằng os.timerfd_settime() theo đơn vị giây.
+   # Timer 1 kích hoạt mỗi 0.25 giây; timer 2 mỗi 0.5 giây; v.v.
    for i, fd in enumerate(fds, start=1):
       os.timerfd_settime(fd, initial=i/4, interval=i/4)
 
@@ -187,23 +182,23 @@ descriptors to wait until the file descriptor is ready for reading:
        conn = None
        is_active = True
        while is_active:
-          # Wait for the timer to expire for 3 seconds.
-          # select.select() returns a list of file descriptors or objects.
+          # Chờ timer hết hạn trong 3 giây.
+          # select.select() trả về một danh sách các bộ mô tả tệp hoặc đối tượng.
           rfd, wfd, xfd = select.select(select_fds, select_fds, select_fds, timeout)
           for fd in rfd:
               if fd == sock:
-                  # Check if there is a connection request.
+                  # Kiểm tra xem có yêu cầu kết nối hay không.
                   print(f"Accepting connection {fd}")
                   conn, addr = sock.accept()
                   conn.setblocking(False)
                   print(f"Accepted connection {conn} from {addr}")
                   select_fds.append(conn)
               elif conn and fd == conn:
-                  # Check if there is data to read.
+                  # Kiểm tra xem có dữ liệu để đọc hay không.
                   print(f"Reading data {fd}")
                   data = conn.recv(1024)
                   if data:
-                      # You should catch UnicodeDecodeError exception for safety.
+                      # Bạn nên bắt ngoại lệ UnicodeDecodeError để đảm bảo an toàn.
                       cmd = data.decode()
                       if cmd.startswith("stop"):
                           print(f"Stopping server")
@@ -211,7 +206,7 @@ descriptors to wait until the file descriptor is ready for reading:
                       else:
                           print(f"Unknown command: {cmd}")
                   else:
-                      # No more data, close connection
+                      # Không còn dữ liệu, đóng kết nối
                       print(f"Closing connection {fd}")
                       select_fds.remove(conn)
                       conn.close()

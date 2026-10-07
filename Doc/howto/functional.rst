@@ -1,209 +1,109 @@
 .. _functional-howto:
 
-********************************
-  Functional Programming HOWTO
-********************************
+***********************
+HƯỚNG DẪN LẬP TRÌNH HÀM
+***********************
 
 :Author: \A. M. Kuchling
 :Release: 0.32
 
-In this document, we'll take a tour of Python's features suitable for
-implementing programs in a functional style.  After an introduction to the
-concepts of functional programming, we'll look at language features such as
-:term:`iterator`\s and :term:`generator`\s and relevant library modules such as
-:mod:`itertools` and :mod:`functools`.
+Trong tài liệu này, chúng ta sẽ tìm hiểu các tính năng của Python phù hợp để triển khai chương trình theo phong cách lập trình hàm. Sau phần giới thiệu về các khái niệm của lập trình hàm, chúng ta sẽ xem xét những tính năng của ngôn ngữ như
+:term:`iterator`\s và :term:`generator`\s, cùng các mô-đun thư viện liên quan như
+:mod:`itertools` và :mod:`functools`.
 
 
-Introduction
-============
+Giới thiệu
+==========
 
-This section explains the basic concept of functional programming; if
-you're just interested in learning about Python language features,
-skip to the next section on :ref:`functional-howto-iterators`.
+Phần này giải thích khái niệm cơ bản của lập trình hàm; nếu bạn chỉ quan tâm đến việc tìm hiểu các tính năng của ngôn ngữ Python, hãy chuyển đến phần tiếp theo về :ref:`functional-howto-iterators`.
 
-Programming languages support decomposing problems in several different ways:
+Các ngôn ngữ lập trình hỗ trợ phân rã bài toán theo một số cách khác nhau:
 
-* Most programming languages are **procedural**: programs are lists of
-  instructions that tell the computer what to do with the program's input.  C,
-  Pascal, and even Unix shells are procedural languages.
+* Hầu hết các ngôn ngữ lập trình đều là ngôn ngữ **thủ tục**: chương trình là danh sách các chỉ dẫn cho máy tính biết cần làm gì với dữ liệu đầu vào của chương trình. C, Pascal và thậm chí cả Unix shell đều là các ngôn ngữ thủ tục.
 
-* In **declarative** languages, you write a specification that describes the
-  problem to be solved, and the language implementation figures out how to
-  perform the computation efficiently.  SQL is the declarative language you're
-  most likely to be familiar with; a SQL query describes the data set you want
-  to retrieve, and the SQL engine decides whether to scan tables or use indexes,
-  which subclauses should be performed first, etc.
+* Trong các ngôn ngữ **khai báo**, bạn viết một đặc tả mô tả bài toán cần giải quyết, còn phần triển khai của ngôn ngữ sẽ xác định cách thực hiện phép tính một cách hiệu quả. SQL là ngôn ngữ khai báo mà bạn có nhiều khả năng đã quen thuộc nhất; một truy vấn SQL mô tả tập dữ liệu bạn muốn truy xuất, còn công cụ SQL quyết định nên quét các bảng hay sử dụng các chỉ mục, mệnh đề con nào nên được thực hiện trước, v.v.
 
-* **Object-oriented** programs manipulate collections of objects.  Objects have
-  internal state and support methods that query or modify this internal state in
-  some way. Smalltalk and Java are object-oriented languages.  C++ and Python
-  are languages that support object-oriented programming, but don't force the
-  use of object-oriented features.
+* Các chương trình **hướng đối tượng** thao tác trên các tập hợp đối tượng. Đối tượng có trạng thái nội bộ và hỗ trợ các phương thức truy vấn hoặc sửa đổi trạng thái nội bộ này theo một cách nào đó. Smalltalk và Java là các ngôn ngữ hướng đối tượng. C++ và Python là những ngôn ngữ hỗ trợ lập trình hướng đối tượng, nhưng không bắt buộc phải sử dụng các tính năng hướng đối tượng.
 
-* **Functional** programming decomposes a problem into a set of functions.
-  Ideally, functions only take inputs and produce outputs, and don't have any
-  internal state that affects the output produced for a given input.  Well-known
-  functional languages include the ML family (Standard ML, OCaml, and other
-  variants) and Haskell.
+* Lập trình **hàm** phân rã bài toán thành một tập hợp các hàm. Lý tưởng nhất, các hàm chỉ nhận đầu vào và tạo ra đầu ra, đồng thời không có trạng thái nội bộ nào ảnh hưởng đến đầu ra được tạo ra với một đầu vào nhất định. Các ngôn ngữ hàm nổi tiếng bao gồm họ ML (Standard ML, OCaml và các biến thể khác) và Haskell.
 
-The designers of some computer languages choose to emphasize one
-particular approach to programming.  This often makes it difficult to
-write programs that use a different approach.  Other languages are
-multi-paradigm languages that support several different approaches.
-Lisp, C++, and Python are multi-paradigm; you can write programs or
-libraries that are largely procedural, object-oriented, or functional
-in all of these languages.  In a large program, different sections
-might be written using different approaches; the GUI might be
-object-oriented while the processing logic is procedural or
-functional, for example.
+Các nhà thiết kế một số ngôn ngữ máy tính chọn nhấn mạnh một cách tiếp cận cụ thể đối với việc lập trình. Điều này thường khiến việc viết các chương trình sử dụng một cách tiếp cận khác trở nên khó khăn. Những ngôn ngữ khác là ngôn ngữ đa mô hình, hỗ trợ một số cách tiếp cận khác nhau. Lisp, C++ và Python là các ngôn ngữ đa mô hình; trong tất cả những ngôn ngữ này, bạn có thể viết các chương trình hoặc thư viện chủ yếu mang tính thủ tục, hướng đối tượng hoặc hàm. Trong một chương trình lớn, các phần khác nhau có thể được viết bằng những cách tiếp cận khác nhau; chẳng hạn, GUI có thể mang tính hướng đối tượng, trong khi logic xử lý mang tính thủ tục hoặc hàm.
 
-In a functional program, input flows through a set of functions. Each function
-operates on its input and produces some output.  Functional style discourages
-functions with side effects that modify internal state or make other changes
-that aren't visible in the function's return value.  Functions that have no side
-effects at all are called **purely functional**.  Avoiding side effects means
-not using data structures that get updated as a program runs; every function's
-output must only depend on its input.
+Trong một chương trình hàm, dữ liệu đầu vào chảy qua một tập hợp các hàm. Mỗi hàm xử lý đầu vào của mình và tạo ra một số đầu ra. Phong cách hàm không khuyến khích các hàm có side effect làm thay đổi trạng thái nội bộ hoặc tạo ra những thay đổi khác không thể hiện trong giá trị trả về của hàm. Các hàm hoàn toàn không có side effect được gọi là **hàm thuần**. Việc tránh side effect đồng nghĩa với việc không sử dụng các cấu trúc dữ liệu được cập nhật trong quá trình chương trình chạy; đầu ra của mỗi hàm chỉ được phụ thuộc vào đầu vào của nó.
 
-Some languages are very strict about purity and don't even have assignment
-statements such as ``a=3`` or ``c = a + b``, but it's difficult to avoid all
-side effects, such as printing to the screen or writing to a disk file. Another
-example is a call to the :func:`print` or :func:`time.sleep` function, neither
-of which returns a useful value. Both are called only for their side effects
-of sending some text to the screen or pausing execution for a second.
+Một số ngôn ngữ rất nghiêm ngặt về tính thuần khiết và thậm chí không có các câu lệnh gán như ``a=3`` hoặc ``c = a + b``, nhưng rất khó tránh mọi side effect, chẳng hạn như in ra màn hình hoặc ghi vào tệp trên đĩa. Một ví dụ khác là lời gọi đến hàm :func:`print` hoặc :func:`time.sleep`, cả hai đều không trả về giá trị hữu ích. Chúng chỉ được gọi vì side effect là gửi một đoạn văn bản nào đó lên màn hình hoặc tạm dừng thực thi trong một giây.
 
-Python programs written in functional style usually won't go to the extreme of
-avoiding all I/O or all assignments; instead, they'll provide a
-functional-appearing interface but will use non-functional features internally.
-For example, the implementation of a function will still use assignments to
-local variables, but won't modify global variables or have other side effects.
+Các chương trình Python được viết theo phong cách functional thường không đi đến mức cực đoan là tránh mọi thao tác I/O hoặc mọi phép gán; thay vào đó, chúng cung cấp một interface có vẻ mang tính functional nhưng sử dụng các tính năng phi functional ở bên trong. Ví dụ, phần triển khai của một hàm vẫn sử dụng phép gán cho các biến cục bộ, nhưng không sửa đổi các biến toàn cục hoặc tạo ra side effect khác.
 
-Functional programming can be considered the opposite of object-oriented
-programming.  Objects are little capsules containing some internal state along
-with a collection of method calls that let you modify this state, and programs
-consist of making the right set of state changes.  Functional programming wants
-to avoid state changes as much as possible and works with data flowing between
-functions.  In Python you might combine the two approaches by writing functions
-that take and return instances representing objects in your application (e-mail
-messages, transactions, etc.).
+Lập trình functional có thể được xem là đối lập với lập trình hướng đối tượng. Các object là những capsule nhỏ chứa một số trạng thái nội bộ cùng với một tập hợp các lời gọi method cho phép bạn sửa đổi trạng thái này, và chương trình bao gồm việc thực hiện đúng tập hợp các thay đổi trạng thái. Lập trình functional muốn tránh thay đổi trạng thái nhiều nhất có thể và làm việc với dữ liệu truyền qua các hàm. Trong Python, bạn có thể kết hợp hai cách tiếp cận này bằng cách viết các hàm nhận vào và trả về các instance đại diện cho những object trong ứng dụng của bạn (thư điện tử, giao dịch, v.v.).
 
-Functional design may seem like an odd constraint to work under.  Why should you
-avoid objects and side effects?  There are theoretical and practical advantages
-to the functional style:
+Thiết kế functional có thể giống như một ràng buộc kỳ lạ phải tuân theo. Tại sao bạn nên tránh object và side effect? Phong cách functional có những ưu điểm cả về lý thuyết lẫn thực tiễn:
 
-* Formal provability.
-* Modularity.
-* Composability.
-* Ease of debugging and testing.
+* Khả năng chứng minh hình thức.
+* Tính module hóa.
+* Khả năng kết hợp.
+* Dễ gỡ lỗi và kiểm thử.
 
 
-Formal provability
-------------------
-
-A theoretical benefit is that it's easier to construct a mathematical proof that
-a functional program is correct.
-
-For a long time researchers have been interested in finding ways to
-mathematically prove programs correct.  This is different from testing a program
-on numerous inputs and concluding that its output is usually correct, or reading
-a program's source code and concluding that the code looks right; the goal is
-instead a rigorous proof that a program produces the right result for all
-possible inputs.
-
-The technique used to prove programs correct is to write down **invariants**,
-properties of the input data and of the program's variables that are always
-true.  For each line of code, you then show that if invariants X and Y are true
-**before** the line is executed, the slightly different invariants X' and Y' are
-true **after** the line is executed.  This continues until you reach the end of
-the program, at which point the invariants should match the desired conditions
-on the program's output.
-
-Functional programming's avoidance of assignments arose because assignments are
-difficult to handle with this technique; assignments can break invariants that
-were true before the assignment without producing any new invariants that can be
-propagated onward.
-
-Unfortunately, proving programs correct is largely impractical and not relevant
-to Python software. Even trivial programs require proofs that are several pages
-long; the proof of correctness for a moderately complicated program would be
-enormous, and few or none of the programs you use daily (the Python interpreter,
-your XML parser, your web browser) could be proven correct.  Even if you wrote
-down or generated a proof, there would then be the question of verifying the
-proof; maybe there's an error in it, and you wrongly believe you've proved the
-program correct.
-
-
-Modularity
-----------
-
-A more practical benefit of functional programming is that it forces you to
-break apart your problem into small pieces.  Programs are more modular as a
-result.  It's easier to specify and write a small function that does one thing
-than a large function that performs a complicated transformation.  Small
-functions are also easier to read and to check for errors.
-
-
-Ease of debugging and testing
+Khả năng chứng minh hình thức
 -----------------------------
 
-Testing and debugging a functional-style program is easier.
+Một lợi ích mang tính lý thuyết là việc xây dựng một chứng minh toán học cho thấy một chương trình functional là đúng sẽ dễ dàng hơn.
 
-Debugging is simplified because functions are generally small and clearly
-specified.  When a program doesn't work, each function is an interface point
-where you can check that the data are correct.  You can look at the intermediate
-inputs and outputs to quickly isolate the function that's responsible for a bug.
+Từ lâu, các nhà nghiên cứu đã quan tâm đến việc tìm ra những cách chứng minh tính đúng đắn của chương trình bằng toán học. Điều này khác với việc kiểm thử một chương trình trên vô số đầu vào rồi kết luận rằng đầu ra của nó thường đúng, hoặc đọc mã nguồn của chương trình rồi kết luận rằng mã có vẻ đúng; thay vào đó, mục tiêu là một chứng minh chặt chẽ rằng chương trình tạo ra kết quả đúng với mọi đầu vào có thể.
 
-Testing is easier because each function is a potential subject for a unit test.
-Functions don't depend on system state that needs to be replicated before
-running a test; instead you only have to synthesize the right input and then
-check that the output matches expectations.
+Kỹ thuật được dùng để chứng minh tính đúng đắn của chương trình là ghi ra **bất biến**, tức các thuộc tính của dữ liệu đầu vào và các biến của chương trình luôn đúng. Với mỗi dòng mã, bạn sẽ chứng minh rằng nếu các bất biến X và Y đúng **trước khi** thực thi dòng đó, thì các bất biến X' và Y' hơi khác sẽ đúng **sau khi** thực thi dòng đó. Quá trình này tiếp tục cho đến khi bạn đến cuối chương trình; tại thời điểm đó, các bất biến phải khớp với những điều kiện mong muốn đối với đầu ra của chương trình.
+
+Việc tránh phép gán trong functional programming bắt nguồn từ việc các phép gán khó xử lý bằng kỹ thuật này; phép gán có thể phá vỡ các bất biến vốn đúng trước khi gán mà không tạo ra bất kỳ bất biến mới nào để tiếp tục truyền đi.
+
+Đáng tiếc là việc chứng minh tính đúng đắn của chương trình phần lớn không thực tế và không liên quan đến phần mềm Python. Ngay cả những chương trình đơn giản cũng cần các chứng minh dài vài trang; chứng minh tính đúng đắn của một chương trình phức tạp vừa phải sẽ rất đồ sộ, và hầu như không có chương trình nào bạn sử dụng hằng ngày (trình thông dịch Python, bộ phân tích cú pháp XML, trình duyệt web) có thể được chứng minh là đúng. Ngay cả khi bạn tự viết hoặc tạo ra một chứng minh, khi đó vẫn còn câu hỏi về việc xác minh chứng minh ấy; có thể nó chứa lỗi và bạn đã lầm tưởng rằng mình chứng minh được tính đúng đắn của chương trình.
 
 
-Composability
--------------
+Tính mô-đun
+-----------
 
-As you work on a functional-style program, you'll write a number of functions
-with varying inputs and outputs.  Some of these functions will be unavoidably
-specialized to a particular application, but others will be useful in a wide
-variety of programs.  For example, a function that takes a directory path and
-returns all the XML files in the directory, or a function that takes a filename
-and returns its contents, can be applied to many different situations.
+Một lợi ích thiết thực hơn của lập trình hàm là nó buộc bạn phải chia nhỏ vấn đề thành những phần nhỏ. Nhờ đó, các chương trình có tính mô-đun cao hơn. Việc xác định và viết một hàm nhỏ chỉ thực hiện một việc sẽ dễ hơn so với một hàm lớn thực hiện một phép biến đổi phức tạp. Các hàm nhỏ cũng dễ đọc và kiểm tra lỗi hơn.
 
-Over time you'll form a personal library of utilities.  Often you'll assemble
-new programs by arranging existing functions in a new configuration and writing
-a few functions specialized for the current task.
+
+Dễ gỡ lỗi và kiểm thử
+---------------------
+
+Việc kiểm thử và gỡ lỗi một chương trình theo phong cách hàm sẽ dễ dàng hơn.
+
+Việc gỡ lỗi được đơn giản hóa vì các hàm thường nhỏ và được đặc tả rõ ràng. Khi chương trình không hoạt động, mỗi hàm là một điểm giao diện để bạn kiểm tra xem dữ liệu có chính xác hay không. Bạn có thể xem các đầu vào và đầu ra trung gian để nhanh chóng xác định hàm gây ra lỗi.
+
+Việc kiểm thử dễ dàng hơn vì mỗi hàm đều có thể là đối tượng của một unit test. Các hàm không phụ thuộc vào trạng thái hệ thống cần được tái tạo trước khi chạy kiểm thử; thay vào đó, bạn chỉ cần tạo đúng đầu vào rồi kiểm tra xem đầu ra có khớp với kết quả mong đợi hay không.
+
+
+Khả năng kết hợp
+----------------
+
+Khi xây dựng một chương trình theo phong cách hàm, bạn sẽ viết nhiều hàm với các đầu vào và đầu ra khác nhau. Một số hàm trong đó chắc chắn sẽ được chuyên biệt cho một ứng dụng cụ thể, nhưng những hàm khác sẽ hữu ích trong nhiều loại chương trình. Ví dụ, một hàm nhận đường dẫn thư mục và trả về tất cả các tệp XML trong thư mục, hoặc một hàm nhận tên tệp và trả về nội dung của tệp đó, có thể được áp dụng trong nhiều tình huống khác nhau.
+
+Theo thời gian, bạn sẽ hình thành một thư viện tiện ích của riêng mình. Thông thường, bạn sẽ tạo các chương trình mới bằng cách sắp xếp những hàm hiện có theo một cấu hình mới và viết thêm một vài hàm được chuyên biệt cho tác vụ hiện tại.
 
 
 .. _functional-howto-iterators:
 
-Iterators
-=========
+Iterator
+========
 
-I'll start by looking at a Python language feature that's an important
-foundation for writing functional-style programs: iterators.
+Tôi sẽ bắt đầu bằng cách xem xét một tính năng của ngôn ngữ Python, nền tảng quan trọng để viết các chương trình theo phong cách hàm: iterator.
 
-An iterator is an object representing a stream of data; this object returns the
-data one element at a time.  A Python iterator must support a method called
-:meth:`~iterator.__next__` that takes no arguments and always returns the next
-element of the stream.  If there are no more elements in the stream,
-:meth:`~iterator.__next__` must raise the :exc:`StopIteration` exception.
-Iterators don't have to be finite, though; it's perfectly reasonable to write
-an iterator that produces an infinite stream of data.
+Iterator là một đối tượng biểu diễn một luồng dữ liệu; đối tượng này trả về dữ liệu từng phần tử một. Một iterator trong Python phải hỗ trợ một phương thức có tên là
+:meth:`~iterator.__next__` không nhận đối số nào và luôn trả về phần tử tiếp theo của luồng. Nếu không còn phần tử nào trong luồng,
+:meth:`~iterator.__next__` phải raise exception :exc:`StopIteration`. Tuy nhiên, iterator không nhất thiết phải hữu hạn; việc viết một iterator tạo ra một luồng dữ liệu vô hạn là hoàn toàn hợp lý.
 
-The built-in :func:`iter` function takes an arbitrary object and tries to return
-an iterator that will return the object's contents or elements, raising
-:exc:`TypeError` if the object doesn't support iteration.  Several of Python's
-built-in data types support iteration, the most common being lists and
-dictionaries.  An object is called :term:`iterable` if you can get an iterator
-for it.
+Hàm :func:`iter` tích hợp sẵn nhận một đối tượng bất kỳ và cố gắng trả về một iterator sẽ trả về nội dung hoặc các phần tử của đối tượng đó, đồng thời phát sinh
+:exc:`TypeError` nếu đối tượng không hỗ trợ iteration. Một số kiểu dữ liệu tích hợp sẵn của Python hỗ trợ iteration, phổ biến nhất là list và dictionary. Một đối tượng được gọi là :term:`iterable` nếu bạn có thể lấy iterator cho đối tượng đó.
 
-You can experiment with the iteration interface manually:
+Bạn có thể tự thực nghiệm với interface iteration:
 
     >>> L = [1, 2, 3]
     >>> it = iter(L)
     >>> it  #doctest: +ELLIPSIS
     <...iterator object at ...>
-    >>> it.__next__()  # same as next(it)
+    >>> it.__next__()  # giống như next(it)
     1
     >>> next(it)
     2
@@ -215,10 +115,7 @@ You can experiment with the iteration interface manually:
     StopIteration
     >>>
 
-Python expects iterable objects in several different contexts, the most
-important being the :keyword:`for` statement.  In the statement ``for X in Y``,
-Y must be an iterator or some object for which :func:`iter` can create an
-iterator.  These two statements are equivalent::
+Python yêu cầu các đối tượng iterable trong một số ngữ cảnh khác nhau, quan trọng nhất là câu lệnh :keyword:`for`. Trong câu lệnh ``for X in Y``, Y phải là một iterator hoặc một đối tượng mà :func:`iter` có thể tạo iterator cho nó. Hai câu lệnh này tương đương::
 
 
     for i in iter(obj):
@@ -227,8 +124,8 @@ iterator.  These two statements are equivalent::
     for i in obj:
         print(i)
 
-Iterators can be materialized as lists or tuples by using the :func:`list` or
-:func:`tuple` constructor functions:
+Iterator có thể được chuyển thành list hoặc tuple bằng cách sử dụng :func:`list` hoặc
+:func:`tuple` các hàm khởi tạo:
 
     >>> L = [1, 2, 3]
     >>> iterator = iter(L)
@@ -236,8 +133,7 @@ Iterators can be materialized as lists or tuples by using the :func:`list` or
     >>> t
     (1, 2, 3)
 
-Sequence unpacking also supports iterators: if you know an iterator will return
-N elements, you can unpack them into an N-tuple:
+Phép unpacking chuỗi cũng hỗ trợ iterator: nếu biết một iterator sẽ trả về N phần tử, bạn có thể unpack chúng vào một tuple gồm N phần tử:
 
     >>> L = [1, 2, 3]
     >>> iterator = iter(L)
@@ -245,32 +141,18 @@ N elements, you can unpack them into an N-tuple:
     >>> a, b, c
     (1, 2, 3)
 
-Built-in functions such as :func:`max` and :func:`min` can take a single
-iterator argument and will return the largest or smallest element.  The ``"in"``
-and ``"not in"`` operators also support iterators: ``X in iterator`` is true if
-X is found in the stream returned by the iterator.  You'll run into obvious
-problems if the iterator is infinite; :func:`max`, :func:`min`
-will never return, and if the element X never appears in the stream, the
-``"in"`` and ``"not in"`` operators won't return either.
+Các hàm tích hợp như :func:`max` và :func:`min` có thể nhận một iterator duy nhất và sẽ trả về phần tử lớn nhất hoặc nhỏ nhất. Các toán tử ``"in"`` và ``"not in"`` cũng hỗ trợ iterator: ``X in iterator`` là true nếu tìm thấy X trong luồng do iterator trả về. Bạn sẽ gặp các vấn đề rõ ràng nếu iterator là vô hạn; :func:`max`, :func:`min` sẽ không bao giờ trả về, và nếu phần tử X không bao giờ xuất hiện trong luồng, các toán tử ``"in"`` và ``"not in"`` cũng sẽ không trả về.
 
-Note that you can only go forward in an iterator; there's no way to get the
-previous element, reset the iterator, or make a copy of it.  Iterator objects
-can optionally provide these additional capabilities, but the iterator protocol
-only specifies the :meth:`~iterator.__next__` method.  Functions may therefore
-consume all of the iterator's output, and if you need to do something different
-with the same stream, you'll have to create a new iterator.
+Lưu ý rằng bạn chỉ có thể tiến về phía trước trong một iterator; không có cách nào lấy phần tử trước đó, đặt lại iterator hoặc tạo một bản sao của nó. Các đối tượng iterator có thể tùy chọn cung cấp những khả năng bổ sung này, nhưng iterator protocol chỉ quy định phương thức :meth:`~iterator.__next__`. Do đó, các hàm có thể tiêu thụ toàn bộ đầu ra của iterator, và nếu cần thực hiện việc khác với cùng luồng đó, bạn sẽ phải tạo một iterator mới.
 
 
 
-Data Types That Support Iterators
----------------------------------
+Các kiểu dữ liệu hỗ trợ iterator
+--------------------------------
 
-We've already seen how lists and tuples support iterators.  In fact, any Python
-sequence type, such as strings, will automatically support creation of an
-iterator.
+Chúng ta đã thấy list và tuple hỗ trợ iterator như thế nào. Trên thực tế, bất kỳ kiểu sequence nào của Python, chẳng hạn như string, cũng sẽ tự động hỗ trợ việc tạo iterator.
 
-Calling :func:`iter` on a dictionary returns an iterator that will loop over the
-dictionary's keys::
+Gọi :func:`iter` trên một dictionary sẽ trả về một iterator lặp qua các key của dictionary::
 
     >>> m = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
     ...      'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
@@ -289,33 +171,24 @@ dictionary's keys::
     Nov 11
     Dec 12
 
-Note that starting with Python 3.7, dictionary iteration order is guaranteed
-to be the same as the insertion order. In earlier versions, the behaviour was
-unspecified and could vary between implementations.
+Lưu ý rằng начиная từ Python 3.7, thứ tự lặp qua dictionary được đảm bảo giống với thứ tự chèn. Ở các phiên bản trước, hành vi này không được xác định và có thể khác nhau giữa các implementation.
 
-Applying :func:`iter` to a dictionary always loops over the keys, but
-dictionaries have methods that return other iterators.  If you want to iterate
-over values or key/value pairs, you can explicitly call the
-:meth:`~dict.values` or :meth:`~dict.items` methods to get an appropriate
-iterator.
+Áp dụng :func:`iter` cho một dictionary luôn lặp qua các key, nhưng dictionary có các method trả về những iterator khác. Nếu muốn lặp qua các value hoặc các cặp key/value, bạn có thể gọi rõ ràng các
+method :meth:`~dict.values` hoặc :meth:`~dict.items` để lấy iterator thích hợp.
 
-The :func:`dict` constructor can accept an iterator that returns a finite stream
-of ``(key, value)`` tuples:
+Constructor :func:`dict` có thể nhận một iterator trả về một luồng hữu hạn gồm các tuple ``(key, value)``:
 
     >>> L = [('Italy', 'Rome'), ('France', 'Paris'), ('US', 'Washington DC')]
     >>> dict(iter(L))
     {'Italy': 'Rome', 'France': 'Paris', 'US': 'Washington DC'}
 
-Files also support iteration by calling the :meth:`~io.TextIOBase.readline`
-method until there are no more lines in the file.  This means you can read each
-line of a file like this::
+File cũng hỗ trợ việc lặp bằng cách gọi method :meth:`~io.TextIOBase.readline` cho đến khi không còn dòng nào trong file. Điều này có nghĩa là bạn có thể đọc từng dòng của file như sau::
 
     for line in file:
-        # do something for each line
+        # thực hiện thao tác cho từng dòng
         ...
 
-Sets can take their contents from an iterable and let you iterate over the set's
-elements::
+Set có thể lấy nội dung từ một iterable và cho phép bạn lặp qua các phần tử của set::
 
     >>> S = {2, 3, 5, 7, 11, 13}
     >>> for i in S:
@@ -329,43 +202,29 @@ elements::
 
 
 
-Generator expressions and list comprehensions
-=============================================
+Biểu thức generator và list comprehension
+=========================================
 
-Two common operations on an iterator's output are 1) performing some operation
-for every element, 2) selecting a subset of elements that meet some condition.
-For example, given a list of strings, you might want to strip off trailing
-whitespace from each line or extract all the strings containing a given
-substring.
+Hai thao tác phổ biến trên đầu ra của một iterator là 1) thực hiện một thao tác nào đó với mọi phần tử, 2) chọn một tập hợp con các phần tử đáp ứng một điều kiện nào đó. Ví dụ, với một danh sách chuỗi, bạn có thể muốn loại bỏ khoảng trắng ở cuối mỗi dòng hoặc trích xuất tất cả các chuỗi chứa một chuỗi con nhất định.
 
-List comprehensions and generator expressions (short form: "listcomps" and
-"genexps") are a concise notation for such operations, borrowed from the
-functional programming language Haskell (https://www.haskell.org/).  You can strip
-all the whitespace from a stream of strings with the following code::
+List comprehension và biểu thức generator (viết tắt: "listcomps" và "genexps") là ký hiệu ngắn gọn cho các thao tác như vậy, được mượn từ ngôn ngữ lập trình hàm Haskell (https://www.haskell.org/).  Bạn có thể loại bỏ toàn bộ khoảng trắng khỏi một luồng chuỗi bằng đoạn mã sau::
 
     >>> line_list = ['  line 1\n', 'line 2  \n', ' \n', '']
 
-    >>> # Generator expression -- returns iterator
+    >>> # Biểu thức generator -- trả về iterator
     >>> stripped_iter = (line.strip() for line in line_list)
 
-    >>> # List comprehension -- returns list
+    >>> # List comprehension -- trả về list
     >>> stripped_list = [line.strip() for line in line_list]
 
-You can select only certain elements by adding an ``"if"`` condition::
+Bạn có thể chỉ chọn một số phần tử nhất định bằng cách thêm điều kiện ``"if"``::
 
     >>> stripped_list = [line.strip() for line in line_list
     ...                  if line != ""]
 
-With a list comprehension, you get back a Python list; ``stripped_list`` is a
-list containing the resulting lines, not an iterator.  Generator expressions
-return an iterator that computes the values as necessary, not needing to
-materialize all the values at once.  This means that list comprehensions aren't
-useful if you're working with iterators that return an infinite stream or a very
-large amount of data.  Generator expressions are preferable in these situations.
+Với list comprehension, bạn nhận được một Python list; ``stripped_list`` là một list chứa các dòng kết quả, không phải một iterator. Biểu thức generator trả về một iterator tính toán các giá trị khi cần, không cần tạo ra tất cả giá trị cùng lúc. Điều này có nghĩa là list comprehension không hữu ích nếu bạn đang làm việc với các iterator trả về một luồng vô hạn hoặc một lượng dữ liệu rất lớn. Trong những tình huống này, nên dùng biểu thức generator.
 
-Generator expressions are surrounded by parentheses ("()") and list
-comprehensions are surrounded by square brackets ("[]").  Generator expressions
-have the form::
+Biểu thức generator được bao quanh bởi dấu ngoặc đơn ("()"), còn list comprehension được bao quanh bởi dấu ngoặc vuông ("[]"). Biểu thức generator có dạng::
 
     ( expression for expr in sequence1
                  if condition1
@@ -377,46 +236,33 @@ have the form::
                  for exprN in sequenceN
                  if conditionN )
 
-Again, for a list comprehension only the outside brackets are different (square
-brackets instead of parentheses).
+Một lần nữa, đối với list comprehension, chỉ có các dấu ngoặc bên ngoài là khác nhau (dấu ngoặc vuông thay vì dấu ngoặc đơn).
 
-The elements of the generated output will be the successive values of
-``expression``.  The ``if`` clauses are all optional; if present, ``expression``
-is only evaluated and added to the result when ``condition`` is true.
+Các phần tử của kết quả được tạo ra sẽ là các giá trị liên tiếp của ``expression``. Các mệnh đề ``if`` đều là tùy chọn; nếu có, ``expression`` chỉ được đánh giá và thêm vào kết quả khi ``condition`` là true.
 
-Generator expressions always have to be written inside parentheses, but the
-parentheses signalling a function call also count.  If you want to create an
-iterator that will be immediately passed to a function you can write::
+Biểu thức generator luôn phải được viết bên trong dấu ngoặc đơn, nhưng dấu ngoặc biểu thị một lệnh gọi hàm cũng được tính. Nếu bạn muốn tạo một iterator sẽ được truyền ngay cho một hàm, bạn có thể viết::
 
     obj_total = sum(obj.count for obj in list_all_objects())
 
-The ``for...in`` clauses contain the sequences to be iterated over.  The
-sequences do not have to be the same length, because they are iterated over from
-left to right, **not** in parallel.  For each element in ``sequence1``,
-``sequence2`` is looped over from the beginning.  ``sequence3`` is then looped
-over for each resulting pair of elements from ``sequence1`` and ``sequence2``.
+Các mệnh đề ``for...in`` chứa những sequence cần được lặp qua. Các sequence không cần có cùng độ dài, vì chúng được lặp từ trái sang phải, **not** song song. Với mỗi phần tử trong ``sequence1``, ``sequence2`` được lặp lại từ đầu. Sau đó, ``sequence3`` được lặp qua cho từng cặp phần tử tạo ra từ ``sequence1`` và ``sequence2``.
 
-To put it another way, a list comprehension or generator expression is
-equivalent to the following Python code::
+Nói cách khác, list comprehension hoặc biểu thức generator tương đương với đoạn mã Python sau::
 
     for expr1 in sequence1:
         if not (condition1):
-            continue   # Skip this element
+            continue   # Bỏ qua phần tử này
         for expr2 in sequence2:
             if not (condition2):
-                continue   # Skip this element
+                continue   # Bỏ qua phần tử này
             ...
             for exprN in sequenceN:
                 if not (conditionN):
-                    continue   # Skip this element
+                    continue   # Bỏ qua phần tử này
 
-                # Output the value of
-                # the expression.
+                # Xuất giá trị của
+                # biểu thức.
 
-This means that when there are multiple ``for...in`` clauses but no ``if``
-clauses, the length of the resulting output will be equal to the product of the
-lengths of all the sequences.  If you have two lists of length 3, the output
-list is 9 elements long:
+Điều này có nghĩa là khi có nhiều mệnh đề ``for...in`` nhưng không có mệnh đề ``if``, độ dài của đầu ra thu được sẽ bằng tích độ dài của tất cả các dãy. Nếu bạn có hai danh sách có độ dài là 3, danh sách đầu ra sẽ có 9 phần tử:
 
     >>> seq1 = 'abc'
     >>> seq2 = (1, 2, 3)
@@ -425,52 +271,32 @@ list is 9 elements long:
      ('b', 1), ('b', 2), ('b', 3),
      ('c', 1), ('c', 2), ('c', 3)]
 
-To avoid introducing an ambiguity into Python's grammar, if ``expression`` is
-creating a tuple, it must be surrounded with parentheses.  The first list
-comprehension below is a syntax error, while the second one is correct::
+Để tránh tạo ra sự mơ hồ trong ngữ pháp của Python, nếu ``expression`` đang tạo một tuple, nó phải được đặt trong dấu ngoặc đơn. Phép list comprehension đầu tiên bên dưới là một lỗi cú pháp, còn phép thứ hai thì đúng::
 
-    # Syntax error
+    # Lỗi cú pháp
     [x, y for x in seq1 for y in seq2]
-    # Correct
+    # Đúng
     [(x, y) for x in seq1 for y in seq2]
 
 
-Generators
-==========
+Generator
+=========
 
-Generators are a special class of functions that simplify the task of writing
-iterators.  Regular functions compute a value and return it, but generators
-return an iterator that returns a stream of values.
+Generator là một lớp hàm đặc biệt giúp đơn giản hóa việc viết iterator. Các hàm thông thường tính toán một giá trị rồi trả về giá trị đó, còn generator trả về một iterator tạo ra một luồng giá trị.
 
-You're doubtless familiar with how regular function calls work in Python or C.
-When you call a function, it gets a private namespace where its local variables
-are created.  When the function reaches a ``return`` statement, the local
-variables are destroyed and the value is returned to the caller.  A later call
-to the same function creates a new private namespace and a fresh set of local
-variables. But, what if the local variables weren't thrown away on exiting a
-function?  What if you could later resume the function where it left off?  This
-is what generators provide; they can be thought of as resumable functions.
+Chắc hẳn bạn đã quen với cách các lời gọi hàm thông thường hoạt động trong Python hoặc C. Khi bạn gọi một hàm, hàm đó nhận được một namespace riêng, nơi các biến cục bộ của nó được tạo ra. Khi hàm thực thi đến câu lệnh ``return``, các biến cục bộ bị hủy và giá trị được trả về cho bên gọi. Một lần gọi sau đó đến cùng hàm sẽ tạo một namespace riêng mới cùng một tập biến cục bộ mới. Nhưng điều gì sẽ xảy ra nếu các biến cục bộ không bị loại bỏ khi thoát khỏi hàm? Nếu sau đó bạn có thể tiếp tục hàm từ nơi nó đã dừng thì sao? Đây chính là điều generator cung cấp; có thể xem chúng như các hàm có thể tiếp tục thực thi.
 
-Here's the simplest example of a generator function:
+Sau đây là ví dụ đơn giản nhất về một hàm generator:
 
     >>> def generate_ints(N):
     ...    for i in range(N):
     ...        yield i
 
-Any function containing a :keyword:`yield` keyword is a generator function;
-this is detected by Python's :term:`bytecode` compiler which compiles the
-function specially as a result.
+Mọi hàm chứa từ khóa :keyword:`yield` đều là một hàm generator; trình biên dịch :term:`bytecode` của Python sẽ phát hiện điều này và biên dịch hàm theo cách đặc biệt.
 
-When you call a generator function, it doesn't return a single value; instead it
-returns a generator object that supports the iterator protocol.  On executing
-the ``yield`` expression, the generator outputs the value of ``i``, similar to a
-``return`` statement.  The big difference between ``yield`` and a ``return``
-statement is that on reaching a ``yield`` the generator's state of execution is
-suspended and local variables are preserved.  On the next call to the
-generator's :meth:`~generator.__next__` method, the function will resume
-executing.
+Khi bạn gọi một hàm generator, hàm đó không trả về một giá trị duy nhất; thay vào đó, nó trả về một đối tượng generator hỗ trợ iterator protocol. Khi thực thi biểu thức ``yield``, generator xuất ra giá trị của ``i``, tương tự như một câu lệnh ``return``. Điểm khác biệt lớn giữa ``yield`` và một câu lệnh ``return`` là khi gặp ``yield``, trạng thái thực thi của generator sẽ bị tạm dừng và các biến cục bộ được bảo toàn. Ở lần gọi tiếp theo đến phương thức :meth:`~generator.__next__` của generator, hàm sẽ tiếp tục thực thi.
 
-Here's a sample usage of the ``generate_ints()`` generator:
+Dưới đây là một ví dụ sử dụng generator ``generate_ints()``:
 
     >>> gen = generate_ints(3)
     >>> gen  #doctest: +ELLIPSIS
@@ -487,28 +313,16 @@ Here's a sample usage of the ``generate_ints()`` generator:
       File "stdin", line 2, in generate_ints
     StopIteration
 
-You could equally write ``for i in generate_ints(5)``, or ``a, b, c =
-generate_ints(3)``.
+Bạn cũng có thể viết ``for i in generate_ints(5)``, hoặc ``a, b, c = generate_ints(3)``.
 
-Inside a generator function, ``return value`` causes ``StopIteration(value)``
-to be raised from the :meth:`~generator.__next__` method.  Once this happens, or
-the bottom of the function is reached, the procession of values ends and the
-generator cannot yield any further values.
+Bên trong một hàm generator, ``return value`` khiến ``StopIteration(value)`` được phát sinh từ phương thức :meth:`~generator.__next__`. Khi điều này xảy ra hoặc khi đã đến cuối hàm, quá trình phát ra các giá trị kết thúc và generator không thể tạo thêm giá trị nào nữa.
 
-You could achieve the effect of generators manually by writing your own class
-and storing all the local variables of the generator as instance variables.  For
-example, returning a list of integers could be done by setting ``self.count`` to
-0, and having the :meth:`~iterator.__next__` method increment ``self.count`` and
-return it.
-However, for a moderately complicated generator, writing a corresponding class
-can be much messier.
+Bạn có thể tự thực hiện hiệu ứng của generator bằng cách viết lớp riêng và lưu tất cả các biến cục bộ của generator dưới dạng biến thể hiện. Ví dụ, để trả về một danh sách các số nguyên, bạn có thể đặt ``self.count`` thành 0, rồi cho phương thức :meth:`~iterator.__next__` tăng ``self.count`` lên và trả về nó. Tuy nhiên, với một generator phức tạp vừa phải, việc viết lớp tương ứng có thể rắc rối hơn nhiều.
 
-The test suite included with Python's library,
-:source:`Lib/test/test_generators.py`, contains
-a number of more interesting examples.  Here's one generator that implements an
-in-order traversal of a tree using generators recursively. ::
+Bộ kiểm thử đi kèm với thư viện của Python,
+:source:`Lib/test/test_generators.py`, chứa một số ví dụ thú vị hơn. Đây là một generator triển khai việc duyệt cây theo thứ tự trung tố bằng cách sử dụng các generator đệ quy.::
 
-    # A recursive generator that generates Tree leaves in in-order.
+    # Generator đệ quy tạo ra các lá của Tree theo thứ tự trung tố.
     def inorder(t):
         if t:
             for x in inorder(t.left):
@@ -519,47 +333,29 @@ in-order traversal of a tree using generators recursively. ::
             for x in inorder(t.right):
                 yield x
 
-Two other examples in ``test_generators.py`` produce solutions for the N-Queens
-problem (placing N queens on an NxN chess board so that no queen threatens
-another) and the Knight's Tour (finding a route that takes a knight to every
-square of an NxN chessboard without visiting any square twice).
+Hai ví dụ khác trong ``test_generators.py`` tạo ra lời giải cho bài toán N-Queens (đặt N quân hậu trên bàn cờ NxN sao cho không quân hậu nào đe dọa quân hậu khác) và Knight's Tour (tìm một lộ trình đưa một quân mã đi qua mọi ô của bàn cờ NxN mà không đi qua bất kỳ ô nào hai lần).
 
 
 
-Passing values into a generator
--------------------------------
+Truyền giá trị vào một generator
+--------------------------------
 
-In Python 2.4 and earlier, generators only produced output.  Once a generator's
-code was invoked to create an iterator, there was no way to pass any new
-information into the function when its execution is resumed.  You could hack
-together this ability by making the generator look at a global variable or by
-passing in some mutable object that callers then modify, but these approaches
-are messy.
+Trong Python 2.4 và các phiên bản trước đó, generator chỉ tạo ra đầu ra. Khi mã của một generator được gọi để tạo một iterator, không có cách nào truyền thông tin mới vào hàm khi quá trình thực thi của nó được tiếp tục. Bạn có thể tạm tạo khả năng này bằng cách để generator đọc một biến toàn cục hoặc truyền vào một đối tượng mutable mà sau đó caller sẽ sửa đổi, nhưng những cách tiếp cận này khá rắc rối.
 
-In Python 2.5 there's a simple way to pass values into a generator.
-:keyword:`yield` became an expression, returning a value that can be assigned to
-a variable or otherwise operated on::
+Trong Python 2.5, có một cách đơn giản để truyền giá trị vào một generator.
+:keyword:`yield` trở thành một expression, trả về một giá trị có thể được gán cho một biến hoặc được xử lý theo cách khác::
 
     val = (yield i)
 
-I recommend that you **always** put parentheses around a ``yield`` expression
-when you're doing something with the returned value, as in the above example.
-The parentheses aren't always necessary, but it's easier to always add them
-instead of having to remember when they're needed.
+Tôi khuyên bạn **luôn** đặt dấu ngoặc đơn quanh một ``yield`` biểu thức khi bạn thực hiện thao tác với giá trị được trả về, như trong ví dụ trên. Dấu ngoặc đơn không phải lúc nào cũng cần thiết, nhưng luôn thêm chúng sẽ dễ hơn so với việc phải nhớ khi nào chúng cần thiết.
 
-(:pep:`342` explains the exact rules, which are that a ``yield``-expression must
-always be parenthesized except when it occurs at the top-level expression on the
-right-hand side of an assignment.  This means you can write ``val = yield i``
-but have to use parentheses when there's an operation, as in ``val = (yield i)
+(:pep:`342` giải thích các quy tắc chính xác: một biểu thức ``yield`` luôn phải được đặt trong dấu ngoặc đơn, trừ khi nó xuất hiện ở cấp cao nhất của biểu thức bên phải phép gán. Điều này có nghĩa là bạn có thể viết ``val = yield i``, nhưng phải dùng dấu ngoặc đơn khi có phép toán, như trong ``val = (yield i)
 + 12``.)
 
-Values are sent into a generator by calling its :meth:`send(value)
-<generator.send>` method.  This method resumes the generator's code and the
-``yield`` expression returns the specified value.  If the regular
-:meth:`~generator.__next__` method is called, the ``yield`` returns ``None``.
+Các giá trị được truyền vào generator bằng cách gọi phương thức :meth:`send(value) <generator.send>` của nó. Phương thức này tiếp tục thực thi mã của generator và biểu thức ``yield`` trả về giá trị được chỉ định. Nếu phương thức thông thường
+:meth:`~generator.__next__` được gọi, ``yield`` trả về ``None``.
 
-Here's a simple counter that increments by 1 and allows changing the value of
-the internal counter.
+Sau đây là một bộ đếm đơn giản tăng thêm 1 và cho phép thay đổi giá trị của bộ đếm nội bộ.
 
 .. testcode::
 
@@ -567,13 +363,13 @@ the internal counter.
         i = 0
         while i < maximum:
             val = (yield i)
-            # If value provided, change counter
+            # Nếu có giá trị được cung cấp, thay đổi bộ đếm
             if val is not None:
                 i = val
             else:
                 i += 1
 
-And here's an example of changing the counter:
+Và đây là một ví dụ về việc thay đổi bộ đếm:
 
     >>> it = counter(10)  #doctest: +SKIP
     >>> next(it)  #doctest: +SKIP
@@ -590,47 +386,31 @@ And here's an example of changing the counter:
         it.next()
     StopIteration
 
-Because ``yield`` will often be returning ``None``, you should always check for
-this case.  Don't just use its value in expressions unless you're sure that the
-:meth:`~generator.send` method will be the only method used to resume your
-generator function.
+Vì ``yield`` thường sẽ trả về ``None``, bạn luôn nên kiểm tra trường hợp này. Đừng chỉ sử dụng giá trị của nó trong các biểu thức trừ khi bạn chắc chắn rằng
+Phương thức :meth:`~generator.send` sẽ là phương thức duy nhất được sử dụng để tiếp tục hàm generator của bạn.
 
-In addition to :meth:`~generator.send`, there are two other methods on
-generators:
+Ngoài :meth:`~generator.send`, generator còn có hai phương thức khác:
 
-* :meth:`throw(value) <generator.throw>` is used to
-  raise an exception inside the generator; the exception is raised by the
-  ``yield`` expression where the generator's execution is paused.
+* :meth:`throw(value) <generator.throw>` được dùng để raise một exception bên trong generator; exception được raise bởi biểu thức ``yield`` tại nơi quá trình thực thi của generator đang tạm dừng.
 
-* :meth:`~generator.close` sends a :exc:`GeneratorExit` exception to the
-  generator to terminate the iteration.  On receiving this exception, the
-  generator's code must either raise :exc:`GeneratorExit` or
-  :exc:`StopIteration`; catching the exception and doing anything else is
-  illegal and will trigger a :exc:`RuntimeError`.  :meth:`~generator.close`
-  will also be called by Python's garbage collector when the generator is
-  garbage-collected.
+* :meth:`~generator.close` gửi một exception :exc:`GeneratorExit` đến generator để kết thúc việc lặp. Khi nhận exception này, mã của generator phải raise :exc:`GeneratorExit` hoặc
+  :exc:`StopIteration`; việc bắt exception rồi thực hiện bất kỳ điều gì khác là không hợp lệ và sẽ kích hoạt một :exc:`RuntimeError`. :meth:`~generator.close` cũng sẽ được Python garbage collector gọi khi generator được garbage-collect.
 
-  If you need to run cleanup code when a :exc:`GeneratorExit` occurs, I suggest
-  using a ``try: ... finally:`` suite instead of catching :exc:`GeneratorExit`.
+  Nếu cần chạy mã cleanup khi xảy ra :exc:`GeneratorExit`, tôi khuyên bạn nên dùng một suite ``try: ... finally:`` thay vì bắt :exc:`GeneratorExit`.
 
-The cumulative effect of these changes is to turn generators from one-way
-producers of information into both producers and consumers.
+Tác động tổng thể của những thay đổi này là biến generator từ các bộ tạo thông tin một chiều thành cả bộ tạo lẫn bộ tiếp nhận thông tin.
 
-Generators also become **coroutines**, a more generalized form of subroutines.
-Subroutines are entered at one point and exited at another point (the top of the
-function, and a ``return`` statement), but coroutines can be entered, exited,
-and resumed at many different points (the ``yield`` statements).
+Generators cũng trở thành **coroutines**, một dạng tổng quát hơn của subroutine. Subroutine được bắt đầu tại một điểm và kết thúc tại một điểm khác (ở đầu hàm và một câu lệnh ``return``), nhưng coroutine có thể được bắt đầu, kết thúc và tiếp tục lại tại nhiều điểm khác nhau (các câu lệnh ``yield``).
 
 
-Built-in functions
-==================
+Các hàm dựng sẵn
+================
 
-Let's look in more detail at built-in functions often used with iterators.
+Hãy xem chi tiết hơn về các hàm dựng sẵn thường được sử dụng với iterator.
 
-Two of Python's built-in functions, :func:`map` and :func:`filter` duplicate the
-features of generator expressions:
+Hai hàm dựng sẵn của Python, :func:`map` và :func:`filter`, có các tính năng trùng với generator expression:
 
-:func:`map(f, iterA, iterB, ...) <map>` returns an iterator over the sequence
+:func:`map(f, iterA, iterB, ...) <map>` trả về một iterator trên sequence
  ``f(iterA[0], iterB[0]), f(iterA[1], iterB[1]), f(iterA[2], iterB[2]), ...``.
 
     >>> def upper(s):
@@ -641,13 +421,9 @@ features of generator expressions:
     >>> [upper(s) for s in ['sentence', 'fragment']]
     ['SENTENCE', 'FRAGMENT']
 
-You can of course achieve the same effect with a list comprehension.
+Tất nhiên, bạn cũng có thể đạt được hiệu ứng tương tự bằng list comprehension.
 
-:func:`filter(predicate, iter) <filter>` returns an iterator over all the
-sequence elements that meet a certain condition, and is similarly duplicated by
-list comprehensions.  A **predicate** is a function that returns the truth
-value of some condition; for use with :func:`filter`, the predicate must take a
-single value.
+:func:`filter(predicate, iter) <filter>` trả về một iterator trên tất cả các phần tử của sequence thỏa mãn một điều kiện nhất định và cũng tương tự như list comprehension. Một **predicate** là một hàm trả về giá trị đúng/sai của một điều kiện nào đó; khi sử dụng với :func:`filter`, predicate phải nhận một giá trị duy nhất.
 
     >>> def is_even(x):
     ...     return (x % 2) == 0
@@ -656,15 +432,13 @@ single value.
     [0, 2, 4, 6, 8]
 
 
-This can also be written as a list comprehension:
+Điều này cũng có thể được viết dưới dạng list comprehension:
 
     >>> list(x for x in range(10) if is_even(x))
     [0, 2, 4, 6, 8]
 
 
-:func:`enumerate(iter, start=0) <enumerate>` counts off the elements in the
-iterable returning 2-tuples containing the count (from *start*) and
-each element. ::
+:func:`enumerate(iter, start=0) <enumerate>` duyệt qua các phần tử trong iterable và trả về các tuple 2 phần tử chứa số đếm (bắt đầu từ *start*) và từng phần tử.::
 
     >>> for item in enumerate(['subject', 'verb', 'object']):
     ...     print(item)
@@ -672,21 +446,17 @@ each element. ::
     (1, 'verb')
     (2, 'object')
 
-:func:`enumerate` is often used when looping through a list and recording the
-indexes at which certain conditions are met::
+:func:`enumerate` thường được sử dụng khi lặp qua một danh sách và ghi lại các chỉ mục tại đó một số điều kiện nhất định được thỏa mãn::
 
     f = open('data.txt', 'r')
     for i, line in enumerate(f):
         if line.strip() == '':
             print('Blank line at line #%i' % i)
 
-:func:`sorted(iterable, key=None, reverse=False) <sorted>` collects all the
-elements of the iterable into a list, sorts the list, and returns the sorted
-result.  The *key* and *reverse* arguments are passed through to the
-constructed list's :meth:`~list.sort` method. ::
+:func:`sorted(iterable, key=None, reverse=False) <sorted>` tập hợp tất cả phần tử của iterable vào một danh sách, sắp xếp danh sách rồi trả về kết quả đã sắp xếp. Các đối số *key* và *reverse* được truyền cho phương thức :meth:`~list.sort` của danh sách được tạo.::
 
     >>> import random
-    >>> # Generate 8 random numbers between [0, 10000)
+    >>> # Tạo 8 số ngẫu nhiên trong khoảng [0, 10000)
     >>> rand_list = random.sample(range(10000), 8)
     >>> rand_list  #doctest: +SKIP
     [769, 7953, 9828, 6431, 8442, 9878, 6213, 2207]
@@ -695,13 +465,10 @@ constructed list's :meth:`~list.sort` method. ::
     >>> sorted(rand_list, reverse=True)  #doctest: +SKIP
     [9878, 9828, 8442, 7953, 6431, 6213, 2207, 769]
 
-(For a more detailed discussion of sorting, see the :ref:`sortinghowto`.)
+(Để xem phần giải thích chi tiết hơn về việc sắp xếp, hãy xem :ref:`sortinghowto`.)
 
 
-The :func:`any(iter) <any>` and :func:`all(iter) <all>` built-ins look at the
-truth values of an iterable's contents.  :func:`any` returns ``True`` if any element
-in the iterable is a true value, and :func:`all` returns ``True`` if all of the
-elements are true values:
+Các built-in :func:`any(iter) <any>` và :func:`all(iter) <all>` kiểm tra các giá trị đúng của nội dung trong một iterable. :func:`any` trả về ``True`` nếu bất kỳ phần tử nào trong iterable là giá trị đúng, còn :func:`all` trả về ``True`` nếu tất cả các phần tử đều là giá trị đúng:
 
     >>> any([0, 1, 0])
     True
@@ -717,50 +484,37 @@ elements are true values:
     True
 
 
-:func:`zip(iterA, iterB, ...) <zip>` takes one element from each iterable and
-returns them in a tuple::
+:func:`zip(iterA, iterB, ...) <zip>` lấy một phần tử từ mỗi iterable và trả về các phần tử đó trong một tuple::
 
     zip(['a', 'b', 'c'], (1, 2, 3)) =>
       ('a', 1), ('b', 2), ('c', 3)
 
-It doesn't construct an in-memory list and :term:`exhaust <exhausted>` all
-the input iterators before returning; instead tuples are constructed and
-returned only if they're requested.
-(The technical term for this behaviour is `lazy evaluation
-<https://en.wikipedia.org/wiki/Lazy_evaluation>`__.)
+Nó không tạo một list trong bộ nhớ rồi :term:`tiêu thụ <exhausted>` tất cả các iterator đầu vào trước khi trả về; thay vào đó, các tuple chỉ được tạo và trả về khi chúng được yêu cầu. (Thuật ngữ kỹ thuật cho hành vi này là `lazy evaluation <https://en.wikipedia.org/wiki/Lazy_evaluation>`__.)
 
-This iterator is intended to be used with iterables that are all of the same
-length.  If the iterables are of different lengths, the resulting stream will be
-the same length as the shortest iterable. ::
+Iterator này được thiết kế để sử dụng với các iterable có cùng độ dài. Nếu các iterable có độ dài khác nhau, stream kết quả sẽ có độ dài bằng iterable ngắn nhất.::
 
     zip(['a', 'b'], (1, 2, 3)) =>
       ('a', 1), ('b', 2)
 
-You should avoid doing this, though, because an element may be taken from the
-longer iterators and discarded.  This means you can't go on to use the iterators
-further because you risk skipping a discarded element.
+Tuy nhiên, bạn nên tránh làm vậy, vì một phần tử có thể được lấy từ các iterator dài hơn rồi bị loại bỏ. Điều này có nghĩa là bạn không thể tiếp tục sử dụng các iterator đó, vì có nguy cơ bỏ qua một phần tử đã bị loại bỏ.
 
 
-The itertools module
-====================
+Mô-đun itertools
+================
 
-The :mod:`itertools` module contains a number of commonly used iterators as well
-as functions for combining several iterators.  This section will introduce the
-module's contents by showing small examples.
+Mô-đun :mod:`itertools` chứa một số iterator thường dùng cũng như các hàm để kết hợp nhiều iterator. Phần này sẽ giới thiệu nội dung của mô-đun bằng cách trình bày các ví dụ nhỏ.
 
-The module's functions fall into a few broad classes:
+Các hàm của mô-đun được chia thành một vài nhóm lớn:
 
-* Functions that create a new iterator based on an existing iterator.
-* Functions for treating an iterator's elements as function arguments.
-* Functions for selecting portions of an iterator's output.
-* A function for grouping an iterator's output.
+* Các hàm tạo một iterator mới dựa trên một iterator hiện có.
+* Các hàm dùng để xử lý các phần tử của iterator như các đối số hàm.
+* Các hàm dùng để chọn một phần đầu ra của iterator.
+* Một hàm dùng để nhóm đầu ra của iterator.
 
-Creating new iterators
-----------------------
+Tạo iterator mới
+----------------
 
-:func:`itertools.count(start, step) <itertools.count>` returns an infinite
-stream of evenly spaced values.  You can optionally supply the starting number,
-which defaults to 0, and the interval between numbers, which defaults to 1::
+:func:`itertools.count(start, step) <itertools.count>` trả về một luồng vô hạn gồm các giá trị cách đều nhau. Bạn có thể tùy chọn cung cấp số bắt đầu, mặc định là 0, và khoảng cách giữa các số, mặc định là 1::
 
     itertools.count() =>
       0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...
@@ -769,35 +523,24 @@ which defaults to 0, and the interval between numbers, which defaults to 1::
     itertools.count(10, 5) =>
       10, 15, 20, 25, 30, 35, 40, 45, 50, 55, ...
 
-:func:`itertools.cycle(iter) <itertools.cycle>` saves a copy of the contents of
-a provided iterable and returns a new iterator that returns its elements from
-first to last.  The new iterator will repeat these elements infinitely. ::
+:func:`itertools.cycle(iter) <itertools.cycle>` lưu một bản sao nội dung của iterable được cung cấp và trả về một iterator mới, lần lượt trả về các phần tử từ đầu đến cuối. Iterator mới sẽ lặp lại vô hạn các phần tử này.::
 
     itertools.cycle([1, 2, 3, 4, 5]) =>
       1, 2, 3, 4, 5, 1, 2, 3, 4, 5, ...
 
-:func:`itertools.repeat(elem, [n]) <itertools.repeat>` returns the provided
-element *n* times, or returns the element endlessly if *n* is not provided. ::
+:func:`itertools.repeat(elem, [n]) <itertools.repeat>` trả về phần tử được cung cấp *n* lần, hoặc trả về phần tử liên tục nếu không cung cấp *n*.::
 
     itertools.repeat('abc') =>
       abc, abc, abc, abc, abc, abc, abc, abc, abc, abc, ...
     itertools.repeat('abc', 5) =>
       abc, abc, abc, abc, abc
 
-:func:`itertools.chain(iterA, iterB, ...) <itertools.chain>` takes an arbitrary
-number of iterables as input, and returns all the elements of the first
-iterator, then all the elements of the second, and so on, until all of the
-iterables have been :term:`exhausted`. ::
+:func:`itertools.chain(iterA, iterB, ...) <itertools.chain>` nhận một số lượng iterable tùy ý làm đầu vào và trả về tất cả phần tử của iterator đầu tiên, sau đó là tất cả phần tử của iterator thứ hai, cứ tiếp tục như vậy cho đến khi tất cả iterable đã được :term:`exhausted`.::
 
     itertools.chain(['a', 'b', 'c'], (1, 2, 3)) =>
       a, b, c, 1, 2, 3
 
-:func:`itertools.islice(iter, [start], stop, [step]) <itertools.islice>` returns
-a stream that's a slice of the iterator.  With a single *stop* argument, it
-will return the first *stop* elements.  If you supply a starting index, you'll
-get *stop-start* elements, and if you supply a value for *step*, elements
-will be skipped accordingly.  Unlike Python's string and list slicing, you can't
-use negative values for *start*, *stop*, or *step*. ::
+:func:`itertools.islice(iter, [start], stop, [step]) <itertools.islice>` trả về một luồng là một lát cắt của iterator. Với một đối số *stop* duy nhất, hàm sẽ trả về *stop* phần tử đầu tiên. Nếu cung cấp chỉ mục bắt đầu, bạn sẽ nhận được *stop-start* phần tử; nếu cung cấp giá trị cho *step*, các phần tử sẽ được bỏ qua tương ứng. Không giống như việc cắt chuỗi và list trong Python, bạn không thể sử dụng giá trị âm cho *start*, *stop* hoặc *step*.::
 
     itertools.islice(range(10), 8) =>
       0, 1, 2, 3, 4, 5, 6, 7
@@ -806,13 +549,7 @@ use negative values for *start*, *stop*, or *step*. ::
     itertools.islice(range(10), 2, 8, 2) =>
       2, 4, 6
 
-:func:`itertools.tee(iter, [n]) <itertools.tee>` replicates an iterator; it
-returns *n* independent iterators that will all return the contents of the
-source iterator.
-If you don't supply a value for *n*, the default is 2.  Replicating iterators
-requires saving some of the contents of the source iterator, so this can consume
-significant memory if the iterator is large and one of the new iterators is
-consumed more than the others. ::
+:func:`itertools.tee(iter, [n]) <itertools.tee>` nhân bản một iterator; hàm trả về *n* iterator độc lập, tất cả đều trả về nội dung của iterator nguồn. Nếu không cung cấp giá trị cho *n*, giá trị mặc định là 2. Việc nhân bản iterator yêu cầu lưu một phần nội dung của iterator nguồn, vì vậy có thể tiêu tốn đáng kể bộ nhớ nếu iterator lớn và một trong các iterator mới được dùng nhiều hơn những iterator còn lại.::
 
         itertools.tee( itertools.count() ) =>
            iterA, iterB
@@ -824,18 +561,13 @@ consumed more than the others. ::
            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...
 
 
-Calling functions on elements
------------------------------
+Gọi các hàm trên các phần tử
+----------------------------
 
-The :mod:`operator` module contains a set of functions corresponding to Python's
-operators.  Some examples are :func:`operator.add(a, b) <operator.add>` (adds
-two values), :func:`operator.ne(a, b)  <operator.ne>` (same as ``a != b``), and
-:func:`operator.attrgetter('id') <operator.attrgetter>`
-(returns a callable that fetches the ``.id`` attribute).
+Mô-đun :mod:`operator` chứa một tập hợp các hàm tương ứng với các toán tử của Python. Một số ví dụ là :func:`operator.add(a, b) <operator.add>` (cộng hai giá trị), :func:`operator.ne(a, b)  <operator.ne>` (giống với ``a != b``), và
+:func:`operator.attrgetter('id') <operator.attrgetter>` (trả về một callable dùng để lấy thuộc tính ``.id``).
 
-:func:`itertools.starmap(func, iter) <itertools.starmap>` assumes that the
-iterable will return a stream of tuples, and calls *func* using these tuples as
-the arguments::
+:func:`itertools.starmap(func, iter) <itertools.starmap>` giả định rằng iterable sẽ trả về một luồng các tuple và gọi *func* bằng cách sử dụng các tuple này làm đối số::
 
     itertools.starmap(os.path.join,
                       [('/bin', 'python'), ('/usr', 'bin', 'java'),
@@ -844,22 +576,17 @@ the arguments::
       /bin/python, /usr/bin/java, /usr/bin/perl, /usr/bin/ruby
 
 
-Selecting elements
-------------------
+Chọn các phần tử
+----------------
 
-Another group of functions chooses a subset of an iterator's elements based on a
-predicate.
+Một nhóm hàm khác chọn một tập con các phần tử của iterator dựa trên một predicate.
 
-:func:`itertools.filterfalse(predicate, iter) <itertools.filterfalse>` is the
-opposite of :func:`filter`, returning all elements for which the predicate
-returns false::
+:func:`itertools.filterfalse(predicate, iter) <itertools.filterfalse>` là ngược lại với :func:`filter`, trả về tất cả các phần tử mà predicate trả về false::
 
     itertools.filterfalse(is_even, itertools.count()) =>
       1, 3, 5, 7, 9, 11, 13, 15, ...
 
-:func:`itertools.takewhile(predicate, iter) <itertools.takewhile>` returns
-elements for as long as the predicate returns true.  Once the predicate returns
-false, the iterator will signal the end of its results. ::
+:func:`itertools.takewhile(predicate, iter) <itertools.takewhile>` trả về các phần tử chừng nào predicate còn trả về true. Khi predicate trả về false, iterator sẽ báo hiệu rằng các kết quả đã kết thúc.::
 
     def less_than_10(x):
         return x < 10
@@ -870,9 +597,7 @@ false, the iterator will signal the end of its results. ::
     itertools.takewhile(is_even, itertools.count()) =>
       0
 
-:func:`itertools.dropwhile(predicate, iter) <itertools.dropwhile>` discards
-elements while the predicate returns true, and then returns the rest of the
-iterable's results. ::
+:func:`itertools.dropwhile(predicate, iter) <itertools.dropwhile>` loại bỏ các phần tử trong khi predicate trả về true, sau đó trả về phần còn lại của các kết quả trong iterable.::
 
     itertools.dropwhile(less_than_10, itertools.count()) =>
       10, 11, 12, 13, 14, 15, 16, 17, 18, 19, ...
@@ -880,20 +605,16 @@ iterable's results. ::
     itertools.dropwhile(is_even, itertools.count()) =>
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...
 
-:func:`itertools.compress(data, selectors) <itertools.compress>` takes two
-iterators and returns only those elements of *data* for which the corresponding
-element of *selectors* is true, stopping whenever either one is :term:`exhausted`::
+:func:`itertools.compress(data, selectors) <itertools.compress>` nhận hai iterator và chỉ trả về những phần tử của *data* mà phần tử tương ứng của *selectors* là true, dừng lại ngay khi một trong hai :term:`exhausted`::
 
     itertools.compress([1, 2, 3, 4, 5], [True, True, False, False, True]) =>
        1, 2, 5
 
 
-Combinatoric functions
-----------------------
+Các hàm tổ hợp
+--------------
 
-The :func:`itertools.combinations(iterable, r) <itertools.combinations>`
-returns an iterator giving all possible *r*-tuple combinations of the
-elements contained in *iterable*.  ::
+:func:`itertools.combinations(iterable, r) <itertools.combinations>` trả về một iterator cung cấp mọi tổ hợp tuple có thể có gồm *r* phần tử chứa trong *iterable*.::
 
     itertools.combinations([1, 2, 3, 4, 5], 2) =>
       (1, 2), (1, 3), (1, 4), (1, 5),
@@ -906,12 +627,8 @@ elements contained in *iterable*.  ::
       (2, 3, 4), (2, 3, 5), (2, 4, 5),
       (3, 4, 5)
 
-The elements within each tuple remain in the same order as
-*iterable* returned them.  For example, the number 1 is always before
-2, 3, 4, or 5 in the examples above.  A similar function,
-:func:`itertools.permutations(iterable, r=None) <itertools.permutations>`,
-removes this constraint on the order, returning all possible
-arrangements of length *r*::
+Các phần tử trong mỗi tuple vẫn giữ nguyên thứ tự như khi *iterable* trả về chúng. Ví dụ, số 1 luôn đứng trước 2, 3, 4 hoặc 5 trong các ví dụ trên. Một hàm tương tự,
+:func:`itertools.permutations(iterable, r=None) <itertools.permutations>`, loại bỏ ràng buộc về thứ tự này và trả về mọi cách sắp xếp có thể có với độ dài *r*::
 
     itertools.permutations([1, 2, 3, 4, 5], 2) =>
       (1, 2), (1, 3), (1, 4), (1, 5),
@@ -925,24 +642,17 @@ arrangements of length *r*::
       ...
       (5, 4, 3, 2, 1)
 
-If you don't supply a value for *r* the length of the iterable is used,
-meaning that all the elements are permuted.
+Nếu bạn không cung cấp giá trị cho *r*, độ dài của iterable sẽ được sử dụng, nghĩa là tất cả các phần tử đều được hoán vị.
 
-Note that these functions produce all of the possible combinations by
-position and don't require that the contents of *iterable* are unique::
+Lưu ý rằng các hàm này tạo ra mọi tổ hợp khả dĩ theo vị trí và không yêu cầu nội dung của *iterable* phải là duy nhất::
 
     itertools.permutations('aba', 3) =>
       ('a', 'b', 'a'), ('a', 'a', 'b'), ('b', 'a', 'a'),
       ('b', 'a', 'a'), ('a', 'a', 'b'), ('a', 'b', 'a')
 
-The identical tuple ``('a', 'a', 'b')`` occurs twice, but the two 'a'
-strings came from different positions.
+Tuple giống hệt nhau ``('a', 'a', 'b')`` xuất hiện hai lần, nhưng hai chuỗi 'a' đến từ các vị trí khác nhau.
 
-The :func:`itertools.combinations_with_replacement(iterable, r) <itertools.combinations_with_replacement>`
-function relaxes a different constraint: elements can be repeated
-within a single tuple.  Conceptually an element is selected for the
-first position of each tuple and then is replaced before the second
-element is selected.  ::
+Hàm :func:`itertools.combinations_with_replacement(iterable, r) <itertools.combinations_with_replacement>` nới lỏng một ràng buộc khác: các phần tử có thể được lặp lại trong cùng một tuple. Về mặt khái niệm, một phần tử được chọn cho vị trí đầu tiên của mỗi tuple, sau đó được thay thế trước khi phần tử thứ hai được chọn.::
 
     itertools.combinations_with_replacement([1, 2, 3, 4, 5], 2) =>
       (1, 1), (1, 2), (1, 3), (1, 4), (1, 5),
@@ -952,17 +662,12 @@ element is selected.  ::
       (5, 5)
 
 
-Grouping elements
------------------
+Nhóm các phần tử
+----------------
 
-The last function I'll discuss, :func:`itertools.groupby(iter, key_func=None)
-<itertools.groupby>`, is the most complicated.  ``key_func(elem)`` is a function
-that can compute a key value for each element returned by the iterable.  If you
-don't supply a key function, the key is simply each element itself.
+Hàm cuối cùng tôi sẽ thảo luận, :func:`itertools.groupby(iter, key_func=None) <itertools.groupby>`, là hàm phức tạp nhất. ``key_func(elem)`` là một hàm có thể tính một giá trị key cho mỗi phần tử do iterable trả về. Nếu bạn không cung cấp hàm key, key đơn giản là chính mỗi phần tử.
 
-:func:`~itertools.groupby` collects all the consecutive elements from the
-underlying iterable that have the same key value, and returns a stream of
-2-tuples containing a key value and an iterator for the elements with that key.
+:func:`~itertools.groupby` thu thập tất cả các phần tử liên tiếp từ iterable bên dưới có cùng giá trị key, rồi trả về một stream gồm các 2-tuple chứa một giá trị key và một iterator cho các phần tử có key đó.
 
 ::
 
@@ -988,32 +693,20 @@ underlying iterable that have the same key value, and returns a stream of
     iterator-3 =>
       ('Flagstaff', 'AZ'), ('Phoenix', 'AZ'), ('Tucson', 'AZ')
 
-:func:`~itertools.groupby` assumes that the underlying iterable's contents will
-already be sorted based on the key.  Note that the returned iterators also use
-the underlying iterable, so you have to consume the results of iterator-1 before
-requesting iterator-2 and its corresponding key.
+:func:`~itertools.groupby` giả định rằng nội dung của iterable nền đã được sắp xếp theo key. Lưu ý rằng các iterator được trả về cũng sử dụng iterable nền, vì vậy bạn phải xử lý hết kết quả của iterator-1 trước khi yêu cầu iterator-2 và key tương ứng của nó.
 
 
-The functools module
-====================
+Mô-đun functools
+================
 
-The :mod:`functools` module contains some higher-order functions.
-A **higher-order function** takes one or more functions as input and returns a
-new function.  The most useful tool in this module is the
-:func:`functools.partial` function.
+Mô-đun :mod:`functools` chứa một số hàm bậc cao. Một **hàm bậc cao** nhận một hoặc nhiều hàm làm đầu vào và trả về một hàm mới. Công cụ hữu ích nhất trong mô-đun này là
+hàm :func:`functools.partial`.
 
-For programs written in a functional style, you'll sometimes want to construct
-variants of existing functions that have some of the parameters filled in.
-Consider a Python function ``f(a, b, c)``; you may wish to create a new function
-``g(b, c)`` that's equivalent to ``f(1, b, c)``; you're filling in a value for
-one of ``f()``'s parameters.  This is called "partial function application".
+Khi viết chương trình theo phong cách hàm, đôi khi bạn sẽ muốn tạo các biến thể của những hàm hiện có với một số tham số đã được điền sẵn. Hãy xét một hàm Python ``f(a, b, c)``; bạn có thể muốn tạo một hàm mới ``g(b, c)`` tương đương với ``f(1, b, c)``; tức là bạn đang điền một giá trị cho một trong các tham số của ``f()``. Đây được gọi là "áp dụng hàm từng phần".
 
-The constructor for :func:`~functools.partial` takes the arguments
-``(function, arg1, arg2, ..., kwarg1=value1, kwarg2=value2)``.  The resulting
-object is callable, so you can just call it to invoke ``function`` with the
-filled-in arguments.
+Hàm khởi tạo của :func:`~functools.partial` nhận các đối số ``(function, arg1, arg2, ..., kwarg1=value1, kwarg2=value2)``. Đối tượng kết quả có thể gọi được, vì vậy bạn chỉ cần gọi nó để gọi ``function`` với các đối số đã được điền sẵn.
 
-Here's a small but realistic example::
+Đây là một ví dụ nhỏ nhưng thực tế::
 
     import functools
 
@@ -1025,17 +718,7 @@ Here's a small but realistic example::
     server_log = functools.partial(log, subsystem='server')
     server_log('Unable to open socket')
 
-:func:`functools.reduce(func, iter, [initial_value]) <functools.reduce>`
-cumulatively performs an operation on all the iterable's elements and,
-therefore, can't be applied to infinite iterables. *func* must be a function
-that takes two elements and returns a single value.  :func:`functools.reduce`
-takes the first two elements A and B returned by the iterator and calculates
-``func(A, B)``.  It then requests the third element, C, calculates
-``func(func(A, B), C)``, combines this result with the fourth element returned,
-and continues until the iterable is :term:`exhausted`.  If the iterable returns no
-values at all, a :exc:`TypeError` exception is raised.  If the initial value is
-supplied, it's used as a starting point and ``func(initial_value, A)`` is the
-first calculation. ::
+:func:`functools.reduce(func, iter, [initial_value]) <functools.reduce>` thực hiện một phép toán lần lượt trên tất cả các phần tử của iterable và vì vậy không thể áp dụng cho các iterable vô hạn. *func* phải là một hàm nhận vào hai phần tử và trả về một giá trị duy nhất. :func:`functools.reduce` lấy hai phần tử đầu tiên A và B do iterator trả về rồi tính ``func(A, B)``. Sau đó, nó yêu cầu phần tử thứ ba, C, tính ``func(func(A, B), C)``, kết hợp kết quả này với phần tử thứ tư được trả về và tiếp tục cho đến khi iterable :term:`exhausted`. Nếu iterable hoàn toàn không trả về giá trị nào, một ngoại lệ :exc:`TypeError` sẽ được đưa ra. Nếu giá trị ban đầu được cung cấp, giá trị đó được dùng làm điểm bắt đầu và ``func(initial_value, A)`` là phép tính đầu tiên.::
 
     >>> import operator, functools
     >>> functools.reduce(operator.concat, ['A', 'BB', 'C'])
@@ -1049,9 +732,7 @@ first calculation. ::
     >>> functools.reduce(operator.mul, [], 1)
     1
 
-If you use :func:`operator.add` with :func:`functools.reduce`, you'll add up all the
-elements of the iterable.  This case is so common that there's a special
-built-in called :func:`sum` to compute it:
+Nếu bạn dùng :func:`operator.add` với :func:`functools.reduce`, bạn sẽ cộng tất cả các phần tử của iterable. Trường hợp này phổ biến đến mức có một hàm dựng sẵn đặc biệt là :func:`sum` để tính giá trị đó:
 
     >>> import functools, operator
     >>> functools.reduce(operator.add, [1, 2, 3, 4], 0)
@@ -1061,22 +742,18 @@ built-in called :func:`sum` to compute it:
     >>> sum([])
     0
 
-For many uses of :func:`functools.reduce`, though, it can be clearer to just
-write the obvious :keyword:`for` loop::
+Tuy nhiên, với nhiều trường hợp sử dụng :func:`functools.reduce`, việc chỉ viết vòng lặp :keyword:`for` hiển nhiên sẽ rõ ràng hơn::
 
    import functools
-   # Instead of:
+   # Thay vì:
    product = functools.reduce(operator.mul, [1, 2, 3], 1)
 
-   # You can write:
+   # Bạn có thể viết:
    product = 1
    for i in [1, 2, 3]:
        product *= i
 
-A related function is :func:`itertools.accumulate(iterable, func=operator.add)
-<itertools.accumulate>`.  It performs the same calculation, but instead of
-returning only the final result, :func:`~itertools.accumulate` returns an iterator
-that also yields each partial result::
+Một hàm liên quan là :func:`itertools.accumulate(iterable, func=operator.add) <itertools.accumulate>`. Hàm này thực hiện cùng phép tính, nhưng thay vì chỉ trả về kết quả cuối cùng, :func:`~itertools.accumulate` trả về một iterator đồng thời cho ra từng kết quả trung gian::
 
     itertools.accumulate([1, 2, 3, 4, 5]) =>
       1, 3, 6, 10, 15
@@ -1085,48 +762,39 @@ that also yields each partial result::
       1, 2, 6, 24, 120
 
 
-The operator module
--------------------
+Mô-đun operator
+---------------
 
-The :mod:`operator` module was mentioned earlier.  It contains a set of
-functions corresponding to Python's operators.  These functions are often useful
-in functional-style code because they save you from writing trivial functions
-that perform a single operation.
+Module :mod:`operator` đã được đề cập trước đó. Module này chứa một tập hợp các hàm tương ứng với các toán tử của Python. Những hàm này thường hữu ích trong code theo phong cách hàm (functional-style) vì giúp bạn không phải viết các hàm tầm thường chỉ thực hiện một phép toán đơn lẻ.
 
-Some of the functions in this module are:
+Một số hàm trong module này gồm:
 
-* Math operations: ``add()``, ``sub()``, ``mul()``, ``floordiv()``, ``abs()``, ...
-* Logical operations: ``not_()``, ``truth()``.
-* Bitwise operations: ``and_()``, ``or_()``, ``invert()``.
-* Comparisons: ``eq()``, ``ne()``, ``lt()``, ``le()``, ``gt()``, and ``ge()``.
-* Object identity: ``is_()``, ``is_not()``.
+* Các phép toán số học: ``add()``, ``sub()``, ``mul()``, ``floordiv()``, ``abs()``, ...
+* Các phép toán logic: ``not_()``, ``truth()``.
+* Các phép toán bit: ``and_()``, ``or_()``, ``invert()``.
+* Các phép so sánh: ``eq()``, ``ne()``, ``lt()``, ``le()``, ``gt()``, và ``ge()``.
+* Định danh đối tượng: ``is_()``, ``is_not()``.
 
-Consult the operator module's documentation for a complete list.
+Hãy xem tài liệu của module operator để biết danh sách đầy đủ.
 
 
-Small functions and the lambda expression
-=========================================
+Các hàm nhỏ và biểu thức lambda
+===============================
 
-When writing functional-style programs, you'll often need little functions that
-act as predicates or that combine elements in some way.
+Khi viết các chương trình theo phong cách functional, bạn sẽ thường cần những hàm nhỏ hoạt động như các predicate hoặc kết hợp các phần tử theo một cách nào đó.
 
-If there's a Python built-in or a module function that's suitable, you don't
-need to define a new function at all::
+Nếu đã có một hàm dựng sẵn của Python hoặc một hàm module phù hợp, bạn không cần tự định nghĩa hàm mới.::
 
     stripped_lines = [line.strip() for line in lines]
     existing_files = filter(os.path.exists, file_list)
 
-If the function you need doesn't exist, you need to write it.  One way to write
-small functions is to use the :keyword:`lambda` expression.  ``lambda`` takes a
-number of parameters and an expression combining these parameters, and creates
-an anonymous function that returns the value of the expression::
+Nếu hàm bạn cần không tồn tại, bạn phải viết nó. Một cách để viết các hàm nhỏ là sử dụng biểu thức :keyword:`lambda`. ``lambda`` nhận một số tham số và một biểu thức kết hợp các tham số đó, rồi tạo ra một hàm anonymous trả về giá trị của biểu thức.::
 
     adder = lambda x, y: x+y
 
     print_assign = lambda name, value: name + '=' + str(value)
 
-An alternative is to just use the ``def`` statement and define a function in the
-usual way::
+Một lựa chọn khác là chỉ cần sử dụng câu lệnh ``def`` và định nghĩa hàm theo cách thông thường.::
 
     def adder(x, y):
         return x + y
@@ -1134,22 +802,14 @@ usual way::
     def print_assign(name, value):
         return name + '=' + str(value)
 
-Which alternative is preferable?  That's a style question; my usual course is to
-avoid using ``lambda``.
+Lựa chọn nào tốt hơn? Đó là vấn đề về phong cách; thông thường tôi tránh sử dụng ``lambda``.
 
-One reason for my preference is that ``lambda`` is quite limited in the
-functions it can define.  The result has to be computable as a single
-expression, which means you can't have multiway ``if... elif... else``
-comparisons or ``try... except`` statements.  If you try to do too much in a
-``lambda`` statement, you'll end up with an overly complicated expression that's
-hard to read.  Quick, what's the following code doing? ::
+Một lý do khiến tôi thích ``lambda`` là nó khá hạn chế về các hàm mà nó có thể định nghĩa. Kết quả phải có thể được tính bằng một biểu thức duy nhất, nghĩa là bạn không thể có các phép so sánh ``if... elif... else`` nhiều nhánh hoặc các câu lệnh ``try... except``. Nếu cố thực hiện quá nhiều việc trong một câu lệnh ``lambda``, bạn sẽ tạo ra một biểu thức quá phức tạp và khó đọc. Thử trả lời nhanh xem đoạn mã sau đang làm gì?::
 
     import functools
     total = functools.reduce(lambda a, b: (0, a[1] + b[1]), items)[1]
 
-You can figure it out, but it takes time to disentangle the expression to figure
-out what's going on.  Using a short nested ``def`` statements makes things a
-little bit better::
+Bạn có thể tìm ra, nhưng sẽ mất thời gian để tháo gỡ biểu thức và hiểu chuyện gì đang diễn ra. Việc sử dụng các câu lệnh ``def`` lồng nhau ngắn gọn khiến mọi thứ khá hơn một chút::
 
     import functools
     def combine(a, b):
@@ -1157,107 +817,84 @@ little bit better::
 
     total = functools.reduce(combine, items)[1]
 
-But it would be best of all if I had simply used a ``for`` loop::
+Nhưng tốt nhất vẫn là nếu tôi chỉ cần sử dụng một vòng lặp ``for``::
 
      total = 0
      for a, b in items:
          total += b
 
-Or the :func:`sum` built-in and a generator expression::
+Hoặc hàm dựng sẵn :func:`sum` và một generator expression::
 
      total = sum(b for a, b in items)
 
-Many uses of :func:`functools.reduce` are clearer when written as ``for`` loops.
+Nhiều cách sử dụng :func:`functools.reduce` sẽ rõ ràng hơn khi được viết dưới dạng các vòng lặp ``for``.
 
-Fredrik Lundh once suggested the following set of rules for refactoring uses of
-``lambda``:
+Fredrik Lundh từng đề xuất tập hợp quy tắc sau để refactor các cách sử dụng ``lambda``:
 
-1. Write a lambda function.
-2. Write a comment explaining what the heck that lambda does.
-3. Study the comment for a while, and think of a name that captures the essence
-   of the comment.
-4. Convert the lambda to a def statement, using that name.
-5. Remove the comment.
+1. Viết một hàm lambda.
+2. Viết một chú thích giải thích chính xác lambda đó làm gì.
+3. Đọc kỹ chú thích một lúc, rồi nghĩ ra một cái tên nắm bắt được nội dung cốt lõi của chú thích.
+4. Chuyển lambda thành câu lệnh def, sử dụng tên đó.
+5. Xóa chú thích.
 
-I really like these rules, but you're free to disagree
-about whether this lambda-free style is better.
+Tôi thực sự thích những quy tắc này, nhưng bạn hoàn toàn có thể không đồng ý về việc phong cách không dùng lambda này có tốt hơn hay không.
 
 
-Revision History and Acknowledgements
-=====================================
+Lịch sử sửa đổi và lời cảm ơn
+=============================
 
-The author would like to thank the following people for offering suggestions,
-corrections and assistance with various drafts of this article: Ian Bicking,
-Nick Coghlan, Nick Efford, Raymond Hettinger, Jim Jewett, Mike Krell, Leandro
-Lameiro, Jussi Salmela, Collin Winter, Blake Winton.
+Tác giả xin cảm ơn những người sau đây đã đưa ra các đề xuất, chỉnh sửa và hỗ trợ cho nhiều bản thảo khác nhau của bài viết này: Ian Bicking, Nick Coghlan, Nick Efford, Raymond Hettinger, Jim Jewett, Mike Krell, Leandro Lameiro, Jussi Salmela, Collin Winter, Blake Winton.
 
-Version 0.1: posted June 30 2006.
+Phiên bản 0.1: đăng ngày 30 tháng 6 năm 2006.
 
-Version 0.11: posted July 1 2006.  Typo fixes.
+Phiên bản 0.11: đăng ngày 1 tháng 7 năm 2006. Sửa lỗi chính tả.
 
-Version 0.2: posted July 10 2006.  Merged genexp and listcomp sections into one.
-Typo fixes.
+Phiên bản 0.2: đăng ngày 10 tháng 7 năm 2006. Gộp các phần genexp và listcomp thành một phần. Sửa lỗi chính tả.
 
-Version 0.21: Added more references suggested on the tutor mailing list.
+Phiên bản 0.21: Bổ sung thêm các tài liệu tham khảo được đề xuất trên mailing list của tutor.
 
-Version 0.30: Adds a section on the ``functional`` module written by Collin
-Winter; adds short section on the operator module; a few other edits.
+Phiên bản 0.30: Bổ sung một phần về module ``functional`` do Collin Winter viết; bổ sung một phần ngắn về module operator; và một số chỉnh sửa khác.
 
 
-References
-==========
+Tài liệu tham khảo
+==================
 
-General
--------
+Chung
+-----
 
-**Structure and Interpretation of Computer Programs**, by Harold Abelson and
-Gerald Jay Sussman with Julie Sussman.  The book can be found at
-https://mitpress.mit.edu/sicp.  In this classic textbook of computer science,
-chapters 2 and 3 discuss the use of sequences and streams to organize the data
-flow inside a program.  The book uses Scheme for its examples, but many of the
-design approaches described in these chapters are applicable to functional-style
-Python code.
+**Cấu trúc và Diễn giải các Chương trình Máy tính**, của Harold Abelson và Gerald Jay Sussman cùng Julie Sussman. Cuốn sách có thể được tìm thấy tại https://mitpress.mit.edu/sicp.  Trong giáo trình kinh điển về khoa học máy tính này, chương 2 và 3 thảo luận về việc sử dụng các sequence và stream để tổ chức luồng dữ liệu bên trong một chương trình. Cuốn sách sử dụng Scheme cho các ví dụ, nhưng nhiều phương pháp thiết kế được mô tả trong các chương này có thể áp dụng cho mã Python theo phong cách functional.
 
-https://defmacro.org/2006/06/19/fp.html: A general introduction to functional
-programming that uses Java examples and has a lengthy historical introduction.
+https://defmacro.org/2006/06/19/fp.html: Một phần giới thiệu tổng quan về lập trình functional, sử dụng các ví dụ Java và có phần giới thiệu lịch sử dài.
 
-https://en.wikipedia.org/wiki/Functional_programming: General Wikipedia entry
-describing functional programming.
+https://en.wikipedia.org/wiki/Functional_programming: Mục Wikipedia tổng quan mô tả lập trình functional.
 
-https://en.wikipedia.org/wiki/Coroutine: Entry for coroutines.
+https://en.wikipedia.org/wiki/Coroutine: Mục về coroutine.
 
-https://en.wikipedia.org/wiki/Partial_application: Entry for the concept of partial function application.
+https://en.wikipedia.org/wiki/Partial_application: Mục về khái niệm partial function application.
 
-https://en.wikipedia.org/wiki/Currying: Entry for the concept of currying.
+https://en.wikipedia.org/wiki/Currying: Mục về khái niệm currying.
 
-Python-specific
+Đặc thù cho Python
+------------------
+
+https://gnosis.cx/TPiP/: Chương đầu tiên trong cuốn sách của David Mertz
+:title-reference:`Xử lý văn bản trong Python` thảo luận về lập trình hàm trong xử lý văn bản, trong phần có tiêu đề "Sử dụng các hàm bậc cao trong xử lý văn bản".
+
+Mertz cũng viết một loạt bài gồm 3 phần về lập trình hàm cho trang DeveloperWorks của IBM; xem `phần 1 <https://developer.ibm.com/articles/l-prog/>`__, `phần 2 <https://developer.ibm.com/tutorials/l-prog2/>`__ và `phần 3 <https://developer.ibm.com/tutorials/l-prog3/>`__,
+
+
+Tài liệu Python
 ---------------
 
-https://gnosis.cx/TPiP/: The first chapter of David Mertz's book
-:title-reference:`Text Processing in Python` discusses functional programming
-for text processing, in the section titled "Utilizing Higher-Order Functions in
-Text Processing".
+Tài liệu dành cho module :mod:`itertools`.
 
-Mertz also wrote a 3-part series of articles on functional programming
-for IBM's DeveloperWorks site; see
-`part 1 <https://developer.ibm.com/articles/l-prog/>`__,
-`part 2 <https://developer.ibm.com/tutorials/l-prog2/>`__, and
-`part 3 <https://developer.ibm.com/tutorials/l-prog3/>`__,
+Tài liệu dành cho module :mod:`functools`.
 
+Tài liệu dành cho module :mod:`operator`.
 
-Python documentation
---------------------
+:pep:`289`: "Biểu thức Generator"
 
-Documentation for the :mod:`itertools` module.
-
-Documentation for the :mod:`functools` module.
-
-Documentation for the :mod:`operator` module.
-
-:pep:`289`: "Generator Expressions"
-
-:pep:`342`: "Coroutines via Enhanced Generators" describes the new generator
-features in Python 2.5.
+:pep:`342`: "Coroutine thông qua Generator được cải tiến" mô tả các tính năng generator mới trong Python 2.5.
 
 .. comment
 

@@ -1,57 +1,41 @@
 .. _urllib-howto:
 
-***********************************************************
-  HOWTO Fetch Internet Resources Using The urllib Package
-***********************************************************
+*************************************************
+HƯỚNG DẪN Lấy tài nguyên Internet bằng gói urllib
+*************************************************
 
 :Author: `Michael Foord <https://agileabstractions.com/>`_
 
 
-Introduction
-============
+Giới thiệu
+==========
 
-.. sidebar:: Related Articles
+.. sidebar:: Các bài viết liên quan
 
-    You may also find useful the following article on fetching web resources
-    with Python:
+    Bạn cũng có thể thấy bài viết sau đây hữu ích khi tìm nạp tài nguyên web bằng Python:
 
-    * `Basic Authentication <https://web.archive.org/web/20201215133350/http://www.voidspace.org.uk/python/articles/authentication.shtml>`__
+    * `Xác thực cơ bản <https://web.archive.org/web/20201215133350/http://www.voidspace.org.uk/python/articles/authentication.shtml>`__
 
-        A tutorial on *Basic Authentication*, with examples in Python.
+        Hướng dẫn về *Xác thực cơ bản*, kèm các ví dụ bằng Python.
 
-**urllib.request** is a Python module for fetching URLs
-(Uniform Resource Locators). It offers a very simple interface, in the form of
-the *urlopen* function. This is capable of fetching URLs using a variety of
-different protocols. It also offers a slightly more complex interface for
-handling common situations - like basic authentication, cookies, proxies and so
-on. These are provided by objects called handlers and openers.
+**urllib.request** là một module Python dùng để tìm nạp URL (Uniform Resource Locators). Module này cung cấp một giao diện rất đơn giản dưới dạng hàm *urlopen*. Hàm này có thể tìm nạp URL bằng nhiều giao thức khác nhau. Module cũng cung cấp một giao diện phức tạp hơn một chút để xử lý các tình huống thường gặp—chẳng hạn như xác thực cơ bản, cookie, proxy, v.v. Các chức năng này được cung cấp thông qua những đối tượng gọi là handler và opener.
 
-urllib.request supports fetching URLs for many "URL schemes" (identified by the string
-before the ``":"`` in URL - for example ``"ftp"`` is the URL scheme of
-``"ftp://python.org/"``) using their associated network protocols (e.g. FTP, HTTP).
-This tutorial focuses on the most common case, HTTP.
+urllib.request hỗ trợ tìm nạp URL cho nhiều "lược đồ URL" (được xác định bởi chuỗi đứng trước ``":"`` trong URL—ví dụ ``"ftp"`` là lược đồ URL của ``"ftp://python.org/"``) bằng các giao thức mạng tương ứng (ví dụ: FTP, HTTP). Tutorial này tập trung vào trường hợp phổ biến nhất là HTTP.
 
-For straightforward situations *urlopen* is very easy to use. But as soon as you
-encounter errors or non-trivial cases when opening HTTP URLs, you will need some
-understanding of the HyperText Transfer Protocol. The most comprehensive and
-authoritative reference to HTTP is :rfc:`2616`. This is a technical document and
-not intended to be easy to read. This HOWTO aims to illustrate using *urllib*,
-with enough detail about HTTP to help you through. It is not intended to replace
-the :mod:`urllib.request` docs, but is supplementary to them.
+Trong các tình huống đơn giản, *urlopen* rất dễ sử dụng. Tuy nhiên, ngay khi gặp lỗi hoặc các trường hợp không đơn giản khi mở URL HTTP, bạn sẽ cần hiểu một số kiến thức về HyperText Transfer Protocol. Tài liệu tham khảo toàn diện và có tính thẩm quyền nhất về HTTP là :rfc:`2616`. Đây là một tài liệu kỹ thuật và không được viết để dễ đọc. HOWTO này nhằm minh họa cách sử dụng *urllib*, đồng thời cung cấp đủ chi tiết về HTTP để hỗ trợ bạn. Tài liệu này không nhằm thay thế tài liệu :mod:`urllib.request`, mà bổ sung cho tài liệu đó.
 
 
-Fetching URLs
-=============
+Tìm nạp URL
+===========
 
-The simplest way to use urllib.request is as follows::
+Cách đơn giản nhất để sử dụng urllib.request như sau::
 
     import urllib.request
     with urllib.request.urlopen('http://python.org/') as response:
        html = response.read()
 
-If you wish to retrieve a resource via URL and store it in a temporary
-location, you can do so via the :func:`shutil.copyfileobj` and
-:func:`tempfile.NamedTemporaryFile` functions::
+Nếu muốn truy xuất một tài nguyên thông qua URL và lưu tài nguyên đó vào một vị trí tạm thời, bạn có thể thực hiện việc này thông qua :func:`shutil.copyfileobj` và
+các hàm :func:`tempfile.NamedTemporaryFile`::
 
     import shutil
     import tempfile
@@ -64,18 +48,9 @@ location, you can do so via the :func:`shutil.copyfileobj` and
     with open(tmp_file.name) as html:
         pass
 
-Many uses of urllib will be that simple (note that instead of an 'http:' URL we
-could have used a URL starting with 'ftp:', 'file:', etc.).  However, it's the
-purpose of this tutorial to explain the more complicated cases, concentrating on
-HTTP.
+Nhiều cách sử dụng urllib sẽ đơn giản như vậy (lưu ý rằng thay vì URL 'http:', chúng ta có thể sử dụng URL bắt đầu bằng 'ftp:', 'file:', v.v.). Tuy nhiên, mục đích của hướng dẫn này là giải thích những trường hợp phức tạp hơn, tập trung vào HTTP.
 
-HTTP is based on requests and responses - the client makes requests and servers
-send responses. urllib.request mirrors this with a ``Request`` object which represents
-the HTTP request you are making. In its simplest form you create a Request
-object that specifies the URL you want to fetch. Calling ``urlopen`` with this
-Request object returns a response object for the URL requested. This response is
-a file-like object, which means you can for example call ``.read()`` on the
-response::
+HTTP dựa trên các request và response - client gửi request, còn server gửi response. urllib.request phản ánh điều này bằng một đối tượng ``Request`` đại diện cho request HTTP mà bạn đang thực hiện. Ở dạng đơn giản nhất, bạn tạo một đối tượng Request chỉ định URL mà bạn muốn truy xuất. Việc gọi ``urlopen`` với đối tượng Request này sẽ trả về một đối tượng response cho URL được yêu cầu. Đây là một đối tượng giống tệp, nghĩa là bạn có thể, chẳng hạn, gọi ``.read()`` trên response::
 
     import urllib.request
 
@@ -83,29 +58,16 @@ response::
     with urllib.request.urlopen(req) as response:
        the_page = response.read()
 
-Note that urllib.request makes use of the same Request interface to handle all URL
-schemes.  For example, you can make an FTP request like so::
+Lưu ý rằng urllib.request sử dụng cùng một interface Request để xử lý tất cả các lược đồ URL. Ví dụ, bạn có thể tạo một request FTP như sau::
 
     req = urllib.request.Request('ftp://example.com/')
 
-In the case of HTTP, there are two extra things that Request objects allow you
-to do: First, you can pass data to be sent to the server.  Second, you can pass
-extra information ("metadata") *about* the data or about the request itself, to
-the server - this information is sent as HTTP "headers".  Let's look at each of
-these in turn.
+Trong trường hợp HTTP, các đối tượng Request cho phép bạn thực hiện thêm hai việc: Thứ nhất, bạn có thể truyền dữ liệu đến server. Thứ hai, bạn có thể truyền thêm thông tin ("metadata") *về* dữ liệu hoặc về chính request đó đến server - thông tin này được gửi dưới dạng các "header" HTTP. Hãy lần lượt xem xét từng việc.
 
-Data
-----
+Dữ liệu
+-------
 
-Sometimes you want to send data to a URL (often the URL will refer to a CGI
-(Common Gateway Interface) script or other web application). With HTTP,
-this is often done using what's known as a **POST** request. This is often what
-your browser does when you submit a HTML form that you filled in on the web. Not
-all POSTs have to come from forms: you can use a POST to transmit arbitrary data
-to your own application. In the common case of HTML forms, the data needs to be
-encoded in a standard way, and then passed to the Request object as the ``data``
-argument. The encoding is done using a function from the :mod:`urllib.parse`
-library. ::
+Đôi khi bạn muốn gửi dữ liệu đến một URL (thường URL này sẽ trỏ đến một script CGI (Common Gateway Interface) hoặc ứng dụng web khác). Với HTTP, việc này thường được thực hiện bằng một request **POST**. Đây thường là việc trình duyệt thực hiện khi bạn gửi một biểu mẫu HTML đã điền trên web. Không phải mọi POST đều phải đến từ biểu mẫu: bạn có thể sử dụng POST để truyền dữ liệu tùy ý đến ứng dụng của riêng mình. Trong trường hợp phổ biến là biểu mẫu HTML, dữ liệu cần được mã hóa theo một cách chuẩn, sau đó truyền cho đối tượng Request dưới dạng đối số ``data``. Việc mã hóa được thực hiện bằng một hàm trong thư viện :mod:`urllib.parse`.::
 
     import urllib.parse
     import urllib.request
@@ -116,27 +78,16 @@ library. ::
               'language' : 'Python' }
 
     data = urllib.parse.urlencode(values)
-    data = data.encode('ascii') # data should be bytes
+    data = data.encode('ascii') # data phải là bytes
     req = urllib.request.Request(url, data)
     with urllib.request.urlopen(req) as response:
        the_page = response.read()
 
-Note that other encodings are sometimes required (e.g. for file upload from HTML
-forms - see `HTML Specification, Form Submission
-<https://www.w3.org/TR/REC-html40/interact/forms.html#h-17.13>`_ for more
-details).
+Lưu ý rằng đôi khi cần các encoding khác (ví dụ: để tải tệp lên từ các biểu mẫu HTML - xem `Đặc tả HTML, Gửi biểu mẫu <https://www.w3.org/TR/REC-html40/interact/forms.html#h-17.13>`_ để biết thêm chi tiết).
 
-If you do not pass the ``data`` argument, urllib uses a **GET** request. One
-way in which GET and POST requests differ is that POST requests often have
-"side-effects": they change the state of the system in some way (for example by
-placing an order with the website for a hundredweight of tinned spam to be
-delivered to your door).  Though the HTTP standard makes it clear that POSTs are
-intended to *always* cause side-effects, and GET requests *never* to cause
-side-effects, nothing prevents a GET request from having side-effects, nor a
-POST requests from having no side-effects. Data can also be passed in an HTTP
-GET request by encoding it in the URL itself.
+Nếu bạn không truyền đối số ``data``, urllib sẽ sử dụng một yêu cầu **GET**. Một điểm khác biệt giữa các yêu cầu GET và POST là các yêu cầu POST thường có "tác dụng phụ": chúng thay đổi trạng thái của hệ thống theo một cách nào đó (ví dụ: đặt hàng với website một hundredweight spam đóng hộp để giao đến tận cửa nhà bạn). Mặc dù tiêu chuẩn HTTP nêu rõ rằng POST được thiết kế để *luôn luôn* gây ra tác dụng phụ, còn các yêu cầu GET *không bao giờ* gây ra tác dụng phụ, nhưng không có gì ngăn cản một yêu cầu GET có tác dụng phụ, cũng như một yêu cầu POST không có tác dụng phụ. Dữ liệu cũng có thể được truyền trong một yêu cầu HTTP GET bằng cách mã hóa dữ liệu ngay trong URL.
 
-This is done as follows::
+Việc này được thực hiện như sau::
 
     >>> import urllib.request
     >>> import urllib.parse
@@ -145,31 +96,20 @@ This is done as follows::
     >>> data['location'] = 'Northampton'
     >>> data['language'] = 'Python'
     >>> url_values = urllib.parse.urlencode(data)
-    >>> print(url_values)  # The order may differ from below.  #doctest: +SKIP
+    >>> print(url_values)  # Thứ tự có thể khác với bên dưới.  #doctest: +SKIP
     name=Somebody+Here&language=Python&location=Northampton
     >>> url = 'http://www.example.com/example.cgi'
     >>> full_url = url + '?' + url_values
     >>> data = urllib.request.urlopen(full_url)
 
-Notice that the full URL is created by adding a ``?`` to the URL, followed by
-the encoded values.
+Lưu ý rằng URL đầy đủ được tạo bằng cách thêm một ``?`` vào URL, sau đó là các giá trị đã mã hóa.
 
-Headers
+Tiêu đề
 -------
 
-We'll discuss here one particular HTTP header, to illustrate how to add headers
-to your HTTP request.
+Ở đây, chúng ta sẽ thảo luận về một HTTP header cụ thể để minh họa cách thêm header vào HTTP request của bạn.
 
-Some websites [#]_ dislike being browsed by programs, or send different versions
-to different browsers [#]_. By default urllib identifies itself as
-``Python-urllib/x.y`` (where ``x`` and ``y`` are the major and minor version
-numbers of the Python release,
-e.g. ``Python-urllib/2.5``), which may confuse the site, or just plain
-not work. The way a browser identifies itself is through the
-``User-Agent`` header [#]_. When you create a Request object you can
-pass a dictionary of headers in. The following example makes the same
-request as above, but identifies itself as a version of Internet
-Explorer [#]_. ::
+Một số website [#]_ không cho phép các chương trình truy cập, hoặc gửi các phiên bản khác nhau đến những trình duyệt khác nhau [#]_. Theo mặc định, urllib tự nhận diện là ``Python-urllib/x.y`` (trong đó ``x`` và ``y`` lần lượt là số phiên bản chính và phụ của bản phát hành Python, ví dụ ``Python-urllib/2.5``), điều này có thể khiến website hiểu nhầm hoặc hoàn toàn không hoạt động. Trình duyệt tự nhận diện thông qua header ``User-Agent`` [#]_. Khi tạo một đối tượng Request, bạn có thể truyền vào một dictionary chứa các header. Ví dụ sau thực hiện cùng request như trên, nhưng tự nhận diện là một phiên bản của Internet Explorer [#]_.::
 
     import urllib.parse
     import urllib.request
@@ -187,31 +127,25 @@ Explorer [#]_. ::
     with urllib.request.urlopen(req) as response:
        the_page = response.read()
 
-The response also has two useful methods. See the section on `info and geturl`_
-which comes after we have a look at what happens when things go wrong.
+Response cũng có hai phương thức hữu ích. Hãy xem phần `info và geturl <info and geturl_>`_, nằm sau phần chúng ta xem xét điều gì xảy ra khi có lỗi.
 
 
-Handling Exceptions
-===================
+Xử lý ngoại lệ
+==============
 
-*urlopen* raises :exc:`~urllib.error.URLError` when it cannot handle a response (though as
-usual with Python APIs, built-in exceptions such as :exc:`ValueError`,
-:exc:`TypeError` etc. may also be raised).
+*urlopen* phát sinh :exc:`~urllib.error.URLError` khi không thể xử lý một response (tuy nhiên, như thường lệ với các API Python, những ngoại lệ dựng sẵn như :exc:`ValueError`,
+:exc:`TypeError` v.v. cũng có thể được phát sinh).
 
-:exc:`~urllib.error.HTTPError` is the subclass of :exc:`~urllib.error.URLError` raised in the specific case of
-HTTP URLs.
+:exc:`~urllib.error.HTTPError` là lớp con của :exc:`~urllib.error.URLError` được phát sinh trong trường hợp cụ thể của các URL HTTP.
 
-The exception classes are exported from the :mod:`urllib.error` module.
+Các lớp ngoại lệ được export từ module :mod:`urllib.error`.
 
 URLError
 --------
 
-Often, URLError is raised because there is no network connection (no route to
-the specified server), or the specified server doesn't exist.  In this case, the
-exception raised will have a 'reason' attribute, which is a tuple containing an
-error code and a text error message.
+Thông thường, URLError được phát sinh vì không có kết nối mạng (không có route đến máy chủ được chỉ định) hoặc máy chủ được chỉ định không tồn tại. Trong trường hợp này, exception được phát sinh sẽ có thuộc tính 'reason', là một tuple chứa mã lỗi và thông báo lỗi dạng văn bản.
 
-e.g. ::
+ví dụ::
 
     >>> req = urllib.request.Request('http://www.pretend_server.org')
     >>> try: urllib.request.urlopen(req)
@@ -224,29 +158,18 @@ e.g. ::
 HTTPError
 ---------
 
-Every HTTP response from the server contains a numeric "status code". Sometimes
-the status code indicates that the server is unable to fulfil the request. The
-default handlers will handle some of these responses for you (for example, if
-the response is a "redirection" that requests the client fetch the document from
-a different URL, urllib will handle that for you). For those it can't handle,
-urlopen will raise an :exc:`~urllib.error.HTTPError`. Typical errors include '404' (page not
-found), '403' (request forbidden), and '401' (authentication required).
+Mọi phản hồi HTTP từ máy chủ đều chứa một "status code" dạng số. Đôi khi status code cho biết máy chủ không thể đáp ứng request. Các handler mặc định sẽ xử lý một số phản hồi này thay bạn (ví dụ: nếu phản hồi là một "redirection" yêu cầu client lấy tài liệu từ URL khác, urllib sẽ xử lý việc đó thay bạn). Với những phản hồi không thể xử lý, urlopen sẽ phát sinh một :exc:`~urllib.error.HTTPError`. Các lỗi thường gặp bao gồm '404' (không tìm thấy trang), '403' (request bị từ chối) và '401' (yêu cầu xác thực).
 
-See section 10 of :rfc:`2616` for a reference on all the HTTP error codes.
+Xem mục 10 của :rfc:`2616` để tham khảo tất cả các mã lỗi HTTP.
 
-The :exc:`~urllib.error.HTTPError` instance raised will have an integer 'code' attribute, which
-corresponds to the error sent by the server.
+Đối tượng :exc:`~urllib.error.HTTPError` được nâng lên sẽ có thuộc tính 'code' kiểu số nguyên, tương ứng với lỗi do máy chủ gửi về.
 
-Error Codes
-~~~~~~~~~~~
+Mã lỗi
+~~~~~~
 
-Because the default handlers handle redirects (codes in the 300 range), and
-codes in the 100--299 range indicate success, you will usually only see error
-codes in the 400--599 range.
+Vì các handler mặc định xử lý các redirect (mã trong phạm vi 300), còn các mã trong phạm vi 100--299 biểu thị thành công, nên thông thường bạn chỉ thấy các mã lỗi trong phạm vi 400--599.
 
-:attr:`http.server.BaseHTTPRequestHandler.responses` is a useful dictionary of
-response codes that shows all the response codes used by :rfc:`2616`.
-An excerpt from the dictionary is shown below ::
+:attr:`http.server.BaseHTTPRequestHandler.responses` là một dictionary hữu ích về các mã phản hồi, hiển thị tất cả mã phản hồi được :rfc:`2616` sử dụng. Một phần trích xuất từ dictionary được hiển thị bên dưới::
 
     responses = {
         ...
@@ -268,10 +191,7 @@ An excerpt from the dictionary is shown below ::
         ...
         }
 
-When an error is raised the server responds by returning an HTTP error code
-*and* an error page. You can use the :exc:`~urllib.error.HTTPError` instance as a response on the
-page returned. This means that as well as the code attribute, it also has read,
-geturl, and info, methods as returned by the ``urllib.response`` module::
+Khi xảy ra lỗi, máy chủ phản hồi bằng cách trả về mã lỗi HTTP *và* một trang lỗi. Bạn có thể sử dụng đối tượng :exc:`~urllib.error.HTTPError` làm response trên trang được trả về. Điều này có nghĩa là ngoài thuộc tính code, đối tượng này còn có các phương thức read, geturl và info, giống như các phương thức được trả về bởi module ``urllib.response``::
 
     >>> req = urllib.request.Request('http://www.python.org/fish.html')
     >>> try:
@@ -287,14 +207,13 @@ geturl, and info, methods as returned by the ``urllib.response`` module::
       <title>Page Not Found</title>\n
       ...
 
-Wrapping it Up
---------------
+Tổng kết
+--------
 
-So if you want to be prepared for :exc:`~urllib.error.HTTPError` *or* :exc:`~urllib.error.URLError` there are two
-basic approaches. I prefer the second approach.
+Vì vậy, nếu muốn chuẩn bị cho :exc:`~urllib.error.HTTPError` *hoặc* :exc:`~urllib.error.URLError` thì có hai cách tiếp cận cơ bản. Tôi thích cách tiếp cận thứ hai hơn.
 
-Number 1
-~~~~~~~~
+Số 1
+~~~~
 
 ::
 
@@ -311,16 +230,15 @@ Number 1
         print('We failed to reach a server.')
         print('Reason: ', e.reason)
     else:
-        # everything is fine
+        # mọi thứ đều ổn
 
 
 .. note::
 
-    The ``except HTTPError`` *must* come first, otherwise ``except URLError``
-    will *also* catch an :exc:`~urllib.error.HTTPError`.
+    ``except HTTPError`` *phải* xuất hiện trước, nếu không ``except URLError`` sẽ *cũng* bắt được một :exc:`~urllib.error.HTTPError`.
 
-Number 2
-~~~~~~~~
+Số 2
+~~~~
 
 ::
 
@@ -337,151 +255,96 @@ Number 2
             print('The server couldn\'t fulfill the request.')
             print('Error code: ', e.code)
     else:
-        # everything is fine
+        # mọi thứ đều ổn
 
+
+.. _`info and geturl`:
 
 info and geturl
 ===============
 
-The response returned by urlopen (or the :exc:`~urllib.error.HTTPError` instance) has two
-useful methods :meth:`!info` and :meth:`!geturl` and is defined in the module
+Phản hồi được trả về bởi urlopen (hoặc instance :exc:`~urllib.error.HTTPError`) có hai phương thức hữu ích là :meth:`!info` và :meth:`!geturl`, và được định nghĩa trong module
 :mod:`urllib.response`.
 
-* **geturl** - this returns the real URL of the page fetched. This is useful
-  because ``urlopen`` (or the opener object used) may have followed a
-  redirect. The URL of the page fetched may not be the same as the URL requested.
+* **geturl** - phương thức này trả về URL thực của trang đã được tìm nạp. Điều này hữu ích vì ``urlopen`` (hoặc đối tượng opener được sử dụng) có thể đã đi theo một chuyển hướng. URL của trang đã được tìm nạp có thể không giống với URL được yêu cầu.
 
-* **info** - this returns a dictionary-like object that describes the page
-  fetched, particularly the headers sent by the server. It is currently an
+* **info** - phương thức này trả về một đối tượng có dạng như từ điển, mô tả trang đã được tìm nạp, đặc biệt là các header do máy chủ gửi. Hiện tại, đây là một
   :class:`http.client.HTTPMessage` instance.
 
-Typical headers include 'Content-length', 'Content-type', and so on. See the
-`Quick Reference to HTTP Headers <https://jkorpela.fi/http.html>`_
-for a useful listing of HTTP headers with brief explanations of their meaning
-and use.
+Các header thường gặp bao gồm 'Content-length', 'Content-type', v.v. Hãy xem `Quick Reference to HTTP Headers <https://jkorpela.fi/http.html>`_ để biết danh sách hữu ích các header HTTP cùng phần giải thích ngắn gọn về ý nghĩa và cách sử dụng của chúng.
 
 
-Openers and Handlers
-====================
+Openers và Handlers
+===================
 
-When you fetch a URL you use an opener (an instance of the perhaps
-confusingly named :class:`urllib.request.OpenerDirector`). Normally we have been using
-the default opener - via ``urlopen`` - but you can create custom
-openers. Openers use handlers. All the "heavy lifting" is done by the
-handlers. Each handler knows how to open URLs for a particular URL scheme (http,
-ftp, etc.), or how to handle an aspect of URL opening, for example HTTP
-redirections or HTTP cookies.
+Khi tìm nạp một URL, bạn sử dụng một opener (một instance của :class:`urllib.request.OpenerDirector` có tên gọi dễ gây nhầm lẫn). Thông thường, chúng ta đã sử dụng opener mặc định - thông qua ``urlopen`` - nhưng bạn có thể tạo các opener tùy chỉnh. Opener sử dụng handlers. Mọi "phần việc nặng" đều do các handler thực hiện. Mỗi handler biết cách mở URL cho một scheme URL cụ thể (http, ftp, v.v.) hoặc cách xử lý một khía cạnh của việc mở URL, chẳng hạn như chuyển hướng HTTP hoặc cookie HTTP.
 
-You will want to create openers if you want to fetch URLs with specific handlers
-installed, for example to get an opener that handles cookies, or to get an
-opener that does not handle redirections.
+Bạn sẽ muốn tạo opener nếu muốn fetch URL bằng các handler cụ thể đã được cài đặt, chẳng hạn như để lấy một opener xử lý cookie hoặc một opener không xử lý chuyển hướng.
 
-To create an opener, instantiate an ``OpenerDirector``, and then call
-``.add_handler(some_handler_instance)`` repeatedly.
+Để tạo một opener, hãy khởi tạo một ``OpenerDirector``, sau đó gọi ``.add_handler(some_handler_instance)`` nhiều lần.
 
-Alternatively, you can use ``build_opener``, which is a convenience function for
-creating opener objects with a single function call.  ``build_opener`` adds
-several handlers by default, but provides a quick way to add more and/or
-override the default handlers.
+Ngoài ra, bạn có thể sử dụng ``build_opener``, đây là một hàm tiện ích để tạo các đối tượng opener chỉ bằng một lần gọi hàm. ``build_opener`` mặc định thêm một số handler, đồng thời cung cấp cách nhanh chóng để thêm handler và/hoặc ghi đè các handler mặc định.
 
-Other sorts of handlers you might want to can handle proxies, authentication,
-and other common but slightly specialised situations.
+Các loại handler khác mà bạn có thể muốn sử dụng có thể xử lý proxy, authentication và những tình huống phổ biến khác nhưng hơi chuyên biệt.
 
-``install_opener`` can be used to make an ``opener`` object the (global) default
-opener. This means that calls to ``urlopen`` will use the opener you have
-installed.
+``install_opener`` có thể được dùng để đặt một đối tượng ``opener`` làm opener mặc định (toàn cục). Điều này có nghĩa là các lệnh gọi đến ``urlopen`` sẽ sử dụng opener mà bạn đã cài đặt.
 
-Opener objects have an ``open`` method, which can be called directly to fetch
-urls in the same way as the ``urlopen`` function: there's no need to call
-``install_opener``, except as a convenience.
+Các đối tượng opener có một phương thức ``open``, có thể được gọi trực tiếp để fetch URL theo cách giống như hàm ``urlopen``: không cần gọi ``install_opener``, trừ khi muốn dùng cho thuận tiện.
 
 
-Basic Authentication
-====================
+.. _`Basic Authentication`:
 
-To illustrate creating and installing a handler we will use the
-``HTTPBasicAuthHandler``. For a more detailed discussion of this subject --
-including an explanation of how Basic Authentication works - see the `Basic
-Authentication Tutorial
-<https://web.archive.org/web/20201215133350/http://www.voidspace.org.uk/python/articles/authentication.shtml>`__.
+Xác thực cơ bản
+===============
 
-When authentication is required, the server sends a header (as well as the 401
-error code) requesting authentication.  This specifies the authentication scheme
-and a 'realm'. The header looks like: ``WWW-Authenticate: SCHEME
-realm="REALM"``.
+Để minh họa việc tạo và cài đặt một handler, chúng ta sẽ sử dụng ``HTTPBasicAuthHandler``. Để tìm hiểu chi tiết hơn về chủ đề này -- bao gồm giải thích về cách Basic Authentication hoạt động - hãy xem `Basic Authentication Tutorial <https://web.archive.org/web/20201215133350/http://www.voidspace.org.uk/python/articles/authentication.shtml>`__.
 
-e.g.
+Khi yêu cầu xác thực, server sẽ gửi một header (cũng như mã lỗi 401) yêu cầu xác thực. Header này chỉ định authentication scheme và một 'realm'. Header có dạng: ``WWW-Authenticate: SCHEME realm="REALM"``.
+
+ví dụ:
 
 .. code-block:: none
 
     WWW-Authenticate: Basic realm="cPanel Users"
 
 
-The client should then retry the request with the appropriate name and password
-for the realm included as a header in the request. This is 'basic
-authentication'. In order to simplify this process we can create an instance of
-``HTTPBasicAuthHandler`` and an opener to use this handler.
+Sau đó, client nên thử lại request với tên và mật khẩu phù hợp với realm, được đưa vào request dưới dạng header. Đây là 'basic authentication'. Để đơn giản hóa quy trình này, chúng ta có thể tạo một instance của ``HTTPBasicAuthHandler`` và một opener để sử dụng handler này.
 
-The ``HTTPBasicAuthHandler`` uses an object called a password manager to handle
-the mapping of URLs and realms to passwords and usernames. If you know what the
-realm is (from the authentication header sent by the server), then you can use a
-``HTTPPasswordMgr``. Frequently one doesn't care what the realm is. In that
-case, it is convenient to use ``HTTPPasswordMgrWithDefaultRealm``. This allows
-you to specify a default username and password for a URL. This will be supplied
-in the absence of you providing an alternative combination for a specific
-realm. We indicate this by providing ``None`` as the realm argument to the
-``add_password`` method.
+``HTTPBasicAuthHandler`` sử dụng một object gọi là password manager để xử lý ánh xạ giữa URL, realm với mật khẩu và username. Nếu biết realm là gì (từ authentication header do server gửi), bạn có thể sử dụng ``HTTPPasswordMgr``. Thông thường, chúng ta không quan tâm realm là gì. Trong trường hợp đó, sẽ thuận tiện hơn nếu sử dụng ``HTTPPasswordMgrWithDefaultRealm``. Cách này cho phép bạn chỉ định username và mật khẩu mặc định cho một URL. Các thông tin này sẽ được cung cấp nếu bạn không đưa ra một cặp thông tin thay thế cho realm cụ thể. Chúng ta biểu thị điều này bằng cách cung cấp ``None`` làm đối số realm cho phương thức ``add_password``.
 
-The top-level URL is the first URL that requires authentication. URLs "deeper"
-than the URL you pass to .add_password() will also match. ::
+URL cấp cao nhất là URL đầu tiên yêu cầu xác thực. Các URL "sâu hơn" URL bạn truyền cho .add_password() cũng sẽ khớp.::
 
-    # create a password manager
+    # tạo password manager
     password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
 
-    # Add the username and password.
-    # If we knew the realm, we could use it instead of None.
+    # Thêm username và password.
+    # Nếu biết realm, chúng ta có thể dùng nó thay cho None.
     top_level_url = "http://example.com/foo/"
     password_mgr.add_password(None, top_level_url, username, password)
 
     handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
 
-    # create "opener" (OpenerDirector instance)
+    # tạo "opener" (một OpenerDirector instance)
     opener = urllib.request.build_opener(handler)
 
-    # use the opener to fetch a URL
+    # dùng opener để lấy một URL
     opener.open(a_url)
 
-    # Install the opener.
-    # Now all calls to urllib.request.urlopen use our opener.
+    # Cài đặt opener.
+    # Giờ đây, mọi lệnh gọi đến urllib.request.urlopen đều sử dụng opener của chúng ta.
     urllib.request.install_opener(opener)
 
 .. note::
 
-    In the above example we only supplied our ``HTTPBasicAuthHandler`` to
-    ``build_opener``. By default openers have the handlers for normal situations
-    -- ``ProxyHandler`` (if a proxy setting such as an :envvar:`!http_proxy`
-    environment variable is set), ``UnknownHandler``, ``HTTPHandler``,
-    ``HTTPDefaultErrorHandler``, ``HTTPRedirectHandler``, ``FTPHandler``,
-    ``FileHandler``, ``DataHandler``, ``HTTPErrorProcessor``.
+    Trong ví dụ trên, chúng ta chỉ cung cấp ``HTTPBasicAuthHandler`` cho ``build_opener``. Theo mặc định, opener có các handler cho những tình huống thông thường -- ``ProxyHandler`` (nếu một thiết lập proxy như biến môi trường :envvar:`!http_proxy` được đặt), ``UnknownHandler``, ``HTTPHandler``, ``HTTPDefaultErrorHandler``, ``HTTPRedirectHandler``, ``FTPHandler``, ``FileHandler``, ``DataHandler``, ``HTTPErrorProcessor``.
 
-``top_level_url`` is in fact *either* a full URL (including the 'http:' scheme
-component and the hostname and optionally the port number)
-e.g. ``"http://example.com/"`` *or* an "authority" (i.e. the hostname,
-optionally including the port number) e.g. ``"example.com"`` or ``"example.com:8080"``
-(the latter example includes a port number).  The authority, if present, must
-NOT contain the "userinfo" component - for example ``"joe:password@example.com"`` is
-not correct.
+``top_level_url`` thực tế là *hoặc* một URL đầy đủ (bao gồm thành phần scheme 'http:', hostname và tùy chọn số cổng), ví dụ ``"http://example.com/"`` *hoặc* một "authority" (tức là hostname, tùy chọn bao gồm số cổng), ví dụ ``"example.com"`` hoặc ``"example.com:8080"`` (ví dụ sau có bao gồm số cổng). Authority, nếu có, KHÔNG được chứa thành phần "userinfo" - ví dụ ``"joe:password@example.com"`` là không đúng.
 
 
-Proxies
-=======
+Proxy
+=====
 
-**urllib** will auto-detect your proxy settings and use those. This is through
-the ``ProxyHandler``, which is part of the normal handler chain when a proxy
-setting is detected.  Normally that's a good thing, but there are occasions
-when it may not be helpful [#]_. One way to do this is to setup our own
-``ProxyHandler``, with no proxies defined. This is done using similar steps to
-setting up a `Basic Authentication`_ handler: ::
+**urllib** sẽ tự động phát hiện các thiết lập proxy của bạn và sử dụng chúng. Việc này được thực hiện thông qua ``ProxyHandler``, thành phần thuộc chuỗi handler thông thường khi phát hiện có thiết lập proxy. Thông thường, đây là điều hữu ích, nhưng đôi khi có thể không phù hợp [#]_. Một cách để làm vậy là tự thiết lập ``ProxyHandler`` mà không định nghĩa proxy nào. Việc này được thực hiện bằng các bước tương tự như khi thiết lập handler `Basic Authentication <Basic Authentication_>`_:::
 
     >>> proxy_support = urllib.request.ProxyHandler({})
     >>> opener = urllib.request.build_opener(proxy_support)
@@ -489,37 +352,29 @@ setting up a `Basic Authentication`_ handler: ::
 
 .. note::
 
-    Currently ``urllib.request`` *does not* support fetching of ``https`` locations
-    through a proxy.  However, this can be enabled by extending urllib.request as
-    shown in the recipe [#]_.
+    Hiện tại ``urllib.request`` *does not* hỗ trợ truy xuất các location ``https`` thông qua proxy. Tuy nhiên, bạn có thể bật tính năng này bằng cách mở rộng urllib.request như trong công thức [#]_.
 
 .. note::
 
-    ``HTTP_PROXY`` will be ignored if a variable ``REQUEST_METHOD`` is set; see
-    the documentation on :func:`~urllib.request.getproxies`.
+    ``HTTP_PROXY`` sẽ bị bỏ qua nếu một biến ``REQUEST_METHOD`` được thiết lập; xem tài liệu về :func:`~urllib.request.getproxies`.
 
 
-Sockets and Layers
-==================
+Socket và các lớp
+=================
 
-The Python support for fetching resources from the web is layered.  urllib uses
-the :mod:`http.client` library, which in turn uses the socket library.
+Hỗ trợ của Python cho việc truy xuất tài nguyên từ web được phân tầng. urllib sử dụng thư viện :mod:`http.client`, thư viện này lần lượt sử dụng thư viện socket.
 
-As of Python 2.3 you can specify how long a socket should wait for a response
-before timing out. This can be useful in applications which have to fetch web
-pages. By default the socket module has *no timeout* and can hang. Currently,
-the socket timeout is not exposed at the http.client or urllib.request levels.
-However, you can set the default timeout globally for all sockets using ::
+Kể từ Python 2.3, bạn có thể chỉ định thời gian một socket chờ phản hồi trước khi hết thời gian chờ. Điều này có thể hữu ích trong các ứng dụng cần tải các trang web. Theo mặc định, module socket có *không có thời gian chờ* và có thể bị treo. Hiện tại, thời gian chờ của socket chưa được cung cấp ở cấp http.client hoặc urllib.request. Tuy nhiên, bạn có thể đặt thời gian chờ mặc định trên toàn cục cho tất cả socket bằng cách sử dụng::
 
     import socket
     import urllib.request
 
-    # timeout in seconds
+    # thời gian chờ tính bằng giây
     timeout = 10
     socket.setdefaulttimeout(timeout)
 
-    # this call to urllib.request.urlopen now uses the default timeout
-    # we have set in the socket module
+    # lệnh gọi này đến urllib.request.urlopen giờ đây sử dụng thời gian chờ mặc định
+    # mà chúng ta đã đặt trong module socket
     req = urllib.request.Request('http://www.voidspace.org.uk')
     response = urllib.request.urlopen(req)
 
@@ -527,24 +382,19 @@ However, you can set the default timeout globally for all sockets using ::
 -------
 
 
-Footnotes
-=========
+Chú thích cuối trang
+====================
 
-This document was reviewed and revised by John Lee.
+Tài liệu này đã được John Lee xem xét và chỉnh sửa.
 
-.. [#] Google for example.
-.. [#] Browser sniffing is a very bad practice for website design - building
-       sites using web standards is much more sensible. Unfortunately a lot of
-       sites still send different versions to different browsers.
-.. [#] The user agent for MSIE 6 is
-       *'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)'*
-.. [#] For details of more HTTP request headers, see
-       `Quick Reference to HTTP Headers`_.
-.. [#] In my case I have to use a proxy to access the internet at work. If you
-       attempt to fetch *localhost* URLs through this proxy it blocks them. IE
-       is set to use the proxy, which urllib picks up on. In order to test
-       scripts with a localhost server, I have to prevent urllib from using
-       the proxy.
-.. [#] urllib opener for SSL proxy (CONNECT method): `ASPN Cookbook Recipe
-       <https://code.activestate.com/recipes/456195-urrlib2-opener-for-ssl-proxy-connect-method/>`_.
+.. [#] Ví dụ: Google.
+.. [#] Browser sniffing là một thực hành rất tồi trong thiết kế website - xây dựng website bằng các web standard hợp lý hơn nhiều. Đáng tiếc là nhiều website vẫn gửi các phiên bản khác nhau đến những trình duyệt khác nhau.
+.. [#] User agent của MSIE 6 là *'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)'*
+.. [#] Để biết thêm chi tiết về các HTTP request header khác, hãy xem `Tài liệu tham khảo nhanh về HTTP header <Quick Reference to HTTP Headers_>`_.
+.. [#] Trong trường hợp của tôi, tôi phải sử dụng proxy để truy cập Internet tại nơi làm việc. Nếu bạn cố gắng fetch các URL *localhost* thông qua proxy này, proxy sẽ chặn chúng. IE được thiết lập để sử dụng proxy và urllib tự động nhận thiết lập này. Để kiểm thử các script với một máy chủ localhost, tôi phải ngăn urllib sử dụng proxy.
+.. [#] urllib opener cho SSL proxy (phương thức CONNECT): `ASPN Cookbook Recipe <https://code.activestate.com/recipes/456195-urrlib2-opener-for-ssl-proxy-connect-method/>`_.
 
+.. _`Michael Foord`: https://agileabstractions.com/
+.. _`HTML Specification, Form Submission`: https://www.w3.org/TR/REC-html40/interact/forms.html#h-17.13
+.. _`Quick Reference to HTTP Headers`: https://jkorpela.fi/http.html
+.. _`ASPN Cookbook Recipe`: https://code.activestate.com/recipes/456195-urrlib2-opener-for-ssl-proxy-connect-method/

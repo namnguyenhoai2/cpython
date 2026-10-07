@@ -2,38 +2,24 @@
 
 .. _perf_profiling:
 
-==============================================
-Python support for the Linux ``perf`` profiler
-==============================================
+=============================================
+Hỗ trợ Python cho profiler ``perf`` của Linux
+=============================================
 
 :author: Pablo Galindo
 
-`The Linux perf profiler <https://perf.wiki.kernel.org>`_
-is a very powerful tool that allows you to profile and obtain
-information about the performance of your application.
-``perf`` also has a very vibrant ecosystem of tools
-that aid with the analysis of the data that it produces.
+`Profiler perf của Linux <https://perf.wiki.kernel.org>`_ là một công cụ rất mạnh, cho phép bạn lập hồ sơ và thu thập thông tin về hiệu năng của ứng dụng. ``perf`` cũng có một hệ sinh thái công cụ rất sôi động hỗ trợ phân tích dữ liệu mà nó tạo ra.
 
-The main problem with using the ``perf`` profiler with Python applications is that
-``perf`` only gets information about native symbols, that is, the names of
-functions and procedures written in C. This means that the names and file names
-of Python functions in your code will not appear in the output of ``perf``.
+Vấn đề chính khi sử dụng profiler ``perf`` với các ứng dụng Python là ``perf`` chỉ thu thập thông tin về các native symbol, tức là tên của các hàm và thủ tục được viết bằng C. Điều này có nghĩa là tên và tên tệp của các hàm Python trong mã của bạn sẽ không xuất hiện trong đầu ra của ``perf``.
 
-Since Python 3.12, the interpreter can run in a special mode that allows Python
-functions to appear in the output of the ``perf`` profiler. When this mode is
-enabled, the interpreter will interpose a small piece of code compiled on the
-fly before the execution of every Python function and it will teach ``perf`` the
-relationship between this piece of code and the associated Python function using
-:doc:`perf map files <../c-api/perfmaps>`.
+Kể từ Python 3.12, trình thông dịch có thể chạy ở một chế độ đặc biệt, cho phép các hàm Python xuất hiện trong đầu ra của profiler ``perf``. Khi chế độ này được bật, trình thông dịch sẽ chèn một đoạn mã nhỏ được biên dịch ngay trong lúc chạy trước khi thực thi mỗi hàm Python, đồng thời cung cấp cho ``perf`` thông tin về mối quan hệ giữa đoạn mã này và hàm Python tương ứng bằng cách sử dụng
+:doc:`tệp perf map <../c-api/perfmaps>`.
 
 .. note::
 
-    Support for the ``perf`` profiler is currently only available for Linux on
-    select architectures. Check the output of the ``configure`` build step or
-    check the output of ``python -m sysconfig | grep HAVE_PERF_TRAMPOLINE``
-    to see if your system is supported.
+    Hiện tại, hỗ trợ cho profiler ``perf`` chỉ khả dụng trên Linux với một số kiến trúc được chọn. Hãy kiểm tra đầu ra của bước build ``configure`` hoặc kiểm tra đầu ra của ``python -m sysconfig | grep HAVE_PERF_TRAMPOLINE`` để biết hệ thống của bạn có được hỗ trợ hay không.
 
-For example, consider the following script:
+Ví dụ: hãy xem xét script sau:
 
 .. code-block:: python
 
@@ -52,11 +38,11 @@ For example, consider the following script:
     if __name__ == "__main__":
         baz(1000000)
 
-We can run ``perf`` to sample CPU stack traces at 9999 hertz::
+Chúng ta có thể chạy ``perf`` để lấy mẫu các dấu vết ngăn xếp CPU ở tần số 9999 hertz::
 
     $ perf record -F 9999 -g -o perf.data python my_script.py
 
-Then we can use ``perf report`` to analyze the data:
+Sau đó, chúng ta có thể dùng ``perf report`` để phân tích dữ liệu:
 
 .. code-block:: shell-session
 
@@ -97,12 +83,9 @@ Then we can use ``perf report`` to analyze the data:
                             |          |          |                     |          |          |--2.97%--_PyObject_Malloc
     ...
 
-As you can see, the Python functions are not shown in the output, only ``_PyEval_EvalFrameDefault``
-(the function that evaluates the Python bytecode) shows up. Unfortunately that's not very useful because all Python
-functions use the same C function to evaluate bytecode so we cannot know which Python function corresponds to which
-bytecode-evaluating function.
+Như bạn có thể thấy, các hàm Python không xuất hiện trong đầu ra; chỉ ``_PyEval_EvalFrameDefault`` (hàm đánh giá bytecode Python) xuất hiện. Đáng tiếc là điều này không hữu ích lắm, vì tất cả các hàm Python đều sử dụng cùng một hàm C để đánh giá bytecode, nên chúng ta không thể biết hàm Python nào tương ứng với hàm đánh giá bytecode nào.
 
-Instead, if we run the same experiment with ``perf`` support enabled we get:
+Thay vào đó, nếu chạy cùng một thử nghiệm với hỗ trợ ``perf`` được bật, chúng ta sẽ nhận được:
 
 .. code-block:: shell-session
 
@@ -148,29 +131,26 @@ Instead, if we run the same experiment with ``perf`` support enabled we get:
 
 
 
-How to enable ``perf`` profiling support
-----------------------------------------
+Cách bật hỗ trợ profiling ``perf``
+----------------------------------
 
-``perf`` profiling support can be enabled either from the start using
-the environment variable :envvar:`PYTHONPERFSUPPORT` or the
-:option:`-X perf <-X>` option,
-or dynamically using :func:`sys.activate_stack_trampoline` and
+Có thể bật hỗ trợ profiling ``perf`` ngay từ đầu bằng biến môi trường :envvar:`PYTHONPERFSUPPORT` hoặc
+tùy chọn :option:`-X perf <-X>`, hoặc một cách động bằng cách sử dụng :func:`sys.activate_stack_trampoline` và
 :func:`sys.deactivate_stack_trampoline`.
 
-The :mod:`!sys` functions take precedence over the :option:`!-X` option,
-the :option:`!-X` option takes precedence over the environment variable.
+Các hàm :mod:`!sys` được ưu tiên hơn tùy chọn :option:`!-X`, còn tùy chọn :option:`!-X` được ưu tiên hơn biến môi trường.
 
-Example, using the environment variable::
+Ví dụ, sử dụng biến môi trường::
 
    $ PYTHONPERFSUPPORT=1 perf record -F 9999 -g -o perf.data python my_script.py
    $ perf report -g -i perf.data
 
-Example, using the :option:`!-X` option::
+Ví dụ, sử dụng tùy chọn :option:`!-X`::
 
    $ perf record -F 9999 -g -o perf.data python -X perf my_script.py
    $ perf report -g -i perf.data
 
-Example, using the :mod:`sys` APIs in file :file:`example.py`:
+Ví dụ, sử dụng các API :mod:`sys` trong tệp :file:`example.py`:
 
 .. code-block:: python
 
@@ -182,100 +162,65 @@ Example, using the :mod:`sys` APIs in file :file:`example.py`:
 
    non_profiled_stuff()
 
-...then::
+...sau đó::
 
    $ perf record -F 9999 -g -o perf.data python ./example.py
    $ perf report -g -i perf.data
 
 
-How to obtain the best results
+Cách đạt được kết quả tốt nhất
 ------------------------------
 
-For best results, Python should be compiled with
-``CFLAGS="-fno-omit-frame-pointer -mno-omit-leaf-frame-pointer"`` as this allows
-profilers to unwind using only the frame pointer and not on DWARF debug
-information. This is because as the code that is interposed to allow ``perf``
-support is dynamically generated it doesn't have any DWARF debugging information
-available.
+Để đạt được kết quả tốt nhất, Python nên được biên dịch với ``CFLAGS="-fno-omit-frame-pointer -mno-omit-leaf-frame-pointer"``, vì điều này cho phép các profiler unwind chỉ bằng cách sử dụng frame pointer mà không cần thông tin debug DWARF. Lý do là đoạn mã được chèn vào để hỗ trợ ``perf`` được tạo động, nên không có thông tin debug DWARF.
 
-You can check if your system has been compiled with this flag by running::
+Bạn có thể kiểm tra xem hệ thống của mình đã được biên dịch với cờ này hay chưa bằng cách chạy::
 
     $ python -m sysconfig | grep 'no-omit-frame-pointer'
 
-If you don't see any output it means that your interpreter has not been compiled with
-frame pointers and therefore it may not be able to show Python functions in the output
-of ``perf``.
+Nếu không thấy kết quả nào, điều đó có nghĩa là interpreter của bạn chưa được biên dịch với frame pointer và do đó có thể không hiển thị được các hàm Python trong kết quả của ``perf``.
 
 
-How to work without frame pointers
-----------------------------------
+Cách làm việc mà không có frame pointer
+---------------------------------------
 
-If you are working with a Python interpreter that has been compiled without
-frame pointers, you can still use the ``perf`` profiler, but the overhead will be
-a bit higher because Python needs to generate unwinding information for every
-Python function call on the fly. Additionally, ``perf`` will take more time to
-process the data because it will need to use the DWARF debugging information to
-unwind the stack and this is a slow process.
+Nếu đang làm việc với một Python interpreter được biên dịch mà không có frame pointer, bạn vẫn có thể sử dụng profiler ``perf``, nhưng overhead sẽ cao hơn một chút vì Python cần tạo thông tin unwind cho mỗi lần gọi hàm Python ngay trong lúc chạy. Ngoài ra, ``perf`` sẽ mất nhiều thời gian hơn để xử lý dữ liệu vì cần sử dụng thông tin debug DWARF để unwind stack, và đây là một quá trình chậm.
 
-To enable this mode, you can use the environment variable
-:envvar:`PYTHON_PERF_JIT_SUPPORT` or the :option:`-X perf_jit <-X>` option,
-which will enable the JIT mode for the ``perf`` profiler.
+Để bật chế độ này, bạn có thể sử dụng biến môi trường
+:envvar:`PYTHON_PERF_JIT_SUPPORT` hoặc tùy chọn :option:`-X perf_jit <-X>`, tùy chọn này sẽ bật chế độ JIT cho profiler ``perf``.
 
 .. note::
 
-    Due to a bug in the ``perf`` tool, only ``perf`` versions higher than v6.8
-    will work with the JIT mode.  The fix was also backported to the v6.7.2
-    version of the tool.
+    Do có một lỗi trong công cụ ``perf``, chỉ những phiên bản ``perf`` cao hơn v6.8 mới hoạt động với chế độ JIT. Bản sửa lỗi cũng đã được backport vào phiên bản v6.7.2 của công cụ.
 
-    Note that when checking the version of the ``perf`` tool (which can be done
-    by running ``perf version``) you must take into account that some distros
-    add some custom version numbers including a ``-`` character.  This means
-    that ``perf 6.7-3`` is not necessarily ``perf 6.7.3``.
+    Lưu ý rằng khi kiểm tra phiên bản của công cụ ``perf`` (có thể thực hiện bằng cách chạy ``perf version``), bạn phải tính đến việc một số distro thêm các số phiên bản tùy chỉnh, bao gồm cả ký tự ``-``. Điều này có nghĩa là ``perf 6.7-3`` không nhất thiết là ``perf 6.7.3``.
 
-When using the perf JIT mode, you need an extra step before you can run ``perf
-report``. You need to call the ``perf inject`` command to inject the JIT
-information into the ``perf.data`` file.::
+Khi sử dụng chế độ JIT của perf, bạn cần thực hiện thêm một bước trước khi có thể chạy ``perf report``. Bạn cần gọi lệnh ``perf inject`` để chèn thông tin JIT vào tệp ``perf.data``.::
 
     $ perf record -F 9999 -g -k 1 --call-graph dwarf -o perf.data python -Xperf_jit my_script.py
     $ perf inject -i perf.data --jit --output perf.jit.data
     $ perf report -g -i perf.jit.data
 
-or using the environment variable::
+hoặc sử dụng biến môi trường::
 
     $ PYTHON_PERF_JIT_SUPPORT=1 perf record -F 9999 -g --call-graph dwarf -o perf.data python my_script.py
     $ perf inject -i perf.data --jit --output perf.jit.data
     $ perf report -g -i perf.jit.data
 
-``perf inject --jit`` command will read ``perf.data``,
-automatically pick up the perf dump file that Python creates (in
-``/tmp/perf-$PID.dump``), and then create ``perf.jit.data`` which merges all the
-JIT information together. It should also create a lot of ``jitted-XXXX-N.so``
-files in the current directory which are ELF images for all the JIT trampolines
-that were created by Python.
+Lệnh ``perf inject --jit`` sẽ đọc ``perf.data``, tự động tìm tệp kết xuất perf mà Python tạo (trong ``/tmp/perf-$PID.dump``), sau đó tạo ``perf.jit.data``, hợp nhất toàn bộ thông tin JIT. Lệnh này cũng sẽ tạo nhiều tệp ``jitted-XXXX-N.so`` trong thư mục hiện tại; đó là các ảnh ELF cho tất cả trampoline JIT được Python tạo ra.
 
 .. warning::
-    When using ``--call-graph dwarf``, the ``perf`` tool will take
-    snapshots of the stack of the process being profiled and save the
-    information in the ``perf.data`` file. By default, the size of the stack dump
-    is 8192 bytes, but you can change the size by passing it after
-    a comma like ``--call-graph dwarf,16384``.
+    Khi sử dụng ``--call-graph dwarf``, công cụ ``perf`` sẽ chụp ảnh nhanh stack của tiến trình đang được profile và lưu thông tin vào tệp ``perf.data``. Theo mặc định, kích thước dữ liệu kết xuất stack là 8192 byte, nhưng bạn có thể thay đổi kích thước bằng cách truyền giá trị sau dấu phẩy, như trong ``--call-graph dwarf,16384``.
 
-    The size of the stack dump is important because if the size is too small
-    ``perf`` will not be able to unwind the stack and the output will be
-    incomplete. On the other hand, if the size is too big, then ``perf`` won't
-    be able to sample the process as frequently as it would like as the overhead
-    will be higher.
+    Kích thước dữ liệu kết xuất stack rất quan trọng vì nếu quá nhỏ, ``perf`` sẽ không thể unwind stack và đầu ra sẽ không đầy đủ. Mặt khác, nếu quá lớn, ``perf`` sẽ không thể sample tiến trình thường xuyên như mong muốn vì overhead sẽ cao hơn.
 
-    The stack size is particularly important when profiling Python code compiled
-    with low optimization levels (like ``-O0``), as these builds tend to have
-    larger stack frames. If you are compiling Python with ``-O0`` and not seeing
-    Python functions in your profiling output, try increasing the stack dump
-    size to 65528 bytes (the maximum)::
+    Kích thước stack đặc biệt quan trọng khi profiling mã Python được biên dịch với mức tối ưu hóa thấp (như ``-O0``), vì các bản build này thường có các stack frame lớn hơn. Nếu bạn biên dịch Python với ``-O0`` nhưng không thấy các hàm Python trong đầu ra profiling, hãy thử tăng kích thước stack dump lên 65528 byte (mức tối đa)::
 
         $ perf record -F 9999 -g -k 1 --call-graph dwarf,65528 -o perf.data python -Xperf_jit my_script.py
 
-    Different compilation flags can significantly impact stack sizes:
+    Các cờ biên dịch khác nhau có thể ảnh hưởng đáng kể đến kích thước stack:
 
-    - Builds with ``-O0`` typically have much larger stack frames than those with ``-O1`` or higher
-    - Adding optimizations (``-O1``, ``-O2``, etc.) typically reduces stack size
-    - Frame pointers (``-fno-omit-frame-pointer``) generally provide more reliable stack unwinding
+    - Các bản build với ``-O0`` thường có stack frame lớn hơn nhiều so với các bản build với ``-O1`` hoặc cao hơn
+    - Việc thêm các tùy chọn tối ưu hóa (``-O1``, ``-O2``, v.v.) thường làm giảm kích thước stack
+    - Frame pointer (``-fno-omit-frame-pointer``) nhìn chung giúp việc stack unwinding đáng tin cậy hơn
+
+.. _`The Linux perf profiler`: https://perf.wiki.kernel.org

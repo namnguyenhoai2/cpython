@@ -1,8 +1,8 @@
 .. _descriptorhowto:
 
-================
-Descriptor Guide
-================
+=======================
+Hướng dẫn về descriptor
+=======================
 
 :Author: Raymond Hettinger
 :Contact: <python at rcn dot com>
@@ -10,40 +10,31 @@ Descriptor Guide
 .. Contents::
 
 
-:term:`Descriptors <descriptor>` let objects customize attribute lookup,
-storage, and deletion.
+:term:`Descriptor <descriptor>` cho phép các đối tượng tùy chỉnh việc tra cứu, lưu trữ và xóa thuộc tính.
 
-This guide has four major sections:
+Hướng dẫn này gồm bốn phần chính:
 
-1) The "primer" gives a basic overview, moving gently from simple examples,
-   adding one feature at a time.  Start here if you're new to descriptors.
+1) "Phần nhập môn" cung cấp tổng quan cơ bản, bắt đầu nhẹ nhàng từ những ví dụ đơn giản và lần lượt bổ sung từng tính năng. Hãy bắt đầu từ đây nếu bạn chưa quen với descriptor.
 
-2) The second section shows a complete, practical descriptor example.  If you
-   already know the basics, start there.
+2) Phần thứ hai trình bày một ví dụ descriptor hoàn chỉnh và thiết thực. Nếu bạn đã nắm được những kiến thức cơ bản, hãy bắt đầu từ đó.
 
-3) The third section provides a more technical tutorial that goes into the
-   detailed mechanics of how descriptors work.  Most people don't need this
-   level of detail.
+3) Phần thứ ba cung cấp một hướng dẫn kỹ thuật chuyên sâu hơn, đi vào cơ chế chi tiết của cách descriptor hoạt động. Hầu hết mọi người không cần mức độ chi tiết này.
 
-4) The last section has pure Python equivalents for built-in descriptors that
-   are written in C.  Read this if you're curious about how functions turn
-   into bound methods or about the implementation of common tools like
-   :deco:`classmethod`, :deco:`staticmethod`, :deco:`property`, and
+4) Phần cuối có các phiên bản tương đương bằng Python thuần túy cho những descriptor tích hợp được viết bằng C. Hãy đọc phần này nếu bạn tò mò về cách các hàm trở thành bound method hoặc về cách triển khai những công cụ phổ biến như
+   :deco:`classmethod`, :deco:`staticmethod`, :deco:`property`, và
    :term:`__slots__`.
 
 
-Primer
-^^^^^^
+Nhập môn
+^^^^^^^^
 
-In this primer, we start with the most basic possible example and then we'll
-add new capabilities one by one.
+Trong phần nhập môn này, chúng ta bắt đầu với ví dụ cơ bản nhất có thể, sau đó lần lượt bổ sung từng khả năng mới.
 
 
-Simple example: A descriptor that returns a constant
-----------------------------------------------------
+Ví dụ đơn giản: Descriptor trả về một hằng số
+---------------------------------------------
 
-The :class:`!Ten` class is a descriptor whose :meth:`~object.__get__` method always
-returns the constant ``10``:
+Lớp :class:`!Ten` là một descriptor có phương thức :meth:`~object.__get__` luôn trả về hằng số ``10``:
 
 .. testcode::
 
@@ -51,44 +42,37 @@ returns the constant ``10``:
         def __get__(self, obj, objtype=None):
             return 10
 
-To use the descriptor, it must be stored as a class variable in another class:
+Để sử dụng descriptor, nó phải được lưu trữ dưới dạng biến lớp trong một lớp khác:
 
 .. testcode::
 
     class A:
-        x = 5                       # Regular class attribute
-        y = Ten()                   # Descriptor instance
+        x = 5                       # Thuộc tính lớp thông thường
+        y = Ten()                   # Instance của descriptor
 
-An interactive session shows the difference between normal attribute lookup
-and descriptor lookup:
+Một phiên tương tác cho thấy sự khác biệt giữa việc tra cứu thuộc tính thông thường và tra cứu descriptor:
 
 .. doctest::
 
-    >>> a = A()                     # Make an instance of class A
-    >>> a.x                         # Normal attribute lookup
+    >>> a = A()                     # Tạo một instance của lớp A
+    >>> a.x                         # Tra cứu thuộc tính thông thường
     5
-    >>> a.y                         # Descriptor lookup
+    >>> a.y                         # Tra cứu descriptor
     10
 
-In the ``a.x`` attribute lookup, the dot operator finds ``'x': 5``
-in the class dictionary.  In the ``a.y`` lookup, the dot operator
-finds a descriptor instance, recognized by its ``__get__`` method.
-Calling that method returns ``10``.
+Trong phép tra cứu thuộc tính ``a.x``, toán tử dấu chấm tìm thấy ``'x': 5`` trong từ điển lớp. Trong phép tra cứu ``a.y``, toán tử dấu chấm tìm thấy một instance descriptor, được nhận diện bởi phương thức ``__get__``. Việc gọi phương thức đó trả về ``10``.
 
-Note that the value ``10`` is not stored in either the class dictionary or the
-instance dictionary.  Instead, the value ``10`` is computed on demand.
+Lưu ý rằng giá trị ``10`` không được lưu trong từ điển lớp cũng như từ điển instance. Thay vào đó, giá trị ``10`` được tính theo yêu cầu.
 
-This example shows how a simple descriptor works, but it isn't very useful.
-For retrieving constants, normal attribute lookup would be better.
+Ví dụ này cho thấy cách một descriptor đơn giản hoạt động, nhưng nó không hữu ích lắm. Để truy xuất các hằng số, phép tra cứu thuộc tính thông thường sẽ phù hợp hơn.
 
-In the next section, we'll create something more useful, a dynamic lookup.
+Trong phần tiếp theo, chúng ta sẽ tạo ra một thứ hữu ích hơn: phép tra cứu động.
 
 
-Dynamic lookups
----------------
+Phép tra cứu động
+-----------------
 
-Interesting descriptors typically run computations instead of returning
-constants:
+Các descriptor thú vị thường thực hiện phép tính thay vì trả về hằng số:
 
 .. testcode::
 
@@ -101,44 +85,32 @@ constants:
 
     class Directory:
 
-        size = DirectorySize()              # Descriptor instance
+        size = DirectorySize()              # Instance descriptor
 
         def __init__(self, dirname):
-            self.dirname = dirname          # Regular instance attribute
+            self.dirname = dirname          # Thuộc tính instance thông thường
 
-An interactive session shows that the lookup is dynamic — it computes
-different, updated answers each time::
+Một phiên tương tác cho thấy việc tra cứu là động — mỗi lần đều tính toán các kết quả khác nhau và được cập nhật::
 
     >>> s = Directory('songs')
     >>> g = Directory('games')
-    >>> s.size                              # The songs directory has twenty files
+    >>> s.size                              # Thư mục songs có hai mươi tệp
     20
-    >>> g.size                              # The games directory has three files
+    >>> g.size                              # Thư mục games có ba tệp
     3
-    >>> os.remove('games/chess')            # Delete a game
-    >>> g.size                              # File count is automatically updated
+    >>> os.remove('games/chess')            # Xóa một game
+    >>> g.size                              # Số lượng tệp được tự động cập nhật
     2
 
-Besides showing how descriptors can run computations, this example also
-reveals the purpose of the parameters to :meth:`~object.__get__`.  The *self*
-parameter is *size*, an instance of *DirectorySize*.  The *obj* parameter is
-either *g* or *s*, an instance of *Directory*.  It is the *obj* parameter that
-lets the :meth:`~object.__get__` method learn the target directory.  The *objtype*
-parameter is the class *Directory*.
+Ngoài việc cho thấy descriptor có thể thực hiện các phép tính, ví dụ này còn cho thấy mục đích của các tham số của :meth:`~object.__get__`.  Tham số *self* là *size*, một instance của *DirectorySize*.  Tham số *obj* là *g* hoặc *s*, một instance của *Directory*.  Chính tham số *obj* cho phép phương thức :meth:`~object.__get__` biết thư mục đích.  Tham số *objtype* là lớp *Directory*.
 
 
-Managed attributes
-------------------
+Thuộc tính được quản lý
+-----------------------
 
-A popular use for descriptors is managing access to instance data.  The
-descriptor is assigned to a public attribute in the class dictionary while the
-actual data is stored as a private attribute in the instance dictionary.  The
-descriptor's :meth:`~object.__get__` and :meth:`~object.__set__` methods are triggered when
-the public attribute is accessed.
+Một cách sử dụng phổ biến của descriptor là quản lý quyền truy cập vào dữ liệu của instance. Descriptor được gán cho một thuộc tính public trong từ điển của class, còn dữ liệu thực tế được lưu trữ dưới dạng thuộc tính private trong từ điển của instance. Các phương thức :meth:`~object.__get__` và :meth:`~object.__set__` của descriptor được gọi khi thuộc tính public được truy cập.
 
-In the following example, *age* is the public attribute and *_age* is the
-private attribute.  When the public attribute is accessed, the descriptor logs
-the lookup or update:
+Trong ví dụ sau, *age* là thuộc tính public còn *_age* là thuộc tính private. Khi thuộc tính public được truy cập, descriptor sẽ ghi nhật ký thao tác tra cứu hoặc cập nhật:
 
 .. testcode::
 
@@ -159,18 +131,17 @@ the lookup or update:
 
     class Person:
 
-        age = LoggedAgeAccess()             # Descriptor instance
+        age = LoggedAgeAccess()             # Instance descriptor
 
         def __init__(self, name, age):
-            self.name = name                # Regular instance attribute
-            self.age = age                  # Calls __set__()
+            self.name = name                # Thuộc tính instance thông thường
+            self.age = age                  # Gọi __set__()
 
         def birthday(self):
-            self.age += 1                   # Calls both __get__() and __set__()
+            self.age += 1                   # Gọi cả __get__() và __set__()
 
 
-An interactive session shows that all access to the managed attribute *age* is
-logged, but that the regular attribute *name* is not logged:
+Một phiên tương tác cho thấy mọi quyền truy cập vào thuộc tính được quản lý *age* đều được ghi nhật ký, nhưng thuộc tính thông thường *name* thì không:
 
 .. testcode::
     :hide:
@@ -180,45 +151,38 @@ logged, but that the regular attribute *name* is not logged:
 
 .. doctest::
 
-    >>> mary = Person('Mary M', 30)         # The initial age update is logged
+    >>> mary = Person('Mary M', 30)         # Lần cập nhật age đầu tiên được ghi nhật ký
     INFO:root:Updating 'age' to 30
     >>> dave = Person('David D', 40)
     INFO:root:Updating 'age' to 40
 
-    >>> vars(mary)                          # The actual data is in a private attribute
+    >>> vars(mary)                          # Dữ liệu thực tế nằm trong một thuộc tính riêng tư
     {'name': 'Mary M', '_age': 30}
     >>> vars(dave)
     {'name': 'David D', '_age': 40}
 
-    >>> mary.age                            # Access the data and log the lookup
+    >>> mary.age                            # Truy cập dữ liệu và ghi nhật ký việc tra cứu
     INFO:root:Accessing 'age' giving 30
     30
-    >>> mary.birthday()                     # Updates are logged as well
+    >>> mary.birthday()                     # Các lần cập nhật cũng được ghi nhật ký
     INFO:root:Accessing 'age' giving 30
     INFO:root:Updating 'age' to 31
 
-    >>> dave.name                           # Regular attribute lookup isn't logged
+    >>> dave.name                           # Việc tra cứu thuộc tính thông thường không được ghi nhật ký
     'David D'
-    >>> dave.age                            # Only the managed attribute is logged
+    >>> dave.age                            # Chỉ thuộc tính được quản lý được ghi nhật ký
     INFO:root:Accessing 'age' giving 40
     40
 
-One major issue with this example is that the private name *_age* is hardwired in
-the *LoggedAgeAccess* class.  That means that each instance can only have one
-logged attribute and that its name is unchangeable.  In the next example,
-we'll fix that problem.
+Một vấn đề lớn với ví dụ này là tên private *_age* được gán cố định trong lớp *LoggedAgeAccess*. Điều đó có nghĩa là mỗi instance chỉ có thể có một thuộc tính được ghi nhật ký và tên của thuộc tính đó không thể thay đổi. Trong ví dụ tiếp theo, chúng ta sẽ khắc phục vấn đề này.
 
 
-Customized names
-----------------
+Tên tùy chỉnh
+-------------
 
-When a class uses descriptors, it can inform each descriptor about which
-variable name was used.
+Khi một lớp sử dụng descriptor, lớp đó có thể thông báo cho mỗi descriptor biết tên biến nào đã được sử dụng.
 
-In this example, the :class:`!Person` class has two descriptor instances,
-*name* and *age*.  When the :class:`!Person` class is defined, it makes a
-callback to :meth:`~object.__set_name__` in *LoggedAccess* so that the field names can
-be recorded, giving each descriptor its own *public_name* and *private_name*:
+Trong ví dụ này, lớp :class:`!Person` có hai instance descriptor là *name* và *age*. Khi lớp :class:`!Person` được định nghĩa, lớp này gọi callback đến :meth:`~object.__set_name__` trong *LoggedAccess* để ghi lại tên các trường, nhờ đó mỗi descriptor có *public_name* và *private_name* riêng:
 
 .. testcode::
 
@@ -243,19 +207,18 @@ be recorded, giving each descriptor its own *public_name* and *private_name*:
 
     class Person:
 
-        name = LoggedAccess()                # First descriptor instance
-        age = LoggedAccess()                 # Second descriptor instance
+        name = LoggedAccess()                # Instance descriptor thứ nhất
+        age = LoggedAccess()                 # Instance descriptor thứ hai
 
         def __init__(self, name, age):
-            self.name = name                 # Calls the first descriptor
-            self.age = age                   # Calls the second descriptor
+            self.name = name                 # Gọi descriptor thứ nhất
+            self.age = age                   # Gọi descriptor thứ hai
 
         def birthday(self):
             self.age += 1
 
-An interactive session shows that the :class:`!Person` class has called
-:meth:`~object.__set_name__` so that the field names would be recorded.  Here
-we call :func:`vars` to look up the descriptor without triggering it:
+Một interactive session cho thấy class :class:`!Person` đã gọi
+:meth:`~object.__set_name__` để các tên trường được ghi lại. Ở đây, chúng ta gọi :func:`vars` để tra cứu descriptor mà không kích hoạt nó:
 
 .. doctest::
 
@@ -264,7 +227,7 @@ we call :func:`vars` to look up the descriptor without triggering it:
     >>> vars(vars(Person)['age'])
     {'public_name': 'age', 'private_name': '_age'}
 
-The new class now logs access to both *name* and *age*:
+Giờ đây, class mới ghi nhật ký việc truy cập cả *name* và *age*:
 
 .. testcode::
     :hide:
@@ -281,7 +244,7 @@ The new class now logs access to both *name* and *age*:
     INFO:root:Updating 'name' to 'Catherine C'
     INFO:root:Updating 'age' to 20
 
-The two *Person* instances contain only the private names:
+Hai instance *Person* chỉ chứa các tên private:
 
 .. doctest::
 
@@ -291,54 +254,38 @@ The two *Person* instances contain only the private names:
     {'_name': 'Catherine C', '_age': 20}
 
 
-Closing thoughts
-----------------
+Suy nghĩ cuối cùng
+------------------
 
-A :term:`descriptor` is what we call any object that defines :meth:`~object.__get__`,
-:meth:`~object.__set__`, or :meth:`~object.__delete__`.
+:term:`descriptor` là cách chúng ta gọi bất kỳ đối tượng nào định nghĩa :meth:`~object.__get__`,
+:meth:`~object.__set__`, hoặc :meth:`~object.__delete__`.
 
-Optionally, descriptors can have a :meth:`~object.__set_name__` method.  This is only
-used in cases where a descriptor needs to know either the class where it was
-created or the name of class variable it was assigned to.  (This method, if
-present, is called even if the class is not a descriptor.)
+Tùy chọn, descriptor có thể có phương thức :meth:`~object.__set_name__`. Phương thức này chỉ được sử dụng trong trường hợp descriptor cần biết lớp nơi nó được tạo hoặc tên của biến lớp mà nó được gán cho. (Phương thức này, nếu có, vẫn được gọi ngay cả khi lớp đó không phải là một descriptor.)
 
-Descriptors get invoked by the dot operator during attribute lookup.  If a
-descriptor is accessed indirectly with ``vars(some_class)[descriptor_name]``,
-the descriptor instance is returned without invoking it.
+Descriptor được gọi bởi toán tử dấu chấm trong quá trình tra cứu thuộc tính. Nếu descriptor được truy cập gián tiếp bằng ``vars(some_class)[descriptor_name]``, thì đối tượng descriptor được trả về mà không gọi nó.
 
-Descriptors only work when used as class variables.  When put in instances,
-they have no effect.
+Descriptor chỉ hoạt động khi được sử dụng như biến lớp. Khi được đặt trong các instance, chúng không có tác dụng.
 
-The main motivation for descriptors is to provide a hook allowing objects
-stored in class variables to control what happens during attribute lookup.
+Động lực chính của descriptor là cung cấp một hook cho phép các đối tượng được lưu trong biến lớp kiểm soát điều gì xảy ra trong quá trình tra cứu thuộc tính.
 
-Traditionally, the calling class controls what happens during lookup.
-Descriptors invert that relationship and allow the data being looked-up to
-have a say in the matter.
+Theo cách truyền thống, lớp gọi sẽ kiểm soát điều gì xảy ra trong quá trình tra cứu. Descriptor đảo ngược mối quan hệ đó và cho phép dữ liệu đang được tra cứu có tiếng nói trong vấn đề này.
 
-Descriptors are used throughout the language.  It is how functions turn into
-bound methods.  Common tools like :deco:`classmethod`, :deco:`staticmethod`,
-:deco:`property`, and :deco:`functools.cached_property` are all implemented as
-descriptors.
+Descriptor được sử dụng xuyên suốt ngôn ngữ. Đó là cách các hàm trở thành bound method. Những công cụ phổ biến như :deco:`classmethod`, :deco:`staticmethod`,
+:deco:`property` và :deco:`functools.cached_property` đều được triển khai dưới dạng descriptor.
 
 
-Complete Practical Example
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ thực tế hoàn chỉnh
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-In this example, we create a practical and powerful tool for locating
-notoriously hard to find data corruption bugs.
+Trong ví dụ này, chúng ta tạo một công cụ thực tế và mạnh mẽ để tìm các lỗi làm hỏng dữ liệu vốn nổi tiếng là rất khó phát hiện.
 
 
-Validator class
----------------
+Lớp Validator
+-------------
 
-A validator is a descriptor for managed attribute access.  Prior to storing
-any data, it verifies that the new value meets various type and range
-restrictions.  If those restrictions aren't met, it raises an exception to
-prevent data corruption at its source.
+Validator là một descriptor để truy cập thuộc tính được quản lý. Trước khi lưu trữ bất kỳ dữ liệu nào, nó xác minh rằng giá trị mới đáp ứng nhiều ràng buộc khác nhau về kiểu và phạm vi. Nếu không đáp ứng các ràng buộc đó, nó sẽ raise một exception để ngăn dữ liệu bị hỏng ngay từ nguồn.
 
-This :class:`!Validator` class is both an :term:`abstract base class` and a
-managed attribute descriptor:
+Lớp :class:`!Validator` này vừa là một :term:`abstract base class` vừa là một descriptor thuộc tính được quản lý:
 
 .. testcode::
 
@@ -360,25 +307,21 @@ managed attribute descriptor:
         def validate(self, value):
             pass
 
-Custom validators need to inherit from :class:`!Validator` and must supply a
-:meth:`!validate` method to test various restrictions as needed.
+Các validator tùy chỉnh cần kế thừa từ :class:`!Validator` và phải cung cấp một
+Phương thức :meth:`!validate` dùng để kiểm tra các ràng buộc khác nhau khi cần.
 
 
-Custom validators
------------------
+Validator tùy chỉnh
+-------------------
 
-Here are three practical data validation utilities:
+Dưới đây là ba tiện ích xác thực dữ liệu thiết thực:
 
-1) :class:`!OneOf` verifies that a value is one of a restricted set of options.
+1) :class:`!OneOf` xác minh rằng một giá trị là một trong số các tùy chọn bị giới hạn.
 
-2) :class:`!Number` verifies that a value is either an :class:`int` or
-   :class:`float`.  Optionally, it verifies that a value is between a given
-   minimum or maximum.
+2) :class:`!Number` xác minh rằng một giá trị là một :class:`int` hoặc
+   :class:`float`. Tùy chọn, nó xác minh rằng một giá trị nằm trong khoảng từ giá trị tối thiểu hoặc tối đa được chỉ định.
 
-3) :class:`!String` verifies that a value is a :class:`str`.  Optionally, it
-   validates a given minimum or maximum length.  It can validate a
-   user-defined `predicate
-   <https://en.wikipedia.org/wiki/Predicate_(mathematical_logic)>`_ as well.
+3) :class:`!String` xác minh rằng một giá trị là một :class:`str`. Tùy chọn, nó xác thực độ dài tối thiểu hoặc tối đa được chỉ định. Nó cũng có thể xác thực một `predicate <https://en.wikipedia.org/wiki/Predicate_(mathematical_logic)>`_ do người dùng định nghĩa.
 
 .. testcode::
 
@@ -435,10 +378,10 @@ Here are three practical data validation utilities:
                 )
 
 
-Practical application
----------------------
+Ứng dụng thực tế
+----------------
 
-Here's how the data validators can be used in a real class:
+Sau đây là cách sử dụng các trình xác thực dữ liệu trong một class thực tế:
 
 .. testcode::
 
@@ -453,72 +396,56 @@ Here's how the data validators can be used in a real class:
             self.kind = kind
             self.quantity = quantity
 
-The descriptors prevent invalid instances from being created:
+Các descriptor ngăn không cho tạo ra các instance không hợp lệ:
 
 .. doctest::
 
-    >>> Component('Widget', 'metal', 5)      # Blocked: 'Widget' is not all uppercase
+    >>> Component('Widget', 'metal', 5)      # Bị chặn: 'Widget' không viết toàn bộ bằng chữ hoa
     Traceback (most recent call last):
         ...
     ValueError: Expected <method 'isupper' of 'str' objects> to be true for 'Widget'
 
-    >>> Component('WIDGET', 'metle', 5)      # Blocked: 'metle' is misspelled
+    >>> Component('WIDGET', 'metle', 5)      # Bị chặn: 'metle' bị viết sai chính tả
     Traceback (most recent call last):
         ...
     ValueError: Expected 'metle' to be one of {'metal', 'plastic', 'wood'}
 
-    >>> Component('WIDGET', 'metal', -5)     # Blocked: -5 is negative
+    >>> Component('WIDGET', 'metal', -5)     # Bị chặn: -5 là số âm
     Traceback (most recent call last):
         ...
     ValueError: Expected -5 to be at least 0
 
-    >>> Component('WIDGET', 'metal', 'V')    # Blocked: 'V' isn't a number
+    >>> Component('WIDGET', 'metal', 'V')    # Bị chặn: 'V' không phải là một số
     Traceback (most recent call last):
         ...
     TypeError: Expected 'V' to be an int or float
 
-    >>> c = Component('WIDGET', 'metal', 5)  # Allowed:  The inputs are valid
+    >>> c = Component('WIDGET', 'metal', 5)  # Được phép: Các đầu vào hợp lệ
 
 
-Technical Tutorial
+Hướng dẫn kỹ thuật
 ^^^^^^^^^^^^^^^^^^
 
-What follows is a more technical tutorial for the mechanics and details of how
-descriptors work.
+Phần tiếp theo là hướng dẫn kỹ thuật chuyên sâu hơn về cơ chế và các chi tiết trong cách descriptor hoạt động.
 
 
-Abstract
---------
+Tóm tắt
+-------
 
-Defines descriptors, summarizes the protocol, and shows how descriptors are
-called.  Provides an example showing how object relational mappings work.
+Định nghĩa descriptor, tóm tắt protocol và trình bày cách gọi descriptor. Cung cấp một ví dụ minh họa cách thức hoạt động của ánh xạ quan hệ đối tượng.
 
-Learning about descriptors not only provides access to a larger toolset, it
-creates a deeper understanding of how Python works.
+Việc tìm hiểu về descriptor không chỉ giúp bạn tiếp cận một bộ công cụ lớn hơn mà còn mang lại hiểu biết sâu sắc hơn về cách Python hoạt động.
 
 
-Definition and introduction
----------------------------
+Định nghĩa và giới thiệu
+------------------------
 
-In general, a descriptor is an attribute value that has one of the methods in
-the descriptor protocol.  Those methods are :meth:`~object.__get__`, :meth:`~object.__set__`,
-and :meth:`~object.__delete__`.  If any of those methods are defined for an
-attribute, it is said to be a :term:`descriptor`.
+Nói chung, descriptor là một giá trị thuộc tính có một trong các phương thức thuộc descriptor protocol. Các phương thức đó là :meth:`~object.__get__`, :meth:`~object.__set__` và :meth:`~object.__delete__`. Nếu bất kỳ phương thức nào trong số đó được định nghĩa cho một thuộc tính, thì thuộc tính đó được gọi là một :term:`descriptor`.
 
-The default behavior for attribute access is to get, set, or delete the
-attribute from an object's dictionary.  For instance, ``a.x`` has a lookup chain
-starting with ``a.__dict__['x']``, then ``type(a).__dict__['x']``, and
-continuing through the method resolution order of ``type(a)``. If the
-looked-up value is an object defining one of the descriptor methods, then Python
-may override the default behavior and invoke the descriptor method instead.
-Where this occurs in the precedence chain depends on which descriptor methods
-were defined.
+Hành vi mặc định khi truy cập thuộc tính là lấy, đặt hoặc xóa thuộc tính khỏi dictionary của một đối tượng. Ví dụ, ``a.x`` có chuỗi tra cứu bắt đầu bằng ``a.__dict__['x']``, tiếp đến là ``type(a).__dict__['x']``, rồi tiếp tục theo thứ tự phân giải phương thức của ``type(a)``. Nếu giá trị được tra cứu là một đối tượng định nghĩa một trong các phương thức descriptor, Python có thể ghi đè hành vi mặc định và gọi phương thức descriptor thay thế. Vị trí xảy ra việc này trong chuỗi ưu tiên phụ thuộc vào những phương thức descriptor nào được định nghĩa.
 
-Descriptors are a powerful, general purpose protocol.  They are the mechanism
-behind properties, methods, static methods, class methods, and
-:func:`super`.  They are used throughout Python itself.  Descriptors
-simplify the underlying C code and offer a flexible set of new tools for
-everyday Python programs.
+Descriptor là một protocol mạnh mẽ và đa dụng. Đây là cơ chế đứng sau property, method, static method, class method và
+:func:`super`. Chúng được sử dụng xuyên suốt chính Python. Descriptor đơn giản hóa mã C bên dưới và cung cấp một tập hợp linh hoạt các công cụ mới cho những chương trình Python thường ngày.
 
 
 Descriptor protocol
@@ -530,58 +457,36 @@ Descriptor protocol
 
 ``descr.__delete__(self, obj)``
 
-That is all there is to it.  Define any of these methods and an object is
-considered a descriptor and can override default behavior upon being looked up
-as an attribute.
+Chỉ vậy thôi. Hãy định nghĩa bất kỳ phương thức nào trong số này, và một đối tượng sẽ được xem là descriptor, đồng thời có thể ghi đè hành vi mặc định khi được tra cứu dưới dạng thuộc tính.
 
-If an object defines :meth:`~object.__set__` or :meth:`~object.__delete__`, it is considered
-a data descriptor.  Descriptors that only define :meth:`~object.__get__` are called
-non-data descriptors (they are often used for methods but other uses are
-possible).
+Nếu một đối tượng định nghĩa :meth:`~object.__set__` hoặc :meth:`~object.__delete__`, thì đối tượng đó được xem là data descriptor. Descriptor chỉ định nghĩa :meth:`~object.__get__` được gọi là non-data descriptor (chúng thường được dùng cho method, nhưng cũng có thể dùng cho những mục đích khác).
 
-Data and non-data descriptors differ in how overrides are calculated with
-respect to entries in an instance's dictionary.  If an instance's dictionary
-has an entry with the same name as a data descriptor, the data descriptor
-takes precedence.  If an instance's dictionary has an entry with the same
-name as a non-data descriptor, the dictionary entry takes precedence.
+Data descriptor và non-data descriptor khác nhau ở cách xác định việc ghi đè đối với các mục trong dictionary của một instance. Nếu dictionary của một instance có mục có cùng tên với một data descriptor, data descriptor sẽ được ưu tiên. Nếu dictionary của một instance có mục có cùng tên với một non-data descriptor, mục trong dictionary sẽ được ưu tiên.
 
-To make a read-only data descriptor, define both :meth:`~object.__get__` and
-:meth:`~object.__set__` with the :meth:`~object.__set__` raising an :exc:`AttributeError` when
-called.  Defining the :meth:`~object.__set__` method with an exception raising
-placeholder is enough to make it a data descriptor.
+Để tạo một data descriptor chỉ đọc, hãy định nghĩa cả :meth:`~object.__get__` và
+:meth:`~object.__set__` với :meth:`~object.__set__` tạo ra một :exc:`AttributeError` khi được gọi. Chỉ cần định nghĩa phương thức :meth:`~object.__set__` với một placeholder tạo ra ngoại lệ là đủ để biến nó thành một data descriptor.
 
 
-Overview of descriptor invocation
----------------------------------
+Tổng quan về việc gọi descriptor
+--------------------------------
 
-A descriptor can be called directly with ``desc.__get__(obj)`` or
-``desc.__get__(None, cls)``.
+Một descriptor có thể được gọi trực tiếp bằng ``desc.__get__(obj)`` hoặc ``desc.__get__(None, cls)``.
 
-But it is more common for a descriptor to be invoked automatically from
-attribute access.
+Tuy nhiên, descriptor thường được tự động gọi khi truy cập thuộc tính.
 
-The expression ``obj.x`` looks up the attribute ``x`` in the chain of
-namespaces for ``obj``.  If the search finds a descriptor outside of the
-instance :attr:`~object.__dict__`, its :meth:`~object.__get__` method is
-invoked according to the precedence rules listed below.
+Biểu thức ``obj.x`` tra cứu thuộc tính ``x`` trong chuỗi namespace của ``obj``. Nếu quá trình tìm kiếm tìm thấy một descriptor bên ngoài :attr:`~object.__dict__` của instance, phương thức :meth:`~object.__get__` của descriptor sẽ được gọi theo các quy tắc ưu tiên được liệt kê bên dưới.
 
-The details of invocation depend on whether ``obj`` is an object, class, or
-instance of super.
+Chi tiết về việc gọi phụ thuộc vào việc ``obj`` là một object, class hay instance của super.
 
 
-Invocation from an instance
----------------------------
+Gọi từ một instance
+-------------------
 
-Instance lookup scans through a chain of namespaces giving data descriptors
-the highest priority, followed by instance variables, then non-data
-descriptors, then class variables, and lastly :meth:`~object.__getattr__` if it is
-provided.
+Việc tra cứu instance quét qua một chuỗi namespace, trong đó data descriptor có độ ưu tiên cao nhất, tiếp theo là biến instance, rồi đến non-data descriptor, biến class và cuối cùng là :meth:`~object.__getattr__` nếu được cung cấp.
 
-If a descriptor is found for ``a.x``, then it is invoked with:
-``desc.__get__(a, type(a))``.
+Nếu tìm thấy một descriptor cho ``a.x``, descriptor đó sẽ được gọi với: ``desc.__get__(a, type(a))``.
 
-The logic for a dotted lookup is in :meth:`object.__getattribute__`.  Here is
-a pure Python equivalent:
+Logic cho việc tra cứu bằng dấu chấm nằm trong :meth:`object.__getattribute__`. Sau đây là một phiên bản tương đương thuần Python:
 
 .. testcode::
 
@@ -603,20 +508,20 @@ a pure Python equivalent:
                 or hasattr(type(cls_var), '__delete__')):
                 return descr_get(cls_var, obj, objtype)     # data descriptor
         if hasattr(obj, '__dict__') and name in vars(obj):
-            return vars(obj)[name]                          # instance variable
+            return vars(obj)[name]                          # biến instance
         if descr_get is not null:
-            return descr_get(cls_var, obj, objtype)         # non-data descriptor
+            return descr_get(cls_var, obj, objtype)         # descriptor không chứa dữ liệu
         if cls_var is not null:
-            return cls_var                                  # class variable
+            return cls_var                                  # biến lớp
         raise AttributeError(name)
 
 
 .. testcode::
     :hide:
 
-    # Test the fidelity of object_getattribute() by comparing it with the
-    # normal object.__getattribute__().  The former will be accessed by
-    # square brackets and the latter by the dot operator.
+    # Kiểm tra độ trung thực của object_getattribute() bằng cách so sánh với
+    # object.__getattribute__() thông thường.  Cái trước sẽ được truy cập bằng
+    # dấu ngoặc vuông, còn cái sau bằng toán tử dấu chấm.
 
     class Object:
 
@@ -719,14 +624,9 @@ a pure Python equivalent:
     >>> object_getattribute(u2, 'x') == u2.x == (D1, u2, U2)
     True
 
-Note, there is no :meth:`~object.__getattr__` hook in the :meth:`~object.__getattribute__`
-code.  That is why calling :meth:`~object.__getattribute__` directly or with
-``super().__getattribute__`` will bypass :meth:`~object.__getattr__` entirely.
+Lưu ý, không có hook :meth:`~object.__getattr__` trong mã :meth:`~object.__getattribute__`.  Vì vậy, việc gọi trực tiếp :meth:`~object.__getattribute__` hoặc gọi bằng ``super().__getattribute__`` sẽ hoàn toàn bỏ qua :meth:`~object.__getattr__`.
 
-Instead, it is the dot operator and the :func:`getattr` function that are
-responsible for invoking :meth:`~object.__getattr__` whenever :meth:`~object.__getattribute__`
-raises an :exc:`AttributeError`.  Their logic is encapsulated in a helper
-function:
+Thay vào đó, chính toán tử dấu chấm và hàm :func:`getattr` chịu trách nhiệm gọi :meth:`~object.__getattr__` mỗi khi :meth:`~object.__getattribute__` phát sinh :exc:`AttributeError`. Logic của chúng được đóng gói trong một hàm trợ giúp:
 
 .. testcode::
 
@@ -772,91 +672,68 @@ function:
     AttributeError: 'ClassWithoutGetAttr' object has no attribute 'z'
 
 
-Invocation from a class
------------------------
+Gọi từ một lớp
+--------------
 
-The logic for a dotted lookup such as ``A.x`` is in
-:meth:`!type.__getattribute__`.  The steps are similar to those for
-:meth:`!object.__getattribute__` but the instance dictionary lookup is replaced
-by a search through the class's :term:`method resolution order`.
+Logic để tra cứu có dấu chấm, chẳng hạn như ``A.x``, nằm trong
+:meth:`!type.__getattribute__`. Các bước tương tự như đối với
+:meth:`!object.__getattribute__`, nhưng việc tra cứu từ điển của instance được thay thế bằng quá trình tìm kiếm trong :term:`method resolution order` của lớp.
 
-If a descriptor is found, it is invoked with ``desc.__get__(None, A)``.
+Nếu tìm thấy một descriptor, nó sẽ được gọi với ``desc.__get__(None, A)``.
 
-The full C implementation can be found in :c:func:`!type_getattro` and
-:c:func:`!_PyType_Lookup` in :source:`Objects/typeobject.c`.
-
-
-Invocation from super
----------------------
-
-The logic for super's dotted lookup is in the :meth:`~object.__getattribute__` method for
-object returned by :func:`super`.
-
-A dotted lookup such as ``super(A, obj).m`` searches ``obj.__class__.__mro__``
-for the base class ``B`` immediately following ``A`` and then returns
-``B.__dict__['m'].__get__(obj, A)``.  If not a descriptor, ``m`` is returned
-unchanged.
-
-The full C implementation can be found in :c:func:`!super_getattro` in
-:source:`Objects/typeobject.c`.  A pure Python equivalent can be found in
-`Guido's Tutorial
-<https://www.python.org/download/releases/2.2.3/descrintro/#cooperation>`_.
+Toàn bộ triển khai C có thể được tìm thấy trong :c:func:`!type_getattro` và
+:c:func:`!_PyType_Lookup` trong :source:`Objects/typeobject.c`.
 
 
-Summary of invocation logic
----------------------------
+Gọi từ super
+------------
 
-The mechanism for descriptors is embedded in the :meth:`~object.__getattribute__`
-methods for :class:`object`, :class:`type`, and :func:`super`.
+Logic tra cứu dạng chấm của super nằm trong phương thức :meth:`~object.__getattribute__` của đối tượng được trả về bởi :func:`super`.
 
-The important points to remember are:
+Một phép tra cứu dạng chấm như ``super(A, obj).m`` sẽ tìm kiếm ``obj.__class__.__mro__`` để tìm lớp cơ sở ``B`` ngay sau ``A``, rồi trả về ``B.__dict__['m'].__get__(obj, A)``. Nếu không phải là descriptor, ``m`` sẽ được trả về nguyên trạng.
 
-* Descriptors are invoked by the :meth:`~object.__getattribute__` method.
+Toàn bộ triển khai C có thể được tìm thấy trong :c:func:`!super_getattro` trong
+:source:`Objects/typeobject.c`. Có thể tìm thấy phiên bản tương đương thuần Python trong `Guido's Tutorial <https://www.python.org/download/releases/2.2.3/descrintro/#cooperation>`_.
 
-* Classes inherit this machinery from :class:`object`, :class:`type`, or
+
+Tóm tắt logic gọi
+-----------------
+
+Cơ chế của descriptor được tích hợp trong các phương thức :meth:`~object.__getattribute__` dành cho :class:`object`, :class:`type` và :func:`super`.
+
+Các điểm quan trọng cần ghi nhớ là:
+
+* Descriptor được gọi bởi phương thức :meth:`~object.__getattribute__`.
+
+* Các lớp kế thừa cơ chế này từ :class:`object`, :class:`type` hoặc
   :func:`super`.
 
-* Overriding :meth:`~object.__getattribute__` prevents automatic descriptor calls
-  because all the descriptor logic is in that method.
+* Việc ghi đè :meth:`~object.__getattribute__` sẽ ngăn các lệnh gọi descriptor tự động vì toàn bộ logic của descriptor nằm trong phương thức đó.
 
-* :meth:`!object.__getattribute__` and :meth:`!type.__getattribute__` make
-  different calls to :meth:`~object.__get__`.  The first includes the instance and may
-  include the class.  The second puts in ``None`` for the instance and always
-  includes the class.
+* :meth:`!object.__getattribute__` và :meth:`!type.__getattribute__` thực hiện các lệnh gọi khác nhau đến :meth:`~object.__get__`. Lệnh gọi đầu tiên bao gồm instance và có thể bao gồm class. Lệnh gọi thứ hai đưa ``None`` vào cho instance và luôn bao gồm class.
 
-* Data descriptors always override instance dictionaries.
+* Các descriptor dữ liệu luôn ghi đè lên dictionary của instance.
 
-* Non-data descriptors may be overridden by instance dictionaries.
+* Các descriptor không phải dữ liệu có thể bị dictionary của instance ghi đè.
 
 
-Automatic name notification
----------------------------
+Thông báo tên tự động
+---------------------
 
-Sometimes it is desirable for a descriptor to know what class variable name it
-was assigned to.  When a new class is created, the :class:`type` metaclass
-scans the dictionary of the new class.  If any of the entries are descriptors
-and if they define :meth:`~object.__set_name__`, that method is called with two
-arguments.  The *owner* is the class where the descriptor is used, and the
-*name* is the class variable the descriptor was assigned to.
+Đôi khi, việc một descriptor biết tên biến lớp mà nó được gán vào là điều hữu ích. Khi một lớp mới được tạo, metaclass :class:`type` sẽ quét dictionary của lớp mới. Nếu bất kỳ mục nào là descriptor và định nghĩa :meth:`~object.__set_name__`, phương thức đó sẽ được gọi với hai đối số. *owner* là lớp nơi descriptor được sử dụng, còn *name* là biến lớp mà descriptor được gán vào.
 
-The implementation details are in :c:func:`!type_new` and
-:c:func:`!set_names` in :source:`Objects/typeobject.c`.
+Chi tiết triển khai nằm trong :c:func:`!type_new` và
+:c:func:`!set_names` trong :source:`Objects/typeobject.c`.
 
-Since the update logic is in :meth:`!type.__new__`, notifications only take
-place at the time of class creation.  If descriptors are added to the class
-afterwards, :meth:`~object.__set_name__` will need to be called manually.
+Vì logic cập nhật nằm trong :meth:`!type.__new__`, thông báo chỉ diễn ra tại thời điểm tạo lớp. Nếu descriptor được thêm vào lớp sau đó, :meth:`~object.__set_name__` sẽ cần được gọi thủ công.
 
 
-ORM example
------------
+Ví dụ về ORM
+------------
 
-The following code is a simplified skeleton showing how data descriptors could
-be used to implement an `object relational mapping
-<https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping>`_.
+Đoạn mã sau đây là một skeleton đơn giản minh họa cách sử dụng các descriptor dữ liệu để triển khai `ánh xạ đối tượng-quan hệ <https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping>`_.
 
-The essential idea is that the data is stored in an external database.  The
-Python instances only hold keys to the database's tables.  Descriptors take
-care of lookups or updates:
+Ý tưởng cốt lõi là dữ liệu được lưu trữ trong một cơ sở dữ liệu bên ngoài. Các instance Python chỉ lưu các khóa trỏ đến các bảng trong cơ sở dữ liệu. Descriptor sẽ xử lý việc tra cứu hoặc cập nhật:
 
 .. testcode::
 
@@ -873,15 +750,13 @@ care of lookups or updates:
             conn.execute(self.store, [value, obj.key])
             conn.commit()
 
-We can use the :class:`!Field` class to define `models
-<https://en.wikipedia.org/wiki/Database_model>`_ that describe the schema for
-each table in a database:
+Chúng ta có thể sử dụng lớp :class:`!Field` để định nghĩa `các mô hình <https://en.wikipedia.org/wiki/Database_model>`_ mô tả schema cho từng bảng trong cơ sở dữ liệu:
 
 .. testcode::
 
     class Movie:
-        table = 'Movies'                    # Table name
-        key = 'title'                       # Primary key
+        table = 'Movies'                    # Tên bảng
+        key = 'title'                       # Khóa chính
         director = Field()
         year = Field()
 
@@ -898,13 +773,12 @@ each table in a database:
         def __init__(self, key):
             self.key = key
 
-To use the models, first connect to the database::
+Để sử dụng các mô hình, trước tiên hãy kết nối với cơ sở dữ liệu::
 
     >>> import sqlite3
     >>> conn = sqlite3.connect('entertainment.db')
 
-An interactive session shows how data is retrieved from the database and how
-it can be updated:
+Một phiên tương tác cho thấy cách truy xuất dữ liệu từ cơ sở dữ liệu và cách cập nhật dữ liệu đó:
 
 .. testsetup::
 
@@ -951,24 +825,20 @@ it can be updated:
    conn.close()
 
 
-Pure Python Equivalents
-^^^^^^^^^^^^^^^^^^^^^^^
+Các tương đương bằng Python thuần túy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The descriptor protocol is simple and offers exciting possibilities.  Several
-use cases are so common that they have been prepackaged into built-in tools.
-Properties, bound methods, static methods, class methods, and \_\_slots\_\_ are
-all based on the descriptor protocol.
+Protocol descriptor rất đơn giản và mở ra nhiều khả năng thú vị. Một số trường hợp sử dụng phổ biến đến mức đã được đóng gói sẵn thành các công cụ tích hợp. Properties, bound methods, static methods, class methods và \_\_slots\_\_ đều dựa trên protocol descriptor.
 
 
 Properties
 ----------
 
-Calling :func:`property` is a succinct way of building a data descriptor that
-triggers a function call upon access to an attribute.  Its signature is::
+Gọi :func:`property` là một cách súc tích để xây dựng một data descriptor, trong đó kích hoạt một lời gọi hàm khi truy cập một thuộc tính. Chữ ký của nó là::
 
     property(fget=None, fset=None, fdel=None, doc=None) -> property
 
-The documentation shows a typical use to define a managed attribute ``x``:
+Tài liệu minh họa một cách sử dụng điển hình để định nghĩa một managed attribute ``x``:
 
 .. testcode::
 
@@ -992,8 +862,7 @@ The documentation shows a typical use to define a managed attribute ``x``:
       ...
     AttributeError: 'C' object has no attribute '_C__x'
 
-To see how :func:`property` is implemented in terms of the descriptor protocol,
-here is a pure Python equivalent that implements most of the core functionality:
+Để xem :func:`property` được triển khai như thế nào theo protocol descriptor, sau đây là một tương đương bằng Python thuần túy triển khai hầu hết chức năng cốt lõi:
 
 .. testcode::
 
@@ -1040,7 +909,7 @@ here is a pure Python equivalent that implements most of the core functionality:
 .. testcode::
     :hide:
 
-    # Verify the Property() emulation
+    # Xác minh mô phỏng Property()
 
     class CC:
         def getx(self):
@@ -1056,7 +925,7 @@ here is a pure Python equivalent that implements most of the core functionality:
         no_doc = Property(getx, setx, delx, None)
 
 
-    # Now do it again but use the decorator style
+    # Bây giờ thực hiện lại nhưng sử dụng kiểu decorator
 
     class CCC:
         @Property
@@ -1119,15 +988,9 @@ here is a pure Python equivalent that implements most of the core functionality:
     >>> CC.no_doc.__doc__ is None
     True
 
-The :func:`property` builtin helps whenever a user interface has granted
-attribute access and then subsequent changes require the intervention of a
-method.
+Builtin :func:`property` hữu ích bất cứ khi nào một giao diện người dùng đã cho phép truy cập thuộc tính, rồi các thay đổi tiếp theo yêu cầu sự can thiệp của một method.
 
-For instance, a spreadsheet class may grant access to a cell value through
-``Cell('b10').value``. Subsequent improvements to the program require the cell
-to be recalculated on every access; however, the programmer does not want to
-affect existing client code accessing the attribute directly.  The solution is
-to wrap access to the value attribute in a property data descriptor:
+Ví dụ, một class bảng tính có thể cho phép truy cập giá trị của một ô thông qua ``Cell('b10').value``. Những cải tiến tiếp theo đối với chương trình yêu cầu ô phải được tính toán lại sau mỗi lần truy cập; tuy nhiên, lập trình viên không muốn ảnh hưởng đến mã client hiện có đang truy cập trực tiếp vào thuộc tính. Giải pháp là bọc quyền truy cập vào thuộc tính value trong một property data descriptor:
 
 .. testcode::
 
@@ -1140,23 +1003,17 @@ to wrap access to the value attribute in a property data descriptor:
             self.recalc()
             return self._value
 
-Either the built-in :func:`property` or our :func:`!Property` equivalent would
-work in this example.
+Trong ví dụ này, builtin :func:`property` hoặc phiên bản tương đương :func:`!Property` của chúng ta đều hoạt động.
 
 
-Functions and methods
----------------------
+Functions và methods
+--------------------
 
-Python's object oriented features are built upon a function based environment.
-Using non-data descriptors, the two are merged seamlessly.
+Các tính năng hướng đối tượng của Python được xây dựng trên một môi trường dựa trên function. Nhờ sử dụng non-data descriptor, hai khái niệm này được hợp nhất một cách liền mạch.
 
-Functions stored in class dictionaries get turned into methods when invoked.
-Methods only differ from regular functions in that the object instance is
-prepended to the other arguments.  By convention, the instance is called
-*self* but could be called *this* or any other variable name.
+Các hàm được lưu trong từ điển lớp sẽ được chuyển thành các method khi được gọi. Method chỉ khác hàm thông thường ở chỗ instance của đối tượng được thêm vào trước các đối số còn lại. Theo quy ước, instance được gọi là *self*, nhưng cũng có thể được gọi là *this* hoặc bất kỳ tên biến nào khác.
 
-Methods can be created manually with :class:`types.MethodType` which is
-roughly equivalent to:
+Có thể tạo method thủ công bằng :class:`types.MethodType`, tương đương về cơ bản với:
 
 .. testcode::
 
@@ -1186,10 +1043,8 @@ roughly equivalent to:
             "Emulate method_descr_get() in Objects/classobject.c"
             return self
 
-To support automatic creation of methods, functions include the
-:meth:`~object.__get__` method for binding methods during attribute access.  This
-means that functions are non-data descriptors that return bound methods
-during dotted lookup from an instance.  Here's how it works:
+Để hỗ trợ việc tự động tạo method, các hàm bao gồm
+:meth:`~object.__get__` method để liên kết các method trong quá trình truy cập thuộc tính. Điều này có nghĩa là các hàm là descriptor không phải dữ liệu, trả về các bound method trong quá trình tra cứu bằng dấu chấm từ một instance. Cách hoạt động như sau:
 
 .. testcode::
 
@@ -1202,8 +1057,7 @@ during dotted lookup from an instance.  Here's how it works:
                 return self
             return MethodType(self, obj)
 
-Running the following class in the interpreter shows how the function
-descriptor works in practice:
+Chạy lớp sau trong interpreter cho thấy descriptor của hàm hoạt động trên thực tế như thế nào:
 
 .. testcode::
 
@@ -1223,34 +1077,31 @@ descriptor works in practice:
     >>> d2.f() is d
     True
 
-The function has a :term:`qualified name` attribute to support introspection:
+Hàm có thuộc tính :term:`qualified name` để hỗ trợ việc introspection:
 
 .. doctest::
 
     >>> D.f.__qualname__
     'D.f'
 
-Accessing the function through the class dictionary does not invoke
-:meth:`~object.__get__`.  Instead, it just returns the underlying function object::
+Truy cập hàm thông qua từ điển lớp không gọi
+:meth:`~object.__get__`.  Thay vào đó, nó chỉ trả về đối tượng hàm nền tảng::
 
     >>> D.__dict__['f']
     <function D.f at 0x00C45070>
 
-Dotted access from a class calls :meth:`~object.__get__` which just returns the
-underlying function unchanged::
+Truy cập bằng dấu chấm từ một class gọi :meth:`~object.__get__`, vốn chỉ trả về hàm nền tảng mà không thay đổi::
 
     >>> D.f
     <function D.f at 0x00C45070>
 
-The interesting behavior occurs during dotted access from an instance.  The
-dotted lookup calls :meth:`~object.__get__` which returns a bound method object::
+Hành vi đáng chú ý xảy ra khi truy cập bằng dấu chấm từ một instance.  Việc tra cứu bằng dấu chấm gọi :meth:`~object.__get__`, vốn trả về một đối tượng bound method::
 
     >>> d = D()
     >>> d.f
     <bound method D.f of <__main__.D object at 0x00B18C90>>
 
-Internally, the bound method stores the underlying function and the bound
-instance::
+Bên trong, bound method lưu trữ hàm nền tảng và instance đã được liên kết::
 
     >>> d.f.__func__
     <function D.f at 0x00C45070>
@@ -1258,58 +1109,39 @@ instance::
     >>> d.f.__self__
     <__main__.D object at 0x00B18C90>
 
-If you have ever wondered where *self* comes from in regular methods or where
-*cls* comes from in class methods, this is it!
+Nếu bạn từng thắc mắc *self* trong các method thông thường hoặc *cls* trong các class method bắt nguồn từ đâu, thì đây chính là câu trả lời!
 
 
-Kinds of methods
-----------------
+Các loại method
+---------------
 
-Non-data descriptors provide a simple mechanism for variations on the usual
-patterns of binding functions into methods.
+Các non-data descriptor cung cấp một cơ chế đơn giản cho những biến thể của các mẫu thông thường dùng để liên kết các hàm thành method.
 
-To recap, functions have a :meth:`~object.__get__` method so that they can be converted
-to a method when accessed as attributes.  The non-data descriptor transforms an
-``obj.f(*args)`` call into ``f(obj, *args)``.  Calling ``cls.f(*args)``
-becomes ``f(*args)``.
+Tóm lại, các hàm có phương thức :meth:`~object.__get__` để chúng có thể được chuyển đổi thành một method khi được truy cập dưới dạng thuộc tính. Descriptor không dữ liệu sẽ chuyển một lệnh gọi ``obj.f(*args)`` thành ``f(obj, *args)``. Việc gọi ``cls.f(*args)`` sẽ trở thành ``f(*args)``.
 
-This chart summarizes the binding and its two most useful variants:
+Bảng này tóm tắt binding và hai biến thể hữu ích nhất của nó:
 
-      +-----------------+----------------------+------------------+
-      | Transformation  | Called from an       | Called from a    |
-      |                 | object               | class            |
-      +=================+======================+==================+
-      | function        | f(obj, \*args)       | f(\*args)        |
-      +-----------------+----------------------+------------------+
-      | staticmethod    | f(\*args)            | f(\*args)        |
-      +-----------------+----------------------+------------------+
-      | classmethod     | f(type(obj), \*args) | f(cls, \*args)   |
-      +-----------------+----------------------+------------------+
+      +--------------+------------------------+-----------------------+
+      | Chuyển đổi   | Được gọi từ một object | Được gọi từ một class |
+      +==============+========================+=======================+
+      | hàm          | f(obj, \*args)         | f(\*args)             |
+      +--------------+------------------------+-----------------------+
+      | staticmethod | f(\*args)              | f(\*args)             |
+      +--------------+------------------------+-----------------------+
+      | classmethod  | f(type(obj), \*args)   | f(cls, \*args)        |
+      +--------------+------------------------+-----------------------+
 
 
-Static methods
---------------
+Phương thức static
+------------------
 
-Static methods return the underlying function without changes.  Calling either
-``c.f`` or ``C.f`` is the equivalent of a direct lookup into
-``object.__getattribute__(c, "f")`` or ``object.__getattribute__(C, "f")``. As a
-result, the function becomes identically accessible from either an object or a
-class.
+Phương thức static trả về hàm bên dưới mà không thay đổi. Việc gọi ``c.f`` hoặc ``C.f`` tương đương với việc tra cứu trực tiếp trong ``object.__getattribute__(c, "f")`` hoặc ``object.__getattribute__(C, "f")``. Do đó, hàm có thể được truy cập giống hệt nhau từ một object hoặc một class.
 
-Good candidates for static methods are methods that do not reference the
-``self`` variable.
+Các ứng viên phù hợp cho phương thức static là những phương thức không tham chiếu đến biến ``self``.
 
-For instance, a statistics package may include a container class for
-experimental data.  The class provides normal methods for computing the average,
-mean, median, and other descriptive statistics that depend on the data. However,
-there may be useful functions which are conceptually related but do not depend
-on the data.  For instance, ``erf(x)`` is handy conversion routine that comes up
-in statistical work but does not directly depend on a particular dataset.
-It can be called either from an object or the class:  ``s.erf(1.5) --> 0.9332``
-or ``Sample.erf(1.5) --> 0.9332``.
+Ví dụ, một package thống kê có thể bao gồm một container class dành cho dữ liệu thực nghiệm. Class này cung cấp các phương thức thông thường để tính giá trị trung bình, mean, median và các thống kê mô tả khác phụ thuộc vào dữ liệu. Tuy nhiên, có thể có những hàm hữu ích về mặt khái niệm có liên quan nhưng không phụ thuộc vào dữ liệu. Chẳng hạn, ``erf(x)`` là một routine chuyển đổi tiện dụng thường xuất hiện trong công việc thống kê nhưng không phụ thuộc trực tiếp vào một dataset cụ thể. Nó có thể được gọi từ một object hoặc class: ``s.erf(1.5) --> 0.9332`` hoặc ``Sample.erf(1.5) --> 0.9332``.
 
-Since static methods return the underlying function with no changes, the
-example calls are unexciting:
+Vì phương thức static trả về hàm bên dưới mà không thay đổi, các lệnh gọi trong ví dụ không có gì đặc biệt:
 
 .. testcode::
 
@@ -1325,8 +1157,8 @@ example calls are unexciting:
     >>> E().f(3)
     30
 
-Using the non-data descriptor protocol, a pure Python version of
-:deco:`staticmethod` would look like this:
+Sử dụng non-data descriptor protocol, phiên bản Python thuần của
+:deco:`staticmethod` sẽ trông như sau:
 
 .. testcode::
 
@@ -1349,11 +1181,7 @@ Using the non-data descriptor protocol, a pure Python version of
         def __annotations__(self):
             return self.f.__annotations__
 
-The :func:`functools.update_wrapper` call adds a ``__wrapped__`` attribute
-that refers to the underlying function.  Also it carries forward
-the attributes necessary to make the wrapper look like the wrapped
-function, including :attr:`~function.__name__`, :attr:`~function.__qualname__`,
-and :attr:`~function.__doc__`.
+Lệnh gọi :func:`functools.update_wrapper` thêm một thuộc tính ``__wrapped__`` tham chiếu đến hàm bên dưới. Đồng thời, nó chuyển tiếp các thuộc tính cần thiết để wrapper trông giống hàm được bọc, bao gồm :attr:`~function.__name__`, :attr:`~function.__qualname__` và :attr:`~function.__doc__`.
 
 .. testcode::
     :hide:
@@ -1417,12 +1245,10 @@ and :attr:`~function.__doc__`.
     True
 
 
-Class methods
--------------
+Phương thức lớp
+---------------
 
-Unlike static methods, class methods prepend the class reference to the
-argument list before calling the function.  This format is the same
-for whether the caller is an object or a class:
+Không giống phương thức tĩnh, phương thức lớp thêm tham chiếu đến lớp vào đầu danh sách đối số trước khi gọi hàm. Định dạng này giống nhau bất kể bên gọi là một đối tượng hay một lớp:
 
 .. testcode::
 
@@ -1438,11 +1264,7 @@ for whether the caller is an object or a class:
     >>> F().f(3)
     ('F', 3)
 
-This behavior is useful whenever the method only needs to have a class
-reference and does not rely on data stored in a specific instance.  One use for
-class methods is to create alternate class constructors.  For example, the
-classmethod :func:`dict.fromkeys` creates a new dictionary from a list of
-keys.  The pure Python equivalent is:
+Cách hoạt động này hữu ích whenever phương thức chỉ cần một tham chiếu đến lớp và không phụ thuộc vào dữ liệu được lưu trong một instance cụ thể. Một cách sử dụng của phương thức lớp là tạo các constructor thay thế cho lớp. Ví dụ, classmethod :func:`dict.fromkeys` tạo một dictionary mới từ danh sách các khóa. Cách tương đương bằng Python thuần là:
 
 .. testcode::
 
@@ -1455,7 +1277,7 @@ keys.  The pure Python equivalent is:
                 d[key] = value
             return d
 
-Now a new dictionary of unique keys can be constructed like this:
+Giờ đây, bạn có thể tạo một dictionary mới gồm các khóa duy nhất như sau:
 
 .. doctest::
 
@@ -1465,8 +1287,8 @@ Now a new dictionary of unique keys can be constructed like this:
     >>> d
     {'a': None, 'b': None, 'r': None, 'c': None, 'd': None}
 
-Using the non-data descriptor protocol, a pure Python version of
-:deco:`classmethod` would look like this:
+Sử dụng non-data descriptor protocol, phiên bản Python thuần của
+:deco:`classmethod` sẽ có dạng như sau:
 
 .. testcode::
 
@@ -1487,7 +1309,7 @@ Using the non-data descriptor protocol, a pure Python version of
 .. testcode::
     :hide:
 
-    # Verify the emulation works
+    # Kiểm tra mô phỏng hoạt động
     class T:
         @ClassMethod
         def cm(cls, x: int, y: str) -> tuple[str, int, str]:
@@ -1501,16 +1323,16 @@ Using the non-data descriptor protocol, a pure Python version of
     >>> T.cm(11, 22)
     ('T', 11, 22)
 
-    # Also call it from an instance
+    # Cũng gọi nó từ một instance
     >>> t = T()
     >>> t.cm(11, 22)
     ('T', 11, 22)
 
-    # Verify that T uses our emulation
+    # Kiểm tra T sử dụng mô phỏng của chúng ta
     >>> type(vars(T)['cm']).__name__
     'ClassMethod'
 
-    # Verify that update_wrapper() correctly copied attributes
+    # Kiểm tra update_wrapper() đã sao chép đúng các thuộc tính
     >>> T.cm.__name__
     'cm'
     >>> T.cm.__qualname__
@@ -1520,7 +1342,7 @@ Using the non-data descriptor protocol, a pure Python version of
     >>> T.cm.__annotations__
     {'x': <class 'int'>, 'y': <class 'str'>, 'return': tuple[str, int, str]}
 
-    # Verify that __wrapped__ was added and works correctly
+    # Kiểm tra __wrapped__ đã được thêm và hoạt động đúng
     >>> f = vars(T)['cm'].__wrapped__
     >>> type(f).__name__
     'function'
@@ -1530,23 +1352,17 @@ Using the non-data descriptor protocol, a pure Python version of
     ('T', 11, 22)
 
 
-The :func:`functools.update_wrapper` call in ``ClassMethod`` adds a
-``__wrapped__`` attribute that refers to the underlying function.  Also
-it carries forward the attributes necessary to make the wrapper look
-like the wrapped function: :attr:`~function.__name__`,
-:attr:`~function.__qualname__`, :attr:`~function.__doc__`,
-and :attr:`~function.__annotations__`.
+Lệnh gọi :func:`functools.update_wrapper` trong ``ClassMethod`` thêm một thuộc tính ``__wrapped__`` tham chiếu đến hàm bên dưới. Nó cũng giữ lại các thuộc tính cần thiết để wrapper trông giống như hàm được bọc: :attr:`~function.__name__`,
+:attr:`~function.__qualname__`, :attr:`~function.__doc__` và :attr:`~function.__annotations__`.
 
 
-Member objects and __slots__
-----------------------------
+Đối tượng thành viên và __slots__
+---------------------------------
 
-When a class defines ``__slots__``, it replaces instance dictionaries with a
-fixed-length array of slot values.  From a user point of view that has
-several effects:
+Khi một lớp định nghĩa ``__slots__``, nó thay thế các dictionary của instance bằng một mảng có độ dài cố định chứa các giá trị slot. Từ góc nhìn người dùng, điều này có một số tác động:
 
-1. Provides immediate detection of bugs due to misspelled attribute
-assignments.  Only attribute names specified in ``__slots__`` are allowed:
+1. Phát hiện ngay các lỗi do viết sai tên thuộc tính
+khi gán. Chỉ cho phép các tên thuộc tính được chỉ định trong ``__slots__``:
 
 .. testcode::
 
@@ -1561,25 +1377,25 @@ assignments.  Only attribute names specified in ``__slots__`` are allowed:
             ...
         AttributeError: 'Vehicle' object has no attribute 'id_nubmer'
 
-2. Helps create immutable objects where descriptors manage access to private
-attributes stored in ``__slots__``:
+2. Giúp tạo các đối tượng bất biến, trong đó descriptor quản lý quyền truy cập vào các
+thuộc tính được lưu trữ trong ``__slots__``:
 
 .. testcode::
 
     class Immutable:
 
-        __slots__ = ('_dept', '_name')          # Replace the instance dictionary
+        __slots__ = ('_dept', '_name')          # Thay thế dictionary của instance
 
         def __init__(self, dept, name):
-            self._dept = dept                   # Store to private attribute
-            self._name = name                   # Store to private attribute
+            self._dept = dept                   # Lưu vào thuộc tính riêng tư
+            self._name = name                   # Lưu vào thuộc tính riêng tư
 
-        @property                               # Read-only descriptor
+        @property                               # Descriptor chỉ đọc
         def dept(self):
             return self._dept
 
         @property
-        def name(self):                         # Read-only descriptor
+        def name(self):                         # Descriptor chỉ đọc
             return self._name
 
 .. doctest::
@@ -1596,25 +1412,23 @@ attributes stored in ``__slots__``:
         ...
     AttributeError: 'Immutable' object has no attribute 'location'
 
-3. Saves memory.  On a 64-bit Linux build, an instance with two attributes
-takes 48 bytes with ``__slots__`` and 152 bytes without.  This `flyweight
-design pattern <https://en.wikipedia.org/wiki/Flyweight_pattern>`_ likely only
-matters when a large number of instances are going to be created.
+3. Giúp tiết kiệm bộ nhớ. Trên bản dựng Linux 64-bit, một thể hiện có hai thuộc tính
+chiếm 48 byte với ``__slots__`` và 152 byte nếu không có. Mẫu thiết kế `flyweight <https://en.wikipedia.org/wiki/Flyweight_pattern>`_ này có lẽ chỉ quan trọng khi sẽ tạo một số lượng lớn các thể hiện.
 
-4. Improves speed.  Reading instance variables is 35% faster with
-``__slots__`` (as measured with Python 3.10 on an Apple M1 processor).
+4. Cải thiện tốc độ. Việc đọc các biến của thể hiện nhanh hơn 35% với
+``__slots__`` (được đo bằng Python 3.10 trên bộ xử lý Apple M1).
 
-5. Blocks tools like :deco:`functools.cached_property` which require an
-instance dictionary to function correctly:
+5. Ngăn các công cụ như :deco:`functools.cached_property`, vốn yêu cầu một
+từ điển instance để hoạt động chính xác:
 
 .. testcode::
 
     from functools import cached_property
 
     class CP:
-        __slots__ = ()                          # Eliminates the instance dict
+        __slots__ = ()                          # Loại bỏ dict của instance
 
-        @cached_property                        # Requires an instance dict
+        @cached_property                        # Yêu cầu dict của instance
         def pi(self):
             return 4 * sum((-1.0)**n / (2.0*n + 1.0)
                            for n in reversed(range(100_000)))
@@ -1626,12 +1440,7 @@ instance dictionary to function correctly:
       ...
     TypeError: No '__dict__' attribute on 'CP' instance to cache 'pi' property.
 
-It is not possible to create an exact drop-in pure Python version of
-``__slots__`` because it requires direct access to C structures and control
-over object memory allocation.  However, we can build a mostly faithful
-simulation where the actual C structure for slots is emulated by a private
-``_slotvalues`` list.  Reads and writes to that private structure are managed
-by member descriptors:
+Không thể tạo một phiên bản Python thuần túy thay thế trực tiếp và chính xác cho ``__slots__`` vì nó yêu cầu quyền truy cập trực tiếp vào các cấu trúc C và quyền kiểm soát việc cấp phát bộ nhớ cho đối tượng. Tuy nhiên, ta có thể xây dựng một mô phỏng tương đối trung thực, trong đó cấu trúc C thực tế dành cho các slot được mô phỏng bằng một danh sách ``_slotvalues`` riêng tư. Các thao tác đọc và ghi vào cấu trúc riêng tư đó được quản lý bởi các member descriptor:
 
 .. testcode::
 
@@ -1641,14 +1450,14 @@ by member descriptors:
 
         def __init__(self, name, clsname, offset):
             'Emulate PyMemberDef in Include/descrobject.h'
-            # Also see descr_new() in Objects/descrobject.c
+            # Xem thêm descr_new() trong Objects/descrobject.c
             self.name = name
             self.clsname = clsname
             self.offset = offset
 
         def __get__(self, obj, objtype=None):
             'Emulate member_get() in Objects/descrobject.c'
-            # Also see PyMember_GetOne() in Python/structmember.c
+            # Xem thêm PyMember_GetOne() trong Python/structmember.c
             if obj is None:
                 return self
             value = obj._slotvalues[self.offset]
@@ -1671,8 +1480,7 @@ by member descriptors:
             'Emulate member_repr() in Objects/descrobject.c'
             return f'<Member {self.name!r} of {self.clsname!r}>'
 
-The :meth:`!type.__new__` method takes care of adding member objects to class
-variables:
+Phương thức :meth:`!type.__new__` đảm nhiệm việc thêm các đối tượng member vào các biến lớp:
 
 .. testcode::
 
@@ -1681,15 +1489,13 @@ variables:
 
         def __new__(mcls, clsname, bases, mapping, **kwargs):
             'Emulate type_new() in Objects/typeobject.c'
-            # type_new() calls PyTypeReady() which calls add_methods()
+            # type_new() gọi PyTypeReady(), rồi gọi add_methods()
             slot_names = mapping.get('slot_names', [])
             for offset, name in enumerate(slot_names):
                 mapping[name] = Member(name, clsname, offset)
             return type.__new__(mcls, clsname, bases, mapping, **kwargs)
 
-The :meth:`object.__new__` method takes care of creating instances that have
-slots instead of an instance dictionary.  Here is a rough simulation in pure
-Python:
+Phương thức :meth:`object.__new__` đảm nhiệm việc tạo các instance có slots thay vì dictionary của instance. Đây là một mô phỏng sơ lược bằng Python thuần:
 
 .. testcode::
 
@@ -1722,8 +1528,7 @@ Python:
                 )
             super().__delattr__(name)
 
-To use the simulation in a real class, just inherit from :class:`!Object` and
-set the :term:`metaclass` to :class:`Type`:
+Để sử dụng mô phỏng này trong một class thực, chỉ cần kế thừa từ :class:`!Object` và đặt :term:`metaclass` thành :class:`Type`:
 
 .. testcode::
 
@@ -1736,7 +1541,7 @@ set the :term:`metaclass` to :class:`Type`:
             self.x = x
             self.y = y
 
-At this point, the metaclass has loaded member objects for *x* and *y*::
+Tại thời điểm này, metaclass đã nạp các đối tượng member cho *x* và *y*::
 
     >>> from pprint import pp
     >>> pp(dict(vars(H)))
@@ -1750,15 +1555,14 @@ At this point, the metaclass has loaded member objects for *x* and *y*::
 .. doctest::
     :hide:
 
-    # We test this separately because the preceding section is not
-    # doctestable due to the hex memory address for the __init__ function
+    # Chúng tôi kiểm thử riêng phần này vì phần trước không
+    # có thể kiểm thử bằng doctest do địa chỉ bộ nhớ dạng hex của hàm __init__
     >>> isinstance(vars(H)['x'], Member)
     True
     >>> isinstance(vars(H)['y'], Member)
     True
 
-When instances are created, they have a ``slot_values`` list where the
-attributes are stored:
+Khi các instance được tạo, chúng có một danh sách ``slot_values`` nơi các thuộc tính được lưu trữ:
 
 .. doctest::
 
@@ -1769,7 +1573,7 @@ attributes are stored:
     >>> vars(h)
     {'_slotvalues': [55, 20]}
 
-Misspelled or unassigned attributes will raise an exception:
+Các thuộc tính bị viết sai hoặc chưa được gán sẽ gây ra một ngoại lệ:
 
 .. doctest::
 
@@ -1796,3 +1600,9 @@ Misspelled or unassigned attributes will raise an exception:
     False
     >>> hasattr(hu, 'y')
     False
+
+.. _`predicate`: https://en.wikipedia.org/wiki/Predicate_(mathematical_logic)
+.. _`Guido's Tutorial`: https://www.python.org/download/releases/2.2.3/descrintro/#cooperation
+.. _`object relational mapping`: https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping
+.. _`models`: https://en.wikipedia.org/wiki/Database_model
+.. _`flyweight design pattern`: https://en.wikipedia.org/wiki/Flyweight_pattern

@@ -2,63 +2,50 @@
 
 .. _instrumentation:
 
-===============================================
-Instrumenting CPython with DTrace and SystemTap
-===============================================
+===========================================
+Instrument CPython bằng DTrace và SystemTap
+===========================================
 
 :author: David Malcolm
 :author: Łukasz Langa
 
-DTrace and SystemTap are monitoring tools, each providing a way to inspect
-what the processes on a computer system are doing.  They both use
-domain-specific languages allowing a user to write scripts which:
+DTrace và SystemTap là các công cụ giám sát, mỗi công cụ cung cấp một cách để kiểm tra những gì các tiến trình trên một hệ thống máy tính đang thực hiện. Cả hai đều sử dụng các ngôn ngữ chuyên biệt cho từng miền, cho phép người dùng viết các script để:
 
-- filter which processes are to be observed
-- gather data from the processes of interest
-- generate reports on the data
+- lọc các tiến trình cần được quan sát
+- thu thập dữ liệu từ các tiến trình cần quan tâm
+- tạo báo cáo về dữ liệu
 
-As of Python 3.6, CPython can be built with embedded "markers", also
-known as "probes", that can be observed by a DTrace or SystemTap script,
-making it easier to monitor what the CPython processes on a system are
-doing.
+Kể từ Python 3.6, CPython có thể được xây dựng với các “marker” được nhúng, còn gọi là “probe”, mà một tập lệnh DTrace hoặc SystemTap có thể quan sát, giúp dễ dàng hơn trong việc theo dõi các tiến trình CPython trên hệ thống đang thực hiện những gì.
 
 .. impl-detail::
 
-   DTrace markers are implementation details of the CPython interpreter.
-   No guarantees are made about probe compatibility between versions of
-   CPython. DTrace scripts can stop working or work incorrectly without
-   warning when changing CPython versions.
+   Các marker DTrace là chi tiết triển khai của trình thông dịch CPython. Không có bảo đảm nào về khả năng tương thích của probe giữa các phiên bản CPython. Các tập lệnh DTrace có thể ngừng hoạt động hoặc hoạt động không chính xác mà không có cảnh báo khi thay đổi phiên bản CPython.
 
 
-Enabling the static markers
----------------------------
+Bật các marker tĩnh
+-------------------
 
-macOS comes with built-in support for DTrace.  On Linux, in order to
-build CPython with the embedded markers for SystemTap, the SystemTap
-development tools must be installed.
+macOS được tích hợp sẵn hỗ trợ cho DTrace. Trên Linux, để xây dựng CPython với các marker được nhúng cho SystemTap, phải cài đặt các công cụ phát triển SystemTap.
 
-On a Linux machine, this can be done via::
+Trên một máy Linux, bạn có thể thực hiện việc này bằng::
 
    $ yum install systemtap-sdt-devel
 
-or::
+hoặc::
 
    $ sudo apt-get install systemtap-sdt-dev
 
 
-CPython must then be :option:`configured with the --with-dtrace option
-<--with-dtrace>`:
+Sau đó, CPython phải được cấu hình với :option:`configured with the --with-dtrace option <--with-dtrace>`:
 
 .. code-block:: none
 
    checking for --with-dtrace... yes
 
-On macOS, you can list available DTrace probes by running a Python
-process in the background and listing all probes made available by the
-Python provider::
+Trên macOS, bạn có thể liệt kê các probe DTrace hiện có bằng cách chạy một tiến trình Python ở chế độ nền rồi liệt kê tất cả probe do Python provider cung cấp::
 
    $ python3.6 -q &
-   $ sudo dtrace -l -P python$!  # or: dtrace -l -m python3.6
+   $ sudo dtrace -l -P python$!  # hoặc: dtrace -l -m python3.6
 
       ID   PROVIDER            MODULE                          FUNCTION NAME
    29564 python18035        python3.6          _PyEval_EvalFrameDefault function-entry
@@ -70,22 +57,19 @@ Python provider::
    29570 python18035        python3.6          _PyEval_EvalFrameDefault line
    29571 python18035        python3.6                 maybe_dtrace_line line
 
-On Linux, you can verify if the SystemTap static markers are present in
-the built binary by seeing if it contains a ".note.stapsdt" section.
+Trên Linux, bạn có thể kiểm tra xem các static marker của SystemTap có hiện diện trong binary đã build hay không bằng cách xem nó có chứa section ".note.stapsdt" hay không.
 
 ::
 
    $ readelf -S ./python | grep .note.stapsdt
    [30] .note.stapsdt        NOTE         0000000000000000 00308d78
 
-If you've built Python as a shared library
-(with the :option:`--enable-shared` configure option), you
-need to look instead within the shared library.  For example::
+Nếu bạn đã build Python dưới dạng shared library (với tùy chọn configure :option:`--enable-shared`), thay vào đó bạn cần kiểm tra bên trong shared library. Ví dụ::
 
    $ readelf -S libpython3.3dm.so.1.0 | grep .note.stapsdt
    [29] .note.stapsdt        NOTE         0000000000000000 00365b68
 
-Sufficiently modern readelf can print the metadata::
+Các phiên bản readelf đủ mới có thể in metadata::
 
     $ readelf -n ./python
 
@@ -122,18 +106,13 @@ Sufficiently modern readelf can print the metadata::
             Location: 0x000000000053dba8, Base: 0x0000000000630ce2, Semaphore: 0x00000000008d6bea
             Arguments: 8@%rbp 8@%r12 -4@%eax
 
-The above metadata contains information for SystemTap describing how it
-can patch strategically placed machine code instructions to enable the
-tracing hooks used by a SystemTap script.
+Metadata ở trên chứa thông tin dành cho SystemTap, mô tả cách nó có thể vá các lệnh machine code được đặt một cách có chủ đích để bật các tracing hook được một script SystemTap sử dụng.
 
 
-Static DTrace probes
---------------------
+Các probe DTrace tĩnh
+---------------------
 
-The following example DTrace script can be used to show the call/return
-hierarchy of a Python script, only tracing within the invocation of
-a function called "start". In other words, import-time function
-invocations are not going to be listed:
+Bạn có thể sử dụng script DTrace sau để hiển thị hệ phân cấp call/return của một script Python, chỉ trace trong lần gọi một hàm có tên "start". Nói cách khác, các lần gọi hàm trong thời gian import sẽ không được liệt kê:
 
 .. code-block:: none
 
@@ -169,11 +148,11 @@ invocations are not going to be listed:
             self->trace = 0;
     }
 
-It can be invoked like this::
+Có thể gọi nó như sau::
 
   $ sudo dtrace -q -s call_stack.d -c "python3.6 script.py"
 
-The output looks like this:
+Kết quả hiển thị như sau:
 
 .. code-block:: none
 
@@ -197,15 +176,12 @@ The output looks like this:
     156641360747370 function-return:call_stack.py:start:28
 
 
-Static SystemTap markers
-------------------------
+Các marker SystemTap tĩnh
+-------------------------
 
-The low-level way to use the SystemTap integration is to use the static
-markers directly.  This requires you to explicitly state the binary file
-containing them.
+Cách sử dụng tích hợp SystemTap ở mức thấp là sử dụng trực tiếp các marker tĩnh. Cách này yêu cầu bạn chỉ rõ tệp nhị phân chứa chúng.
 
-For example, this SystemTap script can be used to show the call/return
-hierarchy of a Python script:
+Ví dụ: bạn có thể sử dụng script SystemTap này để hiển thị hệ phân cấp call/return của một script Python:
 
 .. code-block:: none
 
@@ -227,13 +203,13 @@ hierarchy of a Python script:
               thread_indent(-1), funcname, filename, lineno);
    }
 
-It can be invoked like this::
+Có thể gọi nó như sau::
 
    $ stap \
      show-call-hierarchy.stp \
      -c "./python test.py"
 
-The output looks like this:
+Kết quả sẽ có dạng như sau:
 
 .. code-block:: none
 
@@ -244,120 +220,100 @@ The output looks like this:
    11428 python(8274):         <= __getitem__ in Lib/os.py:426
    11433 python(8274):        <= __contains__ in Lib/_abcoll.py:366
 
-where the columns are:
+trong đó các cột là:
 
-- time in microseconds since start of script
-- name of executable
-- PID of process
+- thời gian tính bằng microgiây kể từ khi script bắt đầu
+- tên của tệp thực thi
+- PID của tiến trình
 
-and the remainder indicates the call/return hierarchy as the script executes.
+và phần còn lại cho biết thứ bậc gọi/trả về khi script thực thi.
 
-For a :option:`--enable-shared` build of CPython, the markers are contained within the
-libpython shared library, and the probe's dotted path needs to reflect this. For
-example, this line from the above example:
+Đối với bản build :option:`--enable-shared` của CPython, các marker nằm trong shared library libpython, và đường dẫn dạng dấu chấm của probe cần phản ánh điều này. Ví dụ, dòng sau trong ví dụ trên:
 
 .. code-block:: none
 
    probe process("python").mark("function__entry") {
 
-should instead read:
+thay vào đó phải là:
 
 .. code-block:: none
 
    probe process("python").library("libpython3.6dm.so.1.0").mark("function__entry") {
 
-(assuming a :ref:`debug build <debug-build>` of CPython 3.6)
+(giả sử là bản dựng :ref:`debug build <debug-build>` của CPython 3.6)
 
 
 .. _static-markers:
 
-Available static markers
-------------------------
+Các static marker hiện có
+-------------------------
 
 .. object:: function__entry(str filename, str funcname, int lineno)
 
-   This marker indicates that execution of a Python function has begun.
-   It is only triggered for pure-Python (bytecode) functions.
+   Marker này cho biết quá trình thực thi một hàm Python đã bắt đầu. Nó chỉ được kích hoạt đối với các hàm Python thuần túy (hàm bytecode).
 
-   The filename, function name, and line number are provided back to the
-   tracing script as positional arguments, which must be accessed using
-   ``$arg1``, ``$arg2``, ``$arg3``:
+   Tên tệp, tên hàm và số dòng được cung cấp cho tracing script dưới dạng các đối số vị trí, phải được truy cập bằng ``$arg1``, ``$arg2``, ``$arg3``:
 
-       * ``$arg1`` : ``(const char *)`` filename, accessible using ``user_string($arg1)``
+       * ``$arg1`` : ``(const char *)`` tên tệp, có thể truy cập bằng ``user_string($arg1)``
 
-       * ``$arg2`` : ``(const char *)`` function name, accessible using
-         ``user_string($arg2)``
+       * ``$arg2`` : ``(const char *)`` tên hàm, có thể truy cập bằng ``user_string($arg2)``
 
-       * ``$arg3`` : ``int`` line number
+       * ``$arg3`` : ``int`` số dòng
 
 .. object:: function__return(str filename, str funcname, int lineno)
 
-   This marker is the converse of :c:func:`!function__entry`, and indicates that
-   execution of a Python function has ended (either via ``return``, or via an
-   exception).  It is only triggered for pure-Python (bytecode) functions.
+   Marker này là điều ngược lại của :c:func:`!function__entry`, cho biết quá trình thực thi một hàm Python đã kết thúc (hoặc thông qua ``return``, hoặc do một exception). Marker này chỉ được kích hoạt đối với các hàm Python thuần (bytecode).
 
-   The arguments are the same as for :c:func:`!function__entry`
+   Các đối số giống như đối với :c:func:`!function__entry`
 
 .. object:: line(str filename, str funcname, int lineno)
 
-   This marker indicates a Python line is about to be executed.  It is
-   the equivalent of line-by-line tracing with a Python profiler.  It is
-   not triggered within C functions.
+   Marker này cho biết một dòng Python sắp được thực thi. Đây là cách tương đương với việc tracing từng dòng bằng một Python profiler. Marker này không được kích hoạt bên trong các hàm C.
 
-   The arguments are the same as for :c:func:`!function__entry`.
+   Các đối số giống như đối với :c:func:`!function__entry`.
 
 .. object:: gc__start(int generation)
 
-   Fires when the Python interpreter starts a garbage collection cycle.
-   ``arg0`` is the generation to scan, like :func:`gc.collect`.
+   Được kích hoạt khi Python interpreter bắt đầu một chu kỳ garbage collection. ``arg0`` là generation cần quét, chẳng hạn như :func:`gc.collect`.
 
 .. object:: gc__done(long collected)
 
-   Fires when the Python interpreter finishes a garbage collection
-   cycle. ``arg0`` is the number of collected objects.
+   Được kích hoạt khi Python interpreter hoàn tất một chu kỳ garbage collection. ``arg0`` là số lượng object đã được thu thập.
 
 .. object:: import__find__load__start(str modulename)
 
-   Fires before :mod:`importlib` attempts to find and load the module.
-   ``arg0`` is the module name.
+   Được kích hoạt trước khi :mod:`importlib` thực hiện các lần thử tìm và tải module. ``arg0`` là tên module.
 
    .. versionadded:: 3.7
 
 .. object:: import__find__load__done(str modulename, int found)
 
-   Fires after :mod:`importlib`'s find_and_load function is called.
-   ``arg0`` is the module name, ``arg1`` indicates if module was
-   successfully loaded.
+   Được kích hoạt sau khi hàm find_and_load của :mod:`importlib` được gọi. ``arg0`` là tên module, ``arg1`` cho biết module có được tải thành công hay không.
 
    .. versionadded:: 3.7
 
 
 .. object:: audit(str event, void *tuple)
 
-   Fires when :func:`sys.audit` or :c:func:`PySys_Audit` is called.
-   ``arg0`` is the event name as C string, ``arg1`` is a :c:type:`PyObject`
-   pointer to a tuple object.
+   Được kích hoạt khi :func:`sys.audit` hoặc :c:func:`PySys_Audit` được gọi. ``arg0`` là tên sự kiện dưới dạng chuỗi C, ``arg1`` là con trỏ :c:type:`PyObject` đến một đối tượng tuple.
 
    .. versionadded:: 3.8
 
 
-C Entry Points
-^^^^^^^^^^^^^^
+Điểm vào C
+^^^^^^^^^^
 
-To simplify triggering of DTrace markers, Python's C API comes with a number
-of helper functions that mirror each static marker. On builds of Python without
-DTrace enabled, these do nothing.
+Để đơn giản hóa việc kích hoạt các marker DTrace, C API của Python cung cấp một số hàm trợ giúp tương ứng với từng marker tĩnh. Trên các bản build Python không bật DTrace, các hàm này không thực hiện thao tác nào.
 
-In general, it is not necessary to call these yourself, as Python will do
-it for you.
+Nhìn chung, bạn không cần tự gọi các hàm này, vì Python sẽ thực hiện việc đó thay bạn.
 
 .. list-table::
    :widths: 50 25 25
    :header-rows: 1
 
-   * * C API Function
-     * Static Marker
-     * Notes
+   * * Hàm C API
+     * Nhãn Static
+     * Ghi chú
    * * .. c:function:: void PyDTrace_LINE(const char *arg0, const char *arg1, int arg2)
      * :c:func:`!line`
      *
@@ -375,16 +331,16 @@ it for you.
      *
    * * .. c:function:: void PyDTrace_INSTANCE_NEW_START(int arg0)
      * :c:func:`!instance__new__start`
-     * Not used by Python
+     * Không được Python sử dụng
    * * .. c:function:: void PyDTrace_INSTANCE_NEW_DONE(int arg0)
      * :c:func:`!instance__new__done`
-     * Not used by Python
+     * Không được Python sử dụng
    * * .. c:function:: void PyDTrace_INSTANCE_DELETE_START(int arg0)
      * :c:func:`!instance__delete__start`
-     * Not used by Python
+     * Không được Python sử dụng
    * * .. c:function:: void PyDTrace_INSTANCE_DELETE_DONE(int arg0)
      * :c:func:`!instance__delete__done`
-     * Not used by Python
+     * Không được Python sử dụng
    * * .. c:function:: void PyDTrace_IMPORT_FIND_LOAD_START(const char *arg0)
      * :c:func:`!import__find__load__start`
      *
@@ -396,8 +352,8 @@ it for you.
      *
 
 
-C Probing Checks
-^^^^^^^^^^^^^^^^
+Các kiểm tra thăm dò trong C
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. c:function:: int PyDTrace_LINE_ENABLED(void)
 .. c:function:: int PyDTrace_FUNCTION_ENTRY_ENABLED(void)
@@ -412,21 +368,16 @@ C Probing Checks
 .. c:function:: int PyDTrace_IMPORT_FIND_LOAD_DONE_ENABLED(void)
 .. c:function:: int PyDTrace_AUDIT_ENABLED(void)
 
-   All calls to ``PyDTrace`` functions must be guarded by a call to one
-   of these functions. This allows Python to minimize performance impact
-   when probing is disabled.
+   Mọi lệnh gọi đến các hàm ``PyDTrace`` phải được bảo vệ bằng một lệnh gọi đến một trong các hàm này. Điều này cho phép Python giảm thiểu ảnh hưởng đến hiệu năng khi tính năng probing bị tắt.
 
-   On builds without DTrace enabled, these functions do nothing and return
-   ``0``.
+   Trên các bản build không bật DTrace, những hàm này không thực hiện thao tác nào và trả về ``0``.
 
-SystemTap Tapsets
------------------
+Tapset của SystemTap
+--------------------
 
-The higher-level way to use the SystemTap integration is to use a "tapset":
-SystemTap's equivalent of a library, which hides some of the lower-level
-details of the static markers.
+Cách sử dụng tích hợp SystemTap ở mức cao hơn là dùng một "tapset": tương đương với một thư viện trong SystemTap, giúp ẩn một số chi tiết cấp thấp hơn của các static marker.
 
-Here is a tapset file, based on a non-shared build of CPython:
+Sau đây là một tệp tapset, dựa trên bản build không dùng shared của CPython:
 
 .. code-block:: none
 
@@ -449,28 +400,20 @@ Here is a tapset file, based on a non-shared build of CPython:
         frameptr = $arg4
     }
 
-If this file is installed in SystemTap's tapset directory (e.g.
-``/usr/share/systemtap/tapset``), then these additional probepoints become
-available:
+Nếu tệp này được cài đặt trong thư mục tapset của SystemTap (ví dụ: ``/usr/share/systemtap/tapset``), thì các probepoint bổ sung sau sẽ khả dụng:
 
 .. object:: python.function.entry(str filename, str funcname, int lineno, frameptr)
 
-   This probe point indicates that execution of a Python function has begun.
-   It is only triggered for pure-Python (bytecode) functions.
+   Probepoint này cho biết quá trình thực thi một hàm Python đã bắt đầu. Nó chỉ được kích hoạt đối với các hàm thuần Python (bytecode).
 
 .. object:: python.function.return(str filename, str funcname, int lineno, frameptr)
 
-   This probe point is the converse of ``python.function.return``, and
-   indicates that execution of a Python function has ended (either via
-   ``return``, or via an exception).  It is only triggered for pure-Python
-   (bytecode) functions.
+   Điểm probe này là đối ngược của ``python.function.return``, và cho biết quá trình thực thi một hàm Python đã kết thúc (do ``return`` hoặc do một ngoại lệ). Điểm này chỉ được kích hoạt đối với các hàm Python thuần túy (bytecode).
 
 
-Examples
---------
-This SystemTap script uses the tapset above to more cleanly implement the
-example given above of tracing the Python function-call hierarchy, without
-needing to directly name the static markers:
+Ví dụ
+-----
+Script SystemTap này sử dụng tapset ở trên để triển khai rõ ràng hơn ví dụ đã nêu ở trên về việc theo dõi hệ thống phân cấp các lần gọi hàm Python, mà không cần nêu trực tiếp tên các static marker:
 
 .. code-block:: none
 
@@ -487,9 +430,7 @@ needing to directly name the static markers:
     }
 
 
-The following script uses the tapset above to provide a top-like view of all
-running CPython code, showing the top 20 most frequently entered bytecode
-frames, each second, across the whole system:
+Script sau đây sử dụng tapset ở trên để cung cấp chế độ xem dạng top về toàn bộ mã CPython đang chạy, hiển thị 20 frame bytecode được vào thường xuyên nhất mỗi giây trên toàn hệ thống:
 
 .. code-block:: none
 

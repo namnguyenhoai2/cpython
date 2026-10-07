@@ -3,63 +3,43 @@
 .. _upgrading-optparse-code:
 .. _migrating-optparse-code:
 
-============================================
-Migrating ``optparse`` code to ``argparse``
-============================================
+===========================================
+Di chuyển mã ``optparse`` sang ``argparse``
+===========================================
 
-The :mod:`argparse` module offers several higher level features not natively
-provided by the :mod:`optparse` module, including:
+Mô-đun :mod:`argparse` cung cấp một số tính năng cấp cao hơn mà mô-đun :mod:`optparse` không hỗ trợ sẵn, bao gồm:
 
-* Handling positional arguments.
-* Supporting subcommands.
-* Allowing alternative option prefixes like ``+`` and ``/``.
-* Handling zero-or-more and one-or-more style arguments.
-* Producing more informative usage messages.
-* Providing a much simpler interface for custom ``type`` and ``action``.
+* Xử lý các đối số vị trí.
+* Hỗ trợ các subcommand.
+* Cho phép sử dụng các tiền tố tùy chọn thay thế như ``+`` và ``/``.
+* Xử lý các đối số kiểu không hoặc nhiều và một hoặc nhiều.
+* Tạo các thông báo hướng dẫn sử dụng giàu thông tin hơn.
+* Cung cấp một giao diện đơn giản hơn nhiều cho các ``type`` và ``action`` tùy chỉnh.
 
-Originally, the :mod:`argparse` module attempted to maintain compatibility
-with :mod:`optparse`.  However, the fundamental design differences between
-supporting declarative command line option processing (while leaving positional
-argument processing to application code), and supporting both named options
-and positional arguments in the declarative interface mean that the
-API has diverged from that of ``optparse`` over time.
+Ban đầu, mô-đun :mod:`argparse` cố gắng duy trì khả năng tương thích với :mod:`optparse`. Tuy nhiên, những khác biệt cơ bản trong thiết kế giữa việc hỗ trợ xử lý tùy chọn dòng lệnh theo khai báo (đồng thời để mã ứng dụng xử lý các đối số vị trí) và việc hỗ trợ cả tùy chọn có tên lẫn đối số vị trí trong giao diện khai báo khiến API dần khác với API của ``optparse``.
 
-As described in :ref:`choosing-an-argument-parser`, applications that are
-currently using :mod:`optparse` and are happy with the way it works can
-just continue to use ``optparse``.
+Như đã mô tả trong :ref:`choosing-an-argument-parser`, các ứng dụng hiện đang sử dụng :mod:`optparse` và hài lòng với cách thức hoạt động của nó có thể tiếp tục sử dụng ``optparse``.
 
-Application developers that are considering migrating should also review
-the list of intrinsic behavioural differences described in that section
-before deciding whether or not migration is desirable.
+Các nhà phát triển ứng dụng đang cân nhắc việc chuyển đổi cũng nên xem lại danh sách những khác biệt về hành vi vốn có được mô tả trong phần đó trước khi quyết định có nên chuyển đổi hay không.
 
-For applications that do choose to migrate from :mod:`optparse` to :mod:`argparse`,
-the following suggestions should be helpful:
+Đối với các ứng dụng thực sự chuyển đổi từ :mod:`optparse` sang :mod:`argparse`, những đề xuất sau đây sẽ hữu ích:
 
-* Replace all :meth:`optparse.OptionParser.add_option` calls with
-  :meth:`ArgumentParser.add_argument` calls.
+* Thay thế tất cả các lệnh gọi :meth:`optparse.OptionParser.add_option` bằng
+  các lệnh gọi :meth:`ArgumentParser.add_argument`.
 
-* Replace ``(options, args) = parser.parse_args()`` with ``args =
-  parser.parse_args()`` and add additional :meth:`ArgumentParser.add_argument`
-  calls for the positional arguments. Keep in mind that what was previously
-  called ``options``, now in the :mod:`argparse` context is called ``args``.
+* Thay thế ``(options, args) = parser.parse_args()`` bằng ``args = parser.parse_args()`` và thêm các lệnh gọi :meth:`ArgumentParser.add_argument` cho các đối số vị trí. Hãy lưu ý rằng thứ trước đây được gọi là ``options`` thì trong ngữ cảnh :mod:`argparse` hiện được gọi là ``args``.
 
-* Replace :meth:`optparse.OptionParser.disable_interspersed_args`
-  by using :meth:`~ArgumentParser.parse_intermixed_args` instead of
+* Thay thế :meth:`optparse.OptionParser.disable_interspersed_args` bằng cách sử dụng :meth:`~ArgumentParser.parse_intermixed_args` thay cho
   :meth:`~ArgumentParser.parse_args`.
 
-* Replace callback actions and the ``callback_*`` keyword arguments with
-  ``type`` or ``action`` arguments.
+* Thay thế các callback action và đối số keyword ``callback_*`` bằng đối số ``type`` hoặc ``action``.
 
-* Replace string names for ``type`` keyword arguments with the corresponding
-  type objects (e.g. int, float, complex, etc).
+* Thay thế tên chuỗi cho các đối số keyword ``type`` bằng các đối tượng kiểu tương ứng (ví dụ: int, float, complex, v.v.).
 
-* Replace :class:`optparse.Values` with :class:`Namespace` and
-  :exc:`optparse.OptionError` and :exc:`optparse.OptionValueError` with
+* Thay thế :class:`optparse.Values` bằng :class:`Namespace` và
+  :exc:`optparse.OptionError` và :exc:`optparse.OptionValueError` bằng
   :exc:`ArgumentError`.
 
-* Replace strings with implicit arguments such as ``%default`` or ``%prog`` with
-  the standard Python syntax to use dictionaries to format strings, that is,
-  ``%(default)s`` and ``%(prog)s``.
+* Thay thế các chuỗi có đối số ngầm định như ``%default`` hoặc ``%prog`` bằng cú pháp Python chuẩn để sử dụng dictionary nhằm định dạng chuỗi, cụ thể là ``%(default)s`` và ``%(prog)s``.
 
-* Replace the OptionParser constructor ``version`` argument with a call to
-  ``parser.add_argument('--version', action='version', version='<the version>')``.
+* Thay đối số ``version`` của hàm khởi tạo OptionParser bằng một lệnh gọi đến ``parser.add_argument('--version', action='version', version='<the version>')``.

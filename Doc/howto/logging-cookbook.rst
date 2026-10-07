@@ -1,45 +1,38 @@
 .. _logging-cookbook:
 
-================
-Logging Cookbook
-================
+==============
+Sổ tay Logging
+==============
 
 :Author: Vinay Sajip <vinay_sajip at red-dove dot com>
 
-This page contains a number of recipes related to logging, which have been found
-useful in the past. For links to tutorial and reference information, please see
+Trang này chứa một số công thức liên quan đến logging đã được chứng minh là hữu ích trong thực tế. Để xem các liên kết đến thông tin hướng dẫn và tham khảo, vui lòng xem
 :ref:`cookbook-ref-links`.
 
 .. currentmodule:: logging
 
-Using logging in multiple modules
----------------------------------
+Sử dụng logging trong nhiều module
+----------------------------------
 
-Multiple calls to ``logging.getLogger('someLogger')`` return a reference to the
-same logger object.  This is true not only within the same module, but also
-across modules as long as it is in the same Python interpreter process.  It is
-true for references to the same object; additionally, application code can
-define and configure a parent logger in one module and create (but not
-configure) a child logger in a separate module, and all logger calls to the
-child will pass up to the parent.  Here is a main module::
+Nhiều lần gọi ``logging.getLogger('someLogger')`` sẽ trả về tham chiếu đến cùng một đối tượng logger. Điều này đúng không chỉ trong cùng một module mà còn giữa các module, miễn là chúng nằm trong cùng một tiến trình Python interpreter. Điều này đúng với các tham chiếu đến cùng một đối tượng; ngoài ra, mã ứng dụng có thể định nghĩa và cấu hình một logger cha trong một module, rồi tạo (nhưng không cấu hình) một logger con trong một module riêng biệt, và tất cả các lệnh gọi logger đến logger con sẽ được chuyển tiếp lên logger cha. Dưới đây là một module chính::
 
     import logging
     import auxiliary_module
 
-    # create logger with 'spam_application'
+    # tạo logger với 'spam_application'
     logger = logging.getLogger('spam_application')
     logger.setLevel(logging.DEBUG)
-    # create file handler which logs even debug messages
+    # tạo file handler ghi lại cả các thông báo debug
     fh = logging.FileHandler('spam.log')
     fh.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
+    # tạo console handler với mức log cao hơn
     ch = logging.StreamHandler()
     ch.setLevel(logging.ERROR)
-    # create formatter and add it to the handlers
+    # tạo formatter và thêm vào các handler
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     ch.setFormatter(formatter)
-    # add the handlers to the logger
+    # thêm các handler vào logger
     logger.addHandler(fh)
     logger.addHandler(ch)
 
@@ -53,11 +46,11 @@ child will pass up to the parent.  Here is a main module::
     auxiliary_module.some_function()
     logger.info('done with auxiliary_module.some_function()')
 
-Here is the auxiliary module::
+Đây là module hỗ trợ::
 
     import logging
 
-    # create logger
+    # tạo logger
     module_logger = logging.getLogger('spam_application.auxiliary')
 
     class Auxiliary:
@@ -73,7 +66,7 @@ Here is the auxiliary module::
     def some_function():
         module_logger.info('received a call to "some_function"')
 
-The output looks like this:
+Kết quả hiển thị như sau:
 
 .. code-block:: none
 
@@ -98,11 +91,10 @@ The output looks like this:
     2005-03-23 23:47:11,673 - spam_application - INFO -
        done with auxiliary_module.some_function()
 
-Logging from multiple threads
------------------------------
+Ghi log từ nhiều thread
+-----------------------
 
-Logging from multiple threads requires no special effort. The following example
-shows logging from the main (initial) thread and another thread::
+Ghi nhật ký từ nhiều thread không đòi hỏi nỗ lực đặc biệt. Ví dụ sau đây minh họa việc ghi nhật ký từ thread chính (thread ban đầu) và một thread khác::
 
     import logging
     import threading
@@ -130,7 +122,7 @@ shows logging from the main (initial) thread and another thread::
     if __name__ == '__main__':
         main()
 
-When run, the script should print something like the following:
+Khi chạy, script sẽ in ra nội dung tương tự như sau:
 
 .. code-block:: none
 
@@ -152,90 +144,72 @@ When run, the script should print something like the following:
   4513 MainThread Hello from main
   4518 Thread-1 Hi from myfunc
 
-This shows the logging output interspersed as one might expect. This approach
-works for more threads than shown here, of course.
+Điều này cho thấy đầu ra ghi nhật ký được xen kẽ như mong đợi. Tất nhiên, cách tiếp cận này cũng hoạt động với nhiều thread hơn ví dụ này.
 
-Multiple handlers and formatters
---------------------------------
+Nhiều handler và formatter
+--------------------------
 
-Loggers are plain Python objects.  The :meth:`~Logger.addHandler` method has no
-minimum or maximum quota for the number of handlers you may add.  Sometimes it
-will be beneficial for an application to log all messages of all severities to a
-text file while simultaneously logging errors or above to the console.  To set
-this up, simply configure the appropriate handlers.  The logging calls in the
-application code will remain unchanged.  Here is a slight modification to the
-previous simple module-based configuration example::
+Logger là các đối tượng Python thuần túy. Phương thức :meth:`~Logger.addHandler` không đặt giới hạn tối thiểu hoặc tối đa cho số lượng handler mà bạn có thể thêm. Đôi khi, ứng dụng sẽ cần ghi tất cả thông báo ở mọi mức độ nghiêm trọng vào một tệp văn bản, đồng thời ghi các lỗi trở lên vào console. Để thiết lập việc này, chỉ cần cấu hình các handler thích hợp. Các lệnh ghi nhật ký trong mã ứng dụng vẫn không thay đổi. Sau đây là một sửa đổi nhỏ đối với ví dụ cấu hình đơn giản dựa trên module ở phần trước::
 
     import logging
 
     logger = logging.getLogger('simple_example')
     logger.setLevel(logging.DEBUG)
-    # create file handler which logs even debug messages
+    # tạo file handler ghi cả các thông báo debug
     fh = logging.FileHandler('spam.log')
     fh.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
+    # tạo console handler với mức ghi nhật ký cao hơn
     ch = logging.StreamHandler()
     ch.setLevel(logging.ERROR)
-    # create formatter and add it to the handlers
+    # tạo formatter và thêm nó vào các handler
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)
-    # add the handlers to logger
+    # thêm các handler vào logger
     logger.addHandler(ch)
     logger.addHandler(fh)
 
-    # 'application' code
+    # mã 'application'
     logger.debug('debug message')
     logger.info('info message')
     logger.warning('warn message')
     logger.error('error message')
     logger.critical('critical message')
 
-Notice that the 'application' code does not care about multiple handlers.  All
-that changed was the addition and configuration of a new handler named *fh*.
+Lưu ý rằng mã 'application' không quan tâm đến việc có nhiều handler. Điều duy nhất thay đổi là việc thêm và cấu hình một handler mới có tên *fh*.
 
-The ability to create new handlers with higher- or lower-severity filters can be
-very helpful when writing and testing an application.  Instead of using many
-``print`` statements for debugging, use ``logger.debug``: Unlike the print
-statements, which you will have to delete or comment out later, the logger.debug
-statements can remain intact in the source code and remain dormant until you
-need them again.  At that time, the only change that needs to happen is to
-modify the severity level of the logger and/or handler to debug.
+Khả năng tạo các handler mới với bộ lọc có mức độ nghiêm trọng cao hơn hoặc thấp hơn có thể rất hữu ích khi viết và kiểm thử một application. Thay vì sử dụng nhiều câu lệnh ``print`` để debug, hãy sử dụng ``logger.debug``: Không giống các câu lệnh print mà sau này bạn sẽ phải xóa hoặc comment out, các câu lệnh logger.debug có thể vẫn được giữ nguyên trong mã nguồn và ở trạng thái không hoạt động cho đến khi bạn cần chúng lại. Khi đó, thay đổi duy nhất cần thực hiện là sửa mức độ nghiêm trọng của logger và/hoặc handler thành debug.
 
 .. _multiple-destinations:
 
-Logging to multiple destinations
---------------------------------
+Ghi log đến nhiều đích
+----------------------
 
-Let's say you want to log to console and file with different message formats and
-in differing circumstances. Say you want to log messages with levels of DEBUG
-and higher to file, and those messages at level INFO and higher to the console.
-Let's also assume that the file should contain timestamps, but the console
-messages should not. Here's how you can achieve this::
+Giả sử bạn muốn ghi log ra console và file với các định dạng thông báo khác nhau trong những trường hợp khác nhau. Giả sử bạn muốn ghi các thông báo có mức DEBUG trở lên vào file, còn các thông báo có mức INFO trở lên vào console. Đồng thời, giả sử file cần chứa timestamp, còn các thông báo trên console thì không. Sau đây là cách bạn có thể thực hiện điều này::
 
    import logging
 
-   # set up logging to file - see previous section for more details
+   # thiết lập logging vào tệp - xem phần trước để biết thêm chi tiết
    logging.basicConfig(level=logging.DEBUG,
                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                        datefmt='%m-%d %H:%M',
                        filename='/tmp/myapp.log',
                        filemode='w')
-   # define a Handler which writes INFO messages or higher to the sys.stderr
+   # định nghĩa một Handler ghi các thông báo INFO trở lên vào sys.stderr
    console = logging.StreamHandler()
    console.setLevel(logging.INFO)
-   # set a format which is simpler for console use
+   # đặt một format đơn giản hơn để sử dụng trên console
    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-   # tell the handler to use this format
+   # bảo Handler sử dụng format này
    console.setFormatter(formatter)
-   # add the handler to the root logger
+   # thêm Handler vào root logger
    logging.getLogger().addHandler(console)
 
-   # Now, we can log to the root logger, or any other logger. First the root...
+   # Bây giờ, chúng ta có thể ghi log vào root logger hoặc bất kỳ logger nào khác. Trước hết là root...
    logging.info('Jackdaws love my big sphinx of quartz.')
 
-   # Now, define a couple of other loggers which might represent areas in your
-   # application:
+   # Bây giờ, định nghĩa một vài logger khác có thể đại diện cho các khu vực trong
+   # ứng dụng:
 
    logger1 = logging.getLogger('myapp.area1')
    logger2 = logging.getLogger('myapp.area2')
@@ -245,7 +219,7 @@ messages should not. Here's how you can achieve this::
    logger2.warning('Jail zesty vixen who grabbed pay from quack.')
    logger2.error('The five boxing wizards jump quickly.')
 
-When you run this, on the console you will see
+Khi chạy đoạn mã này, trên console bạn sẽ thấy
 
 .. code-block:: none
 
@@ -254,7 +228,7 @@ When you run this, on the console you will see
    myapp.area2 : WARNING  Jail zesty vixen who grabbed pay from quack.
    myapp.area2 : ERROR    The five boxing wizards jump quickly.
 
-and in the file you will see something like
+và trong tệp, bạn sẽ thấy nội dung tương tự như sau
 
 .. code-block:: none
 
@@ -264,33 +238,25 @@ and in the file you will see something like
    10-22 22:19 myapp.area2  WARNING  Jail zesty vixen who grabbed pay from quack.
    10-22 22:19 myapp.area2  ERROR    The five boxing wizards jump quickly.
 
-As you can see, the DEBUG message only shows up in the file. The other messages
-are sent to both destinations.
+Như bạn có thể thấy, thông báo DEBUG chỉ xuất hiện trong tệp. Các thông báo khác được gửi đến cả hai đích.
 
-This example uses console and file handlers, but you can use any number and
-combination of handlers you choose.
+Ví dụ này sử dụng các handler cho console và tệp, nhưng bạn có thể sử dụng bất kỳ số lượng và tổ hợp handler nào mình muốn.
 
-Note that the above choice of log filename ``/tmp/myapp.log`` implies use of a
-standard location for temporary files on POSIX systems. On Windows, you may need to
-choose a different directory name for the log - just ensure that the directory exists
-and that you have the permissions to create and update files in it.
+Lưu ý rằng lựa chọn tên tệp nhật ký ``/tmp/myapp.log`` ở trên ngụ ý việc sử dụng vị trí chuẩn dành cho các tệp tạm thời trên hệ thống POSIX. Trên Windows, bạn có thể cần chọn một tên thư mục khác cho nhật ký—chỉ cần đảm bảo thư mục đó tồn tại và bạn có quyền tạo cũng như cập nhật các tệp trong đó.
 
 
 .. _custom-level-handling:
 
-Custom handling of levels
--------------------------
+Tùy chỉnh cách xử lý các cấp độ
+-------------------------------
 
-Sometimes, you might want to do something slightly different from the standard
-handling of levels in handlers, where all levels above a threshold get
-processed by a handler. To do this, you need to use filters. Let's look at a
-scenario where you want to arrange things as follows:
+Đôi khi, bạn có thể muốn xử lý hơi khác so với cách xử lý mức độ tiêu chuẩn trong các handler, trong đó mọi mức độ cao hơn một ngưỡng đều được handler xử lý. Để làm điều này, bạn cần sử dụng các filter. Hãy xem một tình huống trong đó bạn muốn sắp xếp mọi thứ như sau:
 
-* Send messages of severity ``INFO`` and ``WARNING`` to ``sys.stdout``
-* Send messages of severity ``ERROR`` and above to ``sys.stderr``
-* Send messages of severity ``DEBUG`` and above to file ``app.log``
+* Gửi các thông báo có mức độ nghiêm trọng ``INFO`` và ``WARNING`` đến ``sys.stdout``
+* Gửi các thông báo có mức độ nghiêm trọng ``ERROR`` trở lên đến ``sys.stderr``
+* Gửi các thông báo có mức độ nghiêm trọng ``DEBUG`` trở lên đến tệp ``app.log``
 
-Suppose you configure logging with the following JSON:
+Giả sử bạn cấu hình logging bằng JSON sau:
 
 .. code-block:: json
 
@@ -332,11 +298,7 @@ Suppose you configure logging with the following JSON:
         }
     }
 
-This configuration does *almost* what we want, except that ``sys.stdout`` would show messages
-of severity ``ERROR`` and only events of this severity and higher will be tracked
-as well as ``INFO`` and ``WARNING`` messages. To prevent this, we can set up a filter which
-excludes those messages and add it to the relevant handler. This can be configured by
-adding a ``filters`` section parallel to ``formatters`` and ``handlers``:
+Cấu hình này *gần như* thực hiện đúng điều chúng ta muốn, ngoại trừ việc ``sys.stdout`` sẽ hiển thị các thông báo có mức độ nghiêm trọng ``ERROR``, và chỉ các event có mức độ này trở lên mới được theo dõi, cùng với các thông báo ``INFO`` và ``WARNING``. Để ngăn điều này, chúng ta có thể thiết lập một filter loại trừ những thông báo đó rồi thêm filter này vào handler liên quan. Có thể cấu hình việc này bằng cách thêm một phần ``filters`` song song với ``formatters`` và ``handlers``:
 
 .. code-block:: json
 
@@ -349,7 +311,7 @@ adding a ``filters`` section parallel to ``formatters`` and ``handlers``:
         }
     }
 
-and changing the section on the ``stdout`` handler to add it:
+và thay đổi phần dành cho handler ``stdout`` để thêm phần đó:
 
 .. code-block:: json
 
@@ -363,8 +325,7 @@ and changing the section on the ``stdout`` handler to add it:
         }
     }
 
-A filter is just a function, so we can define the ``filter_maker`` (a factory
-function) as follows:
+Bộ lọc chỉ là một hàm, vì vậy ta có thể định nghĩa ``filter_maker`` (một hàm factory) như sau:
 
 .. code-block:: python
 
@@ -376,15 +337,9 @@ function) as follows:
 
         return filter
 
-This converts the string argument passed in to a numeric level, and returns a
-function which only returns ``True`` if the level of the passed in record is
-at or below the specified level. Note that in this example I have defined the
-``filter_maker`` in a test script ``main.py`` that I run from the command line,
-so its module will be ``__main__`` - hence the ``__main__.filter_maker`` in the
-filter configuration. You will need to change that if you define it in a
-different module.
+Hàm này chuyển đổi đối số chuỗi được truyền vào thành một level dạng số, rồi trả về một hàm chỉ trả về ``True`` nếu level của record được truyền vào nhỏ hơn hoặc bằng level đã chỉ định. Lưu ý rằng trong ví dụ này, tôi đã định nghĩa ``filter_maker`` trong một test script ``main.py`` được chạy từ command line, vì vậy module của nó sẽ là ``__main__`` — do đó có ``__main__.filter_maker`` trong cấu hình bộ lọc. Bạn sẽ cần thay đổi giá trị đó nếu định nghĩa nó trong một module khác.
 
-With the filter added, we can run ``main.py``, which in full is:
+Sau khi thêm bộ lọc, ta có thể chạy ``main.py``, đầy đủ là:
 
 .. code-block:: python
 
@@ -454,13 +409,13 @@ With the filter added, we can run ``main.py``, which in full is:
     logging.error('An ERROR message')
     logging.critical('A CRITICAL message')
 
-And after running it like this:
+Và sau khi chạy như sau:
 
 .. code-block:: shell
 
     python main.py 2>stderr.log >stdout.log
 
-We can see the results are as expected:
+Ta có thể thấy kết quả đúng như mong đợi:
 
 .. code-block:: shell
 
@@ -485,28 +440,28 @@ We can see the results are as expected:
     WARNING  - A WARNING message
 
 
-Configuration server example
-----------------------------
+Ví dụ về máy chủ cấu hình
+-------------------------
 
-Here is an example of a module using the logging configuration server::
+Sau đây là ví dụ về một module sử dụng máy chủ cấu hình logging::
 
     import logging
     import logging.config
     import time
     import os
 
-    # read initial config file
+    # đọc tệp cấu hình ban đầu
     logging.config.fileConfig('logging.conf')
 
-    # create and start listener on port 9999
+    # tạo và khởi động listener trên cổng 9999
     t = logging.config.listen(9999)
     t.start()
 
     logger = logging.getLogger('simpleExample')
 
     try:
-        # loop through logging calls to see the difference
-        # new configurations make, until Ctrl+C is pressed
+        # lặp qua các lệnh gọi logging để thấy sự khác biệt
+        # tạo các cấu hình mới cho đến khi nhấn Ctrl+C
         while True:
             logger.debug('debug message')
             logger.info('info message')
@@ -515,13 +470,11 @@ Here is an example of a module using the logging configuration server::
             logger.critical('critical message')
             time.sleep(5)
     except KeyboardInterrupt:
-        # cleanup
+        # dọn dẹp
         logging.config.stopListening()
         t.join()
 
-And here is a script that takes a filename and sends that file to the server,
-properly preceded with the binary-encoded length, as the new logging
-configuration::
+Sau đây là một script nhận tên tệp và gửi tệp đó đến server, với độ dài được mã hóa nhị phân đặt ngay trước nội dung, làm cấu hình logging mới::
 
     #!/usr/bin/env python
     import socket, sys, struct
@@ -543,50 +496,27 @@ configuration::
 
 .. _blocking-handlers:
 
-Dealing with handlers that block
---------------------------------
+Xử lý các handler bị chặn
+-------------------------
 
 .. currentmodule:: logging.handlers
 
-Sometimes you have to get your logging handlers to do their work without
-blocking the thread you're logging from. This is common in web applications,
-though of course it also occurs in other scenarios.
+Đôi khi bạn cần các logging handler thực hiện công việc mà không chặn thread đang thực hiện việc ghi log. Điều này thường gặp trong các ứng dụng web, dù tất nhiên nó cũng xảy ra trong những tình huống khác.
 
-A common culprit which demonstrates sluggish behaviour is the
-:class:`SMTPHandler`: sending emails can take a long time, for a
-number of reasons outside the developer's control (for example, a poorly
-performing mail or network infrastructure). But almost any network-based
-handler can block: Even a :class:`SocketHandler` operation may do a
-DNS query under the hood which is too slow (and this query can be deep in the
-socket library code, below the Python layer, and outside your control).
+Một thủ phạm phổ biến thường thể hiện hành vi chậm chạp là
+:class:`SMTPHandler`: việc gửi email có thể mất nhiều thời gian vì một số nguyên nhân nằm ngoài tầm kiểm soát của developer (chẳng hạn như hạ tầng mail hoặc network hoạt động kém). Tuy nhiên, hầu như bất kỳ handler dựa trên network nào cũng có thể chặn: Ngay cả một thao tác :class:`SocketHandler` cũng có thể ngầm thực hiện truy vấn DNS quá chậm (và truy vấn này có thể nằm sâu trong mã của socket library, bên dưới lớp Python và ngoài tầm kiểm soát của bạn).
 
-One solution is to use a two-part approach. For the first part, attach only a
-:class:`QueueHandler` to those loggers which are accessed from
-performance-critical threads. They simply write to their queue, which can be
-sized to a large enough capacity or initialized with no upper bound to their
-size. The write to the queue will typically be accepted quickly, though you
-will probably need to catch the :exc:`queue.Full` exception as a precaution
-in your code. If you are a library developer who has performance-critical
-threads in their code, be sure to document this (together with a suggestion to
-attach only ``QueueHandlers`` to your loggers) for the benefit of other
-developers who will use your code.
+Một giải pháp là sử dụng phương pháp gồm hai phần. Trước tiên, chỉ gắn một
+:class:`QueueHandler` vào những logger được truy cập từ các thread quan trọng về hiệu năng. Chúng chỉ cần ghi vào queue, queue này có thể được cấp dung lượng đủ lớn hoặc được khởi tạo mà không giới hạn kích thước tối đa. Việc ghi vào queue thường sẽ được chấp nhận nhanh chóng, dù có lẽ bạn vẫn cần bắt ngoại lệ :exc:`queue.Full` để đề phòng trong code của mình. Nếu bạn là library developer và code của bạn có các thread quan trọng về hiệu năng, hãy nhớ ghi rõ điều này trong tài liệu (kèm theo đề xuất chỉ gắn ``QueueHandlers`` vào các logger của bạn) để các developer khác sử dụng code của bạn được thuận tiện.
 
-The second part of the solution is :class:`QueueListener`, which has been
-designed as the counterpart to :class:`QueueHandler`.  A
-:class:`QueueListener` is very simple: it's passed a queue and some handlers,
-and it fires up an internal thread which listens to its queue for LogRecords
-sent from ``QueueHandlers`` (or any other source of ``LogRecords``, for that
-matter). The ``LogRecords`` are removed from the queue and passed to the
-handlers for processing.
+Phần thứ hai của giải pháp là :class:`QueueListener`, được thiết kế như thành phần đối ứng với :class:`QueueHandler`. Một
+:class:`QueueListener` rất đơn giản: nó nhận một queue và một số handler, rồi khởi động một thread nội bộ lắng nghe queue để nhận các LogRecord được gửi từ ``QueueHandlers`` (hoặc từ bất kỳ nguồn ``LogRecords`` nào khác). Các ``LogRecords`` được lấy khỏi queue và chuyển cho các handler để xử lý.
 
-The advantage of having a separate :class:`QueueListener` class is that you
-can use the same instance to service multiple ``QueueHandlers``. This is more
-resource-friendly than, say, having threaded versions of the existing handler
-classes, which would eat up one thread per handler for no particular benefit.
+Ưu điểm của việc có một lớp :class:`QueueListener` riêng là bạn có thể sử dụng cùng một instance để phục vụ nhiều ``QueueHandlers``. Cách này tiết kiệm tài nguyên hơn so với việc tạo các phiên bản có thread của những lớp handler hiện có, vốn sẽ chiếm một thread cho mỗi handler mà không mang lại lợi ích cụ thể nào.
 
-An example of using these two classes follows (imports omitted)::
+Sau đây là ví dụ về cách sử dụng hai lớp này (đã lược bỏ phần import)::
 
-    que = queue.Queue(-1)  # no limit on size
+    que = queue.Queue(-1)  # không giới hạn kích thước
     queue_handler = QueueHandler(que)
     handler = logging.StreamHandler()
     listener = QueueListener(que, handler)
@@ -595,58 +525,46 @@ An example of using these two classes follows (imports omitted)::
     formatter = logging.Formatter('%(threadName)s: %(message)s')
     handler.setFormatter(formatter)
     listener.start()
-    # The log output will display the thread which generated
-    # the event (the main thread) rather than the internal
-    # thread which monitors the internal queue. This is what
-    # you want to happen.
+    # Đầu ra nhật ký sẽ hiển thị thread đã tạo ra
+    # event (thread chính) thay vì thread nội bộ
+    # theo dõi queue nội bộ. Đây là điều
+    # bạn muốn xảy ra.
     root.warning('Look out!')
     listener.stop()
 
-which, when run, will produce:
+mà khi chạy sẽ tạo ra:
 
 .. code-block:: none
 
     MainThread: Look out!
 
-.. note:: Although the earlier discussion wasn't specifically talking about
-   async code, but rather about slow logging handlers, it should be noted that
-   when logging from async code, network and even file handlers could lead to
-   problems (blocking the event loop) because some logging is done from
+.. note:: Mặc dù phần thảo luận trước đó không nói cụ thể về mã async mà nói về các logging handler chậm, cần lưu ý rằng khi ghi log từ mã async, các network handler và thậm chí cả file handler cũng có thể gây ra sự cố (làm block event loop) vì một phần hoạt động ghi log được thực hiện từ
    :mod:`asyncio` internals. It might be best, if any async code is used in an
-   application, to use the above approach for logging, so that any blocking code
-   runs only in the ``QueueListener`` thread.
+   ứng dụng, để sử dụng cách tiếp cận trên cho việc ghi log, sao cho mọi mã có thể block chỉ chạy trong thread ``QueueListener``.
 
 .. versionchanged:: 3.5
-   Prior to Python 3.5, the :class:`QueueListener` always passed every message
-   received from the queue to every handler it was initialized with. (This was
-   because it was assumed that level filtering was all done on the other side,
-   where the queue is filled.) From 3.5 onwards, this behaviour can be changed
-   by passing a keyword argument ``respect_handler_level=True`` to the
-   listener's constructor. When this is done, the listener compares the level
-   of each message with the handler's level, and only passes a message to a
-   handler if it's appropriate to do so.
+   Trước Python 3.5, :class:`QueueListener` luôn chuyển mọi message nhận được từ queue đến mọi handler mà nó được khởi tạo cùng. (Điều này là vì người ta cho rằng việc lọc theo level đã được thực hiện hoàn toàn ở phía bên kia, nơi queue được điền.) Từ phiên bản 3.5 trở đi, hành vi này có thể được thay đổi bằng cách truyền keyword argument ``respect_handler_level=True`` vào constructor của listener. Khi đó, listener sẽ so sánh level của từng message với level của handler và chỉ chuyển message đến handler nếu phù hợp.
 
 .. versionchanged:: 3.14
-   The :class:`QueueListener` can be started (and stopped) via the
-   :keyword:`with` statement. For example:
+   Có thể khởi động (và dừng) :class:`QueueListener` thông qua
+   statement :keyword:`with`. Ví dụ:
 
    .. code-block:: python
 
       with QueueListener(que, handler) as listener:
-          # The queue listener automatically starts
-          # when the 'with' block is entered.
+          # Queue listener tự động khởi động
+          # khi khối 'with' được thực thi.
           pass
-      # The queue listener automatically stops once
-      # the 'with' block is exited.
+      # Trình lắng nghe queue tự động dừng ngay khi
+      # khối 'with' kết thúc.
 
 .. _network-logging:
 
-Sending and receiving logging events across a network
------------------------------------------------------
+Gửi và nhận các sự kiện logging qua mạng
+----------------------------------------
 
-Let's say you want to send logging events across a network, and handle them at
-the receiving end. A simple way of doing this is attaching a
-:class:`SocketHandler` instance to the root logger at the sending end::
+Giả sử bạn muốn gửi các sự kiện logging qua mạng và xử lý chúng ở đầu nhận. Một cách đơn giản để thực hiện việc này là gắn một
+:class:`SocketHandler` instance vào root logger ở đầu gửi::
 
    import logging, logging.handlers
 
@@ -654,15 +572,15 @@ the receiving end. A simple way of doing this is attaching a
    rootLogger.setLevel(logging.DEBUG)
    socketHandler = logging.handlers.SocketHandler('localhost',
                        logging.handlers.DEFAULT_TCP_LOGGING_PORT)
-   # don't bother with a formatter, since a socket handler sends the event as
-   # an unformatted pickle
+   # không cần dùng formatter, vì socket handler gửi sự kiện dưới dạng
+   # một pickle chưa được định dạng
    rootLogger.addHandler(socketHandler)
 
-   # Now, we can log to the root logger, or any other logger. First the root...
+   # Bây giờ, chúng ta có thể ghi log vào root logger hoặc bất kỳ logger nào khác. Trước tiên là root...
    logging.info('Jackdaws love my big sphinx of quartz.')
 
-   # Now, define a couple of other loggers which might represent areas in your
-   # application:
+   # Bây giờ, hãy định nghĩa một vài logger khác, có thể đại diện cho các phần trong
+   # ứng dụng:
 
    logger1 = logging.getLogger('myapp.area1')
    logger2 = logging.getLogger('myapp.area2')
@@ -672,8 +590,7 @@ the receiving end. A simple way of doing this is attaching a
    logger2.warning('Jail zesty vixen who grabbed pay from quack.')
    logger2.error('The five boxing wizards jump quickly.')
 
-At the receiving end, you can set up a receiver using the :mod:`socketserver`
-module. Here is a basic working example::
+Ở phía nhận, bạn có thể thiết lập một receiver bằng module :mod:`socketserver`. Đây là một ví dụ cơ bản có thể hoạt động::
 
    import pickle
    import logging
@@ -711,17 +628,17 @@ module. Here is a basic working example::
            return pickle.loads(data)
 
        def handleLogRecord(self, record):
-           # if a name is specified, we use the named logger rather than the one
-           # implied by the record.
+           # nếu có chỉ định tên, chúng ta sử dụng logger có tên đó thay vì logger
+           # được suy ra từ record.
            if self.server.logname is not None:
                name = self.server.logname
            else:
                name = record.name
            logger = logging.getLogger(name)
-           # N.B. EVERY record gets logged. This is because Logger.handle
-           # is normally called AFTER logger-level filtering. If you want
-           # to do filtering, do it at the client end to save wasting
-           # cycles and network bandwidth!
+           # LƯU Ý: MỌI bản ghi đều được ghi lại. Điều này là do Logger.handle
+           # thường được gọi SAU khi lọc ở cấp logger. Nếu bạn muốn
+           # thực hiện lọc, hãy thực hiện ở phía client để tránh lãng phí
+           # chu kỳ xử lý và băng thông mạng!
            logger.handle(record)
 
    class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
@@ -760,8 +677,7 @@ module. Here is a basic working example::
    if __name__ == '__main__':
        main()
 
-First run the server, and then the client. On the client side, nothing is
-printed on the console; on the server side, you should see something like:
+Trước tiên hãy chạy server, sau đó chạy client. Ở phía client, không có gì được in ra console; ở phía server, bạn sẽ thấy nội dung tương tự như sau:
 
 .. code-block:: none
 
@@ -772,133 +688,85 @@ printed on the console; on the server side, you should see something like:
       69 myapp.area2     WARNING  Jail zesty vixen who grabbed pay from quack.
       69 myapp.area2     ERROR    The five boxing wizards jump quickly.
 
-Note that there are some security issues with pickle in some scenarios. If
-these affect you, you can use an alternative serialization scheme by overriding
-the :meth:`~SocketHandler.makePickle` method and implementing your
-alternative there, as well as adapting the above script to use your alternative
-serialization.
+Lưu ý rằng pickle có thể gây ra một số vấn đề bảo mật trong một số tình huống. Nếu những vấn đề này ảnh hưởng đến bạn, bạn có thể sử dụng một cơ chế serialization thay thế bằng cách ghi đè phương thức :meth:`~SocketHandler.makePickle` và triển khai cơ chế thay thế của mình tại đó, đồng thời điều chỉnh script ở trên để sử dụng cơ chế serialization thay thế đó.
 
 
-Running a logging socket listener in production
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _`Running a logging socket listener in production`:
+
+Chạy socket listener ghi log trong môi trường production
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _socket-listener-gist: https://gist.github.com/vsajip/4b227eeec43817465ca835ca66f75e2b
 
-To run a logging listener in production, you may need to use a
-process-management tool such as `Supervisor <http://supervisord.org/>`_.
-`Here is a Gist <socket-listener-gist_>`__
-which provides the bare-bones files to run the above functionality using
-Supervisor. It consists of the following files:
+Để chạy một logging listener trong môi trường production, bạn có thể cần sử dụng một công cụ quản lý tiến trình như `Supervisor <http://supervisord.org/>`_. `Đây là một Gist <socket-listener-gist_>`__ cung cấp các tệp tối thiểu cần thiết để chạy chức năng trên bằng Supervisor. Gist này gồm các tệp sau:
 
-+-------------------------+----------------------------------------------------+
-| File                    | Purpose                                            |
-+=========================+====================================================+
-| :file:`prepare.sh`      | A Bash script to prepare the environment for       |
-|                         | testing                                            |
-+-------------------------+----------------------------------------------------+
-| :file:`supervisor.conf` | The Supervisor configuration file, which has       |
-|                         | entries for the listener and a multi-process web   |
-|                         | application                                        |
-+-------------------------+----------------------------------------------------+
-| :file:`ensure_app.sh`   | A Bash script to ensure that Supervisor is running |
-|                         | with the above configuration                       |
-+-------------------------+----------------------------------------------------+
-| :file:`log_listener.py` | The socket listener program which receives log     |
-|                         | events and records them to a file                  |
-+-------------------------+----------------------------------------------------+
-| :file:`main.py`         | A simple web application which performs logging    |
-|                         | via a socket connected to the listener             |
-+-------------------------+----------------------------------------------------+
-| :file:`webapp.json`     | A JSON configuration file for the web application  |
-+-------------------------+----------------------------------------------------+
-| :file:`client.py`       | A Python script to exercise the web application    |
-+-------------------------+----------------------------------------------------+
++-------------------------+-------------------------------------------------------------------------------------------------+
+| Tệp                     | Mục đích                                                                                        |
++=========================+=================================================================================================+
+| :file:`prepare.sh`      | Một tập lệnh Bash để chuẩn bị môi trường cho việc kiểm thử                                      |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| :file:`supervisor.conf` | Tệp cấu hình Supervisor, chứa các mục cho listener và một web application đa tiến trình         |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| :file:`ensure_app.sh`   | Một tập lệnh Bash để đảm bảo Supervisor đang chạy với cấu hình trên                             |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| :file:`log_listener.py` | Chương trình socket listener nhận các sự kiện log và ghi chúng vào một tệp                      |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| :file:`main.py`         | Một ứng dụng web đơn giản thực hiện việc ghi nhật ký thông qua socket được kết nối với listener |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| :file:`webapp.json`     | Một tệp cấu hình JSON cho ứng dụng web                                                          |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| :file:`client.py`       | Một tập lệnh Python để kiểm thử ứng dụng web                                                    |
++-------------------------+-------------------------------------------------------------------------------------------------+
 
-The web application uses `Gunicorn <https://gunicorn.org/>`_, which is a
-popular web application server that starts multiple worker processes to handle
-requests. This example setup shows how the workers can write to the same log file
-without conflicting with one another --- they all go through the socket listener.
+Ứng dụng web sử dụng `Gunicorn <https://gunicorn.org/>`_, một web application server phổ biến khởi chạy nhiều worker process để xử lý các yêu cầu. Thiết lập ví dụ này cho thấy cách các worker có thể ghi vào cùng một tệp nhật ký mà không xung đột với nhau --- tất cả đều đi qua socket listener.
 
-To test these files, do the following in a POSIX environment:
+Để kiểm thử các tệp này, hãy thực hiện các bước sau trong môi trường POSIX:
 
-#. Download `the Gist <socket-listener-gist_>`__
-   as a ZIP archive using the :guilabel:`Download ZIP` button.
+#. Tải `Gist <socket-listener-gist_>`__ xuống dưới dạng tệp ZIP bằng nút :guilabel:`Download ZIP`.
 
-#. Unzip the above files from the archive into a scratch directory.
+#. Giải nén các tệp trên từ kho lưu trữ vào một thư mục tạm.
 
-#. In the scratch directory, run ``bash prepare.sh`` to get things ready.
-   This creates a :file:`run` subdirectory to contain Supervisor-related and
-   log files, and a :file:`venv` subdirectory to contain a virtual environment
-   into which ``bottle``, ``gunicorn`` and ``supervisor`` are installed.
+#. Trong thư mục tạm, chạy ``bash prepare.sh`` để chuẩn bị mọi thứ. Thao tác này tạo một thư mục con :file:`run` để chứa các tệp liên quan đến Supervisor và các tệp nhật ký, đồng thời tạo một thư mục con :file:`venv` để chứa một môi trường ảo, trong đó ``bottle``, ``gunicorn`` và ``supervisor`` được cài đặt.
 
-#. Run ``bash ensure_app.sh`` to ensure that Supervisor is running with
-   the above configuration.
+#. Chạy ``bash ensure_app.sh`` để đảm bảo Supervisor đang chạy với cấu hình ở trên.
 
-#. Run ``venv/bin/python client.py`` to exercise the web application,
-   which will lead to records being written to the log.
+#. Chạy ``venv/bin/python client.py`` để kiểm thử ứng dụng web; thao tác này sẽ khiến các bản ghi được ghi vào nhật ký.
 
-#. Inspect the log files in the :file:`run` subdirectory. You should see the
-   most recent log lines in files matching the pattern :file:`app.log*`. They
-   won't be in any particular order, since they have been handled concurrently
-   by different worker processes in a non-deterministic way.
+#. Kiểm tra các tệp nhật ký trong thư mục con :file:`run`. Bạn sẽ thấy các dòng nhật ký mới nhất trong những tệp khớp với mẫu :file:`app.log*`. Chúng sẽ không theo bất kỳ thứ tự cụ thể nào, vì đã được các quy trình worker khác nhau xử lý đồng thời theo cách không xác định.
 
-#. You can shut down the listener and the web application by running
-   ``venv/bin/supervisorctl -c supervisor.conf shutdown``.
+#. Bạn có thể tắt listener và ứng dụng web bằng cách chạy ``venv/bin/supervisorctl -c supervisor.conf shutdown``.
 
-You may need to tweak the configuration files in the unlikely event that the
-configured ports clash with something else in your test environment.
+Bạn có thể cần điều chỉnh các tệp cấu hình trong trường hợp hiếm gặp khi các cổng đã cấu hình xung đột với một thành phần khác trong môi trường kiểm thử của bạn.
 
-The default configuration uses a TCP socket on port 9020. You can use a Unix
-Domain socket instead of a TCP socket by doing the following:
+Cấu hình mặc định sử dụng TCP socket trên cổng 9020. Bạn có thể sử dụng Unix Domain socket thay cho TCP socket bằng cách thực hiện như sau:
 
-#. In :file:`listener.json`, add a ``socket`` key with the path to the domain
-   socket you want to use. If this key is present, the listener listens on the
-   corresponding domain socket and not on a TCP socket (the ``port`` key is
-   ignored).
+#. Trong :file:`listener.json`, thêm một khóa ``socket`` với đường dẫn đến domain socket bạn muốn sử dụng. Nếu khóa này hiện diện, listener sẽ lắng nghe trên domain socket tương ứng thay vì trên TCP socket (khóa ``port`` sẽ bị bỏ qua).
 
-#. In :file:`webapp.json`, change the socket handler configuration dictionary
-   so that the ``host`` value is the path to the domain socket, and set the
-   ``port`` value to ``null``.
+#. Trong :file:`webapp.json`, thay đổi dictionary cấu hình socket handler để giá trị ``host`` là đường dẫn đến domain socket, và đặt giá trị ``port`` thành ``null``.
 
 
 .. currentmodule:: logging
 
 .. _context-info:
 
-Adding contextual information to your logging output
-----------------------------------------------------
+Thêm thông tin ngữ cảnh vào đầu ra logging
+------------------------------------------
 
-Sometimes you want logging output to contain contextual information in
-addition to the parameters passed to the logging call. For example, in a
-networked application, it may be desirable to log client-specific information
-in the log (e.g. remote client's username, or IP address). Although you could
-use the *extra* parameter to achieve this, it's not always convenient to pass
-the information in this way. While it might be tempting to create
-:class:`Logger` instances on a per-connection basis, this is not a good idea
-because these instances are not garbage collected. While this is not a problem
-in practice, when the number of :class:`Logger` instances is dependent on the
-level of granularity you want to use in logging an application, it could
-be hard to manage if the number of :class:`Logger` instances becomes
-effectively unbounded.
+Đôi khi bạn muốn đầu ra logging chứa thông tin ngữ cảnh bên cạnh các tham số được truyền vào lời gọi logging. Ví dụ: trong một ứng dụng nối mạng, bạn có thể muốn ghi lại thông tin dành riêng cho client trong log (ví dụ: username hoặc địa chỉ IP của client từ xa). Mặc dù bạn có thể sử dụng tham số *extra* để thực hiện việc này, nhưng việc truyền thông tin theo cách này không phải lúc nào cũng thuận tiện. Mặc dù bạn có thể muốn tạo
+các instance :class:`Logger` cho từng connection, đây không phải là ý hay vì các instance này không được garbage collection. Mặc dù trên thực tế điều này không gây vấn đề, khi số lượng instance :class:`Logger` phụ thuộc vào mức độ chi tiết bạn muốn sử dụng trong việc logging một ứng dụng, việc quản lý có thể trở nên khó khăn nếu số lượng instance :class:`Logger` tăng lên không có giới hạn thực tế.
 
 
-Using LoggerAdapters to impart contextual information
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng LoggerAdapters để truyền thông tin ngữ cảnh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An easy way in which you can pass contextual information to be output along
-with logging event information is to use the :class:`LoggerAdapter` class.
-This class is designed to look like a :class:`Logger`, so that you can call
+Một cách dễ dàng để truyền thông tin ngữ cảnh nhằm xuất cùng với thông tin về sự kiện logging là sử dụng class :class:`LoggerAdapter`. Class này được thiết kế để trông giống như một :class:`Logger`, vì vậy bạn có thể gọi
 :meth:`debug`, :meth:`info`, :meth:`warning`, :meth:`error`,
-:meth:`exception`, :meth:`critical` and :meth:`log`. These methods have the
-same signatures as their counterparts in :class:`Logger`, so you can use the
-two types of instances interchangeably.
+:meth:`exception`, :meth:`critical` và :meth:`log`. Các phương thức này có cùng chữ ký với các phương thức tương ứng trong :class:`Logger`, vì vậy bạn có thể sử dụng thay thế lẫn nhau hai loại instance này.
 
-When you create an instance of :class:`LoggerAdapter`, you pass it a
-:class:`Logger` instance and a dict-like object which contains your contextual
-information. When you call one of the logging methods on an instance of
-:class:`LoggerAdapter`, it delegates the call to the underlying instance of
-:class:`Logger` passed to its constructor, and arranges to pass the contextual
-information in the delegated call. Here's a snippet from the code of
+Khi tạo một instance của :class:`LoggerAdapter`, bạn truyền vào đó một
+instance :class:`Logger` và một đối tượng dạng dict chứa thông tin ngữ cảnh của bạn. Khi gọi một trong các phương thức logging trên một instance của
+:class:`LoggerAdapter`, nó chuyển tiếp lệnh gọi đến instance nền tảng của
+:class:`Logger` được truyền vào hàm khởi tạo, đồng thời sắp xếp để truyền thông tin ngữ cảnh trong lệnh gọi được chuyển tiếp. Dưới đây là một đoạn trích từ mã của
 :class:`LoggerAdapter`::
 
     def debug(self, msg, /, *args, **kwargs):
@@ -909,22 +777,10 @@ information in the delegated call. Here's a snippet from the code of
         msg, kwargs = self.process(msg, kwargs)
         self.logger.debug(msg, *args, **kwargs)
 
-The :meth:`~LoggerAdapter.process` method of :class:`LoggerAdapter` is where the
-contextual information is added to the logging output. It's passed the message
-and keyword arguments of the logging call, and it passes back (potentially)
-modified versions of these to use in the call to the underlying logger. The
-default implementation of this method leaves the message alone, but inserts
-an 'extra' key in the keyword argument whose value is the dict-like object
-passed to the constructor. Of course, if you had passed an 'extra' keyword
-argument in the call to the adapter, it will be silently overwritten.
+Phương thức :meth:`~LoggerAdapter.process` của :class:`LoggerAdapter` là nơi thông tin ngữ cảnh được thêm vào đầu ra logging. Phương thức này nhận thông báo và các đối số từ khóa của lệnh gọi logging, rồi trả về các phiên bản (có thể đã được sửa đổi) của chúng để sử dụng trong lệnh gọi đến logger nền tảng. Cách triển khai mặc định của phương thức này giữ nguyên thông báo, nhưng chèn một khóa 'extra' vào đối số từ khóa, với giá trị là đối tượng dạng dict được truyền vào hàm khởi tạo. Tất nhiên, nếu bạn đã truyền một đối số từ khóa 'extra' trong lệnh gọi đến adapter, đối số đó sẽ bị ghi đè một cách im lặng.
 
-The advantage of using 'extra' is that the values in the dict-like object are
-merged into the :class:`LogRecord` instance's __dict__, allowing you to use
-customized strings with your :class:`Formatter` instances which know about
-the keys of the dict-like object. If you need a different method, e.g. if you
-want to prepend or append the contextual information to the message string,
-you just need to subclass :class:`LoggerAdapter` and override
-:meth:`~LoggerAdapter.process` to do what you need. Here is a simple example::
+Ưu điểm của việc sử dụng 'extra' là các giá trị trong đối tượng dạng dict được hợp nhất vào __dict__ của instance :class:`LogRecord`, cho phép bạn sử dụng các chuỗi tùy chỉnh với các instance :class:`Formatter` biết các khóa của đối tượng dạng dict. Nếu cần một phương thức khác, chẳng hạn như muốn thêm thông tin ngữ cảnh vào đầu hoặc cuối chuỗi thông báo, bạn chỉ cần tạo lớp con của :class:`LoggerAdapter` và ghi đè
+:meth:`~LoggerAdapter.process` để thực hiện việc bạn cần. Dưới đây là một ví dụ đơn giản::
 
     class CustomAdapter(logging.LoggerAdapter):
         """
@@ -934,41 +790,28 @@ you just need to subclass :class:`LoggerAdapter` and override
         def process(self, msg, kwargs):
             return '[%s] %s' % (self.extra['connid'], msg), kwargs
 
-which you can use like this::
+mà bạn có thể sử dụng như sau::
 
     logger = logging.getLogger(__name__)
     adapter = CustomAdapter(logger, {'connid': some_conn_id})
 
-Then any events that you log to the adapter will have the value of
-``some_conn_id`` prepended to the log messages.
+Sau đó, mọi sự kiện bạn ghi nhật ký vào adapter sẽ có giá trị của ``some_conn_id`` được thêm vào trước các thông báo nhật ký.
 
-Using objects other than dicts to pass contextual information
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Sử dụng các đối tượng khác dict để truyền đạt thông tin theo ngữ cảnh
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You don't need to pass an actual dict to a :class:`LoggerAdapter` - you could
-pass an instance of a class which implements ``__getitem__`` and ``__iter__`` so
-that it looks like a dict to logging. This would be useful if you want to
-generate values dynamically (whereas the values in a dict would be constant).
+Bạn không cần truyền một dict thực sự vào một :class:`LoggerAdapter` - bạn có thể truyền một instance của một class triển khai ``__getitem__`` và ``__iter__`` để logging xem nó như một dict. Điều này hữu ích nếu bạn muốn tạo các giá trị một cách động (trong khi các giá trị trong dict sẽ là hằng số).
 
 
 .. _filters-contextual:
 
-Using Filters to impart contextual information
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng Filters để truyền đạt thông tin theo ngữ cảnh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can also add contextual information to log output using a user-defined
-:class:`Filter`. ``Filter`` instances are allowed to modify the ``LogRecords``
-passed to them, including adding additional attributes which can then be output
-using a suitable format string, or if needed a custom :class:`Formatter`.
+Bạn cũng có thể bổ sung thông tin theo ngữ cảnh vào đầu ra nhật ký bằng cách sử dụng một do người dùng định nghĩa
+:class:`Filter`. Các instance ``Filter`` được phép sửa đổi ``LogRecords`` được truyền cho chúng, bao gồm việc thêm các thuộc tính bổ sung, sau đó có thể xuất các thuộc tính này bằng một format string phù hợp hoặc, nếu cần, một :class:`Formatter` tùy chỉnh.
 
-For example in a web application, the request being processed (or at least,
-the interesting parts of it) can be stored in a threadlocal
-(:class:`threading.local`) variable, and then accessed from a ``Filter`` to
-add, say, information from the request - say, the remote IP address and remote
-user's username - to the ``LogRecord``, using the attribute names 'ip' and
-'user' as in the ``LoggerAdapter`` example above. In that case, the same format
-string can be used to get similar output to that shown above. Here's an example
-script::
+Ví dụ, trong một ứng dụng web, request đang được xử lý (hoặc ít nhất là những phần đáng chú ý của request) có thể được lưu trong một biến threadlocal (:class:`threading.local`), sau đó được truy cập từ một ``Filter`` để thêm, chẳng hạn, thông tin từ request — cụ thể là địa chỉ IP từ xa và username của người dùng từ xa — vào ``LogRecord``, bằng cách sử dụng các tên thuộc tính 'ip' và 'user' như trong ví dụ ``LoggerAdapter`` ở trên. Khi đó, có thể sử dụng cùng một format string để tạo ra kết quả tương tự như kết quả đã trình bày ở trên. Dưới đây là một script mẫu::
 
     import logging
     from random import choice
@@ -1007,7 +850,7 @@ script::
             lvlname = logging.getLevelName(lvl)
             a2.log(lvl, 'A message at %s level with %d %s', lvlname, 2, 'parameters')
 
-which, when run, produces something like:
+khi chạy sẽ tạo ra kết quả tương tự như sau:
 
 .. code-block:: none
 
@@ -1024,23 +867,14 @@ which, when run, produces something like:
     2010-09-06 22:38:15,301 d.e.f DEBUG    IP: 123.231.231.123 User: fred     A message at DEBUG level with 2 parameters
     2010-09-06 22:38:15,301 d.e.f INFO     IP: 123.231.231.123 User: fred     A message at INFO level with 2 parameters
 
-Use of ``contextvars``
-----------------------
+Sử dụng ``contextvars``
+-----------------------
 
-Since Python 3.7, the :mod:`contextvars` module has provided context-local storage
-which works for both :mod:`threading` and :mod:`asyncio` processing needs. This type
-of storage may thus be generally preferable to thread-locals. The following example
-shows how, in a multi-threaded environment, logs can populated with contextual
-information such as, for example, request attributes handled by web applications.
+Kể từ Python 3.7, module :mod:`contextvars` đã cung cấp bộ nhớ lưu trữ cục bộ theo context, hoạt động cho cả nhu cầu xử lý :mod:`threading` và :mod:`asyncio`. Vì vậy, loại bộ nhớ này nhìn chung có thể phù hợp hơn thread-local. Ví dụ sau đây cho thấy trong một môi trường đa luồng, log có thể được bổ sung thông tin theo context, chẳng hạn như các thuộc tính của request do các ứng dụng web xử lý.
 
-For the purposes of illustration, say that you have different web applications, each
-independent of the other but running in the same Python process and using a library
-common to them. How can each of these applications have their own log, where all
-logging messages from the library (and other request processing code) are directed to
-the appropriate application's log file, while including in the log additional
-contextual information such as client IP, HTTP request method and client username?
+Để minh họa, giả sử bạn có nhiều ứng dụng web khác nhau, mỗi ứng dụng độc lập với các ứng dụng còn lại nhưng chạy trong cùng một tiến trình Python và sử dụng một thư viện dùng chung. Làm thế nào để mỗi ứng dụng có log riêng, trong đó tất cả thông báo log từ thư viện (và phần code xử lý request khác) đều được ghi vào file log của ứng dụng tương ứng, đồng thời bao gồm các thông tin bổ sung theo context như IP của client, phương thức HTTP request và username của client?
 
-Let's assume that the library can be simulated by the following code:
+Giả sử thư viện có thể được mô phỏng bằng đoạn code sau:
 
 .. code-block:: python
 
@@ -1051,14 +885,12 @@ Let's assume that the library can be simulated by the following code:
     logger = logging.getLogger(__name__)
 
     def useful():
-        # Just a representative event logged from the library
+        # Chỉ là một sự kiện đại diện được ghi lại từ thư viện
         logger.debug('Hello from webapplib!')
-        # Just sleep for a bit so other threads get to run
+        # Chỉ cần tạm nghỉ một lát để các thread khác có thể chạy
         time.sleep(0.01)
 
-We can simulate the multiple web applications by means of two simple classes,
-``Request`` and ``WebApp``. These simulate how real threaded web applications work -
-each request is handled by a thread:
+Chúng ta có thể mô phỏng nhiều ứng dụng web bằng hai lớp đơn giản, ``Request`` và ``WebApp``. Các lớp này mô phỏng cách những ứng dụng web đa thread thực hoạt động - mỗi request được xử lý bởi một thread:
 
 .. code-block:: python
 
@@ -1085,10 +917,10 @@ each request is handled by a thread:
             self.ip = ip
             self.user = user
 
-    # A dummy set of requests which will be used in the simulation - we'll just pick
-    # from this list randomly. Note that all GET requests are from 192.168.2.XXX
-    # addresses, whereas POST requests are from 192.16.3.XXX addresses. Three users
-    # are represented in the sample requests.
+    # Một tập hợp request giả sẽ được dùng trong mô phỏng - chúng ta sẽ chỉ chọn ngẫu nhiên
+    # từ danh sách này. Lưu ý rằng tất cả request GET đều đến từ 192.168.2.XXX
+    # các địa chỉ, trong khi các yêu cầu POST đến từ các địa chỉ 192.16.3.XXX. Ba người dùng
+    # được biểu diễn trong các yêu cầu mẫu.
 
     REQUESTS = [
         Request('GET', '192.168.2.20', 'jim'),
@@ -1099,13 +931,13 @@ each request is handled by a thread:
         Request('POST', '192.168.3.22', 'sheila'),
     ]
 
-    # Note that the format string includes references to request context information
-    # such as HTTP method, client IP and username
+    # Lưu ý rằng chuỗi định dạng bao gồm các tham chiếu đến thông tin ngữ cảnh của yêu cầu
+    # chẳng hạn như phương thức HTTP, IP máy khách và tên người dùng
 
     formatter = logging.Formatter('%(threadName)-11s %(appName)s %(name)-9s %(user)-6s %(ip)s %(method)-4s %(message)s')
 
-    # Create our context variables. These will be filled at the start of request
-    # processing, and used in the logging that happens during that processing
+    # Tạo các biến ngữ cảnh của chúng ta. Các biến này sẽ được điền vào lúc bắt đầu xử lý yêu cầu
+    # và được sử dụng trong hoạt động ghi nhật ký diễn ra trong quá trình xử lý đó
 
     ctx_request = ContextVar('request')
     ctx_appname = ContextVar('appname')
@@ -1166,31 +998,31 @@ each request is handled by a thread:
         aa('--count', '-c', type=int, default=100, help='How many requests to simulate')
         options = ap.parse_args()
 
-        # Create the dummy webapps and put them in a list which we can use to select
-        # from randomly
+        # Tạo các webapp giả và đưa chúng vào một danh sách mà chúng ta có thể dùng để chọn
+        # một cách ngẫu nhiên
         app1 = WebApp('app1')
         app2 = WebApp('app2')
         apps = [app1, app2]
         threads = []
-        # Add a common handler which will capture all events
+        # Thêm một handler dùng chung để capture tất cả sự kiện
         handler = logging.FileHandler('app.log', 'w')
         handler.setFormatter(formatter)
         root.addHandler(handler)
 
-        # Generate calls to process requests
+        # Tạo các lệnh gọi để xử lý request
         for i in range(options.count):
             try:
-                # Pick an app at random and a request for it to process
+                # Chọn ngẫu nhiên một app và một request để app đó xử lý
                 app = choice(apps)
                 request = choice(REQUESTS)
-                # Process the request in its own thread
+                # Xử lý request trong thread riêng
                 t = threading.Thread(target=app.process_request, args=(request,))
                 threads.append(t)
                 t.start()
             except KeyboardInterrupt:
                 break
 
-        # Wait for the threads to terminate
+        # Chờ các thread kết thúc
         for t in threads:
             t.join()
 
@@ -1200,12 +1032,7 @@ each request is handled by a thread:
     if __name__ == '__main__':
         main()
 
-If you run the above, you should find that roughly half the requests go
-into :file:`app1.log` and the rest into :file:`app2.log`, and the all the requests are
-logged to :file:`app.log`. Each webapp-specific log will contain only log entries for
-only that webapp, and the request information will be displayed consistently in the
-log (i.e. the information in each dummy request will always appear together in a log
-line). This is illustrated by the following shell output:
+Nếu chạy đoạn mã trên, bạn sẽ thấy khoảng một nửa số request được ghi vào :file:`app1.log` và số còn lại được ghi vào :file:`app2.log`, đồng thời tất cả request đều được ghi log vào :file:`app.log`. Mỗi log dành riêng cho một webapp sẽ chỉ chứa các mục log của chính webapp đó, và thông tin request sẽ được hiển thị nhất quán trong log (tức là thông tin trong mỗi dummy request sẽ luôn xuất hiện cùng nhau trên một dòng log). Điều này được minh họa bằng kết quả shell sau:
 
 .. code-block:: shell
 
@@ -1246,13 +1073,10 @@ line). This is illustrated by the following shell output:
     147
 
 
-Imparting contextual information in handlers
---------------------------------------------
+Truyền thông tin ngữ cảnh trong các handler
+-------------------------------------------
 
-Each :class:`~Handler` has its own chain of filters.
-If you want to add contextual information to a :class:`LogRecord` without leaking
-it to other handlers, you can use a filter that returns
-a new :class:`~LogRecord` instead of modifying it in-place, as shown in the following script::
+Mỗi :class:`~Handler` có chuỗi filter riêng. Nếu muốn thêm thông tin ngữ cảnh vào một :class:`LogRecord` mà không làm lộ thông tin đó cho các handler khác, bạn có thể sử dụng một filter trả về một :class:`~LogRecord` mới thay vì sửa đổi nó tại chỗ, như trong script sau::
 
     import copy
     import logging
@@ -1275,61 +1099,39 @@ a new :class:`~LogRecord` instead of modifying it in-place, as shown in the foll
 
 .. _multiple-processes:
 
-Logging to a single file from multiple processes
+Ghi log vào một tệp duy nhất từ nhiều tiến trình
 ------------------------------------------------
 
-Although logging is thread-safe, and logging to a single file from multiple
-threads in a single process *is* supported, logging to a single file from
-*multiple processes* is *not* supported, because there is no standard way to
-serialize access to a single file across multiple processes in Python. If you
-need to log to a single file from multiple processes, one way of doing this is
-to have all the processes log to a :class:`~handlers.SocketHandler`, and have a
-separate process which implements a socket server which reads from the socket
-and logs to file. (If you prefer, you can dedicate one thread in one of the
-existing processes to perform this function.)
-:ref:`This section <network-logging>` documents this approach in more detail and
-includes a working socket receiver which can be used as a starting point for you
-to adapt in your own applications.
+Mặc dù logging an toàn với thread và việc ghi log vào một tệp duy nhất từ nhiều thread trong một tiến trình *được* hỗ trợ, việc ghi log vào một tệp duy nhất từ *nhiều tiến trình* *không* được hỗ trợ, vì trong Python không có cách tiêu chuẩn nào để tuần tự hóa quyền truy cập vào một tệp duy nhất giữa nhiều tiến trình. Nếu cần ghi log vào một tệp duy nhất từ nhiều tiến trình, một cách thực hiện là để tất cả các tiến trình ghi log vào một :class:`~handlers.SocketHandler`, đồng thời có một tiến trình riêng triển khai socket server để đọc dữ liệu từ socket và ghi vào tệp. (Nếu muốn, bạn có thể dành riêng một thread trong một trong các tiến trình hiện có để thực hiện chức năng này.)
+:ref:`Phần này <network-logging>` trình bày chi tiết hơn về cách tiếp cận này và bao gồm một socket receiver hoạt động được, có thể dùng làm điểm khởi đầu để bạn điều chỉnh cho các ứng dụng của mình.
 
-You could also write your own handler which uses the :class:`~multiprocessing.Lock`
-class from the :mod:`multiprocessing` module to serialize access to the
-file from your processes. The stdlib :class:`FileHandler` and subclasses do
-not make use of :mod:`multiprocessing`.
+Bạn cũng có thể tự viết một handler sử dụng class :class:`~multiprocessing.Lock` từ module :mod:`multiprocessing` để tuần tự hóa quyền truy cập vào tệp từ các tiến trình của mình. :class:`FileHandler` trong stdlib và các lớp con của nó không sử dụng :mod:`multiprocessing`.
 
 .. currentmodule:: logging.handlers
 
-Alternatively, you can use a ``Queue`` and a :class:`QueueHandler` to send
-all logging events to one of the processes in your multi-process application.
-The following example script demonstrates how you can do this; in the example
-a separate listener process listens for events sent by other processes and logs
-them according to its own logging configuration. Although the example only
-demonstrates one way of doing it (for example, you may want to use a listener
-thread rather than a separate listener process -- the implementation would be
-analogous) it does allow for completely different logging configurations for
-the listener and the other processes in your application, and can be used as
-the basis for code meeting your own specific requirements::
+Ngoài ra, bạn có thể sử dụng một ``Queue`` và một :class:`QueueHandler` để gửi tất cả các sự kiện logging đến một trong các tiến trình trong ứng dụng đa tiến trình của mình. Script ví dụ sau minh họa cách thực hiện việc này; trong ví dụ, một tiến trình listener riêng lắng nghe các sự kiện do những tiến trình khác gửi đến và ghi log theo cấu hình logging riêng của nó. Mặc dù ví dụ chỉ minh họa một cách thực hiện (chẳng hạn, bạn có thể muốn dùng một listener thread thay vì một tiến trình listener riêng — cách triển khai sẽ tương tự), nhưng nó cho phép áp dụng các cấu hình logging hoàn toàn khác nhau cho listener và các tiến trình khác trong ứng dụng của bạn, đồng thời có thể dùng làm cơ sở cho code đáp ứng các yêu cầu cụ thể của riêng bạn::
 
-    # You'll need these imports in your own code
+    # Bạn sẽ cần các import này trong mã của riêng mình
     import logging
     import logging.handlers
     import multiprocessing
 
-    # Next two import lines for this demo only
+    # Hai dòng import tiếp theo chỉ dành cho bản minh họa này
     from random import choice, random
     import time
 
     #
-    # Because you'll want to define the logging configurations for listener and workers, the
-    # listener and worker process functions take a configurer parameter which is a callable
-    # for configuring logging for that process. These functions are also passed the queue,
-    # which they use for communication.
+    # Vì bạn sẽ muốn định nghĩa các cấu hình logging cho listener và worker, các hàm
+    # listener và worker process nhận một tham số configurer, là một callable
+    # dùng để cấu hình logging cho process đó. Các hàm này cũng nhận queue,
+    # mà chúng sử dụng để giao tiếp.
     #
-    # In practice, you can configure the listener however you want, but note that in this
-    # simple example, the listener does not apply level or filter logic to received records.
-    # In practice, you would probably want to do this logic in the worker processes, to avoid
-    # sending events which would be filtered out between processes.
+    # Trên thực tế, bạn có thể cấu hình listener theo bất kỳ cách nào mình muốn, nhưng lưu ý rằng trong
+    # ví dụ đơn giản, listener không áp dụng logic level hoặc filter cho các record nhận được.
+    # Trong thực tế, có lẽ bạn sẽ muốn thực hiện logic này trong các worker process để tránh
+    # gửi các event sẽ bị filter giữa các process.
     #
-    # The size of the rotated files is made small so you can see the results easily.
+    # Kích thước của các tệp được xoay vòng được đặt nhỏ để bạn có thể dễ dàng xem kết quả.
     def listener_configurer():
         root = logging.getLogger()
         h = logging.handlers.RotatingFileHandler('mptest.log', 'a', 300, 10)
@@ -1337,24 +1139,24 @@ the basis for code meeting your own specific requirements::
         h.setFormatter(f)
         root.addHandler(h)
 
-    # This is the listener process top-level loop: wait for logging events
-    # (LogRecords)on the queue and handle them, quit when you get a None for a
+    # Đây là vòng lặp cấp cao nhất của listener process: chờ các event logging
+    # (LogRecords) trong queue và xử lý chúng, thoát khi nhận được None cho một
     # LogRecord.
     def listener_process(queue, configurer):
         configurer()
         while True:
             try:
                 record = queue.get()
-                if record is None:  # We send this as a sentinel to tell the listener to quit.
+                if record is None:  # Gửi giá trị này như một sentinel để báo cho listener thoát.
                     break
                 logger = logging.getLogger(record.name)
-                logger.handle(record)  # No level or filter logic applied - just do it!
+                logger.handle(record)  # Không áp dụng logic level hoặc filter - chỉ cần thực hiện!
             except Exception:
                 import sys, traceback
                 print('Whoops! Problem:', file=sys.stderr)
                 traceback.print_exc(file=sys.stderr)
 
-    # Arrays used for random selections in this demo
+    # Các array được dùng để chọn ngẫu nhiên trong demo này
 
     LEVELS = [logging.DEBUG, logging.INFO, logging.WARNING,
               logging.ERROR, logging.CRITICAL]
@@ -1367,19 +1169,19 @@ the basis for code meeting your own specific requirements::
         'Random message #3',
     ]
 
-    # The worker configuration is done at the start of the worker process run.
-    # Note that on Windows you can't rely on fork semantics, so each process
-    # will run the logging configuration code when it starts.
+    # Cấu hình worker được thực hiện khi bắt đầu chạy tiến trình worker.
+    # Lưu ý rằng trên Windows, bạn không thể dựa vào ngữ nghĩa fork, vì vậy mỗi tiến trình
+    # sẽ chạy mã cấu hình logging khi khởi động.
     def worker_configurer(queue):
-        h = logging.handlers.QueueHandler(queue)  # Just the one handler needed
+        h = logging.handlers.QueueHandler(queue)  # Chỉ cần một handler
         root = logging.getLogger()
         root.addHandler(h)
-        # send all messages, for demo; no other level or filter logic applied.
+        # gửi tất cả thông báo để minh họa; không áp dụng logic cấp độ hoặc bộ lọc nào khác.
         root.setLevel(logging.DEBUG)
 
-    # This is the worker process top-level loop, which just logs ten events with
-    # random intervening delays before terminating.
-    # The print messages are just so you know it's doing something!
+    # Đây là vòng lặp cấp cao nhất của tiến trình worker, chỉ ghi nhật ký mười sự kiện với
+    # các khoảng trễ ngẫu nhiên xen kẽ trước khi kết thúc.
+    # Các thông báo print chỉ để bạn biết chương trình đang thực hiện một việc gì đó!
     def worker_process(queue, configurer):
         configurer(queue)
         name = multiprocessing.current_process().name
@@ -1392,9 +1194,9 @@ the basis for code meeting your own specific requirements::
             logger.log(level, message)
         print('Worker finished: %s' % name)
 
-    # Here's where the demo gets orchestrated. Create the queue, create and start
-    # the listener, create ten workers and start them, wait for them to finish,
-    # then send a None to the queue to tell the listener to finish.
+    # Đây là nơi điều phối bản demo. Tạo queue, tạo và khởi động
+    # listener, tạo mười worker và khởi động chúng, chờ chúng hoàn tất,
+    # sau đó gửi None vào queue để báo cho listener kết thúc.
     def main():
         queue = multiprocessing.Queue(-1)
         listener = multiprocessing.Process(target=listener_process,
@@ -1414,8 +1216,7 @@ the basis for code meeting your own specific requirements::
     if __name__ == '__main__':
         main()
 
-A variant of the above script keeps the logging in the main process, in a
-separate thread::
+Một biến thể của script trên giữ việc ghi nhật ký trong tiến trình chính, ở một thread riêng::
 
     import logging
     import logging.config
@@ -1501,38 +1302,34 @@ separate thread::
         logging.config.dictConfig(d)
         lp = threading.Thread(target=logger_thread, args=(q,))
         lp.start()
-        # At this point, the main process could do some useful work of its own
-        # Once it's done that, it can wait for the workers to terminate...
+        # Đến đây, tiến trình chính có thể tự thực hiện một số công việc hữu ích
+        # Sau khi hoàn tất, tiến trình này có thể chờ các worker kết thúc...
         for wp in workers:
             wp.join()
-        # And now tell the logging thread to finish up, too
+        # Bây giờ cũng yêu cầu thread ghi nhật ký hoàn tất
         q.put(None)
         lp.join()
 
-This variant shows how you can e.g. apply configuration for particular loggers
-- e.g. the ``foo`` logger has a special handler which stores all events in the
-``foo`` subsystem in a file ``mplog-foo.log``. This will be used by the logging
-machinery in the main process (even though the logging events are generated in
-the worker processes) to direct the messages to the appropriate destinations.
+Biến thể này cho thấy cách bạn có thể áp dụng cấu hình, chẳng hạn, cho các logger cụ thể
+- chẳng hạn, logger ``foo`` có một handler đặc biệt lưu trữ tất cả các sự kiện trong
+subsystem ``foo`` vào một file ``mplog-foo.log``. Cơ chế logging trong tiến trình chính sẽ sử dụng file này (mặc dù các sự kiện logging được tạo trong các tiến trình worker) để chuyển các thông báo đến những đích phù hợp.
 
-Using concurrent.futures.ProcessPoolExecutor
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng concurrent.futures.ProcessPoolExecutor
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you want to use :class:`concurrent.futures.ProcessPoolExecutor` to start
-your worker processes, you need to create the queue slightly differently.
-Instead of
+Nếu bạn muốn sử dụng :class:`concurrent.futures.ProcessPoolExecutor` để khởi động các worker process, bạn cần tạo queue theo cách hơi khác. Thay vì
 
 .. code-block:: python
 
    queue = multiprocessing.Queue(-1)
 
-you should use
+bạn nên sử dụng
 
 .. code-block:: python
 
-   queue = multiprocessing.Manager().Queue(-1)  # also works with the examples above
+   queue = multiprocessing.Manager().Queue(-1)  # cũng hoạt động với các ví dụ ở trên
 
-and you can then replace the worker creation from this::
+sau đó bạn có thể thay thế việc tạo worker từ đoạn này::
 
     workers = []
     for i in range(10):
@@ -1543,35 +1340,26 @@ and you can then replace the worker creation from this::
     for w in workers:
         w.join()
 
-to this (remembering to first import :mod:`concurrent.futures`)::
+thành đoạn này (nhớ import :mod:`concurrent.futures` trước)::
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=10) as executor:
         for i in range(10):
             executor.submit(worker_process, queue, worker_configurer)
 
-Deploying web applications using Gunicorn and uWSGI
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Triển khai ứng dụng web bằng Gunicorn và uWSGI
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When deploying web applications using `Gunicorn <https://gunicorn.org/>`_ or `uWSGI
-<https://uwsgi-docs.readthedocs.io/en/latest/>`_ (or similar), multiple worker
-processes are created to handle client requests. In such environments, avoid creating
-file-based handlers directly in your web application. Instead, use a
-:class:`SocketHandler` to log from the web application to a listener in a separate
-process. This can be set up using a process management tool such as Supervisor - see
-`Running a logging socket listener in production`_ for more details.
+Khi deploy các ứng dụng web bằng `Gunicorn <https://gunicorn.org/>`_ hoặc `uWSGI <https://uwsgi-docs.readthedocs.io/en/latest/>`_ (hoặc công cụ tương tự), nhiều worker process được tạo để xử lý các request từ client. Trong những môi trường như vậy, tránh tạo trực tiếp các handler dựa trên tệp trong ứng dụng web. Thay vào đó, hãy sử dụng một
+:class:`SocketHandler` để ghi log từ ứng dụng web đến một listener trong một process riêng biệt. Bạn có thể thiết lập việc này bằng một công cụ quản lý process như Supervisor - xem `Running a logging socket listener in production <Running a logging socket listener in production_>`_ để biết thêm chi tiết.
 
 
-Using file rotation
--------------------
+Sử dụng tính năng xoay tệp
+--------------------------
 
 .. sectionauthor:: Doug Hellmann, Vinay Sajip (changes)
 .. (see <https://pymotw.com/3/logging/>)
 
-Sometimes you want to let a log file grow to a certain size, then open a new
-file and log to that. You may want to keep a certain number of these files, and
-when that many files have been created, rotate the files so that the number of
-files and the size of the files both remain bounded. For this usage pattern, the
-logging package provides a :class:`RotatingFileHandler`::
+Đôi khi, bạn muốn cho phép tệp log tăng đến một kích thước nhất định, sau đó mở một tệp mới và ghi log vào đó. Bạn có thể muốn giữ lại một số lượng tệp nhất định, và khi đã tạo đủ số lượng tệp đó, xoay các tệp để cả số lượng tệp lẫn kích thước tệp đều được giới hạn. Đối với mẫu sử dụng này, package logging cung cấp một :class:`RotatingFileHandler`::
 
    import glob
    import logging
@@ -1579,28 +1367,27 @@ logging package provides a :class:`RotatingFileHandler`::
 
    LOG_FILENAME = 'logging_rotatingfile_example.out'
 
-   # Set up a specific logger with our desired output level
+   # Thiết lập một logger cụ thể với mức output mong muốn
    my_logger = logging.getLogger('MyLogger')
    my_logger.setLevel(logging.DEBUG)
 
-   # Add the log message handler to the logger
+   # Thêm log message handler vào logger
    handler = logging.handlers.RotatingFileHandler(
                  LOG_FILENAME, maxBytes=20, backupCount=5)
 
    my_logger.addHandler(handler)
 
-   # Log some messages
+   # Ghi một số message
    for i in range(20):
        my_logger.debug('i = %d' % i)
 
-   # See what files are created
+   # Xem các tệp được tạo
    logfiles = glob.glob('%s*' % LOG_FILENAME)
 
    for filename in logfiles:
        print(filename)
 
-The result should be 6 separate files, each with part of the log history for the
-application:
+Kết quả sẽ là 6 tệp riêng biệt, mỗi tệp chứa một phần lịch sử nhật ký của ứng dụng:
 
 .. code-block:: none
 
@@ -1611,36 +1398,22 @@ application:
    logging_rotatingfile_example.out.4
    logging_rotatingfile_example.out.5
 
-The most current file is always :file:`logging_rotatingfile_example.out`,
-and each time it reaches the size limit it is renamed with the suffix
-``.1``. Each of the existing backup files is renamed to increment the suffix
-(``.1`` becomes ``.2``, etc.)  and the ``.6`` file is erased.
+Tệp hiện tại luôn là :file:`logging_rotatingfile_example.out`, và mỗi khi đạt đến giới hạn kích thước, tệp sẽ được đổi tên với hậu tố ``.1``. Mỗi tệp sao lưu hiện có sẽ được đổi tên để tăng hậu tố (``.1`` trở thành ``.2``, v.v.), còn tệp ``.6`` sẽ bị xóa.
 
-Obviously this example sets the log length much too small as an extreme
-example.  You would want to set *maxBytes* to an appropriate value.
+Rõ ràng, ví dụ này đặt độ dài nhật ký quá nhỏ một cách cực đoan. Bạn nên đặt *maxBytes* thành một giá trị phù hợp.
 
 .. currentmodule:: logging
 
 .. _format-styles:
 
-Use of alternative formatting styles
-------------------------------------
+Sử dụng các kiểu định dạng thay thế
+-----------------------------------
 
-When logging was added to the Python standard library, the only way of
-formatting messages with variable content was to use the %-formatting
-method. Since then, Python has gained two new formatting approaches:
-:class:`string.Template` (added in Python 2.4) and :meth:`str.format`
-(added in Python 2.6).
+Khi chức năng ghi nhật ký được thêm vào thư viện chuẩn Python, cách duy nhất để định dạng thông báo có nội dung biến đổi là sử dụng phương pháp định dạng %. Kể từ đó, Python đã có thêm hai cách tiếp cận định dạng mới:
+:class:`string.Template` (được thêm trong Python 2.4) và :meth:`str.format` (được thêm trong Python 2.6).
 
-Logging (as of 3.2) provides improved support for these two additional
-formatting styles. The :class:`Formatter` class been enhanced to take an
-additional, optional keyword parameter named ``style``. This defaults to
-``'%'``, but other possible values are ``'{'`` and ``'$'``, which correspond
-to the other two formatting styles. Backwards compatibility is maintained by
-default (as you would expect), but by explicitly specifying a style parameter,
-you get the ability to specify format strings which work with
-:meth:`str.format` or :class:`string.Template`. Here's an example console
-session to show the possibilities:
+Logging (kể từ phiên bản 3.2) cung cấp hỗ trợ được cải thiện cho hai kiểu định dạng bổ sung này. Lớp :class:`Formatter` đã được nâng cấp để nhận thêm một tham số từ khóa tùy chọn có tên là ``style``. Giá trị mặc định là ``'%'``, nhưng các giá trị khả dụng khác là ``'{'`` và ``'$'``, tương ứng với hai kiểu định dạng còn lại. Theo mặc định, khả năng tương thích ngược vẫn được duy trì (như bạn mong đợi), nhưng bằng cách chỉ định rõ một tham số style, bạn có thể chỉ định các chuỗi định dạng hoạt động với
+:meth:`str.format` hoặc :class:`string.Template`. Sau đây là một phiên console minh họa các khả năng này:
 
 .. code-block:: pycon
 
@@ -1666,32 +1439,16 @@ session to show the possibilities:
     2010-10-28 15:13:11,494 foo.bar CRITICAL This is a CRITICAL message
     >>>
 
-Note that the formatting of logging messages for final output to logs is
-completely independent of how an individual logging message is constructed.
-That can still use %-formatting, as shown here::
+Lưu ý rằng cách định dạng các thông báo logging khi xuất cuối cùng vào log hoàn toàn độc lập với cách xây dựng từng thông báo logging. Bạn vẫn có thể sử dụng %-formatting cho việc đó, như minh họa ở đây::
 
     >>> logger.error('This is an%s %s %s', 'other,', 'ERROR,', 'message')
     2010-10-28 15:19:29,833 foo.bar ERROR This is another, ERROR, message
     >>>
 
-Logging calls (``logger.debug()``, ``logger.info()`` etc.) only take
-positional parameters for the actual logging message itself, with keyword
-parameters used only for determining options for how to handle the actual
-logging call (e.g. the ``exc_info`` keyword parameter to indicate that
-traceback information should be logged, or the ``extra`` keyword parameter
-to indicate additional contextual information to be added to the log). So
-you cannot directly make logging calls using :meth:`str.format` or
-:class:`string.Template` syntax, because internally the logging package
-uses %-formatting to merge the format string and the variable arguments.
-There would be no changing this while preserving backward compatibility, since
-all logging calls which are out there in existing code will be using %-format
-strings.
+Các lệnh gọi logging (``logger.debug()``, ``logger.info()`` v.v.) chỉ nhận các tham số vị trí cho chính thông báo logging, còn các tham số từ khóa chỉ được dùng để xác định các tùy chọn xử lý lệnh gọi logging thực tế (ví dụ: tham số từ khóa ``exc_info`` để cho biết cần ghi thông tin traceback, hoặc tham số từ khóa ``extra`` để cho biết cần thêm thông tin ngữ cảnh). Vì vậy, bạn không thể trực tiếp thực hiện các lệnh gọi logging bằng :meth:`str.format` hoặc
+cú pháp :class:`string.Template`, vì bên trong, package logging sử dụng %-formatting để hợp nhất chuỗi định dạng và các đối số biến. Không thể thay đổi điều này mà vẫn duy trì khả năng tương thích ngược, vì mọi lệnh gọi logging hiện có trong mã nguồn đều sẽ sử dụng các chuỗi định dạng %-format.
 
-There is, however, a way that you can use {}- and $- formatting to construct
-your individual log messages. Recall that for a message you can use an
-arbitrary object as a message format string, and that the logging package will
-call ``str()`` on that object to get the actual format string. Consider the
-following two classes::
+Tuy nhiên, có một cách để bạn sử dụng định dạng {} và $ để xây dựng từng thông báo log riêng lẻ. Hãy nhớ rằng đối với một thông báo, bạn có thể sử dụng một đối tượng tùy ý làm chuỗi định dạng thông báo, và package logging sẽ gọi ``str()`` trên đối tượng đó để lấy chuỗi định dạng thực tế. Hãy xem xét hai lớp sau::
 
     class BraceMessage:
         def __init__(self, fmt, /, *args, **kwargs):
@@ -1711,17 +1468,9 @@ following two classes::
             from string import Template
             return Template(self.fmt).substitute(**self.kwargs)
 
-Either of these can be used in place of a format string, to allow {}- or
-$-formatting to be used to build the actual "message" part which appears in the
-formatted log output in place of "%(message)s" or "{message}" or "$message".
-It's a little unwieldy to use the class names whenever you want to log
-something, but it's quite palatable if you use an alias such as __ (double
-underscore --- not to be confused with _, the single underscore used as a
-synonym/alias for :func:`gettext.gettext` or its brethren).
+Bạn có thể sử dụng một trong hai lớp này thay cho chuỗi định dạng, cho phép dùng định dạng {} hoặc $ để tạo phần "message" thực tế xuất hiện trong đầu ra log đã định dạng, thay cho "%(message)s", "{message}" hoặc "$message". Việc sử dụng tên lớp mỗi khi muốn ghi log hơi bất tiện, nhưng sẽ khá dễ dùng nếu bạn tạo một alias chẳng hạn như __ (hai dấu gạch dưới --- không nên nhầm với _, một dấu gạch dưới được dùng làm từ đồng nghĩa/alias cho :func:`gettext.gettext` hoặc các biến thể tương tự).
 
-The above classes are not included in Python, though they're easy enough to
-copy and paste into your own code. They can be used as follows (assuming that
-they're declared in a module called ``wherever``):
+Các lớp trên không được tích hợp sẵn trong Python, dù chúng đủ dễ để sao chép và dán vào mã của riêng bạn. Bạn có thể sử dụng chúng như sau (giả sử chúng được khai báo trong một module có tên ``wherever``):
 
 .. code-block:: pycon
 
@@ -1741,20 +1490,11 @@ they're declared in a module called ``wherever``):
     Message with 2 placeholders
     >>>
 
-While the above examples use ``print()`` to show how the formatting works, you
-would of course use ``logger.debug()`` or similar to actually log using this
-approach.
+Mặc dù các ví dụ trên sử dụng ``print()`` để minh họa cách hoạt động của việc định dạng, tất nhiên bạn sẽ sử dụng ``logger.debug()`` hoặc tương tự để thực sự ghi nhật ký theo cách tiếp cận này.
 
-One thing to note is that you pay no significant performance penalty with this
-approach: the actual formatting happens not when you make the logging call, but
-when (and if) the logged message is actually about to be output to a log by a
-handler. So the only slightly unusual thing which might trip you up is that the
-parentheses go around the format string and the arguments, not just the format
-string. That's because the __ notation is just syntax sugar for a constructor
-call to one of the :samp:`{XXX}Message` classes.
+Một điều cần lưu ý là cách tiếp cận này không gây ảnh hưởng đáng kể đến hiệu năng: việc định dạng thực tế không diễn ra khi bạn gọi hàm ghi nhật ký, mà diễn ra khi (và nếu) thông báo đã ghi nhật ký thực sự sắp được một handler xuất ra log. Vì vậy, điều hơi bất thường duy nhất có thể khiến bạn nhầm lẫn là dấu ngoặc đơn bao quanh chuỗi định dạng và các đối số, chứ không chỉ chuỗi định dạng. Đó là vì ký hiệu __ chỉ là cú pháp viết tắt cho một lời gọi hàm khởi tạo đến một trong các lớp :samp:`{XXX}Message`.
 
-If you prefer, you can use a :class:`LoggerAdapter` to achieve a similar effect
-to the above, as in the following example::
+Nếu muốn, bạn có thể sử dụng một :class:`LoggerAdapter` để đạt được hiệu ứng tương tự như trên, như trong ví dụ sau::
 
     import logging
 
@@ -1782,72 +1522,44 @@ to the above, as in the following example::
         logging.basicConfig(level=logging.DEBUG)
         main()
 
-The above script should log the message ``Hello, world!`` when run with
-Python 3.8 or later.
+Khi chạy bằng Python 3.8 trở lên, đoạn mã trên sẽ ghi thông báo ``Hello, world!`` vào log.
 
 
 .. currentmodule:: logging
 
 .. _custom-logrecord:
 
-Customizing ``LogRecord``
--------------------------
+Tùy chỉnh ``LogRecord``
+-----------------------
 
-Every logging event is represented by a :class:`LogRecord` instance.
-When an event is logged and not filtered out by a logger's level, a
-:class:`LogRecord` is created, populated with information about the event and
-then passed to the handlers for that logger (and its ancestors, up to and
-including the logger where further propagation up the hierarchy is disabled).
-Before Python 3.2, there were only two places where this creation was done:
+Mỗi sự kiện ghi nhật ký được biểu diễn bằng một instance :class:`LogRecord`. Khi một sự kiện được ghi nhật ký và không bị lọc bởi level của logger, một
+:class:`LogRecord` được tạo, điền thông tin về sự kiện, sau đó được chuyển đến các handler của logger đó (và các logger tổ tiên của nó, cho đến và bao gồm cả logger nơi việc truyền tiếp lên trong hệ phân cấp bị vô hiệu hóa). Trước Python 3.2, chỉ có hai nơi thực hiện việc tạo này:
 
-* :meth:`Logger.makeRecord`, which is called in the normal process of
-  logging an event. This invoked :class:`LogRecord` directly to create an
-  instance.
-* :func:`makeLogRecord`, which is called with a dictionary containing
-  attributes to be added to the LogRecord. This is typically invoked when a
-  suitable dictionary has been received over the network (e.g. in pickle form
-  via a :class:`~handlers.SocketHandler`, or in JSON form via an
+* :meth:`Logger.makeRecord`, được gọi trong quy trình ghi log một sự kiện thông thường. Hàm này trực tiếp gọi :class:`LogRecord` để tạo một instance.
+* :func:`makeLogRecord`, được gọi với một dictionary chứa các thuộc tính cần thêm vào LogRecord. Hàm này thường được gọi khi một dictionary phù hợp được nhận qua mạng (ví dụ: ở dạng pickle thông qua một :class:`~handlers.SocketHandler`, hoặc ở dạng JSON thông qua một
   :class:`~handlers.HTTPHandler`).
 
-This has usually meant that if you need to do anything special with a
-:class:`LogRecord`, you've had to do one of the following.
+Điều này thường có nghĩa là nếu bạn cần thực hiện điều gì đó đặc biệt với một
+:class:`LogRecord`, bạn phải thực hiện một trong các cách sau.
 
-* Create your own :class:`Logger` subclass, which overrides
-  :meth:`Logger.makeRecord`, and set it using :func:`~logging.setLoggerClass`
-  before any loggers that you care about are instantiated.
-* Add a :class:`Filter` to a logger or handler, which does the
-  necessary special manipulation you need when its
-  :meth:`~Filter.filter` method is called.
+* Tạo lớp con :class:`Logger` của riêng bạn, lớp này ghi đè
+  :meth:`Logger.makeRecord`, và thiết lập nó bằng :func:`~logging.setLoggerClass` trước khi khởi tạo bất kỳ logger nào mà bạn quan tâm.
+* Thêm một :class:`Filter` vào logger hoặc handler, thực hiện thao tác đặc biệt cần thiết khi phương thức của nó
+  :meth:`~Filter.filter` được gọi.
 
-The first approach would be a little unwieldy in the scenario where (say)
-several different libraries wanted to do different things. Each would attempt
-to set its own :class:`Logger` subclass, and the one which did this last would
-win.
+Cách tiếp cận đầu tiên sẽ hơi cồng kềnh trong trường hợp (chẳng hạn) một số thư viện khác nhau muốn thực hiện những việc khác nhau. Mỗi thư viện sẽ cố gắng đặt lớp con :class:`Logger` của riêng mình, và thư viện thực hiện việc này sau cùng sẽ chiếm ưu thế.
 
-The second approach works reasonably well for many cases, but does not allow
-you to e.g. use a specialized subclass of :class:`LogRecord`. Library
-developers can set a suitable filter on their loggers, but they would have to
-remember to do this every time they introduced a new logger (which they would
-do simply by adding new packages or modules and doing ::
+Cách tiếp cận thứ hai hoạt động khá tốt trong nhiều trường hợp, nhưng không cho phép bạn, chẳng hạn, sử dụng một lớp con chuyên biệt của :class:`LogRecord`. Các nhà phát triển thư viện có thể đặt một filter phù hợp trên các logger của mình, nhưng họ sẽ phải nhớ thực hiện việc này mỗi khi thêm một logger mới (bằng cách đơn giản là thêm các package hoặc module mới và thực hiện::
 
    logger = logging.getLogger(__name__)
 
-at module level). It's probably one too many things to think about. Developers
-could also add the filter to a :class:`~logging.NullHandler` attached to their
-top-level logger, but this would not be invoked if an application developer
-attached a handler to a lower-level library logger --- so output from that
-handler would not reflect the intentions of the library developer.
+ở cấp module). Có lẽ đây là thêm một việc cần phải ghi nhớ. Các nhà phát triển cũng có thể thêm filter vào một :class:`~logging.NullHandler` gắn với logger cấp cao nhất của họ, nhưng filter này sẽ không được gọi nếu nhà phát triển ứng dụng gắn một handler vào logger cấp thấp hơn của thư viện — vì vậy đầu ra từ handler đó sẽ không phản ánh ý định của nhà phát triển thư viện.
 
-In Python 3.2 and later, :class:`~logging.LogRecord` creation is done through a
-factory, which you can specify. The factory is just a callable you can set with
-:func:`~logging.setLogRecordFactory`, and interrogate with
-:func:`~logging.getLogRecordFactory`. The factory is invoked with the same
-signature as the :class:`~logging.LogRecord` constructor, as :class:`LogRecord`
-is the default setting for the factory.
+Trong Python 3.2 trở lên, việc tạo :class:`~logging.LogRecord` được thực hiện thông qua một factory mà bạn có thể chỉ định. Factory chỉ là một callable mà bạn có thể thiết lập bằng
+:func:`~logging.setLogRecordFactory`, và truy vấn bằng
+:func:`~logging.getLogRecordFactory`. Factory được gọi với cùng chữ ký như constructor :class:`~logging.LogRecord`, vì :class:`LogRecord` là thiết lập mặc định cho factory.
 
-This approach allows a custom factory to control all aspects of LogRecord
-creation. For example, you could return a subclass, or just add some additional
-attributes to the record once created, using a pattern similar to this::
+Cách tiếp cận này cho phép một factory tùy chỉnh kiểm soát mọi khía cạnh của việc tạo LogRecord. Ví dụ, bạn có thể trả về một subclass hoặc chỉ cần thêm một số thuộc tính bổ sung vào record sau khi tạo, bằng cách sử dụng một mẫu tương tự như sau::
 
     old_factory = logging.getLogRecordFactory()
 
@@ -1858,33 +1570,26 @@ attributes to the record once created, using a pattern similar to this::
 
     logging.setLogRecordFactory(record_factory)
 
-This pattern allows different libraries to chain factories together, and as
-long as they don't overwrite each other's attributes or unintentionally
-overwrite the attributes provided as standard, there should be no surprises.
-However, it should be borne in mind that each link in the chain adds run-time
-overhead to all logging operations, and the technique should only be used when
-the use of a :class:`Filter` does not provide the desired result.
+Mẫu này cho phép các thư viện khác nhau nối tiếp các factory với nhau, và miễn là chúng không ghi đè lên thuộc tính của nhau hoặc vô tình ghi đè lên các thuộc tính được cung cấp theo tiêu chuẩn thì sẽ không có bất ngờ nào. Tuy nhiên, cần lưu ý rằng mỗi mắt xích trong chuỗi đều làm tăng run-time overhead cho mọi hoạt động logging, và chỉ nên sử dụng kỹ thuật này khi việc sử dụng :class:`Filter` không mang lại kết quả mong muốn.
 
 .. currentmodule:: logging.handlers
 
 .. _zeromq-handlers:
 
-Subclassing QueueHandler and QueueListener- a ZeroMQ example
-------------------------------------------------------------
+Phân lớp QueueHandler và QueueListener—một ví dụ về ZeroMQ
+----------------------------------------------------------
 
-Subclass ``QueueHandler``
+Phân lớp ``QueueHandler``
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can use a :class:`QueueHandler` subclass to send messages to other kinds
-of queues, for example a ZeroMQ 'publish' socket. In the example below,the
-socket is created separately and passed to the handler (as its 'queue')::
+Bạn có thể sử dụng một subclass của :class:`QueueHandler` để gửi thông báo đến các loại queue khác, chẳng hạn như socket 'publish' của ZeroMQ. Trong ví dụ dưới đây, socket được tạo riêng và truyền vào handler (dưới dạng 'queue')::
 
-    import zmq   # using pyzmq, the Python binding for ZeroMQ
-    import json  # for serializing records portably
+    import zmq   # sử dụng pyzmq, Python binding cho ZeroMQ
+    import json  # để tuần tự hóa các record theo cách portable
 
     ctx = zmq.Context()
-    sock = zmq.Socket(ctx, zmq.PUB)  # or zmq.PUSH, or other suitable value
-    sock.bind('tcp://*:5556')        # or wherever
+    sock = zmq.Socket(ctx, zmq.PUB)  # hoặc zmq.PUSH, hoặc giá trị phù hợp khác
+    sock.bind('tcp://*:5556')        # hoặc bất cứ đâu
 
     class ZeroMQSocketHandler(QueueHandler):
         def enqueue(self, record):
@@ -1894,8 +1599,7 @@ socket is created separately and passed to the handler (as its 'queue')::
     handler = ZeroMQSocketHandler(sock)
 
 
-Of course there are other ways of organizing this, for example passing in the
-data needed by the handler to create the socket::
+Tất nhiên, có những cách khác để tổ chức việc này, chẳng hạn như truyền dữ liệu cần thiết vào handler để tạo socket::
 
     class ZeroMQSocketHandler(QueueHandler):
         def __init__(self, uri, socktype=zmq.PUB, ctx=None):
@@ -1911,17 +1615,16 @@ data needed by the handler to create the socket::
             self.queue.close()
 
 
-Subclass ``QueueListener``
+Phân lớp ``QueueListener``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can also subclass :class:`QueueListener` to get messages from other kinds
-of queues, for example a ZeroMQ 'subscribe' socket. Here's an example::
+Bạn cũng có thể phân lớp :class:`QueueListener` để nhận thông báo từ các loại queue khác, chẳng hạn như socket 'subscribe' của ZeroMQ. Đây là một ví dụ::
 
     class ZeroMQSocketListener(QueueListener):
         def __init__(self, uri, /, *handlers, **kwargs):
             self.ctx = kwargs.get('ctx') or zmq.Context()
             socket = zmq.Socket(self.ctx, zmq.SUB)
-            socket.setsockopt_string(zmq.SUBSCRIBE, '')  # subscribe to everything
+            socket.setsockopt_string(zmq.SUBSCRIBE, '')  # subscribe mọi thứ
             socket.connect(uri)
             super().__init__(socket, *handlers, **kwargs)
 
@@ -1931,17 +1634,13 @@ of queues, for example a ZeroMQ 'subscribe' socket. Here's an example::
 
 .. _pynng-handlers:
 
-Subclassing QueueHandler and QueueListener- a ``pynng`` example
----------------------------------------------------------------
+Tạo lớp con cho QueueHandler và QueueListener - một ví dụ về ``pynng``
+----------------------------------------------------------------------
 
-In a similar way to the above section, we can implement a listener and handler
-using :pypi:`pynng`, which is a Python binding to
-`NNG <https://nng.nanomsg.org/>`_, billed as a spiritual successor to ZeroMQ.
-The following snippets illustrate -- you can test them in an environment which has
-``pynng`` installed. Just for variety, we present the listener first.
+Tương tự như phần trên, chúng ta có thể triển khai listener và handler bằng :pypi:`pynng`, một binding Python cho `NNG <https://nng.nanomsg.org/>`_, được xem là thế hệ kế nhiệm về mặt tinh thần của ZeroMQ. Các đoạn mã sau minh họa cách thực hiện -- bạn có thể thử chúng trong một môi trường đã cài đặt ``pynng``. Để đa dạng hơn, chúng tôi trình bày listener trước.
 
 
-Subclass ``QueueListener``
+Phân lớp ``QueueListener``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -1960,18 +1659,18 @@ Subclass ``QueueListener``
     class NNGSocketListener(logging.handlers.QueueListener):
 
         def __init__(self, uri, /, *handlers, **kwargs):
-            # Have a timeout for interruptibility, and open a
-            # subscriber socket
+            # Đặt thời gian chờ để có thể ngắt, và mở một
+            # socket subscriber
             socket = pynng.Sub0(listen=uri, recv_timeout=500)
-            # The b'' subscription matches all topics
+            # Subscription b'' khớp với mọi topic
             topics = kwargs.pop('topics', None) or b''
             socket.subscribe(topics)
-            # We treat the socket as a queue
+            # Coi socket như một hàng đợi
             super().__init__(socket, *handlers, **kwargs)
 
         def dequeue(self, block):
             data = None
-            # Keep looping while not interrupted and no data received over the
+            # Tiếp tục lặp khi chưa bị ngắt và chưa nhận được dữ liệu qua
             # socket
             while not interrupted:
                 try:
@@ -1979,17 +1678,17 @@ Subclass ``QueueListener``
                     break
                 except pynng.Timeout:
                     pass
-                except pynng.Closed:  # sometimes happens when you hit Ctrl-C
+                except pynng.Closed:  # đôi khi xảy ra khi bạn nhấn Ctrl-C
                     break
             if data is None:
                 return None
-            # Get the logging event sent from a publisher
+            # Nhận sự kiện logging được gửi từ publisher
             event = json.loads(data.decode('utf-8'))
             return logging.makeLogRecord(event)
 
         def enqueue_sentinel(self):
-            # Not used in this implementation, as the socket isn't really a
-            # queue
+            # Không được dùng trong cách triển khai này, vì socket thực sự không phải là một
+            # hàng đợi
             pass
 
     logging.getLogger('pynng').propagate = False
@@ -2005,7 +1704,7 @@ Subclass ``QueueListener``
         listener.stop()
 
 
-Subclass ``QueueHandler``
+Phân lớp ``QueueHandler``
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. currentmodule:: logging
@@ -2030,7 +1729,7 @@ Subclass ``QueueHandler``
             super().__init__(socket)
 
         def enqueue(self, record):
-            # Send the record as UTF-8 encoded JSON
+            # Gửi record dưới dạng JSON được mã hóa UTF-8
             d = dict(record.__dict__)
             data = json.dumps(d)
             self.queue.send(data.encode('utf-8'))
@@ -2040,7 +1739,7 @@ Subclass ``QueueHandler``
 
     logging.getLogger('pynng').propagate = False
     handler = NNGSocketHandler(DEFAULT_ADDR)
-    # Make sure the process ID is in the output
+    # Đảm bảo đầu ra có chứa ID của process
     logging.basicConfig(level=logging.DEBUG,
                         handlers=[logging.StreamHandler(), handler],
                         format='%(levelname)-8s %(name)10s %(process)6s %(message)s')
@@ -2049,7 +1748,7 @@ Subclass ``QueueHandler``
     logger_names = ('myapp', 'myapp.lib1', 'myapp.lib2')
     msgno = 1
     while True:
-        # Just randomly select some loggers and levels and log away
+        # Chỉ cần chọn ngẫu nhiên một số logger và level rồi ghi log
         level = random.choice(levels)
         logger = logging.getLogger(random.choice(logger_names))
         logger.log(level, 'Message no. %5d' % msgno)
@@ -2057,9 +1756,7 @@ Subclass ``QueueHandler``
         delay = random.random() * 2 + 0.5
         time.sleep(delay)
 
-You can run the above two snippets in separate command shells. If we run the
-listener in one shell and run the sender in two separate shells, we should see
-something like the following. In the first sender shell:
+Bạn có thể chạy hai đoạn mã trên trong các cửa sổ lệnh riêng biệt. Nếu chạy listener trong một cửa sổ và chạy sender trong hai cửa sổ riêng biệt, bạn sẽ thấy kết quả tương tự như sau. Trong cửa sổ sender thứ nhất:
 
 .. code-block:: console
 
@@ -2074,7 +1771,7 @@ something like the following. In the first sender shell:
     INFO     myapp.lib1    613 Message no.     8
     (and so on)
 
-In the second sender shell:
+Trong cửa sổ sender thứ hai:
 
 .. code-block:: console
 
@@ -2089,7 +1786,7 @@ In the second sender shell:
     DEBUG    myapp.lib1    657 Message no.     8
     (and so on)
 
-In the listener shell:
+Trong listener shell:
 
 .. code-block:: console
 
@@ -2113,16 +1810,13 @@ In the listener shell:
     DEBUG    myapp.lib1    657 Message no.     8
     (and so on)
 
-As you can see, the logging from the two sender processes is interleaved in the
-listener's output.
+Như bạn có thể thấy, nhật ký từ hai tiến trình sender được xen kẽ trong đầu ra của listener.
 
 
-An example dictionary-based configuration
------------------------------------------
+Ví dụ về cấu hình dựa trên dictionary
+-------------------------------------
 
-Below is an example of a logging configuration dictionary - it's taken from
-the `documentation on the Django project <https://docs.djangoproject.com/en/stable/topics/logging/#configuring-logging>`_.
-This dictionary is passed to :func:`~config.dictConfig` to put the configuration into effect::
+Dưới đây là một ví dụ về dictionary cấu hình logging - được lấy từ `tài liệu <https://docs.djangoproject.com/en/stable/topics/logging/#configuring-logging>`_ trên dự án Django. Dictionary này được truyền vào :func:`~config.dictConfig` để áp dụng cấu hình::
 
     LOGGING = {
         'version': 1,
@@ -2173,17 +1867,14 @@ This dictionary is passed to :func:`~config.dictConfig` to put the configuration
         }
     }
 
-For more information about this configuration, you can see the `relevant
-section <https://docs.djangoproject.com/en/stable/topics/logging/#configuring-logging>`_
-of the Django documentation.
+Để biết thêm thông tin về cấu hình này, bạn có thể xem `phần liên quan <https://docs.djangoproject.com/en/stable/topics/logging/#configuring-logging>`_ trong tài liệu Django.
 
 .. _cookbook-rotator-namer:
 
-Using a rotator and namer to customize log rotation processing
---------------------------------------------------------------
+Sử dụng rotator và namer để tùy chỉnh quá trình xoay vòng log
+-------------------------------------------------------------
 
-An example of how you can define a namer and rotator is given in the following
-runnable script, which shows gzip compression of the log file::
+Script có thể chạy sau đây minh họa cách bạn định nghĩa namer và rotator, đồng thời cho thấy cách nén tệp log bằng gzip::
 
     import gzip
     import logging
@@ -2213,7 +1904,7 @@ runnable script, which shows gzip compression of the log file::
     for i in range(1000):
         root.info(f'Message no. {i + 1}')
 
-After running this, you will see six new files, five of which are compressed:
+Sau khi chạy lệnh này, bạn sẽ thấy sáu tệp mới, trong đó có năm tệp được nén:
 
 .. code-block:: shell-session
 
@@ -2225,26 +1916,14 @@ After running this, you will see six new files, five of which are compressed:
     2023-01-20 02:28:17,767 Message no. 997
     2023-01-20 02:28:17,767 Message no. 998
 
-A more elaborate multiprocessing example
-----------------------------------------
+Một ví dụ multiprocessing phức tạp hơn
+--------------------------------------
 
-The following working example shows how logging can be used with multiprocessing
-using configuration files. The configurations are fairly simple, but serve to
-illustrate how more complex ones could be implemented in a real multiprocessing
-scenario.
+Ví dụ hoạt động sau đây cho thấy cách sử dụng logging với multiprocessing bằng các tệp cấu hình. Các cấu hình khá đơn giản, nhưng giúp minh họa cách triển khai những cấu hình phức tạp hơn trong một kịch bản multiprocessing thực tế.
 
-In the example, the main process spawns a listener process and some worker
-processes. Each of the main process, the listener and the workers have three
-separate configurations (the workers all share the same configuration). We can
-see logging in the main process, how the workers log to a QueueHandler and how
-the listener implements a QueueListener and a more complex logging
-configuration, and arranges to dispatch events received via the queue to the
-handlers specified in the configuration. Note that these configurations are
-purely illustrative, but you should be able to adapt this example to your own
-scenario.
+Trong ví dụ này, tiến trình chính tạo một tiến trình listener và một số tiến trình worker. Tiến trình chính, listener và các worker đều có ba cấu hình riêng biệt (tất cả worker dùng chung một cấu hình). Ta có thể thấy cách ghi log trong tiến trình chính, cách các worker ghi log vào một QueueHandler, cũng như cách listener triển khai một QueueListener và một cấu hình logging phức tạp hơn, đồng thời sắp xếp để chuyển các sự kiện nhận được qua queue đến các handler được chỉ định trong cấu hình. Lưu ý rằng các cấu hình này chỉ nhằm mục đích minh họa, nhưng bạn có thể điều chỉnh ví dụ này cho kịch bản của riêng mình.
 
-Here's the script - the docstrings and the comments hopefully explain how it
-works::
+Đây là script - hy vọng các docstring và comment sẽ giải thích cách script hoạt động::
 
     import logging
     import logging.config
@@ -2269,8 +1948,8 @@ works::
                 logger = logging.getLogger(record.name)
 
             if logger.isEnabledFor(record.levelno):
-                # The process name is transformed just to show that it's the listener
-                # doing the logging to files and console
+                # Biến đổi tên tiến trình chỉ để cho thấy đây là listener
+                # thực hiện ghi log vào các tệp và console
                 record.processName = '%s (for %s)' % (current_process().name, record.processName)
                 logger.handle(record)
 
@@ -2287,12 +1966,12 @@ works::
         listener = logging.handlers.QueueListener(q, MyHandler())
         listener.start()
         if os.name == 'posix':
-            # On POSIX, the setup logger will have been configured in the
-            # parent process, but should have been disabled following the
-            # dictConfig call.
-            # On Windows, since fork isn't used, the setup logger won't
-            # exist in the child, so it would be created and the message
-            # would appear - hence the "if posix" clause.
+            # Trên POSIX, setup logger đã được cấu hình trong tiến trình cha
+            # nhưng lẽ ra đã bị vô hiệu hóa sau lệnh gọi
+            # dictConfig.
+            # Trên Windows, vì fork không được sử dụng, setup logger sẽ không
+            # tồn tại trong tiến trình con, nên nó sẽ được tạo và thông báo
+            # sẽ xuất hiện — do đó có mệnh đề "if posix".
             logger = logging.getLogger('setup')
             logger.critical('Should not appear, because of disabled logger ...')
         stop_event.wait()
@@ -2318,12 +1997,12 @@ works::
         loggers = ['foo', 'foo.bar', 'foo.bar.baz',
                    'spam', 'spam.ham', 'spam.ham.eggs']
         if os.name == 'posix':
-            # On POSIX, the setup logger will have been configured in the
-            # parent process, but should have been disabled following the
-            # dictConfig call.
-            # On Windows, since fork isn't used, the setup logger won't
-            # exist in the child, so it would be created and the message
-            # would appear - hence the "if posix" clause.
+            # Trên POSIX, setup logger đã được cấu hình trong tiến trình cha
+            # nhưng lẽ ra đã bị vô hiệu hóa sau lệnh gọi
+            # dictConfig.
+            # Trên Windows, vì fork không được sử dụng, setup logger sẽ không
+            # tồn tại trong tiến trình con, nên nó sẽ được tạo và thông báo
+            # sẽ xuất hiện — do đó có mệnh đề "if posix".
             logger = logging.getLogger('setup')
             logger.critical('Should not appear, because of disabled logger ...')
         for i in range(100):
@@ -2334,7 +2013,7 @@ works::
 
     def main():
         q = Queue()
-        # The main process gets a simple configuration which prints to the console.
+        # Tiến trình chính nhận một cấu hình đơn giản để in ra console.
         config_initial = {
             'version': 1,
             'handlers': {
@@ -2348,11 +2027,11 @@ works::
                 'level': 'DEBUG'
             }
         }
-        # The worker process configuration is just a QueueHandler attached to the
-        # root logger, which allows all messages to be sent to the queue.
-        # We disable existing loggers to disable the "setup" logger used in the
-        # parent process. This is needed on POSIX because the logger will
-        # be there in the child following a fork().
+        # Cấu hình của tiến trình worker chỉ là một QueueHandler được gắn vào
+        # root logger, cho phép gửi tất cả thông báo vào queue.
+        # Vô hiệu hóa các logger hiện có để vô hiệu hóa logger "setup" được sử dụng trong
+        # process cha. Điều này cần thiết trên POSIX vì logger sẽ
+        # có trong process con sau khi fork().
         config_worker = {
             'version': 1,
             'disable_existing_loggers': True,
@@ -2367,12 +2046,12 @@ works::
                 'level': 'DEBUG'
             }
         }
-        # The listener process configuration shows that the full flexibility of
-        # logging configuration is available to dispatch events to handlers however
-        # you want.
-        # We disable existing loggers to disable the "setup" logger used in the
-        # parent process. This is needed on POSIX because the logger will
-        # be there in the child following a fork().
+        # Cấu hình process listener cho thấy toàn bộ tính linh hoạt của
+        # cấu hình logging đều khả dụng để phân phối các sự kiện đến các handler theo cách
+        # bạn muốn.
+        # Vô hiệu hóa các logger hiện có để vô hiệu hóa logger "setup" được sử dụng trong
+        # process cha. Điều này cần thiết trên POSIX vì logger sẽ
+        # có trong process con sau khi fork().
         config_listener = {
             'version': 1,
             'disable_existing_loggers': True,
@@ -2422,8 +2101,8 @@ works::
                 'level': 'DEBUG'
             }
         }
-        # Log some initial events, just to show that logging in the parent works
-        # normally.
+        # Ghi lại một số sự kiện ban đầu để cho thấy việc ghi log trong tiến trình cha hoạt động
+        # bình thường.
         logging.config.dictConfig(config_initial)
         logger = logging.getLogger('setup')
         logger.info('About to create workers ...')
@@ -2440,11 +2119,11 @@ works::
                      args=(q, stop_event, config_listener))
         lp.start()
         logger.info('Started listener')
-        # We now hang around for the workers to finish their work.
+        # Bây giờ chờ các worker hoàn tất công việc.
         for wp in workers:
             wp.join()
-        # Workers all done, listening can now stop.
-        # Logging in the parent still works normally.
+        # Tất cả worker đã hoàn tất, giờ có thể dừng việc lắng nghe.
+        # Việc ghi log trong tiến trình cha vẫn hoạt động bình thường.
         logger.info('Telling listener to stop ...')
         stop_event.set()
         lp.join()
@@ -2454,60 +2133,36 @@ works::
         main()
 
 
-Inserting a BOM into messages sent to a SysLogHandler
------------------------------------------------------
+Chèn BOM vào các thông điệp được gửi đến SysLogHandler
+------------------------------------------------------
 
-:rfc:`5424` requires that a
-Unicode message be sent to a syslog daemon as a set of bytes which have the
-following structure: an optional pure-ASCII component, followed by a UTF-8 Byte
-Order Mark (BOM), followed by Unicode encoded using UTF-8. (See the
+:rfc:`5424` yêu cầu một thông điệp Unicode được gửi đến daemon syslog dưới dạng một tập hợp byte có cấu trúc sau: một thành phần chỉ gồm ASCII tùy chọn, tiếp theo là Byte Order Mark (BOM) UTF-8, tiếp theo là Unicode được mã hóa bằng UTF-8. (Xem
 :rfc:`relevant section of the specification <5424#section-6>`.)
 
-In Python 3.1, code was added to
-:class:`~logging.handlers.SysLogHandler` to insert a BOM into the message, but
-unfortunately, it was implemented incorrectly, with the BOM appearing at the
-beginning of the message and hence not allowing any pure-ASCII component to
-appear before it.
+Trong Python 3.1, mã đã được thêm vào
+:class:`~logging.handlers.SysLogHandler` để chèn BOM vào thông điệp, nhưng không may là nó được triển khai không đúng, khiến BOM xuất hiện ở đầu thông điệp và do đó không cho phép bất kỳ thành phần chỉ gồm ASCII nào xuất hiện trước nó.
 
-As this behaviour is broken, the incorrect BOM insertion code is being removed
-from Python 3.2.4 and later. However, it is not being replaced, and if you
-want to produce :rfc:`5424`-compliant messages which include a BOM, an optional
-pure-ASCII sequence before it and arbitrary Unicode after it, encoded using
-UTF-8, then you need to do the following:
+Vì hành vi này bị lỗi, mã chèn BOM không đúng sẽ bị loại bỏ khỏi Python 3.2.4 trở lên. Tuy nhiên, mã này không được thay thế, và nếu bạn muốn tạo các thông điệp tuân thủ :rfc:`5424` có chứa BOM, một chuỗi chỉ gồm ASCII tùy chọn trước BOM và Unicode bất kỳ sau BOM, được mã hóa bằng UTF-8, thì bạn cần thực hiện như sau:
 
-#. Attach a :class:`~logging.Formatter` instance to your
-   :class:`~logging.handlers.SysLogHandler` instance, with a format string
-   such as::
+#. Gắn một instance :class:`~logging.Formatter` vào
+   :class:`~logging.handlers.SysLogHandler` instance, với một format string chẳng hạn như::
 
       'ASCII section\ufeffUnicode section'
 
-   The Unicode code point U+FEFF, when encoded using UTF-8, will be
-   encoded as a UTF-8 BOM -- the byte-string ``b'\xef\xbb\xbf'``.
+   Điểm mã Unicode U+FEFF, khi được mã hóa bằng UTF-8, sẽ được mã hóa thành BOM UTF-8 -- chuỗi byte ``b'\xef\xbb\xbf'``.
 
-#. Replace the ASCII section with whatever placeholders you like, but make sure
-   that the data that appears in there after substitution is always ASCII (that
-   way, it will remain unchanged after UTF-8 encoding).
+#. Thay thế phần ASCII bằng bất kỳ placeholder nào bạn muốn, nhưng hãy đảm bảo rằng dữ liệu xuất hiện ở đó sau khi thay thế luôn là ASCII (nhờ vậy, dữ liệu sẽ không thay đổi sau khi được mã hóa bằng UTF-8).
 
-#. Replace the Unicode section with whatever placeholders you like; if the data
-   which appears there after substitution contains characters outside the ASCII
-   range, that's fine -- it will be encoded using UTF-8.
+#. Thay thế phần Unicode bằng bất kỳ placeholder nào bạn muốn; nếu dữ liệu xuất hiện ở đó sau khi thay thế chứa các ký tự nằm ngoài phạm vi ASCII thì cũng không sao -- dữ liệu sẽ được mã hóa bằng UTF-8.
 
-The formatted message *will* be encoded using UTF-8 encoding by
-``SysLogHandler``. If you follow the above rules, you should be able to produce
-:rfc:`5424`-compliant messages. If you don't, logging may not complain, but your
-messages will not be RFC 5424-compliant, and your syslog daemon may complain.
+Thông báo đã được định dạng *sẽ* được mã hóa bằng UTF-8 bởi ``SysLogHandler``. Nếu tuân theo các quy tắc trên, bạn sẽ có thể tạo ra
+các thông báo tuân thủ :rfc:`5424`. Nếu không, logging có thể không báo lỗi, nhưng các thông báo của bạn sẽ không tuân thủ RFC 5424 và daemon syslog của bạn có thể báo lỗi.
 
 
-Implementing structured logging
--------------------------------
+Triển khai structured logging
+-----------------------------
 
-Although most logging messages are intended for reading by humans, and thus not
-readily machine-parseable, there might be circumstances where you want to output
-messages in a structured format which *is* capable of being parsed by a program
-(without needing complex regular expressions to parse the log message). This is
-straightforward to achieve using the logging package. There are a number of
-ways in which this could be achieved, but the following is a simple approach
-which uses JSON to serialise the event in a machine-parseable manner::
+Mặc dù hầu hết thông báo ghi nhật ký được viết để con người đọc, nên không dễ phân tích bằng máy, nhưng trong một số trường hợp, bạn có thể muốn xuất thông báo ở định dạng có cấu trúc mà *có khả năng* được một chương trình phân tích (mà không cần các biểu thức chính quy phức tạp để phân tích thông báo nhật ký). Việc này có thể dễ dàng thực hiện bằng package logging. Có một số cách để thực hiện, nhưng cách tiếp cận đơn giản sau đây sử dụng JSON để tuần tự hóa sự kiện theo cách mà máy có thể phân tích được::
 
     import json
     import logging
@@ -2520,22 +2175,20 @@ which uses JSON to serialise the event in a machine-parseable manner::
         def __str__(self):
             return '%s >>> %s' % (self.message, json.dumps(self.kwargs))
 
-    _ = StructuredMessage   # optional, to improve readability
+    _ = StructuredMessage   # tùy chọn, để cải thiện khả năng đọc
 
     logging.basicConfig(level=logging.INFO, format='%(message)s')
     logging.info(_('message 1', foo='bar', bar='baz', num=123, fnum=123.456))
 
-If the above script is run, it prints:
+Nếu chạy script trên, kết quả in ra là:
 
 .. code-block:: none
 
     message 1 >>> {"fnum": 123.456, "num": 123, "bar": "baz", "foo": "bar"}
 
-Note that the order of items might be different according to the version of
-Python used.
+Lưu ý rằng thứ tự của các mục có thể khác nhau tùy theo phiên bản Python được sử dụng.
 
-If you need more specialised processing, you can use a custom JSON encoder,
-as in the following complete example::
+Nếu cần xử lý chuyên biệt hơn, bạn có thể sử dụng một JSON encoder tùy chỉnh, như trong ví dụ hoàn chỉnh sau đây::
 
     import json
     import logging
@@ -2558,7 +2211,7 @@ as in the following complete example::
             s = Encoder().encode(self.kwargs)
             return '%s >>> %s' % (self.message, s)
 
-    _ = StructuredMessage   # optional, to improve readability
+    _ = StructuredMessage   # tùy chọn, để cải thiện khả năng đọc
 
     def main():
         logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -2567,29 +2220,23 @@ as in the following complete example::
     if __name__ == '__main__':
         main()
 
-When the above script is run, it prints:
+Khi chạy script trên, kết quả in ra là:
 
 .. code-block:: none
 
     message 1 >>> {"snowman": "\u2603", "set_value": [1, 2, 3]}
 
-Note that the order of items might be different according to the version of
-Python used.
+Lưu ý rằng thứ tự của các mục có thể khác nhau tùy theo phiên bản Python được sử dụng.
 
 
 .. _custom-handlers:
 
 .. currentmodule:: logging.config
 
-Customizing handlers with :func:`dictConfig`
---------------------------------------------
+Tùy chỉnh các handler bằng :func:`dictConfig`
+---------------------------------------------
 
-There are times when you want to customize logging handlers in particular ways,
-and if you use :func:`dictConfig` you may be able to do this without
-subclassing. As an example, consider that you may want to set the ownership of a
-log file. On POSIX, this is easily done using :func:`shutil.chown`, but the file
-handlers in the stdlib don't offer built-in support. You can customize handler
-creation using a plain function such as::
+Đôi khi bạn muốn tùy chỉnh các logging handler theo những cách cụ thể, và nếu sử dụng :func:`dictConfig`, bạn có thể thực hiện việc này mà không cần tạo lớp con. Ví dụ, bạn có thể muốn thiết lập quyền sở hữu cho một tệp nhật ký. Trên POSIX, việc này dễ dàng thực hiện bằng :func:`shutil.chown`, nhưng các file handler trong stdlib không tích hợp sẵn tính năng hỗ trợ này. Bạn có thể tùy chỉnh việc tạo handler bằng một hàm thông thường như sau::
 
     def owned_file_handler(filename, mode='a', encoding=None, owner=None):
         if owner:
@@ -2598,8 +2245,7 @@ creation using a plain function such as::
             shutil.chown(filename, *owner)
         return logging.FileHandler(filename, mode, encoding)
 
-You can then specify, in a logging configuration passed to :func:`dictConfig`,
-that a logging handler be created by calling this function::
+Sau đó, trong cấu hình logging được truyền vào :func:`dictConfig`, bạn có thể chỉ định rằng một logging handler được tạo bằng cách gọi hàm này::
 
     LOGGING = {
         'version': 1,
@@ -2611,14 +2257,14 @@ that a logging handler be created by calling this function::
         },
         'handlers': {
             'file':{
-                # The values below are popped from this dictionary and
-                # used to create the handler, set the handler's level and
-                # its formatter.
+                # Các giá trị bên dưới sẽ được lấy ra khỏi dictionary này và
+                # được dùng để tạo handler, thiết lập mức của handler và
+                # formatter của nó.
                 '()': owned_file_handler,
                 'level':'DEBUG',
                 'formatter': 'default',
-                # The values below are passed to the handler creator callable
-                # as keyword arguments.
+                # Các giá trị dưới đây được truyền cho callable tạo handler
+                # dưới dạng các đối số từ khóa.
                 'owner': ['pulse', 'pulse'],
                 'filename': 'chowntest.log',
                 'mode': 'w',
@@ -2631,9 +2277,7 @@ that a logging handler be created by calling this function::
         },
     }
 
-In this example I am setting the ownership using the ``pulse`` user and group,
-just for the purposes of illustration. Putting it together into a working
-script, ``chowntest.py``::
+Trong ví dụ này, tôi thiết lập quyền sở hữu bằng người dùng và nhóm ``pulse``, chỉ nhằm mục đích minh họa. Ghép lại thành một script hoạt động, ``chowntest.py``::
 
     import logging, logging.config, os, shutil
 
@@ -2654,14 +2298,14 @@ script, ``chowntest.py``::
         },
         'handlers': {
             'file':{
-                # The values below are popped from this dictionary and
-                # used to create the handler, set the handler's level and
-                # its formatter.
+                # Các giá trị bên dưới sẽ được lấy ra khỏi dictionary này và
+                # được dùng để tạo handler, thiết lập mức của handler và
+                # formatter của nó.
                 '()': owned_file_handler,
                 'level':'DEBUG',
                 'formatter': 'default',
-                # The values below are passed to the handler creator callable
-                # as keyword arguments.
+                # Các giá trị dưới đây được truyền cho callable tạo handler
+                # dưới dạng các đối số từ khóa.
                 'owner': ['pulse', 'pulse'],
                 'filename': 'chowntest.log',
                 'mode': 'w',
@@ -2678,7 +2322,7 @@ script, ``chowntest.py``::
     logger = logging.getLogger('mylogger')
     logger.debug('A debug message')
 
-To run this, you will probably need to run as ``root``:
+Để chạy đoạn này, có lẽ bạn cần chạy dưới quyền ``root``:
 
 .. code-block:: shell-session
 
@@ -2688,98 +2332,57 @@ To run this, you will probably need to run as ``root``:
     $ ls -l chowntest.log
     -rw-r--r-- 1 pulse pulse 55 2013-11-05 09:34 chowntest.log
 
-Note that this example uses Python 3.3 because that's where :func:`shutil.chown`
-makes an appearance. This approach should work with any Python version that
-supports :func:`dictConfig` - namely, Python 2.7, 3.2 or later. With pre-3.3
-versions, you would need to implement the actual ownership change using e.g.
+Lưu ý rằng ví dụ này sử dụng Python 3.3 vì đây là phiên bản đầu tiên xuất hiện :func:`shutil.chown`. Cách tiếp cận này sẽ hoạt động với mọi phiên bản Python hỗ trợ :func:`dictConfig` - cụ thể là Python 2.7, 3.2 trở lên. Với các phiên bản trước 3.3, bạn sẽ cần triển khai việc thay đổi quyền sở hữu thực tế bằng cách, chẳng hạn như
 :func:`os.chown`.
 
-In practice, the handler-creating function may be in a utility module somewhere
-in your project. Instead of the line in the configuration::
+Trên thực tế, hàm tạo handler có thể nằm trong một module tiện ích nào đó trong project của bạn. Thay vì dòng trong cấu hình::
 
     '()': owned_file_handler,
 
-you could use e.g.::
+bạn có thể dùng, chẳng hạn như::
 
     '()': 'ext://project.util.owned_file_handler',
 
-where ``project.util`` can be replaced with the actual name of the package
-where the function resides. In the above working script, using
-``'ext://__main__.owned_file_handler'`` should work. Here, the actual callable
-is resolved by :func:`dictConfig` from the ``ext://`` specification.
+trong đó ``project.util`` có thể được thay thế bằng tên thực tế của package chứa hàm. Trong script hoạt động ở trên, sử dụng ``'ext://__main__.owned_file_handler'`` sẽ phù hợp. Ở đây, callable thực tế được :func:`dictConfig` phân giải từ đặc tả ``ext://``.
 
-This example hopefully also points the way to how you could implement other
-types of file change - e.g. setting specific POSIX permission bits - in the
-same way, using :func:`os.chmod`.
+Hy vọng ví dụ này cũng gợi ý cách bạn có thể triển khai các kiểu thay đổi file khác - chẳng hạn như thiết lập các bit quyền POSIX cụ thể - theo cùng cách, bằng cách sử dụng :func:`os.chmod`.
 
-Of course, the approach could also be extended to types of handler other than a
-:class:`~logging.FileHandler` - for example, one of the rotating file handlers,
-or a different type of handler altogether.
+Tất nhiên, cách tiếp cận này cũng có thể được mở rộng cho các kiểu handler khác ngoài một
+:class:`~logging.FileHandler` - chẳng hạn như một trong các rotating file handler hoặc hoàn toàn là một kiểu handler khác.
 
 
 .. currentmodule:: logging
 
 .. _formatting-styles:
 
-Using particular formatting styles throughout your application
---------------------------------------------------------------
+Sử dụng các kiểu định dạng cụ thể trong toàn bộ ứng dụng của bạn
+----------------------------------------------------------------
 
-In Python 3.2, the :class:`~logging.Formatter` gained a ``style`` keyword
-parameter which, while defaulting to ``%`` for backward compatibility, allowed
-the specification of ``{`` or ``$`` to support the formatting approaches
-supported by :meth:`str.format` and :class:`string.Template`. Note that this
-governs the formatting of logging messages for final output to logs, and is
-completely orthogonal to how an individual logging message is constructed.
+Trong Python 3.2, :class:`~logging.Formatter` đã được bổ sung tham số từ khóa ``style``, mặc dù mặc định là ``%`` để đảm bảo khả năng tương thích ngược, cho phép chỉ định ``{`` hoặc ``$`` nhằm hỗ trợ các phương thức định dạng được :meth:`str.format` và :class:`string.Template` hỗ trợ. Lưu ý rằng tham số này chi phối việc định dạng các thông báo logging để xuất ra log cuối cùng và hoàn toàn độc lập với cách một thông báo logging riêng lẻ được tạo.
 
-Logging calls (:meth:`~Logger.debug`, :meth:`~Logger.info` etc.) only take
-positional parameters for the actual logging message itself, with keyword
-parameters used only for determining options for how to handle the logging call
-(e.g. the ``exc_info`` keyword parameter to indicate that traceback information
-should be logged, or the ``extra`` keyword parameter to indicate additional
-contextual information to be added to the log). So you cannot directly make
-logging calls using :meth:`str.format` or :class:`string.Template` syntax,
-because internally the logging package uses %-formatting to merge the format
-string and the variable arguments. There would be no changing this while preserving
-backward compatibility, since all logging calls which are out there in existing
-code will be using %-format strings.
+Các lệnh gọi logging (:meth:`~Logger.debug`, :meth:`~Logger.info` v.v.) chỉ nhận các tham số vị trí cho chính thông báo logging, còn các tham số từ khóa chỉ được dùng để xác định các tùy chọn về cách xử lý lệnh gọi logging (ví dụ: tham số từ khóa ``exc_info`` để chỉ ra rằng thông tin traceback cần được ghi log, hoặc tham số từ khóa ``extra`` để chỉ ra thông tin ngữ cảnh bổ sung cần được thêm vào log). Vì vậy, bạn không thể trực tiếp thực hiện các lệnh gọi logging bằng cú pháp :meth:`str.format` hoặc :class:`string.Template`, vì bên trong, package logging sử dụng định dạng %-formatting để hợp nhất chuỗi định dạng và các đối số biến. Không thể thay đổi điều này mà vẫn đảm bảo khả năng tương thích ngược, vì tất cả các lệnh gọi logging hiện có trong mã nguồn đều sẽ sử dụng các chuỗi định dạng %-format.
 
-There have been suggestions to associate format styles with specific loggers,
-but that approach also runs into backward compatibility problems because any
-existing code could be using a given logger name and using %-formatting.
+Đã có những đề xuất gắn các kiểu định dạng với những logger cụ thể, nhưng cách tiếp cận đó cũng gặp phải các vấn đề về khả năng tương thích ngược, vì bất kỳ mã nguồn hiện có nào cũng có thể đang sử dụng một tên logger nhất định cùng với %-formatting.
 
-For logging to work interoperably between any third-party libraries and your
-code, decisions about formatting need to be made at the level of the
-individual logging call. This opens up a couple of ways in which alternative
-formatting styles can be accommodated.
+Để logging hoạt động tương thích giữa mọi thư viện bên thứ ba và mã nguồn của bạn, các quyết định về định dạng cần được đưa ra ở cấp độ của từng lệnh gọi logging. Điều này mở ra một vài cách để hỗ trợ các kiểu định dạng thay thế.
 
 
-Using LogRecord factories
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng các factory LogRecord
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In Python 3.2, along with the :class:`~logging.Formatter` changes mentioned
-above, the logging package gained the ability to allow users to set their own
-:class:`LogRecord` subclasses, using the :func:`setLogRecordFactory` function.
-You can use this to set your own subclass of :class:`LogRecord`, which does the
-Right Thing by overriding the :meth:`~LogRecord.getMessage` method. The base
-class implementation of this method is where the ``msg % args`` formatting
-happens, and where you can substitute your alternate formatting; however, you
-should be careful to support all formatting styles and allow %-formatting as
-the default, to ensure interoperability with other code. Care should also be
-taken to call ``str(self.msg)``, just as the base implementation does.
+Trong Python 3.2, cùng với những thay đổi về :class:`~logging.Formatter` được đề cập ở trên, gói logging có thêm khả năng cho phép người dùng tự thiết lập
+các lớp con :class:`LogRecord`, bằng cách sử dụng hàm :func:`setLogRecordFactory`. Bạn có thể dùng cách này để thiết lập lớp con riêng của :class:`LogRecord`, lớp này thực hiện đúng chức năng bằng cách ghi đè phương thức :meth:`~LogRecord.getMessage`. Phần triển khai phương thức này trong lớp cơ sở là nơi diễn ra việc định dạng ``msg % args``, và là nơi bạn có thể thay thế bằng cách định dạng khác; tuy nhiên, bạn nên đảm bảo hỗ trợ mọi kiểu định dạng và cho phép %-formatting làm mặc định để bảo đảm khả năng tương tác với mã khác. Bạn cũng cần chú ý gọi ``str(self.msg)``, giống như phần triển khai trong lớp cơ sở.
 
-Refer to the reference documentation on :func:`setLogRecordFactory` and
-:class:`LogRecord` for more information.
+Xem tài liệu tham khảo về :func:`setLogRecordFactory` và
+:class:`LogRecord` để biết thêm thông tin.
 
 
-Using custom message objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng các đối tượng message tùy chỉnh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There is another, perhaps simpler way that you can use {}- and $- formatting to
-construct your individual log messages. You may recall (from
-:ref:`arbitrary-object-messages`) that when logging you can use an arbitrary
-object as a message format string, and that the logging package will call
-:func:`str` on that object to get the actual format string. Consider the
-following two classes::
+Có một cách khác, có lẽ đơn giản hơn, cho phép bạn sử dụng định dạng {} và $ để tạo từng message log riêng. Có thể bạn còn nhớ (từ
+:ref:`arbitrary-object-messages`) rằng khi ghi nhật ký, bạn có thể sử dụng một đối tượng tùy ý làm chuỗi định dạng thông báo, và gói logging sẽ gọi
+:func:`str` trên đối tượng đó để lấy chuỗi định dạng thực tế. Hãy xem xét hai lớp sau đây::
 
     class BraceMessage:
         def __init__(self, fmt, /, *args, **kwargs):
@@ -2799,15 +2402,9 @@ following two classes::
             from string import Template
             return Template(self.fmt).substitute(**self.kwargs)
 
-Either of these can be used in place of a format string, to allow {}- or
-$-formatting to be used to build the actual "message" part which appears in the
-formatted log output in place of “%(message)s” or “{message}” or “$message”.
-If you find it a little unwieldy to use the class names whenever you want to log
-something, you can make it more palatable if you use an alias such as ``M`` or
-``_`` for the message (or perhaps ``__``, if you are using ``_`` for
-localization).
+Bạn có thể sử dụng bất kỳ lớp nào trong hai lớp này thay cho chuỗi định dạng, cho phép dùng định dạng {} hoặc $ để tạo phần "message" thực tế, phần này sẽ xuất hiện trong đầu ra log đã định dạng thay cho “%(message)s” hoặc “{message}” hoặc “$message”. Nếu bạn thấy việc sử dụng tên lớp mỗi khi muốn ghi nhật ký hơi bất tiện, bạn có thể làm cho cách này dễ dùng hơn bằng cách sử dụng một bí danh như ``M`` hoặc ``_`` cho message (hoặc có thể là ``__``, nếu bạn đang sử dụng ``_`` để bản địa hóa).
 
-Examples of this approach are given below. Firstly, formatting with
+Các ví dụ về cách tiếp cận này được đưa ra dưới đây. Trước tiên, định dạng bằng
 :meth:`str.format`::
 
     >>> __ = BraceMessage
@@ -2821,39 +2418,26 @@ Examples of this approach are given below. Firstly, formatting with
     >>> print(__('Message with coordinates: ({point.x:.2f}, {point.y:.2f})', point=p))
     Message with coordinates: (0.50, 0.50)
 
-Secondly, formatting with :class:`string.Template`::
+Thứ hai, định dạng bằng :class:`string.Template`::
 
     >>> __ = DollarMessage
     >>> print(__('Message with $num $what', num=2, what='placeholders'))
     Message with 2 placeholders
     >>>
 
-One thing to note is that you pay no significant performance penalty with this
-approach: the actual formatting happens not when you make the logging call, but
-when (and if) the logged message is actually about to be output to a log by a
-handler. So the only slightly unusual thing which might trip you up is that the
-parentheses go around the format string and the arguments, not just the format
-string. That’s because the __ notation is just syntax sugar for a constructor
-call to one of the :samp:`{XXX}Message` classes shown above.
+Điều cần lưu ý là cách tiếp cận này không gây tổn thất đáng kể về hiệu năng: việc định dạng thực tế không diễn ra khi bạn thực hiện lệnh gọi logging, mà diễn ra khi (và nếu) thông báo đã ghi thực sự sắp được một handler ghi ra log. Vì vậy, điều hơi bất thường duy nhất có thể khiến bạn gặp khó khăn là dấu ngoặc đơn bao quanh chuỗi định dạng và các đối số, chứ không chỉ riêng chuỗi định dạng. Đó là vì __ notation chỉ là cú pháp rút gọn cho một lời gọi hàm khởi tạo của một trong các lớp :samp:`{XXX}Message` được trình bày ở trên.
 
 
 .. _filters-dictconfig:
 
 .. currentmodule:: logging.config
 
-Configuring filters with :func:`dictConfig`
--------------------------------------------
+Cấu hình filter bằng :func:`dictConfig`
+---------------------------------------
 
-You *can* configure filters using :func:`~logging.config.dictConfig`, though it
-might not be obvious at first glance how to do it (hence this recipe). Since
-:class:`~logging.Filter` is the only filter class included in the standard
-library, and it is unlikely to cater to many requirements (it's only there as a
-base class), you will typically need to define your own :class:`~logging.Filter`
-subclass with an overridden :meth:`~logging.Filter.filter` method. To do this,
-specify the ``()`` key in the configuration dictionary for the filter,
-specifying a callable which will be used to create the filter (a class is the
-most obvious, but you can provide any callable which returns a
-:class:`~logging.Filter` instance). Here is a complete example::
+Bạn *có thể* cấu hình các filter bằng :func:`~logging.config.dictConfig`, mặc dù thoạt nhìn có thể không rõ cách thực hiện (do đó có công thức này). Vì
+:class:`~logging.Filter` là lớp filter duy nhất được cung cấp trong standard library và khó có thể đáp ứng nhiều yêu cầu (nó chỉ tồn tại dưới dạng lớp cơ sở), thông thường bạn sẽ cần định nghĩa một lớp con :class:`~logging.Filter` của riêng mình với phương thức :meth:`~logging.Filter.filter` được ghi đè. Để làm vậy, hãy chỉ định khóa ``()`` trong dictionary cấu hình của filter, với một callable sẽ được dùng để tạo filter (lớp là lựa chọn rõ ràng nhất, nhưng bạn có thể cung cấp bất kỳ callable nào trả về một
+:class:`~logging.Filter` instance). Sau đây là một ví dụ hoàn chỉnh::
 
     import logging
     import logging.config
@@ -2897,40 +2481,27 @@ most obvious, but you can provide any callable which returns a
         logging.debug('hello')
         logging.debug('hello - noshow')
 
-This example shows how you can pass configuration data to the callable which
-constructs the instance, in the form of keyword parameters. When run, the above
-script will print:
+Ví dụ này cho thấy bạn có thể truyền dữ liệu cấu hình cho callable tạo instance dưới dạng các tham số keyword. Khi chạy, script trên sẽ in:
 
 .. code-block:: none
 
     changed: hello
 
-which shows that the filter is working as configured.
+qua đó cho thấy filter đang hoạt động theo đúng cấu hình.
 
-A couple of extra points to note:
+Có một vài điểm bổ sung cần lưu ý:
 
-* If you can't refer to the callable directly in the configuration (e.g. if it
-  lives in a different module, and you can't import it directly where the
-  configuration dictionary is), you can use the form ``ext://...`` as described
-  in :ref:`logging-config-dict-externalobj`. For example, you could have used
-  the text ``'ext://__main__.MyFilter'`` instead of ``MyFilter`` in the above
-  example.
+* Nếu bạn không thể tham chiếu trực tiếp đến callable trong cấu hình (ví dụ: nếu nó nằm trong một module khác và bạn không thể import trực tiếp tại nơi có dictionary cấu hình), bạn có thể sử dụng dạng ``ext://...`` như được mô tả trong :ref:`logging-config-dict-externalobj`. Ví dụ, trong ví dụ trên, bạn có thể đã sử dụng văn bản ``'ext://__main__.MyFilter'`` thay cho ``MyFilter``.
 
-* As well as for filters, this technique can also be used to configure custom
-  handlers and formatters. See :ref:`logging-config-dict-userdef` for more
-  information on how logging supports using user-defined objects in its
-  configuration, and see the other cookbook recipe :ref:`custom-handlers` above.
+* Ngoài bộ lọc, kỹ thuật này cũng có thể được dùng để cấu hình các handler và formatter tùy chỉnh. Xem :ref:`logging-config-dict-userdef` để biết thêm thông tin về cách logging hỗ trợ sử dụng các đối tượng do người dùng định nghĩa trong cấu hình, và xem công thức cookbook khác :ref:`custom-handlers` ở trên.
 
 
 .. _custom-format-exception:
 
-Customized exception formatting
--------------------------------
+Tùy chỉnh định dạng ngoại lệ
+----------------------------
 
-There might be times when you want to do customized exception formatting - for
-argument's sake, let's say you want exactly one line per logged event, even
-when exception information is present. You can do this with a custom formatter
-class, as shown in the following example::
+Có những lúc bạn muốn tùy chỉnh định dạng ngoại lệ—ví dụ, giả sử bạn muốn mỗi sự kiện được ghi log chỉ chiếm đúng một dòng, ngay cả khi có thông tin ngoại lệ. Bạn có thể thực hiện điều này bằng một lớp formatter tùy chỉnh, như trong ví dụ sau::
 
     import logging
 
@@ -2940,7 +2511,7 @@ class, as shown in the following example::
             Format an exception so that it prints on a single line.
             """
             result = super().formatException(exc_info)
-            return repr(result)  # or format into one line however you want to
+            return repr(result)  # hoặc định dạng thành một dòng theo cách bạn muốn
 
         def format(self, record):
             s = super().format(record)
@@ -2968,34 +2539,21 @@ class, as shown in the following example::
     if __name__ == '__main__':
         main()
 
-When run, this produces a file with exactly two lines:
+Khi chạy, đoạn mã này tạo ra một tệp có đúng hai dòng:
 
 .. code-block:: none
 
     28/01/2015 07:21:23|INFO|Sample message|
     28/01/2015 07:21:23|ERROR|ZeroDivisionError: division by zero|'Traceback (most recent call last):\n  File "logtest7.py", line 30, in main\n    x = 1 / 0\nZeroDivisionError: division by zero'|
 
-While the above treatment is simplistic, it points the way to how exception
-information can be formatted to your liking. The :mod:`traceback` module may be
-helpful for more specialized needs.
+Mặc dù cách xử lý ở trên còn đơn giản, nó cho thấy cách định dạng thông tin ngoại lệ theo ý muốn. Mô-đun :mod:`traceback` có thể hữu ích cho các nhu cầu chuyên biệt hơn.
 
 .. _spoken-messages:
 
-Speaking logging messages
--------------------------
+Đọc thành tiếng các thông báo logging
+-------------------------------------
 
-There might be situations when it is desirable to have logging messages rendered
-in an audible rather than a visible format. This is easy to do if you have
-text-to-speech (TTS) functionality available in your system, even if it doesn't have
-a Python binding. Most TTS systems have a command line program you can run, and
-this can be invoked from a handler using :mod:`subprocess`. It's assumed here
-that TTS command line programs won't expect to interact with users or take a
-long time to complete, and that the frequency of logged messages will be not so
-high as to swamp the user with messages, and that it's acceptable to have the
-messages spoken one at a time rather than concurrently, The example implementation
-below waits for one message to be spoken before the next is processed, and this
-might cause other handlers to be kept waiting. Here is a short example showing
-the approach, which assumes that the ``espeak`` TTS package is available::
+Có thể có những tình huống trong đó việc hiển thị các thông báo ghi nhật ký ở dạng âm thanh thay vì dạng trực quan là điều mong muốn. Việc này rất dễ thực hiện nếu hệ thống của bạn có chức năng chuyển văn bản thành giọng nói (TTS), ngay cả khi hệ thống đó không có binding Python. Hầu hết các hệ thống TTS đều có một chương trình dòng lệnh mà bạn có thể chạy, và chương trình này có thể được gọi từ một handler bằng :mod:`subprocess`. Ở đây, giả định rằng các chương trình dòng lệnh TTS không yêu cầu tương tác với người dùng hoặc mất nhiều thời gian để hoàn tất, tần suất các thông báo ghi nhật ký không quá cao đến mức khiến người dùng bị dồn dập bởi các thông báo, và việc đọc các thông báo lần lượt thay vì đồng thời là chấp nhận được. Phần triển khai ví dụ dưới đây chờ một thông báo được đọc xong trước khi xử lý thông báo tiếp theo, điều này có thể khiến các handler khác phải chờ. Dưới đây là một ví dụ ngắn minh họa cách tiếp cận này, với giả định rằng gói TTS ``espeak`` khả dụng::
 
     import logging
     import subprocess
@@ -3004,18 +2562,18 @@ the approach, which assumes that the ``espeak`` TTS package is available::
     class TTSHandler(logging.Handler):
         def emit(self, record):
             msg = self.format(record)
-            # Speak slowly in a female English voice
+            # Đọc chậm bằng giọng nữ tiếng Anh
             cmd = ['espeak', '-s150', '-ven+f3', msg]
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT)
-            # wait for the program to finish
+            # chờ chương trình hoàn tất
             p.communicate()
 
     def configure_logging():
         h = TTSHandler()
         root = logging.getLogger()
         root.addHandler(h)
-        # the default formatter just returns the message
+        # formatter mặc định chỉ trả về thông báo
         root.setLevel(logging.DEBUG)
 
     def main():
@@ -3026,50 +2584,28 @@ the approach, which assumes that the ``espeak`` TTS package is available::
         configure_logging()
         sys.exit(main())
 
-When run, this script should say "Hello" and then "Goodbye" in a female voice.
+Khi chạy, script này sẽ đọc "Hello" rồi "Goodbye" bằng giọng nữ.
 
-The above approach can, of course, be adapted to other TTS systems and even
-other systems altogether which can process messages via external programs run
-from a command line.
+Tất nhiên, cách tiếp cận trên có thể được điều chỉnh cho các hệ thống TTS khác, thậm chí cho những hệ thống hoàn toàn khác có thể xử lý thông báo thông qua các chương trình bên ngoài được chạy từ dòng lệnh.
 
 
 .. _buffered-logging:
 
-Buffering logging messages and outputting them conditionally
-------------------------------------------------------------
+Đệm các thông báo ghi nhật ký và xuất chúng có điều kiện
+--------------------------------------------------------
 
-There might be situations where you want to log messages in a temporary area
-and only output them if a certain condition occurs. For example, you may want to
-start logging debug events in a function, and if the function completes without
-errors, you don't want to clutter the log with the collected debug information,
-but if there is an error, you want all the debug information to be output as well
-as the error.
+Có thể có những tình huống bạn muốn ghi các thông báo vào một vùng tạm thời và chỉ xuất chúng khi một điều kiện nhất định xảy ra. Ví dụ: bạn có thể muốn bắt đầu ghi các sự kiện debug trong một hàm; nếu hàm hoàn tất mà không có lỗi, bạn không muốn làm rối log bằng thông tin debug đã thu thập, nhưng nếu có lỗi, bạn muốn xuất toàn bộ thông tin debug cùng với lỗi đó.
 
-Here is an example which shows how you could do this using a decorator for your
-functions where you want logging to behave this way. It makes use of the
-:class:`logging.handlers.MemoryHandler`, which allows buffering of logged events
-until some condition occurs, at which point the buffered events are ``flushed``
-- passed to another handler (the ``target`` handler) for processing. By default,
-the ``MemoryHandler`` flushed when its buffer gets filled up or an event whose
-level is greater than or equal to a specified threshold is seen. You can use this
-recipe with a more specialised subclass of ``MemoryHandler`` if you want custom
-flushing behavior.
+Dưới đây là một ví dụ cho thấy cách bạn có thể thực hiện việc này bằng cách sử dụng decorator cho các hàm mà bạn muốn logging hoạt động theo cách này. Ví dụ sử dụng
+:class:`logging.handlers.MemoryHandler`, cho phép lưu đệm các sự kiện đã ghi cho đến khi một điều kiện nào đó xảy ra; khi đó, các sự kiện đã lưu đệm sẽ được ``flushed``
+- chuyển đến một handler khác (handler ``target``) để xử lý. Theo mặc định,
+``MemoryHandler`` được flush khi bộ đệm đầy hoặc khi gặp một sự kiện có level lớn hơn hoặc bằng một ngưỡng được chỉ định. Bạn có thể sử dụng công thức này với một subclass chuyên biệt hơn của ``MemoryHandler`` nếu muốn có hành vi flush tùy chỉnh.
 
-The example script has a simple function, ``foo``, which just cycles through
-all the logging levels, writing to ``sys.stderr`` to say what level it's about
-to log at, and then actually logging a message at that level. You can pass a
-parameter to ``foo`` which, if true, will log at ERROR and CRITICAL levels -
-otherwise, it only logs at DEBUG, INFO and WARNING levels.
+Script ví dụ có một hàm đơn giản, ``foo``, chỉ lần lượt đi qua tất cả các level logging, ghi vào ``sys.stderr`` để cho biết nó sắp log ở level nào, rồi thực sự ghi một thông báo ở level đó. Bạn có thể truyền một tham số vào ``foo``; nếu tham số này là true, hàm sẽ log ở các level ERROR và CRITICAL; nếu không, hàm chỉ log ở các level DEBUG, INFO và WARNING.
 
-The script just arranges to decorate ``foo`` with a decorator which will do the
-conditional logging that's required. The decorator takes a logger as a parameter
-and attaches a memory handler for the duration of the call to the decorated
-function. The decorator can be additionally parameterised using a target handler,
-a level at which flushing should occur, and a capacity for the buffer (number of
-records buffered). These default to a :class:`~logging.StreamHandler` which
-writes to ``sys.stderr``, ``logging.ERROR`` and ``100`` respectively.
+Script chỉ cần gắn một decorator cho ``foo``, trong đó decorator này thực hiện việc logging có điều kiện cần thiết. Decorator nhận một logger làm tham số và gắn một memory handler trong suốt thời gian lời gọi đến hàm được decorate. Ngoài ra, bạn có thể cấu hình decorator bằng một target handler, một level tại đó việc flush sẽ xảy ra và một capacity cho bộ đệm (số lượng record được lưu đệm). Theo mặc định, các giá trị này lần lượt là :class:`~logging.StreamHandler` ghi vào ``sys.stderr``, ``logging.ERROR`` và ``100``.
 
-Here's the script::
+Đây là script::
 
     import logging
     from logging.handlers import MemoryHandler
@@ -3132,7 +2668,7 @@ Here's the script::
         write_line('Calling decorated foo with True')
         assert decorated_foo(True)
 
-When this script is run, the following output should be observed:
+Khi chạy script này, bạn sẽ thấy kết quả sau:
 
 .. code-block:: none
 
@@ -3162,11 +2698,9 @@ When this script is run, the following output should be observed:
     about to log at CRITICAL ...
     Actually logged at CRITICAL
 
-As you can see, actual logging output only occurs when an event is logged whose
-severity is ERROR or greater, but in that case, any previous events at lower
-severities are also logged.
+Như bạn có thể thấy, kết quả ghi nhật ký thực tế chỉ xuất hiện khi một sự kiện được ghi nhật ký có mức độ nghiêm trọng là ERROR hoặc cao hơn; tuy nhiên, trong trường hợp đó, mọi sự kiện trước đó có mức độ nghiêm trọng thấp hơn cũng được ghi nhật ký.
 
-You can of course use the conventional means of decoration::
+Tất nhiên, bạn có thể sử dụng các phương thức trang trí thông thường::
 
     @log_if_errors(logger)
     def foo(fail=False):
@@ -3175,16 +2709,11 @@ You can of course use the conventional means of decoration::
 
 .. _buffered-smtp:
 
-Sending logging messages to email, with buffering
--------------------------------------------------
+Gửi thông báo ghi nhật ký qua email cùng với bộ đệm
+---------------------------------------------------
 
-To illustrate how you can send log messages via email, so that a set number of
-messages are sent per email, you can subclass
-:class:`~logging.handlers.BufferingHandler`. In the following  example, which you can
-adapt to suit your specific needs, a simple test harness is provided which allows you
-to run the script with command line arguments specifying what you typically need to
-send things via SMTP. (Run the downloaded script with the ``-h`` argument to see the
-required and optional arguments.)
+Để minh họa cách gửi thông báo nhật ký qua email, sao cho mỗi email chứa một số lượng thông báo nhất định, bạn có thể tạo lớp con của
+:class:`~logging.handlers.BufferingHandler`. Trong ví dụ sau, bạn có thể điều chỉnh cho phù hợp với nhu cầu cụ thể của mình, một bộ kiểm thử đơn giản được cung cấp để cho phép bạn chạy script với các đối số dòng lệnh chỉ định những gì bạn thường cần để gửi dữ liệu qua SMTP. (Chạy script đã tải xuống với đối số ``-h`` để xem các đối số bắt buộc và tùy chọn.)
 
 .. code-block:: python
 
@@ -3250,18 +2779,14 @@ required and optional arguments.)
         h.flush()
         h.close()
 
-If you run this script and your SMTP server is correctly set up, you should find that
-it sends eleven emails to the addressee you specify. The first ten emails will each
-have ten log messages, and the eleventh will have two messages. That makes up 102
-messages as specified in the script.
+Nếu chạy script này và máy chủ SMTP của bạn được thiết lập chính xác, bạn sẽ thấy script gửi mười một email đến người nhận mà bạn chỉ định. Mười email đầu tiên mỗi email sẽ có mười thông báo nhật ký, còn email thứ mười một sẽ có hai thông báo. Tổng cộng là 102 thông báo như được chỉ định trong script.
 
 .. _utc-formatting:
 
-Formatting times using UTC (GMT) via configuration
---------------------------------------------------
+Định dạng thời gian bằng UTC (GMT) thông qua cấu hình
+-----------------------------------------------------
 
-Sometimes you want to format times using UTC, which can be done using a class
-such as ``UTCFormatter``, shown below::
+Đôi khi bạn muốn định dạng thời gian bằng UTC; bạn có thể thực hiện việc này bằng một lớp như ``UTCFormatter``, được minh họa bên dưới::
 
     import logging
     import time
@@ -3269,10 +2794,8 @@ such as ``UTCFormatter``, shown below::
     class UTCFormatter(logging.Formatter):
         converter = time.gmtime
 
-and you can then use the ``UTCFormatter`` in your code instead of
-:class:`~logging.Formatter`. If you want to do that via configuration, you can
-use the :func:`~logging.config.dictConfig` API with an approach illustrated by
-the following complete example::
+sau đó bạn có thể sử dụng ``UTCFormatter`` trong mã của mình thay cho
+:class:`~logging.Formatter`. Nếu muốn thực hiện việc đó thông qua cấu hình, bạn có thể sử dụng API :func:`~logging.config.dictConfig` theo cách được minh họa trong ví dụ hoàn chỉnh sau đây::
 
     import logging
     import logging.config
@@ -3312,28 +2835,22 @@ the following complete example::
         logging.config.dictConfig(LOGGING)
         logging.warning('The local time is %s', time.asctime())
 
-When this script is run, it should print something like:
+Khi chạy script này, kết quả in ra sẽ tương tự như sau:
 
 .. code-block:: none
 
     2015-10-17 12:53:29,501 The local time is Sat Oct 17 13:53:29 2015
     2015-10-17 13:53:29,501 The local time is Sat Oct 17 13:53:29 2015
 
-showing how the time is formatted both as local time and UTC, one for each
-handler.
+cho thấy thời gian được định dạng cả theo giờ địa phương và UTC, mỗi handler một kiểu.
 
 
 .. _context-manager:
 
-Using a context manager for selective logging
----------------------------------------------
+Sử dụng context manager để logging có chọn lọc
+----------------------------------------------
 
-There are times when it would be useful to temporarily change the logging
-configuration and revert it back after doing something. For this, a context
-manager is the most obvious way of saving and restoring the logging context.
-Here is a simple example of such a context manager, which allows you to
-optionally change the logging level and add a logging handler purely in the
-scope of the context manager::
+Có những lúc bạn cần tạm thời thay đổi cấu hình logging rồi khôi phục lại sau khi thực hiện một thao tác nào đó. Trong trường hợp này, context manager là cách rõ ràng nhất để lưu và khôi phục context của logging. Sau đây là một ví dụ đơn giản về context manager như vậy, cho phép bạn tùy chọn thay đổi mức logging và thêm một logging handler chỉ trong phạm vi của context manager::
 
     import logging
     import sys
@@ -3359,16 +2876,11 @@ scope of the context manager::
                 self.logger.removeHandler(self.handler)
             if self.handler and self.close:
                 self.handler.close()
-            # implicit return of None => don't swallow exceptions
+            # ngầm trả về None => không nuốt ngoại lệ
 
-If you specify a level value, the logger's level is set to that value in the
-scope of the with block covered by the context manager. If you specify a
-handler, it is added to the logger on entry to the block and removed on exit
-from the block. You can also ask the manager to close the handler for you on
-block exit - you could do this if you don't need the handler any more.
+Nếu chỉ định một giá trị level, level của logger sẽ được đặt thành giá trị đó trong phạm vi của khối with được context manager bao phủ. Nếu chỉ định một handler, handler đó sẽ được thêm vào logger khi bắt đầu khối và bị xóa khi kết thúc khối. Bạn cũng có thể yêu cầu manager đóng handler khi thoát khỏi khối — bạn có thể làm vậy nếu không còn cần handler này nữa.
 
-To illustrate how it works, we can add the following block of code to the
-above::
+Để minh họa cách hoạt động, chúng ta có thể thêm khối mã sau vào phần mã ở trên::
 
     if __name__ == '__main__':
         logger = logging.getLogger('foo')
@@ -3385,17 +2897,9 @@ above::
         logger.info('6. This should appear just once on stderr.')
         logger.debug('7. This should not appear.')
 
-We initially set the logger's level to ``INFO``, so message #1 appears and
-message #2 doesn't. We then change the level to ``DEBUG`` temporarily in the
-following ``with`` block, and so message #3 appears. After the block exits, the
-logger's level is restored to ``INFO`` and so message #4 doesn't appear. In the
-next ``with`` block, we set the level to ``DEBUG`` again but also add a handler
-writing to ``sys.stdout``. Thus, message #5 appears twice on the console (once
-via ``stderr`` and once via ``stdout``). After the ``with`` statement's
-completion, the status is as it was before so message #6 appears (like message
-#1) whereas message #7 doesn't (just like message #2).
+Ban đầu, chúng ta đặt level của logger thành ``INFO``, vì vậy message #1 xuất hiện còn message #2 thì không. Sau đó, chúng ta tạm thời đổi level thành ``DEBUG`` trong khối ``with`` sau đây, vì vậy message #3 xuất hiện. Sau khi thoát khỏi khối, level của logger được khôi phục về ``INFO``, nên message #4 không xuất hiện. Trong khối ``with`` tiếp theo, chúng ta lại đặt level thành ``DEBUG``, đồng thời thêm một handler ghi vào ``sys.stdout``. Do đó, message #5 xuất hiện hai lần trên console (một lần thông qua ``stderr`` và một lần thông qua ``stdout``). Sau khi câu lệnh ``with`` hoàn tất, trạng thái trở về như trước, nên message #6 xuất hiện (giống message #1), còn message #7 thì không (giống message #2).
 
-If we run the resulting script, the result is as follows:
+Nếu chạy script thu được, kết quả sẽ như sau:
 
 .. code-block:: shell-session
 
@@ -3406,15 +2910,14 @@ If we run the resulting script, the result is as follows:
     5. This should appear twice - once on stderr and once on stdout.
     6. This should appear just once on stderr.
 
-If we run it again, but pipe ``stderr`` to ``/dev/null``, we see the following,
-which is the only message written to ``stdout``:
+Nếu chúng ta chạy lại, nhưng chuyển ``stderr`` vào ``/dev/null``, chúng ta thấy kết quả sau đây; đây là thông báo duy nhất được ghi vào ``stdout``:
 
 .. code-block:: shell-session
 
     $ python logctx.py 2>/dev/null
     5. This should appear twice - once on stderr and once on stdout.
 
-Once again, but piping ``stdout`` to ``/dev/null``, we get:
+Một lần nữa, nhưng chuyển ``stdout`` vào ``/dev/null``, chúng ta nhận được:
 
 .. code-block:: shell-session
 
@@ -3424,32 +2927,23 @@ Once again, but piping ``stdout`` to ``/dev/null``, we get:
     5. This should appear twice - once on stderr and once on stdout.
     6. This should appear just once on stderr.
 
-In this case, the message #5 printed to ``stdout`` doesn't appear, as expected.
+Trong trường hợp này, thông báo số 5 được in vào ``stdout`` không xuất hiện, đúng như mong đợi.
 
-Of course, the approach described here can be generalised, for example to attach
-logging filters temporarily. Note that the above code works in Python 2 as well
-as Python 3.
+Tất nhiên, cách tiếp cận được mô tả ở đây có thể được khái quát hóa, chẳng hạn như để tạm thời đính kèm các bộ lọc logging. Lưu ý rằng đoạn mã trên hoạt động cả trong Python 2 và Python 3.
 
 
 .. _starter-template:
 
-A CLI application starter template
-----------------------------------
+Mẫu khởi đầu cho ứng dụng CLI
+-----------------------------
 
-Here's an example which shows how you can:
+Dưới đây là một ví dụ cho thấy bạn có thể:
 
-* Use a logging level based on command-line arguments
-* Dispatch to multiple subcommands in separate files, all logging at the same
-  level in a consistent way
-* Make use of simple, minimal configuration
+* Sử dụng mức logging dựa trên các đối số dòng lệnh
+* Điều phối đến nhiều subcommand trong các tệp riêng biệt, tất cả đều ghi log ở cùng một cấp độ theo cách nhất quán
+* Sử dụng cấu hình đơn giản, tối thiểu
 
-Suppose we have a command-line application whose job is to stop, start or
-restart some services. This could be organised for the purposes of illustration
-as a file ``app.py`` that is the main script for the application, with individual
-commands implemented in ``start.py``, ``stop.py`` and ``restart.py``. Suppose
-further that we want to control the verbosity of the application via a
-command-line argument, defaulting to ``logging.INFO``. Here's one way that
-``app.py`` could be written::
+Giả sử chúng ta có một ứng dụng dòng lệnh có nhiệm vụ dừng, khởi động hoặc khởi động lại một số service. Để minh họa, ứng dụng này có thể được tổ chức thành một tệp ``app.py`` đóng vai trò là script chính của ứng dụng, với các lệnh riêng lẻ được triển khai trong ``start.py``, ``stop.py`` và ``restart.py``. Giả sử thêm rằng chúng ta muốn kiểm soát mức độ chi tiết của ứng dụng thông qua một đối số dòng lệnh, với giá trị mặc định là ``logging.INFO``. Đây là một cách để viết ``app.py``::
 
     import argparse
     import importlib
@@ -3476,15 +2970,15 @@ command-line argument, defaulting to ``logging.INFO``. Here's one way that
         restart_cmd.add_argument('names', metavar='NAME', nargs='+',
                                  help='Name of service to restart')
         options = parser.parse_args()
-        # the code to dispatch commands could all be in this file. For the purposes
-        # of illustration only, we implement each command in a separate module.
+        # code để điều phối các lệnh có thể nằm toàn bộ trong tệp này. Nhằm mục đích
+        # minh họa בלבד, chúng ta triển khai mỗi lệnh trong một module riêng biệt.
         try:
             mod = importlib.import_module(options.command)
             cmd = getattr(mod, 'command')
         except (ImportError, AttributeError):
             print('Unable to find the code for command \'%s\'' % options.command)
             return 1
-        # Could get fancy here and load configuration from file or dictionary
+        # Có thể làm phức tạp hơn ở đây và tải cấu hình từ tệp hoặc dictionary
         logging.basicConfig(level=options.log_level,
                             format='%(levelname)s %(name)s %(message)s')
         cmd(options)
@@ -3492,8 +2986,7 @@ command-line argument, defaulting to ``logging.INFO``. Here's one way that
     if __name__ == '__main__':
         sys.exit(main())
 
-And the ``start``, ``stop`` and ``restart`` commands can be implemented in
-separate modules, like so for starting::
+Các lệnh ``start``, ``stop`` và ``restart`` có thể được triển khai trong các module riêng biệt, như sau đối với lệnh khởi động::
 
     # start.py
     import logging
@@ -3502,10 +2995,10 @@ separate modules, like so for starting::
 
     def command(options):
         logger.debug('About to start %s', options.name)
-        # actually do the command processing here ...
+        # thực hiện xử lý lệnh tại đây ...
         logger.info('Started the \'%s\' service.', options.name)
 
-and thus for stopping::
+và tương tự để dừng::
 
     # stop.py
     import logging
@@ -3523,10 +3016,10 @@ and thus for stopping::
             i = services.rfind(', ')
             services = services[:i] + ' and ' + services[i + 2:]
         logger.debug('About to stop %s', services)
-        # actually do the command processing here ...
+        # thực hiện xử lý lệnh tại đây ...
         logger.info('Stopped the %s service%s.', services, plural)
 
-and similarly for restarting::
+và tương tự để khởi động lại::
 
     # restart.py
     import logging
@@ -3544,10 +3037,10 @@ and similarly for restarting::
             i = services.rfind(', ')
             services = services[:i] + ' and ' + services[i + 2:]
         logger.debug('About to restart %s', services)
-        # actually do the command processing here ...
+        # thực hiện xử lý lệnh tại đây ...
         logger.info('Restarted the %s service%s.', services, plural)
 
-If we run this application with the default log level, we get output like this:
+Nếu chạy ứng dụng này với cấp độ ghi nhật ký mặc định, chúng ta sẽ nhận được kết quả như sau:
 
 .. code-block:: shell-session
 
@@ -3560,11 +3053,9 @@ If we run this application with the default log level, we get output like this:
     $ python app.py restart foo bar baz
     INFO restart Restarted the 'foo', 'bar' and 'baz' services.
 
-The first word is the logging level, and the second word is the module or
-package name of the place where the event was logged.
+Từ đầu tiên là cấp độ ghi nhật ký, còn từ thứ hai là tên module hoặc package của nơi sự kiện được ghi lại.
 
-If we change the logging level, then we can change the information sent to the
-log. For example, if we want more information:
+Nếu thay đổi cấp độ ghi nhật ký, chúng ta có thể thay đổi thông tin được gửi vào log. Ví dụ, nếu muốn có thêm thông tin:
 
 .. code-block:: shell-session
 
@@ -3580,7 +3071,7 @@ log. For example, if we want more information:
     DEBUG restart About to restart 'foo', 'bar' and 'baz'
     INFO restart Restarted the 'foo', 'bar' and 'baz' services.
 
-And if we want less:
+Còn nếu muốn ít thông tin hơn:
 
 .. code-block:: shell-session
 
@@ -3588,34 +3079,21 @@ And if we want less:
     $ python app.py --log-level WARNING stop foo bar
     $ python app.py --log-level WARNING restart foo bar baz
 
-In this case, the commands don't print anything to the console, since nothing
-at ``WARNING`` level or above is logged by them.
+Trong trường hợp này, các lệnh không in gì ra console, vì chúng không ghi nhật ký ở cấp độ ``WARNING`` hoặc cao hơn.
 
 .. _qt-gui:
 
-A Qt GUI for logging
---------------------
+GUI Qt cho việc ghi nhật ký
+---------------------------
 
-A question that comes up from time to time is about how to log to a GUI
-application. The `Qt <https://www.qt.io/>`_ framework is a popular
-cross-platform UI framework with Python bindings using :pypi:`PySide2`
-or :pypi:`PyQt5` libraries.
+Một câu hỏi thỉnh thoảng được đặt ra là làm thế nào để ghi log vào một ứng dụng GUI. Framework `Qt <https://www.qt.io/>`_ là một framework UI đa nền tảng phổ biến, có các binding Python sử dụng thư viện :pypi:`PySide2` hoặc :pypi:`PyQt5`.
 
-The following example shows how to log to a Qt GUI. This introduces a simple
-``QtHandler`` class which takes a callable, which should be a slot in the main
-thread that does GUI updates. A worker thread is also created to show how you
-can log to the GUI from both the UI itself (via a button for manual logging)
-as well as a worker thread doing work in the background (here, just logging
-messages at random levels with random short delays in between).
+Ví dụ sau đây minh họa cách ghi log vào một GUI Qt. Ví dụ này giới thiệu một lớp ``QtHandler`` đơn giản, nhận vào một callable, vốn phải là một slot trong main thread để thực hiện các cập nhật GUI. Một worker thread cũng được tạo để minh họa cách ghi log vào GUI từ chính UI (thông qua một nút để ghi log thủ công) cũng như từ một worker thread đang thực hiện công việc trong nền (ở đây chỉ ghi các thông báo ở những mức ngẫu nhiên, với khoảng thời gian trễ ngắn và ngẫu nhiên giữa các lần ghi).
 
-The worker thread is implemented using Qt's ``QThread`` class rather than the
-:mod:`threading` module, as there are circumstances where one has to use
-``QThread``, which offers better integration with other ``Qt`` components.
+Worker thread được triển khai bằng lớp ``QThread`` của Qt thay vì
+module :mod:`threading`, vì có những trường hợp cần sử dụng ``QThread``, vốn cung cấp khả năng tích hợp tốt hơn với các component ``Qt`` khác.
 
-The code should work with recent releases of any of ``PySide6``, ``PyQt6``,
-``PySide2`` or ``PyQt5``. You should be able to adapt the approach to earlier
-versions of Qt. Please refer to the comments in the code snippet for more
-detailed information.
+Mã sẽ hoạt động với các bản phát hành gần đây của bất kỳ thư viện nào trong số ``PySide6``, ``PyQt6``, ``PySide2`` hoặc ``PyQt5``. Bạn có thể điều chỉnh cách tiếp cận này cho các phiên bản Qt cũ hơn. Vui lòng tham khảo các chú thích trong đoạn mã để biết thêm thông tin chi tiết.
 
 .. code-block:: python3
 
@@ -3624,7 +3102,7 @@ detailed information.
     import sys
     import time
 
-    # Deal with minor differences between different Qt packages
+    # Xử lý những khác biệt nhỏ giữa các package Qt khác nhau
     try:
         from PySide6 import QtCore, QtGui, QtWidgets
         Signal = QtCore.Signal
@@ -3648,22 +3126,22 @@ detailed information.
 
 
     #
-    # Signals need to be contained in a QObject or subclass in order to be correctly
-    # initialized.
+    # Các signal cần được chứa trong một QObject hoặc lớp con để được xử lý chính xác
+    # đã được khởi tạo.
     #
     class Signaller(QtCore.QObject):
         signal = Signal(str, logging.LogRecord)
 
     #
-    # Output to a Qt GUI is only supposed to happen on the main thread. So, this
-    # handler is designed to take a slot function which is set up to run in the main
-    # thread. In this example, the function takes a string argument which is a
-    # formatted log message, and the log record which generated it. The formatted
-    # string is just a convenience - you could format a string for output any way
-    # you like in the slot function itself.
+    # Việc xuất ra Qt GUI chỉ nên được thực hiện trên main thread. Vì vậy, đây là
+    # handler được thiết kế để nhận một hàm slot được thiết lập để chạy trên main
+    # thread. Trong ví dụ này, hàm nhận một đối số chuỗi là
+    # thông báo log đã được định dạng và log record đã tạo ra nó. Chuỗi đã được định dạng
+    # chỉ là một tiện ích - bạn có thể định dạng chuỗi để xuất ra theo bất kỳ cách nào
+    # bạn muốn ngay trong hàm slot.
     #
-    # You specify the slot function to do whatever GUI updates you want. The handler
-    # doesn't know or care about specific UI elements.
+    # Bạn chỉ định hàm slot để thực hiện mọi cập nhật GUI mong muốn. Handler
+    # không biết hoặc không quan tâm đến các phần tử UI cụ thể.
     #
     class QtHandler(logging.Handler):
         def __init__(self, slotfunc, *args, **kwargs):
@@ -3676,32 +3154,32 @@ detailed information.
             self.signaller.signal.emit(s, record)
 
     #
-    # This example uses QThreads, which means that the threads at the Python level
-    # are named something like "Dummy-1". The function below gets the Qt name of the
-    # current thread.
+    # Ví dụ này sử dụng QThreads, nghĩa là các thread ở cấp Python
+    # được đặt tên dạng như "Dummy-1". Hàm bên dưới lấy tên Qt của
+    # thread hiện tại.
     #
     def ctname():
         return QtCore.QThread.currentThread().objectName()
 
 
     #
-    # Used to generate random levels for logging.
+    # Dùng để tạo các level ngẫu nhiên cho việc logging.
     #
     LEVELS = (logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR,
               logging.CRITICAL)
 
     #
-    # This worker class represents work that is done in a thread separate to the
-    # main thread. The way the thread is kicked off to do work is via a button press
-    # that connects to a slot in the worker.
+    # Lớp worker này đại diện cho công việc được thực hiện trong một thread riêng với
+    # luồng chính. Cách khởi chạy luồng để thực hiện công việc là thông qua thao tác nhấn nút
+    # kết nối với một slot trong worker.
     #
-    # Because the default threadName value in the LogRecord isn't much use, we add
-    # a qThreadName which contains the QThread name as computed above, and pass that
-    # value in an "extra" dictionary which is used to update the LogRecord with the
-    # QThread name.
+    # Vì giá trị threadName mặc định trong LogRecord không hữu ích lắm, chúng ta thêm
+    # qThreadName chứa tên QThread được tính như trên, rồi truyền giá trị đó trong
+    # một dictionary "extra" dùng để cập nhật LogRecord với tên
+    # QThread.
     #
-    # This example worker just outputs messages sequentially, interspersed with
-    # random delays of the order of a few seconds.
+    # Worker trong ví dụ này chỉ tuần tự xuất các thông báo, xen kẽ với
+    # các khoảng trễ ngẫu nhiên cỡ vài giây.
     #
     class Worker(QtCore.QObject):
         @Slot()
@@ -3709,8 +3187,8 @@ detailed information.
             extra = {'qThreadName': ctname() }
             logger.debug('Started work', extra=extra)
             i = 1
-            # Let the thread run until interrupted. This allows reasonably clean
-            # thread termination.
+            # Cho thread chạy cho đến khi bị ngắt. Điều này cho phép kết thúc thread tương đối gọn gàng
+            # .
             while not QtCore.QThread.currentThread().isInterruptionRequested():
                 delay = 0.5 + random.random() * 2
                 time.sleep(delay)
@@ -3725,12 +3203,12 @@ detailed information.
                 i += 1
 
     #
-    # Implement a simple UI for this cookbook example. This contains:
+    # Triển khai một UI đơn giản cho ví dụ trong cookbook này. Thành phần gồm:
     #
-    # * A read-only text edit window which holds formatted log messages
-    # * A button to start work and log stuff in a separate thread
-    # * A button to log something from the main thread
-    # * A button to clear the log window
+    # * Một cửa sổ soạn thảo văn bản chỉ đọc chứa các thông báo log đã định dạng
+    # * Một nút để bắt đầu công việc và ghi log trong một thread riêng
+    # * Một nút để ghi log một nội dung nào đó từ main thread
+    # * Nút để xóa cửa sổ log
     #
     class Window(QtWidgets.QWidget):
 
@@ -3746,12 +3224,12 @@ detailed information.
             super().__init__()
             self.app = app
             self.textedit = te = QtWidgets.QPlainTextEdit(self)
-            # Set whatever the default monospace font is for the platform
+            # Đặt phông chữ monospace mặc định của nền tảng
             f = QtGui.QFont('nosuchfont')
             if hasattr(f, 'Monospace'):
                 f.setStyleHint(f.Monospace)
             else:
-                f.setStyleHint(f.StyleHint.Monospace)  # for Qt6
+                f.setStyleHint(f.StyleHint.Monospace)  # cho Qt6
             te.setFont(f)
             te.setReadOnly(True)
             PB = QtWidgets.QPushButton
@@ -3759,15 +3237,15 @@ detailed information.
             self.log_button = PB('Log a message at a random level', self)
             self.clear_button = PB('Clear log window', self)
             self.handler = h = QtHandler(self.update_status)
-            # Remember to use qThreadName rather than threadName in the format string.
+            # Nhớ dùng qThreadName thay vì threadName trong chuỗi định dạng.
             fs = '%(asctime)s %(qThreadName)-12s %(levelname)-8s %(message)s'
             formatter = logging.Formatter(fs)
             h.setFormatter(formatter)
             logger.addHandler(h)
-            # Set up to terminate the QThread when we exit
+            # Thiết lập để kết thúc QThread khi thoát
             app.aboutToQuit.connect(self.force_quit)
 
-            # Lay out all the widgets
+            # Bố trí tất cả widget
             layout = QtWidgets.QVBoxLayout(self)
             layout.addWidget(te)
             layout.addWidget(self.work_button)
@@ -3775,28 +3253,28 @@ detailed information.
             layout.addWidget(self.clear_button)
             self.setFixedSize(900, 400)
 
-            # Connect the non-worker slots and signals
+            # Kết nối các slot và signal không thuộc worker
             self.log_button.clicked.connect(self.manual_update)
             self.clear_button.clicked.connect(self.clear_display)
 
-            # Start a new worker thread and connect the slots for the worker
+            # Khởi động một worker thread mới và kết nối các slot cho worker
             self.start_thread()
             self.work_button.clicked.connect(self.worker.start)
-            # Once started, the button should be disabled
+            # Sau khi khởi động, nút này sẽ bị vô hiệu hóa
             self.work_button.clicked.connect(lambda : self.work_button.setEnabled(False))
 
         def start_thread(self):
             self.worker = Worker()
             self.worker_thread = QtCore.QThread()
             self.worker.setObjectName('Worker')
-            self.worker_thread.setObjectName('WorkerThread')  # for qThreadName
+            self.worker_thread.setObjectName('WorkerThread')  # cho qThreadName
             self.worker.moveToThread(self.worker_thread)
-            # This will start an event loop in the worker thread
+            # Thao tác này sẽ khởi động một event loop trong worker thread
             self.worker_thread.start()
 
         def kill_thread(self):
-            # Just tell the worker to stop, then tell it to quit and wait for that
-            # to happen
+            # Chỉ cần yêu cầu worker dừng, sau đó yêu cầu nó thoát và chờ việc đó
+            # xảy ra
             self.worker_thread.requestInterruption()
             if self.worker_thread.isRunning():
                 self.worker_thread.quit()
@@ -3805,12 +3283,12 @@ detailed information.
                 print('worker has already exited.')
 
         def force_quit(self):
-            # For use when the window is closed
+            # Dùng khi cửa sổ được đóng
             if self.worker_thread.isRunning():
                 self.kill_thread()
 
-        # The functions below update the UI and run in the main thread because
-        # that's where the slots are set up
+        # Các hàm dưới đây cập nhật UI và chạy trên main thread vì
+        # đó là nơi các slot được thiết lập
 
         @Slot(str, logging.LogRecord)
         def update_status(self, status, record):
@@ -3820,9 +3298,9 @@ detailed information.
 
         @Slot()
         def manual_update(self):
-            # This function uses the formatted message passed in, but also uses
-            # information from the record to format the message in an appropriate
-            # color according to its severity (level).
+            # Hàm này sử dụng thông báo đã truyền vào ở dạng đã định dạng, nhưng cũng sử dụng
+            # thông tin từ bản ghi để định dạng thông báo theo một
+            # màu phù hợp với mức độ nghiêm trọng (level) của nó.
             level = random.choice(LEVELS)
             extra = {'qThreadName': ctname() }
             logger.log(level, 'Manually logged!', extra=extra)
@@ -3847,19 +3325,12 @@ detailed information.
     if __name__=='__main__':
         main()
 
-Logging to syslog with RFC5424 support
---------------------------------------
+Ghi log vào syslog với hỗ trợ RFC5424
+-------------------------------------
 
-Although :rfc:`5424` dates from 2009, most syslog servers are configured by default to
-use the older :rfc:`3164`, which hails from 2001. When ``logging`` was added to Python
-in 2003, it supported the earlier (and only existing) protocol at the time. Since
-RFC 5424 came out, as there has not been widespread deployment of it in syslog
-servers, the :class:`~logging.handlers.SysLogHandler` functionality has not been
-updated.
+Mặc dù :rfc:`5424` có từ năm 2009, hầu hết các máy chủ syslog được cấu hình mặc định để sử dụng :rfc:`3164` cũ hơn, ra đời năm 2001. Khi ``logging`` được thêm vào Python năm 2003, nó hỗ trợ giao thức trước đó (và là giao thức duy nhất tồn tại) tại thời điểm đó. Kể từ khi RFC 5424 được công bố, do giao thức này chưa được triển khai rộng rãi trên các máy chủ syslog, chức năng :class:`~logging.handlers.SysLogHandler` vẫn chưa được cập nhật.
 
-RFC 5424 contains some useful features such as support for structured data, and if you
-need to be able to log to a syslog server with support for it, you can do so with a
-subclassed handler which looks something like this::
+RFC 5424 có một số tính năng hữu ích, chẳng hạn như hỗ trợ dữ liệu có cấu trúc; nếu bạn cần ghi nhật ký vào một máy chủ syslog có hỗ trợ tính năng này, bạn có thể thực hiện bằng một handler được phân lớp, có dạng tương tự như sau::
 
     import datetime as dt
     import logging.handlers
@@ -3901,11 +3372,11 @@ subclassed handler which looks something like this::
             sdata = '-'
             if hasattr(record, 'structured_data'):
                 sd = record.structured_data
-                # This should be a dict where the keys are SD-ID and the value is a
-                # dict mapping PARAM-NAME to PARAM-VALUE (refer to the RFC for what these
-                # mean)
-                # There's no error checking here - it's purely for illustration, and you
-                # can adapt this code for use in production environments
+                # Đây phải là một dict trong đó các khóa là SD-ID và giá trị là một
+                # dict ánh xạ PARAM-NAME với PARAM-VALUE (hãy tham khảo RFC để biết các giá trị này
+                # có nghĩa là gì)
+                # Ở đây không có kiểm tra lỗi—đoạn mã này chỉ nhằm mục đích minh họa, và bạn
+                # có thể điều chỉnh đoạn mã này để sử dụng trong môi trường production
                 parts = []
 
                 def replacer(m):
@@ -3923,10 +3394,7 @@ subclassed handler which looks something like this::
                 sdata = ''.join(parts)
             return f'{version} {asctime} {hostname} {appname} {procid} {msgid} {sdata} {msg}'
 
-You'll need to be familiar with RFC 5424 to fully understand the above code, and it
-may be that you have slightly different needs (e.g. for how you pass structural data
-to the log). Nevertheless, the above should be adaptable to your specific needs. With
-the above handler, you'd pass structured data using something like this::
+Bạn cần quen thuộc với RFC 5424 để hiểu đầy đủ đoạn mã trên, và có thể bạn có những nhu cầu hơi khác (ví dụ: cách bạn truyền dữ liệu có cấu trúc vào log). Tuy vậy, bạn vẫn có thể điều chỉnh đoạn mã trên cho phù hợp với nhu cầu cụ thể của mình. Với handler trên, bạn sẽ truyền dữ liệu có cấu trúc bằng cách tương tự như sau::
 
     sd = {
         'foo@12345': {'bar': 'baz', 'baz': 'bozz', 'fizz': r'buzz'},
@@ -3936,13 +3404,10 @@ the above handler, you'd pass structured data using something like this::
     i = 1
     logger.debug('Message %d', i, extra=extra)
 
-How to treat a logger like an output stream
--------------------------------------------
+Cách sử dụng logger như một output stream
+-----------------------------------------
 
-Sometimes, you need to interface to a third-party API which expects a file-like
-object to write to, but you want to direct the API's output to a logger. You
-can do this using a class which wraps a logger with a file-like API.
-Here's a short script illustrating such a class:
+Đôi khi, bạn cần tương tác với một API của bên thứ ba yêu cầu một đối tượng dạng tệp để ghi dữ liệu vào, nhưng bạn muốn chuyển đầu ra của API đến một logger. Bạn có thể thực hiện việc này bằng một class bao bọc logger với API dạng tệp. Sau đây là một script ngắn minh họa cho class đó:
 
 .. code-block:: python
 
@@ -3954,18 +3419,18 @@ Here's a short script illustrating such a class:
             self.level = level
 
         def write(self, message):
-            if message != '\n':  # avoid printing bare newlines, if you like
+            if message != '\n':  # tránh in các dòng mới trống nếu muốn
                 self.logger.log(self.level, message)
 
         def flush(self):
-            # doesn't actually do anything, but might be expected of a file-like
-            # object - so optional depending on your situation
+            # thực ra không làm gì, nhưng có thể được mong đợi ở một đối tượng dạng tệp
+            # object - nên tùy trường hợp mà có thể bỏ qua
             pass
 
         def close(self):
-            # doesn't actually do anything, but might be expected of a file-like
-            # object - so optional depending on your situation. You might want
-            # to set a flag so that later calls to write raise an exception
+            # thực ra không làm gì, nhưng có thể được mong đợi ở một đối tượng dạng tệp
+            # object - nên tùy trường hợp mà có thể bỏ qua. Bạn có thể muốn
+            # đặt một cờ để các lần gọi write sau đó phát sinh ngoại lệ
             pass
 
     def main():
@@ -3979,15 +3444,14 @@ Here's a short script illustrating such a class:
     if __name__ == "__main__":
         main()
 
-When this script is run, it prints
+Khi chạy script này, nó sẽ in ra
 
 .. code-block:: text
 
     INFO:demo:An INFO message
     DEBUG:demo:A DEBUG message
 
-You could also use ``LoggerWriter`` to redirect ``sys.stdout`` and
-``sys.stderr`` by doing something like this:
+Bạn cũng có thể sử dụng ``LoggerWriter`` để chuyển hướng ``sys.stdout`` và ``sys.stderr`` bằng cách làm như sau:
 
 .. code-block:: python
 
@@ -3996,10 +3460,7 @@ You could also use ``LoggerWriter`` to redirect ``sys.stdout`` and
     sys.stdout = LoggerWriter(logger, logging.INFO)
     sys.stderr = LoggerWriter(logger, logging.WARNING)
 
-You should do this *after* configuring logging for your needs. In the above
-example, the :func:`~logging.basicConfig` call does this (using the
-``sys.stderr`` value *before* it is overwritten by a ``LoggerWriter``
-instance). Then, you'd get this kind of result:
+Bạn nên thực hiện việc này *sau khi* cấu hình logging theo nhu cầu của mình. Trong ví dụ trên, lời gọi :func:`~logging.basicConfig` thực hiện việc này (sử dụng giá trị ``sys.stderr`` *trước khi* nó bị ghi đè bởi một instance ``LoggerWriter``). Sau đó, bạn sẽ nhận được kết quả như sau:
 
 .. code-block:: pycon
 
@@ -4009,20 +3470,17 @@ instance). Then, you'd get this kind of result:
     WARNING:demo:Bar
     >>>
 
-Of course, the examples above show output according to the format used by
-:func:`~logging.basicConfig`, but you can use a different formatter when you
-configure logging.
+Tất nhiên, các ví dụ trên hiển thị đầu ra theo định dạng được sử dụng bởi
+:func:`~logging.basicConfig`, nhưng bạn có thể sử dụng formatter khác khi cấu hình logging.
 
-Note that with the above scheme, you are somewhat at the mercy of buffering and
-the sequence of write calls which you are intercepting. For example, with the
-definition of ``LoggerWriter`` above, if you have the snippet
+Lưu ý rằng với sơ đồ trên, bạn phần nào phụ thuộc vào buffering và chuỗi các lần gọi write mà bạn đang intercept. Ví dụ, với định nghĩa của ``LoggerWriter`` ở trên, nếu bạn có đoạn mã
 
 .. code-block:: python
 
     sys.stderr = LoggerWriter(logger, logging.WARNING)
     1 / 0
 
-then running the script results in
+sau đó chạy script sẽ cho kết quả là
 
 .. code-block:: text
 
@@ -4040,11 +3498,7 @@ then running the script results in
     WARNING:demo::
     WARNING:demo:division by zero
 
-As you can see, this output isn't ideal. That's because the underlying code
-which writes to ``sys.stderr`` makes multiple writes, each of which results in a
-separate logged line (for example, the last three lines above). To get around
-this problem, you need to buffer things and only output log lines when newlines
-are seen. Let's use a slightly better implementation of ``LoggerWriter``:
+Như bạn có thể thấy, kết quả này chưa lý tưởng. Đó là vì mã bên dưới ghi vào ``sys.stderr`` thực hiện nhiều lần ghi, và mỗi lần ghi lại tạo ra một dòng nhật ký riêng (ví dụ: ba dòng cuối ở trên). Để khắc phục vấn đề này, bạn cần đệm dữ liệu và chỉ xuất các dòng nhật ký khi gặp ký tự xuống dòng. Hãy sử dụng một cách triển khai ``LoggerWriter`` tốt hơn một chút:
 
 .. code-block:: python
 
@@ -4065,8 +3519,7 @@ are seen. Let's use a slightly better implementation of ``LoggerWriter``:
                 for part in parts:
                     self.logger.log(self.level, part)
 
-This just buffers up stuff until a newline is seen, and then logs complete
-lines. With this approach, you get better output:
+Cách này chỉ đệm dữ liệu cho đến khi gặp ký tự xuống dòng, rồi ghi các dòng hoàn chỉnh vào nhật ký. Với cách tiếp cận này, kết quả sẽ tốt hơn:
 
 .. code-block:: text
 
@@ -4077,20 +3530,14 @@ lines. With this approach, you get better output:
     WARNING:demo:    1/0
     WARNING:demo:ZeroDivisionError: division by zero
 
-How to uniformly handle newlines in logging output
---------------------------------------------------
+Cách xử lý thống nhất các ký tự xuống dòng trong kết quả ghi nhật ký
+--------------------------------------------------------------------
 
-Usually, messages that are logged (say to console or file) consist of a single
-line of text. However, sometimes there is a need to handle messages with
-multiple lines - whether because a logging format string contains newlines, or
-logged data contains newlines. If you want to handle such messages uniformly, so
-that each line in the logged message appears uniformly formatted as if it was
-logged separately, you can do this using a handler mixin, as in the following
-snippet:
+Thông thường, các thông báo được ghi vào nhật ký (chẳng hạn như vào console hoặc tệp) chỉ gồm một dòng văn bản. Tuy nhiên, đôi khi cần xử lý các thông báo nhiều dòng — có thể vì chuỗi định dạng ghi nhật ký chứa ký tự xuống dòng hoặc dữ liệu được ghi chứa ký tự xuống dòng. Nếu muốn xử lý thống nhất các thông báo như vậy, để mỗi dòng trong thông báo được ghi nhật ký có định dạng nhất quán như thể được ghi riêng, bạn có thể thực hiện việc này bằng một handler mixin, như trong đoạn mã sau:
 
 .. code-block:: python
 
-    # Assume this is in a module mymixins.py
+    # Giả sử đoạn mã này nằm trong module mymixins.py
     import copy
 
     class MultilineMixin:
@@ -4106,7 +3553,7 @@ snippet:
                     rec.msg = line
                     super().emit(rec)
 
-You can use the mixin as in the following script:
+Bạn có thể sử dụng mixin như trong script sau:
 
 .. code-block:: python
 
@@ -4127,7 +3574,7 @@ You can use the mixin as in the following script:
         logger.debug('Another single line')
         logger.debug('Multiple lines:\n%s', 'fool me ...\ncan\'t get fooled again')
 
-The script, when run, prints something like:
+Khi chạy, script sẽ in ra nội dung tương tự như sau:
 
 .. code-block:: text
 
@@ -4139,9 +3586,7 @@ The script, when run, prints something like:
     2025-07-02 13:54:47,234 DEBUG     fool me ...
     2025-07-02 13:54:47,234 DEBUG     can't get fooled again
 
-If, on the other hand, you are concerned about `log injection
-<https://owasp.org/www-community/attacks/Log_Injection>`_, you can use a
-formatter which escapes newlines, as per the following example:
+Mặt khác, nếu bạn lo ngại về `log injection <https://owasp.org/www-community/attacks/Log_Injection>`_, bạn có thể sử dụng formatter để escape các dòng mới, như trong ví dụ sau:
 
 .. code-block:: python
 
@@ -4163,8 +3608,7 @@ formatter which escapes newlines, as per the following example:
         logger.debug('Another single line')
         logger.debug('Multiple lines:\n%s', 'fool me ...\ncan\'t get fooled again')
 
-You can, of course, use whatever escaping scheme makes the most sense for you.
-The script, when run, should produce output like this:
+Tất nhiên, bạn có thể sử dụng bất kỳ scheme escape nào phù hợp nhất với mình. Khi chạy, script sẽ tạo ra đầu ra tương tự như sau:
 
 .. code-block:: text
 
@@ -4173,102 +3617,74 @@ The script, when run, should produce output like this:
     2025-07-09 06:47:33,783 DEBUG     Another single line
     2025-07-09 06:47:33,783 DEBUG     Multiple lines:\nfool me ...\ncan't get fooled again
 
-Escaping behaviour can't be the stdlib default , as it would break backwards
-compatibility.
+Hành vi escape không thể là mặc định của stdlib, vì điều đó sẽ phá vỡ khả năng tương thích ngược.
 
 .. patterns-to-avoid:
 
-Patterns to avoid
+Các mẫu cần tránh
 -----------------
 
-Although the preceding sections have described ways of doing things you might
-need to do or deal with, it is worth mentioning some usage patterns which are
-*unhelpful*, and which should therefore be avoided in most cases. The following
-sections are in no particular order.
+Mặc dù các phần trước đã mô tả những cách thực hiện hoặc xử lý một số việc mà bạn có thể cần, vẫn cần đề cập đến một số mẫu sử dụng *không hữu ích* và do đó nên tránh trong hầu hết các trường hợp. Các phần sau không được sắp xếp theo thứ tự cụ thể nào.
 
-Opening the same log file multiple times
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mở cùng một tệp log nhiều lần
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-On Windows, you will generally not be able to open the same file multiple times
-as this will lead to a "file is in use by another process" error. However, on
-POSIX platforms you'll not get any errors if you open the same file multiple
-times. This could be done accidentally, for example by:
+Trên Windows, nhìn chung bạn sẽ không thể mở cùng một tệp nhiều lần vì điều này sẽ dẫn đến lỗi "file is in use by another process". Tuy nhiên, trên các nền tảng POSIX, bạn sẽ không gặp lỗi nếu mở cùng một tệp nhiều lần. Điều này có thể vô tình xảy ra, chẳng hạn như do:
 
-* Adding a file handler more than once which references the same file (e.g. by
-  a copy/paste/forget-to-change error).
+* Thêm một file handler nhiều hơn một lần nhưng cùng tham chiếu đến một tệp (ví dụ: do lỗi sao chép/dán/quên thay đổi).
 
-* Opening two files that look different, as they have different names, but are
-  the same because one is a symbolic link to the other.
+* Mở hai tệp trông có vẻ khác nhau vì có tên khác nhau, nhưng thực chất là cùng một tệp do một tệp là symbolic link trỏ đến tệp kia.
 
-* Forking a process, following which both parent and child have a reference to
-  the same file. This might be through use of the :mod:`multiprocessing` module,
-  for example.
+* Fork một process, sau đó cả process cha và process con đều có tham chiếu đến cùng một tệp. Ví dụ, điều này có thể xảy ra khi sử dụng module :mod:`multiprocessing`.
 
-Opening a file multiple times might *appear* to work most of the time, but can
-lead to a number of problems in practice:
+Việc mở một tệp nhiều lần có thể *trông như* hoạt động bình thường trong hầu hết thời gian, nhưng trên thực tế có thể dẫn đến một số vấn đề:
 
-* Logging output can be garbled because multiple threads or processes try to
-  write to the same file. Although logging guards against concurrent use of the
-  same handler instance by multiple threads, there is no such protection if
-  concurrent writes are attempted by two different threads using two different
-  handler instances which happen to point to the same file.
+* Đầu ra logging có thể bị lộn xộn vì nhiều thread hoặc process cố gắng ghi vào cùng một tệp. Mặc dù logging ngăn việc nhiều thread sử dụng đồng thời cùng một handler instance, không có cơ chế bảo vệ tương tự nếu hai thread khác nhau thực hiện ghi đồng thời bằng hai handler instance khác nhau nhưng tình cờ trỏ đến cùng một tệp.
 
-* An attempt to delete a file (e.g. during file rotation) silently fails,
-  because there is another reference pointing to it. This can lead to confusion
-  and wasted debugging time - log entries end up in unexpected places, or are
-  lost altogether. Or a file that was supposed to be moved remains in place,
-  and grows in size unexpectedly despite size-based rotation being supposedly
-  in place.
+* Nỗ lực xóa một tệp (ví dụ: trong quá trình xoay vòng tệp) âm thầm thất bại vì có một tham chiếu khác đang trỏ đến tệp đó. Điều này có thể gây nhầm lẫn và làm lãng phí thời gian debug - các mục log kết thúc ở những vị trí không mong muốn hoặc bị mất hoàn toàn. Hoặc một tệp lẽ ra phải được di chuyển vẫn nằm nguyên vị trí và tăng kích thước ngoài dự kiến, dù việc xoay vòng dựa trên kích thước được cho là đang được áp dụng.
 
-Use the techniques outlined in :ref:`multiple-processes` to circumvent such
-issues.
+Sử dụng các kỹ thuật được trình bày trong :ref:`multiple-processes` để khắc phục những vấn đề như vậy.
 
-Using loggers as attributes in a class or passing them as parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sử dụng logger làm thuộc tính trong một class hoặc truyền logger dưới dạng tham số
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-While there might be unusual cases where you'll need to do this, in general
-there is no point because loggers are singletons. Code can always access a
-given logger instance by name using ``logging.getLogger(name)``, so passing
-instances around and holding them as instance attributes is pointless. Note
-that in other languages such as Java and C#, loggers are often static class
-attributes. However, this pattern doesn't make sense in Python, where the
-module (and not the class) is the unit of software decomposition.
+Mặc dù có thể có những trường hợp đặc biệt mà bạn cần làm như vậy, nhưng nhìn chung điều này không có ý nghĩa vì logger là singleton. Code luôn có thể truy cập một instance logger cụ thể theo tên bằng cách sử dụng ``logging.getLogger(name)``, vì vậy việc truyền các instance xung quanh và lưu giữ chúng làm thuộc tính của instance là vô nghĩa. Lưu ý rằng trong các ngôn ngữ khác như Java và C#, logger thường là thuộc tính static của class. Tuy nhiên, mẫu này không phù hợp trong Python, nơi module (chứ không phải class) là đơn vị phân rã phần mềm.
 
-Adding handlers other than :class:`~logging.NullHandler` to a logger in a library
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thêm các handler khác ngoài :class:`~logging.NullHandler` vào logger trong một thư viện
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Configuring logging by adding handlers, formatters and filters is the
-responsibility of the application developer, not the library developer. If you
-are maintaining a library, ensure that you don't add handlers to any of your
-loggers other than a :class:`~logging.NullHandler` instance.
+Việc cấu hình logging bằng cách thêm handler, formatter và filter là trách nhiệm của nhà phát triển ứng dụng, không phải nhà phát triển thư viện. Nếu bạn đang duy trì một thư viện, hãy đảm bảo rằng bạn không thêm handler vào bất kỳ logger nào ngoài một instance :class:`~logging.NullHandler`.
 
-Creating a lot of loggers
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Tạo quá nhiều logger
+^^^^^^^^^^^^^^^^^^^^
 
-Loggers are singletons that are never freed during a script execution, and so
-creating lots of loggers will use up memory which can't then be freed. Rather
-than create a logger per e.g. file processed or network connection made, use
-the :ref:`existing mechanisms <context-info>` for passing contextual
-information into your logs and restrict the loggers created to those describing
-areas within your application (generally modules, but occasionally slightly
-more fine-grained than that).
+Logger là các singleton không bao giờ được giải phóng trong suốt quá trình thực thi một script, vì vậy việc tạo quá nhiều logger sẽ sử dụng bộ nhớ mà sau đó không thể được giải phóng. Thay vì tạo một logger cho mỗi, chẳng hạn, tệp được xử lý hoặc kết nối mạng được thiết lập, hãy sử dụng :ref:`existing mechanisms <context-info>` để truyền thông tin ngữ cảnh vào log của bạn và giới hạn các logger được tạo ở những logger mô tả các khu vực trong ứng dụng của bạn (thường là các module, nhưng đôi khi có phạm vi chi tiết hơn một chút).
 
 .. _cookbook-ref-links:
 
-Other resources
+Tài nguyên khác
 ---------------
 
 .. seealso::
 
-   Module :mod:`logging`
-      API reference for the logging module.
+   Mô-đun :mod:`logging`
+      Tài liệu tham khảo API cho mô-đun logging.
 
-   Module :mod:`logging.config`
-      Configuration API for the logging module.
+   Mô-đun :mod:`logging.config`
+      API cấu hình cho mô-đun logging.
 
-   Module :mod:`logging.handlers`
-      Useful handlers included with the logging module.
+   Mô-đun :mod:`logging.handlers`
+      Các handler hữu ích đi kèm mô-đun logging.
 
-   :ref:`Basic Tutorial <logging-basic-tutorial>`
+   :ref:`Hướng dẫn cơ bản <logging-basic-tutorial>`
 
-   :ref:`Advanced Tutorial <logging-advanced-tutorial>`
+   :ref:`Hướng dẫn nâng cao <logging-advanced-tutorial>`
+
+.. _`Supervisor`: http://supervisord.org/
+.. _`Gunicorn`: https://gunicorn.org/
+.. _`uWSGI`: https://uwsgi-docs.readthedocs.io/en/latest/
+.. _`NNG`: https://nng.nanomsg.org/
+.. _`documentation on the Django project`: https://docs.djangoproject.com/en/stable/topics/logging/#configuring-logging
+.. _`relevant section`: https://docs.djangoproject.com/en/stable/topics/logging/#configuring-logging
+.. _`Qt`: https://www.qt.io/
+.. _`log injection`: https://owasp.org/www-community/attacks/Log_Injection

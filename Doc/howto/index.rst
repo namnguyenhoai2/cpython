@@ -1,13 +1,10 @@
 .. _how-tos:
 
 ***************
- Python HOWTOs
+HOWTO về Python
 ***************
 
-Python HOWTOs are documents that cover a specific topic in-depth.
-Modeled on the Linux Documentation Project's HOWTO collection, this collection is an
-effort to foster documentation that's more detailed than the
-Python Library Reference.
+HOWTO về Python là các tài liệu trình bày chuyên sâu về một chủ đề cụ thể. Dựa trên bộ sưu tập HOWTO của Linux Documentation Project, bộ sưu tập này nhằm thúc đẩy việc xây dựng tài liệu chi tiết hơn Python Library Reference.
 
 .. toctree::
    :maxdepth: 1
@@ -39,7 +36,7 @@ Python Library Reference.
    free-threading-extensions.rst
    remote_debugging.rst
 
-General:
+Chung:
 
 * :ref:`a-conceptual-overview-of-asyncio`
 * :ref:`annotations-howto`
@@ -55,7 +52,7 @@ General:
 * :ref:`unicode-howto`
 * :ref:`urllib-howto`
 
-Advanced development:
+Phát triển nâng cao:
 
 * :ref:`curses-howto`
 * :ref:`freethreading-python-howto`
@@ -66,7 +63,7 @@ Advanced development:
 * :ref:`timerfd-howto`
 * :ref:`cporting-howto`
 
-Debugging and profiling:
+Gỡ lỗi và lập hồ sơ:
 
 * :ref:`gdb`
 * :ref:`instrumentation`

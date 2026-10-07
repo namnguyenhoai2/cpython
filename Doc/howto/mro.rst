@@ -1,111 +1,54 @@
 .. _python_2.3_mro:
 
-The Python 2.3 Method Resolution Order
-======================================
+Thứ tự phân giải phương thức trong Python 2.3
+=============================================
 
 .. note::
 
-   This is a historical document, provided as an appendix to the official
-   documentation.
-   The Method Resolution Order discussed here was *introduced* in Python 2.3,
-   but it is still used in later versions -- including Python 3.
+   Đây là một tài liệu lịch sử, được cung cấp dưới dạng phụ lục cho tài liệu chính thức. Thứ tự phân giải phương thức được thảo luận ở đây đã được *giới thiệu* trong Python 2.3, nhưng vẫn được sử dụng trong các phiên bản sau này -- bao gồm cả Python 3.
 
-By `Michele Simionato <https://github.com/micheles>`__.
+Bởi `Michele Simionato <https://github.com/micheles>`__.
 
 :Abstract:
 
-  *This document is intended for Python programmers who want to
-  understand the C3 Method Resolution Order used in Python 2.3.
-  Although it is not intended for newbies, it is quite pedagogical with
-  many worked out examples.  I am not aware of other publicly available
-  documents with the same scope, therefore it should be useful.*
+  *Tài liệu này dành cho các lập trình viên Python muốn hiểu về Thứ tự phân giải phương thức C3 được sử dụng trong Python 2.3. Mặc dù không dành cho người mới bắt đầu, tài liệu khá giàu tính sư phạm với nhiều ví dụ được giải thích chi tiết. Tôi không biết có tài liệu nào khác được công khai với cùng phạm vi như vậy, vì thế tài liệu này sẽ hữu ích.*
 
-Disclaimer:
+Tuyên bố miễn trừ trách nhiệm:
 
-   *I donate this document to the Python Software Foundation, under the
-   Python 2.3 license.  As usual in these circumstances, I warn the
-   reader that what follows* should *be correct, but I don't give any
-   warranty.  Use it at your own risk and peril!*
+   *Tôi tặng tài liệu này cho Python Software Foundation theo giấy phép Python 2.3. Như thường lệ trong những trường hợp này, tôi cảnh báo người đọc rằng những điều sau đây* sẽ *được cho là đúng, nhưng tôi không đưa ra bất kỳ bảo đảm nào. Hãy tự chịu mọi rủi ro và hậu quả khi sử dụng tài liệu này!*
 
-Acknowledgments:
+Lời cảm ơn:
 
-   *All the people of the Python mailing list who sent me their support.
-   Paul Foley who pointed out various imprecisions and made me to add the
-   part on local precedence ordering. David Goodger for help with the
-   formatting in reStructuredText. David Mertz for help with the editing.
-   Finally, Guido van Rossum who enthusiastically added this document to
-   the official Python 2.3 home-page.*
+   *Tất cả những người trong mailing list Python đã gửi lời ủng hộ tôi. Paul Foley, người đã chỉ ra nhiều điểm chưa chính xác và khiến tôi bổ sung phần về thứ tự ưu tiên cục bộ. David Goodger đã giúp tôi định dạng bằng reStructuredText. David Mertz đã giúp tôi biên tập. Cuối cùng là Guido van Rossum, người đã nhiệt tình bổ sung tài liệu này vào trang chủ chính thức của Python 2.3.*
 
-The beginning
--------------
+Phần mở đầu
+-----------
 
-                *Felix qui potuit rerum cognoscere causas* -- Virgilius
+                *Hạnh phúc thay người có thể hiểu được nguyên nhân của sự vật* -- Virgilius
 
-Everything started with a post by Samuele Pedroni to the Python
-development mailing list [#]_.  In his post, Samuele showed that the
-Python 2.2 method resolution order is not monotonic and he proposed to
-replace it with the C3 method resolution order.  Guido agreed with his
-arguments and therefore now Python 2.3 uses C3.  The C3 method itself
-has nothing to do with Python, since it was invented by people working
-on Dylan and it is described in a paper intended for lispers [#]_.  The
-present paper gives a (hopefully) readable discussion of the C3
-algorithm for Pythonistas who want to understand the reasons for the
-change.
+Mọi chuyện bắt đầu từ một bài đăng của Samuele Pedroni trên mailing list dành cho các nhà phát triển Python [#]_. Trong bài đăng đó, Samuele chỉ ra rằng thứ tự phân giải phương thức của Python 2.2 không đơn điệu và đề xuất thay thế nó bằng thứ tự phân giải phương thức C3. Guido đồng ý với các lập luận của ông, vì vậy Python 2.3 hiện sử dụng C3. Bản thân phương thức C3 không liên quan gì đến Python, vì nó được phát minh bởi những người làm việc với Dylan và được mô tả trong một bài viết dành cho những người sử dụng Lisp [#]_. Bài viết này trình bày một thảo luận (hy vọng là dễ đọc) về thuật toán C3 dành cho các Pythonista muốn hiểu lý do của thay đổi này.
 
-First of all, let me point out that what I am going to say only applies
-to the *new style classes* introduced in Python 2.2:  *classic classes*
-maintain their old method resolution order, depth first and then left to
-right.  Therefore, there is no breaking of old code for classic classes;
-and even if in principle there could be breaking of code for Python 2.2
-new style classes, in practice the cases in which the C3 resolution
-order differs from the Python 2.2 method resolution order are so rare
-that no real breaking of code is expected.  Therefore:
+Trước hết, tôi xin lưu ý rằng những điều tôi sắp trình bày chỉ áp dụng cho *các lớp kiểu mới* được giới thiệu trong Python 2.2: *các lớp kiểu cũ* vẫn giữ thứ tự phân giải phương thức cũ, theo chiều sâu rồi từ trái sang phải. Vì vậy, không có mã cũ nào dành cho các lớp kiểu cũ bị phá vỡ; và ngay cả khi về nguyên tắc mã dành cho các lớp kiểu mới của Python 2.2 có thể bị phá vỡ, trên thực tế các trường hợp mà thứ tự phân giải C3 khác với thứ tự phân giải phương thức của Python 2.2 hiếm đến mức không dự kiến có sự phá vỡ mã thực sự nào. Vì vậy:
 
-   *Don't be scared!*
+   *Đừng sợ!*
 
-Moreover, unless you make strong use of multiple inheritance and you
-have non-trivial hierarchies, you don't need to understand the C3
-algorithm, and you can easily skip this paper.  On the other hand, if
-you really want to know how multiple inheritance works, then this paper
-is for you.  The good news is that things are not as complicated as you
-might expect.
+Hơn nữa, trừ khi bạn sử dụng nhiều kế thừa ở mức độ lớn và có các hệ phân cấp không tầm thường, bạn không cần hiểu thuật toán C3 và có thể dễ dàng bỏ qua bài viết này. Mặt khác, nếu bạn thực sự muốn biết cơ chế hoạt động của nhiều kế thừa, thì bài viết này dành cho bạn. Tin tốt là mọi thứ không phức tạp như bạn có thể nghĩ.
 
-Let me begin with some basic definitions.
+Hãy bắt đầu với một số định nghĩa cơ bản.
 
-1) Given a class C in a complicated multiple inheritance hierarchy, it
-   is a non-trivial task to specify the order in which methods are
-   overridden, i.e. to specify the order of the ancestors of C.
+1) Với một lớp C trong một hệ phân cấp đa kế thừa phức tạp, việc xác định thứ tự các phương thức bị ghi đè, tức là xác định thứ tự các lớp tổ tiên của C, không phải là một nhiệm vụ đơn giản.
 
-2) The list of the ancestors of a class C, including the class itself,
-   ordered from the nearest ancestor to the furthest, is called the
-   class precedence list or the *linearization* of C.
+2) Danh sách các lớp tổ tiên của một lớp C, bao gồm chính lớp đó, được sắp xếp từ lớp tổ tiên gần nhất đến xa nhất, được gọi là danh sách ưu tiên lớp hoặc *phép tuyến tính hóa* của C.
 
-3) The *Method Resolution Order* (MRO) is the set of rules that
-   construct the linearization.  In the Python literature, the idiom
-   "the MRO of C" is also used as a synonymous for the linearization of
-   the class C.
+3) *Thứ tự phân giải phương thức* (MRO) là tập hợp các quy tắc dùng để xây dựng phép tuyến tính hóa. Trong tài liệu Python, thành ngữ "MRO của C" cũng được dùng như từ đồng nghĩa với phép tuyến tính hóa của lớp C.
 
-4) For instance, in the case of single inheritance hierarchy, if C is a
-   subclass of C1, and C1 is a subclass of C2, then the linearization of
-   C is simply the list [C, C1 , C2].  However, with multiple
-   inheritance hierarchies, the construction of the linearization is
-   more cumbersome, since it is more difficult to construct a
-   linearization that respects *local precedence ordering* and
-   *monotonicity*.
+4) Chẳng hạn, trong trường hợp hệ phân cấp kế thừa đơn, nếu C là lớp con của C1, còn C1 là lớp con của C2, thì phép tuyến tính hóa của C đơn giản là danh sách [C, C1 , C2]. Tuy nhiên, với các hệ phân cấp đa kế thừa, việc xây dựng phép tuyến tính hóa phức tạp hơn, vì khó xây dựng một phép tuyến tính hóa vừa tuân thủ *thứ tự ưu tiên cục bộ* vừa tuân thủ *tính đơn điệu*.
 
-5) I will discuss the local precedence ordering later, but I can give
-   the definition of monotonicity here.  A MRO is monotonic when the
-   following is true:  *if C1 precedes C2 in the linearization of C,
-   then C1 precedes C2 in the linearization of any subclass of C*.
-   Otherwise, the innocuous operation of deriving a new class could
-   change the resolution order of methods, potentially introducing very
-   subtle bugs.  Examples where this happens will be shown later.
+5) Tôi sẽ thảo luận về thứ tự ưu tiên cục bộ sau, nhưng có thể đưa ra định nghĩa về tính đơn điệu ở đây. Một MRO là đơn điệu khi điều sau đây đúng: *nếu C1 đứng trước C2 trong phép tuyến tính hóa của C, thì C1 đứng trước C2 trong phép tuyến tính hóa của mọi lớp con của C*. Nếu không, thao tác tưởng như vô hại là tạo một lớp mới có thể làm thay đổi thứ tự phân giải phương thức, có khả năng dẫn đến những lỗi rất khó nhận thấy. Các ví dụ về trường hợp này sẽ được trình bày sau.
 
-6) Not all classes admit a linearization.  There are cases, in
-   complicated hierarchies, where it is not possible to derive a class
-   such that its linearization respects all the desired properties.
+6) Không phải mọi lớp đều cho phép xây dựng phép tuyến tính hóa. Trong các hệ phân cấp phức tạp, có những trường hợp không thể tạo ra một lớp sao cho phép tuyến tính hóa của nó tuân thủ tất cả các thuộc tính mong muốn.
 
-Here I give an example of this situation. Consider the hierarchy
+Sau đây là một ví dụ về tình huống này. Hãy xét hệ phân cấp
 
   >>> O = object
   >>> class X(O): pass
@@ -113,9 +56,7 @@ Here I give an example of this situation. Consider the hierarchy
   >>> class A(X,Y): pass
   >>> class B(Y,X): pass
 
-which can be represented with the following inheritance graph, where I
-have denoted with O the ``object`` class, which is the beginning of any
-hierarchy for new style classes:
+có thể được biểu diễn bằng đồ thị kế thừa sau đây, trong đó tôi ký hiệu lớp ``object`` bằng O; đây là điểm bắt đầu của mọi hệ phân cấp đối với các class kiểu mới:
 
  .. code-block:: text
 
@@ -130,88 +71,63 @@ hierarchy for new style classes:
             \   /
               ?
 
-In this case, it is not possible to derive a new class C from A and B,
-since X precedes Y in A, but Y precedes X in B, therefore the method
-resolution order would be ambiguous in C.
+Trong trường hợp này, không thể suy dẫn một class mới C từ A và B, vì X đứng trước Y trong A, nhưng Y lại đứng trước X trong B; do đó, thứ tự phân giải phương thức trong C sẽ không rõ ràng.
 
-Python 2.3 raises an exception in this situation (TypeError:  MRO
-conflict among bases Y, X) forbidding the naive programmer from creating
-ambiguous hierarchies.  Python 2.2 instead does not raise an exception,
-but chooses an *ad hoc* ordering (CABXYO in this case).
+Python 2.3 phát sinh một ngoại lệ trong tình huống này (TypeError:  MRO conflict among bases Y, X), ngăn lập trình viên thiếu thận trọng tạo ra các hệ phân cấp không rõ ràng.  Ngược lại, Python 2.2 không phát sinh ngoại lệ mà chọn một thứ tự *tùy tiện* (trong trường hợp này là CABXYO).
 
-The C3 Method Resolution Order
-------------------------------
+Thứ tự phân giải phương thức C3
+-------------------------------
 
-Let me introduce a few simple notations which will be useful for the
-following discussion.  I will use the shortcut notation::
+Trước tiên, hãy giới thiệu một vài ký hiệu đơn giản sẽ hữu ích cho phần thảo luận sau đây.  Tôi sẽ sử dụng ký hiệu rút gọn::
 
   C1 C2 ... CN
 
-to indicate the list of classes [C1, C2, ... , CN].
+để biểu thị danh sách các class [C1, C2, ... , CN].
 
-The *head* of the list is its first element::
+*head* của danh sách là phần tử đầu tiên của danh sách::
 
   head = C1
 
-whereas the *tail* is the rest of the list::
+trong khi *tail* là phần còn lại của danh sách::
 
   tail = C2 ... CN.
 
-I shall also use the notation::
+Tôi cũng sẽ sử dụng ký hiệu::
 
   C + (C1 C2 ... CN) = C C1 C2 ... CN
 
-to denote the sum of the lists [C] + [C1, C2, ... ,CN].
+để biểu thị tổng của các danh sách [C] + [C1, C2, ... ,CN].
 
-Now I can explain how the MRO works in Python 2.3.
+Bây giờ tôi có thể giải thích cách MRO hoạt động trong Python 2.3.
 
-Consider a class C in a multiple inheritance hierarchy, with C
-inheriting from the base classes B1, B2, ...  , BN.  We want to
-compute the linearization L[C] of the class C. The rule is the
-following:
+Hãy xét một lớp C trong một hệ phân cấp đa kế thừa, trong đó C kế thừa từ các lớp cơ sở B1, B2, ...  , BN. Chúng ta muốn tính phép tuyến tính hóa L[C] của lớp C. Quy tắc như sau:
 
-  *the linearization of C is the sum of C plus the merge of the
-  linearizations of the parents and the list of the parents.*
+  *phép tuyến tính hóa của C là tổng của C với phép trộn các phép tuyến tính hóa của các lớp cha và danh sách các lớp cha.*
 
-In symbolic notation::
+Trong ký hiệu tượng trưng::
 
    L[C(B1 ... BN)] = C + merge(L[B1] ... L[BN], B1 ... BN)
 
-In particular, if C is the ``object`` class, which has no parents, the
-linearization is trivial::
+Cụ thể, nếu C là lớp ``object``, không có lớp cha nào, thì phép tuyến tính hóa là hiển nhiên::
 
        L[object] = object.
 
-However, in general one has to compute the merge according to the following
-prescription:
+Tuy nhiên, nhìn chung, cần tính phép trộn theo quy tắc sau:
 
-  *take the head of the first list, i.e L[B1][0]; if this head is not in
-  the tail of any of the other lists, then add it to the linearization
-  of C and remove it from the lists in the merge, otherwise look at the
-  head of the next list and take it, if it is a good head.  Then repeat
-  the operation until all the classes are removed or it is impossible to
-  find good heads.  In this case, it is impossible to construct the
-  merge, Python 2.3 will refuse to create the class C and will raise an
-  exception.*
+  *lấy phần tử đầu của danh sách đầu tiên, tức là L[B1][0]; nếu phần tử đầu này không nằm trong phần đuôi của bất kỳ danh sách nào khác, thì thêm nó vào phép tuyến tính hóa của C và xóa nó khỏi các danh sách trong phép trộn; nếu không, chuyển sang phần tử đầu của danh sách tiếp theo và lấy nó nếu đó là một phần tử đầu hợp lệ. Sau đó lặp lại thao tác này cho đến khi tất cả các lớp được loại bỏ hoặc không thể tìm thấy phần tử đầu hợp lệ nào. Trong trường hợp này, không thể xây dựng phép trộn; Python 2.3 sẽ từ chối tạo lớp C và phát sinh một ngoại lệ.*
 
-This prescription ensures that the merge operation *preserves* the
-ordering, if the ordering can be preserved.  On the other hand, if the
-order cannot be preserved (as in the example of serious order
-disagreement discussed above) then the merge cannot be computed.
+Quy tắc này đảm bảo rằng phép trộn *bảo toàn* thứ tự, nếu có thể bảo toàn thứ tự. Mặt khác, nếu không thể bảo toàn thứ tự (như trong ví dụ về sự bất đồng nghiêm trọng về thứ tự đã thảo luận ở trên), thì không thể tính được phép trộn.
 
-The computation of the merge is trivial if C has only one parent
-(single inheritance); in this case::
+Việc tính phép trộn là hiển nhiên nếu C chỉ có một lớp cha (kế thừa đơn); trong trường hợp này::
 
        L[C(B)] = C + merge(L[B],B) = C + L[B]
 
-However, in the case of multiple inheritance things are more cumbersome
-and I don't expect you can understand the rule without a couple of
-examples ;-)
+Tuy nhiên, trong trường hợp đa kế thừa, mọi thứ phức tạp hơn và tôi không nghĩ bạn có thể hiểu quy tắc này nếu không có vài ví dụ ;-)
 
-Examples
---------
+Ví dụ
+-----
 
-First example. Consider the following hierarchy:
+Ví dụ đầu tiên. Xét hệ phân cấp sau:
 
   >>> O = object
   >>> class F(O): pass
@@ -221,7 +137,7 @@ First example. Consider the following hierarchy:
   >>> class B(D,E): pass
   >>> class A(B,C): pass
 
-In this case the inheritance graph can be drawn as:
+Trong trường hợp này, đồ thị kế thừa có thể được vẽ như sau:
 
  .. code-block:: text
 
@@ -248,33 +164,29 @@ In this case the inheritance graph can be drawn as:
                              ---
 
 
-The linearizations of O,D,E and F are trivial::
+Các phép tuyến tính hóa của O,D,E và F là hiển nhiên::
 
   L[O] = O
   L[D] = D O
   L[E] = E O
   L[F] = F O
 
-The linearization of B can be computed as::
+Có thể tính phép tuyến tính hóa của B như sau::
 
   L[B] = B + merge(DO, EO, DE)
 
-We see that D is a good head, therefore we take it and we are reduced to
-compute ``merge(O,EO,E)``.  Now O is not a good head, since it is in the
-tail of the sequence EO.  In this case the rule says that we have to
-skip to the next sequence.  Then we see that E is a good head; we take
-it and we are reduced to compute ``merge(O,O)`` which gives O. Therefore::
+Ta thấy D là phần tử đầu tốt, do đó ta chọn nó và còn phải tính ``merge(O,EO,E)``.  Bây giờ O không phải là phần tử đầu tốt, vì nó nằm trong phần đuôi của dãy EO.  Trong trường hợp này, quy tắc yêu cầu chúng ta bỏ qua dãy tiếp theo.  Sau đó, ta thấy E là phần tử đầu tốt; ta chọn nó và còn phải tính ``merge(O,O)``, cho kết quả là O. Do đó::
 
   L[B] =  B D E O
 
-Using the same procedure one finds::
+Áp dụng quy trình tương tự, ta được::
 
   L[C] = C + merge(DO,FO,DF)
        = C + D + merge(O,FO,F)
        = C + D + F + merge(O,O)
        = C D F O
 
-Now we can compute::
+Bây giờ chúng ta có thể tính::
 
   L[A] = A + merge(BDEO,CDFO,BC)
        = A + B + merge(DEO,CDFO,C)
@@ -284,13 +196,9 @@ Now we can compute::
        = A + B + C + D + E + F + merge(O,O)
        = A B C D E F O
 
-In this example, the linearization is ordered in a pretty nice way
-according to the inheritance level, in the sense that lower levels (i.e.
-more specialized classes) have higher precedence (see the inheritance
-graph).  However, this is not the general case.
+Trong ví dụ này, linearization được sắp xếp khá hợp lý theo cấp độ kế thừa, theo nghĩa là các cấp thấp hơn (tức là các lớp chuyên biệt hơn) có độ ưu tiên cao hơn (xem đồ thị kế thừa). Tuy nhiên, đây không phải là trường hợp tổng quát.
 
-I leave as an exercise for the reader to compute the linearization for
-my second example:
+Tôi để người đọc tự tính linearization cho ví dụ thứ hai của tôi:
 
   >>> O = object
   >>> class F(O): pass
@@ -300,9 +208,7 @@ my second example:
   >>> class B(E,D): pass
   >>> class A(B,C): pass
 
-The only difference with the previous example is the change B(D,E) -->
-B(E,D); however even such a little modification completely changes the
-ordering of the hierarchy:
+Điểm khác biệt duy nhất so với ví dụ trước là thay đổi B(D,E) --> B(E,D); tuy nhiên, ngay cả một sửa đổi nhỏ như vậy cũng làm thay đổi hoàn toàn thứ tự của hệ thống phân cấp:
 
  .. code-block:: text
 
@@ -329,22 +235,16 @@ ordering of the hierarchy:
                             ---
 
 
-Notice that the class E, which is in the second level of the hierarchy,
-precedes the class C, which is in the first level of the hierarchy, i.e.
-E is more specialized than C, even if it is in a higher level.
+Hãy lưu ý rằng lớp E, nằm ở cấp thứ hai của hệ thống phân cấp, đứng trước lớp C, nằm ở cấp thứ nhất của hệ thống phân cấp, tức là E chuyên biệt hơn C, dù nó nằm ở cấp cao hơn.
 
-A lazy programmer can obtain the MRO directly from Python 2.2, since in
-this case it coincides with the Python 2.3 linearization.  It is enough
-to invoke the :meth:`~type.mro` method of class A:
+Một lập trình viên lười có thể lấy MRO trực tiếp từ Python 2.2, vì trong trường hợp này, nó trùng với linearization của Python 2.3. Chỉ cần gọi phương thức :meth:`~type.mro` của lớp A:
 
   >>> A.mro()  # doctest: +NORMALIZE_WHITESPACE
   [<class 'A'>, <class 'B'>, <class 'E'>,
   <class 'C'>, <class 'D'>, <class 'F'>,
   <class 'object'>]
 
-Finally, let me consider the example discussed in the first section,
-involving a serious order disagreement.  In this case, it is
-straightforward to compute the linearizations of O, X, Y, A and B:
+Cuối cùng, hãy xem xét ví dụ được thảo luận trong phần đầu tiên, liên quan đến một bất đồng nghiêm trọng về thứ tự. Trong trường hợp này, việc tính các phép tuyến tính hóa của O, X, Y, A và B rất đơn giản:
 
  .. code-block:: text
 
@@ -354,34 +254,26 @@ straightforward to compute the linearizations of O, X, Y, A and B:
   L[A] = A X Y O
   L[B] = B Y X O
 
-However, it is impossible to compute the linearization for a class C
-that inherits from A and B::
+Tuy nhiên, không thể tính phép tuyến tính hóa cho một lớp C kế thừa từ A và B::
 
   L[C] = C + merge(AXYO, BYXO, AB)
        = C + A + merge(XYO, BYXO, B)
        = C + A + B + merge(XYO, YXO)
 
-At this point we cannot merge the lists XYO and YXO, since X is in the
-tail of YXO whereas Y is in the tail of XYO:  therefore there are no
-good heads and the C3 algorithm stops.  Python 2.3 raises an error and
-refuses to create the class C.
+Tại thời điểm này, chúng ta không thể hợp nhất các danh sách XYO và YXO, vì X nằm ở phần đuôi của YXO trong khi Y nằm ở phần đuôi của XYO: do đó không có phần tử đầu phù hợp và thuật toán C3 dừng lại. Python 2.3 phát sinh lỗi và từ chối tạo lớp C.
 
-Bad Method Resolution Orders
-----------------------------
+Thứ tự phân giải phương thức không hợp lệ
+-----------------------------------------
 
-A MRO is *bad* when it breaks such fundamental properties as local
-precedence ordering and monotonicity.  In this section, I will show
-that both the MRO for classic classes and the MRO for new style classes
-in Python 2.2 are bad.
+Một MRO là *không hợp lệ* khi nó vi phạm các thuộc tính nền tảng như thứ tự ưu tiên cục bộ và tính đơn điệu. Trong phần này, tôi sẽ chỉ ra rằng cả MRO của các lớp classic và MRO của các lớp new-style trong Python 2.2 đều không hợp lệ.
 
-It is easier to start with the local precedence ordering.  Consider the
-following example:
+Bắt đầu với thứ tự ưu tiên cục bộ sẽ dễ hơn. Hãy xem xét ví dụ sau:
 
   >>> F=type('Food',(),{'remember2buy':'spam'})
   >>> E=type('Eggs',(F,),{'remember2buy':'eggs'})
-  >>> G=type('GoodFood',(F,E),{}) # under Python 2.3 this is an error!  # doctest: +SKIP
+  >>> G=type('GoodFood',(F,E),{}) # trong Python 2.3, đây là lỗi!  # doctest: +SKIP
 
-with inheritance diagram
+với sơ đồ kế thừa
 
  .. code-block:: text
 
@@ -396,25 +288,16 @@ with inheritance diagram
          (buy eggs or spam ?)
 
 
-We see that class G inherits from F and E, with F *before* E:  therefore
-we would expect the attribute *G.remember2buy* to be inherited by
-*F.remember2buy* and not by *E.remember2buy*:  nevertheless Python 2.2
-gives
+Ta thấy rằng class G kế thừa từ F và E, trong đó F *before* E: do đó, ta sẽ mong đợi thuộc tính *G.remember2buy* được kế thừa bởi *F.remember2buy* chứ không phải bởi *E.remember2buy*: tuy nhiên Python 2.2 cho kết quả
 
   >>> G.remember2buy  # doctest: +SKIP
   'eggs'
 
-This is a breaking of local precedence ordering since the order in the
-local precedence list, i.e. the list of the parents of G, is not
-preserved in the Python 2.2 linearization of G::
+Đây là sự phá vỡ thứ tự ưu tiên cục bộ, vì thứ tự trong danh sách ưu tiên cục bộ, tức danh sách các lớp cha của G, không được giữ nguyên trong phép tuyến tính hóa G của Python 2.2::
 
   L[G,P22]= G E F object   # F *follows* E
 
-One could argue that the reason why F follows E in the Python 2.2
-linearization is that F is less specialized than E, since F is the
-superclass of E; nevertheless the breaking of local precedence ordering
-is quite non-intuitive and error prone.  This is particularly true since
-it is a different from old style classes:
+Có thể lập luận rằng lý do F đứng sau E trong phép tuyến tính hóa của Python 2.2 là F ít chuyên biệt hơn E, vì F là superclass của E; tuy nhiên, việc phá vỡ thứ tự ưu tiên cục bộ khá phản trực giác và dễ gây lỗi. Điều này đặc biệt đúng vì đây là một điểm khác biệt so với các class kiểu cũ:
 
   >>> class F: remember2buy='spam'
   >>> class E(F): remember2buy='eggs'
@@ -422,24 +305,15 @@ it is a different from old style classes:
   >>> G.remember2buy  # doctest: +SKIP
   'spam'
 
-In this case the MRO is GFEF and the local precedence ordering is
-preserved.
+Trong trường hợp này, MRO là GFEF và thứ tự ưu tiên cục bộ được bảo toàn.
 
-As a general rule, hierarchies such as the previous one should be
-avoided, since it is unclear if F should override E or vice-versa.
-Python 2.3 solves the ambiguity by raising an exception in the creation
-of class G, effectively stopping the programmer from generating
-ambiguous hierarchies.  The reason for that is that the C3 algorithm
-fails when the merge::
+Theo quy tắc chung, nên tránh các hệ phân cấp như trên, vì không rõ F nên override E hay ngược lại. Python 2.3 giải quyết sự mơ hồ này bằng cách phát sinh một exception khi tạo class G, qua đó ngăn lập trình viên tạo ra các hệ phân cấp mơ hồ. Lý do là thuật toán C3 không thể thực hiện phép trộn khi::
 
    merge(FO,EFO,FE)
 
-cannot be computed, because F is in the tail of EFO and E is in the tail
-of FE.
+không thể tính toán được, vì F nằm ở cuối EFO còn E nằm ở cuối FE.
 
-The real solution is to design a non-ambiguous hierarchy, i.e. to derive
-G from E and F (the more specific first) and not from F and E; in this
-case the MRO is GEF without any doubt.
+Giải pháp thực sự là thiết kế một hệ phân cấp không mơ hồ, tức là cho G kế thừa từ E và F (lớp cụ thể hơn đứng trước), thay vì từ F và E; trong trường hợp này, MRO chắc chắn là GEF.
 
  .. code-block:: text
 
@@ -453,38 +327,27 @@ case the MRO is GEF without any doubt.
                   (eggs, no doubt)
 
 
-Python 2.3 forces the programmer to write good hierarchies (or, at
-least, less error-prone ones).
+Python 2.3 buộc lập trình viên phải viết các hệ phân cấp tốt (hoặc ít nhất là ít dễ gây lỗi hơn).
 
-On a related note, let me point out that the Python 2.3 algorithm is
-smart enough to recognize obvious mistakes, as the duplication of
-classes in the list of parents:
+Nhân đây, tôi muốn chỉ ra rằng thuật toán của Python 2.3 đủ thông minh để nhận biết những lỗi rõ ràng, chẳng hạn như việc lặp lại các class trong danh sách các class cha:
 
   >>> class A(object): pass
-  >>> class C(A,A): pass # error
+  >>> class C(A,A): pass # lỗi
   Traceback (most recent call last):
     File "<stdin>", line 1, in ?
   TypeError: duplicate base class A
 
-Python 2.2 (both for classic classes and new style classes) in this
-situation, would not raise any exception.
+Trong tình huống này, Python 2.2 (cả đối với các lớp kiểu cũ và các lớp kiểu mới) sẽ không phát sinh ngoại lệ nào.
 
-Finally, I would like to point out two lessons we have learned from this
-example:
+Cuối cùng, tôi muốn chỉ ra hai bài học mà chúng ta đã rút ra từ ví dụ này:
 
-1. despite the name, the MRO determines the resolution order of
-   attributes, not only of methods;
+1. mặc dù có tên như vậy, MRO xác định thứ tự phân giải của các thuộc tính, không chỉ các phương thức;
 
-2. the default food for Pythonistas is spam !  (but you already knew
-   that ;-)
+2. món ăn mặc định của các Pythonista là spam !  (nhưng bạn đã biết điều đó rồi ;-)
 
-Having discussed the issue of local precedence ordering, let me now
-consider the issue of monotonicity.  My goal is to show that neither the
-MRO for classic classes nor that for Python 2.2 new style classes is
-monotonic.
+Sau khi đã thảo luận về vấn đề thứ tự ưu tiên cục bộ, bây giờ hãy xem xét vấn đề tính đơn điệu. Mục tiêu của tôi là chỉ ra rằng cả MRO của các lớp kiểu cũ lẫn MRO của các lớp kiểu mới trong Python 2.2 đều không đơn điệu.
 
-To prove that the MRO for classic classes is non-monotonic is rather
-trivial, it is enough to look at the diamond diagram:
+Để chứng minh rằng MRO của các lớp kiểu cũ không đơn điệu thì khá đơn giản, chỉ cần xem sơ đồ hình thoi:
 
  .. code-block:: text
 
@@ -497,25 +360,18 @@ trivial, it is enough to look at the diamond diagram:
                   \ /
                    D
 
-One easily discerns the inconsistency::
+Ta có thể dễ dàng nhận ra sự không nhất quán::
 
-  L[B,P21] = B C        # B precedes C : B's methods win
-  L[D,P21] = D A C B C  # B follows C  : C's methods win!
+  L[B,P21] = B C        # B đứng trước C: các phương thức của B được ưu tiên
+  L[D,P21] = D A C B C  # B đứng sau C: các phương thức của C được ưu tiên!
 
-On the other hand, there are no problems with the Python 2.2 and 2.3
-MROs, they give both::
+Mặt khác, không có vấn đề gì với các MRO của Python 2.2 và 2.3; chúng cung cấp cho cả hai::
 
   L[D] = D A B C
 
-Guido points out in his essay [#]_ that the classic MRO is not so bad in
-practice, since one can typically avoids diamonds for classic classes.
-But all new style classes inherit from ``object``, therefore diamonds are
-unavoidable and inconsistencies shows up in every multiple inheritance
-graph.
+Guido chỉ ra trong bài tiểu luận [#]_ của mình rằng MRO cổ điển trên thực tế không quá tệ, vì thông thường ta có thể tránh các hình thoi đối với các class cổ điển. Nhưng mọi class kiểu mới đều kế thừa từ ``object``, do đó các hình thoi là không thể tránh khỏi và sự không nhất quán xuất hiện trong mọi đồ thị kế thừa đa cấp.
 
-The MRO of Python 2.2 makes breaking monotonicity difficult, but not
-impossible.  The following example, originally provided by Samuele
-Pedroni, shows that the MRO of Python 2.2 is non-monotonic:
+MRO của Python 2.2 khiến việc phá vỡ tính đơn điệu trở nên khó khăn, nhưng không phải là không thể. Ví dụ sau, ban đầu do Samuele Pedroni cung cấp, cho thấy MRO của Python 2.2 không đơn điệu:
 
   >>> class A(object): pass
   >>> class B(object): pass
@@ -527,9 +383,7 @@ Pedroni, shows that the MRO of Python 2.2 is non-monotonic:
   >>> class K3(D,A):   pass
   >>> class Z(K1,K2,K3): pass
 
-Here are the linearizations according to the C3 MRO (the reader should
-verify these linearizations as an exercise and draw the inheritance
-diagram ;-) ::
+Sau đây là các phép tuyến tính hóa theo MRO C3 (người đọc nên tự kiểm tra các phép tuyến tính hóa này như một bài tập và vẽ sơ đồ kế thừa ;-)::
 
   L[A] = A O
   L[B] = B O
@@ -541,35 +395,16 @@ diagram ;-) ::
   L[K3]= K3 D A O
   L[Z] = Z K1 K2 K3 D A B C E O
 
-Python 2.2 gives exactly the same linearizations for A, B, C, D, E, K1,
-K2 and K3, but a different linearization for Z::
+Python 2.2 cho kết quả tuyến tính hóa hoàn toàn giống nhau đối với A, B, C, D, E, K1, K2 và K3, nhưng cho kết quả tuyến tính hóa khác đối với Z::
 
   L[Z,P22] = Z K1 K3 A K2 D B C E O
 
-It is clear that this linearization is *wrong*, since A comes before D
-whereas in the linearization of K3 A comes *after* D. In other words, in
-K3 methods derived by D override methods derived by A, but in Z, which
-still is a subclass of K3, methods derived by A override methods derived
-by D!  This is a violation of monotonicity.  Moreover, the Python 2.2
-linearization of Z is also inconsistent with local precedence ordering,
-since the local precedence list of the class Z is [K1, K2, K3] (K2
-precedes K3), whereas in the linearization of Z K2 *follows* K3.  These
-problems explain why the 2.2 rule has been dismissed in favor of the C3
-rule.
+Rõ ràng phép tuyến tính hóa này là *sai*, vì A đứng trước D, trong khi trong phép tuyến tính hóa của K3, A đứng *sau* D. Nói cách khác, trong K3, các phương thức bắt nguồn từ D ghi đè các phương thức bắt nguồn từ A, nhưng trong Z, vốn vẫn là một lớp con của K3, các phương thức bắt nguồn từ A lại ghi đè các phương thức bắt nguồn từ D! Đây là hành vi vi phạm tính đơn điệu. Hơn nữa, phép tuyến tính hóa Z của Python 2.2 cũng không nhất quán với thứ tự ưu tiên cục bộ, vì danh sách ưu tiên cục bộ của lớp Z là [K1, K2, K3] (K2 đứng trước K3), trong khi trong phép tuyến tính hóa của Z, K2 *đứng sau* K3. Những vấn đề này giải thích tại sao quy tắc 2.2 đã bị loại bỏ để chuyển sang quy tắc C3.
 
-The end
--------
+Kết thúc
+--------
 
-This section is for the impatient reader, who skipped all the previous
-sections and jumped immediately to the end.  This section is for the
-lazy programmer too, who didn't want to exercise her/his brain.
-Finally, it is for the programmer with some hubris, otherwise s/he would
-not be reading a paper on the C3 method resolution order in multiple
-inheritance hierarchies ;-) These three virtues taken all together (and
-*not* separately) deserve a prize:  the prize is a short Python 2.2
-script that allows you to compute the 2.3 MRO without risk to your
-brain.  Simply change the last line to play with the various examples I
-have discussed in this paper.::
+Phần này dành cho độc giả thiếu kiên nhẫn, những người đã bỏ qua tất cả các phần trước và nhảy ngay đến cuối. Phần này cũng dành cho lập trình viên lười biếng, những người không muốn vận dụng trí óc. Cuối cùng, phần này dành cho lập trình viên có phần tự phụ; nếu không, họ đã chẳng đọc một bài viết về thứ tự phân giải phương thức C3 trong các hệ phân cấp đa kế thừa ;-) Ba đức tính này khi kết hợp với nhau (và *không* riêng lẻ) xứng đáng nhận một phần thưởng: phần thưởng là một script Python 2.2 ngắn gọn, cho phép bạn tính MRO 2.3 mà không gây rủi ro cho bộ não. Chỉ cần thay đổi dòng cuối cùng để thử các ví dụ khác nhau mà tôi đã thảo luận trong bài viết này.::
 
   #<mro.py>
 
@@ -580,16 +415,16 @@ have discussed in this paper.::
       __repr__ = lambda cls: cls.__name__
 
   class ex_2:
-      "Serious order disagreement" #From Guido
+      "Serious order disagreement" #Từ Guido
       class O: pass
       class X(O): pass
       class Y(O): pass
       class A(X,Y): pass
       class B(Y,X): pass
       try:
-          class Z(A,B): pass #creates Z(A,B) in Python 2.2
+          class Z(A,B): pass #tạo Z(A,B) trong Python 2.2
       except TypeError:
-          pass # Z(A,B) cannot be created in Python 2.3
+          pass # Không thể tạo Z(A,B) trong Python 2.3
 
   class ex_5:
       "My first example"
@@ -612,7 +447,7 @@ have discussed in this paper.::
       class A(B,C): pass
 
   class ex_9:
-      "Difference between Python 2.2 MRO and C3" #From Samuele
+      "Difference between Python 2.2 MRO and C3" #Từ Samuele
       class O: pass
       class A(O): pass
       class B(O): pass
@@ -631,14 +466,14 @@ have discussed in this paper.::
         nonemptyseqs=[seq for seq in seqs if seq]
         if not nonemptyseqs: return res
         i+=1; print '\n',i,'round: candidates...',
-        for seq in nonemptyseqs: # find merge candidates among seq heads
+        for seq in nonemptyseqs: # tìm các ứng viên hợp nhất trong các đầu seq
             cand = seq[0]; print ' ',cand,
             nothead=[s for s in nonemptyseqs if cand in s[1:]]
-            if nothead: cand=None #reject candidate
+            if nothead: cand=None #từ chối ứng viên
             else: break
         if not cand: raise "Inconsistent hierarchy"
         res.append(cand)
-        for seq in nonemptyseqs: # remove cand
+        for seq in nonemptyseqs: # xóa cand
             if seq[0] == cand: del seq[0]
 
   def mro(C):
@@ -653,19 +488,16 @@ have discussed in this paper.::
 
   #</mro.py>
 
-That's all folks,
+Vậy là hết,
 
-                            enjoy !
+                            Chúc bạn vui vẻ!
 
 
-Resources
----------
+Tài nguyên
+----------
 
-.. [#] The thread on python-dev started by Samuele Pedroni:
-       https://mail.python.org/pipermail/python-dev/2002-October/029035.html
+.. [#] Chủ đề trên python-dev do Samuele Pedroni khởi xướng: https://mail.python.org/pipermail/python-dev/2002-October/029035.html
 
-.. [#] The paper *A Monotonic Superclass Linearization for Dylan*:
-       https://doi.org/10.1145/236337.236343
+.. [#] Bài viết *Một phép tuyến tính hóa lớp cha đơn điệu cho Dylan*: https://doi.org/10.1145/236337.236343
 
-.. [#] Guido van Rossum's essay, *Unifying types and classes in Python 2.2*:
-       https://web.archive.org/web/20140210194412/http://www.python.org/download/releases/2.2.2/descrintro
+.. [#] Bài tiểu luận của Guido van Rossum, *Hợp nhất các kiểu và lớp trong Python 2.2*: https://web.archive.org/web/20140210194412/http://www.python.org/download/releases/2.2.2/descrintro

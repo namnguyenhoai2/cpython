@@ -1,84 +1,53 @@
 .. _a-conceptual-overview-of-asyncio:
 
-****************************************
-A Conceptual Overview of :mod:`!asyncio`
-****************************************
+**************************************
+Tổng quan khái niệm về :mod:`!asyncio`
+**************************************
 
-This :ref:`HOWTO <how-tos>` article seeks to help you build a sturdy mental
-model of how :mod:`asyncio` fundamentally works, helping you understand the
-how and why behind the recommended patterns.
+Bài viết :ref:`HOWTO <how-tos>` này nhằm giúp bạn xây dựng một mô hình tư duy vững chắc về cách :mod:`asyncio` thực sự hoạt động, qua đó hiểu được cơ sở và lý do đằng sau các mẫu được khuyến nghị.
 
-You might be curious about some key :mod:`!asyncio` concepts.
-By the end of this article, you'll be able to comfortably answer these questions:
+Bạn có thể tò mò về một số khái niệm :mod:`!asyncio` then chốt. Đến cuối bài viết này, bạn sẽ có thể tự tin trả lời các câu hỏi sau:
 
-- What's happening behind the scenes when an object is awaited?
-- How does :mod:`!asyncio` differentiate between a task which doesn't need
-  CPU time (such as a network request or file read) as opposed to a task that
-  does (such as computing n-factorial)?
-- How to write an asynchronous variant of an operation, such as
-  an async sleep or database request.
+- Điều gì xảy ra ở phía sau khi một đối tượng được await?
+- :mod:`!asyncio` phân biệt như thế nào giữa một tác vụ không cần thời gian CPU (chẳng hạn như yêu cầu mạng hoặc đọc tệp) và một tác vụ cần thời gian CPU (chẳng hạn như tính giai thừa của n)?
+- Cách viết một biến thể bất đồng bộ của một thao tác, chẳng hạn như thao tác sleep bất đồng bộ hoặc yêu cầu cơ sở dữ liệu.
 
 .. seealso::
 
-   * The `guide <https://github.com/anordin95/a-conceptual-overview-of-asyncio/
-     tree/main>`_ that inspired this HOWTO article, by Alexander Nordin.
-   * This in-depth `YouTube tutorial series <https://www.youtube.com/
-     watch?v=Xbl7XjFYsN4&list=PLhNSoGM2ik6SIkVGXWBwerucXjgP1rHmB>`_ on
-     ``asyncio`` created by Python core team member, Łukasz Langa.
-   * `500 Lines or Less: A Web Crawler With asyncio Coroutines <https://
-     aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html>`_ by A.
-     Jesse Jiryu Davis and Guido van Rossum.
+   * `guide <https://github.com/anordin95/a-conceptual-overview-of-asyncio/ tree/main>`_ đã truyền cảm hứng cho bài viết HOWTO này, do Alexander Nordin viết.
+   * Loạt `hướng dẫn chuyên sâu trên YouTube <https://www.youtube.com/ watch?v=Xbl7XjFYsN4&list=PLhNSoGM2ik6SIkVGXWBwerucXjgP1rHmB>`_ này về ``asyncio`` do thành viên nhóm phát triển cốt lõi của Python, Łukasz Langa, thực hiện.
+   * `500 dòng mã trở xuống: Trình thu thập dữ liệu web với các coroutine asyncio <https:// aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html>`_ của A. Jesse Jiryu Davis và Guido van Rossum.
 
---------------------------------------------
-A conceptual overview part 1: the high-level
---------------------------------------------
+------------------------------------
+Tổng quan khái niệm, phần 1: cấp cao
+------------------------------------
 
-In part 1, we'll cover the main, high-level building blocks of :mod:`!asyncio`:
-the event loop, coroutine functions, coroutine objects, tasks, and ``await``.
+Trong phần 1, chúng ta sẽ tìm hiểu các khối xây dựng cấp cao chính của :mod:`!asyncio`: event loop, các hàm coroutine, các đối tượng coroutine, task và ``await``.
 
 ==========
 Event Loop
 ==========
 
-Everything in :mod:`!asyncio` happens relative to the event loop.
-It's the star of the show.
-It's like an orchestra conductor.
-It's behind the scenes managing resources.
-Some power is explicitly granted to it, but a lot of its ability to get things
-done comes from the respect and cooperation of its worker bees.
+Mọi thứ trong :mod:`!asyncio` đều diễn ra trong mối quan hệ với event loop. Nó là nhân vật chính của toàn bộ hệ thống. Nó giống như một nhạc trưởng. Nó âm thầm quản lý các tài nguyên ở phía sau. Một phần quyền hạn được cấp rõ ràng cho nó, nhưng phần lớn khả năng hoàn thành công việc của nó đến từ sự tôn trọng và phối hợp của những worker tận tụy.
 
-In more technical terms, the event loop contains a collection of jobs to be run.
-Some jobs are added directly by you, and some indirectly by :mod:`!asyncio`.
-The event loop takes a job from its backlog of work and invokes it (or "gives
-it control"), similar to calling a function, and then that job runs.
-Once it pauses or completes, it returns control to the event loop.
-The event loop will then select another job from its pool and invoke it.
-You can *roughly* think of the collection of jobs as a queue: jobs are added and
-then processed one at a time, generally (but not always) in order.
-This process repeats indefinitely, with the event loop cycling endlessly
-onwards.
-If there are no more jobs pending execution, the event loop is smart enough to
-rest and avoid needlessly wasting CPU cycles, and will come back when there's
-more work to be done.
+Theo cách nói kỹ thuật hơn, event loop chứa một tập hợp các công việc cần được chạy. Một số công việc do bạn trực tiếp thêm vào, còn một số được :mod:`!asyncio` thêm vào gián tiếp. Event loop lấy một công việc từ danh sách công việc đang chờ và gọi nó (hoặc "trao quyền điều khiển cho nó"), tương tự như khi gọi một hàm, rồi công việc đó bắt đầu chạy. Khi tạm dừng hoặc hoàn tất, công việc sẽ trả quyền điều khiển về cho event loop. Sau đó, event loop sẽ chọn một công việc khác từ nhóm của mình và gọi nó. Bạn có thể *hình dung một cách tương đối* tập hợp các công việc như một hàng đợi: các công việc được thêm vào rồi xử lý lần lượt từng công việc, nhìn chung (nhưng không phải lúc nào cũng vậy) theo thứ tự. Quá trình này lặp lại vô thời hạn, khi event loop liên tục chuyển sang các công việc tiếp theo. Nếu không còn công việc nào đang chờ thực thi, event loop đủ thông minh để nghỉ và tránh lãng phí chu kỳ CPU không cần thiết, rồi quay lại khi có thêm việc cần làm.
 
-Effective execution relies on jobs sharing well and cooperating; a greedy job
-could hog control and leave the other jobs to starve, rendering the overall
-event loop approach rather useless.
+Việc thực thi hiệu quả phụ thuộc vào việc các job phối hợp và chia sẻ quyền điều khiển tốt; một job tham lam có thể chiếm quyền điều khiển và khiến các job khác bị đói tài nguyên, làm cho cách tiếp cận event loop tổng thể trở nên khá vô ích.
 
 ::
 
    import asyncio
 
-   # This creates an event loop and indefinitely cycles through
-   # its collection of jobs.
+   # Tạo một event loop và lặp vô hạn qua
+   # tập hợp các job của nó.
    event_loop = asyncio.new_event_loop()
    event_loop.run_forever()
 
-=====================================
-Asynchronous functions and coroutines
-=====================================
+================================
+Các hàm bất đồng bộ và coroutine
+================================
 
-This is a basic, boring Python function::
+Đây là một hàm Python cơ bản, đơn điệu::
 
    def hello_printer():
        print(
@@ -87,15 +56,13 @@ This is a basic, boring Python function::
            "partner in crime."
        )
 
-Calling a regular function invokes its logic or body::
+Việc gọi một hàm thông thường sẽ thực thi logic hoặc phần thân của hàm đó::
 
    >>> hello_printer()
    Hi, I am a lowly, simple printer, though I have all I need in life --
    fresh paper and my dearly beloved octopus partner in crime.
 
-The :ref:`async def <async def>`, as opposed to just a plain ``def``, makes
-this an asynchronous function (or "coroutine function").
-Calling it creates and returns a :ref:`coroutine <coroutine>` object.
+:ref:`async def <async def>`, thay vì chỉ là một ``def``, khiến đây trở thành một hàm bất đồng bộ (hay "hàm coroutine"). Việc gọi hàm này sẽ tạo và trả về một đối tượng :ref:`coroutine <coroutine>`.
 
 ::
 
@@ -105,36 +72,21 @@ Calling it creates and returns a :ref:`coroutine <coroutine>` object.
         f"By the way, my lucky number is: {magic_number}."
        )
 
-Calling the async function, ``loudmouth_penguin``, does not execute the print statement;
-instead, it creates a coroutine object::
+Việc gọi hàm async, ``loudmouth_penguin``, không thực thi câu lệnh print; thay vào đó, nó tạo ra một đối tượng coroutine::
 
    >>> loudmouth_penguin(magic_number=3)
    <coroutine object loudmouth_penguin at 0x104ed2740>
 
-The terms "coroutine function" and "coroutine object" are often conflated
-as coroutine.
-That can be confusing!
-In this article, coroutine specifically refers to a coroutine object, or more
-precisely, an instance of :class:`types.CoroutineType` (native coroutine).
-Note that coroutines can also exist as instances of
-:class:`collections.abc.Coroutine` -- a distinction that matters for type
-checking.
+Các thuật ngữ "coroutine function" và "coroutine object" thường bị gộp chung thành coroutine. Điều đó có thể gây nhầm lẫn! Trong bài viết này, coroutine cụ thể chỉ một đối tượng coroutine, hay chính xác hơn là một instance của :class:`types.CoroutineType` (native coroutine). Lưu ý rằng coroutine cũng có thể tồn tại dưới dạng instance của
+:class:`collections.abc.Coroutine` -- một điểm khác biệt quan trọng khi kiểm tra kiểu.
 
-A coroutine represents the function's body or logic.
-A coroutine has to be explicitly started; again, merely creating the coroutine
-does not start it.
-Notably, the coroutine can be paused and resumed at various points within the
-function's body.
-That pausing and resuming ability is what allows for asynchronous behavior!
+Một coroutine đại diện cho phần thân hoặc logic của hàm. Coroutine phải được khởi động một cách rõ ràng; một lần nữa, chỉ tạo coroutine không có nghĩa là khởi động nó. Đáng chú ý, coroutine có thể tạm dừng và tiếp tục tại nhiều điểm khác nhau trong phần thân hàm. Khả năng tạm dừng và tiếp tục đó cho phép thực hiện hành vi bất đồng bộ!
 
-Coroutines and coroutine functions were built by leveraging the functionality
-of :term:`generators <generator iterator>` and
-:term:`generator functions <generator>`.
-Recall, a generator function is a function that :keyword:`yield`\s, like this
-one::
+Coroutine và coroutine function được xây dựng bằng cách tận dụng chức năng của :term:`generators <generator iterator>` và
+:term:`generator functions <generator>`. Hãy nhớ rằng, một hàm generator là một hàm :keyword:`yield`\s, như hàm này::
 
    def get_random_number():
-       # This would be a bad random number generator!
+       # Đây sẽ là một bộ tạo số ngẫu nhiên tồi!
        print("Hi")
        yield 1
        print("Hello")
@@ -143,16 +95,12 @@ one::
        yield 4
        ...
 
-Similar to a coroutine function, calling a generator function does not run it.
-Instead, it creates a generator object::
+Tương tự như một hàm coroutine, việc gọi một hàm generator không thực thi hàm đó. Thay vào đó, nó tạo ra một đối tượng generator::
 
    >>> get_random_number()
    <generator object get_random_number at 0x1048671c0>
 
-You can proceed to the next ``yield`` of a generator by using the
-built-in function :func:`next`.
-In other words, the generator runs, then pauses.
-For example::
+Bạn có thể chuyển sang ``yield`` tiếp theo của một generator bằng cách sử dụng hàm dựng sẵn :func:`next`. Nói cách khác, generator chạy rồi tạm dừng. Ví dụ::
 
    >>> generator = get_random_number()
    >>> next(generator)
@@ -162,55 +110,37 @@ For example::
    Hello
    7
 
-=====
-Tasks
-=====
+====
+Task
+====
 
-Roughly speaking, :ref:`tasks <asyncio-task-obj>` are coroutines (not coroutine
-functions) tied to an event loop.
-A task also maintains a list of callback functions whose importance will become
-clear in a moment when we discuss :keyword:`await`.
-The recommended way to create tasks is via :func:`asyncio.create_task`.
+Nói một cách khái quát, :ref:`task <asyncio-task-obj>` là các coroutine (không phải hàm coroutine) được liên kết với một event loop. Một task cũng duy trì danh sách các hàm callback; tầm quan trọng của danh sách này sẽ trở nên rõ ràng sau khi chúng ta thảo luận về :keyword:`await`. Cách được khuyến nghị để tạo task là thông qua :func:`asyncio.create_task`.
 
-Creating a task automatically schedules it for execution (by adding a
-callback to run it in the event loop's to-do list, that is, collection of jobs).
+Việc tạo một task sẽ tự động lên lịch thực thi task đó (bằng cách thêm một callback để chạy task vào danh sách việc cần làm của event loop, tức là tập hợp các job).
 
-:mod:`!asyncio` automatically associates tasks with the event loop for you.
-This automatic association was purposely designed into :mod:`!asyncio` for
-the sake of simplicity.
-Without it, you'd have to keep track of the event loop object and pass it to
-any coroutine function that wants to create tasks, adding redundant clutter
-to your code.
+:mod:`!asyncio` tự động liên kết các task với event loop cho bạn. Cơ chế liên kết tự động này được cố ý thiết kế vào :mod:`!asyncio` để đơn giản hóa việc sử dụng. Nếu không có nó, bạn sẽ phải tự theo dõi đối tượng event loop và truyền đối tượng đó cho mọi hàm coroutine muốn tạo task, khiến mã của bạn trở nên rườm rà không cần thiết.
 
 ::
 
    coroutine = loudmouth_penguin(magic_number=5)
-   # This creates a Task object and schedules its execution via the event loop.
+   # Tạo một đối tượng Task và lên lịch thực thi đối tượng này thông qua event loop.
    task = asyncio.create_task(coroutine)
 
-Earlier, we manually created the event loop and set it to run forever.
-In practice, it's recommended to use (and common to see) :func:`asyncio.run`,
-which takes care of managing the event loop and ensuring the provided
-coroutine finishes before advancing.
-For example, many async programs follow this setup::
+Trước đó, chúng ta đã tự tạo event loop và thiết lập để nó chạy vô hạn. Trong thực tế, bạn nên sử dụng (và thường sẽ thấy) :func:`asyncio.run`, vì nó đảm nhiệm việc quản lý event loop và đảm bảo coroutine được cung cấp hoàn tất trước khi tiếp tục. Ví dụ, nhiều chương trình async sử dụng cấu trúc sau::
 
    import asyncio
 
    async def main():
-       # Perform all sorts of wacky, wild asynchronous things...
+       # Thực hiện đủ mọi thứ bất đồng bộ kỳ quặc, hoang dã...
        ...
 
    if __name__ == "__main__":
        asyncio.run(main())
-       # The program will not reach the following print statement until the
-       # coroutine main() finishes.
+       # Chương trình sẽ không thực thi câu lệnh print sau đây cho đến khi
+       # coroutine main() hoàn tất.
        print("coroutine main() is done!")
 
-It's important to be aware that the task itself is not added to the event loop,
-only a callback to the task is.
-This matters if the task object you created is garbage collected before it's
-called by the event loop.
-For example, consider this program:
+Điều quan trọng cần lưu ý là bản thân task không được thêm vào event loop; chỉ có một callback gọi task mới được thêm vào. Điều này quan trọng nếu đối tượng task mà bạn tạo bị garbage collection trước khi event loop gọi nó. Hãy xem xét chương trình sau:
 
 .. code-block::
    :linenos:
@@ -220,77 +150,41 @@ For example, consider this program:
 
    async def main():
        asyncio.create_task(hello())
-       # Other asynchronous instructions which run for a while
-       # and cede control to the event loop...
+       # Các chỉ thị bất đồng bộ khác chạy trong một khoảng thời gian
+       # và nhường quyền điều khiển cho event loop...
        ...
 
    asyncio.run(main())
 
-Because there's no reference to the task object created on line 5, it *might*
-be garbage collected before the event loop invokes it.
-Later instructions in the coroutine ``main()`` hand control back to the event
-loop so it can invoke other jobs.
-When the event loop eventually tries to run the task, it might fail and
-discover the task object does not exist!
-This can also happen even if a coroutine keeps a reference to a task but
-completes before that task finishes.
-When the coroutine exits, local variables go out of scope and may be subject
-to garbage collection.
-In practice, ``asyncio`` and Python's garbage collector work pretty hard to
-ensure this sort of thing doesn't happen.
-But that's no reason to be reckless!
+Vì không có tham chiếu nào đến đối tượng task được tạo ở dòng 5, nó *có thể* bị garbage collector thu gom trước khi event loop gọi nó. Các chỉ dẫn tiếp theo trong coroutine ``main()`` trả quyền điều khiển lại cho event loop để nó có thể gọi các job khác. Cuối cùng, khi event loop cố chạy task, nó có thể gặp lỗi và phát hiện đối tượng task không tồn tại! Điều này cũng có thể xảy ra ngay cả khi một coroutine giữ tham chiếu đến một task nhưng hoàn tất trước khi task đó kết thúc. Khi coroutine thoát, các biến cục bộ không còn nằm trong phạm vi và có thể bị garbage collector thu gom. Trên thực tế, ``asyncio`` và garbage collector của Python hoạt động khá tích cực để đảm bảo điều này không xảy ra. Nhưng đó không phải là lý do để hành động bất cẩn!||||
 
 =====
 await
 =====
 
-:keyword:`await` is a Python keyword that's commonly used in one of two
-different ways::
+:keyword:`await` là một từ khóa Python thường được sử dụng theo một trong hai cách khác nhau::
 
    await task
    await coroutine
 
-In a crucial way, the behavior of ``await`` depends on the type of object
-being awaited.
+Ở một khía cạnh quan trọng, hành vi của ``await`` phụ thuộc vào kiểu của đối tượng được await.
 
-Awaiting a task will cede control from the current task or coroutine to
-the event loop.
-In the process of relinquishing control, a few important things happen.
-We'll use the following code example to illustrate::
+Await một task sẽ nhường quyền điều khiển từ task hoặc coroutine hiện tại cho event loop. Trong quá trình nhường quyền điều khiển, một vài việc quan trọng sẽ xảy ra. Chúng ta sẽ sử dụng ví dụ mã sau để minh họa::
 
    async def plant_a_tree():
        dig_the_hole_task = asyncio.create_task(dig_the_hole())
        await dig_the_hole_task
 
-       # Other instructions associated with planting a tree.
+       # Các chỉ dẫn khác liên quan đến việc trồng cây.
        ...
 
-In this example, imagine the event loop has passed control to the start of the
-coroutine ``plant_a_tree()``.
-As seen above, the coroutine creates a task and then awaits it.
-The ``await dig_the_hole_task`` instruction adds a callback (which will resume
-``plant_a_tree()``) to the ``dig_the_hole_task`` object's list of callbacks.
-And then, the instruction cedes control to the event loop.
-Some time later, the event loop will pass control to ``dig_the_hole_task``
-and the task will finish whatever it needs to do.
-Once the task finishes, it will add its various callbacks to the event loop,
-in this case, a call to resume ``plant_a_tree()``.
+Trong ví dụ này, hãy tưởng tượng event loop đã chuyển quyền điều khiển cho phần bắt đầu của coroutine ``plant_a_tree()``. Như đã thấy ở trên, coroutine tạo một task rồi await task đó. Chỉ dẫn ``await dig_the_hole_task`` thêm một callback (callback này sẽ tiếp tục ``plant_a_tree()``) vào danh sách callback của đối tượng ``dig_the_hole_task``. Sau đó, chỉ dẫn này nhường quyền điều khiển cho event loop. Một thời gian sau, event loop sẽ chuyển quyền điều khiển cho ``dig_the_hole_task`` và task sẽ hoàn tất mọi việc cần làm. Khi task hoàn tất, nó sẽ thêm các callback khác nhau của mình vào event loop; trong trường hợp này là một lệnh gọi để tiếp tục ``plant_a_tree()``.
 
-Generally speaking, when the awaited task finishes (``dig_the_hole_task``),
-the original task or coroutine (``plant_a_tree()``) is added back to the event
-loop's to-do list to be resumed.
+Nói chung, khi task được await hoàn tất (``dig_the_hole_task``), task hoặc coroutine ban đầu (``plant_a_tree()``) sẽ được thêm lại vào danh sách việc cần làm của event loop để tiếp tục chạy.
 
-This is a basic, yet reliable mental model.
-In practice, the control handoffs are slightly more complex, but not by much.
-In part 2, we'll walk through the details that make this possible.
+Đây là một mô hình tư duy cơ bản nhưng đáng tin cậy. Trên thực tế, việc chuyển quyền điều khiển phức tạp hơn một chút, nhưng không đáng kể. Trong phần 2, chúng ta sẽ đi qua các chi tiết giúp điều này khả thi.
 
-**Unlike tasks, awaiting a coroutine does not hand control back to the event
-loop!**
-Wrapping a coroutine in a task first, then awaiting that would cede
-control.
-The behavior of ``await coroutine`` is effectively the same as invoking a
-regular, synchronous Python function.
-Consider this program::
+**Không giống task, việc await một coroutine không chuyển quyền điều khiển lại cho event loop!** Trước tiên, nếu bọc một coroutine trong task rồi await task đó, quyền điều khiển sẽ được nhường lại. Hành vi của ``await coroutine`` về cơ bản giống với việc gọi một hàm Python thông thường, đồng bộ. Hãy xem xét chương trình này::
 
    import asyncio
 
@@ -309,11 +203,7 @@ Consider this program::
 
    asyncio.run(main())
 
-The first statement in the coroutine ``main()`` creates ``task_b`` and schedules
-it for execution via the event loop.
-Then, ``coro_a()`` is repeatedly awaited. Control never cedes to the
-event loop, which is why we see the output of all three ``coro_a()``
-invocations before ``coro_b()``'s output:
+Câu lệnh đầu tiên trong coroutine ``main()`` tạo ``task_b`` và lên lịch thực thi nó thông qua event loop. Sau đó, ``coro_a()`` được await lặp đi lặp lại. Quyền điều khiển không bao giờ được nhường cho event loop, đó là lý do chúng ta thấy đầu ra của cả ba lần gọi ``coro_a()`` trước đầu ra của ``coro_b()``:
 
 .. code-block:: none
 
@@ -322,12 +212,7 @@ invocations before ``coro_b()``'s output:
    I am coro_a(). Hi!
    I am coro_b(). I sure hope no one hogs the event loop...
 
-If we change ``await coro_a()`` to ``await asyncio.create_task(coro_a())``, the
-behavior changes.
-The coroutine ``main()`` cedes control to the event loop with that statement.
-The event loop then proceeds through its backlog of work, calling ``task_b``
-and then the task which wraps ``coro_a()`` before resuming the coroutine
-``main()``.
+Nếu chúng ta thay đổi ``await coro_a()`` thành ``await asyncio.create_task(coro_a())``, hành vi sẽ thay đổi. Với câu lệnh đó, coroutine ``main()`` nhường quyền điều khiển cho event loop. Sau đó, event loop tiếp tục xử lý các công việc đang chờ, gọi ``task_b`` rồi đến task bọc ``coro_a()`` trước khi tiếp tục chạy coroutine ``main()``.
 
 .. code-block:: none
 
@@ -336,46 +221,25 @@ and then the task which wraps ``coro_a()`` before resuming the coroutine
    I am coro_a(). Hi!
    I am coro_a(). Hi!
 
-This behavior of ``await coroutine`` can trip a lot of people up!
-That example highlights how using only ``await coroutine`` could
-unintentionally hog control from other tasks and effectively stall the event
-loop.
-:func:`asyncio.run` can help you detect such occurrences via the
-``debug=True`` flag, which enables
-:ref:`debug mode <asyncio-debug-mode>`.
-Among other things, it will log any coroutines that monopolize execution for
-100ms or longer.
+Hành vi này của ``await coroutine`` có thể khiến nhiều người bối rối! Ví dụ đó cho thấy việc chỉ sử dụng ``await coroutine`` có thể vô tình chiếm quyền điều khiển từ các task khác và thực tế làm event loop bị đình trệ.
+:func:`asyncio.run` có thể giúp bạn phát hiện những trường hợp như vậy thông qua cờ ``debug=True``, cờ này cho phép
+:ref:`chế độ debug <asyncio-debug-mode>`. Trong số những việc khác, nó sẽ ghi lại mọi coroutine chiếm quyền thực thi trong 100ms trở lên.
 
-The design intentionally trades off some conceptual clarity around usage of
-``await`` for improved performance.
-Each time a task is awaited, control needs to be passed all the way up the
-call stack to the event loop.
-That might sound minor, but in a large program with many ``await`` statements and a deep
-call stack, that overhead can add up to a meaningful performance drag.
+Thiết kế này cố ý đánh đổi một phần tính rõ ràng về mặt khái niệm khi sử dụng ``await`` để cải thiện hiệu suất. Mỗi khi một task được await, quyền điều khiển cần được truyền ngược lên toàn bộ call stack đến event loop. Điều đó có thể nghe có vẻ không đáng kể, nhưng trong một chương trình lớn với nhiều câu lệnh ``await`` và call stack sâu, phần overhead đó có thể tích tụ thành mức suy giảm hiệu suất đáng kể.
 
-------------------------------------------------
-A conceptual overview part 2: the nuts and bolts
-------------------------------------------------
+---------------------------------------------------
+Tổng quan khái niệm, phần 2: các chi tiết bên trong
+---------------------------------------------------
 
-Part 2 goes into detail on the mechanisms :mod:`!asyncio` uses to manage
-control flow.
-This is where the magic happens.
-You'll come away from this section knowing what ``await`` does behind the scenes
-and how to make your own asynchronous operators.
+Phần 2 đi sâu vào các cơ chế mà :mod:`!asyncio` sử dụng để quản lý control flow. Đây là nơi phép màu xảy ra. Sau khi hoàn thành phần này, bạn sẽ hiểu ``await`` thực hiện những gì ở phía sau và cách tạo các toán tử bất đồng bộ của riêng mình.
 
-================================
-The inner workings of coroutines
-================================
+========================================
+Cơ chế hoạt động bên trong của coroutine
+========================================
 
-:mod:`!asyncio` leverages four components to pass around control.
+:mod:`!asyncio` sử dụng bốn thành phần để truyền quyền điều khiển.
 
-:meth:`coroutine.send(arg) <generator.send>` is the method used to start or
-resume a coroutine.
-If the coroutine was paused and is now being resumed, the argument ``arg``
-will be sent in as the return value of the ``yield`` statement which originally
-paused it.
-If the coroutine is being used for the first time (as opposed to being resumed),
-``arg`` must be ``None``.
+:meth:`coroutine.send(arg) <generator.send>` là phương thức được dùng để bắt đầu hoặc tiếp tục một coroutine. Nếu coroutine đã bị tạm dừng và hiện đang được tiếp tục, đối số ``arg`` sẽ được truyền vào làm giá trị trả về của câu lệnh ``yield`` vốn đã tạm dừng coroutine đó. Nếu coroutine đang được sử dụng lần đầu tiên (thay vì được tiếp tục), ``arg`` phải là ``None``.
 
 .. code-block::
    :linenos:
@@ -405,23 +269,11 @@ If the coroutine is being used for the first time (as opposed to being resumed),
        returned_value = e.value
    print(f"Coroutine main() finished and provided value: {returned_value}.")
 
-:ref:`yield <yieldexpr>`, as usual, pauses execution and returns control
-to the caller.
-In the example above, the ``yield``, on line 3, is called by
-``... = await rock`` on line 11.
-More broadly speaking, ``await`` calls the :meth:`~object.__await__` method of
-the given object.
-``await`` also does one more very special thing: it propagates (or "passes
-along") any ``yield``\ s it receives up the call chain.
-In this case, that's back to ``... = coroutine.send(None)`` on line 16.
+:ref:`yield <yieldexpr>`, như thường lệ, tạm dừng quá trình thực thi và trả quyền điều khiển về cho bên gọi. Trong ví dụ trên, ``yield``, ở dòng 3, được gọi bởi ``... = await rock`` ở dòng 11. Nói rộng hơn, ``await`` gọi phương thức :meth:`~object.__await__` của đối tượng đã cho. ``await`` còn thực hiện thêm một việc rất đặc biệt: nó truyền (hay “chuyển tiếp”) mọi ``yield``\ s mà nó nhận được ngược lên chuỗi lời gọi. Trong trường hợp này, đó là quay lại ``... = coroutine.send(None)`` ở dòng 16.
 
-The coroutine is resumed via the ``coroutine.send(42)`` call on line 21.
-The coroutine picks back up from where it ``yield``\ ed (or paused) on line 3
-and executes the remaining statements in its body.
-When a coroutine finishes, it raises a :exc:`StopIteration` exception with the
-return value attached in the :attr:`~StopIteration.value` attribute.
+Coroutine được tiếp tục thông qua lời gọi ``coroutine.send(42)`` ở dòng 21. Coroutine tiếp tục từ nơi nó ``yield``\ ed (hoặc tạm dừng) ở dòng 3 và thực thi các câu lệnh còn lại trong thân của nó. Khi một coroutine kết thúc, nó phát sinh một ngoại lệ :exc:`StopIteration`, trong đó giá trị trả về được đính kèm trong thuộc tính :attr:`~StopIteration.value`.
 
-That snippet produces this output:
+Đoạn mã đó tạo ra kết quả sau:
 
 .. code-block:: none
 
@@ -433,69 +285,37 @@ That snippet produces this output:
    Coroutine received value: 42 from rock.
    Coroutine main() finished and provided value: 23.
 
-It's worth pausing for a moment here and making sure you followed the various
-ways that control flow and values were passed. A lot of important ideas were
-covered and it's worth ensuring your understanding is firm.
+Bạn nên tạm dừng một chút ở đây để bảo đảm rằng mình đã theo dõi được những cách khác nhau mà luồng điều khiển và các giá trị được truyền đi. Đã có nhiều ý quan trọng được đề cập, vì vậy bạn nên chắc chắn rằng mình đã nắm vững chúng.
 
-The only way to yield (or effectively cede control) from a coroutine is to
-``await`` an object that ``yield``\ s in its ``__await__`` method.
-That might sound odd to you. You might be thinking:
+Cách duy nhất để yield (hoặc thực chất là nhường quyền điều khiển) từ một coroutine là ``await`` một đối tượng ``yield``\ s trong phương thức ``__await__`` của nó. Điều này có thể khiến bạn thấy kỳ lạ. Có thể bạn đang nghĩ:
 
-   1. What about a ``yield`` directly within the coroutine function? The
-   coroutine function becomes an
-   :ref:`async generator function <asynchronous-generator-functions>`, a
-   different beast entirely.
+   1. Còn ``yield`` trực tiếp bên trong hàm coroutine thì sao? The
+   coroutine function trở thành một
+   :ref:`async generator function <asynchronous-generator-functions>`, hoàn toàn khác biệt.
 
-   2. What about a :ref:`yield from <yieldexpr>` within the coroutine function to a (plain)
-   generator?
-   That causes the error: ``SyntaxError: yield from not allowed in a coroutine.``
-   This was intentionally designed for the sake of simplicity -- mandating only
-   one way of using coroutines.
-   Initially ``yield`` was barred as well, but was re-accepted to allow for
-   async generators.
-   Despite that, ``yield from`` and ``await`` effectively do the same thing.
+   2. Còn :ref:`yield from <yieldexpr>` bên trong hàm coroutine để tạo ra một
+   generator thì sao? Điều đó gây ra lỗi: ``SyntaxError: yield from not allowed in a coroutine.`` Điều này được thiết kế có chủ ý để đơn giản hóa — chỉ yêu cầu một cách duy nhất để sử dụng coroutine. Ban đầu ``yield`` cũng bị cấm, nhưng sau đó được chấp nhận lại để cho phép async generator. Mặc dù vậy, ``yield from`` và ``await`` thực tế làm cùng một việc.
 
 =======
 Futures
 =======
 
-A :ref:`future <asyncio-future-obj>` is an object meant to represent a
-computation's status and result.
-The term is a nod to the idea of something still to come or not yet happened,
-and the object is a way to keep an eye on that something.
+Một :ref:`future <asyncio-future-obj>` là một đối tượng dùng để biểu diễn trạng thái và kết quả của một phép tính. Thuật ngữ này gợi đến ý tưởng về một điều vẫn sẽ xảy ra hoặc chưa xảy ra, còn đối tượng này là cách để theo dõi điều đó.
 
-A future has a few important attributes. One is its state, which can be either
-"pending", "cancelled", or "done".
-Another is its result, which is set when the state transitions to done.
-Unlike a coroutine, a future does not represent the actual computation to be
-done; instead, it represents the status and result of that computation, kind of
-like a status light (red, yellow, or green) or indicator.
+Một future có một số thuộc tính quan trọng. Một thuộc tính là trạng thái của nó, có thể là "pending", "cancelled" hoặc "done". Một thuộc tính khác là kết quả, được thiết lập khi trạng thái chuyển sang done. Không giống coroutine, future không biểu diễn phép tính thực sự cần được thực hiện; thay vào đó, nó biểu diễn trạng thái và kết quả của phép tính đó, gần giống như đèn trạng thái (đỏ, vàng hoặc xanh lục) hay đèn báo.
 
-:class:`asyncio.Task` subclasses :class:`asyncio.Future` in order to gain
-these various capabilities.
-The prior section said tasks store a list of callbacks, which wasn't entirely
-accurate.
-It's actually the ``Future`` class that implements this logic, which ``Task``
-inherits.
+:class:`asyncio.Task` kế thừa :class:`asyncio.Future` để có được nhiều khả năng khác nhau. Phần trước nói rằng task lưu trữ một danh sách callback, điều này không hoàn toàn chính xác. Thực ra, chính lớp ``Future`` triển khai logic này, và ``Task`` kế thừa lớp đó.
 
-Futures may also be used directly (not via tasks).
-Tasks mark themselves as done when their coroutine is complete.
-Futures are much more versatile and will be marked as done when you say so.
-In this way, they're the flexible interface for you to make your own conditions
-for waiting and resuming.
+Futures cũng có thể được sử dụng trực tiếp (không thông qua tasks). Tasks tự đánh dấu là đã hoàn tất khi coroutine của chúng hoàn thành. Futures linh hoạt hơn nhiều và sẽ được đánh dấu là đã hoàn tất khi bạn yêu cầu. Theo cách này, chúng là giao diện linh hoạt để bạn tự tạo các điều kiện chờ và tiếp tục thực thi.
 
 ========================
-A homemade asyncio.sleep
+Một asyncio.sleep tự tạo
 ========================
 
-We'll go through an example of how you could leverage a future to create your
-own variant of asynchronous sleep (``async_sleep``) which mimics
+Chúng ta sẽ xem qua một ví dụ về cách bạn có thể tận dụng một future để tạo biến thể riêng của thao tác sleep bất đồng bộ (``async_sleep``) mô phỏng
 :func:`asyncio.sleep`.
 
-This snippet registers a few tasks with the event loop and then awaits the task
-created by ``asyncio.create_task``, which wraps the ``async_sleep(3)`` coroutine.
-We want that task to finish only after three seconds have elapsed, but without
-preventing other tasks from running.
+Đoạn mã này đăng ký một vài task với event loop, sau đó await task được tạo bởi ``asyncio.create_task``, task này bao bọc coroutine ``async_sleep(3)``. Chúng ta muốn task đó chỉ hoàn tất sau khi ba giây trôi qua, nhưng không ngăn các task khác chạy.
 
 ::
 
@@ -503,8 +323,8 @@ preventing other tasks from running.
        print("I like work. Work work.")
 
    async def main():
-       # Add a few other tasks to the event loop, so there's something
-       # to do while asynchronously sleeping.
+       # Thêm một vài task khác vào event loop để có việc
+       # thực hiện trong khi đang sleep bất đồng bộ.
        work_tasks = [
            asyncio.create_task(other_work()),
            asyncio.create_task(other_work()),
@@ -519,48 +339,25 @@ preventing other tasks from running.
            "Done asynchronous sleep at time: "
            f"{datetime.datetime.now().strftime("%H:%M:%S")}."
        )
-       # asyncio.gather effectively awaits each task in the collection.
+       # asyncio.gather về cơ bản await từng task trong tập hợp.
        await asyncio.gather(*work_tasks)
 
 
-Below, we use a future to enable custom control over when that task will be
-marked as done.
-If :meth:`future.set_result() <asyncio.Future.set_result>` (the method
-responsible for marking that future as done) is never called, then this task
-will never finish.
-We've also enlisted the help of another task, which we'll see in a moment, that
-will monitor how much time has elapsed and, accordingly, call
-``future.set_result()``.
+Dưới đây, chúng ta sử dụng một future để cho phép kiểm soát tùy chỉnh thời điểm task đó được đánh dấu là đã hoàn tất. Nếu :meth:`future.set_result() <asyncio.Future.set_result>` (phương thức chịu trách nhiệm đánh dấu future đó là đã hoàn tất) không bao giờ được gọi, thì task này sẽ không bao giờ kết thúc. Chúng ta cũng nhờ đến sự hỗ trợ của một task khác, mà chúng ta sẽ xem ngay sau đây, để theo dõi thời gian đã trôi qua và từ đó gọi ``future.set_result()``.
 
 ::
 
    async def async_sleep(seconds: float):
        future = asyncio.Future()
        time_to_wake = time.time() + seconds
-       # Add the watcher-task to the event loop.
+       # Thêm watcher-task vào event loop.
        watcher_task = asyncio.create_task(_sleep_watcher(future, time_to_wake))
-       # Block until the future is marked as done.
+       # Chặn cho đến khi future được đánh dấu là đã hoàn tất.
        await future
 
-Below, we use a rather bare ``YieldToEventLoop()`` object to ``yield``
-from its ``__await__`` method, ceding control to the event loop.
-This is effectively the same as calling ``asyncio.sleep(0)``, but this approach
-offers more clarity, not to mention it's somewhat cheating to use
-``asyncio.sleep`` when showcasing how to implement it!
+Dưới đây, chúng ta sử dụng một đối tượng ``YieldToEventLoop()`` khá đơn giản để ``yield`` từ phương thức ``__await__`` của nó, nhường quyền điều khiển cho event loop. Cách này về cơ bản tương đương với việc gọi ``asyncio.sleep(0)``, nhưng cách tiếp cận này rõ ràng hơn, chưa kể việc sử dụng ``asyncio.sleep`` khi trình bày cách triển khai nó cũng có phần gian lận!
 
-As usual, the event loop cycles through its tasks, giving them control
-and receiving control back when they pause or finish.
-The ``watcher_task``, which runs the coroutine ``_sleep_watcher(...)``, will
-be invoked once per full cycle of the event loop.
-On each resumption, it'll check the time and if not enough has elapsed, then
-it'll pause once again and hand control back to the event loop.
-Once enough time has elapsed, ``_sleep_watcher(...)``
-marks the future as done and completes by exiting its
-infinite ``while`` loop.
-Given this helper task is only invoked once per cycle of the event loop,
-you'd be correct to note that this asynchronous sleep will sleep *at least*
-three seconds, rather than exactly three seconds.
-Note this is also true of ``asyncio.sleep``.
+Như thường lệ, event loop tuần tự xử lý các task, trao quyền điều khiển cho chúng và nhận lại quyền điều khiển khi chúng tạm dừng hoặc kết thúc. ``watcher_task``, chạy coroutine ``_sleep_watcher(...)``, sẽ được gọi một lần trong mỗi chu kỳ hoàn chỉnh của event loop. Mỗi khi được tiếp tục, nó sẽ kiểm tra thời gian; nếu chưa đủ thời gian trôi qua, nó sẽ lại tạm dừng và trả quyền điều khiển cho event loop. Khi đã đủ thời gian trôi qua, ``_sleep_watcher(...)`` đánh dấu future là đã hoàn tất và kết thúc bằng cách thoát khỏi vòng lặp ``while`` vô hạn. Vì task trợ giúp này chỉ được gọi một lần trong mỗi chu kỳ của event loop, bạn có thể nhận thấy rằng thao tác sleep bất đồng bộ này sẽ ngủ *ít nhất* ba giây, thay vì chính xác ba giây. Lưu ý rằng điều này cũng đúng với ``asyncio.sleep``.
 
 ::
 
@@ -571,13 +368,13 @@ Note this is also true of ``asyncio.sleep``.
    async def _sleep_watcher(future, time_to_wake):
        while True:
            if time.time() >= time_to_wake:
-               # This marks the future as done.
+               # Đánh dấu future là đã hoàn tất.
                future.set_result(None)
                break
            else:
                await YieldToEventLoop()
 
-Here is the full program's output:
+Đây là đầu ra của toàn bộ chương trình:
 
 .. code-block:: none
 
@@ -588,12 +385,7 @@ Here is the full program's output:
    I like work. Work work.
    Done asynchronous sleep at time: 14:52:25.
 
-You might feel this implementation of asynchronous sleep was unnecessarily
-convoluted.
-And, well, it was.
-The example was meant to showcase the versatility of futures with a simple
-example that could be mimicked for more complex needs.
-For reference, you could implement it without futures, like so::
+Bạn có thể cảm thấy cách triển khai sleep bất đồng bộ này quá rườm rà. Và đúng là như vậy. Ví dụ này nhằm minh họa tính linh hoạt của futures bằng một ví dụ đơn giản có thể được áp dụng tương tự cho những nhu cầu phức tạp hơn. Để tham khảo, bạn có thể triển khai nó mà không cần futures như sau::
 
    async def simpler_async_sleep(seconds):
        time_to_wake = time.time() + seconds
@@ -603,6 +395,9 @@ For reference, you could implement it without futures, like so::
            else:
                await YieldToEventLoop()
 
-But that's all for now. Hopefully you're ready to more confidently dive into
-some async programming or check out advanced topics in the
+Nhưng hiện tại chỉ đến đây thôi. Hy vọng bạn đã sẵn sàng hơn để tự tin tìm hiểu về lập trình bất đồng bộ hoặc khám phá các chủ đề nâng cao trong
 :mod:`rest of the documentation <asyncio>`.
+
+.. _`guide`: https://github.com/anordin95/a-conceptual-overview-of-asyncio/ tree/main
+.. _`YouTube tutorial series`: https://www.youtube.com/ watch?v=Xbl7XjFYsN4&list=PLhNSoGM2ik6SIkVGXWBwerucXjgP1rHmB
+.. _`500 Lines or Less: A Web Crawler With asyncio Coroutines`: https:// aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html

@@ -4,71 +4,52 @@
 
 .. _ipaddress-howto:
 
-***************************************
-An introduction to the ipaddress module
-***************************************
+******************************
+Giới thiệu về module ipaddress
+******************************
 
 :author: Peter Moody
 :author: Nick Coghlan
 
-.. topic:: Overview
+.. topic:: Tổng quan
 
-   This document aims to provide a gentle introduction to the
-   :mod:`ipaddress` module. It is aimed primarily at users that aren't
-   already familiar with IP networking terminology, but may also be useful
-   to network engineers wanting an overview of how :mod:`ipaddress`
-   represents IP network addressing concepts.
+   Tài liệu này nhằm cung cấp phần giới thiệu dễ hiểu về
+   :mod:`ipaddress` module. Tài liệu chủ yếu dành cho những người chưa quen với thuật ngữ mạng IP, nhưng cũng có thể hữu ích cho các kỹ sư mạng muốn có cái nhìn tổng quan về cách :mod:`ipaddress` biểu diễn các khái niệm địa chỉ mạng IP.
 
 
-Creating Address/Network/Interface objects
-==========================================
+Tạo các đối tượng Address/Network/Interface
+===========================================
 
-Since :mod:`ipaddress` is a module for inspecting and manipulating IP addresses,
-the first thing you'll want to do is create some objects.  You can use
-:mod:`ipaddress` to create objects from strings and integers.
-
-
-A Note on IP Versions
----------------------
-
-For readers that aren't particularly familiar with IP addressing, it's
-important to know that the Internet Protocol (IP) is currently in the process
-of moving from version 4 of the protocol to version 6. This transition is
-occurring largely because version 4 of the protocol doesn't provide enough
-addresses to handle the needs of the whole world, especially given the
-increasing number of devices with direct connections to the internet.
-
-Explaining the details of the differences between the two versions of the
-protocol is beyond the scope of this introduction, but readers need to at
-least be aware that these two versions exist, and it will sometimes be
-necessary to force the use of one version or the other.
+Vì :mod:`ipaddress` là một module dùng để kiểm tra và thao tác với các địa chỉ IP, việc đầu tiên bạn cần làm là tạo một số đối tượng. Bạn có thể sử dụng
+:mod:`ipaddress` để tạo các đối tượng từ chuỗi và số nguyên.
 
 
-IP Host Addresses
------------------
+Lưu ý về các phiên bản IP
+-------------------------
 
-Addresses, often referred to as "host addresses" are the most basic unit
-when working with IP addressing. The simplest way to create addresses is
-to use the :func:`ipaddress.ip_address` factory function, which automatically
-determines whether to create an IPv4 or IPv6 address based on the passed in
-value:
+Đối với những độc giả chưa thật sự quen thuộc với việc định địa chỉ IP, điều quan trọng cần biết là Internet Protocol (IP) hiện đang trong quá trình chuyển từ phiên bản 4 sang phiên bản 6. Quá trình chuyển đổi này chủ yếu diễn ra vì phiên bản 4 của giao thức không cung cấp đủ địa chỉ để đáp ứng nhu cầu của toàn thế giới, đặc biệt khi số lượng thiết bị có kết nối trực tiếp với internet ngày càng tăng.
+
+Việc giải thích chi tiết sự khác biệt giữa hai phiên bản của giao thức nằm ngoài phạm vi của phần giới thiệu này, nhưng độc giả ít nhất cần biết rằng có hai phiên bản này và đôi khi sẽ cần buộc sử dụng phiên bản này hoặc phiên bản kia.
+
+
+Địa chỉ máy chủ IP
+------------------
+
+Địa chỉ, thường được gọi là "địa chỉ máy chủ", là đơn vị cơ bản nhất khi làm việc với việc định địa chỉ IP. Cách đơn giản nhất để tạo địa chỉ là sử dụng hàm factory :func:`ipaddress.ip_address`, hàm này tự động xác định nên tạo địa chỉ IPv4 hay IPv6 dựa trên giá trị được truyền vào:
 
    >>> ipaddress.ip_address('192.0.2.1')
    IPv4Address('192.0.2.1')
    >>> ipaddress.ip_address('2001:DB8::1')
    IPv6Address('2001:db8::1')
 
-Addresses can also be created directly from integers. Values that will
-fit within 32 bits are assumed to be IPv4 addresses::
+Địa chỉ cũng có thể được tạo trực tiếp từ các số nguyên. Các giá trị vừa trong phạm vi 32 bit được mặc định là địa chỉ IPv4::
 
    >>> ipaddress.ip_address(3221225985)
    IPv4Address('192.0.2.1')
    >>> ipaddress.ip_address(42540766411282592856903984951653826561)
    IPv6Address('2001:db8::1')
 
-To force the use of IPv4 or IPv6 addresses, the relevant classes can be
-invoked directly. This is particularly useful to force creation of IPv6
-addresses for small integers::
+Để buộc sử dụng địa chỉ IPv4 hoặc IPv6, bạn có thể gọi trực tiếp các lớp tương ứng. Điều này đặc biệt hữu ích khi muốn buộc tạo địa chỉ IPv6 từ các số nguyên nhỏ::
 
    >>> ipaddress.ip_address(1)
    IPv4Address('0.0.0.1')
@@ -78,36 +59,22 @@ addresses for small integers::
    IPv6Address('::1')
 
 
-Defining Networks
------------------
+Định nghĩa mạng
+---------------
 
-Host addresses are usually grouped together into IP networks, so
-:mod:`ipaddress` provides a way to create, inspect and manipulate network
-definitions. IP network objects are constructed from strings that define the
-range of host addresses that are part of that network. The simplest form
-for that information is a "network address/network prefix" pair, where the
-prefix defines the number of leading bits that are compared to determine
-whether or not an address is part of the network and the network address
-defines the expected value of those bits.
+Các địa chỉ máy chủ thường được nhóm lại thành các mạng IP, vì vậy
+:mod:`ipaddress` cung cấp cách tạo, kiểm tra và thao tác với các định nghĩa mạng. Đối tượng mạng IP được xây dựng từ các chuỗi xác định phạm vi địa chỉ máy chủ thuộc mạng đó. Dạng đơn giản nhất của thông tin này là một cặp "địa chỉ mạng/prefix mạng", trong đó prefix xác định số bit đầu tiên được so sánh để xác định một địa chỉ có thuộc mạng hay không, còn địa chỉ mạng xác định giá trị mong đợi của các bit đó.
 
-As for addresses, a factory function is provided that determines the correct
-IP version automatically::
+Tương tự như với địa chỉ, một hàm factory được cung cấp để tự động xác định phiên bản IP phù hợp::
 
    >>> ipaddress.ip_network('192.0.2.0/24')
    IPv4Network('192.0.2.0/24')
    >>> ipaddress.ip_network('2001:db8::0/96')
    IPv6Network('2001:db8::/96')
 
-Network objects cannot have any host bits set.  The practical effect of this
-is that ``192.0.2.1/24`` does not describe a network.  Such definitions are
-referred to as interface objects since the ip-on-a-network notation is
-commonly used to describe network interfaces of a computer on a given network
-and are described further in the next section.
+Đối tượng mạng không thể có bất kỳ bit máy chủ nào được thiết lập. Hệ quả thực tế là ``192.0.2.1/24`` không mô tả một mạng. Những định nghĩa như vậy được gọi là đối tượng interface vì ký hiệu ip-on-a-network thường được dùng để mô tả các interface mạng của một máy tính trên một mạng nhất định; chúng sẽ được mô tả thêm trong phần tiếp theo.
 
-By default, attempting to create a network object with host bits set will
-result in :exc:`ValueError` being raised. To request that the
-additional bits instead be coerced to zero, the flag ``strict=False`` can
-be passed to the constructor::
+Theo mặc định, việc cố tạo một đối tượng network có các bit host được thiết lập sẽ khiến :exc:`ValueError` được phát sinh. Để yêu cầu các bit bổ sung thay vào đó được ép về 0, có thể truyền cờ ``strict=False`` cho constructor::
 
    >>> ipaddress.ip_network('192.0.2.1/24')
    Traceback (most recent call last):
@@ -116,51 +83,35 @@ be passed to the constructor::
    >>> ipaddress.ip_network('192.0.2.1/24', strict=False)
    IPv4Network('192.0.2.0/24')
 
-While the string form offers significantly more flexibility, networks can
-also be defined with integers, just like host addresses. In this case, the
-network is considered to contain only the single address identified by the
-integer, so the network prefix includes the entire network address::
+Mặc dù dạng chuỗi linh hoạt hơn đáng kể, network cũng có thể được định nghĩa bằng số nguyên, giống như địa chỉ host. Trong trường hợp này, network được xem là chỉ chứa một địa chỉ duy nhất được xác định bởi số nguyên đó, vì vậy tiền tố network bao gồm toàn bộ địa chỉ network::
 
    >>> ipaddress.ip_network(3221225984)
    IPv4Network('192.0.2.0/32')
    >>> ipaddress.ip_network(42540766411282592856903984951653826560)
    IPv6Network('2001:db8::/128')
 
-As with addresses, creation of a particular kind of network can be forced
-by calling the class constructor directly instead of using the factory
-function.
+Cũng như với các địa chỉ, có thể buộc tạo một loại network cụ thể bằng cách gọi trực tiếp constructor của class thay vì sử dụng factory function.
 
 
-Host Interfaces
----------------
+Giao diện Host
+--------------
 
-As mentioned just above, if you need to describe an address on a particular
-network, neither the address nor the network classes are sufficient.
-Notation like ``192.0.2.1/24`` is commonly used by network engineers and the
-people who write tools for firewalls and routers as shorthand for "the host
-``192.0.2.1`` on the network ``192.0.2.0/24``", Accordingly, :mod:`ipaddress`
-provides a set of hybrid classes that associate an address with a particular
-network. The interface for creation is identical to that for defining network
-objects, except that the address portion isn't constrained to being a network
-address.
+Như đã đề cập ngay trên, nếu cần mô tả một địa chỉ trên một network cụ thể thì cả class địa chỉ lẫn class network đều không đủ. Ký hiệu như ``192.0.2.1/24`` thường được các kỹ sư network và những người viết công cụ cho firewall và router sử dụng như cách viết tắt cho "host ``192.0.2.1`` trên network ``192.0.2.0/24``", Theo đó, :mod:`ipaddress` cung cấp một tập hợp các class kết hợp một địa chỉ với một network cụ thể. Giao diện để tạo đối tượng giống hệt giao diện dùng để định nghĩa các đối tượng network, ngoại trừ việc phần địa chỉ không bị giới hạn phải là một địa chỉ network.
 
    >>> ipaddress.ip_interface('192.0.2.1/24')
    IPv4Interface('192.0.2.1/24')
    >>> ipaddress.ip_interface('2001:db8::1/96')
    IPv6Interface('2001:db8::1/96')
 
-Integer inputs are accepted (as with networks), and use of a particular IP
-version can be forced by calling the relevant constructor directly.
+Có thể sử dụng đầu vào là số nguyên (tương tự như với network), và có thể buộc sử dụng một phiên bản IP cụ thể bằng cách gọi trực tiếp constructor tương ứng.
 
 
-Inspecting Address/Network/Interface Objects
-============================================
+Kiểm tra các đối tượng Address/Network/Interface
+================================================
 
-You've gone to the trouble of creating an IPv(4|6)(Address|Network|Interface)
-object, so you probably want to get information about it.  :mod:`ipaddress`
-tries to make doing this easy and intuitive.
+Bạn đã mất công tạo một đối tượng IPv(4|6)(Address|Network|Interface), vì vậy có lẽ bạn muốn lấy thông tin về đối tượng đó. :mod:`ipaddress` cố gắng giúp việc này trở nên dễ dàng và trực quan.
 
-Extracting the IP version::
+Trích xuất phiên bản IP::
 
    >>> addr4 = ipaddress.ip_address('192.0.2.1')
    >>> addr6 = ipaddress.ip_address('2001:db8::1')
@@ -169,7 +120,7 @@ Extracting the IP version::
    >>> addr4.version
    4
 
-Obtaining the network from an interface::
+Lấy network từ một interface::
 
    >>> host4 = ipaddress.ip_interface('192.0.2.1/24')
    >>> host4.network
@@ -178,7 +129,7 @@ Obtaining the network from an interface::
    >>> host6.network
    IPv6Network('2001:db8::/96')
 
-Finding out how many individual addresses are in a network::
+Tìm số lượng địa chỉ riêng lẻ trong một network::
 
    >>> net4 = ipaddress.ip_network('192.0.2.0/24')
    >>> net4.num_addresses
@@ -187,7 +138,7 @@ Finding out how many individual addresses are in a network::
    >>> net6.num_addresses
    4294967296
 
-Iterating through the "usable" addresses on a network::
+Duyệt qua các địa chỉ "có thể sử dụng" trên một network::
 
    >>> net4 = ipaddress.ip_network('192.0.2.0/24')
    >>> for x in net4.hosts():
@@ -202,8 +153,7 @@ Iterating through the "usable" addresses on a network::
    192.0.2.254
 
 
-Obtaining the netmask (i.e. set bits corresponding to the network prefix) or
-the hostmask (any bits that are not part of the netmask):
+Lấy netmask (tức là các bit được thiết lập tương ứng với network prefix) hoặc hostmask (bất kỳ bit nào không thuộc netmask):
 
    >>> net4 = ipaddress.ip_network('192.0.2.0/24')
    >>> net4.netmask
@@ -217,7 +167,7 @@ the hostmask (any bits that are not part of the netmask):
    IPv6Address('::ffff:ffff')
 
 
-Exploding or compressing the address::
+Mở rộng hoặc nén địa chỉ::
 
    >>> addr6.exploded
    '2001:0db8:0000:0000:0000:0000:0000:0001'
@@ -228,17 +178,13 @@ Exploding or compressing the address::
    >>> net6.compressed
    '2001:db8::/96'
 
-While IPv4 doesn't support explosion or compression, the associated objects
-still provide the relevant properties so that version neutral code can
-easily ensure the most concise or most verbose form is used for IPv6
-addresses while still correctly handling IPv4 addresses.
+Mặc dù IPv4 không hỗ trợ việc mở rộng hoặc nén, các đối tượng liên quan vẫn cung cấp những thuộc tính tương ứng để code không phụ thuộc phiên bản có thể dễ dàng bảo đảm sử dụng dạng ngắn gọn nhất hoặc đầy đủ nhất cho các địa chỉ IPv6, đồng thời vẫn xử lý chính xác các địa chỉ IPv4.
 
 
-Networks as lists of Addresses
-==============================
+Mạng dưới dạng danh sách Address
+================================
 
-It's sometimes useful to treat networks as lists.  This means it is possible
-to index them like this::
+Đôi khi việc xem các mạng như những danh sách rất hữu ích. Điều này cho phép lập chỉ mục cho chúng như sau::
 
    >>> net4[1]
    IPv4Address('192.0.2.1')
@@ -250,13 +196,12 @@ to index them like this::
    IPv6Address('2001:db8::ffff:ffff')
 
 
-It also means that network objects lend themselves to using the list
-membership test syntax like this::
+Điều này cũng có nghĩa là các đối tượng mạng phù hợp với việc sử dụng cú pháp kiểm tra phần tử trong danh sách như sau::
 
    if address in network:
-       # do something
+       # thực hiện thao tác gì đó
 
-Containment testing is done efficiently based on the network prefix::
+Việc kiểm tra bao hàm được thực hiện hiệu quả dựa trên network prefix::
 
    >>> addr4 = ipaddress.ip_address('192.0.2.1')
    >>> addr4 in ipaddress.ip_network('192.0.2.0/24')
@@ -265,25 +210,21 @@ Containment testing is done efficiently based on the network prefix::
    False
 
 
-Comparisons
-===========
+So sánh
+=======
 
-:mod:`ipaddress` provides some simple, hopefully intuitive ways to compare
-objects, where it makes sense::
+:mod:`ipaddress` cung cấp một số cách đơn giản, hy vọng là trực quan, để so sánh các đối tượng khi điều đó hợp lý::
 
    >>> ipaddress.ip_address('192.0.2.1') < ipaddress.ip_address('192.0.2.2')
    True
 
-A :exc:`TypeError` exception is raised if you try to compare objects of
-different versions or different types.
+Một ngoại lệ :exc:`TypeError` sẽ được phát sinh nếu bạn cố so sánh các đối tượng thuộc các phiên bản khác nhau hoặc có kiểu khác nhau.
 
 
-Using IP Addresses with other modules
-=====================================
+Sử dụng địa chỉ IP với các mô-đun khác
+======================================
 
-Other modules that use IP addresses (such as :mod:`socket`) usually won't
-accept objects from this module directly. Instead, they must be coerced to
-an integer or string that the other module will accept::
+Các mô-đun khác sử dụng địa chỉ IP (chẳng hạn như :mod:`socket`) thường không chấp nhận trực tiếp các đối tượng từ mô-đun này. Thay vào đó, chúng phải được chuyển đổi thành một số nguyên hoặc chuỗi mà mô-đun kia chấp nhận::
 
    >>> addr4 = ipaddress.ip_address('192.0.2.1')
    >>> str(addr4)
@@ -292,24 +233,16 @@ an integer or string that the other module will accept::
    3221225985
 
 
-Getting more detail when instance creation fails
-================================================
+Nhận thêm thông tin chi tiết khi tạo thực thể không thành công
+==============================================================
 
-When creating address/network/interface objects using the version-agnostic
-factory functions, any errors will be reported as :exc:`ValueError` with
-a generic error message that simply says the passed in value was not
-recognized as an object of that type. The lack of a specific error is
-because it's necessary to know whether the value is *supposed* to be IPv4
-or IPv6 in order to provide more detail on why it has been rejected.
+Khi tạo các đối tượng địa chỉ/mạng/giao diện bằng các hàm factory không phụ thuộc phiên bản, mọi lỗi sẽ được báo cáo dưới dạng :exc:`ValueError` với thông báo lỗi chung, chỉ cho biết rằng giá trị được truyền vào không được nhận dạng là một đối tượng thuộc kiểu đó. Việc không có lỗi cụ thể là vì cần biết liệu giá trị đó có *supposed* là IPv4 hay IPv6 thì mới có thể cung cấp thêm chi tiết về lý do giá trị đó bị từ chối.
 
-To support use cases where it is useful to have access to this additional
-detail, the individual class constructors actually raise the
-:exc:`ValueError` subclasses :exc:`ipaddress.AddressValueError` and
-:exc:`ipaddress.NetmaskValueError` to indicate exactly which part of
-the definition failed to parse correctly.
+Để hỗ trợ các trường hợp sử dụng cần truy cập vào thông tin chi tiết bổ sung này, các hàm khởi tạo của từng lớp thực sự sẽ raise
+:exc:`ValueError` là lớp con của :exc:`ipaddress.AddressValueError` và
+:exc:`ipaddress.NetmaskValueError` để chỉ ra chính xác phần nào trong định nghĩa không thể được phân tích cú pháp chính xác.
 
-The error messages are significantly more detailed when using the
-class constructors directly. For example::
+Các thông báo lỗi sẽ chi tiết hơn đáng kể khi sử dụng trực tiếp các hàm khởi tạo của lớp. Ví dụ::
 
    >>> ipaddress.ip_address("192.168.0.256")
    Traceback (most recent call last):
@@ -329,9 +262,7 @@ class constructors directly. For example::
      ...
    ipaddress.NetmaskValueError: '64' is not a valid netmask
 
-However, both of the module specific exceptions have :exc:`ValueError` as their
-parent class, so if you're not concerned with the particular type of error,
-you can still write code like the following::
+Tuy nhiên, cả hai exception dành riêng cho module đều có :exc:`ValueError` làm lớp cha, vì vậy nếu bạn không quan tâm đến loại lỗi cụ thể, bạn vẫn có thể viết mã như sau::
 
    try:
        network = ipaddress.IPv4Network(address)

@@ -1,293 +1,178 @@
 .. _freethreading-python-howto:
 
-*********************************
-Python support for free threading
-*********************************
+**********************************
+Hỗ trợ free threading trong Python
+**********************************
 
-Starting with the 3.13 release, CPython has support for a build of
-Python called :term:`free threading` where the :term:`global interpreter lock`
-(GIL) is disabled.  Free-threaded execution allows for full utilization of the
-available processing power by running threads in parallel on available CPU cores.
-While not all software will benefit from this automatically, programs
-designed with threading in mind will run faster on multi-core hardware.
+Bắt đầu từ bản phát hành 3.13, CPython hỗ trợ một bản build Python có tên là :term:`free threading` trong đó :term:`global interpreter lock` (GIL) bị vô hiệu hóa.  Việc thực thi free-threaded cho phép tận dụng toàn bộ năng lực xử lý hiện có bằng cách chạy các thread song song trên các lõi CPU khả dụng. Mặc dù không phải mọi phần mềm đều tự động hưởng lợi từ điều này, các chương trình được thiết kế có tính đến threading sẽ chạy nhanh hơn trên phần cứng đa lõi.
 
-Some third-party packages, in particular ones
-with an :term:`extension module`, may not be ready for use in a
-free-threaded build, and will re-enable the :term:`GIL`.
+Một số package bên thứ ba, đặc biệt là những package có :term:`extension module`, có thể chưa sẵn sàng để sử dụng trong bản build free-threaded và sẽ bật lại :term:`GIL`.
 
-This document describes the implications of free threading
-for Python code.  See :ref:`freethreading-extensions-howto` for information on
-how to write C extensions that support the free-threaded build.
+Tài liệu này mô tả những tác động của free threading đối với mã Python.  Xem :ref:`freethreading-extensions-howto` để biết thông tin về cách viết các phần mở rộng C hỗ trợ bản build free-threaded.
 
 .. seealso::
 
-   :pep:`703` – Making the Global Interpreter Lock Optional in CPython for an
-   overall description of free-threaded Python.
+   :pep:`703` – Mô tả tổng quan về việc làm cho Global Interpreter Lock trở thành tùy chọn trong CPython.
 
 
-Installation
-============
+Cài đặt
+=======
 
-Starting with Python 3.13, the official macOS and Windows installers
-optionally support installing free-threaded Python binaries.  The installers
-are available at https://www.python.org/downloads/.
+Bắt đầu từ Python 3.13, các trình cài đặt chính thức cho macOS và Windows tùy chọn hỗ trợ cài đặt các binary Python free-threaded.  Các trình cài đặt có tại https://www.python.org/downloads/.
 
-For information on other platforms, see the `Installing a Free-Threaded Python
-<https://py-free-threading.github.io/installing-cpython/>`_, a
-community-maintained installation guide for installing free-threaded Python.
+Để biết thông tin về các nền tảng khác, hãy xem `Hướng dẫn cài đặt Python không GIL <https://py-free-threading.github.io/installing-cpython/>`_, một hướng dẫn cài đặt Python không GIL do cộng đồng duy trì.
 
-When building CPython from source, the :option:`--disable-gil` configure option
-should be used to build a free-threaded Python interpreter.
+Khi xây dựng CPython từ mã nguồn, nên sử dụng tùy chọn cấu hình :option:`--disable-gil` để xây dựng một trình thông dịch Python không GIL.
 
 
-Identifying free-threaded Python
-================================
+Xác định Python không GIL
+=========================
 
-To check if the current interpreter supports free-threading, :option:`python -VV <-V>`
-and :data:`sys.version` contain "free-threading build".
-The new :func:`sys._is_gil_enabled` function can be used to check whether
-the GIL is actually disabled in the running process.
+Để kiểm tra xem trình thông dịch hiện tại có hỗ trợ free-threading hay không, :option:`python -VV <-V>` và :data:`sys.version` chứa "free-threading build". Có thể sử dụng hàm :func:`sys._is_gil_enabled` mới để kiểm tra xem GIL có thực sự bị vô hiệu hóa trong tiến trình đang chạy hay không.
 
-The ``sysconfig.get_config_var("Py_GIL_DISABLED")`` configuration variable can
-be used to determine whether the build supports free threading.  If the variable
-is set to ``1``, then the build supports free threading.  This is the recommended
-mechanism for decisions related to the build configuration.
+Có thể sử dụng biến cấu hình ``sysconfig.get_config_var("Py_GIL_DISABLED")`` để xác định liệu bản build có hỗ trợ free threading hay không. Nếu biến này được đặt thành ``1``, thì bản build hỗ trợ free threading. Đây là cơ chế được khuyến nghị để đưa ra các quyết định liên quan đến cấu hình bản build.
 
 
-The global interpreter lock in free-threaded Python
-===================================================
+Global interpreter lock trong Python không GIL
+==============================================
 
-Free-threaded builds of CPython support optionally running with the GIL enabled
-at runtime using the environment variable :envvar:`PYTHON_GIL` or
-the command-line option :option:`-X gil`.
+Các bản build không GIL của CPython hỗ trợ tùy chọn chạy với GIL được bật tại runtime bằng biến môi trường :envvar:`PYTHON_GIL` hoặc tùy chọn dòng lệnh :option:`-X gil`.
 
-The GIL may also automatically be enabled when importing a C-API extension
-module that is not explicitly marked as supporting free threading.  A warning
-will be printed in this case.
+GIL cũng có thể được tự động bật khi import một extension module C-API không được đánh dấu rõ ràng là hỗ trợ free threading. Trong trường hợp này, một cảnh báo sẽ được in ra.
 
-In addition to individual package documentation, the following websites track
-the status of popular packages support for free threading:
+Ngoài tài liệu của từng package, các website sau đây theo dõi trạng thái hỗ trợ free threading của các package phổ biến:
 
 * https://py-free-threading.github.io/tracking/
 * https://hugovk.github.io/free-threaded-wheels/
 
 
-Thread safety
-=============
+Tính an toàn luồng
+==================
 
-The free-threaded build of CPython aims to provide similar thread-safety
-behavior at the Python level to the default GIL-enabled build.  Built-in
-types like :class:`dict`, :class:`list`, and :class:`set` use internal locks
-to protect against concurrent modifications in ways that behave similarly to
-the GIL.  See :ref:`threadsafety` for the guarantees provided by built-in types.
+Bản build free-threaded của CPython hướng đến việc cung cấp hành vi an toàn luồng ở cấp độ Python tương tự bản build mặc định có bật GIL. Các kiểu tích hợp như :class:`dict`, :class:`list` và :class:`set` sử dụng các khóa nội bộ để bảo vệ khỏi những sửa đổi đồng thời theo cách tương tự GIL. Xem :ref:`threadsafety` để biết các đảm bảo do các kiểu tích hợp cung cấp.
 
 .. note::
 
-   It's recommended to use the :class:`threading.Lock` or other synchronization
-   primitives instead of relying on the internal locks of built-in types, when
-   possible.
+   Bạn nên sử dụng :class:`threading.Lock` hoặc các primitive đồng bộ hóa khác thay vì dựa vào các khóa nội bộ của kiểu tích hợp, nếu có thể.
 
 
-Known limitations
-=================
+Các hạn chế đã biết
+===================
 
-This section describes known limitations of the free-threaded CPython build.
+Phần này mô tả các hạn chế đã biết của bản build free-threaded CPython.
 
-Immortalization
+Bất tử hóa
+----------
+
+Trong bản build free-threaded, một số đối tượng được :term:`immortal`. Các đối tượng bất tử không bị giải phóng và có số lượng tham chiếu không bao giờ bị thay đổi. Điều này nhằm tránh tranh chấp số lượng tham chiếu, vốn sẽ ngăn cản việc mở rộng hiệu quả khi chạy đa luồng.
+
+Kể từ bản phát hành 3.14, việc bất tử hóa chỉ giới hạn ở:
+
+* Các hằng số mã: các literal số, literal chuỗi và literal tuple được tạo thành từ các hằng số khác.
+* Các chuỗi được intern bởi :func:`sys.intern`.
+
+
+Đối tượng frame
 ---------------
 
-In the free-threaded build, some objects are :term:`immortal`.
-Immortal objects are not deallocated and have reference counts that are
-never modified.  This is done to avoid reference count contention that would
-prevent efficient multi-threaded scaling.
-
-As of the 3.14 release, immortalization is limited to:
-
-* Code constants: numeric literals, string literals, and tuple literals
-  composed of other constants.
-* Strings interned by :func:`sys.intern`.
+Không an toàn khi truy cập :attr:`frame.f_locals` từ một đối tượng :ref:`frame <frame-objects>` nếu frame đó hiện đang được thực thi trong một thread khác; việc này có thể làm trình thông dịch bị crash.
 
 
-Frame objects
+Iterator
+--------
+
+Nhìn chung, việc truy cập cùng một đối tượng iterator từ nhiều thread đồng thời là không an toàn với thread, và các thread có thể thấy các phần tử bị trùng lặp hoặc bị thiếu.
+
+
+Hiệu năng đơn thread
+--------------------
+
+Bản build free-threaded có thêm overhead khi thực thi mã Python so với bản build mặc định có bật GIL. Mức overhead phụ thuộc vào workload và phần cứng. Trên bộ benchmark pyperformance, overhead trung bình dao động từ khoảng 1% trên macOS aarch64 đến 8% trên các hệ thống Linux x86-64.
+
+
+Các thay đổi về hành vi
+=======================
+
+Phần này mô tả các thay đổi về hành vi của CPython với bản build free-threaded.
+
+
+Biến ngữ cảnh
 -------------
 
-It is not safe to access :attr:`frame.f_locals` from a :ref:`frame <frame-objects>`
-object if that frame is currently executing in another thread, and doing so may
-crash the interpreter.
+Trong bản dựng free-threaded, cờ :data:`~sys.flags.thread_inherit_context` được đặt thành true theo mặc định, khiến các thread được tạo bằng
+:class:`threading.Thread` bắt đầu với một bản sao của
+:class:`~contextvars.Context()` của bên gọi
+:meth:`~threading.Thread.start`.  Trong bản dựng bật GIL mặc định, cờ này mặc định là false, vì vậy các thread bắt đầu với một :class:`~contextvars.Context()` trống.
 
 
-Iterators
----------
-
-It is generally not thread-safe to access the same iterator object from
-multiple threads concurrently, and threads may see duplicate or missing
-elements.
-
-
-Single-threaded performance
----------------------------
-
-The free-threaded build has additional overhead when executing Python code
-compared to the default GIL-enabled build.  The amount of overhead depends
-on the workload and hardware.  On the pyperformance benchmark suite, the
-average overhead ranges from about 1% on macOS aarch64 to 8% on x86-64 Linux
-systems.
-
-
-Behavioral changes
-==================
-
-This section describes CPython behavioural changes with the free-threaded
-build.
-
-
-Context variables
------------------
-
-In the free-threaded build, the flag :data:`~sys.flags.thread_inherit_context`
-is set to true by default which causes threads created with
-:class:`threading.Thread` to start with a copy of the
-:class:`~contextvars.Context()` of the caller of
-:meth:`~threading.Thread.start`.  In the default GIL-enabled build, the flag
-defaults to false so threads start with an
-empty :class:`~contextvars.Context()`.
-
-
-Warning filters
+Bộ lọc cảnh báo
 ---------------
 
-In the free-threaded build, the flag :data:`~sys.flags.context_aware_warnings`
-is set to true by default.  In the default GIL-enabled build, the flag defaults
-to false.  If the flag is true then the :class:`warnings.catch_warnings`
-context manager uses a context variable for warning filters.  If the flag is
-false then :class:`~warnings.catch_warnings` modifies the global filters list,
-which is not thread-safe.  See the :mod:`warnings` module for more details.
+Trong bản dựng free-threaded, cờ :data:`~sys.flags.context_aware_warnings` được đặt thành true theo mặc định.  Trong bản dựng bật GIL mặc định, cờ này mặc định là false.  Nếu cờ là true thì context manager :class:`warnings.catch_warnings` sử dụng một biến context cho các bộ lọc cảnh báo.  Nếu cờ là false thì :class:`~warnings.catch_warnings` sửa đổi danh sách bộ lọc toàn cục, vốn không an toàn khi sử dụng với nhiều thread.  Xem module :mod:`warnings` để biết thêm chi tiết.
 
 
-Increased memory usage
-----------------------
+Mức sử dụng bộ nhớ tăng
+-----------------------
 
-The free-threaded build will typically use more memory compared to the default
-build.  There are multiple reasons for this, mostly due to design decisions.
-
-
-All interned strings are immortal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For modern Python versions (since version 2.3), interning a string (e.g. with
-:func:`sys.intern`) does not cause it to become immortal.  Instead, if the last
-reference to that string disappears, it will be removed from the interned
-string table.  This is not the case for the free-threaded build and any interned
-string will become immortal, surviving until interpreter shutdown.
+Bản dựng free-threaded thường sẽ sử dụng nhiều bộ nhớ hơn so với bản dựng mặc định. Có nhiều lý do cho điều này, phần lớn bắt nguồn từ các quyết định thiết kế.
 
 
-Non-GC objects have a larger object header
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The free-threaded build uses a different :c:type:`PyObject` structure.  Instead
-of having the GC related information allocated before the :c:type:`PyObject`
-structure, like in the default build, the GC related info is part of the normal
-object header.  For example, on the AMD64 platform, ``None`` uses 32 bytes on
-the free-threaded build vs 16 bytes for the default build.  GC objects (such as
-dicts and lists) are the same size for both builds since the free-threaded
-build does not use additional space for the GC info.
-
-
-QSBR can delay freeing of memory
+Tất cả chuỗi interned đều bất tử
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In order to safely implement lock-free data structures, a safe memory
-reclamation (SMR) scheme is used, known as quiescent state-based reclamation
-(QSBR).  This means that the memory backing data structures allowing lock-free
-access will use QSBR, which defers the free operation, rather than immediately
-freeing the memory.  Two examples of these data structures are the list object
-and the dictionary keys object.  See ``InternalDocs/qsbr.md`` in the CPython
-source tree for more details on how QSBR is implemented.  Running
-:func:`gc.collect` should cause all memory being held by QSBR to be actually
-freed.  Note that even when QSBR frees the memory, the underlying memory
-allocator may not immediately return that memory to the OS and so the resident
-set size (RSS) of the process might not decrease.
+Đối với các phiên bản Python hiện đại (kể từ phiên bản 2.3), việc intern một chuỗi (ví dụ bằng
+:func:`sys.intern`) không khiến chuỗi đó trở thành bất tử. Thay vào đó, nếu tham chiếu cuối cùng đến chuỗi đó biến mất, chuỗi sẽ bị xóa khỏi bảng chuỗi interned. Điều này không đúng với bản dựng free-threaded và mọi chuỗi interned sẽ trở thành bất tử, tồn tại cho đến khi trình thông dịch tắt.
 
 
-mimalloc allocator vs pymalloc
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng không thuộc GC có phần header đối tượng lớn hơn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default build will normally use the "pymalloc" memory allocator for small
-allocations (512 bytes or smaller).  The free-threaded build does not use
-pymalloc and allocates all Python objects using the "mimalloc" allocator.  The
-pymalloc allocator has the following properties that help keep memory usage
-low: small per-allocated-block overhead, effective memory fragmentation
-prevention, and quick return of free memory to the operating system.  The
-mimalloc allocator does quite well in these respects as well but can have some
-more overhead.
-
-In the free-threaded build, mimalloc manages memory in a number of separate
-heaps (currently four).  For example, all GC supporting objects are allocated
-from their own heap.  Using separate heaps means that free memory in one heap
-cannot be used for an allocation that uses another heap.  Also, some heaps are
-configured to use QSBR (quiescent-state based reclamation) when freeing the
-memory that backs up the heap (known as "pages" in mimalloc terminology).  The
-use of QSBR creates a delay between all memory blocks for a page being freed
-and the memory page being released, either for new allocations or back to the
-OS.
-
-The mimalloc allocator also defers returning freed memory back to the OS.  You
-can reduce that delay by setting the environment variable
-:envvar:`!MIMALLOC_PURGE_DELAY` to ``0``.  Note that this will likely reduce
-the performance of the allocator.
+Bản dựng free-threaded sử dụng cấu trúc :c:type:`PyObject` khác. Thay vì có thông tin liên quan đến GC được cấp phát trước cấu trúc :c:type:`PyObject` như trong bản dựng mặc định, thông tin liên quan đến GC là một phần của header đối tượng thông thường. Ví dụ, trên nền tảng AMD64, ``None`` sử dụng 32 byte trong bản dựng free-threaded, so với 16 byte trong bản dựng mặc định. Các đối tượng GC (chẳng hạn như dict và list) có cùng kích thước trong cả hai bản dựng, vì bản dựng free-threaded không sử dụng thêm không gian cho thông tin GC.
 
 
-Free-threaded reference counting can cause objects to live longer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+QSBR có thể trì hoãn việc giải phóng bộ nhớ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In the default build, when an object's reference count reaches zero, it is
-normally deallocated.  The free-threaded build uses "biased reference
-counting", with a fast-path for objects "owned" by the current thread and a
-slow path for other objects.  See :pep:`703` for additional details.  Any time
-an object's reference count ends up in a "queued" state, deallocation can be
-deferred.  The queued state is cleared from the "eval breaker" section of the
-bytecode evaluator.
-
-The free-threaded build also allows a different mode of reference counting,
-known as "deferred reference counting".  This mode is enabled by setting a flag
-on a per-object basis.  Deferred reference counting is enabled for the
-following types:
-
-* module objects
-* module top-level functions
-* class methods defined in the class scope
-* descriptor objects
-* thread-local objects, created by :class:`threading.local`
-
-When deferred reference counting is enabled, references from Python function
-stacks are not added to the reference count.  This scheme reduces the overhead
-of reference counting, especially for objects used from multiple threads.
-Because the stack references are not counted, objects with deferred reference
-counting are not immediately freed when their internal reference count goes to
-zero.  Instead, they are examined by the next GC run and, if no stack
-references to them are found, they are freed.  This means these objects are
-freed by the GC and not when their reference count goes to zero, as is typical.
+Để triển khai an toàn các cấu trúc dữ liệu không khóa, một lược đồ thu hồi bộ nhớ an toàn (safe memory reclamation - SMR) được sử dụng, được gọi là thu hồi dựa trên trạng thái ổn định (quiescent state-based reclamation - QSBR). Điều này có nghĩa là bộ nhớ hỗ trợ các cấu trúc dữ liệu cho phép truy cập không khóa sẽ sử dụng QSBR, trì hoãn thao tác giải phóng thay vì giải phóng bộ nhớ ngay lập tức. Hai ví dụ về các cấu trúc dữ liệu này là đối tượng list và đối tượng dictionary keys. Xem ``InternalDocs/qsbr.md`` trong cây mã nguồn CPython để biết thêm chi tiết về cách QSBR được triển khai. Đang chạy
+:func:`gc.collect` sẽ khiến toàn bộ bộ nhớ đang được QSBR giữ thực sự được giải phóng. Lưu ý rằng ngay cả khi QSBR giải phóng bộ nhớ, bộ cấp phát bộ nhớ bên dưới có thể không ngay lập tức trả lại bộ nhớ đó cho hệ điều hành, vì vậy kích thước tập thường trú (RSS) của tiến trình có thể không giảm.
 
 
-Per-thread reference counting can delay freeing objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+bộ cấp phát mimalloc so với pymalloc
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To avoid contention on the reference count fields of frequently shared
-objects, the free-threaded build also uses "per-thread reference counting"
-for a few selected object types.  Rather than updating a single shared
-reference count, each thread maintains its own local reference count array,
-indexed by a unique id assigned to the object.  The true reference count is
-only computed by summing the per-thread counts when the object's local
-count drops to zero.  Per-thread reference counting is currently used for:
+Bản build mặc định thường sử dụng bộ cấp phát bộ nhớ "pymalloc" cho các lần cấp phát nhỏ (512 byte trở xuống). Bản build free-threaded không sử dụng pymalloc và cấp phát tất cả đối tượng Python bằng bộ cấp phát "mimalloc". Bộ cấp phát pymalloc có các đặc tính sau giúp duy trì mức sử dụng bộ nhớ thấp: chi phí phụ trên mỗi khối được cấp phát thấp, ngăn phân mảnh bộ nhớ hiệu quả và nhanh chóng trả lại bộ nhớ trống cho hệ điều hành. Bộ cấp phát mimalloc cũng hoạt động khá tốt ở những khía cạnh này, nhưng có thể có thêm một phần chi phí phụ.
 
-* heap type objects (classes created in Python)
-* code objects
-* the ``__dict__`` of module objects
+Trong bản build free-threaded, mimalloc quản lý bộ nhớ trong một số heap riêng biệt (hiện tại là bốn). Ví dụ, tất cả đối tượng hỗ trợ GC được cấp phát từ heap riêng của chúng. Việc sử dụng các heap riêng biệt có nghĩa là bộ nhớ trống trong một heap không thể được dùng cho một lần cấp phát sử dụng heap khác. Ngoài ra, một số heap được cấu hình để sử dụng QSBR (thu hồi dựa trên trạng thái ổn định) khi giải phóng bộ nhớ hỗ trợ heap đó (được gọi là "pages" trong thuật ngữ của mimalloc). Việc sử dụng QSBR tạo ra độ trễ giữa thời điểm tất cả khối bộ nhớ của một page được giải phóng và thời điểm page bộ nhớ được giải phóng để dùng cho các lần cấp phát mới hoặc trả lại cho hệ điều hành.
 
-Because the per-thread counts must be merged back to the object before it
-can be deallocated, objects using per-thread reference counting are
-typically freed later than they would be in the default build.  In
-particular, such an object is usually not freed until the thread that
-referenced it reaches a safe point (for example, in the "eval breaker"
-section of the bytecode evaluator) or exits.  Running :func:`gc.collect`
-will merge the per-thread counts and allow these objects to be freed.
+Bộ cấp phát mimalloc cũng trì hoãn việc trả lại bộ nhớ đã giải phóng cho hệ điều hành. Bạn có thể giảm độ trễ đó bằng cách đặt biến môi trường
+:envvar:`!MIMALLOC_PURGE_DELAY` thành ``0``. Lưu ý rằng điều này có thể làm giảm hiệu suất của bộ cấp phát.
+
+
+Đếm tham chiếu không khóa có thể khiến các đối tượng tồn tại lâu hơn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Trong bản dựng mặc định, khi số lượng tham chiếu của một đối tượng về 0, đối tượng đó thường được giải phóng. Bản dựng không khóa sử dụng "biased reference counting", với đường đi nhanh cho các đối tượng được luồng hiện tại "sở hữu" và đường đi chậm cho các đối tượng khác. Xem :pep:`703` để biết thêm chi tiết. Bất cứ khi nào số lượng tham chiếu của một đối tượng kết thúc ở trạng thái "queued", việc giải phóng có thể bị trì hoãn. Trạng thái queued được xóa khỏi phần "eval breaker" của trình đánh giá bytecode.
+
+Bản dựng không khóa cũng cho phép một chế độ đếm tham chiếu khác, được gọi là "deferred reference counting". Chế độ này được bật bằng cách thiết lập một cờ riêng cho từng đối tượng. Đếm tham chiếu trì hoãn được bật cho các kiểu sau:
+
+* các đối tượng module
+* các hàm cấp cao nhất của module
+* các phương thức lớp được định nghĩa trong phạm vi lớp
+* các đối tượng descriptor
+* các đối tượng cục bộ theo thread, được tạo bởi :class:`threading.local`
+
+Khi tính reference count trì hoãn được bật, các tham chiếu từ stack của hàm Python không được cộng vào reference count. Cơ chế này làm giảm overhead của việc tính reference count, đặc biệt đối với các đối tượng được sử dụng từ nhiều thread. Vì các tham chiếu trên stack không được tính, các đối tượng sử dụng tính reference count trì hoãn không được giải phóng ngay khi reference count nội bộ của chúng giảm xuống 0. Thay vào đó, chúng được kiểm tra trong lần chạy GC tiếp theo và được giải phóng nếu không tìm thấy tham chiếu nào trên stack đến chúng. Điều này có nghĩa là các đối tượng này được GC giải phóng thay vì được giải phóng khi reference count của chúng giảm xuống 0, như thông thường.
+
+
+Tính reference count theo từng thread có thể trì hoãn việc giải phóng đối tượng
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Để tránh tranh chấp trên các trường reference count của những đối tượng thường xuyên được chia sẻ, bản build free-threaded cũng sử dụng "tính reference count theo từng thread" cho một số ít kiểu đối tượng được chọn. Thay vì cập nhật một reference count dùng chung duy nhất, mỗi thread duy trì mảng reference count cục bộ riêng, được lập chỉ mục bằng một ID duy nhất được gán cho đối tượng. Reference count thực chỉ được tính bằng cách cộng các reference count theo từng thread khi reference count cục bộ của đối tượng giảm xuống 0. Hiện tại, tính reference count theo từng thread được sử dụng cho:
+
+* các đối tượng kiểu heap (các lớp được tạo trong Python)
+* các đối tượng code
+* ``__dict__`` của các đối tượng module
+
+Vì các số đếm theo từng thread phải được hợp nhất trở lại vào đối tượng trước khi đối tượng đó có thể được giải phóng, các đối tượng sử dụng cơ chế đếm tham chiếu theo từng thread thường được giải phóng muộn hơn so với trong bản dựng mặc định. Cụ thể, một đối tượng như vậy thường chỉ được giải phóng khi thread đã tham chiếu đến nó đạt đến một điểm an toàn (chẳng hạn như trong phần "eval breaker" của trình đánh giá bytecode) hoặc thoát. Việc chạy :func:`gc.collect` sẽ hợp nhất các số đếm theo từng thread và cho phép giải phóng các đối tượng này.
+
+.. _`Installing a Free-Threaded Python`: https://py-free-threading.github.io/installing-cpython/

@@ -1,8 +1,8 @@
 .. _curses-howto:
 
-**********************************
-  Curses Programming with Python
-**********************************
+****************************
+Lập trình Curses bằng Python
+****************************
 
 .. currentmodule:: curses
 
@@ -10,137 +10,81 @@
 :Release: 2.04
 
 
-.. topic:: Abstract
+.. topic:: Tóm tắt
 
-   This document describes how to use the :mod:`curses` extension
-   module to control text-mode displays.
+   Tài liệu này mô tả cách sử dụng mô-đun mở rộng :mod:`curses` để điều khiển màn hình ở chế độ văn bản.
 
 
-What is curses?
-===============
+curses là gì?
+=============
 
-The curses library supplies a terminal-independent screen-painting and
-keyboard-handling facility for text-based terminals; such terminals
-include VT100s, the Linux console, and the simulated terminal provided
-by various programs.  Display terminals support various control codes
-to perform common operations such as moving the cursor, scrolling the
-screen, and erasing areas.  Different terminals use widely differing
-codes, and often have their own minor quirks.
+Thư viện curses cung cấp một cơ chế vẽ màn hình và xử lý bàn phím độc lập với terminal cho các terminal dựa trên văn bản; những terminal như vậy bao gồm VT100, console Linux và terminal mô phỏng do nhiều chương trình cung cấp. Các terminal hiển thị hỗ trợ nhiều mã điều khiển để thực hiện những thao tác phổ biến như di chuyển con trỏ, cuộn màn hình và xóa các vùng. Các terminal khác nhau sử dụng những mã rất khác nhau và thường có các đặc điểm riêng nhỏ.
 
-In a world of graphical displays, one might ask "why bother"?  It's
-true that character-cell display terminals are an obsolete technology,
-but there are niches in which being able to do fancy things with them
-are still valuable.  One niche is on small-footprint or embedded
-Unixes that don't run an X server.  Another is tools such as OS
-installers and kernel configurators that may have to run before any
-graphical support is available.
+Trong thời đại của màn hình đồ họa, người ta có thể hỏi "tại sao phải bận tâm"? Đúng là các terminal hiển thị dạng ô ký tự đã là công nghệ lỗi thời, nhưng vẫn có những lĩnh vực mà khả năng thực hiện các thao tác phức tạp với chúng vẫn có giá trị. Một lĩnh vực là các hệ điều hành Unix có kích thước nhỏ hoặc nhúng không chạy máy chủ X. Một lĩnh vực khác là các công cụ như trình cài đặt hệ điều hành và trình cấu hình kernel, vốn có thể phải chạy trước khi bất kỳ hỗ trợ đồ họa nào khả dụng.
 
-The curses library provides fairly basic functionality, providing the
-programmer with an abstraction of a display containing multiple
-non-overlapping windows of text.  The contents of a window can be
-changed in various ways---adding text, erasing it, changing its
-appearance---and the curses library will figure out what control codes
-need to be sent to the terminal to produce the right output.  curses
-doesn't provide many user-interface concepts such as buttons, checkboxes,
-or dialogs; if you need such features, consider a user interface library such as
+Thư viện curses cung cấp chức năng khá cơ bản, tạo cho lập trình viên một lớp trừu tượng về màn hình chứa nhiều cửa sổ văn bản không chồng lấp. Nội dung của một cửa sổ có thể được thay đổi theo nhiều cách—thêm văn bản, xóa văn bản, thay đổi giao diện—và thư viện curses sẽ xác định những mã điều khiển nào cần được gửi đến terminal để tạo ra đầu ra chính xác. curses không cung cấp nhiều khái niệm về giao diện người dùng như nút, hộp kiểm hoặc hộp thoại; nếu cần những tính năng như vậy, hãy cân nhắc một thư viện giao diện người dùng như
 :pypi:`Urwid`.
 
-The curses library was originally written for BSD Unix; the later System V
-versions of Unix from AT&T added many enhancements and new functions. BSD curses
-is no longer maintained, having been replaced by ncurses, which is an
-open-source implementation of the AT&T interface.  If you're using an
-open-source Unix such as Linux or FreeBSD, your system almost certainly uses
-ncurses.  Since most current commercial Unix versions are based on System V
-code, all the functions described here will probably be available.  The older
-versions of curses carried by some proprietary Unixes may not support
-everything, though.
+Thư viện curses ban đầu được viết cho BSD Unix; các phiên bản Unix System V sau này của AT&T đã bổ sung nhiều cải tiến và hàm mới. BSD curses không còn được duy trì nữa và đã được thay thế bằng ncurses, một triển khai mã nguồn mở của giao diện AT&T. Nếu bạn đang sử dụng một Unix mã nguồn mở như Linux hoặc FreeBSD, hệ thống của bạn gần như chắc chắn sử dụng ncurses. Vì hầu hết các phiên bản Unix thương mại hiện nay đều dựa trên mã System V, có lẽ tất cả các hàm được mô tả ở đây đều khả dụng. Tuy nhiên, các phiên bản curses cũ hơn đi kèm với một số Unix độc quyền có thể không hỗ trợ mọi thứ.
 
-The Windows version of Python doesn't include the :mod:`curses` module.
-The third-party :pypi:`windows-curses` package provides the same interface on Windows.
+Phiên bản Python dành cho Windows không bao gồm mô-đun :mod:`curses`. Gói :pypi:`windows-curses` của bên thứ ba cung cấp cùng giao diện trên Windows.
 
 
-The Python curses module
+Mô-đun curses của Python
 ------------------------
 
-The Python module is a fairly simple wrapper over the C functions provided by
-curses; if you're already familiar with curses programming in C, it's really
-easy to transfer that knowledge to Python.  The biggest difference is that the
-Python interface makes things simpler by merging different C functions such as
-:c:func:`!addstr`, :c:func:`!mvaddstr`, and :c:func:`!mvwaddstr` into a single
-:meth:`~curses.window.addstr` method.  You'll see this covered in more
-detail later.
+Mô-đun Python là một wrapper khá đơn giản trên các hàm C do curses cung cấp; nếu bạn đã quen với lập trình curses bằng C, việc chuyển kiến thức đó sang Python thực sự rất dễ dàng. Điểm khác biệt lớn nhất là giao diện Python làm mọi thứ đơn giản hơn bằng cách hợp nhất các hàm C khác nhau như
+:c:func:`!addstr`, :c:func:`!mvaddstr` và :c:func:`!mvwaddstr` thành một
+phương thức :meth:`~curses.window.addstr`. Bạn sẽ tìm hiểu chi tiết hơn về điều này ở phần sau.
 
-This HOWTO is an introduction to writing text-mode programs with curses
-and Python. It doesn't attempt to be a complete guide to the curses API; for
-that, see the Python library guide's section on ncurses, and the C manual pages
-for ncurses.  It will, however, give you the basic ideas.
+HOWTO này là phần giới thiệu về cách viết các chương trình dạng văn bản bằng curses và Python. Tài liệu không cố gắng trở thành hướng dẫn đầy đủ về curses API; để biết thêm, hãy xem phần về ncurses trong hướng dẫn thư viện Python và các trang hướng dẫn C về ncurses. Tuy nhiên, tài liệu sẽ cung cấp cho bạn những ý tưởng cơ bản.
 
 
-Starting and ending a curses application
-========================================
+Khởi động và kết thúc một ứng dụng curses
+=========================================
 
-Before doing anything, curses must be initialized.  This is done by
-calling the :func:`~curses.initscr` function, which will determine the
-terminal type, send any required setup codes to the terminal, and
-create various internal data structures.  If successful,
-:func:`!initscr` returns a window object representing the entire
-screen; this is usually called ``stdscr`` after the name of the
-corresponding C variable. ::
+Trước khi thực hiện bất kỳ thao tác nào, curses phải được khởi tạo. Việc này được thực hiện bằng cách gọi hàm :func:`~curses.initscr`, hàm này sẽ xác định loại terminal, gửi mọi mã thiết lập cần thiết đến terminal và tạo nhiều cấu trúc dữ liệu nội bộ khác nhau. Nếu thành công,
+:func:`!initscr` trả về một đối tượng cửa sổ đại diện cho toàn bộ màn hình; đối tượng này thường được gọi là ``stdscr``, theo tên của biến C tương ứng.::
 
    import curses
    stdscr = curses.initscr()
 
-Usually curses applications turn off automatic echoing of keys to the
-screen, in order to be able to read keys and only display them under
-certain circumstances.  This requires calling the
-:func:`~curses.noecho` function. ::
+Thông thường, các ứng dụng curses tắt việc tự động echo các phím lên màn hình để có thể đọc phím và chỉ hiển thị chúng trong những trường hợp nhất định. Việc này yêu cầu gọi
+:func:`~curses.noecho`.::
 
    curses.noecho()
 
-Applications will also commonly need to react to keys instantly,
-without requiring the Enter key to be pressed; this is called cbreak
-mode, as opposed to the usual buffered input mode. ::
+Các ứng dụng cũng thường cần phản hồi phím ngay lập tức mà không yêu cầu nhấn phím Enter; chế độ này được gọi là chế độ cbreak, trái ngược với chế độ nhập được đệm thông thường.::
 
    curses.cbreak()
 
-Terminals usually return special keys, such as the cursor keys or navigation
-keys such as Page Up and Home, as a multibyte escape sequence.  While you could
-write your application to expect such sequences and process them accordingly,
-curses can do it for you, returning a special value such as
-:const:`curses.KEY_LEFT`.  To get curses to do the job, you'll have to enable
-keypad mode. ::
+Các terminal thường trả về những phím đặc biệt, chẳng hạn như các phím con trỏ hoặc các phím điều hướng như Page Up và Home, dưới dạng một chuỗi escape nhiều byte. Mặc dù bạn có thể viết ứng dụng để chờ các chuỗi như vậy và xử lý chúng tương ứng, curses có thể làm việc đó thay bạn và trả về một giá trị đặc biệt như
+:const:`curses.KEY_LEFT`. Để curses thực hiện việc này, bạn phải bật chế độ keypad.::
 
    stdscr.keypad(True)
 
-Terminating a curses application is much easier than starting one. You'll need
-to call::
+Việc kết thúc một ứng dụng curses dễ hơn nhiều so với việc khởi động. Bạn cần gọi::
 
    curses.nocbreak()
    stdscr.keypad(False)
    curses.echo()
 
-to reverse the curses-friendly terminal settings. Then call the
-:func:`~curses.endwin` function to restore the terminal to its original
-operating mode. ::
+để khôi phục các thiết lập terminal tương thích với curses. Sau đó gọi
+hàm :func:`~curses.endwin` để đưa terminal về chế độ hoạt động ban đầu.::
 
    curses.endwin()
 
-A common problem when debugging a curses application is to get your terminal
-messed up when the application dies without restoring the terminal to its
-previous state.  In Python this commonly happens when your code is buggy and
-raises an uncaught exception.  Keys are no longer echoed to the screen when
-you type them, for example, which makes using the shell difficult.
+Một vấn đề phổ biến khi gỡ lỗi ứng dụng curses là terminal bị rối loạn khi ứng dụng bị lỗi mà không khôi phục terminal về trạng thái trước đó. Trong Python, điều này thường xảy ra khi mã của bạn có lỗi và phát sinh một ngoại lệ không được bắt. Chẳng hạn, các phím sẽ không còn được hiển thị trên màn hình khi bạn gõ, khiến việc sử dụng shell trở nên khó khăn.
 
-In Python you can avoid these complications and make debugging much easier by
-importing the :func:`curses.wrapper` function and using it like this::
+Trong Python, bạn có thể tránh những rắc rối này và giúp việc gỡ lỗi dễ dàng hơn nhiều bằng cách import hàm :func:`curses.wrapper` và sử dụng nó như sau::
 
    from curses import wrapper
 
    def main(stdscr):
-       # Clear screen
+       # Xóa màn hình
        stdscr.clear()
 
-       # This raises ZeroDivisionError when i == 10.
+       # Điều này gây ra ZeroDivisionError khi i == 10.
        for i in range(0, 11):
            v = i-10
            stdscr.addstr(i, 0, '10 divided by {} is {}'.format(v, 10/v))
@@ -150,359 +94,198 @@ importing the :func:`curses.wrapper` function and using it like this::
 
    wrapper(main)
 
-The :func:`~curses.wrapper` function takes a callable object and does the
-initializations described above, also initializing colors if color
-support is present.  :func:`!wrapper` then runs your provided callable.
-Once the callable returns, :func:`!wrapper` will restore the original
-state of the terminal.  The callable is called inside a
-:keyword:`try`...\ :keyword:`except` that catches exceptions, restores
-the state of the terminal, and then re-raises the exception.  Therefore
-your terminal won't be left in a funny state on exception and you'll be
-able to read the exception's message and traceback.
+Hàm :func:`~curses.wrapper` nhận một đối tượng có thể gọi và thực hiện các bước khởi tạo được mô tả ở trên, đồng thời khởi tạo màu nếu có hỗ trợ màu. :func:`!wrapper` sau đó chạy đối tượng có thể gọi do bạn cung cấp. Khi đối tượng có thể gọi trả về, :func:`!wrapper` sẽ khôi phục trạng thái ban đầu của terminal. Đối tượng có thể gọi được gọi bên trong một
+:keyword:`try`...\ :keyword:`except` bắt các ngoại lệ, khôi phục trạng thái của terminal rồi phát sinh lại ngoại lệ. Vì vậy, terminal của bạn sẽ không bị bỏ lại ở trạng thái bất thường khi xảy ra ngoại lệ, và bạn vẫn có thể đọc thông báo cùng traceback của ngoại lệ.
 
 
-Windows and Pads
-================
+Windows và Pads
+===============
 
-Windows are the basic abstraction in curses.  A window object represents a
-rectangular area of the screen, and supports methods to display text,
-erase it, allow the user to input strings, and so forth.
+Windows là abstraction cơ bản trong curses. Một đối tượng window biểu diễn một vùng hình chữ nhật trên màn hình và hỗ trợ các phương thức để hiển thị văn bản, xóa văn bản, cho phép người dùng nhập chuỗi, v.v.
 
-The ``stdscr`` object returned by the :func:`~curses.initscr` function is a
-window object that covers the entire screen.  Many programs may need
-only this single window, but you might wish to divide the screen into
-smaller windows, in order to redraw or clear them separately. The
-:func:`~curses.newwin` function creates a new window of a given size,
-returning the new window object. ::
+Đối tượng ``stdscr`` được hàm :func:`~curses.initscr` trả về là một đối tượng window bao phủ toàn bộ màn hình. Nhiều chương trình có thể chỉ cần một window duy nhất này, nhưng bạn có thể muốn chia màn hình thành các window nhỏ hơn để vẽ lại hoặc xóa chúng riêng biệt. The
+Hàm :func:`~curses.newwin` tạo một cửa sổ mới với kích thước đã cho và trả về đối tượng cửa sổ mới.::
 
    begin_x = 20; begin_y = 7
    height = 5; width = 40
    win = curses.newwin(height, width, begin_y, begin_x)
 
-Note that the coordinate system used in curses is unusual.
-Coordinates are always passed in the order *y,x*, and the top-left
-corner of a window is coordinate (0,0).  This breaks the normal
-convention for handling coordinates where the *x* coordinate comes
-first.  This is an unfortunate difference from most other computer
-applications, but it's been part of curses since it was first written,
-and it's too late to change things now.
+Lưu ý rằng hệ tọa độ được sử dụng trong curses khá khác thường. Tọa độ luôn được truyền theo thứ tự *y,x*, và góc trên bên trái của cửa sổ có tọa độ (0,0). Điều này trái với quy ước thông thường khi xử lý tọa độ, trong đó tọa độ *x* được đặt trước. Đây là một điểm khác biệt đáng tiếc so với hầu hết các ứng dụng máy tính khác, nhưng nó đã là một phần của curses kể từ khi được viết lần đầu và hiện đã quá muộn để thay đổi.
 
-Your application can determine the size of the screen by using the
-:data:`curses.LINES` and :data:`curses.COLS` variables to obtain the *y* and
-*x* sizes.  Legal coordinates will then extend from ``(0,0)`` to
-``(curses.LINES - 1, curses.COLS - 1)``.
+Ứng dụng của bạn có thể xác định kích thước màn hình bằng cách sử dụng
+các biến :data:`curses.LINES` và :data:`curses.COLS` để lấy kích thước *y* và *x*. Khi đó, các tọa độ hợp lệ sẽ nằm trong khoảng từ ``(0,0)`` đến ``(curses.LINES - 1, curses.COLS - 1)``.
 
-When you call a method to display or erase text, the effect doesn't
-immediately show up on the display.  Instead you must call the
-:meth:`~curses.window.refresh` method of window objects to update the
-screen.
+Khi gọi một phương thức để hiển thị hoặc xóa văn bản, hiệu ứng sẽ không ngay lập tức xuất hiện trên màn hình. Thay vào đó, bạn phải gọi
+phương thức :meth:`~curses.window.refresh` của các đối tượng cửa sổ để cập nhật màn hình.
 
-This is because curses was originally written with slow 300-baud
-terminal connections in mind; with these terminals, minimizing the
-time required to redraw the screen was very important.  Instead curses
-accumulates changes to the screen and displays them in the most
-efficient manner when you call :meth:`!refresh`.  For example, if your
-program displays some text in a window and then clears the window,
-there's no need to send the original text because they're never
-visible.
+Điều này là do curses ban đầu được viết với các kết nối terminal tốc độ 300 baud chậm chạp; với những terminal này, việc giảm thiểu thời gian cần thiết để vẽ lại màn hình là rất quan trọng. Thay vào đó, curses tích lũy các thay đổi trên màn hình và hiển thị chúng theo cách hiệu quả nhất khi bạn gọi :meth:`!refresh`. Ví dụ: nếu chương trình của bạn hiển thị một số văn bản trong cửa sổ rồi xóa cửa sổ, thì không cần gửi văn bản ban đầu vì văn bản đó chưa bao giờ được hiển thị.
 
-In practice, explicitly telling curses to redraw a window doesn't
-really complicate programming with curses much. Most programs go into a flurry
-of activity, and then pause waiting for a keypress or some other action on the
-part of the user.  All you have to do is to be sure that the screen has been
-redrawn before pausing to wait for user input, by first calling
-:meth:`!stdscr.refresh` or the :meth:`!refresh` method of some other relevant
-window.
+Trên thực tế, việc yêu cầu curses vẽ lại một cửa sổ một cách rõ ràng không thực sự khiến việc lập trình với curses phức tạp hơn nhiều. Hầu hết chương trình đều hoạt động dồn dập trong chốc lát rồi tạm dừng để chờ thao tác nhấn phím hoặc một hành động khác từ người dùng. Bạn chỉ cần đảm bảo màn hình đã được vẽ lại trước khi tạm dừng để chờ dữ liệu nhập từ người dùng, bằng cách gọi trước
+:meth:`!stdscr.refresh` hoặc phương thức :meth:`!refresh` của một cửa sổ liên quan khác.
 
-A pad is a special case of a window; it can be larger than the actual display
-screen, and only a portion of the pad displayed at a time. Creating a pad
-requires the pad's height and width, while refreshing a pad requires giving the
-coordinates of the on-screen area where a subsection of the pad will be
-displayed.  ::
+Pad là một trường hợp đặc biệt của cửa sổ; nó có thể lớn hơn màn hình hiển thị thực tế và tại mỗi thời điểm chỉ một phần của pad được hiển thị. Việc tạo pad yêu cầu chiều cao và chiều rộng của pad, còn việc làm mới pad yêu cầu cung cấp tọa độ của vùng trên màn hình nơi một phần của pad sẽ được hiển thị.::
 
    pad = curses.newpad(100, 100)
-   # These loops fill the pad with letters; addch() is
-   # explained in the next section
+   # Các vòng lặp này điền các chữ cái vào pad; addch() được
+   # giải thích trong phần tiếp theo
    for y in range(0, 99):
        for x in range(0, 99):
            pad.addch(y,x, ord('a') + (x*x+y*y) % 26)
 
-   # Displays a section of the pad in the middle of the screen.
-   # (0,0) : coordinate of upper-left corner of pad area to display.
-   # (5,5) : coordinate of upper-left corner of window area to be filled
-   #         with pad content.
-   # (20, 75) : coordinate of lower-right corner of window area to be
-   #          : filled with pad content.
+   # Hiển thị một phần của pad ở giữa màn hình.
+   # (0,0) : tọa độ của góc trên bên trái của vùng pad cần hiển thị.
+   # (5,5) : tọa độ của góc trên bên trái của vùng cửa sổ sẽ được điền
+   #         bằng nội dung của pad.
+   # (20, 75) : tọa độ của góc dưới bên phải của vùng cửa sổ sẽ được
+   #          : điền bằng nội dung của pad.
    pad.refresh( 0,0, 5,5, 20,75)
 
-The :meth:`!refresh` call displays a section of the pad in the rectangle
-extending from coordinate (5,5) to coordinate (20,75) on the screen; the upper
-left corner of the displayed section is coordinate (0,0) on the pad.  Beyond
-that difference, pads are exactly like ordinary windows and support the same
-methods.
+Lệnh gọi :meth:`!refresh` hiển thị một phần của pad trong hình chữ nhật kéo dài từ tọa độ (5,5) đến tọa độ (20,75) trên màn hình; góc trên bên trái của phần được hiển thị là tọa độ (0,0) trên pad. Ngoài điểm khác biệt đó, pad giống hệt các cửa sổ thông thường và hỗ trợ các phương thức tương tự.
 
-If you have multiple windows and pads on screen there is a more
-efficient way to update the screen and prevent annoying screen flicker
-as each part of the screen gets updated.  :meth:`!refresh` actually
-does two things:
+Nếu có nhiều cửa sổ và pad trên màn hình, có một cách hiệu quả hơn để cập nhật màn hình và ngăn hiện tượng nhấp nháy khó chịu khi từng phần của màn hình được cập nhật. :meth:`!refresh` thực hiện hai việc:
 
-1) Calls the :meth:`~curses.window.noutrefresh` method of each window
-   to update an underlying data structure representing the desired
-   state of the screen.
-2) Calls the function :func:`~curses.doupdate` function to change the
-   physical screen to match the desired state recorded in the data structure.
+1) Gọi phương thức :meth:`~curses.window.noutrefresh` của từng cửa sổ để cập nhật một cấu trúc dữ liệu bên dưới biểu thị trạng thái mong muốn của màn hình.
+2) Gọi hàm :func:`~curses.doupdate` để thay đổi màn hình vật lý sao cho khớp với trạng thái mong muốn được ghi trong cấu trúc dữ liệu.
 
-Instead you can call :meth:`!noutrefresh` on a number of windows to
-update the data structure, and then call :func:`!doupdate` to update
-the screen.
+Thay vào đó, bạn có thể gọi :meth:`!noutrefresh` trên một số cửa sổ để cập nhật cấu trúc dữ liệu, sau đó gọi :func:`!doupdate` để cập nhật màn hình.
 
 
-Displaying Text
-===============
+Hiển thị văn bản
+================
 
-From a C programmer's point of view, curses may sometimes look like a
-twisty maze of functions, all subtly different.  For example,
-:c:func:`!addstr` displays a string at the current cursor location in
-the ``stdscr`` window, while :c:func:`!mvaddstr` moves to a given y,x
-coordinate first before displaying the string. :c:func:`!waddstr` is just
-like :c:func:`!addstr`, but allows specifying a window to use instead of
-using ``stdscr`` by default. :c:func:`!mvwaddstr` allows specifying both
-a window and a coordinate.
+Từ góc nhìn của một lập trình viên C, curses đôi khi có thể trông như một mê cung quanh co gồm nhiều hàm, mỗi hàm khác nhau một cách tinh tế. Ví dụ:
+:c:func:`!addstr` hiển thị một chuỗi tại vị trí con trỏ hiện tại trong cửa sổ ``stdscr``, trong khi :c:func:`!mvaddstr` trước tiên di chuyển đến tọa độ y,x đã cho rồi mới hiển thị chuỗi. :c:func:`!waddstr` cũng giống như :c:func:`!addstr`, nhưng cho phép chỉ định một cửa sổ để sử dụng thay vì mặc định dùng ``stdscr``. :c:func:`!mvwaddstr` cho phép chỉ định cả cửa sổ và tọa độ.
 
-Fortunately the Python interface hides all these details.  ``stdscr``
-is a window object like any other, and methods such as
-:meth:`~curses.window.addstr` accept multiple argument forms.  Usually there
-are four different forms.
+May mắn là giao diện Python ẩn đi tất cả những chi tiết này. ``stdscr`` là một đối tượng cửa sổ giống như mọi đối tượng khác, và các phương thức như
+:meth:`~curses.window.addstr` chấp nhận nhiều dạng đối số. Thông thường có bốn dạng khác nhau.
 
-+---------------------------------+-----------------------------------------------+
-| Form                            | Description                                   |
-+=================================+===============================================+
-| *str* or *ch*                   | Display the string *str* or character *ch* at |
-|                                 | the current position                          |
-+---------------------------------+-----------------------------------------------+
-| *str* or *ch*, *attr*           | Display the string *str* or character *ch*,   |
-|                                 | using attribute *attr* at the current         |
-|                                 | position                                      |
-+---------------------------------+-----------------------------------------------+
-| *y*, *x*, *str* or *ch*         | Move to position *y,x* within the window, and |
-|                                 | display *str* or *ch*                         |
-+---------------------------------+-----------------------------------------------+
-| *y*, *x*, *str* or *ch*, *attr* | Move to position *y,x* within the window, and |
-|                                 | display *str* or *ch*, using attribute *attr* |
-+---------------------------------+-----------------------------------------------+
++-----------------------------------+------------------------------------------------------------------------------------------------+
+| Dạng thức                         | Mô tả                                                                                          |
++===================================+================================================================================================+
+| *str* hoặc *ch*                   | Hiển thị chuỗi *str* hoặc ký tự *ch* tại vị trí hiện tại                                       |
++-----------------------------------+------------------------------------------------------------------------------------------------+
+| *str* hoặc *ch*, *attr*           | Hiển thị chuỗi *str* hoặc ký tự *ch*, sử dụng thuộc tính *attr* tại vị trí hiện tại            |
++-----------------------------------+------------------------------------------------------------------------------------------------+
+| *y*, *x*, *str* hoặc *ch*         | Di chuyển đến vị trí *y,x* trong cửa sổ và hiển thị *str* hoặc *ch*                            |
++-----------------------------------+------------------------------------------------------------------------------------------------+
+| *y*, *x*, *str* hoặc *ch*, *attr* | Di chuyển đến vị trí *y,x* trong cửa sổ và hiển thị *str* hoặc *ch*, sử dụng thuộc tính *attr* |
++-----------------------------------+------------------------------------------------------------------------------------------------+
 
-Attributes allow displaying text in highlighted forms such as boldface,
-underline, reverse code, or in color.  They'll be explained in more detail in
-the next subsection.
+Các thuộc tính cho phép hiển thị văn bản ở dạng được làm nổi bật, chẳng hạn như chữ đậm, gạch chân, mã đảo màu hoặc có màu. Chúng sẽ được giải thích chi tiết hơn trong phần tiếp theo.
 
 
-The :meth:`~curses.window.addstr` method takes a Python string or
-bytestring as the value to be displayed.  The contents of bytestrings
-are sent to the terminal as-is.
-On a build without wide-character support strings are encoded
-using the value of the window's :attr:`~window.encoding` attribute;
-this defaults to the default system encoding
-as returned by :func:`locale.getencoding`.
+Phương thức :meth:`~curses.window.addstr` nhận một chuỗi Python hoặc chuỗi byte làm giá trị cần hiển thị. Nội dung của các chuỗi byte được gửi nguyên trạng đến terminal. Trong bản dựng không hỗ trợ ký tự chiều rộng, các chuỗi được mã hóa bằng giá trị của thuộc tính :attr:`~window.encoding` của cửa sổ; giá trị mặc định là encoding mặc định của hệ thống, do :func:`locale.getencoding` trả về.
 
-The :meth:`~curses.window.addch` methods take a character, which can be
-either a string of length 1, a bytestring of length 1, or an integer.
+Các phương thức :meth:`~curses.window.addch` nhận một ký tự, có thể là chuỗi có độ dài 1, chuỗi byte có độ dài 1 hoặc một số nguyên.
 
-Constants are provided for the characters of the terminal's alternate
-character set.
-For example, :const:`ACS_PLMINUS` is a +/-
-symbol, and :const:`ACS_ULCORNER` is the upper left corner of a box
-(handy for drawing borders).  You can also use the appropriate Unicode
-character.
+Các hằng số được cung cấp cho các ký tự của bộ ký tự thay thế của terminal. Ví dụ, :const:`ACS_PLMINUS` là ký hiệu +/-, còn :const:`ACS_ULCORNER` là góc trên bên trái của một khung (tiện dụng để vẽ đường viền). Bạn cũng có thể sử dụng ký tự Unicode tương ứng.
 
-Windows remember where the cursor was left after the last operation, so if you
-leave out the *y,x* coordinates, the string or character will be displayed
-wherever the last operation left off.  You can also move the cursor with the
-``move(y,x)`` method.  Because some terminals always display a flashing cursor,
-you may want to ensure that the cursor is positioned in some location where it
-won't be distracting; it can be confusing to have the cursor blinking at some
-apparently random location.
+Các cửa sổ ghi nhớ vị trí con trỏ sau thao tác cuối cùng, vì vậy nếu bỏ qua tọa độ *y,x*, chuỗi hoặc ký tự sẽ được hiển thị tại vị trí mà thao tác cuối cùng dừng lại. Bạn cũng có thể di chuyển con trỏ bằng phương thức ``move(y,x)``. Vì một số terminal luôn hiển thị con trỏ nhấp nháy, bạn nên đảm bảo con trỏ được đặt ở một vị trí không gây mất tập trung; việc con trỏ nhấp nháy ở một vị trí có vẻ ngẫu nhiên có thể gây khó hiểu.
 
-If your application doesn't need a blinking cursor at all, you can
-call ``curs_set(False)`` to make it invisible.
-The window method :meth:`~curses.window.leaveok` does something different:
-when its argument is true,
-curses leaves the cursor wherever the last update put it,
-instead of moving it back to the window's cursor position.
+Nếu ứng dụng của bạn hoàn toàn không cần con trỏ nhấp nháy, bạn có thể gọi ``curs_set(False)`` để làm con trỏ ẩn đi. Phương thức cửa sổ :meth:`~curses.window.leaveok` thực hiện điều khác: khi đối số của nó là true, curses giữ con trỏ ở vị trí mà lần cập nhật gần nhất đặt nó vào, thay vì di chuyển con trỏ về vị trí con trỏ của cửa sổ.
 
 
-Attributes and Color
---------------------
+Thuộc tính và màu sắc
+---------------------
 
-Characters can be displayed in different ways.  Status lines in a text-based
-application are commonly shown in reverse video, or a text viewer may need to
-highlight certain words.  curses supports this by allowing you to specify an
-attribute for each cell on the screen.
+Các ký tự có thể được hiển thị theo nhiều cách khác nhau. Các dòng trạng thái trong ứng dụng dạng văn bản thường được hiển thị bằng video đảo (reverse video), hoặc trình xem văn bản có thể cần làm nổi bật một số từ nhất định. curses hỗ trợ việc này bằng cách cho phép bạn chỉ định một thuộc tính cho mỗi ô trên màn hình.
 
-An attribute is an integer, each bit representing a different
-attribute.  You can try to display text with multiple attribute bits
-set, but curses doesn't guarantee that all the possible combinations
-are available, or that they're all visually distinct.  That depends on
-the ability of the terminal being used, so it's safest to stick to the
-most commonly available attributes, listed here.
+Một thuộc tính là một số nguyên, trong đó mỗi bit biểu thị một thuộc tính khác nhau. Bạn có thể thử hiển thị văn bản với nhiều bit thuộc tính được thiết lập, nhưng curses không đảm bảo rằng mọi tổ hợp có thể đều khả dụng hoặc tất cả đều khác biệt về mặt trực quan. Điều đó phụ thuộc vào khả năng của terminal đang được sử dụng, vì vậy cách an toàn nhất là chỉ dùng các thuộc tính phổ biến nhất, được liệt kê ở đây.
 
-+----------------------+--------------------------------------+
-| Attribute            | Description                          |
-+======================+======================================+
-| :const:`A_BLINK`     | Blinking text                        |
-+----------------------+--------------------------------------+
-| :const:`A_BOLD`      | Extra bright or bold text            |
-+----------------------+--------------------------------------+
-| :const:`A_DIM`       | Half bright text                     |
-+----------------------+--------------------------------------+
-| :const:`A_REVERSE`   | Reverse-video text                   |
-+----------------------+--------------------------------------+
-| :const:`A_STANDOUT`  | The best highlighting mode available |
-+----------------------+--------------------------------------+
-| :const:`A_UNDERLINE` | Underlined text                      |
-+----------------------+--------------------------------------+
++----------------------+-------------------------------------+
+| Thuộc tính           | Mô tả                               |
++======================+=====================================+
+| :const:`A_BLINK`     | Văn bản nhấp nháy                   |
++----------------------+-------------------------------------+
+| :const:`A_BOLD`      | Văn bản cực sáng hoặc in đậm        |
++----------------------+-------------------------------------+
+| :const:`A_DIM`       | Văn bản nửa sáng                    |
++----------------------+-------------------------------------+
+| :const:`A_REVERSE`   | Văn bản đảo màu                     |
++----------------------+-------------------------------------+
+| :const:`A_STANDOUT`  | Chế độ làm nổi bật tốt nhất hiện có |
++----------------------+-------------------------------------+
+| :const:`A_UNDERLINE` | Văn bản gạch chân                   |
++----------------------+-------------------------------------+
 
-So, to display a reverse-video status line on the top line of the screen, you
-could code::
+Vì vậy, để hiển thị một dòng trạng thái đảo màu ở dòng đầu tiên của màn hình, bạn có thể viết mã::
 
    stdscr.addstr(0, 0, "Current mode: Typing mode",
                  curses.A_REVERSE)
    stdscr.refresh()
 
-The curses library also supports color on those terminals that provide it. The
-most common such terminal is probably the Linux console, followed by color
-xterms.
+Thư viện curses cũng hỗ trợ màu trên những terminal cung cấp tính năng này. Terminal phổ biến nhất như vậy có lẽ là console Linux, tiếp theo là các xterm có màu.
 
-To use color, you must call the :func:`~curses.start_color` function soon
-after calling :func:`~curses.initscr`, to initialize the default color set
-(the :func:`curses.wrapper` function does this automatically).  Once that's
-done, the :func:`~curses.has_colors` function returns TRUE if the terminal
-in use can
-actually display color.  (Note: curses uses the American spelling 'color',
-instead of the Canadian/British spelling 'colour'.  If you're used to the
-British spelling, you'll have to resign yourself to misspelling it for the sake
-of these functions.)
+Để sử dụng màu, bạn phải gọi hàm :func:`~curses.start_color` ngay sau khi gọi :func:`~curses.initscr`, nhằm khởi tạo bộ màu mặc định (hàm :func:`curses.wrapper` tự động thực hiện việc này). Sau khi hoàn tất, hàm :func:`~curses.has_colors` trả về TRUE nếu terminal đang sử dụng thực sự có thể hiển thị màu. (Lưu ý: curses sử dụng cách viết 'color' của tiếng Anh-Mỹ thay vì cách viết 'colour' của tiếng Anh-Canada/Anh. Nếu bạn quen với cách viết của Anh, bạn sẽ phải chấp nhận viết sai chính tả vì lợi ích của các hàm này.)
 
-The curses library maintains a finite number of color pairs, containing a
-foreground (or text) color and a background color.  You can get the attribute
-value corresponding to a color pair with the :func:`~curses.color_pair`
-function; this can be bitwise-OR'ed with other attributes such as
-:const:`A_REVERSE`, but again, such combinations are not guaranteed to work
-on all terminals.
+Thư viện curses duy trì một số lượng hữu hạn các cặp màu, mỗi cặp gồm màu tiền cảnh (hoặc màu văn bản) và màu nền. Bạn có thể lấy giá trị thuộc tính tương ứng với một cặp màu bằng hàm :func:`~curses.color_pair`; giá trị này có thể được thực hiện phép OR theo bit với các thuộc tính khác như
+:const:`A_REVERSE`, nhưng một lần nữa, các kết hợp như vậy không được đảm bảo hoạt động trên mọi terminal.
 
-An example, which displays a line of text using color pair 1::
+Một ví dụ hiển thị một dòng văn bản bằng cặp màu 1::
 
    stdscr.addstr("Pretty text", curses.color_pair(1))
    stdscr.refresh()
 
-As I said before, a color pair consists of a foreground and background color.
-The ``init_pair(n, f, b)`` function changes the definition of color pair *n*, to
-foreground color f and background color b.  Color pair 0 is hard-wired to white
-on black, and cannot be changed.
+Như tôi đã nói trước đó, một cặp màu gồm màu tiền cảnh và màu nền. Hàm ``init_pair(n, f, b)`` thay đổi định nghĩa của cặp màu *n*, thành màu tiền cảnh f và màu nền b. Cặp màu 0 được cố định là chữ trắng trên nền đen và không thể thay đổi.
 
-Colors are numbered, and :func:`start_color` initializes 8 basic
-colors when it activates color mode.  They are: 0:black, 1:red,
-2:green, 3:yellow, 4:blue, 5:magenta, 6:cyan, and 7:white.  The :mod:`curses`
-module defines named constants for each of these colors:
-:const:`curses.COLOR_BLACK`, :const:`curses.COLOR_RED`, and so forth.
+Các màu được đánh số, và :func:`start_color` khởi tạo 8 màu cơ bản khi kích hoạt chế độ màu. Đó là: 0:đen, 1:đỏ, 2:xanh lá, 3:vàng, 4:xanh dương, 5:tím đỏ, 6:xanh lơ và 7:trắng. Mô-đun :mod:`curses` định nghĩa các hằng số có tên cho từng màu này:
+:const:`curses.COLOR_BLACK`, :const:`curses.COLOR_RED`, vân vân.
 
-Let's put all this together. To change color 1 to red text on a white
-background, you would call::
+Hãy tổng hợp tất cả những điều này. Để đổi màu 1 thành chữ màu đỏ trên nền trắng, bạn sẽ gọi::
 
    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
 
-When you change a color pair, any text already displayed using that color pair
-will change to the new colors.  You can also display new text in this color
-with::
+Khi bạn thay đổi một cặp màu, mọi văn bản đã hiển thị bằng cặp màu đó sẽ đổi sang các màu mới. Bạn cũng có thể hiển thị văn bản mới bằng màu này với::
 
    stdscr.addstr(0,0, "RED ALERT!", curses.color_pair(1))
 
-Very fancy terminals can change the definitions of the actual colors to a given
-RGB value.  This lets you change color 1, which is usually red, to purple or
-blue or any other color you like.  Unfortunately, the Linux console doesn't
-support this, so I'm unable to try it out, and can't provide any examples.  You
-can check if your terminal can do this by calling
-:func:`~curses.can_change_color`, which returns ``True`` if the capability is
-there.  If you're lucky enough to have such a talented terminal, consult your
-system's man pages for more information.
+Các terminal cao cấp có thể thay đổi định nghĩa của những màu thực tế thành một giá trị RGB cụ thể. Điều này cho phép bạn đổi màu 1, vốn thường là màu đỏ, thành tím, xanh dương hoặc bất kỳ màu nào khác mà bạn muốn. Đáng tiếc là Linux console không hỗ trợ tính năng này, nên tôi không thể thử và cũng không thể cung cấp ví dụ. Bạn có thể kiểm tra xem terminal của mình có làm được điều này hay không bằng cách gọi
+:func:`~curses.can_change_color`, trả về ``True`` nếu có khả năng này. Nếu may mắn sở hữu một terminal tài năng như vậy, hãy xem các man page của hệ thống để biết thêm thông tin.
 
 
-User Input
-==========
+Nhập liệu từ người dùng
+=======================
 
-The C curses library offers only very simple input mechanisms. Python's
-:mod:`curses` module adds a basic text-input widget.  (Other libraries
-such as :pypi:`Urwid` have more extensive collections of widgets.)
+Thư viện C curses chỉ cung cấp các cơ chế nhập liệu rất đơn giản. Python's
+Mô-đun :mod:`curses` bổ sung một widget nhập văn bản cơ bản. (Các thư viện khác như :pypi:`Urwid` có những bộ widget phong phú hơn.)
 
-There are three methods for getting input from a window:
+Có ba phương thức để nhận dữ liệu đầu vào từ một cửa sổ:
 
-* :meth:`~curses.window.get_wch` refreshes the screen and then waits for
-  the user to hit a key, displaying the key if :func:`~curses.echo` has been
-  called earlier.  You can optionally specify a coordinate to which
-  the cursor should be moved before pausing.
+* :meth:`~curses.window.get_wch` làm mới màn hình rồi chờ người dùng nhấn một phím, đồng thời hiển thị phím đó nếu trước đó đã gọi :func:`~curses.echo`. Bạn cũng có thể tùy chọn chỉ định tọa độ để di chuyển con trỏ đến đó trước khi tạm dừng.
 
-* :meth:`~curses.window.getch` does the same thing but returns the code of
-  the key instead of a character.
-  With ncurses this is a single byte of the key's encoding in the current
-  locale, so a character encoded with several bytes takes several calls,
-  one byte per call.
+* :meth:`~curses.window.getch` cũng thực hiện tương tự nhưng trả về mã của phím thay vì một ký tự. Với ncurses, đây là một byte trong phần mã hóa của phím theo locale hiện tại, vì vậy một ký tự được mã hóa bằng nhiều byte sẽ cần nhiều lần gọi, mỗi lần một byte.
 
-* :meth:`~curses.window.getkey` does the same as :meth:`!getch` but returns
-  a string:
-  an ordinary key as a 1-character string,
-  and a special key as its name, such as ``KEY_UP``.
+* :meth:`~curses.window.getkey` thực hiện tương tự :meth:`!getch` nhưng trả về một chuỗi: một phím thông thường dưới dạng chuỗi 1 ký tự, còn một phím đặc biệt dưới dạng tên của nó, chẳng hạn như ``KEY_UP``.
 
-It's possible to not wait for the user using the
-:meth:`~curses.window.nodelay` window method. After ``nodelay(True)``,
-the reads for the window become non-blocking.
-To signal that no input is ready,
-:meth:`!get_wch` and :meth:`!getkey` raise an exception,
-and :meth:`!getch` returns ``-1``.
-There's also a :func:`~curses.halfdelay` function, which can be used to (in
-effect) set a timer on each read; if no input becomes
-available within a specified delay (measured in tenths of a second),
-the read fails the same way.
+Có thể không chờ người dùng bằng cách sử dụng
+phương thức window :meth:`~curses.window.nodelay`. Sau ``nodelay(True)``, thao tác đọc đối với window sẽ trở thành non-blocking. Để báo hiệu rằng chưa có dữ liệu đầu vào nào sẵn sàng,
+:meth:`!get_wch` và :meth:`!getkey` sẽ phát sinh một ngoại lệ, còn :meth:`!getch` trả về ``-1``. Ngoài ra còn có hàm :func:`~curses.halfdelay`, có thể được dùng để (về cơ bản) đặt bộ hẹn giờ cho mỗi lần đọc; nếu không có dữ liệu đầu vào nào khả dụng trong khoảng thời gian chờ đã chỉ định (tính bằng phần mười giây), thao tác đọc sẽ thất bại theo cùng cách đó.
 
-Special keys such as Page Up, Home, or the cursor keys are returned by all
-three as one of the :ref:`KEY_* constants <curses-key-constants>`,
-all larger than 255.
-You can compare the value returned to constants such as
+Các phím đặc biệt như Page Up, Home hoặc các phím con trỏ được cả ba hàm trả về dưới dạng một trong các hằng số :ref:`KEY_* <curses-key-constants>`, tất cả đều lớn hơn 255. Bạn có thể so sánh giá trị được trả về với các hằng số như
 :const:`curses.KEY_PPAGE`,
-:const:`curses.KEY_HOME`, or :const:`curses.KEY_LEFT`.  The main loop of
-your program may look something like this::
+:const:`curses.KEY_HOME` hoặc :const:`curses.KEY_LEFT`. Vòng lặp chính của chương trình có thể trông như sau::
 
    while True:
        c = stdscr.get_wch()
        if c == 'p':
            PrintDocument()
        elif c == 'q':
-           break  # Exit the while loop
+           break  # Thoát khỏi vòng lặp while
        elif c == curses.KEY_HOME:
            x = y = 0
 
-The :mod:`curses.ascii` module supplies ASCII class membership functions that
-take either integer or 1-character string arguments; these may be useful in
-writing more readable tests for such loops.  It also supplies
-conversion functions  that take either integer or 1-character-string arguments
-and return the same type.  For example, :func:`curses.ascii.ctrl` returns the
-control character corresponding to its argument.
+Mô-đun :mod:`curses.ascii` cung cấp các hàm xác định nhóm ASCII, nhận đối số là số nguyên hoặc chuỗi 1 ký tự; chúng có thể hữu ích khi viết các phép kiểm tra dễ đọc hơn cho những vòng lặp như vậy. Mô-đun này cũng cung cấp các hàm chuyển đổi nhận đối số là số nguyên hoặc chuỗi 1 ký tự và trả về cùng kiểu dữ liệu. Ví dụ, :func:`curses.ascii.ctrl` trả về ký tự điều khiển tương ứng với đối số của nó.
 
-There's also a method to retrieve an entire line,
-:meth:`~curses.window.getstr`.  It isn't used very often, because its
-functionality is quite limited; the only editing keys available are
-the erase and kill characters, and the Enter key, which terminates the line.
-It returns a bytes object,
-and can optionally be limited to a fixed number of bytes. ::
+Ngoài ra còn có một phương thức để lấy toàn bộ một dòng,
+:meth:`~curses.window.getstr`. Phương thức này không được sử dụng thường xuyên vì chức năng khá hạn chế; các phím chỉnh sửa duy nhất khả dụng là các ký tự xóa và xóa dòng, cùng với phím Enter dùng để kết thúc dòng. Phương thức này trả về một đối tượng bytes và có thể được giới hạn tùy chọn ở một số byte cố định.::
 
-   curses.echo()            # Enable echoing of characters
+   curses.echo()            # Bật chế độ hiển thị ký tự
 
-   # Get a line of at most 15 bytes, with the cursor on the top line
+   # Nhận một dòng tối đa 15 byte, với con trỏ ở dòng trên cùng
    s = stdscr.getstr(0,0, 15)
 
-The :mod:`curses.textpad` module supplies a text box that supports an
-Emacs-like set of keybindings.  Various methods of the
-:class:`~curses.textpad.Textbox` class support editing with input
-validation and gathering the edit results either with or without
-trailing spaces.  Here's an example::
+Module :mod:`curses.textpad` cung cấp một hộp văn bản hỗ trợ một tập hợp keybinding tương tự Emacs. Nhiều phương thức của
+lớp :class:`~curses.textpad.Textbox` hỗ trợ chỉnh sửa với việc xác thực đầu vào và thu thập kết quả chỉnh sửa có hoặc không có khoảng trắng ở cuối. Đây là một ví dụ::
 
    import curses
    from curses.textpad import Textbox, rectangle
@@ -516,44 +299,33 @@ trailing spaces.  Here's an example::
 
        box = Textbox(editwin)
 
-       # Let the user edit until Ctrl-G is struck.
+       # Cho phép người dùng chỉnh sửa cho đến khi nhấn Ctrl-G.
        box.edit()
 
-       # Get resulting contents
+       # Lấy nội dung thu được
        message = box.gather()
 
-See the library documentation on :mod:`curses.textpad` for more details.
+Xem tài liệu thư viện về :mod:`curses.textpad` để biết thêm chi tiết.
 
 
-For More Information
-====================
+Để biết thêm thông tin
+======================
 
-This HOWTO doesn't cover some advanced topics, such as reading the
-contents of the screen or capturing mouse events from an xterm
-instance, but the Python library page for the :mod:`curses` module is now
-reasonably complete.  You should browse it next.
+HOWTO này không đề cập đến một số chủ đề nâng cao, chẳng hạn như đọc nội dung màn hình hoặc bắt các sự kiện chuột từ một phiên bản xterm, nhưng trang thư viện Python dành cho module :mod:`curses` hiện đã khá đầy đủ. Bạn nên xem trang đó tiếp theo.
 
-If you're in doubt about the detailed behavior of the curses
-functions, consult the manual pages for your curses implementation,
-whether it's ncurses or a proprietary Unix vendor's.  The manual pages
-will document any quirks, and provide complete lists of all the
-functions, attributes, and :ref:`ACS_\* <curses-acs-codes>` characters available to
-you.
+Nếu không chắc chắn về hành vi chi tiết của các hàm curses, hãy tham khảo các trang hướng dẫn sử dụng dành cho bản triển khai curses của bạn, dù đó là ncurses hay bản của một nhà cung cấp Unix độc quyền. Các trang hướng dẫn sử dụng sẽ ghi lại mọi điểm khác biệt và cung cấp danh sách đầy đủ tất cả các hàm, thuộc tính và :ref:`ACS_\* <curses-acs-codes>` ký tự có sẵn cho bạn.
 
-Because the curses API is so large, some functions aren't supported in
-the Python interface.  Often this isn't because they're difficult to
-implement, but because no one has needed them yet.  Also, Python
-doesn't yet support the menu library associated with ncurses.
-Patches adding support for these would be welcome; see
-`the Python Developer's Guide <https://devguide.python.org/>`_ to
-learn more about submitting patches to Python.
+Vì API curses rất lớn nên một số hàm không được hỗ trợ trong giao diện Python. Thường thì nguyên nhân không phải vì chúng khó triển khai, mà vì chưa có ai cần đến chúng. Ngoài ra, Python hiện chưa hỗ trợ thư viện menu đi kèm với ncurses. Các bản vá bổ sung hỗ trợ cho những thư viện này luôn được hoan nghênh; hãy xem `Hướng dẫn dành cho nhà phát triển Python <https://devguide.python.org/>`_ để tìm hiểu thêm về cách gửi bản vá cho Python.
 
-* `Writing Programs with NCURSES <https://invisible-island.net/ncurses/ncurses-intro.html>`_:
-  a lengthy tutorial for C programmers.
-* `The ncurses man page <https://linux.die.net/man/3/ncurses>`_
-* `The ncurses FAQ <https://invisible-island.net/ncurses/ncurses.faq.html>`_
-* `"Use curses... don't swear" <https://www.youtube.com/watch?v=eN1eZtjLEnU>`_:
-  video of a PyCon 2013 talk on controlling terminals using curses or Urwid.
-* `"Console Applications with Urwid" <https://pyvideo.org/video/1568/console-applications-with-urwid>`_:
-  video of a PyCon CA 2012 talk demonstrating some applications written using
-  Urwid.
+* `Lập trình với NCURSES <https://invisible-island.net/ncurses/ncurses-intro.html>`_: một hướng dẫn dài dành cho các lập trình viên C.
+* `Trang man của ncurses <https://linux.die.net/man/3/ncurses>`_
+* `Câu hỏi thường gặp về ncurses <https://invisible-island.net/ncurses/ncurses.faq.html>`_
+* `"Use curses... don't swear" <https://www.youtube.com/watch?v=eN1eZtjLEnU>`_: video về một bài nói chuyện tại PyCon 2013 về việc điều khiển terminal bằng curses hoặc Urwid.
+* `"Console Applications with Urwid" <https://pyvideo.org/video/1568/console-applications-with-urwid>`_: video về một bài nói chuyện tại PyCon CA 2012, trình bày một số ứng dụng được viết bằng Urwid.
+
+.. _`the Python Developer's Guide`: https://devguide.python.org/
+.. _`Writing Programs with NCURSES`: https://invisible-island.net/ncurses/ncurses-intro.html
+.. _`The ncurses man page`: https://linux.die.net/man/3/ncurses
+.. _`The ncurses FAQ`: https://invisible-island.net/ncurses/ncurses.faq.html
+.. _`"Use curses... don't swear"`: https://www.youtube.com/watch?v=eN1eZtjLEnU
+.. _`"Console Applications with Urwid"`: https://pyvideo.org/video/1568/console-applications-with-urwid

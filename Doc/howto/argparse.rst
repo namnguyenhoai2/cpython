@@ -1,35 +1,24 @@
 .. _argparse-tutorial:
 
-*****************
-Argparse Tutorial
-*****************
+*********************
+Hướng dẫn về Argparse
+*********************
 
 :author: Tshepang Mbambo
 
 .. currentmodule:: argparse
 
-This tutorial is intended to be a gentle introduction to :mod:`argparse`, the
-recommended command-line parsing module in the Python standard library.
+Hướng dẫn này nhằm giới thiệu một cách dễ tiếp cận về :mod:`argparse`, mô-đun phân tích dòng lệnh được khuyến nghị trong thư viện chuẩn Python.
 
 .. note::
 
-   The standard library includes two other libraries directly related
-   to command-line parameter processing: the lower level :mod:`optparse`
-   module (which may require more code to configure for a given application,
-   but also allows an application to request behaviors that ``argparse``
-   doesn't support), and the very low level :mod:`getopt` (which specifically
-   serves as an equivalent to the :c:func:`!getopt` family of functions
-   available to C programmers).
-   While neither of those modules is covered directly in this guide, many of
-   the core concepts in ``argparse`` first originated in ``optparse``, so
-   some aspects of this tutorial will also be relevant to ``optparse`` users.
+   Thư viện chuẩn bao gồm hai thư viện khác cũng liên quan trực tiếp đến việc xử lý tham số dòng lệnh: mô-đun :mod:`optparse` cấp thấp hơn (có thể cần nhiều mã hơn để cấu hình cho một ứng dụng cụ thể, nhưng cũng cho phép ứng dụng yêu cầu những hành vi mà ``argparse`` không hỗ trợ), và :mod:`getopt` cấp rất thấp (chủ yếu đóng vai trò tương đương với nhóm hàm :c:func:`!getopt` dành cho lập trình viên C). Mặc dù cả hai mô-đun này không được đề cập trực tiếp trong hướng dẫn, nhiều khái niệm cốt lõi trong ``argparse`` bắt nguồn từ ``optparse``, vì vậy một số phần của hướng dẫn này cũng sẽ hữu ích cho người dùng ``optparse``.
 
 
-Concepts
-========
+Các khái niệm
+=============
 
-Let's show the sort of functionality that we are going to explore in this
-introductory tutorial by making use of the :command:`ls` command:
+Hãy minh họa loại chức năng mà chúng ta sẽ tìm hiểu trong hướng dẫn nhập môn này bằng cách sử dụng lệnh :command:`ls`:
 
 .. code-block:: shell-session
 
@@ -50,39 +39,27 @@ introductory tutorial by making use of the :command:`ls` command:
    Sort entries alphabetically if none of -cftuvSUX nor --sort is specified.
    ...
 
-A few concepts we can learn from the four commands:
+Bốn lệnh trên cho chúng ta biết một vài khái niệm:
 
-* The :command:`ls` command is useful when run without any options at all. It defaults
-  to displaying the contents of the current directory.
+* Lệnh :command:`ls` rất hữu ích khi được chạy hoàn toàn không có tùy chọn nào. Theo mặc định, lệnh này sẽ hiển thị nội dung của thư mục hiện tại.
 
-* If we want beyond what it provides by default, we tell it a bit more. In
-  this case, we want it to display a different directory, ``pypy``.
-  What we did is specify what is known as a positional argument. It's named so
-  because the program should know what to do with the value, solely based on
-  where it appears on the command line. This concept is more relevant
-  to a command like :command:`cp`, whose most basic usage is ``cp SRC DEST``.
-  The first position is *what you want copied,* and the second
-  position is *where you want it copied to*.
+* Nếu muốn làm nhiều hơn những gì lệnh cung cấp theo mặc định, chúng ta sẽ cung cấp thêm một chút thông tin cho lệnh. Trong trường hợp này, chúng ta muốn lệnh hiển thị một thư mục khác, ``pypy``. Việc chúng ta làm được gọi là chỉ định một positional argument. Nó được gọi như vậy vì chương trình phải biết cần làm gì với giá trị đó chỉ dựa vào vị trí của giá trị trên dòng lệnh. Khái niệm này phù hợp hơn với một lệnh như :command:`cp`, có cách sử dụng cơ bản nhất là ``cp SRC DEST``. Vị trí đầu tiên là *thứ bạn muốn sao chép,* còn vị trí thứ hai là *nơi bạn muốn sao chép đến*.
 
-* Now, say we want to change behaviour of the program. In our example,
-  we display more info for each file instead of just showing the file names.
-  The ``-l`` in that case is known as an optional argument.
+* Bây giờ, giả sử chúng ta muốn thay đổi hành vi của chương trình. Trong ví dụ này, chúng ta hiển thị nhiều thông tin hơn cho mỗi tệp thay vì chỉ hiển thị tên tệp. ``-l`` trong trường hợp đó được gọi là một optional argument.
 
-* That's a snippet of the help text. It's very useful in that you can
-  come across a program you have never used before, and can figure out
-  how it works simply by reading its help text.
+* Đó là một đoạn văn bản trợ giúp. Nó rất hữu ích vì bạn có thể gặp một chương trình mà mình chưa từng sử dụng trước đây và tìm hiểu cách chương trình hoạt động chỉ bằng cách đọc văn bản trợ giúp của nó.
 
 
-The basics
-==========
+Những điều cơ bản
+=================
 
-Let us start with a very simple example which does (almost) nothing::
+Hãy bắt đầu với một ví dụ rất đơn giản, gần như không làm gì cả::
 
    import argparse
    parser = argparse.ArgumentParser()
    parser.parse_args()
 
-Following is a result of running the code:
+Sau đây là kết quả khi chạy đoạn mã:
 
 .. code-block:: shell-session
 
@@ -99,24 +76,19 @@ Following is a result of running the code:
    usage: prog.py [-h]
    prog.py: error: unrecognized arguments: foo
 
-Here is what is happening:
+Sau đây là những gì đang diễn ra:
 
-* Running the script without any options results in nothing displayed to
-  stdout. Not so useful.
+* Chạy script mà không có tùy chọn nào sẽ không hiển thị gì trên stdout. Không hữu ích lắm.
 
-* The second one starts to display the usefulness of the :mod:`argparse`
-  module. We have done almost nothing, but already we get a nice help message.
+* Mục thứ hai bắt đầu cho thấy tính hữu ích của module :mod:`argparse`. Chúng ta hầu như chưa làm gì, nhưng đã nhận được một thông báo trợ giúp khá rõ ràng.
 
-* The ``--help`` option, which can also be shortened to ``-h``, is the only
-  option we get for free (i.e. no need to specify it). Specifying anything
-  else results in an error. But even then, we do get a useful usage message,
-  also for free.
+* Tùy chọn ``--help``, cũng có thể được viết ngắn gọn thành ``-h``, là tùy chọn duy nhất chúng ta được cung cấp sẵn (tức là không cần chỉ định). Việc chỉ định bất kỳ thứ gì khác sẽ dẫn đến lỗi. Nhưng ngay cả khi đó, chúng ta vẫn nhận được một thông báo usage hữu ích, cũng được cung cấp sẵn.
 
 
-Introducing Positional arguments
-================================
+Giới thiệu các đối số vị trí
+============================
 
-An example::
+Một ví dụ::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -124,7 +96,7 @@ An example::
    args = parser.parse_args()
    print(args.echo)
 
-And running the code:
+Và chạy đoạn code:
 
 .. code-block:: shell-session
 
@@ -142,26 +114,17 @@ And running the code:
    $ python prog.py foo
    foo
 
-Here is what's happening:
+Sau đây là những gì đang diễn ra:
 
-* We've added the :meth:`~ArgumentParser.add_argument` method, which is what we use to specify
-  which command-line options the program is willing to accept. In this case,
-  I've named it ``echo`` so that it's in line with its function.
+* Chúng ta đã thêm phương thức :meth:`~ArgumentParser.add_argument`, được dùng để chỉ định các tùy chọn dòng lệnh mà chương trình chấp nhận. Trong trường hợp này, tôi đặt tên cho nó là ``echo`` để phù hợp với chức năng của nó.
 
-* Calling our program now requires us to specify an option.
+* Giờ đây, để gọi chương trình, chúng ta cần chỉ định một tùy chọn.
 
-* The :meth:`~ArgumentParser.parse_args` method actually returns some data from the
-  options specified, in this case, ``echo``.
+* Phương thức :meth:`~ArgumentParser.parse_args` thực sự trả về một số dữ liệu từ các tùy chọn đã chỉ định, trong trường hợp này là ``echo``.
 
-* The variable is some form of 'magic' that :mod:`argparse` performs for free
-  (i.e. no need to specify which variable that value is stored in).
-  You will also notice that its name matches the string argument given
-  to the method, ``echo``.
+* Biến này là một dạng 'ma thuật' mà :mod:`argparse` tự động thực hiện (tức là bạn không cần chỉ định giá trị đó được lưu trữ trong biến nào). Bạn cũng sẽ nhận thấy rằng tên của biến khớp với đối số chuỗi được truyền cho phương thức, ``echo``.
 
-Note however that, although the help display looks nice and all, it currently
-is not as helpful as it can be. For example we see that we got ``echo`` as a
-positional argument, but we don't know what it does, other than by guessing or
-by reading the source code. So, let's make it a bit more useful::
+Tuy nhiên, hãy lưu ý rằng mặc dù phần hiển thị trợ giúp trông khá đẹp, hiện tại nó vẫn chưa hữu ích nhiều như có thể. Ví dụ, chúng ta thấy rằng mình nhận được ``echo`` dưới dạng một đối số vị trí, nhưng không biết nó làm gì ngoài việc đoán hoặc đọc mã nguồn. Vì vậy, hãy làm cho nó hữu ích hơn một chút::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -169,7 +132,7 @@ by reading the source code. So, let's make it a bit more useful::
    args = parser.parse_args()
    print(args.echo)
 
-And we get:
+Và chúng ta nhận được:
 
 .. code-block:: shell-session
 
@@ -182,7 +145,7 @@ And we get:
    options:
      -h, --help  show this help message and exit
 
-Now, how about doing something even more useful::
+Bây giờ, hãy thử làm một việc thậm chí còn hữu ích hơn::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -190,7 +153,7 @@ Now, how about doing something even more useful::
    args = parser.parse_args()
    print(args.square**2)
 
-Following is a result of running the code:
+Sau đây là kết quả khi chạy đoạn mã:
 
 .. code-block:: shell-session
 
@@ -200,9 +163,8 @@ Following is a result of running the code:
        print(args.square**2)
    TypeError: unsupported operand type(s) for ** or pow(): 'str' and 'int'
 
-That didn't go so well. That's because :mod:`argparse` treats the options we
-give it as strings, unless we tell it otherwise. So, let's tell
-:mod:`argparse` to treat that input as an integer::
+Kết quả không được tốt lắm. Đó là vì :mod:`argparse` xử lý các tùy chọn chúng ta cung cấp dưới dạng chuỗi, trừ khi chúng ta yêu cầu nó làm khác đi. Vì vậy, hãy yêu cầu
+:mod:`argparse` xử lý dữ liệu đầu vào đó dưới dạng số nguyên::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -211,7 +173,7 @@ give it as strings, unless we tell it otherwise. So, let's tell
    args = parser.parse_args()
    print(args.square**2)
 
-Following is a result of running the code:
+Sau đây là kết quả khi chạy đoạn mã:
 
 .. code-block:: shell-session
 
@@ -221,15 +183,13 @@ Following is a result of running the code:
    usage: prog.py [-h] square
    prog.py: error: argument square: invalid int value: 'four'
 
-That went well. The program now even helpfully quits on bad illegal input
-before proceeding.
+Lần này đã thành công. Giờ đây, chương trình thậm chí còn hữu ích ở chỗ tự động thoát khi gặp dữ liệu đầu vào không hợp lệ trước khi tiếp tục.
 
 
-Introducing Optional arguments
+Giới thiệu các đối số tùy chọn
 ==============================
 
-So far we have been playing with positional arguments. Let us
-have a look on how to add optional ones::
+Cho đến nay, chúng ta đã làm việc với các đối số vị trí. Hãy cùng xem cách thêm các đối số tùy chọn::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -238,7 +198,7 @@ have a look on how to add optional ones::
    if args.verbosity:
        print("verbosity turned on")
 
-And the output:
+Và kết quả:
 
 .. code-block:: shell-session
 
@@ -256,25 +216,17 @@ And the output:
    usage: prog.py [-h] [--verbosity VERBOSITY]
    prog.py: error: argument --verbosity: expected one argument
 
-Here is what is happening:
+Sau đây là những gì đang diễn ra:
 
-* The program is written so as to display something when ``--verbosity`` is
-  specified and display nothing when not.
+* Chương trình được viết để hiển thị nội dung nào đó khi ``--verbosity`` được chỉ định và không hiển thị gì khi không được chỉ định.
 
-* To show that the option is actually optional, there is no error when running
-  the program without it. Note that by default, if an optional argument isn't
-  used, the relevant variable, in this case ``args.verbosity``, is
-  given ``None`` as a value, which is the reason it fails the truth
-  test of the :keyword:`if` statement.
+* Để cho thấy tùy chọn này thực sự là tùy chọn, chương trình không báo lỗi khi chạy mà không có tùy chọn đó. Lưu ý rằng theo mặc định, nếu một đối số tùy chọn không được sử dụng, biến tương ứng, trong trường hợp này là ``args.verbosity``, sẽ nhận ``None`` làm giá trị, đó là lý do nó không vượt qua phép kiểm tra điều kiện của câu lệnh :keyword:`if`.
 
-* The help message is a bit different.
+* Thông báo trợ giúp có đôi chút khác biệt.
 
-* When using the ``--verbosity`` option, one must also specify some value,
-  any value.
+* Khi sử dụng tùy chọn ``--verbosity``, bạn cũng phải chỉ định một giá trị nào đó, bất kỳ giá trị nào.
 
-The above example accepts arbitrary integer values for ``--verbosity``, but for
-our simple program, only two values are actually useful, ``True`` or ``False``.
-Let's modify the code accordingly::
+Ví dụ trên chấp nhận các giá trị số nguyên tùy ý cho ``--verbosity``, nhưng đối với chương trình đơn giản của chúng ta, chỉ có hai giá trị thực sự hữu ích là ``True`` hoặc ``False``. Hãy sửa đổi mã cho phù hợp::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -284,7 +236,7 @@ Let's modify the code accordingly::
    if args.verbose:
        print("verbosity turned on")
 
-And the output:
+Và kết quả:
 
 .. code-block:: shell-session
 
@@ -300,27 +252,19 @@ And the output:
      -h, --help  show this help message and exit
      --verbose   increase output verbosity
 
-Here is what is happening:
+Sau đây là những gì đang diễn ra:
 
-* The option is now more of a flag than something that requires a value.
-  We even changed the name of the option to match that idea.
-  Note that we now specify a new keyword, ``action``, and give it the value
-  ``"store_true"``. This means that, if the option is specified,
-  assign the value ``True`` to ``args.verbose``.
-  Not specifying it implies ``False``.
+* Tùy chọn này giờ giống một flag hơn là một tùy chọn yêu cầu giá trị. Chúng ta thậm chí đã đổi tên tùy chọn để phản ánh ý tưởng đó. Lưu ý rằng giờ đây chúng ta chỉ định một keyword mới là ``action`` và gán cho nó giá trị ``"store_true"``. Điều này có nghĩa là nếu tùy chọn được chỉ định, hãy gán giá trị ``True`` cho ``args.verbose``. Nếu không chỉ định tùy chọn này thì mặc định là ``False``.
 
-* It complains when you specify a value, in true spirit of what flags
-  actually are.
+* Nó sẽ báo lỗi khi bạn chỉ định một giá trị, đúng với bản chất thực sự của các flag.
 
-* Notice the different help text.
+* Hãy chú ý đến phần văn bản trợ giúp khác biệt.
 
 
-Short options
--------------
+Các tùy chọn ngắn
+-----------------
 
-If you are familiar with command line usage,
-you will notice that I haven't yet touched on the topic of short
-versions of the options. It's quite simple::
+Nếu bạn quen sử dụng command line, bạn sẽ nhận thấy rằng tôi vẫn chưa đề cập đến phiên bản viết tắt của các tùy chọn. Điều này khá đơn giản::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -330,7 +274,7 @@ versions of the options. It's quite simple::
    if args.verbose:
        print("verbosity turned on")
 
-And here goes:
+Và đây là cách thực hiện:
 
 .. code-block:: shell-session
 
@@ -343,13 +287,13 @@ And here goes:
      -h, --help     show this help message and exit
      -v, --verbose  increase output verbosity
 
-Note that the new ability is also reflected in the help text.
+Lưu ý rằng khả năng mới này cũng được phản ánh trong phần văn bản trợ giúp.
 
 
-Combining Positional and Optional arguments
-===========================================
+Kết hợp các đối số positional và optional
+=========================================
 
-Our program keeps growing in complexity::
+Chương trình của chúng ta tiếp tục trở nên phức tạp hơn::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -364,7 +308,7 @@ Our program keeps growing in complexity::
    else:
        print(answer)
 
-And now the output:
+Và đây là kết quả đầu ra:
 
 .. code-block:: shell-session
 
@@ -378,12 +322,11 @@ And now the output:
    $ python prog.py --verbose 4
    the square of 4 equals 16
 
-* We've brought back a positional argument, hence the complaint.
+* Chúng ta đã đưa một đối số positional trở lại, vì vậy mới xuất hiện thông báo lỗi.
 
-* Note that the order does not matter.
+* Lưu ý rằng thứ tự không quan trọng.
 
-How about we give this program of ours back the ability to have
-multiple verbosity values, and actually get to use them::
+Vậy hãy khôi phục cho chương trình của chúng ta khả năng nhận nhiều giá trị verbosity và thực sự sử dụng chúng::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -400,7 +343,7 @@ multiple verbosity values, and actually get to use them::
    else:
        print(answer)
 
-And the output:
+Và kết quả:
 
 .. code-block:: shell-session
 
@@ -416,8 +359,7 @@ And the output:
    $ python prog.py 4 -v 3
    16
 
-These all look good except the last one, which exposes a bug in our program.
-Let's fix it by restricting the values the ``--verbosity`` option can accept::
+Tất cả đều có vẻ ổn, ngoại trừ trường hợp cuối cùng làm lộ ra một lỗi trong chương trình. Hãy sửa lỗi này bằng cách giới hạn các giá trị mà tùy chọn ``--verbosity`` có thể chấp nhận::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -434,7 +376,7 @@ Let's fix it by restricting the values the ``--verbosity`` option can accept::
    else:
        print(answer)
 
-And the output:
+Và kết quả:
 
 .. code-block:: shell-session
 
@@ -452,12 +394,9 @@ And the output:
      -v, --verbosity {0,1,2}
                            increase output verbosity
 
-Note that the change also reflects both in the error message as well as the
-help string.
+Lưu ý rằng thay đổi này được phản ánh cả trong thông báo lỗi lẫn chuỗi trợ giúp.
 
-Now, let's use a different approach of playing with verbosity, which is pretty
-common. It also matches the way the CPython executable handles its own
-verbosity argument (check the output of ``python --help``)::
+Bây giờ, hãy thử một cách khác để điều khiển verbosity, cách này khá phổ biến. Nó cũng tương ứng với cách tệp thực thi CPython xử lý đối số verbosity của chính nó (hãy kiểm tra kết quả của ``python --help``)::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -474,8 +413,7 @@ verbosity argument (check the output of ``python --help``)::
    else:
        print(answer)
 
-We have introduced another action, "count",
-to count the number of occurrences of specific options.
+Chúng ta đã thêm một action khác, "count", để đếm số lần xuất hiện của các tùy chọn cụ thể.
 
 
 .. code-block:: shell-session
@@ -503,28 +441,22 @@ to count the number of occurrences of specific options.
    $ python prog.py 4 -vvv
    16
 
-* Yes, it's now more of a flag (similar to ``action="store_true"``) in the
-  previous version of our script. That should explain the complaint.
+* Đúng vậy, giờ nó giống một flag hơn (tương tự như ``action="store_true"``) trong phiên bản trước của script. Điều đó sẽ giải thích lời phàn nàn này.
 
-* It also behaves similar to "store_true" action.
+* Nó cũng hoạt động tương tự action "store_true".
 
-* Now here's a demonstration of what the "count" action gives. You've probably
-  seen this sort of usage before.
+* Sau đây là minh họa về những gì action "count" cung cấp. Có lẽ bạn đã từng thấy kiểu sử dụng này trước đây.
 
-* And if you don't specify the ``-v`` flag, that flag is considered to have
-  ``None`` value.
+* Và nếu bạn không chỉ định flag ``-v``, flag đó được xem là có giá trị ``None``.
 
-* As should be expected, specifying the long form of the flag, we should get
-  the same output.
+* Đúng như dự kiến, khi chỉ định dạng đầy đủ của flag, chúng ta sẽ nhận được cùng một kết quả.
 
-* Sadly, our help output isn't very informative on the new ability our script
-  has acquired, but that can always be fixed by improving the documentation for
-  our script (e.g. via the ``help`` keyword argument).
+* Đáng tiếc là phần output trợ giúp của chúng ta chưa cung cấp nhiều thông tin về khả năng mới mà script đã có, nhưng điều đó luôn có thể được khắc phục bằng cách cải thiện tài liệu cho script (ví dụ: thông qua keyword argument ``help``).
 
-* That last output exposes a bug in our program.
+* Kết quả đầu ra cuối cùng đó cho thấy một lỗi trong chương trình của chúng ta.
 
 
-Let's fix::
+Hãy sửa lỗi này::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -543,7 +475,7 @@ Let's fix::
    else:
        print(answer)
 
-And this is what it gives:
+Và đây là kết quả:
 
 .. code-block:: shell-session
 
@@ -558,12 +490,11 @@ And this is what it gives:
    TypeError: '>=' not supported between instances of 'NoneType' and 'int'
 
 
-* First output went well, and fixes the bug we had before.
-  That is, we want any value >= 2 to be as verbose as possible.
+* Kết quả đầu tiên diễn ra tốt và đã sửa được lỗi trước đó. Nghĩa là, chúng ta muốn mọi giá trị >= 2 đều có mức độ chi tiết tối đa.
 
-* Third output not so good.
+* Kết quả thứ ba không được tốt lắm.
 
-Let's fix that bug::
+Hãy sửa lỗi đó::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -580,31 +511,22 @@ Let's fix that bug::
    else:
        print(answer)
 
-We've just introduced yet another keyword, ``default``.
-We've set it to ``0`` in order to make it comparable to the other int values.
-Remember that by default,
-if an optional argument isn't specified,
-it gets the ``None`` value, and that cannot be compared to an int value
-(hence the :exc:`TypeError` exception).
+Chúng ta vừa giới thiệu thêm một keyword, ``default``. Chúng ta đặt nó thành ``0`` để có thể so sánh với các giá trị int khác. Hãy nhớ rằng theo mặc định, nếu không chỉ định một đối số tùy chọn, nó sẽ nhận giá trị ``None``, và giá trị này không thể so sánh với một giá trị int (do đó mới có exception :exc:`TypeError`).
 
-And:
+Và:
 
 .. code-block:: shell-session
 
    $ python prog.py 4
    16
 
-You can go quite far just with what we've learned so far,
-and we have only scratched the surface.
-The :mod:`argparse` module is very powerful,
-and we'll explore a bit more of it before we end this tutorial.
+Chỉ với những gì đã học cho đến nay, bạn đã có thể làm được khá nhiều việc, trong khi chúng ta mới chỉ khám phá sơ qua. Module :mod:`argparse` rất mạnh mẽ, và chúng ta sẽ tìm hiểu thêm một chút về module này trước khi kết thúc tutorial.
 
 
-Getting a little more advanced
+Tìm hiểu nâng cao hơn một chút
 ==============================
 
-What if we wanted to expand our tiny program to perform other powers,
-not just squares::
+Nếu muốn mở rộng chương trình nhỏ của mình để thực hiện các phép lũy thừa khác, không chỉ bình phương thì sao::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -620,7 +542,7 @@ not just squares::
    else:
        print(answer)
 
-Output:
+Kết quả:
 
 .. code-block:: shell-session
 
@@ -641,9 +563,7 @@ Output:
    4^2 == 16
 
 
-Notice that so far we've been using verbosity level to *change* the text
-that gets displayed. The following example instead uses verbosity level
-to display *more* text instead::
+Hãy chú ý rằng cho đến nay, chúng ta đã sử dụng mức độ verbosity để *thay đổi* văn bản được hiển thị. Thay vào đó, ví dụ sau sử dụng mức độ verbosity để hiển thị *nhiều hơn* văn bản::
 
    import argparse
    parser = argparse.ArgumentParser()
@@ -658,7 +578,7 @@ to display *more* text instead::
        print(f"{args.x}^{args.y} == ", end="")
    print(answer)
 
-Output:
+Kết quả:
 
 .. code-block:: shell-session
 
@@ -673,18 +593,16 @@ Output:
 
 .. _specifying-ambiguous-arguments:
 
-Specifying ambiguous arguments
-------------------------------
+Chỉ định các đối số không rõ ràng
+---------------------------------
 
-When there is ambiguity in deciding whether an argument is positional or for an
-argument, ``--`` can be used to tell :meth:`~ArgumentParser.parse_args` that
-everything after that is a positional argument::
+Khi có sự không rõ ràng trong việc quyết định một đối số là positional hay dành cho một argument, ``--`` có thể được dùng để cho :meth:`~ArgumentParser.parse_args` biết rằng mọi thứ sau đó là một positional argument::
 
    >>> parser = argparse.ArgumentParser(prog='PROG')
    >>> parser.add_argument('-n', nargs='+')
    >>> parser.add_argument('args', nargs='*')
 
-   >>> # ambiguous, so parse_args assumes it's an option
+   >>> # không rõ ràng, nên parse_args giả định đó là một option
    >>> parser.parse_args(['-f'])
    usage: PROG [-h] [-n N [N ...]] [args ...]
    PROG: error: unrecognized arguments: -f
@@ -692,7 +610,7 @@ everything after that is a positional argument::
    >>> parser.parse_args(['--', '-f'])
    Namespace(args=['-f'], n=None)
 
-   >>> # ambiguous, so the -n option greedily accepts arguments
+   >>> # không rõ ràng, nên tùy chọn -n chấp nhận các đối số một cách tham lam
    >>> parser.parse_args(['-n', '1', '2', '3'])
    Namespace(args=[], n=['1', '2', '3'])
 
@@ -700,16 +618,12 @@ everything after that is a positional argument::
    Namespace(args=['2', '3'], n=['1'])
 
 
-Conflicting options
--------------------
+Các tùy chọn xung đột
+---------------------
 
-So far, we have been working with two methods of an
-:class:`argparse.ArgumentParser` instance. Let's introduce a third one,
-:meth:`~ArgumentParser.add_mutually_exclusive_group`. It allows for us to specify options that
-conflict with each other. Let's also change the rest of the program so that
-the new functionality makes more sense:
-we'll introduce the ``--quiet`` option,
-which will be the opposite of the ``--verbose`` one::
+Cho đến nay, chúng ta đã làm việc với hai phương thức của một
+:class:`argparse.ArgumentParser` instance. Hãy giới thiệu thêm một tùy chọn thứ ba,
+:meth:`~ArgumentParser.add_mutually_exclusive_group`. Nó cho phép chúng ta chỉ định các tùy chọn xung đột với nhau. Hãy thay đổi phần còn lại của chương trình để chức năng mới trở nên hợp lý hơn: chúng ta sẽ giới thiệu tùy chọn ``--quiet``, là tùy chọn đối lập với tùy chọn ``--verbose``::
 
    import argparse
 
@@ -729,8 +643,7 @@ which will be the opposite of the ``--verbose`` one::
    else:
        print(f"{args.x}^{args.y} == {answer}")
 
-Our program is now simpler, and we've lost some functionality for the sake of
-demonstration. Anyways, here's the output:
+Chương trình của chúng ta giờ đây đơn giản hơn và chúng ta đã loại bỏ một số chức năng để phục vụ mục đích minh họa. Dù sao thì đây là đầu ra:
 
 .. code-block:: shell-session
 
@@ -747,12 +660,9 @@ demonstration. Anyways, here's the output:
    usage: prog.py [-h] [-v | -q] x y
    prog.py: error: argument -q/--quiet: not allowed with argument -v/--verbose
 
-That should be easy to follow. I've added that last output so you can see the
-sort of flexibility you get, i.e. mixing long form options with short form
-ones.
+Điều này hẳn khá dễ theo dõi. Tôi đã thêm phần đầu ra cuối cùng đó để bạn thấy được mức độ linh hoạt, tức là có thể kết hợp các tùy chọn dạng dài với các tùy chọn dạng ngắn.
 
-Before we conclude, you probably want to tell your users the main purpose of
-your program, just in case they don't know::
+Trước khi kết thúc, có lẽ bạn muốn cho người dùng biết mục đích chính của chương trình, phòng trường hợp họ không biết::
 
    import argparse
 
@@ -772,9 +682,7 @@ your program, just in case they don't know::
    else:
        print(f"{args.x}^{args.y} == {answer}")
 
-Note that slight difference in the usage text. Note the ``[-v | -q]``,
-which tells us that we can either use ``-v`` or ``-q``,
-but not both at the same time:
+Hãy lưu ý sự khác biệt nhỏ trong văn bản usage. Lưu ý ``[-v | -q]``, cho chúng ta biết rằng có thể sử dụng ``-v`` hoặc ``-q``, nhưng không thể sử dụng cả hai cùng lúc:
 
 .. code-block:: shell-session
 
@@ -793,15 +701,13 @@ but not both at the same time:
      -q, --quiet
 
 
-How to translate the argparse output
-====================================
+Cách dịch đầu ra của argparse
+=============================
 
-The output of the :mod:`argparse` module such as its help text and error
-messages are all made translatable using the :mod:`gettext` module. This
-allows applications to easily localize messages produced by
-:mod:`argparse`. See also :ref:`i18n-howto`.
+Đầu ra của mô-đun :mod:`argparse`, chẳng hạn như văn bản trợ giúp và thông báo lỗi, đều có thể được dịch bằng mô-đun :mod:`gettext`. Điều này cho phép các ứng dụng dễ dàng bản địa hóa những thông báo do
+:mod:`argparse` tạo ra. Xem thêm :ref:`i18n-howto`.
 
-For instance, in this :mod:`argparse` output:
+Ví dụ, trong đầu ra của :mod:`argparse` này:
 
 .. code-block:: shell-session
 
@@ -819,48 +725,33 @@ For instance, in this :mod:`argparse` output:
      -v, --verbose
      -q, --quiet
 
-The strings ``usage:``, ``positional arguments:``, ``options:`` and
-``show this help message and exit`` are all translatable.
+Các chuỗi ``usage:``, ``positional arguments:``, ``options:`` và ``show this help message and exit`` đều có thể được dịch.
 
-In order to translate these strings, they must first be extracted
-into a ``.po`` file. For example, using `Babel <https://babel.pocoo.org/>`__,
-run this command:
+Để dịch các chuỗi này, trước tiên chúng phải được trích xuất vào một tệp ``.po``. Ví dụ, sử dụng `Babel <https://babel.pocoo.org/>`__, hãy chạy lệnh sau:
 
 .. code-block:: shell-session
 
   $ pybabel extract -o messages.po /usr/lib/python3.12/argparse.py
 
-This command will extract all translatable strings from the :mod:`argparse`
-module and output them into a file named ``messages.po``. This command assumes
-that your Python installation is in ``/usr/lib``.
+Lệnh này sẽ trích xuất tất cả các chuỗi có thể dịch từ mô-đun :mod:`argparse` và xuất chúng vào một tệp có tên ``messages.po``. Lệnh này giả định rằng bản cài đặt Python của bạn nằm trong ``/usr/lib``.
 
-You can find out the location of the :mod:`argparse` module on your system
-using this script::
+Bạn có thể tìm vị trí của mô-đun :mod:`argparse` trên hệ thống bằng tập lệnh này::
 
    import argparse
    print(argparse.__file__)
 
-Once the messages in the ``.po`` file are translated and the translations are
-installed using :mod:`gettext`, :mod:`argparse` will be able to display the
-translated messages.
+Sau khi các thông báo trong tệp ``.po`` được dịch và các bản dịch được cài đặt bằng :mod:`gettext`, :mod:`argparse` sẽ có thể hiển thị các thông báo đã dịch.
 
-To translate your own strings in the :mod:`argparse` output, use :mod:`gettext`.
+Để dịch các chuỗi của riêng bạn trong đầu ra :mod:`argparse`, hãy sử dụng :mod:`gettext`.
 
-Custom type converters
-======================
+Bộ chuyển đổi kiểu tùy chỉnh
+============================
 
-The :mod:`argparse` module allows you to specify custom type converters for
-your command-line arguments. This allows you to modify user input before it's
-stored in the :class:`argparse.Namespace`. This can be useful when you need to
-pre-process the input before it is used in your program.
+Mô-đun :mod:`argparse` cho phép bạn chỉ định các bộ chuyển đổi kiểu tùy chỉnh cho các đối số dòng lệnh. Điều này cho phép bạn sửa đổi dữ liệu đầu vào của người dùng trước khi lưu vào :class:`argparse.Namespace`. Tính năng này hữu ích khi bạn cần tiền xử lý dữ liệu đầu vào trước khi sử dụng trong chương trình.
 
-When using a custom type converter, you can use any callable that takes a
-single string argument (the argument value) and returns the converted value.
-However, if you need to handle more complex scenarios, you can use a custom
-action class with the **action** parameter instead.
+Khi sử dụng bộ chuyển đổi kiểu tùy chỉnh, bạn có thể dùng bất kỳ callable nào nhận một đối số chuỗi duy nhất (giá trị đối số) và trả về giá trị đã chuyển đổi. Tuy nhiên, nếu cần xử lý các tình huống phức tạp hơn, bạn có thể sử dụng một lớp action tùy chỉnh với tham số **action** thay thế.
 
-For example, let's say you want to handle arguments with different prefixes and
-process them accordingly::
+Ví dụ: giả sử bạn muốn xử lý các đối số có các tiền tố khác nhau và xử lý chúng tương ứng::
 
    import argparse
 
@@ -874,29 +765,22 @@ process them accordingly::
    args = parser.parse_args()
    print(args)
 
-Output:
+Đầu ra:
 
 .. code-block:: shell-session
 
    $ python prog.py -a value1 +a value2
    Namespace(a=[('-', 'value1'), ('+', 'value2')])
 
-In this example, we:
+Trong ví dụ này, chúng ta:
 
-* Created a parser with custom prefix characters using the ``prefix_chars``
-  parameter.
+* Đã tạo một parser với các ký tự tiền tố tùy chỉnh bằng tham số ``prefix_chars``.
 
-* Defined two arguments, ``-a`` and ``+a``, which used the ``type`` parameter to
-  create custom type converters to store the value in a tuple with the prefix.
+* Đã định nghĩa hai đối số, ``-a`` và ``+a``, sử dụng tham số ``type`` để tạo các bộ chuyển đổi kiểu tùy chỉnh nhằm lưu trữ giá trị trong một tuple cùng với tiền tố.
 
-Without the custom type converters, the arguments would have treated the ``-a``
-and ``+a`` as the same argument, which would have been undesirable. By using custom
-type converters, we were able to differentiate between the two arguments.
+Nếu không có các bộ chuyển đổi kiểu tùy chỉnh, các đối số sẽ coi ``-a`` và ``+a`` là cùng một đối số, điều này sẽ không phù hợp. Bằng cách sử dụng các bộ chuyển đổi kiểu tùy chỉnh, chúng ta đã có thể phân biệt hai đối số này.
 
-Conclusion
-==========
+Kết luận
+========
 
-The :mod:`argparse` module offers a lot more than shown here.
-Its docs are quite detailed and thorough, and full of examples.
-Having gone through this tutorial, you should easily digest them
-without feeling overwhelmed.
+Module :mod:`argparse` cung cấp nhiều tính năng hơn những gì được trình bày ở đây. Tài liệu của module này khá chi tiết, đầy đủ và có rất nhiều ví dụ. Sau khi hoàn thành hướng dẫn này, bạn sẽ dễ dàng tiếp thu tài liệu đó mà không cảm thấy quá tải.
