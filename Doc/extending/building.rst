@@ -2,14 +2,13 @@
 
 .. _building:
 
-*****************************
-Building C and C++ Extensions
-*****************************
+******************************
+Xây dựng phần mở rộng C và C++
+******************************
 
-A C extension for CPython is a shared library (for example, a ``.so`` file on
-Linux, ``.pyd`` on Windows), which exports an *initialization function*.
+Phần mở rộng C cho CPython là một thư viện dùng chung (ví dụ: tệp ``.so`` trên Linux, ``.pyd`` trên Windows), trong đó xuất một *hàm khởi tạo*.
 
-See :ref:`extension-modules` for details.
+Xem :ref:`extension-modules` để biết chi tiết.
 
 
 .. highlight:: c
@@ -17,14 +16,10 @@ See :ref:`extension-modules` for details.
 .. _install-index:
 .. _setuptools-index:
 
-Building C and C++ Extensions with setuptools
-=============================================
+Xây dựng phần mở rộng C và C++ bằng setuptools
+==============================================
 
 
-Building, packaging and distributing extension modules is best done with
-third-party tools, and is out of scope of this document.
-One suitable tool is Setuptools, whose documentation can be found at
-https://setuptools.pypa.io/en/latest/setuptools.html.
+Việc xây dựng, đóng gói và phân phối các module mở rộng nên được thực hiện bằng các công cụ bên thứ ba, và nằm ngoài phạm vi của tài liệu này. Một công cụ phù hợp là Setuptools; bạn có thể xem tài liệu của công cụ này tại https://setuptools.pypa.io/en/latest/setuptools.html.
 
-The :mod:`distutils` module, which was included in the standard library
-until Python 3.12, is now maintained as part of Setuptools.
+Mô-đun :mod:`distutils`, vốn được đưa vào thư viện chuẩn cho đến Python 3.12, hiện được duy trì như một phần của Setuptools.

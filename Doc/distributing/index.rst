@@ -5,15 +5,13 @@
 
 .. _distributing-index:
 
-###############################
-  Distributing Python Modules
-###############################
+###########################
+Phân phối các module Python
+###########################
 
 .. note::
 
-   Information and guidance on distributing Python modules and packages
-   has been moved to the `Python Packaging User Guide`_,
-   and the tutorial on `packaging Python projects`_.
+   Thông tin và hướng dẫn về việc phân phối các module và package Python đã được chuyển sang `Python Packaging User Guide <Python Packaging User Guide_>`_ và hướng dẫn về `đóng gói các dự án Python <packaging Python projects_>`_.
 
    .. _Python Packaging User Guide: https://packaging.python.org/
    .. _packaging Python projects: https://packaging.python.org/en/latest/tutorials/packaging-projects/

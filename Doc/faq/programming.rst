@@ -1,129 +1,92 @@
 :tocdepth: 2
 
-===============
-Programming FAQ
-===============
+===============================
+Câu hỏi thường gặp về lập trình
+===============================
 
 .. only:: html
 
    .. contents::
 
-General questions
-=================
+Câu hỏi chung
+=============
 
-Is there a source code-level debugger with breakpoints and single-stepping?
----------------------------------------------------------------------------
+Có trình gỡ lỗi ở cấp mã nguồn với các điểm dừng và khả năng thực thi từng bước không?
+--------------------------------------------------------------------------------------
 
-Yes.
+Có.
 
-Several debuggers for Python are described below, and the built-in function
-:func:`breakpoint` allows you to drop into any of them.
+Dưới đây là phần mô tả một số trình gỡ lỗi dành cho Python, cùng với hàm tích hợp sẵn
+:func:`breakpoint` cho phép bạn chuyển sang bất kỳ trình gỡ lỗi nào trong số đó.
 
-The pdb module is a simple but adequate console-mode debugger for Python. It is
-part of the standard Python library, and is :mod:`documented in the Library
-Reference Manual <pdb>`. You can also write your own debugger by using the code
-for pdb as an example.
+Mô-đun pdb là một trình gỡ lỗi đơn giản nhưng đầy đủ cho Python, hoạt động ở chế độ console. Mô-đun này thuộc thư viện Python tiêu chuẩn và được :mod:`documented in the Library Reference Manual <pdb>`. Bạn cũng có thể tự viết trình gỡ lỗi bằng cách sử dụng mã của pdb làm ví dụ.
 
-The IDLE interactive development environment, which is part of the standard
-Python distribution (normally available as :mod:`idlelib`),
-includes a graphical debugger.
+Môi trường phát triển tương tác IDLE, là một phần của bản phân phối Python tiêu chuẩn (thường có sẵn dưới dạng :mod:`idlelib`), bao gồm một trình gỡ lỗi đồ họa.
 
-PythonWin is a Python IDE that includes a GUI debugger based on pdb.  The
-PythonWin debugger colors breakpoints and has quite a few cool features such as
-debugging non-PythonWin programs.  PythonWin is available as part of
-`pywin32 <https://github.com/mhammond/pywin32>`_ project and
-as a part of the
-`ActivePython <https://www.activestate.com/products/python/>`_ distribution.
+PythonWin là một Python IDE bao gồm trình gỡ lỗi GUI dựa trên pdb. Trình gỡ lỗi PythonWin tô màu các breakpoint và có khá nhiều tính năng thú vị, chẳng hạn như gỡ lỗi các chương trình không phải PythonWin. PythonWin có sẵn trong dự án `pywin32 <https://github.com/mhammond/pywin32>`_ và là một phần của bản phân phối `ActivePython <https://www.activestate.com/products/python/>`_.
 
-`Eric <https://eric-ide.python-projects.org/>`_ is an IDE built on PyQt
-and the Scintilla editing component.
+`Eric <https://eric-ide.python-projects.org/>`_ là một IDE được xây dựng trên PyQt và thành phần chỉnh sửa Scintilla.
 
-`trepan3k <https://github.com/rocky/python3-trepan/>`_ is a gdb-like debugger.
+`trepan3k <https://github.com/rocky/python3-trepan/>`_ là một trình gỡ lỗi tương tự gdb.
 
-`Visual Studio Code <https://code.visualstudio.com/>`_ is an IDE with debugging
-tools that integrates with version-control software.
+`Visual Studio Code <https://code.visualstudio.com/>`_ là một IDE có các công cụ gỡ lỗi tích hợp với phần mềm quản lý phiên bản.
 
-There are a number of commercial Python IDEs that include graphical debuggers.
-They include:
+Có một số Python IDE thương mại bao gồm các trình gỡ lỗi đồ họa. Các IDE đó gồm:
 
 * `Wing IDE <https://wingware.com/>`_
 * `PyCharm <https://www.jetbrains.com/pycharm/>`_
 
 
-Are there tools to help find bugs or perform static analysis?
--------------------------------------------------------------
+Có công cụ nào giúp tìm lỗi hoặc thực hiện phân tích tĩnh không?
+----------------------------------------------------------------
 
-Yes.
+Có.
 
-`Ruff <https://docs.astral.sh/ruff/>`__,
-`Pylint <https://pylint.readthedocs.io/>`__ and
-`Pyflakes <https://github.com/PyCQA/pyflakes>`__ do basic checking that will
-help you catch bugs sooner.
+`Ruff <https://docs.astral.sh/ruff/>`__, `Pylint <https://pylint.readthedocs.io/>`__ và `Pyflakes <https://github.com/PyCQA/pyflakes>`__ thực hiện các bước kiểm tra cơ bản, giúp bạn phát hiện lỗi sớm hơn.
 
-Static type checkers such as `mypy <https://mypy-lang.org/>`__,
-`ty <https://docs.astral.sh/ty/>`__,
-`Pyrefly <https://pyrefly.org/>`__, and
-`pytype <https://github.com/google/pytype>`__ can check type hints in Python
-source code.
+Các trình kiểm tra kiểu tĩnh như `mypy <https://mypy-lang.org/>`__, `ty <https://docs.astral.sh/ty/>`__, `Pyrefly <https://pyrefly.org/>`__ và `pytype <https://github.com/google/pytype>`__ có thể kiểm tra các type hint trong mã nguồn Python.
 
 
 .. _faq-create-standalone-binary:
 
-How can I create a stand-alone binary from a Python script?
------------------------------------------------------------
+Làm thế nào để tạo tệp nhị phân độc lập từ một script Python?
+-------------------------------------------------------------
 
-You don't need the ability to compile Python to C code if all you want is a
-stand-alone program that users can download and run without having to install
-the Python distribution first.  There are a number of tools that determine the
-set of modules required by a program and bind these modules together with a
-Python binary to produce a single executable.
+Bạn không cần khả năng biên dịch Python thành mã C nếu mục tiêu duy nhất của bạn là tạo một chương trình độc lập mà người dùng có thể tải xuống và chạy mà không phải cài đặt bản phân phối Python trước. Có một số công cụ xác định tập hợp các module mà chương trình yêu cầu, rồi liên kết các module này với một tệp nhị phân Python để tạo ra một tệp thực thi duy nhất.
 
-One is to use the freeze tool, which is included in the Python source tree as
-:source:`Tools/freeze`.
-It converts Python byte code to C arrays; with a C compiler you can
-embed all your modules into a new program, which is then linked with the
-standard Python modules.
+Một cách là sử dụng công cụ freeze, được tích hợp trong cây mã nguồn Python dưới dạng
+:source:`Tools/freeze`. Công cụ này chuyển mã bytecode Python thành các mảng C; với một trình biên dịch C, bạn có thể nhúng tất cả module vào một chương trình mới, sau đó liên kết chương trình đó với các module Python chuẩn.
 
-It works by scanning your source recursively for import statements (in both
-forms) and looking for the modules in the standard Python path as well as in the
-source directory (for built-in modules).  It then turns the bytecode for modules
-written in Python into C code (array initializers that can be turned into code
-objects using the marshal module) and creates a custom-made config file that
-only contains those built-in modules which are actually used in the program.  It
-then compiles the generated C code and links it with the rest of the Python
-interpreter to form a self-contained binary which acts exactly like your script.
+Công cụ này hoạt động bằng cách quét đệ quy mã nguồn để tìm các câu lệnh import (ở cả hai dạng), đồng thời tìm các module trong đường dẫn Python chuẩn cũng như trong thư mục mã nguồn (đối với các module tích hợp sẵn). Sau đó, công cụ chuyển bytecode của các module được viết bằng Python thành mã C (các trình khởi tạo mảng có thể được chuyển thành các đối tượng mã bằng module marshal) và tạo một tệp cấu hình tùy chỉnh chỉ chứa những module tích hợp sẵn thực sự được chương trình sử dụng. Tiếp đó, công cụ biên dịch mã C đã tạo và liên kết mã này với phần còn lại của trình thông dịch Python để tạo thành một binary độc lập, hoạt động chính xác như script của bạn.
 
-The following packages can help with the creation of console and GUI
-executables:
+Các package sau có thể hỗ trợ tạo các executable cho console và GUI:
 
-* `Nuitka <https://nuitka.net/>`_ (Cross-platform)
-* `PyInstaller <https://pyinstaller.org/>`_ (Cross-platform)
-* `PyOxidizer <https://pyoxidizer.readthedocs.io/en/stable/>`_ (Cross-platform)
-* `cx_Freeze <https://marcelotduarte.github.io/cx_Freeze/>`_ (Cross-platform)
-* `py2app <https://github.com/ronaldoussoren/py2app>`_ (macOS only)
-* `py2exe <https://www.py2exe.org/>`_ (Windows only)
+* `Nuitka <https://nuitka.net/>`_ (Đa nền tảng)
+* `PyInstaller <https://pyinstaller.org/>`_ (Đa nền tảng)
+* `PyOxidizer <https://pyoxidizer.readthedocs.io/en/stable/>`_ (Đa nền tảng)
+* `cx_Freeze <https://marcelotduarte.github.io/cx_Freeze/>`_ (Đa nền tảng)
+* `py2app <https://github.com/ronaldoussoren/py2app>`_ (chỉ dành cho macOS)
+* `py2exe <https://www.py2exe.org/>`_ (chỉ dành cho Windows)
 
 
-Are there coding standards or a style guide for Python programs?
-----------------------------------------------------------------
+Có tiêu chuẩn lập trình hoặc hướng dẫn về phong cách viết mã cho các chương trình Python không?
+-----------------------------------------------------------------------------------------------
 
-Yes.  The coding style required for standard library modules is documented as
+Có. Phong cách viết mã bắt buộc đối với các module trong standard library được ghi lại trong
 :pep:`8`.
 
 
-Core language
-=============
+Ngôn ngữ cốt lõi
+================
 
 .. _faq-unboundlocalerror:
 
-Why am I getting an UnboundLocalError when the variable has a value?
---------------------------------------------------------------------
+Tại sao tôi lại nhận được lỗi UnboundLocalError khi biến đã có giá trị?
+-----------------------------------------------------------------------
 
-It can be a surprise to get the :exc:`UnboundLocalError` in previously working
-code when it is modified by adding an assignment statement somewhere in
-the body of a function.
+Có thể bạn sẽ bất ngờ khi gặp :exc:`UnboundLocalError` trong đoạn mã trước đó vẫn hoạt động, sau khi sửa bằng cách thêm một câu lệnh gán ở đâu đó trong phần thân của một hàm.
 
-This code:
+Đoạn mã này:
 
    >>> x = 10
    >>> def bar():
@@ -132,29 +95,23 @@ This code:
    >>> bar()
    10
 
-works, but this code:
+hoạt động, nhưng đoạn mã này:
 
    >>> x = 10
    >>> def foo():
    ...     print(x)
    ...     x += 1
 
-results in an :exc:`!UnboundLocalError`:
+dẫn đến :exc:`!UnboundLocalError`:
 
    >>> foo()
    Traceback (most recent call last):
      ...
    UnboundLocalError: cannot access local variable 'x' where it is not associated with a value
 
-This is because when you make an assignment to a variable in a scope, that
-variable becomes local to that scope and shadows any similarly named variable
-in the outer scope.  Since the last statement in foo assigns a new value to
-``x``, the compiler recognizes it as a local variable.  Consequently when the
-earlier ``print(x)`` attempts to print the uninitialized local variable and
-an error results.
+Điều này là do khi bạn thực hiện phép gán cho một biến trong một phạm vi, biến đó sẽ trở thành biến cục bộ trong phạm vi ấy và che khuất mọi biến cùng tên trong phạm vi bên ngoài. Vì câu lệnh cuối cùng trong foo gán một giá trị mới cho ``x``, trình biên dịch nhận diện nó là một biến cục bộ. Do đó, khi ``print(x)`` ở phía trước cố in biến cục bộ chưa được khởi tạo, lỗi sẽ xảy ra.
 
-In the example above you can access the outer scope variable by declaring it
-global:
+Trong ví dụ trên, bạn có thể truy cập biến thuộc phạm vi bên ngoài bằng cách khai báo biến đó là global:
 
    >>> x = 10
    >>> def foobar():
@@ -165,15 +122,12 @@ global:
    >>> foobar()
    10
 
-This explicit declaration is required in order to remind you that (unlike the
-superficially analogous situation with class and instance variables) you are
-actually modifying the value of the variable in the outer scope:
+Khai báo rõ ràng này là bắt buộc để nhắc bạn rằng (không giống tình huống có vẻ tương tự với các biến lớp và biến thực thể) bạn thực sự đang thay đổi giá trị của biến trong phạm vi bên ngoài:
 
    >>> print(x)
    11
 
-You can do a similar thing in a nested scope using the :keyword:`nonlocal`
-keyword:
+Bạn có thể thực hiện điều tương tự trong một phạm vi lồng nhau bằng từ khóa :keyword:`nonlocal`:
 
    >>> def foo():
    ...    x = 10
@@ -189,86 +143,60 @@ keyword:
    11
 
 
-What are the rules for local and global variables in Python?
-------------------------------------------------------------
+Các quy tắc đối với biến cục bộ và biến toàn cục trong Python là gì?
+--------------------------------------------------------------------
 
-In Python, variables that are only referenced inside a function are implicitly
-global.  If a variable is assigned a value anywhere within the function's body,
-it's assumed to be a local unless explicitly declared as global.
+Trong Python, các biến chỉ được tham chiếu bên trong một hàm sẽ mặc nhiên là biến toàn cục. Nếu một biến được gán giá trị ở bất kỳ đâu trong thân hàm, biến đó được xem là biến cục bộ, trừ khi được khai báo rõ ràng là biến toàn cục.
 
-Though a bit surprising at first, a moment's consideration explains this.  On
-one hand, requiring :keyword:`global` for assigned variables provides a bar
-against unintended side-effects.  On the other hand, if ``global`` was required
-for all global references, you'd be using ``global`` all the time.  You'd have
-to declare as global every reference to a built-in function or to a component of
-an imported module.  This clutter would defeat the usefulness of the ``global``
-declaration for identifying side-effects.
+Mặc dù thoạt đầu hơi bất ngờ, nhưng chỉ cần suy xét một chút là có thể hiểu được điều này. Một mặt, việc yêu cầu :keyword:`global` đối với các biến được gán tạo ra một rào cản chống lại các tác dụng phụ ngoài ý muốn. Mặt khác, nếu ``global`` được yêu cầu cho mọi tham chiếu toàn cục, bạn sẽ phải sử dụng ``global`` mọi lúc. Bạn sẽ phải khai báo là biến toàn cục mọi tham chiếu đến một hàm dựng sẵn hoặc đến một thành phần của mô-đun đã import. Sự rườm rà này sẽ làm mất đi tính hữu ích của khai báo ``global`` trong việc xác định các tác dụng phụ.
 
 
-Why do lambdas defined in a loop with different values all return the same result?
-----------------------------------------------------------------------------------
+Tại sao các lambda được định nghĩa trong một vòng lặp với những giá trị khác nhau lại đều trả về cùng một kết quả?
+------------------------------------------------------------------------------------------------------------------
 
-Assume you use a for loop to define a few different lambdas (or even plain
-functions), for example::
+Giả sử bạn sử dụng vòng lặp for để định nghĩa một vài lambda khác nhau (hoặc thậm chí các hàm thông thường), chẳng hạn như sau::
 
    >>> squares = []
    >>> for x in range(5):
    ...     squares.append(lambda: x**2)
 
-This gives you a list that contains 5 lambdas that calculate ``x**2``.  You
-might expect that, when called, they would return, respectively, ``0``, ``1``,
-``4``, ``9``, and ``16``.  However, when you actually try you will see that
-they all return ``16``::
+Thao tác này tạo ra một danh sách chứa 5 lambda tính toán ``x**2``. Bạn có thể mong đợi rằng khi được gọi, chúng lần lượt sẽ trả về ``0``, ``1``, ``4``, ``9`` và ``16``. Tuy nhiên, khi thực sự thử, bạn sẽ thấy rằng tất cả chúng đều trả về ``16``::
 
    >>> squares[2]()
    16
    >>> squares[4]()
    16
 
-This happens because ``x`` is not local to the lambdas, but is defined in
-the outer scope, and it is accessed when the lambda is called --- not when it
-is defined.  At the end of the loop, the value of ``x`` is ``4``, so all the
-functions now return ``4**2``, that is ``16``.  You can also verify this by
-changing the value of ``x`` and see how the results of the lambdas change::
+Điều này xảy ra vì ``x`` không phải là biến cục bộ của các lambda mà được định nghĩa trong scope bên ngoài, và nó được truy cập khi lambda được gọi --- chứ không phải khi được định nghĩa.  Khi vòng lặp kết thúc, giá trị của ``x`` là ``4``, vì vậy tất cả các hàm hiện đều trả về ``4**2``, tức là ``16``.  Bạn cũng có thể kiểm chứng điều này bằng cách thay đổi giá trị của ``x`` và xem kết quả của các lambda thay đổi như thế nào::
 
    >>> x = 8
    >>> squares[2]()
    64
 
-In order to avoid this, you need to save the values in variables local to the
-lambdas, so that they don't rely on the value of the global ``x``::
+Để tránh điều này, bạn cần lưu các giá trị vào những biến cục bộ của các lambda, ताकि chúng không phụ thuộc vào giá trị của ``x``::
 
    >>> squares = []
    >>> for x in range(5):
    ...     squares.append(lambda n=x: n**2)
 
-Here, ``n=x`` creates a new variable ``n`` local to the lambda and computed
-when the lambda is defined so that it has the same value that ``x`` had at
-that point in the loop.  This means that the value of ``n`` will be ``0``
-in the first lambda, ``1`` in the second, ``2`` in the third, and so on.
-Therefore each lambda will now return the correct result::
+Ở đây, ``n=x`` tạo một biến mới ``n`` cục bộ của lambda và được tính toán khi lambda được định nghĩa, để nó có cùng giá trị mà ``x`` có tại thời điểm đó trong vòng lặp.  Điều này có nghĩa là giá trị của ``n`` sẽ là ``0`` trong lambda thứ nhất, ``1`` trong lambda thứ hai, ``2`` trong lambda thứ ba, v.v. Vì vậy, mỗi lambda giờ sẽ trả về kết quả chính xác::
 
    >>> squares[2]()
    4
    >>> squares[4]()
    16
 
-Note that this behaviour is not peculiar to lambdas, but applies to regular
-functions too.
+Lưu ý rằng hành vi này không chỉ xảy ra với lambda mà còn áp dụng cho cả các hàm thông thường.
 
 
-How do I share global variables across modules?
-------------------------------------------------
+Làm thế nào để chia sẻ các biến toàn cục giữa các module?
+---------------------------------------------------------
 
-The canonical way to share information across modules within a single program is
-to create a special module (often called config or cfg).  Just import the config
-module in all modules of your application; the module then becomes available as
-a global name.  Because there is only one instance of each module, any changes
-made to the module object get reflected everywhere.  For example:
+Cách chuẩn để chia sẻ thông tin giữa các module trong cùng một chương trình là tạo một module đặc biệt (thường được gọi là config hoặc cfg).  Chỉ cần import module config trong tất cả các module của ứng dụng; khi đó module này sẽ khả dụng dưới dạng một tên toàn cục.  Vì mỗi module chỉ có một instance, mọi thay đổi được thực hiện đối với đối tượng module sẽ được phản ánh ở mọi nơi.  Ví dụ:
 
 config.py::
 
-   x = 0   # Default value of the 'x' configuration setting
+   x = 0   # Giá trị mặc định của thiết lập cấu hình 'x'
 
 mod.py::
 
@@ -281,123 +209,79 @@ main.py::
    import mod
    print(config.x)
 
-Note that using a module is also the basis for implementing the singleton design
-pattern, for the same reason.
+Lưu ý rằng việc sử dụng một module cũng là cơ sở để triển khai mẫu thiết kế singleton, vì cùng một lý do.
 
 
-What are the "best practices" for using import in a module?
------------------------------------------------------------
+"Các phương pháp hay nhất" khi sử dụng import trong một module là gì?
+---------------------------------------------------------------------
 
-In general, don't use ``from modulename import *``.  Doing so clutters the
-importer's namespace, and makes it much harder for linters to detect undefined
-names.
+Nhìn chung, đừng sử dụng ``from modulename import *``. Làm vậy sẽ làm rối namespace của bên import và khiến các linter khó phát hiện những tên chưa được định nghĩa hơn nhiều.
 
-Import modules at the top of a file.  Doing so makes it clear what other modules
-your code requires and avoids questions of whether the module name is in scope.
-Using one import per line makes it easy to add and delete module imports, but
-using multiple imports per line uses less screen space.
+Đặt các module import ở đầu tệp. Làm vậy giúp làm rõ những module nào mà code của bạn yêu cầu và tránh các câu hỏi về việc tên module có nằm trong phạm vi hay không. Sử dụng một import trên mỗi dòng giúp dễ thêm và xóa các module import, nhưng sử dụng nhiều import trên một dòng sẽ tốn ít không gian màn hình hơn.
 
-It's good practice if you import modules in the following order:
+Bạn nên nhập các module theo thứ tự sau:
 
-1. standard library modules -- such as :mod:`sys`, :mod:`os`, :mod:`argparse`, :mod:`re`
-2. third-party library modules (anything installed in Python's site-packages
-   directory) -- such as :pypi:`dateutil`, :pypi:`requests`, :pypi:`tzdata`
-3. locally developed modules
+1. các module của standard library -- chẳng hạn như :mod:`sys`, :mod:`os`, :mod:`argparse`, :mod:`re`
+2. các module của thư viện bên thứ ba (bất kỳ module nào được cài đặt trong thư mục site-packages của Python) -- chẳng hạn như :pypi:`dateutil`, :pypi:`requests`, :pypi:`tzdata`
+3. các module được phát triển cục bộ
 
-It is sometimes necessary to move imports to a function or class to avoid
-problems with circular imports.  Gordon McMillan says:
+Đôi khi cần chuyển các lệnh nhập vào một hàm hoặc lớp để tránh các vấn đề do import vòng (circular import). Gordon McMillan nói:
 
-   Circular imports are fine where both modules use the "import <module>" form
-   of import.  They fail when the 2nd module wants to grab a name out of the
-   first ("from module import name") and the import is at the top level.  That's
-   because names in the 1st are not yet available, because the first module is
-   busy importing the 2nd.
+   Import vòng không có vấn đề gì khi cả hai module đều sử dụng dạng import "import <module>". Chúng sẽ thất bại khi module thứ hai muốn lấy một tên từ module thứ nhất ("from module import name") và lệnh import nằm ở cấp cao nhất. Đó là vì các tên trong module thứ nhất chưa khả dụng, do module thứ nhất đang bận nhập module thứ hai.
 
-In this case, if the second module is only used in one function, then the import
-can easily be moved into that function.  By the time the import is called, the
-first module will have finished initializing, and the second module can do its
-import.
+Trong trường hợp này, nếu module thứ hai chỉ được sử dụng trong một hàm, bạn có thể dễ dàng chuyển lệnh import vào hàm đó. Đến khi lệnh import được gọi, module thứ nhất đã hoàn tất việc khởi tạo, và module thứ hai có thể thực hiện import của mình.
 
-It may also be necessary to move imports out of the top level of code if some of
-the modules are platform-specific.  In that case, it may not even be possible to
-import all of the modules at the top of the file.  In this case, importing the
-correct modules in the corresponding platform-specific code is a good option.
+Cũng có thể cần đưa các câu lệnh import ra khỏi cấp cao nhất của mã nếu một số mô-đun phụ thuộc vào nền tảng. Trong trường hợp đó, thậm chí có thể không thể import tất cả các mô-đun ở đầu tệp. Khi đó, import các mô-đun phù hợp trong phần mã tương ứng với từng nền tảng là một lựa chọn tốt.
 
-Only move imports into a local scope, such as inside a function definition, if
-it's necessary to solve a problem such as avoiding a circular import or are
-trying to reduce the initialization time of a module.  This technique is
-especially helpful if many of the imports are unnecessary depending on how the
-program executes.  You may also want to move imports into a function if the
-modules are only ever used in that function.  Note that loading a module the
-first time may be expensive because of the one time initialization of the
-module, but loading a module multiple times is virtually free, costing only a
-couple of dictionary lookups.  Even if the module name has gone out of scope,
-the module is probably available in :data:`sys.modules`.
+Chỉ chuyển các câu lệnh import vào phạm vi cục bộ, chẳng hạn như bên trong định nghĩa hàm, nếu cần làm vậy để giải quyết một vấn đề như tránh import vòng hoặc đang cố giảm thời gian khởi tạo của mô-đun. Kỹ thuật này đặc biệt hữu ích nếu nhiều import không cần thiết, tùy thuộc vào cách chương trình thực thi. Bạn cũng có thể muốn chuyển các câu lệnh import vào một hàm nếu các mô-đun chỉ được sử dụng trong hàm đó. Lưu ý rằng việc tải một mô-đun lần đầu có thể tốn kém do quá trình khởi tạo mô-đun chỉ diễn ra một lần, nhưng việc tải một mô-đun nhiều lần gần như không tốn chi phí, chỉ cần thực hiện một vài lần tra cứu dictionary. Ngay cả khi tên mô-đun đã ra khỏi phạm vi, mô-đun có thể vẫn khả dụng trong :data:`sys.modules`.
 
 
-Why are default values shared between objects?
-----------------------------------------------
+Tại sao các giá trị mặc định lại được dùng chung giữa các đối tượng?
+--------------------------------------------------------------------
 
-This type of bug commonly bites neophyte programmers.  Consider this function::
+Loại lỗi này thường khiến những lập trình viên mới vào nghề mắc phải. Hãy xét hàm này::
 
-   def foo(mydict={}):  # Danger: shared reference to one dict for all calls
+   def foo(mydict={}):  # Nguy hiểm: tham chiếu dùng chung đến một dict cho mọi lần gọi
        ... compute something ...
        mydict[key] = value
        return mydict
 
-The first time you call this function, ``mydict`` contains a single item.  The
-second time, ``mydict`` contains two items because when ``foo()`` begins
-executing, ``mydict`` starts out with an item already in it.
+Lần đầu gọi hàm này, ``mydict`` chứa một mục duy nhất. Lần thứ hai, ``mydict`` chứa hai mục vì khi ``foo()`` bắt đầu thực thi, ``mydict`` đã có sẵn một mục.
 
-It is often expected that a function call creates new objects for default
-values. This is not what happens. Default values are created exactly once, when
-the function is defined.  If that object is changed, like the dictionary in this
-example, subsequent calls to the function will refer to this changed object.
+Thông thường, người ta kỳ vọng rằng một lần gọi hàm sẽ tạo các đối tượng mới cho những giá trị mặc định. Nhưng thực tế không phải vậy. Các giá trị mặc định được tạo đúng một lần, khi hàm được định nghĩa. Nếu đối tượng đó bị thay đổi, như dictionary trong ví dụ này, các lần gọi hàm sau đó sẽ tham chiếu đến đối tượng đã thay đổi này.
 
-By definition, immutable objects such as numbers, strings, tuples, and ``None``,
-are safe from change. Changes to mutable objects such as dictionaries, lists,
-and class instances can lead to confusion.
+Theo định nghĩa, các đối tượng bất biến như số, chuỗi, tuple và ``None`` không thể bị thay đổi. Việc thay đổi các đối tượng khả biến như dictionary, list và các instance của class có thể dẫn đến nhầm lẫn.
 
-Because of this feature, it is good programming practice to not use mutable
-objects as default values.  Instead, use ``None`` as the default value and
-inside the function, check if the parameter is ``None`` and create a new
-list/dictionary/whatever if it is.  For example, don't write::
+Vì đặc điểm này, một thực hành lập trình tốt là không sử dụng các đối tượng khả biến làm giá trị mặc định. Thay vào đó, hãy dùng ``None`` làm giá trị mặc định và bên trong hàm, kiểm tra xem tham số có phải là ``None`` hay không rồi tạo một list/dictionary/đối tượng tương ứng mới nếu đúng như vậy. Ví dụ, đừng viết::
 
    def foo(mydict={}):
        ...
 
-but::
+mà hãy::
 
    def foo(mydict=None):
        if mydict is None:
-           mydict = {}  # create a new dict for local namespace
+           mydict = {}  # Tạo dict mới cho namespace cục bộ
 
-This feature can be useful.  When you have a function that's time-consuming to
-compute, a common technique is to cache the parameters and the resulting value
-of each call to the function, and return the cached value if the same value is
-requested again.  This is called "memoizing", and can be implemented like this::
+Đặc điểm này có thể hữu ích. Khi bạn có một hàm tốn nhiều thời gian để tính toán, một kỹ thuật phổ biến là lưu vào cache các tham số và giá trị kết quả của mỗi lần gọi hàm, rồi trả về giá trị đã lưu trong cache nếu cùng một giá trị được yêu cầu lại. Kỹ thuật này được gọi là "memoizing" và có thể được triển khai như sau::
 
-   # Callers can only provide two parameters and optionally pass _cache by keyword
+   # Caller chỉ có thể cung cấp hai tham số và tùy chọn truyền _cache bằng keyword
    def expensive(arg1, arg2, *, _cache={}):
        if (arg1, arg2) in _cache:
            return _cache[(arg1, arg2)]
 
-       # Calculate the value
+       # Tính giá trị
        result = ... expensive computation ...
-       _cache[(arg1, arg2)] = result           # Store result in the cache
+       _cache[(arg1, arg2)] = result           # Lưu kết quả vào cache
        return result
 
-You could use a global variable containing a dictionary instead of the default
-value; it's a matter of taste.
+Bạn có thể sử dụng một biến global chứa dictionary thay cho giá trị mặc định; đó là vấn đề về sở thích.
 
 
-How can I pass optional or keyword parameters from one function to another?
----------------------------------------------------------------------------
+Làm cách nào để truyền các tham số tùy chọn hoặc tham số keyword từ một hàm này sang một hàm khác?
+--------------------------------------------------------------------------------------------------
 
-Collect the arguments using the ``*`` and ``**`` specifiers in the function's
-parameter list; this gives you the positional arguments as a tuple and the
-keyword arguments as a dictionary.  You can then pass these arguments when
-calling another function by using ``*`` and ``**``::
+Thu thập các đối số bằng các specifier ``*`` và ``**`` trong danh sách tham số của hàm; thao tác này cung cấp cho bạn các đối số vị trí dưới dạng tuple và các đối số keyword dưới dạng dictionary. Sau đó, bạn có thể truyền các đối số này khi gọi một hàm khác bằng cách sử dụng ``*`` và ``**``::
 
    def f(x, *args, **kwargs):
        ...
@@ -412,30 +296,26 @@ calling another function by using ``*`` and ``**``::
 
 .. _faq-argument-vs-parameter:
 
-What is the difference between arguments and parameters?
---------------------------------------------------------
+Sự khác biệt giữa đối số và tham số là gì?
+------------------------------------------
 
-:term:`Parameters <parameter>` are defined by the names that appear in a
-function definition, whereas :term:`arguments <argument>` are the values
-actually passed to a function when calling it.  Parameters define what
-:term:`kind of arguments <parameter>` a function can accept.  For
-example, given the function definition::
+:term:`Tham số <parameter>` được xác định bởi các tên xuất hiện trong phần định nghĩa hàm, trong khi :term:`đối số <argument>` là các giá trị thực sự được truyền cho hàm khi gọi hàm đó. Tham số xác định hàm sẽ nhận loại gì
+:term:`loại đối số <parameter>` nào. Ví dụ, với định nghĩa hàm::
 
    def func(foo, bar=None, **kwargs):
        pass
 
-*foo*, *bar* and *kwargs* are parameters of ``func``.  However, when calling
-``func``, for example::
+*foo*, *bar* và *kwargs* là các parameter của ``func``. Tuy nhiên, khi gọi ``func``, chẳng hạn::
 
    func(42, bar=314, extra=somevar)
 
-the values ``42``, ``314``, and ``somevar`` are arguments.
+các giá trị ``42``, ``314`` và ``somevar`` là các argument.
 
 
-Why did changing list 'y' also change list 'x'?
-------------------------------------------------
+Tại sao việc thay đổi list 'y' cũng làm thay đổi list 'x'?
+----------------------------------------------------------
 
-If you wrote code like::
+Nếu bạn viết code như sau::
 
    >>> x = []
    >>> y = x
@@ -445,82 +325,50 @@ If you wrote code like::
    >>> x
    [10]
 
-you might be wondering why appending an element to ``y`` changed ``x`` too.
+có thể bạn thắc mắc tại sao việc thêm một phần tử vào ``y`` cũng làm thay đổi ``x``.
 
-There are two factors that produce this result:
+Có hai yếu tố dẫn đến kết quả này:
 
-1) Variables are simply names that refer to objects.  Doing ``y = x`` doesn't
-   create a copy of the list -- it creates a new variable ``y`` that refers to
-   the same object ``x`` refers to.  This means that there is only one object
-   (the list), and both ``x`` and ``y`` refer to it.
+1) Các biến chỉ đơn giản là những tên tham chiếu đến các object. Việc thực hiện ``y = x`` không tạo bản sao của list -- nó tạo một biến mới ``y`` tham chiếu đến cùng object mà ``x`` tham chiếu. Điều này có nghĩa là chỉ có một object (list), và cả ``x`` lẫn ``y`` đều tham chiếu đến object đó.
 2) Lists are :term:`mutable`, which means that you can change their content.
 
-After the call to :meth:`~sequence.append`, the content of the mutable object has
-changed from ``[]`` to ``[10]``.  Since both the variables refer to the same
-object, using either name accesses the modified value ``[10]``.
+Sau lệnh gọi :meth:`~sequence.append`, nội dung của đối tượng có thể thay đổi đã đổi từ ``[]`` thành ``[10]``. Vì cả hai biến đều tham chiếu đến cùng một đối tượng, việc sử dụng một trong hai tên sẽ truy cập giá trị đã sửa đổi ``[10]``.
 
-If we instead assign an immutable object to ``x``::
+Nếu thay vào đó, chúng ta gán một đối tượng bất biến cho ``x``::
 
-   >>> x = 5  # ints are immutable
+   >>> x = 5  # số nguyên là bất biến
    >>> y = x
-   >>> x = x + 1  # 5 can't be mutated, we are creating a new object here
+   >>> x = x + 1  # 5 không thể bị thay đổi, ở đây chúng ta đang tạo một đối tượng mới
    >>> x
    6
    >>> y
    5
 
-we can see that in this case ``x`` and ``y`` are not equal anymore.  This is
-because integers are :term:`immutable`, and when we do ``x = x + 1`` we are not
-mutating the int ``5`` by incrementing its value; instead, we are creating a
-new object (the int ``6``) and assigning it to ``x`` (that is, changing which
-object ``x`` refers to).  After this assignment we have two objects (the ints
-``6`` and ``5``) and two variables that refer to them (``x`` now refers to
-``6`` but ``y`` still refers to ``5``).
+chúng ta có thể thấy rằng trong trường hợp này, ``x`` và ``y`` không còn bằng nhau nữa. Điều này là do các số nguyên :term:`immutable`, và khi thực hiện ``x = x + 1``, chúng ta không thay đổi số nguyên ``5`` bằng cách tăng giá trị của nó; thay vào đó, chúng ta tạo một đối tượng mới (số nguyên ``6``) và gán nó cho ``x`` (tức là thay đổi đối tượng mà ``x`` tham chiếu đến). Sau phép gán này, chúng ta có hai đối tượng (các số nguyên ``6`` và ``5``) và hai biến tham chiếu đến chúng (``x`` giờ đây tham chiếu đến ``6``, nhưng ``y`` vẫn tham chiếu đến ``5``).
 
-Some operations (for example ``y.append(10)`` and ``y.sort()``) mutate the
-object, whereas superficially similar operations (for example ``y = y + [10]``
-and :func:`sorted(y) <sorted>`) create a new object.  In general in Python (and in all cases
-in the standard library) a method that mutates an object will return ``None``
-to help avoid getting the two types of operations confused.  So if you
-mistakenly write ``y.sort()`` thinking it will give you a sorted copy of ``y``,
-you'll instead end up with ``None``, which will likely cause your program to
-generate an easily diagnosed error.
+Một số thao tác (ví dụ ``y.append(10)`` và ``y.sort()``) làm thay đổi đối tượng, trong khi các thao tác trông tương tự trên bề mặt (ví dụ ``y = y + [10]`` và :func:`sorted(y) <sorted>`) lại tạo một đối tượng mới. Nhìn chung trong Python (và trong mọi trường hợp trong standard library), một method làm thay đổi đối tượng sẽ trả về ``None`` để giúp tránh nhầm lẫn giữa hai loại thao tác này. Vì vậy, nếu bạn vô tình viết ``y.sort()`` với suy nghĩ rằng nó sẽ cung cấp cho bạn một bản sao đã được sắp xếp của ``y``, thì thay vào đó bạn sẽ nhận được ``None``, điều này có thể khiến chương trình của bạn phát sinh một lỗi dễ chẩn đoán.
 
-However, there is one class of operations where the same operation sometimes
-has different behaviors with different types:  the augmented assignment
-operators.  For example, ``+=`` mutates lists but not tuples or ints (``a_list
-+= [1, 2, 3]`` is equivalent to ``a_list.extend([1, 2, 3])`` and mutates
-``a_list``, whereas ``some_tuple += (1, 2, 3)`` and ``some_int += 1`` create
-new objects).
+Tuy nhiên, có một nhóm phép toán mà cùng một phép toán đôi khi có hành vi khác nhau với các kiểu khác nhau: các toán tử phép gán kết hợp. Ví dụ, ``+=`` thay đổi các list nhưng không thay đổi tuple hoặc int (``a_list += [1, 2, 3]`` tương đương với ``a_list.extend([1, 2, 3])`` và thay đổi ``a_list``, trong khi ``some_tuple += (1, 2, 3)`` và ``some_int += 1`` tạo các đối tượng mới).
 
-In other words:
+Nói cách khác:
 
-* If we have a mutable object (such as :class:`list`, :class:`dict`, :class:`set`),
-  we can use some specific operations to mutate it and all the variables
-  that refer to it will see the change.
-* If we have an immutable object (such as :class:`str`, :class:`int`, :class:`tuple`),
-  all the variables that refer to it will always see the same value,
-  but operations that transform that value into a new value always return a new
-  object.
+* Nếu có một đối tượng có thể thay đổi (chẳng hạn như :class:`list`, :class:`dict`, :class:`set`), ta có thể sử dụng một số phép toán cụ thể để thay đổi nó, và tất cả các biến tham chiếu đến nó sẽ thấy sự thay đổi đó.
+* Nếu có một đối tượng bất biến (chẳng hạn như :class:`str`, :class:`int`, :class:`tuple`), tất cả các biến tham chiếu đến nó sẽ luôn thấy cùng một giá trị, nhưng các phép toán biến đổi giá trị đó thành một giá trị mới luôn trả về một đối tượng mới.
 
-If you want to know if two variables refer to the same object or not, you can
-use the :keyword:`is` operator, or the built-in function :func:`id`.
+Nếu muốn biết hai biến có tham chiếu đến cùng một đối tượng hay không, bạn có thể sử dụng toán tử :keyword:`is` hoặc hàm tích hợp sẵn :func:`id`.
 
 
-How do I write a function with output parameters (call by reference)?
----------------------------------------------------------------------
+Làm thế nào để viết một hàm có tham số đầu ra (truyền tham chiếu)?
+------------------------------------------------------------------
 
-Remember that arguments are passed by assignment in Python.  Since assignment
-just creates references to objects, there's no alias between an argument name in
-the caller and callee, and consequently no call-by-reference.  You can achieve the
-desired effect in a number of ways.
+Hãy nhớ rằng các đối số được truyền bằng phép gán trong Python. Vì phép gán chỉ tạo các tham chiếu đến đối tượng, không có bí danh nào giữa tên đối số trong hàm gọi và hàm được gọi, nên không có cơ chế truyền tham chiếu. Bạn có thể đạt được hiệu ứng mong muốn bằng một số cách.
 
-1) By returning a tuple of the results::
+1) Bằng cách trả về một tuple chứa các kết quả::
 
       >>> def func1(a, b):
-      ...     a = 'new-value'        # a and b are local names
-      ...     b = b + 1              # assigned to new objects
-      ...     return a, b            # return new values
+      ...     a = 'new-value'        # a và b là các tên cục bộ
+      ...     b = b + 1              # được gán cho các đối tượng mới
+      ...     return a, b            # trả về các giá trị mới
       ...
       >>> x, y = 'old-value', 99
       >>> func1(x, y)
@@ -528,31 +376,31 @@ desired effect in a number of ways.
 
    This is almost always the clearest solution.
 
-2) By using global variables.  This isn't thread-safe, and is not recommended.
+2) Bằng cách sử dụng các biến toàn cục. Cách này không an toàn với thread và không được khuyến nghị.
 
-3) By passing a mutable (changeable in-place) object::
+3) Bằng cách truyền một đối tượng có thể thay đổi (thay đổi trực tiếp tại chỗ)::
 
       >>> def func2(a):
-      ...     a[0] = 'new-value'     # 'a' references a mutable list
-      ...     a[1] = a[1] + 1        # changes a shared object
+      ...     a[0] = 'new-value'     # 'a' tham chiếu đến một mutable list
+      ...     a[1] = a[1] + 1        # thay đổi một đối tượng dùng chung
       ...
       >>> args = ['old-value', 99]
       >>> func2(args)
       >>> args
       ['new-value', 100]
 
-4) By passing in a dictionary that gets mutated::
+4) Bằng cách truyền vào một dictionary được biến đổi::
 
       >>> def func3(args):
-      ...     args['a'] = 'new-value'     # args is a mutable dictionary
-      ...     args['b'] = args['b'] + 1   # change it in-place
+      ...     args['a'] = 'new-value'     # args là một dictionary có thể biến đổi
+      ...     args['b'] = args['b'] + 1   # thay đổi trực tiếp tại chỗ
       ...
       >>> args = {'a': 'old-value', 'b': 99}
       >>> func3(args)
       >>> args
       {'a': 'new-value', 'b': 100}
 
-5) Or bundle up values in a class instance::
+5) Hoặc đóng gói các giá trị trong một thực thể lớp::
 
       >>> class Namespace:
       ...     def __init__(self, /, **args):
@@ -560,8 +408,8 @@ desired effect in a number of ways.
       ...             setattr(self, key, value)
       ...
       >>> def func4(args):
-      ...     args.a = 'new-value'        # args is a mutable Namespace
-      ...     args.b = args.b + 1         # change object in-place
+      ...     args.a = 'new-value'        # args là một Namespace có thể biến đổi
+      ...     args.b = args.b + 1         # thay đổi đối tượng trực tiếp tại chỗ
       ...
       >>> args = Namespace(a='old-value', b=99)
       >>> func4(args)
@@ -571,22 +419,20 @@ desired effect in a number of ways.
 
    There's almost never a good reason to get this complicated.
 
-Your best choice is to return a tuple containing the multiple results.
+Lựa chọn tốt nhất là trả về một tuple chứa nhiều kết quả.
 
 
-How do you make a higher order function in Python?
---------------------------------------------------
+Làm thế nào để tạo một higher-order function trong Python?
+----------------------------------------------------------
 
-You have two choices: you can use nested scopes or you can use callable objects.
-For example, suppose you wanted to define ``linear(a,b)`` which returns a
-function ``f(x)`` that computes the value ``a*x+b``.  Using nested scopes::
+Bạn có hai lựa chọn: sử dụng phạm vi lồng nhau hoặc sử dụng các callable object. Ví dụ, giả sử bạn muốn định nghĩa ``linear(a,b)``, hàm này trả về một function ``f(x)`` để tính giá trị ``a*x+b``. Sử dụng phạm vi lồng nhau::
 
    def linear(a, b):
        def result(x):
            return a * x + b
        return result
 
-Or using a callable object::
+Hoặc sử dụng một callable object::
 
    class linear:
 
@@ -596,22 +442,20 @@ Or using a callable object::
        def __call__(self, x):
            return self.a * x + self.b
 
-In both cases, ::
+Trong cả hai trường hợp,::
 
    taxes = linear(0.3, 2)
 
-gives a callable object where ``taxes(10e6) == 0.3 * 10e6 + 2``.
+sẽ cho một callable object trong đó ``taxes(10e6) == 0.3 * 10e6 + 2``.
 
-The callable object approach has the disadvantage that it is a bit slower and
-results in slightly longer code.  However, note that a collection of callables
-can share their signature via inheritance::
+Cách tiếp cận bằng callable object có nhược điểm là chậm hơn một chút và tạo ra code dài hơn đôi chút. Tuy nhiên, lưu ý rằng một tập hợp các callable có thể dùng chung signature thông qua inheritance::
 
    class exponential(linear):
-       # __init__ inherited
+       # __init__ được kế thừa
        def __call__(self, x):
            return self.a * (x ** self.b)
 
-Object can encapsulate state for several methods::
+Đối tượng có thể đóng gói trạng thái cho nhiều phương thức::
 
    class counter:
 
@@ -629,41 +473,33 @@ Object can encapsulate state for several methods::
    count = counter()
    inc, dec, reset = count.up, count.down, count.set
 
-Here ``inc()``, ``dec()`` and ``reset()`` act like functions which share the
-same counting variable.
+Ở đây, ``inc()``, ``dec()`` và ``reset()`` hoạt động như các hàm dùng chung một biến đếm.
 
 
-How do I copy an object in Python?
-----------------------------------
+Làm thế nào để sao chép một đối tượng trong Python?
+---------------------------------------------------
 
-In general, try :func:`copy.copy` or :func:`copy.deepcopy` for the general case.
-Not all objects can be copied, but most can.
+Nhìn chung, hãy thử :func:`copy.copy` hoặc :func:`copy.deepcopy` trong trường hợp thông thường. Không phải mọi đối tượng đều có thể được sao chép, nhưng hầu hết đều có thể.
 
-Some objects can be copied more easily.  Dictionaries have a :meth:`~dict.copy`
-method::
+Một số đối tượng có thể được sao chép dễ dàng hơn. Từ điển có một phương thức :meth:`~dict.copy`::
 
    newdict = olddict.copy()
 
-Sequences can be copied by slicing::
+Có thể sao chép các sequence bằng cách cắt lát::
 
    new_l = l[:]
 
 
-How can I find the methods or attributes of an object?
-------------------------------------------------------
+Làm thế nào để tìm các phương thức hoặc thuộc tính của một đối tượng?
+---------------------------------------------------------------------
 
-For an instance ``x`` of a user-defined class, :func:`dir(x) <dir>` returns an alphabetized
-list of the names containing the instance attributes and methods and attributes
-defined by its class.
+Đối với một instance ``x`` của một class do người dùng định nghĩa, :func:`dir(x) <dir>` trả về một danh sách được sắp xếp theo thứ tự bảng chữ cái gồm các tên của các thuộc tính và phương thức của instance, cùng các thuộc tính và phương thức được định nghĩa bởi class đó.
 
 
-How can my code discover the name of an object?
------------------------------------------------
+Làm thế nào để code của tôi phát hiện tên của một đối tượng?
+------------------------------------------------------------
 
-Generally speaking, it can't, because objects don't really have names.
-Essentially, assignment always binds a name to a value; the same is true of
-``def`` and ``class`` statements, but in that case the value is a
-callable. Consider the following code::
+Nói chung là không thể, vì các đối tượng thực sự không có tên. Về bản chất, phép gán luôn liên kết một tên với một giá trị; điều tương tự cũng đúng với các câu lệnh ``def`` và ``class``, nhưng trong trường hợp đó, giá trị là một callable. Hãy xem đoạn code sau::
 
    >>> class A:
    ...     pass
@@ -676,86 +512,70 @@ callable. Consider the following code::
    >>> print(a)
    <__main__.A object at 0x16D07CC>
 
-Arguably the class has a name: even though it is bound to two names and invoked
-through the name ``B`` the created instance is still reported as an instance of
-class ``A``.  However, it is impossible to say whether the instance's name is ``a`` or
-``b``, since both names are bound to the same value.
+Có thể nói class có một tên: mặc dù nó được liên kết với hai tên và được gọi thông qua tên ``B``, instance được tạo ra vẫn được xác định là một instance của class ``A``. Tuy nhiên, không thể nói instance đó có tên là ``a`` hay ``b``, vì cả hai tên đều được liên kết với cùng một giá trị.
 
-Generally speaking it should not be necessary for your code to "know the names"
-of particular values. Unless you are deliberately writing introspective
-programs, this is usually an indication that a change of approach might be
-beneficial.
+Nói chung, code của bạn không cần phải "biết tên" của các giá trị cụ thể. Trừ khi bạn đang chủ ý viết các chương trình introspection, điều này thường cho thấy rằng thay đổi cách tiếp cận có thể sẽ hữu ích.
 
-In comp.lang.python, Fredrik Lundh once gave an excellent analogy in answer to
-this question:
+Trong comp.lang.python, Fredrik Lundh từng đưa ra một phép so sánh rất hay để trả lời câu hỏi này:
 
-   The same way as you get the name of that cat you found on your porch: the cat
-   (object) itself cannot tell you its name, and it doesn't really care -- so
-   the only way to find out what it's called is to ask all your neighbours
-   (namespaces) if it's their cat (object)...
+   Tương tự như khi bạn tìm tên của con mèo mà bạn thấy trên hiên nhà: bản thân con mèo (object) không thể cho bạn biết tên của nó, và nó cũng không thực sự quan tâm -- vì vậy cách duy nhất để biết nó được gọi là gì là hỏi tất cả hàng xóm (namespaces) xem đó có phải là mèo (object) của họ không...
 
-   ....and don't be surprised if you'll find that it's known by many names, or
-   no name at all!
+   ....và đừng ngạc nhiên nếu bạn phát hiện ra rằng nó được biết đến bằng nhiều tên, hoặc hoàn toàn không có tên nào!
 
 
-What's up with the comma operator's precedence?
------------------------------------------------
+Có gì đáng chú ý về độ ưu tiên của toán tử dấu phẩy?
+----------------------------------------------------
 
-Comma is not an operator in Python.  Consider this session::
+Dấu phẩy không phải là một toán tử trong Python. Hãy xem xét phiên làm việc này::
 
     >>> "a" in "b", "a"
     (False, 'a')
 
-Since the comma is not an operator, but a separator between expressions the
-above is evaluated as if you had entered::
+Vì dấu phẩy không phải là một toán tử mà là dấu phân cách giữa các biểu thức, đoạn trên được đánh giá như thể bạn đã nhập::
 
     ("a" in "b"), "a"
 
-not::
+không::
 
     "a" in ("b", "a")
 
-The same is true of the various assignment operators (``=``, ``+=``, and so on).
-They are not truly operators but syntactic delimiters in assignment statements.
+Điều tương tự cũng đúng với các toán tử gán khác nhau (``=``, ``+=``, vân vân). Chúng không thực sự là các toán tử mà là các dấu phân cách cú pháp trong các câu lệnh gán.
 
 
-Is there an equivalent of C's "?:" ternary operator?
-----------------------------------------------------
+Có toán tử ba ngôi "?:" tương đương với C không?
+------------------------------------------------
 
-Yes, there is. The syntax is as follows::
+Có. Cú pháp như sau::
 
    [on_true] if [expression] else [on_false]
 
    x, y = 50, 25
    small = x if x < y else y
 
-Before this syntax was introduced in Python 2.5, a common idiom was to use
-logical operators::
+Trước khi cú pháp này được giới thiệu trong Python 2.5, một cách viết phổ biến là sử dụng các toán tử logic::
 
    [expression] and [on_true] or [on_false]
 
-However, this idiom is unsafe, as it can give wrong results when *on_true*
-has a false boolean value.  Therefore, it is always better to use
-the ``... if ... else ...`` form.
+Tuy nhiên, cách viết này không an toàn, vì nó có thể cho kết quả sai khi *on_true* có giá trị boolean là false. Do đó, luôn nên sử dụng dạng ``... if ... else ...``.
 
 
-Is it possible to write obfuscated one-liners in Python?
---------------------------------------------------------
+Có thể viết các câu lệnh một dòng làm rối trong Python không?
+-------------------------------------------------------------
 
-Yes.  Usually this is done by nesting :keyword:`lambda` within
-:keyword:`!lambda`.  See the following three examples, slightly adapted from Ulf Bartelt::
+Có. Thông thường, người ta thực hiện việc này bằng cách lồng :keyword:`lambda` vào trong
+:keyword:`!lambda`. Xem ba ví dụ sau, được điều chỉnh đôi chút từ Ulf Bartelt::
 
    from functools import reduce
 
-   # Primes < 1000
+   # Các số nguyên tố < 1000
    print(list(filter(None,map(lambda y:y*reduce(lambda x,y:x*y!=0,
    map(lambda x,y=y:y%x,range(2,int(pow(y,0.5)+1))),1),range(2,1000)))))
 
-   # First 10 Fibonacci numbers
+   # 10 số Fibonacci đầu tiên
    print(list(map(lambda x,f=lambda x,f:(f(x-1,f)+f(x-2,f)) if x>1 else 1:
    f(x,f), range(10))))
 
-   # Mandelbrot set
+   # Tập Mandelbrot
    print((lambda Ru,Ro,Iu,Io,IM,Sx,Sy:reduce(lambda x,y:x+'\n'+y,map(lambda y,
    Iu=Iu,Io=Io,Ru=Ru,Ro=Ro,Sy=Sy,L=lambda yc,Iu=Iu,Io=Io,Ru=Ru,Ro=Ro,i=IM,
    Sx=Sx,Sy=Sy:reduce(lambda x,y:x+y,map(lambda x,xc=Ru,yc=yc,Ru=Ru,Ro=Ro,
@@ -763,26 +583,21 @@ Yes.  Usually this is done by nesting :keyword:`lambda` within
    >=4.0) or 1+f(xc,yc,x*x-y*y+xc,2.0*x*y+yc,k-1,f):f(xc,yc,x,y,k,f):chr(
    64+F(Ru+x*(Ro-Ru)/Sx,yc,0,0,i)),range(Sx))):L(Iu+y*(Io-Iu)/Sy),range(Sy
    ))))(-2.1, 0.7, -1.2, 1.2, 30, 80, 24))
-   #    \___ ___/  \___ ___/  |   |   |__ lines on screen
-   #        V          V      |   |______ columns on screen
-   #        |          |      |__________ maximum of "iterations"
-   #        |          |_________________ range on y axis
-   #        |____________________________ range on x axis
+   #    \___ ___/  \___ ___/  |   |   |__ dòng trên màn hình
+   #        V          V      |   |______ cột trên màn hình
+   #        |          |      |__________ giá trị tối đa của "iterations"
+   #        |          |_________________ phạm vi trên trục y
+   #        |____________________________ khoảng trên trục x
 
-Don't try this at home, kids!
+Đừng thử làm theo ở nhà nhé, các bạn nhỏ!
 
 
 .. _faq-positional-only-arguments:
 
-What does the slash(/) in the parameter list of a function mean?
-----------------------------------------------------------------
+Dấu gạch chéo(/) trong danh sách tham số của một hàm có ý nghĩa gì?
+-------------------------------------------------------------------
 
-A slash in the argument list of a function denotes that the parameters prior to
-it are positional-only.  Positional-only parameters are the ones without an
-externally usable name.  Upon calling a function that accepts positional-only
-parameters, arguments are mapped to parameters based solely on their position.
-For example, :func:`divmod` is a function that accepts positional-only
-parameters. Its documentation looks like this::
+Dấu gạch chéo trong danh sách đối số của một hàm cho biết các tham số đứng trước nó chỉ có thể được truyền theo vị trí. Các tham số chỉ có thể được truyền theo vị trí là những tham số không có tên có thể sử dụng từ bên ngoài. Khi gọi một hàm chấp nhận các tham số chỉ có thể được truyền theo vị trí, các đối số được ánh xạ tới các tham số chỉ dựa trên vị trí của chúng. Ví dụ: :func:`divmod` là một hàm chấp nhận các tham số chỉ có thể được truyền theo vị trí. Tài liệu của hàm có dạng như sau::
 
    >>> help(divmod)
    Help on built-in function divmod in module builtins:
@@ -790,9 +605,7 @@ parameters. Its documentation looks like this::
    divmod(x, y, /)
        Return the tuple (x//y, x%y).  Invariant: div*y + mod == x.
 
-The slash at the end of the parameter list means that both parameters are
-positional-only. Thus, calling :func:`divmod` with keyword arguments would lead
-to an error::
+Dấu gạch chéo ở cuối danh sách tham số có nghĩa là cả hai tham số đều chỉ có thể được truyền theo vị trí. Do đó, việc gọi :func:`divmod` bằng các đối số từ khóa sẽ dẫn đến lỗi::
 
    >>> divmod(x=3, y=4)
    Traceback (most recent call last):
@@ -800,23 +613,19 @@ to an error::
    TypeError: divmod() takes no keyword arguments
 
 
-Numbers and strings
-===================
+Số và chuỗi
+===========
 
-How do I specify hexadecimal and octal integers?
-------------------------------------------------
+Làm thế nào để chỉ định các số nguyên thập lục phân và bát phân?
+----------------------------------------------------------------
 
-To specify an octal digit, precede the octal value with a zero, and then a lower
-or uppercase "o".  For example, to set the variable "a" to the octal value "10"
-(8 in decimal), type::
+Để chỉ định một chữ số bát phân, hãy đặt số 0 trước giá trị bát phân, rồi thêm chữ "o" thường hoặc hoa. Ví dụ, để đặt biến "a" thành giá trị bát phân "10" (8 ở hệ thập phân), hãy nhập::
 
    >>> a = 0o10
    >>> a
    8
 
-Hexadecimal is just as easy.  Simply precede the hexadecimal number with a zero,
-and then a lower or uppercase "x".  Hexadecimal digits can be specified in lower
-or uppercase.  For example, in the Python interpreter::
+Hệ thập lục phân cũng đơn giản như vậy. Chỉ cần đặt số 0 trước số thập lục phân, rồi thêm chữ "x" thường hoặc hoa. Các chữ số thập lục phân có thể được viết thường hoặc hoa. Ví dụ, trong trình thông dịch Python::
 
    >>> a = 0xa5
    >>> a
@@ -826,30 +635,22 @@ or uppercase.  For example, in the Python interpreter::
    178
 
 
-Why does -22 // 10 return -3?
------------------------------
+Tại sao -22 // 10 lại trả về -3?
+--------------------------------
 
-It's primarily driven by the desire that ``i % j`` have the same sign as ``j``.
-If you want that, and also want::
+Điều này chủ yếu xuất phát từ mong muốn ``i % j`` có cùng dấu với ``j``. Nếu bạn muốn điều đó, đồng thời cũng muốn::
 
     i == (i // j) * j + (i % j)
 
-then integer division has to return the floor.  C also requires that identity to
-hold, and then compilers that truncate ``i // j`` need to make ``i % j`` have
-the same sign as ``i``.
+thì phép chia số nguyên phải trả về phần nguyên dưới. C cũng yêu cầu đẳng thức đó đúng, và khi đó các compiler cắt ngắn ``i // j`` cần làm cho ``i % j`` có cùng dấu với ``i``.
 
-There are few real use cases for ``i % j`` when ``j`` is negative.  When ``j``
-is positive, there are many, and in virtually all of them it's more useful for
-``i % j`` to be ``>= 0``.  If the clock says 10 now, what did it say 200 hours
-ago?  ``-190 % 12 == 2`` is useful; ``-190 % 12 == -10`` is a bug waiting to
-bite.
+Có rất ít trường hợp sử dụng thực tế cho ``i % j`` khi ``j`` là số âm. Khi ``j`` là số dương thì có rất nhiều, và trong hầu như mọi trường hợp đó, việc ``i % j`` là ``>= 0`` sẽ hữu ích hơn. Nếu đồng hồ hiện 10 giờ bây giờ, thì 200 giờ trước là mấy giờ? ``-190 % 12 == 2`` rất hữu ích; ``-190 % 12 == -10`` là một lỗi đang chực chờ gây rắc rối.
 
 
-How do I get int literal attribute instead of SyntaxError?
-----------------------------------------------------------
+Làm thế nào để lấy thuộc tính của literal int thay vì gặp SyntaxError?
+----------------------------------------------------------------------
 
-Trying to lookup an ``int`` literal attribute in the normal manner gives
-a :exc:`SyntaxError` because the period is seen as a decimal point::
+Cố gắng tra cứu thuộc tính literal ``int`` theo cách thông thường sẽ gây ra :exc:`SyntaxError` vì dấu chấm được hiểu là dấu thập phân::
 
    >>> 1.__class__
      File "<stdin>", line 1
@@ -857,8 +658,7 @@ a :exc:`SyntaxError` because the period is seen as a decimal point::
       ^
    SyntaxError: invalid decimal literal
 
-The solution is to separate the literal from the period
-with either a space or parentheses.
+Giải pháp là tách literal khỏi dấu chấm bằng một khoảng trắng hoặc dấu ngoặc đơn.
 
    >>> 1 .__class__
    <class 'int'>
@@ -866,51 +666,28 @@ with either a space or parentheses.
    <class 'int'>
 
 
-How do I convert a string to a number?
---------------------------------------
+Làm thế nào để chuyển đổi một chuỗi thành một số?
+-------------------------------------------------
 
-For integers, use the built-in :func:`int` type constructor, for example, ``int('144')
-== 144``.  Similarly, :func:`float` converts to a floating-point number,
-for example, ``float('144') == 144.0``.
+Đối với số nguyên, hãy sử dụng hàm dựng kiểu tích hợp sẵn :func:`int`, chẳng hạn như ``int('144') == 144``. Tương tự, :func:`float` chuyển đổi thành số dấu phẩy động, chẳng hạn như ``float('144') == 144.0``.
 
-By default, these interpret the number as decimal, so that ``int('0144') ==
-144`` holds true, and ``int('0x144')`` raises :exc:`ValueError`. ``int(string,
-base)`` takes the base to convert from as a second optional argument, so ``int(
-'0x144', 16) == 324``.  If the base is specified as 0, the number is interpreted
-using Python's rules: a leading '0o' indicates octal, and '0x' indicates a hex
-number.
+Theo mặc định, các hàm này diễn giải số ở dạng thập phân, vì vậy ``int('0144') == 144`` cho kết quả đúng, còn ``int('0x144')`` gây ra :exc:`ValueError`. ``int(string, base)`` nhận cơ số cần chuyển đổi từ đó làm đối số tùy chọn thứ hai, vì vậy ``int( '0x144', 16) == 324``. Nếu cơ số được chỉ định là 0, số sẽ được diễn giải theo các quy tắc của Python: tiền tố '0o' cho biết số bát phân, còn '0x' cho biết số thập lục phân.
 
-Do not use the built-in function :func:`eval` if all you need is to convert
-strings to numbers.  :func:`eval` will be significantly slower and it presents a
-security risk: someone could pass you a Python expression that might have
-unwanted side effects.  For example, someone could pass
-``__import__('os').system("rm -rf $HOME")`` which would erase your home
-directory.
+Không sử dụng hàm tích hợp sẵn :func:`eval` nếu tất cả những gì bạn cần chỉ là chuyển đổi chuỗi thành số. :func:`eval` sẽ chậm hơn đáng kể và gây ra rủi ro bảo mật: ai đó có thể truyền cho bạn một biểu thức Python có thể gây ra các tác dụng phụ không mong muốn. Chẳng hạn, ai đó có thể truyền ``__import__('os').system("rm -rf $HOME")``, thao tác này sẽ xóa thư mục chính của bạn.
 
-:func:`eval` also has the effect of interpreting numbers as Python expressions,
-so that, for example, ``eval('09')`` gives a syntax error because Python does not allow
-leading '0' in a decimal number (except '0').
+:func:`eval` cũng có tác dụng diễn giải các số dưới dạng biểu thức Python, vì vậy, chẳng hạn, ``eval('09')`` gây ra lỗi cú pháp vì Python không cho phép số '0' đứng đầu trong một số thập phân (ngoại trừ '0').
 
 
-How do I convert a number to a string?
---------------------------------------
+Làm thế nào để chuyển một số thành chuỗi?
+-----------------------------------------
 
-For example, to convert the number ``144`` to the string ``'144'``, use the built-in type
-constructor :func:`str`.  If you want a hexadecimal or octal representation, use
-the built-in functions :func:`hex` or :func:`oct`.  For fancy formatting, see
-the :ref:`f-strings` and :ref:`formatstrings` sections.
-For example, ``"{:04d}".format(144)`` yields
-``'0144'`` and ``"{:.3f}".format(1.0/3.0)`` yields ``'0.333'``.
+Ví dụ, để chuyển số ``144`` thành chuỗi ``'144'``, hãy sử dụng hàm dựng kiểu tích hợp sẵn :func:`str`. Nếu muốn biểu diễn dưới dạng thập lục phân hoặc bát phân, hãy sử dụng các hàm tích hợp sẵn :func:`hex` hoặc :func:`oct`. Để định dạng nâng cao, hãy xem các phần :ref:`f-strings` và :ref:`formatstrings`. Ví dụ, ``"{:04d}".format(144)`` cho kết quả là ``'0144'`` và ``"{:.3f}".format(1.0/3.0)`` cho kết quả là ``'0.333'``.
 
 
-How do I modify a string in place?
-----------------------------------
+Làm thế nào để sửa đổi một chuỗi tại chỗ?
+-----------------------------------------
 
-You can't, because strings are immutable.  In most situations, you should
-simply construct a new string from the various parts you want to assemble
-it from.  However, if you need an object with the ability to modify in-place
-Unicode data, try using an :class:`io.StringIO` object or the :mod:`array`
-module::
+Bạn không thể làm vậy vì chuỗi là bất biến. Trong hầu hết các trường hợp, bạn chỉ nên tạo một chuỗi mới từ các phần khác nhau mà bạn muốn ghép lại. Tuy nhiên, nếu cần một đối tượng có khả năng sửa đổi dữ liệu Unicode tại chỗ, hãy thử sử dụng đối tượng :class:`io.StringIO` hoặc module :mod:`array`::
 
    >>> import io
    >>> s = "Hello, world"
@@ -935,15 +712,12 @@ module::
    'yello, world'
 
 
-How do I use strings to call functions/methods?
------------------------------------------------
+Làm thế nào để sử dụng chuỗi để gọi các hàm/phương thức?
+--------------------------------------------------------
 
-There are various techniques.
+Có nhiều kỹ thuật khác nhau.
 
-* The best is to use a dictionary that maps strings to functions.  The primary
-  advantage of this technique is that the strings do not need to match the names
-  of the functions.  This is also the primary technique used to emulate a case
-  construct::
+* Cách tốt nhất là sử dụng một dictionary ánh xạ các chuỗi tới các hàm. Ưu điểm chính của kỹ thuật này là các chuỗi không cần phải trùng với tên của các hàm. Đây cũng là kỹ thuật chính được sử dụng để mô phỏng cấu trúc case::
 
      def a():
          pass
@@ -951,11 +725,11 @@ There are various techniques.
      def b():
          pass
 
-     dispatch = {'go': a, 'stop': b}  # Note lack of parens for funcs
+     dispatch = {'go': a, 'stop': b}  # Lưu ý không có dấu ngoặc đơn khi gọi các hàm
 
-     dispatch[get_input()]()  # Note trailing parens to call function
+     dispatch[get_input()]()  # Lưu ý dấu ngoặc đơn ở cuối để gọi hàm
 
-* Use the built-in function :func:`getattr`::
+* Sử dụng hàm tích hợp sẵn :func:`getattr`::
 
      import foo
      getattr(foo, 'bar')()
@@ -976,7 +750,7 @@ There are various techniques.
      f()
 
 
-* Use :func:`locals` to resolve the function name::
+* Sử dụng :func:`locals` để phân giải tên hàm::
 
      def myFunc():
          print("hello")
@@ -987,14 +761,10 @@ There are various techniques.
      f()
 
 
-Is there an equivalent to Perl's ``chomp()`` for removing trailing newlines from strings?
------------------------------------------------------------------------------------------
+Có hàm tương đương với ``chomp()`` của Perl để xóa các ký tự xuống dòng ở cuối chuỗi không?
+-------------------------------------------------------------------------------------------
 
-You can use ``S.rstrip("\r\n")`` to remove all occurrences of any line
-terminator from the end of the string ``S`` without removing other trailing
-whitespace.  If the string ``S`` represents more than one line, with several
-empty lines at the end, the line terminators for all the blank lines will
-be removed::
+Bạn có thể sử dụng ``S.rstrip("\r\n")`` để xóa mọi lần xuất hiện của bất kỳ ký tự kết thúc dòng nào ở cuối chuỗi ``S`` mà không xóa các khoảng trắng khác ở cuối. Nếu chuỗi ``S`` biểu diễn nhiều hơn một dòng, với nhiều dòng trống ở cuối, các ký tự kết thúc dòng của tất cả các dòng trống sẽ bị xóa::
 
    >>> lines = ("line 1 \r\n"
    ...          "\r\n"
@@ -1002,37 +772,32 @@ be removed::
    >>> lines.rstrip("\n\r")
    'line 1 '
 
-Since this is typically only desired when reading text one line at a time, using
-``S.rstrip()`` this way works well.
+Vì cách này thường chỉ cần thiết khi đọc văn bản từng dòng một, sử dụng ``S.rstrip()`` theo cách này sẽ hoạt động hiệu quả.
 
 
-Is there a ``scanf()`` or ``sscanf()`` equivalent?
---------------------------------------------------
+Có tương đương với ``scanf()`` hoặc ``sscanf()`` không?
+-------------------------------------------------------
 
-Not as such.
+Không hẳn là vậy.
 
-For simple input parsing, the easiest approach is usually to split the line into
-whitespace-delimited words using the :meth:`~str.split` method of string objects
-and then convert decimal strings to numeric values using :func:`int` or
-:func:`float`.  :meth:`!split` supports an optional "sep" parameter which is useful
-if the line uses something other than whitespace as a separator.
+Để phân tích cú pháp đầu vào đơn giản, cách dễ nhất thường là tách dòng thành các từ được phân cách bằng khoảng trắng bằng phương thức :meth:`~str.split` của các đối tượng chuỗi, sau đó chuyển đổi các chuỗi thập phân thành giá trị số bằng :func:`int` hoặc
+:func:`float`.  :meth:`!split` hỗ trợ tham số "sep" tùy chọn, hữu ích nếu dòng sử dụng một ký tự khác khoảng trắng làm dấu phân cách.
 
-For more complicated input parsing, regular expressions are more powerful
-than C's ``sscanf`` and better suited for the task.
+Để phân tích cú pháp đầu vào phức tạp hơn, biểu thức chính quy mạnh hơn ``sscanf`` của C và phù hợp hơn với tác vụ này.
 
 
-What does ``UnicodeDecodeError`` or ``UnicodeEncodeError`` error mean?
+Lỗi ``UnicodeDecodeError`` hoặc ``UnicodeEncodeError`` có nghĩa là gì?
 ----------------------------------------------------------------------
 
-See the :ref:`unicode-howto`.
+Xem :ref:`unicode-howto`.
 
 
 .. _faq-programming-raw-string-backslash:
 
-Can I end a raw string with an odd number of backslashes?
----------------------------------------------------------
+Tôi có thể kết thúc chuỗi raw bằng một số lẻ dấu gạch chéo ngược không?
+-----------------------------------------------------------------------
 
-A raw string ending with an odd number of backslashes will escape the string's quote::
+Chuỗi raw kết thúc bằng một số lẻ dấu gạch chéo ngược sẽ escape dấu ngoặc kép của chuỗi::
 
    >>> r'C:\this\will\not\work\'
      File "<stdin>", line 1
@@ -1040,176 +805,122 @@ A raw string ending with an odd number of backslashes will escape the string's q
        ^
    SyntaxError: unterminated string literal (detected at line 1)
 
-There are several workarounds for this. One is to use regular strings and double
-the backslashes::
+Có một số cách khắc phục vấn đề này. Một cách là sử dụng các chuỗi thông thường và nhân đôi dấu gạch chéo ngược::
 
    >>> 'C:\\this\\will\\work\\'
    'C:\\this\\will\\work\\'
 
-Another is to concatenate a regular string containing an escaped backslash to the
-raw string::
+Một cách khác là nối một chuỗi thông thường chứa dấu gạch chéo ngược đã được escape vào chuỗi raw::
 
    >>> r'C:\this\will\work' '\\'
    'C:\\this\\will\\work\\'
 
-It is also possible to use :func:`os.path.join` to append a backslash on Windows::
+Bạn cũng có thể sử dụng :func:`os.path.join` để thêm một dấu gạch chéo ngược trên Windows::
 
    >>> os.path.join(r'C:\this\will\work', '')
    'C:\\this\\will\\work\\'
 
-Note that while a backslash will "escape" a quote for the purposes of
-determining where the raw string ends, no escaping occurs when interpreting the
-value of the raw string. That is, the backslash remains present in the value of
-the raw string::
+Lưu ý rằng mặc dù dấu gạch chéo ngược sẽ "escape" dấu ngoặc kép nhằm xác định vị trí kết thúc chuỗi raw, không có thao tác escape nào xảy ra khi diễn giải giá trị của chuỗi raw. Nghĩa là dấu gạch chéo ngược vẫn hiện diện trong giá trị của chuỗi raw::
 
    >>> r'backslash\'preserved'
    "backslash\\'preserved"
 
-Also see the specification in the :ref:`language reference <strings>`.
+Xem thêm đặc tả trong :ref:`tài liệu tham chiếu ngôn ngữ <strings>`.
 
 
-Performance
-===========
+Hiệu năng
+=========
 
-My program is too slow. How do I speed it up?
----------------------------------------------
+Chương trình của tôi quá chậm. Làm thế nào để tăng tốc chương trình?
+--------------------------------------------------------------------
 
-That's a tough one, in general.  First, here is a list of things to
-remember before diving further:
+Nhìn chung, đây là một vấn đề khó. Trước tiên, dưới đây là danh sách những điều cần ghi nhớ trước khi tìm hiểu sâu hơn:
 
-* Performance characteristics vary across Python implementations.  This FAQ
-  focuses on :term:`CPython`.
-* Behaviour can vary across operating systems, especially when talking about
-  I/O or multi-threading.
-* You should always find the hot spots in your program *before* attempting to
-  optimize any code (see the :mod:`profile` module).
-* Writing benchmark scripts will allow you to iterate quickly when searching
-  for improvements (see the :mod:`timeit` module).
-* It is highly recommended to have good code coverage (through unit testing
-  or any other technique) before potentially introducing regressions hidden
-  in sophisticated optimizations.
+* Đặc tính hiệu năng khác nhau giữa các bản triển khai Python. Câu hỏi thường gặp này tập trung vào :term:`CPython`.
+* Hành vi có thể khác nhau giữa các hệ điều hành, đặc biệt khi nói đến I/O hoặc đa luồng.
+* Bạn luôn nên xác định các điểm nóng trong chương trình *trước* khi cố gắng tối ưu hóa bất kỳ đoạn mã nào (xem module :mod:`profile`).
+* Việc viết các tập lệnh benchmark sẽ cho phép bạn nhanh chóng lặp lại quy trình khi tìm kiếm cải tiến (xem module :mod:`timeit`).
+* Bạn rất nên có độ bao phủ mã tốt (thông qua kiểm thử đơn vị hoặc bất kỳ kỹ thuật nào khác) trước khi có khả năng đưa vào các hồi quy bị che giấu trong những tối ưu hóa phức tạp.
 
-That being said, there are many tricks to speed up Python code.  Here are
-some general principles which go a long way towards reaching acceptable
-performance levels:
+Dù vậy, có rất nhiều thủ thuật để tăng tốc mã Python. Dưới đây là một số nguyên tắc chung có thể giúp bạn đạt được mức hiệu năng chấp nhận được:
 
-* Making your algorithms faster (or changing to faster ones) can yield
-  much larger benefits than trying to sprinkle micro-optimization tricks
-  all over your code.
+* Làm cho các thuật toán của bạn nhanh hơn (hoặc chuyển sang các thuật toán nhanh hơn) có thể mang lại lợi ích lớn hơn nhiều so với việc cố rải các thủ thuật vi tối ưu hóa khắp mã của bạn.
 
-* Use the right data structures.  Study documentation for the :ref:`bltin-types`
-  and the :mod:`collections` module.
+* Hãy sử dụng đúng cấu trúc dữ liệu. Hãy đọc tài liệu về :ref:`bltin-types` và module :mod:`collections`.
 
-* When the standard library provides a primitive for doing something, it is
-  likely (although not guaranteed) to be faster than any alternative you
-  may come up with.  This is doubly true for primitives written in C, such
-  as builtins and some extension types.  For example, be sure to use
-  either the :meth:`list.sort` built-in method or the related :func:`sorted`
-  function to do sorting (and see the :ref:`sortinghowto` for examples
-  of moderately advanced usage).
+* Khi thư viện chuẩn cung cấp một primitive để thực hiện việc gì đó, nhiều khả năng (dù không được đảm bảo) primitive đó sẽ nhanh hơn bất kỳ giải pháp thay thế nào bạn có thể nghĩ ra. Điều này càng đúng đối với các primitive được viết bằng C, chẳng hạn như các hàm built-in và một số kiểu mở rộng. Ví dụ, hãy nhớ sử dụng phương thức built-in :meth:`list.sort` hoặc hàm :func:`sorted` liên quan để thực hiện việc sắp xếp (và xem :ref:`sortinghowto` để biết các ví dụ về cách sử dụng tương đối nâng cao).
 
-* Abstractions tend to create indirections and force the interpreter to work
-  more.  If the levels of indirection outweigh the amount of useful work
-  done, your program will be slower.  You should avoid excessive abstraction,
-  especially under the form of tiny functions or methods (which are also often
-  detrimental to readability).
+* Các abstraction thường tạo ra những lớp trung gian và buộc trình thông dịch phải làm việc nhiều hơn. Nếu các lớp trung gian nhiều hơn khối lượng công việc hữu ích được thực hiện, chương trình của bạn sẽ chậm hơn. Bạn nên tránh abstraction quá mức, đặc biệt dưới dạng các hàm hoặc phương thức nhỏ (những thành phần này cũng thường làm giảm khả năng dễ đọc).
 
-If you have reached the limit of what pure Python can allow, there are tools
-to take you further away.  For example, `Cython <https://cython.org>`_ can
-compile a slightly modified version of Python code into a C extension, and
-can be used on many different platforms.  Cython can take advantage of
-compilation (and optional type annotations) to make your code significantly
-faster than when interpreted.  If you are confident in your C programming
-skills, you can also :ref:`write a C extension module <extending-index>`
-yourself.
+Nếu bạn đã đạt đến giới hạn mà Python thuần túy cho phép, có những công cụ giúp bạn tiến xa hơn. Ví dụ, `Cython <https://cython.org>`_ có thể biên dịch một phiên bản mã Python được sửa đổi đôi chút thành một extension C và có thể được sử dụng trên nhiều nền tảng khác nhau. Cython có thể tận dụng việc biên dịch (và các chú thích kiểu tùy chọn) để làm cho mã của bạn nhanh hơn đáng kể so với khi được thông dịch. Nếu tự tin vào kỹ năng lập trình C của mình, bạn cũng có thể :ref:`tự viết một extension module bằng C <extending-index>`.
 
 .. seealso::
-   The wiki page devoted to `performance tips
-   <https://wiki.python.org/moin/PythonSpeed/PerformanceTips>`_.
+   Trang wiki dành riêng cho `mẹo về hiệu năng <https://wiki.python.org/moin/PythonSpeed/PerformanceTips>`_.
 
 
 .. _efficient_string_concatenation:
 
-What is the most efficient way to concatenate many strings together?
---------------------------------------------------------------------
+Cách hiệu quả nhất để nối nhiều chuỗi với nhau là gì?
+-----------------------------------------------------
 
-:class:`str` and :class:`bytes` objects are immutable, therefore concatenating
-many strings together is inefficient as each concatenation creates a new
-object.  In the general case, the total runtime cost is quadratic in the
-total string length.  See :ref:`time-complexity` for more information.
+Các đối tượng :class:`str` và :class:`bytes` là bất biến, vì vậy việc nối nhiều chuỗi với nhau không hiệu quả vì mỗi lần nối lại tạo một đối tượng mới. Trong trường hợp tổng quát, chi phí thời gian chạy có độ phức tạp bậc hai theo tổng độ dài chuỗi. Xem :ref:`time-complexity` để biết thêm thông tin.
 
-To accumulate many :class:`str` objects, the recommended idiom is to place
-them into a list and call :meth:`str.join` at the end::
+Để tích lũy nhiều đối tượng :class:`str`, cách viết được khuyến nghị là đưa chúng vào một danh sách và gọi :meth:`str.join` ở cuối::
 
    chunks = []
    for s in my_strings:
        chunks.append(s)
    result = ''.join(chunks)
 
-(Another reasonably efficient idiom is to use :class:`io.StringIO`.)
+(Một cách viết khác cũng khá hiệu quả là sử dụng :class:`io.StringIO`.)
 
-To accumulate many :class:`bytes` objects, the recommended idiom is to extend
-a :class:`bytearray` object using in-place concatenation (the ``+=`` operator)::
+Để tích lũy nhiều đối tượng :class:`bytes`, cách viết được khuyến nghị là mở rộng một đối tượng :class:`bytearray` bằng phép nối tại chỗ (toán tử ``+=``)::
 
    result = bytearray()
    for b in my_bytes_objects:
        result += b
 
 
-Sequences (tuples/lists)
-========================
+Các sequence (tuple/list)
+=========================
 
-How do I convert between tuples and lists?
-------------------------------------------
+Làm thế nào để chuyển đổi giữa tuple và list?
+---------------------------------------------
 
-The type constructor ``tuple(seq)`` converts any sequence (actually, any
-iterable) into a tuple with the same items in the same order.
+Hàm khởi tạo kiểu ``tuple(seq)`` chuyển đổi mọi sequence (thực ra là mọi iterable) thành một tuple có cùng các phần tử theo cùng thứ tự.
 
-For example, ``tuple([1, 2, 3])`` yields ``(1, 2, 3)`` and ``tuple('abc')``
-yields ``('a', 'b', 'c')``.  If the argument is a tuple, it does not make a copy
-but returns the same object, so it is cheap to call :func:`tuple` when you
-aren't sure that an object is already a tuple.
+Ví dụ, ``tuple([1, 2, 3])`` cho kết quả ``(1, 2, 3)`` và ``tuple('abc')`` cho kết quả ``('a', 'b', 'c')``. Nếu đối số là một tuple, hàm không tạo bản sao mà trả về chính đối tượng đó, vì vậy gọi :func:`tuple` là một thao tác rẻ khi bạn không chắc một đối tượng đã là tuple hay chưa.
 
-The type constructor ``list(seq)`` converts any sequence or iterable into a list
-with the same items in the same order.  For example, ``list((1, 2, 3))`` yields
-``[1, 2, 3]`` and ``list('abc')`` yields ``['a', 'b', 'c']``.  If the argument
-is a list, it makes a copy just like ``seq[:]`` would.
+Hàm khởi tạo kiểu ``list(seq)`` chuyển đổi mọi sequence hoặc iterable thành một list có cùng các phần tử theo cùng thứ tự. Ví dụ, ``list((1, 2, 3))`` cho kết quả ``[1, 2, 3]`` và ``list('abc')`` cho kết quả ``['a', 'b', 'c']``. Nếu đối số là một list, hàm sẽ tạo một bản sao, giống như ``seq[:]``.
 
 
-What's a negative index?
-------------------------
+Chỉ mục âm là gì?
+-----------------
 
-Python sequences are indexed with positive numbers and negative numbers.  For
-positive numbers 0 is the first index 1 is the second index and so forth.  For
-negative indices -1 is the last index and -2 is the penultimate (next to last)
-index and so forth.  Think of ``seq[-n]`` as the same as ``seq[len(seq)-n]``.
+Các sequence trong Python được lập chỉ mục bằng số dương và số âm. Với các số dương, 0 là chỉ mục đầu tiên, 1 là chỉ mục thứ hai, v.v. Với các chỉ mục âm, -1 là chỉ mục cuối cùng và -2 là chỉ mục áp chót (ngay trước chỉ mục cuối), v.v. Hãy coi ``seq[-n]`` giống như ``seq[len(seq)-n]``.
 
-Using negative indices can be very convenient.  For example ``S[:-1]`` is all of
-the string except for its last character, which is useful for removing the
-trailing newline from a string.
+Việc sử dụng các chỉ mục âm có thể rất tiện lợi. Ví dụ, ``S[:-1]`` là toàn bộ chuỗi ngoại trừ ký tự cuối cùng, rất hữu ích khi xóa ký tự xuống dòng ở cuối chuỗi.
 
 
-How do I iterate over a sequence in reverse order?
---------------------------------------------------
+Làm thế nào để lặp qua một sequence theo thứ tự ngược?
+------------------------------------------------------
 
-Use the :func:`reversed` built-in function::
+Sử dụng hàm tích hợp :func:`reversed`::
 
    for x in reversed(sequence):
-       ...  # do something with x ...
+       ...  # làm gì đó với x ...
 
-This won't touch your original sequence, but build a new copy with reversed
-order to iterate over.
+Cách này không tác động đến sequence ban đầu của bạn mà tạo một bản sao mới theo thứ tự ngược để lặp qua.
 
 
-How do you remove duplicates from a list?
------------------------------------------
+Làm thế nào để loại bỏ các phần tử trùng lặp khỏi một list?
+-----------------------------------------------------------
 
-See the Python Cookbook for a long discussion of many ways to do this:
+Xem Python Cookbook để đọc phần thảo luận chi tiết về nhiều cách thực hiện việc này:
 
    https://code.activestate.com/recipes/52560/
 
-If you don't mind reordering the list, sort it and then scan from the end of the
-list, deleting duplicates as you go::
+Nếu bạn không ngại sắp xếp lại list, hãy sắp xếp nó rồi quét từ cuối list, xóa các phần tử trùng lặp khi thực hiện::
 
    if mylist:
        mylist.sort()
@@ -1220,66 +931,54 @@ list, deleting duplicates as you go::
            else:
                last = mylist[i]
 
-If all elements of the list may be used as set keys (that is, they are all
-:term:`hashable`) this is often faster::
+Nếu tất cả các phần tử của danh sách đều có thể được dùng làm khóa của set (nghĩa là, tất cả chúng đều
+:term:`hashable`) thì cách này thường nhanh hơn::
 
    mylist = list(set(mylist))
 
-This converts the list into a set, thereby removing duplicates, and then back
-into a list.
+Cách này chuyển danh sách thành một set, qua đó loại bỏ các phần tử trùng lặp, rồi chuyển ngược lại thành một danh sách.
 
 
-How do you remove multiple items from a list?
----------------------------------------------
+Làm thế nào để xóa nhiều phần tử khỏi một danh sách?
+----------------------------------------------------
 
-As with removing duplicates, explicitly iterating in reverse with a
-delete condition is one possibility.  However, it is easier and faster
-to use slice replacement with an implicit or explicit forward iteration.
-Here are three variations::
+Tương tự như khi loại bỏ các phần tử trùng lặp, một cách là lặp ngược một cách tường minh với điều kiện xóa. Tuy nhiên, việc sử dụng phép thay thế lát cắt với một vòng lặp xuôi tường minh hoặc ngầm định sẽ dễ dàng và nhanh hơn. Dưới đây là ba biến thể::
 
    mylist[:] = filter(keep_function, mylist)
    mylist[:] = (x for x in mylist if keep_condition)
    mylist[:] = [x for x in mylist if keep_condition]
 
-The list comprehension may be fastest.
+List comprehension có thể là cách nhanh nhất.
 
 
-How do you make an array in Python?
------------------------------------
+Làm thế nào để tạo một mảng trong Python?
+-----------------------------------------
 
-Use a list::
+Dùng một list::
 
    ["this", 1, "is", "an", "array"]
 
-Lists are equivalent to C or Pascal arrays in their time complexity; the primary
-difference is that a Python list can contain objects of many different types.
+List tương đương với mảng C hoặc Pascal về độ phức tạp thời gian; điểm khác biệt chính là một list Python có thể chứa các đối tượng thuộc nhiều kiểu khác nhau.
 
-The ``array`` module also provides methods for creating arrays of fixed types
-with compact representations, but they are slower to index than lists.  Also
-note that `NumPy <https://numpy.org/>`_
-and other third-party packages define array-like structures with
-various characteristics as well.
+Mô-đun ``array`` cũng cung cấp các phương thức để tạo mảng có kiểu cố định với biểu diễn nhỏ gọn, nhưng chúng có tốc độ truy cập theo chỉ mục chậm hơn list. Cũng lưu ý rằng `NumPy <https://numpy.org/>`_ và các package bên thứ ba khác cũng định nghĩa những cấu trúc dạng mảng với nhiều đặc điểm khác nhau.
 
-To get Lisp-style linked lists, you can emulate *cons cells* using tuples::
+Để có linked list kiểu Lisp, bạn có thể mô phỏng *cons cells* bằng tuple::
 
    lisp_list = ("like",  ("this",  ("example", None) ) )
 
-If mutability is desired, you could use lists instead of tuples.  Here the
-analogue of a Lisp *car* is ``lisp_list[0]`` and the analogue of *cdr* is
-``lisp_list[1]``.  Only do this if you're sure you really need to, because it's
-usually a lot slower than using Python lists.
+Nếu cần khả năng thay đổi, bạn có thể dùng list thay vì tuple. Ở đây, tương đương của *car* trong Lisp là ``lisp_list[0]`` và tương đương của *cdr* là ``lisp_list[1]``. Chỉ làm vậy nếu bạn chắc chắn thực sự cần, vì cách này thường chậm hơn nhiều so với việc dùng list Python.
 
 
 .. _faq-multidimensional-list:
 
-How do I create a multidimensional list?
-----------------------------------------
+Làm cách nào để tạo một list đa chiều?
+--------------------------------------
 
-You probably tried to make a multidimensional array like this::
+Có lẽ bạn đã thử tạo một mảng đa chiều như sau::
 
    >>> A = [[None] * 2] * 3
 
-This looks correct if you print it:
+Điều này trông có vẻ đúng nếu bạn in nó ra:
 
 .. testsetup::
 
@@ -1290,7 +989,7 @@ This looks correct if you print it:
    >>> A
    [[None, None], [None, None], [None, None]]
 
-But when you assign a value, it shows up in multiple places:
+Nhưng khi bạn gán một giá trị, nó lại xuất hiện ở nhiều vị trí:
 
 .. testsetup::
 
@@ -1302,40 +1001,32 @@ But when you assign a value, it shows up in multiple places:
    >>> A
    [[5, None], [5, None], [5, None]]
 
-The reason is that replicating a list with ``*`` doesn't create copies, it only
-creates references to the existing objects.  The ``*3`` creates a list
-containing 3 references to the same list of length two.  Changes to one row will
-show in all rows, which is almost certainly not what you want.
+Lý do là việc nhân bản một danh sách bằng ``*`` không tạo ra các bản sao mà chỉ tạo các tham chiếu đến những đối tượng hiện có. ``*3`` tạo một danh sách chứa 3 tham chiếu đến cùng một danh sách có độ dài hai. Các thay đổi đối với một hàng sẽ hiển thị ở tất cả các hàng, và gần như chắc chắn đó không phải là điều bạn muốn.
 
-The suggested approach is to create a list of the desired length first and then
-fill in each element with a newly created list::
+Cách được khuyến nghị là trước tiên tạo một danh sách có độ dài mong muốn, sau đó điền vào từng phần tử bằng một danh sách mới được tạo::
 
    A = [None] * 3
    for i in range(3):
        A[i] = [None] * 2
 
-This generates a list containing 3 different lists of length two.  You can also
-use a list comprehension::
+Cách này tạo ra một danh sách chứa 3 danh sách khác nhau có độ dài hai. Bạn cũng có thể sử dụng list comprehension::
 
    w, h = 2, 3
    A = [[None] * w for i in range(h)]
 
-Or, you can use an extension that provides a matrix datatype; `NumPy
-<https://numpy.org/>`_ is the best known.
+Hoặc bạn có thể sử dụng một extension cung cấp kiểu dữ liệu ma trận; `NumPy <https://numpy.org/>`_ là thư viện được biết đến nhiều nhất.
 
 
-How do I apply a method or function to a sequence of objects?
--------------------------------------------------------------
+Làm thế nào để áp dụng một method hoặc function cho một dãy các đối tượng?
+--------------------------------------------------------------------------
 
-To call a method or function and accumulate the return values in a list,
-a :term:`list comprehension` is an elegant solution::
+Để gọi một method hoặc function và tích lũy các giá trị trả về vào một danh sách, :term:`list comprehension` là một giải pháp tao nhã::
 
    result = [obj.method() for obj in mylist]
 
    result = [function(obj) for obj in mylist]
 
-To just run the method or function without saving the return values,
-a plain :keyword:`for` loop will suffice::
+Nếu chỉ muốn chạy method hoặc function mà không lưu các giá trị trả về, một vòng lặp :keyword:`for` thông thường là đủ::
 
    for obj in mylist:
        obj.method()
@@ -1346,18 +1037,14 @@ a plain :keyword:`for` loop will suffice::
 
 .. _faq-augmented-assignment-tuple-error:
 
-Why does a_tuple[i] += ['item'] raise an exception when the addition works?
----------------------------------------------------------------------------
+Tại sao a_tuple[i] += ['item'] lại phát sinh ngoại lệ khi phép cộng vẫn hoạt động?
+----------------------------------------------------------------------------------
 
-This is because of a combination of the fact that augmented assignment
-operators are *assignment* operators, and the difference between mutable and
-immutable objects in Python.
+Lý do là sự kết hợp giữa việc các toán tử *phép gán* tăng cường là các toán tử gán, và sự khác biệt giữa các đối tượng mutable và immutable trong Python.
 
-This discussion applies in general when augmented assignment operators are
-applied to elements of a tuple that point to mutable objects, but we'll use
-a ``list`` and ``+=`` as our exemplar.
+Thảo luận này áp dụng nói chung khi các toán tử gán tăng cường được áp dụng cho các phần tử của một tuple trỏ tới các đối tượng mutable, nhưng chúng ta sẽ dùng một ``list`` và ``+=`` làm ví dụ minh họa.
 
-If you wrote::
+Nếu bạn viết::
 
    >>> a_tuple = (1, 2)
    >>> a_tuple[0] += 1
@@ -1365,14 +1052,9 @@ If you wrote::
       ...
    TypeError: 'tuple' object does not support item assignment
 
-The reason for the exception should be immediately clear: ``1`` is added to the
-object ``a_tuple[0]`` points to (``1``), producing the result object, ``2``,
-but when we attempt to assign the result of the computation, ``2``, to element
-``0`` of the tuple, we get an error because we can't change what an element of
-a tuple points to.
+Lý do gây ra ngoại lệ sẽ ngay lập tức trở nên rõ ràng: ``1`` được thêm vào đối tượng mà ``a_tuple[0]`` trỏ tới (``1``), tạo ra đối tượng kết quả ``2``; nhưng khi cố gắng gán kết quả của phép tính, ``2``, cho phần tử ``0`` của tuple, chúng ta gặp lỗi vì không thể thay đổi phần tử của tuple đang trỏ tới đâu.
 
-Under the covers, what this augmented assignment statement is doing is
-approximately this::
+Về bản chất, câu lệnh phép gán kết hợp này thực hiện gần như sau::
 
    >>> result = a_tuple[0] + 1
    >>> a_tuple[0] = result
@@ -1380,10 +1062,9 @@ approximately this::
      ...
    TypeError: 'tuple' object does not support item assignment
 
-It is the assignment part of the operation that produces the error, since a
-tuple is immutable.
+Chính phần phép gán của thao tác này gây ra lỗi, vì tuple là immutable.
 
-When you write something like::
+Khi bạn viết một biểu thức như::
 
    >>> a_tuple = (['foo'], 'bar')
    >>> a_tuple[0] += ['item']
@@ -1391,36 +1072,28 @@ When you write something like::
      ...
    TypeError: 'tuple' object does not support item assignment
 
-The exception is a bit more surprising, and even more surprising is the fact
-that even though there was an error, the append worked::
+Ngoại lệ này có phần bất ngờ, và còn bất ngờ hơn là dù đã xảy ra lỗi, thao tác append vẫn thành công::
 
     >>> a_tuple[0]
     ['foo', 'item']
 
-To see why this happens, you need to know that (a) if an object implements an
-:meth:`~object.__iadd__` magic method, it gets called when the ``+=`` augmented
-assignment
-is executed, and its return value is what gets used in the assignment statement;
-and (b) for lists, :meth:`!__iadd__` is equivalent to calling
-:meth:`~sequence.extend` on the list and returning the list.
-That's why we say that for lists, ``+=`` is a "shorthand" for :meth:`list.extend`::
+Để hiểu tại sao điều này xảy ra, bạn cần biết rằng (a) nếu một đối tượng triển khai một
+:meth:`~object.__iadd__` magic method, phương thức này sẽ được gọi khi phép gán kết hợp ``+=`` được thực thi, và giá trị trả về của nó sẽ được sử dụng trong câu lệnh phép gán; và (b) đối với list, :meth:`!__iadd__` tương đương với việc gọi
+:meth:`~sequence.extend` trên list rồi trả về list đó. Đó là lý do chúng ta nói rằng đối với list, ``+=`` là một "cách viết tắt" của :meth:`list.extend`::
 
     >>> a_list = []
     >>> a_list += [1]
     >>> a_list
     [1]
 
-This is equivalent to::
+Điều này tương đương với::
 
     >>> result = a_list.__iadd__([1])
     >>> a_list = result
 
-The object pointed to by a_list has been mutated, and the pointer to the
-mutated object is assigned back to ``a_list``.  The end result of the
-assignment is a no-op, since it is a pointer to the same object that ``a_list``
-was previously pointing to, but the assignment still happens.
+Đối tượng được a_list trỏ tới đã bị thay đổi, và con trỏ tới đối tượng đã thay đổi được gán trở lại cho ``a_list``. Kết quả cuối cùng của phép gán không làm thay đổi gì, vì đó là con trỏ tới cùng đối tượng mà ``a_list`` trước đó đã trỏ tới, nhưng phép gán vẫn được thực hiện.
 
-Thus, in our tuple example what is happening is equivalent to::
+Do đó, trong ví dụ về tuple của chúng ta, điều xảy ra tương đương với::
 
    >>> result = a_tuple[0].__iadd__(['item'])
    >>> a_tuple[0] = result
@@ -1428,27 +1101,22 @@ Thus, in our tuple example what is happening is equivalent to::
      ...
    TypeError: 'tuple' object does not support item assignment
 
-The :meth:`!__iadd__` succeeds, and thus the list is extended, but even though
-``result`` points to the same object that ``a_tuple[0]`` already points to,
-that final assignment still results in an error, because tuples are immutable.
+Phép :meth:`!__iadd__` thành công, vì vậy list được mở rộng, nhưng mặc dù ``result`` trỏ tới cùng đối tượng mà ``a_tuple[0]`` đã trỏ tới, phép gán cuối cùng đó vẫn gây ra lỗi, vì tuple là bất biến.
 
 
-I want to do a complicated sort: can you do a Schwartzian Transform in Python?
-------------------------------------------------------------------------------
+Tôi muốn thực hiện một phép sắp xếp phức tạp: Python có thể thực hiện Schwartzian Transform không?
+--------------------------------------------------------------------------------------------------
 
-The technique, attributed to Randal Schwartz of the Perl community, sorts the
-elements of a list by a metric which maps each element to its "sort value". In
-Python, use the ``key`` argument for the :meth:`list.sort` method::
+Kỹ thuật này, được cho là do Randal Schwartz trong cộng đồng Perl phát triển, sắp xếp các phần tử của một list theo một thước đo ánh xạ mỗi phần tử tới "giá trị sắp xếp" của nó. Trong Python, hãy sử dụng đối số ``key`` cho phương thức :meth:`list.sort`::
 
    Isorted = L[:]
    Isorted.sort(key=lambda s: int(s[10:15]))
 
 
-How can I sort one list by values from another list?
-----------------------------------------------------
+Làm thế nào để sắp xếp một list theo các giá trị từ một list khác?
+------------------------------------------------------------------
 
-Merge them into an iterator of tuples, sort the resulting list, and then pick
-out the element you want.
+Gộp chúng thành một iterator gồm các tuple, sắp xếp danh sách kết quả, rồi chọn ra phần tử bạn muốn.
 
    >>> list1 = ["what", "I'm", "sorting", "by"]
    >>> list2 = ["something", "else", "to", "sort"]
@@ -1461,62 +1129,42 @@ out the element you want.
    ['else', 'sort', 'to', 'something']
 
 
-Objects
-=======
+Đối tượng
+=========
 
-What is a class?
-----------------
+Class là gì?
+------------
 
-A class is the particular object type created by executing a class statement.
-Class objects are used as templates to create instance objects, which embody
-both the data (attributes) and code (methods) specific to a datatype.
+Class là kiểu đối tượng cụ thể được tạo ra bằng cách thực thi một câu lệnh class. Các đối tượng class được dùng làm mẫu để tạo các đối tượng instance, trong đó bao gồm cả dữ liệu (các thuộc tính) và mã (các phương thức) dành riêng cho một kiểu dữ liệu.
 
-A class can be based on one or more other classes, called its base class(es). It
-then inherits the attributes and methods of its base classes. This allows an
-object model to be successively refined by inheritance.  You might have a
-generic ``Mailbox`` class that provides basic accessor methods for a mailbox,
-and subclasses such as ``MboxMailbox``, ``MaildirMailbox``, ``OutlookMailbox``
-that handle various specific mailbox formats.
+Một class có thể dựa trên một hoặc nhiều class khác, được gọi là các base class của nó. Khi đó, nó kế thừa các thuộc tính và phương thức của các base class. Điều này cho phép mô hình đối tượng được tinh chỉnh dần thông qua tính kế thừa. Bạn có thể có một class ``Mailbox`` tổng quát cung cấp các phương thức accessor cơ bản cho một mailbox, cùng các subclass như ``MboxMailbox``, ``MaildirMailbox``, ``OutlookMailbox`` để xử lý nhiều định dạng mailbox cụ thể khác nhau.
 
 
-What is a method?
------------------
+Method là gì?
+-------------
 
-A method is a function on some object ``x`` that you normally call as
-``x.name(arguments...)``.  Methods are defined as functions inside the class
-definition::
+Method là một hàm trên một đối tượng ``x`` nào đó mà bạn thường gọi như sau: ``x.name(arguments...)``. Các method được định nghĩa dưới dạng các hàm bên trong phần định nghĩa class::
 
    class C:
        def meth(self, arg):
            return arg * 2 + self.attribute
 
 
-What is self?
--------------
+self là gì?
+-----------
 
-Self is merely a conventional name for the first argument of a method.  A method
-defined as ``meth(self, a, b, c)`` should be called as ``x.meth(a, b, c)`` for
-some instance ``x`` of the class in which the definition occurs; the called
-method will think it is called as ``meth(x, a, b, c)``.
+Self chỉ đơn thuần là tên gọi theo quy ước cho đối số đầu tiên của một method. Một method được định nghĩa là ``meth(self, a, b, c)`` nên được gọi là ``x.meth(a, b, c)`` đối với một instance ``x`` của class nơi định nghĩa đó xuất hiện; method được gọi sẽ cho rằng nó được gọi là ``meth(x, a, b, c)``.
 
-See also :ref:`why-self`.
+Xem thêm :ref:`why-self`.
 
 
-How do I check if an object is an instance of a given class or of a subclass of it?
------------------------------------------------------------------------------------
+Làm thế nào để kiểm tra xem một object có phải là instance của một class nhất định hoặc của một subclass của class đó hay không?
+--------------------------------------------------------------------------------------------------------------------------------
 
-Use the built-in function :func:`isinstance(obj, cls) <isinstance>`.  You can
-check if an object
-is an instance of any of a number of classes by providing a tuple instead of a
-single class, for example, ``isinstance(obj, (class1, class2, ...))``, and can also
-check whether an object is one of Python's built-in types, for example,
-``isinstance(obj, str)`` or ``isinstance(obj, (int, float, complex))``.
+Hãy sử dụng built-in function :func:`isinstance(obj, cls) <isinstance>`. Bạn có thể kiểm tra xem một object có phải là instance của bất kỳ class nào trong số nhiều class hay không bằng cách cung cấp một tuple thay vì một class duy nhất, chẳng hạn như ``isinstance(obj, (class1, class2, ...))``, đồng thời cũng có thể kiểm tra xem một object có phải là một trong các built-in type của Python hay không, chẳng hạn như ``isinstance(obj, str)`` hoặc ``isinstance(obj, (int, float, complex))``.
 
-Note that :func:`isinstance` also checks for virtual inheritance from an
-:term:`abstract base class`.  So, the test will return ``True`` for a
-registered class even if hasn't directly or indirectly inherited from it.  To
-test for "true inheritance", scan the :term:`method resolution order` (MRO) of
-the class:
+Lưu ý rằng :func:`isinstance` cũng kiểm tra tính kế thừa ảo từ một
+:term:`abstract base class`. Vì vậy, phép kiểm tra sẽ trả về ``True`` đối với một class đã đăng ký ngay cả khi class đó không kế thừa trực tiếp hoặc gián tiếp từ nó. Để kiểm tra "tính kế thừa thực sự", hãy quét :term:`method resolution order` (MRO) của class:
 
 .. testcode::
 
@@ -1533,61 +1181,49 @@ the class:
 .. doctest::
 
     >>> c = C()
-    >>> isinstance(c, C)        # direct
+    >>> isinstance(c, C)        # trực tiếp
     True
-    >>> isinstance(c, P)        # indirect
+    >>> isinstance(c, P)        # gián tiếp
     True
-    >>> isinstance(c, Mapping)  # virtual
+    >>> isinstance(c, Mapping)  # ảo
     True
 
-    # Actual inheritance chain
+    # Chuỗi kế thừa thực tế
     >>> type(c).__mro__
     (<class 'C'>, <class 'P'>, <class 'object'>)
 
-    # Test for "true inheritance"
+    # Kiểm tra "kế thừa thực sự"
     >>> Mapping in type(c).__mro__
     False
 
-Note that most programs do not use :func:`isinstance` on user-defined classes
-very often.  If you are developing the classes yourself, a more proper
-object-oriented style is to define methods on the classes that encapsulate a
-particular behaviour, instead of checking the object's class and doing a
-different thing based on what class it is.  For example, if you have a function
-that does something::
+Lưu ý rằng hầu hết chương trình không thường xuyên sử dụng :func:`isinstance` trên các lớp do người dùng định nghĩa. Nếu bạn tự phát triển các lớp, phong cách lập trình hướng đối tượng phù hợp hơn là định nghĩa các phương thức trên lớp để đóng gói một hành vi cụ thể, thay vì kiểm tra lớp của đối tượng rồi thực hiện các thao tác khác nhau dựa trên lớp đó. Ví dụ: nếu bạn có một hàm thực hiện một việc gì đó::
 
    def search(obj):
        if isinstance(obj, Mailbox):
-           ...  # code to search a mailbox
+           ...  # mã để tìm kiếm một hộp thư
        elif isinstance(obj, Document):
-           ...  # code to search a document
+           ...  # mã để tìm kiếm tài liệu
        elif ...
 
-A better approach is to define a ``search()`` method on all the classes and just
-call it::
+Một cách tiếp cận tốt hơn là định nghĩa phương thức ``search()`` trên tất cả các lớp rồi chỉ cần gọi phương thức đó::
 
    class Mailbox:
        def search(self):
-           ...  # code to search a mailbox
+           ...  # mã để tìm kiếm một hộp thư
 
    class Document:
        def search(self):
-           ...  # code to search a document
+           ...  # mã để tìm kiếm tài liệu
 
    obj.search()
 
 
-What is delegation?
--------------------
+Ủy quyền là gì?
+---------------
 
-Delegation is an object-oriented technique (also called a design pattern).
-Let's say you have an object ``x`` and want to change the behaviour of just one
-of its methods.  You can create a new class that provides a new implementation
-of the method you're interested in changing and delegates all other methods to
-the corresponding method of ``x``.
+Ủy quyền là một kỹ thuật lập trình hướng đối tượng (còn được gọi là một design pattern). Giả sử bạn có một đối tượng ``x`` và muốn thay đổi hành vi của chỉ một trong các phương thức của nó. Bạn có thể tạo một lớp mới cung cấp cách triển khai mới cho phương thức mà bạn muốn thay đổi, đồng thời ủy quyền tất cả các phương thức khác cho phương thức tương ứng của ``x``.
 
-Python programmers can easily implement delegation.  For example, the following
-class implements a class that behaves like a file but converts all written data
-to uppercase::
+Các lập trình viên Python có thể dễ dàng triển khai delegation. Ví dụ, lớp sau đây triển khai một lớp hoạt động như một tệp nhưng chuyển đổi tất cả dữ liệu được ghi thành chữ hoa::
 
    class UpperOut:
 
@@ -1600,17 +1236,11 @@ to uppercase::
        def __getattr__(self, name):
            return getattr(self._outfile, name)
 
-Here the ``UpperOut`` class redefines the ``write()`` method to convert the
-argument string to uppercase before calling the underlying
-``self._outfile.write()`` method.  All other methods are delegated to the
-underlying ``self._outfile`` object.  The delegation is accomplished via the
-:meth:`~object.__getattr__` method; consult :ref:`the language reference <attribute-access>`
-for more information about controlling attribute access.
+Ở đây, lớp ``UpperOut`` định nghĩa lại phương thức ``write()`` để chuyển chuỗi đối số thành chữ hoa trước khi gọi phương thức ``self._outfile.write()`` bên dưới. Tất cả các phương thức khác được ủy quyền cho đối tượng ``self._outfile`` bên dưới. Việc ủy quyền được thực hiện thông qua
+phương thức :meth:`~object.__getattr__`; hãy tham khảo :ref:`tài liệu tham chiếu của ngôn ngữ <attribute-access>` để biết thêm thông tin về cách kiểm soát quyền truy cập thuộc tính.
 
-Note that for more general cases delegation can get trickier. When attributes
-must be set as well as retrieved, the class must define a :meth:`~object.__setattr__`
-method too, and it must do so carefully.  The basic implementation of
-:meth:`!__setattr__` is roughly equivalent to the following::
+Lưu ý rằng trong các trường hợp tổng quát hơn, việc ủy quyền có thể trở nên phức tạp hơn. Khi cần vừa thiết lập vừa truy xuất thuộc tính, lớp cũng phải định nghĩa phương thức :meth:`~object.__setattr__`, và phải thực hiện việc đó một cách cẩn thận. Cách triển khai cơ bản của
+:meth:`!__setattr__` gần tương đương với đoạn mã sau::
 
    class X:
        ...
@@ -1618,40 +1248,32 @@ method too, and it must do so carefully.  The basic implementation of
            self.__dict__[name] = value
        ...
 
-Many :meth:`~object.__setattr__` implementations call :meth:`!object.__setattr__` to set
-an attribute on self without causing infinite recursion::
+Nhiều cách triển khai :meth:`~object.__setattr__` gọi :meth:`!object.__setattr__` để thiết lập một thuộc tính trên self mà không gây ra đệ quy vô hạn::
 
    class X:
        def __setattr__(self, name, value):
-           # Custom logic here...
+           # Logic tùy chỉnh ở đây...
            object.__setattr__(self, name, value)
 
-Alternatively, it is possible to set attributes by inserting
-entries into :attr:`self.__dict__ <object.__dict__>` directly.
+Ngoài ra, có thể thiết lập thuộc tính bằng cách chèn trực tiếp các mục vào :attr:`self.__dict__ <object.__dict__>`.
 
 
-How do I call a method defined in a base class from a derived class that extends it?
-------------------------------------------------------------------------------------
+Làm thế nào để gọi một phương thức được định nghĩa trong lớp cơ sở từ một lớp dẫn xuất mở rộng lớp đó?
+------------------------------------------------------------------------------------------------------
 
-Use the built-in :func:`super` function::
+Sử dụng hàm dựng sẵn :func:`super`::
 
    class Derived(Base):
        def meth(self):
-           super().meth()  # calls Base.meth
+           super().meth()  # gọi Base.meth
 
-In the example, :func:`super` will automatically determine the instance from
-which it was called (the ``self`` value), look up the :term:`method resolution
-order` (MRO) with ``type(self).__mro__``, and return the next in line after
-``Derived`` in the MRO: ``Base``.
+Trong ví dụ, :func:`super` sẽ tự động xác định instance mà từ đó nó được gọi (giá trị ``self``), tra cứu :term:`method resolution order` (MRO) bằng ``type(self).__mro__``, rồi trả về phần tử tiếp theo sau ``Derived`` trong MRO: ``Base``.
 
 
-How can I organize my code to make it easier to change the base class?
-----------------------------------------------------------------------
+Làm thế nào để tổ chức mã nguồn để dễ thay đổi lớp cơ sở hơn?
+-------------------------------------------------------------
 
-You could assign the base class to an alias and derive from the alias.  Then all
-you have to change is the value assigned to the alias.  Incidentally, this trick
-is also handy if you want to decide dynamically (such as depending on availability
-of resources) which base class to use.  Example::
+Bạn có thể gán lớp cơ sở cho một alias rồi kế thừa từ alias đó. Khi ấy, tất cả những gì bạn phải thay đổi là giá trị được gán cho alias. Ngoài ra, thủ thuật này cũng hữu ích nếu bạn muốn quyết định động lớp cơ sở nào sẽ được sử dụng (chẳng hạn tùy thuộc vào khả năng sẵn có của tài nguyên). Ví dụ::
 
    class Base:
        ...
@@ -1662,60 +1284,50 @@ of resources) which base class to use.  Example::
        ...
 
 
-How do I create static class data and static class methods?
------------------------------------------------------------
+Làm thế nào để tạo dữ liệu tĩnh của lớp và các phương thức tĩnh của lớp?
+------------------------------------------------------------------------
 
-Both static data and static methods (in the sense of C++ or Java) are supported
-in Python.
+Python hỗ trợ cả dữ liệu static và các phương thức static (theo nghĩa của C++ hoặc Java).
 
-For static data, simply define a class attribute.  To assign a new value to the
-attribute, you have to explicitly use the class name in the assignment::
+Đối với dữ liệu static, chỉ cần định nghĩa một thuộc tính của lớp. Để gán giá trị mới cho thuộc tính, bạn phải sử dụng tường minh tên lớp trong phép gán::
 
    class C:
-       count = 0   # number of times C.__init__ called
+       count = 0   # số lần C.__init__ được gọi
 
        def __init__(self):
            C.count = C.count + 1
 
        def getcount(self):
-           return C.count  # or return self.count
+           return C.count  # hoặc return self.count
 
-``c.count`` also refers to ``C.count`` for any ``c`` such that ``isinstance(c,
-C)`` holds, unless overridden by ``c`` itself or by some class on the base-class
-search path from ``c.__class__`` back to ``C``.
+``c.count`` cũng tham chiếu đến ``C.count`` đối với mọi ``c`` sao cho ``isinstance(c, C)`` đúng, trừ khi bị chính ``c`` hoặc một lớp nào đó trên đường dẫn tìm kiếm lớp cơ sở từ ``c.__class__`` ngược về ``C`` ghi đè.
 
-Caution: within a method of C, an assignment like ``self.count = 42`` creates a
-new and unrelated instance named "count" in ``self``'s own dict.  Rebinding of a
-class-static data name must always specify the class whether inside a method or
-not::
+Cảnh báo: trong một phương thức của C, phép gán như ``self.count = 42`` sẽ tạo một instance mới, không liên quan, có tên "count" trong dict riêng của ``self``. Việc liên kết lại một tên dữ liệu static của lớp luôn phải chỉ rõ lớp, dù ở bên trong một phương thức hay không::
 
    C.count = 314
 
-Static methods are possible::
+Có thể sử dụng các phương thức static::
 
    class C:
        @staticmethod
        def static(arg1, arg2, arg3):
-           # No 'self' parameter!
+           # Không có tham số 'self'!
            ...
 
-However, a far more straightforward way to get the effect of a static method is
-via a simple module-level function::
+Tuy nhiên, một cách đơn giản hơn nhiều để đạt được hiệu ứng của một phương thức static là sử dụng một hàm cấp mô-đun đơn giản::
 
    def getcount():
        return C.count
 
-If your code is structured so as to define one class (or tightly related class
-hierarchy) per module, this supplies the desired encapsulation.
+Nếu mã của bạn được cấu trúc để định nghĩa một lớp (hoặc một hệ thống phân cấp các lớp có liên quan chặt chẽ) trong mỗi mô-đun, cách này sẽ cung cấp khả năng đóng gói mong muốn.
 
 
-How can I overload constructors (or methods) in Python?
--------------------------------------------------------
+Làm thế nào để overload constructor (hoặc phương thức) trong Python?
+--------------------------------------------------------------------
 
-This answer actually applies to all methods, but the question usually comes up
-first in the context of constructors.
+Câu trả lời này thực ra áp dụng cho tất cả các phương thức, nhưng câu hỏi thường xuất hiện trước tiên trong ngữ cảnh của constructor.
 
-In C++ you'd write:
+Trong C++, bạn sẽ viết:
 
 .. code-block:: c++
 
@@ -1724,8 +1336,7 @@ In C++ you'd write:
         C(int i) { cout << "Argument is " << i << "\n"; }
     }
 
-In Python you have to write a single constructor that catches all cases using
-default arguments.  For example::
+Trong Python, bạn phải viết một constructor duy nhất để xử lý mọi trường hợp bằng cách sử dụng các đối số mặc định. Ví dụ::
 
    class C:
        def __init__(self, i=None):
@@ -1734,27 +1345,22 @@ default arguments.  For example::
            else:
                print("Argument is", i)
 
-This is not entirely equivalent, but close enough in practice.
+Điều này không hoàn toàn tương đương, nhưng trên thực tế thì đủ gần.
 
-You could also try a variable-length argument list, for example::
+Bạn cũng có thể thử một danh sách đối số có độ dài thay đổi, chẳng hạn như::
 
    def __init__(self, *args):
        ...
 
-The same approach works for all method definitions.
+Cách tiếp cận tương tự áp dụng cho mọi định nghĩa phương thức.
 
 
-I try to use __spam and I get an error about _SomeClassName__spam.
-------------------------------------------------------------------
+Tôi cố sử dụng __spam và nhận được lỗi về _SomeClassName__spam.
+---------------------------------------------------------------
 
-Variable names with double leading underscores are "mangled" to provide a simple
-but effective way to define class private variables.  Any identifier of the form
-``__spam`` (at least two leading underscores, at most one trailing underscore)
-is textually replaced with ``_classname__spam``, where ``classname`` is the
-current class name with any leading underscores stripped.
+Tên biến có hai dấu gạch dưới ở đầu sẽ được "mangle" để cung cấp một cách đơn giản nhưng hiệu quả nhằm định nghĩa các biến riêng tư của lớp. Bất kỳ identifier nào có dạng ``__spam`` (ít nhất hai dấu gạch dưới ở đầu, nhiều nhất một dấu gạch dưới ở cuối) đều được thay thế về mặt văn bản bằng ``_classname__spam``, trong đó ``classname`` là tên lớp hiện tại sau khi bỏ mọi dấu gạch dưới ở đầu.
 
-The identifier can be used unchanged within the class, but to access it outside
-the class, the mangled name must be used:
+Identifier này có thể được sử dụng không thay đổi bên trong lớp, nhưng để truy cập nó bên ngoài lớp, phải sử dụng tên đã được mangle:
 
 .. code-block:: python
 
@@ -1770,47 +1376,26 @@ the class, the mangled name must be used:
 
    four = 4 * A()._A__one()
 
-In particular, this does not guarantee privacy since an outside user can still
-deliberately access the private attribute; many Python programmers never bother
-to use private variable names at all.
+Cụ thể, điều này không đảm bảo tính riêng tư, vì người dùng bên ngoài vẫn có thể cố ý truy cập thuộc tính riêng tư; nhiều lập trình viên Python hoàn toàn không dùng tên biến riêng tư.
 
 .. seealso::
 
-   The :ref:`private name mangling specifications <private-name-mangling>`
-   for details and special cases.
+   Xem :ref:`đặc tả về việc làm rối tên private <private-name-mangling>` để biết chi tiết và các trường hợp đặc biệt.
 
 
-My class defines __del__ but it is not called when I delete the object.
------------------------------------------------------------------------
+Lớp của tôi định nghĩa __del__ nhưng phương thức này không được gọi khi tôi xóa đối tượng.
+------------------------------------------------------------------------------------------
 
-There are several possible reasons for this.
+Có một số nguyên nhân có thể dẫn đến điều này.
 
-The :keyword:`del` statement does not necessarily call :meth:`~object.__del__` -- it simply
-decrements the object's reference count, and if this reaches zero
-:meth:`!__del__` is called.
+Câu lệnh :keyword:`del` không nhất thiết gọi :meth:`~object.__del__` -- nó chỉ giảm bộ đếm tham chiếu của đối tượng, và nếu bộ đếm này về 0
+:meth:`!__del__` sẽ được gọi.
 
-If your data structures contain circular links (for example, a tree where each child has
-a parent reference and each parent has a list of children) the reference counts
-will never go back to zero.  Once in a while Python runs an algorithm to detect
-such cycles, but the garbage collector might run some time after the last
-reference to your data structure vanishes, so your :meth:`!__del__` method may be
-called at an inconvenient and random time. This is inconvenient if you're trying
-to reproduce a problem. Worse, the order in which object's :meth:`!__del__`
-methods are executed is arbitrary.  You can run :func:`gc.collect` to force a
-collection, but there *are* pathological cases where objects will never be
-collected.
+Nếu các cấu trúc dữ liệu của bạn chứa các liên kết vòng (ví dụ: một cây trong đó mỗi nút con có tham chiếu đến nút cha và mỗi nút cha có một danh sách các nút con), bộ đếm tham chiếu sẽ không bao giờ về 0. Thỉnh thoảng Python chạy một thuật toán để phát hiện các chu kỳ như vậy, nhưng garbage collector có thể chạy một thời gian sau khi tham chiếu cuối cùng đến cấu trúc dữ liệu của bạn biến mất, vì vậy phương thức :meth:`!__del__` của bạn có thể được gọi vào một thời điểm bất tiện và ngẫu nhiên. Điều này gây bất tiện nếu bạn đang cố tái hiện một sự cố. Tệ hơn nữa, thứ tự thực thi các phương thức :meth:`!__del__` của đối tượng là không xác định. Bạn có thể chạy :func:`gc.collect` để buộc thực hiện việc thu gom, nhưng có *các* trường hợp đặc biệt trong đó các đối tượng sẽ không bao giờ được thu gom.
 
-Despite the cycle collector, it's still a good idea to define an explicit
-``close()`` method on objects to be called whenever you're done with them.  The
-``close()`` method can then remove attributes that refer to subobjects.  Don't
-call :meth:`!__del__` directly -- :meth:`!__del__` should call ``close()`` and
-``close()`` should make sure that it can be called more than once for the same
-object.
+Mặc dù có cycle collector, bạn vẫn nên định nghĩa một phương thức ``close()`` tường minh trên các đối tượng để gọi phương thức này bất cứ khi nào bạn không còn dùng chúng. Sau đó, phương thức ``close()`` có thể xóa các thuộc tính tham chiếu đến các đối tượng con. Đừng gọi trực tiếp :meth:`!__del__` -- :meth:`!__del__` nên gọi ``close()`` và ``close()`` phải đảm bảo rằng phương thức này có thể được gọi nhiều lần trên cùng một đối tượng.
 
-Another way to avoid cyclical references is to use the :mod:`weakref` module,
-which allows you to point to objects without incrementing their reference count.
-Tree data structures, for instance, should use weak references for their parent
-and sibling references (if they need them!).
+Một cách khác để tránh các tham chiếu vòng là sử dụng mô-đun :mod:`weakref`, cho phép bạn trỏ đến các đối tượng mà không làm tăng số lượng tham chiếu của chúng. Chẳng hạn, các cấu trúc dữ liệu dạng cây nên sử dụng weak reference cho các tham chiếu đến nút cha và nút anh em (nếu cần!).
 
 .. XXX relevant for Python 3?
 
@@ -1820,36 +1405,26 @@ and sibling references (if they need them!).
    Normally, calling :func:`sys.exc_clear` will take care of this by clearing
    the last recorded exception.
 
-Finally, if your :meth:`!__del__` method raises an exception, a warning message
-is printed to :data:`sys.stderr`.
+Cuối cùng, nếu phương thức :meth:`!__del__` của bạn phát sinh ngoại lệ, một thông báo cảnh báo sẽ được in ra :data:`sys.stderr`.
 
 
-How do I get a list of all instances of a given class?
-------------------------------------------------------
+Làm thế nào để lấy danh sách tất cả các instance của một class nhất định?
+-------------------------------------------------------------------------
 
-Python does not keep track of all instances of a class (or of a built-in type).
-You can program the class's constructor to keep track of all instances by
-keeping a list of weak references to each instance.
+Python không theo dõi tất cả các instance của một class (hoặc của một kiểu dựng sẵn). Bạn có thể lập trình constructor của class để theo dõi tất cả các instance bằng cách lưu một danh sách các weak reference đến từng instance.
 
 
-Why does the result of ``id()`` appear to be not unique?
---------------------------------------------------------
+Tại sao kết quả của ``id()`` dường như không phải là duy nhất?
+--------------------------------------------------------------
 
-The :func:`id` builtin returns an integer that is guaranteed to be unique during
-the lifetime of the object.  Since in CPython, this is the object's memory
-address, it happens frequently that after an object is deleted from memory, the
-next freshly created object is allocated at the same position in memory.  This
-is illustrated by this example:
+Builtin :func:`id` trả về một số nguyên được đảm bảo là duy nhất trong suốt vòng đời của đối tượng. Vì trong CPython, đây là địa chỉ bộ nhớ của đối tượng, nên thường xảy ra trường hợp sau khi một đối tượng bị xóa khỏi bộ nhớ, đối tượng mới được tạo tiếp theo lại được cấp phát tại cùng vị trí trong bộ nhớ. Ví dụ sau minh họa điều này:
 
 >>> id(1000) # doctest: +SKIP
 13901272
 >>> id(2000) # doctest: +SKIP
 13901272
 
-The two ids belong to different integer objects that are created before, and
-deleted immediately after execution of the ``id()`` call.  To be sure that
-objects whose id you want to examine are still alive, create another reference
-to the object:
+Hai id này thuộc về hai đối tượng số nguyên khác nhau, được tạo trước và bị xóa ngay sau khi thực thi lệnh gọi ``id()``. Để chắc chắn rằng các đối tượng bạn muốn kiểm tra id vẫn còn tồn tại, hãy tạo thêm một tham chiếu đến đối tượng:
 
 >>> a = 1000; b = 2000
 >>> id(a) # doctest: +SKIP
@@ -1860,36 +1435,22 @@ to the object:
 
 .. _faq-identity-with-is:
 
-When can I rely on identity tests with the *is* operator?
----------------------------------------------------------
+Khi nào tôi có thể dựa vào các phép kiểm tra identity với toán tử *is*?
+-----------------------------------------------------------------------
 
-The ``is`` operator tests for object identity.  The test ``a is b`` is
-equivalent to ``id(a) == id(b)``.
+Toán tử ``is`` kiểm tra identity của đối tượng. Phép kiểm tra ``a is b`` tương đương với ``id(a) == id(b)``.
 
-The most important property of an identity test is that an object is always
-identical to itself, ``a is a`` always returns ``True``.  Identity tests are
-usually faster than equality tests.  And unlike equality tests, identity tests
-are guaranteed to return a boolean ``True`` or ``False``.
+Thuộc tính quan trọng nhất của phép kiểm tra identity là một đối tượng luôn giống hệt chính nó, ``a is a`` luôn trả về ``True``. Các phép kiểm tra identity thường nhanh hơn các phép kiểm tra bằng nhau. Và không giống các phép kiểm tra bằng nhau, các phép kiểm tra identity được đảm bảo luôn trả về một giá trị boolean ``True`` hoặc ``False``.
 
-However, identity tests can *only* be substituted for equality tests when
-object identity is assured.  Generally, there are three circumstances where
-identity is guaranteed:
+Tuy nhiên, phép kiểm tra identity *chỉ* có thể được dùng thay cho phép kiểm tra equality khi chắc chắn về identity của đối tượng. Nhìn chung, có ba trường hợp identity được đảm bảo:
 
-1) Assignments create new names but do not change object identity.  After the
-   assignment ``new = old``, it is guaranteed that ``new is old``.
+1) Phép gán tạo ra các tên mới nhưng không thay đổi identity của đối tượng. Sau phép gán ``new = old``, chắc chắn rằng ``new is old``.
 
-2) Putting an object in a container that stores object references does not
-   change object identity.  After the list assignment ``s[0] = x``, it is
-   guaranteed that ``s[0] is x``.
+2) Đưa một đối tượng vào container lưu trữ các tham chiếu đến đối tượng không làm thay đổi identity của đối tượng. Sau phép gán list ``s[0] = x``, chắc chắn rằng ``s[0] is x``.
 
-3) If an object is a singleton, it means that only one instance of that object
-   can exist.  After the assignments ``a = None`` and ``b = None``, it is
-   guaranteed that ``a is b`` because ``None`` is a singleton.
+3) Nếu một đối tượng là singleton, điều đó có nghĩa là chỉ có thể tồn tại một instance của đối tượng đó. Sau các phép gán ``a = None`` và ``b = None``, chắc chắn rằng ``a is b`` vì ``None`` là singleton.
 
-In most other circumstances, identity tests are inadvisable and equality tests
-are preferred.  In particular, identity tests should not be used to check
-constants such as :class:`int` and :class:`str` which aren't guaranteed to be
-singletons::
+Trong hầu hết các trường hợp khác, không nên dùng phép kiểm tra identity và nên ưu tiên phép kiểm tra equality. Cụ thể, không nên dùng phép kiểm tra identity để kiểm tra các hằng số như :class:`int` và :class:`str`, vì không đảm bảo chúng là singleton::
 
     >>> a = 10_000_000
     >>> b = 5_000_000
@@ -1903,24 +1464,18 @@ singletons::
     >>> a is c
     False
 
-Likewise, new instances of mutable containers are never identical::
+Tương tự, các instance mới của mutable container không bao giờ identical::
 
     >>> a = []
     >>> b = []
     >>> a is b
     False
 
-In the standard library code, you will see several common patterns for
-correctly using identity tests:
+Trong mã của standard library, bạn sẽ thấy một số mẫu phổ biến để sử dụng phép kiểm tra identity đúng cách:
 
-1) As recommended by :pep:`8`, an identity test is the preferred way to check
-   for ``None``.  This reads like plain English in code and avoids confusion
-   with other objects that may have boolean values that evaluate to false.
+1) Theo khuyến nghị của :pep:`8`, kiểm tra định danh là cách được ưu tiên để kiểm tra ``None``. Cách này khiến mã dễ đọc như tiếng Anh thông thường và tránh nhầm lẫn với các đối tượng khác có thể có giá trị boolean được đánh giá là false.
 
-2) Detecting optional arguments can be tricky when ``None`` is a valid input
-   value.  In those situations, you can create a singleton sentinel object
-   guaranteed to be distinct from other objects.  For example, here is how
-   to implement a method that behaves like :meth:`dict.pop`:
+2) Việc phát hiện các đối số tùy chọn có thể phức tạp khi ``None`` là một giá trị đầu vào hợp lệ. Trong những trường hợp đó, bạn có thể tạo một đối tượng sentinel singleton được đảm bảo khác biệt với các đối tượng khác. Ví dụ sau đây minh họa cách triển khai một phương thức hoạt động như :meth:`dict.pop`:
 
    .. code-block:: python
 
@@ -1935,11 +1490,9 @@ correctly using identity tests:
               raise KeyError(key)
           return default
 
-3) Container implementations sometimes need to augment equality tests with
-   identity tests.  This prevents the code from being confused by objects
-   such as ``float('NaN')`` that are not equal to themselves.
+3) Các triển khai container đôi khi cần bổ sung kiểm tra định danh cho các kiểm tra bằng nhau. Điều này ngăn mã bị nhầm lẫn bởi những đối tượng như ``float('NaN')``, vốn không bằng chính chúng.
 
-For example, here is the implementation of
+Ví dụ, sau đây là triển khai của
 :meth:`!collections.abc.Sequence.__contains__`::
 
     def __contains__(self, value):
@@ -1949,16 +1502,12 @@ For example, here is the implementation of
         return False
 
 
-How can a subclass control what data is stored in an immutable instance?
-------------------------------------------------------------------------
+Làm thế nào một lớp con có thể kiểm soát dữ liệu được lưu trữ trong một thực thể bất biến?
+------------------------------------------------------------------------------------------
 
-When subclassing an immutable type, override the :meth:`~object.__new__` method
-instead of the :meth:`~object.__init__` method.  The latter only runs *after* an
-instance is created, which is too late to alter data in an immutable
-instance.
+Khi tạo lớp con từ một kiểu bất biến, hãy ghi đè phương thức :meth:`~object.__new__` thay vì phương thức :meth:`~object.__init__`. Phương thức sau chỉ chạy *after* một thực thể được tạo, nên đã quá muộn để thay đổi dữ liệu trong một thực thể bất biến.
 
-All of these immutable classes have a different signature than their
-parent class:
+Tất cả các lớp bất biến này đều có chữ ký khác với lớp cha của chúng:
 
 .. testcode::
 
@@ -1983,7 +1532,7 @@ parent class:
             s = ''.join([c for c in s if c.isalnum() or c == '-'])
             return super().__new__(cls, s)
 
-The classes can be used like this:
+Các lớp có thể được sử dụng như sau:
 
 .. doctest::
 
@@ -1999,64 +1548,47 @@ The classes can be used like this:
 
 .. _faq-cache-method-calls:
 
-How do I cache method calls?
-----------------------------
+Làm thế nào để cache các lần gọi phương thức?
+---------------------------------------------
 
-The two principal tools for caching methods are
-:deco:`functools.cached_property` and :deco:`functools.lru_cache`.  The
-former stores results at the instance level and the latter at the class
-level.
+Hai công cụ chính để cache các phương thức là
+:deco:`functools.cached_property` và :deco:`functools.lru_cache`. Công cụ thứ nhất lưu trữ kết quả ở cấp instance, còn công cụ thứ hai lưu trữ kết quả ở cấp lớp.
 
-The ``cached_property`` approach only works with methods that do not take
-any arguments.  It does not create a reference to the instance.  The
-cached method result will be kept only as long as the instance is alive.
+Cách tiếp cận ``cached_property`` chỉ hoạt động với các phương thức không nhận đối số nào. Nó không tạo tham chiếu đến instance. Kết quả phương thức được cache sẽ chỉ được giữ lại chừng nào instance còn tồn tại.
 
-The advantage is that when an instance is no longer used, the cached
-method result will be released right away.  The disadvantage is that if
-instances accumulate, so too will the accumulated method results.  They
-can grow without bound.
+Ưu điểm là khi một instance không còn được sử dụng, kết quả phương thức được cache sẽ được giải phóng ngay. Nhược điểm là nếu các instance tích lũy, thì các kết quả phương thức được tích lũy cũng sẽ tăng theo. Chúng có thể tăng không giới hạn.
 
-The ``lru_cache`` approach works with methods that have :term:`hashable`
-arguments.  It creates a reference to the instance unless special
-efforts are made to pass in weak references.
+Cách tiếp cận ``lru_cache`` hoạt động với các phương thức có :term:`hashable` đối số. Nó tạo tham chiếu đến instance, trừ khi có các biện pháp đặc biệt để truyền vào các weak reference.
 
-The advantage of the least recently used algorithm is that the cache is
-bounded by the specified *maxsize*.  The disadvantage is that instances
-are kept alive until they age out of the cache or until the cache is
-cleared.
+Ưu điểm của thuật toán ít được sử dụng gần đây nhất là cache được giới hạn bởi *maxsize* được chỉ định. Nhược điểm là các đối tượng vẫn được duy trì cho đến khi hết thời gian lưu trong cache hoặc cache được xóa.
 
-This example shows the various techniques::
+Ví dụ này minh họa nhiều kỹ thuật khác nhau::
 
     class Weather:
         "Lookup weather information on a government website"
 
         def __init__(self, station_id):
             self._station_id = station_id
-            # The _station_id is private and immutable
+            # _station_id là private và bất biến
 
         def current_temperature(self):
             "Latest hourly observation"
-            # Do not cache this because old results
-            # can be out of date.
+            # Không cache giá trị này vì các kết quả cũ
+            # có thể đã lỗi thời.
 
         @cached_property
         def location(self):
             "Return the longitude/latitude coordinates of the station"
-            # Result only depends on the station_id
+            # Kết quả chỉ phụ thuộc vào station_id
 
         @lru_cache(maxsize=20)
         def historic_rainfall(self, date, units='mm'):
             "Rainfall on a given date"
-            # Depends on the station_id, date, and units.
+            # Phụ thuộc vào station_id, ngày và đơn vị.
 
-The above example assumes that the *station_id* never changes.  If the
-relevant instance attributes are mutable, the ``cached_property`` approach
-can't be made to work because it cannot detect changes to the
-attributes.
+Ví dụ trên giả định rằng *station_id* không bao giờ thay đổi. Nếu các thuộc tính của instance liên quan có thể thay đổi, không thể sử dụng ``cached_property`` approach vì nó không thể phát hiện những thay đổi đối với các thuộc tính đó.
 
-To make the ``lru_cache`` approach work when the *station_id* is mutable,
-the class needs to define the :meth:`~object.__eq__` and :meth:`~object.__hash__`
-methods so that the cache can detect relevant attribute updates::
+Để ``lru_cache`` approach hoạt động khi *station_id* có thể thay đổi, class cần định nghĩa các phương thức :meth:`~object.__eq__` và :meth:`~object.__hash__` để cache có thể phát hiện những cập nhật thuộc tính liên quan::
 
     class Weather:
         "Example with a mutable station identifier"
@@ -2076,70 +1608,42 @@ methods so that the cache can detect relevant attribute updates::
         @lru_cache(maxsize=20)
         def historic_rainfall(self, date, units='cm'):
             'Rainfall on a given date'
-            # Depends on the station_id, date, and units.
+            # Phụ thuộc vào station_id, ngày và đơn vị.
 
 
-Modules
-=======
+Các module
+==========
 
-How do I create a .pyc file?
+Làm thế nào để tạo tệp .pyc?
 ----------------------------
 
-When a module is imported for the first time (or when the source file has
-changed since the current compiled file was created) a ``.pyc`` file containing
-the compiled code should be created in a ``__pycache__`` subdirectory of the
-directory containing the ``.py`` file.  The ``.pyc`` file will have a
-filename that starts with the same name as the ``.py`` file, and ends with
-``.pyc``, with a middle component that depends on the particular ``python``
-binary that created it.  (See :pep:`3147` for details.)
+Khi một module được import lần đầu (hoặc khi tệp mã nguồn đã thay đổi kể từ lúc tệp đã biên dịch hiện tại được tạo), một tệp ``.pyc`` chứa mã đã biên dịch sẽ được tạo trong thư mục con ``__pycache__`` của thư mục chứa tệp ``.py``. Tệp ``.pyc`` sẽ có tên tệp bắt đầu bằng cùng tên với tệp ``.py``, và kết thúc bằng ``.pyc``, với một phần ở giữa phụ thuộc vào binary ``python`` cụ thể đã tạo ra tệp đó. (Xem :pep:`3147` để biết chi tiết.)
 
-One reason that a ``.pyc`` file may not be created is a permissions problem
-with the directory containing the source file, meaning that the ``__pycache__``
-subdirectory cannot be created. This can happen, for example, if you develop as
-one user but run as another, such as if you are testing with a web server.
+Một lý do khiến tệp ``.pyc`` không được tạo có thể là vấn đề về quyền đối với thư mục chứa tệp mã nguồn, khiến không thể tạo thư mục con ``__pycache__``. Ví dụ, điều này có thể xảy ra nếu bạn phát triển bằng một user nhưng chạy bằng một user khác, chẳng hạn khi bạn kiểm thử bằng web server.
 
-Unless the :envvar:`PYTHONDONTWRITEBYTECODE` environment variable is set,
-creation of a .pyc file is automatic if you're importing a module and Python
-has the ability (permissions, free space, and so on) to create a ``__pycache__``
-subdirectory and write the compiled module to that subdirectory.
+Trừ khi biến môi trường :envvar:`PYTHONDONTWRITEBYTECODE` được thiết lập, việc tạo tệp .pyc sẽ tự động diễn ra nếu bạn đang import một module và Python có khả năng (quyền, dung lượng trống, v.v.) tạo thư mục con ``__pycache__`` và ghi module đã biên dịch vào thư mục con đó.
 
-Running Python on a top-level script is not considered an import and no
-``.pyc`` will be created.  For example, if you have a top-level module
-``foo.py`` that imports another module ``xyz.py``, when you run ``foo`` (by
-typing ``python foo.py`` as a shell command), a ``.pyc`` will be created for
-``xyz`` because ``xyz`` is imported, but no ``.pyc`` file will be created for
-``foo`` since ``foo.py`` isn't being imported.
+Việc chạy Python trên một tập lệnh cấp cao nhất không được xem là thao tác import và sẽ không tạo ``.pyc``. Ví dụ, nếu bạn có module cấp cao nhất ``foo.py`` import một module khác là ``xyz.py``, khi chạy ``foo`` (bằng cách nhập ``python foo.py`` dưới dạng lệnh shell), một ``.pyc`` sẽ được tạo cho ``xyz`` vì ``xyz`` được import, nhưng sẽ không có tệp ``.pyc`` nào được tạo cho ``foo`` vì ``foo.py`` không được import.
 
-If you need to create a ``.pyc`` file for ``foo`` -- that is, to create a
-``.pyc`` file for a module that is not imported -- you can, using the
-:mod:`py_compile` and :mod:`compileall` modules.
+Nếu cần tạo tệp ``.pyc`` cho ``foo`` -- tức là tạo tệp ``.pyc`` cho một module không được import -- bạn có thể sử dụng
+các module :mod:`py_compile` và :mod:`compileall`.
 
-The :mod:`py_compile` module can manually compile any module.  One way is to use
-the ``compile()`` function in that module interactively::
+Module :mod:`py_compile` có thể biên dịch thủ công bất kỳ module nào. Một cách là sử dụng hàm ``compile()`` trong module đó ở chế độ tương tác::
 
    >>> import py_compile
    >>> py_compile.compile('foo.py')                 # doctest: +SKIP
 
-This will write the ``.pyc`` to a ``__pycache__`` subdirectory in the same
-location as ``foo.py`` (or you can override that with the optional parameter
-*cfile*).
+Thao tác này sẽ ghi ``.pyc`` vào thư mục con ``__pycache__`` tại cùng vị trí với ``foo.py`` (hoặc bạn có thể ghi đè vị trí đó bằng tham số tùy chọn *cfile*).
 
-You can also automatically compile all files in a directory or directories using
-the :mod:`compileall` module.  You can do it from the shell prompt by running
-``compileall.py`` and providing the path of a directory containing Python files
-to compile::
+Bạn cũng có thể tự động biên dịch tất cả các tệp trong một hoặc nhiều thư mục bằng mô-đun :mod:`compileall`. Bạn có thể thực hiện việc này từ dấu nhắc shell bằng cách chạy ``compileall.py`` và cung cấp đường dẫn đến một thư mục chứa các tệp Python cần biên dịch::
 
        python -m compileall .
 
 
-How do I find the current module name?
---------------------------------------
+Làm thế nào để tìm tên mô-đun hiện tại?
+---------------------------------------
 
-A module can find out its own module name by looking at the predefined global
-variable ``__name__``.  If this has the value ``'__main__'``, the program is
-running as a script.  Many modules that are usually used by importing them also
-provide a command-line interface or a self-test, and only execute this code
-after checking ``__name__``::
+Một mô-đun có thể tìm ra tên của chính nó bằng cách xem biến toàn cục được định nghĩa trước ``__name__``. Nếu biến này có giá trị ``'__main__'``, chương trình đang chạy dưới dạng một script. Nhiều mô-đun thường được sử dụng bằng cách import cũng cung cấp giao diện dòng lệnh hoặc chức năng tự kiểm tra, và chỉ thực thi mã này sau khi kiểm tra ``__name__``::
 
    def main():
        print('Running test...')
@@ -2149,10 +1653,10 @@ after checking ``__name__``::
        main()
 
 
-How can I have modules that mutually import each other?
--------------------------------------------------------
+Làm thế nào để các mô-đun import lẫn nhau?
+------------------------------------------
 
-Suppose you have the following modules:
+Giả sử bạn có các mô-đun sau:
 
 :file:`foo.py`::
 
@@ -2164,90 +1668,90 @@ Suppose you have the following modules:
    from foo import foo_var
    bar_var = 2
 
-The problem is that the interpreter will perform the following steps:
+Vấn đề là trình thông dịch sẽ thực hiện các bước sau:
 
-* main imports ``foo``
-* Empty globals for ``foo`` are created
-* ``foo`` is compiled and starts executing
-* ``foo`` imports ``bar``
-* Empty globals for ``bar`` are created
-* ``bar`` is compiled and starts executing
-* ``bar`` imports ``foo`` (which is a no-op since there already is a module named ``foo``)
-* The import mechanism tries to read ``foo_var`` from ``foo`` globals, to set ``bar.foo_var = foo.foo_var``
+* main import ``foo``
+* Các biến toàn cục rỗng cho ``foo`` được tạo
+* ``foo`` được biên dịch và bắt đầu thực thi
+* ``foo`` import ``bar``
+* Các biến toàn cục rỗng cho ``bar`` được tạo
+* ``bar`` được biên dịch và bắt đầu thực thi
+* ``bar`` import ``foo`` (không thực hiện gì vì đã có một module có tên ``foo``)
+* Cơ chế import cố đọc ``foo_var`` từ các biến toàn cục của ``foo`` để đặt ``bar.foo_var = foo.foo_var``
 
-The last step fails, because Python isn't done with interpreting ``foo`` yet and
-the global symbol dictionary for ``foo`` is still empty.
+Bước cuối cùng không thành công vì Python vẫn chưa diễn giải xong ``foo`` và từ điển ký hiệu toàn cục của ``foo`` vẫn còn trống.
 
-The same thing happens when you use ``import foo``, and then try to access
-``foo.foo_var`` in global code.
+Điều tương tự cũng xảy ra khi bạn sử dụng ``import foo``, rồi cố truy cập ``foo.foo_var`` trong mã toàn cục.
 
-There are (at least) three possible workarounds for this problem.
+Có (ít nhất) ba cách giải quyết khả thi cho vấn đề này.
 
-Guido van Rossum recommends avoiding all uses of ``from <module> import ...``,
-and placing all code inside functions.  Initializations of global variables and
-class variables should use constants or built-in functions only.  This means
-everything from an imported module is referenced as ``<module>.<name>``.
+Guido van Rossum khuyến nghị tránh mọi cách sử dụng ``from <module> import ...`` và đặt toàn bộ mã bên trong các hàm. Việc khởi tạo các biến toàn cục và biến lớp chỉ nên sử dụng hằng số hoặc các hàm dựng sẵn. Điều này có nghĩa là mọi thứ từ một module đã import đều được tham chiếu dưới dạng ``<module>.<name>``.
 
-Jim Roskind suggests performing steps in the following order in each module:
+Jim Roskind đề xuất thực hiện các bước theo thứ tự sau trong mỗi module:
 
-* exports (globals, functions, and classes that don't need imported base
-  classes)
-* ``import`` statements
-* active code (including globals that are initialized from imported values).
+* các thành phần export (biến toàn cục, hàm và lớp không cần các lớp cơ sở đã import)
+* các câu lệnh ``import``
+* mã đang hoạt động (bao gồm cả các biến toàn cục được khởi tạo từ những giá trị đã import).
 
-Van Rossum doesn't like this approach much because the imports appear in a
-strange place, but it does work.
+Van Rossum không mấy ưa cách tiếp cận này vì các câu lệnh import xuất hiện ở một vị trí khá kỳ lạ, nhưng cách này vẫn hoạt động.
 
-Matthias Urlichs recommends restructuring your code so that the recursive import
-is not necessary in the first place.
+Matthias Urlichs khuyến nghị tái cấu trúc mã của bạn để ngay từ đầu không cần đến import đệ quy.
 
-These solutions are not mutually exclusive.
+Các giải pháp này không loại trừ lẫn nhau.
 
 
-__import__('x.y.z') returns <module 'x'>; how do I get z?
----------------------------------------------------------
+__import__('x.y.z') trả về <module 'x'>; làm thế nào để lấy z?
+--------------------------------------------------------------
 
-Consider using the convenience function :func:`~importlib.import_module` from
-:mod:`importlib` instead::
+Hãy cân nhắc sử dụng hàm tiện ích :func:`~importlib.import_module` từ
+:mod:`importlib` thay vào đó::
 
    z = importlib.import_module('x.y.z')
 
 
-When I edit an imported module and reimport it, the changes don't show up.  Why does this happen?
--------------------------------------------------------------------------------------------------
+Khi tôi chỉnh sửa một module đã import rồi import lại module đó, các thay đổi không xuất hiện. Tại sao lại như vậy?
+-------------------------------------------------------------------------------------------------------------------
 
-For reasons of efficiency as well as consistency, Python only reads the module
-file on the first time a module is imported.  If it didn't, in a program
-consisting of many modules where each one imports the same basic module, the
-basic module would be parsed and re-parsed many times.  To force re-reading of a
-changed module, do this::
+Để tăng hiệu quả cũng như bảo đảm tính nhất quán, Python chỉ đọc tệp module vào lần đầu tiên module được import. Nếu không, trong một chương trình gồm nhiều module và mỗi module đều import cùng một module cơ bản, module cơ bản sẽ bị phân tích cú pháp lặp đi lặp lại nhiều lần. Để buộc đọc lại một module đã thay đổi, hãy làm như sau::
 
    import importlib
    import modname
    importlib.reload(modname)
 
-Warning: this technique is not 100% fool-proof.  In particular, modules
-containing statements like::
+Cảnh báo: kỹ thuật này không hoàn toàn đáng tin cậy. Cụ thể, các module chứa những câu lệnh như::
 
    from modname import some_objects
 
-will continue to work with the old version of the imported objects.  If the
-module contains class definitions, existing class instances will *not* be
-updated to use the new class definition.  This can result in the following
-paradoxical behaviour::
+sẽ tiếp tục hoạt động với phiên bản cũ của các đối tượng đã import. Nếu module chứa các định nghĩa lớp, các instance lớp hiện có *không* được cập nhật để sử dụng định nghĩa lớp mới. Điều này có thể dẫn đến hành vi nghịch lý sau đây::
 
    >>> import importlib
    >>> import cls
-   >>> c = cls.C()                # Create an instance of C
+   >>> c = cls.C()                # Tạo một instance của C
    >>> importlib.reload(cls)
    <module 'cls' from 'cls.py'>
-   >>> isinstance(c, cls.C)       # isinstance is false?!?
+   >>> isinstance(c, cls.C)       # isinstance là false?!?
    False
 
-The nature of the problem is made clear if you print out the "identity" of the
-class objects::
+Bản chất của vấn đề sẽ trở nên rõ ràng nếu bạn in ra "identity" của các đối tượng lớp::
 
    >>> hex(id(c.__class__))
    '0x7352a0'
    >>> hex(id(cls.C))
    '0x4198d0'
+
+.. _`pywin32`: https://github.com/mhammond/pywin32
+.. _`ActivePython`: https://www.activestate.com/products/python/
+.. _`Eric`: https://eric-ide.python-projects.org/
+.. _`trepan3k`: https://github.com/rocky/python3-trepan/
+.. _`Visual Studio Code`: https://code.visualstudio.com/
+.. _`Wing IDE`: https://wingware.com/
+.. _`PyCharm`: https://www.jetbrains.com/pycharm/
+.. _`Nuitka`: https://nuitka.net/
+.. _`PyInstaller`: https://pyinstaller.org/
+.. _`PyOxidizer`: https://pyoxidizer.readthedocs.io/en/stable/
+.. _`cx_Freeze`: https://marcelotduarte.github.io/cx_Freeze/
+.. _`py2app`: https://github.com/ronaldoussoren/py2app
+.. _`py2exe`: https://www.py2exe.org/
+.. _`Cython`: https://cython.org
+.. _`performance tips`: https://wiki.python.org/moin/PythonSpeed/PerformanceTips
+.. _`NumPy`: https://numpy.org/

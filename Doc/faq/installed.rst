@@ -1,53 +1,35 @@
-=============================================
-"Why is Python Installed on my Computer?" FAQ
-=============================================
+=======================================================================
+Câu hỏi thường gặp "Tại sao Python được cài đặt trên máy tính của tôi?"
+=======================================================================
 
-What is Python?
----------------
+Python là gì?
+-------------
 
-Python is a programming language.  It's used for many different applications.
-It's used in some high schools and colleges as an introductory programming
-language because Python is easy to learn, but it's also used by professional
-software developers at places such as Google, NASA, and Lucasfilm Ltd.
+Python là một ngôn ngữ lập trình. Nó được sử dụng cho nhiều ứng dụng khác nhau. Python được giảng dạy tại một số trường trung học và đại học như một ngôn ngữ lập trình nhập môn vì dễ học, nhưng cũng được các nhà phát triển phần mềm chuyên nghiệp tại những nơi như Google, NASA và Lucasfilm Ltd. sử dụng.
 
-If you wish to learn more about Python, start with the `Beginner's Guide to
-Python <https://wiki.python.org/moin/BeginnersGuide>`_.
+Nếu muốn tìm hiểu thêm về Python, hãy bắt đầu với `Hướng dẫn cho người mới bắt đầu về Python <https://wiki.python.org/moin/BeginnersGuide>`_.
 
 
-Why is Python installed on my machine?
---------------------------------------
+Tại sao Python được cài đặt trên máy của tôi?
+---------------------------------------------
 
-If you find Python installed on your system but don't remember installing it,
-there are several possible ways it could have gotten there.
+Nếu bạn thấy Python được cài đặt trên hệ thống của mình nhưng không nhớ đã cài đặt nó, có một số khả năng giải thích cách nó được cài đặt trên máy.
 
-* Perhaps another user on the computer wanted to learn programming and installed
-  it; you'll have to figure out who's been using the machine and might have
-  installed it.
-* A third-party application installed on the machine might have been written in
-  Python and included a Python installation.  There are many such applications,
-  from GUI programs to network servers and administrative scripts.
-* Some Windows machines also have Python installed.  At this writing we're aware
-  of computers from Hewlett-Packard and Compaq that include Python.  Apparently
-  some of HP/Compaq's administrative tools are written in Python.
-* Many Unix-compatible operating systems, such as macOS and some Linux
-  distributions, have Python installed by default; it's included in the base
-  installation.
+* Có thể một người dùng khác trên máy tính muốn học lập trình và đã cài đặt Python; bạn sẽ phải tìm hiểu ai đã sử dụng máy tính này và có thể đã cài đặt nó.
+* Một ứng dụng bên thứ ba được cài đặt trên máy có thể được viết bằng Python và đã bao gồm một bản cài đặt Python. Có rất nhiều ứng dụng như vậy, từ các chương trình GUI đến các máy chủ mạng và script quản trị.
+* Một số máy Windows cũng được cài đặt Python. Tại thời điểm viết tài liệu này, chúng tôi biết rằng một số máy tính của Hewlett-Packard và Compaq có kèm Python. Có vẻ như một số công cụ quản trị của HP/Compaq được viết bằng Python.
+* Nhiều hệ điều hành tương thích với Unix, chẳng hạn như macOS và một số bản phân phối Linux, được cài đặt Python theo mặc định; Python được bao gồm trong bản cài đặt cơ sở.
 
 
-Can I delete Python?
---------------------
+Tôi có thể xóa Python không?
+----------------------------
 
-That depends on where Python came from.
+Điều đó còn tùy vào nguồn gốc của Python.
 
-If someone installed it deliberately, you can remove it without hurting
-anything.  On Windows, use the Add/Remove Programs icon in the Control Panel.
+Nếu ai đó cố ý cài đặt Python, bạn có thể gỡ cài đặt mà không gây ảnh hưởng gì. Trên Windows, hãy sử dụng biểu tượng Add/Remove Programs trong Control Panel.
 
-If Python was installed by a third-party application, you can also remove it,
-but that application will no longer work.  You should use that application's
-uninstaller rather than removing Python directly.
+Nếu Python được cài đặt bởi một ứng dụng bên thứ ba, bạn cũng có thể gỡ cài đặt Python, nhưng ứng dụng đó sẽ không còn hoạt động. Bạn nên sử dụng trình gỡ cài đặt của ứng dụng đó thay vì xóa Python trực tiếp.
 
-If Python came with your operating system, removing it is not recommended.  If
-you remove it, whatever tools were written in Python will no longer run, and
-some of them might be important to you.  Reinstalling the whole system would
-then be required to fix things again.
+Nếu Python được cài sẵn cùng hệ điều hành, bạn không nên gỡ bỏ nó. Nếu gỡ bỏ, mọi công cụ được viết bằng Python sẽ không còn chạy, và một số công cụ trong đó có thể quan trọng với bạn. Khi đó, bạn sẽ phải cài đặt lại toàn bộ hệ thống để khắc phục sự cố.
 
+.. _`Beginner's Guide to Python`: https://wiki.python.org/moin/BeginnersGuide

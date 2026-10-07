@@ -1,48 +1,31 @@
 .. _extending-index:
 
-##################################################
-  Extending and Embedding the Python Interpreter
-##################################################
+########################################
+Mở rộng và nhúng trình thông dịch Python
+########################################
 
-This document describes how to write modules in C or C++ to extend the Python
-interpreter with new modules.  Those modules can not only define new functions
-but also new object types and their methods.  The document also describes how
-to embed the Python interpreter in another application, for use as an extension
-language.  Finally, it shows how to compile and link extension modules so that
-they can be loaded dynamically (at run time) into the interpreter, if the
-underlying operating system supports this feature.
+Tài liệu này mô tả cách viết các module bằng C hoặc C++ để mở rộng trình thông dịch Python bằng các module mới. Các module đó không chỉ có thể định nghĩa các hàm mới mà còn cả các kiểu đối tượng mới và các phương thức của chúng. Tài liệu cũng mô tả cách nhúng trình thông dịch Python vào một ứng dụng khác để sử dụng làm ngôn ngữ mở rộng. Cuối cùng, tài liệu trình bày cách biên dịch và liên kết các module mở rộng để chúng có thể được tải động (trong thời gian chạy) vào trình thông dịch, nếu hệ điều hành nền hỗ trợ tính năng này.
 
-This document assumes basic knowledge about C and Python.  For an informal
-introduction to Python, see :ref:`tutorial-index`.  :ref:`reference-index`
-gives a more formal definition of the language.  :ref:`builtins-index` documents
-the built-in functions and object types, and :ref:`library-index` documents the
-modules (both built-in and written in Python) that give the language its wide
-application range.
+Tài liệu này giả định bạn có kiến thức cơ bản về C và Python. Để xem phần giới thiệu không chính thức về Python, hãy xem :ref:`tutorial-index`. :ref:`reference-index` đưa ra định nghĩa chính thức hơn về ngôn ngữ này. :ref:`builtins-index` ghi lại các hàm dựng sẵn và kiểu đối tượng, còn :ref:`library-index` ghi lại các module (cả module dựng sẵn và module được viết bằng Python) giúp ngôn ngữ này có phạm vi ứng dụng rộng rãi.
 
-For a detailed description of the whole Python/C API, see the separate
+Để xem mô tả chi tiết về toàn bộ Python/C API, hãy xem tài liệu riêng
 :ref:`c-api-index`.
 
 
-Recommended third party tools
-=============================
+Các công cụ bên thứ ba được khuyến nghị
+=======================================
 
-This guide only covers the basic tools for creating extensions provided
-as part of this version of CPython. Some :ref:`third party tools
-<c-api-tools>` offer both simpler and more sophisticated approaches to creating
-C and C++ extensions for Python.
+Hướng dẫn này chỉ đề cập đến các công cụ cơ bản để tạo extension được cung cấp trong phiên bản CPython này. Một số :ref:`công cụ bên thứ ba <c-api-tools>` cung cấp cả những phương pháp đơn giản hơn lẫn tinh vi hơn để tạo extension C và C++ cho Python.
 
 
-Creating extensions without third party tools
-=============================================
+Tạo extension mà không dùng công cụ bên thứ ba
+==============================================
 
-This section of the guide covers creating C and C++ extensions without
-assistance from third party tools. It is intended primarily for creators
-of those tools, rather than being a recommended way to create your own
-C extensions.
+Phần này của tài liệu hướng dẫn trình bày cách tạo các phần mở rộng C và C++ mà không cần đến công cụ của bên thứ ba. Nội dung chủ yếu dành cho những người tạo ra các công cụ đó, thay vì là cách được khuyến nghị để bạn tự tạo phần mở rộng C của mình.
 
 .. seealso::
 
-   :pep:`489` -- Multi-phase extension module initialization
+   :pep:`489` -- Khởi tạo module phần mở rộng theo nhiều giai đoạn
 
 .. toctree::
    :maxdepth: 2
@@ -54,13 +37,10 @@ C extensions.
    building.rst
    windows.rst
 
-Embedding the CPython runtime in a larger application
-=====================================================
+Nhúng runtime CPython vào một ứng dụng lớn hơn
+==============================================
 
-Sometimes, rather than creating an extension that runs inside the Python
-interpreter as the main application, it is desirable to instead embed
-the CPython runtime inside a larger application. This section covers
-some of the details involved in doing that successfully.
+Đôi khi, thay vì tạo một phần mở rộng chạy bên trong trình thông dịch Python với vai trò là ứng dụng chính, việc nhúng runtime CPython vào một ứng dụng lớn hơn sẽ phù hợp hơn. Phần này trình bày một số chi tiết liên quan đến việc thực hiện điều đó thành công.
 
 .. toctree::
    :maxdepth: 2

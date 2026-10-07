@@ -2,92 +2,62 @@
 
 .. _defining-new-types:
 
-**********************************
-Defining Extension Types: Tutorial
-**********************************
+****************************************
+Định nghĩa các kiểu Extension: Hướng dẫn
+****************************************
 
 .. sectionauthor:: Michael Hudson <mwh@python.net>
 .. sectionauthor:: Dave Kuhlman <dkuhlman@rexx.com>
 .. sectionauthor:: Jim Fulton <jim@zope.com>
 
 
-Python allows the writer of a C extension module to define new types that
-can be manipulated from Python code, much like the built-in :class:`str`
-and :class:`list` types.  The code for all extension types follows a
-pattern, but there are some details that you need to understand before you
-can get started.  This document is a gentle introduction to the topic.
+Python cho phép người viết module extension C định nghĩa các kiểu mới có thể được thao tác từ mã Python, tương tự như các kiểu :class:`str` và :class:`list` tích hợp sẵn. Mã cho tất cả các kiểu extension đều tuân theo một mẫu, nhưng có một số chi tiết bạn cần hiểu trước khi bắt đầu. Tài liệu này là phần giới thiệu nhẹ nhàng về chủ đề này.
 
 
 .. _dnt-basics:
 
-The Basics
-==========
+Kiến thức cơ bản
+================
 
-The :term:`CPython` runtime sees all Python objects as variables of type
-:c:expr:`PyObject*`, which serves as a "base type" for all Python objects.
-The :c:type:`PyObject` structure itself only contains the object's
-:term:`reference count` and a pointer to the object's "type object".
-This is where the action is; the type object determines which (C) functions
-get called by the interpreter when, for instance, an attribute gets looked up
-on an object, a method called, or it is multiplied by another object.  These
-C functions are called "type methods".
+runtime :term:`CPython` xem tất cả các đối tượng Python là các biến thuộc kiểu
+:c:expr:`PyObject*`, đóng vai trò là "kiểu cơ sở" cho tất cả các đối tượng Python. Bản thân cấu trúc :c:type:`PyObject` chỉ chứa
+:term:`reference count` của đối tượng và một con trỏ đến "đối tượng kiểu" của đối tượng đó. Đây là nơi diễn ra phần xử lý chính; đối tượng kiểu quyết định những hàm (C) nào được trình thông dịch gọi khi, chẳng hạn, một thuộc tính được tra cứu trên một đối tượng, một phương thức được gọi hoặc đối tượng đó được nhân với một đối tượng khác. Các hàm C này được gọi là "phương thức kiểu".
 
-So, if you want to define a new extension type, you need to create a new type
-object.
+Vì vậy, nếu muốn định nghĩa một kiểu extension mới, bạn cần tạo một đối tượng kiểu mới.
 
-This sort of thing can only be explained by example, so here's a minimal, but
-complete, module that defines a new type named :class:`!Custom` inside a C
-extension module :mod:`!custom`:
+Loại nội dung này chỉ có thể được giải thích bằng ví dụ, vì vậy dưới đây là một module tối giản nhưng hoàn chỉnh, định nghĩa một kiểu mới có tên :class:`!Custom` bên trong module mở rộng C :mod:`!custom`:
 
 .. note::
-   What we're showing here is the traditional way of defining *static*
-   extension types.  It should be adequate for most uses.  The C API also
-   allows defining heap-allocated extension types using the
-   :c:func:`PyType_FromSpec` function, which isn't covered in this tutorial.
+   Ở đây, chúng ta trình bày cách truyền thống để định nghĩa các kiểu mở rộng *static*. Cách này đáp ứng hầu hết các trường hợp sử dụng. C API cũng cho phép định nghĩa các kiểu mở rộng được cấp phát trên heap bằng
+   hàm :c:func:`PyType_FromSpec`, nhưng nội dung này không được đề cập trong tutorial.
 
 .. literalinclude:: ../includes/newtypes/custom.c
 
-Now that's quite a bit to take in at once, but hopefully bits will seem familiar
-from the previous chapter.  This file defines three things:
+Có khá nhiều thông tin cần tiếp nhận cùng lúc, nhưng hy vọng một số phần sẽ quen thuộc từ chương trước. Tệp này định nghĩa ba thành phần:
 
-#. What a :class:`!Custom` **object** contains: this is the ``CustomObject``
-   struct, which is allocated once for each :class:`!Custom` instance.
-#. How the :class:`!Custom` **type** behaves: this is the ``CustomType`` struct,
-   which defines a set of flags and function pointers that the interpreter
-   inspects when specific operations are requested.
-#. How to define and execute the :mod:`!custom` module: this is the
-   ``PyInit_custom`` function and the associated ``custom_module`` struct for
-   defining the module, and the ``custom_module_exec`` function to set up
-   a fresh module object.
+#. Nội dung của một :class:`!Custom` **object**: đây là struct ``CustomObject``, được cấp phát một lần cho mỗi instance của :class:`!Custom`.
+#. Cách một :class:`!Custom` **type** hoạt động: đây là struct ``CustomType``, định nghĩa một tập hợp các cờ và con trỏ hàm mà interpreter kiểm tra khi có yêu cầu thực hiện các thao tác cụ thể.
+#. Cách định nghĩa và thực thi module :mod:`!custom`: đây là hàm ``PyInit_custom`` và struct ``custom_module`` tương ứng để định nghĩa module, cùng với hàm ``custom_module_exec`` để thiết lập một module object mới.
 
-The first bit is::
+Phần đầu tiên là::
 
    typedef struct {
        PyObject_HEAD
    } CustomObject;
 
-This is what a Custom object will contain.  ``PyObject_HEAD`` is mandatory
-at the start of each object struct and defines a field called ``ob_base``
-of type :c:type:`PyObject`, containing a pointer to a type object and a
-reference count (these can be accessed using the macros :c:macro:`Py_TYPE`
-and :c:macro:`Py_REFCNT` respectively).  The reason for the macro is to
-abstract away the layout and to enable additional fields in :ref:`debug builds
-<debug-build>`.
+Đây là những gì một đối tượng Custom sẽ chứa. ``PyObject_HEAD`` là bắt buộc ở đầu mỗi struct đối tượng và định nghĩa một trường có tên ``ob_base`` thuộc kiểu :c:type:`PyObject`, chứa một con trỏ trỏ đến một đối tượng kiểu và một bộ đếm tham chiếu (có thể truy cập chúng lần lượt bằng các macro :c:macro:`Py_TYPE` và :c:macro:`Py_REFCNT`). Macro này được dùng để ẩn chi tiết bố cục và cho phép thêm các trường trong :ref:`debug builds <debug-build>`.
 
 .. note::
-   There is no semicolon above after the :c:macro:`PyObject_HEAD` macro.
-   Be wary of adding one by accident: some compilers will complain.
+   Ở trên không có dấu chấm phẩy sau macro :c:macro:`PyObject_HEAD`. Hãy cẩn thận để không vô tình thêm dấu này: một số compiler sẽ báo lỗi.
 
-Of course, objects generally store additional data besides the standard
-``PyObject_HEAD`` boilerplate; for example, here is the definition for
-standard Python floats::
+Dĩ nhiên, các đối tượng thường lưu trữ thêm dữ liệu bên cạnh phần boilerplate ``PyObject_HEAD`` tiêu chuẩn; ví dụ, sau đây là định nghĩa cho các số thực Python tiêu chuẩn::
 
    typedef struct {
        PyObject_HEAD
        double ob_fval;
    } PyFloatObject;
 
-The second bit is the definition of the type object. ::
+Phần thứ hai là định nghĩa của đối tượng kiểu.::
 
    static PyTypeObject CustomType = {
        .ob_base = PyVarObject_HEAD_INIT(NULL, 0)
@@ -100,26 +70,19 @@ The second bit is the definition of the type object. ::
    };
 
 .. note::
-   We recommend using C99-style designated initializers as above, to
-   avoid listing all the :c:type:`PyTypeObject` fields that you don't care
-   about and also to avoid caring about the fields' declaration order.
+   Chúng tôi khuyến nghị sử dụng designated initializer theo kiểu C99 như trên, để tránh phải liệt kê tất cả các trường :c:type:`PyTypeObject` mà bạn không quan tâm, đồng thời không phải quan tâm đến thứ tự khai báo các trường.
 
-The actual definition of :c:type:`PyTypeObject` in :file:`object.h` has
-many more :ref:`fields <type-structs>` than the definition above.  The
-remaining fields will be filled with zeros by the C compiler, and it's
-common practice to not specify them explicitly unless you need them.
+Định nghĩa thực tế của :c:type:`PyTypeObject` trong :file:`object.h` có nhiều :ref:`fields <type-structs>` hơn đáng kể so với định nghĩa ở trên. Các trường còn lại sẽ được compiler C điền bằng số 0, và thông thường người ta không chỉ định chúng một cách rõ ràng trừ khi cần dùng đến.
 
-We're going to pick it apart, one field at a time::
+Chúng ta sẽ mổ xẻ nó, từng trường một::
 
    .ob_base = PyVarObject_HEAD_INIT(NULL, 0)
 
-This line is mandatory boilerplate to initialize the ``ob_base``
-field mentioned above. ::
+Dòng này là mã mẫu bắt buộc để khởi tạo trường ``ob_base`` được đề cập ở trên.::
 
    .tp_name = "custom.Custom",
 
-The name of our type.  This will appear in the default textual representation of
-our objects and in some error messages, for example:
+Tên của kiểu. Tên này sẽ xuất hiện trong biểu diễn văn bản mặc định của các đối tượng của chúng ta và trong một số thông báo lỗi, ví dụ:
 
 .. code-block:: pycon
 
@@ -128,128 +91,101 @@ our objects and in some error messages, for example:
      File "<stdin>", line 1, in <module>
    TypeError: can only concatenate str (not "custom.Custom") to str
 
-Note that the name is a dotted name that includes both the module name and the
-name of the type within the module. The module in this case is :mod:`!custom` and
-the type is :class:`!Custom`, so we set the type name to :class:`!custom.Custom`.
-Using the real dotted import path is important to make your type compatible
-with the :mod:`pydoc` and :mod:`pickle` modules. ::
+Lưu ý rằng tên này là một tên có dấu chấm, bao gồm cả tên module và tên kiểu trong module. Trong trường hợp này, module là :mod:`!custom` và kiểu là :class:`!Custom`, vì vậy chúng ta đặt tên kiểu là :class:`!custom.Custom`. Việc sử dụng đường dẫn import có dấu chấm thực tế rất quan trọng để kiểu của bạn tương thích với các module :mod:`pydoc` và :mod:`pickle`.::
 
    .tp_basicsize = sizeof(CustomObject),
    .tp_itemsize = 0,
 
-This is so that Python knows how much memory to allocate when creating
-new :class:`!Custom` instances.  :c:member:`~PyTypeObject.tp_itemsize` is
-only used for variable-sized objects and should otherwise be zero.
+Điều này giúp Python biết cần cấp phát bao nhiêu bộ nhớ khi tạo các instance :class:`!Custom` mới. :c:member:`~PyTypeObject.tp_itemsize` chỉ được sử dụng cho các đối tượng có kích thước thay đổi và nếu không thì phải là số không.
 
 .. note::
 
-   If you want your type to be subclassable from Python, and your type has the same
-   :c:member:`~PyTypeObject.tp_basicsize` as its base type, you may have problems with multiple
-   inheritance.  A Python subclass of your type will have to list your type first
-   in its :attr:`~type.__bases__`, or else it will not be able to call your type's
-   :meth:`~object.__new__` method without getting an error.  You can avoid this problem by
-   ensuring that your type has a larger value for :c:member:`~PyTypeObject.tp_basicsize` than its
-   base type does.  Most of the time, this will be true anyway, because either your
-   base type will be :class:`object`, or else you will be adding data members to
-   your base type, and therefore increasing its size.
+   Nếu bạn muốn kiểu của mình có thể được tạo lớp con từ Python, và kiểu của bạn có cùng
+   :c:member:`~PyTypeObject.tp_basicsize` với kiểu cơ sở, bạn có thể gặp vấn đề với đa kế thừa. Một lớp con Python của kiểu của bạn sẽ phải liệt kê kiểu của bạn trước trong :attr:`~type.__bases__`, nếu không nó sẽ không thể gọi
+   phương thức :meth:`~object.__new__` mà không gặp lỗi. Bạn có thể tránh vấn đề này bằng cách đảm bảo rằng kiểu của bạn có giá trị :c:member:`~PyTypeObject.tp_basicsize` lớn hơn kiểu cơ sở của nó. Phần lớn thời gian, điều này vốn sẽ đúng, vì kiểu cơ sở của bạn либо sẽ là :class:`object`, либо bạn sẽ thêm các thành viên dữ liệu vào kiểu cơ sở, và do đó làm tăng kích thước của nó.
 
-We set the class flags to :c:macro:`Py_TPFLAGS_DEFAULT`. ::
+Chúng ta đặt các cờ của lớp thành :c:macro:`Py_TPFLAGS_DEFAULT`.::
 
    .tp_flags = Py_TPFLAGS_DEFAULT,
 
-All types should include this constant in their flags.  It enables all of the
-members defined until at least Python 3.3.  If you need further members,
-you will need to OR the corresponding flags.
+Tất cả các kiểu nên bao gồm hằng số này trong các cờ của chúng. Hằng số này bật tất cả các thành viên được định nghĩa cho đến ít nhất Python 3.3. Nếu cần thêm thành viên, bạn sẽ phải OR các cờ tương ứng.
 
-We provide a doc string for the type in :c:member:`~PyTypeObject.tp_doc`. ::
+Chúng ta cung cấp chuỗi tài liệu cho kiểu trong :c:member:`~PyTypeObject.tp_doc`.::
 
    .tp_doc = PyDoc_STR("Custom objects"),
 
-To enable object creation, we have to provide a :c:member:`~PyTypeObject.tp_new`
-handler.  This is the equivalent of the Python method :meth:`~object.__new__`, but
-has to be specified explicitly.  In this case, we can just use the default
-implementation provided by the API function :c:func:`PyType_GenericNew`. ::
+Để bật việc tạo đối tượng, chúng ta phải cung cấp một trình xử lý :c:member:`~PyTypeObject.tp_new`. Đây là phần tương đương với phương thức Python :meth:`~object.__new__`, nhưng phải được chỉ định rõ ràng. Trong trường hợp này, chúng ta có thể chỉ cần sử dụng phần triển khai mặc định do hàm API :c:func:`PyType_GenericNew` cung cấp.::
 
    .tp_new = PyType_GenericNew,
 
-Everything else in the file should be familiar, except for some code in
+Mọi thứ khác trong tệp sẽ khá quen thuộc, ngoại trừ một phần mã trong
 :c:func:`!custom_module_exec`::
 
    if (PyType_Ready(&CustomType) < 0) {
        return -1;
    }
 
-This initializes the :class:`!Custom` type, filling in a number of members
-to the appropriate default values, including :c:member:`~PyObject.ob_type` that we initially
-set to ``NULL``. ::
+Thao tác này khởi tạo kiểu :class:`!Custom`, điền một số thành viên bằng các giá trị mặc định phù hợp, bao gồm :c:member:`~PyObject.ob_type`, mà ban đầu chúng ta đặt thành ``NULL``.::
 
    if (PyModule_AddObjectRef(m, "Custom", (PyObject *) &CustomType) < 0) {
        return -1;
    }
 
-This adds the type to the module dictionary.  This allows us to create
-:class:`!Custom` instances by calling the :class:`!Custom` class:
+Điều này thêm kiểu vào từ điển module. Điều này cho phép chúng ta tạo
+các thực thể :class:`!Custom` bằng cách gọi lớp :class:`!Custom`:
 
 .. code-block:: pycon
 
    >>> import custom
    >>> mycustom = custom.Custom()
 
-That's it!  All that remains is to build it; put the above code in a file called
+Vậy là xong! Tất cả những gì còn lại là build nó; hãy đặt đoạn mã trên vào một tệp có tên
 :file:`custom.c`,
 
 .. literalinclude:: ../includes/newtypes/pyproject.toml
 
-in a file called :file:`pyproject.toml`, and
+trong một tệp có tên :file:`pyproject.toml`, và
 
 .. code-block:: python
 
    from setuptools import Extension, setup
    setup(ext_modules=[Extension("custom", ["custom.c"])])
 
-in a file called :file:`setup.py`; then typing
+trong một tệp có tên :file:`setup.py`; sau đó nhập
 
 .. code-block:: shell-session
 
    $ python -m pip install .
 
-in a shell should produce a file :file:`custom.so` in a subdirectory
-and install it; now fire up Python --- you should be able to ``import custom``
-and play around with ``Custom`` objects.
+trong shell sẽ tạo ra một tệp :file:`custom.so` trong một thư mục con và cài đặt nó; bây giờ hãy khởi động Python --- bạn sẽ có thể ``import custom`` và thử làm việc với các đối tượng ``Custom``.
 
-That wasn't so hard, was it?
+Cũng không khó lắm, phải không?
 
-Of course, the current Custom type is pretty uninteresting. It has no data and
-doesn't do anything. It can't even be subclassed.
+Dĩ nhiên, kiểu Custom hiện tại khá tẻ nhạt. Nó không có dữ liệu và cũng không thực hiện bất kỳ điều gì. Thậm chí nó còn không thể được phân lớp.
 
 
-Adding data and methods to the Basic example
-============================================
+Thêm dữ liệu và phương thức vào ví dụ Basic
+===========================================
 
-Let's extend the basic example to add some data and methods.  Let's also make
-the type usable as a base class. We'll create a new module, :mod:`!custom2` that
-adds these capabilities:
+Hãy mở rộng ví dụ cơ bản để thêm một số dữ liệu và phương thức. Đồng thời, hãy làm cho kiểu này có thể được sử dụng làm lớp cơ sở. Chúng ta sẽ tạo một module mới, :mod:`!custom2` bổ sung các khả năng này:
 
 .. literalinclude:: ../includes/newtypes/custom2.c
 
 
-This version of the module has a number of changes.
+Phiên bản module này có một số thay đổi.
 
-The  :class:`!Custom` type now has three data attributes in its C struct,
-*first*, *last*, and *number*.  The *first* and *last* variables are Python
-strings containing first and last names.  The *number* attribute is a C integer.
+Kiểu :class:`!Custom` hiện có ba thuộc tính dữ liệu trong struct C của nó, *first*, *last* và *number*. Các biến *first* và *last* là các chuỗi Python chứa tên và họ. Thuộc tính *number* là một số nguyên C.
 
-The object structure is updated accordingly::
+Cấu trúc đối tượng được cập nhật tương ứng::
 
    typedef struct {
        PyObject_HEAD
-       PyObject *first; /* first name */
-       PyObject *last;  /* last name */
+       PyObject *first; /* tên */
+       PyObject *last;  /* họ */
        int number;
    } CustomObject;
 
-Because we now have data to manage, we have to be more careful about object
-allocation and deallocation.  At a minimum, we need a deallocation method::
+Vì hiện có dữ liệu cần quản lý, chúng ta phải cẩn thận hơn khi cấp phát và giải phóng đối tượng. Tối thiểu, chúng ta cần một phương thức giải phóng::
 
    static void
    Custom_dealloc(PyObject *op)
@@ -260,31 +196,18 @@ allocation and deallocation.  At a minimum, we need a deallocation method::
        Py_TYPE(self)->tp_free(self);
    }
 
-which is assigned to the :c:member:`~PyTypeObject.tp_dealloc` member::
+được gán cho thành viên :c:member:`~PyTypeObject.tp_dealloc`::
 
    .tp_dealloc = Custom_dealloc,
 
-This method first clears the reference counts of the two Python attributes.
-:c:func:`Py_XDECREF` correctly handles the case where its argument is
-``NULL`` (which might happen here if ``tp_new`` failed midway).  It then
-calls the :c:member:`~PyTypeObject.tp_free` member of the object's type
-(computed by ``Py_TYPE(self)``) to free the object's memory.  Note that
-the object's type might not be :class:`!CustomType`, because the object may
-be an instance of a subclass.
+Phương thức này trước tiên xóa số lượng tham chiếu của hai thuộc tính Python.
+:c:func:`Py_XDECREF` xử lý chính xác trường hợp đối số của nó là ``NULL`` (điều này có thể xảy ra ở đây nếu ``tp_new`` bị lỗi giữa chừng). Sau đó, nó gọi thành viên :c:member:`~PyTypeObject.tp_free` của kiểu đối tượng (được tính bằng ``Py_TYPE(self)``) để giải phóng bộ nhớ của đối tượng. Lưu ý rằng kiểu của đối tượng có thể không phải là :class:`!CustomType`, vì đối tượng có thể là một instance của lớp con.
 
 .. note::
 
-   The explicit cast to ``CustomObject *`` above is needed because we defined
-   ``Custom_dealloc`` to take a ``PyObject *`` argument, as the ``tp_dealloc``
-   function pointer expects to receive a ``PyObject *`` argument.
-   By assigning to the ``tp_dealloc`` slot of a type, we declare
-   that it can only be called with instances of our ``CustomObject``
-   class, so the cast to ``(CustomObject *)`` is safe.
-   This is object-oriented polymorphism, in C!
+   Phép ép kiểu tường minh sang ``CustomObject *`` ở trên là cần thiết vì chúng ta đã định nghĩa ``Custom_dealloc`` nhận đối số ``PyObject *``, do con trỏ hàm ``tp_dealloc`` yêu cầu nhận đối số ``PyObject *``. Bằng cách gán vào slot ``tp_dealloc`` của một kiểu, chúng ta khai báo rằng nó chỉ có thể được gọi với các instance của lớp ``CustomObject`` của chúng ta, vì vậy phép ép kiểu sang ``(CustomObject *)`` là an toàn. Đây chính là tính đa hình hướng đối tượng trong C!
 
-   In existing code, or in previous versions of this tutorial,
-   you might see similar functions take a pointer to the subtype
-   object structure (``CustomObject*``) directly, like this::
+   Trong mã hiện có hoặc các phiên bản trước của hướng dẫn này, bạn có thể thấy những hàm tương tự nhận trực tiếp một con trỏ đến cấu trúc đối tượng của kiểu con (``CustomObject*``), như sau::
 
       Custom_dealloc(CustomObject *self)
       {
@@ -295,12 +218,9 @@ be an instance of a subclass.
       ...
       .tp_dealloc = (destructor) Custom_dealloc,
 
-   This does the same thing on all architectures that CPython
-   supports, but according to the C standard, it invokes
-   undefined behavior.
+   Cách này thực hiện cùng một việc trên mọi kiến trúc mà CPython hỗ trợ, nhưng theo tiêu chuẩn C, nó gọi đến hành vi không xác định.
 
-We want to make sure that the first and last names are initialized to empty
-strings, so we provide a ``tp_new`` implementation::
+Chúng ta muốn đảm bảo rằng tên và họ được khởi tạo thành các chuỗi rỗng, vì vậy chúng ta cung cấp một triển khai ``tp_new``::
 
    static PyObject *
    Custom_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -323,56 +243,31 @@ strings, so we provide a ``tp_new`` implementation::
        return (PyObject *) self;
    }
 
-and install it in the :c:member:`~PyTypeObject.tp_new` member::
+và cài đặt nó vào thành viên :c:member:`~PyTypeObject.tp_new`::
 
    .tp_new = Custom_new,
 
-The ``tp_new`` handler is responsible for creating (as opposed to initializing)
-objects of the type.  It is exposed in Python as the :meth:`~object.__new__` method.
-It is not required to define a ``tp_new`` member, and indeed many extension
-types will simply reuse :c:func:`PyType_GenericNew` as done in the first
-version of the :class:`!Custom` type above.  In this case, we use the ``tp_new``
-handler to initialize the ``first`` and ``last`` attributes to non-``NULL``
-default values.
+Handler ``tp_new`` chịu trách nhiệm tạo (trái với khởi tạo) các đối tượng thuộc kiểu này. Trong Python, nó được cung cấp dưới dạng phương thức :meth:`~object.__new__`. Không bắt buộc phải định nghĩa thành viên ``tp_new``, và trên thực tế, nhiều extension type sẽ đơn giản tái sử dụng :c:func:`PyType_GenericNew` như trong phiên bản đầu tiên của kiểu :class:`!Custom` ở trên. Trong trường hợp này, chúng ta sử dụng handler ``tp_new`` để khởi tạo các thuộc tính ``first`` và ``last`` bằng các giá trị mặc định khác ``NULL``.
 
-``tp_new`` is passed the type being instantiated (not necessarily ``CustomType``,
-if a subclass is instantiated) and any arguments passed when the type was
-called, and is expected to return the instance created.  ``tp_new`` handlers
-always accept positional and keyword arguments, but they often ignore the
-arguments, leaving the argument handling to initializer (a.k.a. ``tp_init``
-in C or ``__init__`` in Python) methods.
+``tp_new`` được truyền kiểu đang được khởi tạo (không nhất thiết là ``CustomType`` nếu một subclass được khởi tạo) cùng với mọi đối số được truyền khi kiểu này được gọi, và được kỳ vọng trả về instance đã tạo. Các handler ``tp_new`` luôn chấp nhận cả đối số positional và keyword, nhưng thường bỏ qua các đối số này, để việc xử lý đối số cho các phương thức initializer (còn gọi là ``tp_init`` trong C hoặc ``__init__`` trong Python) thực hiện.
 
 .. note::
-   ``tp_new`` shouldn't call ``tp_init`` explicitly, as the interpreter
-   will do it itself.
+   ``tp_new`` không nên gọi ``tp_init`` một cách rõ ràng, vì interpreter sẽ tự thực hiện việc đó.
 
-The ``tp_new`` implementation calls the :c:member:`~PyTypeObject.tp_alloc`
-slot to allocate memory::
+Việc triển khai ``tp_new`` gọi slot :c:member:`~PyTypeObject.tp_alloc` để cấp phát bộ nhớ::
 
    self = (CustomObject *) type->tp_alloc(type, 0);
 
-Since memory allocation may fail, we must check the :c:member:`~PyTypeObject.tp_alloc`
-result against ``NULL`` before proceeding.
+Vì việc cấp phát bộ nhớ có thể thất bại, chúng ta phải kiểm tra kết quả :c:member:`~PyTypeObject.tp_alloc` với ``NULL`` trước khi tiếp tục.
 
 .. note::
-   We didn't fill the :c:member:`~PyTypeObject.tp_alloc` slot ourselves. Rather
-   :c:func:`PyType_Ready` fills it for us by inheriting it from our base class,
-   which is :class:`object` by default.  Most types use the default allocation
-   strategy.
+   Chúng ta không tự điền slot :c:member:`~PyTypeObject.tp_alloc`. Thay vào đó
+   :c:func:`PyType_Ready` điền giá trị đó cho chúng ta bằng cách kế thừa nó từ lớp cơ sở, mặc định là :class:`object`. Hầu hết các kiểu sử dụng chiến lược cấp phát mặc định.
 
 .. note::
-   If you are creating a co-operative :c:member:`~PyTypeObject.tp_new` (one
-   that calls a base type's :c:member:`~PyTypeObject.tp_new` or :meth:`~object.__new__`),
-   you must *not* try to determine what method to call using method resolution
-   order at runtime.  Always statically determine what type you are going to
-   call, and call its :c:member:`~PyTypeObject.tp_new` directly, or via
-   ``type->tp_base->tp_new``.  If you do not do this, Python subclasses of your
-   type that also inherit from other Python-defined classes may not work correctly.
-   (Specifically, you may not be able to create instances of such subclasses
-   without getting a :exc:`TypeError`.)
+   Nếu bạn đang tạo một :c:member:`~PyTypeObject.tp_new` hợp tác (một :c:member:`~PyTypeObject.tp_new` gọi :c:member:`~PyTypeObject.tp_new` hoặc :meth:`~object.__new__` của kiểu cơ sở), bạn *không* được cố gắng xác định phương thức cần gọi bằng thứ tự phân giải phương thức (method resolution order) tại runtime. Luôn xác định tĩnh kiểu mà bạn sẽ gọi, rồi gọi trực tiếp :c:member:`~PyTypeObject.tp_new` của kiểu đó hoặc thông qua ``type->tp_base->tp_new``. Nếu không làm vậy, các lớp con Python của kiểu bạn, vốn cũng kế thừa từ những lớp khác được định nghĩa bằng Python, có thể không hoạt động chính xác. (Cụ thể, bạn có thể không tạo được các thực thể của những lớp con như vậy mà không gặp :exc:`TypeError`.)
 
-We also define an initialization function which accepts arguments to provide
-initial values for our instance::
+Chúng ta cũng định nghĩa một hàm khởi tạo nhận các đối số để cung cấp các giá trị ban đầu cho đối tượng của mình::
 
    static int
    Custom_init(PyObject *op, PyObject *args, PyObject *kwds)
@@ -401,22 +296,14 @@ initial values for our instance::
        return 0;
    }
 
-by filling the :c:member:`~PyTypeObject.tp_init` slot. ::
+bằng cách điền vào slot :c:member:`~PyTypeObject.tp_init`.::
 
    .tp_init = Custom_init,
 
-The :c:member:`~PyTypeObject.tp_init` slot is exposed in Python as the
-:meth:`~object.__init__` method.  It is used to initialize an object after it's
-created.  Initializers always accept positional and keyword arguments,
-and they should return either ``0`` on success or ``-1`` on error.
+Slot :c:member:`~PyTypeObject.tp_init` được cung cấp trong Python dưới dạng
+phương thức :meth:`~object.__init__`. Phương thức này được dùng để khởi tạo một đối tượng sau khi đối tượng được tạo. Các hàm khởi tạo luôn nhận các đối số vị trí và đối số từ khóa, đồng thời phải trả về ``0`` khi thành công hoặc ``-1`` khi xảy ra lỗi.
 
-Unlike the ``tp_new`` handler, there is no guarantee that ``tp_init``
-is called at all (for example, the :mod:`pickle` module by default
-doesn't call :meth:`~object.__init__` on unpickled instances).  It can also be
-called multiple times.  Anyone can call the :meth:`!__init__` method on
-our objects.  For this reason, we have to be extra careful when assigning
-the new attribute values.  We might be tempted, for example to assign the
-``first`` member like this::
+Không giống trình xử lý ``tp_new``, không có gì đảm bảo rằng ``tp_init`` được gọi (ví dụ: theo mặc định, mô-đun :mod:`pickle` không gọi :meth:`~object.__init__` trên các thực thể đã được unpickle). Phương thức này cũng có thể được gọi nhiều lần. Bất kỳ ai cũng có thể gọi phương thức :meth:`!__init__` trên các đối tượng của chúng ta. Vì lý do này, chúng ta phải đặc biệt cẩn thận khi gán các giá trị thuộc tính mới. Chẳng hạn, chúng ta có thể bị hấp dẫn bởi cách gán thành viên ``first`` như sau::
 
    if (first) {
        Py_XDECREF(self->first);
@@ -424,27 +311,18 @@ the new attribute values.  We might be tempted, for example to assign the
        self->first = first;
    }
 
-But this would be risky.  Our type doesn't restrict the type of the
-``first`` member, so it could be any kind of object.  It could have a
-destructor that causes code to be executed that tries to access the
-``first`` member; or that destructor could detach the
-:term:`thread state <attached thread state>` and let arbitrary code run in other
-threads that accesses and modifies our object.
+Tuy nhiên, việc này sẽ tiềm ẩn rủi ro. Kiểu của chúng ta không giới hạn kiểu của thành viên ``first``, vì vậy thành viên đó có thể là bất kỳ loại đối tượng nào. Đối tượng đó có thể có một hàm hủy khiến đoạn mã được thực thi và cố truy cập thành viên ``first``; hoặc hàm hủy đó có thể tách trạng thái
+:term:`trạng thái luồng <attached thread state>` và cho phép mã tùy ý chạy trong các luồng khác, truy cập và sửa đổi đối tượng của chúng ta.
 
-To be paranoid and protect ourselves against this possibility, we almost
-always reassign members before decrementing their reference counts.  When
-don't we have to do this?
+Để thận trọng và tự bảo vệ trước khả năng này, chúng ta gần như luôn gán lại các thành viên trước khi giảm số lượng tham chiếu của chúng. Khi nào chúng ta không cần làm vậy?
 
-* when we absolutely know that the reference count is greater than 1;
+* khi chúng ta hoàn toàn biết chắc rằng số lượng tham chiếu lớn hơn 1;
 
-* when we know that deallocation of the object [#]_ will neither detach
-  the :term:`thread state <attached thread state>` nor cause any calls back into our type's code;
+* khi chúng ta biết rằng việc giải phóng đối tượng [#]_ sẽ không tách :term:`trạng thái luồng <attached thread state>` và cũng không gây ra bất kỳ lời gọi nào quay lại mã của kiểu chúng ta;
 
-* when decrementing a reference count in a :c:member:`~PyTypeObject.tp_dealloc`
-  handler on a type which doesn't support cyclic garbage collection [#]_.
+* khi giảm số lượng tham chiếu trong một trình xử lý :c:member:`~PyTypeObject.tp_dealloc` trên một kiểu không hỗ trợ thu gom rác theo chu kỳ [#]_.
 
-We want to expose our instance variables as attributes. There are a
-number of ways to do that. The simplest way is to define member definitions::
+Chúng ta muốn đưa các biến thực thể ra dưới dạng thuộc tính. Có một số cách để thực hiện việc đó. Cách đơn giản nhất là định nghĩa các thành viên::
 
    static PyMemberDef Custom_members[] = {
        {"first", Py_T_OBJECT_EX, offsetof(CustomObject, first), 0,
@@ -453,26 +331,18 @@ number of ways to do that. The simplest way is to define member definitions::
         "last name"},
        {"number", Py_T_INT, offsetof(CustomObject, number), 0,
         "custom number"},
-       {NULL}  /* Sentinel */
+       {NULL}  /* Phần tử đánh dấu kết thúc */
    };
 
-and put the definitions in the :c:member:`~PyTypeObject.tp_members` slot::
+và đặt các định nghĩa vào vị trí :c:member:`~PyTypeObject.tp_members`::
 
    .tp_members = Custom_members,
 
-Each member definition has a member name, type, offset, access flags and
-documentation string.  See the :ref:`Generic-Attribute-Management` section
-below for details.
+Mỗi định nghĩa thành viên gồm có tên thành viên, kiểu, độ lệch, cờ truy cập và chuỗi tài liệu. Xem phần :ref:`Generic-Attribute-Management` bên dưới để biết chi tiết.
 
-A disadvantage of this approach is that it doesn't provide a way to restrict the
-types of objects that can be assigned to the Python attributes.  We expect the
-first and last names to be strings, but any Python objects can be assigned.
-Further, the attributes can be deleted, setting the C pointers to ``NULL``.  Even
-though we can make sure the members are initialized to non-``NULL`` values, the
-members can be set to ``NULL`` if the attributes are deleted.
+Một nhược điểm của cách tiếp cận này là nó không cung cấp cách hạn chế các kiểu đối tượng có thể được gán cho các thuộc tính Python. Chúng ta mong đợi tên và họ là các chuỗi, nhưng có thể gán bất kỳ đối tượng Python nào. Ngoài ra, các thuộc tính có thể bị xóa, khiến các con trỏ C được đặt thành ``NULL``. Mặc dù chúng ta có thể đảm bảo các thành viên được khởi tạo bằng các giá trị không phải ``NULL``, các thành viên có thể được đặt thành ``NULL`` nếu các thuộc tính bị xóa.
 
-We define a single method, :meth:`!Custom.name`, that outputs the objects name as the
-concatenation of the first and last names. ::
+Chúng ta định nghĩa một phương thức duy nhất, :meth:`!Custom.name`, để xuất tên của đối tượng bằng cách nối tên và họ.::
 
    static PyObject *
    Custom_name(PyObject *op, PyObject *Py_UNUSED(dummy))
@@ -489,53 +359,39 @@ concatenation of the first and last names. ::
        return PyUnicode_FromFormat("%S %S", self->first, self->last);
    }
 
-The method is implemented as a C function that takes a :class:`!Custom` (or
-:class:`!Custom` subclass) instance as the first argument.  Methods always take an
-instance as the first argument. Methods often take positional and keyword
-arguments as well, but in this case we don't take any and don't need to accept
-a positional argument tuple or keyword argument dictionary. This method is
-equivalent to the Python method:
+Phương thức này được triển khai dưới dạng một hàm C nhận một :class:`!Custom` (hoặc
+một thể hiện lớp con :class:`!Custom`) làm đối số đầu tiên. Các phương thức luôn nhận một thể hiện làm đối số đầu tiên. Các phương thức thường cũng nhận các đối số vị trí và từ khóa, nhưng trong trường hợp này chúng ta không nhận đối số nào và không cần chấp nhận một tuple đối số vị trí hoặc một dictionary đối số từ khóa. Phương thức này tương đương với phương thức Python:
 
 .. code-block:: python
 
    def name(self):
        return "%s %s" % (self.first, self.last)
 
-Note that we have to check for the possibility that our :attr:`!first` and
-:attr:`!last` members are ``NULL``.  This is because they can be deleted, in which
-case they are set to ``NULL``.  It would be better to prevent deletion of these
-attributes and to restrict the attribute values to be strings.  We'll see how to
-do that in the next section.
+Lưu ý rằng chúng ta phải kiểm tra khả năng :attr:`!first` và
+Các member :attr:`!last` là ``NULL``. Điều này là vì chúng có thể bị xóa, khi đó chúng được đặt thành ``NULL``. Tốt hơn là ngăn việc xóa các thuộc tính này và giới hạn giá trị thuộc tính ở dạng chuỗi. Chúng ta sẽ xem cách thực hiện điều đó trong phần tiếp theo.
 
-Now that we've defined the method, we need to create an array of method
-definitions::
+Bây giờ, sau khi đã định nghĩa phương thức, chúng ta cần tạo một mảng các định nghĩa phương thức::
 
    static PyMethodDef Custom_methods[] = {
        {"name", Custom_name, METH_NOARGS,
         "Return the name, combining the first and last name"
        },
-       {NULL}  /* Sentinel */
+       {NULL}  /* Phần tử đánh dấu kết thúc */
    };
 
-(note that we used the :c:macro:`METH_NOARGS` flag to indicate that the method
-is expecting no arguments other than *self*)
+(lưu ý rằng chúng ta đã sử dụng cờ :c:macro:`METH_NOARGS` để cho biết phương thức không nhận đối số nào ngoài *self*)
 
-and assign it to the :c:member:`~PyTypeObject.tp_methods` slot::
+và gán mảng đó cho slot :c:member:`~PyTypeObject.tp_methods`::
 
    .tp_methods = Custom_methods,
 
-Finally, we'll make our type usable as a base class for subclassing.  We've
-written our methods carefully so far so that they don't make any assumptions
-about the type of the object being created or used, so all we need to do is
-to add the :c:macro:`Py_TPFLAGS_BASETYPE` to our class flag definition::
+Cuối cùng, chúng ta sẽ làm cho kiểu của mình có thể được sử dụng làm lớp cơ sở để tạo lớp con. Cho đến nay, chúng ta đã cẩn thận viết các phương thức sao cho chúng không giả định bất kỳ điều gì về kiểu của đối tượng được tạo hoặc sử dụng, vì vậy tất cả những gì cần làm là thêm :c:macro:`Py_TPFLAGS_BASETYPE` vào định nghĩa cờ lớp của chúng ta::
 
    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
 
-We rename :c:func:`!PyInit_custom` to :c:func:`!PyInit_custom2`, update the
-module name in the :c:type:`PyModuleDef` struct, and update the full class
-name in the :c:type:`PyTypeObject` struct.
+Chúng ta đổi tên :c:func:`!PyInit_custom` thành :c:func:`!PyInit_custom2`, cập nhật tên module trong struct :c:type:`PyModuleDef`, và cập nhật tên lớp đầy đủ trong struct :c:type:`PyTypeObject`.
 
-Finally, we update our :file:`setup.py` file to include the new module,
+Cuối cùng, chúng ta cập nhật tệp :file:`setup.py` để đưa module mới vào,
 
 .. code-block:: python
 
@@ -545,27 +401,22 @@ Finally, we update our :file:`setup.py` file to include the new module,
        Extension("custom2", ["custom2.c"]),
    ])
 
-and then we re-install so that we can ``import custom2``:
+và sau đó chúng ta cài đặt lại để có thể ``import custom2``:
 
 .. code-block:: shell-session
 
    $ python -m pip install .
 
-Providing finer control over data attributes
-============================================
+Kiểm soát chi tiết hơn các thuộc tính dữ liệu
+=============================================
 
-In this section, we'll provide finer control over how the :attr:`!first` and
-:attr:`!last` attributes are set in the :class:`!Custom` example. In the previous
-version of our module, the instance variables :attr:`!first` and :attr:`!last`
-could be set to non-string values or even deleted. We want to make sure that
-these attributes always contain strings.
+Trong phần này, chúng ta sẽ kiểm soát chi tiết hơn cách các thuộc tính :attr:`!first` và
+:attr:`!last` được thiết lập trong ví dụ :class:`!Custom`. Ở phiên bản trước của module, các biến thể hiện :attr:`!first` và :attr:`!last` có thể được đặt thành các giá trị không phải chuỗi hoặc thậm chí bị xóa. Chúng ta muốn đảm bảo rằng các thuộc tính này luôn chứa chuỗi.
 
 .. literalinclude:: ../includes/newtypes/custom3.c
 
 
-To provide greater control, over the :attr:`!first` and :attr:`!last` attributes,
-we'll use custom getter and setter functions.  Here are the functions for
-getting and setting the :attr:`!first` attribute::
+Để kiểm soát tốt hơn các thuộc tính :attr:`!first` và :attr:`!last`, chúng ta sẽ sử dụng các hàm getter và setter tùy chỉnh.  Dưới đây là các hàm lấy và thiết lập thuộc tính :attr:`!first`::
 
    static PyObject *
    Custom_getfirst(PyObject *op, void *closure)
@@ -596,44 +447,35 @@ getting and setting the :attr:`!first` attribute::
        return 0;
    }
 
-The getter function is passed a :class:`!Custom` object and a "closure", which is
-a void pointer.  In this case, the closure is ignored.  (The closure supports an
-advanced usage in which definition data is passed to the getter and setter. This
-could, for example, be used to allow a single set of getter and setter functions
-that decide the attribute to get or set based on data in the closure.)
+Hàm getter nhận một đối tượng :class:`!Custom` và một "closure", tức là một con trỏ void.  Trong trường hợp này, closure bị bỏ qua.  (Closure hỗ trợ một cách sử dụng nâng cao, trong đó dữ liệu định nghĩa được truyền cho getter và setter. Ví dụ, cách này có thể được dùng để cho phép một cặp hàm getter và setter duy nhất quyết định thuộc tính cần lấy hoặc thiết lập dựa trên dữ liệu trong closure.)
 
-The setter function is passed the :class:`!Custom` object, the new value, and the
-closure.  The new value may be ``NULL``, in which case the attribute is being
-deleted.  In our setter, we raise an error if the attribute is deleted or if its
-new value is not a string.
+Hàm setter nhận đối tượng :class:`!Custom`, giá trị mới và closure.  Giá trị mới có thể là ``NULL``, trong trường hợp đó thuộc tính đang bị xóa.  Trong setter của chúng ta, chúng ta phát sinh lỗi nếu thuộc tính bị xóa hoặc nếu giá trị mới của thuộc tính không phải là một chuỗi.
 
-We create an array of :c:type:`PyGetSetDef` structures::
+Chúng ta tạo một mảng các cấu trúc :c:type:`PyGetSetDef`::
 
    static PyGetSetDef Custom_getsetters[] = {
        {"first", Custom_getfirst, Custom_setfirst,
         "first name", NULL},
        {"last", Custom_getlast, Custom_setlast,
         "last name", NULL},
-       {NULL}  /* Sentinel */
+       {NULL}  /* Phần tử đánh dấu kết thúc */
    };
 
-and register it in the :c:member:`~PyTypeObject.tp_getset` slot::
+và đăng ký mảng đó trong slot :c:member:`~PyTypeObject.tp_getset`::
 
    .tp_getset = Custom_getsetters,
 
-The last item in a :c:type:`PyGetSetDef` structure is the "closure" mentioned
-above.  In this case, we aren't using a closure, so we just pass ``NULL``.
+Phần tử cuối cùng trong một cấu trúc :c:type:`PyGetSetDef` là "closure" được đề cập ở trên. Trong trường hợp này, chúng ta không sử dụng closure, nên chỉ truyền ``NULL``.
 
-We also remove the member definitions for these attributes::
+Chúng ta cũng xóa các định nghĩa thành viên cho những thuộc tính này::
 
    static PyMemberDef Custom_members[] = {
        {"number", Py_T_INT, offsetof(CustomObject, number), 0,
         "custom number"},
-       {NULL}  /* Sentinel */
+       {NULL}  /* Phần tử đánh dấu kết thúc */
    };
 
-We also need to update the :c:member:`~PyTypeObject.tp_init` handler to only
-allow strings [#]_ to be passed::
+Chúng ta cũng cần cập nhật handler :c:member:`~PyTypeObject.tp_init` để chỉ cho phép truyền các chuỗi [#]_::
 
    static int
    Custom_init(PyObject *op, PyObject *args, PyObject *kwds)
@@ -662,24 +504,17 @@ allow strings [#]_ to be passed::
        return 0;
    }
 
-With these changes, we can assure that the ``first`` and ``last`` members are
-never ``NULL`` so we can remove checks for ``NULL`` values in almost all cases.
-This means that most of the :c:func:`Py_XDECREF` calls can be converted to
-:c:func:`Py_DECREF` calls.  The only place we can't change these calls is in
-the ``tp_dealloc`` implementation, where there is the possibility that the
-initialization of these members failed in ``tp_new``.
+Với những thay đổi này, chúng ta có thể đảm bảo rằng các thành viên ``first`` và ``last`` không bao giờ ``NULL``, nên có thể xóa các kiểm tra giá trị ``NULL`` trong hầu hết các trường hợp. Điều này có nghĩa là hầu hết các lệnh gọi :c:func:`Py_XDECREF` có thể được chuyển đổi thành
+các lệnh gọi :c:func:`Py_DECREF`. Vị trí duy nhất chúng ta không thể thay đổi các lệnh gọi này là trong phần triển khai ``tp_dealloc``, nơi có khả năng việc khởi tạo các thành viên này đã thất bại trong ``tp_new``.
 
-We also rename the module initialization function and module name in the
-initialization function, as we did before, and we add an extra definition to the
-:file:`setup.py` file.
+Chúng ta cũng đổi tên hàm khởi tạo module và tên module trong hàm khởi tạo, như đã làm trước đây, đồng thời thêm một định nghĩa bổ sung vào
+:file:`setup.py` tệp.
 
 
-Supporting cyclic garbage collection
-====================================
+Hỗ trợ thu gom rác theo chu kỳ
+==============================
 
-Python has a :term:`cyclic garbage collector (GC) <garbage collection>` that
-can identify unneeded objects even when their reference counts are not zero.
-This can happen when objects are involved in cycles.  For example, consider:
+Python có một :term:`bộ thu gom rác theo chu kỳ (GC) <garbage collection>` có thể xác định các đối tượng không cần thiết ngay cả khi số lượng tham chiếu của chúng không bằng không. Điều này có thể xảy ra khi các đối tượng tham gia vào các chu kỳ. Ví dụ: hãy xét:
 
 .. code-block:: pycon
 
@@ -687,16 +522,10 @@ This can happen when objects are involved in cycles.  For example, consider:
    >>> l.append(l)
    >>> del l
 
-In this example, we create a list that contains itself. When we delete it, it
-still has a reference from itself. Its reference count doesn't drop to zero.
-Fortunately, Python's cyclic garbage collector will eventually figure out that
-the list is garbage and free it.
+Trong ví dụ này, chúng ta tạo một danh sách chứa chính nó. Khi xóa danh sách, nó vẫn có một tham chiếu từ chính nó. Số lượng tham chiếu của nó không giảm xuống bằng không. May mắn là bộ thu gom rác theo chu kỳ của Python cuối cùng sẽ xác định danh sách đó là rác và giải phóng nó.
 
-In the second version of the :class:`!Custom` example, we allowed any kind of
-object to be stored in the :attr:`!first` or :attr:`!last` attributes [#]_.
-Besides, in the second and third versions, we allowed subclassing
-:class:`!Custom`, and subclasses may add arbitrary attributes.  For any of
-those two reasons, :class:`!Custom` objects can participate in cycles:
+Trong phiên bản thứ hai của ví dụ :class:`!Custom` , chúng ta cho phép lưu trữ mọi loại đối tượng trong các thuộc tính :attr:`!first` hoặc :attr:`!last` [#]_. Ngoài ra, trong phiên bản thứ hai và thứ ba, chúng ta cho phép tạo lớp con
+:class:`!Custom`, và các lớp con có thể thêm các thuộc tính tùy ý. Vì một trong hai lý do đó, các đối tượng :class:`!Custom` có thể tham gia vào các chu kỳ:
 
 .. code-block:: pycon
 
@@ -706,15 +535,12 @@ those two reasons, :class:`!Custom` objects can participate in cycles:
    >>> n = Derived()
    >>> n.some_attribute = n
 
-To allow a :class:`!Custom` instance participating in a reference cycle to
-be properly detected and collected by the cyclic GC, our :class:`!Custom` type
-needs to fill two additional slots and to enable a flag that enables these slots:
+Để cho phép một thể hiện :class:`!Custom` tham gia vào một chu trình tham chiếu được cyclic GC phát hiện và thu gom đúng cách, kiểu :class:`!Custom` của chúng ta cần điền vào hai slot bổ sung và bật một cờ cho phép sử dụng các slot này:
 
 .. literalinclude:: ../includes/newtypes/custom4.c
 
 
-First, the traversal method lets the cyclic GC know about subobjects that could
-participate in cycles::
+Trước tiên, phương thức traversal cho cyclic GC biết về các subobject có thể tham gia vào chu trình::
 
    static int
    Custom_traverse(PyObject *op, visitproc visit, void *arg)
@@ -734,15 +560,11 @@ participate in cycles::
        return 0;
    }
 
-For each subobject that can participate in cycles, we need to call the
-:c:func:`!visit` function, which is passed to the traversal method. The
-:c:func:`!visit` function takes as arguments the subobject and the extra argument
-*arg* passed to the traversal method.  It returns an integer value that must be
-returned if it is non-zero.
+Đối với mỗi subobject có thể tham gia vào chu trình, chúng ta cần gọi
+hàm :c:func:`!visit`, được truyền vào phương thức traversal. Hàm
+:c:func:`!visit` nhận subobject và đối số bổ sung *arg* được truyền vào phương thức traversal làm các đối số. Hàm này trả về một giá trị số nguyên phải được trả về nếu giá trị đó khác không.
 
-Python provides a :c:func:`Py_VISIT` macro that automates calling visit
-functions.  With :c:func:`Py_VISIT`, we can minimize the amount of boilerplate
-in ``Custom_traverse``::
+Python cung cấp macro :c:func:`Py_VISIT` để tự động gọi các hàm visit. Với :c:func:`Py_VISIT`, chúng ta có thể giảm lượng mã lặp trong ``Custom_traverse``::
 
    static int
    Custom_traverse(PyObject *op, visitproc visit, void *arg)
@@ -754,11 +576,9 @@ in ``Custom_traverse``::
    }
 
 .. note::
-   The :c:member:`~PyTypeObject.tp_traverse` implementation must name its
-   arguments exactly *visit* and *arg* in order to use :c:func:`Py_VISIT`.
+   Phần triển khai :c:member:`~PyTypeObject.tp_traverse` phải đặt tên các đối số chính xác là *visit* và *arg* để có thể sử dụng :c:func:`Py_VISIT`.
 
-Second, we need to provide a method for clearing any subobjects that can
-participate in cycles::
+Thứ hai, chúng ta cần cung cấp một phương thức để dọn mọi đối tượng con có thể tham gia vào các chu trình::
 
    static int
    Custom_clear(PyObject *op)
@@ -769,31 +589,19 @@ participate in cycles::
        return 0;
    }
 
-Notice the use of the :c:func:`Py_CLEAR` macro.  It is the recommended and safe
-way to clear data attributes of arbitrary types while decrementing
-their reference counts.  If you were to call :c:func:`Py_XDECREF` instead
-on the attribute before setting it to ``NULL``, there is a possibility
-that the attribute's destructor would call back into code that reads the
-attribute again (*especially* if there is a reference cycle).
+Hãy chú ý đến việc sử dụng macro :c:func:`Py_CLEAR`. Đây là cách được khuyến nghị và an toàn để xóa các thuộc tính dữ liệu thuộc kiểu bất kỳ đồng thời giảm số lượng tham chiếu của chúng. Nếu thay vào đó, bạn gọi :c:func:`Py_XDECREF` trên thuộc tính trước khi đặt thuộc tính thành ``NULL``, có khả năng hàm hủy của thuộc tính sẽ gọi ngược vào mã đọc lại thuộc tính (*đặc biệt* nếu có một chu trình tham chiếu).
 
 .. note::
-   You could emulate :c:func:`Py_CLEAR` by writing::
+   Bạn có thể mô phỏng :c:func:`Py_CLEAR` bằng cách viết::
 
       PyObject *tmp;
       tmp = self->first;
       self->first = NULL;
       Py_XDECREF(tmp);
 
-   Nevertheless, it is much easier and less error-prone to always
-   use :c:func:`Py_CLEAR` when deleting an attribute.  Don't
-   try to micro-optimize at the expense of robustness!
+   Tuy nhiên, việc luôn sử dụng :c:func:`Py_CLEAR` khi xóa một thuộc tính sẽ dễ dàng hơn nhiều và ít có nguy cơ gây lỗi hơn. Đừng cố tối ưu vi mô (micro-optimize) mà đánh đổi tính vững chắc!
 
-The deallocator ``Custom_dealloc`` may call arbitrary code when clearing
-attributes.  It means the circular GC can be triggered inside the function.
-Since the GC assumes reference count is not zero, we need to untrack the object
-from the GC by calling :c:func:`PyObject_GC_UnTrack` before clearing members.
-Here is our reimplemented deallocator using :c:func:`PyObject_GC_UnTrack`
-and ``Custom_clear``::
+Bộ giải phóng ``Custom_dealloc`` có thể gọi mã bất kỳ khi dọn các thuộc tính. Điều đó có nghĩa là circular GC có thể được kích hoạt bên trong hàm. Vì GC giả định rằng số lượng tham chiếu không bằng 0, chúng ta cần bỏ theo dõi đối tượng khỏi GC bằng cách gọi :c:func:`PyObject_GC_UnTrack` trước khi dọn các thành phần. Đây là bộ giải phóng được cài đặt lại của chúng ta, sử dụng :c:func:`PyObject_GC_UnTrack` và ``Custom_clear``::
 
    static void
    Custom_dealloc(PyObject *op)
@@ -803,27 +611,20 @@ and ``Custom_clear``::
        Py_TYPE(op)->tp_free(op);
    }
 
-Finally, we add the :c:macro:`Py_TPFLAGS_HAVE_GC` flag to the class flags::
+Cuối cùng, chúng ta thêm cờ :c:macro:`Py_TPFLAGS_HAVE_GC` vào các cờ của lớp::
 
    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC,
 
-That's pretty much it.  If we had written custom :c:member:`~PyTypeObject.tp_alloc` or
-:c:member:`~PyTypeObject.tp_free` handlers, we'd need to modify them for cyclic
-garbage collection.  Most extensions will use the versions automatically provided.
+Về cơ bản là xong. Nếu chúng ta đã viết :c:member:`~PyTypeObject.tp_alloc` tùy chỉnh hoặc
+:c:member:`~PyTypeObject.tp_free` handlers, chúng ta sẽ cần sửa đổi chúng để hỗ trợ thu gom rác theo chu kỳ. Hầu hết các extension sẽ tự động sử dụng những phiên bản được cung cấp sẵn.
 
 
-Subclassing other types
-=======================
+Kế thừa các kiểu khác
+=====================
 
-It is possible to create new extension types that are derived from existing
-types. It is easiest to inherit from the built in types, since an extension can
-easily use the :c:type:`PyTypeObject` it needs. It can be difficult to share
-these :c:type:`PyTypeObject` structures between extension modules.
+Có thể tạo các kiểu extension mới được dẫn xuất từ các kiểu hiện có. Việc kế thừa từ các kiểu dựng sẵn là dễ nhất, vì extension có thể dễ dàng sử dụng :c:type:`PyTypeObject` mà nó cần. Việc chia sẻ các cấu trúc :c:type:`PyTypeObject` này giữa các mô-đun extension có thể khó khăn.
 
-In this example we will create a :class:`!SubList` type that inherits from the
-built-in :class:`list` type. The new type will be completely compatible with
-regular lists, but will have an additional :meth:`!increment` method that
-increases an internal counter:
+Trong ví dụ này, chúng ta sẽ tạo một kiểu :class:`!SubList` kế thừa từ kiểu :class:`list` dựng sẵn. Kiểu mới sẽ hoàn toàn tương thích với các list thông thường, nhưng sẽ có thêm phương thức :meth:`!increment` để tăng một bộ đếm nội bộ:
 
 .. code-block:: pycon
 
@@ -840,20 +641,16 @@ increases an internal counter:
 .. literalinclude:: ../includes/newtypes/sublist.c
 
 
-As you can see, the source code closely resembles the :class:`!Custom` examples in
-previous sections. We will break down the main differences between them. ::
+Như bạn có thể thấy, mã nguồn rất giống với các ví dụ :class:`!Custom` trong những phần trước. Chúng ta sẽ phân tích những điểm khác biệt chính giữa chúng.::
 
    typedef struct {
        PyListObject list;
        int state;
    } SubListObject;
 
-The primary difference for derived type objects is that the base type's
-object structure must be the first value.  The base type will already include
-the :c:func:`PyObject_HEAD` at the beginning of its structure.
+Điểm khác biệt chính đối với các đối tượng kiểu dẫn xuất là cấu trúc đối tượng của kiểu cơ sở phải là giá trị đầu tiên. Kiểu cơ sở đã bao gồm :c:func:`PyObject_HEAD` ở đầu cấu trúc của nó.
 
-When a Python object is a :class:`!SubList` instance, its ``PyObject *`` pointer
-can be safely cast to both ``PyListObject *`` and ``SubListObject *``::
+Khi một đối tượng Python là một thể hiện :class:`!SubList`, con trỏ ``PyObject *`` của nó có thể được ép kiểu an toàn thành cả ``PyListObject *`` và ``SubListObject *``::
 
    static int
    SubList_init(PyObject *op, PyObject *args, PyObject *kwds)
@@ -865,20 +662,13 @@ can be safely cast to both ``PyListObject *`` and ``SubListObject *``::
        return 0;
    }
 
-We see above how to call through to the :meth:`~object.__init__` method of the base
-type.
+Như đã thấy ở trên, chúng ta có thể gọi đến phương thức :meth:`~object.__init__` của kiểu cơ sở.
 
-This pattern is important when writing a type with custom
-:c:member:`~PyTypeObject.tp_new` and :c:member:`~PyTypeObject.tp_dealloc`
-members.  The :c:member:`~PyTypeObject.tp_new` handler should not actually
-create the memory for the object with its :c:member:`~PyTypeObject.tp_alloc`,
-but let the base class handle it by calling its own :c:member:`~PyTypeObject.tp_new`.
+Mẫu này rất quan trọng khi viết một kiểu tùy chỉnh
+:c:member:`~PyTypeObject.tp_new` và :c:member:`~PyTypeObject.tp_dealloc` thành viên. Trình xử lý :c:member:`~PyTypeObject.tp_new` không nên thực sự tạo vùng nhớ cho đối tượng bằng :c:member:`~PyTypeObject.tp_alloc` của nó, mà để lớp cơ sở xử lý việc đó bằng cách gọi :c:member:`~PyTypeObject.tp_new` của chính lớp đó.
 
-The :c:type:`PyTypeObject` struct supports a :c:member:`~PyTypeObject.tp_base`
-specifying the type's concrete base class.  Due to cross-platform compiler
-issues, you can't fill that field directly with a reference to
-:c:type:`PyList_Type`; it should be done in the :c:data:`Py_mod_exec`
-function::
+Cấu trúc :c:type:`PyTypeObject` hỗ trợ một :c:member:`~PyTypeObject.tp_base` chỉ định lớp cơ sở cụ thể của kiểu. Do các vấn đề về trình biên dịch đa nền tảng, bạn không thể điền trực tiếp trường đó bằng một tham chiếu đến
+:c:type:`PyList_Type`; việc này nên được thực hiện trong hàm :c:data:`Py_mod_exec`::
 
    static int
    sublist_module_exec(PyObject *m)
@@ -895,30 +685,18 @@ function::
        return 0;
    }
 
-Before calling :c:func:`PyType_Ready`, the type structure must have the
-:c:member:`~PyTypeObject.tp_base` slot filled in.  When we are deriving an
-existing type, it is not necessary to fill out the :c:member:`~PyTypeObject.tp_alloc`
-slot with :c:func:`PyType_GenericNew` -- the allocation function from the base
-type will be inherited.
+Trước khi gọi :c:func:`PyType_Ready`, cấu trúc kiểu phải có slot
+:c:member:`~PyTypeObject.tp_base` được điền. Khi dẫn xuất một kiểu hiện có, không cần điền slot :c:member:`~PyTypeObject.tp_alloc` bằng :c:func:`PyType_GenericNew` -- hàm cấp phát từ kiểu cơ sở sẽ được kế thừa.
 
-After that, calling :c:func:`PyType_Ready` and adding the type object to the
-module is the same as with the basic :class:`!Custom` examples.
+Sau đó, việc gọi :c:func:`PyType_Ready` và thêm đối tượng type vào module cũng giống như trong các ví dụ :class:`!Custom` cơ bản.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích
 
-.. [#] This is true when we know that the object is a basic type, like a string or a
-   float.
+.. [#] Điều này đúng khi chúng ta biết đối tượng là một kiểu cơ bản, chẳng hạn như string hoặc float.
 
-.. [#] We relied on this in the :c:member:`~PyTypeObject.tp_dealloc` handler
-   in this example, because our type doesn't support garbage collection.
+.. [#] Chúng ta đã dựa vào điều này trong handler :c:member:`~PyTypeObject.tp_dealloc` ở ví dụ này, vì type của chúng ta không hỗ trợ garbage collection.
 
-.. [#] We now know that the first and last members are strings, so perhaps we
-   could be less careful about decrementing their reference counts, however,
-   we accept instances of string subclasses.  Even though deallocating normal
-   strings won't call back into our objects, we can't guarantee that deallocating
-   an instance of a string subclass won't call back into our objects.
+.. [#] Bây giờ chúng ta biết rằng member đầu tiên và cuối cùng là string, nên có lẽ chúng ta có thể bớt thận trọng hơn khi giảm reference count của chúng. Tuy nhiên, chúng ta chấp nhận các instance của subclass string. Mặc dù việc giải phóng các string thông thường sẽ không gọi ngược vào các object của chúng ta, chúng ta không thể đảm bảo rằng việc giải phóng một instance của subclass string sẽ không gọi ngược vào các object của chúng ta.
 
-.. [#] Also, even with our attributes restricted to strings instances, the user
-   could pass arbitrary :class:`str` subclasses and therefore still create
-   reference cycles.
+.. [#] Ngoài ra, ngay cả khi các attribute của chúng ta chỉ giới hạn ở các instance string, người dùng vẫn có thể truyền các subclass :class:`str` tùy ý và do đó vẫn tạo ra các reference cycle.

@@ -1,241 +1,150 @@
-======================
-Design and History FAQ
-======================
+=========================================
+Câu hỏi thường gặp về Thiết kế và Lịch sử
+=========================================
 
 .. only:: html
 
    .. contents::
 
 
-Why does Python use indentation for grouping of statements?
------------------------------------------------------------
+Tại sao Python sử dụng thụt lề để nhóm các câu lệnh?
+----------------------------------------------------
 
-Guido van Rossum believes that using indentation for grouping is extremely
-elegant and contributes a lot to the clarity of the average Python program.
-Most people learn to love this feature after a while.
+Guido van Rossum cho rằng việc sử dụng thụt lề để nhóm các câu lệnh cực kỳ tinh tế và góp phần rất lớn vào tính rõ ràng của một chương trình Python điển hình. Sau một thời gian, hầu hết mọi người đều học cách yêu thích tính năng này.
 
-Since there are no begin/end brackets there cannot be a disagreement between
-grouping perceived by the parser and the human reader.  Occasionally C
-programmers will encounter a fragment of code like this::
+Vì không có dấu ngoặc begin/end nên không thể xảy ra bất đồng giữa cách nhóm mà trình phân tích cú pháp nhận biết và cách người đọc hiểu. Đôi khi các lập trình viên C sẽ gặp một đoạn mã như sau::
 
    if (x <= y)
            x++;
            y--;
    z++;
 
-Only the ``x++`` statement is executed if the condition is true, but the
-indentation leads many to believe otherwise.  Even experienced C programmers will
-sometimes stare at it a long time wondering as to why ``y`` is being decremented even
-for ``x > y``.
+Chỉ câu lệnh ``x++`` được thực thi nếu điều kiện đúng, nhưng cách thụt lề khiến nhiều người tin rằng không phải vậy. Ngay cả những lập trình viên C giàu kinh nghiệm đôi khi cũng sẽ nhìn chằm chằm vào đoạn mã này trong một thời gian dài và tự hỏi tại sao ``y`` lại bị giảm ngay cả khi ``x > y``.
 
-Because there are no begin/end brackets, Python is much less prone to
-coding-style conflicts.  In C there are many different ways to place the braces.
-After becoming used to reading and writing code using a particular style,
-it is normal to feel somewhat uneasy when reading (or being required to write)
-in a different one.
+Vì không có dấu ngoặc begin/end, Python ít có khả năng phát sinh xung đột về coding style hơn nhiều. Trong C, có rất nhiều cách khác nhau để đặt dấu ngoặc. Sau khi quen với việc đọc và viết mã theo một style cụ thể, việc cảm thấy hơi không thoải mái khi đọc (hoặc được yêu cầu viết) theo một style khác là điều bình thường.
 
 
-Many coding styles place begin/end brackets on a line by themselves.  This makes
-programs considerably longer and wastes valuable screen space, making it harder
-to get a good overview of a program.  Ideally, a function should fit on one
-screen (say, 20--30 lines).  20 lines of Python can do a lot more work than 20
-lines of C.  This is not solely due to the lack of begin/end brackets -- the
-lack of declarations and the high-level data types are also responsible -- but
-the indentation-based syntax certainly helps.
+Nhiều coding style đặt dấu ngoặc begin/end trên một dòng riêng. Điều này khiến chương trình dài hơn đáng kể và lãng phí không gian màn hình quý giá, làm việc có được cái nhìn tổng quan về chương trình trở nên khó khăn hơn. Lý tưởng nhất là một function nên vừa trên một màn hình (chẳng hạn 20--30 dòng). 20 dòng Python có thể thực hiện nhiều công việc hơn đáng kể so với 20 dòng C. Điều này không chỉ là do thiếu dấu ngoặc begin/end -- việc thiếu các khai báo và các kiểu dữ liệu cấp cao cũng góp phần -- nhưng cú pháp dựa trên thụt lề chắc chắn giúp ích.
 
 
-Why am I getting strange results with simple arithmetic operations?
--------------------------------------------------------------------
+Tại sao tôi nhận được kết quả kỳ lạ với các phép toán số học đơn giản?
+----------------------------------------------------------------------
 
-See the next question.
+Xem câu hỏi tiếp theo.
 
 
-Why are floating-point calculations so inaccurate?
---------------------------------------------------
+Tại sao các phép tính số thực dấu phẩy động lại thiếu chính xác đến vậy?
+------------------------------------------------------------------------
 
-Users are often surprised by results like this::
+Người dùng thường ngạc nhiên trước những kết quả như thế này::
 
     >>> 1.2 - 1.0
     0.19999999999999996
 
-and think it is a bug in Python.  It's not.  This has little to do with Python,
-and much more to do with how the underlying platform handles floating-point
-numbers.
+và cho rằng đó là lỗi trong Python.  Không phải vậy.  Điều này ít liên quan đến Python, mà liên quan nhiều hơn đến cách nền tảng bên dưới xử lý các số dấu phẩy động.
 
-The :class:`float` type in CPython uses a C ``double`` for storage.  A
-:class:`float` object's value is stored in binary floating-point with a fixed
-precision (typically 53 bits) and Python uses C operations, which in turn rely
-on the hardware implementation in the processor, to perform floating-point
-operations. This means that as far as floating-point operations are concerned,
-Python behaves like many popular languages including C and Java.
+Kiểu :class:`float` trong CPython sử dụng một ``double`` của C để lưu trữ.  Một
+đối tượng :class:`float` được lưu trữ dưới dạng số dấu phẩy động nhị phân với độ chính xác cố định (thường là 53 bit), và Python sử dụng các phép toán của C, vốn lần lượt phụ thuộc vào cách triển khai phần cứng trong bộ xử lý, để thực hiện các phép toán dấu phẩy động. Điều này có nghĩa là, xét về các phép toán dấu phẩy động, Python hoạt động giống như nhiều ngôn ngữ phổ biến khác, bao gồm C và Java.
 
-Many numbers that can be written easily in decimal notation cannot be expressed
-exactly in binary floating point.  For example, after::
+Nhiều số có thể dễ dàng viết dưới dạng thập phân lại không thể được biểu diễn chính xác dưới dạng số dấu phẩy động nhị phân. Ví dụ, sau đây::
 
     >>> x = 1.2
 
-the value stored for ``x`` is a (very good) approximation to the decimal value
-``1.2``, but is not exactly equal to it.  On a typical machine, the actual
-stored value is::
+giá trị được lưu cho ``x`` là một giá trị xấp xỉ (rất tốt) cho giá trị thập phân ``1.2``, nhưng không hoàn toàn bằng nó. Trên một máy tính điển hình, giá trị thực sự được lưu là::
 
     1.0011001100110011001100110011001100110011001100110011 (binary)
 
-which is exactly::
+giá trị này chính xác là::
 
     1.1999999999999999555910790149937383830547332763671875 (decimal)
 
-The typical precision of 53 bits provides Python floats with 15--16
-decimal digits of accuracy.
+Độ chính xác thông thường là 53 bit, cung cấp cho các số float của Python độ chính xác từ 15--16 chữ số thập phân.
 
-For a fuller explanation, please see the :ref:`floating-point arithmetic
-<tut-fp-issues>` chapter in the Python tutorial.
+Để xem phần giải thích đầy đủ hơn, vui lòng tham khảo chương :ref:`phép tính số dấu phẩy động <tut-fp-issues>` trong hướng dẫn Python.
 
 
-Why are Python strings immutable?
+Tại sao chuỗi Python là bất biến?
 ---------------------------------
 
-There are several advantages.
+Có một số ưu điểm.
 
-One is performance: knowing that a string is immutable means we can allocate
-space for it at creation time, and the storage requirements are fixed and
-unchanging.  This is also one of the reasons for the distinction between tuples
-and lists.
+Một lý do là hiệu năng: khi biết rằng một chuỗi là bất biến, chúng ta có thể cấp phát không gian cho chuỗi ngay khi tạo, và các yêu cầu lưu trữ là cố định, không thay đổi. Đây cũng là một trong những lý do có sự phân biệt giữa tuple và list.
 
-Another advantage is that strings in Python are considered as "elemental" as
-numbers.  No amount of activity will change the value 8 to anything else, and in
-Python, no amount of activity will change the string "eight" to anything else.
+Một ưu điểm khác là trong Python, chuỗi được xem là có tính "elemental" như các số. Không hoạt động nào có thể thay đổi giá trị 8 thành một giá trị khác, và trong Python, không hoạt động nào có thể thay đổi chuỗi "eight" thành một chuỗi khác.
 
 
 .. _why-self:
 
-Why must 'self' be used explicitly in method definitions and calls?
--------------------------------------------------------------------
+Tại sao phải sử dụng 'self' một cách tường minh trong định nghĩa và lời gọi method?
+-----------------------------------------------------------------------------------
 
-The idea was borrowed from Modula-3.  It turns out to be very useful, for a
-variety of reasons.
+Ý tưởng này được mượn từ Modula-3. Hóa ra nó rất hữu ích vì nhiều lý do khác nhau.
 
-First, it's more obvious that you are using a method or instance attribute
-instead of a local variable.  Reading ``self.x`` or ``self.meth()`` makes it
-absolutely clear that an instance variable or method is used even if you don't
-know the class definition by heart.  In C++, you can sort of tell by the lack of
-a local variable declaration (assuming globals are rare or easily recognizable)
--- but in Python, there are no local variable declarations, so you'd have to
-look up the class definition to be sure.  Some C++ and Java coding standards
-call for instance attributes to have an ``m_`` prefix, so this explicitness is
-still useful in those languages, too.
+Trước hết, điều này giúp nhận thấy rõ hơn rằng bạn đang sử dụng một method hoặc thuộc tính instance thay vì một biến cục bộ. Khi đọc ``self.x`` hoặc ``self.meth()``, bạn có thể hoàn toàn chắc chắn rằng một biến instance hoặc method đang được sử dụng, ngay cả khi bạn không thuộc lòng định nghĩa class. Trong C++, bạn có thể phần nào nhận biết điều này nhờ không có khai báo biến cục bộ (giả sử biến toàn cục hiếm gặp hoặc dễ nhận ra) -- nhưng trong Python không có khai báo biến cục bộ, vì vậy bạn sẽ phải tra cứu định nghĩa class để chắc chắn. Một số tiêu chuẩn viết mã C++ và Java yêu cầu thuộc tính instance có tiền tố ``m_``, vì vậy tính tường minh này vẫn hữu ích trong cả những ngôn ngữ đó.
 
-Second, it means that no special syntax is necessary if you want to explicitly
-reference or call the method from a particular class.  In C++, if you want to
-use a method from a base class which is overridden in a derived class, you have
-to use the ``::`` operator -- in Python you can write
-``baseclass.methodname(self, <argument list>)``.  This is particularly useful
-for :meth:`~object.__init__` methods, and in general in cases where a derived class
-method wants to extend the base class method of the same name and thus has to
-call the base class method somehow.
+Thứ hai, điều này có nghĩa là không cần cú pháp đặc biệt nếu bạn muốn tham chiếu hoặc gọi tường minh method từ một class cụ thể. Trong C++, nếu muốn sử dụng một method từ base class bị override trong derived class, bạn phải dùng toán tử ``::`` -- còn trong Python, bạn có thể viết ``baseclass.methodname(self, <argument list>)``. Điều này đặc biệt hữu ích cho các method :meth:`~object.__init__`, và nói chung trong những trường hợp method của derived class muốn mở rộng method của base class có cùng tên, nên phải gọi method của base class bằng cách nào đó.
 
-Finally, for instance variables it solves a syntactic problem with assignment:
-since local variables in Python are (by definition!) those variables to which a
-value is assigned in a function body (and that aren't explicitly declared
-global), there has to be some way to tell the interpreter that an assignment was
-meant to assign to an instance variable instead of to a local variable, and it
-should preferably be syntactic (for efficiency reasons).  C++ does this through
-declarations, but Python doesn't have declarations and it would be a pity having
-to introduce them just for this purpose.  Using the explicit ``self.var`` solves
-this nicely.  Similarly, for using instance variables, having to write
-``self.var`` means that references to unqualified names inside a method don't
-have to search the instance's directories.  To put it another way, local
-variables and instance variables live in two different namespaces, and you need
-to tell Python which namespace to use.
+Cuối cùng, đối với các biến instance, cách này giải quyết một vấn đề cú pháp khi gán: vì các biến cục bộ trong Python (theo định nghĩa!) là những biến được gán một giá trị trong phần thân hàm (và không được khai báo tường minh là biến toàn cục), cần có cách để cho trình thông dịch biết rằng phép gán nhằm gán cho một biến instance thay vì một biến cục bộ, và tốt nhất cách đó nên thể hiện qua cú pháp (vì lý do hiệu năng). C++ thực hiện điều này thông qua các khai báo, nhưng Python không có khai báo và sẽ thật đáng tiếc nếu phải đưa chúng vào chỉ vì mục đích này. Việc sử dụng ``self.var`` tường minh giải quyết vấn đề này một cách gọn gàng. Tương tự, khi sử dụng các biến instance, việc phải viết ``self.var`` có nghĩa là các tham chiếu đến những tên không đủ định tính bên trong một method không cần phải tìm trong các namespace của instance. Nói cách khác, biến cục bộ và biến instance nằm trong hai namespace khác nhau, và bạn cần cho Python biết nên sử dụng namespace nào.
 
 
 .. _why-can-t-i-use-an-assignment-in-an-expression:
 
-Why can't I use an assignment in an expression?
------------------------------------------------
+Tại sao tôi không thể sử dụng phép gán trong một biểu thức?
+-----------------------------------------------------------
 
-Starting in Python 3.8, you can!
+Bắt đầu từ Python 3.8, bạn có thể làm vậy!
 
-Assignment expressions using the walrus operator ``:=`` assign a variable in an
-expression::
+Biểu thức gán sử dụng toán tử walrus ``:=`` để gán một biến trong một biểu thức::
 
    while chunk := fp.read(200):
       print(chunk)
 
-See :pep:`572` for more information.
+Xem :pep:`572` để biết thêm thông tin.
 
 
 
-Why does Python use methods for some functionality (e.g. list.index()) but functions for other (e.g. len(list))?
-----------------------------------------------------------------------------------------------------------------
+Tại sao Python sử dụng phương thức cho một số chức năng (ví dụ: list.index()) nhưng lại sử dụng hàm cho những chức năng khác (ví dụ: len(list))?
+------------------------------------------------------------------------------------------------------------------------------------------------
 
-As Guido said:
+Như Guido đã nói:
 
-    (a) For some operations, prefix notation just reads better than
-    postfix -- prefix (and infix!) operations have a long tradition in
-    mathematics which likes notations where the visuals help the
-    mathematician thinking about a problem. Compare the easy with which we
-    rewrite a formula like x*(a+b) into x*a + x*b to the clumsiness of
-    doing the same thing using a raw OO notation.
+    (a) Đối với một số phép toán, ký pháp tiền tố dễ đọc hơn
+    Các phép toán hậu tố -- tiền tố (và trung tố!) có truyền thống lâu đời trong toán học, vốn ưa chuộng những ký hiệu trực quan giúp các nhà toán học suy nghĩ về một bài toán. Hãy so sánh sự dễ dàng khi viết lại một công thức như x*(a+b) thành x*a + x*b với sự vụng về khi thực hiện điều tương tự bằng ký hiệu OO thuần túy.
 
-    (b) When I read code that says len(x) I *know* that it is asking for
-    the length of something. This tells me two things: the result is an
-    integer, and the argument is some kind of container. To the contrary,
-    when I read x.len(), I have to already know that x is some kind of
-    container implementing an interface or inheriting from a class that
-    has a standard len(). Witness the confusion we occasionally have when
-    a class that is not implementing a mapping has a get() or keys()
-    method, or something that isn't a file has a write() method.
+    (b) Khi đọc đoạn mã viết len(x), tôi *biết* rằng nó đang yêu cầu
+    độ dài của một thứ gì đó. Điều này cho tôi biết hai điều: kết quả là một số nguyên và đối số là một dạng container nào đó. Ngược lại, khi đọc x.len(), tôi phải biết trước rằng x là một dạng container nào đó triển khai một interface hoặc kế thừa từ một class có len() chuẩn. Hãy thử xem sự nhầm lẫn đôi khi xảy ra khi một class không triển khai mapping lại có phương thức get() hoặc keys(), hoặc một thứ không phải là file lại có phương thức write().
 
     -- https://mail.python.org/pipermail/python-3000/2006-November/004643.html
 
 
-Why is join() a string method instead of a list or tuple method?
-----------------------------------------------------------------
+Tại sao join() lại là một phương thức của string thay vì của list hoặc tuple?
+-----------------------------------------------------------------------------
 
-Strings became much more like other standard types starting in Python 1.6, when
-methods were added which give the same functionality that has always been
-available using the functions of the string module.  Most of these new methods
-have been widely accepted, but the one which appears to make some programmers
-feel uncomfortable is::
+String trở nên giống các kiểu chuẩn khác hơn nhiều bắt đầu từ Python 1.6, khi các phương thức được bổ sung để cung cấp chức năng tương tự như chức năng vốn luôn có sẵn thông qua các hàm của module string. Hầu hết các phương thức mới này đã được chấp nhận rộng rãi, nhưng phương thức khiến một số lập trình viên cảm thấy không thoải mái là::
 
    ", ".join(['1', '2', '4', '8', '16'])
 
-which gives the result::
+cho kết quả::
 
    "1, 2, 4, 8, 16"
 
-There are two common arguments against this usage.
+Có hai lập luận phổ biến phản đối cách sử dụng này.
 
-The first runs along the lines of: "It looks really ugly using a method of a
-string literal (string constant)", to which the answer is that it might, but a
-string literal is just a fixed value. If the methods are to be allowed on names
-bound to strings there is no logical reason to make them unavailable on
-literals.
+Lập luận đầu tiên thường được diễn đạt như sau: "Việc sử dụng một method của string literal (string constant) trông thực sự rất xấu", và câu trả lời là có thể đúng, nhưng string literal chỉ là một giá trị cố định. Nếu cho phép sử dụng các method trên những tên được liên kết với các string thì không có lý do hợp lý nào để không cho phép sử dụng chúng trên các literal.
 
-The second objection is typically cast as: "I am really telling a sequence to
-join its members together with a string constant".  Sadly, you aren't.  For some
-reason there seems to be much less difficulty with having :meth:`~str.split` as
-a string method, since in that case it is easy to see that ::
+Phản đối thứ hai thường được diễn đạt như sau: "Tôi thực sự đang yêu cầu một sequence nối các phần tử của nó lại với nhau bằng một string constant". Đáng tiếc là không phải vậy. Vì một lý do nào đó, dường như mọi người ít thấy khó chịu hơn khi :meth:`~str.split` là một string method, vì trong trường hợp đó, ta dễ dàng thấy rằng::
 
    "1, 2, 4, 8, 16".split(", ")
 
-is an instruction to a string literal to return the substrings delimited by the
-given separator (or, by default, arbitrary runs of white space).
+là một chỉ thị yêu cầu string literal trả về các substring được phân tách bằng separator đã cho (hoặc mặc định là các chuỗi khoảng trắng liên tiếp tùy ý).
 
-:meth:`~str.join` is a string method because in using it you are telling the
-separator string to iterate over a sequence of strings and insert itself between
-adjacent elements.  This method can be used with any argument which obeys the
-rules for sequence objects, including any new classes you might define yourself.
-Similar methods exist for bytes and bytearray objects.
+:meth:`~str.join` là một string method vì khi sử dụng nó, bạn đang yêu cầu separator string lặp qua một sequence gồm các string và chèn chính nó giữa những phần tử liền kề. Method này có thể được sử dụng với bất kỳ đối số nào tuân theo các quy tắc dành cho sequence object, bao gồm cả những class mới mà bạn có thể tự định nghĩa. Các method tương tự cũng tồn tại cho các object bytes và bytearray.
 
 
-How fast are exceptions?
-------------------------
+Exception nhanh đến mức nào?
+----------------------------
 
-A :keyword:`try`/:keyword:`except` block is extremely efficient if no exceptions
-are raised.  Actually
-catching an exception is expensive.  In versions of Python prior to 2.0 it was
-common to use this idiom::
+Một block :keyword:`try`/:keyword:`except` cực kỳ hiệu quả nếu không có exception nào được raised. Thực sự bắt một exception thì tốn kém. Trong các phiên bản Python trước 2.0, người ta thường sử dụng idiom này::
 
    try:
        value = mydict[key]
@@ -243,33 +152,22 @@ common to use this idiom::
        mydict[key] = getvalue(key)
        value = mydict[key]
 
-This only made sense when you expected the dict to have the key almost all the
-time.  If that wasn't the case, you coded it like this::
+Điều này chỉ hợp lý khi bạn dự kiến dict hầu như lúc nào cũng có key đó. Nếu không phải vậy, bạn sẽ viết code như sau::
 
    if key in mydict:
        value = mydict[key]
    else:
        value = mydict[key] = getvalue(key)
 
-For this specific case, you could also use ``value = dict.setdefault(key,
-getvalue(key))``, but only if the ``getvalue()`` call is cheap enough because it
-is evaluated in all cases.
+Trong trường hợp cụ thể này, bạn cũng có thể sử dụng ``value = dict.setdefault(key, getvalue(key))``, nhưng chỉ khi lời gọi ``getvalue()`` đủ rẻ vì nó được đánh giá trong mọi trường hợp.
 
 
-Why isn't there a switch or case statement in Python?
------------------------------------------------------
+Tại sao Python không có câu lệnh switch hoặc case?
+--------------------------------------------------
 
-In general, structured switch statements execute one block of code
-when an expression has a particular value or set of values.
-Since Python 3.10 one can easily match literal values, or constants
-within a namespace, with a ``match ... case`` statement.
-See :ref:`the specification <match>` and :ref:`the tutorial <tut-match>`
-for more information about :keyword:`match` statements.
-An older alternative is a sequence of ``if... elif... elif... else``.
+Nhìn chung, các câu lệnh switch có cấu trúc sẽ thực thi một khối mã khi một biểu thức có một giá trị hoặc tập hợp giá trị cụ thể. Kể từ Python 3.10, bạn có thể dễ dàng so khớp các giá trị literal hoặc các hằng số trong một namespace bằng câu lệnh ``match ... case``. Xem :ref:`đặc tả <match>` và :ref:`hướng dẫn <tut-match>` để biết thêm thông tin về các câu lệnh :keyword:`match`. Một lựa chọn cũ hơn là một chuỗi ``if... elif... elif... else``.
 
-For cases where you need to choose from a very large number of possibilities,
-you can create a dictionary mapping case values to functions to call.  For
-example::
+Trong trường hợp cần lựa chọn trong một số lượng rất lớn khả năng, bạn có thể tạo một dictionary ánh xạ các giá trị case với những hàm cần gọi. Ví dụ:::
 
    functions = {'a': function_1,
                 'b': function_2,
@@ -278,8 +176,8 @@ example::
    func = functions[value]
    func()
 
-For calling methods on objects, you can simplify yet further by using the
-:func:`getattr` built-in to retrieve methods with a particular name::
+Để gọi các phương thức trên đối tượng, bạn còn có thể đơn giản hóa hơn nữa bằng cách sử dụng
+:func:`getattr` tích hợp sẵn để lấy các phương thức có một tên cụ thể::
 
    class MyVisitor:
        def visit_a(self):
@@ -290,235 +188,132 @@ For calling methods on objects, you can simplify yet further by using the
            method = getattr(self, method_name)
            method()
 
-It's suggested that you use a prefix for the method names, such as ``visit_`` in
-this example.  Without such a prefix, if values are coming from an untrusted
-source, an attacker would be able to call any method on your object.
+Bạn nên dùng một tiền tố cho tên các phương thức, chẳng hạn như ``visit_`` trong ví dụ này. Nếu không có tiền tố như vậy, khi các giá trị đến từ một nguồn không đáng tin cậy, kẻ tấn công sẽ có thể gọi bất kỳ phương thức nào trên đối tượng của bạn.
 
-Imitating switch with fallthrough, as with C's switch-case-default,
-is possible, much harder, and less needed.
+Việc mô phỏng switch có fallthrough, như switch-case-default của C, là có thể, nhưng khó hơn nhiều và ít cần thiết hơn.
 
 
-Can't you emulate threads in the interpreter instead of relying on an OS-specific thread implementation?
---------------------------------------------------------------------------------------------------------
+Không thể mô phỏng thread trong interpreter thay vì dựa vào một implementation thread đặc thù cho hệ điều hành sao?
+-------------------------------------------------------------------------------------------------------------------
 
-Answer 1: Unfortunately, the interpreter pushes at least one C stack frame for
-each Python stack frame.  Also, extensions can call back into Python at almost
-random moments.  Therefore, a complete threads implementation requires thread
-support for C.
+Câu trả lời 1: Đáng tiếc là interpreter đẩy ít nhất một C stack frame cho mỗi Python stack frame. Ngoài ra, các extension có thể gọi ngược vào Python ở gần như bất kỳ thời điểm nào. Do đó, một implementation thread hoàn chỉnh cần có hỗ trợ thread cho C.
 
-Answer 2: Fortunately, there is `Stackless Python <https://github.com/stackless-dev/stackless/wiki>`_,
-which has a completely redesigned interpreter loop that avoids the C stack.
+Câu trả lời 2: May mắn thay, có `Stackless Python <https://github.com/stackless-dev/stackless/wiki>`_, với vòng lặp interpreter được thiết kế lại hoàn toàn để tránh C stack.
 
 
-Why can't lambda expressions contain statements?
-------------------------------------------------
+Tại sao biểu thức lambda không thể chứa statement?
+--------------------------------------------------
 
-Python lambda expressions cannot contain statements because Python's syntactic
-framework can't handle statements nested inside expressions.  However, in
-Python, this is not a serious problem.  Unlike lambda forms in other languages,
-where they add functionality, Python lambdas are only a shorthand notation if
-you're too lazy to define a function.
+Biểu thức lambda của Python không thể chứa statement vì khung cú pháp của Python không thể xử lý statement lồng bên trong biểu thức. Tuy nhiên, trong Python, đây không phải là vấn đề nghiêm trọng. Không giống các dạng lambda trong những ngôn ngữ khác, nơi chúng bổ sung chức năng, lambda của Python chỉ là một cách viết tắt nếu bạn quá lười định nghĩa một function.
 
-Functions are already first class objects in Python, and can be declared in a
-local scope.  Therefore the only advantage of using a lambda instead of a
-locally defined function is that you don't need to invent a name for the
-function -- but that's just a local variable to which the function object (which
-is exactly the same type of object that a lambda expression yields) is assigned!
+Function vốn đã là first-class object trong Python và có thể được khai báo trong phạm vi cục bộ. Vì vậy, lợi ích duy nhất của việc dùng lambda thay cho một function được định nghĩa cục bộ là bạn không cần nghĩ ra tên cho function — nhưng đó chỉ là một biến cục bộ được gán cho function object (chính xác là cùng kiểu object mà một biểu thức lambda tạo ra)!
 
 
-Can Python be compiled to machine code, C or some other language?
------------------------------------------------------------------
+Python có thể được biên dịch thành mã máy, C hoặc một ngôn ngữ nào khác không?
+------------------------------------------------------------------------------
 
-`Cython <https://cython.org/>`_ compiles a modified version of Python with
-optional annotations into C extensions.  `Nuitka <https://nuitka.net/>`_ is
-an up-and-coming compiler of Python into C++ code, aiming to support the full
-Python language.
+`Cython <https://cython.org/>`_ biên dịch một phiên bản Python đã được sửa đổi, có thêm các chú thích tùy chọn, thành các phần mở rộng C. `Nuitka <https://nuitka.net/>`_ là một trình biên dịch Python mới nổi, chuyển Python thành mã C++, với mục tiêu hỗ trợ đầy đủ ngôn ngữ Python.
 
 
-How does Python manage memory?
-------------------------------
+Python quản lý bộ nhớ như thế nào?
+----------------------------------
 
-The details of Python memory management depend on the implementation.  The
-standard implementation of Python, :term:`CPython`, uses reference counting to
-detect inaccessible objects, and another mechanism to collect reference cycles,
-periodically executing a cycle detection algorithm which looks for inaccessible
-cycles and deletes the objects involved. The :mod:`gc` module provides functions
-to perform a garbage collection, obtain debugging statistics, and tune the
-collector's parameters.
+Chi tiết về việc quản lý bộ nhớ của Python phụ thuộc vào bản triển khai. Bản triển khai tiêu chuẩn của Python, :term:`CPython`, sử dụng cơ chế đếm tham chiếu để phát hiện các đối tượng không thể truy cập, cùng một cơ chế khác để thu gom các chu trình tham chiếu; định kỳ, cơ chế này thực thi một thuật toán phát hiện chu trình để tìm các chu trình không thể truy cập và xóa những đối tượng liên quan. Mô-đun :mod:`gc` cung cấp các hàm để thực hiện thu gom rác, lấy số liệu thống kê gỡ lỗi và điều chỉnh các tham số của bộ thu gom.
 
-Other implementations (such as `Jython <https://www.jython.org>`_ or
-`PyPy <https://pypy.org>`_), however, can rely on a different mechanism
-such as a full-blown garbage collector.  This difference can cause some
-subtle porting problems if your Python code depends on the behavior of the
-reference counting implementation.
+Tuy nhiên, các bản triển khai khác (chẳng hạn như `Jython <https://www.jython.org>`_ hoặc `PyPy <https://pypy.org>`_) có thể dựa vào một cơ chế khác, chẳng hạn như một bộ thu gom rác đầy đủ. Sự khác biệt này có thể gây ra một số vấn đề chuyển mã tinh vi nếu mã Python của bạn phụ thuộc vào hành vi của bản triển khai sử dụng cơ chế đếm tham chiếu.
 
-In some Python implementations, the following code (which is fine in CPython)
-will probably run out of file descriptors::
+Trong một số bản triển khai Python, đoạn mã sau (hoạt động bình thường trong CPython) có thể sẽ dùng hết các bộ mô tả tệp::
 
    for file in very_long_list_of_files:
        f = open(file)
        c = f.read(1)
 
-Indeed, using CPython's reference counting and destructor scheme, each new
-assignment to ``f`` closes the previous file.  With a traditional GC, however,
-those file objects will only get collected (and closed) at varying and possibly
-long intervals.
+Quả thực, với cơ chế đếm tham chiếu và lược đồ destructor của CPython, mỗi phép gán mới cho ``f`` sẽ đóng tệp trước đó. Tuy nhiên, với một GC truyền thống, các đối tượng tệp đó chỉ được thu gom (và đóng) theo những khoảng thời gian khác nhau, có thể khá dài.
 
-If you want to write code that will work with any Python implementation,
-you should explicitly close the file or use the :keyword:`with` statement;
-this will work regardless of memory management scheme::
+Nếu bạn muốn viết mã hoạt động với mọi triển khai Python, bạn nên đóng tệp một cách rõ ràng hoặc sử dụng câu lệnh :keyword:`with`; cách này sẽ hoạt động bất kể cơ chế quản lý bộ nhớ nào được sử dụng::
 
    for file in very_long_list_of_files:
        with open(file) as f:
            c = f.read(1)
 
 
-Why doesn't CPython use a more traditional garbage collection scheme?
----------------------------------------------------------------------
+Tại sao CPython không sử dụng một cơ chế garbage collection truyền thống hơn?
+-----------------------------------------------------------------------------
 
-For one thing, this is not a C standard feature and hence it's not portable.
-(Yes, we know about the Boehm GC library.  It has bits of assembler code for
-*most* common platforms, not for all of them, and although it is mostly
-transparent, it isn't completely transparent; patches are required to get
-Python to work with it.)
+Trước hết, đây không phải là một tính năng của tiêu chuẩn C nên không có tính portable. (Đúng vậy, chúng tôi biết về thư viện Boehm GC. Thư viện này có các đoạn mã assembler cho *hầu hết* các nền tảng phổ biến, nhưng không phải tất cả, và mặc dù phần lớn hoạt động minh bạch, nó không hoàn toàn minh bạch; cần có các bản vá để Python hoạt động với thư viện này.)
 
-Traditional GC also becomes a problem when Python is embedded into other
-applications.  While in a standalone Python it's fine to replace the standard
-``malloc()`` and ``free()`` with versions provided by the GC library, an application
-embedding Python may want to have its *own* substitute for ``malloc()`` and ``free()``,
-and may not want Python's.  Right now, CPython works with anything that
-implements ``malloc()`` and ``free()`` properly.
+GC truyền thống cũng trở thành một vấn đề khi Python được nhúng vào các ứng dụng khác. Trong một Python độc lập, việc thay thế ``malloc()`` tiêu chuẩn và ``free()`` bằng các phiên bản do thư viện GC cung cấp là điều ổn, nhưng một ứng dụng nhúng Python có thể muốn có *bộ thay thế* ``malloc()`` và ``free()`` riêng, đồng thời có thể không muốn sử dụng các phiên bản của Python. Hiện tại, CPython hoạt động với mọi thứ triển khai đúng ``malloc()`` và ``free()``.
 
 
-Why isn't all memory freed when CPython exits?
-----------------------------------------------
+Tại sao không phải toàn bộ bộ nhớ đều được giải phóng khi CPython thoát?
+------------------------------------------------------------------------
 
-Objects referenced from the global namespaces of Python modules are not always
-deallocated when Python exits.  This may happen if there are circular
-references.  There are also certain bits of memory that are allocated by the C
-library that are impossible to free (e.g. a tool like Purify will complain about
-these).  Python is, however, aggressive about cleaning up memory on exit and
-does try to destroy every single object.
+Các đối tượng được tham chiếu từ không gian tên toàn cục của các mô-đun Python không phải lúc nào cũng được giải phóng khi Python thoát. Điều này có thể xảy ra nếu tồn tại các tham chiếu vòng. Ngoài ra, có một số phần bộ nhớ được thư viện C cấp phát nhưng không thể giải phóng (ví dụ: một công cụ như Purify sẽ cảnh báo về chúng). Tuy nhiên, Python rất tích cực dọn dẹp bộ nhớ khi thoát và cố gắng hủy từng đối tượng.
 
-If you want to force Python to delete certain things on deallocation use the
-:mod:`atexit` module to run a function that will force those deletions.
+Nếu muốn buộc Python xóa một số thứ khi giải phóng bộ nhớ, hãy sử dụng
+module :mod:`atexit` để chạy một hàm buộc giải phóng các đối tượng đó.
 
 
-Why are there separate tuple and list data types?
--------------------------------------------------
+Tại sao lại có các kiểu dữ liệu tuple và list riêng biệt?
+---------------------------------------------------------
 
-Lists and tuples, while similar in many respects, are generally used in
-fundamentally different ways.  Tuples can be thought of as being similar to
-Pascal ``records`` or C ``structs``; they're small collections of related data which may
-be of different types which are operated on as a group.  For example, a
-Cartesian coordinate is appropriately represented as a tuple of two or three
-numbers.
+Mặc dù tuple và list giống nhau ở nhiều khía cạnh, chúng thường được sử dụng theo những cách hoàn toàn khác nhau. Có thể hình dung tuple tương tự như ``records`` của Pascal hoặc ``structs`` của C; chúng là những tập hợp nhỏ gồm các dữ liệu có liên quan, có thể thuộc các kiểu khác nhau và được xử lý như một nhóm. Ví dụ, một tọa độ Descartes thích hợp được biểu diễn dưới dạng tuple gồm hai hoặc ba số.
 
-Lists, on the other hand, are more like arrays in other languages.  They tend to
-hold a varying number of objects all of which have the same type and which are
-operated on one-by-one.  For example, :func:`os.listdir('.') <os.listdir>`
-returns a list of
-strings representing the files in the current directory.  Functions which
-operate on this output would generally not break if you added another file or
-two to the directory.
+Mặt khác, list giống với mảng trong các ngôn ngữ khác hơn. Chúng thường chứa một số lượng đối tượng thay đổi, tất cả đều cùng kiểu và được xử lý từng đối tượng một. Ví dụ, :func:`os.listdir('.') <os.listdir>` trả về một list các chuỗi đại diện cho những tệp trong thư mục hiện tại. Các hàm xử lý kết quả này nhìn chung sẽ không bị ảnh hưởng nếu bạn thêm một hoặc hai tệp vào thư mục.
 
-Tuples are immutable, meaning that once a tuple has been created, you can't
-replace any of its elements with a new value.  Lists are mutable, meaning that
-you can always change a list's elements.  Only immutable elements can be used as
-dictionary keys, and hence only tuples and not lists can be used as keys.
+Tuple là bất biến, nghĩa là một khi tuple đã được tạo, bạn không thể thay thế bất kỳ phần tử nào của nó bằng một giá trị mới. List là khả biến, nghĩa là bạn luôn có thể thay đổi các phần tử của list. Chỉ các phần tử bất biến mới có thể được dùng làm khóa dictionary, vì vậy chỉ tuple, chứ không phải list, mới có thể được dùng làm khóa.
 
 
 .. _how-are-lists-implemented:
 
-How are lists implemented in CPython?
--------------------------------------
+List được triển khai trong CPython như thế nào?
+-----------------------------------------------
 
-CPython's lists are really variable-length arrays, not Lisp-style linked lists.
-The implementation uses a contiguous array of references to other objects, and
-keeps a pointer to this array and the array's length in a list head structure.
+List của CPython thực chất là các mảng có độ dài thay đổi, không phải linked list theo kiểu Lisp. Cách triển khai này sử dụng một mảng liên tục chứa các tham chiếu đến những đối tượng khác, đồng thời lưu một con trỏ đến mảng đó và độ dài của mảng trong một cấu trúc đầu list.
 
-This makes indexing a list ``a[i]`` an operation whose cost is independent of
-the size of the list or the value of the index.
+Điều này khiến việc lập chỉ mục một danh sách ``a[i]`` trở thành một thao tác có chi phí không phụ thuộc vào kích thước của danh sách hay giá trị của chỉ mục.
 
-When items are appended or inserted, the array of references is resized.  Some
-cleverness is applied to improve the performance of appending items repeatedly;
-when the array must be grown, some extra space is allocated so the next few
-times don't require an actual resize.
+Khi các phần tử được thêm vào cuối hoặc chèn vào, mảng tham chiếu sẽ được thay đổi kích thước. Một số kỹ thuật được áp dụng để cải thiện hiệu suất khi liên tục thêm phần tử vào cuối; khi mảng cần được mở rộng, một phần không gian bổ sung sẽ được cấp phát để vài lần tiếp theo không cần thực sự thay đổi kích thước.
 
-See :ref:`time-complexity` for the costs of the various list operations.
+Xem :ref:`time-complexity` để biết chi phí của các thao tác danh sách khác nhau.
 
 
 .. _how-are-dictionaries-implemented:
 
-How are dictionaries implemented in CPython?
---------------------------------------------
+Từ điển được triển khai như thế nào trong CPython?
+--------------------------------------------------
 
-CPython's dictionaries are implemented as resizable hash tables.  Compared to
-B-trees, this gives better performance for lookup (the most common operation by
-far) under most circumstances, and the implementation is simpler.
+Từ điển của CPython được triển khai dưới dạng các bảng băm có thể thay đổi kích thước. So với cây B, cách này cho hiệu suất tra cứu tốt hơn (cho đến nay là thao tác phổ biến nhất) trong hầu hết trường hợp, đồng thời việc triển khai cũng đơn giản hơn.
 
-Dictionaries work by computing a hash code for each key stored in the dictionary
-using the :func:`hash` built-in function.  The hash code varies widely depending
-on the key and a per-process seed; for example, ``'Python'`` could hash to
-``-539294296`` while ``'python'``, a string that differs by a single bit, could hash
-to ``1142331976``.  The hash code is then used to calculate a location in an
-internal array where the value will be stored.  Assuming that you're storing
-keys that all have different hash values, this means that dictionaries take
-constant time -- *O*\ (1), in Big-O notation -- to retrieve a key.
+Từ điển hoạt động bằng cách tính mã băm cho mỗi khóa được lưu trong từ điển bằng hàm dựng sẵn :func:`hash`. Mã băm thay đổi rất lớn tùy thuộc vào khóa và một seed riêng cho mỗi process; chẳng hạn, ``'Python'`` có thể được băm thành ``-539294296``, trong khi ``'python'``, một chuỗi chỉ khác một bit, có thể được băm thành ``1142331976``. Sau đó, mã băm được dùng để tính vị trí trong một mảng nội bộ, nơi giá trị sẽ được lưu trữ. Nếu giả định rằng bạn đang lưu các khóa có giá trị băm khác nhau, điều này có nghĩa là từ điển mất thời gian hằng số -- *O*\ (1), theo ký hiệu Big-O -- để truy xuất một khóa.
 
-See :ref:`time-complexity` for the costs of the various dictionary operations.
+Xem :ref:`time-complexity` để biết chi phí của các thao tác từ điển khác nhau.
 
 
-Why must dictionary keys be immutable?
---------------------------------------
+Tại sao các khóa của dictionary phải là bất biến?
+-------------------------------------------------
 
-The hash table implementation of dictionaries uses a hash value calculated from
-the key value to find the key.  If the key were a mutable object, its value
-could change, and thus its hash could also change.  But since whoever changes
-the key object can't tell that it was being used as a dictionary key, it can't
-move the entry around in the dictionary.  Then, when you try to look up the same
-object in the dictionary it won't be found because its hash value is different.
-If you tried to look up the old value it wouldn't be found either, because the
-value of the object found in that hash bin would be different.
+Cài đặt bảng băm của dictionary sử dụng một giá trị băm được tính từ giá trị của khóa để tìm khóa đó. Nếu khóa là một đối tượng có thể thay đổi, giá trị của nó có thể thay đổi, và do đó giá trị băm của nó cũng có thể thay đổi. Tuy nhiên, vì người thay đổi đối tượng khóa không biết rằng nó đang được dùng làm khóa dictionary nên không thể di chuyển mục nhập đó trong dictionary. Khi bạn cố tra cứu lại chính đối tượng đó trong dictionary, nó sẽ không được tìm thấy vì giá trị băm của nó đã khác. Nếu bạn cố tra cứu giá trị cũ thì cũng không tìm thấy, vì giá trị của đối tượng nằm trong bin băm đó đã khác.
 
-If you want a dictionary indexed with a list, simply convert the list to a tuple
-first; the function ``tuple(L)`` creates a tuple with the same entries as the
-list ``L``.  Tuples are immutable and can therefore be used as dictionary keys.
+Nếu muốn lập chỉ mục dictionary bằng một list, chỉ cần chuyển list thành tuple trước; hàm ``tuple(L)`` tạo một tuple có các phần tử giống với list ``L``. Tuple là bất biến và do đó có thể được dùng làm khóa dictionary.
 
-Some unacceptable solutions that have been proposed:
+Một số giải pháp không thể chấp nhận đã được đề xuất:
 
-- Hash lists by their address (object ID).  This doesn't work because if you
-  construct a new list with the same value it won't be found; e.g.::
+- Băm list theo địa chỉ của chúng (ID đối tượng). Cách này không hiệu quả vì nếu bạn tạo một list mới có cùng giá trị thì nó sẽ không được tìm thấy; ví dụ:::
 
      mydict = {[1, 2]: '12'}
      print(mydict[[1, 2]])
 
-  would raise a :exc:`KeyError` exception because the id of the ``[1, 2]`` used in the
-  second line differs from that in the first line.  In other words, dictionary
-  keys should be compared using ``==``, not using :keyword:`is`.
+  sẽ gây ra ngoại lệ :exc:`KeyError` vì ID của ``[1, 2]`` được dùng ở dòng thứ hai khác với ID ở dòng đầu tiên. Nói cách khác, các khóa dictionary nên được so sánh bằng ``==``, không phải bằng :keyword:`is`.
 
-- Make a copy when using a list as a key.  This doesn't work because the list,
-  being a mutable object, could contain a reference to itself, and then the
-  copying code would run into an infinite loop.
+- Tạo một bản sao khi dùng list làm khóa. Cách này không hiệu quả vì list, vốn là một đối tượng có thể thay đổi, có thể chứa một tham chiếu đến chính nó, và khi đó mã sao chép sẽ rơi vào vòng lặp vô hạn.
 
-- Allow lists as keys but tell the user not to modify them.  This would allow a
-  class of hard-to-track bugs in programs when you forgot or modified a list by
-  accident. It also invalidates an important invariant of dictionaries: every
-  value in ``d.keys()`` is usable as a key of the dictionary.
+- Cho phép các list làm khóa nhưng hãy nói rõ với người dùng rằng không được sửa đổi chúng. Điều này có thể dẫn đến một nhóm lỗi khó truy vết trong chương trình khi bạn vô tình quên hoặc sửa đổi một list. Nó cũng làm mất một bất biến quan trọng của dictionary: mọi giá trị trong ``d.keys()`` đều có thể được dùng làm khóa của dictionary.
 
-- Mark lists as read-only once they are used as a dictionary key.  The problem
-  is that it's not just the top-level object that could change its value; you
-  could use a tuple containing a list as a key.  Entering anything as a key into
-  a dictionary would require marking all objects reachable from there as
-  read-only -- and again, self-referential objects could cause an infinite loop.
+- Đánh dấu các list là chỉ đọc ngay khi chúng được dùng làm khóa dictionary. Vấn đề là không chỉ đối tượng cấp cao nhất mới có thể thay đổi giá trị của nó; bạn có thể dùng một tuple chứa một list làm khóa. Việc đưa bất kỳ thứ gì vào dictionary làm khóa sẽ yêu cầu đánh dấu tất cả đối tượng có thể truy cập từ đó là chỉ đọc — và một lần nữa, các đối tượng tự tham chiếu có thể gây ra vòng lặp vô hạn.
 
-There is a trick to get around this if you need to, but use it at your own risk:
-You can wrap a mutable structure inside a class instance which has both a
-:meth:`~object.__eq__` and a :meth:`~object.__hash__` method.
-You must then make sure that the
-hash value for all such wrapper objects that reside in a dictionary (or other
-hash based structure), remain fixed while the object is in the dictionary (or
-other structure). ::
+Có một mẹo để xử lý vấn đề này nếu bạn cần, nhưng hãy tự chịu rủi ro khi sử dụng: Bạn có thể bọc một cấu trúc có thể thay đổi bên trong một thể hiện lớp có cả một
+:meth:`~object.__eq__` và một phương thức :meth:`~object.__hash__`. Sau đó, bạn phải bảo đảm rằng giá trị băm của tất cả các đối tượng wrapper như vậy đang nằm trong một dictionary (hoặc cấu trúc dựa trên hash khác) vẫn cố định trong thời gian đối tượng nằm trong dictionary (hoặc cấu trúc khác đó).::
 
    class ListWrapper:
        def __init__(self, the_list):
@@ -537,250 +332,166 @@ other structure). ::
                    result = (result % 7777777) + i * 333
            return result
 
-Note that the hash computation is complicated by the possibility that some
-members of the list may be unhashable and also by the possibility of arithmetic
-overflow.
+Lưu ý rằng việc tính hash trở nên phức tạp do khả năng một số phần tử của list có thể không hash được, cũng như khả năng xảy ra tràn số học.
 
-Furthermore it must always be the case that if ``o1 == o2`` (ie ``o1.__eq__(o2)
-is True``) then ``hash(o1) == hash(o2)`` (ie, ``o1.__hash__() == o2.__hash__()``),
-regardless of whether the object is in a dictionary or not.  If you fail to meet
-these restrictions dictionaries and other hash based structures will misbehave.
+Hơn nữa, luôn phải đúng rằng nếu ``o1 == o2`` (tức là ``o1.__eq__(o2) is True``) thì ``hash(o1) == hash(o2)`` (tức là ``o1.__hash__() == o2.__hash__()``), bất kể đối tượng có nằm trong dictionary hay không. Nếu không đáp ứng các giới hạn này, dictionary và những cấu trúc dựa trên hash khác sẽ hoạt động sai.
 
-In the case of :class:`!ListWrapper`, whenever the wrapper object is in a dictionary the
-wrapped list must not change to avoid anomalies.  Don't do this unless you are
-prepared to think hard about the requirements and the consequences of not
-meeting them correctly.  Consider yourself warned.
+Trong trường hợp :class:`!ListWrapper`, bất cứ khi nào đối tượng wrapper nằm trong dictionary, list được bọc không được thay đổi để tránh các hành vi bất thường. Đừng làm điều này trừ khi bạn sẵn sàng suy nghĩ cẩn thận về các yêu cầu và hậu quả của việc không đáp ứng đúng chúng. Hãy coi đây là lời cảnh báo.
 
 
-Why doesn't list.sort() return the sorted list?
------------------------------------------------
+Tại sao list.sort() không trả về danh sách đã sắp xếp?
+------------------------------------------------------
 
-In situations where performance matters, making a copy of the list just to sort
-it would be wasteful. Therefore, :meth:`list.sort` sorts the list in place. In
-order to remind you of that fact, it does not return the sorted list.  This way,
-you won't be fooled into accidentally overwriting a list when you need a sorted
-copy but also need to keep the unsorted version around.
+Trong những tình huống cần quan tâm đến hiệu năng, việc tạo một bản sao của danh sách chỉ để sắp xếp sẽ rất lãng phí. Vì vậy, :meth:`list.sort` sắp xếp danh sách ngay tại chỗ. Để nhắc bạn về điều đó, hàm này không trả về danh sách đã sắp xếp. Nhờ vậy, bạn sẽ không vô tình ghi đè lên một danh sách khi cần một bản sao đã sắp xếp nhưng vẫn muốn giữ lại phiên bản chưa sắp xếp.
 
-If you want to return a new list, use the built-in :func:`sorted` function
-instead.  This function creates a new list from a provided iterable, sorts
-it and returns it.  For example, here's how to iterate over the keys of a
-dictionary in sorted order::
+Nếu muốn trả về một danh sách mới, thay vào đó hãy sử dụng hàm :func:`sorted` tích hợp sẵn. Hàm này tạo một danh sách mới từ một iterable được cung cấp, sắp xếp danh sách đó rồi trả về. Ví dụ, sau đây là cách lặp qua các khóa của một dictionary theo thứ tự đã sắp xếp::
 
    for key in sorted(mydict):
-       ...  # do whatever with mydict[key]...
+       ...  # thực hiện bất cứ điều gì với mydict[key]...
 
 
-How do you specify and enforce an interface spec in Python?
------------------------------------------------------------
+Làm thế nào để chỉ định và thực thi một đặc tả interface trong Python?
+----------------------------------------------------------------------
 
-An interface specification for a module as provided by languages such as C++ and
-Java describes the prototypes for the methods and functions of the module.  Many
-feel that compile-time enforcement of interface specifications helps in the
-construction of large programs.
+Đặc tả interface cho một module, như được cung cấp bởi các ngôn ngữ như C++ và Java, mô tả các prototype của những method và function trong module. Nhiều người cho rằng việc thực thi đặc tả interface tại thời điểm biên dịch giúp ích cho việc xây dựng các chương trình lớn.
 
-Python 2.6 adds an :mod:`abc` module that lets you define Abstract Base Classes
-(ABCs).  You can then use :func:`isinstance` and :func:`issubclass` to check
-whether an instance or a class implements a particular ABC.  The
-:mod:`collections.abc` module defines a set of useful ABCs such as
-:class:`~collections.abc.Iterable`, :class:`~collections.abc.Container`, and
+Python 2.6 bổ sung module :mod:`abc`, cho phép bạn định nghĩa Abstract Base Class (ABC). Sau đó, bạn có thể sử dụng :func:`isinstance` và :func:`issubclass` để kiểm tra xem một instance hoặc một class có triển khai một ABC cụ thể hay không.
+Mô-đun :mod:`collections.abc` định nghĩa một tập hợp các ABC hữu ích như
+:class:`~collections.abc.Iterable`, :class:`~collections.abc.Container`, và
 :class:`~collections.abc.MutableMapping`.
 
-For Python, many of the advantages of interface specifications can be obtained
-by an appropriate test discipline for components.
+Trong Python, nhiều ưu điểm của các đặc tả interface có thể đạt được bằng một quy trình kiểm thử phù hợp cho các component.
 
-A good test suite for a module can both provide a regression test and serve as a
-module interface specification and a set of examples.  Many Python modules can
-be run as a script to provide a simple "self test."  Even modules which use
-complex external interfaces can often be tested in isolation using trivial
-"stub" emulations of the external interface.  The :mod:`doctest` and
-:mod:`unittest` modules or third-party test frameworks can be used to construct
-exhaustive test suites that exercise every line of code in a module.
+Một test suite tốt cho một module vừa có thể cung cấp kiểm thử hồi quy, vừa đóng vai trò là đặc tả interface của module và một tập hợp các ví dụ. Nhiều module Python có thể được chạy dưới dạng script để cung cấp một "self test" đơn giản. Ngay cả những module sử dụng các interface bên ngoài phức tạp thường cũng có thể được kiểm thử độc lập bằng các mô phỏng "stub" đơn giản của interface bên ngoài. :mod:`doctest` và
+các module :mod:`unittest` hoặc các test framework của bên thứ ba có thể được dùng để xây dựng các test suite toàn diện, thực thi mọi dòng mã trong một module.
 
-An appropriate testing discipline can help build large complex applications in
-Python as well as having interface specifications would.  In fact, it can be
-better because an interface specification cannot test certain properties of a
-program.  For example, the :meth:`list.append` method is expected to add new elements
-to the end of some internal list; an interface specification cannot test that
-your :meth:`list.append` implementation will actually do this correctly, but it's
-trivial to check this property in a test suite.
+Một quy trình kiểm thử phù hợp có thể giúp xây dựng các ứng dụng lớn, phức tạp bằng Python cũng hiệu quả như khi có các đặc tả interface. Trên thực tế, cách này có thể tốt hơn vì một đặc tả interface không thể kiểm thử một số thuộc tính nhất định của chương trình. Ví dụ, phương thức :meth:`list.append` được kỳ vọng sẽ thêm các phần tử mới vào cuối một danh sách nội bộ; một đặc tả interface không thể kiểm thử việc triển khai :meth:`list.append` của bạn có thực sự thực hiện đúng điều này hay không, nhưng việc kiểm tra thuộc tính này trong một test suite lại rất đơn giản.
 
-Writing test suites is very helpful, and you might want to design your code to
-make it easily tested. One increasingly popular technique, test-driven
-development, calls for writing parts of the test suite first, before you write
-any of the actual code.  Of course Python allows you to be sloppy and not write
-test cases at all.
+Viết các test suite rất hữu ích, và bạn có thể muốn thiết kế mã của mình sao cho dễ kiểm thử. Một kỹ thuật ngày càng phổ biến, test-driven development, yêu cầu viết trước một phần test suite, trước khi viết bất kỳ mã thực tế nào. Tất nhiên, Python cho phép bạn làm qua loa và hoàn toàn không viết các test case.
 
 
-Why is there no goto?
----------------------
+Tại sao không có goto?
+----------------------
 
-In the 1970s people realized that unrestricted goto could lead
-to messy "spaghetti" code that was hard to understand and revise.
-In a high-level language, it is also unneeded as long as there
-are ways to branch (in Python, with :keyword:`if` statements and :keyword:`or`,
-:keyword:`and`, and :keyword:`if`/:keyword:`else` expressions) and loop (with :keyword:`while`
-and :keyword:`for` statements, possibly containing :keyword:`continue` and :keyword:`break`).
+Vào những năm 1970, người ta nhận ra rằng goto không bị hạn chế có thể dẫn đến mã "spaghetti" rối rắm, khó hiểu và khó sửa đổi. Trong một ngôn ngữ cấp cao, goto cũng không cần thiết miễn là có các cách để rẽ nhánh (trong Python, bằng các câu lệnh :keyword:`if` và :keyword:`or`,
+:keyword:`and`, và các biểu thức :keyword:`if`/:keyword:`else`) và lặp (bằng các câu lệnh :keyword:`while` và :keyword:`for`, có thể chứa :keyword:`continue` và :keyword:`break`).
 
-One can also use exceptions to provide a "structured goto"
-that works even across
-function calls.  Many feel that exceptions can conveniently emulate all
-reasonable uses of the ``go`` or ``goto`` constructs of C, Fortran, and other
-languages.  For example::
+Bạn cũng có thể sử dụng exception để cung cấp một "goto có cấu trúc" hoạt động ngay cả khi đi qua các lần gọi hàm. Nhiều người cho rằng exception có thể mô phỏng thuận tiện mọi cách sử dụng hợp lý của các cấu trúc ``go`` hoặc ``goto`` trong C, Fortran và các ngôn ngữ khác. Ví dụ::
 
-   class label(Exception): pass  # declare a label
+   class label(Exception): pass  # khai báo một nhãn
 
    try:
        ...
-       if condition: raise label()  # goto label
+       if condition: raise label()  # goto đến nhãn
        ...
-   except label:  # where to goto
+   except label:  # điểm cần goto đến
        pass
    ...
 
-This doesn't allow you to jump into the middle of a loop, but that's usually
-considered an abuse of ``goto`` anyway.  Use sparingly.
+Điều này không cho phép bạn nhảy vào giữa một vòng lặp, nhưng việc đó thường bị xem là lạm dụng ``goto`` dù sao đi nữa. Hãy sử dụng một cách hạn chế.
 
 
-Why can't raw strings (r-strings) end with a backslash?
--------------------------------------------------------
+Tại sao chuỗi thô (r-strings) không thể kết thúc bằng dấu gạch chéo ngược?
+--------------------------------------------------------------------------
 
-More precisely, they can't end with an odd number of backslashes: the unpaired
-backslash at the end escapes the closing quote character, leaving an
-unterminated string.
+Chính xác hơn, chúng không thể kết thúc bằng một số lẻ dấu gạch chéo ngược: dấu gạch chéo ngược không đi cặp ở cuối sẽ escape ký tự dấu ngoặc kép đóng, khiến chuỗi không được kết thúc.
 
-Raw strings were designed to ease creating input for processors (chiefly regular
-expression engines) that want to do their own backslash escape processing. Such
-processors consider an unmatched trailing backslash to be an error anyway, so
-raw strings disallow that.  In return, they allow you to pass on the string
-quote character by escaping it with a backslash.  These rules work well when
-r-strings are used for their intended purpose.
+Chuỗi thô được thiết kế để giúp dễ dàng tạo đầu vào cho các bộ xử lý (chủ yếu là các regular expression engine) muốn tự xử lý việc escape dấu gạch chéo ngược. Các bộ xử lý như vậy vốn cũng xem dấu gạch chéo ngược đơn độc ở cuối là một lỗi, nên chuỗi thô không cho phép điều đó. Đổi lại, chúng cho phép bạn truyền nguyên ký tự dấu ngoặc kép của chuỗi bằng cách escape ký tự đó với một dấu gạch chéo ngược. Những quy tắc này hoạt động hiệu quả khi r-strings được sử dụng cho mục đích đã định.
 
-If you're trying to build Windows pathnames, note that all Windows system calls
-accept forward slashes too::
+Nếu bạn đang cố tạo pathname cho Windows, hãy lưu ý rằng mọi system call của Windows cũng chấp nhận dấu gạch chéo xuôi::
 
-   f = open("/mydir/file.txt")  # works fine!
+   f = open("/mydir/file.txt")  # hoạt động hoàn toàn tốt!
 
-If you're trying to build a pathname for a DOS command, try e.g. one of ::
+Nếu bạn đang cố tạo pathname cho một lệnh DOS, hãy thử một trong các cách sau::
 
    dir = r"\this\is\my\dos\dir" "\\"
    dir = r"\this\is\my\dos\dir\ "[:-1]
    dir = "\\this\\is\\my\\dos\\dir\\"
 
 
-Why doesn't Python have a "with" statement for attribute assignments?
----------------------------------------------------------------------
+Tại sao Python không có câu lệnh "with" để gán thuộc tính?
+----------------------------------------------------------
 
-Python has a :keyword:`with` statement that wraps the execution of a block, calling code
-on the entrance and exit from the block.  Some languages have a construct that
-looks like this::
+Python có câu lệnh :keyword:`with` bao bọc việc thực thi một khối lệnh, gọi mã khi bắt đầu và kết thúc khối lệnh. Một số ngôn ngữ có một cấu trúc trông như sau::
 
    with obj:
-       a = 1               # equivalent to obj.a = 1
+       a = 1               # tương đương với obj.a = 1
        total = total + 1   # obj.total = obj.total + 1
 
-In Python, such a construct would be ambiguous.
+Trong Python, một cấu trúc như vậy sẽ gây ra sự mơ hồ.
 
-Other languages, such as Object Pascal, Delphi, and C++, use static types, so
-it's possible to know, in an unambiguous way, what member is being assigned
-to. This is the main point of static typing -- the compiler *always* knows the
-scope of every variable at compile time.
+Các ngôn ngữ khác, chẳng hạn như Object Pascal, Delphi và C++, sử dụng kiểu tĩnh, vì vậy có thể xác định một cách rõ ràng thành viên nào đang được gán. Đây là điểm chính của việc định kiểu tĩnh -- trình biên dịch *always* biết phạm vi của mọi biến tại thời điểm biên dịch.
 
-Python uses dynamic types. It is impossible to know in advance which attribute
-will be referenced at runtime. Member attributes may be added or removed from
-objects on the fly. This makes it impossible to know, from a simple reading,
-what attribute is being referenced: a local one, a global one, or a member
-attribute?
+Python sử dụng kiểu động. Không thể biết trước thuộc tính nào sẽ được tham chiếu trong runtime. Các thuộc tính thành viên có thể được thêm vào hoặc xóa khỏi đối tượng ngay trong lúc chạy. Điều này khiến việc xác định thuộc tính nào đang được tham chiếu chỉ bằng cách đọc đơn giản trở nên bất khả thi: thuộc tính cục bộ, thuộc tính toàn cục hay thuộc tính thành viên?
 
-For instance, take the following incomplete snippet::
+Ví dụ, hãy xem đoạn mã chưa hoàn chỉnh sau đây::
 
    def foo(a):
        with a:
            print(x)
 
-The snippet assumes that ``a`` must have a member attribute called ``x``. However,
-there is nothing in Python that tells the interpreter this. What should happen
-if ``a`` is, let us say, an integer?  If there is a global variable named ``x``,
-will it be used inside the :keyword:`with` block?  As you see, the dynamic nature of Python
-makes such choices much harder.
+Đoạn mã giả định rằng ``a`` phải có một thuộc tính thành viên có tên là ``x``. Tuy nhiên, không có gì trong Python cho trình thông dịch biết điều này. Điều gì sẽ xảy ra nếu ``a``, chẳng hạn, là một số nguyên? Nếu có một biến toàn cục tên là ``x``, biến đó có được sử dụng bên trong khối :keyword:`with` không? Như bạn thấy, tính động của Python khiến những lựa chọn như vậy khó hơn nhiều.
 
-The primary benefit of :keyword:`with` and similar language features (reduction of code
-volume) can, however, easily be achieved in Python by assignment.  Instead of::
+Tuy nhiên, lợi ích chính của :keyword:`with` và các tính năng tương tự của ngôn ngữ (giảm lượng mã) có thể dễ dàng đạt được trong Python bằng phép gán. Thay vì::
 
    function(args).mydict[index][index].a = 21
    function(args).mydict[index][index].b = 42
    function(args).mydict[index][index].c = 63
 
-write this::
+viết như sau::
 
    ref = function(args).mydict[index][index]
    ref.a = 21
    ref.b = 42
    ref.c = 63
 
-This also has the side-effect of increasing execution speed because name
-bindings are resolved at run-time in Python, and the second version only needs
-to perform the resolution once.
+Điều này cũng có tác dụng phụ là tăng tốc độ thực thi, vì các liên kết tên được phân giải tại thời điểm chạy trong Python, còn phiên bản thứ hai chỉ cần thực hiện việc phân giải một lần.
 
-Similar proposals that would introduce syntax to further reduce code volume,
-such as using a 'leading dot', have been rejected in favour of explicitness (see
-https://mail.python.org/pipermail/python-ideas/2016-May/040070.html).
+Các đề xuất tương tự nhằm đưa vào cú pháp để tiếp tục giảm lượng mã, chẳng hạn như sử dụng 'leading dot', đã bị từ chối để ưu tiên tính rõ ràng (xem https://mail.python.org/pipermail/python-ideas/2016-May/040070.html).
 
 
-Why don't generators support the with statement?
-------------------------------------------------
+Tại sao generator không hỗ trợ câu lệnh with?
+---------------------------------------------
 
-For technical reasons, a generator used directly as a context manager
-would not work correctly.  When, as is most common, a generator is used as
-an iterator run to completion, no closing is needed.  When it is, wrap
-it as :func:`contextlib.closing(generator) <contextlib.closing>`
-in the :keyword:`with` statement.
+Vì lý do kỹ thuật, generator được sử dụng trực tiếp như một context manager sẽ không hoạt động chính xác. Trong trường hợp phổ biến nhất, khi generator được sử dụng như một iterator chạy đến khi hoàn tất thì không cần đóng nó. Khi cần đóng, hãy bọc nó dưới dạng :func:`contextlib.closing(generator) <contextlib.closing>` trong câu lệnh :keyword:`with`.
 
 
-Why are colons required for the if/while/def/class statements?
---------------------------------------------------------------
+Tại sao cần có dấu hai chấm cho các câu lệnh if/while/def/class?
+----------------------------------------------------------------
 
-The colon is required primarily to enhance readability (one of the results of
-the experimental ABC language).  Consider this::
+Dấu hai chấm chủ yếu được yêu cầu để tăng khả năng đọc (một trong những kết quả của ngôn ngữ ABC thử nghiệm). Hãy xem xét điều này::
 
    if a == b
        print(a)
 
-versus ::
+so với::
 
    if a == b:
        print(a)
 
-Notice how the second one is slightly easier to read.  Notice further how a
-colon sets off the example in this FAQ answer; it's a standard usage in English.
+Hãy chú ý rằng cách thứ hai dễ đọc hơn một chút. Hơn nữa, hãy chú ý cách dấu hai chấm tách riêng ví dụ trong câu trả lời FAQ này; đây là cách dùng tiêu chuẩn trong tiếng Anh.
 
-Another minor reason is that the colon makes it easier for editors with syntax
-highlighting; they can look for colons to decide when indentation needs to be
-increased instead of having to do a more elaborate parsing of the program text.
+Một lý do nhỏ khác là dấu hai chấm giúp các trình soạn thảo có syntax highlighting dễ xử lý hơn; chúng có thể tìm dấu hai chấm để quyết định khi nào cần tăng mức thụt lề, thay vì phải phân tích văn bản chương trình phức tạp hơn.
 
 
-Why does Python allow commas at the end of lists and tuples?
-------------------------------------------------------------
+Tại sao Python cho phép có dấu phẩy ở cuối các list và tuple?
+-------------------------------------------------------------
 
-Python lets you add a trailing comma at the end of lists, tuples, and
-dictionaries::
+Python cho phép bạn thêm dấu phẩy ở cuối danh sách, tuple và dictionary::
 
    [1, 2, 3,]
    ('a', 'b', 'c',)
    d = {
        "A": [1, 5],
-       "B": [6, 7],  # last trailing comma is optional but good style
+       "B": [6, 7],  # dấu phẩy ở cuối cùng là tùy chọn nhưng là phong cách tốt
    }
 
 
-There are several reasons to allow this.
+Có một số lý do để cho phép điều này.
 
-When you have a literal value for a list, tuple, or dictionary spread across
-multiple lines, it's easier to add more elements because you don't have to
-remember to add a comma to the previous line.  The lines can also be reordered
-without creating a syntax error.
+Khi một giá trị literal của danh sách, tuple hoặc dictionary được trải dài trên nhiều dòng, việc thêm phần tử sẽ dễ dàng hơn vì bạn không phải nhớ thêm dấu phẩy vào dòng trước đó. Các dòng cũng có thể được sắp xếp lại mà không gây ra lỗi cú pháp.
 
-Accidentally omitting the comma can lead to errors that are hard to diagnose.
-For example::
+Vô tình bỏ sót dấu phẩy có thể dẫn đến những lỗi khó chẩn đoán. Ví dụ:::
 
        x = [
          "fee",
@@ -789,7 +500,12 @@ For example::
          "fum"
        ]
 
-This list looks like it has four elements, but it actually contains three:
-"fee", "fiefoo" and "fum".  Always adding the comma avoids this source of error.
+Danh sách này trông như có bốn phần tử, nhưng thực tế chỉ chứa ba phần tử: "fee", "fiefoo" và "fum". Luôn thêm dấu phẩy sẽ tránh được nguồn gây lỗi này.
 
-Allowing the trailing comma may also make programmatic code generation easier.
+Việc cho phép dấu phẩy ở cuối cũng có thể giúp việc tạo mã bằng chương trình dễ dàng hơn.
+
+.. _`Stackless Python`: https://github.com/stackless-dev/stackless/wiki
+.. _`Cython`: https://cython.org/
+.. _`Nuitka`: https://nuitka.net/
+.. _`Jython`: https://www.jython.org
+.. _`PyPy`: https://pypy.org

@@ -1,80 +1,61 @@
 :tocdepth: 2
 
-=========================
-Library and Extension FAQ
-=========================
+===========================================
+Câu hỏi thường gặp về Thư viện và Extension
+===========================================
 
 .. only:: html
 
    .. contents::
 
-General Library Questions
+Câu hỏi chung về Thư viện
 =========================
 
-How do I find a module or application to perform task X?
---------------------------------------------------------
+Làm thế nào để tìm một module hoặc ứng dụng thực hiện tác vụ X?
+---------------------------------------------------------------
 
-Check :ref:`the Library Reference <library-index>` to see if there's a relevant
-standard library module.  (Eventually you'll learn what's in the standard
-library and will be able to skip this step.)
+Hãy xem :ref:`Tài liệu tham khảo về Thư viện <library-index>` để kiểm tra xem có module standard library phù hợp hay không. (Cuối cùng, bạn sẽ biết standard library có những gì và có thể bỏ qua bước này.)
 
-For third-party packages, search the `Python Package Index
-<https://pypi.org>`_ or try `Google <https://www.google.com>`_ or
-another web search engine.  Searching for "Python" plus a keyword or two for
-your topic of interest will usually find something helpful.
+Đối với các package của bên thứ ba, hãy tìm kiếm trên `Python Package Index <https://pypi.org>`_ hoặc thử `Google <https://www.google.com>`_ hay một công cụ tìm kiếm web khác. Tìm kiếm "Python" cùng với một hoặc hai từ khóa về chủ đề bạn quan tâm thường sẽ giúp bạn tìm được thông tin hữu ích.
 
 
-Where is the math.py (socket.py, regex.py, etc.) source file?
--------------------------------------------------------------
+Tệp mã nguồn math.py (socket.py, regex.py, v.v.) nằm ở đâu?
+-----------------------------------------------------------
 
-If you can't find a source file for a module it may be a built-in or
-dynamically loaded module implemented in C, C++ or other compiled language.
-In this case you may not have the source file or it may be something like
-:file:`mathmodule.c`, somewhere in a C source directory (not on the Python Path).
+Nếu không thể tìm thấy tệp mã nguồn của một module, có thể đó là module tích hợp sẵn hoặc module được tải động, được triển khai bằng C, C++ hoặc một ngôn ngữ biên dịch khác. Trong trường hợp này, bạn có thể không có tệp mã nguồn hoặc tệp đó có thể có dạng như
+:file:`mathmodule.c`, ở đâu đó trong một thư mục mã nguồn C (không nằm trên Python Path).
 
-There are (at least) three kinds of modules in Python:
+Có (ít nhất) ba loại module trong Python:
 
-1) modules written in Python (.py);
-2) modules written in C and dynamically loaded (.dll, .pyd, .so, .sl, etc);
-3) modules written in C and linked with the interpreter; to get a list of these,
-   type::
+1) module được viết bằng Python (.py);
+2) module được viết bằng C và được tải động (.dll, .pyd, .so, .sl, v.v.);
+3) module được viết bằng C và được liên kết với trình thông dịch; để lấy danh sách các module này, hãy nhập::
 
       import sys
       print(sys.builtin_module_names)
 
 
-How do I make a Python script executable on Unix?
--------------------------------------------------
+Làm thế nào để khiến một tập lệnh Python có thể thực thi trên Unix?
+-------------------------------------------------------------------
 
-You need to do two things: the script file's mode must be executable and the
-first line must begin with ``#!`` followed by the path of the Python
-interpreter.
+Bạn cần làm hai việc: chế độ của tệp tập lệnh phải cho phép thực thi và dòng đầu tiên phải bắt đầu bằng ``#!`` theo sau là đường dẫn đến trình thông dịch Python.
 
-The first is done by executing ``chmod +x scriptfile`` or perhaps ``chmod 755
-scriptfile``.
+Cách đầu tiên được thực hiện bằng cách chạy ``chmod +x scriptfile`` hoặc có thể là ``chmod 755 scriptfile``.
 
-The second can be done in a number of ways.  The most straightforward way is to
-write ::
+Cách thứ hai có thể được thực hiện theo nhiều cách. Cách đơn giản nhất là viết::
 
   #!/usr/local/bin/python
 
-as the very first line of your file, using the pathname for where the Python
-interpreter is installed on your platform.
+ở dòng đầu tiên của tệp, sử dụng pathname trỏ đến vị trí cài đặt Python interpreter trên nền tảng của bạn.
 
-If you would like the script to be independent of where the Python interpreter
-lives, you can use the :program:`env` program.  Almost all Unix variants support
-the following, assuming the Python interpreter is in a directory on the user's
+Nếu muốn script không phụ thuộc vào vị trí của Python interpreter, bạn có thể sử dụng chương trình :program:`env`. Hầu hết các biến thể Unix đều hỗ trợ cách sau, với điều kiện Python interpreter nằm trong một thư mục trên :program:`env` của người dùng
 :envvar:`PATH`::
 
   #!/usr/bin/env python
 
-*Don't* do this for CGI scripts.  The :envvar:`PATH` variable for CGI scripts is
-often very minimal, so you need to use the actual absolute pathname of the
-interpreter.
+*Đừng* làm vậy với các CGI script. Biến :envvar:`PATH` dành cho CGI script thường rất tối giản, vì vậy bạn cần sử dụng pathname tuyệt đối thực tế của interpreter.
 
-Occasionally, a user's environment is so full that the :program:`/usr/bin/env`
-program fails; or there's no env program at all.  In that case, you can try the
-following hack (due to Alex Rezinsky):
+Đôi khi, môi trường của người dùng quá đầy khiến chương trình :program:`/usr/bin/env` bị lỗi; hoặc hoàn toàn không có chương trình env. Trong trường hợp đó, bạn có thể thử thủ thuật sau (do Alex Rezinsky đề xuất):
 
 .. code-block:: sh
 
@@ -83,112 +64,81 @@ following hack (due to Alex Rezinsky):
    exec python $0 ${1+"$@"}
    """
 
-The minor disadvantage is that this defines the script's __doc__ string.
-However, you can fix that by adding ::
+Một nhược điểm nhỏ là cách này định nghĩa chuỗi __doc__ của script. Tuy nhiên, bạn có thể khắc phục bằng cách thêm::
 
    __doc__ = """...Whatever..."""
 
 
 
-Is there a curses/termcap package for Python?
----------------------------------------------
+Python có package curses/termcap không?
+---------------------------------------
 
 .. XXX curses *is* built by default, isn't it?
 
-For Unix variants: The standard Python source distribution comes with a curses
-module in the :source:`Modules` subdirectory, though it's not compiled by default.
-(Note that this is not available in the Windows distribution -- there is no
-curses module for Windows.)
+Đối với các biến thể Unix: Bản phân phối mã nguồn Python tiêu chuẩn đi kèm một module curses trong thư mục con :source:`Modules`, mặc dù module này không được biên dịch theo mặc định. (Lưu ý rằng module này không có trong bản phân phối Windows -- không có module curses cho Windows.)
 
-The :mod:`curses` module supports basic curses features as well as many additional
-functions from ncurses and SYSV curses such as colour, alternative character set
-support, pads, and mouse support. This means the module isn't compatible with
-operating systems that only have BSD curses, but there don't seem to be any
-currently maintained OSes that fall into this category.
+Module :mod:`curses` hỗ trợ các tính năng curses cơ bản cũng như nhiều hàm bổ sung từ ncurses và SYSV curses, chẳng hạn như màu sắc, hỗ trợ bộ ký tự thay thế, pads và hỗ trợ chuột. Điều này có nghĩa là module này không tương thích với các hệ điều hành chỉ có BSD curses, nhưng dường như hiện không có hệ điều hành nào còn được duy trì thuộc nhóm này.
 
 
-Is there an equivalent to C's onexit() in Python?
--------------------------------------------------
+Trong Python có thành phần tương đương với onexit() của C không?
+----------------------------------------------------------------
 
-The :mod:`atexit` module provides a register function that is similar to C's
+Module :mod:`atexit` cung cấp một hàm register tương tự như của C
 :c:func:`!onexit`.
 
 
-Why don't my signal handlers work?
-----------------------------------
+Tại sao các signal handler của tôi không hoạt động?
+---------------------------------------------------
 
-The most common problem is that the signal handler is declared with the wrong
-argument list.  It is called as ::
+Vấn đề thường gặp nhất là signal handler được khai báo với danh sách đối số không đúng. Nó được gọi như sau::
 
    handler(signum, frame)
 
-so it should be declared with two parameters::
+vì vậy nó phải được khai báo với hai tham số::
 
    def handler(signum, frame):
        ...
 
 
-Common tasks
-============
+Các tác vụ thường gặp
+=====================
 
-How do I test a Python program or component?
---------------------------------------------
+Làm thế nào để kiểm thử một chương trình hoặc thành phần Python?
+----------------------------------------------------------------
 
-Python comes with two testing frameworks.  The :mod:`doctest` module finds
-examples in the docstrings for a module and runs them, comparing the output with
-the expected output given in the docstring.
+Python đi kèm với hai framework kiểm thử. Mô-đun :mod:`doctest` tìm các ví dụ trong docstring của một mô-đun và chạy chúng, rồi so sánh đầu ra với đầu ra dự kiến được nêu trong docstring.
 
-The :mod:`unittest` module is a fancier testing framework modelled on Java and
-Smalltalk testing frameworks.
+Mô-đun :mod:`unittest` là một framework kiểm thử nâng cao hơn, được xây dựng theo mô hình của các framework kiểm thử Java và Smalltalk.
 
-To make testing easier, you should use good modular design in your program.
-Your program should have almost all functionality
-encapsulated in either functions or class methods -- and this sometimes has the
-surprising and delightful effect of making the program run faster (because local
-variable accesses are faster than global accesses).  Furthermore the program
-should avoid depending on mutating global variables, since this makes testing
-much more difficult to do.
+Để việc kiểm thử dễ dàng hơn, bạn nên sử dụng thiết kế module tốt trong chương trình của mình. Chương trình của bạn nên đóng gói gần như toàn bộ chức năng trong các hàm hoặc phương thức của lớp -- và điều này đôi khi còn mang lại hiệu quả bất ngờ và thú vị là làm chương trình chạy nhanh hơn (vì việc truy cập biến cục bộ nhanh hơn truy cập biến toàn cục). Ngoài ra, chương trình nên tránh phụ thuộc vào việc thay đổi các biến toàn cục, vì điều này khiến việc kiểm thử khó hơn nhiều.
 
-The "global main logic" of your program may be as simple as ::
+"logic chính toàn cục" của chương trình có thể đơn giản như sau::
 
    if __name__ == "__main__":
        main_logic()
 
-at the bottom of the main module of your program.
+ở cuối module chính của chương trình.
 
-Once your program is organized as a tractable collection of function and class
-behaviours, you should write test functions that exercise the behaviours.  A
-test suite that automates a sequence of tests can be associated with each module.
-This sounds like a lot of work, but since Python is so terse and flexible it's
-surprisingly easy.  You can make coding much more pleasant and fun by writing
-your test functions in parallel with the "production code", since this makes it
-easy to find bugs and even design flaws earlier.
+Khi chương trình của bạn được tổ chức thành một tập hợp có thể quản lý gồm các hành vi của hàm và lớp, bạn nên viết các hàm kiểm thử để thực thi những hành vi đó. Một test suite tự động hóa một chuỗi bài kiểm thử có thể được liên kết với từng module. Điều này nghe có vẻ tốn nhiều công sức, nhưng vì Python rất ngắn gọn và linh hoạt nên việc này dễ hơn đáng kể. Bạn có thể khiến việc lập trình trở nên thú vị và dễ chịu hơn nhiều bằng cách viết các hàm kiểm thử song song với "production code", vì điều này giúp bạn dễ dàng tìm ra lỗi và thậm chí cả những thiếu sót trong thiết kế sớm hơn.
 
-"Support modules" that are not intended to be the main module of a program may
-include a self-test of the module. ::
+Các "support module" không được dùng làm module chính của chương trình có thể bao gồm một bài tự kiểm thử cho module đó.::
 
    if __name__ == "__main__":
        self_test()
 
-Even programs that interact with complex external interfaces may be tested when
-the external interfaces are unavailable by using "fake" interfaces implemented
-in Python.
+Ngay cả những chương trình tương tác với các giao diện bên ngoài phức tạp cũng có thể được kiểm thử khi các giao diện bên ngoài không khả dụng, bằng cách sử dụng các giao diện "giả" được triển khai bằng Python.
 
 
-How do I create documentation from doc strings?
------------------------------------------------
+Làm cách nào để tạo tài liệu từ các chuỗi tài liệu?
+---------------------------------------------------
 
-The :mod:`pydoc` module can create HTML from the doc strings in your Python
-source code.  An alternative for creating API documentation purely from
-docstrings is `epydoc <https://epydoc.sourceforge.net/>`_.  `Sphinx
-<https://www.sphinx-doc.org>`_ can also include docstring content.
+Module :mod:`pydoc` có thể tạo HTML từ các chuỗi tài liệu trong mã nguồn Python của bạn. Một lựa chọn khác để tạo tài liệu API hoàn toàn từ các chuỗi tài liệu là `epydoc <https://epydoc.sourceforge.net/>`_. `Sphinx <https://www.sphinx-doc.org>`_ cũng có thể đưa nội dung chuỗi tài liệu vào.
 
 
-How do I get a single keypress at a time?
------------------------------------------
+Làm cách nào để nhận từng lần nhấn phím riêng lẻ?
+-------------------------------------------------
 
-For Unix variants there are several solutions.  It's straightforward to do this
-using curses, but curses is a fairly large module to learn.
+Đối với các biến thể Unix, có một số giải pháp. Thực hiện việc này bằng curses khá đơn giản, nhưng curses là một module tương đối lớn cần tìm hiểu.
 
 .. XXX this doesn't work out of the box, some IO expert needs to check why
 
@@ -233,22 +183,18 @@ using curses, but curses is a fairly large module to learn.
 Threads
 =======
 
-How do I program using threads?
--------------------------------
+Lập trình bằng threads như thế nào?
+-----------------------------------
 
-Be sure to use the :mod:`threading` module and not the :mod:`_thread` module.
-The :mod:`threading` module builds convenient abstractions on top of the
-low-level primitives provided by the :mod:`_thread` module.
+Hãy đảm bảo sử dụng module :mod:`threading` chứ không phải module :mod:`_thread`. Module :mod:`threading` xây dựng các abstraction thuận tiện dựa trên những primitive cấp thấp do module :mod:`_thread` cung cấp.
 
 
-None of my threads seem to run: why?
-------------------------------------
+Tại sao dường như không có thread nào của tôi chạy?
+---------------------------------------------------
 
-As soon as the main thread exits, all threads are killed.  Your main thread is
-running too quickly, giving the threads no time to do any work.
+Ngay khi main thread thoát, mọi thread đều bị dừng. Main thread của bạn đang chạy quá nhanh, không cho các thread có thời gian thực hiện bất kỳ công việc nào.
 
-A simple fix is to add a sleep to the end of the program that's long enough for
-all the threads to finish::
+Một cách khắc phục đơn giản là thêm một lệnh sleep vào cuối chương trình với thời lượng đủ dài để tất cả các thread hoàn tất::
 
    import threading, time
 
@@ -262,11 +208,9 @@ all the threads to finish::
 
    time.sleep(10)  # <---------------------------!
 
-But now (on many platforms) the threads don't run in parallel, but appear to run
-sequentially, one at a time!  The reason is that the OS thread scheduler doesn't
-start a new thread until the previous thread is blocked.
+Nhưng hiện nay (trên nhiều nền tảng), các thread không chạy song song mà dường như chạy tuần tự, từng thread một! Lý do là bộ lập lịch thread của OS không khởi động thread mới cho đến khi thread trước đó bị chặn.
 
-A simple fix is to add a tiny sleep to the start of the run function::
+Một cách khắc phục đơn giản là thêm một khoảng sleep rất ngắn vào đầu hàm run::
 
    def thread_task(name, n):
        time.sleep(0.001)  # <--------------------!
@@ -279,33 +223,24 @@ A simple fix is to add a tiny sleep to the start of the run function::
 
    time.sleep(10)
 
-Instead of trying to guess a good delay value for :func:`time.sleep`,
-it's better to use some kind of semaphore mechanism.  One idea is to use the
-:mod:`queue` module to create a queue object, let each thread append a token to
-the queue when it finishes, and let the main thread read as many tokens from the
-queue as there are threads.
+Thay vì cố đoán một giá trị delay phù hợp cho :func:`time.sleep`, tốt hơn là sử dụng một dạng cơ chế semaphore. Một ý tưởng là sử dụng
+module :mod:`queue` để tạo một đối tượng queue, cho mỗi thread thêm một token vào queue khi hoàn tất, rồi để main thread đọc số token từ queue tương ứng với số thread.
 
 
-How do I parcel out work among a bunch of worker threads?
----------------------------------------------------------
+Làm thế nào để phân chia công việc cho một nhóm worker thread?
+--------------------------------------------------------------
 
-The easiest way is to use the :mod:`concurrent.futures` module,
-especially the :mod:`~concurrent.futures.ThreadPoolExecutor` class.
+Cách dễ nhất là sử dụng module :mod:`concurrent.futures`, đặc biệt là class :mod:`~concurrent.futures.ThreadPoolExecutor`.
 
-Or, if you want fine control over the dispatching algorithm, you can write
-your own logic manually.  Use the :mod:`queue` module to create a queue
-containing a list of jobs.  The :class:`~queue.Queue` class maintains a
-list of objects and has a ``.put(obj)`` method that adds items to the queue and
-a ``.get()`` method to return them.  The class will take care of the locking
-necessary to ensure that each job is handed out exactly once.
+Hoặc nếu muốn kiểm soát chi tiết thuật toán dispatch, bạn có thể tự viết logic theo cách thủ công. Sử dụng module :mod:`queue` để tạo một queue chứa danh sách job. Class :class:`~queue.Queue` duy trì một danh sách các object và có method ``.put(obj)`` để thêm các item vào queue, cùng method ``.get()`` để lấy chúng ra. Class này sẽ xử lý việc locking cần thiết để bảo đảm mỗi job được phân phối chính xác một lần.
 
-Here's a trivial example::
+Đây là một ví dụ đơn giản::
 
    import threading, queue, time
 
-   # The worker thread gets jobs off the queue.  When the queue is empty, it
-   # assumes there will be no more work and exits.
-   # (Realistically workers will run until terminated.)
+   # Luồng worker lấy các công việc từ hàng đợi. Khi hàng đợi trống, nó
+   # giả định rằng sẽ không còn công việc nào nữa và thoát.
+   # (Trên thực tế, các worker sẽ chạy cho đến khi bị kết thúc.)
    def worker():
        print('Running worker')
        time.sleep(0.1)
@@ -321,23 +256,23 @@ Here's a trivial example::
                print('running with argument', arg)
                time.sleep(0.5)
 
-   # Create queue
+   # Tạo hàng đợi
    q = queue.Queue()
 
-   # Start a pool of 5 workers
+   # Khởi động một pool gồm 5 worker
    for i in range(5):
        t = threading.Thread(target=worker, name='worker %i' % (i+1))
        t.start()
 
-   # Begin adding work to the queue
+   # Bắt đầu thêm công việc vào hàng đợi
    for i in range(50):
        q.put(i)
 
-   # Give threads time to run
+   # Cho các thread thời gian để chạy
    print('Main thread sleeping')
    time.sleep(5)
 
-When run, this will produce the following output:
+Khi chạy, đoạn mã này sẽ tạo ra đầu ra sau:
 
 .. code-block:: none
 
@@ -355,27 +290,17 @@ When run, this will produce the following output:
    Worker <Thread(worker 1, started 130283832797456)> running with argument 5
    ...
 
-Consult the module's documentation for more details; the :class:`~queue.Queue`
-class provides a featureful interface.
+Tham khảo tài liệu của module để biết thêm chi tiết; lớp :class:`~queue.Queue` cung cấp một giao diện đầy đủ tính năng.
 
 
-What kinds of global value mutation are thread-safe?
-----------------------------------------------------
+Những kiểu thay đổi giá trị toàn cục nào là an toàn cho thread?
+---------------------------------------------------------------
 
-A :term:`global interpreter lock` (GIL) is used internally to ensure that only one
-thread runs in the Python VM at a time.  In general, Python offers to switch
-among threads only between bytecode instructions; how frequently it switches can
-be set via :func:`sys.setswitchinterval`.  Each bytecode instruction and
-therefore all the C implementation code reached from each instruction is
-therefore atomic from the point of view of a Python program.
+Một :term:`global interpreter lock` (GIL) được sử dụng nội bộ để đảm bảo rằng tại một thời điểm chỉ có một thread chạy trong Python VM. Nhìn chung, Python chỉ chuyển đổi giữa các thread giữa các lệnh bytecode; tần suất chuyển đổi có thể được thiết lập thông qua :func:`sys.setswitchinterval`. Do đó, mỗi lệnh bytecode và toàn bộ mã triển khai C được gọi từ mỗi lệnh đều mang tính nguyên tử dưới góc nhìn của một chương trình Python.
 
-In theory, this means an exact accounting requires an exact understanding of the
-PVM bytecode implementation.  In practice, it means that operations on shared
-variables of built-in data types (ints, lists, dicts, etc) that "look atomic"
-really are.
+Về lý thuyết, điều này có nghĩa là muốn tính toán chính xác thì cần hiểu chính xác cách triển khai bytecode của PVM. Trên thực tế, điều này có nghĩa là các thao tác trên những biến dùng chung thuộc các kiểu dữ liệu tích hợp sẵn (int, list, dict, v.v.) mà "trông có vẻ nguyên tử" thực sự là nguyên tử.
 
-For example, the following operations are all atomic (L, L1, L2 are lists, D,
-D1, D2 are dicts, x, y are objects, i, j are ints)::
+Ví dụ, tất cả các thao tác sau đều mang tính nguyên tử (L, L1, L2 là các list, D, D1, D2 là các dict, x, y là các object, i, j là các int)::
 
    L.append(x)
    L1.extend(L2)
@@ -389,125 +314,67 @@ D1, D2 are dicts, x, y are objects, i, j are ints)::
    D1.update(D2)
    D.keys()
 
-These aren't::
+Những thao tác này không phải::
 
    i = i+1
    L.append(L[-1])
    L[i] = L[j]
    D[x] = D[x] + 1
 
-Operations that replace other objects may invoke those other objects'
-:meth:`~object.__del__` method when their reference count reaches zero, and that can
-affect things.  This is especially true for the mass updates to dictionaries and
-lists.  When in doubt, use a mutex!
+Các thao tác thay thế những đối tượng khác có thể gọi phương thức
+:meth:`~object.__del__` của các đối tượng đó khi số lượng tham chiếu của chúng giảm xuống 0, và điều đó có thể ảnh hưởng đến mọi thứ. Điều này đặc biệt đúng với các thao tác cập nhật hàng loạt đối với dictionary và list. Khi không chắc chắn, hãy dùng mutex!
 
 
-Can't we get rid of the Global Interpreter Lock?
-------------------------------------------------
+Có thể loại bỏ Global Interpreter Lock không?
+---------------------------------------------
 
-The :term:`global interpreter lock` (GIL) is often seen as a hindrance to Python's
-deployment on high-end multiprocessor server machines, because a multi-threaded
-Python program effectively only uses one CPU, due to the insistence that
-(almost) all Python code can only run while the GIL is held.
+:term:`global interpreter lock` (GIL) thường được xem là một trở ngại đối với việc triển khai Python trên các máy chủ đa bộ xử lý cao cấp, vì một chương trình Python đa luồng thực tế chỉ sử dụng một CPU, do yêu cầu gần như toàn bộ mã Python chỉ có thể chạy khi đang giữ GIL.
 
-With the approval of :pep:`703` work is now underway to remove the GIL from the
-CPython implementation of Python.  Initially it will be implemented as an
-optional compiler flag when building the interpreter, and so separate
-builds will be available with and without the GIL.  Long-term, the hope is
-to settle on a single build, once the performance implications of removing the
-GIL are fully understood.  Python 3.13 is likely to be the first release
-containing this work, although it may not be completely functional in this
-release.
+Sau khi :pep:`703` được phê duyệt, công việc loại bỏ GIL khỏi quá trình triển khai CPython của Python hiện đang được tiến hành. Ban đầu, tính năng này sẽ được triển khai dưới dạng một cờ compiler tùy chọn khi xây dựng interpreter, vì vậy sẽ có các bản build riêng có và không có GIL. Về lâu dài, hy vọng là sẽ thống nhất thành một bản build duy nhất, sau khi hiểu đầy đủ những ảnh hưởng về hiệu năng của việc loại bỏ GIL. Python 3.13 có khả năng là bản phát hành đầu tiên chứa công việc này, mặc dù trong bản phát hành đó tính năng này có thể chưa hoạt động hoàn chỉnh.
 
-The current work to remove the GIL is based on a
-`fork of Python 3.9 with the GIL removed <https://github.com/colesbury/nogil>`_
-by Sam Gross.
-Prior to that,
-in the days of Python 1.5, Greg Stein actually implemented a comprehensive
-patch set (the "free threading" patches) that removed the GIL and replaced it
-with fine-grained locking.  Adam Olsen did a similar experiment
-in his `python-safethread <https://code.google.com/archive/p/python-safethread>`_
-project.  Unfortunately, both of these earlier experiments exhibited a sharp
-drop in single-thread
-performance (at least 30% slower), due to the amount of fine-grained locking
-necessary to compensate for the removal of the GIL.  The Python 3.9 fork
-is the first attempt at removing the GIL with an acceptable performance
-impact.
+Công việc hiện tại nhằm loại bỏ GIL dựa trên một `fork của Python 3.9 đã loại bỏ GIL <https://github.com/colesbury/nogil>`_ do Sam Gross thực hiện. Trước đó, vào thời Python 1.5, Greg Stein thực sự đã triển khai một bộ bản vá toàn diện (các bản vá "free threading") loại bỏ GIL và thay thế nó bằng cơ chế khóa chi tiết. Adam Olsen cũng thực hiện một thử nghiệm tương tự trong dự án `python-safethread <https://code.google.com/archive/p/python-safethread>`_ của mình. Đáng tiếc là cả hai thử nghiệm trước đó đều cho thấy hiệu năng đơn luồng giảm mạnh (chậm hơn ít nhất 30%), do cần quá nhiều cơ chế khóa chi tiết để bù đắp cho việc loại bỏ GIL. Fork Python 3.9 là nỗ lực đầu tiên nhằm loại bỏ GIL với mức ảnh hưởng đến hiệu năng có thể chấp nhận được.
 
-The presence of the GIL in current Python releases
-doesn't mean that you can't make good use of Python on multi-CPU machines!
-You just have to be creative with dividing the work up between multiple
-*processes* rather than multiple *threads*.  The
-:class:`~concurrent.futures.ProcessPoolExecutor` class in the new
-:mod:`concurrent.futures` module provides an easy way of doing so; the
-:mod:`multiprocessing` module provides a lower-level API in case you want
-more control over dispatching of tasks.
+Việc GIL tồn tại trong các bản phát hành Python hiện tại không có nghĩa là bạn không thể tận dụng tốt Python trên các máy có nhiều CPU! Bạn chỉ cần sáng tạo trong việc chia công việc giữa nhiều *tiến trình* thay vì nhiều *luồng*.  The
+:class:`~concurrent.futures.ProcessPoolExecutor` class trong phiên bản mới
+:mod:`concurrent.futures` module cung cấp một cách dễ dàng để thực hiện việc này; còn
+:mod:`multiprocessing` module cung cấp API cấp thấp hơn trong trường hợp bạn muốn kiểm soát nhiều hơn việc phân phối tác vụ.
 
-Judicious use of C extensions will also help; if you use a C extension to
-perform a time-consuming task, the extension can release the GIL while the
-thread of execution is in the C code and allow other threads to get some work
-done.  Some standard library modules such as :mod:`zlib` and :mod:`hashlib`
-already do this.
+Việc sử dụng hợp lý các phần mở rộng C cũng sẽ hữu ích; nếu bạn dùng một phần mở rộng C để thực hiện một tác vụ tốn nhiều thời gian, phần mở rộng đó có thể giải phóng GIL trong khi luồng thực thi đang chạy mã C, cho phép các luồng khác thực hiện một phần công việc. Một số module trong standard library như :mod:`zlib` và :mod:`hashlib` đã làm như vậy.
 
-An alternative approach to reducing the impact of the GIL is
-to make the GIL a per-interpreter-state lock rather than truly global.
-This was :ref:`first implemented in Python 3.12 <whatsnew312-pep684>` and is
-available in the C API. A Python interface to it is expected in Python 3.13.
-The main limitation to it at the moment is likely to be 3rd party extension
-modules, since these must be written with multiple interpreters in mind in
-order to be usable, so many older extension modules will not be usable.
+Một cách tiếp cận khác để giảm ảnh hưởng của GIL là biến GIL thành một khóa theo trạng thái interpreter thay vì thực sự mang tính toàn cục. Điều này :ref:`được triển khai lần đầu trong Python 3.12 <whatsnew312-pep684>` và có sẵn trong C API. Dự kiến sẽ có giao diện Python cho tính năng này trong Python 3.13. Hạn chế chính của tính năng này ở thời điểm hiện tại có thể là các module phần mở rộng của bên thứ ba, vì chúng phải được viết có tính đến nhiều interpreter thì mới có thể sử dụng được; do đó, nhiều module phần mở rộng cũ sẽ không thể sử dụng.
 
 
-Input and Output
-================
+Đầu vào và Đầu ra
+=================
 
-How do I delete a file? (And other file questions...)
------------------------------------------------------
+Làm thế nào để xóa một tệp? (Và các câu hỏi khác về tệp...)
+-----------------------------------------------------------
 
-Use ``os.remove(filename)`` or ``os.unlink(filename)``; for documentation, see
-the :mod:`os` module.  The two functions are identical; :func:`~os.unlink` is simply
-the name of the Unix system call for this function.
+Sử dụng ``os.remove(filename)`` hoặc ``os.unlink(filename)``; để xem tài liệu, hãy tham khảo module :mod:`os`. Hai hàm này giống hệt nhau; :func:`~os.unlink` đơn giản là tên của lệnh gọi hệ thống Unix cho hàm này.
 
-To remove a directory, use :func:`os.rmdir`; use :func:`os.mkdir` to create one.
-``os.makedirs(path)`` will create any intermediate directories in ``path`` that
-don't exist. ``os.removedirs(path)`` will remove intermediate directories as
-long as they're empty; if you want to delete an entire directory tree and its
-contents, use :func:`shutil.rmtree`.
+Để xóa một thư mục, hãy sử dụng :func:`os.rmdir`; sử dụng :func:`os.mkdir` để tạo thư mục. ``os.makedirs(path)`` sẽ tạo mọi thư mục trung gian trong ``path`` chưa tồn tại. ``os.removedirs(path)`` sẽ xóa các thư mục trung gian miễn là chúng rỗng; nếu bạn muốn xóa toàn bộ cây thư mục cùng nội dung của nó, hãy sử dụng :func:`shutil.rmtree`.
 
-To rename a file, use ``os.rename(old_path, new_path)``.
+Để đổi tên một tệp, hãy sử dụng ``os.rename(old_path, new_path)``.
 
-To truncate a file, open it using ``f = open(filename, "rb+")``, and use
-``f.truncate(offset)``; offset defaults to the current seek position.  There's
-also ``os.ftruncate(fd, offset)`` for files opened with :func:`os.open`, where
-*fd* is the file descriptor (a small integer).
+Để cắt ngắn một tệp, hãy mở tệp bằng ``f = open(filename, "rb+")`` và sử dụng ``f.truncate(offset)``; offset mặc định là vị trí seek hiện tại. Ngoài ra còn có ``os.ftruncate(fd, offset)`` dành cho các tệp được mở bằng :func:`os.open`, trong đó *fd* là file descriptor (một số nguyên nhỏ).
 
-The :mod:`shutil` module also contains a number of functions to work on files
-including :func:`~shutil.copyfile`, :func:`~shutil.copytree`, and
+Module :mod:`shutil` cũng chứa một số hàm để thao tác với tệp, bao gồm :func:`~shutil.copyfile`, :func:`~shutil.copytree`, và
 :func:`~shutil.rmtree`.
 
 
-How do I copy a file?
----------------------
+Làm thế nào để sao chép một tệp?
+--------------------------------
 
-The :mod:`shutil` module contains a :func:`~shutil.copyfile` function.
-Note that on Windows NTFS volumes, it does not copy
-`alternate data streams
-<https://en.wikipedia.org/wiki/NTFS#Alternate_data_stream_(ADS)>`_
-nor `resource forks <https://en.wikipedia.org/wiki/Resource_fork>`__
-on macOS HFS+ volumes, though both are now rarely used.
-It also doesn't copy file permissions and metadata, though using
-:func:`shutil.copy2` instead will preserve most (though not all) of it.
+Mô-đun :mod:`shutil` chứa một hàm :func:`~shutil.copyfile`. Lưu ý rằng trên các volume NTFS của Windows, hàm này không sao chép `alternate data streams <https://en.wikipedia.org/wiki/NTFS#Alternate_data_stream_(ADS)>`_ và cũng không sao chép `resource forks <https://en.wikipedia.org/wiki/Resource_fork>`__ trên các volume HFS+ của macOS, mặc dù hiện nay cả hai đều hiếm khi được sử dụng. Hàm này cũng không sao chép quyền truy cập và siêu dữ liệu của tệp, mặc dù việc sử dụng
+:func:`shutil.copy2` thay vào đó sẽ bảo toàn phần lớn (dù không phải tất cả) các thuộc tính này.
 
 
-How do I read (or write) binary data?
--------------------------------------
+Làm thế nào để đọc (hoặc ghi) dữ liệu nhị phân?
+-----------------------------------------------
 
-To read or write complex binary data formats, it's best to use the :mod:`struct`
-module.  It allows you to take a string containing binary data (usually numbers)
-and convert it to Python objects; and vice versa.
+Để đọc hoặc ghi các định dạng dữ liệu nhị phân phức tạp, tốt nhất nên sử dụng mô-đun :mod:`struct`. Mô-đun này cho phép bạn nhận một chuỗi chứa dữ liệu nhị phân (thường là các số) và chuyển đổi chuỗi đó thành các đối tượng Python, cũng như thực hiện chuyển đổi ngược lại.
 
-For example, the following code reads two 2-byte integers and one 4-byte integer
-in big-endian format from a file::
+Ví dụ, đoạn mã sau đọc hai số nguyên 2 byte và một số nguyên 4 byte từ một tệp ở định dạng big-endian::
 
    import struct
 
@@ -515,104 +382,79 @@ in big-endian format from a file::
        s = f.read(8)
        x, y, z = struct.unpack(">hhl", s)
 
-The '>' in the format string forces big-endian data; the letter 'h' reads one
-"short integer" (2 bytes), and 'l' reads one "long integer" (4 bytes) from the
-string.
+Ký tự '>' trong chuỗi định dạng buộc dữ liệu sử dụng thứ tự big-endian; chữ 'h' đọc một "short integer" (2 byte), còn 'l' đọc một "long integer" (4 byte) từ chuỗi.
 
-For data that is more regular (e.g. a homogeneous list of ints or floats),
-you can also use the :mod:`array` module.
+Đối với dữ liệu có cấu trúc đều đặn hơn (ví dụ: một danh sách đồng nhất các số nguyên hoặc số thực), bạn cũng có thể sử dụng mô-đun :mod:`array`.
 
 .. note::
 
-   To read and write binary data, it is mandatory to open the file in
-   binary mode (here, passing ``"rb"`` to :func:`open`).  If you use
-   ``"r"`` instead (the default), the file will be open in text mode
-   and ``f.read()`` will return :class:`str` objects rather than
-   :class:`bytes` objects.
+   Để đọc và ghi dữ liệu nhị phân, bắt buộc phải mở tệp ở chế độ nhị phân (ở đây là truyền ``"rb"`` cho :func:`open`). Nếu thay vào đó bạn sử dụng ``"r"`` (mặc định), tệp sẽ được mở ở chế độ văn bản và ``f.read()`` sẽ trả về các đối tượng :class:`str` thay vì
+   các đối tượng :class:`bytes`.
 
 
-I can't seem to use os.read() on a pipe created with os.popen(); why?
----------------------------------------------------------------------
+Tại sao tôi không thể sử dụng os.read() trên một pipe được tạo bằng os.popen()?
+-------------------------------------------------------------------------------
 
-:func:`os.read` is a low-level function which takes a file descriptor, a small
-integer representing the opened file.  :func:`os.popen` creates a high-level
-file object, the same type returned by the built-in :func:`open` function.
-Thus, to read *n* bytes from a pipe *p* created with :func:`os.popen`, you need to
-use ``p.read(n)``.
+:func:`os.read` là một hàm cấp thấp nhận một file descriptor, tức một số nguyên nhỏ đại diện cho tệp đã mở. :func:`os.popen` tạo một đối tượng tệp cấp cao, cùng kiểu với đối tượng được trả về bởi hàm tích hợp sẵn :func:`open`. Vì vậy, để đọc *n* byte từ pipe *p* được tạo bằng :func:`os.popen`, bạn cần sử dụng ``p.read(n)``.
 
 
-How do I access the serial (RS232) port?
-----------------------------------------
+Làm thế nào để truy cập cổng nối tiếp (RS232)?
+----------------------------------------------
 
-For Win32, OSX, Linux, BSD, Jython, IronPython:
+Đối với Win32, OSX, Linux, BSD, Jython, IronPython:
 
    :pypi:`pyserial`
 
-For Unix, see a Usenet post by Mitch Chapman:
+Đối với Unix, hãy xem bài đăng Usenet của Mitch Chapman:
 
    https://groups.google.com/groups?selm=34A04430.CF9@ohioee.com
 
 
-Why doesn't closing sys.stdout (stdin, stderr) really close it?
----------------------------------------------------------------
+Tại sao việc đóng sys.stdout (stdin, stderr) lại không thực sự đóng nó?
+-----------------------------------------------------------------------
 
-Python :term:`file objects <file object>` are a high-level layer of
-abstraction on low-level C file descriptors.
+Các :term:`đối tượng file <file object>` của Python là một lớp trừu tượng cấp cao trên các file descriptor C cấp thấp.
 
-For most file objects you create in Python via the built-in :func:`open`
-function, ``f.close()`` marks the Python file object as being closed from
-Python's point of view, and also arranges to close the underlying C file
-descriptor.  This also happens automatically in ``f``'s destructor, when
-``f`` becomes garbage.
+Đối với hầu hết các đối tượng file bạn tạo trong Python thông qua hàm dựng sẵn :func:`open`, ``f.close()`` đánh dấu đối tượng file Python là đã đóng theo quan điểm của Python, đồng thời sắp xếp để đóng file descriptor C bên dưới. Điều này cũng tự động xảy ra trong destructor của ``f``, khi ``f`` trở thành rác.
 
-But stdin, stdout and stderr are treated specially by Python, because of the
-special status also given to them by C.  Running ``sys.stdout.close()`` marks
-the Python-level file object as being closed, but does *not* close the
-associated C file descriptor.
+Nhưng stdin, stdout và stderr được Python xử lý đặc biệt, vì C cũng dành cho chúng một trạng thái đặc biệt. Việc chạy ``sys.stdout.close()`` đánh dấu đối tượng file ở cấp Python là đã đóng, nhưng *không* đóng file descriptor C liên kết.
 
-To close the underlying C file descriptor for one of these three, you should
-first be sure that's what you really want to do (e.g., you may confuse
-extension modules trying to do I/O).  If it is, use :func:`os.close`::
+Để đóng file descriptor C bên dưới của một trong ba đối tượng này, trước tiên bạn nên chắc chắn rằng đó thực sự là điều mình muốn làm (ví dụ: bạn có thể gây nhầm lẫn cho các extension module đang cố gắng thực hiện I/O). Nếu đúng là vậy, hãy sử dụng :func:`os.close`::
 
    os.close(stdin.fileno())
    os.close(stdout.fileno())
    os.close(stderr.fileno())
 
-Or you can use the numeric constants 0, 1 and 2, respectively.
+Hoặc bạn có thể sử dụng các hằng số số 0, 1 và 2, lần lượt tương ứng.
 
 
-Network/Internet Programming
-============================
+Lập trình mạng/Internet
+=======================
 
-What WWW tools are there for Python?
-------------------------------------
+Có những công cụ WWW nào dành cho Python?
+-----------------------------------------
 
-See the chapters titled :ref:`internet` and :ref:`netdata` in the Library
-Reference Manual.  Python has many modules that will help you build server-side
-and client-side web systems.
+Xem các chương có tiêu đề :ref:`internet` và :ref:`netdata` trong Sổ tay Tham khảo Thư viện. Python có nhiều mô-đun giúp bạn xây dựng các hệ thống web phía máy chủ và phía máy khách.
 
 .. XXX check if wiki page is still up to date
 
-A summary of available frameworks is maintained by Paul Boddie at
-https://wiki.python.org/moin/WebProgramming\ .
+Paul Boddie duy trì bản tóm tắt các framework hiện có tại https://wiki.python.org/moin/WebProgramming\ .
 
 
-What module should I use to help with generating HTML?
-------------------------------------------------------
+Tôi nên sử dụng mô-đun nào để hỗ trợ việc tạo HTML?
+---------------------------------------------------
 
 .. XXX add modern template languages
 
-You can find a collection of useful links on the `Web Programming wiki page
-<https://wiki.python.org/moin/WebProgramming>`_.
+Bạn có thể tìm thấy một tập hợp các liên kết hữu ích trên `trang wiki Lập trình Web <https://wiki.python.org/moin/WebProgramming>`_.
 
 
-How do I send mail from a Python script?
-----------------------------------------
+Làm thế nào để gửi thư từ một tập lệnh Python?
+----------------------------------------------
 
-Use the standard library module :mod:`smtplib`.
+Hãy sử dụng mô-đun thư viện chuẩn :mod:`smtplib`.
 
-Here's a very simple interactive mail sender that uses it.  This method will
-work on any host that supports an SMTP listener. ::
+Đây là một trình gửi thư tương tác rất đơn giản sử dụng nó. Phương thức này sẽ hoạt động trên mọi máy chủ hỗ trợ trình lắng nghe SMTP.::
 
    import sys, smtplib
 
@@ -626,23 +468,20 @@ work on any host that supports an SMTP listener. ::
            break
        msg += line
 
-   # The actual mail send
+   # Gửi thư thực tế
    server = smtplib.SMTP('localhost')
    server.sendmail(fromaddr, toaddrs, msg)
    server.quit()
 
-A Unix-only alternative uses sendmail.  The location of the sendmail program
-varies between systems; sometimes it is ``/usr/lib/sendmail``, sometimes
-``/usr/sbin/sendmail``.  The sendmail manual page will help you out.  Here's
-some sample code::
+Một lựa chọn thay thế chỉ dành cho Unix là sử dụng sendmail. Vị trí của chương trình sendmail thay đổi tùy hệ thống; đôi khi là ``/usr/lib/sendmail``, đôi khi là ``/usr/sbin/sendmail``. Trang hướng dẫn sử dụng sendmail sẽ giúp bạn. Dưới đây là một đoạn mã mẫu::
 
    import os
 
-   SENDMAIL = "/usr/sbin/sendmail"  # sendmail location
+   SENDMAIL = "/usr/sbin/sendmail"  # vị trí sendmail
    p = os.popen("%s -t -i" % SENDMAIL, "w")
    p.write("To: receiver@example.com\n")
    p.write("Subject: test\n")
-   p.write("\n")  # blank line separating headers from body
+   p.write("\n")  # dòng trống phân tách phần header khỏi phần nội dung
    p.write("Some text\n")
    p.write("some more text\n")
    sts = p.close()
@@ -650,86 +489,73 @@ some sample code::
        print("Sendmail exit status", sts)
 
 
-How do I avoid blocking in the connect() method of a socket?
-------------------------------------------------------------
+Làm thế nào để tránh bị chặn trong phương thức connect() của socket?
+--------------------------------------------------------------------
 
-The :mod:`select` module is commonly used to help with asynchronous I/O on
-sockets.
+Mô-đun :mod:`select` thường được dùng để hỗ trợ I/O bất đồng bộ trên các socket.
 
-To prevent the TCP connect from blocking, you can set the socket to non-blocking
-mode.  Then when you do the :meth:`~socket.socket.connect`,
-you will either connect immediately
-(unlikely) or get an exception that contains the error number as ``.errno``.
-``errno.EINPROGRESS`` indicates that the connection is in progress, but hasn't
-finished yet.  Different OSes will return different values, so you're going to
-have to check what's returned on your system.
+Để tránh việc kết nối TCP bị blocking, bạn có thể đặt socket ở chế độ non-blocking. Sau đó, khi thực hiện :meth:`~socket.socket.connect`, bạn sẽ либо kết nối ngay lập tức (không có khả năng cao) hoặc nhận được một exception chứa số lỗi dưới dạng ``.errno``. ``errno.EINPROGRESS`` cho biết kết nối đang được tiến hành nhưng chưa hoàn tất. Các hệ điều hành khác nhau sẽ trả về các giá trị khác nhau, vì vậy bạn sẽ phải kiểm tra giá trị được trả về trên hệ thống của mình.
 
-You can use the :meth:`~socket.socket.connect_ex` method
-to avoid creating an exception.
-It will just return the errno value.
-To poll, you can call :meth:`~socket.socket.connect_ex` again later
--- ``0`` or ``errno.EISCONN`` indicate that you're connected -- or you can pass this
-socket to :meth:`select.select` to check if it's writable.
+Bạn có thể sử dụng phương thức :meth:`~socket.socket.connect_ex` để tránh tạo exception. Phương thức này chỉ trả về giá trị errno. Để polling, bạn có thể gọi lại :meth:`~socket.socket.connect_ex` sau đó -- ``0`` hoặc ``errno.EISCONN`` cho biết bạn đã kết nối -- hoặc truyền socket này cho :meth:`select.select` để kiểm tra xem nó có thể ghi hay không.
 
 .. note::
-   The :mod:`asyncio` module provides a general purpose single-threaded and
-   concurrent asynchronous library, which can be used for writing non-blocking
-   network code.
-   The third-party `Twisted <https://twisted.org/>`_ library is
-   a popular and feature-rich alternative.
+   Module :mod:`asyncio` cung cấp một thư viện asynchronous tổng quát, đơn luồng và concurrent, có thể được dùng để viết mã mạng non-blocking. Thư viện bên thứ ba `Twisted <https://twisted.org/>`_ là một lựa chọn thay thế phổ biến và giàu tính năng.
 
 
-Databases
-=========
+Cơ sở dữ liệu
+=============
 
-Are there any interfaces to database packages in Python?
---------------------------------------------------------
+Có interface nào cho các package cơ sở dữ liệu trong Python không?
+------------------------------------------------------------------
 
-Yes.
+Có.
 
-Interfaces to disk-based hashes such as :mod:`DBM <dbm.ndbm>` and :mod:`GDBM
-<dbm.gnu>` are also included with standard Python.  There is also the
-:mod:`sqlite3` module, which provides a lightweight disk-based relational
-database.
+Các interface cho những hash dựa trên đĩa như :mod:`DBM <dbm.ndbm>` và :mod:`GDBM <dbm.gnu>` cũng được tích hợp trong Python tiêu chuẩn. Ngoài ra còn có
+mô-đun :mod:`sqlite3`, cung cấp một cơ sở dữ liệu quan hệ nhẹ dựa trên đĩa.
 
-Support for most relational databases is available.  See the
-`DatabaseProgramming wiki page
-<https://wiki.python.org/moin/DatabaseProgramming>`_ for details.
+Có hỗ trợ cho hầu hết các cơ sở dữ liệu quan hệ. Xem trang wiki `DatabaseProgramming <https://wiki.python.org/moin/DatabaseProgramming>`_ để biết chi tiết.
 
 
-How do you implement persistent objects in Python?
---------------------------------------------------
+Làm thế nào để triển khai các đối tượng persistent trong Python?
+----------------------------------------------------------------
 
-The :mod:`pickle` library module solves this in a very general way (though you
-still can't store things like open files, sockets or windows), and the
-:mod:`shelve` library module uses pickle and (g)dbm to create persistent
-mappings containing arbitrary Python objects.
+Mô-đun thư viện :mod:`pickle` giải quyết vấn đề này theo một cách rất tổng quát (mặc dù bạn vẫn không thể lưu trữ những thứ như tệp đang mở, socket hoặc cửa sổ), và
+Mô-đun thư viện :mod:`shelve` sử dụng pickle và (g)dbm để tạo các ánh xạ persistent chứa các đối tượng Python tùy ý.
 
 
-Mathematics and Numerics
+Toán học và Tính toán số
 ========================
 
-How do I generate random numbers in Python?
--------------------------------------------
+Làm thế nào để tạo các số ngẫu nhiên trong Python?
+--------------------------------------------------
 
-The standard module :mod:`random` implements a random number generator.  Usage
-is simple::
+Mô-đun chuẩn :mod:`random` triển khai một bộ sinh số ngẫu nhiên. Cách sử dụng rất đơn giản::
 
    import random
    random.random()
 
-This returns a random floating-point number in the range [0, 1).
+Lệnh này trả về một số dấu phẩy động ngẫu nhiên trong khoảng [0, 1).
 
-There are also many other specialized generators in this module, such as:
+Mô-đun này cũng có nhiều bộ sinh chuyên biệt khác, chẳng hạn như:
 
-* ``randrange(a, b)`` chooses an integer in the range [a, b).
-* ``uniform(a, b)`` chooses a floating-point number in the range [a, b).
-* ``normalvariate(mean, sdev)`` samples the normal (Gaussian) distribution.
+* ``randrange(a, b)`` chọn một số nguyên trong khoảng [a, b).
+* ``uniform(a, b)`` chọn một số dấu phẩy động trong khoảng [a, b).
+* ``normalvariate(mean, sdev)`` lấy mẫu phân phối chuẩn (Gaussian).
 
-Some higher-level functions operate on sequences directly, such as:
+Một số hàm cấp cao hơn hoạt động trực tiếp trên các sequence, chẳng hạn như:
 
-* ``choice(S)`` chooses a random element from a given sequence.
-* ``shuffle(L)`` shuffles a list in-place, i.e. permutes it randomly.
+* ``choice(S)`` chọn một phần tử ngẫu nhiên từ một dãy cho trước.
+* ``shuffle(L)`` xáo trộn một danh sách ngay tại chỗ, tức là hoán vị danh sách đó một cách ngẫu nhiên.
 
-There's also a ``Random`` class you can instantiate to create independent
-multiple random number generators.
+Ngoài ra, còn có một class ``Random`` mà bạn có thể khởi tạo để tạo nhiều bộ tạo số ngẫu nhiên độc lập.
+
+.. _`Python Package Index`: https://pypi.org
+.. _`Google`: https://www.google.com
+.. _`epydoc`: https://epydoc.sourceforge.net/
+.. _`Sphinx`: https://www.sphinx-doc.org
+.. _`fork of Python 3.9 with the GIL removed`: https://github.com/colesbury/nogil
+.. _`python-safethread`: https://code.google.com/archive/p/python-safethread
+.. _`alternate data streams`: https://en.wikipedia.org/wiki/NTFS#Alternate_data_stream_(ADS)
+.. _`Web Programming wiki page`: https://wiki.python.org/moin/WebProgramming
+.. _`Twisted`: https://twisted.org/
+.. _`DatabaseProgramming wiki page`: https://wiki.python.org/moin/DatabaseProgramming

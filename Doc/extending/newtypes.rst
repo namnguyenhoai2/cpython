@@ -2,56 +2,41 @@
 
 .. _new-types-topics:
 
-*****************************************
-Defining Extension Types: Assorted Topics
-*****************************************
+********************************************
+Định nghĩa các kiểu mở rộng: Các chủ đề khác
+********************************************
 
 .. _dnt-type-methods:
 
-This section aims to give a quick fly-by on the various type methods you can
-implement and what they do.
+Phần này nhằm cung cấp cái nhìn tổng quan nhanh về các phương thức kiểu khác nhau mà bạn có thể triển khai và chức năng của chúng.
 
-Here is the definition of :c:type:`PyTypeObject`, with some fields only used in
-:ref:`debug builds <debug-build>` omitted:
+Đây là định nghĩa của :c:type:`PyTypeObject`, trong đó một số trường chỉ được sử dụng trong
+:ref:`các bản build debug <debug-build>` được lược bỏ:
 
 .. literalinclude:: ../includes/typestruct.h
 
 
-Now that's a *lot* of methods.  Don't worry too much though -- if you have
-a type you want to define, the chances are very good that you will only
-implement a handful of these.
+Như bạn có thể thấy, có *rất nhiều* phương thức. Tuy vậy, đừng quá lo lắng -- nếu bạn có một kiểu muốn định nghĩa, rất có khả năng bạn sẽ chỉ triển khai một vài phương thức trong số này.
 
-As you probably expect by now, we're going to go over this and give more
-information about the various handlers.  We won't go in the order they are
-defined in the structure, because there is a lot of historical baggage that
-impacts the ordering of the fields.  It's often easiest to find an example
-that includes the fields you need and then change the values to suit your new
-type. ::
+Như bạn có thể đã đoán, chúng ta sẽ xem xét phần này và cung cấp thêm thông tin về các handler khác nhau. Chúng ta sẽ không đi theo thứ tự chúng được định nghĩa trong cấu trúc, vì có rất nhiều yếu tố lịch sử ảnh hưởng đến thứ tự của các trường. Thường thì cách dễ nhất là tìm một ví dụ có các trường bạn cần, sau đó thay đổi các giá trị để phù hợp với kiểu mới của bạn.::
 
-   const char *tp_name; /* For printing */
+   const char *tp_name; /* Dùng để in */
 
-The name of the type -- as mentioned in the previous chapter, this will appear in
-various places, almost entirely for diagnostic purposes. Try to choose something
-that will be helpful in such a situation! ::
+Tên của kiểu -- như đã đề cập trong chương trước, tên này sẽ xuất hiện ở nhiều nơi, hầu như hoàn toàn nhằm mục đích chẩn đoán. Hãy cố gắng chọn một tên hữu ích trong những tình huống như vậy!::
 
-   Py_ssize_t tp_basicsize, tp_itemsize; /* For allocation */
+   Py_ssize_t tp_basicsize, tp_itemsize; /* Dùng để cấp phát */
 
-These fields tell the runtime how much memory to allocate when new objects of
-this type are created.  Python has some built-in support for variable length
-structures (think: strings, tuples) which is where the :c:member:`~PyTypeObject.tp_itemsize` field
-comes in.  This will be dealt with later. ::
+Các trường này cho runtime biết cần cấp phát bao nhiêu bộ nhớ khi các đối tượng thuộc kiểu này được tạo. Python có hỗ trợ tích hợp cho các cấu trúc có độ dài thay đổi (ví dụ: chuỗi, tuple), và đó là lý do trường :c:member:`~PyTypeObject.tp_itemsize` được sử dụng. Nội dung này sẽ được trình bày sau.::
 
    const char *tp_doc;
 
-Here you can put a string (or its address) that you want returned when the
-Python script references ``obj.__doc__`` to retrieve the doc string.
+Tại đây, bạn có thể đặt một chuỗi (hoặc địa chỉ của chuỗi) mà bạn muốn trả về khi script Python tham chiếu đến ``obj.__doc__`` để lấy chuỗi tài liệu.
 
-Now we come to the basic type methods -- the ones most extension types will
-implement.
+Bây giờ chúng ta chuyển sang các phương thức kiểu cơ bản -- những phương thức mà hầu hết các kiểu mở rộng sẽ triển khai.
 
 
-Finalization and De-allocation
-------------------------------
+Hoàn tất và giải phóng bộ nhớ
+-----------------------------
 
 .. index::
    single: object; deallocation
@@ -63,11 +48,7 @@ Finalization and De-allocation
 
    destructor tp_dealloc;
 
-This function is called when the reference count of the instance of your type is
-reduced to zero and the Python interpreter wants to reclaim it.  If your type
-has memory to free or other clean-up to perform, you can put it here.  The
-object itself needs to be freed here as well.  Here is an example of this
-function::
+Hàm này được gọi khi số lượng tham chiếu đến một instance của kiểu bạn giảm xuống bằng 0 và trình thông dịch Python muốn thu hồi nó. Nếu kiểu của bạn có bộ nhớ cần giải phóng hoặc cần thực hiện các thao tác dọn dẹp khác, bạn có thể đặt chúng tại đây. Bản thân đối tượng cũng cần được giải phóng tại đây. Sau đây là một ví dụ về hàm này::
 
    static void
    newdatatype_dealloc(PyObject *op)
@@ -77,8 +58,8 @@ function::
        Py_TYPE(self)->tp_free(self);
    }
 
-If your type supports garbage collection, the destructor should call
-:c:func:`PyObject_GC_UnTrack` before clearing any member fields::
+Nếu kiểu của bạn hỗ trợ garbage collection, hàm hủy nên gọi
+:c:func:`PyObject_GC_UnTrack` trước khi xóa mọi trường thành viên::
 
    static void
    newdatatype_dealloc(PyObject *op)
@@ -94,17 +75,8 @@ If your type supports garbage collection, the destructor should call
    single: PyErr_Fetch (C function)
    single: PyErr_Restore (C function)
 
-One important requirement of the deallocator function is that it leaves any
-pending exceptions alone.  This is important since deallocators are frequently
-called as the interpreter unwinds the Python stack; when the stack is unwound
-due to an exception (rather than normal returns), nothing is done to protect the
-deallocators from seeing that an exception has already been set.  Any actions
-which a deallocator performs which may cause additional Python code to be
-executed may detect that an exception has been set.  This can lead to misleading
-errors from the interpreter.  The proper way to protect against this is to save
-a pending exception before performing the unsafe action, and restoring it when
-done.  This can be done using the :c:func:`PyErr_Fetch` and
-:c:func:`PyErr_Restore` functions::
+Một yêu cầu quan trọng đối với hàm deallocator là không tác động đến bất kỳ exception nào đang chờ xử lý. Điều này rất quan trọng vì các deallocator thường được gọi khi interpreter unwinds ngăn xếp Python; khi ngăn xếp được unwind do một exception (thay vì các lệnh return thông thường), không có gì bảo vệ các deallocator khỏi việc thấy rằng một exception đã được thiết lập. Bất kỳ hành động nào mà deallocator thực hiện có thể khiến mã Python bổ sung được thực thi và phát hiện rằng một exception đã được thiết lập. Điều này có thể dẫn đến các lỗi gây hiểu nhầm từ interpreter. Cách đúng để bảo vệ là lưu exception đang chờ xử lý trước khi thực hiện hành động không an toàn, rồi khôi phục nó sau khi hoàn tất. Có thể thực hiện việc này bằng cách sử dụng :c:func:`PyErr_Fetch` và
+:c:func:`PyErr_Restore` các hàm::
 
    static void
    my_dealloc(PyObject *obj)
@@ -115,7 +87,7 @@ done.  This can be done using the :c:func:`PyErr_Fetch` and
        if (self->my_callback != NULL) {
            PyObject *err_type, *err_value, *err_traceback;
 
-           /* This saves the current exception state */
+           /* Lưu trạng thái ngoại lệ hiện tại */
            PyErr_Fetch(&err_type, &err_value, &err_traceback);
 
            cbresult = PyObject_CallNoArgs(self->my_callback);
@@ -126,7 +98,7 @@ done.  This can be done using the :c:func:`PyErr_Fetch` and
                Py_DECREF(cbresult);
            }
 
-           /* This restores the saved exception state */
+           /* Khôi phục trạng thái ngoại lệ đã lưu */
            PyErr_Restore(err_type, err_value, err_traceback);
 
            Py_DECREF(self->my_callback);
@@ -135,18 +107,11 @@ done.  This can be done using the :c:func:`PyErr_Fetch` and
    }
 
 .. note::
-   There are limitations to what you can safely do in a deallocator function.
-   First, if your type supports garbage collection (using :c:member:`~PyTypeObject.tp_traverse`
-   and/or :c:member:`~PyTypeObject.tp_clear`), some of the object's members can have been
-   cleared or finalized by the time :c:member:`~PyTypeObject.tp_dealloc` is called.  Second, in
-   :c:member:`~PyTypeObject.tp_dealloc`, your object is in an unstable state: its reference
-   count is equal to zero.  Any call to a non-trivial object or API (as in the
-   example above) might end up calling :c:member:`~PyTypeObject.tp_dealloc` again, causing a
-   double free and a crash.
+   Có những giới hạn đối với những gì bạn có thể thực hiện một cách an toàn trong hàm deallocator. Trước hết, nếu kiểu của bạn hỗ trợ garbage collection (sử dụng :c:member:`~PyTypeObject.tp_traverse` và/hoặc :c:member:`~PyTypeObject.tp_clear`), một số thành viên của đối tượng có thể đã bị xóa hoặc finalized trước khi :c:member:`~PyTypeObject.tp_dealloc` được gọi. Thứ hai, trong
+   :c:member:`~PyTypeObject.tp_dealloc`, đối tượng của bạn đang ở trạng thái không ổn định: reference count của nó bằng không. Bất kỳ lệnh gọi nào đến một đối tượng hoặc API không tầm thường (như trong ví dụ trên) cũng có thể lại gọi :c:member:`~PyTypeObject.tp_dealloc`, gây ra double free và crash.
 
-   Starting with Python 3.4, it is recommended not to put any complex
-   finalization code in :c:member:`~PyTypeObject.tp_dealloc`, and instead use the new
-   :c:member:`~PyTypeObject.tp_finalize` type method.
+   Bắt đầu từ Python 3.4, bạn được khuyến nghị không đặt bất kỳ mã finalization phức tạp nào trong :c:member:`~PyTypeObject.tp_dealloc`, mà thay vào đó hãy sử dụng kiểu method mới
+   :c:member:`~PyTypeObject.tp_finalize`.
 
    .. seealso::
       :pep:`442` explains the new finalization scheme.
@@ -155,21 +120,17 @@ done.  This can be done using the :c:func:`PyErr_Fetch` and
    single: string; object representation
    pair: built-in function; repr
 
-Object Presentation
+Trình bày đối tượng
 -------------------
 
-In Python, there are two ways to generate a textual representation of an object:
-the :func:`repr` function, and the :func:`str` function.  (The :func:`print`
-function just calls :func:`str`.)  These handlers are both optional.
+Trong Python, có hai cách để tạo biểu diễn dạng văn bản của một đối tượng: hàm :func:`repr` và hàm :func:`str`. (Hàm :func:`print` chỉ gọi :func:`str`.) Cả hai handler này đều là tùy chọn.
 
 ::
 
    reprfunc tp_repr;
    reprfunc tp_str;
 
-The :c:member:`~PyTypeObject.tp_repr` handler should return a string object containing a
-representation of the instance for which it is called.  Here is a simple
-example::
+Handler :c:member:`~PyTypeObject.tp_repr` sẽ trả về một đối tượng chuỗi chứa biểu diễn của instance mà nó được gọi cho. Đây là một ví dụ đơn giản::
 
    static PyObject *
    newdatatype_repr(PyObject *op)
@@ -179,18 +140,12 @@ example::
                                    self->obj_UnderlyingDatatypePtr->size);
    }
 
-If no :c:member:`~PyTypeObject.tp_repr` handler is specified, the interpreter will supply a
-representation that uses the type's :c:member:`~PyTypeObject.tp_name` and a uniquely identifying
-value for the object.
+Nếu không chỉ định handler :c:member:`~PyTypeObject.tp_repr`, interpreter sẽ cung cấp một biểu diễn sử dụng :c:member:`~PyTypeObject.tp_name` của kiểu và một giá trị nhận dạng duy nhất cho đối tượng.
 
-The :c:member:`~PyTypeObject.tp_str` handler is to :func:`str` what the :c:member:`~PyTypeObject.tp_repr` handler
-described above is to :func:`repr`; that is, it is called when Python code calls
-:func:`str` on an instance of your object.  Its implementation is very similar
-to the :c:member:`~PyTypeObject.tp_repr` function, but the resulting string is intended for human
-consumption.  If :c:member:`~PyTypeObject.tp_str` is not specified, the :c:member:`~PyTypeObject.tp_repr` handler is
-used instead.
+Handler :c:member:`~PyTypeObject.tp_str` đối với :func:`str` cũng giống như handler :c:member:`~PyTypeObject.tp_repr` được mô tả ở trên đối với :func:`repr`; nghĩa là, nó được gọi khi mã Python gọi
+:func:`str` trên một instance của đối tượng bạn. Cách triển khai của nó rất giống với hàm :c:member:`~PyTypeObject.tp_repr`, nhưng chuỗi kết quả được dành cho con người đọc. Nếu không chỉ định :c:member:`~PyTypeObject.tp_str`, handler :c:member:`~PyTypeObject.tp_repr` sẽ được sử dụng thay thế.
 
-Here is a simple example::
+Đây là một ví dụ đơn giản::
 
    static PyObject *
    newdatatype_str(PyObject *op)
@@ -202,85 +157,57 @@ Here is a simple example::
 
 
 
-Attribute Management
---------------------
+Quản lý thuộc tính
+------------------
 
-For every object which can support attributes, the corresponding type must
-provide the functions that control how the attributes are resolved.  There needs
-to be a function which can retrieve attributes (if any are defined), and another
-to set attributes (if setting attributes is allowed).  Removing an attribute is
-a special case, for which the new value passed to the handler is ``NULL``.
+Đối với mọi đối tượng có thể hỗ trợ thuộc tính, kiểu tương ứng phải cung cấp các hàm kiểm soát cách các thuộc tính được phân giải. Cần có một hàm để truy xuất các thuộc tính (nếu có thuộc tính nào được định nghĩa) và một hàm khác để thiết lập thuộc tính (nếu cho phép thiết lập thuộc tính). Việc xóa một thuộc tính là trường hợp đặc biệt, trong đó giá trị mới được truyền cho handler là ``NULL``.
 
-Python supports two pairs of attribute handlers; a type that supports attributes
-only needs to implement the functions for one pair.  The difference is that one
-pair takes the name of the attribute as a :c:expr:`char\*`, while the other
-accepts a :c:expr:`PyObject*`.  Each type can use whichever pair makes more
-sense for the implementation's convenience. ::
+Python hỗ trợ hai cặp handler thuộc tính; một kiểu hỗ trợ thuộc tính chỉ cần triển khai các hàm cho một cặp. Điểm khác biệt là một cặp nhận tên thuộc tính dưới dạng :c:expr:`char\*`, còn cặp kia nhận một :c:expr:`PyObject*`. Mỗi kiểu có thể sử dụng cặp phù hợp hơn với sự thuận tiện khi triển khai.::
 
-   getattrfunc  tp_getattr;        /* char * version */
+   getattrfunc  tp_getattr;        /* phiên bản dùng char * */
    setattrfunc  tp_setattr;
    /* ... */
-   getattrofunc tp_getattro;       /* PyObject * version */
+   getattrofunc tp_getattro;       /* phiên bản dùng PyObject * */
    setattrofunc tp_setattro;
 
-If accessing attributes of an object is always a simple operation (this will be
-explained shortly), there are generic implementations which can be used to
-provide the :c:expr:`PyObject*` version of the attribute management functions.
-The actual need for type-specific attribute handlers almost completely
-disappeared starting with Python 2.2, though there are many examples which have
-not been updated to use some of the new generic mechanism that is available.
+Nếu việc truy cập các thuộc tính của một đối tượng luôn là một thao tác đơn giản (điều này sẽ được giải thích ngay sau đây), có các triển khai tổng quát có thể được dùng để cung cấp phiên bản :c:expr:`PyObject*` của các hàm quản lý thuộc tính. Nhu cầu thực tế đối với các handler thuộc tính dành riêng cho từng kiểu gần như hoàn toàn biến mất kể từ Python 2.2, dù vẫn có nhiều ví dụ chưa được cập nhật để sử dụng một số cơ chế tổng quát mới hiện có.
 
 
 .. _generic-attribute-management:
 
-Generic Attribute Management
+Quản lý thuộc tính tổng quát
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Most extension types only use *simple* attributes.  So, what makes the
-attributes simple?  There are only a couple of conditions that must be met:
+Hầu hết các kiểu mở rộng chỉ sử dụng các thuộc tính *đơn giản*. Vậy điều gì khiến các thuộc tính này đơn giản? Chỉ có một vài điều kiện cần đáp ứng:
 
-#. The name of the attributes must be known when :c:func:`PyType_Ready` is
-   called.
+#. Tên của các thuộc tính phải được biết khi :c:func:`PyType_Ready` được gọi.
 
-#. No special processing is needed to record that an attribute was looked up or
-   set, nor do actions need to be taken based on the value.
+#. Không cần xử lý đặc biệt để ghi nhận rằng một thuộc tính đã được tra cứu hoặc thiết lập, cũng không cần thực hiện hành động nào dựa trên giá trị đó.
 
-Note that this list does not place any restrictions on the values of the
-attributes, when the values are computed, or how relevant data is stored.
+Lưu ý rằng danh sách này không đặt ra bất kỳ hạn chế nào đối với giá trị của các thuộc tính, thời điểm tính toán các giá trị hoặc cách dữ liệu liên quan được lưu trữ.
 
-When :c:func:`PyType_Ready` is called, it uses three tables referenced by the
-type object to create :term:`descriptor`\s which are placed in the dictionary of the
-type object.  Each descriptor controls access to one attribute of the instance
-object.  Each of the tables is optional; if all three are ``NULL``, instances of
-the type will only have attributes that are inherited from their base type, and
-should leave the :c:member:`~PyTypeObject.tp_getattro` and :c:member:`~PyTypeObject.tp_setattro` fields ``NULL`` as
-well, allowing the base type to handle attributes.
+Khi :c:func:`PyType_Ready` được gọi, nó sử dụng ba bảng được tham chiếu bởi đối tượng kiểu để tạo :term:`descriptor`\s, được đặt trong từ điển của đối tượng kiểu. Mỗi descriptor kiểm soát quyền truy cập vào một thuộc tính của đối tượng instance. Mỗi bảng đều là tùy chọn; nếu cả ba đều ``NULL``, các instance của kiểu này sẽ chỉ có những thuộc tính được kế thừa từ kiểu cơ sở và cũng nên để các trường :c:member:`~PyTypeObject.tp_getattro` và :c:member:`~PyTypeObject.tp_setattro` ở trạng thái ``NULL``, cho phép kiểu cơ sở xử lý các thuộc tính.
 
-The tables are declared as three fields of the type object::
+Các bảng được khai báo dưới dạng ba trường của đối tượng kiểu::
 
    struct PyMethodDef *tp_methods;
    struct PyMemberDef *tp_members;
    struct PyGetSetDef *tp_getset;
 
-If :c:member:`~PyTypeObject.tp_methods` is not ``NULL``, it must refer to an array of
-:c:type:`PyMethodDef` structures.  Each entry in the table is an instance of this
-structure::
+Nếu :c:member:`~PyTypeObject.tp_methods` không phải là ``NULL``, nó phải tham chiếu đến một mảng gồm
+các cấu trúc :c:type:`PyMethodDef`. Mỗi mục trong bảng là một instance của cấu trúc này::
 
    typedef struct PyMethodDef {
-       const char  *ml_name;       /* method name */
-       PyCFunction  ml_meth;       /* implementation function */
-       int          ml_flags;      /* flags */
-       const char  *ml_doc;        /* docstring */
+       const char  *ml_name;       /* tên phương thức */
+       PyCFunction  ml_meth;       /* hàm triển khai */
+       int          ml_flags;      /* các cờ */
+       const char  *ml_doc;        /* chuỗi tài liệu */
    } PyMethodDef;
 
-One entry should be defined for each method provided by the type; no entries are
-needed for methods inherited from a base type.  One additional entry is needed
-at the end; it is a sentinel that marks the end of the array.  The
-:c:member:`~PyMethodDef.ml_name` field of the sentinel must be ``NULL``.
+Cần định nghĩa một mục cho mỗi phương thức do kiểu cung cấp; không cần mục nào cho các phương thức được kế thừa từ kiểu cơ sở. Cần thêm một mục ở cuối; đó là sentinel đánh dấu kết thúc mảng. Trường
+:c:member:`~PyMethodDef.ml_name` của sentinel phải là ``NULL``.
 
-The second table is used to define attributes which map directly to data stored
-in the instance.  A variety of primitive C types are supported, and access may
-be read-only or read-write.  The structures in the table are defined as::
+Bảng thứ hai được dùng để định nghĩa các thuộc tính ánh xạ trực tiếp tới dữ liệu được lưu trong instance. Nhiều kiểu C nguyên thủy được hỗ trợ, và quyền truy cập có thể là chỉ đọc hoặc đọc-ghi. Các cấu trúc trong bảng được định nghĩa như sau::
 
    typedef struct PyMemberDef {
        const char *name;
@@ -290,22 +217,14 @@ be read-only or read-write.  The structures in the table are defined as::
        const char *doc;
    } PyMemberDef;
 
-For each entry in the table, a :term:`descriptor` will be constructed and added to the
-type which will be able to extract a value from the instance structure.  The
-:c:member:`~PyMemberDef.type` field should contain a type code like :c:macro:`Py_T_INT` or
-:c:macro:`Py_T_DOUBLE`; the value will be used to determine how to
-convert Python values to and from C values.  The :c:member:`~PyMemberDef.flags` field is used to
-store flags which control how the attribute can be accessed: you can set it to
-:c:macro:`Py_READONLY` to prevent Python code from setting it.
+Đối với mỗi mục trong bảng, một :term:`descriptor` sẽ được tạo và thêm vào kiểu, cho phép trích xuất một giá trị từ cấu trúc instance. :term:`descriptor`
+Trường :c:member:`~PyMemberDef.type` phải chứa một mã kiểu như :c:macro:`Py_T_INT` hoặc
+:c:macro:`Py_T_DOUBLE`; giá trị này sẽ được dùng để xác định cách chuyển đổi các giá trị Python sang và từ các giá trị C. Trường :c:member:`~PyMemberDef.flags` được dùng để lưu các cờ kiểm soát cách truy cập thuộc tính: bạn có thể đặt trường này thành
+:c:macro:`Py_READONLY` để ngăn mã Python thiết lập thuộc tính đó.
 
-An interesting advantage of using the :c:member:`~PyTypeObject.tp_members` table to build
-descriptors that are used at runtime is that any attribute defined this way can
-have an associated doc string simply by providing the text in the table.  An
-application can use the introspection API to retrieve the descriptor from the
-class object, and get the doc string using its :attr:`~type.__doc__` attribute.
+Một ưu điểm đáng chú ý của việc sử dụng bảng :c:member:`~PyTypeObject.tp_members` để xây dựng các descriptor được dùng trong runtime là bất kỳ thuộc tính nào được định nghĩa theo cách này cũng có thể có chuỗi tài liệu đi kèm, chỉ cần cung cấp văn bản trong bảng. Một ứng dụng có thể sử dụng API introspection để truy xuất descriptor từ đối tượng lớp và lấy chuỗi tài liệu bằng thuộc tính :attr:`~type.__doc__` của descriptor đó.
 
-As with the :c:member:`~PyTypeObject.tp_methods` table, a sentinel entry with a :c:member:`~PyMethodDef.ml_name` value
-of ``NULL`` is required.
+Cũng như với bảng :c:member:`~PyTypeObject.tp_methods`, cần có một mục sentinel với giá trị :c:member:`~PyMethodDef.ml_name` là ``NULL``.
 
 .. XXX Descriptors need to be explained in more detail somewhere, but not here.
 
@@ -317,22 +236,14 @@ of ``NULL`` is required.
    passed the descriptor, instance, type, and new value;
 
 
-Type-specific Attribute Management
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Quản lý thuộc tính theo kiểu
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For simplicity, only the :c:expr:`char\*` version will be demonstrated here; the
-type of the name parameter is the only difference between the :c:expr:`char\*`
-and :c:expr:`PyObject*` flavors of the interface. This example effectively does
-the same thing as the generic example above, but does not use the generic
-support added in Python 2.2.  It explains how the handler functions are
-called, so that if you do need to extend their functionality, you'll understand
-what needs to be done.
+Để đơn giản, ở đây chỉ minh họa phiên bản :c:expr:`char\*`; kiểu của tham số name là điểm khác biệt duy nhất giữa hai biến thể :c:expr:`char\*` và :c:expr:`PyObject*` của giao diện. Ví dụ này thực hiện hiệu quả cùng một việc như ví dụ tổng quát ở trên, nhưng không sử dụng cơ chế hỗ trợ tổng quát được bổ sung trong Python 2.2. Ví dụ giải thích cách các hàm handler được gọi, để nếu cần mở rộng chức năng của chúng, bạn sẽ hiểu cần thực hiện những gì.
 
-The :c:member:`~PyTypeObject.tp_getattr` handler is called when the object requires an attribute
-look-up.  It is called in the same situations where the :meth:`~object.__getattr__`
-method of a class would be called.
+Handler :c:member:`~PyTypeObject.tp_getattr` được gọi khi đối tượng cần tra cứu thuộc tính. Nó được gọi trong cùng những tình huống mà phương thức :meth:`~object.__getattr__` của một class sẽ được gọi.
 
-Here is an example::
+Sau đây là một ví dụ::
 
    static PyObject *
    newdatatype_getattr(PyObject *op, char *name)
@@ -348,11 +259,9 @@ Here is an example::
        return NULL;
    }
 
-The :c:member:`~PyTypeObject.tp_setattr` handler is called when the :meth:`~object.__setattr__` or
-:meth:`~object.__delattr__` method of a class instance would be called.  When an
-attribute should be deleted, the third parameter will be ``NULL``.  Here is an
-example that simply raises an exception; if this were really all you wanted, the
-:c:member:`~PyTypeObject.tp_setattr` handler should be set to ``NULL``. ::
+Handler :c:member:`~PyTypeObject.tp_setattr` được gọi khi phương thức :meth:`~object.__setattr__` hoặc
+phương thức :meth:`~object.__delattr__` của một instance class được gọi. Khi một thuộc tính cần bị xóa, tham số thứ ba sẽ là ``NULL``. Sau đây là một ví dụ chỉ đơn giản là raise một exception; nếu đây thực sự là tất cả những gì bạn muốn, handler
+:c:member:`~PyTypeObject.tp_setattr` nên được đặt thành ``NULL``.::
 
    static int
    newdatatype_setattr(PyObject *op, char *name, PyObject *v)
@@ -361,28 +270,20 @@ example that simply raises an exception; if this were really all you wanted, the
        return -1;
    }
 
-Object Comparison
+So sánh đối tượng
 -----------------
 
 ::
 
    richcmpfunc tp_richcompare;
 
-The :c:member:`~PyTypeObject.tp_richcompare` handler is called when comparisons are needed.  It is
-analogous to the :ref:`rich comparison methods <richcmpfuncs>`, like
-:meth:`!__lt__`, and also called by :c:func:`PyObject_RichCompare` and
+Bộ xử lý :c:member:`~PyTypeObject.tp_richcompare` được gọi khi cần thực hiện so sánh. Nó tương tự như các :ref:`phương thức so sánh mở rộng <richcmpfuncs>`, chẳng hạn như
+:meth:`!__lt__`, và cũng được gọi bởi :c:func:`PyObject_RichCompare` và
 :c:func:`PyObject_RichCompareBool`.
 
-This function is called with two Python objects and the operator as arguments,
-where the operator is one of ``Py_EQ``, ``Py_NE``, ``Py_LE``, ``Py_GE``,
-``Py_LT`` or ``Py_GT``.  It should compare the two objects with respect to the
-specified operator and return ``Py_True`` or ``Py_False`` if the comparison is
-successful, ``Py_NotImplemented`` to indicate that comparison is not
-implemented and the other object's comparison method should be tried, or ``NULL``
-if an exception was set.
+Hàm này được gọi với hai đối tượng Python và toán tử làm các đối số, trong đó toán tử là một trong các toán tử ``Py_EQ``, ``Py_NE``, ``Py_LE``, ``Py_GE``, ``Py_LT`` hoặc ``Py_GT``. Hàm này nên so sánh hai đối tượng theo toán tử được chỉ định và trả về ``Py_True`` hoặc ``Py_False`` nếu phép so sánh thành công, ``Py_NotImplemented`` để cho biết phép so sánh chưa được triển khai và nên thử phương thức so sánh của đối tượng còn lại, hoặc ``NULL`` nếu một ngoại lệ đã được thiết lập.
 
-Here is a sample implementation, for a datatype that is considered equal if the
-size of an internal pointer is equal::
+Sau đây là một cách triển khai mẫu cho một kiểu dữ liệu được xem là bằng nhau nếu kích thước của một con trỏ nội bộ bằng nhau::
 
    static PyObject *
    newdatatype_richcmp(PyObject *lhs, PyObject *rhs, int op)
@@ -392,8 +293,8 @@ size of an internal pointer is equal::
        PyObject *result;
        int c, size1, size2;
 
-       /* code to make sure that both arguments are of type
-          newdatatype omitted */
+       /* lược bỏ mã bảo đảm cả hai đối số đều có kiểu
+          newdatatype */
 
        size1 = obj1->obj_UnderlyingDatatypePtr->size;
        size2 = obj2->obj_UnderlyingDatatypePtr->size;
@@ -411,39 +312,24 @@ size of an internal pointer is equal::
     }
 
 
-Abstract Protocol Support
--------------------------
+Hỗ trợ giao thức trừu tượng
+---------------------------
 
-Python supports a variety of *abstract* 'protocols;' the specific interfaces
-provided to use these interfaces are documented in :ref:`abstract`.
+Python hỗ trợ nhiều *giao thức trừu tượng*; các giao diện cụ thể được cung cấp để sử dụng những giao diện này được ghi lại trong :ref:`abstract`.
 
 
-A number of these abstract interfaces were defined early in the development of
-the Python implementation.  In particular, the number, mapping, and sequence
-protocols have been part of Python since the beginning.  Other protocols have
-been added over time.  For protocols which depend on several handler routines
-from the type implementation, the older protocols have been defined as optional
-blocks of handlers referenced by the type object.  For newer protocols there are
-additional slots in the main type object, with a flag bit being set to indicate
-that the slots are present and should be checked by the interpreter.  (The flag
-bit does not indicate that the slot values are non-``NULL``. The flag may be set
-to indicate the presence of a slot, but a slot may still be unfilled.) ::
+Một số giao thức trừu tượng này đã được định nghĩa từ giai đoạn đầu phát triển bản triển khai Python. Cụ thể, các giao thức number, mapping và sequence đã là một phần của Python ngay từ đầu. Các giao thức khác được bổ sung theo thời gian. Đối với những giao thức phụ thuộc vào nhiều routine xử lý từ phần triển khai type, các giao thức cũ hơn được định nghĩa dưới dạng các khối handler tùy chọn được type object tham chiếu. Đối với các giao thức mới hơn, có thêm các slot trong type object chính, cùng với một bit cờ được đặt để cho biết rằng các slot này hiện diện và interpreter cần kiểm tra chúng. (Bit cờ không cho biết các giá trị slot có phải là ``NULL`` hay không. Cờ có thể được đặt để cho biết sự hiện diện của một slot, nhưng slot đó vẫn có thể chưa được điền.)::
 
    PyNumberMethods   *tp_as_number;
    PySequenceMethods *tp_as_sequence;
    PyMappingMethods  *tp_as_mapping;
 
-If you wish your object to be able to act like a number, a sequence, or a
-mapping object, then you place the address of a structure that implements the C
-type :c:type:`PyNumberMethods`, :c:type:`PySequenceMethods`, or
-:c:type:`PyMappingMethods`, respectively. It is up to you to fill in this
-structure with appropriate values. You can find examples of the use of each of
-these in the :file:`Objects` directory of the Python source distribution. ::
+Nếu muốn object của mình có thể hoạt động như một number, sequence hoặc mapping object, bạn đặt địa chỉ của một cấu trúc triển khai C type :c:type:`PyNumberMethods`, :c:type:`PySequenceMethods` hoặc
+:c:type:`PyMappingMethods`, tương ứng. Bạn cần tự điền các giá trị thích hợp vào cấu trúc này. Bạn có thể tìm thấy các ví dụ về cách sử dụng từng cấu trúc trong thư mục :file:`Objects` của bản phân phối mã nguồn Python.::
 
    hashfunc tp_hash;
 
-This function, if you choose to provide it, should return a hash number for an
-instance of your data type. Here is a simple example::
+Nếu chọn cung cấp hàm này, hàm sẽ trả về một số hash cho một instance của data type. Sau đây là một ví dụ đơn giản::
 
    static Py_hash_t
    newdatatype_hash(PyObject *op)
@@ -457,34 +343,26 @@ instance of your data type. Here is a simple example::
        return result;
    }
 
-:c:type:`Py_hash_t` is a signed integer type with a platform-varying width.
-Returning ``-1`` from :c:member:`~PyTypeObject.tp_hash` indicates an error,
-which is why you should be careful to avoid returning it when hash computation
-is successful, as seen above.
+:c:type:`Py_hash_t` là một kiểu số nguyên có dấu với độ rộng thay đổi tùy theo nền tảng. Việc trả về ``-1`` từ :c:member:`~PyTypeObject.tp_hash` cho biết đã xảy ra lỗi, đó là lý do bạn cần cẩn thận để tránh trả về giá trị này khi việc tính hash thành công, như trong ví dụ trên.
 
 ::
 
    ternaryfunc tp_call;
 
-This function is called when an instance of your data type is "called", for
-example, if ``obj1`` is an instance of your data type and the Python script
-contains ``obj1('hello')``, the :c:member:`~PyTypeObject.tp_call` handler is invoked.
+Hàm này được gọi khi một instance của data type được "gọi", ví dụ: nếu ``obj1`` là một instance của data type của bạn và script Python chứa ``obj1('hello')``, handler :c:member:`~PyTypeObject.tp_call` sẽ được gọi.
 
-This function takes three arguments:
+Hàm này nhận ba đối số:
 
-#. *self* is the instance of the data type which is the subject of the call.
-   If the call is ``obj1('hello')``, then *self* is ``obj1``.
+#. *self* là instance của kiểu dữ liệu đóng vai trò chủ thể của lời gọi. Nếu lời gọi là ``obj1('hello')``, thì *self* là ``obj1``.
 
-#. *args* is a tuple containing the arguments to the call.  You can use
-   :c:func:`PyArg_ParseTuple` to extract the arguments.
+#. *args* là một tuple chứa các đối số của lời gọi. Bạn có thể sử dụng
+   :c:func:`PyArg_ParseTuple` để trích xuất các đối số.
 
-#. *kwds* is a dictionary of keyword arguments that were passed. If this is
-   non-``NULL`` and you support keyword arguments, use
-   :c:func:`PyArg_ParseTupleAndKeywords` to extract the arguments.  If you
-   do not want to support keyword arguments and this is non-``NULL``, raise a
-   :exc:`TypeError` with a message saying that keyword arguments are not supported.
+#. *kwds* là một dictionary chứa các đối số keyword được truyền vào. Nếu giá trị này khác ``NULL`` và bạn hỗ trợ các đối số keyword, hãy sử dụng
+   :c:func:`PyArg_ParseTupleAndKeywords` để trích xuất các đối số. Nếu bạn không muốn hỗ trợ các đối số keyword và giá trị này khác ``NULL``, hãy raise một
+   :exc:`TypeError` với thông báo cho biết các đối số keyword không được hỗ trợ.
 
-Here is a toy ``tp_call`` implementation::
+Sau đây là một triển khai ``tp_call`` đơn giản::
 
    static PyObject *
    newdatatype_call(PyObject *op, PyObject *args, PyObject *kwds)
@@ -507,93 +385,61 @@ Here is a toy ``tp_call`` implementation::
 
 ::
 
-   /* Iterators */
+   /* Các iterator */
    getiterfunc tp_iter;
    iternextfunc tp_iternext;
 
-These functions provide support for the iterator protocol.  Both handlers
-take exactly one parameter, the instance for which they are being called,
-and return a new reference.  In the case of an error, they should set an
-exception and return ``NULL``.  :c:member:`~PyTypeObject.tp_iter` corresponds
-to the Python :meth:`~object.__iter__` method, while :c:member:`~PyTypeObject.tp_iternext`
-corresponds to the Python :meth:`~iterator.__next__` method.
+Các hàm này cung cấp hỗ trợ cho iterator protocol. Cả hai handler đều nhận chính xác một tham số, là instance mà chúng được gọi cho, và trả về một tham chiếu mới. Trong trường hợp xảy ra lỗi, chúng phải thiết lập một exception và trả về ``NULL``. :c:member:`~PyTypeObject.tp_iter` tương ứng với phương thức :meth:`~object.__iter__` của Python, còn :c:member:`~PyTypeObject.tp_iternext` tương ứng với phương thức :meth:`~iterator.__next__` của Python.
 
-Any :term:`iterable` object must implement the :c:member:`~PyTypeObject.tp_iter`
-handler, which must return an :term:`iterator` object.  Here the same guidelines
-apply as for Python classes:
+Mọi đối tượng :term:`iterable` đều phải triển khai handler :c:member:`~PyTypeObject.tp_iter`, handler này phải trả về một đối tượng :term:`iterator`. Ở đây, các hướng dẫn tương tự như đối với các class Python được áp dụng:
 
-* For collections (such as lists and tuples) which can support multiple
-  independent iterators, a new iterator should be created and returned by
-  each call to :c:member:`~PyTypeObject.tp_iter`.
-* Objects which can only be iterated over once (usually due to side effects of
-  iteration, such as file objects) can implement :c:member:`~PyTypeObject.tp_iter`
-  by returning a new reference to themselves -- and should also therefore
-  implement the :c:member:`~PyTypeObject.tp_iternext`  handler.
+* Đối với các collection (chẳng hạn như list và tuple) có thể hỗ trợ nhiều iterator độc lập, mỗi lần gọi :c:member:`~PyTypeObject.tp_iter` nên tạo và trả về một iterator mới.
+* Các đối tượng chỉ có thể được lặp qua một lần (thường là do các side effect của quá trình lặp, chẳng hạn như các đối tượng file) có thể triển khai :c:member:`~PyTypeObject.tp_iter` bằng cách trả về một tham chiếu mới đến chính chúng -- và do đó cũng nên triển khai handler :c:member:`~PyTypeObject.tp_iternext`.
 
-Any :term:`iterator` object should implement both :c:member:`~PyTypeObject.tp_iter`
-and :c:member:`~PyTypeObject.tp_iternext`.  An iterator's
-:c:member:`~PyTypeObject.tp_iter` handler should return a new reference
-to the iterator.  Its :c:member:`~PyTypeObject.tp_iternext` handler should
-return a new reference to the next object in the iteration, if there is one.
-If the iteration has reached the end, :c:member:`~PyTypeObject.tp_iternext`
-may return ``NULL`` without setting an exception, or it may set
-:exc:`StopIteration` *in addition* to returning ``NULL``; avoiding
-the exception can yield slightly better performance.  If an actual error
-occurs, :c:member:`~PyTypeObject.tp_iternext` should always set an exception
-and return ``NULL``.
+Mọi đối tượng :term:`iterator` nên triển khai cả :c:member:`~PyTypeObject.tp_iter` và :c:member:`~PyTypeObject.tp_iternext`. Một iterator
+handler :c:member:`~PyTypeObject.tp_iter` phải trả về một tham chiếu mới đến iterator. Handler :c:member:`~PyTypeObject.tp_iternext` của nó phải trả về một tham chiếu mới đến đối tượng tiếp theo trong quá trình lặp, nếu có. Nếu quá trình lặp đã đến cuối, :c:member:`~PyTypeObject.tp_iternext` có thể trả về ``NULL`` mà không thiết lập exception, hoặc có thể thiết lập
+:exc:`StopIteration` *ngoài việc* trả về ``NULL``; việc tránh exception có thể mang lại hiệu năng tốt hơn một chút. Nếu xảy ra lỗi thực sự, :c:member:`~PyTypeObject.tp_iternext` luôn phải thiết lập một exception và trả về ``NULL``.
 
 
 .. _weakref-support:
 
-Weak Reference Support
-----------------------
+Hỗ trợ tham chiếu yếu
+---------------------
 
-One of the goals of Python's weak reference implementation is to allow any type
-to participate in the weak reference mechanism without incurring the overhead on
-performance-critical objects (such as numbers).
+Một trong những mục tiêu của việc triển khai tham chiếu yếu trong Python là cho phép mọi kiểu tham gia vào cơ chế tham chiếu yếu mà không làm phát sinh chi phí hiệu năng đối với các đối tượng quan trọng về hiệu năng (chẳng hạn như số).
 
 .. seealso::
-   Documentation for the :mod:`weakref` module.
+   Tài liệu về mô-đun :mod:`weakref`.
 
-For an object to be weakly referenceable, the extension type must set the
-``Py_TPFLAGS_MANAGED_WEAKREF`` bit of the :c:member:`~PyTypeObject.tp_flags`
-field. The legacy :c:member:`~PyTypeObject.tp_weaklistoffset` field should
-be left as zero.
+Để một đối tượng có thể được tham chiếu yếu, kiểu mở rộng phải đặt bit ``Py_TPFLAGS_MANAGED_WEAKREF`` của trường :c:member:`~PyTypeObject.tp_flags`. Trường :c:member:`~PyTypeObject.tp_weaklistoffset` kiểu cũ nên được để ở giá trị zero.
 
-Concretely, here is how the statically declared type object would look::
+Cụ thể, đối tượng kiểu được khai báo tĩnh sẽ có dạng như sau::
 
    static PyTypeObject TrivialType = {
        PyVarObject_HEAD_INIT(NULL, 0)
-       /* ... other members omitted for brevity ... */
+       /* ... lược bỏ các thành viên khác cho ngắn gọn ... */
        .tp_flags = Py_TPFLAGS_MANAGED_WEAKREF | ...,
    };
 
 
-The only further addition is that ``tp_dealloc`` needs to clear any weak
-references (by calling :c:func:`PyObject_ClearWeakRefs`)::
+Bổ sung duy nhất cần thực hiện là ``tp_dealloc`` phải xóa mọi tham chiếu yếu (bằng cách gọi :c:func:`PyObject_ClearWeakRefs`)::
 
    static void
    Trivial_dealloc(PyObject *op)
    {
-       /* Clear weakrefs first before calling any destructors */
+       /* Xóa weakref trước khi gọi bất kỳ destructor nào */
        PyObject_ClearWeakRefs(op);
-       /* ... remainder of destruction code omitted for brevity ... */
+       /* ... lược bỏ phần mã hủy còn lại cho ngắn gọn ... */
        Py_TYPE(op)->tp_free(op);
    }
 
 
-More Suggestions
+Các đề xuất khác
 ----------------
 
-In order to learn how to implement any specific method for your new data type,
-get the :term:`CPython` source code.  Go to the :file:`Objects` directory,
-then search the C source files for ``tp_`` plus the function you want
-(for example, ``tp_richcompare``).  You will find examples of the function
-you want to implement.
+Để tìm hiểu cách triển khai một phương thức cụ thể cho kiểu dữ liệu mới, hãy tải mã nguồn :term:`CPython`. Đi tới thư mục :file:`Objects`, sau đó tìm trong các tệp mã nguồn C ``tp_`` cùng với hàm bạn muốn (ví dụ: ``tp_richcompare``). Bạn sẽ tìm thấy các ví dụ về hàm mà mình muốn triển khai.
 
-When you need to verify that an object is a concrete instance of the type you
-are implementing, use the :c:func:`PyObject_TypeCheck` function.  A sample of
-its use might be something like the following::
+Khi cần xác minh rằng một đối tượng là một thể hiện cụ thể của kiểu bạn đang triển khai, hãy sử dụng hàm :c:func:`PyObject_TypeCheck`. Ví dụ về cách sử dụng hàm này có thể như sau::
 
    if (!PyObject_TypeCheck(some_object, &MyType)) {
        PyErr_SetString(PyExc_TypeError, "arg #1 not a mything");
@@ -601,8 +447,8 @@ its use might be something like the following::
    }
 
 .. seealso::
-   Download CPython source releases.
+   Tải xuống các bản phát hành mã nguồn CPython.
       https://www.python.org/downloads/source/
 
-   The CPython project on GitHub, where the CPython source code is developed.
+   Dự án CPython trên GitHub, nơi phát triển mã nguồn CPython.
       https://github.com/python/cpython

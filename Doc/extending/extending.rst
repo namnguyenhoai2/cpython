@@ -4,112 +4,76 @@
 .. _extending-intro:
 
 ******************************
-Extending Python with C or C++
+Mở rộng Python bằng C hoặc C++
 ******************************
 
-It is quite easy to add new built-in modules to Python, if you know how to
-program in C.  Such :dfn:`extension modules` can do two things that can't be
-done directly in Python: they can implement new built-in object types, and they
-can call C library functions and system calls.
+Việc thêm các mô-đun tích hợp mới vào Python khá dễ dàng nếu bạn biết lập trình bằng C. Những :dfn:`mô-đun mở rộng` như vậy có thể thực hiện hai việc không thể làm trực tiếp bằng Python: triển khai các kiểu đối tượng tích hợp mới và gọi các hàm thư viện C cũng như các lệnh gọi hệ thống.
 
-To support extensions, the Python API (Application Programmers Interface)
-defines a set of functions, macros and variables that provide access to most
-aspects of the Python run-time system.  The Python API is incorporated in a C
-source file by including the header ``"Python.h"``.
+Để hỗ trợ các phần mở rộng, Python API (Giao diện Lập trình Ứng dụng) định nghĩa một tập hợp các hàm, macro và biến cho phép truy cập vào hầu hết các khía cạnh của hệ thống run-time Python. Python API được đưa vào một tệp mã nguồn C bằng cách thêm header ``"Python.h"``.
 
-The compilation of an extension module depends on its intended use as well as on
-your system setup; details are given in later chapters.
+Việc biên dịch một mô-đun mở rộng phụ thuộc vào mục đích sử dụng của mô-đun cũng như cấu hình hệ thống của bạn; thông tin chi tiết được trình bày trong các chương sau.
 
 .. note::
 
-   The C extension interface is specific to CPython, and extension modules do
-   not work on other Python implementations.  In many cases, it is possible to
-   avoid writing C extensions and preserve portability to other implementations.
-   For example, if your use case is calling C library functions or system calls,
-   you should consider using the :mod:`ctypes` module or the `cffi
-   <https://cffi.readthedocs.io/>`_ library rather than writing
-   custom C code.
-   These modules let you write Python code to interface with C code and are more
-   portable between implementations of Python than writing and compiling a C
-   extension module.
+   Giao diện phần mở rộng C dành riêng cho CPython và các mô-đun mở rộng không hoạt động trên những triển khai Python khác. Trong nhiều trường hợp, bạn có thể tránh viết phần mở rộng C mà vẫn duy trì khả năng portable sang các triển khai khác. Ví dụ: nếu trường hợp sử dụng của bạn là gọi các hàm thư viện C hoặc các lệnh gọi hệ thống, bạn nên cân nhắc sử dụng mô-đun :mod:`ctypes` hoặc thư viện `cffi <https://cffi.readthedocs.io/>`_ thay vì tự viết mã C. Các mô-đun này cho phép bạn viết mã Python để giao tiếp với mã C và có tính portable giữa các triển khai Python tốt hơn so với việc viết và biên dịch một mô-đun mở rộng C.
 
 
 .. _extending-simpleexample:
 
-A Simple Example
-================
+Một ví dụ đơn giản
+==================
 
-Let's create an extension module called ``spam`` (the favorite food of Monty
-Python fans...) and let's say we want to create a Python interface to the C
-library function :c:func:`system` [#]_. This function takes a null-terminated
-character string as argument and returns an integer.  We want this function to
-be callable from Python as follows:
+Hãy tạo một mô-đun mở rộng có tên ``spam`` (món ăn yêu thích của những người hâm mộ Monty Python...) và giả sử chúng ta muốn tạo một giao diện Python cho hàm thư viện C :c:func:`system` [#]_. Hàm này nhận một chuỗi ký tự kết thúc bằng null làm đối số và trả về một số nguyên. Chúng ta muốn hàm này có thể được gọi từ Python như sau:
 
 .. code-block:: pycon
 
    >>> import spam
    >>> status = spam.system("ls -l")
 
-Begin by creating a file :file:`spammodule.c`.  (Historically, if a module is
-called ``spam``, the C file containing its implementation is called
-:file:`spammodule.c`; if the module name is very long, like ``spammify``, the
-module name can be just :file:`spammify.c`.)
+Bắt đầu bằng cách tạo một tệp :file:`spammodule.c`.  (Theo thông lệ trước đây, nếu một module có tên ``spam``, tệp C chứa phần triển khai của module đó được gọi là
+:file:`spammodule.c`; nếu tên module rất dài, chẳng hạn như ``spammify``, thì tên module có thể chỉ là :file:`spammify.c`.)
 
-The first two lines of our file can be::
+Hai dòng đầu tiên của tệp có thể là::
 
    #define PY_SSIZE_T_CLEAN
    #include <Python.h>
 
-which pulls in the Python API (you can add a comment describing the purpose of
-the module and a copyright notice if you like).
+dòng này đưa Python API vào (nếu muốn, bạn có thể thêm một comment mô tả mục đích của module và thông báo bản quyền).
 
 .. note::
 
-   Since Python may define some pre-processor definitions which affect the standard
-   headers on some systems, you *must* include :file:`Python.h` before any standard
-   headers are included.
+   Vì Python có thể định nghĩa một số macro tiền xử lý ảnh hưởng đến các header chuẩn trên một số hệ thống, bạn *phải* include :file:`Python.h` trước khi include bất kỳ header chuẩn nào.
 
-   ``#define PY_SSIZE_T_CLEAN`` was used to indicate that ``Py_ssize_t`` should be
-   used in some APIs instead of ``int``.
-   It is not necessary since Python 3.13, but we keep it here for backward compatibility.
-   See :ref:`arg-parsing-string-and-buffers` for a description of this macro.
+   ``#define PY_SSIZE_T_CLEAN`` được dùng để chỉ rằng trong một số API, nên sử dụng ``Py_ssize_t`` thay vì ``int``. Điều này không còn cần thiết kể từ Python 3.13, nhưng chúng tôi vẫn giữ lại để tương thích ngược. Xem :ref:`arg-parsing-string-and-buffers` để biết mô tả về macro này.
 
-All user-visible symbols defined by :file:`Python.h` have a prefix of ``Py`` or
-``PY``, except those defined in standard header files.
+Tất cả các symbol hiển thị với người dùng được định nghĩa bởi :file:`Python.h` đều có tiền tố ``Py`` hoặc ``PY``, ngoại trừ những symbol được định nghĩa trong các tệp header tiêu chuẩn.
 
 .. tip::
 
-   For backward compatibility, :file:`Python.h` includes several standard header files.
-   C extensions should include the standard headers that they use,
-   and should not rely on these implicit includes.
-   If using the limited C API version 3.13 or newer, the implicit includes are:
+   Để tương thích ngược, :file:`Python.h` bao gồm một số tệp header tiêu chuẩn. Các phần mở rộng C nên include những header tiêu chuẩn mà chúng sử dụng và không nên phụ thuộc vào các include ngầm định này. Nếu sử dụng limited C API phiên bản 3.13 trở lên, các include ngầm định là:
 
    * ``<assert.h>``
-   * ``<intrin.h>`` (on Windows)
+   * ``<intrin.h>`` (trên Windows)
    * ``<inttypes.h>``
    * ``<limits.h>``
    * ``<math.h>``
    * ``<stdarg.h>``
    * ``<wchar.h>``
-   * ``<sys/types.h>`` (if present)
+   * ``<sys/types.h>`` (nếu có)
 
-   If :c:macro:`Py_LIMITED_API` is not defined, or is set to version 3.12 or older,
-   the headers below are also included:
+   Nếu :c:macro:`Py_LIMITED_API` chưa được định nghĩa hoặc được đặt ở phiên bản 3.12 trở xuống, các header bên dưới cũng được include:
 
    * ``<ctype.h>``
-   * ``<unistd.h>`` (on POSIX)
+   * ``<unistd.h>`` (trên POSIX)
 
-   If :c:macro:`Py_LIMITED_API` is not defined, or is set to version 3.10 or older,
-   the headers below are also included:
+   Nếu :c:macro:`Py_LIMITED_API` chưa được định nghĩa hoặc được đặt thành phiên bản 3.10 hoặc cũ hơn, các header dưới đây cũng được включ vào:
 
    * ``<errno.h>``
    * ``<stdio.h>``
    * ``<stdlib.h>``
    * ``<string.h>``
 
-The next thing we add to our module file is the C function that will be called
-when the Python expression ``spam.system(string)`` is evaluated (we'll see
-shortly how it ends up being called)::
+Tiếp theo, chúng ta thêm vào tệp module hàm C sẽ được gọi khi biểu thức Python ``spam.system(string)`` được đánh giá (chúng ta sẽ sớm xem cách hàm này được gọi)::
 
    static PyObject *
    spam_system(PyObject *self, PyObject *args)
@@ -123,126 +87,65 @@ shortly how it ends up being called)::
        return PyLong_FromLong(sts);
    }
 
-There is a straightforward translation from the argument list in Python (for
-example, the single expression ``"ls -l"``) to the arguments passed to the C
-function.  The C function always has two arguments, conventionally named *self*
-and *args*.
+Có một cách chuyển đổi trực tiếp từ danh sách đối số trong Python (ví dụ: biểu thức duy nhất ``"ls -l"``) sang các đối số được truyền cho hàm C. Hàm C luôn có hai đối số, theo quy ước được đặt tên là *self* và *args*.
 
-The *self* argument points to the module object for module-level functions;
-for a method it would point to the object instance.
+Đối số *self* trỏ đến đối tượng module đối với các hàm cấp module; đối với một method, nó sẽ trỏ đến instance của đối tượng.
 
-The *args* argument will be a pointer to a Python tuple object containing the
-arguments.  Each item of the tuple corresponds to an argument in the call's
-argument list.  The arguments are Python objects --- in order to do anything
-with them in our C function we have to convert them to C values.  The function
-:c:func:`PyArg_ParseTuple` in the Python API checks the argument types and
-converts them to C values.  It uses a template string to determine the required
-types of the arguments as well as the types of the C variables into which to
-store the converted values.  More about this later.
+Đối số *args* sẽ là một con trỏ đến đối tượng tuple Python chứa các đối số. Mỗi phần tử của tuple tương ứng với một đối số trong danh sách đối số của lời gọi. Các đối số là các đối tượng Python --- để làm bất kỳ điều gì với chúng trong hàm C, chúng ta phải chuyển đổi chúng thành các giá trị C. Hàm
+:c:func:`PyArg_ParseTuple` trong Python API kiểm tra kiểu của các đối số và chuyển đổi chúng thành các giá trị C. Hàm này sử dụng một chuỗi mẫu để xác định các kiểu cần thiết của đối số cũng như kiểu của các biến C dùng để lưu trữ các giá trị đã chuyển đổi. Chúng ta sẽ tìm hiểu thêm về điều này sau.
 
-:c:func:`PyArg_ParseTuple` returns true (nonzero) if all arguments have the right
-type and its components have been stored in the variables whose addresses are
-passed.  It returns false (zero) if an invalid argument list was passed.  In the
-latter case it also raises an appropriate exception so the calling function can
-return ``NULL`` immediately (as we saw in the example).
+:c:func:`PyArg_ParseTuple` trả về true (khác 0) nếu tất cả các đối số đều có kiểu phù hợp và các thành phần của chúng đã được lưu vào những biến có địa chỉ được truyền vào. Hàm trả về false (0) nếu một danh sách đối số không hợp lệ được truyền vào. Trong trường hợp sau, hàm cũng đưa ra một exception phù hợp để hàm gọi có thể trả về ``NULL`` ngay lập tức (như chúng ta đã thấy trong ví dụ).
 
 
 .. _extending-errors:
 
-Intermezzo: Errors and Exceptions
-=================================
+Xen kẽ: Lỗi và Ngoại lệ
+=======================
 
-An important convention throughout the Python interpreter is the following: when
-a function fails, it should set an exception condition and return an error value
-(usually ``-1`` or a ``NULL`` pointer).  Exception information is stored in
-three members of the interpreter's thread state.  These are ``NULL`` if
-there is no exception.  Otherwise they are the C equivalents of the members
-of the Python tuple returned by :meth:`sys.exc_info`.  These are the
-exception type, exception instance, and a traceback object.  It is important
-to know about them to understand how errors are passed around.
+Một quy ước quan trọng trong toàn bộ trình thông dịch Python là: khi một hàm không thành công, hàm đó phải thiết lập điều kiện ngoại lệ và trả về một giá trị lỗi (thường là ``-1`` hoặc một con trỏ ``NULL``). Thông tin ngoại lệ được lưu trong ba thành viên của trạng thái luồng của trình thông dịch. Khi không có ngoại lệ, các thành viên này là ``NULL``. Nếu không, chúng là các thành phần tương ứng trong C của bộ ba Python được :meth:`sys.exc_info` trả về. Đó là kiểu ngoại lệ, thực thể ngoại lệ và một đối tượng traceback. Biết về chúng là điều quan trọng để hiểu cách các lỗi được truyền đi.
 
-The Python API defines a number of functions to set various types of exceptions.
+Python API định nghĩa một số hàm để thiết lập nhiều loại ngoại lệ khác nhau.
 
-The most common one is :c:func:`PyErr_SetString`.  Its arguments are an exception
-object and a C string.  The exception object is usually a predefined object like
-:c:data:`PyExc_ZeroDivisionError`.  The C string indicates the cause of the error
-and is converted to a Python string object and stored as the "associated value"
-of the exception.
+Hàm phổ biến nhất là :c:func:`PyErr_SetString`. Các đối số của hàm là một đối tượng ngoại lệ và một chuỗi C. Đối tượng ngoại lệ thường là một đối tượng được định nghĩa sẵn như
+:c:data:`PyExc_ZeroDivisionError`. Chuỗi C cho biết nguyên nhân của lỗi, được chuyển đổi thành một đối tượng chuỗi Python và lưu dưới dạng "giá trị liên kết" của ngoại lệ.
 
-Another useful function is :c:func:`PyErr_SetFromErrno`, which only takes an
-exception argument and constructs the associated value by inspection of the
-global variable :c:data:`errno`.  The most general function is
-:c:func:`PyErr_SetObject`, which takes two object arguments, the exception and
-its associated value.  You don't need to :c:func:`Py_INCREF` the objects passed
-to any of these functions.
+Một hàm hữu ích khác là :c:func:`PyErr_SetFromErrno`, chỉ nhận một đối số ngoại lệ và tạo giá trị liên kết bằng cách kiểm tra biến toàn cục :c:data:`errno`. Hàm tổng quát nhất là
+:c:func:`PyErr_SetObject`, nhận hai đối số đối tượng, gồm ngoại lệ và giá trị liên kết của nó. Bạn không cần :c:func:`Py_INCREF` các đối tượng được truyền cho bất kỳ hàm nào trong số này.
 
-You can test non-destructively whether an exception has been set with
-:c:func:`PyErr_Occurred`.  This returns the current exception object, or ``NULL``
-if no exception has occurred.  You normally don't need to call
-:c:func:`PyErr_Occurred` to see whether an error occurred in a function call,
-since you should be able to tell from the return value.
+Bạn có thể kiểm tra một cách không gây thay đổi xem một exception đã được thiết lập hay chưa bằng
+:c:func:`PyErr_Occurred`.  Lệnh này trả về đối tượng exception hiện tại hoặc ``NULL`` nếu chưa xảy ra exception nào.  Thông thường, bạn không cần gọi
+:c:func:`PyErr_Occurred` để kiểm tra xem đã xảy ra lỗi trong một lần gọi hàm hay chưa, vì bạn có thể nhận biết điều đó từ giá trị trả về.
 
-When a function *f* that calls another function *g* detects that the latter
-fails, *f* should itself return an error value (usually ``NULL`` or ``-1``).  It
-should *not* call one of the ``PyErr_*`` functions --- one has already
-been called by *g*. *f*'s caller is then supposed to also return an error
-indication to *its* caller, again *without* calling ``PyErr_*``, and so on
---- the most detailed cause of the error was already reported by the function
-that first detected it.  Once the error reaches the Python interpreter's main
-loop, this aborts the currently executing Python code and tries to find an
-exception handler specified by the Python programmer.
+Khi một hàm *f* gọi một hàm khác *g* và phát hiện hàm sau bị lỗi, *f* cũng phải tự trả về một giá trị lỗi (thường là ``NULL`` hoặc ``-1``). Nó *không* được gọi một trong các hàm ``PyErr_*`` --- một hàm như vậy đã được *g* gọi. Sau đó, caller của *f* cũng phải trả về một chỉ báo lỗi cho caller *its*, một lần nữa *không* gọi ``PyErr_*``, v.v. --- nguyên nhân chi tiết nhất của lỗi đã được báo cáo bởi hàm đầu tiên phát hiện ra lỗi. Khi lỗi đến vòng lặp chính của trình thông dịch Python, vòng lặp này sẽ hủy đoạn mã Python hiện đang thực thi và cố gắng tìm một exception handler do lập trình viên Python chỉ định.
 
-(There are situations where a module can actually give a more detailed error
-message by calling another ``PyErr_*`` function, and in such cases it is
-fine to do so.  As a general rule, however, this is not necessary, and can cause
-information about the cause of the error to be lost: most operations can fail
-for a variety of reasons.)
+(Có những tình huống trong đó một module thực sự có thể cung cấp thông báo lỗi chi tiết hơn bằng cách gọi một hàm ``PyErr_*`` khác, và trong những trường hợp như vậy thì làm vậy là phù hợp. Tuy nhiên, theo nguyên tắc chung, điều này không cần thiết và có thể khiến thông tin về nguyên nhân của lỗi bị mất: hầu hết các thao tác đều có thể thất bại vì nhiều lý do khác nhau.)
 
-To ignore an exception set by a function call that failed, the exception
-condition must be cleared explicitly by calling :c:func:`PyErr_Clear`.  The only
-time C code should call :c:func:`PyErr_Clear` is if it doesn't want to pass the
-error on to the interpreter but wants to handle it completely by itself
-(possibly by trying something else, or pretending nothing went wrong).
+Để bỏ qua một exception được thiết lập bởi một lần gọi hàm bị lỗi, điều kiện exception phải được xóa rõ ràng bằng cách gọi :c:func:`PyErr_Clear`. Mã C chỉ nên gọi :c:func:`PyErr_Clear` khi không muốn chuyển lỗi lên trình thông dịch mà muốn tự mình xử lý hoàn toàn (có thể bằng cách thử một phương án khác hoặc giả vờ như không có gì sai).
 
-Every failing :c:func:`malloc` call must be turned into an exception --- the
-direct caller of :c:func:`malloc` (or :c:func:`realloc`) must call
-:c:func:`PyErr_NoMemory` and return a failure indicator itself.  All the
-object-creating functions (for example, :c:func:`PyLong_FromLong`) already do
-this, so this note is only relevant to those who call :c:func:`malloc` directly.
+Mọi lần gọi :c:func:`malloc` bị lỗi đều phải được chuyển thành một exception --- caller trực tiếp của :c:func:`malloc` (hoặc :c:func:`realloc`) phải gọi
+:c:func:`PyErr_NoMemory` và tự nó trả về một chỉ báo thất bại. Tất cả các hàm tạo đối tượng (ví dụ: :c:func:`PyLong_FromLong`) đều đã làm điều này, vì vậy lưu ý này chỉ liên quan đến những ai trực tiếp gọi :c:func:`malloc`.
 
-Also note that, with the important exception of :c:func:`PyArg_ParseTuple` and
-friends, functions that return an integer status usually return a positive value
-or zero for success and ``-1`` for failure, like Unix system calls.
+Cũng lưu ý rằng, ngoại trừ trường hợp quan trọng là :c:func:`PyArg_ParseTuple` và các hàm tương tự, những hàm trả về trạng thái dạng số nguyên thường trả về một giá trị dương hoặc bằng không khi thành công và ``-1`` khi thất bại, giống như các system call của Unix.
 
-Finally, be careful to clean up garbage (by making :c:func:`Py_XDECREF` or
-:c:func:`Py_DECREF` calls for objects you have already created) when you return
-an error indicator!
+Cuối cùng, hãy nhớ dọn dẹp các đối tượng rác (bằng cách gọi :c:func:`Py_XDECREF` hoặc
+:c:func:`Py_DECREF` cho những đối tượng bạn đã tạo) khi trả về một chỉ báo lỗi!
 
-The choice of which exception to raise is entirely yours.  There are predeclared
-C objects corresponding to all built-in Python exceptions, such as
-:c:data:`PyExc_ZeroDivisionError`, which you can use directly. Of course, you
-should choose exceptions wisely --- don't use :c:data:`PyExc_TypeError` to mean
-that a file couldn't be opened (that should probably be :c:data:`PyExc_OSError`).
-If something's wrong with the argument list, the :c:func:`PyArg_ParseTuple`
-function usually raises :c:data:`PyExc_TypeError`.  If you have an argument whose
-value must be in a particular range or must satisfy other conditions,
-:c:data:`PyExc_ValueError` is appropriate.
+Bạn hoàn toàn có thể tự chọn exception cần raise. Có các đối tượng C được khai báo sẵn tương ứng với tất cả các exception dựng sẵn của Python, chẳng hạn như
+:c:data:`PyExc_ZeroDivisionError`, mà bạn có thể sử dụng trực tiếp. Tất nhiên, bạn nên lựa chọn exception một cách hợp lý --- đừng dùng :c:data:`PyExc_TypeError` để biểu thị rằng không thể mở một tệp (trường hợp đó có lẽ nên dùng :c:data:`PyExc_OSError`). Nếu danh sách đối số có vấn đề, hàm :c:func:`PyArg_ParseTuple` thường raise :c:data:`PyExc_TypeError`. Nếu bạn có một đối số mà giá trị của nó phải nằm trong một phạm vi cụ thể hoặc phải thỏa mãn các điều kiện khác,
+:c:data:`PyExc_ValueError` là phù hợp.
 
-You can also define a new exception that is unique to your module.
-The simplest way to do this is to declare a static global object variable at
-the beginning of the file::
+Bạn cũng có thể định nghĩa một exception mới dành riêng cho module của mình. Cách đơn giản nhất để thực hiện việc này là khai báo một biến đối tượng toàn cục static ở đầu tệp::
 
    static PyObject *SpamError = NULL;
 
-and initialize it by calling :c:func:`PyErr_NewException` in the module's
-:c:data:`Py_mod_exec` function (:c:func:`!spam_module_exec`)::
+và khởi tạo biến đó bằng cách gọi :c:func:`PyErr_NewException` trong hàm
+:c:data:`Py_mod_exec` của module (:c:func:`!spam_module_exec`)::
 
    SpamError = PyErr_NewException("spam.error", NULL, NULL);
 
-Since :c:data:`!SpamError` is a global variable, it will be overwritten every time
-the module is reinitialized, when the :c:data:`Py_mod_exec` function is called.
+Vì :c:data:`!SpamError` là một biến toàn cục, nó sẽ bị ghi đè mỗi khi module được khởi tạo lại, khi hàm :c:data:`Py_mod_exec` được gọi.
 
-For now, let's avoid the issue: we will block repeated initialization by raising an
+Hiện tại, hãy tránh vấn đề này: chúng ta sẽ ngăn việc khởi tạo lặp lại bằng cách raise một
 :py:exc:`ImportError`::
 
    static PyObject *SpamError = NULL;
@@ -271,7 +174,7 @@ For now, let's avoid the issue: we will block repeated initialization by raising
    static struct PyModuleDef spam_module = {
        .m_base = PyModuleDef_HEAD_INIT,
        .m_name = "spam",
-       .m_size = 0,  // non-negative
+       .m_size = 0,  // không âm
        .m_slots = spam_module_slots,
    };
 
@@ -281,28 +184,16 @@ For now, let's avoid the issue: we will block repeated initialization by raising
        return PyModuleDef_Init(&spam_module);
    }
 
-Note that the Python name for the exception object is :exc:`!spam.error`.  The
-:c:func:`PyErr_NewException` function may create a class with the base class
-being :exc:`Exception` (unless another class is passed in instead of ``NULL``),
-described in :ref:`bltin-exceptions`.
+Lưu ý rằng tên Python của đối tượng exception là :exc:`!spam.error`.  Hàm
+:c:func:`PyErr_NewException` có thể tạo một class với base class là :exc:`Exception` (trừ khi một class khác được truyền vào thay cho ``NULL``), được mô tả trong :ref:`bltin-exceptions`.
 
-Note also that the :c:data:`!SpamError` variable retains a reference to the newly
-created exception class; this is intentional!  Since the exception could be
-removed from the module by external code, an owned reference to the class is
-needed to ensure that it will not be discarded, causing :c:data:`!SpamError` to
-become a dangling pointer. Should it become a dangling pointer, C code which
-raises the exception could cause a core dump or other unintended side effects.
+Cũng lưu ý rằng biến :c:data:`!SpamError` giữ một tham chiếu đến lớp ngoại lệ mới được tạo; đây là chủ ý! Vì ngoại lệ có thể bị mã bên ngoài xóa khỏi module, cần có một tham chiếu sở hữu đến lớp để bảo đảm lớp đó không bị loại bỏ, khiến :c:data:`!SpamError` trở thành con trỏ treo. Nếu trở thành con trỏ treo, mã C thực hiện việc phát sinh ngoại lệ có thể gây ra core dump hoặc các tác dụng phụ ngoài ý muốn khác.
 
-For now, the :c:func:`Py_DECREF` call to remove this reference is missing.
-Even when the Python interpreter shuts down, the global :c:data:`!SpamError`
-variable will not be garbage-collected. It will "leak".
-We did, however, ensure that this will happen at most once per process.
+Hiện tại, lệnh gọi :c:func:`Py_DECREF` để xóa tham chiếu này vẫn còn thiếu. Ngay cả khi trình thông dịch Python tắt, biến toàn cục :c:data:`!SpamError` cũng sẽ không được garbage collection. Nó sẽ bị "rò rỉ". Tuy nhiên, chúng ta đã bảo đảm rằng điều này xảy ra nhiều nhất một lần trong mỗi tiến trình.
 
-We discuss the use of :c:macro:`PyMODINIT_FUNC` as a function return type later in this
-sample.
+Phần sau của ví dụ này sẽ thảo luận về việc sử dụng :c:macro:`PyMODINIT_FUNC` làm kiểu trả về của hàm.
 
-The :exc:`!spam.error` exception can be raised in your extension module using a
-call to :c:func:`PyErr_SetString` as shown below::
+Có thể phát sinh ngoại lệ :exc:`!spam.error` trong extension module của bạn bằng cách gọi :c:func:`PyErr_SetString` như minh họa bên dưới::
 
    static PyObject *
    spam_system(PyObject *self, PyObject *args)
@@ -323,81 +214,59 @@ call to :c:func:`PyErr_SetString` as shown below::
 
 .. _backtoexample:
 
-Back to the Example
-===================
+Quay lại ví dụ
+==============
 
-Going back to our example function, you should now be able to understand this
-statement::
+Quay lại hàm ví dụ, giờ đây bạn có thể hiểu câu lệnh này::
 
    if (!PyArg_ParseTuple(args, "s", &command))
        return NULL;
 
-It returns ``NULL`` (the error indicator for functions returning object pointers)
-if an error is detected in the argument list, relying on the exception set by
-:c:func:`PyArg_ParseTuple`.  Otherwise the string value of the argument has been
-copied to the local variable :c:data:`!command`.  This is a pointer assignment and
-you are not supposed to modify the string to which it points (so in Standard C,
-the variable :c:data:`!command` should properly be declared as ``const char
-*command``).
+Hàm trả về ``NULL`` (ký hiệu lỗi dành cho các hàm trả về con trỏ đối tượng) nếu phát hiện lỗi trong danh sách đối số, dựa vào ngoại lệ được thiết lập bởi
+:c:func:`PyArg_ParseTuple`. Nếu không, giá trị chuỗi của đối số đã được sao chép vào biến cục bộ :c:data:`!command`. Đây là phép gán con trỏ và bạn không được sửa đổi chuỗi mà nó trỏ tới (vì vậy trong Standard C, biến :c:data:`!command` cần được khai báo đúng là ``const char *command``).
 
-The next statement is a call to the Unix function :c:func:`system`, passing it
-the string we just got from :c:func:`PyArg_ParseTuple`::
+Câu lệnh tiếp theo là một lệnh gọi đến hàm Unix :c:func:`system`, truyền cho nó chuỗi mà chúng ta vừa nhận được từ :c:func:`PyArg_ParseTuple`::
 
    sts = system(command);
 
-Our :func:`!spam.system` function must return the value of :c:data:`!sts` as a
-Python object.  This is done using the function :c:func:`PyLong_FromLong`. ::
+Hàm :func:`!spam.system` của chúng ta phải trả về giá trị của :c:data:`!sts` dưới dạng một đối tượng Python. Việc này được thực hiện bằng hàm :c:func:`PyLong_FromLong`.::
 
    return PyLong_FromLong(sts);
 
-In this case, it will return an integer object.  (Yes, even integers are objects
-on the heap in Python!)
+Trong trường hợp này, nó sẽ trả về một đối tượng số nguyên. (Đúng vậy, ngay cả số nguyên cũng là các đối tượng trên heap trong Python!)
 
-If you have a C function that returns no useful argument (a function returning
-:c:expr:`void`), the corresponding Python function must return ``None``.   You
-need this idiom to do so (which is implemented by the :c:macro:`Py_RETURN_NONE`
-macro)::
+Nếu bạn có một hàm C không trả về đối số hữu ích nào (một hàm trả về
+:c:expr:`void`), thì hàm Python tương ứng phải trả về ``None``. Bạn cần dùng thành ngữ sau để thực hiện việc đó (được triển khai bằng macro :c:macro:`Py_RETURN_NONE`)::
 
    Py_INCREF(Py_None);
    return Py_None;
 
-:c:data:`Py_None` is the C name for the special Python object ``None``.  It is a
-genuine Python object rather than a ``NULL`` pointer, which means "error" in most
-contexts, as we have seen.
+:c:data:`Py_None` là tên C của đối tượng Python đặc biệt ``None``. Đây là một đối tượng Python thực sự chứ không phải một con trỏ ``NULL``, vốn có nghĩa là "lỗi" trong hầu hết các ngữ cảnh, như chúng ta đã thấy.
 
 
 .. _methodtable:
 
-The Module's Method Table and Initialization Function
-=====================================================
+Bảng phương thức và Hàm khởi tạo của Module
+===========================================
 
-I promised to show how :c:func:`!spam_system` is called from Python programs.
-First, we need to list its name and address in a "method table"::
+Tôi đã hứa sẽ chỉ cho bạn cách :c:func:`!spam_system` được gọi từ các chương trình Python. Trước tiên, chúng ta cần liệt kê tên và địa chỉ của nó trong một "bảng phương thức"::
 
    static PyMethodDef spam_methods[] = {
        ...
        {"system",  spam_system, METH_VARARGS,
         "Execute a shell command."},
        ...
-       {NULL, NULL, 0, NULL}        /* Sentinel */
+       {NULL, NULL, 0, NULL}        /* Phần tử đánh dấu kết thúc */
    };
 
-Note the third entry (``METH_VARARGS``).  This is a flag telling the interpreter
-the calling convention to be used for the C function.  It should normally always
-be ``METH_VARARGS`` or ``METH_VARARGS | METH_KEYWORDS``; a value of ``0`` means
-that an obsolete variant of :c:func:`PyArg_ParseTuple` is used.
+Hãy lưu ý mục thứ ba (``METH_VARARGS``). Đây là một cờ cho trình thông dịch biết quy ước gọi nào sẽ được sử dụng cho hàm C. Thông thường, giá trị này luôn phải là ``METH_VARARGS`` hoặc ``METH_VARARGS | METH_KEYWORDS``; giá trị ``0`` có nghĩa là một biến thể lỗi thời của :c:func:`PyArg_ParseTuple` được sử dụng.
 
-When using only ``METH_VARARGS``, the function should expect the Python-level
-parameters to be passed in as a tuple acceptable for parsing via
-:c:func:`PyArg_ParseTuple`; more information on this function is provided below.
+Khi chỉ sử dụng ``METH_VARARGS``, hàm phải chờ các tham số ở cấp Python được truyền vào dưới dạng một tuple có thể được phân tích cú pháp thông qua
+:c:func:`PyArg_ParseTuple`; bên dưới có cung cấp thêm thông tin về hàm này.
 
-The :c:macro:`METH_KEYWORDS` bit may be set in the third field if keyword
-arguments should be passed to the function.  In this case, the C function should
-accept a third ``PyObject *`` parameter which will be a dictionary of keywords.
-Use :c:func:`PyArg_ParseTupleAndKeywords` to parse the arguments to such a
-function.
+Có thể đặt bit :c:macro:`METH_KEYWORDS` trong trường thứ ba nếu cần truyền các đối số từ khóa cho hàm. Trong trường hợp này, hàm C phải chấp nhận tham số ``PyObject *`` thứ ba, là một dictionary chứa các từ khóa. Sử dụng :c:func:`PyArg_ParseTupleAndKeywords` để phân tích cú pháp các đối số cho một hàm như vậy.
 
-The method table must be referenced in the module definition structure::
+Bảng phương thức phải được tham chiếu trong cấu trúc định nghĩa module::
 
    static struct PyModuleDef spam_module = {
        ...
@@ -405,10 +274,8 @@ The method table must be referenced in the module definition structure::
        ...
    };
 
-This structure, in turn, must be passed to the interpreter in the module's
-initialization function.  The initialization function must be named
-:c:func:`!PyInit_name`, where *name* is the name of the module, and should be the
-only non-\ ``static`` item defined in the module file::
+Cấu trúc này, đến lượt nó, phải được truyền cho interpreter trong hàm khởi tạo của module. Hàm khởi tạo phải có tên là
+:c:func:`!PyInit_name`, trong đó *name* là tên của module và phải là mục duy nhất không phải \ ``static`` được định nghĩa trong tệp module::
 
    PyMODINIT_FUNC
    PyInit_spam(void)
@@ -416,19 +283,12 @@ only non-\ ``static`` item defined in the module file::
        return PyModuleDef_Init(&spam_module);
    }
 
-Note that :c:macro:`PyMODINIT_FUNC` declares the function as ``PyObject *`` return type,
-declares any special linkage declarations required by the platform, and for C++
-declares the function as ``extern "C"``.
+Lưu ý rằng :c:macro:`PyMODINIT_FUNC` khai báo hàm với kiểu trả về là ``PyObject *``, khai báo mọi liên kết đặc biệt cần thiết cho nền tảng, và đối với C++ thì khai báo hàm là ``extern "C"``.
 
-:c:func:`!PyInit_spam` is called when each interpreter imports its module
-:mod:`!spam` for the first time.  (See below for comments about embedding Python.)
-A pointer to the module definition must be returned via :c:func:`PyModuleDef_Init`,
-so that the import machinery can create the module and store it in ``sys.modules``.
+:c:func:`!PyInit_spam` được gọi khi mỗi interpreter lần đầu import module của nó
+:mod:`!spam`. (Xem bên dưới để biết các nhận xét về việc nhúng Python.) Một con trỏ đến định nghĩa module phải được trả về thông qua :c:func:`PyModuleDef_Init`, để cơ chế import có thể tạo module và lưu trữ module đó trong ``sys.modules``.
 
-When embedding Python, the :c:func:`!PyInit_spam` function is not called
-automatically unless there's an entry in the :c:data:`PyImport_Inittab` table.
-To add the module to the initialization table, use :c:func:`PyImport_AppendInittab`,
-optionally followed by an import of the module::
+Khi nhúng Python, hàm :c:func:`!PyInit_spam` không được tự động gọi trừ khi có một mục nhập trong bảng :c:data:`PyImport_Inittab`. Để thêm module vào bảng khởi tạo, hãy sử dụng :c:func:`PyImport_AppendInittab`, tùy chọn theo sau là thao tác import module::
 
    #define PY_SSIZE_T_CLEAN
    #include <Python.h>
@@ -440,36 +300,36 @@ optionally followed by an import of the module::
        PyConfig config;
        PyConfig_InitPythonConfig(&config);
 
-       /* Add a built-in module, before Py_Initialize */
+       /* Thêm một mô-đun tích hợp trước Py_Initialize */
        if (PyImport_AppendInittab("spam", PyInit_spam) == -1) {
            fprintf(stderr, "Error: could not extend in-built modules table\n");
            exit(1);
        }
 
-       /* Pass argv[0] to the Python interpreter */
+       /* Truyền argv[0] cho trình thông dịch Python */
        status = PyConfig_SetBytesString(&config, &config.program_name, argv[0]);
        if (PyStatus_Exception(status)) {
            goto exception;
        }
 
-       /* Initialize the Python interpreter.  Required.
-          If this step fails, it will be a fatal error. */
+       /* Khởi tạo trình thông dịch Python. Bắt buộc.
+          Nếu bước này thất bại, đó sẽ là lỗi nghiêm trọng. */
        status = Py_InitializeFromConfig(&config);
        if (PyStatus_Exception(status)) {
            goto exception;
        }
        PyConfig_Clear(&config);
 
-       /* Optionally import the module; alternatively,
-          import can be deferred until the embedded script
-          imports it. */
+       /* Tùy chọn import mô-đun; hoặc,
+          có thể hoãn việc import cho đến khi tập lệnh nhúng
+          để mã Python import mô-đun. */
        PyObject *pmodule = PyImport_ImportModule("spam");
        if (!pmodule) {
            PyErr_Print();
            fprintf(stderr, "Error: could not import module 'spam'\n");
        }
 
-       // ... use Python C API here ...
+       // ... sử dụng Python C API ở đây ...
 
        return 0;
 
@@ -480,51 +340,30 @@ optionally followed by an import of the module::
 
 .. note::
 
-   If you declare a global variable or a local static one, the module may
-   experience unintended side-effects on re-initialisation, for example when
-   removing entries from ``sys.modules`` or importing compiled modules into
-   multiple interpreters within a process
-   (or following a :c:func:`fork` without an intervening :c:func:`exec`).
-   If module state is not yet fully :ref:`isolated <isolating-extensions-howto>`,
-   authors should consider marking the module as having no support for subinterpreters
-   (via :c:macro:`Py_MOD_MULTIPLE_INTERPRETERS_NOT_SUPPORTED`).
+   Nếu bạn khai báo một biến toàn cục hoặc một biến static cục bộ, module có thể gặp các tác dụng phụ ngoài ý muốn khi khởi tạo lại, chẳng hạn như khi xóa các mục khỏi ``sys.modules`` hoặc nhập các module đã biên dịch vào nhiều interpreter trong cùng một tiến trình (hoặc sau một :c:func:`fork` mà không có một :c:func:`exec` xen giữa). Nếu trạng thái module chưa được :ref:`cô lập <isolating-extensions-howto>` hoàn toàn, tác giả nên cân nhắc đánh dấu module là không hỗ trợ subinterpreter (thông qua :c:macro:`Py_MOD_MULTIPLE_INTERPRETERS_NOT_SUPPORTED`).
 
-A more substantial example module is included in the Python source distribution
-as :file:`Modules/xxlimited.c`.  This file may be used as a template or simply
-read as an example.
+Một module mẫu đầy đủ hơn được cung cấp trong bản phân phối mã nguồn Python dưới dạng :file:`Modules/xxlimited.c`. Bạn có thể dùng tệp này làm mẫu hoặc chỉ đọc để tham khảo.
 
 
 .. _compilation:
 
-Compilation and Linkage
-=======================
+Biên dịch và liên kết
+=====================
 
-There are two more things to do before you can use your new extension: compiling
-and linking it with the Python system.  If you use dynamic loading, the details
-may depend on the style of dynamic loading your system uses; see the chapters
-about building extension modules (chapter :ref:`building`) and additional
-information that pertains only to building on Windows (chapter
-:ref:`building-on-windows`) for more information about this.
+Còn hai việc cần thực hiện trước khi bạn có thể sử dụng extension mới: biên dịch và liên kết nó với hệ thống Python. Nếu bạn sử dụng dynamic loading, chi tiết có thể phụ thuộc vào kiểu dynamic loading mà hệ thống của bạn sử dụng; hãy xem các chương về xây dựng extension module (chương :ref:`building`) và thông tin bổ sung chỉ áp dụng cho việc xây dựng trên Windows (chương
+:ref:`building-on-windows`) để biết thêm thông tin về vấn đề này.
 
-If you can't use dynamic loading, or if you want to make your module a permanent
-part of the Python interpreter, you will have to change the configuration setup
-and rebuild the interpreter.  Luckily, this is very simple on Unix: just place
-your file (:file:`spammodule.c` for example) in the :file:`Modules/` directory
-of an unpacked source distribution, add a line to the file
-:file:`Modules/Setup.local` describing your file:
+Nếu bạn không thể sử dụng dynamic loading, hoặc muốn biến module của mình thành một phần cố định của Python interpreter, bạn sẽ phải thay đổi cấu hình thiết lập và xây dựng lại interpreter. May mắn là việc này rất đơn giản trên Unix: chỉ cần đặt tệp của bạn (ví dụ :file:`spammodule.c`) vào thư mục :file:`Modules/` của bản phân phối mã nguồn đã giải nén, rồi thêm một dòng vào tệp
+:file:`Modules/Setup.local` mô tả tệp của bạn:
 
 .. code-block:: sh
 
    spam spammodule.o
 
-and rebuild the interpreter by running :program:`make` in the toplevel
-directory.  You can also run :program:`make` in the :file:`Modules/`
-subdirectory, but then you must first rebuild :file:`Makefile` there by running
-':program:`make` Makefile'.  (This is necessary each time you change the
-:file:`Setup` file.)
+và xây dựng lại interpreter bằng cách chạy :program:`make` trong thư mục cấp cao nhất. Bạn cũng có thể chạy :program:`make` trong thư mục con :file:`Modules/`, nhưng trước tiên bạn phải xây dựng lại :file:`Makefile` ở đó bằng cách chạy ':program:`make` Makefile'. (Việc này là cần thiết mỗi khi bạn thay đổi
+tệp :file:`Setup`.)
 
-If your module requires additional libraries to link with, these can be listed
-on the line in the configuration file as well, for instance:
+Nếu module của bạn yêu cầu liên kết với các thư viện bổ sung, bạn cũng có thể liệt kê chúng trên dòng tương ứng trong tệp cấu hình, chẳng hạn như:
 
 .. code-block:: sh
 
@@ -533,27 +372,14 @@ on the line in the configuration file as well, for instance:
 
 .. _callingpython:
 
-Calling Python Functions from C
-===============================
+Gọi các hàm Python từ C
+=======================
 
-So far we have concentrated on making C functions callable from Python.  The
-reverse is also useful: calling Python functions from C. This is especially the
-case for libraries that support so-called "callback" functions.  If a C
-interface makes use of callbacks, the equivalent Python often needs to provide a
-callback mechanism to the Python programmer; the implementation will require
-calling the Python callback functions from a C callback.  Other uses are also
-imaginable.
+Cho đến nay, chúng ta đã tập trung vào việc cho phép gọi các hàm C từ Python. Chiều ngược lại cũng hữu ích: gọi các hàm Python từ C. Điều này đặc biệt đúng với các thư viện hỗ trợ cái gọi là hàm "callback". Nếu một giao diện C sử dụng callback, phần tương đương trong Python thường cần cung cấp một cơ chế callback cho lập trình viên Python; phần triển khai sẽ yêu cầu gọi các hàm callback Python từ một callback C. Cũng có thể hình dung những trường hợp sử dụng khác.
 
-Fortunately, the Python interpreter is easily called recursively, and there is a
-standard interface to call a Python function.  (If you're interested in how to call the
-Python parser with a particular string as input, see :ref:`veryhigh`.)
+May mắn là interpreter Python có thể dễ dàng được gọi đệ quy, và có một giao diện tiêu chuẩn để gọi một hàm Python. (Nếu bạn quan tâm đến cách gọi trình phân tích cú pháp Python với một chuỗi cụ thể làm đầu vào, hãy xem :ref:`veryhigh`.)
 
-Calling a Python function is easy.  First, the Python program must somehow pass
-you the Python function object.  You should provide a function (or some other
-interface) to do this.  When this function is called, save a pointer to the
-Python function object (be careful to :c:func:`Py_INCREF` it!) in a global
-variable --- or wherever you see fit. For example, the following function might
-be part of a module definition::
+Việc gọi một hàm Python rất đơn giản. Trước tiên, chương trình Python phải bằng cách nào đó truyền cho bạn đối tượng hàm Python. Bạn nên cung cấp một hàm (hoặc một giao diện khác) để thực hiện việc này. Khi hàm này được gọi, hãy lưu một con trỏ đến đối tượng hàm Python (hãy cẩn thận :c:func:`Py_INCREF` nó!) vào một biến toàn cục — hoặc bất cứ nơi nào bạn thấy phù hợp. Ví dụ, hàm sau đây có thể là một phần của định nghĩa module::
 
    static PyObject *my_callback = NULL;
 
@@ -568,36 +394,28 @@ be part of a module definition::
                PyErr_SetString(PyExc_TypeError, "parameter must be callable");
                return NULL;
            }
-           Py_XINCREF(temp);         /* Add a reference to new callback */
-           Py_XDECREF(my_callback);  /* Dispose of previous callback */
-           my_callback = temp;       /* Remember new callback */
-           /* Boilerplate to return "None" */
+           Py_XINCREF(temp);         /* Thêm tham chiếu đến callback mới */
+           Py_XDECREF(my_callback);  /* Hủy callback trước đó */
+           my_callback = temp;       /* Lưu callback mới */
+           /* Mã khuôn mẫu để trả về "None" */
            Py_INCREF(Py_None);
            result = Py_None;
        }
        return result;
    }
 
-This function must be registered with the interpreter using the
-:c:macro:`METH_VARARGS` flag; this is described in section :ref:`methodtable`.  The
-:c:func:`PyArg_ParseTuple` function and its arguments are documented in section
+Hàm này phải được đăng ký với interpreter bằng cách sử dụng
+cờ :c:macro:`METH_VARARGS`; nội dung này được mô tả trong phần :ref:`methodtable`.
+Hàm :c:func:`PyArg_ParseTuple` và các đối số của nó được ghi chép trong phần
 :ref:`parsetuple`.
 
-The macros :c:func:`Py_XINCREF` and :c:func:`Py_XDECREF` increment/decrement the
-reference count of an object and are safe in the presence of ``NULL`` pointers
-(but note that *temp* will not be  ``NULL`` in this context).  More info on them
-in section :ref:`refcounts`.
+Các macro :c:func:`Py_XINCREF` và :c:func:`Py_XDECREF` tăng/giảm reference count của một đối tượng và an toàn khi có các con trỏ ``NULL`` (nhưng lưu ý rằng *temp* sẽ không được ``NULL`` trong ngữ cảnh này). Xem thêm thông tin về chúng trong phần :ref:`refcounts`.
 
 .. index:: single: PyObject_CallObject (C function)
 
-Later, when it is time to call the function, you call the C function
-:c:func:`PyObject_CallObject`.  This function has two arguments, both pointers to
-arbitrary Python objects: the Python function, and the argument list.  The
-argument list must always be a tuple object, whose length is the number of
-arguments.  To call the Python function with no arguments, pass in ``NULL``, or
-an empty tuple; to call it with one argument, pass a singleton tuple.
-:c:func:`Py_BuildValue` returns a tuple when its format string consists of zero
-or more format codes between parentheses.  For example::
+Sau đó, khi đến lúc gọi hàm, bạn gọi hàm C
+:c:func:`PyObject_CallObject`. Hàm này có hai đối số, cả hai đều là con trỏ đến các đối tượng Python bất kỳ: hàm Python và danh sách đối số. Danh sách đối số luôn phải là một đối tượng tuple, với độ dài bằng số lượng đối số. Để gọi hàm Python mà không có đối số, hãy truyền ``NULL``, hoặc một tuple rỗng; để gọi hàm với một đối số, hãy truyền một tuple singleton.
+:c:func:`Py_BuildValue` trả về một tuple khi chuỗi format của nó bao gồm từ không đến nhiều format code đặt trong dấu ngoặc đơn. Ví dụ::
 
    int arg;
    PyObject *arglist;
@@ -605,45 +423,25 @@ or more format codes between parentheses.  For example::
    ...
    arg = 123;
    ...
-   /* Time to call the callback */
+   /* Đến lúc gọi callback */
    arglist = Py_BuildValue("(i)", arg);
    result = PyObject_CallObject(my_callback, arglist);
    Py_DECREF(arglist);
 
-:c:func:`PyObject_CallObject` returns a Python object pointer: this is the return
-value of the Python function.  :c:func:`PyObject_CallObject` is
-"reference-count-neutral" with respect to its arguments.  In the example a new
-tuple was created to serve as the argument list, which is
-:c:func:`Py_DECREF`\ -ed immediately after the :c:func:`PyObject_CallObject`
-call.
+:c:func:`PyObject_CallObject` trả về một con trỏ đến đối tượng Python: đây là giá trị trả về của hàm Python. :c:func:`PyObject_CallObject` không làm thay đổi số lượng tham chiếu đối với các đối số của nó. Trong ví dụ, một tuple mới đã được tạo để làm danh sách đối số, và tuple này sẽ được
+:c:func:`Py_DECREF`\ -ed ngay sau lệnh gọi :c:func:`PyObject_CallObject`.
 
-The return value of :c:func:`PyObject_CallObject` is "new": either it is a brand
-new object, or it is an existing object whose reference count has been
-incremented.  So, unless you want to save it in a global variable, you should
-somehow :c:func:`Py_DECREF` the result, even (especially!) if you are not
-interested in its value.
+Giá trị trả về của :c:func:`PyObject_CallObject` là "mới": hoặc đó là một đối tượng hoàn toàn mới, hoặc đó là một đối tượng hiện có nhưng số lượng tham chiếu của nó đã được tăng lên. Vì vậy, trừ khi bạn muốn lưu nó vào một biến toàn cục, bằng cách nào đó bạn nên :c:func:`Py_DECREF` kết quả, ngay cả (đặc biệt là!) khi bạn không quan tâm đến giá trị của nó.
 
-Before you do this, however, it is important to check that the return value
-isn't ``NULL``.  If it is, the Python function terminated by raising an exception.
-If the C code that called :c:func:`PyObject_CallObject` is called from Python, it
-should now return an error indication to its Python caller, so the interpreter
-can print a stack trace, or the calling Python code can handle the exception.
-If this is not possible or desirable, the exception should be cleared by calling
-:c:func:`PyErr_Clear`.  For example::
+Tuy nhiên, trước khi thực hiện việc này, điều quan trọng là phải kiểm tra xem giá trị trả về có phải là ``NULL`` hay không. Nếu đúng như vậy, hàm Python đã kết thúc bằng cách phát sinh một ngoại lệ. Nếu mã C gọi :c:func:`PyObject_CallObject` được gọi từ Python, lúc này nó nên trả về một chỉ báo lỗi cho bên gọi Python, để interpreter có thể in stack trace hoặc mã Python gọi nó có thể xử lý ngoại lệ. Nếu điều này không thể thực hiện hoặc không nên thực hiện, ngoại lệ cần được xóa bằng cách gọi
+:c:func:`PyErr_Clear`. Ví dụ::
 
    if (result == NULL)
-       return NULL; /* Pass error back */
+       return NULL; /* Truyền lỗi trở lại */
    ...use result...
    Py_DECREF(result);
 
-Depending on the desired interface to the Python callback function, you may also
-have to provide an argument list to :c:func:`PyObject_CallObject`.  In some cases
-the argument list is also provided by the Python program, through the same
-interface that specified the callback function.  It can then be saved and used
-in the same manner as the function object.  In other cases, you may have to
-construct a new tuple to pass as the argument list.  The simplest way to do this
-is to call :c:func:`Py_BuildValue`.  For example, if you want to pass an integral
-event code, you might use the following code::
+Tùy thuộc vào interface mong muốn cho hàm callback Python, bạn cũng có thể phải cung cấp một danh sách đối số cho :c:func:`PyObject_CallObject`. Trong một số trường hợp, danh sách đối số cũng được chương trình Python cung cấp thông qua cùng interface đã chỉ định hàm callback. Khi đó, danh sách này có thể được lưu lại và sử dụng giống như đối tượng hàm. Trong các trường hợp khác, bạn có thể phải tạo một tuple mới để truyền làm danh sách đối số. Cách đơn giản nhất để thực hiện việc này là gọi :c:func:`Py_BuildValue`. Ví dụ: nếu muốn truyền một mã sự kiện dạng số nguyên, bạn có thể sử dụng đoạn mã sau::
 
    PyObject *arglist;
    ...
@@ -651,17 +449,15 @@ event code, you might use the following code::
    result = PyObject_CallObject(my_callback, arglist);
    Py_DECREF(arglist);
    if (result == NULL)
-       return NULL; /* Pass error back */
-   /* Here maybe use the result */
+       return NULL; /* Truyền lỗi trở lại */
+   /* Có thể sử dụng kết quả tại đây */
    Py_DECREF(result);
 
-Note the placement of ``Py_DECREF(arglist)`` immediately after the call, before
-the error check!  Also note that strictly speaking this code is not complete:
-:c:func:`Py_BuildValue` may run out of memory, and this should be checked.
+Hãy lưu ý vị trí của ``Py_DECREF(arglist)`` ngay sau lời gọi, trước khi kiểm tra lỗi! Đồng thời, cần lưu ý rằng nói một cách nghiêm ngặt, đoạn mã này chưa hoàn chỉnh:
+:c:func:`Py_BuildValue` có thể hết bộ nhớ, và cần kiểm tra trường hợp này.
 
-You may also call a function with keyword arguments by using
-:c:func:`PyObject_Call`, which supports arguments and keyword arguments.  As in
-the above example, we use :c:func:`Py_BuildValue` to construct the dictionary. ::
+Bạn cũng có thể gọi một hàm với các đối số từ khóa bằng cách sử dụng
+:c:func:`PyObject_Call`, hỗ trợ cả đối số và đối số từ khóa. Như trong ví dụ trên, chúng ta sử dụng :c:func:`Py_BuildValue` để tạo dictionary.::
 
    PyObject *dict;
    ...
@@ -669,37 +465,29 @@ the above example, we use :c:func:`Py_BuildValue` to construct the dictionary. :
    result = PyObject_Call(my_callback, NULL, dict);
    Py_DECREF(dict);
    if (result == NULL)
-       return NULL; /* Pass error back */
-   /* Here maybe use the result */
+       return NULL; /* Truyền lỗi trở lại */
+   /* Có thể sử dụng kết quả tại đây */
    Py_DECREF(result);
 
 
 .. _parsetuple:
 
-Extracting Parameters in Extension Functions
-============================================
+Trích xuất tham số trong các hàm mở rộng
+========================================
 
 .. index:: single: PyArg_ParseTuple (C function)
 
-The :c:func:`PyArg_ParseTuple` function is declared as follows::
+Hàm :c:func:`PyArg_ParseTuple` được khai báo như sau::
 
    int PyArg_ParseTuple(PyObject *arg, const char *format, ...);
 
-The *arg* argument must be a tuple object containing an argument list passed
-from Python to a C function.  The *format* argument must be a format string,
-whose syntax is explained in :ref:`arg-parsing` in the Python/C API Reference
-Manual.  The remaining arguments must be addresses of variables whose type is
-determined by the format string.
+Đối số *arg* phải là một đối tượng tuple chứa danh sách đối số được truyền từ Python đến một hàm C. Đối số *format* phải là một chuỗi định dạng, với cú pháp được giải thích trong :ref:`arg-parsing` của Sổ tay tham khảo Python/C API. Các đối số còn lại phải là địa chỉ của các biến có kiểu được xác định bởi chuỗi định dạng.
 
-Note that while :c:func:`PyArg_ParseTuple` checks that the Python arguments have
-the required types, it cannot check the validity of the addresses of C variables
-passed to the call: if you make mistakes there, your code will probably crash or
-at least overwrite random bits in memory.  So be careful!
+Lưu ý rằng mặc dù :c:func:`PyArg_ParseTuple` kiểm tra các kiểu bắt buộc của đối số Python, nó không thể kiểm tra tính hợp lệ của địa chỉ các biến C được truyền vào lời gọi: nếu mắc lỗi ở đó, mã của bạn có thể sẽ bị crash hoặc ít nhất ghi đè các bit ngẫu nhiên trong bộ nhớ. Vì vậy, hãy cẩn thận!
 
-Note that any Python object references which are provided to the caller are
-*borrowed* references; do not decrement their reference count!
+Lưu ý rằng mọi tham chiếu đến đối tượng Python được cung cấp cho caller đều là tham chiếu *borrowed*; không được giảm reference count của chúng!
 
-Some example calls::
+Một số lời gọi mẫu::
 
    #define PY_SSIZE_T_CLEAN
    #include <Python.h>
@@ -712,24 +500,24 @@ Some example calls::
    const char *s;
    Py_ssize_t size;
 
-   ok = PyArg_ParseTuple(args, ""); /* No arguments */
-       /* Python call: f() */
+   ok = PyArg_ParseTuple(args, ""); /* Không có đối số */
+       /* Lời gọi Python: f() */
 
 ::
 
-   ok = PyArg_ParseTuple(args, "s", &s); /* A string */
-       /* Possible Python call: f('whoops!') */
+   ok = PyArg_ParseTuple(args, "s", &s); /* Một chuỗi */
+       /* Lời gọi Python có thể có: f('whoops!') */
 
 ::
 
-   ok = PyArg_ParseTuple(args, "lls", &k, &l, &s); /* Two longs and a string */
-       /* Possible Python call: f(1, 2, 'three') */
+   ok = PyArg_ParseTuple(args, "lls", &k, &l, &s); /* Hai long và một chuỗi */
+       /* Lời gọi Python có thể có: f(1, 2, 'three') */
 
 ::
 
    ok = PyArg_ParseTuple(args, "(ii)s#", &i, &j, &s, &size);
-       /* A pair of ints and a string, whose size is also returned */
-       /* Possible Python call: f((1, 2), 'three') */
+       /* Một cặp int và một chuỗi, đồng thời trả về kích thước chuỗi */
+       /* Lời gọi Python có thể có: f((1, 2), 'three') */
 
 ::
 
@@ -738,8 +526,8 @@ Some example calls::
        const char *mode = "r";
        int bufsize = 0;
        ok = PyArg_ParseTuple(args, "s|si", &file, &mode, &bufsize);
-       /* A string, and optionally another string and an integer */
-       /* Possible Python calls:
+       /* Một chuỗi, cùng với tùy chọn một chuỗi khác và một số nguyên */
+       /* Các lời gọi Python có thể có:
           f('spam')
           f('spam', 'w')
           f('spam', 'wb', 100000) */
@@ -751,8 +539,8 @@ Some example calls::
        int left, top, right, bottom, h, v;
        ok = PyArg_ParseTuple(args, "((ii)(ii))(ii)",
                 &left, &top, &right, &bottom, &h, &v);
-       /* A rectangle and a point */
-       /* Possible Python call:
+       /* Một hình chữ nhật và một điểm */
+       /* Lời gọi Python có thể có:
           f(((0, 0), (400, 300)), (10, 10)) */
    }
 
@@ -761,41 +549,33 @@ Some example calls::
    {
        Py_complex c;
        ok = PyArg_ParseTuple(args, "D:myfunction", &c);
-       /* a complex, also providing a function name for errors */
-       /* Possible Python call: myfunction(1+2j) */
+       /* một số phức, đồng thời cung cấp tên hàm cho lỗi */
+       /* Lời gọi Python có thể có: myfunction(1+2j) */
    }
 
 
 .. _parsetupleandkeywords:
 
-Keyword Parameters for Extension Functions
-==========================================
+Tham số từ khóa cho các hàm mở rộng
+===================================
 
 .. index:: single: PyArg_ParseTupleAndKeywords (C function)
 
-The :c:func:`PyArg_ParseTupleAndKeywords` function is declared as follows::
+Hàm :c:func:`PyArg_ParseTupleAndKeywords` được khai báo như sau::
 
    int PyArg_ParseTupleAndKeywords(PyObject *arg, PyObject *kwdict,
                                    const char *format, char * const *kwlist, ...);
 
-The *arg* and *format* parameters are identical to those of the
-:c:func:`PyArg_ParseTuple` function.  The *kwdict* parameter is the dictionary of
-keywords received as the third parameter from the Python runtime.  The *kwlist*
-parameter is a ``NULL``-terminated list of strings which identify the parameters;
-the names are matched with the type information from *format* from left to
-right.  On success, :c:func:`PyArg_ParseTupleAndKeywords` returns true, otherwise
-it returns false and raises an appropriate exception.
+Các tham số *arg* và *format* giống hệt các tham số của
+:c:func:`PyArg_ParseTuple` hàm. Tham số *kwdict* là từ điển các keyword nhận được dưới dạng tham số thứ ba từ Python runtime. Tham số *kwlist* là danh sách chuỗi kết thúc bằng ``NULL``, dùng để xác định các tham số; tên được đối chiếu với thông tin kiểu từ *format* theo thứ tự từ trái sang phải. Khi thành công, :c:func:`PyArg_ParseTupleAndKeywords` trả về true; nếu không, nó trả về false và phát sinh ngoại lệ phù hợp.
 
 .. note::
 
-   Nested tuples cannot be parsed when using keyword arguments!  Keyword parameters
-   passed in which are not present in the *kwlist* will cause :exc:`TypeError` to
-   be raised.
+   Không thể phân tích các tuple lồng nhau khi sử dụng keyword arguments! Các keyword parameter được truyền vào nhưng không có trong *kwlist* sẽ khiến :exc:`TypeError` được phát sinh.
 
 .. index:: single: Philbrick, Geoff
 
-Here is an example module which uses keywords, based on an example by Geoff
-Philbrick (philbrick@hks.com)::
+Sau đây là một module mẫu sử dụng keyword, dựa trên một ví dụ của Geoff Philbrick (philbrick@hks.com)::
 
    #define PY_SSIZE_T_CLEAN
    #include <Python.h>
@@ -822,13 +602,13 @@ Philbrick (philbrick@hks.com)::
    }
 
    static PyMethodDef keywdarg_methods[] = {
-       /* The cast of the function is necessary since PyCFunction values
-        * only take two PyObject* parameters, and keywdarg_parrot() takes
-        * three.
+       /* Ép kiểu hàm là cần thiết vì các giá trị PyCFunction
+        * chỉ nhận hai tham số PyObject*, còn keywdarg_parrot() nhận
+        * ba tham số.
         */
        {"parrot", (PyCFunction)(void(*)(void))keywdarg_parrot, METH_VARARGS | METH_KEYWORDS,
         "Print a lovely skit to standard output."},
-       {NULL, NULL, 0, NULL}   /* sentinel */
+       {NULL, NULL, 0, NULL}   /* phần tử đánh dấu kết thúc */
    };
 
    static struct PyModuleDef keywdarg_module = {
@@ -847,28 +627,19 @@ Philbrick (philbrick@hks.com)::
 
 .. _buildvalue:
 
-Building Arbitrary Values
-=========================
+Xây dựng các giá trị tùy ý
+==========================
 
-This function is the counterpart to :c:func:`PyArg_ParseTuple`.  It is declared
-as follows::
+Hàm này là hàm tương ứng với :c:func:`PyArg_ParseTuple`. Hàm được khai báo như sau::
 
    PyObject *Py_BuildValue(const char *format, ...);
 
-It recognizes a set of format units similar to the ones recognized by
-:c:func:`PyArg_ParseTuple`, but the arguments (which are input to the function,
-not output) must not be pointers, just values.  It returns a new Python object,
-suitable for returning from a C function called from Python.
+Hàm này nhận diện một tập hợp các đơn vị định dạng tương tự như các đơn vị được nhận diện bởi
+:c:func:`PyArg_ParseTuple`, nhưng các đối số (là đầu vào của hàm, không phải đầu ra) không được là con trỏ mà phải là các giá trị. Hàm trả về một đối tượng Python mới, thích hợp để trả về từ một hàm C được gọi từ Python.
 
-One difference with :c:func:`PyArg_ParseTuple`: while the latter requires its
-first argument to be a tuple (since Python argument lists are always represented
-as tuples internally), :c:func:`Py_BuildValue` does not always build a tuple.  It
-builds a tuple only if its format string contains two or more format units. If
-the format string is empty, it returns ``None``; if it contains exactly one
-format unit, it returns whatever object is described by that format unit.  To
-force it to return a tuple of size 0 or one, parenthesize the format string.
+Một điểm khác biệt so với :c:func:`PyArg_ParseTuple` là: trong khi hàm sau yêu cầu đối số đầu tiên của nó phải là một tuple (vì các danh sách đối số Python luôn được biểu diễn dưới dạng tuple ở bên trong), :c:func:`Py_BuildValue` không phải lúc nào cũng tạo một tuple. Hàm chỉ tạo một tuple nếu chuỗi định dạng chứa từ hai đơn vị định dạng trở lên. Nếu chuỗi định dạng rỗng, hàm trả về ``None``; nếu chuỗi chứa chính xác một đơn vị định dạng, hàm trả về đối tượng được mô tả bởi đơn vị định dạng đó. Để buộc hàm trả về một tuple có kích thước 0 hoặc 1, hãy đặt chuỗi định dạng trong dấu ngoặc đơn.
 
-Examples (to the left the call, to the right the resulting Python value):
+Ví dụ (lệnh gọi ở bên trái, giá trị Python nhận được ở bên phải):
 
 .. code-block:: none
 
@@ -893,176 +664,79 @@ Examples (to the left the call, to the right the resulting Python value):
 
 .. _refcounts:
 
-Reference Counts
-================
+Bộ đếm tham chiếu
+=================
 
-In languages like C or C++, the programmer is responsible for dynamic allocation
-and deallocation of memory on the heap.  In C, this is done using the functions
-:c:func:`malloc` and :c:func:`free`.  In C++, the operators ``new`` and
-``delete`` are used with essentially the same meaning and we'll restrict
-the following discussion to the C case.
+Trong các ngôn ngữ như C hoặc C++, lập trình viên chịu trách nhiệm cấp phát và giải phóng động bộ nhớ trên heap. Trong C, việc này được thực hiện bằng các hàm
+:c:func:`malloc` và :c:func:`free`. Trong C++, các toán tử ``new`` và ``delete`` được dùng với ý nghĩa về cơ bản giống nhau, và chúng ta sẽ giới hạn phần thảo luận sau đây trong trường hợp C.
 
-Every block of memory allocated with :c:func:`malloc` should eventually be
-returned to the pool of available memory by exactly one call to :c:func:`free`.
-It is important to call :c:func:`free` at the right time.  If a block's address
-is forgotten but :c:func:`free` is not called for it, the memory it occupies
-cannot be reused until the program terminates.  This is called a :dfn:`memory
-leak`.  On the other hand, if a program calls :c:func:`free` for a block and then
-continues to use the block, it creates a conflict with reuse of the block
-through another :c:func:`malloc` call.  This is called :dfn:`using freed memory`.
-It has the same bad consequences as referencing uninitialized data --- core
-dumps, wrong results, mysterious crashes.
+Mỗi khối bộ nhớ được cấp phát bằng :c:func:`malloc` cuối cùng phải được trả lại vùng bộ nhớ khả dụng bằng đúng một lần gọi :c:func:`free`. Việc gọi :c:func:`free` đúng thời điểm là rất quan trọng. Nếu địa chỉ của một khối bị quên nhưng :c:func:`free` không được gọi cho khối đó, vùng bộ nhớ mà nó chiếm giữ không thể được sử dụng lại cho đến khi chương trình kết thúc. Đây được gọi là :dfn:`rò rỉ bộ nhớ`. Mặt khác, nếu một chương trình gọi :c:func:`free` cho một khối rồi tiếp tục sử dụng khối đó, nó sẽ tạo ra xung đột với việc tái sử dụng khối thông qua một lần gọi :c:func:`malloc` khác. Đây được gọi là :dfn:`sử dụng bộ nhớ đã được giải phóng`. Điều này gây ra những hậu quả tồi tệ giống như việc tham chiếu dữ liệu chưa được khởi tạo --- kết xuất core, kết quả sai và các sự cố khó hiểu.
 
-Common causes of memory leaks are unusual paths through the code.  For instance,
-a function may allocate a block of memory, do some calculation, and then free
-the block again.  Now a change in the requirements for the function may add a
-test to the calculation that detects an error condition and can return
-prematurely from the function.  It's easy to forget to free the allocated memory
-block when taking this premature exit, especially when it is added later to the
-code.  Such leaks, once introduced, often go undetected for a long time: the
-error exit is taken only in a small fraction of all calls, and most modern
-machines have plenty of virtual memory, so the leak only becomes apparent in a
-long-running process that uses the leaking function frequently.  Therefore, it's
-important to prevent leaks from happening by having a coding convention or
-strategy that minimizes this kind of errors.
+Những nguyên nhân phổ biến của rò rỉ bộ nhớ là các đường đi bất thường trong mã. Chẳng hạn, một hàm có thể cấp phát một khối bộ nhớ, thực hiện một số phép tính rồi lại giải phóng khối đó. Sau đó, một thay đổi trong yêu cầu đối với hàm có thể bổ sung một phép kiểm tra vào quá trình tính toán để phát hiện điều kiện lỗi và trả về sớm khỏi hàm. Khi thực hiện việc thoát sớm này, rất dễ quên giải phóng khối bộ nhớ đã cấp phát, đặc biệt khi đoạn mã đó được bổ sung sau. Một khi đã xuất hiện, những rò rỉ như vậy thường không bị phát hiện trong thời gian dài: nhánh thoát do lỗi chỉ được thực hiện trong một phần rất nhỏ của tổng số lần gọi, và hầu hết các máy hiện đại đều có nhiều bộ nhớ ảo, vì vậy rò rỉ chỉ trở nên rõ ràng trong một tiến trình chạy lâu và thường xuyên sử dụng hàm gây rò rỉ. Do đó, điều quan trọng là ngăn rò rỉ xảy ra bằng cách áp dụng một quy ước hoặc chiến lược lập trình giúp giảm thiểu loại lỗi này.
 
-Since Python makes heavy use of :c:func:`malloc` and :c:func:`free`, it needs a
-strategy to avoid memory leaks as well as the use of freed memory.  The chosen
-method is called :dfn:`reference counting`.  The principle is simple: every
-object contains a counter, which is incremented when a reference to the object
-is stored somewhere, and which is decremented when a reference to it is deleted.
-When the counter reaches zero, the last reference to the object has been deleted
-and the object is freed.
+Vì Python sử dụng nhiều :c:func:`malloc` và :c:func:`free`, nó cũng cần một chiến lược để tránh rò rỉ bộ nhớ cũng như việc sử dụng bộ nhớ đã được giải phóng. Phương pháp được chọn có tên là :dfn:`đếm tham chiếu`. Nguyên tắc rất đơn giản: mỗi đối tượng chứa một bộ đếm, bộ đếm này được tăng lên khi một tham chiếu đến đối tượng được lưu ở đâu đó và được giảm xuống khi một tham chiếu đến đối tượng bị xóa. Khi bộ đếm đạt đến số 0, tham chiếu cuối cùng đến đối tượng đã bị xóa và đối tượng được giải phóng.
 
-An alternative strategy is called :dfn:`automatic garbage collection`.
-(Sometimes, reference counting is also referred to as a garbage collection
-strategy, hence the use of "automatic" to distinguish the two.)  The big
-advantage of automatic garbage collection is that the user doesn't need to call
-:c:func:`free` explicitly.  (Another claimed advantage is an improvement in speed
-or memory usage --- this is no hard fact however.)  The disadvantage is that for
-C, there is no truly portable automatic garbage collector, while reference
-counting can be implemented portably (as long as the functions :c:func:`malloc`
-and :c:func:`free` are available --- which the C Standard guarantees). Maybe some
-day a sufficiently portable automatic garbage collector will be available for C.
-Until then, we'll have to live with reference counts.
+Một chiến lược thay thế có tên là :dfn:`thu gom rác tự động`. (Đôi khi, đếm tham chiếu cũng được xem là một chiến lược thu gom rác, do đó từ "tự động" được dùng để phân biệt hai phương pháp.) Ưu điểm lớn của thu gom rác tự động là người dùng không cần gọi
+:c:func:`free` một cách tường minh. (Một ưu điểm khác được cho là cải thiện tốc độ hoặc mức sử dụng bộ nhớ --- tuy nhiên đây không phải là sự thật chắc chắn.) Nhược điểm là đối với C, không có trình thu gom rác tự động nào thực sự portable, trong khi việc đếm tham chiếu có thể được triển khai theo cách portable (miễn là các hàm :c:func:`malloc` và :c:func:`free` khả dụng --- điều mà C Standard đảm bảo). Có lẽ một ngày nào đó sẽ có một trình thu gom rác tự động đủ portable cho C. Cho đến lúc đó, chúng ta sẽ phải sử dụng đếm tham chiếu.
 
-While Python uses the traditional reference counting implementation, it also
-offers a cycle detector that works to detect reference cycles.  This allows
-applications to not worry about creating direct or indirect circular references;
-these are the weakness of garbage collection implemented using only reference
-counting.  Reference cycles consist of objects which contain (possibly indirect)
-references to themselves, so that each object in the cycle has a reference count
-which is non-zero.  Typical reference counting implementations are not able to
-reclaim the memory belonging to any objects in a reference cycle, or referenced
-from the objects in the cycle, even though there are no further references to
-the cycle itself.
+Mặc dù Python sử dụng cách triển khai đếm tham chiếu truyền thống, nó cũng cung cấp một bộ phát hiện chu kỳ để phát hiện các chu kỳ tham chiếu. Điều này cho phép các ứng dụng không phải lo lắng về việc tạo ra các tham chiếu vòng trực tiếp hoặc gián tiếp; đây là điểm yếu của cơ chế thu gom rác chỉ được triển khai bằng cách đếm tham chiếu. Các chu kỳ tham chiếu bao gồm những đối tượng chứa các tham chiếu (có thể là gián tiếp) đến chính chúng, khiến mỗi đối tượng trong chu kỳ có số lượng tham chiếu khác không. Các cách triển khai đếm tham chiếu điển hình không thể thu hồi bộ nhớ thuộc về bất kỳ đối tượng nào trong một chu kỳ tham chiếu hoặc được các đối tượng trong chu kỳ tham chiếu đến, mặc dù không còn tham chiếu nào khác đến chính chu kỳ đó.
 
-The cycle detector is able to detect garbage cycles and can reclaim them.
-The :mod:`gc` module exposes a way to run the detector (the
-:func:`~gc.collect` function), as well as configuration
-interfaces and the ability to disable the detector at runtime.
+Bộ phát hiện chu kỳ có thể phát hiện các chu kỳ rác và thu hồi chúng. Module :mod:`gc` cung cấp một cách để chạy bộ phát hiện (the
+hàm :func:`~gc.collect`), cũng như các giao diện cấu hình và khả năng vô hiệu hóa bộ phát hiện trong runtime.
 
 
 .. _refcountsinpython:
 
-Reference Counting in Python
-----------------------------
+Đếm tham chiếu trong Python
+---------------------------
 
-There are two macros, ``Py_INCREF(x)`` and ``Py_DECREF(x)``, which handle the
-incrementing and decrementing of the reference count. :c:func:`Py_DECREF` also
-frees the object when the count reaches zero. For flexibility, it doesn't call
-:c:func:`free` directly --- rather, it makes a call through a function pointer in
-the object's :dfn:`type object`.  For this purpose (and others), every object
-also contains a pointer to its type object.
+Có hai macro, ``Py_INCREF(x)`` và ``Py_DECREF(x)``, xử lý việc tăng và giảm số đếm tham chiếu. :c:func:`Py_DECREF` cũng giải phóng đối tượng khi số đếm đạt đến 0. Để linh hoạt, nó không gọi
+:c:func:`free` trực tiếp --- thay vào đó, nó gọi thông qua một con trỏ hàm trong :dfn:`đối tượng kiểu` của đối tượng. Vì mục đích này (và các mục đích khác), mọi đối tượng cũng chứa một con trỏ đến đối tượng kiểu của nó.
 
-The big question now remains: when to use ``Py_INCREF(x)`` and ``Py_DECREF(x)``?
-Let's first introduce some terms.  Nobody "owns" an object; however, you can
-:dfn:`own a reference` to an object.  An object's reference count is now defined
-as the number of owned references to it.  The owner of a reference is
-responsible for calling :c:func:`Py_DECREF` when the reference is no longer
-needed.  Ownership of a reference can be transferred.  There are three ways to
-dispose of an owned reference: pass it on, store it, or call :c:func:`Py_DECREF`.
-Forgetting to dispose of an owned reference creates a memory leak.
+Câu hỏi lớn còn lại là: khi nào nên sử dụng ``Py_INCREF(x)`` và ``Py_DECREF(x)``? Trước tiên, hãy giới thiệu một số thuật ngữ. Không ai "sở hữu" một đối tượng; tuy nhiên, bạn có thể
+:dfn:`sở hữu một tham chiếu` đến một đối tượng. Khi đó, số đếm tham chiếu của một đối tượng được định nghĩa là số lượng tham chiếu được sở hữu đến đối tượng đó. Chủ sở hữu của một tham chiếu có trách nhiệm gọi :c:func:`Py_DECREF` khi tham chiếu đó không còn cần thiết. Quyền sở hữu một tham chiếu có thể được chuyển giao. Có ba cách để xử lý một tham chiếu được sở hữu: chuyển nó đi, lưu trữ nó hoặc gọi :c:func:`Py_DECREF`. Quên xử lý một tham chiếu được sở hữu sẽ tạo ra rò rỉ bộ nhớ.
 
-It is also possible to :dfn:`borrow` [#]_ a reference to an object.  The
-borrower of a reference should not call :c:func:`Py_DECREF`.  The borrower must
-not hold on to the object longer than the owner from which it was borrowed.
-Using a borrowed reference after the owner has disposed of it risks using freed
-memory and should be avoided completely [#]_.
+Cũng có thể :dfn:`mượn` [#]_ một tham chiếu đến một đối tượng. Bên mượn tham chiếu không được gọi :c:func:`Py_DECREF`. Bên mượn không được giữ đối tượng lâu hơn chủ sở hữu mà từ đó nó được mượn. Việc sử dụng một tham chiếu đã mượn sau khi chủ sở hữu đã hủy đối tượng có nguy cơ sử dụng bộ nhớ đã được giải phóng và nên hoàn toàn tránh [#]_.
 
-The advantage of borrowing over owning a reference is that you don't need to
-take care of disposing of the reference on all possible paths through the code
---- in other words, with a borrowed reference you don't run the risk of leaking
-when a premature exit is taken.  The disadvantage of borrowing over owning is
-that there are some subtle situations where in seemingly correct code a borrowed
-reference can be used after the owner from which it was borrowed has in fact
-disposed of it.
+Ưu điểm của việc mượn thay vì sở hữu một tham chiếu là bạn không cần lo việc hủy tham chiếu trên mọi đường đi có thể qua mã --- nói cách khác, với một tham chiếu đã mượn, bạn không có nguy cơ gây rò rỉ khi thoát sớm. Nhược điểm của việc mượn thay vì sở hữu là có một số tình huống tinh vi mà trong mã có vẻ đúng, một tham chiếu đã mượn lại có thể được sử dụng sau khi chủ sở hữu mà từ đó nó được mượn thực tế đã hủy nó.
 
-A borrowed reference can be changed into an owned reference by calling
-:c:func:`Py_INCREF`.  This does not affect the status of the owner from which the
-reference was borrowed --- it creates a new owned reference, and gives full
-owner responsibilities (the new owner must dispose of the reference properly, as
-well as the previous owner).
+Có thể chuyển một tham chiếu đã mượn thành một tham chiếu sở hữu bằng cách gọi
+:c:func:`Py_INCREF`. Việc này không ảnh hưởng đến trạng thái của chủ sở hữu mà từ đó tham chiếu được mượn --- nó tạo ra một tham chiếu sở hữu mới và trao đầy đủ trách nhiệm của chủ sở hữu (chủ sở hữu mới phải hủy tham chiếu đúng cách, cũng như chủ sở hữu trước đó).
 
 
 .. _ownershiprules:
 
-Ownership Rules
----------------
+Quy tắc sở hữu
+--------------
 
-Whenever an object reference is passed into or out of a function, it is part of
-the function's interface specification whether ownership is transferred with the
-reference or not.
+Bất cứ khi nào một tham chiếu đối tượng được truyền vào hoặc truyền ra khỏi một hàm, việc quyền sở hữu có được chuyển cùng với tham chiếu hay không là một phần trong đặc tả giao diện của hàm.
 
-Most functions that return a reference to an object pass on ownership with the
-reference.  In particular, all functions whose function it is to create a new
-object, such as :c:func:`PyLong_FromLong` and :c:func:`Py_BuildValue`, pass
-ownership to the receiver.  Even if the object is not actually new, you still
-receive ownership of a new reference to that object.  For instance,
-:c:func:`PyLong_FromLong` maintains a cache of popular values and can return a
-reference to a cached item.
+Hầu hết các hàm trả về một tham chiếu đến đối tượng đều chuyển quyền sở hữu cùng với tham chiếu đó. Cụ thể, tất cả các hàm có nhiệm vụ tạo một đối tượng mới, chẳng hạn như :c:func:`PyLong_FromLong` và :c:func:`Py_BuildValue`, đều chuyển quyền sở hữu cho bên nhận. Ngay cả khi đối tượng thực tế không mới, bạn vẫn nhận quyền sở hữu một tham chiếu mới đến đối tượng đó. Ví dụ,
+:c:func:`PyLong_FromLong` duy trì bộ nhớ đệm các giá trị phổ biến và có thể trả về một tham chiếu đến mục được lưu trong bộ nhớ đệm.
 
-Many functions that extract objects from other objects also transfer ownership
-with the reference, for instance :c:func:`PyObject_GetAttrString`.  The picture
-is less clear, here, however, since a few common routines are exceptions:
-:c:func:`PyTuple_GetItem`, :c:func:`PyList_GetItem`, :c:func:`PyDict_GetItem`, and
-:c:func:`PyDict_GetItemString` all return references that you borrow from the
-tuple, list or dictionary.
+Nhiều hàm trích xuất các đối tượng từ những đối tượng khác cũng chuyển quyền sở hữu cùng với tham chiếu, chẳng hạn như :c:func:`PyObject_GetAttrString`. Tuy nhiên, ở đây vấn đề không hoàn toàn rõ ràng, vì một vài routine phổ biến là ngoại lệ:
+:c:func:`PyTuple_GetItem`, :c:func:`PyList_GetItem`, :c:func:`PyDict_GetItem`, và
+:c:func:`PyDict_GetItemString` đều trả về các tham chiếu được mượn từ tuple, list hoặc dictionary.
 
-The function :c:func:`PyImport_AddModule` also returns a borrowed reference, even
-though it may actually create the object it returns: this is possible because an
-owned reference to the object is stored in ``sys.modules``.
+Hàm :c:func:`PyImport_AddModule` cũng trả về một tham chiếu được mượn, mặc dù thực tế nó có thể tạo ra đối tượng được trả về: điều này có thể thực hiện được vì một tham chiếu sở hữu đối tượng được lưu trong ``sys.modules``.
 
-When you pass an object reference into another function, in general, the
-function borrows the reference from you --- if it needs to store it, it will use
-:c:func:`Py_INCREF` to become an independent owner.  There are exactly two
-important exceptions to this rule: :c:func:`PyTuple_SetItem` and
-:c:func:`PyList_SetItem`.  These functions take over ownership of the item passed
-to them --- even if they fail!  (Note that :c:func:`PyDict_SetItem` and friends
-don't take over ownership --- they are "normal.")
+Khi bạn truyền một tham chiếu đối tượng vào một hàm khác, nhìn chung, hàm đó mượn tham chiếu từ bạn --- nếu cần lưu trữ tham chiếu, hàm sẽ sử dụng
+:c:func:`Py_INCREF` để trở thành chủ sở hữu độc lập. Có đúng hai ngoại lệ quan trọng cho quy tắc này: :c:func:`PyTuple_SetItem` và
+:c:func:`PyList_SetItem`. Các hàm này tiếp nhận quyền sở hữu đối với đối tượng được truyền cho chúng --- ngay cả khi chúng thất bại! (Lưu ý rằng :c:func:`PyDict_SetItem` và các hàm tương tự không tiếp nhận quyền sở hữu --- chúng là các hàm "bình thường." )
 
-When a C function is called from Python, it borrows references to its arguments
-from the caller.  The caller owns a reference to the object, so the borrowed
-reference's lifetime is guaranteed until the function returns.  Only when such a
-borrowed reference must be stored or passed on, it must be turned into an owned
-reference by calling :c:func:`Py_INCREF`.
+Khi một hàm C được gọi từ Python, hàm đó mượn các tham chiếu đến những đối số của mình từ bên gọi. Bên gọi sở hữu một tham chiếu đến đối tượng, vì vậy thời gian tồn tại của tham chiếu mượn được bảo đảm cho đến khi hàm trả về. Chỉ khi cần lưu trữ hoặc truyền tiếp một tham chiếu mượn như vậy, tham chiếu đó mới phải được chuyển thành tham chiếu sở hữu bằng cách gọi :c:func:`Py_INCREF`.
 
-The object reference returned from a C function that is called from Python must
-be an owned reference --- ownership is transferred from the function to its
-caller.
+Tham chiếu đối tượng được trả về từ một hàm C được gọi từ Python phải là một tham chiếu sở hữu --- quyền sở hữu được chuyển từ hàm sang bên gọi.
 
 
 .. _thinice:
 
-Thin Ice
---------
+Băng mỏng
+---------
 
-There are a few situations where seemingly harmless use of a borrowed reference
-can lead to problems.  These all have to do with implicit invocations of the
-interpreter, which can cause the owner of a reference to dispose of it.
+Có một vài tình huống mà việc sử dụng tưởng như vô hại một tham chiếu mượn có thể dẫn đến sự cố. Tất cả đều liên quan đến những lần gọi ngầm trình thông dịch, có thể khiến bên sở hữu một tham chiếu giải phóng tham chiếu đó.
 
-The first and most important case to know about is using :c:func:`Py_DECREF` on
-an unrelated object while borrowing a reference to a list item.  For instance::
+Trường hợp đầu tiên và quan trọng nhất cần biết là sử dụng :c:func:`Py_DECREF` trên một đối tượng không liên quan trong khi đang mượn tham chiếu đến một phần tử danh sách. Ví dụ:::
 
    void
    bug(PyObject *list)
@@ -1070,37 +744,22 @@ an unrelated object while borrowing a reference to a list item.  For instance::
        PyObject *item = PyList_GetItem(list, 0);
 
        PyList_SetItem(list, 1, PyLong_FromLong(0L));
-       PyObject_Print(item, stdout, 0); /* BUG! */
+       PyObject_Print(item, stdout, 0); /* LỖI! */
    }
 
-This function first borrows a reference to ``list[0]``, then replaces
-``list[1]`` with the value ``0``, and finally prints the borrowed reference.
-Looks harmless, right?  But it's not!
+Hàm này trước tiên mượn một tham chiếu đến ``list[0]``, sau đó thay thế ``list[1]`` bằng giá trị ``0``, và cuối cùng in tham chiếu đã mượn. Có vẻ vô hại, đúng không? Nhưng không phải vậy!
 
-Let's follow the control flow into :c:func:`PyList_SetItem`.  The list owns
-references to all its items, so when item 1 is replaced, it has to dispose of
-the original item 1.  Now let's suppose the original item 1 was an instance of a
-user-defined class, and let's further suppose that the class defined a
-:meth:`!__del__` method.  If this class instance has a reference count of 1,
-disposing of it will call its :meth:`!__del__` method. Internally,
-:c:func:`PyList_SetItem` calls :c:func:`Py_DECREF` on the replaced item,
-which invokes replaced item's corresponding
-:c:member:`~PyTypeObject.tp_dealloc` function. During
-deallocation, :c:member:`~PyTypeObject.tp_dealloc` calls
-:c:member:`~PyTypeObject.tp_finalize`, which is mapped to the
-:meth:`!__del__` method for class instances (see :pep:`442`). This entire
-sequence happens synchronously within the :c:func:`PyList_SetItem` call.
+Hãy lần theo luồng điều khiển đến :c:func:`PyList_SetItem`. Danh sách sở hữu các tham chiếu đến tất cả phần tử của nó, vì vậy khi phần tử 1 được thay thế, danh sách phải giải phóng phần tử 1 ban đầu. Bây giờ, hãy giả sử phần tử 1 ban đầu là một instance của lớp do người dùng định nghĩa, và giả sử thêm rằng lớp đó định nghĩa một
+phương thức :meth:`!__del__`. Nếu instance của lớp này có số lượng tham chiếu là 1, việc giải phóng nó sẽ gọi phương thức :meth:`!__del__` của nó. Về mặt nội bộ,
+:c:func:`PyList_SetItem` gọi :c:func:`Py_DECREF` trên phần tử được thay thế, và thao tác này gọi hàm tương ứng của phần tử được thay thế là
+hàm :c:member:`~PyTypeObject.tp_dealloc`. Trong quá trình giải phóng, :c:member:`~PyTypeObject.tp_dealloc` gọi
+:c:member:`~PyTypeObject.tp_finalize`, được ánh xạ tới
+phương thức :meth:`!__del__` đối với các instance của lớp (xem :pep:`442`). Toàn bộ chuỗi này diễn ra đồng bộ trong lời gọi :c:func:`PyList_SetItem`.
 
-Since it is written in Python, the :meth:`!__del__` method can execute arbitrary
-Python code.  Could it perhaps do something to invalidate the reference to
-``item`` in :c:func:`!bug`?  You bet!  Assuming that the list passed into
-:c:func:`!bug` is accessible to the :meth:`!__del__` method, it could execute a
-statement to the effect of ``del list[0]``, and assuming this was the last
-reference to that object, it would free the memory associated with it, thereby
-invalidating ``item``.
+Vì được viết bằng Python, phương thức :meth:`!__del__` có thể thực thi mã Python tùy ý. Liệu nó có thể làm gì đó để làm mất hiệu lực tham chiếu đến ``item`` trong :c:func:`!bug` không? Chắc chắn là có! Giả sử danh sách được truyền vào
+:c:func:`!bug` có thể truy cập được đối với phương thức :meth:`!__del__`, phương thức này có thể thực thi một câu lệnh tương tự như ``del list[0]``, và nếu giả sử đây là tham chiếu cuối cùng đến đối tượng đó, nó sẽ giải phóng bộ nhớ được liên kết với đối tượng, từ đó làm ``item`` không còn hợp lệ.
 
-The solution, once you know the source of the problem, is easy: temporarily
-increment the reference count.  The correct version of the function reads::
+Khi đã biết nguồn gốc của vấn đề, cách giải quyết rất đơn giản: tạm thời tăng số lượng tham chiếu. Phiên bản đúng của hàm là::
 
    void
    no_bug(PyObject *list)
@@ -1113,19 +772,11 @@ increment the reference count.  The correct version of the function reads::
        Py_DECREF(item);
    }
 
-This is a true story.  An older version of Python contained variants of this bug
-and someone spent a considerable amount of time in a C debugger to figure out
-why his :meth:`!__del__` methods would fail...
+Đây là một câu chuyện có thật. Một phiên bản cũ của Python từng chứa các biến thể của lỗi này, và có người đã mất khá nhiều thời gian trong trình gỡ lỗi C để tìm ra lý do các phương thức :meth:`!__del__` của mình bị lỗi...
 
-The second case of problems with a borrowed reference is a variant involving
-threads.  Normally, multiple threads in the Python interpreter can't get in each
-other's way, because there is a :term:`global lock <global interpreter lock>`
-protecting Python's entire object space.
-However, it is possible to temporarily release this lock using the macro
-:c:macro:`Py_BEGIN_ALLOW_THREADS`, and to re-acquire it using
-:c:macro:`Py_END_ALLOW_THREADS`.  This is common around blocking I/O calls, to
-let other threads use the processor while waiting for the I/O to complete.
-Obviously, the following function has the same problem as the previous one::
+Trường hợp thứ hai của các vấn đề với tham chiếu mượn là một biến thể liên quan đến thread. Thông thường, nhiều thread trong trình thông dịch Python không thể cản trở lẫn nhau, vì có một :term:`khóa toàn cục <global interpreter lock>` bảo vệ toàn bộ không gian đối tượng của Python. Tuy nhiên, có thể tạm thời giải phóng khóa này bằng macro
+:c:macro:`Py_BEGIN_ALLOW_THREADS`, và lấy lại khóa bằng
+:c:macro:`Py_END_ALLOW_THREADS`. Điều này thường được thực hiện quanh các lệnh gọi I/O chặn, để các thread khác có thể sử dụng bộ xử lý trong khi chờ I/O hoàn tất. Rõ ràng, hàm sau đây gặp vấn đề giống như hàm trước đó::
 
    void
    bug(PyObject *list)
@@ -1134,42 +785,26 @@ Obviously, the following function has the same problem as the previous one::
        Py_BEGIN_ALLOW_THREADS
        ...some blocking I/O call...
        Py_END_ALLOW_THREADS
-       PyObject_Print(item, stdout, 0); /* BUG! */
+       PyObject_Print(item, stdout, 0); /* LỖI! */
    }
 
 
 .. _nullpointers:
 
-NULL Pointers
--------------
+Con trỏ NULL
+------------
 
-In general, functions that take object references as arguments do not expect you
-to pass them ``NULL`` pointers, and will dump core (or cause later core dumps) if
-you do so.  Functions that return object references generally return ``NULL`` only
-to indicate that an exception occurred.  The reason for not testing for ``NULL``
-arguments is that functions often pass the objects they receive on to other
-function --- if each function were to test for ``NULL``, there would be a lot of
-redundant tests and the code would run more slowly.
+Nhìn chung, các hàm nhận tham chiếu đối tượng làm đối số không mong bạn truyền cho chúng các con trỏ ``NULL``, và sẽ gây kết xuất core (hoặc gây ra các lần kết xuất core sau đó) nếu bạn làm vậy. Các hàm trả về tham chiếu đối tượng thường chỉ trả về ``NULL`` để cho biết đã xảy ra một ngoại lệ. Lý do không kiểm tra các đối số ``NULL`` là vì các hàm thường chuyển tiếp những đối tượng mà chúng nhận được cho các hàm khác --- nếu mỗi hàm đều kiểm tra ``NULL``, sẽ có rất nhiều phép kiểm tra dư thừa và mã sẽ chạy chậm hơn.
 
-It is better to test for ``NULL`` only at the "source:" when a pointer that may be
-``NULL`` is received, for example, from :c:func:`malloc` or from a function that
-may raise an exception.
+Tốt hơn là chỉ kiểm tra ``NULL`` tại "nguồn:" khi nhận được một con trỏ có thể là ``NULL``, chẳng hạn như từ :c:func:`malloc` hoặc từ một hàm có thể phát sinh ngoại lệ.
 
-The macros :c:func:`Py_INCREF` and :c:func:`Py_DECREF` do not check for ``NULL``
-pointers --- however, their variants :c:func:`Py_XINCREF` and :c:func:`Py_XDECREF`
-do.
+Các macro :c:func:`Py_INCREF` và :c:func:`Py_DECREF` không kiểm tra các con trỏ ``NULL`` --- tuy nhiên, các biến thể :c:func:`Py_XINCREF` và :c:func:`Py_XDECREF` của chúng thì có.
 
-The macros for checking for a particular object type (``Pytype_Check()``) don't
-check for ``NULL`` pointers --- again, there is much code that calls several of
-these in a row to test an object against various different expected types, and
-this would generate redundant tests.  There are no variants with ``NULL``
-checking.
+Các macro dùng để kiểm tra một kiểu đối tượng cụ thể (``Pytype_Check()``) không kiểm tra các con trỏ ``NULL`` --- một lần nữa, có rất nhiều mã gọi liên tiếp một số macro này để kiểm tra một đối tượng với nhiều kiểu dự kiến khác nhau, và điều này sẽ tạo ra các phép kiểm tra dư thừa. Không có biến thể nào thực hiện kiểm tra ``NULL``.
 
-The C function calling mechanism guarantees that the argument list passed to C
-functions (``args`` in the examples) is never ``NULL`` --- in fact it guarantees
-that it is always a tuple [#]_.
+Cơ chế gọi hàm C đảm bảo rằng danh sách đối số được truyền cho các hàm C (``args`` trong các ví dụ) không bao giờ là ``NULL`` --- thực tế, cơ chế này đảm bảo rằng nó luôn là một tuple [#]_.
 
-It is a severe error to ever let a ``NULL`` pointer "escape" to the Python user.
+Để một con trỏ ``NULL`` "thoát" đến người dùng Python là một lỗi nghiêm trọng.
 
 .. Frank Stajano:
    A pedagogically buggy example, along the lines of the previous listing, would
@@ -1179,103 +814,47 @@ It is a severe error to ever let a ``NULL`` pointer "escape" to the Python user.
 
 .. _cplusplus:
 
-Writing Extensions in C++
-=========================
+Viết phần mở rộng bằng C++
+==========================
 
-It is possible to write extension modules in C++.  Some restrictions apply.  If
-the main program (the Python interpreter) is compiled and linked by the C
-compiler, global or static objects with constructors cannot be used.  This is
-not a problem if the main program is linked by the C++ compiler.  Functions that
-will be called by the Python interpreter (in particular, module initialization
-functions) have to be declared using ``extern "C"``. It is unnecessary to
-enclose the Python header files in ``extern "C" {...}`` --- they use this form
-already if the symbol ``__cplusplus`` is defined (all recent C++ compilers
-define this symbol).
+Có thể viết các module mở rộng bằng C++. Có một số hạn chế. Nếu chương trình chính (trình thông dịch Python) được biên dịch và liên kết bằng trình biên dịch C, thì không thể sử dụng các đối tượng toàn cục hoặc tĩnh có hàm khởi tạo. Đây không phải là vấn đề nếu chương trình chính được liên kết bằng trình biên dịch C++. Các hàm sẽ được trình thông dịch Python gọi (đặc biệt là các hàm khởi tạo module) phải được khai báo bằng ``extern "C"``. Không cần đặt các tệp header của Python trong ``extern "C" {...}`` --- chúng đã sử dụng dạng này nếu ký hiệu ``__cplusplus`` được định nghĩa (tất cả các trình biên dịch C++ gần đây đều định nghĩa ký hiệu này).
 
 
 .. _using-capsules:
 
-Providing a C API for an Extension Module
-=========================================
+Cung cấp API C cho một module mở rộng
+=====================================
 
 .. sectionauthor:: Konrad Hinsen <hinsen@cnrs-orleans.fr>
 
 
-Many extension modules just provide new functions and types to be used from
-Python, but sometimes the code in an extension module can be useful for other
-extension modules. For example, an extension module could implement a type
-"collection" which works like lists without order. Just like the standard Python
-list type has a C API which permits extension modules to create and manipulate
-lists, this new collection type should have a set of C functions for direct
-manipulation from other extension modules.
+Nhiều module mở rộng chỉ cung cấp các hàm và kiểu mới để sử dụng từ Python, nhưng đôi khi mã trong một module mở rộng có thể hữu ích cho các module mở rộng khác. Ví dụ, một module mở rộng có thể triển khai một kiểu "collection" hoạt động giống như các list nhưng không có thứ tự. Cũng như kiểu list Python tiêu chuẩn có một API C cho phép các module mở rộng tạo và thao tác với các list, kiểu collection mới này cũng nên có một tập hợp các hàm C để các module mở rộng khác thao tác trực tiếp.
 
-At first sight this seems easy: just write the functions (without declaring them
-``static``, of course), provide an appropriate header file, and document
-the C API. And in fact this would work if all extension modules were always
-linked statically with the Python interpreter. When modules are used as shared
-libraries, however, the symbols defined in one module may not be visible to
-another module. The details of visibility depend on the operating system; some
-systems use one global namespace for the Python interpreter and all extension
-modules (Windows, for example), whereas others require an explicit list of
-imported symbols at module link time (AIX is one example), or offer a choice of
-different strategies (most Unices). And even if symbols are globally visible,
-the module whose functions one wishes to call might not have been loaded yet!
+Thoạt nhìn, việc này có vẻ dễ: chỉ cần viết các hàm (tất nhiên là không khai báo chúng bằng ``static``), cung cấp một tệp header phù hợp và ghi lại tài liệu về API C. Và thực tế, cách này sẽ hoạt động nếu tất cả các module mở rộng luôn được liên kết tĩnh với trình thông dịch Python. Tuy nhiên, khi các module được sử dụng dưới dạng shared library, các symbol được định nghĩa trong một module có thể không hiển thị với module khác. Chi tiết về khả năng hiển thị phụ thuộc vào hệ điều hành; một số hệ thống sử dụng một namespace toàn cục cho trình thông dịch Python và tất cả các module mở rộng (ví dụ như Windows), trong khi các hệ thống khác yêu cầu một danh sách tường minh các symbol được import tại thời điểm liên kết module (AIX là một ví dụ), hoặc cung cấp lựa chọn giữa nhiều chiến lược khác nhau (phần lớn các hệ thống Unix). Và ngay cả khi các symbol hiển thị trên toàn cục, module chứa các hàm mà ta muốn gọi có thể vẫn chưa được tải!
 
-Portability therefore requires not to make any assumptions about symbol
-visibility. This means that all symbols in extension modules should be declared
-``static``, except for the module's initialization function, in order to
-avoid name clashes with other extension modules (as discussed in section
-:ref:`methodtable`). And it means that symbols that *should* be accessible from
-other extension modules must be exported in a different way.
+Do đó, để đảm bảo tính portable, không được đưa ra bất kỳ giả định nào về khả năng hiển thị của symbol. Điều này có nghĩa là tất cả các symbol trong module mở rộng phải được khai báo bằng ``static``, ngoại trừ hàm khởi tạo module, nhằm tránh xung đột tên với các module mở rộng khác (như đã thảo luận trong phần
+:ref:`methodtable`). Đồng thời, các symbol mà *should* có thể được các module mở rộng khác truy cập phải được export theo một cách khác.
 
-Python provides a special mechanism to pass C-level information (pointers) from
-one extension module to another one: Capsules. A Capsule is a Python data type
-which stores a pointer (:c:expr:`void \*`).  Capsules can only be created and
-accessed via their C API, but they can be passed around like any other Python
-object. In particular,  they can be assigned to a name in an extension module's
-namespace. Other extension modules can then import this module, retrieve the
-value of this name, and then retrieve the pointer from the Capsule.
+Python cung cấp một cơ chế đặc biệt để truyền thông tin ở cấp C (các con trỏ) từ module mở rộng này sang module mở rộng khác: Capsules. Capsule là một kiểu dữ liệu Python lưu trữ một con trỏ (:c:expr:`void \*`). Các Capsule chỉ có thể được tạo và truy cập thông qua API C của chúng, nhưng có thể được truyền đi như bất kỳ đối tượng Python nào khác. Cụ thể, chúng có thể được gán cho một tên trong namespace của module mở rộng. Sau đó, các module mở rộng khác có thể import module này, lấy giá trị của tên đó, rồi lấy con trỏ từ Capsule.
 
-There are many ways in which Capsules can be used to export the C API of an
-extension module. Each function could get its own Capsule, or all C API pointers
-could be stored in an array whose address is published in a Capsule. And the
-various tasks of storing and retrieving the pointers can be distributed in
-different ways between the module providing the code and the client modules.
+Có nhiều cách sử dụng Capsules để export C API của một extension module. Mỗi hàm có thể có Capsule riêng, hoặc tất cả con trỏ C API có thể được lưu trong một mảng mà địa chỉ của mảng được công bố trong một Capsule. Ngoài ra, các tác vụ lưu trữ và truy xuất những con trỏ này có thể được phân chia theo nhiều cách khác nhau giữa module cung cấp mã và các client module.
 
-Whichever method you choose, it's important to name your Capsules properly.
-The function :c:func:`PyCapsule_New` takes a name parameter
-(:c:expr:`const char \*`); you're permitted to pass in a ``NULL`` name, but
-we strongly encourage you to specify a name.  Properly named Capsules provide
-a degree of runtime type-safety; there is no feasible way to tell one unnamed
-Capsule from another.
+Dù chọn phương pháp nào, việc đặt tên đúng cho các Capsule là rất quan trọng. Hàm :c:func:`PyCapsule_New` nhận một tham số name (:c:expr:`const char \*`); bạn được phép truyền vào một tên ``NULL``, nhưng chúng tôi đặc biệt khuyến khích bạn chỉ định một tên. Các Capsule được đặt tên đúng cung cấp một mức độ type-safety tại runtime; không có cách khả thi nào để phân biệt Capsule không có tên này với Capsule không có tên khác.
 
-In particular, Capsules used to expose C APIs should be given a name following
-this convention::
+Cụ thể, các Capsule được dùng để expose C API nên được đặt tên theo quy ước sau::
 
     modulename.attributename
 
-The convenience function :c:func:`PyCapsule_Import` makes it easy to
-load a C API provided via a Capsule, but only if the Capsule's name
-matches this convention.  This behavior gives C API users a high degree
-of certainty that the Capsule they load contains the correct C API.
+Hàm tiện ích :c:func:`PyCapsule_Import` giúp dễ dàng load một C API được cung cấp thông qua Capsule, nhưng chỉ khi tên của Capsule khớp với quy ước này. Hành vi này giúp người dùng C API có mức độ chắc chắn cao rằng Capsule họ load chứa đúng C API.
 
-The following example demonstrates an approach that puts most of the burden on
-the writer of the exporting module, which is appropriate for commonly used
-library modules. It stores all C API pointers (just one in the example!) in an
-array of :c:expr:`void` pointers which becomes the value of a Capsule. The header
-file corresponding to the module provides a macro that takes care of importing
-the module and retrieving its C API pointers; client modules only have to call
-this macro before accessing the C API.
+Ví dụ sau minh họa một phương pháp đặt phần lớn công việc lên người viết module export, phù hợp với các module thư viện được sử dụng phổ biến. Phương pháp này lưu tất cả con trỏ C API (chỉ có một con trỏ trong ví dụ!) trong một mảng các con trỏ :c:expr:`void`, rồi dùng mảng đó làm giá trị của một Capsule. Tệp header tương ứng với module cung cấp một macro đảm nhiệm việc import module và truy xuất các con trỏ C API; các client module chỉ cần gọi macro này trước khi truy cập C API.
 
-The exporting module is a modification of the :mod:`!spam` module from section
-:ref:`extending-simpleexample`. The function :func:`!spam.system` does not call
-the C library function :c:func:`system` directly, but a function
-:c:func:`!PySpam_System`, which would of course do something more complicated in
-reality (such as adding "spam" to every command). This function
-:c:func:`!PySpam_System` is also exported to other extension modules.
+Module export là một phiên bản sửa đổi của module :mod:`!spam` trong phần
+:ref:`extending-simpleexample`. Hàm :func:`!spam.system` không gọi trực tiếp hàm thư viện C :c:func:`system`, mà gọi một hàm
+:c:func:`!PySpam_System`, tất nhiên trong thực tế sẽ thực hiện điều gì đó phức tạp hơn (chẳng hạn như thêm "spam" vào mọi lệnh). Hàm này
+:c:func:`!PySpam_System` cũng được export sang các extension module khác.
 
-The function :c:func:`!PySpam_System` is a plain C function, declared
-``static`` like everything else::
+Hàm :c:func:`!PySpam_System` là một hàm C thuần túy, được khai báo ``static`` như mọi thứ khác::
 
    static int
    PySpam_System(const char *command)
@@ -1283,7 +862,7 @@ The function :c:func:`!PySpam_System` is a plain C function, declared
        return system(command);
    }
 
-The function :c:func:`!spam_system` is modified in a trivial way::
+Hàm :c:func:`!spam_system` được sửa đổi theo một cách đơn giản::
 
    static PyObject *
    spam_system(PyObject *self, PyObject *args)
@@ -1297,18 +876,16 @@ The function :c:func:`!spam_system` is modified in a trivial way::
        return PyLong_FromLong(sts);
    }
 
-In the beginning of the module, right after the line ::
+Ở phần đầu của module, ngay sau dòng::
 
    #include <Python.h>
 
-two more lines must be added::
+cần thêm hai dòng nữa::
 
-   #define SPAM_MODULE
+   #định nghĩa SPAM_MODULE
    #include "spammodule.h"
 
-The ``#define`` is used to tell the header file that it is being included in the
-exporting module, not a client module. Finally, the module's :c:data:`mod_exec
-<Py_mod_exec>` function must take care of initializing the C API pointer array::
+``#define`` được dùng để cho tệp header biết rằng nó đang được include trong exporting module, không phải client module. Cuối cùng, hàm :c:data:`mod_exec <Py_mod_exec>` của module phải đảm nhiệm việc khởi tạo mảng con trỏ C API::
 
    static int
    spam_module_exec(PyObject *m)
@@ -1316,10 +893,10 @@ exporting module, not a client module. Finally, the module's :c:data:`mod_exec
        static void *PySpam_API[PySpam_API_pointers];
        PyObject *c_api_object;
 
-       /* Initialize the C API pointer array */
+       /* Khởi tạo mảng con trỏ C API */
        PySpam_API[PySpam_System_NUM] = (void *)PySpam_System;
 
-       /* Create a Capsule containing the API pointer array's address */
+       /* Tạo Capsule chứa địa chỉ của mảng con trỏ API */
        c_api_object = PyCapsule_New((void *)PySpam_API, "spam._C_API", NULL);
 
        if (PyModule_Add(m, "_C_API", c_api_object) < 0) {
@@ -1329,11 +906,9 @@ exporting module, not a client module. Finally, the module's :c:data:`mod_exec
        return 0;
    }
 
-Note that ``PySpam_API`` is declared ``static``; otherwise the pointer
-array would disappear when :c:func:`!PyInit_spam` terminates!
+Lưu ý rằng ``PySpam_API`` được khai báo ``static``; nếu không, mảng con trỏ sẽ biến mất khi :c:func:`!PyInit_spam` kết thúc!
 
-The bulk of the work is in the header file :file:`spammodule.h`, which looks
-like this::
+Phần lớn công việc nằm trong tệp header :file:`spammodule.h`, có dạng như sau::
 
    #ifndef Py_SPAMMODULE_H
    #define Py_SPAMMODULE_H
@@ -1341,32 +916,32 @@ like this::
    extern "C" {
    #endif
 
-   /* Header file for spammodule */
+   /* Tệp header cho spammodule */
 
-   /* C API functions */
+   /* Các hàm C API */
    #define PySpam_System_NUM 0
    #define PySpam_System_RETURN int
    #define PySpam_System_PROTO (const char *command)
 
-   /* Total number of C API pointers */
+   /* Tổng số con trỏ C API */
    #define PySpam_API_pointers 1
 
 
    #ifdef SPAM_MODULE
-   /* This section is used when compiling spammodule.c */
+   /* Phần này được dùng khi biên dịch spammodule.c */
 
    static PySpam_System_RETURN PySpam_System PySpam_System_PROTO;
 
    #else
-   /* This section is used in modules that use spammodule's API */
+   /* Phần này được dùng trong các mô-đun dùng API của spammodule */
 
    static void **PySpam_API;
 
    #define PySpam_System \
     (*(PySpam_System_RETURN (*)PySpam_System_PROTO) PySpam_API[PySpam_System_NUM])
 
-   /* Return -1 on error, 0 on success.
-    * PyCapsule_Import will set an exception if there's an error.
+   /* Trả về -1 khi có lỗi, 0 khi thành công.
+    * PyCapsule_Import sẽ thiết lập một ngoại lệ nếu có lỗi.
     */
    static int
    import_spam(void)
@@ -1383,9 +958,9 @@ like this::
 
    #endif /* !defined(Py_SPAMMODULE_H) */
 
-All that a client module must do in order to have access to the function
-:c:func:`!PySpam_System` is to call the function (or rather macro)
-:c:func:`!import_spam` in its :c:data:`mod_exec <Py_mod_exec>` function::
+Tất cả những gì một module client cần làm để có quyền truy cập vào hàm
+:c:func:`!PySpam_System` là cách gọi hàm (hay đúng hơn là macro)
+:c:func:`!import_spam` trong hàm :c:data:`mod_exec <Py_mod_exec>` của nó::
 
    static int
    client_module_exec(PyObject *m)
@@ -1393,32 +968,23 @@ All that a client module must do in order to have access to the function
        if (import_spam() < 0) {
            return -1;
        }
-       /* additional initialization can happen here */
+       /* có thể thực hiện khởi tạo bổ sung tại đây */
        return 0;
    }
 
-The main disadvantage of this approach is that the file :file:`spammodule.h` is
-rather complicated. However, the basic structure is the same for each function
-that is exported, so it has to be learned only once.
+Nhược điểm chính của cách tiếp cận này là tệp :file:`spammodule.h` khá phức tạp. Tuy nhiên, cấu trúc cơ bản giống nhau đối với mỗi hàm được export, vì vậy chỉ cần học một lần.
 
-Finally it should be mentioned that Capsules offer additional functionality,
-which is especially useful for memory allocation and deallocation of the pointer
-stored in a Capsule. The details are described in the Python/C API Reference
-Manual in the section :ref:`capsules` and in the implementation of Capsules (files
-:file:`Include/pycapsule.h` and :file:`Objects/capsule.c` in the Python source
-code distribution).
+Cuối cùng, cần đề cập rằng Capsules cung cấp thêm chức năng, đặc biệt hữu ích cho việc cấp phát và giải phóng bộ nhớ của con trỏ được lưu trong một Capsule. Các chi tiết được mô tả trong Python/C API Reference Manual, tại phần :ref:`capsules` và trong phần triển khai Capsules (các tệp
+:file:`Include/pycapsule.h` và :file:`Objects/capsule.c` trong bản phân phối mã nguồn Python).
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] An interface for this function already exists in the standard module :mod:`os`
-   --- it was chosen as a simple and straightforward example.
+.. [#] Một interface cho hàm này đã tồn tại trong module chuẩn :mod:`os` --- nó được chọn làm ví dụ đơn giản và dễ hiểu.
 
-.. [#] The metaphor of "borrowing" a reference is not completely correct: the owner
-   still has a copy of the reference.
+.. [#] Ẩn dụ về việc “mượn” một tham chiếu không hoàn toàn chính xác: chủ sở hữu vẫn giữ một bản sao của tham chiếu đó.
 
-.. [#] Checking that the reference count is at least 1 **does not work** --- the
-   reference count itself could be in freed memory and may thus be reused for
-   another object!
+.. [#] Việc kiểm tra xem số lượng tham chiếu có ít nhất là 1 **không hoạt động** --- bản thân số lượng tham chiếu có thể nằm trong vùng nhớ đã được giải phóng và do đó có thể được tái sử dụng cho một đối tượng khác!
 
-.. [#] These guarantees don't hold when you use the "old" style calling convention ---
-   this is still found in much existing code.
+.. [#] Những bảo đảm này không áp dụng khi bạn sử dụng quy ước gọi "cũ" --- quy ước này vẫn xuất hiện trong nhiều đoạn mã hiện có.
+
+.. _`cffi`: https://cffi.readthedocs.io/

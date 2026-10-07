@@ -3,55 +3,31 @@
 
 .. _embedding:
 
-***************************************
-Embedding Python in Another Application
-***************************************
+**********************************
+Nhúng Python vào một ứng dụng khác
+**********************************
 
-The previous chapters discussed how to extend Python, that is, how to extend the
-functionality of Python by attaching a library of C functions to it.  It is also
-possible to do it the other way around: enrich your C/C++ application by
-embedding Python in it.  Embedding provides your application with the ability to
-implement some of the functionality of your application in Python rather than C
-or C++. This can be used for many purposes; one example would be to allow users
-to tailor the application to their needs by writing some scripts in Python.  You
-can also use it yourself if some of the functionality can be written in Python
-more easily.
+Các chương trước đã thảo luận về cách mở rộng Python, tức là cách mở rộng chức năng của Python bằng cách gắn vào đó một thư viện các hàm C. Bạn cũng có thể làm theo hướng ngược lại: tăng cường ứng dụng C/C++ của mình bằng cách nhúng Python vào đó. Việc nhúng cho phép ứng dụng của bạn triển khai một số chức năng bằng Python thay vì C hoặc C++. Cách này có thể được sử dụng cho nhiều mục đích; một ví dụ là cho phép người dùng tùy chỉnh ứng dụng theo nhu cầu bằng cách viết một số script bằng Python. Bạn cũng có thể tự sử dụng cách này nếu một số chức năng có thể được viết bằng Python dễ dàng hơn.
 
-Embedding Python is similar to extending it, but not quite.  The difference is
-that when you extend Python, the main program of the application is still the
-Python interpreter, while if you embed Python, the main program may have nothing
-to do with Python --- instead, some parts of the application occasionally call
-the Python interpreter to run some Python code.
+Nhúng Python tương tự như mở rộng Python, nhưng không hoàn toàn giống nhau. Điểm khác biệt là khi bạn mở rộng Python, chương trình chính của ứng dụng vẫn là trình thông dịch Python, còn khi bạn nhúng Python, chương trình chính có thể không liên quan gì đến Python — thay vào đó, một số phần của ứng dụng thỉnh thoảng gọi trình thông dịch Python để chạy một đoạn mã Python.
 
-So if you are embedding Python, you are providing your own main program.  One of
-the things this main program has to do is initialize the Python interpreter.  At
-the very least, you have to call the function :c:func:`Py_Initialize`.  There are
-optional calls to pass command line arguments to Python.  Then later you can
-call the interpreter from any part of the application.
+Vì vậy, nếu bạn nhúng Python, bạn đang cung cấp chương trình chính của riêng mình. Một trong những việc mà chương trình chính này phải làm là khởi tạo trình thông dịch Python. Tối thiểu, bạn phải gọi hàm :c:func:`Py_Initialize`. Bạn có thể tùy chọn truyền các đối số dòng lệnh cho Python. Sau đó, bạn có thể gọi trình thông dịch từ bất kỳ phần nào của ứng dụng.
 
-There are several different ways to call the interpreter: you can pass a string
-containing Python statements to :c:func:`PyRun_SimpleString`, or you can pass a
-stdio file pointer and a file name (for identification in error messages only)
-to :c:func:`PyRun_SimpleFile`.  You can also call the lower-level operations
-described in the previous chapters to construct and use Python objects.
+Có một số cách khác nhau để gọi trình thông dịch: bạn có thể truyền một chuỗi chứa các câu lệnh Python cho :c:func:`PyRun_SimpleString`, hoặc truyền một con trỏ tệp stdio và tên tệp (chỉ để nhận diện trong thông báo lỗi) cho :c:func:`PyRun_SimpleFile`. Bạn cũng có thể gọi các thao tác ở cấp thấp hơn được mô tả trong các chương trước để tạo và sử dụng các đối tượng Python.
 
 
 .. seealso::
 
    :ref:`c-api-index`
-      The details of Python's C interface are given in this manual. A great deal of
-      necessary information can be found here.
+      Các chi tiết về giao diện C của Python được trình bày trong tài liệu này. Bạn có thể tìm thấy rất nhiều thông tin cần thiết tại đây.
 
 
 .. _high-level-embedding:
 
-Very High Level Embedding
-=========================
+Nhúng ở cấp độ rất cao
+======================
 
-The simplest form of embedding Python is the use of the very high level
-interface. This interface is intended to execute a Python script without needing
-to interact with the application directly. This can for example be used to
-perform some operation on a file. ::
+Cách đơn giản nhất để nhúng Python là sử dụng giao diện cấp rất cao. Giao diện này được thiết kế để thực thi một tập lệnh Python mà không cần tương tác trực tiếp với ứng dụng. Ví dụ, bạn có thể dùng cách này để thực hiện một thao tác nào đó trên một tệp.::
 
    #define PY_SSIZE_T_CLEAN
    #include <Python.h>
@@ -63,7 +39,7 @@ perform some operation on a file. ::
        PyConfig config;
        PyConfig_InitPythonConfig(&config);
 
-       /* optional but recommended */
+       /* không bắt buộc nhưng được khuyến nghị */
        status = PyConfig_SetBytesString(&config, &config.program_name, argv[0]);
        if (PyStatus_Exception(status)) {
            goto exception;
@@ -89,84 +65,54 @@ perform some operation on a file. ::
 
 .. note::
 
-   ``#define PY_SSIZE_T_CLEAN`` was used to indicate that ``Py_ssize_t`` should be
-   used in some APIs instead of ``int``.
-   It is not necessary since Python 3.13, but we keep it here for backward compatibility.
-   See :ref:`arg-parsing-string-and-buffers` for a description of this macro.
+   ``#define PY_SSIZE_T_CLEAN`` được dùng để chỉ ra rằng ``Py_ssize_t`` nên được sử dụng trong một số API thay cho ``int``. Macro này không còn cần thiết kể từ Python 3.13, nhưng chúng tôi vẫn giữ lại để tương thích ngược. Xem :ref:`arg-parsing-string-and-buffers` để biết mô tả về macro này.
 
-Setting :c:member:`PyConfig.program_name` should be called before
-:c:func:`Py_InitializeFromConfig` to inform the interpreter about paths to Python run-time
-libraries.  Next, the Python interpreter is initialized with
-:c:func:`Py_Initialize`, followed by the execution of a hard-coded Python script
-that prints the date and time.  Afterwards, the :c:func:`Py_FinalizeEx` call shuts
-the interpreter down, followed by the end of the program.  In a real program,
-you may want to get the Python script from another source, perhaps a text-editor
-routine, a file, or a database.  Getting the Python code from a file can better
-be done by using the :c:func:`PyRun_SimpleFile` function, which saves you the
-trouble of allocating memory space and loading the file contents.
+Việc thiết lập :c:member:`PyConfig.program_name` nên được gọi trước
+:c:func:`Py_InitializeFromConfig` để thông báo cho trình thông dịch về các đường dẫn đến thư viện runtime của Python. Tiếp theo, trình thông dịch Python được khởi tạo bằng
+:c:func:`Py_Initialize`, sau đó thực thi một tập lệnh Python được viết cố định để in ngày và giờ. Sau đó, lệnh gọi :c:func:`Py_FinalizeEx` sẽ tắt trình thông dịch, rồi chương trình kết thúc. Trong một chương trình thực tế, bạn có thể muốn lấy tập lệnh Python từ một nguồn khác, chẳng hạn như một routine của trình soạn thảo văn bản, một tệp hoặc một cơ sở dữ liệu. Việc lấy mã Python từ một tệp có thể được thực hiện tốt hơn bằng cách sử dụng hàm :c:func:`PyRun_SimpleFile`, nhờ đó bạn không phải tự cấp phát bộ nhớ và tải nội dung tệp.
 
 
 .. _lower-level-embedding:
 
-Beyond Very High Level Embedding: An overview
-=============================================
+Vượt ra ngoài Nhúng ở Mức Rất Cao: Tổng quan
+============================================
 
-The high level interface gives you the ability to execute arbitrary pieces of
-Python code from your application, but exchanging data values is quite
-cumbersome to say the least. If you want that, you should use lower level calls.
-At the cost of having to write more C code, you can achieve almost anything.
+Giao diện cấp cao cho phép bạn thực thi các đoạn mã Python tùy ý từ ứng dụng của mình, nhưng việc trao đổi các giá trị dữ liệu phải nói là khá cồng kềnh. Nếu muốn làm điều đó, bạn nên sử dụng các lời gọi cấp thấp hơn. Đổi lại, bạn phải viết nhiều mã C hơn, nhưng có thể thực hiện gần như mọi việc.
 
-It should be noted that extending Python and embedding Python is quite the same
-activity, despite the different intent. Most topics discussed in the previous
-chapters are still valid. To show this, consider what the extension code from
-Python to C really does:
+Cần lưu ý rằng việc mở rộng Python và nhúng Python thực chất là cùng một hoạt động, dù mục đích khác nhau. Hầu hết các chủ đề được thảo luận trong những chương trước vẫn còn nguyên giá trị. Để thấy rõ điều này, hãy xem mã mở rộng từ Python sang C thực sự làm gì:
 
-#. Convert data values from Python to C,
+#. Chuyển đổi các giá trị dữ liệu từ Python sang C,
 
-#. Perform a function call to a C routine using the converted values, and
+#. Thực hiện lời gọi hàm đến một routine C bằng các giá trị đã chuyển đổi, rồi
 
-#. Convert the data values from the call from C to Python.
+#. Chuyển đổi các giá trị dữ liệu từ lời gọi từ C sang Python.
 
-When embedding Python, the interface code does:
+Khi nhúng Python, mã giao diện sẽ:
 
-#. Convert data values from C to Python,
+#. Chuyển đổi các giá trị dữ liệu từ C sang Python,
 
-#. Perform a function call to a Python interface routine using the converted
-   values, and
+#. Thực hiện lời gọi hàm đến một routine giao diện Python bằng các giá trị đã chuyển đổi, và
 
-#. Convert the data values from the call from Python to C.
+#. Chuyển đổi các giá trị dữ liệu từ lời gọi đó từ Python sang C.
 
-As you can see, the data conversion steps are simply swapped to accommodate the
-different direction of the cross-language transfer. The only difference is the
-routine that you call between both data conversions. When extending, you call a
-C routine, when embedding, you call a Python routine.
+Như bạn có thể thấy, các bước chuyển đổi dữ liệu chỉ đơn giản là được hoán đổi để phù hợp với hướng khác nhau của việc truyền dữ liệu giữa các ngôn ngữ. Điểm khác biệt duy nhất là routine được gọi giữa hai lần chuyển đổi dữ liệu. Khi mở rộng, bạn gọi một routine C; khi nhúng, bạn gọi một routine Python.
 
-This chapter will not discuss how to convert data from Python to C and vice
-versa.  Also, proper use of references and dealing with errors is assumed to be
-understood.  Since these aspects do not differ from extending the interpreter,
-you can refer to earlier chapters for the required information.
+Chương này sẽ không trình bày cách chuyển đổi dữ liệu từ Python sang C và ngược lại. Ngoài ra, giả định rằng bạn đã hiểu cách sử dụng tham chiếu đúng cách và xử lý lỗi. Vì các khía cạnh này không khác với việc mở rộng interpreter, bạn có thể tham khảo các chương trước để biết thông tin cần thiết.
 
 
 .. _pure-embedding:
 
-Pure Embedding
-==============
+Nhúng thuần túy
+===============
 
-The first program aims to execute a function in a Python script. Like in the
-section about the very high level interface, the Python interpreter does not
-directly interact with the application (but that will change in the next
-section).
+Chương trình đầu tiên nhằm thực thi một hàm trong một script Python. Tương tự như trong phần về interface cấp độ rất cao, interpreter Python không tương tác trực tiếp với ứng dụng (nhưng điều đó sẽ thay đổi trong phần tiếp theo).
 
-The code to run a function defined in a Python script is:
+Mã để chạy một hàm được định nghĩa trong một script Python là:
 
 .. literalinclude:: ../includes/run-func.c
 
 
-This code loads a Python script using ``argv[1]``, and calls the function named
-in ``argv[2]``.  Its integer arguments are the other values of the ``argv``
-array.  If you :ref:`compile and link <compiling>` this program (let's call
-the finished executable :program:`call`), and use it to execute a Python
-script, such as:
+Mã này tải một script Python bằng ``argv[1]`` và gọi hàm có tên được chỉ định trong ``argv[2]``. Các đối số số nguyên của hàm là những giá trị còn lại trong mảng ``argv``. Nếu bạn :ref:`biên dịch và liên kết <compiling>` chương trình này (hãy gọi tệp thực thi hoàn chỉnh là :program:`call`) rồi dùng nó để thực thi một script Python, chẳng hạn như:
 
 .. code-block:: python
 
@@ -177,7 +123,7 @@ script, such as:
            c = c + b
        return c
 
-then the result should be:
+thì kết quả sẽ là:
 
 .. code-block:: shell-session
 
@@ -185,58 +131,42 @@ then the result should be:
    Will compute 3 times 2
    Result of call: 6
 
-Although the program is quite large for its functionality, most of the code is
-for data conversion between Python and C, and for error reporting.  The
-interesting part with respect to embedding Python starts with ::
+Mặc dù chương trình khá lớn so với chức năng của nó, phần lớn mã dùng để chuyển đổi dữ liệu giữa Python và C, cũng như báo cáo lỗi. Phần thú vị liên quan đến việc nhúng Python bắt đầu từ::
 
    Py_Initialize();
    pName = PyUnicode_DecodeFSDefault(argv[1]);
-   /* Error checking of pName left out */
+   /* Bỏ qua việc kiểm tra lỗi của pName */
    pModule = PyImport_Import(pName);
 
-After initializing the interpreter, the script is loaded using
-:c:func:`PyImport_Import`.  This routine needs a Python string as its argument,
-which is constructed using the :c:func:`PyUnicode_DecodeFSDefault` data
-conversion routine. ::
+Sau khi khởi tạo interpreter, script được tải bằng
+:c:func:`PyImport_Import`. Hàm này cần một chuỗi Python làm đối số, được tạo bằng routine chuyển đổi dữ liệu :c:func:`PyUnicode_DecodeFSDefault`.::
 
    pFunc = PyObject_GetAttrString(pModule, argv[2]);
-   /* pFunc is a new reference */
+   /* pFunc là một tham chiếu mới */
 
    if (pFunc && PyCallable_Check(pFunc)) {
        ...
    }
    Py_XDECREF(pFunc);
 
-Once the script is loaded, the name we're looking for is retrieved using
-:c:func:`PyObject_GetAttrString`.  If the name exists, and the object returned is
-callable, you can safely assume that it is a function.  The program then
-proceeds by constructing a tuple of arguments as normal.  The call to the Python
-function is then made with::
+Sau khi script được tải, tên mà chúng ta đang tìm kiếm được lấy bằng
+:c:func:`PyObject_GetAttrString`. Nếu tên này tồn tại và đối tượng được trả về có thể gọi được, bạn có thể an tâm giả định rằng đó là một hàm. Sau đó, chương trình tiếp tục tạo một tuple các đối số như bình thường. Tiếp theo, hàm Python được gọi với::
 
    pValue = PyObject_CallObject(pFunc, pArgs);
 
-Upon return of the function, ``pValue`` is either ``NULL`` or it contains a
-reference to the return value of the function.  Be sure to release the reference
-after examining the value.
+Khi hàm trả về, ``pValue`` либо là ``NULL`` hoặc chứa một tham chiếu đến giá trị trả về của hàm. Hãy nhớ giải phóng tham chiếu sau khi kiểm tra giá trị.
 
 
 .. _extending-with-embedding:
 
-Extending Embedded Python
+Mở rộng Python được nhúng
 =========================
 
-Until now, the embedded Python interpreter had no access to functionality from
-the application itself.  The Python API allows this by extending the embedded
-interpreter.  That is, the embedded interpreter gets extended with routines
-provided by the application. While it sounds complex, it is not so bad.  Simply
-forget for a while that the application starts the Python interpreter.  Instead,
-consider the application to be a set of subroutines, and write some glue code
-that gives Python access to those routines, just like you would write a normal
-Python extension.  For example::
+Cho đến lúc này, trình thông dịch Python được nhúng chưa có quyền truy cập vào các chức năng của chính ứng dụng. Python API cho phép thực hiện điều này bằng cách mở rộng trình thông dịch được nhúng. Nghĩa là, trình thông dịch được nhúng được mở rộng bằng các thủ tục do ứng dụng cung cấp. Mặc dù nghe có vẻ phức tạp, nhưng thực ra không quá khó. Tạm thời hãy quên rằng ứng dụng khởi động trình thông dịch Python. Thay vào đó, hãy xem ứng dụng như một tập hợp các thủ tục con và viết một đoạn glue code để Python có thể truy cập các thủ tục đó, giống như khi bạn viết một Python extension thông thường. Ví dụ::
 
    static int numargs=0;
 
-   /* Return the number of arguments of the application command line */
+   /* Trả về số đối số của dòng lệnh ứng dụng */
    static PyObject*
    emb_numargs(PyObject *self, PyObject *args)
    {
@@ -264,23 +194,20 @@ Python extension.  For example::
        return PyModuleDef_Init(&emb_module);
    }
 
-Insert the above code just above the :c:func:`main` function. Also, insert the
-following two statements before the call to :c:func:`Py_Initialize`::
+Chèn đoạn mã trên ngay phía trên hàm :c:func:`main`. Đồng thời, chèn hai câu lệnh sau trước lệnh gọi đến :c:func:`Py_Initialize`::
 
    numargs = argc;
    PyImport_AppendInittab("emb", &PyInit_emb);
 
-These two lines initialize the ``numargs`` variable, and make the
-:func:`!emb.numargs` function accessible to the embedded Python interpreter.
-With these extensions, the Python script can do things like
+Hai dòng này khởi tạo biến ``numargs`` và làm cho
+hàm :func:`!emb.numargs` có thể được trình thông dịch Python được nhúng truy cập. Với các phần mở rộng này, tập lệnh Python có thể thực hiện những việc như
 
 .. code-block:: python
 
    import emb
    print("Number of arguments", emb.numargs())
 
-In a real application, the methods will expose an API of the application to
-Python.
+Trong một ứng dụng thực tế, các method sẽ cung cấp cho Python một API của ứng dụng.
 
 .. TODO: threads, code examples do not really behave well if errors happen
    (what to watch out for)
@@ -288,42 +215,30 @@ Python.
 
 .. _embeddingincplusplus:
 
-Embedding Python in C++
-=======================
+Nhúng Python vào C++
+====================
 
-It is also possible to embed Python in a C++ program; precisely how this is done
-will depend on the details of the C++ system used; in general you will need to
-write the main program in C++, and use the C++ compiler to compile and link your
-program.  There is no need to recompile Python itself using C++.
+Bạn cũng có thể nhúng Python vào một chương trình C++; cách thực hiện chính xác sẽ phụ thuộc vào chi tiết của hệ thống C++ được sử dụng; nhìn chung, bạn sẽ cần viết chương trình chính bằng C++ và sử dụng trình biên dịch C++ để biên dịch và liên kết chương trình. Bạn không cần biên dịch lại bản thân Python bằng C++.
 
 
 .. _compiling:
 
-Compiling and Linking under Unix-like systems
-=============================================
+Biên dịch và liên kết trên các hệ thống Unix-like
+=================================================
 
-It is not necessarily trivial to find the right flags to pass to your
-compiler (and linker) in order to embed the Python interpreter into your
-application, particularly because Python needs to load library modules
-implemented as C dynamic extensions (:file:`.so` files) linked against
-it.
+Không phải lúc nào cũng dễ dàng tìm được các cờ thích hợp để truyền cho trình biên dịch (và linker) nhằm nhúng trình thông dịch Python vào ứng dụng của bạn, đặc biệt vì Python cần tải các module thư viện được triển khai dưới dạng phần mở rộng động C (:file:`.so` files) được liên kết với nó.
 
-To find out the required compiler and linker flags, you can execute the
-:file:`python{X.Y}-config` script which is generated as part of the
-installation process (a :file:`python3-config` script may also be
-available).  This script has several options, of which the following will
-be directly useful to you:
+Để tìm các cờ cần thiết cho trình biên dịch và linker, bạn có thể thực thi
+:file:`python{X.Y}-config` script được tạo trong quá trình cài đặt (một :file:`python3-config` script cũng có thể khả dụng). Script này có một số tùy chọn, trong đó các tùy chọn sau sẽ hữu ích trực tiếp cho bạn:
 
-* ``pythonX.Y-config --cflags`` will give you the recommended flags when
-  compiling:
+* ``pythonX.Y-config --cflags`` sẽ cung cấp cho bạn các cờ được khuyến nghị khi biên dịch:
 
   .. code-block:: shell-session
 
      $ /opt/bin/python3.11-config --cflags
      -I/opt/include/python3.11 -I/opt/include/python3.11 -Wsign-compare  -DNDEBUG -g -fwrapv -O3 -Wall
 
-* ``pythonX.Y-config --ldflags --embed`` will give you the recommended flags
-  when linking:
+* ``pythonX.Y-config --ldflags --embed`` sẽ cung cấp cho bạn các cờ được khuyến nghị khi liên kết:
 
   .. code-block:: shell-session
 
@@ -331,19 +246,9 @@ be directly useful to you:
      -L/opt/lib/python3.11/config-3.11-x86_64-linux-gnu -L/opt/lib -lpython3.11 -lpthread -ldl  -lutil -lm
 
 .. note::
-   To avoid confusion between several Python installations (and especially
-   between the system Python and your own compiled Python), it is recommended
-   that you use the absolute path to :file:`python{X.Y}-config`, as in the above
-   example.
+   Để tránh nhầm lẫn giữa nhiều bản cài đặt Python (đặc biệt là giữa Python của hệ thống và Python do bạn tự biên dịch), bạn nên sử dụng đường dẫn tuyệt đối đến :file:`python{X.Y}-config`, như trong ví dụ trên.
 
-If this procedure doesn't work for you (it is not guaranteed to work for
-all Unix-like platforms; however, we welcome :ref:`bug reports <reporting-bugs>`)
-you will have to read your system's documentation about dynamic linking and/or
-examine Python's :file:`Makefile` (use :func:`sysconfig.get_makefile_filename`
-to find its location) and compilation
-options.  In this case, the :mod:`sysconfig` module is a useful tool to
-programmatically extract the configuration values that you will want to
-combine together.  For example:
+Nếu quy trình này không hiệu quả với bạn (quy trình này không được đảm bảo hoạt động trên tất cả các nền tảng kiểu Unix; tuy nhiên, chúng tôi hoan nghênh :ref:`báo cáo lỗi <reporting-bugs>`), bạn sẽ phải đọc tài liệu của hệ thống về liên kết động và/hoặc kiểm tra :file:`Makefile` của Python (dùng :func:`sysconfig.get_makefile_filename` để tìm vị trí của tệp) và các tùy chọn biên dịch. Trong trường hợp này, mô-đun :mod:`sysconfig` là một công cụ hữu ích để trích xuất theo cách lập trình các giá trị cấu hình mà bạn sẽ muốn kết hợp với nhau. Ví dụ:
 
 .. code-block:: pycon
 

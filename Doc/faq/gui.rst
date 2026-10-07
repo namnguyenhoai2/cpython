@@ -1,8 +1,8 @@
 :tocdepth: 2
 
-==========================
-Graphic User Interface FAQ
-==========================
+==================================
+FAQ về giao diện người dùng đồ họa
+==================================
 
 .. only:: html
 
@@ -11,63 +11,43 @@ Graphic User Interface FAQ
 .. XXX need review for Python 3.
 
 
-General GUI Questions
-=====================
+Các câu hỏi chung về GUI
+========================
 
-What GUI toolkits exist for Python?
-===================================
+Có những bộ công cụ GUI nào cho Python?
+=======================================
 
-Standard builds of Python include an object-oriented interface to the Tcl/Tk
-widget set, called :ref:`tkinter <Tkinter>`.  This is probably the easiest to
-install (since it comes included with most
-`binary distributions <https://www.python.org/downloads/>`_ of Python) and use.
-For more info about Tk, including pointers to the source, see the
-`Tcl/Tk home page <https://www.tcl.tk>`_.  Tcl/Tk is fully portable to the
-macOS, Windows, and Unix platforms.
+Các bản build tiêu chuẩn của Python bao gồm một interface hướng đối tượng cho bộ widget Tcl/Tk, có tên là :ref:`tkinter <Tkinter>`. Đây có lẽ là lựa chọn dễ cài đặt và sử dụng nhất (vì nó đi kèm với hầu hết `bản phân phối nhị phân <https://www.python.org/downloads/>`_ của Python). Để biết thêm thông tin về Tk, bao gồm các liên kết đến mã nguồn, hãy xem `trang chủ Tcl/Tk <https://www.tcl.tk>`_. Tcl/Tk hoàn toàn portable trên các nền tảng macOS, Windows và Unix.
 
-Depending on what platform(s) you are aiming at, there are also several
-alternatives. A `list of cross-platform
-<https://wiki.python.org/moin/GuiProgramming#Cross-Platform_Frameworks>`_ and
-`platform-specific
-<https://wiki.python.org/moin/GuiProgramming#Platform-specific_Frameworks>`_ GUI
-frameworks can be found on the python wiki.
+Tùy thuộc vào (các) nền tảng bạn nhắm đến, cũng có một số lựa chọn khác. Có thể tìm thấy một `danh sách các framework GUI đa nền tảng <https://wiki.python.org/moin/GuiProgramming#Cross-Platform_Frameworks>`_ và `dành riêng cho từng nền tảng <https://wiki.python.org/moin/GuiProgramming#Platform-specific_Frameworks>`_ trên wiki của Python.
 
-Tkinter questions
-=================
+Các câu hỏi về Tkinter
+======================
 
-How do I freeze Tkinter applications?
--------------------------------------
+Làm thế nào để freeze các ứng dụng Tkinter?
+-------------------------------------------
 
-Freeze is a tool to create stand-alone applications.  When freezing Tkinter
-applications, the applications will not be truly stand-alone, as the application
-will still need the Tcl and Tk libraries.
+Freeze là một công cụ để tạo các ứng dụng độc lập. Khi đóng băng các ứng dụng Tkinter, các ứng dụng sẽ không thực sự độc lập, vì chúng vẫn cần các thư viện Tcl và Tk.
 
-One solution is to ship the application with the Tcl and Tk libraries, and point
-to them at run-time using the :envvar:`!TCL_LIBRARY` and :envvar:`!TK_LIBRARY`
-environment variables.
+Một giải pháp là đóng gói ứng dụng cùng với các thư viện Tcl và Tk, rồi trỏ đến chúng trong thời gian chạy bằng các biến môi trường :envvar:`!TCL_LIBRARY` và :envvar:`!TK_LIBRARY`.
 
-Various third-party freeze libraries such as py2exe and cx_Freeze have
-handling for Tkinter applications built-in.
+Nhiều thư viện đóng băng của bên thứ ba như py2exe và cx_Freeze đã tích hợp sẵn khả năng xử lý các ứng dụng Tkinter.
 
 
-Can I have Tk events handled while waiting for I/O?
----------------------------------------------------
+Tôi có thể xử lý các sự kiện Tk trong khi chờ I/O không?
+--------------------------------------------------------
 
-On platforms other than Windows, yes, and you don't even
-need threads!  But you'll have to restructure your I/O
-code a bit.  Tk has the equivalent of Xt's :c:func:`!XtAddInput` call, which allows you
-to register a callback function which will be called from the Tk mainloop when
-I/O is possible on a file descriptor.  See :ref:`tkinter-file-handlers`.
+Trên các nền tảng khác Windows, câu trả lời là có, và bạn thậm chí không cần đến thread! Tuy nhiên, bạn sẽ phải cấu trúc lại một chút mã I/O của mình. Tk có lệnh tương đương với lệnh :c:func:`!XtAddInput` của Xt, cho phép bạn đăng ký một hàm callback sẽ được gọi từ mainloop của Tk khi có thể thực hiện I/O trên một file descriptor. Xem :ref:`tkinter-file-handlers`.
 
 
-I can't get key bindings to work in Tkinter: why?
--------------------------------------------------
+Tại sao tôi không thể làm cho các liên kết phím hoạt động trong Tkinter?
+------------------------------------------------------------------------
 
-An often-heard complaint is that event handlers :ref:`bound <bindings-and-events>`
-to events with the :meth:`!bind` method
-don't get handled even when the appropriate key is pressed.
+Một phàn nàn thường được nghe là các trình xử lý sự kiện :ref:`bound <bindings-and-events>` với các sự kiện bằng phương thức :meth:`!bind` không được xử lý ngay cả khi nhấn đúng phím.
 
-The most common cause is that the widget to which the binding applies doesn't
-have "keyboard focus".  Check out the Tk documentation for the focus command.
-Usually a widget is given the keyboard focus by clicking in it (but not for
-labels; see the takefocus option).
+Nguyên nhân phổ biến nhất là widget mà binding áp dụng không có “keyboard focus”. Hãy xem tài liệu Tk về lệnh focus. Thông thường, một widget nhận keyboard focus bằng cách nhấp vào widget đó (nhưng không áp dụng cho label; xem tùy chọn takefocus).
+
+.. _`binary distributions`: https://www.python.org/downloads/
+.. _`Tcl/Tk home page`: https://www.tcl.tk
+.. _`list of cross-platform`: https://wiki.python.org/moin/GuiProgramming#Cross-Platform_Frameworks
+.. _`platform-specific`: https://wiki.python.org/moin/GuiProgramming#Platform-specific_Frameworks

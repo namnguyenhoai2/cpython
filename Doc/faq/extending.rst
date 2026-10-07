@@ -1,6 +1,6 @@
-=======================
-Extending/Embedding FAQ
-=======================
+===================================
+Câu hỏi thường gặp về mở rộng/nhúng
+===================================
 
 .. only:: html
 
@@ -12,102 +12,76 @@ Extending/Embedding FAQ
 .. XXX need review for Python 3.
 
 
-Can I create my own functions in C?
------------------------------------
+Tôi có thể tự tạo các hàm bằng C không?
+---------------------------------------
 
-Yes, you can create built-in modules containing functions, variables, exceptions
-and even new types in C.  This is explained in the document
+Có, bạn có thể tạo các module dựng sẵn chứa hàm, biến, ngoại lệ và thậm chí cả kiểu mới bằng C. Điều này được giải thích trong tài liệu
 :ref:`extending-index`.
 
-Most intermediate or advanced Python books will also cover this topic.
+Hầu hết các sách Python trình độ trung cấp hoặc nâng cao cũng đề cập đến chủ đề này.
 
 
-Can I create my own functions in C++?
--------------------------------------
+Tôi có thể tự tạo các hàm bằng C++ không?
+-----------------------------------------
 
-Yes, using the C compatibility features found in C++.  Place ``extern "C" {
-... }`` around the Python include files and put ``extern "C"`` before each
-function that is going to be called by the Python interpreter.  Global or static
-C++ objects with constructors are probably not a good idea.
+Có, bằng cách sử dụng các tính năng tương thích với C có trong C++. Hãy đặt ``extern "C" { ... }`` bao quanh các tệp include của Python và đặt ``extern "C"`` trước mỗi hàm sẽ được trình thông dịch Python gọi. Các đối tượng C++ toàn cục hoặc static có hàm khởi tạo có lẽ không phải là một ý hay.
 
 
 .. _c-wrapper-software:
 
-Writing C is hard; are there any alternatives?
-----------------------------------------------
+Viết C thật khó; có lựa chọn nào khác không?
+--------------------------------------------
 
-There are a number of alternatives to writing your own C extensions, depending
-on what you're trying to do. :ref:`Recommended third party tools <c-api-tools>`
-offer both simpler and more sophisticated approaches to creating C and C++
-extensions for Python.
+Có một số lựa chọn thay thế cho việc tự viết các phần mở rộng C, tùy thuộc vào điều bạn đang muốn thực hiện. :ref:`Các công cụ bên thứ ba được đề xuất <c-api-tools>` cung cấp cả những cách tiếp cận đơn giản hơn và nâng cao hơn để tạo các phần mở rộng C và C++ cho Python.
 
 
-How can I execute arbitrary Python statements from C?
------------------------------------------------------
+Làm thế nào để thực thi các câu lệnh Python tùy ý từ C?
+-------------------------------------------------------
 
-The highest-level function to do this is :c:func:`PyRun_SimpleString` which takes
-a single string argument to be executed in the context of the module
-``__main__`` and returns ``0`` for success and ``-1`` when an exception occurred
-(including :exc:`SyntaxError`).  If you want more control, use
-:c:func:`PyRun_String`; see the source for :c:func:`PyRun_SimpleString` in
-``Python/pythonrun.c``.
+Hàm ở cấp cao nhất để thực hiện việc này là :c:func:`PyRun_SimpleString`, nhận một đối số chuỗi duy nhất để thực thi trong ngữ cảnh của module ``__main__`` và trả về ``0`` nếu thành công, còn ``-1`` khi xảy ra ngoại lệ (bao gồm cả :exc:`SyntaxError`). Nếu muốn kiểm soát nhiều hơn, hãy sử dụng
+:c:func:`PyRun_String`; xem mã nguồn của :c:func:`PyRun_SimpleString` trong ``Python/pythonrun.c``.
 
 
-How can I evaluate an arbitrary Python expression from C?
----------------------------------------------------------
+Làm thế nào để đánh giá một biểu thức Python tùy ý từ C?
+--------------------------------------------------------
 
-Call the function :c:func:`PyRun_String` from the previous question with the
-start symbol :c:data:`Py_eval_input`; it parses an expression, evaluates it and
-returns its value.
+Gọi hàm :c:func:`PyRun_String` từ câu hỏi trước với ký hiệu bắt đầu :c:data:`Py_eval_input`; hàm này phân tích cú pháp một biểu thức, đánh giá biểu thức đó và trả về giá trị của nó.
 
 
-How do I extract C values from a Python object?
------------------------------------------------
+Làm thế nào để trích xuất các giá trị C từ một đối tượng Python?
+----------------------------------------------------------------
 
-That depends on the object's type.  If it's a tuple, :c:func:`PyTuple_Size`
-returns its length and :c:func:`PyTuple_GetItem` returns the item at a specified
-index.  Lists have similar functions, :c:func:`PyList_Size` and
+Điều đó phụ thuộc vào kiểu của đối tượng. Nếu đó là một tuple, :c:func:`PyTuple_Size` trả về độ dài của tuple và :c:func:`PyTuple_GetItem` trả về phần tử tại một chỉ mục được chỉ định. Lists có các hàm tương tự, :c:func:`PyList_Size` và
 :c:func:`PyList_GetItem`.
 
-For bytes, :c:func:`PyBytes_Size` returns its length and
-:c:func:`PyBytes_AsStringAndSize` provides a pointer to its value and its
-length.  Note that Python bytes objects may contain null bytes so C's
-:c:func:`!strlen` should not be used.
+Đối với bytes, :c:func:`PyBytes_Size` trả về độ dài của nó và
+:c:func:`PyBytes_AsStringAndSize` cung cấp một con trỏ đến giá trị và độ dài của nó. Lưu ý rằng các đối tượng bytes của Python có thể chứa byte null, vì vậy của C
+:c:func:`!strlen` không nên được sử dụng.
 
-To test the type of an object, first make sure it isn't ``NULL``, and then use
-:c:func:`PyBytes_Check`, :c:func:`PyTuple_Check`, :c:func:`PyList_Check`, etc.
+Để kiểm tra kiểu của một đối tượng, trước tiên hãy đảm bảo rằng nó không phải là ``NULL``, sau đó sử dụng
+:c:func:`PyBytes_Check`, :c:func:`PyTuple_Check`, :c:func:`PyList_Check`, v.v.
 
-There is also a high-level API to Python objects which is provided by the
-so-called 'abstract' interface -- read ``Include/abstract.h`` for further
-details.  It allows interfacing with any kind of Python sequence using calls
-like :c:func:`PySequence_Length`, :c:func:`PySequence_GetItem`, etc. as well
-as many other useful protocols such as numbers (:c:func:`PyNumber_Index` et
-al.) and mappings in the PyMapping APIs.
+Ngoài ra còn có một API cấp cao để làm việc với các đối tượng Python, được cung cấp bởi giao diện được gọi là "abstract" — hãy đọc ``Include/abstract.h`` để biết thêm chi tiết. Giao diện này cho phép tương tác với mọi loại sequence Python bằng các lệnh gọi như :c:func:`PySequence_Length`, :c:func:`PySequence_GetItem`, v.v., cũng như nhiều protocol hữu ích khác như numbers (:c:func:`PyNumber_Index` và các hàm khác) và mappings trong các API PyMapping.
 
 
-How do I use Py_BuildValue() to create a tuple of arbitrary length?
--------------------------------------------------------------------
+Làm thế nào để sử dụng Py_BuildValue() nhằm tạo một tuple có độ dài tùy ý?
+--------------------------------------------------------------------------
 
-You can't.  Use :c:func:`PyTuple_Pack` instead.
+Không thể. Thay vào đó, hãy sử dụng :c:func:`PyTuple_Pack`.
 
 
-How do I call an object's method from C?
-----------------------------------------
+Làm thế nào để gọi phương thức của một đối tượng từ C?
+------------------------------------------------------
 
-The :c:func:`PyObject_CallMethod` function can be used to call an arbitrary
-method of an object.  The parameters are the object, the name of the method to
-call, a format string like that used with :c:func:`Py_BuildValue`, and the
-argument values::
+Có thể sử dụng hàm :c:func:`PyObject_CallMethod` để gọi một phương thức bất kỳ của một đối tượng. Các tham số gồm đối tượng, tên phương thức cần gọi, một chuỗi định dạng giống chuỗi được sử dụng với :c:func:`Py_BuildValue`, và các giá trị đối số::
 
    PyObject *
    PyObject_CallMethod(PyObject *object, const char *method_name,
                        const char *arg_format, ...);
 
-This works for any object that has methods -- whether built-in or user-defined.
-You are responsible for eventually :c:func:`Py_DECREF`\ 'ing the return value.
+Cách này hoạt động với mọi đối tượng có phương thức -- dù là phương thức dựng sẵn hay do người dùng định nghĩa. Bạn chịu trách nhiệm cuối cùng trong việc :c:func:`Py_DECREF`\ 'ing giá trị trả về.
 
-To call, e.g., a file object's "seek" method with arguments 10, 0 (assuming the
-file object pointer is "f")::
+Để gọi, chẳng hạn, phương thức "seek" của một đối tượng file với các đối số 10, 0 (giả sử con trỏ đối tượng file là "f")::
 
    res = PyObject_CallMethod(f, "seek", "(ii)", 10, 0);
    if (res == NULL) {
@@ -117,21 +91,15 @@ file object pointer is "f")::
            Py_DECREF(res);
    }
 
-Note that since :c:func:`PyObject_CallObject` *always* wants a tuple for the
-argument list, to call a function without arguments, pass "()" for the format,
-and to call a function with one argument, surround the argument in parentheses,
-e.g. "(i)".
+Lưu ý rằng vì :c:func:`PyObject_CallObject` *luôn* yêu cầu một tuple cho danh sách đối số, để gọi một hàm không có đối số, hãy truyền "()" làm định dạng; còn để gọi một hàm có một đối số, hãy đặt đối số trong dấu ngoặc đơn, chẳng hạn "(i)".
 
 
-How do I catch the output from PyErr_Print() (or anything that prints to stdout/stderr)?
-----------------------------------------------------------------------------------------
+Làm thế nào để bắt đầu ra từ PyErr_Print() (hoặc bất kỳ thứ gì in ra stdout/stderr)?
+------------------------------------------------------------------------------------
 
-In Python code, define an object that supports the ``write()`` method.  Assign
-this object to :data:`sys.stdout` and :data:`sys.stderr`.  Call print_error, or
-just allow the standard traceback mechanism to work. Then, the output will go
-wherever your ``write()`` method sends it.
+Trong mã Python, hãy định nghĩa một đối tượng hỗ trợ phương thức ``write()``. Gán đối tượng này cho :data:`sys.stdout` và :data:`sys.stderr`. Gọi print_error hoặc chỉ cần cho phép cơ chế traceback tiêu chuẩn hoạt động. Khi đó, đầu ra sẽ được chuyển đến nơi mà phương thức ``write()`` của bạn gửi đến.
 
-The easiest way to do this is to use the :class:`io.StringIO` class:
+Cách dễ nhất để thực hiện việc này là sử dụng lớp :class:`io.StringIO`:
 
 .. code-block:: pycon
 
@@ -143,7 +111,7 @@ The easiest way to do this is to use the :class:`io.StringIO` class:
    foo
    hello world!
 
-A custom object to do the same would look like this:
+Một đối tượng tùy chỉnh để thực hiện điều tương tự sẽ có dạng như sau:
 
 .. code-block:: pycon
 
@@ -163,61 +131,49 @@ A custom object to do the same would look like this:
    hello world!
 
 
-How do I access a module written in Python from C?
---------------------------------------------------
+Làm thế nào để truy cập một module được viết bằng Python từ C?
+--------------------------------------------------------------
 
-You can get a pointer to the module object as follows::
+Bạn có thể lấy con trỏ đến đối tượng module như sau::
 
    module = PyImport_ImportModule("<modulename>");
 
-If the module hasn't been imported yet (i.e. it is not yet present in
-:data:`sys.modules`), this initializes the module; otherwise it simply returns
-the value of ``sys.modules["<modulename>"]``.  Note that it doesn't enter the
-module into any namespace -- it only ensures it has been initialized and is
-stored in :data:`sys.modules`.
+Nếu module chưa được import (tức là nó vẫn chưa xuất hiện trong
+:data:`sys.modules`), thao tác này khởi tạo module; nếu không thì nó chỉ trả về giá trị của ``sys.modules["<modulename>"]``. Lưu ý rằng thao tác này không đưa module vào bất kỳ namespace nào -- nó chỉ đảm bảo module đã được khởi tạo và được lưu trong :data:`sys.modules`.
 
-You can then access the module's attributes (i.e. any name defined in the
-module) as follows::
+Sau đó, bạn có thể truy cập các thuộc tính của module (tức là bất kỳ tên nào được định nghĩa trong module) như sau::
 
    attr = PyObject_GetAttrString(module, "<attrname>");
 
-Calling :c:func:`PyObject_SetAttrString` to assign to variables in the module
-also works.
+Việc gọi :c:func:`PyObject_SetAttrString` để gán giá trị cho các biến trong module cũng hoạt động.
 
 
-How do I interface to C++ objects from Python?
-----------------------------------------------
+Làm cách nào để giao tiếp với các đối tượng C++ từ Python?
+----------------------------------------------------------
 
-Depending on your requirements, there are many approaches.  To do this manually,
-begin by reading :ref:`the "Extending and Embedding" document
-<extending-index>`.  Realize that for the Python run-time system, there isn't a
-whole lot of difference between C and C++ -- so the strategy of building a new
-Python type around a C structure (pointer) type will also work for C++ objects.
+Tùy theo yêu cầu, có nhiều cách tiếp cận. Để thực hiện thủ công, trước tiên hãy đọc :ref:`tài liệu "Mở rộng và nhúng" <extending-index>`. Hãy lưu ý rằng đối với hệ thống runtime của Python, C và C++ không khác nhau quá nhiều -- vì vậy, chiến lược xây dựng một kiểu Python mới dựa trên kiểu cấu trúc (con trỏ) C cũng sẽ hoạt động với các đối tượng C++.
 
-For C++ libraries, see :ref:`c-wrapper-software`.
+Đối với các thư viện C++, hãy xem :ref:`c-wrapper-software`.
 
 
-I added a module using the Setup file and the make fails; why?
---------------------------------------------------------------
+Tôi đã thêm một module bằng tệp Setup nhưng make không thành công; tại sao?
+---------------------------------------------------------------------------
 
-Setup must end in a newline, if there is no newline there, the build process
-fails.  (Fixing this requires some ugly shell script hackery, and this bug is so
-minor that it doesn't seem worth the effort.)
+Setup phải kết thúc bằng một ký tự xuống dòng; nếu không có ký tự xuống dòng ở đó, quá trình build sẽ thất bại. (Việc sửa lỗi này đòi hỏi một số thủ thuật shell khá rắc rối, và lỗi này nhỏ đến mức có vẻ không đáng bỏ công sức.)
 
 
-How do I debug an extension?
-----------------------------
+Làm thế nào để debug một extension?
+-----------------------------------
 
-When using GDB with dynamically loaded extensions, you can't set a breakpoint in
-your extension until your extension is loaded.
+Khi sử dụng GDB với các extension được tải động, bạn không thể đặt breakpoint trong extension của mình cho đến khi extension đó được tải.
 
-In your ``.gdbinit`` file (or interactively), add the command:
+Trong tệp ``.gdbinit`` của bạn (hoặc trong chế độ tương tác), hãy thêm lệnh:
 
 .. code-block:: none
 
    br _PyImport_LoadDynamicModule
 
-Then, when you run GDB:
+Sau đó, khi bạn chạy GDB:
 
 .. code-block:: shell-session
 
@@ -228,48 +184,34 @@ Then, when you run GDB:
    gdb) br myfunction.c:50
    gdb) continue
 
-I want to compile a Python module on my Linux system, but some files are missing. Why?
---------------------------------------------------------------------------------------
+Tôi muốn biên dịch một module Python trên hệ thống Linux của mình, nhưng một số tệp bị thiếu. Tại sao?
+------------------------------------------------------------------------------------------------------
 
-Most packaged versions of Python omit some files
-required for compiling Python extensions.
+Hầu hết các phiên bản Python được đóng gói đều lược bỏ một số tệp cần thiết để biên dịch các extension Python.
 
-For Red Hat, install the python3-devel RPM to get the necessary files.
+Đối với Red Hat, hãy cài đặt RPM python3-devel để có các tệp cần thiết.
 
-For Debian, run ``apt-get install python3-dev``.
+Đối với Debian, hãy chạy ``apt-get install python3-dev``.
 
-How do I tell "incomplete input" from "invalid input"?
-------------------------------------------------------
+Làm thế nào để phân biệt "incomplete input" với "invalid input"?
+----------------------------------------------------------------
 
-Sometimes you want to emulate the Python interactive interpreter's behavior,
-where it gives you a continuation prompt when the input is incomplete (e.g. you
-typed the start of an "if" statement or you didn't close your parentheses or
-triple string quotes), but it gives you a syntax error message immediately when
-the input is invalid.
+Đôi khi bạn muốn mô phỏng hành vi của trình thông dịch tương tác Python, trong đó trình thông dịch hiển thị lời nhắc tiếp tục khi dữ liệu đầu vào chưa hoàn chỉnh (ví dụ: bạn đã nhập phần đầu của câu lệnh "if" hoặc chưa đóng dấu ngoặc hay dấu ngoặc kép ba), nhưng ngay lập tức hiển thị thông báo lỗi cú pháp khi dữ liệu đầu vào không hợp lệ.
 
-In Python you can use the :mod:`codeop` module, which approximates the parser's
-behavior sufficiently.  IDLE uses this, for example.
+Trong Python, bạn có thể sử dụng mô-đun :mod:`codeop`, mô-đun này mô phỏng đủ chính xác hành vi của parser. Ví dụ, IDLE sử dụng mô-đun này.
 
-The easiest way to do it in C is to call :c:func:`PyRun_InteractiveLoop` (perhaps
-in a separate thread) and let the Python interpreter handle the input for
-you. You can also set the :c:func:`PyOS_ReadlineFunctionPointer` to point at your
-custom input function. See ``Modules/readline.c`` and ``Parser/myreadline.c``
-for more hints.
+Cách dễ nhất để thực hiện việc này trong C là gọi :c:func:`PyRun_InteractiveLoop` (có thể trong một thread riêng) và để trình thông dịch Python xử lý dữ liệu đầu vào cho bạn. Bạn cũng có thể đặt :c:func:`PyOS_ReadlineFunctionPointer` trỏ đến hàm input tùy chỉnh của mình. Hãy xem ``Modules/readline.c`` và ``Parser/myreadline.c`` để biết thêm gợi ý.
 
-How do I find undefined g++ symbols __builtin_new or __pure_virtual?
---------------------------------------------------------------------
+Làm thế nào để tìm các symbol g++ chưa được định nghĩa __builtin_new hoặc __pure_virtual?
+-----------------------------------------------------------------------------------------
 
-To dynamically load g++ extension modules, you must recompile Python, relink it
-using g++ (change LINKCC in the Python Modules Makefile), and link your
-extension module using g++ (e.g., ``g++ -shared -o mymodule.so mymodule.o``).
+Để tải động các extension module g++ , bạn phải biên dịch lại Python, liên kết lại bằng g++ (thay đổi LINKCC trong Python Modules Makefile), rồi liên kết extension module của bạn bằng g++ (ví dụ: ``g++ -shared -o mymodule.so mymodule.o``).
 
 
-Can I create an object class with some methods implemented in C and others in Python (e.g. through inheritance)?
-----------------------------------------------------------------------------------------------------------------
+Tôi có thể tạo một object class với một số phương thức được triển khai bằng C và các phương thức khác bằng Python (ví dụ: thông qua inheritance) không?
+-------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Yes, you can inherit from built-in classes such as :class:`int`, :class:`list`,
-:class:`dict`, etc.
+Có, bạn có thể kế thừa từ các built-in class như :class:`int`, :class:`list`,
+:class:`dict`, v.v.
 
-The Boost Python Library (BPL, https://www.boost.org/libs/python/doc/index.html)
-provides a way of doing this from C++ (i.e. you can inherit from an extension
-class written in C++ using the BPL).
+Boost Python Library (BPL, https://www.boost.org/libs/python/doc/index.html) cung cấp một cách để thực hiện việc này từ C++ (tức là bạn có thể kế thừa từ một extension class được viết bằng C++ bằng BPL).

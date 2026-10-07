@@ -4,9 +4,9 @@
 
 .. _windows-faq:
 
-=====================
-Python on Windows FAQ
-=====================
+=========================================
+Câu hỏi thường gặp về Python trên Windows
+=========================================
 
 .. only:: html
 
@@ -18,50 +18,34 @@ Python on Windows FAQ
 .. _faq-run-program-under-windows:
 
 
-How do I run a Python program under Windows?
---------------------------------------------
+Làm thế nào để chạy một chương trình Python trên Windows?
+---------------------------------------------------------
 
-This is not necessarily a straightforward question. If you are already familiar
-with running programs from the Windows command line then everything will seem
-obvious; otherwise, you might need a little more guidance.
+Đây không nhất thiết là một câu hỏi đơn giản. Nếu bạn đã quen chạy các chương trình từ dòng lệnh Windows thì mọi thứ sẽ có vẻ hiển nhiên; nếu không, bạn có thể cần thêm một chút hướng dẫn.
 
-Unless you use some sort of integrated development environment, you will end up
-*typing* Windows commands into what is referred to as a
-"Command prompt window".  Usually you can create such a window from your
-search bar by searching for ``cmd``.  You should be able to recognize
-when you have started such a window because you will see a Windows "command
-prompt", which usually looks like this:
+Trừ khi sử dụng một dạng môi trường phát triển tích hợp nào đó, bạn sẽ phải *gõ* các lệnh Windows vào nơi thường được gọi là "Command prompt window". Thông thường, bạn có thể mở một cửa sổ như vậy từ thanh tìm kiếm bằng cách tìm ``cmd``. Bạn sẽ có thể nhận ra khi đã mở một cửa sổ như vậy vì bạn sẽ thấy "command prompt" của Windows, thường có dạng như sau:
 
 .. code-block:: doscon
 
    C:\>
 
-The letter may be different, and there might be other things after it, so you
-might just as easily see something like:
+Chữ cái này có thể khác, và có thể có thêm những thứ khác sau đó, vì vậy bạn cũng có thể dễ dàng thấy dạng như sau:
 
 .. code-block:: doscon
 
    D:\YourName\Projects\Python>
 
-depending on how your computer has been set up and what else you have recently
-done with it.  Once you have started such a window, you are well on the way to
-running Python programs.
+tùy thuộc vào cách máy tính của bạn được thiết lập và những việc khác bạn vừa thực hiện trên đó. Khi đã mở một cửa sổ như vậy, bạn đã tiến khá gần đến việc chạy các chương trình Python.
 
-You need to realize that your Python scripts have to be processed by another
-program called the Python *interpreter*.  The interpreter reads your script,
-compiles it into bytecodes, and then executes the bytecodes to run your
-program. So, how do you arrange for the interpreter to handle your Python?
+Bạn cần hiểu rằng các tập lệnh Python của mình phải được xử lý bởi một chương trình khác có tên là *interpreter* Python. Interpreter đọc tập lệnh của bạn, biên dịch nó thành bytecode, rồi thực thi bytecode để chạy chương trình. Vậy bạn cần làm gì để interpreter xử lý mã Python của mình?
 
-First, you need to make sure that your command window recognises the word
-"py" as an instruction to start the interpreter.  If you have opened a
-command window, you should try entering the command ``py`` and hitting
-return:
+Trước tiên, bạn cần đảm bảo rằng cửa sổ lệnh nhận biết từ "py" là chỉ dẫn để khởi động interpreter. Nếu bạn đã mở một cửa sổ lệnh, hãy thử nhập lệnh ``py`` rồi nhấn Enter:
 
 .. code-block:: doscon
 
    C:\Users\YourName> py
 
-You should then see something like:
+Sau đó, bạn sẽ thấy nội dung tương tự như sau:
 
 .. code-block:: pycon
 
@@ -69,10 +53,7 @@ You should then see something like:
    Type "help", "copyright", "credits" or "license" for more information.
    >>>
 
-You have started the interpreter in "interactive mode". That means you can enter
-Python statements or expressions interactively and have them executed or
-evaluated while you wait.  This is one of Python's strongest features.  Check it
-by entering a few expressions of your choice and seeing the results:
+Bạn đã khởi động interpreter ở "interactive mode". Điều đó có nghĩa là bạn có thể tương tác nhập các câu lệnh hoặc biểu thức Python, rồi chờ chúng được thực thi hoặc đánh giá. Đây là một trong những tính năng mạnh nhất của Python. Hãy kiểm tra bằng cách nhập một vài biểu thức tùy ý và xem kết quả:
 
 .. code-block:: pycon
 
@@ -81,150 +62,81 @@ by entering a few expressions of your choice and seeing the results:
     >>> "Hello" * 3
     'HelloHelloHello'
 
-Many people use the interactive mode as a convenient yet highly programmable
-calculator.  When you want to end your interactive Python session,
-call the :func:`exit` function or hold the :kbd:`Ctrl` key down
-while you enter a :kbd:`Z`, then hit the ":kbd:`Enter`" key to get
-back to your Windows command prompt.
+Nhiều người sử dụng interactive mode như một máy tính vừa tiện lợi vừa có khả năng lập trình cao. Khi muốn kết thúc phiên Python tương tác, hãy gọi hàm :func:`exit` hoặc giữ phím :kbd:`Ctrl` trong khi nhập ký tự :kbd:`Z`, sau đó nhấn phím ":kbd:`Enter`" để quay lại dấu nhắc lệnh Windows.
 
-You may also find that you have a Start-menu entry such as :menuselection:`Start
---> Programs --> Python 3.x --> Python (command line)` that results in you
-seeing the ``>>>`` prompt in a new window.  If so, the window will disappear
-after you call the :func:`exit` function or enter the :kbd:`Ctrl-Z`
-character; Windows is running a single "python"
-command in the window, and closes it when you terminate the interpreter.
+Bạn cũng có thể thấy trong Start-menu một mục như :menuselection:`Start --> Programs --> Python 3.x --> Python (command line)`, mục này sẽ mở dấu nhắc ``>>>`` trong một cửa sổ mới. Nếu vậy, cửa sổ sẽ biến mất sau khi bạn gọi hàm :func:`exit` hoặc nhập ký tự :kbd:`Ctrl-Z`; Windows đang chạy một lệnh "python" duy nhất trong cửa sổ đó và sẽ đóng cửa sổ khi bạn kết thúc interpreter.
 
-Now that we know the ``py`` command is recognized, you can give your
-Python script to it. You'll have to give either an absolute or a
-relative path to the Python script. Let's say your Python script is
-located in your desktop and is named ``hello.py``, and your command
-prompt is nicely opened in your home directory so you're seeing something
-similar to::
+Giờ đây, khi đã biết lệnh ``py`` được nhận diện, bạn có thể đưa tập lệnh Python của mình cho nó. Bạn sẽ phải cung cấp đường dẫn tuyệt đối hoặc tương đối đến tập lệnh Python. Giả sử tập lệnh Python của bạn nằm trên màn hình nền và có tên là ``hello.py``, còn dấu nhắc lệnh đang được mở thuận tiện trong thư mục nhà của bạn nên bạn thấy nội dung tương tự như sau::
 
    C:\Users\YourName>
 
-So now you'll ask the ``py`` command to give your script to Python by
-typing ``py`` followed by your script path::
+Vậy bây giờ bạn sẽ yêu cầu lệnh ``py`` đưa tập lệnh của mình cho Python bằng cách nhập ``py`` theo sau là đường dẫn đến tập lệnh::
 
 
    C:\Users\YourName> py Desktop\hello.py
    hello
 
-How do I make Python scripts executable?
-----------------------------------------
-
-On Windows, the standard Python installer already associates the .py
-extension with a file type (Python.File) and gives that file type an open
-command that runs the interpreter (``D:\Program Files\Python\python.exe "%1"
-%*``).  This is enough to make scripts executable from the command prompt as
-'foo.py'.  If you'd rather be able to execute the script by simple typing 'foo'
-with no extension you need to add .py to the PATHEXT environment variable.
-
-Why does Python sometimes take so long to start?
-------------------------------------------------
-
-Usually Python starts very quickly on Windows, but occasionally there are bug
-reports that Python suddenly begins to take a long time to start up.  This is
-made even more puzzling because Python will work fine on other Windows systems
-which appear to be configured identically.
-
-The problem may be caused by a misconfiguration of virus checking software on
-the problem machine.  Some virus scanners have been known to introduce startup
-overhead of two orders of magnitude when the scanner is configured to monitor
-all reads from the filesystem.  Try checking the configuration of virus scanning
-software on your systems to ensure that they are indeed configured identically.
-McAfee, when configured to scan all file system read activity, is a particular
-offender.
-
-
-How do I make an executable from a Python script?
+Làm thế nào để các script Python có thể thực thi?
 -------------------------------------------------
 
-See :ref:`faq-create-standalone-binary` for a list of tools that can be used to
-make executables.
+Trên Windows, trình cài đặt Python chuẩn đã liên kết phần mở rộng .py với một loại tệp (Python.File) và cung cấp cho loại tệp đó một lệnh mở để chạy trình thông dịch (``D:\Program Files\Python\python.exe "%1" %*``). Điều này đủ để làm cho các script có thể thực thi từ command prompt dưới dạng 'foo.py'. Nếu muốn có thể thực thi script chỉ bằng cách gõ 'foo' mà không có phần mở rộng, bạn cần thêm .py vào biến môi trường PATHEXT.
+
+Tại sao đôi khi Python khởi động lâu đến vậy?
+---------------------------------------------
+
+Thông thường Python khởi động rất nhanh trên Windows, nhưng đôi khi có các báo cáo lỗi cho biết Python đột nhiên mất nhiều thời gian để khởi động. Điều này càng khó hiểu hơn vì Python vẫn hoạt động bình thường trên các hệ thống Windows khác có vẻ được cấu hình giống hệt nhau.
+
+Vấn đề có thể do phần mềm kiểm tra virus trên máy gặp sự cố được cấu hình sai. Một số trình quét virus được biết là làm tăng thời gian khởi động lên hai bậc độ lớn khi được cấu hình để theo dõi mọi thao tác đọc từ filesystem. Hãy kiểm tra cấu hình của phần mềm quét virus trên các hệ thống của bạn để đảm bảo rằng chúng thực sự được cấu hình giống hệt nhau. McAfee là một trường hợp đặc biệt gây vấn đề khi được cấu hình để quét mọi hoạt động đọc filesystem.
 
 
-Is a ``*.pyd`` file the same as a DLL?
---------------------------------------
+Làm thế nào để tạo tệp thực thi từ một script Python?
+-----------------------------------------------------
 
-Yes, .pyd files are dll's, but there are a few differences.  If you have a DLL
-named ``foo.pyd``, then it must have a function ``PyInit_foo()``.  You can then
-write Python "import foo", and Python will search for foo.pyd (as well as
-foo.py, foo.pyc) and if it finds it, will attempt to call ``PyInit_foo()`` to
-initialize it.  You do not link your .exe with foo.lib, as that would cause
-Windows to require the DLL to be present.
-
-Note that the search path for foo.pyd is PYTHONPATH, not the same as the path
-that Windows uses to search for foo.dll.  Also, foo.pyd need not be present to
-run your program, whereas if you linked your program with a dll, the dll is
-required.  Of course, foo.pyd is required if you want to say ``import foo``.  In
-a DLL, linkage is declared in the source code with ``__declspec(dllexport)``.
-In a .pyd, linkage is defined in a list of available functions.
+Xem :ref:`faq-create-standalone-binary` để biết danh sách các công cụ có thể dùng để tạo tệp thực thi.
 
 
-How can I embed Python into a Windows application?
---------------------------------------------------
+Tệp ``*.pyd`` có giống DLL không?
+---------------------------------
 
-Embedding the Python interpreter in a Windows app can be summarized as follows:
+Có, các tệp .pyd là dll, nhưng có một vài điểm khác biệt. Nếu bạn có một DLL tên là ``foo.pyd``, thì nó phải có một hàm ``PyInit_foo()``. Sau đó, bạn có thể viết Python "import foo", và Python sẽ tìm foo.pyd (cũng như foo.py, foo.pyc); nếu tìm thấy, Python sẽ cố gọi ``PyInit_foo()`` để khởi tạo nó. Bạn không liên kết .exe của mình với foo.lib, vì điều đó sẽ khiến Windows yêu cầu DLL phải hiện diện.
 
-1. Do **not** build Python into your .exe file directly.  On Windows, Python must
-   be a DLL to handle importing modules that are themselves DLL's.  (This is the
-   first key undocumented fact.)  Instead, link to :file:`python{NN}.dll`; it is
-   typically installed in ``C:\Windows\System``.  *NN* is the Python version, a
-   number such as "33" for Python 3.3.
+Lưu ý rằng đường dẫn tìm kiếm cho foo.pyd là PYTHONPATH, không giống với đường dẫn mà Windows dùng để tìm foo.dll. Ngoài ra, foo.pyd không nhất thiết phải hiện diện để chạy chương trình của bạn, trong khi nếu bạn liên kết chương trình với một dll thì dll đó là bắt buộc. Tất nhiên, foo.pyd là bắt buộc nếu bạn muốn viết ``import foo``. Trong DLL, việc liên kết được khai báo trong mã nguồn bằng ``__declspec(dllexport)``. Trong .pyd, việc liên kết được xác định trong danh sách các hàm khả dụng.
 
-   You can link to Python in two different ways.  Load-time linking means
-   linking against :file:`python{NN}.lib`, while run-time linking means linking
-   against :file:`python{NN}.dll`.  (General note: :file:`python{NN}.lib` is the
-   so-called "import lib" corresponding to :file:`python{NN}.dll`.  It merely
-   defines symbols for the linker.)
 
-   Run-time linking greatly simplifies link options; everything happens at run
-   time.  Your code must load :file:`python{NN}.dll` using the Windows
-   ``LoadLibraryEx()`` routine.  The code must also use access routines and data
-   in :file:`python{NN}.dll` (that is, Python's C API's) using pointers obtained
-   by the Windows ``GetProcAddress()`` routine.  Macros can make using these
-   pointers transparent to any C code that calls routines in Python's C API.
+Làm cách nào để nhúng Python vào một ứng dụng Windows?
+------------------------------------------------------
+
+Có thể tóm tắt việc nhúng trình thông dịch Python vào một ứng dụng Windows như sau:
+
+1. Đừng **not** xây dựng Python trực tiếp vào tệp .exe của bạn. Trên Windows, Python phải là một DLL để xử lý việc import các module vốn cũng là DLL. (Đây là sự thật quan trọng đầu tiên nhưng không được tài liệu hóa.) Thay vào đó, hãy liên kết với :file:`python{NN}.dll`; tệp này thường được cài đặt tại ``C:\Windows\System``. *NN* là phiên bản Python, một số như "33" đối với Python 3.3.
+
+   Bạn có thể liên kết với Python theo hai cách khác nhau. Liên kết lúc tải nghĩa là liên kết với :file:`python{NN}.lib`, còn liên kết lúc chạy nghĩa là liên kết với :file:`python{NN}.dll`. (Lưu ý chung: :file:`python{NN}.lib` là "import lib" tương ứng với :file:`python{NN}.dll`. Nó chỉ định nghĩa các symbol cho linker.)
+
+   Liên kết khi chạy (run-time linking) đơn giản hóa đáng kể các tùy chọn liên kết; mọi thứ đều diễn ra trong lúc chạy. Mã của bạn phải tải :file:`python{NN}.dll` bằng routine ``LoadLibraryEx()`` của Windows. Mã cũng phải sử dụng các routine truy cập và dữ liệu trong :file:`python{NN}.dll` (tức là C API của Python) bằng các con trỏ nhận được từ routine ``GetProcAddress()`` của Windows. Macro có thể giúp mọi mã C gọi các routine trong C API của Python sử dụng những con trỏ này một cách trong suốt.
 
    .. XXX what about static linking?
 
-2. If you use SWIG, it is easy to create a Python "extension module" that will
-   make the app's data and methods available to Python.  SWIG will handle just
-   about all the grungy details for you.  The result is C code that you link
-   *into* your .exe file (!)  You do **not** have to create a DLL file, and this
-   also simplifies linking.
+2. Nếu sử dụng SWIG, bạn có thể dễ dàng tạo một "extension module" Python để cung cấp dữ liệu và các phương thức của ứng dụng cho Python. SWIG sẽ xử lý gần như mọi chi tiết rắc rối cho bạn. Kết quả là mã C mà bạn liên kết *into* tệp .exe của mình (!)  Bạn **not** phải tạo tệp DLL, và điều này cũng đơn giản hóa việc liên kết.
 
-3. SWIG will create an init function (a C function) whose name depends on the
-   name of the extension module.  For example, if the name of the module is leo,
-   the init function will be called initleo().  If you use SWIG shadow classes,
-   as you should, the init function will be called initleoc().  This initializes
-   a mostly hidden helper class used by the shadow class.
+3. SWIG sẽ tạo một hàm init (một hàm C), với tên phụ thuộc vào tên của extension module. Ví dụ, nếu tên module là leo, hàm init sẽ được gọi là initleo(). Nếu sử dụng shadow class của SWIG, như bạn nên làm, hàm init sẽ được gọi là initleoc(). Hàm này khởi tạo một helper class gần như được ẩn, được shadow class sử dụng.
 
-   The reason you can link the C code in step 2 into your .exe file is that
-   calling the initialization function is equivalent to importing the module
-   into Python! (This is the second key undocumented fact.)
+   Lý do bạn có thể liên kết mã C ở bước 2 vào tệp .exe là vì việc gọi hàm khởi tạo tương đương với việc import module vào Python! (Đây là sự thật quan trọng thứ hai chưa được ghi chép.)
 
-4. In short, you can use the following code to initialize the Python interpreter
-   with your extension module.
+4. Tóm lại, bạn có thể sử dụng đoạn mã sau để khởi tạo trình thông dịch Python cùng với extension module của mình.
 
    .. code-block:: c
 
       #include <Python.h>
       ...
-      Py_Initialize();  // Initialize Python.
-      initmyAppc();  // Initialize (import) the helper class.
-      PyRun_SimpleString("import myApp");  // Import the shadow class.
+      Py_Initialize();  // Khởi tạo Python.
+      initmyAppc();  // Khởi tạo (import) helper class.
+      PyRun_SimpleString("import myApp");  // Import lớp shadow.
 
-5. There are two problems with Python's C API which will become apparent if you
-   use a compiler other than MSVC, the compiler used to build pythonNN.dll.
+5. Có hai vấn đề với C API của Python sẽ trở nên rõ ràng nếu bạn sử dụng trình biên dịch khác MSVC, là trình biên dịch được dùng để xây dựng pythonNN.dll.
 
-   Problem 1: The so-called "Very High Level" functions that take ``FILE *``
-   arguments will not work in a multi-compiler environment because each
-   compiler's notion of a ``struct FILE`` will be different.  From an implementation
-   standpoint these are very low level functions.
+   Vấn đề 1: Các hàm được gọi là "Very High Level" nhận các đối số ``FILE *`` sẽ không hoạt động trong môi trường đa trình biên dịch vì cách hiểu về ``struct FILE`` của mỗi trình biên dịch sẽ khác nhau. Xét từ góc độ triển khai, đây là các hàm cấp rất thấp.
 
-   Problem 2: SWIG generates the following code when generating wrappers to void
-   functions:
+   Vấn đề 2: SWIG tạo ra đoạn mã sau khi tạo wrapper cho các hàm void:
 
    .. code-block:: c
 
@@ -232,55 +144,34 @@ Embedding the Python interpreter in a Windows app can be summarized as follows:
       _resultobj = Py_None;
       return _resultobj;
 
-   Alas, Py_None is a macro that expands to a reference to a complex data
-   structure called _Py_NoneStruct inside pythonNN.dll.  Again, this code will
-   fail in a mult-compiler environment.  Replace such code by:
+   Đáng tiếc là Py_None là một macro được mở rộng thành tham chiếu đến một cấu trúc dữ liệu phức tạp có tên _Py_NoneStruct bên trong pythonNN.dll. Một lần nữa, đoạn mã này sẽ không hoạt động trong môi trường đa trình biên dịch. Hãy thay đoạn mã đó bằng:
 
    .. code-block:: c
 
       return Py_BuildValue("");
 
-   It may be possible to use SWIG's ``%typemap`` command to make the change
-   automatically, though I have not been able to get this to work (I'm a
-   complete SWIG newbie).
+   Có thể sử dụng lệnh ``%typemap`` của SWIG để tự động thực hiện thay đổi này, mặc dù tôi chưa thể làm cho cách này hoạt động (tôi hoàn toàn là người mới dùng SWIG).
 
-6. Using a Python shell script to put up a Python interpreter window from inside
-   your Windows app is not a good idea; the resulting window will be independent
-   of your app's windowing system.  Rather, you (or the wxPythonWindow class)
-   should create a "native" interpreter window.  It is easy to connect that
-   window to the Python interpreter.  You can redirect Python's i/o to _any_
-   object that supports read and write, so all you need is a Python object
-   (defined in your extension module) that contains read() and write() methods.
+6. Sử dụng shell script Python để mở một cửa sổ trình thông dịch Python từ bên trong ứng dụng Windows của bạn không phải là ý hay; cửa sổ tạo ra sẽ độc lập với hệ thống cửa sổ của ứng dụng. Thay vào đó, bạn (hoặc lớp wxPythonWindow) nên tạo một cửa sổ trình thông dịch "native". Việc kết nối cửa sổ đó với trình thông dịch Python rất dễ dàng. Bạn có thể chuyển hướng i/o của Python đến _any_ đối tượng hỗ trợ read và write, vì vậy tất cả những gì bạn cần là một đối tượng Python (được định nghĩa trong extension module) chứa các phương thức read() và write().
 
-How do I keep editors from inserting tabs into my Python source?
-----------------------------------------------------------------
+Làm thế nào để ngăn các trình soạn thảo chèn tab vào mã nguồn Python của tôi?
+-----------------------------------------------------------------------------
 
-The FAQ does not recommend using tabs, and the Python style guide, :pep:`8`,
-recommends 4 spaces for distributed Python code; this is also the Emacs
-python-mode default.
+FAQ không khuyến nghị sử dụng tab, và hướng dẫn kiểu Python, :pep:`8`, khuyến nghị dùng 4 dấu cách cho mã Python được phân phối; đây cũng là mặc định của Emacs python-mode.
 
-Under any editor, mixing tabs and spaces is a bad idea.  MSVC is no different in
-this respect, and is easily configured to use spaces: Take :menuselection:`Tools
---> Options --> Tabs`, and for file type "Default" set "Tab size" and "Indent
-size" to 4, and select the "Insert spaces" radio button.
+Trong bất kỳ trình soạn thảo nào, việc trộn tab và dấu cách đều là một ý tưởng tồi. MSVC cũng không ngoại lệ về điểm này và có thể dễ dàng được cấu hình để sử dụng dấu cách: Chọn :menuselection:`Tools --> Options --> Tabs`, rồi đối với loại tệp "Default", đặt "Tab size" và "Indent size" thành 4, sau đó chọn nút radio "Insert spaces".
 
-Python raises :exc:`IndentationError` or :exc:`TabError` if mixed tabs
-and spaces are causing problems in leading whitespace.
-You may also run the :mod:`tabnanny` module to check a directory tree
-in batch mode.
+Python sẽ phát sinh :exc:`IndentationError` hoặc :exc:`TabError` nếu tab và dấu cách bị trộn lẫn gây ra sự cố trong khoảng trắng ở đầu dòng. Bạn cũng có thể chạy module :mod:`tabnanny` để kiểm tra một cây thư mục ở chế độ xử lý hàng loạt.
 
 
-How do I check for a keypress without blocking?
------------------------------------------------
+Làm thế nào để kiểm tra thao tác nhấn phím mà không chặn?
+---------------------------------------------------------
 
-Use the :mod:`msvcrt` module.  This is a standard Windows-specific extension module.
-It defines a function ``kbhit()`` which checks whether a keyboard hit is
-present, and ``getch()`` which gets one character without echoing it.
+Sử dụng module :mod:`msvcrt`. Đây là một extension module tiêu chuẩn dành riêng cho Windows. Module này định nghĩa một hàm ``kbhit()`` để kiểm tra xem có thao tác nhấn phím nào hay không, và ``getch()`` để lấy một ký tự mà không hiển thị ký tự đó.
 
-How do I solve the missing api-ms-win-crt-runtime-l1-1-0.dll error?
--------------------------------------------------------------------
+Làm thế nào để khắc phục lỗi thiếu api-ms-win-crt-runtime-l1-1-0.dll?
+---------------------------------------------------------------------
 
-This can occur on Python 3.5 and later when using Windows 8.1 or earlier without all updates having been installed.
-First ensure your operating system is supported and is up to date, and if that does not resolve the issue,
-visit the `Microsoft support page <https://support.microsoft.com/en-us/help/3118401/>`_
-for guidance on manually installing the C Runtime update.
+Điều này có thể xảy ra trên Python 3.5 trở lên khi sử dụng Windows 8.1 hoặc phiên bản cũ hơn mà chưa cài đặt đầy đủ mọi bản cập nhật. Trước tiên, hãy đảm bảo hệ điều hành của bạn được hỗ trợ và đã cập nhật, và nếu cách này không giải quyết được sự cố, hãy truy cập `trang hỗ trợ của Microsoft <https://support.microsoft.com/en-us/help/3118401/>`_ để được hướng dẫn cài đặt thủ công bản cập nhật C Runtime.
+
+.. _`Microsoft support page`: https://support.microsoft.com/en-us/help/3118401/
