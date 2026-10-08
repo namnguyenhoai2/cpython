@@ -4,13 +4,13 @@
 {%- endblock -%}
 {%- block extrahead -%}
     {{ super() }}
-    <meta property="og:title" content="Python {{ version }} documentation">
+    <meta property="og:title" content="Tài liệu Python {{ version }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://docs.python.org/3/">
-    <meta property="og:site_name" content="Python documentation">
-    <meta property="og:description" content="The official Python documentation.">
+    <meta property="og:site_name" content="Tài liệu Python">
+    <meta property="og:description" content="Tài liệu chính thức của Python.">
     <meta property="og:image" content="https://docs.python.org/3/_static/og-image.png">
-    <meta name="description" content="The official Python documentation.">
+    <meta name="description" content="Tài liệu chính thức của Python.">
     <meta property="og:image:width" content="200">
     <meta property="og:image:height" content="200">
     <meta name="theme-color" content="#3776ab">
@@ -47,87 +47,87 @@
 {% block body %}
   <h1>{{ docstitle|e }}</h1>
   <p>
-  {% trans %}Welcome! This is the official documentation for Python {{ release }}.{% endtrans %}
+  {% trans %}Chào mừng! Đây là tài liệu chính thức cho Python {{ release }}.{% endtrans %}
   </p>
-  <p><strong>{% trans %}Documentation sections:{% endtrans %}</strong></p>
+  <p><strong>{% trans %}Các phần tài liệu:{% endtrans %}</strong></p>
   <div class="contentstable">
     <ul>
-      <li class="biglink"><a class="biglink" href="{{ pathto("whatsnew/" + version) }}">{% trans %}What's new in Python {{ version }}?{% endtrans %}</a><br>
-         <span class="linkdescr"> {% trans whatsnew_index=pathto("whatsnew/index") %}Or <a href="{{ whatsnew_index }}">all "What's new" documents since Python 2.0</a>{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("tutorial/index") }}">{% trans %}Tutorial{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Start here: a tour of Python's syntax and features{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("builtins/index") }}">{% trans %}Built-ins reference{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Built-in functions and classes{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("library/index") }}">{% trans %}Library reference{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Standard library modules{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("reference/index") }}">{% trans %}Language reference{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Syntax and language elements{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("using/index") }}">{% trans %}Python setup and usage{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}How to install, configure, and use Python{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("whatsnew/" + version) }}">{% trans %}Có gì mới trong Python {{ version }}?{% endtrans %}</a><br>
+         <span class="linkdescr"> {% trans whatsnew_index=pathto("whatsnew/index") %}Hoặc <a href="{{ whatsnew_index }}">tất cả tài liệu "Có gì mới" kể từ Python 2.0</a>{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("tutorial/index") }}">{% trans %}Hướng dẫn{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Bắt đầu tại đây: khám phá cú pháp và tính năng của Python{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("builtins/index") }}">{% trans %}Tham chiếu các thành phần dựng sẵn{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Các hàm và lớp dựng sẵn{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("library/index") }}">{% trans %}Tham chiếu thư viện{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Các mô-đun thư viện chuẩn{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("reference/index") }}">{% trans %}Tham chiếu ngôn ngữ{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Cú pháp và các thành phần ngôn ngữ{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("using/index") }}">{% trans %}Cài đặt và sử dụng Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Cách cài đặt, cấu hình và sử dụng Python{% endtrans %}</span></li>
     </ul>
     <ul>
-      <li class="biglink"><a class="biglink" href="{{ pathto("howto/index") }}">{% trans %}Python HOWTOs{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}In-depth topic manuals{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("installing/index") }}">{% trans %}Installing Python modules{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Third-party modules and PyPI.org{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("extending/index") }}">{% trans %}Extending and embedding{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}For C/C++ programmers{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("c-api/index") }}">{% trans %}Python's C API{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}C API reference{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("faq/index") }}">{% trans %}FAQs{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Frequently asked questions (with answers!){% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("deprecations/index") }}">{% trans %}Deprecations{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Deprecated functionality{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("howto/index") }}">{% trans %}Các hướng dẫn HOWTO về Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Hướng dẫn chuyên sâu theo chủ đề{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("installing/index") }}">{% trans %}Cài đặt mô-đun Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Các mô-đun bên thứ ba và PyPI.org{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("extending/index") }}">{% trans %}Mở rộng và nhúng{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Dành cho lập trình viên C/C++{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("c-api/index") }}">{% trans %}C API của Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Tham chiếu C API{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("faq/index") }}">{% trans %}Câu hỏi thường gặp{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Các câu hỏi thường gặp (kèm lời giải đáp!){% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("deprecations/index") }}">{% trans %}Các tính năng không còn được dùng{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Chức năng không còn được dùng{% endtrans %}</span></li>
     </ul>
   </div>
 
-  <p><strong>{% trans %}Other resources:{% endtrans %}</strong></p>
+  <p><strong>{% trans %}Tài nguyên khác:{% endtrans %}</strong></p>
   <div class="contentstable">
     <ul>
-      <li class="biglink"><a class="biglink" href="https://devguide.python.org">{% trans %}Python developer's guide{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Information on contributing to Python{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="https://packaging.python.org">{% trans %}Python Packaging User Guide{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Resources relating to Python packaging{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="https://www.python.org/doc/av/">{% trans %}Audio/visual talks{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Podcasts, talks, and video presentations from the community{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="https://devguide.python.org">{% trans %}Hướng dẫn cho nhà phát triển Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Thông tin về việc đóng góp cho Python{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="https://packaging.python.org">{% trans %}Hướng dẫn đóng gói Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Tài nguyên liên quan đến việc đóng gói Python{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="https://www.python.org/doc/av/">{% trans %}Bài nói chuyện âm thanh/hình ảnh{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Podcast, bài nói chuyện và video trình bày từ cộng đồng{% endtrans %}</span></li>
     </ul>
     <ul>
-      <li class="biglink"><a class="biglink" href="https://peps.python.org/">{% trans %}Python Enhancement Proposals{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Index of proposed improvements to Python{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="https://typing.python.org">{% trans %}Static Typing with Python{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Information and guides about Python type safety{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="https://peps.python.org/">{% trans %}Đề xuất cải tiến Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Chỉ mục các đề xuất cải tiến Python{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="https://typing.python.org">{% trans %}Kiểu tĩnh trong Python{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Thông tin và hướng dẫn về an toàn kiểu trong Python{% endtrans %}</span></li>
     </ul>
   </div>
 
-  <p><strong>{% trans %}Indices, glossary, and search:{% endtrans %}</strong></p>
+  <p><strong>{% trans %}Các chỉ mục, bảng thuật ngữ và tìm kiếm:{% endtrans %}</strong></p>
   <div class="contentstable">
     <ul>
-      <li class="biglink"><a class="biglink" href="{{ pathto("py-modindex") }}">{% trans %}Global module index{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}All modules and libraries{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("genindex") }}">{% trans %}General index{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}All functions, classes, and terms{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("glossary") }}">{% trans %}Glossary{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Terms explained{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("py-modindex") }}">{% trans %}Chỉ mục mô-đun toàn cục{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Tất cả mô-đun và thư viện{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("genindex") }}">{% trans %}Chỉ mục tổng quát{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Tất cả hàm, lớp và thuật ngữ{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("glossary") }}">{% trans %}Bảng thuật ngữ{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Giải thích các thuật ngữ{% endtrans %}</span></li>
     </ul>
     <ul>
-      <li class="biglink"><a class="biglink" href="{{ pathto("search") }}">{% trans %}Search page{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}Search this documentation{% endtrans %}</span></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("contents") }}">{% trans %}Complete table of contents{% endtrans %}</a><br>
-         <span class="linkdescr">{% trans %}All sections and subsections{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("search") }}">{% trans %}Trang tìm kiếm{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Tìm kiếm trong tài liệu này{% endtrans %}</span></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("contents") }}">{% trans %}Mục lục đầy đủ{% endtrans %}</a><br>
+         <span class="linkdescr">{% trans %}Tất cả phần và phần con{% endtrans %}</span></li>
     </ul>
   </div>
 
-  <p><strong>{% trans %}Project information:{% endtrans %}</strong></p>
+  <p><strong>{% trans %}Thông tin dự án:{% endtrans %}</strong></p>
   <div class="contentstable">
     <ul>
-      <li class="biglink"><a class="biglink" href="{{ pathto("bugs") }}">{% trans %}Reporting issues{% endtrans %}</a></li>
-      <li class="biglink"><a class="biglink" href="https://devguide.python.org/documentation/help-documenting/">{% trans %}Contributing to docs{% endtrans %}</a></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("download") }}">{% trans %}Download the documentation{% endtrans %}</a></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("bugs") }}">{% trans %}Báo cáo vấn đề{% endtrans %}</a></li>
+      <li class="biglink"><a class="biglink" href="https://devguide.python.org/documentation/help-documenting/">{% trans %}Đóng góp cho tài liệu{% endtrans %}</a></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("download") }}">{% trans %}Tải tài liệu xuống{% endtrans %}</a></li>
     </ul>
     <ul>
-      <li class="biglink"><a class="biglink" href="{{ pathto("license") }}">{% trans %}History and license of Python{% endtrans %}</a></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("copyright") }}">{% trans %}Copyright{% endtrans %}</a></li>
-      <li class="biglink"><a class="biglink" href="{{ pathto("about") }}">{% trans %}About the documentation{% endtrans %}</a></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("license") }}">{% trans %}Lịch sử và giấy phép của Python{% endtrans %}</a></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("copyright") }}">{% trans %}Bản quyền{% endtrans %}</a></li>
+      <li class="biglink"><a class="biglink" href="{{ pathto("about") }}">{% trans %}Giới thiệu về tài liệu{% endtrans %}</a></li>
     </ul>
   </div>
 {% endblock %}

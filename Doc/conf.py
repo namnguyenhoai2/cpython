@@ -276,6 +276,7 @@ html_theme_options = {
     'issues_url': '/bugs.html',
     'license_url': '/license.html',
     'root_include_title': False,  # We use the version switcher instead.
+    'root_url': 'https://docs.300baicodethieunhi.com/python/v3.14.8/index.html',
 }
 
 if os.getenv("READTHEDOCS"):

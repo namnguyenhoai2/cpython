@@ -3,17 +3,17 @@
 {% block header %}
 {%- if outdated %}
 <div id="outdated-warning" style="padding: .5em; text-align: center; background-color: #FFBABA; color: #6A0E0E;">
-    {% trans %}This document is for an old version of Python that is no longer supported.
-    You should upgrade, and read the{% endtrans %}
-    <a href="/3/{{ pagename }}{{ file_suffix }}">{% trans %}Python documentation for the current stable release{% endtrans %}</a>.
+    {% trans %}Tài liệu này dành cho một phiên bản Python cũ không còn được hỗ trợ.
+    Bạn nên nâng cấp và đọc{% endtrans %}
+    <a href="/3/{{ pagename }}{{ file_suffix }}">{% trans %}tài liệu Python cho bản phát hành ổn định hiện tại{% endtrans %}</a>.
 </div>
 {%- endif %}
 
 {%- if is_deployment_preview %}
 <div id="deployment-preview-warning" style="padding: .5em; text-align: center; background-color: #fff2ba; color: #6a580e;">
-  {% trans %}This is a deploy preview created from a <a href="{{ repository_url }}/pull/{{ pr_id }}">pull request</a>.
-  For authoritative documentation, see{% endtrans %}
-  <a href="https://docs.python.org/3/{{ pagename }}{{ file_suffix }}">{% trans %}the current stable release{% endtrans %}</a>.
+  {% trans %}Đây là bản xem trước triển khai được tạo từ một <a href="{{ repository_url }}/pull/{{ pr_id }}">yêu cầu kéo</a>.
+  Để xem tài liệu chính thức, hãy xem{% endtrans %}
+  <a href="https://docs.python.org/3/{{ pagename }}{{ file_suffix }}">bản phát hành ổn định hiện tại{% endtrans %}</a>.
 </div>
 {%- endif %}
 {% endblock %}

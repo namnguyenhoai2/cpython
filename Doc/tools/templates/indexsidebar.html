@@ -1,8 +1,8 @@
-<h3>{% trans %}Download{% endtrans %}</h3>
-<p><a href="{{ pathto('download') }}">{% trans %}Download the documentation{% endtrans %}</a></p>
-<h3>{% trans %}Docs by version{% endtrans %}</h3>
+<h3>{% trans %}Tải xuống{% endtrans %}</h3>
+<p><a href="{{ pathto('download') }}">{% trans %}Tải tài liệu xuống{% endtrans %}</a></p>
+<h3>{% trans %}Tài liệu theo phiên bản{% endtrans %}</h3>
 <ul>
   {# _docs_by_version.html is overwritten by build_docs.py for non-EOL versions #}
   {% include "_docs_by_version.html" without context %}
-  <li><a href="https://www.python.org/doc/versions/">{% trans %}All versions{% endtrans %}</a></li>
+  <li><a href="https://www.python.org/doc/versions/">{% trans %}Tất cả phiên bản{% endtrans %}</a></li>
 </ul>
