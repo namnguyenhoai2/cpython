@@ -13,7 +13,7 @@
 <div id="deployment-preview-warning" style="padding: .5em; text-align: center; background-color: #fff2ba; color: #6a580e;">
   {% trans %}Đây là bản xem trước triển khai được tạo từ một <a href="{{ repository_url }}/pull/{{ pr_id }}">yêu cầu kéo</a>.
   Để xem tài liệu chính thức, hãy xem{% endtrans %}
-  <a href="https://docs.python.org/3/{{ pagename }}{{ file_suffix }}">bản phát hành ổn định hiện tại{% endtrans %}</a>.
+  <a href="https://docs.python.org/3/{{ pagename }}{{ file_suffix }}">{% trans %}bản phát hành ổn định hiện tại{% endtrans %}</a>.
 </div>
 {%- endif %}
 {% endblock %}

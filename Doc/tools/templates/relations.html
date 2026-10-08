@@ -1,0 +1,15 @@
+{# Sphinx sidebar template: relation links. #}
+{%- if prev %}
+  <div>
+    <h4>{{ _('Chủ đề trước') }}</h4>
+    <p class="topless"><a href="{{ prev.link|e }}"
+                          title="{{ _('chương trước') }}">{{ prev.title }}</a></p>
+  </div>
+{%- endif %}
+{%- if next %}
+  <div>
+    <h4>{{ _('Chủ đề tiếp theo') }}</h4>
+    <p class="topless"><a href="{{ next.link|e }}"
+                          title="{{ _('chương tiếp theo') }}">{{ next.title }}</a></p>
+  </div>
+{%- endif %}
